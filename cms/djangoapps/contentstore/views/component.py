@@ -27,6 +27,11 @@ from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from cms.djangoapps.contentstore.toggles import use_new_problem_editor
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
+try:
+    # Technically this is a django app plugin, so we should not error if it's not installed:
+    import openedx.core.djangoapps.content_staging.api as content_staging_api
+except ImportError:
+    content_staging_api = None
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -185,6 +190,12 @@ def container_handler(request, usage_key_string):
                     break
                 index += 1
 
+            # Get the status of the user's clipboard so they can paste components if they have something to paste
+            if content_staging_api:
+                user_clipboard = content_staging_api.get_user_clipboard_status_json(request.user.id, request)
+            else:
+                user_clipboard = {"content": None}
+
             return render_to_response('container.html', {
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
@@ -205,7 +216,9 @@ def container_handler(request, usage_key_string):
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
-                'templates': CONTAINER_TEMPLATES
+                'templates': CONTAINER_TEMPLATES,
+                # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
+                'user_clipboard': user_clipboard,
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")

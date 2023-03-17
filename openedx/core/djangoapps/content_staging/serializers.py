@@ -16,7 +16,7 @@ class StagedContentSerializer(serializers.ModelSerializer):
         model = StagedContent
         fields = [
             'id',
-            'user',
+            'user_id',
             'created',
             'purpose',
             'status',

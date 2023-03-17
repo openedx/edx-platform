@@ -72,6 +72,7 @@ from ..utils import (
 from .helpers import (
     create_xblock,
     get_parent_xblock,
+    import_staged_content_from_user_clipboard,
     is_unit,
     usage_key_with_run,
     xblock_primary_child_category,
@@ -169,6 +170,8 @@ def xblock_handler(request, usage_key_string=None):
                 :display_name: name for new xblock, optional
                 :boilerplate: template name for populating fields, optional and only used
                      if duplicate_source_locator is not present
+                :staged_content: use "clipboard" to paste from the OLX user's clipboard. (Incompatible with all other
+                     fields except parent_locator)
               The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
     if usage_key_string:
@@ -700,6 +703,14 @@ def _create_block(request):
     usage_key = usage_key_with_run(parent_locator)
     if not has_studio_write_access(request.user, usage_key.course_key):
         raise PermissionDenied()
+
+    if request.json.get('staged_content') == "clipboard":
+        created_xblock = import_staged_content_from_user_clipboard(parent_key=usage_key, user=request.user)
+        if created_xblock is None:
+            return HttpResponseBadRequest("User clipboard empty or invalid", content_type="text/plain")
+        return JsonResponse(
+            {'locator': str(created_xblock.location), 'courseKey': str(created_xblock.location.course_key)}
+        )
 
     category = request.json['category']
     if isinstance(usage_key, LibraryUsageLocator):

@@ -1953,9 +1953,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         the definition, structure, nor course if they didn't change.
         """
         partitioned_fields = self.partition_xblock_fields_by_scope(descriptor)
+        definition_locator = getattr(descriptor, "definition_locator", None)
+        if definition_locator is None and not allow_not_found:
+            raise AttributeError("descriptor is missing expected definition_locator from caching descriptor system")
         return self._update_item_from_fields(
             user_id, descriptor.location.course_key, BlockKey.from_usage_key(descriptor.location),
-            partitioned_fields, descriptor.definition_locator, allow_not_found, force, **kwargs
+            partitioned_fields, definition_locator, allow_not_found, force, **kwargs
         ) or descriptor
 
     def _update_item_from_fields(self, user_id, course_key, block_key, partitioned_fields,    # pylint: disable=too-many-statements
@@ -2162,7 +2165,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         partitioned_fields = self.partition_xblock_fields_by_scope(xblock)
         new_def_data = self._serialize_fields(xblock.category, partitioned_fields[Scope.content])
         is_updated = False
-        if xblock.definition_locator is None or isinstance(xblock.definition_locator.definition_id, LocalId):
+        current_definition_locator = getattr(xblock, "definition_locator", xblock.scope_ids.def_id)
+        if current_definition_locator is None or isinstance(current_definition_locator.definition_id, LocalId):
             xblock.definition_locator = self.create_definition_from_data(
                 course_key, new_def_data, xblock.category, user_id
             )
