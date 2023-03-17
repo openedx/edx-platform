@@ -1,9 +1,11 @@
+"""
+REST API views for content staging
+"""
 import logging
 
 from django.db.transaction import atomic
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext as _
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
@@ -31,15 +33,12 @@ class StagedContentOLXEndpoint(APIView):
     API Endpoint to get the OLX of any given StagedContent.
     """
 
-    def get(self, request, id):
+    def get(self, request, id):  # pylint: disable=redefined-builtin
         """
         Get the OLX of the given StagedContent object.
         """
-        staged_content = get_object_or_404(StagedContent,
-            # Users can only access their own staged content:
-            user=request.user.id,
-            pk=id,
-        )
+        # Users can only access their own staged content:
+        staged_content = get_object_or_404(StagedContent, user=request.user.id, pk=id)
         if staged_content.status != StagedContent.Status.READY:
             # If the status is LOADING, the OLX may not be generated/valid yet.
             # If the status is ERROR or EXPIRED, this row is no longer usable.
@@ -59,7 +58,7 @@ class ClipboardEndpoint(APIView):
 
     @atomic
     @apidocs.schema(
-        responses = {
+        responses={
             200: UserClipboardSerializer,
         }
     )
@@ -113,8 +112,8 @@ class ClipboardEndpoint(APIView):
         # Get the OLX of the content
         try:
             block = modulestore().get_item(usage_key)
-        except ItemNotFoundError:
-            raise NotFound("The requested usage key does not exist.")
+        except ItemNotFoundError as exc:
+            raise NotFound("The requested usage key does not exist.") from exc
         block_data = XBlockSerializer(block)
 
         with atomic():
@@ -139,5 +138,5 @@ class ClipboardEndpoint(APIView):
             # Return the current clipboard exactly as if GET was called:
             serializer = UserClipboardSerializer(clipboard, context={"request": request})
             # Log an event so we can analyze how this feature is used:
-            log.info(f"User {request.user.id} copied {usage_key.block_type} component \"{usage_key}\" to their clipboard.")
+            log.info(f"Copied {usage_key.block_type} component \"{usage_key}\" to their clipboard.")
             return Response(serializer.data)

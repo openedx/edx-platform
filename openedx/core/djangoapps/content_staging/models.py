@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 
 User = get_user_model()
 
+
 class StagedContent(models.Model):
     """
     Each StagedContent instance represents a "piece" of content (e.g. a single
