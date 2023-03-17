@@ -118,6 +118,21 @@ class TahoeUserMetadataProcessor(object):
         else:
             return {}
 
+    def _get_idp_metadata_from_tpa_pipeline(self):
+        """Check ThirdPartyAuth pipeline for details containing IdP metadata."""
+        import crum
+        from third_party_auth import pipeline
+        try:
+            request = crum.get_current_request()
+            tpa_running = pipeline.running(request)
+            if not tpa_running:
+                return None
+            tpa = pipeline.get(request)
+            details = tpa['kwargs'].get('details')
+            return details.get('tahoe_idp_metadata', {})
+        except:
+            return None
+
     def _get_custom_registration_metadata(self, user_id):
         """
         Get any custom registration field data for the User.
@@ -136,10 +151,18 @@ class TahoeUserMetadataProcessor(object):
         try:
             profile = UserProfile.objects.get(user__id=user_id)
         except UserProfile.DoesNotExist:
-            logger.info("User {user_id} has no UserProfile".format(user_id=user_id))
             return {}
-        meta = profile.get_meta()
-        idp_metadata = meta.get("tahoe_idp_metadata", {})
+        else:
+            meta = profile.get_meta()
+            idp_metadata = meta.get("tahoe_idp_metadata", {})
+            if not idp_metadata:
+                logger.info("User {user_id} has no IDP metadata yet".format(user_id=user_id))
+                # We could be processing an event (e.g., course enrollment) on very first User.save()
+                # This can happen  before UserProfile has been updated via tahoe_idp TPA step.
+                # Try getting it direclty from TPA pipeline.
+                idp_metadata = self._get_idp_metadata_from_tpa_pipeline()
+                if not idp_metadata:
+                    return {}
         custom_reg_data = idp_metadata.get("registration_additional")
         userprofile_metadata_cache.set_by_user_id(user_id, idp_metadata)
         return custom_reg_data
