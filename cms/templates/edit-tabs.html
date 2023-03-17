@@ -38,7 +38,18 @@
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button new-button new-tab"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("New Page")}</a>
+          <a
+            href="#"
+            class="button new-button new-tab"
+            onclick="mixpanel.track('create_page',
+                    {
+                        'service': 'studio',
+                        'screen_name': 'pages',
+                        'organization': '${platform_name}',
+                    }
+                );"
+          >
+          <span class="icon fa fa-plus" aria-hidden="true"></span> ${_("New Page")}</a>
         </li>
         <li class="nav-item">
           <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
@@ -140,6 +151,7 @@
                     {
                         'service': 'studio',
                         'screen_name': 'pages',
+                        'organization': '${platform_name}',
                     }
                 );"
                 >

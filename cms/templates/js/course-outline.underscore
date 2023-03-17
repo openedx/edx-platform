@@ -147,6 +147,7 @@ if (is_proctored_exam) {
                                 {
                                     'service': 'studio',
                                     'screen_name': 'course_outline',
+                                    'organization': <%- platform_name %>,
                                 }
                             );"
                         >

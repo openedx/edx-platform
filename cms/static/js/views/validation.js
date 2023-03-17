@@ -120,9 +120,10 @@ define(['edx-ui-toolkit/js/utils/html-utils',
                                 primaryClick();
                                 self.confirmation.hide();
                                 self.notificationBarShowing = false;
-                                mixpanel.track('advanced_setting_saved', {
+                                mixpanel.track('advanced_settings_saved', {
                                     service: 'studio',
                                     screen_name: 'advanced_settings',
+                                    organization: platform_name
                                 })
                             }
                         },

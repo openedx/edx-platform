@@ -125,6 +125,7 @@
                             onclick: mixpanel.track('add_cohort', {
                                 service: 'lms',
                                 screen_name: 'cohorts',
+                                organization: platform_name
                             })
                         });
                     }
