@@ -36,7 +36,7 @@ matplotlib==3.3.4
     # via
     #   -c requirements/edx-sandbox/../constraints.txt
     #   -r requirements/edx-sandbox/py38.in
-mpmath==1.2.1
+mpmath==1.3.0
     # via sympy
 networkx==3.0
     # via -r requirements/edx-sandbox/py38.in
@@ -83,5 +83,5 @@ sympy==1.11.1
     # via
     #   -r requirements/edx-sandbox/py38.in
     #   openedx-calc
-tqdm==4.64.1
+tqdm==4.65.0
     # via nltk

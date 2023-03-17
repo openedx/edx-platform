@@ -81,5 +81,12 @@ pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticke
 # Deprecated version of the AWS SDK;
 # we should stop using this
 boto==2.39.0
-boto3==1.4.8                        # Amazon Web Services SDK for Python
-botocore==1.8.17                    # via boto3, s3transfer
+boto3==1.7.0                       # Amazon Web Services SDK for Python
+botocore==1.10.84                  # via boto3, s3transfer
+
+# adding these constraints to minimize boto3 and botocore changeset
+social-auth-core==4.3.0
+babel==2.11.0
+social-auth-app-django==5.0.0
+algoliasearch==2.6.3
+django-ipware==4.0.2
