@@ -1,15 +1,14 @@
 """
 Models for content staging (and clipboard)
 """
-from __future__ import annotations  # in lieu of typing.Self
 import logging
-# from typing import Self # Needs Python 3.11
 
-from defusedxml import ElementTree
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from opaque_keys.edx.django.models import LearningContextKeyField
+from opaque_keys.edx.django.models import UsageKeyField
+from opaque_keys.edx.keys import LearningContextKey
 
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
@@ -55,7 +54,7 @@ class StagedContent(models.Model):
 
     block_type = models.CharField(
         max_length=100,
-        help_text=("""
+        help_text=_("""
             What type of content is staged. Only OLX content is supported, and
             this field must be the same as the root tag of the OLX.
             e.g. "video" if a video is staged, or "vertical" for a unit.
@@ -64,55 +63,55 @@ class StagedContent(models.Model):
     olx = models.TextField(null=False, blank=False)
     # The display name of whatever item is staged here, i.e. the root XBlock.
     display_name = models.CharField(max_length=1024)
-    # What course or library this content comes from, if it exists in the CMS already. If it doesn't, leave this blank.
-    source_context = LearningContextKeyField(max_length=255)
+    # A _suggested_ URL name to use for this content. Since this suggestion may already be in use, it's fine to generate
+    # a new url_name instead.
+    suggested_url_name = models.CharField(max_length=1024)
 
-    def _get_url_name(self) -> str:
-        """
-        Get the url_name from the OLX, if it's set on the root node. May return
-        an empty string.
-        """
-        try:
-            root_node = ElementTree.fromstring(self.olx)
-            return root_node.attrib.get("url_name", "")
-        except ElementTree.ParseError as err:
-            log.warning(f"StagedContent: Unable to parse OLX to get url_name", exc_info=err)
-            return ""
-        
     @property
     def olx_filename(self) -> str:
         """ Get a filename that can be used for the OLX content of this staged content """
-        return f"{self._get_url_name() or self.block_type}.xml"
+        return f"{self.suggested_url_name}.xml"
+
+
+class UserClipboard(models.Model):
+    """
+    Each user has a clipboard that can hold one item at a time, where an item
+    is some OLX content that can be used in a course, such as an XBlock, a Unit,
+    or a Subsection.
+    """
+    # The user that copied something. Clipboards are user-specific and
+    # previously copied items are not kept.
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    content = models.ForeignKey(StagedContent, on_delete=models.CASCADE)
+    source_usage_key = UsageKeyField(
+        max_length=255,
+        help_text=_("Original usage key/ID of the thing that is in the clipboard."),
+    )
+
+    @property
+    def source_context_key(self) -> LearningContextKey:
+        """ Get the context (course/library) that this was copied from """
+        return self.source_usage_key.context_key
 
     def get_source_context_title(self) -> str:
         """ Get the title of the source context, if any """
-        if self.source_context and self.source_context.is_course:
-            course_overview = get_course_overview_or_none(self.source_context)
+        if self.source_context_key.is_course:
+            course_overview = get_course_overview_or_none(self.source_context_key)
             if course_overview:
                 return course_overview.display_name_with_default
         # Just return the ID as the name, if it's empty or is not a course.
-        return self.source_context
+        return str(self.source_context_key)
 
-    @classmethod
-    def get_clipboard_content(cls, user_id: int) -> StagedContent|None:
-        """ Get the current clipboard contents for the specified user """
-        return cls.objects.filter(
-            user_id=user_id,
-            purpose=cls.Purpose.CLIPBOARD,
-        ).order_by("-created").first()
+    def clean(self):
+        """ Check that this model is being used correctly. """
+        # These could probably be replaced with constraints in Django 4.1+
+        if self.user.id != self.content.user.id:
+            raise ValidationError("User ID mismatch.")
+        if self.content.purpose != StagedContent.Purpose.CLIPBOARD:
+            raise ValidationError("StagedContent.purpose must be Purpose.CLIPBOARD to use it as clipboard content.")
 
-
-# class UserClipboard(models.Model):
-#     """
-#     Each user has a clipboard that can hold one item at a time, where an item
-#     is some OLX content that can be used in a course, such as an XBlock, a Unit,
-#     or a Subsection.
-#     """
-#     # The user that copied something. Clipboards are user-specific and
-#     # previously copied items are not kept.
-#     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-#     content = models.ForeignKey(StagedContent, on_delete=models.CASCADE)
-
-
-
-
+    def save(self, *args, **kwargs):
+        """ Save this model instance """
+        # Enforce checks on save:
+        self.full_clean()
+        return super().save(*args, **kwargs)

@@ -304,7 +304,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     clipboardEndpoint,
                     { usage_key: usageKeyToCopy },
                 ).then((data) => {
-                    const status = data.staged_content?.status;
+                    const status = data.content?.status;
                     if (status === "ready") {
                         // The XBlock has been copied and is ready to use.
                         return data;
@@ -314,7 +314,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                         const deferred = $.Deferred();
                         const checkStatus = () => {
                             $.getJSON(clipboardEndpoint, (pollData) => {
-                                const newStatus = pollData.staged_content?.status;
+                                const newStatus = pollData.content?.status;
                                 if (newStatus === "ready") {
                                     deferred.resolve(pollData);
                                 } else if (newStatus === "loading") {

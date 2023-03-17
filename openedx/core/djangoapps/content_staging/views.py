@@ -19,7 +19,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .block_serializer import XBlockSerializer
-from .models import StagedContent
+from .models import StagedContent, UserClipboard
 from .serializers import UserClipboardSerializer
 
 log = logging.getLogger(__name__)
@@ -68,8 +68,12 @@ class ClipboardEndpoint(APIView):
         Get the status of the user's clipboard. (Is there any content in the
         clipboard, and if so what?) This does not return the OLX.
         """
-        staged_content = StagedContent.get_clipboard_content(request.user.id)
-        serializer = UserClipboardSerializer({"staged_content": staged_content}, context={"request": request})
+        try:
+            clipboard = UserClipboard.objects.get(user=request.user.id)
+        except UserClipboard.DoesNotExist:
+            # This user does not have any content on their clipboard.
+            return Response({"content": None, "source_usage_key": "", "source_context_title": ""})
+        serializer = UserClipboardSerializer(clipboard, context={"request": request})
         return Response(serializer.data)
 
     @apidocs.schema(
@@ -119,14 +123,19 @@ class ClipboardEndpoint(APIView):
                 status=StagedContent.Status.EXPIRED,
             )
             # Insert a new StagedContent row for this
-            StagedContent.objects.create(
+            staged_content = StagedContent.objects.create(
                 user=request.user,
                 purpose=StagedContent.Purpose.CLIPBOARD,
                 status=StagedContent.Status.READY,
                 block_type=usage_key.block_type,
                 olx=block_data.olx_str,
                 display_name=block_metadata_utils.display_name_with_default(block),
-                source_context=usage_key.context_key,
+                suggested_url_name=usage_key.block_id,
             )
+            (clipboard, _created) = UserClipboard.objects.update_or_create(user=request.user, defaults={
+                "content": staged_content,
+                "source_usage_key": usage_key,
+            })
             # Return the current clipboard exactly as if GET was called:
-            return self.get(request)
+            serializer = UserClipboardSerializer(clipboard, context={"request": request})
+            return Response(serializer.data)
