@@ -138,4 +138,6 @@ class ClipboardEndpoint(APIView):
             })
             # Return the current clipboard exactly as if GET was called:
             serializer = UserClipboardSerializer(clipboard, context={"request": request})
+            # Log an event so we can analyze how this feature is used:
+            log.info(f"User {request.user.id} copied {usage_key.block_type} component \"{usage_key}\" to their clipboard.")
             return Response(serializer.data)
