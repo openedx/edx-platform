@@ -22,7 +22,6 @@ class XBlockSerializer:
     """
     # TEMP: this needs to be consolidated with the XBlockSerializer in olx_rest_api.
     # i.e. have one base serializer, and a derived blockstore serializer
-    # There is no docstring to create a pylint error so this doesn't get merged as is.
 
     def __init__(self, block):
         """
