@@ -29,6 +29,9 @@ class StagedContent(models.Model):
     pasted if its status is READY.
     """
 
+    class Meta:
+        verbose_name_plural = _("Staged Content")
+
     class Purpose(models.TextChoices):
         """ The purpose of this staged content. """
         CLIPBOARD = "clipboard", _("Clipboard")
@@ -72,6 +75,10 @@ class StagedContent(models.Model):
     def olx_filename(self) -> str:
         """ Get a filename that can be used for the OLX content of this staged content """
         return f"{self.suggested_url_name}.xml"
+
+    def __str__(self):
+        """ String representation of this instance """
+        return f'Staged {self.block_type} block "{self.display_name}" ({self.status})'
 
 
 class UserClipboard(models.Model):

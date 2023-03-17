@@ -29,6 +29,9 @@ class Migration(migrations.Migration):
                 ('suggested_url_name', models.CharField(max_length=1024)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
+            options={
+                'verbose_name_plural': 'Staged Content',
+            },
         ),
         migrations.CreateModel(
             name='UserClipboard',
