@@ -261,7 +261,7 @@ django-config-models==2.3.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==3.14.0
+django-cors-headers==3.13.0
     # via -r requirements/edx/base.in
 django-countries==7.5.1
     # via
