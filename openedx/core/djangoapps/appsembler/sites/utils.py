@@ -88,9 +88,11 @@ def get_active_organizations():
 
     TODO: This helper should live in a future Tahoe Sites package.
     """
-    active_tiers_uuids = get_active_organizations_uuids()
-
-    return get_organizations_from_uuids(uuids=active_tiers_uuids)
+    if settings.FEATURES.get('ENABLE_TIERS_APP', False):
+        active_tiers_uuids = get_active_organizations_uuids()
+        return get_organizations_from_uuids(uuids=active_tiers_uuids)
+    else:
+        return Organization.objects.all()
 
 
 def get_active_sites(order_by='domain'):
