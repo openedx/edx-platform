@@ -37,8 +37,9 @@ class StagedContentOLXEndpoint(APIView):
         """
         Get the OLX of the given StagedContent object.
         """
-        # Users can only access their own staged content:
-        staged_content = get_object_or_404(StagedContent, user=request.user.id, pk=id)
+        staged_content = get_object_or_404(StagedContent, pk=id)
+        if staged_content.user.id != request.user.id:
+            raise PermissionDenied("Users can only access their own staged content")
         if staged_content.status != StagedContent.Status.READY:
             # If the status is LOADING, the OLX may not be generated/valid yet.
             # If the status is ERROR or EXPIRED, this row is no longer usable.
