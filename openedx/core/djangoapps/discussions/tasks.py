@@ -232,4 +232,3 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         args=[str(course_key)],
         countdown=300,
     )
-
