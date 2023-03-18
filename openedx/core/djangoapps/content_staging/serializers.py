@@ -35,3 +35,11 @@ class UserClipboardSerializer(serializers.Serializer):
     source_usage_key = serializers.CharField(allow_blank=True)
     # The title of the course that the content came from originally, if relevant
     source_context_title = serializers.CharField(allow_blank=True, source="get_source_context_title")
+
+
+class PostToClipboardSerializer(serializers.Serializer):
+    """
+    Serializer for the POST request body when putting a new XBlock into the
+    user's clipboard.
+    """
+    usage_key = serializers.CharField(help_text="Usage key to copy into the clipboard")

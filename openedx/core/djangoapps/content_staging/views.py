@@ -22,7 +22,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .block_serializer import XBlockSerializer
 from .models import StagedContent, UserClipboard
-from .serializers import UserClipboardSerializer
+from .serializers import UserClipboardSerializer, PostToClipboardSerializer
 
 log = logging.getLogger(__name__)
 
@@ -65,8 +65,7 @@ class ClipboardEndpoint(APIView):
     )
     def get(self, request):
         """
-        Get the status of the user's clipboard. (Is there any content in the
-        clipboard, and if so what?) This does not return the OLX.
+        Get the detailed status of the user's clipboard. This does not return the OLX.
         """
         try:
             clipboard = UserClipboard.objects.get(user=request.user.id)
@@ -77,13 +76,7 @@ class ClipboardEndpoint(APIView):
         return Response(serializer.data)
 
     @apidocs.schema(
-        parameters=[
-            apidocs.string_parameter(
-                "usage_key",
-                apidocs.ParameterLocation.BODY,
-                description="Usage key to copy into the clipboard",
-            ),
-        ],
+        body=PostToClipboardSerializer,
         responses={
             200: UserClipboardSerializer,
             403: "You do not have permission to read the specified usage key.",
