@@ -14642,6 +14642,14 @@ msgstr "E-mail"
 msgid "Return To %s"
 msgstr "Voltar Para %s"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -15025,6 +15033,12 @@ msgstr "Transferências e transcrições"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Transferir ficheiro de vídeo"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr "Partilhar no Twitter"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16389,11 +16403,6 @@ msgstr "Clicar no link para ver o meu certificado."
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Publicar no Facebook"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "Partilhar no Twitter"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
