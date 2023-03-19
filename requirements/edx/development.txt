@@ -108,16 +108,14 @@ boto==2.39.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edxval
-boto3==1.7.0
+boto3==1.26.94
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.10.84
+botocore==1.29.94
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   boto3
     #   s3transfer
@@ -220,7 +218,7 @@ coreschema==0.0.4
     #   -r requirements/edx/testing.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==7.2.1
+coverage[toml]==7.2.2
     # via
     #   -r requirements/edx/testing.txt
     #   pytest-cov
@@ -395,7 +393,7 @@ django-filter==22.1
     #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-blockstore
-django-ipware==5.0.0
+django-ipware==4.0.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -524,8 +522,6 @@ docopt==0.6.2
     # via -r requirements/edx/testing.txt
 docutils==0.19
     # via
-    #   -r requirements/edx/testing.txt
-    #   botocore
     #   sphinx
     #   sphinx-mdinclude
 done-xblock==2.0.5
@@ -576,7 +572,7 @@ edx-django-release-util==1.2.0
     #   openedx-blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/testing.txt
-edx-django-utils==5.2.0
+edx-django-utils==5.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-config-models
@@ -720,7 +716,7 @@ faker==17.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.94.1
+fastapi==0.95.0
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -801,7 +797,7 @@ imagesize==1.4.1
     # via sphinx
 import-linter==1.8.0
     # via -r requirements/edx/testing.txt
-importlib-metadata==6.0.0
+importlib-metadata==6.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   markdown
@@ -844,7 +840,7 @@ jinja2==3.1.2
     #   coreschema
     #   diff-cover
     #   sphinx
-jmespath==0.10.0
+jmespath==1.0.1
     # via
     #   -r requirements/edx/testing.txt
     #   boto3
@@ -1408,7 +1404,7 @@ rules==3.3
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-proctoring
-s3transfer==0.1.13
+s3transfer==0.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   boto3
@@ -1636,6 +1632,7 @@ uritemplate==4.1.1
 urllib3==1.26.15
     # via
     #   -r requirements/edx/testing.txt
+    #   botocore
     #   elasticsearch
     #   geoip2
     #   pact-python
