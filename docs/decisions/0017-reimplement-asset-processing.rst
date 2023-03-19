@@ -109,6 +109,9 @@ Consequences
 Reimplementation Specification
 ==============================
 
+Commands and stages
+-------------------
+
 The three top-level edx-platform asset processing actions are *build*, *collect*, and *watch*. The build action can be further broken down into five stages. Here is how those actions and stages will be reimplemented:
 
 
@@ -160,11 +163,11 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Python wrapper around a call to webpack. Invokes the ``./manage.py [lms|cms] print_setting`` multiple times in order to determine Django settings, adding which can add 20+ seconds to the build.
 
-     - ``scripts/build-assets.sh webpack $(./manage.py lms print_asset_settings)``
+     - ``scripts/build-assets.sh webpack --static-root "$(./manage.py lms print_setting STATIC_ROOT)"``.
 
-       Bash wrapper around a call to webpack. The script will accept parameters for Django settings rather than looking them up.
+       Bash wrapper around a call to webpack. The script will accept parameters rather than looking up Django settings itself.
 
-       The print_asset_settings management command will be added as well. It will print the set of Django settings needed for the asset build in a way that build-assets.sh can accept as input. Some distributions may not need to call this command; Tutor, for example, will probably render the settings directly into the build-assets.sh call.
+       The print_setting command will still be available for distributions to use to extract ``STATIC_ROOT`` from Django settings, but it will only need to be run once. As described in **Build Configuration** below, unnecessary Django settings will be removed. Some distributions may not even need to look up ``STATIC_ROOT``; Tutor, for example, will probably render ``STATIC_ROOT`` directly into the environment variable ``OPENEDX_BUILD_ASSETS_OPTS`` variable, described in the **Build Configuration**.
    
    * - + **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
 
@@ -222,6 +225,54 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Note: This adds a Python dependency to build-assets.sh. However, we could be clear that watchman is an *optional* dependency of build-assets.sh which enables the optional ``--watch`` feature. This would keep the *build* action Python-free. Alternatively, watchman is also available Python-free via apt and homebrew.
 
+Build Configuration
+-------------------
+
+``scripts/build-assets.sh`` will accept various command-line options to configure the build. It will also accept the same options in the form of the ``OPENEDX_BUILD_ASSETS_OPTS`` enviroment variable. Options from the environment variable will be processed first, and then overridden by options provided on the command line. The environment variable allows distributions like Tutor to seed the build script with "defaults" in the event that the upstream defaults are not sufficient, while still allowing individual operators to run the script with whichever options they like.
+
+As a concrete example, the default value of ``--theme-dirs`` will be ``''`` (that is: no themes) and the default value of ``--static-root`` will be ``./test_root/static``. Neither of those are suitable for Tutor. Instead, Tutor will set the environment variable in its Dockerfile::
+
+  ...
+  ENV OPENEDX_BUILD_ASSETS_OPTS '--theme-dirs /openedx/themes --static-root /openedx/staticfiles'
+  ...
+
+Later, in the container, a user might run::
+
+  # This would search for themes in /openedx/themes
+  # and use /openedx/staticfiles as the static root:
+  scripts/build-assets.sh
+
+  # This would search for themes in ./mythemes
+  # but use /openedx/staticfiles as the static root:
+  scripts/build-assets.sh --theme-dirs ./mythemes
+
+Furthermore, to facilitate a Python-free build reimplementation, we will remove two Django settings related to assets. These settings have never worked in Tutor, and 2U states that edx.org does not use them. However, on the off chance that some community operators rely on them, there exist alternative configuration methods for each, which will work both with and without Tutor:
+
+.. list-table::
+   :header-rows: 1
+
+   * - Setting
+     - Description
+     - New configuration method
+
+   * - WEBPACK_CONFIG_PATH
+
+     - Path to Webpack config file. Defaults to ``webpack.[dev|prod].config.js``.
+
+     - Set an environment variable before calling build-assets.sh::
+
+         OPENEDX_BUILD_ASSETS_OPTS=\
+         '--webpack-config path/to/webpack.my.config.js'
+
+   * - JS_ENV_EXTRA_CONFIG
+
+     - Global configuration object available to edx-platform JS modules. Defaults empty. Only known use is to add configuration and plugins for the TinyMCE editor.
+
+     - Set an environment variable before calling build-assets.sh::
+
+         JS_ENV_EXTRA_CONFIG=\
+         '{"MYKEY": "myvalue", "MYKEY2", ["myvalue2"]}'``
+
 Migration
 =========
 
@@ -262,6 +313,12 @@ Either way, the migration path is straightforward:
      - ``scripts/build-assets.sh --watch themes``
 
 The options accepted by ``openedx-assets`` will all be valid inputs to ``scripts/build-assets.sh``.
+
+non-Tutor migration guide
+-------------------------
+
+Operators using distributions other than Tutor should refer to the upstream edx-platform changes described above in **Reimplementation Specification**, and adapt them accordingly to their distribution.
+
 
 See also
 ********

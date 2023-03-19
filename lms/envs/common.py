@@ -4573,6 +4573,8 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'license_manager_worker',
     'enterprise_catalog_worker',
     'enterprise_channel_worker',
+    'enterprise_access_worker',
+    'enterprise_subsidy_worker',
 ]
 
 

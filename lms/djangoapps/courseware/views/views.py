@@ -38,6 +38,7 @@ from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_filters.learning.filters import CourseAboutRenderStarted
+from organizations.api import get_course_organization
 from pytz import UTC
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from rest_framework import status
@@ -87,7 +88,7 @@ from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_stu
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
-from lms.djangoapps.courseware.toggles import course_is_invitation_only, PUBLIC_VIDEO_SHARE
+from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.utils import (
     _use_new_financial_assistance_flow,
@@ -115,6 +116,7 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
@@ -1738,7 +1740,7 @@ class BasePublicVideoXBlockView(View):
         """
         Load course and video from modulestore.
         Raises 404 if:
-         - courseware.public_video_share waffle flag is not enabled for this course
+         - video_config.public_video_share waffle flag is not enabled for this course
          - block is not video
          - block is not marked as "public_access"
          """
@@ -1784,9 +1786,11 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
         })
         course_about_page_url, enroll_url = self.get_public_video_cta_button_urls(course)
         social_sharing_metadata = self.get_social_sharing_metadata(course, video_block)
+        org_logo = self.get_organization_logo_from_course(course)
         context = {
             'fragment': fragment,
             'course': course,
+            'org_logo': org_logo,
             'social_sharing_metadata': social_sharing_metadata,
             'learn_more_url': course_about_page_url,
             'enroll_url': enroll_url,
@@ -1797,6 +1801,16 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             'is_mobile_app': False,
         }
         return 'public_video.html', context
+
+    def get_organization_logo_from_course(self, course):
+        """
+        Get organization logo for this course
+        """
+        course_org = get_course_organization(course.id)
+
+        if course_org and course_org['logo']:
+            return course_org['logo'].url
+        return None
 
     def get_social_sharing_metadata(self, course, video_block):
         """

@@ -75,8 +75,13 @@ from lms.djangoapps.courseware.block_render import get_block, handle_xblock_call
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expiration_banner_text, set_preview_mode
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
-from lms.djangoapps.courseware.toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK, PUBLIC_VIDEO_SHARE
+from lms.djangoapps.courseware.toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.views.views import (
+    BasePublicVideoXBlockView,
+    PublicVideoXBlockView,
+    PublicVideoXBlockEmbedView,
+)
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -87,6 +92,7 @@ from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import get_mock_request
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -2998,19 +3004,19 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         assert response.status_code == expected_response
 
 
-@ddt.ddt
-class TestRenderPublicVideoXBlock(ModuleStoreTestCase):
+class TestBasePublicVideoXBlock(ModuleStoreTestCase):
     """
-    Tests for the courseware.render_public_video_xblock endpoint.
+    Tests for public video xblock.
     """
-
     def setup_course(self, enable_waffle=True):
         """
         Helper method to create the course.
         """
+        # pylint:disable=attribute-defined-outside-init
+
         with self.store.default_store(self.store.default_modulestore.get_modulestore_type()):
-            course = CourseFactory.create(**{'start': datetime.now() - timedelta(days=1)})
-            chapter = BlockFactory.create(parent=course, category='chapter')
+            self.course = CourseFactory.create(**{'start': datetime.now() - timedelta(days=1)})
+            chapter = BlockFactory.create(parent=self.course, category='chapter')
             vertical_block = BlockFactory.create(
                 parent_location=chapter.location,
                 category='vertical',
@@ -3034,11 +3040,17 @@ class TestRenderPublicVideoXBlock(ModuleStoreTestCase):
             )
         WaffleFlagCourseOverrideModel.objects.create(
             waffle_flag=PUBLIC_VIDEO_SHARE.name,
-            course_id=course.id,
+            course_id=self.course.id,
             enabled=enable_waffle,
         )
-        CourseOverview.load_from_module_store(course.id)
+        CourseOverview.load_from_module_store(self.course.id)
 
+
+@ddt.ddt
+class TestRenderPublicVideoXBlock(TestBasePublicVideoXBlock):
+    """
+    Tests for the courseware.render_public_video_xblock endpoint.
+    """
     def get_response(self, usage_key, is_embed):
         """
         Overridable method to get the response from the endpoint that is being tested.
@@ -3083,6 +3095,41 @@ class TestRenderPublicVideoXBlock(ModuleStoreTestCase):
 
         self.assertEqual(expected_status_code, response.status_code)
         self.assertEqual(expected_status_code, embed_response.status_code)
+
+    def test_get_org_logo_none(self):
+        # Given a course with no organizational logo
+        self.setup_course()
+        target_video = self.video_block_public
+
+        # When I render the page
+        response = self.get_response(usage_key=target_video.location, is_embed=False)
+        content = response.content.decode('utf-8')
+
+        # Then the page does not render an org logo
+        org_logo = re.search('<img .*class=[\'"]org-logo[\'"].*>', content)
+        self.assertIsNone(org_logo)
+
+    @patch('lms.djangoapps.courseware.views.views.get_course_organization')
+    def test_get_org_logo(self, mock_get_org):
+        # Given a course with an organizational logo
+        self.setup_course()
+        target_video = self.video_block_public
+
+        mock_org_logo_url = "/assets/foo"
+        mock_org_logo = MagicMock()
+        mock_org_logo.url = mock_org_logo_url
+
+        mock_get_org.return_value = {
+            "logo": mock_org_logo
+        }
+
+        # When I render the page
+        response = self.get_response(usage_key=target_video.location, is_embed=False)
+        content = response.content.decode('utf-8')
+
+        # Then the page does render an org logo
+        org_logo = re.search(f'<img .*class=[\'"]org-logo[\'"].*src=[\'"]{mock_org_logo_url}[\'"].*>', content)
+        self.assertIsNotNone(org_logo)
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disable=test-inherits-tests
@@ -3448,3 +3495,112 @@ class TestCourseWideResources(ModuleStoreTestCase):
         else:
             assert js_match == [None, None, None]
             assert css_match == [None, None, None]
+
+
+@ddt.ddt
+class TestBasePublicVideoXBlockView(TestBasePublicVideoXBlock):
+    """Test Base Public Video XBlock View tests"""
+    base_block = BasePublicVideoXBlockView(request=MagicMock())
+
+    @ddt.data(
+        (True, True),
+        (True, False),
+        (False, True),
+        (False, False),
+    )
+    @ddt.unpack
+    @patch('lms.djangoapps.courseware.views.views.get_block_by_usage_id')
+    def test_get_course_and_video_block(self, is_waffle_enabled, is_public_video, mock_get_block_by_usage_id):
+        """
+        Test that get_course_and_video_block returns course and video block.
+        """
+
+        self.setup_course(enable_waffle=is_waffle_enabled)
+        target_video = self.video_block_public if is_public_video else self.video_block_not_public
+
+        mock_get_block_by_usage_id.return_value = (target_video, None)
+
+        # get 404 unless waffle is enabled and video is public
+        if is_public_video and is_waffle_enabled:
+            course, video_block = self.base_block.get_course_and_video_block(str(target_video.location))
+            assert course.id == self.course.id
+            assert video_block.location == target_video.location
+        else:
+            with self.assertRaisesRegex(Http404, "Video not found"):
+                course, video_block = self.base_block.get_course_and_video_block(str(target_video.location))
+
+
+@ddt.ddt
+class TestPublicVideoXBlockView(TestBasePublicVideoXBlock):
+    """Test Public Video XBlock View"""
+    request = RequestFactory().get('/?utm_source=edx.org&utm_medium=referral&utm_campaign=video')
+    base_block = PublicVideoXBlockView(request=request)
+
+    def test_get_template_and_context(self):
+        """
+        Get template and context.
+        """
+        self.setup_course(enable_waffle=True)
+        fragment = MagicMock()
+        with patch.object(self.video_block_public, "render", return_value=fragment):
+            template, context = self.base_block.get_template_and_context(self.course, self.video_block_public)
+            assert template == 'public_video.html'
+            assert context['fragment'] == fragment
+            assert context['course'] == self.course
+
+    @ddt.data("poster", None)
+    def test_get_social_sharing_metadata(self, poster_url):
+        """
+        Test that get_social_sharing_metadata returns correct metadata.
+        """
+        self.setup_course(enable_waffle=True)
+        # can't mock something that doesn't exist
+        self.video_block_public._post = MagicMock(return_value=poster_url)
+
+        metadata = self.base_block.get_social_sharing_metadata(self.course, self.video_block_public)
+        assert metadata["video_title"] == self.video_block_public.display_name_with_default
+        assert metadata["video_description"] == f"Watch a video from the course {self.course.display_name} on edX.org"
+        assert metadata["video_thumbnail"] == "" if poster_url is None else poster_url
+
+    def test_get_utm_params(self):
+        """
+        Test that get_utm_params returns correct utm params.
+        """
+        utm_params = self.base_block.get_utm_params()
+        assert utm_params == {
+            'utm_source': 'edx.org',
+            'utm_medium': 'referral',
+            'utm_campaign': 'video',
+        }
+
+    def test_build_url(self):
+        """
+        Test that build_url returns correct url.
+        """
+        base_url = 'http://test.server'
+        params = {
+            'param1': 'value1',
+            'param2': 'value2',
+        }
+        utm_params = {
+            "utm_source": "edx.org",
+        }
+        url = self.base_block.build_url(base_url, params, utm_params)
+        assert url == 'http://test.server?param1=value1&param2=value2&utm_source=edx.org'
+
+
+class TestPublicVideoXBlockEmbedView(TestBasePublicVideoXBlock):
+    """Test Public Video XBlock Embed View"""
+    base_block = PublicVideoXBlockEmbedView()
+
+    def test_get_template_and_context(self):
+        """
+        Get template and context.
+        """
+        self.setup_course(enable_waffle=True)
+        fragment = MagicMock()
+        with patch.object(self.video_block_public, "render", return_value=fragment):
+            template, context = self.base_block.get_template_and_context(self.course, self.video_block_public)
+            assert template == 'public_video_share_embed.html'
+            assert context['fragment'] == fragment
+            assert context['course'] == self.course

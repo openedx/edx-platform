@@ -10,7 +10,6 @@ from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
 from django.core.exceptions import PermissionDenied
-from opaque_keys.edx.keys import CourseKey
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -65,8 +64,7 @@ class AmplitudeRecommendationsView(APIView):
     def get(self, request, course_id):
         """
         Returns
-            - Amplitude course recommendations
-            - Upsell program if the requesting course has a related program
+            - Amplitude course recommendations for course about page
         """
         if not enable_course_about_page_recommendations():
             return Response(status=404)
@@ -75,8 +73,6 @@ class AmplitudeRecommendationsView(APIView):
             raise PermissionDenied()
 
         user = request.user
-        course_locator = CourseKey.from_string(course_id)
-        course_key = f'{course_locator.org}+{course_locator.course}'
 
         try:
             is_control, has_is_control, course_keys = get_amplitude_course_recommendations(
@@ -95,7 +91,7 @@ class AmplitudeRecommendationsView(APIView):
                 user,
                 course_keys,
                 user_country_code=user_country_code,
-                request_course=course_key,
+                request_course_key=course_id,
                 recommendation_count=self.recommendations_count
             )
 
