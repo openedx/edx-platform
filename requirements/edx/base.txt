@@ -71,16 +71,14 @@ boto==2.39.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edxval
-boto3==1.7.0
+boto3==1.26.94
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.10.84
+botocore==1.29.94
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   boto3
     #   s3transfer
@@ -289,7 +287,7 @@ django-filter==22.1
     #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-blockstore
-django-ipware==5.0.0
+django-ipware==4.0.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -406,8 +404,6 @@ djfernet==0.8.1
     # via edxval
 docopt==0.6.2
     # via -r requirements/edx/base.in
-docutils==0.19
-    # via botocore
 done-xblock==2.0.5
     # via -r requirements/edx/base.in
 drf-jwt==1.19.2
@@ -450,7 +446,7 @@ edx-django-release-util==1.2.0
     #   openedx-blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.in
-edx-django-utils==5.2.0
+edx-django-utils==5.3.0
     # via
     #   -r requirements/edx/base.in
     #   django-config-models
@@ -609,7 +605,7 @@ idna==3.4
     #   requests
     #   snowflake-connector-python
     #   yarl
-importlib-metadata==6.0.0
+importlib-metadata==6.1.0
     # via markdown
 importlib-resources==5.12.0
     # via jsonschema
@@ -627,7 +623,7 @@ jinja2==3.1.2
     # via
     #   code-annotations
     #   coreschema
-jmespath==0.10.0
+jmespath==1.0.1
     # via
     #   boto3
     #   botocore
@@ -1006,7 +1002,7 @@ rules==3.3
     #   -r requirements/edx/base.in
     #   edx-enterprise
     #   edx-proctoring
-s3transfer==0.1.13
+s3transfer==0.6.0
     # via boto3
 sailthru-client==2.2.3
     # via edx-ace
@@ -1129,6 +1125,7 @@ uritemplate==4.1.1
 urllib3==1.26.15
     # via
     #   -r requirements/edx/paver.txt
+    #   botocore
     #   elasticsearch
     #   geoip2
     #   py2neo
