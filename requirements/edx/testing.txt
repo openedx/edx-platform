@@ -100,21 +100,18 @@ bleach[css]==6.0.0
     #   xblock-poll
 bok-choy==1.1.1
     # via -r requirements/edx/testing.in
-boto==2.39.0
+boto==2.49.0
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edxval
-boto3==1.7.0
+boto3==1.26.94
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   django-ses
     #   fs-s3fs
     #   ora2
-botocore==1.10.84
+botocore==1.29.94
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   boto3
     #   s3transfer
@@ -210,7 +207,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==7.2.1
+coverage[toml]==7.2.2
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -376,7 +373,7 @@ django-filter==22.1
     #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-blockstore
-django-ipware==5.0.0
+django-ipware==4.0.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -503,10 +500,6 @@ djfernet==0.8.1
     #   edxval
 docopt==0.6.2
     # via -r requirements/edx/base.txt
-docutils==0.19
-    # via
-    #   -r requirements/edx/base.txt
-    #   botocore
 done-xblock==2.0.5
     # via -r requirements/edx/base.txt
 drf-jwt==1.19.2
@@ -555,7 +548,7 @@ edx-django-release-util==1.2.0
     #   openedx-blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.txt
-edx-django-utils==5.2.0
+edx-django-utils==5.3.0
     # via
     #   -r requirements/edx/base.txt
     #   django-config-models
@@ -692,7 +685,7 @@ factory-boy==3.2.1
     # via -r requirements/edx/testing.in
 faker==17.6.0
     # via factory-boy
-fastapi==0.94.1
+fastapi==0.95.0
     # via pact-python
 fastavro==1.7.3
     # via
@@ -762,7 +755,7 @@ idna==3.4
     #   yarl
 import-linter==1.8.0
     # via -r requirements/edx/testing.in
-importlib-metadata==6.0.0
+importlib-metadata==6.1.0
     # via
     #   -r requirements/edx/base.txt
     #   markdown
@@ -802,7 +795,7 @@ jinja2==3.1.2
     #   code-annotations
     #   coreschema
     #   diff-cover
-jmespath==0.10.0
+jmespath==1.0.1
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1328,7 +1321,7 @@ rules==3.3
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-proctoring
-s3transfer==0.1.13
+s3transfer==0.6.0
     # via
     #   -r requirements/edx/base.txt
     #   boto3
@@ -1515,6 +1508,7 @@ uritemplate==4.1.1
 urllib3==1.26.15
     # via
     #   -r requirements/edx/base.txt
+    #   botocore
     #   elasticsearch
     #   geoip2
     #   pact-python
