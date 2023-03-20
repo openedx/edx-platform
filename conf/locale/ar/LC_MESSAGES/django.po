@@ -137,6 +137,7 @@
 # baraahadri <baraahadri@gmail.com>, 2014
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
 # طاهر <charaf.le.prince@gmail.com>, 2014
+# Deimer Morales, 2023
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # Hamza Madni, 2022
@@ -14424,6 +14425,14 @@ msgstr "عنوان البريد الإلكتروني"
 msgid "Return To %s"
 msgstr "العودة إلى %s "
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -14803,6 +14812,12 @@ msgstr "التنزيلات والنصوص"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "تنزيل ملف الفيديو "
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr "شارك على تويتر"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16118,11 +16133,6 @@ msgstr "انقر على الرابط لمشاهدة شهادتي"
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "انشر على فيسبوك"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "شارك على تويتر"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
