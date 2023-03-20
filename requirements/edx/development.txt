@@ -907,7 +907,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==9.0.0
+lti-consumer-xblock==8.0.1
     # via -r requirements/edx/testing.txt
 lxml==4.9.2
     # via
@@ -1025,7 +1025,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/testing.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/testing.txt
-openedx-events==7.0.0
+openedx-events==5.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
@@ -1664,7 +1664,7 @@ voluptuous==0.13.1
     #   ora2
 vulture==2.7
     # via -r requirements/edx/development.in
-watchdog==3.0.0
+watchdog==2.3.1
     # via -r requirements/edx/testing.txt
 wcwidth==0.2.6
     # via

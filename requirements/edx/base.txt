@@ -671,7 +671,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==9.0.0
+lti-consumer-xblock==8.0.1
     # via -r requirements/edx/base.in
 lxml==4.9.2
     # via
@@ -767,7 +767,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/base.in
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.in
-openedx-events==7.0.0
+openedx-events==5.1.0
     # via
     #   -r requirements/edx/base.in
     #   edx-event-bus-kafka
@@ -1144,7 +1144,7 @@ vine==5.0.0
     #   kombu
 voluptuous==0.13.1
     # via ora2
-watchdog==3.0.0
+watchdog==2.3.1
     # via -r requirements/edx/paver.txt
 wcwidth==0.2.6
     # via prompt-toolkit
