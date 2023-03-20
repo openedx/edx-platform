@@ -57,10 +57,12 @@ from openedx.core.djangoapps.user_authn.views.registration_form import (
     RegistrationFormFactory
 )
 from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
+from openedx.features.edly.constants import ACTIVATION_EMAIL
 from openedx.features.edly.validators import get_subscription_limit, handle_subscription_limit
 from openedx.features.edly.utils import (
     create_learner_link_with_permission_groups,
     create_user_link_with_edly_sub_organization,
+    is_config_enabled,
 )
 from student.helpers import (
     authenticate_new_user,
@@ -229,8 +231,11 @@ def create_account_with_params(request, params):
 
     if skip_email:
         registration.activate()
-    else:
+    elif is_config_enabled(request.site, ACTIVATION_EMAIL):
         compose_and_send_activation_email(user, profile, registration)
+    else:
+        # Send custom email e.g; your account is being reviewed, contact support.
+        pass
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
