@@ -20,7 +20,6 @@ from common.djangoapps.student.models import UserProfile
 from openedx.core.djangoapps.oauth_dispatch.adapters import DOTAdapter
 from openedx.core.djangoapps.oauth_dispatch.api import create_dot_access_token
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_from_token
-from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn.exceptions import AuthFailedError
 from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
@@ -190,8 +189,6 @@ def _set_deprecated_user_info_cookie(response, request, user, cookie_settings):
         "username": "test-user",
         "header_urls": {
             "account_settings": "https://example.com/account/settings",
-            "resume_block":
-                "https://example.com//courses/org.0/course_0/Run_0/jump_to/i4x://org.0/course_0/vertical/vertical_4"
             "learner_profile": "https://example.com/u/test-user",
             "logout": "https://example.com/logout"
         }
@@ -248,19 +245,6 @@ def _get_user_info_cookie_data(request, user):
         header_urls['learner_profile'] = reverse('learner_profile', kwargs={'username': user.username})
     except NoReverseMatch:
         pass
-
-    # Add 'resume course' last completed block
-    try:
-        block_url = retrieve_last_sitewide_block_completed(user)
-        if block_url:
-            header_urls['resume_block'] = block_url
-    except User.DoesNotExist:
-        pass
-    except Exception as err:  # pylint: disable=broad-except
-        log.exception(
-            '[PROD-2877] Error retrieving resume block for user %s with raw error %r',
-            user.username, err,
-        )
 
     header_urls = _convert_to_absolute_uris(request, header_urls)
 

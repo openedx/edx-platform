@@ -9,18 +9,13 @@ import string
 from urllib.parse import urlparse  # pylint: disable=import-error
 
 import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
-from completion.models import BlockCompletion
-from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.conf import settings
 from django.utils.translation import gettext as _
 from edx_django_utils.user import generate_password
 from social_django.models import UserSocialAuth
 
 from common.djangoapps.student.models import AccountRecovery, Registration, get_retired_email_by_email
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import UserRetirementStatus
 
@@ -109,84 +104,6 @@ def _is_valid_social_username(value):
     in the username.
     """
     return '/' not in value
-
-
-def retrieve_last_sitewide_block_completed(user):
-    """
-    Completion utility
-    From a given User object retrieve
-    the last course block marked as 'completed' and construct a URL
-
-    :param user: obj(User)
-    :return: block_lms_url
-
-    """
-    if not ENABLE_COMPLETION_TRACKING_SWITCH.is_enabled():
-        return
-
-    latest_completions_by_course = BlockCompletion.latest_blocks_completed_all_courses(user)
-
-    known_site_configs = [
-        other_site_config.get_value('course_org_filter') for other_site_config in SiteConfiguration.objects.all()
-        if other_site_config.get_value('course_org_filter')
-    ]
-
-    current_site_configuration = get_config_value_from_site_or_settings(
-        name='course_org_filter',
-        site=get_current_site()
-    )
-
-    # courses.edx.org has no 'course_org_filter'
-    # however the courses within DO, but those entries are not found in
-    # known_site_configs, which are White Label sites
-    # This is necessary because the WL sites and courses.edx.org
-    # have the same AWS RDS mySQL instance
-    candidate_course = None
-    candidate_block_key = None
-    latest_date = None
-    # Go through dict, find latest
-    for course, [modified_date, block_key] in latest_completions_by_course.items():
-        if not current_site_configuration:
-            # This is a edx.org
-            if course.org in known_site_configs:
-                continue
-            if not latest_date or modified_date > latest_date:
-                candidate_course = course
-                candidate_block_key = block_key
-                latest_date = modified_date
-
-        else:
-            # This is a White Label site, and we should find candidates from the same site
-            if course.org not in current_site_configuration:
-                # Not the same White Label, or a edx.org course
-                continue
-            if not latest_date or modified_date > latest_date:
-                candidate_course = course
-                candidate_block_key = block_key
-                latest_date = modified_date
-
-    if not candidate_course:
-        return
-
-    lms_root = SiteConfiguration.get_value_for_org(candidate_course.org, "LMS_ROOT_URL", settings.LMS_ROOT_URL)
-
-    try:
-        item = modulestore().get_item(candidate_block_key, depth=1)
-    except Exception as err:  # pylint: disable=broad-except
-        LOGGER.exception(
-            '[PROD-2877] Error retrieving resume block for user %s with raw error %r',
-            user.username, err,
-        )
-        item = None
-
-    if not (lms_root and item):
-        return
-
-    return "{lms_root}/courses/{course_key}/jump_to/{location}".format(
-        lms_root=lms_root,
-        course_key=str(item.location.course_key),
-        location=str(item.location),
-    )
 
 
 def is_secondary_email_feature_enabled():
