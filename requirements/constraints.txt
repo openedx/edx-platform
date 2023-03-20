@@ -81,6 +81,10 @@ pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticke
 # we should stop using this
 boto==2.39.0
 
+# it was coming via botocore in base.txt. Just for safe side adding it again to avoid any breakage.
+docutils==0.19
+
+
 # adding these constraints to minimize boto3 and botocore changeset
 social-auth-core==4.3.0
 babel==2.11.0
