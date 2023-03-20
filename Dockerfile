@@ -116,7 +116,7 @@ RUN pip install -r requirements/pip.txt
 RUN pip install -r requirements/edx/base.txt
 
 # Install node and node modules
-RUN nodeenv /edx/app/edxapp/nodeenv --node=16.14.0 --prebuilt
+RUN nodeenv /edx/app/edxapp/nodeenv --node=18 --prebuilt
 RUN npm install -g npm@8.5.x
 COPY package.json package.json
 COPY package-lock.json package-lock.json

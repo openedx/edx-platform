@@ -14,12 +14,10 @@ jobs:
       matrix:
         os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
-        node-version: [ 16 ]
-        npm-version: [ 8.5.x ]
 
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -30,14 +28,12 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install libxmlsec1-dev pkg-config
-
+    - name: Setup Nodejs Env
+      run: echo "NODE_VER=`cat .nvmrc`" >> $GITHUB_ENV
     - name: Setup Node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
-
-    - name: Setup npm
-      run: npm i -g npm@${{ matrix.npm-version }}
+        node-version: ${{ env.NODE_VER }}
 
     - name: Get pip cache dir
       id: pip-cache-dir

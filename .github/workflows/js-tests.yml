@@ -15,22 +15,20 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-20.04 ]
-        node-version: [ 16 ]
         python-version: [ 3.8 ]
 
     steps:
 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Fetch master to compare coverage
       run: git fetch --depth=1 origin master
-
+    - name: Setup Nodejs Env
+      run: echo "NODE_VER=`cat .nvmrc`" >> $GITHUB_ENV
     - name: Setup Node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: ${{ env.NODE_VER }}
 
-    - name: Setup npm
-      run: npm i -g npm@8.5.x
 
     - name: Install Firefox 61.0
       run: |
