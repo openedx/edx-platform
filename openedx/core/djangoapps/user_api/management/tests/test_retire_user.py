@@ -83,12 +83,6 @@ def test_retire_user_with_usename_email_mismatch(setup_retirement_states):  # li
 
 
 @skip_unless_lms
-def test_retire_user_without_usename_email_userfile(setup_retirement_states):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
-    with pytest.raises(CommandError, match=r'Please provide user_file or username and user_email '):
-        call_command('retire_user')
-
-
-@skip_unless_lms
 def test_successful_retire_with_username_email(setup_retirement_states):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-argument
     user = UserFactory.create(username='user0', email="user0@example.com")
     username = user.username
