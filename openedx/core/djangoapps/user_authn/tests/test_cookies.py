@@ -11,7 +11,6 @@ from django.urls import reverse
 from edx_rest_framework_extensions.auth.jwt.decoder import jwt_decode_handler
 from edx_rest_framework_extensions.auth.jwt.middleware import JwtAuthCookieMiddleware
 
-from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangoapps.user_authn import cookies as cookies_api
 from openedx.core.djangoapps.user_authn.tests.utils import setup_login_oauth_client
 from openedx.core.djangolib.testing.utils import skip_unless_lms
@@ -60,9 +59,6 @@ class CookieTests(TestCase):
             'account_settings': reverse('account_settings'),
             'learner_profile': reverse('learner_profile', kwargs={'username': self.user.username}),
         }
-        block_url = retrieve_last_sitewide_block_completed(self.user)
-        if block_url:
-            expected_header_urls['resume_block'] = block_url
 
         expected_header_urls = self._convert_to_absolute_uris(self.request, expected_header_urls)
 

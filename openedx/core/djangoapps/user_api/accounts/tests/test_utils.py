@@ -5,9 +5,7 @@ import ddt
 from completion import models
 from completion.test_utils import CompletionWaffleTestMixin
 from django.test import TestCase
-from django.test.utils import override_settings
 
-from openedx.core.djangoapps.user_api.accounts.utils import retrieve_last_sitewide_block_completed
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
@@ -105,26 +103,3 @@ class CompletionUtilsTestCase(SharedModuleStoreTestCase, CompletionWaffleTestMix
                 block_key=block.location,
                 completion=1.0
             )
-
-    @override_settings(LMS_ROOT_URL='test_url:9999')
-    def test_retrieve_last_sitewide_block_completed(self):
-        """
-        Test that the method returns a URL for the "last completed" block
-        when sending a user object
-        """
-        block_url = retrieve_last_sitewide_block_completed(
-            self.engaged_user
-        )
-        empty_block_url = retrieve_last_sitewide_block_completed(
-            self.cruft_user
-        )
-        assert block_url ==\
-               'test_url:9999/courses/course-v1:{org}+{course}+{run}/jump_to/'\
-               'block-v1:{org}+{course}+{run}+type@vertical+block@{vertical_id}'.format(
-                   org=self.course.location.course_key.org,
-                   course=self.course.location.course_key.course,
-                   run=self.course.location.course_key.run,
-                   vertical_id=self.vertical2.location.block_id
-               )
-
-        assert empty_block_url is None
