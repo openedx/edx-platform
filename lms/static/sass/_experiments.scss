@@ -514,43 +514,51 @@
 }
 
 // AU 972 Social Video Sharing Page
-.public-video-share-cta {
-  position: relative;
-  z-index: 1;
+.public-video-page {
 
-  .org-logo{
-    height: 40px;
+  .tc-wrapper, div.video {
+    max-width: 60vw;
   }
 
-  .nav-links{
-    float: right;
-  }
+  .public-video-share-cta {
+    position: relative;
+    z-index: 1;
+    margin-top: 20px;
 
-  .btn-learn-more{
-    @extend %btn-shims;
-    color: #00262B;
-    background: #FFFFFF;
-    border-color: #F2F0EF;
-    &:hover,
-    &:active,
-    &:focus {
-      background: darken(#FFFFFF, 7%);
-      border-color: darken(#F2F0EF, 7%);
+    .org-logo{
+      height: 40px;
     }
-  }
 
-  .btn-enroll{
-    @extend %btn-shims;
-    color: #FFFFFF;
-    background: #D23228;
-    border-color: #D23228;
+    .nav-links{
+      float: right;
+    }
 
-    &:hover,
-    &:active,
-    &:focus {
-      color: darken(#FFFFFF, 7%);
-      background: darken(#D23228, 7%);
-      border-color: darken(#D23228, 7%);
+    .btn-learn-more{
+      @extend %btn-shims;
+      color: #00262B;
+      background: #FFFFFF;
+      border-color: #F2F0EF;
+      &:hover,
+      &:active,
+      &:focus {
+        background: darken(#FFFFFF, 7%);
+        border-color: darken(#F2F0EF, 7%);
+      }
+    }
+
+    .btn-enroll{
+      @extend %btn-shims;
+      color: #FFFFFF;
+      background: #D23228;
+      border-color: #D23228;
+
+      &:hover,
+      &:active,
+      &:focus {
+        color: darken(#FFFFFF, 7%);
+        background: darken(#D23228, 7%);
+        border-color: darken(#D23228, 7%);
+      }
     }
   }
 }
