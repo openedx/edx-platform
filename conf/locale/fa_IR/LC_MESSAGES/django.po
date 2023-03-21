@@ -14418,6 +14418,14 @@ msgstr "نشانی رایانامه"
 msgid "Return To %s"
 msgstr "بازگشت به %s"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -14797,6 +14805,12 @@ msgstr "بارگیری‌ها و زیرنویس‌ها"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "بارگیری پرونده تصویری"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr "اشتراک‌گذاری در تویتر"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16118,11 +16132,6 @@ msgstr "روی پیوند کلیک کنید تا گواهی‌نامه مرا ب
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "انتشار در فیس‌بوک"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "اشتراک‌گذاری در تویتر"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."

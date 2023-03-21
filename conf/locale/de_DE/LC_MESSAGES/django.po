@@ -15,6 +15,7 @@
 # Arno <transifex@senlogik.de>, 2013
 # Arno <transifex@senlogik.de>, 2013
 # Bert Krohn <bert.krohn@tum.de>, 2018
+# Daniel Herrmann, 2023
 # Donna Kl <donna@polarstern-education.com>, 2019
 # Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014,2016
@@ -320,8 +321,8 @@ msgid ""
 "photos for verification.  This appies ONLY to modes that require "
 "verification."
 msgstr ""
-"OPTIONAL: Nach diesem Datum/Uhrzeit können keine Fotos zur Verifikation mhr "
-"eingereicht werden. Dieses betrifft NUR Teilnahmen die eine Verifikation "
+"OPTIONAL: Nach diesem Datum/Uhrzeit können keine Fotos zur Verifikation mehr"
+" eingereicht werden. Dieses betrifft NUR Teilnahmen die eine Verifikation "
 "benötigen."
 
 #: common/djangoapps/course_modes/helpers.py
@@ -14560,6 +14561,14 @@ msgstr "E-Mail"
 msgid "Return To %s"
 msgstr "Zurück zu %s"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -14943,6 +14952,12 @@ msgstr "Downloads und Transkripte"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Videodatei herunterladen"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr "Auf Twitter teilen"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16357,11 +16372,6 @@ msgstr "Klicke auf den Link, um deine Zertifikate zu sehen."
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Auf Facebook teilen"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "Auf Twitter teilen"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
