@@ -74,6 +74,11 @@ class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=mis
                 (
                     LOGGER_NAME,
                     'INFO',
+                    f'Cleaned {0} rows from {RefreshToken.__name__} table'
+                ),
+                (
+                    LOGGER_NAME,
+                    'INFO',
                     f'Cleaned {0} rows from {AccessToken.__name__} table',
                 ),
                 (
@@ -99,8 +104,8 @@ class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=mis
         QuerySet.delete = counter(QuerySet.delete)
         try:
             call_command('edx_clear_expired_tokens', batch_size=1, sleep_time=0)
-            # three being the number of tables we'll end up unnecessarily calling .delete on once
-            assert QuerySet.delete.invocations == initial_count + 3  # pylint: disable=no-member
+            # four being the number of tables we'll end up unnecessarily calling .delete on once
+            assert QuerySet.delete.invocations == initial_count + 4  # pylint: disable=no-member
             assert AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now).count() == 0
         finally:
             QuerySet.delete = original_delete
@@ -128,7 +133,7 @@ class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=mis
         QuerySet.delete = counter(QuerySet.delete)
         try:
             call_command('edx_clear_expired_tokens', batch_size=batch_size, sleep_time=0)
-            assert QuerySet.delete.invocations == (math.ceil(initial_count / batch_size) * 2 + 3)
+            assert QuerySet.delete.invocations == (math.ceil(initial_count / batch_size) * 2 + 4)
             assert RefreshToken.objects.filter(access_token__expires__lt=refresh_expires).count() == 0
         finally:
             QuerySet.delete = original_delete

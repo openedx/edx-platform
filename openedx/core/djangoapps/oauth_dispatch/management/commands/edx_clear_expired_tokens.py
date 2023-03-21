@@ -90,6 +90,12 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         refresh_expire_at = self.get_expiration_time(now)
 
         if options['refresh-tokens']:
+            # remove revoked RefreshTokens
+            revoked = RefreshToken.objects.filter(revoked__lt=refresh_expire_at).exclude(
+                application_id__in=excluded_application_ids)
+            self.clear_table_data(revoked, batch_size, RefreshToken, sleep_time)
+
+            # remove expired RefreshTokens
             query_set = RefreshToken.objects.filter(access_token__expires__lt=refresh_expire_at).exclude(
                 application_id__in=excluded_application_ids)
             self.clear_table_data(query_set, batch_size, RefreshToken, sleep_time)
