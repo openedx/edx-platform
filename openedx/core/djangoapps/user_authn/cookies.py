@@ -8,7 +8,6 @@ import logging
 import time
 
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.dispatch import Signal
 from django.urls import NoReverseMatch, reverse
 from django.utils.http import http_date, parse_http_date
