@@ -1,0 +1,36 @@
+name: Tutor Build Action
+
+on:
+  push:
+    branches:
+      - 'pearson-release/olive.stage'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Get current time
+        uses: josStorer/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYY-MM-DD-HH-mm
+
+      - name: Build and push Image
+        uses: Pearson-Advance/tutor-build-image-action@0.2.0
+        with:
+          python-version: ${{ vars.BUILD_PYTHON_VERSION }}
+          tutor-version: ${{ vars.BUILD_TUTOR_VERSION }}
+          path-image-to-be-built: '/env/build/openedx'
+          repository-name: ${{ vars.BUILD_STAGE_REPOSITORY_NAME }}
+          image-name: ${{ vars.BUILD_STAGE_IMAGE_NAME }}
+          image-tag: ${{ vars.BUILD_TUTOR_VERSION }}-RC-${{ steps.current-time.outputs.formattedTime }}
+          docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
+          use-docker-cache: ${{ vars.BUILD_USE_CACHE }}
+          gh-access-token: ${{ secrets.GH_PAT }}
+          theme-repository: ${{ vars.BUILD_THEME_REPOSITORY }}
+          theme-branch: ${{ vars.BUILD_THEME_BRANCH }}
+          extra-private-requirements: true
+          private-repositories: ${{ vars.BUILD_PRIVATE_REPOSITORIES }}
+          branches: ${{ vars.BUILD_BRANCHES }}
