@@ -80,7 +80,7 @@ backports-zoneinfo==0.2.1
     # via
     #   -r requirements/edx/base.txt
     #   icalendar
-beautifulsoup4==4.11.2
+beautifulsoup4==4.12.0
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
@@ -210,7 +210,7 @@ coreschema==0.0.4
     #   -r requirements/edx/base.txt
     #   coreapi
     #   drf-yasg
-coverage[toml]==7.2.1
+coverage[toml]==7.2.2
     # via
     #   -r requirements/edx/coverage.txt
     #   pytest-cov
@@ -346,7 +346,7 @@ django-config-models==2.3.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==3.13.0
+django-cors-headers==3.14.0
     # via -r requirements/edx/base.txt
 django-countries==7.5.1
     # via
@@ -555,7 +555,7 @@ edx-django-release-util==1.2.0
     #   openedx-blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.txt
-edx-django-utils==5.2.0
+edx-django-utils==5.3.0
     # via
     #   -r requirements/edx/base.txt
     #   django-config-models
@@ -589,7 +589,7 @@ edx-enterprise==3.61.7
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   learner-pathway-progress
-edx-event-bus-kafka==3.9.4
+edx-event-bus-kafka==3.9.6
     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.9.2
     # via
@@ -690,9 +690,9 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==17.6.0
+faker==18.2.0
     # via factory-boy
-fastapi==0.94.1
+fastapi==0.95.0
     # via pact-python
 fastavro==1.7.3
     # via
@@ -762,7 +762,7 @@ idna==3.4
     #   yarl
 import-linter==1.8.0
     # via -r requirements/edx/testing.in
-importlib-metadata==6.0.0
+importlib-metadata==6.1.0
     # via
     #   -r requirements/edx/base.txt
     #   markdown
@@ -864,7 +864,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==8.0.1
+lti-consumer-xblock==9.0.0
     # via -r requirements/edx/base.txt
 lxml==4.9.2
     # via
@@ -936,7 +936,7 @@ mysqlclient==2.1.1
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-newrelic==8.7.0
+newrelic==8.7.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -975,7 +975,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.txt
-openedx-events==5.1.0
+openedx-events==7.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
@@ -1278,7 +1278,7 @@ rapidfuzz==2.13.7
     #   levenshtein
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
-redis==4.5.1
+redis==4.5.2
     # via -r requirements/edx/base.txt
 regex==2022.10.31
     # via
@@ -1538,7 +1538,7 @@ voluptuous==0.13.1
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-watchdog==2.3.1
+watchdog==3.0.0
     # via -r requirements/edx/base.txt
 wcwidth==0.2.6
     # via
