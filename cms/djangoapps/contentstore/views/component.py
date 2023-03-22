@@ -42,7 +42,7 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['discussion', 'library', 'html', 'openassessment', 'problem', 'video']
+COMPONENT_TYPES = ['discussion', 'library', 'html', 'openassessment', 'problem', 'video', 'drag-and-drop-v2']
 
 ADVANCED_COMPONENT_TYPES = sorted({name for name, class_ in XBlock.load_classes()} - set(COMPONENT_TYPES))
 
@@ -283,6 +283,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         'video': _("Video"),
         'openassessment': _("Open Response"),
         'library': _("Library Content"),
+        'drag-and-drop-v2': _("Drag and Drop"),
     }
 
     component_templates = []
