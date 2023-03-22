@@ -48,6 +48,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         self._add_boolean_flag(parser, 'refresh-tokens', True)
         self._add_boolean_flag(parser, 'access-tokens', True)
         self._add_boolean_flag(parser, 'grants', True)
+        self._add_boolean_flag(parser, 'revoked-tokens', True)
 
     def clear_table_data(self, query_set, batch_size, model, sleep_time):  # lint-amnesty, pylint: disable=missing-function-docstring
         total_deletions = 0
@@ -89,13 +90,13 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         now = timezone.now()
         refresh_expire_at = self.get_expiration_time(now)
 
-        if options['refresh-tokens']:
-            # remove revoked RefreshTokens
+        if options['revoked-tokens']:
+            # remove revoked, as opposed to expired, RefreshTokens
             revoked = RefreshToken.objects.filter(revoked__lt=refresh_expire_at).exclude(
                 application_id__in=excluded_application_ids)
             self.clear_table_data(revoked, batch_size, RefreshToken, sleep_time)
 
-            # remove expired RefreshTokens
+        if options['refresh-tokens']:
             query_set = RefreshToken.objects.filter(access_token__expires__lt=refresh_expire_at).exclude(
                 application_id__in=excluded_application_ids)
             self.clear_table_data(query_set, batch_size, RefreshToken, sleep_time)
