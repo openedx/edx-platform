@@ -4216,7 +4216,7 @@ ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
 # Exam Service
-EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
+EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
 TOKEN_SIGNING = {
     'JWT_ISSUER': 'http://127.0.0.1:8740',
