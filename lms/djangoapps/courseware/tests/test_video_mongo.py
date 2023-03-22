@@ -243,14 +243,16 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
     @ddt.data(
         (True, False),
         (False, False),
+        (False, True),
         (True, True),
     )
     @ddt.unpack
     def test_public_video_url(self, is_lms_platform, enable_public_share):
         """Test public video url."""
         assert self.item_descriptor.public_access is True
-        with patch.object(self.item_descriptor, '_is_lms_platform', return_value=is_lms_platform), \
-                patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=enable_public_share):
+        if not is_lms_platform:
+            self.item_descriptor.runtime.is_author_mode = True
+        with patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=enable_public_share):
             context = self.item_descriptor.render(STUDENT_VIEW).content
             # public video url iif PUBLIC_VIDEO_SHARE waffle and is_lms_platform, public_access are true
             assert bool(get_context_dict_from_string(context)['public_video_url']) \
