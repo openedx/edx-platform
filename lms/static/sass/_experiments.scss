@@ -516,8 +516,9 @@
 // AU 972 Social Video Sharing Page
 .public-video-page {
 
-  .tc-wrapper, div.video {
-    max-width: 60vw;
+  .tc-wrapper{
+    margin: auto;
+    width: \min(90vw, 70vh * 1.6739);
   }
 
   .public-video-share-cta {
@@ -536,7 +537,7 @@
     .btn-learn-more{
       @extend %btn-shims;
       color: #00262B;
-      background: #FFFFFF;
+      background: #1c9e57;
       border-color: #F2F0EF;
       &:hover,
       &:active,
