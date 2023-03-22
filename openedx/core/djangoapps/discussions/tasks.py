@@ -207,7 +207,12 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
             else:
                 vertical.discussion_enabled = False
             store.update_item(vertical, user_id)
+
+    # There should be no existing topics before this job runs.
+    # When jobs run out of sync topics for all are created.
+    # Delete all discussion topic links for the course.
     DiscussionTopicLink.objects.filter(context_key=course_key).delete()
+
     # If there are any graded subsections that have discussion units,
     # then enable discussions for graded subsections for the course
     enable_graded_subsections = bool(graded_subsections & subsections_with_discussions)
