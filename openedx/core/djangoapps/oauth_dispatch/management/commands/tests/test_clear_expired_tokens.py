@@ -37,11 +37,12 @@ def counter(fn):
     _counted.invocations = 0
     return _counted
 
+
 def create_factory_refresh_token_for_user(user, expires, revoked=None):
     application = factories.ApplicationFactory(user=user)
     access_token = factories.AccessTokenFactory(user=user, application=application, expires=expires)
     return factories.RefreshTokenFactory(access_token=access_token, application=application, user=user,
-                                  revoked=revoked)
+                                         revoked=revoked)
 
 
 @ddt.ddt
@@ -143,7 +144,6 @@ class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=mis
             assert RefreshToken.objects.get(token=keep_token.token) == keep_token
         finally:
             QuerySet.delete = original_delete
-
 
     @override_settings()
     @ddt.unpack
