@@ -1386,10 +1386,3 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         """
         if self.signal_handler:
             self.signal_handler.send("item_deleted", usage_key=usage_key, user_id=user_id)
-
-
-def only_xmodules(identifier, entry_points):
-    """Only use entry_points that are supplied by the xmodule package"""
-    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
-
-    return default_select(identifier, from_xmodule)
