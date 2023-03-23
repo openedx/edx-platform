@@ -77,7 +77,7 @@ from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expirat
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
-from lms.djangoapps.courseware.views.views import (
+from lms.djangoapps.courseware.views.public_video import (
     BasePublicVideoXBlockView,
     PublicVideoXBlockView,
     PublicVideoXBlockEmbedView,

@@ -23,7 +23,7 @@ from lms.djangoapps.courseware.block_render import (
     xblock_view,
     xqueue_callback
 )
-from lms.djangoapps.courseware.views import views as courseware_views
+from lms.djangoapps.courseware.views import views as courseware_views, public_video as courseware_public_video
 from lms.djangoapps.courseware.views.index import CoursewareIndex
 from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from lms.djangoapps.debug import views as debug_views
@@ -53,8 +53,6 @@ from openedx.features.enterprise_support.api import enterprise_enabled
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
-RENDER_VIDEO_XBLOCK_NAME = 'render_public_video_xblock'
-RENDER_VIDEO_XBLOCK_EMBED_NAME = 'render_public_video_xblock_embed'
 COURSE_PROGRESS_NAME = 'progress'
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -327,14 +325,24 @@ urlpatterns += [
         name=RENDER_XBLOCK_NAME,
     ),
     re_path(
+        fr'^videosf/{settings.USAGE_KEY_PATTERN}$',
+        courseware_public_video.render_public_video_xblock,
+        name=courseware_public_video.RENDER_VIDEO_XBLOCK_NAME_FUNC,
+    ),
+    re_path(
+        fr'^videosf/{settings.USAGE_KEY_PATTERN}/embed$',
+        courseware_public_video.render_public_video_xblock_embed,
+        name=courseware_public_video.RENDER_VIDEO_XBLOCK_EMBED_NAME_FUNC,
+    ),
+    re_path(
         fr'^videos/{settings.USAGE_KEY_PATTERN}$',
-        courseware_views.PublicVideoXBlockView.as_view(),
-        name=RENDER_VIDEO_XBLOCK_NAME,
+        courseware_public_video.PublicVideoXBlockView.as_view(),
+        name=courseware_public_video.RENDER_VIDEO_XBLOCK_NAME,
     ),
     re_path(
         fr'^videos/{settings.USAGE_KEY_PATTERN}/embed$',
-        courseware_views.PublicVideoXBlockEmbedView.as_view(),
-        name=RENDER_VIDEO_XBLOCK_EMBED_NAME,
+        courseware_public_video.PublicVideoXBlockEmbedView.as_view(),
+        name=courseware_public_video.RENDER_VIDEO_XBLOCK_EMBED_NAME,
     ),
 
 
