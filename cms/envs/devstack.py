@@ -316,6 +316,33 @@ EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
 EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
 
+# Check syntax with https://csp-evaluator.withgoogle.com/ before deploying!
+#
+# See wiki for more information on building and modifying policies:
+# https://2u-internal.atlassian.net/wiki/spaces/SI/pages/363593785/Content-Security-Policy+for+edx.org+sites
+#
+# Explanation of exceptions:
+#
+# - We still have a lot of inline scripts and even eval. Those will need to be dealt with
+#   over time, and some may need to wait for when we can use strict-dynamic.
+# - jsdeliver is used for MathJax; we should look into vendoring that in, since there are
+#   CSP bypasses on jsdeliver.
+# - YouTube is loaded in course content and in video XBlocks
+# - SCORM XBlock requires self-framing
+CSP_REPORT_ONLY = f"""
+  default-src 'none';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.youtube.com {LMS_BASE};
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com {LMS_BASE};
+  font-src 'self' https://fonts.gstatic.com;
+  img-src 'self' data: https://logos.openedx.org;
+  connect-src 'self' https://cdn.jsdelivr.net {LMS_BASE};
+  frame-src 'self' https://www.youtube.com;
+  base-uri 'none';
+"""
+CSP_REPORTING_URI = "https://reporting.cybersecurity.2u.com"
+CSP_REPORTING_NAME = "blotter"
+
+
 ################# New settings must go ABOVE this line #################
 ########################################################################
 # See if the developer has any local overrides.
