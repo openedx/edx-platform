@@ -21,22 +21,24 @@ A hybrid solution faces two challenges:
 - "dirty writes": how do we handle a situation where there are multiple asynchronous import or update operations
   at once that may be in conflict with each other?
 
-We analyzed a number of options to handle these challenges. As they may become relevant later on,
-you can find them in this `decision-tree diagram`_.
-
-.. _`decision-tree diagram`: insert link
-
-Some of the rejected options involved a toggle that lets users switch the course between enforcing only manual editing
-and only API editing. This toggle needs to allow for running import operations to finish before switching. There is an
-example state diagram here_.
-
-.. _here: insert link
-
 Some considerations that come into play when picking an approach are:
 
-1. Having the system reliably play traffic cop isn't simple, principally because of our reliance on slow-running async tasks
+1. Having the system reliably play traffic cop isn't simple, principally because of our reliance on slow-running async tasks.
 2. Even if we ignore the problem of playing traffic cop, embracing hybrid editing means clients need some way to know
-   whether other users have made changes
+   whether other users have made changes.
+
+We analyzed a range of the most viable options to handle these challenges.
+We mainly rejected two alternatives, although there are many options:
+
+- adding a toggle that lets users switch the course between enforcing only manual editing
+  and only API editing. This toggle needs to allow for running import operations to finish before switching, thus making it complex.
+- using a form of optimistic concurrency control where we expect different users and explicitly version each change, then forbid
+  any API operation unless the API operator provides a version identifier that is not out of date.
+
+We rejected these challenges on the basis that they were complex to implement and make us play "Traffic cop".
+
+However, future iterations may require us to be more strict and employ further safeguards, and it remains a possibility to circle
+back and add one of these options on top of what we do now initially.
 
 Decision
 --------
@@ -57,8 +59,9 @@ We can only give them the tools to rollback changes and modifications to xblocks
 risk of them causing problems with course-level settings or assets. If they do not version control on their own side, they need
 to find other solutions to fix this.
 
-This can be mitigated by adding more safety mechanisms, like actually enforcing this one-concurrent-user policy.
+This can be mitigated by adding more safety mechanisms later on, the most straightforward action being to
+actually enforce this one-concurrent-user policy.
 
 It is clear where the responsibility lies for dealing with problems. Choosing this option, we do not have to
 build a complex mechanism to avoid or resolve conflicts ("playing traffic cop")
-and then be at fault for any errors that happen because this mechanism isn't perfect.
+and then needing to act on any errors that happen when this mechanism isn't perfect.
