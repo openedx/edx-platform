@@ -72,26 +72,26 @@ class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=mis
         factories.RefreshTokenFactory(user=application.user, application=application, access_token=access_token)
         with LogCapture(LOGGER_NAME) as log:
             call_command('edx_clear_expired_tokens', sleep_time=0, excluded_application_ids=str(application.id))
-            log.check(
+            log.check_present(
                 (
                     LOGGER_NAME,
                     'INFO',
-                    f'Cleaned {0} rows from {RefreshToken.__name__} table'
+                    f'Final deletion count: Cleaned {0} rows from {RefreshToken.__name__} table'
                 ),
                 (
                     LOGGER_NAME,
                     'INFO',
-                    f'Cleaned {0} rows from {RefreshToken.__name__} table'
+                    f'Final deletion count: Cleaned {0} rows from {RefreshToken.__name__} table'
                 ),
                 (
                     LOGGER_NAME,
                     'INFO',
-                    f'Cleaned {0} rows from {AccessToken.__name__} table',
+                    f'Final deletion count: Cleaned {0} rows from {AccessToken.__name__} table',
                 ),
                 (
                     LOGGER_NAME,
                     'INFO',
-                    f'Cleaned 0 rows from {Grant.__name__} table',
+                    f'Final deletion count: Cleaned 0 rows from {Grant.__name__} table',
                 )
             )
         assert RefreshToken.objects.filter(application=application).exists()
