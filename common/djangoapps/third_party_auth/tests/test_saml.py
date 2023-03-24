@@ -5,7 +5,10 @@ Unit tests for third_party_auth SAML auth providers
 
 from unittest import mock
 
-from common.djangoapps.third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
+from django.utils.datastructures import MultiValueDictKeyError
+from social_core.exceptions import AuthMissingParameter
+
+from common.djangoapps.third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class, SAMLAuthBackend
 from common.djangoapps.third_party_auth.tests.data.saml_identity_provider_mock_data import (
     expected_user_details,
     mock_attributes,
@@ -32,3 +35,16 @@ class TestEdXSAMLIdentityProvider(SAMLTestCase):
         """ test get_attr and get_user_details of EdXSAMLIdentityProvider"""
         edx_saml_identity_provider = EdXSAMLIdentityProvider('demo', **mock_conf)
         assert edx_saml_identity_provider.get_user_details(mock_attributes) == expected_user_details
+
+
+class TestSAMLAuthBackend(SAMLTestCase):
+    """ Tests for the SAML backend. """
+
+    @mock.patch('common.djangoapps.third_party_auth.saml.SAMLAuth.auth_complete')
+    def test_saml_auth_complete(self, super_auth_complete):
+        super_auth_complete.side_effect = MultiValueDictKeyError('RelayState')
+        backend = SAMLAuthBackend()
+        with self.assertRaises(AuthMissingParameter) as cm:
+            backend.auth_complete()
+
+        assert cm.exception.parameter == 'RelayState'

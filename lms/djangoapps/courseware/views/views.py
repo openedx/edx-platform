@@ -1722,14 +1722,14 @@ class XBlockContentInspector:
         return False
 
 
+@method_decorator(ensure_valid_usage_key, name='dispatch')
+@method_decorator(xframe_options_exempt, name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class BasePublicVideoXBlockView(View):
     """
     Base functionality for public video xblock view and embed view
     """
 
-    @method_decorator(ensure_valid_usage_key)
-    @method_decorator(xframe_options_exempt)
-    @method_decorator(transaction.non_atomic_requests)
     def get(self, _, usage_key_string):
         """ Load course and video and render public view """
         course, video_block = self.get_course_and_video_block(usage_key_string)
@@ -1774,6 +1774,9 @@ class BasePublicVideoXBlockView(View):
         return course, video_block
 
 
+@method_decorator(ensure_valid_usage_key, name='dispatch')
+@method_decorator(xframe_options_exempt, name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class PublicVideoXBlockView(BasePublicVideoXBlockView):
     """ View for displaying public videos """
 
@@ -1794,6 +1797,7 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             'social_sharing_metadata': social_sharing_metadata,
             'learn_more_url': course_about_page_url,
             'enroll_url': enroll_url,
+            'allow_iframing': True,
             'disable_window_wrap': True,
             'disable_register_button': True,
             'edx_notes_enabled': False,
@@ -1880,6 +1884,9 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
         ))
 
 
+@method_decorator(ensure_valid_usage_key, name='dispatch')
+@method_decorator(xframe_options_exempt, name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class PublicVideoXBlockEmbedView(BasePublicVideoXBlockView):
     """ View for viewing public videos embedded within Twitter or other social media """
     def get_template_and_context(self, course, video_block):
