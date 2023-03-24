@@ -332,7 +332,7 @@ urlpatterns += [
         name=RENDER_VIDEO_XBLOCK_EMBED_NAME,
     ),
     re_path(
-        fr'^videos/{settings.USAGE_KEY_PATTERN}/$',
+        fr'^videos/{settings.USAGE_KEY_PATTERN}$',
         courseware_views.PublicVideoXBlockView.as_view(),
         name=RENDER_VIDEO_XBLOCK_NAME,
     ),
