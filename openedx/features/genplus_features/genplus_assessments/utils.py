@@ -173,11 +173,13 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                     responses['results'] = []
                 else:
                     responses['results'] = {}
-
+                students_answered_count = 0
                 for user_id in student_list:
                     user = get_user_model().objects.get(pk=user_id)
                     user_states = generated_report_data.get(user.username)
                     if user_states:
+                        # increment in student answer count in case of user_states exists
+                        students_answered_count += 1
                         # For each response in the block, aggregate the result for the problem, and add in the responses
                         if responses['problem_type'] in ProblemTypes.CHOICE_TYPE_PROBLEMS:
                             if filter_type == "aggregate_response":
@@ -213,6 +215,9 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
 
                 if responses['problem_type'] in ProblemTypes.SHOW_IN_STUDENT_ANSWERS_PROBLEMS:
                     if not single_problem:
+                        if not filter_type == "individual_response":
+                            responses['students_count'] = len(student_list)
+                            responses['students_answered_count'] = students_answered_count
                         student_data.append(responses)
                     else:
                         student_data.update(responses)
