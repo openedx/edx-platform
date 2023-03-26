@@ -1129,6 +1129,22 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         context = self.item_descriptor.render(STUDENT_VIEW).content
         assert "'download_video_link': None" in context
 
+    def test_get_html_non_hls_video_download(self):
+        """
+        Verify that `download_video_link` is available if a non HLS videos is available
+        """
+        video_xml = """
+        <video display_name="Video" download_video="true">
+            <source src="http://example.com/example.m3u8"/>
+            <source src="http://example.com/example.mp4"/>
+            <source src="http://example.com/example.webm"/>
+        </video>
+        """
+
+        self.initialize_block(data=video_xml)
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+        assert "'download_video_link': 'http://example.com/example.mp4'" in context
+
     def test_html_student_public_view(self):
         """
         Test the student and public views
