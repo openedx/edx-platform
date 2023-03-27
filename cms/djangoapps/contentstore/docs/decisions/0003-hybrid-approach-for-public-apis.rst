@@ -15,7 +15,7 @@ we will offer a hybrid solution where both are possible.
 
 A hybrid solution faces two challenges:
 
-- "out-of-date write conflicts": how do we handle a situation where an API user where an API user attempts to update
+- "out-of-date write conflicts": how do we handle a situation where an API user attempts to update
   a course using a stale course snapshot as a starting point?
   This creates a danger of overwriting another person's changes.
 - "dirty writes": how do we handle a situation where there are multiple concurrent, asynchronous import or update 
@@ -59,6 +59,9 @@ Decision
   we leave open the option of doing so in the future..
 - We provide logs about past changes to the user to alert them of other users' changes.
 - We provide sufficient rollback tools to fix any problems with xblocks / xblock structure the users may have caused.
+  Provided that modulestore versioning makes older versions of an XBlock available, we will provide a programmatic way to replace the current version
+  of an XBlock with an older version, referenced by version ID.
+  Our current goal is to offer this packaged as a "revert task" operation.
 - We do not provide any versioning, rolling back, or logging for anything that is not an xblock (static assets,
   course-level policies and settings, etc). We recommend that the users employ version control for this on their side.
 
