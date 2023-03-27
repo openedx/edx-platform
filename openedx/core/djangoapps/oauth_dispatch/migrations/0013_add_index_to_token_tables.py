@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         # Adding as raw SQL because we don't have access to the underlying model
         migrations.RunSQL(
             sql='''CREATE INDEX oauth2_provider_accesstoken_expires ON oauth2_provider_accesstoken (expires);''',
-            reverse_sql='DROP INDEX "oauth2_provider_accesstoken_expires";',
+            reverse_sql='DROP INDEX oauth2_provider_accesstoken_expires ON oauth2_provider_accesstoken;',
         ),
     ]
 
