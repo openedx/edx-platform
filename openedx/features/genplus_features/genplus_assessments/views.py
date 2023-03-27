@@ -46,7 +46,28 @@ class AssessmentReportPDFView(TemplateView):
         Return a HTTPResponse either of a PDF file or HTML.
         :rtype: HttpResponse
         """
-        context = self.get_context_data(*args, **kwargs)
+        if not self.request.user.is_authenticated:
+            raise PermissionDenied()
+
+        gen_user = GenUser.objects.filter(user=self.request.user).first()
+        if not gen_user:
+            raise PermissionDenied()
+
+        if gen_user.is_student:
+            user_id = self.request.user.id
+            student = gen_user.student
+        elif gen_user.is_teacher:
+            user_id = self.request.GET.get('user_id')
+            user = GenUser.objects.filter(user__id=user_id).first()
+            if not (user and user.is_student):
+                raise PermissionDenied()
+            if gen_user.school != user.school:
+                raise PermissionDenied()
+            student = user.student
+        else:
+            raise PermissionDenied()
+
+        context = self.get_context_data(user_id, student, **kwargs)
 
         if 'html' in request.GET:
             # Output HTML
@@ -60,7 +81,7 @@ class AssessmentReportPDFView(TemplateView):
             response = HttpResponse(content, content_type='application/pdf')
 
             if (not self.inline or 'download' in request.GET) and 'inline' not in request.GET:
-                response['Content-Disposition'] = 'attachment; filename=%s' % self.get_filename()
+                response['Content-Disposition'] = 'attachment; filename=%s' % self.get_filename(user_id=user_id)
 
             response['Content-Length'] = len(content)
 
@@ -131,14 +152,19 @@ class AssessmentReportPDFView(TemplateView):
             'header-spacing': '10',
         }
 
-    def get_filename(self):
+    def get_filename(self, user_id):
         """
         Return ``self.filename`` if set otherwise return the template basename with a ``.pdf`` extension.
         :rtype: str
         """
+        user = User.objects.filter(id=user_id).first()
+        name = ''
         if self.filename is None:
-            name = splitext(basename(self.template_path))[0]
-            return '{}.pdf'.format(name)
+            if user:
+                name = f'{user.profile.name}'.replace(' ', '')
+            if not name:
+                name = splitext(basename(self.template_path))[0]
+            return f'{name}.pdf'
 
         return self.filename
 
@@ -169,30 +195,8 @@ class AssessmentReportPDFView(TemplateView):
 
         return skills_assessment
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, user_id, student, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        if not self.request.user.is_authenticated:
-            raise PermissionDenied()
-
-        gen_user = GenUser.objects.filter(user=self.request.user).first()
-        if not gen_user:
-            raise PermissionDenied()
-
-        if gen_user.is_student:
-            user_id = self.request.user.id
-            student = gen_user.student
-        elif gen_user.is_teacher:
-            user_id = self.request.GET.get('user_id')
-            user = GenUser.objects.filter(user__id=user_id).first()
-            if not (user and user.is_student):
-                raise PermissionDenied()
-            if gen_user.school != user.school:
-                raise PermissionDenied()
-            student = user.student
-        else:
-            raise PermissionDenied()
-
         course_reports = {}
 
         enrolled_program_ids = ProgramEnrollment.visible_objects.filter(student=student).values_list('program', flat=True)
