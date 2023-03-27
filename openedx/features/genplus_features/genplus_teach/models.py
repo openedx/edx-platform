@@ -153,7 +153,7 @@ class ArticleRating(TimeStampedModel):
 
     def __str__(self):
         return '{} has rated {} stars to article {}'.format(
-            self.teacher.gen_user.user.get_full_name(),
+            self.teacher.gen_user.user.profile.name,
             self.rating,
             self.article.title
         )
@@ -232,7 +232,7 @@ class HelpGuideRating(TimeStampedModel):
 
     def __str__(self):
         return '{} has rated {} stars to guide {}'.format(
-            self.teacher.gen_user.user.get_full_name(),
+            self.teacher.gen_user.user.profile.name,
             self.rating,
             self.help_guide.title
         )

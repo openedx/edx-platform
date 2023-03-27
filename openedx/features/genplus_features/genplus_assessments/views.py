@@ -26,7 +26,8 @@ from .utils import (
     get_user_assessment_result
 )
 from openedx.features.genplus_features.genplus.models import GenUser, Student, JournalPost, Teacher
-from openedx.features.genplus_features.genplus_learning.models import Program, Unit, UnitCompletion
+from openedx.features.genplus_features.genplus_learning.models import Program, Unit, UnitCompletion, ProgramEnrollment
+from openedx.features.genplus_features.genplus_learning.constants import ProgramStatuses
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
 from openedx.features.genplus_features.genplus.constants import JournalTypes
 from openedx.features.genplus_features.genplus_assessments.api.v1.serializers import RatingAssessmentSerializer, TextAssessmentSerializer
@@ -186,17 +187,25 @@ class AssessmentReportPDFView(TemplateView):
             user = GenUser.objects.filter(user__id=user_id).first()
             if not (user and user.is_student):
                 raise PermissionDenied()
-
+            if gen_user.school != user.school:
+                raise PermissionDenied()
             student = user.student
         else:
             raise PermissionDenied()
 
         course_reports = {}
 
-        program_ids = student.program_enrollments.all().values_list('program', flat=True)
-        programs = Program.objects.filter(id__in=program_ids)
-        units = Unit.objects.filter(program__in=program_ids)
-        course_keys = units.values_list('course', flat=True)
+        enrolled_program_ids = ProgramEnrollment.visible_objects.filter(student=student).values_list('program', flat=True)
+        enrolled_programs = Program.objects.filter(id__in=enrolled_program_ids)
+        enrolled_year_groups = enrolled_programs.values_list('year_group', flat=True).distinct().order_by()
+
+        unenrolled_active_programs_ids = Program.objects \
+                                .filter(status=ProgramStatuses.ACTIVE) \
+                                .exclude(year_group__in=enrolled_year_groups).values_list('id', flat=True)
+
+        program_ids = list(enrolled_program_ids) + list(unenrolled_active_programs_ids)
+        all_units = Unit.objects.filter(program__in=program_ids).order_by('program', 'order')
+        course_keys = Unit.objects.filter(program__in=enrolled_program_ids).values_list('course', flat=True)
         unit_completions = UnitCompletion.objects.filter(course_key__in=course_keys, user=user_id)
 
         for course_key in course_keys:
@@ -224,7 +233,7 @@ class AssessmentReportPDFView(TemplateView):
             "units": [],
         }
 
-        for unit in units:
+        for unit in all_units:
             course_key = unit.course.id
             unit_completion = unit_completions.filter(course_key=course_key, user=user_id).first()
             unit_image_url = get_absolute_url(self.request, unit.unit_image) if unit.unit_image else ''
@@ -234,7 +243,7 @@ class AssessmentReportPDFView(TemplateView):
                 'display_name': unit.display_name,
                 'is_complete': unit_completion is not None and unit_completion.is_complete,
                 'unit_image_url': unit_image_url,
-                'reflections': course_reports[str(course_key)].get(user_id, [])
+                'reflections': course_reports.get(str(course_key), {}).get(user_id, [])
             }
             student_data['units'].append(course_data)
 
@@ -252,17 +261,19 @@ class AssessmentReportPDFView(TemplateView):
                 teacher_feedbacks[teacher_id] = {
                     'teacher_name': teacher_name,
                     'comments': [{
+                        'title': feedback.title,
                         'description': feedback.description,
                         'datetime': feedback.created
                     }],
                 }
             else:
                 teacher_feedbacks[teacher_id]['comments'].append({
+                    'title': feedback.title,
                     'description': feedback.description,
                     'datetime': feedback.created
                 })
 
         student_data['teacher_feedbacks'] = teacher_feedbacks
-        student_data['skills_assessment'] = self._get_skill_assessment_data(user_id, student, programs)
+        student_data['skills_assessment'] = self._get_skill_assessment_data(user_id, student, enrolled_programs)
         context['student_data'] = student_data
         return context
