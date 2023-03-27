@@ -61,7 +61,7 @@ Decision
 - We provide sufficient rollback tools to fix any problems with xblocks / xblock structure the users may have caused.
   Provided that modulestore versioning makes older versions of an XBlock available, we will provide a programmatic way to replace the current version
   of an XBlock with an older version, referenced by version ID.
-  Our current goal is to offer this packaged as a "revert task" operation.
+  Our current goal is to offer this packaged as a "undo task" operation.
 - We do not provide any versioning, rolling back, or logging for anything that is not an xblock (static assets,
   course-level policies and settings, etc). We recommend that the users employ version control for this on their side.
 
