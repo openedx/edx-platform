@@ -14,13 +14,13 @@ log = logging.getLogger('retry_photo_verification')
 class Command(BaseCommand):
     """
     This method finds those PhotoVerifications with a status of
-    MUST_RETRY and attempts to verify them.
+    'submitted' from 2023-03-01 to 2023-03-28 and attempts to verify them.
     """
     args = "<SoftwareSecurePhotoVerification id, SoftwareSecurePhotoVerification id, ...>"
     help = (
         "Retries SoftwareSecurePhotoVerifications passed as "
         "arguments, or if no arguments are supplied, all that "
-        "are in a state of 'must_retry'"
+        "are in a state of 'submitted' from 2023-03-01 to 2023-03-28"
     )
 
     def add_arguments(self, parser):
@@ -59,14 +59,21 @@ class Command(BaseCommand):
         options = self.get_args_from_database() if options['args_from_database'] else options
         args = options.get('verification_ids', None)
 
+        # if we have arguments, get the id's from the arbuments
         if args:
             attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(
                 receipt_id__in=options['verification_ids']
             )
             log.info("Fetching retry verification ids from config model")
+            # set the statuses to "must_retry" so we can re-submit later on
             force_must_retry = True
         else:
-            attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(status='must_retry')
+            # Otherwise, we're pulling those id's from the model.
+            # State is submitted, and submitted between 2023-03-01 and 2023-03-28
+            # NOTE: To what extent will we need to account for timezones for the date range here?
+            attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(status='submitted', 
+                                                                               submitted_at__range=('2023-03-01','2023-03-28')
+                                                                               )
             force_must_retry = False
 
         log.info(f"Attempting to retry {len(attempts_to_retry)} failed PhotoVerification submissions")
