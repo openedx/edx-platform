@@ -1787,7 +1787,7 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
         fragment = video_block.render('public_view', context={
             'public_video_embed': False,
         })
-        course_about_page_url, enroll_url = self.get_public_video_cta_button_urls(course)
+        learn_more_url, enroll_url = self.get_public_video_cta_button_urls(course)
         social_sharing_metadata = self.get_social_sharing_metadata(course, video_block)
         org_logo = self.get_organization_logo_from_course(course)
         context = {
@@ -1795,7 +1795,7 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             'course': course,
             'org_logo': org_logo,
             'social_sharing_metadata': social_sharing_metadata,
-            'learn_more_url': course_about_page_url,
+            'learn_more_url': learn_more_url,
             'enroll_url': enroll_url,
             'allow_iframing': True,
             'disable_window_wrap': True,
@@ -1836,25 +1836,42 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             )
         }
 
+    def get_learn_more_button_url(self, course, utm_params):
+        """
+        If the marketing site is enabled and a course has a marketing page, use that URL.
+        If not, point to the `about_course` view.
+        Override all with the MKTG_URL_OVERRIDES setting.
+        """
+        course_key = str(course.id)
+        course_overview = CourseOverview.get_from_id(course.id)
+        if course_overview.has_marketing_url():
+            base_url = course_overview.marketing_url
+        else:
+            base_url = reverse('about_course', kwargs={'course_id': course_key})
+
+        marketing_url_overrides = configuration_helpers.get_value(
+            'MKTG_URL_OVERRIDES',
+            settings.MKTG_URL_OVERRIDES
+        )
+        base_url = marketing_url_overrides.get(course_key, base_url)
+        return self.build_url(base_url, {}, utm_params)
+
     def get_public_video_cta_button_urls(self, course):
         """
         Get the links for the 'enroll' and 'learn more' buttons on the public video page
         """
-        course_key = str(course.id)
         utm_params = self.get_utm_params()
-        course_about_page_url = self.build_url(
-            reverse('about_course', kwargs={'course_id': course_key}), {}, utm_params
-        )
+        learn_more_url = self.get_learn_more_button_url(course, utm_params)
         enroll_url = self.build_url(
             reverse('register_user'),
             {
-                'course_id': course_key,
+                'course_id': str(course.id),
                 'enrollment_action': 'enroll',
                 'email_opt_in': False,
             },
             utm_params
         )
-        return course_about_page_url, enroll_url
+        return learn_more_url, enroll_url
 
     def get_utm_params(self):
         """
