@@ -186,7 +186,7 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
             for student in students:
                 user_id = 'user_' + str(student.gen_user.user_id)
                 response['student_response'][user_id] = {
-                    'full_name': student.gen_user.user.get_full_name(),
+                    'full_name': student.gen_user.user.profile.name,
                     'score_start_of_year': 0,
                     'score_end_of_year': 0,
                     'total_score': TOTAL_PROBLEM_SCORE

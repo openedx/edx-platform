@@ -74,7 +74,7 @@
                   <div class="year-info start">
                     <img src="${static.url('genplus_assessments/assets/images/start.png')}" width="32" alt="" />
                     <ul class="star-rating">
-                      % if question.get('total_problem_score'):
+                      % if question.get('total_problem_score') and question.get('score_end_of_year') > 0:
                         % for i, star in enumerate(range(question.get('total_problem_score', 0))):
                           % if i < question.get('score_start_of_year'):
                             <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
@@ -82,6 +82,8 @@
                             <li><img src="${static.url('genplus_assessments/assets/images/star-outline.png')}" width="25" alt="Favourite" /></li>
                           % endif
                         % endfor
+                      % else:
+                        <li><strong class="icon-info">&#x21;</strong><span class="text">Still to<br />complete</span></li>
                       % endif
                     </ul>
                   </div>
@@ -116,6 +118,10 @@
                           % for response in question.get('response_start_of_year', []):
                             <li>${ response }</li>
                           % endfor
+                        </ul>
+                      % else:
+                        <ul class="list-unstyled">
+                          <li><p><strong class="icon-info">&#x21;</strong> Still to complete</p></li>
                         </ul>
                       % endif
                     </div>
@@ -227,6 +233,7 @@
                 <h3>Comments from ${ value.get('teacher_name') }:</h3>
                   % for comment in value.get('comments'):
                     <blockquote>
+                      <p><strong>${ comment.get('title') }</strong></p>
                       <q>${ comment.get('description') }</q>
                       <cite>${ comment.get('datetime').strftime('%d/%m/%Y') }</cite>
                     </blockquote>

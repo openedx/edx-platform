@@ -46,7 +46,7 @@ class ClassStudentSerializer(serializers.ModelSerializer):
         return obj.gen_user.user.email if obj.gen_user.user else obj.gen_user.email
 
     def get_full_name(self, obj):
-        return obj.gen_user.user.get_full_name() if obj.gen_user.user else ''
+        return obj.gen_user.user.profile.name if obj.gen_user.user else ''
 
     def get_profile_pic_url(self, obj):
         if obj.character is not None and obj.character.profile_pic is not None:
@@ -79,7 +79,7 @@ class TextAssessmentSerializer(serializers.ModelSerializer):
                   'assessment_time', 'skill', 'full_name', 'student_response', 'score')
 
     def get_full_name(self, obj):
-        return get_user_model().objects.get(pk=obj.user_id).get_full_name()
+        return get_user_model().objects.get(pk=obj.user_id).profile.name
 
 
 class RatingAssessmentSerializer(serializers.ModelSerializer):
@@ -92,4 +92,4 @@ class RatingAssessmentSerializer(serializers.ModelSerializer):
                   'assessment_time', 'skill', 'full_name', 'rating')
 
     def get_full_name(self, obj):
-        return get_user_model().objects.get(pk=obj.user_id).get_full_name()
+        return get_user_model().objects.get(pk=obj.user_id).profile.name
