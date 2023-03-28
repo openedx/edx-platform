@@ -61,6 +61,7 @@ conf/locale/fake*/LC_MESSAGES/*.po
 conf/locale/fake*/LC_MESSAGES/*.mo
 # this was a mistake in i18n_tools, now fixed.
 conf/locale/messages.mo
+conf/plugins-locale/
 
 ### Testing artifacts
 .testids/

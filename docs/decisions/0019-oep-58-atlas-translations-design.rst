@@ -136,16 +136,16 @@ New ``pull_plugins_translations`` command
 
 Introduce new Django commands to the ``edx-platform``:
 
-- ``manage.py lms pull_plugins_translations --list-only``: This command
+- ``manage.py lms pull_plugins_translations --list``: This command
   will list all the XBlocks and Plugins that are installed in the
   ``edx-platform`` virtual environment regardless of whether its run
   in Docker, devstack or Native Installation.
 
-  If the command is executed with the ``--list-only`` flag it will print a
+  If the command is executed with the ``--list`` flag it will print a
   list of Python *module names* (as opposed to git repository names) of the
   installed XBlocks and Plugins e.g.::
 
-    $ manage.py lms atlas_pull_plugins_translations --list-only
+    $ manage.py lms atlas_pull_plugins_translations --list
     drag_and_drop_v2
     done
     eox_tenant

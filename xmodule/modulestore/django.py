@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from importlib import import_module
 import gettext
 import logging
+from os import path
 
 from pkg_resources import resource_filename
 import re  # lint-amnesty, pylint: disable=wrong-import-order
@@ -29,6 +30,7 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.modulestore.draft_and_published import BranchSettingMixin  # lint-amnesty, pylint: disable=wrong-import-position
 from xmodule.modulestore.mixed import MixedModuleStore  # lint-amnesty, pylint: disable=wrong-import-position
 from xmodule.util.xmodule_django import get_current_request_hostname  # lint-amnesty, pylint: disable=wrong-import-position
+from xmodule.waffle import ENABLE_ATLAS_TRANSLATIONS
 
 # We also may not always have the current request user (crum) module available
 try:
@@ -369,8 +371,7 @@ class XBlockI18nService:
     def __init__(self, block=None):
         """
         Attempt to load an XBlock-specific GNU gettext translator using the XBlock's own domain
-        translation catalog, currently expected to be found at:
-            <xblock_root>/conf/locale/<language>/LC_MESSAGES/<domain>.po|mo
+        translation catalog.
         If we can't locate the domain translation catalog then we fall-back onto
         django.utils.translation, which will point to the system's own domain translation catalog
         This effectively achieves translations by coincidence for an XBlock which does not provide
@@ -378,21 +379,63 @@ class XBlockI18nService:
         """
         self.translator = django.utils.translation
         if block:
-            xblock_class = getattr(block, 'unmixed_class', block.__class__)
-            xblock_resource = xblock_class.__module__
+            xblock_domain = 'django'
+            selected_language = get_language()
+
+            xblock_locale_path = self.get_python_locale_directory(block)
+            if xblock_locale_path:
+                try:
+                    self.translator = gettext.translation(
+                        xblock_domain,
+                        xblock_locale_path,
+                        [to_locale(selected_language if selected_language else settings.LANGUAGE_CODE)]
+                    )
+                except OSError:
+                    # Fall back to the default Django translator if the XBlock translator is not found.
+                    pass
+
+    @staticmethod
+    def get_python_locale_directory(block):
+        """
+        Return the XBlock locale directory with support for OEP-58 updated translation infrastructure.
+
+        This function works in two modes:
+            1. With ENABLE_ATLAS_TRANSLATIONS enabled it loads OEP-58 external translations.
+            2. With ENABLE_ATLAS_TRANSLATIONS disabled it uses the old in-xblock translations which are
+              typically found at <xblock_root>/conf/locale/<language>/LC_MESSAGES/<domain>.po|mo
+
+        The second mode is going to be eventually deprecated when OEP-58 is fully in use.
+        """
+        xblock_class = getattr(block, 'unmixed_class', block.__class__)
+        xblock_resource = xblock_class.__module__
+
+        if ENABLE_ATLAS_TRANSLATIONS.is_enabled():
+            xblock_module_name = xblock_resource
+            xblock_locale_path = path.join(settings.PLUGINS_TRANSLATIONS_ROOT, xblock_module_name, 'conf/locale')
+        else:
             xblock_locale_dir = 'translations'
             xblock_locale_path = resource_filename(xblock_resource, xblock_locale_dir)
-            xblock_domain = 'text'
-            selected_language = get_language()
-            try:
-                self.translator = gettext.translation(
-                    xblock_domain,
-                    xblock_locale_path,
-                    [to_locale(selected_language if selected_language else settings.LANGUAGE_CODE)]
-                )
-            except OSError:
-                # Fall back to the default Django translator if the XBlock translator is not found.
-                pass
+
+        return xblock_locale_path
+
+    @staticmethod
+    def get_javascript_locale_path(block):
+        """
+        Return the XBlock compiled javascript i18n path with support for OEP-58 updated translation infrastructure.
+
+        This function only works With ENABLE_ATLAS_TRANSLATIONS waffle switch enabled.
+        """
+        xblock_class = getattr(block, 'unmixed_class', block.__class__)
+        xblock_resource = xblock_class.__module__
+        selected_language = get_language()
+
+        if ENABLE_ATLAS_TRANSLATIONS.is_enabled():
+            xblock_module_name = xblock_resource
+            xblock_locale_dir = 'conf/locale/{language}/LC_MESSAGES'.format(language=selected_language)
+            translations_dir = settings.XBLOCK_TRANSLATIONS_DIRECTORY
+            xblock_locale_path = path.join(translations_dir, xblock_module_name, xblock_locale_dir, 'text.js')
+            if path.exists(xblock_locale_path):
+                return xblock_locale_path
 
     def __getattr__(self, name):
         name = 'gettext' if name == 'ugettext' else name

@@ -2,6 +2,7 @@
 API methods related to xblock state.
 """
 
+import pkg_resources
 
 from openedx.core.lib.cache_utils import CacheInvalidationManager
 from common.djangoapps.xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration
@@ -25,6 +26,14 @@ def disabled_xblocks():
     Note that this method is independent of `XBlockStudioConfigurationFlag` and `XBlockStudioConfiguration`.
     """
     return XBlockConfiguration.objects.current_set().filter(enabled=False)
+
+
+def get_xblocks_entry_points():
+    return [entry_point for entry_point in pkg_resources.iter_entry_points(group='xblock.v1')]
+
+def get_xblocks():
+    return [entry_point.resolve() for entry_point in get_xblocks_entry_points()]
+
 
 
 def authorable_xblocks(allow_unsupported=False, name=None):

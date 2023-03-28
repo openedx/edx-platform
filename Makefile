@@ -43,7 +43,16 @@ extract_translations: ## extract localizable strings from sources
 push_translations: ## push source strings to Transifex for translation
 	i18n_tool transifex push
 
-pull_translations:  ## pull translations from Transifex
+pull_xblock_translations:
+ifeq ($(OPENEDX_ATLAS_PULL),)
+	@echo "atlas is not used due to empty OPENEDX_ATLAS_PULL environment variable"
+else
+	rm -rf conf/xblocks/locale
+	mkdir conf/xblocks/locale
+	python manage.py lms xblocks_atlas_pull_module
+endif
+
+pull_translations: pull_xblock_translations ## pull translations from Transifex
 	git clean -fdX conf/locale
 	i18n_tool transifex pull
 	i18n_tool extract
