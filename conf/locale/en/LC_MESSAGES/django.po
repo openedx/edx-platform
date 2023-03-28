@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-19 20:35+0000\n"
-"PO-Revision-Date: 2023-03-19 20:35:49.010190\n"
+"POT-Creation-Date: 2023-03-26 20:35+0000\n"
+"PO-Revision-Date: 2023-03-26 20:35:58.162914\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -240,6 +240,17 @@ msgid ""
 "OPTIONAL: After this date/time, users will no longer be able to enroll in "
 "this mode. Leave this blank if users can enroll in this mode until "
 "enrollment closes for the course."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -11693,6 +11704,10 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Library Content"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
