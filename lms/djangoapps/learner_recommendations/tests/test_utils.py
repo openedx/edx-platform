@@ -247,8 +247,8 @@ class TestGetCrossProductRecommendationsMethod(TestCase):
     """Test for get_cross_product_recommendations method"""
 
     @ddt.data(
-        ('adamX+HUM2x', ['AdelaideX+AddictionX', 'AdelaideX+AnalyticsX']),
-        ('HarvardX+CS50P', ['AdelaideX+AddictionY', 'AdelaideX+AnalyticsY']),
+        ("HKUx+FinTechT1x", ["ColumbiaX+BC24FNTC", "MITx+BLN"]),
+        ("RITx+CYBER501x", ["UniversityofUtah+BC24CYB", "HarvardX+CYB"]),
         ('NoKeyAssociated', None)
     )
     @ddt.unpack

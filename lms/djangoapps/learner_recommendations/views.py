@@ -22,8 +22,11 @@ from lms.djangoapps.learner_recommendations.toggles import enable_course_about_p
 from lms.djangoapps.learner_recommendations.utils import (
     get_amplitude_course_recommendations,
     filter_recommended_courses,
+    _has_country_restrictions,
 )
-from lms.djangoapps.learner_recommendations.serializers import RecommendationsSerializer
+from lms.djangoapps.learner_recommendations.serializers import RecommendationsSerializer, CrossProductRecommendationsSerializer
+from lms.djangoapps.learner_recommendations.utils import get_cross_product_recommendations
+from openedx.core.djangoapps.catalog.utils import get_course_data
 
 
 log = logging.getLogger(__name__)
@@ -113,6 +116,63 @@ class AmplitudeRecommendationsView(APIView):
                 {
                     "courses": recommended_courses,
                     "is_control": is_control,
+                }
+            ).data,
+            status=200,
+        )
+
+
+class CrossProductRecommendationsView(APIView):
+    """
+    **Example Request**
+
+    GET api/learner_recommendations/cross_product/{course_id}/
+    """
+
+    authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, course_id):
+        """
+        Returns cross product recommendation courses
+        """
+        course_locator = CourseKey.from_string(course_id)
+        course_key = f'{course_locator.org}+{course_locator.course}'
+
+        associated_course_keys = get_cross_product_recommendations(course_key)
+
+        if associated_course_keys == None:
+            return Response([], status=200)
+
+        fields = [
+            "key",
+            "uuid",
+            "title",
+            "owners",
+            "image",
+            "url_slug",
+            "course_type",
+            "course_runs",
+            "location_restriction",
+        ]
+        course_data = [get_course_data(key, fields) for key in associated_course_keys]
+
+        ip_address = get_client_ip(request)[0]
+        user_country_code = country_code_from_ip(ip_address).upper()
+
+        for course in course_data:
+            if _has_country_restrictions(course, user_country_code):
+                course_data.remove(course)
+
+        for course in course_data:
+            course.update({
+                "active_course_run": course.get("course_runs")[0]
+            })
+
+        return Response(
+            CrossProductRecommendationsSerializer(
+                {
+                    "courses": course_data
                 }
             ).data,
             status=200,

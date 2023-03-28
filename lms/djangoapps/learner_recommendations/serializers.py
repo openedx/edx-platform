@@ -39,6 +39,11 @@ class RecommendedCourseSerializer(serializers.Serializer):
         return f"course/{url_slug}"
 
 
+class CrossProductCourseSerializer(RecommendedCourseSerializer):
+    """Serializer for a cross product recommended course"""
+    courseType = serializers.CharField(source="course_type")
+
+
 class RecommendationsSerializer(serializers.Serializer):
     """Recommended courses for course about page"""
 
@@ -48,4 +53,11 @@ class RecommendationsSerializer(serializers.Serializer):
     isControl = serializers.BooleanField(
         source="is_control",
         default=None
+    )
+
+
+class CrossProductRecommendationsSerializer(serializers.Serializer):
+    """Cross product recommendation courses for course about page"""
+    courses = serializers.ListField(
+        child=CrossProductCourseSerializer(), allow_empty=True
     )
