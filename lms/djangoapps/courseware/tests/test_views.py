@@ -3540,6 +3540,7 @@ class TestPublicVideoXBlockView(TestBasePublicVideoXBlock):
 
     @contextmanager
     def mock_get_learn_more_url(self, **kwargs):
+        """ Helper for mocking get_learn_more_button_url """
         with patch.object(
             PublicVideoXBlockView,
             'get_learn_more_button_url',
