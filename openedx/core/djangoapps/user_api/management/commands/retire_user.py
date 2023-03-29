@@ -68,6 +68,8 @@ class Command(BaseCommand):
             raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
 
         for record in userinfo:
+            if isinstance(record, bytes):
+                record = record.decode('utf-8')
             userdata = record.split(',')
             username = userdata[0].strip()
             user_email = userdata[1].strip()
