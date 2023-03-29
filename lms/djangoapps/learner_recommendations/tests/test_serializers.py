@@ -85,6 +85,7 @@ class TestDashboardRecommendationsSerializer(TestCase):
 
 
 class TestCrossProductRecommendationsSerializer(TestCase):
+    """Tests for the Cross Product Recommendations Serializer"""
 
     def mock_recommended_courses(self, num_of_courses):
         """Course data mock"""

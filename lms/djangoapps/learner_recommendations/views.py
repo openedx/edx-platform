@@ -150,7 +150,7 @@ class CrossProductRecommendationsView(APIView):
 
         associated_course_keys = get_cross_product_recommendations(course_key)
 
-        if associated_course_keys == None:
+        if associated_course_keys is None:
             return self.empty_response()
 
         fields = [
@@ -169,12 +169,14 @@ class CrossProductRecommendationsView(APIView):
         ip_address = get_client_ip(request)[0]
         user_country_code = country_code_from_ip(ip_address).upper()
 
-        filtered_course_data = [course for course in course_data if not _has_country_restrictions(course, user_country_code)]
+        for course in course_data[:]:
+            if _has_country_restrictions(course, user_country_code):
+                course_data.remove(course)
 
-        if len(filtered_course_data) == 0:
+        if len(course_data) == 0:
             return self.empty_response()
 
-        for course in filtered_course_data:
+        for course in course_data:
             course.update({
                 "active_course_run": course.get("course_runs")[0]
             })
@@ -182,7 +184,7 @@ class CrossProductRecommendationsView(APIView):
         return Response(
             CrossProductRecommendationsSerializer(
                 {
-                    "courses": filtered_course_data
+                    "courses": course_data
                 }).data,
             status=200
         )

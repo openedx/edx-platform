@@ -163,21 +163,30 @@ class TestCrossProductRecommendationsView(APITestCase):
         self.client.login(username=self.user.username, password="test")
         self.associated_course_keys = ["ColumbiaX+BC24FNTC", "MITx+BLN"]
 
-    def get_url(self, course_key):
+    def _get_url(self, course_key):
+        """
+        Returns the url with a sepcific course id
+        """
+
         return reverse_lazy(
             "learner_recommendations:cross_product_recommendations",
             kwargs={'course_id': f'course-v1:{course_key}+Test_Course'}
         )
 
-    def get_recommended_courses(self, has_location_restriction=False, course_restriction_num=0):
+    def _get_recommended_courses(self, has_location_restriction=False, course_restriction_num=0):
+        """
+        Returns an array of 2 discovery courses with or without country restrictions
+        """
         courses = []
-        location_restriction = {
+        restriction_object = {
             "restriction_type": "blocklist",
             "countries": ["CN"],
             "states": []
         }
 
         for i in enumerate(self.associated_course_keys):
+            location_restriction = restriction_object if has_location_restriction and course_restriction_num > 0 else None
+
             courses.append({
                 "key": i[1],
                 "uuid": "6f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
@@ -201,7 +210,7 @@ class TestCrossProductRecommendationsView(APITestCase):
                         "availability": "Current",
                     }
                 ],
-                "location_restriction": location_restriction if has_location_restriction and course_restriction_num > 0 else None
+                "location_restriction": location_restriction
             })
 
             if course_restriction_num > 0:
@@ -218,10 +227,10 @@ class TestCrossProductRecommendationsView(APITestCase):
         Verify 2 cross product course recommendations are returned.
         """
         country_code_from_ip_mock.return_value = "za"
-        mock_course_data = self.get_recommended_courses()
+        mock_course_data = self._get_recommended_courses()
         get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
 
-        response = self.client.get(self.get_url('HKUx+FinTechT1x'))
+        response = self.client.get(self._get_url('HKUx+FinTechT1x'))
         response_content = json.loads(response.content)
         course_data = response_content["courses"]
 
@@ -238,10 +247,10 @@ class TestCrossProductRecommendationsView(APITestCase):
         if there is a location restriction for one course for the users country
         """
         country_code_from_ip_mock.return_value = "cn"
-        mock_course_data = self.get_recommended_courses(True, 1)
+        mock_course_data = self._get_recommended_courses(True, 1)
         get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
 
-        response = self.client.get(self.get_url('HKUx+FinTechT1x'))
+        response = self.client.get(self._get_url('HKUx+FinTechT1x'))
         response_content = json.loads(response.content)
         course_data = response_content["courses"]
 
@@ -259,11 +268,11 @@ class TestCrossProductRecommendationsView(APITestCase):
         for the users country.
         """
         country_code_from_ip_mock.return_value = "cn"
-        mock_course_data = self.get_recommended_courses(True, 2)
+        mock_course_data = self._get_recommended_courses(True, 2)
 
         get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
 
-        response = self.client.get(self.get_url('HKUx+FinTechT1x'))
+        response = self.client.get(self._get_url('HKUx+FinTechT1x'))
         response_content = json.loads(response.content)
         course_data = response_content["courses"]
 
@@ -274,7 +283,7 @@ class TestCrossProductRecommendationsView(APITestCase):
         """
         Verify an empty array of courses is returned if there are no associated course keys.
         """
-        response = self.client.get(self.get_url('No+Associations'))
+        response = self.client.get(self._get_url('No+Associations'))
         response_content = json.loads(response.content)
         course_data = response_content["courses"]
 
