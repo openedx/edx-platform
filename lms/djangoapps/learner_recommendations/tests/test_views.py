@@ -173,19 +173,19 @@ class TestCrossProductRecommendationsView(APITestCase):
             kwargs={'course_id': f'course-v1:{course_key}+Test_Course'}
         )
 
-    def _get_recommended_courses(self, has_location_restriction=False, course_restriction_num=0):
+    def _get_recommended_courses(self, has_location_restriction=False, restriction_num=0):
         """
         Returns an array of 2 discovery courses with or without country restrictions
         """
         courses = []
-        restriction_object = {
+        restriction_obj = {
             "restriction_type": "blocklist",
             "countries": ["CN"],
             "states": []
         }
 
         for i in enumerate(self.associated_course_keys):
-            location_restriction = restriction_object if has_location_restriction and course_restriction_num > 0 else None
+            location_restriction = restriction_obj if has_location_restriction and restriction_num > 0 else None
 
             courses.append({
                 "key": i[1],
@@ -213,8 +213,8 @@ class TestCrossProductRecommendationsView(APITestCase):
                 "location_restriction": location_restriction
             })
 
-            if course_restriction_num > 0:
-                course_restriction_num -= 1
+            if restriction_num > 0:
+                restriction_num -= 1
 
         return courses
 
