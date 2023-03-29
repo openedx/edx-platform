@@ -125,6 +125,12 @@ class CourseModeForm(forms.ModelForm):
         mode_slug = cleaned_data.get("mode_slug")
         upgrade_deadline = cleaned_data.get("_expiration_datetime")
         verification_deadline = cleaned_data.get("verification_deadline")
+        expiration_datetime_is_explicit = cleaned_data.get("expiration_datetime_is_explicit")
+
+        if expiration_datetime_is_explicit and upgrade_deadline is None:
+            raise forms.ValidationError(
+                "An upgrade deadline must be specified when setting Lock upgrade deadline date to True."
+            )
 
         # Allow upgrade deadlines ONLY for the "verified" mode
         # This avoids a nasty error condition in which the upgrade deadline is set
@@ -189,6 +195,7 @@ class CourseModeAdmin(admin.ModelAdmin):
         'min_price',
         'currency',
         '_expiration_datetime',
+        'expiration_datetime_is_explicit',
         'verification_deadline',
         'sku',
         'android_sku',

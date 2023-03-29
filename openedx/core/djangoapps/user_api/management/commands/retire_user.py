@@ -10,7 +10,7 @@ from social_django.models import UserSocialAuth
 from common.djangoapps.student.models import AccountRecovery, Registration, get_retired_email_by_email
 from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_models
 
-from ...models import UserRetirementStatus
+from ...models import BulkUserRetirementConfig, UserRetirementStatus
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +48,35 @@ class Command(BaseCommand):
             help='Comma separated file that have username and user_email of the users that needs to be retired'
         )
 
+    def append_users_lists(self, file_handler, user_model):
+        """
+        Function to extract users list from CSV files.
+        """
+        unknown_users = []
+        users = []
+        if file_handler is None:
+            raise CommandError("No user file specified")
+
+        try:
+            if isinstance(file_handler, str):
+                userinfo = open(file_handler, 'r')
+            else:
+                userinfo = file_handler.open('r')
+        except Exception as exc:
+            error_message = f'Error while reading file: {exc}'
+            logger.error(error_message)
+            raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
+
+        for record in userinfo:
+            userdata = record.split(',')
+            username = userdata[0].strip()
+            user_email = userdata[1].strip()
+            try:
+                users.append(User.objects.get(username=username, email=user_email))
+            except user_model.DoesNotExist:
+                unknown_users.append({username: user_email})
+        return users, unknown_users
+
     def check_user_exist(self, user_model, userfile, user_name, useremail):
         """
         Function to check if user exists. This function will execute for userfile
@@ -63,21 +92,7 @@ class Command(BaseCommand):
         user = user_name
         email = useremail
         if userfile and (not user and not email):
-            try:
-                userinfo = open(userfile, 'r')
-            except Exception as exc:
-                error_message = f'Error while reading file: {exc}'
-                logger.error(error_message)
-                raise CommandError(error_message)  # lint-amnesty, pylint: disable=raise-missing-from
-
-            for record in userinfo:
-                userdata = record.split(',')
-                username = userdata[0].strip()
-                user_email = userdata[1].strip()
-                try:
-                    users.append(User.objects.get(username=username, email=user_email))
-                except user_model.DoesNotExist:
-                    unknown_users.append({username: user_email})
+            users, unknown_users = self.append_users_lists(userfile, user_model)
         elif (user and email) and not userfile:
             try:
                 users.append(User.objects.get(username=user, email=email))
@@ -97,13 +112,21 @@ class Command(BaseCommand):
         """
         Execute the command.
         """
-        userfile = options['user_file']
-        user_name = options['username']
-        useremail = options['user_email']
-
+        users = []
+        unknown_users = []
         user_model = get_user_model()
 
-        users, unknown_users = self.check_user_exist(user_model, userfile, user_name, useremail)
+        if not options['username'] and not options['user_email'] and not options['user_file']:
+            bulk_user_retirement_config = BulkUserRetirementConfig.current()
+            file_handle = bulk_user_retirement_config.csv_file if bulk_user_retirement_config.is_enabled() else None
+            users, unknown_users = self.append_users_lists(file_handle, user_model)
+        else:
+            userfile = options['user_file']
+            user_name = options['username']
+            useremail = options['user_email']
+
+            users, unknown_users = self.check_user_exist(user_model, userfile, user_name, useremail)
+
         # Raise if found any such user that does not exit
         if len(unknown_users) > 0:
             error_message = (

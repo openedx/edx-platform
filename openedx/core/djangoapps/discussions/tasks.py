@@ -12,7 +12,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from .config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 
-from .models import DiscussionsConfiguration, Provider
+from .models import DiscussionsConfiguration, Provider, DiscussionTopicLink
 from .utils import get_accessible_discussion_xblocks_by_course_id
 
 log = logging.getLogger(__name__)
@@ -208,6 +208,11 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
                 vertical.discussion_enabled = False
             store.update_item(vertical, user_id)
 
+    # There should be no existing topics before this job runs.
+    # When jobs run out of sync topics for all are created.
+    # Delete all discussion topic links for the course.
+    DiscussionTopicLink.objects.filter(context_key=course_key).delete()
+
     # If there are any graded subsections that have discussion units,
     # then enable discussions for graded subsections for the course
     enable_graded_subsections = bool(graded_subsections & subsections_with_discussions)
@@ -219,6 +224,7 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         course = store.get_course(course_key)
         provider = Provider.OPEN_EDX
         course.discussions_settings['provider'] = provider
+        course.discussions_settings['provider_type'] = provider
         course.discussions_settings['enable_graded_units'] = enable_graded_subsections
         course.discussions_settings['unit_level_visibility'] = True
         store.update_item(course, user_id)
@@ -227,3 +233,7 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         discussion_config.enable_graded_units = enable_graded_subsections
         discussion_config.unit_level_visibility = True
         discussion_config.save()
+    update_discussions_settings_from_course_task.apply_async(
+        args=[str(course_key)],
+        countdown=300,
+    )

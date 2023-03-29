@@ -28,12 +28,13 @@ def filter_discussion_xblocks_from_response(response, course_key):
         # Removing reference of discussion xblocks from unit
         # These references needs to be removed because they no longer exist
         for _, block_data in filtered_blocks.items():
-            descendants = block_data.get('descendants', [])
-            if descendants:
-                descendants = [
-                    descendant for descendant in descendants
-                    if descendant not in discussion_xblocks
-                ]
-                block_data['descendants'] = descendants
+            for key in ['descendants', 'children']:
+                descendants = block_data.get(key, [])
+                if descendants:
+                    descendants = [
+                        descendant for descendant in descendants
+                        if descendant not in discussion_xblocks
+                    ]
+                    block_data[key] = descendants
         response.data['blocks'] = filtered_blocks
     return response

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-12 20:35+0000\n"
-"PO-Revision-Date: 2023-03-12 20:35:55.895088\n"
+"POT-Creation-Date: 2023-03-26 20:35+0000\n"
+"PO-Revision-Date: 2023-03-26 20:35:58.162914\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -249,6 +249,20 @@ msgstr ""
 "ØⱣŦƗØNȺŁ: Ⱥɟʇǝɹ ʇɥᴉs dɐʇǝ/ʇᴉɯǝ, nsǝɹs ʍᴉll nø lønƃǝɹ bǝ ɐblǝ ʇø ǝnɹøll ᴉn "
 "ʇɥᴉs ɯødǝ. Łǝɐʌǝ ʇɥᴉs blɐnʞ ᴉɟ nsǝɹs ɔɐn ǝnɹøll ᴉn ʇɥᴉs ɯødǝ nnʇᴉl "
 "ǝnɹøllɯǝnʇ ɔløsǝs ɟøɹ ʇɥǝ ɔønɹsǝ."
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr "Łøɔʞ ndƃɹɐdǝ dǝɐdlᴉnǝ dɐʇǝ"
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
+"ØⱣŦƗØNȺŁ: Sǝʇ ʇø Ŧɹnǝ ʇø løɔʞ ᴉn ʇɥǝ ǝxdlᴉɔᴉʇlʎ dǝɟᴉnǝd ndƃɹɐdǝ dǝɐdlᴉnǝ "
+"dɐʇǝ. Sǝʇ ʇø Fɐlsǝ ᴉɟ ʇɥǝɹǝ ᴉs nø ndƃɹɐdǝ dǝɐdlᴉnǝ øɹ ʇø nsǝ ʇɥǝ dǝɟɐnlʇ "
+"ndƃɹɐdǝ dǝɐdlᴉnǝ."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -13015,6 +13029,10 @@ msgstr "Ødǝn Ɍǝsdønsǝ"
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Library Content"
 msgstr "Łᴉbɹɐɹʎ Ȼønʇǝnʇ"
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr "Đɹɐƃ ɐnd Đɹød"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"

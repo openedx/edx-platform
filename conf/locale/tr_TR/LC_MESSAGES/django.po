@@ -14543,6 +14543,14 @@ msgstr "E-posta"
 msgid "Return To %s"
 msgstr "%s Sayfasına Geri Dön"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -14924,6 +14932,12 @@ msgstr "İndirmeler ve altyazılar"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Video dosyasını indir"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr "Twitter'da paylaş"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16133,11 +16147,6 @@ msgstr "Sertifikanızı görmek için bağlantıya tıklayın."
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Facebook'ta paylaş"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "Twitter'da paylaş"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
@@ -24086,11 +24095,11 @@ msgstr "Erişim Ver"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Copy"
-msgstr ""
+msgstr "Kopyala"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
-msgstr ""
+msgstr "Erişimi Yönet"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

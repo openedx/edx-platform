@@ -495,7 +495,7 @@ class VideoBlock(
         Returns the public video url
         """
         if self.public_access and self._is_lms_platform():
-            from lms.djangoapps.courseware.toggles import PUBLIC_VIDEO_SHARE
+            from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
             if PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key):
                 return urljoin(
                     settings.LMS_ROOT_URL,
