@@ -1,6 +1,8 @@
 """
 Tests for course_overviews app.
 """
+import json
+import os
 from io import BytesIO
 from unittest import mock
 
@@ -35,6 +37,7 @@ from xmodule.course_block import (  # lint-amnesty, pylint: disable=wrong-import
 )
 from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -600,6 +603,24 @@ class CourseOverviewTestCase(CatalogIntegrationMixin, ModuleStoreTestCase, Cache
         assert overviews_by_id[old_overview.id].id == old_overview.id
         assert overviews_by_id[non_existent_course_key] is None
         assert mock_load_from_modulestore.call_count == 3
+
+    def test_mongo_course_overview_generation(self):
+        """
+        Tests that course_overview can be generated for old Mongo course.
+        """
+        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data/mongo_course.json')
+        with open(file_path) as file:
+            course_structure = json.load(file)
+
+        store.collection.insert_one(course_structure)
+
+        course_key = CourseKey.from_string('org.0/course_0/Run_0')
+        assert CourseOverview.course_exists(course_key)
+        assert not CourseOverview.objects.filter(id=course_key).exists()
+
+        CourseOverview.load_from_module_store(course_key)
+        assert CourseOverview.objects.filter(id=course_key).exists()
 
 
 @ddt.ddt
