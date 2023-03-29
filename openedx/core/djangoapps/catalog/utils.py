@@ -444,10 +444,26 @@ def get_course_runs():
     return course_runs
 
 
+def _catalog_course_cache_key(course_identifier, catalog_integration):
+    """
+    Helper to generate a cache key for catalog courses.
+    In most cases the course_identifier is a course uuid, but in some cases
+    where we don't have a uuid it is a course key.
+    """
+    return f"{catalog_integration.CACHE_KEY}.course.{course_identifier}"
+
+
+def _catalog_course_run_cache_key(course_run_key, catalog_integration):
+    """
+    Helper to generate a cache key for catalog course runs.
+    """
+    return f"{catalog_integration.CACHE_KEY}.course_run.{course_run_key}"
+
+
 def get_course_runs_for_course(course_uuid):  # lint-amnesty, pylint: disable=missing-function-docstring
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course runs')
     if user:
-        cache_key = f"{catalog_integration.CACHE_KEY}.course.{course_uuid}.course_runs"
+        cache_key = _catalog_course_cache_key(course_uuid, catalog_integration)
 
         data = get_api_data(
             catalog_integration,
@@ -467,7 +483,7 @@ def get_course_runs_for_course(course_uuid):  # lint-amnesty, pylint: disable=mi
 def get_owners_for_course(course_uuid):  # lint-amnesty, pylint: disable=missing-function-docstring
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Owners')
     if user:
-        cache_key = f"{catalog_integration.CACHE_KEY}.course.{course_uuid}.course_runs"
+        cache_key = _catalog_course_cache_key(course_uuid, catalog_integration)
 
         data = get_api_data(
             catalog_integration,
@@ -500,7 +516,7 @@ def get_course_uuid_for_course(course_run_key):
         api_client = get_catalog_api_client(user)
         base_api_url = get_catalog_api_base_url()
 
-        run_cache_key = f"{catalog_integration.CACHE_KEY}.course_run.{course_run_key}"
+        run_cache_key = _catalog_course_run_cache_key(course_run_key, catalog_integration)
 
         course_run_data = get_api_data(
             catalog_integration,
@@ -516,7 +532,7 @@ def get_course_uuid_for_course(course_run_key):
         course_key_str = course_run_data.get('course', None)
 
         if course_key_str:
-            run_cache_key = f"{catalog_integration.CACHE_KEY}.course.{course_key_str}"
+            cache_key = _catalog_course_cache_key(course_key_str, catalog_integration)
 
             data = get_api_data(
                 catalog_integration,
@@ -524,7 +540,7 @@ def get_course_uuid_for_course(course_run_key):
                 resource_id=course_key_str,
                 api_client=api_client,
                 base_api_url=base_api_url,
-                cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
+                cache_key=cache_key if catalog_integration.is_cache_enabled else None,
                 long_term_cache=True,
                 many=False,
             )
@@ -613,7 +629,7 @@ def get_course_run_details(course_run_key, fields):
         error_message_field=f'Data for course_run {course_run_key}'
     )
     if user:
-        cache_key = f'{catalog_integration.CACHE_KEY}.course_runs'
+        cache_key =  _catalog_course_run_cache_key(course_run_key, catalog_integration)
 
         course_run_details = get_api_data(
             catalog_integration,
@@ -758,7 +774,7 @@ def get_course_data(course_key_str, fields, querystring=None):
         api_client = get_catalog_api_client(user)
         base_api_url = get_catalog_api_base_url()
         if course_key_str:
-            course_cache_key = f'{catalog_integration.CACHE_KEY}.course.{course_key_str}'
+            course_cache_key = _catalog_course_cache_key(catalog_integration, course_key_str)
             data = get_api_data(
                 catalog_integration,
                 'courses',
@@ -791,7 +807,7 @@ def get_course_run_data(course_run_id, fields):
         api_client = get_catalog_api_client(user)
         base_api_url = get_catalog_api_base_url()
         if course_run_id:
-            course_run_cache_key = f'{catalog_integration.CACHE_KEY}.course_run.{course_run_id}'
+            course_run_cache_key = _catalog_course_run_cache_key(course_run_id)
             data = get_api_data(
                 catalog_integration,
                 'course_runs',
