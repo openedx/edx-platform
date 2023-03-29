@@ -204,60 +204,6 @@ def filter_recommended_courses(
     return filtered_recommended_courses
 
 
-def get_programs_based_on_course(request_course, country_code, user):
-    """
-    Returns a program for the course. If a course is part of multiple programs,
-    this function returns the program with the highest price.
-    """
-    max_price, max_price_program = 0, {}
-    programs = get_programs(course=request_course)
-
-    if not programs:
-        return None
-
-    for program in programs:
-        if program.get('status') != 'active' or _has_country_restrictions(program, country_code):
-            continue
-
-        price = program['price_ranges'][0]['total']
-        if price > max_price:
-            if fetch_program_enrollments_by_student(program_uuids=[program.get('uuid')], user=user).exists():
-                continue
-
-            course_keys = [
-                course['key']
-                for course in program.get('courses', [])
-                if course.get('key') and course.get('key') != request_course
-            ]
-            if _remove_user_enrolled_course_keys(user, course_keys):
-                max_price_program = program
-                max_price = price
-
-    if not max_price_program:
-        return None
-
-    course_pacing_type, total_weeks_to_complete = '', 0
-    for course in max_price_program.get('courses'):
-        for course_run in course.get('course_runs'):
-            if course_run.get('status') == 'published':
-                if not course_pacing_type:
-                    course_pacing_type = course_run.get("pacing_type")
-                total_weeks_to_complete += int(course_run.get("weeks_to_complete"))
-
-    program_upsell = {
-        "title": max_price_program.get('title'),
-        "marketing_url": max_price_program.get('marketing_url'),
-        "courses_count": len(max_price_program.get('courses')),
-        "pacing_type": course_pacing_type,
-        "weeks_to_complete": _get_program_duration(total_weeks_to_complete),
-        "min_hours": max_price_program.get('min_hours_effort_per_week'),
-        "max_hours": max_price_program.get('max_hours_effort_per_week'),
-        "type": max_price_program.get('type'),
-    }
-
-    return program_upsell
-
-
 class CrossProductRecommendationsDictionary:
     """
     Dictionary containing associated course keys
