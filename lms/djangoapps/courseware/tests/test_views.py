@@ -2,6 +2,7 @@
 Tests courseware views.py
 """
 
+from contextlib import contextmanager
 import html
 import itertools
 import json
@@ -27,6 +28,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
+from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from rest_framework import status
 from web_fragments.fragment import Fragment
@@ -3536,6 +3538,16 @@ class TestPublicVideoXBlockView(TestBasePublicVideoXBlock):
     request = RequestFactory().get('/?utm_source=edx.org&utm_medium=referral&utm_campaign=video')
     base_block = PublicVideoXBlockView(request=request)
 
+    @contextmanager
+    def mock_get_learn_more_url(self, **kwargs):
+        """ Helper for mocking get_learn_more_button_url """
+        with patch.object(
+            PublicVideoXBlockView,
+            'get_learn_more_button_url',
+            **kwargs
+        ) as mock_get_learn_more_url:
+            yield mock_get_learn_more_url
+
     def test_get_template_and_context(self):
         """
         Get template and context.
@@ -3543,10 +3555,11 @@ class TestPublicVideoXBlockView(TestBasePublicVideoXBlock):
         self.setup_course(enable_waffle=True)
         fragment = MagicMock()
         with patch.object(self.video_block_public, "render", return_value=fragment):
-            template, context = self.base_block.get_template_and_context(self.course, self.video_block_public)
-            assert template == 'public_video.html'
-            assert context['fragment'] == fragment
-            assert context['course'] == self.course
+            with self.mock_get_learn_more_url():
+                template, context = self.base_block.get_template_and_context(self.course, self.video_block_public)
+        assert template == 'public_video.html'
+        assert context['fragment'] == fragment
+        assert context['course'] == self.course
 
     @ddt.data("poster", None)
     def test_get_social_sharing_metadata(self, poster_url):
@@ -3587,6 +3600,62 @@ class TestPublicVideoXBlockView(TestBasePublicVideoXBlock):
         }
         url = self.base_block.build_url(base_url, params, utm_params)
         assert url == 'http://test.server?param1=value1&param2=value2&utm_source=edx.org'
+
+    @patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": False})
+    def test_get_learn_more_button_url__marketing_not_enabled(self):
+        """
+        Test that when the marketing site isn't enabled, the learn more button
+        goes to the 'about_course' view
+        """
+        self.setup_course()
+        CourseOverviewFactory.create(
+            id=self.course.id,
+        )
+        url = self.base_block.get_learn_more_button_url(
+            self.course, {}
+        )
+        self.assertEqual(
+            url,
+            reverse('about_course', kwargs={'course_id': str(self.course.id)})
+        )
+
+    @ddt.unpack
+    @ddt.data(
+        (True, False),
+        (False, True),
+        (True, True),
+        (True, False)
+    )
+    @patch.dict(settings.FEATURES, {"ENABLE_MKTG_SITE": True})
+    def test_get_learn_more_button_url(self, has_marketing_url, has_override):
+        """
+        Test for learn more button url behavior when the marketing site is
+        enabled but considering overrides and missing marketing urls.
+        """
+        self.setup_course()
+        utm_params = {'utm_source': 'askjeeves'}
+        overview = CourseOverviewFactory.create(id=self.course.id)
+        if has_marketing_url:
+            overview.marketing_url = 'mysite.com/this_course'
+            overview.save()
+
+        url_overrides = {'someothercourse': 'someotherurl'}
+        overridden_url = "goto.this/site/instead"
+        if has_override:
+            url_overrides[str(self.course.id)] = overridden_url
+
+        with override_settings(MKTG_URL_OVERRIDES=url_overrides):
+            url = self.base_block.get_learn_more_button_url(self.course, utm_params)
+
+        if has_override:
+            expected_url = overridden_url
+        elif has_marketing_url:
+            expected_url = overview.marketing_url
+        else:
+            expected_url = reverse('about_course', kwargs={'course_id': str(self.course.id)})
+
+        self.assertIn(expected_url, url)
+        self.assertIn(urlencode(utm_params), url)
 
 
 class TestPublicVideoXBlockEmbedView(TestBasePublicVideoXBlock):
