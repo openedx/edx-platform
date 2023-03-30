@@ -23,7 +23,7 @@ from lms.djangoapps.courseware.block_render import (
     xblock_view,
     xqueue_callback
 )
-from lms.djangoapps.courseware.views import views as courseware_views
+from lms.djangoapps.courseware.views import views as courseware_views, public_video as public_video_views
 from lms.djangoapps.courseware.views.index import CoursewareIndex
 from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from lms.djangoapps.debug import views as debug_views
@@ -328,12 +328,12 @@ urlpatterns += [
     ),
     re_path(
         fr'^videos/embed/{settings.USAGE_KEY_PATTERN}$',
-        courseware_views.PublicVideoXBlockEmbedView.as_view(),
+        public_video_views.PublicVideoXBlockEmbedView.as_view(),
         name=RENDER_VIDEO_XBLOCK_EMBED_NAME,
     ),
     re_path(
         fr'^videos/{settings.USAGE_KEY_PATTERN}$',
-        courseware_views.PublicVideoXBlockView.as_view(),
+        public_video_views.PublicVideoXBlockView.as_view(),
         name=RENDER_VIDEO_XBLOCK_NAME,
     ),
 
