@@ -52,6 +52,7 @@
                 this.supportURL = data.supportURL;
                 this.passwordResetSupportUrl = data.passwordResetSupportUrl;
                 this.createAccountOption = data.createAccountOption;
+                this.showRegisterLinks = data.showRegisterLinks;
                 this.accountActivationMessages = data.accountActivationMessages;
                 this.accountRecoveryMessages = data.accountRecoveryMessages;
                 this.hideAuthWarnings = data.hideAuthWarnings;
