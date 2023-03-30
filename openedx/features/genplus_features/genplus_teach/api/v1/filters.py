@@ -15,6 +15,7 @@ class ArticleFilter(django_filters.FilterSet):
     )
     is_completed = django_filters.BooleanFilter(method='filter_is_completed')
     is_archived = django_filters.BooleanFilter()
+    academic_year = django_filters.CharFilter(field_name='academic_year')
 
     def filter_is_completed(self, queryset, name, value):
         teacher = Teacher.objects.get(gen_user__user=self.request.user)
