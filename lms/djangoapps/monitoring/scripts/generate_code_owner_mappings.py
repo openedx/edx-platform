@@ -19,6 +19,9 @@ import click
 
 # Maps edx-platform installed Django apps to the edx repo that contains
 # the app code. Please add in alphabetical order.
+#
+# The URLs here must match the URLs in the "Own: Repos" sheet:
+# https://docs.google.com/spreadsheets/d/1qpWfbPYLSaE_deaumWSEZfz91CshWd3v3B7xhOk5M4U/view#gid=1990273504
 EDX_REPO_APPS = {
     'bulk_grades': 'https://github.com/openedx/edx-bulk-grades',
     'coaching': 'https://github.com/edx/platform-plugin-coaching',
@@ -45,6 +48,9 @@ EDX_REPO_APPS = {
 
 # Maps edx-platform installed Django apps to the third-party repo that contains
 # the app code. Please add in alphabetical order.
+#
+# The URLs here must match the URLs in the "Reference: edx-platform Libs" sheet:
+# https://docs.google.com/spreadsheets/d/1qpWfbPYLSaE_deaumWSEZfz91CshWd3v3B7xhOk5M4U/view#gid=506252353
 THIRD_PARTY_APPS = {
     'corsheaders': 'https://github.com/adamchainz/django-cors-headers',
     'django': 'https://github.com/django/django',
@@ -143,7 +149,7 @@ def _map_repo_apps(csv_type, repo_csv, app_to_repo_map, owner_map, owner_to_path
     Reads CSV of repo ownership and uses app_to_repo_map to update owner_map and owner_to_paths_map
 
     Arguments:
-        csv_type (string): Either 'edx-repo' or '3rd-party' for warning message
+        csv_type (string): Either 'edx-repo' or '3rd-party' for error message
         repo_csv (string): File name for the edx-repo or 3rd-party repo csv
         app_to_repo_map (dict): Dict mapping Django apps to repo urls
         owner_map (dict): Dict of owner details
@@ -166,7 +172,11 @@ def _map_repo_apps(csv_type, repo_csv, app_to_repo_map, owner_map, owner_to_path
                 owner_to_paths_map[owner] = []
             owner_to_paths_map[owner].append(app)
         else:
-            print(f'WARNING: Repo {repo_url} was not found in {csv_type} csv. Needed for app {app}.')
+            raise Exception(
+                f'ERROR: Repo {repo_url} was not found in {csv_type} csv. Needed for app {app}. '
+                'Please reconcile the hardcoded lookup tables in this script with the ownership '
+                'sheet.'
+            )
 
 
 def _map_edx_platform_apps(app_csv, owner_map, owner_to_paths_map):
