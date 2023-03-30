@@ -38,7 +38,6 @@ from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx_filters.learning.filters import CourseAboutRenderStarted
-from organizations.api import get_course_organization
 from pytz import UTC
 from requests.exceptions import ConnectionError, Timeout  # pylint: disable=redefined-builtin
 from rest_framework import status
@@ -102,7 +101,12 @@ from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.survey import views as survey_views
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
+from openedx.core.djangoapps.catalog.utils import (
+    get_course_data,
+    get_course_uuid_for_course,
+    get_programs,
+    get_programs_with_type
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
@@ -1787,13 +1791,13 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
         fragment = video_block.render('public_view', context={
             'public_video_embed': False,
         })
-        learn_more_url, enroll_url = self.get_public_video_cta_button_urls(course)
+        catalog_course_data = self.get_catalog_course_data(course)
+        learn_more_url, enroll_url = self.get_public_video_cta_button_urls(course, catalog_course_data)
         social_sharing_metadata = self.get_social_sharing_metadata(course, video_block)
-        org_logo = self.get_organization_logo_from_course(course)
         context = {
             'fragment': fragment,
             'course': course,
-            'org_logo': org_logo,
+            'org_logo': catalog_course_data.get('org_logo'),
             'social_sharing_metadata': social_sharing_metadata,
             'learn_more_url': learn_more_url,
             'enroll_url': enroll_url,
@@ -1806,15 +1810,44 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
         }
         return 'public_video.html', context
 
-    def get_organization_logo_from_course(self, course):
+    def get_catalog_course_data(self, course):
         """
-        Get organization logo for this course
+        Get information from the catalog service for this course
         """
-        course_org = get_course_organization(course.id)
+        course_uuid = get_course_uuid_for_course(course.id)
+        if course_uuid is None:
+            return {}
+        catalog_course_data = get_course_data(
+            course_uuid,
+            ['owner', 'url_slug'],
+        )
+        if catalog_course_data is None:
+            return {}
 
-        if course_org and course_org['logo']:
-            return course_org['logo'].url
-        return None
+        return {
+            'org_logo': self._get_catalog_course_owner_logo(catalog_course_data),
+            'marketing_url': self._get_catalog_course_marketing_url(catalog_course_data),
+        }
+
+    def _get_catalog_course_marketing_url(self, catalog_course_data):
+        """
+        Helper to extract url and remove any potential utm queries.
+        The discovery API includes UTM info unless you request it to not be included.
+        The request for the UUIDs will cache the response within the LMS so we need
+        to strip it here.
+        """
+        marketing_url = catalog_course_data.get('marketing_url')
+        if marketing_url is None:
+            return marketing_url
+        url_parts = urlparse(marketing_url)
+        return self._replace_url_query(url_parts, {})
+
+    def _get_catalog_course_owner_logo(self, catalog_course_data):
+        """ Helper to safely extract the course owner image url from the catalog course """
+        owners_data = catalog_course_data.get('owners', [])
+        if len(owners_data) == 0:
+            return None
+        return owners_data[0].get('logo_image_url', None)
 
     def get_social_sharing_metadata(self, course, video_block):
         """
@@ -1836,32 +1869,23 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             )
         }
 
-    def get_learn_more_button_url(self, course, utm_params):
+    def get_learn_more_button_url(self, course, catalog_course_data, utm_params):
         """
         If the marketing site is enabled and a course has a marketing page, use that URL.
         If not, point to the `about_course` view.
         Override all with the MKTG_URL_OVERRIDES setting.
         """
-        course_key = str(course.id)
-        course_overview = CourseOverview.get_from_id(course.id)
-        if course_overview.has_marketing_url():
-            base_url = course_overview.marketing_url
-        else:
-            base_url = reverse('about_course', kwargs={'course_id': course_key})
-
-        marketing_url_overrides = configuration_helpers.get_value(
-            'MKTG_URL_OVERRIDES',
-            settings.MKTG_URL_OVERRIDES
-        )
-        base_url = marketing_url_overrides.get(course_key, base_url)
+        base_url = catalog_course_data.get('marketing_url', None)
+        if base_url is None:
+            base_url = reverse('about_course', kwargs={'course_id': str(course.id)})
         return self.build_url(base_url, {}, utm_params)
 
-    def get_public_video_cta_button_urls(self, course):
+    def get_public_video_cta_button_urls(self, course, catalog_course_data):
         """
         Get the links for the 'enroll' and 'learn more' buttons on the public video page
         """
         utm_params = self.get_utm_params()
-        learn_more_url = self.get_learn_more_button_url(course, utm_params)
+        learn_more_url = self.get_learn_more_button_url(course, catalog_course_data, utm_params)
         enroll_url = self.build_url(
             reverse('register_user'),
             {
@@ -1889,15 +1913,18 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
         """
         if not params and not utm_params:
             return base_url
-        url_parts = urlparse(base_url)
+        parsed_url = urlparse(base_url)
         full_params = {**params, **utm_params}
+        return self._replace_url_query(parsed_url, full_params)
+
+    def _replace_url_query(self, parsed_url, query):
         return urlunparse((
-            url_parts.scheme,
-            url_parts.netloc,
-            url_parts.path,
-            url_parts.params,
-            urlencode(full_params),
-            url_parts.fragment
+            parsed_url.scheme,
+            parsed_url.netloc,
+            parsed_url.path,
+            parsed_url.params,
+            urlencode(query) if query else '',
+            parsed_url.fragment
         ))
 
 
