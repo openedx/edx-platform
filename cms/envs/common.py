@@ -344,6 +344,9 @@ FEATURES = {
     # Allow public account creation
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
+    # Allow showing the registration links
+    'SHOW_REGISTRATION_LINKS': True,
+
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
     'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
 
