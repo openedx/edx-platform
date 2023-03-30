@@ -1,1 +1,0 @@
-pytest lms/djangoapps/verify_student/management/commands/tests/test_trigger_softwaresecurephotoverifications_post_save_signal.py

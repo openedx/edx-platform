@@ -78,11 +78,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        status=options['status']
+        status=options['status'][0]
         # Filter by status
+        print("status to filter:", status)
         attempts_to_resubmit = SoftwareSecurePhotoVerification.objects.filter(
             status=status
         )
+        print("RESUBMITTING:", attempts_to_resubmit)
 
         # Filter by date range
         # Make sure we have both a start date and end date
