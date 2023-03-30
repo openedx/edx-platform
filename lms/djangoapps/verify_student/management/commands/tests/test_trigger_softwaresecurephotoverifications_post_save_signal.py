@@ -11,6 +11,7 @@ from freezegun import freeze_time
 from unittest.mock import call, patch, ANY  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.test.utils import MockS3Boto3Mixin
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from lms.djangoapps.verify_student.tests.test_models import (
     FAKE_SETTINGS,
@@ -27,11 +28,12 @@ class TestTriggerSoftwareSecurePhotoVerificationsPostSaveSignal(MockS3Boto3Mixin
     Tests for django admin command `trigger_softwaresecurephotoverifications_post_save_signal`
     in the verify_student module
     """
+
     def setUp(self):
         super().setUp()
-        with freeze_time("2021-10-30 12:00:00"):
+        with freeze_time("2023-03-01 00:00:00"):
             self._create_attempts(4)
-        with freeze_time("2021-11-01 03:00:00"):
+        with freeze_time("2023-03-28 23:59:59"):
             self._create_attempts(4)
 
     def _create_attempts(self, num_attempts):
@@ -40,7 +42,17 @@ class TestTriggerSoftwareSecurePhotoVerificationsPostSaveSignal(MockS3Boto3Mixin
 
     @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
     def test_command(self, send_idv_update_mock):
-        call_command('trigger_softwaresecurephotoverifications_post_save_signal', start_date_time='2021-10-31 06:00:00')
+
+        # debug code:
+        sspv_set = SoftwareSecurePhotoVerification.objects.all()
+        for item in sspv_set:
+            print("sspv status:", item.status)
+            
+        call_command('trigger_softwaresecurephotoverifications_post_save_signal',
+                     'status="submitted"',
+                     start_datetime="2023-03-01 00:00:00",
+                     end_datetime="2023-03-28 23:59:59"
+                     )
 
         # The UserFactory instantiates first_name and last_name using a Sequence, which provide integers to
         # generate unique values. A Sequence maintains its state across test runs, so the value of a given Sequence,
@@ -52,19 +64,19 @@ class TestTriggerSoftwareSecurePhotoVerificationsPostSaveSignal(MockS3Boto3Mixin
         # attempt_id, and user_id, as the signal is tested elsewhere.
         expected_calls = [
             call(
-                sender='idv_update', attempt_id=5, user_id=5, status='must_retry',
+                sender='idv_update', attempt_id=5, user_id=5, status='submitted',
                 photo_id_name=ANY, full_name=ANY
             ),
             call(
-                sender='idv_update', attempt_id=6, user_id=6, status='must_retry',
+                sender='idv_update', attempt_id=6, user_id=6, status='submitted',
                 photo_id_name=ANY, full_name=ANY
             ),
             call(
-                sender='idv_update', attempt_id=7, user_id=7, status='must_retry',
+                sender='idv_update', attempt_id=7, user_id=7, status='submitted',
                 photo_id_name=ANY, full_name=ANY
             ),
             call(
-                sender='idv_update', attempt_id=8, user_id=8, status='must_retry',
+                sender='idv_update', attempt_id=8, user_id=8, status='submitted',
                 photo_id_name=ANY, full_name=ANY
             ),
         ]

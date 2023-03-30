@@ -22,19 +22,17 @@ class Command(BaseCommand):
     Use case: Multiple IDVs need to be resubmitted.
 
     Example: 
-        $ ./manage.py lms date_range_resubmit status="submitted" --start_datetime="2023-03-01 00:00:00" --end_datetime="2023-03-28 00:00:00"
+        $ ./manage.py lms trigger_softwaresecurephotoverifications_post_save_signal submitted --start_datetime="2023-03-01 00:00:00" --end_datetime="2023-03-28 23:59:59"
         (This resubmits all 'submitted' SoftwareSecurePhotoVerifications from 2023-03-01 to 2023-03-28)
     """
     help = (
-        "Retries SoftwareSecurePhotoVerifications passed as "
-        "arguments, or if no arguments are supplied, all that "
+        "Retries SoftwareSecurePhotoVerifications with a specified status, "
         "from a start datetime to an end datetime"
     )
 
     def add_arguments(self, parser):
         parser.add_argument(
             'status',
-            dest='status',
             action='store',
             nargs=1,
             type=str,
@@ -42,7 +40,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            'start_datetime',
+            '--start_datetime',
             action='store',
             dest='start_datetime',
             help='Start date for a date range of SoftwareSecurePhotoVerifications; '
@@ -51,7 +49,7 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            'end_datetime',
+            '--end_datetime',
             action='store',
             dest='end_datetime',
             help='End date for a date range of SoftwareSecurePhotoVerifications; '
@@ -80,31 +78,31 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        status=options['status']
         # Filter by status
         attempts_to_resubmit = SoftwareSecurePhotoVerification.objects.filter(
-            status=options['status']
+            status=status
         )
 
-         # Filter by date range
-        if start_datetime is not None or end_datetime is not None:
-            # Make sure we have both a start date and end date
-            try:
-                start_datetime = datetime.datetime.strptime(options['start_datetime'], '%Y-%m-%d %H:%M:%S')
-            except:
-                log.exception("start_datetime argument not present")
-                return
+        # Filter by date range
+        # Make sure we have both a start date and end date
+        try:
+            start_datetime = datetime.datetime.strptime(options['start_datetime'], '%Y-%m-%d %H:%M:%S')
+        except:
+            log.exception("start_datetime argument not present")
+            return
 
-            try:
-                end_datetime = datetime.datetime.strptime(options['end_datetime'], '%Y-%m-%d %H:%M:%S')
-            except:
-                log.exception("end_datetime argument not present")
-                return
+        try:
+            end_datetime = datetime.datetime.strptime(options['end_datetime'], '%Y-%m-%d %H:%M:%S')
+        except:
+            log.exception("end_datetime argument not present")
+            return
 
-            attempts_to_resubmit = SoftwareSecurePhotoVerification.objects.filter(submitted_at__range=(start_datetime, end_datetime))
+        attempts_to_resubmit = attempts_to_resubmit.filter(submitted_at__range=(start_datetime, end_datetime))
 
         log.info(
             f"Attempting to re-submit {len(attempts_to_resubmit)} failed SoftwareSecurePhotoVerification submissions; "
-            f"\nIn date range: {start_datetime} to {end_datetime}"
+            f"\nIn date range: `{start_datetime}` to `{end_datetime}` with status: {status}"
         )
 
         batch_size = options['batch_size']
