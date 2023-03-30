@@ -7,11 +7,12 @@
     <tr>
         <td>
             <h1>
-                {% filter force_escape %}
+                {% autoescape off %}
+                 {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
                 {% blocktrans %}
                     You have been invited to be a beta tester for {{ course_name }} at {{ site_name }}
                 {% endblocktrans %}
-                {% endfilter %}
+                {% endautoescape %}
             </h1>
 
             <p style="color: rgba(0,0,0,.75);">

@@ -7,17 +7,19 @@
     <tr>
         <td>
             <h1>
-                {% filter force_escape %}
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
                 {% blocktrans %}
                     You have been enrolled in {{ course_name }}
                 {% endblocktrans %}
-                {% endfilter %}
+                {% endautoescape %}
             </h1>
 
             <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
                 {% blocktrans %}You have been enrolled in {{ course_name }} at {{ site_name }} by a member of the course staff. This course will now appear on your {{ site_name }} dashboard.{% endblocktrans %}
-                {% endfilter %}
+                {% endautoescape %}
                 <br />
             </p>
 

@@ -73,6 +73,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'iconClass': 'fa-facebook',
                 'iconImage': None,
                 'skipHintedLogin': False,
+                'skipRegistrationForm': False,
                 'loginUrl': self._third_party_login_url('facebook', 'login', params),
                 'registerUrl': self._third_party_login_url('facebook', 'register', params)
             },
@@ -82,6 +83,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'iconClass': 'fa-google-plus',
                 'iconImage': None,
                 'skipHintedLogin': False,
+                "skipRegistrationForm": False,
                 'loginUrl': self._third_party_login_url('google-oauth2', 'login', params),
                 'registerUrl': self._third_party_login_url('google-oauth2', 'register', params)
             },
@@ -174,6 +176,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
             'iconClass': 'fa-linkedin',
             'iconImage': None,
             'skipHintedLogin': False,
+            'skipRegistrationForm': False,
             'loginUrl': self._third_party_login_url('linkedin-oauth2', 'login', params),
             'registerUrl': self._third_party_login_url('linkedin-oauth2', 'register', params)
         })
