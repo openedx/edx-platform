@@ -24,10 +24,6 @@ function ProgramListFactory(options) {
         childView: ProgramCardView,
         collection: new ProgramCollection(options.programsData),
         context: options,
-        titleContext: {
-            el: 'h2',
-            title: 'Your Programs',
-        },
     }).render();
 
     if (options.programsData.length) {
