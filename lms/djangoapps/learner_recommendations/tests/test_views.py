@@ -153,7 +153,6 @@ class TestAboutPageRecommendationsView(TestRecommendationsBase):
         assert segment_mock.call_args[0][1] == "edx.bi.user.recommendations.viewed"
 
 
-@override_waffle_flag(ENABLE_COURSE_ABOUT_PAGE_RECOMMENDATIONS, active=True)
 class TestCrossProductRecommendationsView(APITestCase):
     """Unit tests for the Cross Product Recommendations View"""
 
