@@ -1,0 +1,14 @@
+<span class="badge badge-warning align-self-start"><%- gettext('New') %></span>
+<h4 class="m-0"><%- gettext('Monthly program subscriptions now available') %></h4>
+<p class="advertise-message">
+    <%- StringUtils.interpolate(
+        gettext(
+            'An easier way to access popular programs with more control over how much you spend. Starting at {min_subscription_price} per month after a {trial_length}-day free trial. Cancel anytime.'
+        ),
+        { min_subscription_price, trial_length }
+    ) %>
+</p>
+<a href="" class="btn-brand btn cta-primary view-button align-self-stretch">
+    <span class="icon fa fa-search" aria-hidden="true"></span>
+    <span><%- gettext('Explore subscription options') %></span>
+</a>

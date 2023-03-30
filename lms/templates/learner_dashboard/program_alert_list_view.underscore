@@ -10,7 +10,7 @@
                 </div>
             </div>
             <% if (url && urlText) { %>
-            <a href="<%- url %>" class="btn-brand btn cta-primary view-detail-button">
+            <a href="<%- url %>" class="btn-brand btn cta-primary view-button">
                 <%- urlText %>
             </a>
             <% } %>

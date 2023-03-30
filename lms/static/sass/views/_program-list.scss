@@ -3,8 +3,23 @@
     margin-top: 24px;
     gap: 24px;
   }
+}
 
-  .view-detail-button {
+.program-list-wrapper {
+  @include make-row();
+  padding: ($baseline*2) ($baseline/2);
+
+  @include media-breakpoint-up(md) {
+    padding: ($baseline*2) 0;
+  }
+
+  .program-list-container {
+    @include media-breakpoint-up(md) {
+      padding: 0 ($baseline*2);
+    }
+  }
+
+  .view-button {
     background: theme-color("success");
     border-color: theme-color("success");
     border-radius: 0;
@@ -15,26 +30,8 @@
   }
 }
 
-.program-list-wrapper {
-  @include make-row();
-
-  max-width: 73.125rem;
-  margin: 0 auto;
-
-  @include media-breakpoint-up(sm) {
-    padding: $baseline;
-  }
-}
-
 .program-cards-container {
   @include grid-container();
-  @include make-col(12);
-
-  padding: 0 8px;
-
-  @include media-breakpoint-up(sm) {
-    @include make-col(9);
-  }
 
   .subscription-badge {
     position: absolute;
@@ -45,48 +42,38 @@
 }
 
 .sidebar {
-  @include make-col(12);
   @include float(right);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 24px;
 
-  margin-bottom: $baseline;
-  padding: 0 8px;
-
-  @include media-breakpoint-up(sm) {
-    @include make-col(3);
+  @include media-breakpoint-only(md) {
+    padding: 0 ($baseline*2);
   }
 
   .aside {
+    display: flex;
+    flex-direction: column;
     padding: $baseline;
-    margin-bottom: $baseline;
     box-sizing: border-box;
-    border: 1px solid $gray-500;
+    gap: 16px;
+    background: #fbfaf9;
+    border: 1px solid #d7d3d1;
   }
 
   .program-advertise {
     clear: both;
+  }
 
-    .new-programs-btn {
-      width: 100%;
-      text-align: center;
-      padding: 10px;
-      white-space: normal;
-      border-color: theme-color("primary");
-      color: theme-color("primary");
-      font-weight: 600;
+  .advertise-message {
+    font-size: 1rem;
+    color: $gray-dark;
+    margin: 0;
+  }
 
-      &:hover,
-      &:active,
-      &:focus {
-        background: theme-color("primary");
-        color: $white;
-      }
-    }
-
-    .advertise-message {
-      font-size: 0.75rem;
-      color: $gray-dark;
-      margin-bottom: $baseline;
-    }
+  .view-button {
+    white-space: normal;
   }
 }
 
