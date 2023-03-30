@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
     Use case: Multiple IDVs need to be resubmitted.
 
-    Example: 
+    Example:
         $ ./manage.py lms trigger_softwaresecurephotoverifications_post_save_signal submitted --start_datetime="2023-03-01 00:00:00" --end_datetime="2023-03-28 23:59:59"
         (This resubmits all 'submitted' SoftwareSecurePhotoVerifications from 2023-03-01 to 2023-03-28)
     """
@@ -78,13 +78,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        status=options['status'][0]
+        status = options['status'][0]
         # Filter by status
-        print("status to filter:", status)
         attempts_to_resubmit = SoftwareSecurePhotoVerification.objects.filter(
             status=status
         )
-        print("RESUBMITTING:", attempts_to_resubmit)
 
         # Filter by date range
         # Make sure we have both a start date and end date
@@ -128,4 +126,3 @@ class Command(BaseCommand):
                 count = 0
 
         log.info("Done resubmitting failed photo verifications")
-

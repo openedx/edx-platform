@@ -11,7 +11,6 @@ from freezegun import freeze_time
 from unittest.mock import call, patch, ANY  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.test.utils import MockS3Boto3Mixin
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from lms.djangoapps.verify_student.tests.test_models import (
     FAKE_SETTINGS,
@@ -48,11 +47,6 @@ class TestTriggerSoftwareSecurePhotoVerificationsPostSaveSignal(MockS3Boto3Mixin
     @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
     def test_command(self, send_idv_update_mock):
 
-        # debug code:
-        sspv_set = SoftwareSecurePhotoVerification.objects.all()
-        for item in sspv_set:
-            print("sspv status:", item.status)
-            
         call_command('trigger_softwaresecurephotoverifications_post_save_signal',
                      'submitted',
                      start_datetime="2023-03-01 00:00:00",
