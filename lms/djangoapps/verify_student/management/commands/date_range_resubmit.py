@@ -15,19 +15,19 @@ log = logging.getLogger('retry_photo_verification')
 
 class Command(BaseCommand):
     """
-    This method finds those SoftwareSecurePhotoVerifications with a status of
-    'submitted' from a start_datetime to an end_datetime and attempts to verify them.
+    This method finds those SoftwareSecurePhotoVerifications with a selected status
+    from a start_datetime to an end_datetime and attempts to verify them.
 
-    Use case: Multiple IDVs that have a status of 'submitted' need to be
-    resubmitted.
+    Use case: Multiple IDVs need to be resubmitted.
 
     Example: 
-        $ ./manage.py lms date_range_resubmit --start_datetime="2023-03-01 00:00:00" --end_datetime="2023-03-28 00:00:00"
+        $ ./manage.py lms date_range_resubmit status="submitted" --start_datetime="2023-03-01 00:00:00" --end_datetime="2023-03-28 00:00:00"
+        (This resubmits all 'submitted' SoftwareSecurePhotoVerifications from 2023-03-01 to 2023-03-28)
     """
     help = (
         "Retries SoftwareSecurePhotoVerifications passed as "
         "arguments, or if no arguments are supplied, all that "
-        "are in a state of 'submitted' from a start_datetime to an end_datetime"
+        "are in a state of from a start_datetime to an end_datetime"
     )
 
     def add_arguments(self, parser):
@@ -91,7 +91,6 @@ class Command(BaseCommand):
 
         batch_size = options['batch_size']
         sleep_time = options['sleep_time']
-
 
         # Get those 'submitted' objects in that date range
         attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(status='submitted',
