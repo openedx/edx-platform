@@ -62,6 +62,8 @@ RUN apt-get update && \
         # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
         lynx \
         ntp \
+        git \
+        build-essential \
         gettext \
         gfortran \
         graphviz \
@@ -83,10 +85,7 @@ FROM minimal-system as builder-production
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
         curl \
-        git \
-        git-core \
         pkg-config \
-        build-essential \
         libmysqlclient-dev \
         libssl-dev \
         libxml2-dev \
