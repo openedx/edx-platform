@@ -91,18 +91,18 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         now = timezone.now()
         refresh_expire_at = self.get_expiration_time(now)
 
+        if options['refresh-tokens']:
+            logger.info("Removing expired RefreshTokens")
+            query_set = RefreshToken.objects.filter(access_token__expires__lt=refresh_expire_at).exclude(
+                application_id__in=excluded_application_ids)
+            self.clear_table_data(query_set, batch_size, RefreshToken, sleep_time)
+
         if options['revoked-tokens']:
             logger.info("Removing revoked RefreshTokens")
             # remove revoked, as opposed to expired, RefreshTokens
             revoked = RefreshToken.objects.filter(revoked__lt=refresh_expire_at).exclude(
                 application_id__in=excluded_application_ids)
             self.clear_table_data(revoked, batch_size, RefreshToken, sleep_time)
-
-        if options['refresh-tokens']:
-            logger.info("Removing expired RefreshTokens")
-            query_set = RefreshToken.objects.filter(access_token__expires__lt=refresh_expire_at).exclude(
-                application_id__in=excluded_application_ids)
-            self.clear_table_data(query_set, batch_size, RefreshToken, sleep_time)
 
         if options['access-tokens']:
             logger.info("Removing expired AccessTokens")
