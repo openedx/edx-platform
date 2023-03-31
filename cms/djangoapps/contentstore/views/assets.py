@@ -16,6 +16,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
 from opaque_keys.edx.keys import AssetKey, CourseKey
+from openedx_filters.learning.filters import TenantAwareLinkRenderStarted
 from pymongo import ASCENDING, DESCENDING
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
@@ -598,7 +599,21 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
     Helper method for formatting the asset information to send to client.
     '''
     asset_url = StaticContent.serialize_asset_key_with_slash(location)
-    external_url = urljoin(configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL), asset_url)
+    lms_root = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
+
+    try:
+        ## .. filter_implemented_name: TenantAwareLinkRenderStarted
+        ## .. filter_type: org.openedx.learning.tenant_aware_link.render.started.v1
+        lms_root = TenantAwareLinkRenderStarted.run_filter(
+            context=lms_root,
+            org=location.org,
+            val_name='LMS_ROOT_URL',
+            default=settings.LMS_ROOT_URL
+        )
+    except TenantAwareLinkRenderStarted.PreventTenantAwarelinkRender as exc:
+        raise TenantAwareRenderNotAllowed(str(exc)) from exc
+
+    external_url = urljoin(lms_root, asset_url)
     portable_url = StaticContent.get_static_path_from_location(location)
     return {
         'display_name': display_name,
@@ -613,3 +628,11 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
         # needed for Backbone delete/update.
         'id': str(location)
     }
+
+
+class TenantAwareRenderException(Exception):
+    pass
+
+
+class TenantAwareRenderNotAllowed(TenantAwareRenderException):
+    pass
