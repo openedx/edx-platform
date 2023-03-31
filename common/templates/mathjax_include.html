@@ -1,11 +1,11 @@
 ## mako
-## File:   templates/mathjax_include.html
+## File: templates/mathjax_include.html
 ##
 ## Note that this file is only used by LMS.
 ## MathJax configuration for Studio lives in
 ## cms/js/require-config.js.
 
-<%page args="disable_fast_preview=True" expression_filter="h"/>
+<%page args="disable_fast_preview=True" expression_filter="h" />
 
 ## Avoid loading mathjax if already loaded on the page
 
@@ -27,68 +27,126 @@
 %endif
 
 %if mathjax_mode is not Undefined and mathjax_mode == 'wiki':
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {inlineMath: [ ['$','$'], ["\\(","\\)"]],
-              displayMath: [ ['$$','$$'], ["\\[","\\]"]]}
-  });
-</script>
-%else:
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    messageStyle: "none",
-    tex2jax: {
-      inlineMath: [
-        ["\\(","\\)"],
-        ['[mathjaxinline]','[/mathjaxinline]']
-      ],
-      displayMath: [
-        ["\\[","\\]"],
-        ['[mathjax]','[/mathjax]']
-      ]
-    }
-  });
-</script>
-%endif
-<script type="text/x-mathjax-config">
-
-  %if disable_fast_preview:
-  // In order to eliminate all flashing during interactive
-  // preview, it is necessary to set processSectionDelay to 0
-  // (remove delay between input and output phases). This
-  // effectively disables fast preview, regardless of
-  // the fast preview setting as shown in the context menu.
-  MathJax.Hub.processSectionDelay = 0;
-  %endif
-
-  MathJax.Hub.signal.Interest(function(message) {
-    if(message[0] === "End Math") {
-        set_mathjax_display_div_settings();
-    }
-  });
-  function set_mathjax_display_div_settings() {
-    $('.MathJax_Display').each(function( index ) {
-      this.setAttribute('tabindex', '0');
-      this.setAttribute('aria-live', 'off');
-      this.removeAttribute('role');
-      this.removeAttribute('aria-readonly');
-    });
-  }
-</script>
 
 <script type="text/javascript">
-    // Activating Mathjax accessibility files
-    window.MathJax = {
-        menuSettings: {
-            collapsible: true,
-            autocollapse: false,
-            explorer: true
-        }
-    };
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ["\\(", "\\)"]],
+      displayMath: [['$$', '$$'], ["\\[", "\\]"]],
+      autoload: {
+        color: [],
+        colorv2: ['color']
+      },
+      packages: { '[+]': ['noerrors'] }
+    },
+    options: {
+      ignoreHtmlClass: 'tex2jax_ignore',
+      processHtmlClass: 'tex2jax_process'
+    },
+    loader: {
+      load: ['input/asciimath', '[tex]/noerrors']
+    },
+    menuSettings: {
+      collapsible: true,
+      autocollapse: false,
+      explorer: true
+    },
+  };
+</script>
+%else:
+<script type="text/javascript">
+  window.MathJax = {
+    messageStyle: "none",
+    tex: {
+      inlineMath: [
+        ["\\(", "\\)"],
+        ['[mathjaxinline]', '[/mathjaxinline]']
+      ],
+      displayMath: [
+        ["\\[", "\\]"],
+        ['[mathjax]', '[/mathjax]']
+      ],
+      autoload: {
+        color: [],
+        colorv2: ['color']
+      },
+      packages: { '[+]': ['noerrors'] }
+    },
+    options: {
+      ignoreHtmlClass: 'tex2jax_ignore',
+      processHtmlClass: 'tex2jax_process'
+    },
+    loader: {
+      load: ['input/asciimath', '[tex]/noerrors']
+    },
+    menuSettings: {
+      collapsible: true,
+      autocollapse: false,
+      explorer: true
+    },
+  };
+</script>
+%endif
+
+
+<script type="text/javascript">
+ 
+  // window.MathJax.signal.Interest(function (message) {
+  //   if (message[0] === "End Math") {
+  //     set_mathjax_display_div_settings();
+  //   }
+  // });
+  // function set_mathjax_display_div_settings() {
+  //   $('.MathJax_Display').each(function (index) {
+  //     this.setAttribute('tabindex', '0');
+  //     this.setAttribute('aria-live', 'off');
+  //     this.removeAttribute('role');
+  //     this.removeAttribute('aria-readonly');
+  //   });
+  // }
 </script>
 
 <!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
      It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
      MathJax extension libraries -->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_SVG"></script>
+<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js?config=TeX-MML-AM_SVG"></script> -->
+
+<script>
+  (function () {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.0.1/es5/tex-mml-chtml.js';
+    document.head.appendChild(script);
+    // var script2 = document.createElement('script');
+    // script2.innerHTML = "\
+    //   \
+    // let mathjax_promise = Promise.resolve();  // Used to hold chain of typesetting calls \
+    // function typeset(code) { \
+    // mathjax_promise = mathjax_promise.then(() => MathJax.typesetPromise(code())) \
+    //                .catch((err) => console.log('Typeset failed: ' + err.message)); \
+    // return mathjax_promise; \
+    // } "
+    // function typeset(code) { 
+    // mathjax_promise = mathjax_promise.then(() => MathJax.typesetPromise(code())) 
+    //                .catch((err) => console.log('Typeset failed: ' + err.message)); 
+    // return mathjax_promise; 
+    // }
+  mathjax.typeset(() => { 
+      const main = document.querySelector('#main'); 
+      return main; 
+  }); 
+
+// document.head.appendChild(script2)
+  })();
+</script>
+<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"/> -->
 %endif
+<html xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+
+<head>
+  <!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_SharedWithUsers msdt:dt="string">Subodha Members</mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_SharedWithUsers>
+<mso:SharedWithUsers msdt:dt="string">8;#Subodha Members</mso:SharedWithUsers>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
+</head>
