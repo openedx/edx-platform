@@ -106,6 +106,7 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
         super().setUp()
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
+        self.non_staff_client, _ = self.create_non_staff_authed_user_client()
 
     @override_settings(FEATURES={'DISABLE_MOBILE_COURSE_AVAILABLE': True})
     def test_mobile_field_available(self):
@@ -143,6 +144,17 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 self.assertEqual('allow_anonymous_to_peers' in response, fields_visible)
                 self.assertEqual('discussion_blackouts' in response, fields_visible)
                 self.assertEqual('discussion_topics' in response, fields_visible)
+
+    @override_settings(FEATURES={'DISABLE_ADVANCED_SETTINGS': True})
+    def test_disable_advanced_settings_feature(self):
+        """
+        If this feature is enabled, only staff should be able to access the advanced settings page.
+        """
+        response = self.non_staff_client.get_html(self.course_setting_url)
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.get_html(self.course_setting_url)
+        self.assertEqual(response.status_code, 200)
 
 
 @ddt.ddt
