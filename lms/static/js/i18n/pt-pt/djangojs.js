@@ -414,7 +414,6 @@
     "Cancel upload": "Cancelar envio",
     "Cannot delete when in use by a unit": "N\u00e3o \u00e9 poss\u00edvel eliminar quanto est\u00e1 a ser utilizada por uma unidade",
     "Cannot delete when in use by an experiment": "N\u00e3o \u00e9 poss\u00edvel eliminar quando est\u00e1 a ser utilizado numa experi\u00eancia",
-    "Cannot drop more <%- types %> assignments than are assigned.": "N\u00e3o \u00e9 poss\u00edvel libertar mais <%- types %> tarefas do que as atribu\u00eddas.",
     "Cannot join instructor managed team": "N\u00e3o \u00e9 poss\u00edvel participar na equipa gerida pelo formador",
     "Caption": "Legenda",
     "Caution: The last published version of this unit is live. By publishing changes you will change the student experience.": "Aten\u00e7\u00e3o: a \u00faltima vers\u00e3o publicada desta unidade \u00e9 ao vivo. Ao publicar altera\u00e7\u00f5es, voc\u00ea mudar\u00e1 a experi\u00eancia do estudante.",

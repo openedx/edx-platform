@@ -387,7 +387,6 @@
     "Cancel upload": "Y\u00fcklemeyi iptal et",
     "Cannot delete when in use by a unit": "Bir birim taraf\u0131ndan kullan\u0131mdaysa silinemez",
     "Cannot delete when in use by an experiment": "Bir deney taraf\u0131ndan kullan\u0131l\u0131yorken silinemez.",
-    "Cannot drop more <%- types %> assignments than are assigned.": "Atanan <%- types %> g\u00f6revlerinden daha fazla d\u00fc\u015f\u00fcr\u00fclemez.",
     "Cannot join instructor managed team": "E\u011fitmen taraf\u0131ndan y\u00f6netilen tak\u0131ma kat\u0131lamazs\u0131n\u0131z.",
     "Caption": "Altyaz\u0131",
     "Caution: The last published version of this unit is live. By publishing changes you will change the student experience.": "Dikkat: Bu \u00fcnitenin son yay\u0131nlanan s\u00fcr\u00fcm\u00fc canl\u0131dad\u0131r. De\u011fi\u015fiklikleri yay\u0131nlad\u0131\u011f\u0131n\u0131zda \u00f6\u011frenci deneyimini de\u011fi\u015ftirirsiniz.",

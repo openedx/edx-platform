@@ -377,7 +377,6 @@
     "Cancel upload": "Upload abbrechen",
     "Cannot delete when in use by a unit": "Kann nicht gel\u00f6scht werden, w\u00e4hrend es von einer Lerneinheit genutzt wird",
     "Cannot delete when in use by an experiment": "W\u00e4hrend der Nutzung in einem Experiment, ist das L\u00f6schen nicht m\u00f6glich",
-    "Cannot drop more <%- types %> assignments than are assigned.": "Es k\u00f6nnen nicht mehr <%- types %> Aufgaben bearbeitet werden als zugeordnet sind.",
     "Cannot join instructor managed team": "Kann nicht dem von einem Dozenten verwalteten Team beitreten",
     "Caption": "Untertitel",
     "Caution: The last published version of this unit is live. By publishing changes you will change the student experience.": "Vorsicht: die zuletzt ver\u00f6ffentlichte Version dieser Lerneinheit ist live. Durch die Ver\u00f6ffentlichung von \u00c4nderungen wirst du das Kurserlebnis der Teilnehmer st\u00f6ren.",
