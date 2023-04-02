@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-26 20:35+0000\n"
-"PO-Revision-Date: 2023-03-26 20:35:58.162914\n"
+"POT-Creation-Date: 2023-04-02 20:35+0000\n"
+"PO-Revision-Date: 2023-04-02 20:36:00.673257\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -9509,6 +9509,14 @@ msgstr "Süççéss Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Àçtïöns Ⱡ'σяєм ιρѕυм #"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
+"Çömmä sépärätéd fïlé thät hävé üsérnämé änd üsér_émäïl öf thé üsérs thät "
+"nééds tö ßé rétïréd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -20852,10 +20860,6 @@ msgstr "Sçhööls Ⱡ'σяєм ιρѕυм #"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr "Régïstér för fréé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Résümé ýöür läst çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
