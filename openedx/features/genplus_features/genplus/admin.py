@@ -398,7 +398,7 @@ class TeacherAdmin(admin.ModelAdmin):
 class StudentAdmin(admin.ModelAdmin):
     search_fields = ('gen_user__user__email', 'gen_user__email')
     list_filter = (MoreThanOneClassFilter, 'gen_user__school',)
-    list_display = ('username', 'school', 'enrolled_classes', 'progress')
+    list_display = ('username', 'school', 'enrolled_classes', 'active_class', 'progress')
 
     def username(self, obj):
         return obj.__str__()
