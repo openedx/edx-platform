@@ -11,38 +11,17 @@ from django.conf import settings
 from django.core.management import call_command
 from testfixtures import LogCapture
 
+from django.test.utils import override_settings
 from common.test.utils import MockS3Boto3Mixin
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, SSPVerificationRetryConfig
 from lms.djangoapps.verify_student.tests import TestVerificationBase
 from lms.djangoapps.verify_student.tests.test_models import (
+    FAKE_SETTINGS,
     mock_software_secure_post,
     mock_software_secure_post_error
 )
 
 LOGGER_NAME = 'retry_photo_verification'
-
-FAKE_SETTINGS = {
-    "SOFTWARE_SECURE": {
-        "FACE_IMAGE_AES_KEY": "AAAAAAAAAAAAAAAA",
-        "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
-        "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
-        "RSA_PUBLIC_KEY": """-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu2fUn20ZQtDpa1TKeCA/
-rDA2cEeFARjEr41AP6jqP/k3O7TeqFX6DgCBkxcjojRCs5IfE8TimBHtv/bcSx9o
-7PANTq/62ZLM9xAMpfCcU6aAd4+CVqQkXSYjj5TUqamzDFBkp67US8IPmw7I2Gaa
-tX8ErZ9D7ieOJ8/0hEiphHpCZh4TTgGuHgjon6vMV8THtq3AQMaAQ/y5R3V7Lezw
-dyZCM9pBcvcH+60ma+nNg8GVGBAW/oLxILBtg+T3PuXSUvcu/r6lUFMHk55pU94d
-9A/T8ySJm379qU24ligMEetPk1o9CUasdaI96xfXVDyFhrzrntAmdD+HYCSPOQHz
-iwIDAQAB
------END PUBLIC KEY-----""",
-        "API_URL": "http://localhost/verify_student/fake_endpoint",
-        "AWS_ACCESS_KEY": "FAKEACCESSKEY",
-        "AWS_SECRET_KEY": "FAKESECRETKEY",
-        "S3_BUCKET": "fake-bucket",
-        "CERT_VERIFICATION_PATH": False,
-    },
-    "DAYS_GOOD_FOR": 10,
-}
 
 # Lots of patching to stub in our own settings, and HTTP posting
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
@@ -114,25 +93,28 @@ class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
                     ),
                 )
 
-@patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
+
+@override_settings(VERIFY_STUDENT=FAKE_SETTINGS)
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-@patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
-class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
+class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):  # TODO rename this to specify date/status stuff
     """
     insert docs here
     """
     def setUp(self):
-        # super().setUp()
+        super().setUp()
         # Test that the correct attempts within a date range are called
-        print("SETTINGS:",settings.VERIFY_STUDENT)
-        with freeze_time("2023-02-28 23:59:59"):
-            self._create_attempts(1)
-        with freeze_time("2023-03-01 00:00:00"):
-            self._create_attempts(4)
-        with freeze_time("2023-03-28 23:59:59"):
-            self._create_attempts(4)
-        with freeze_time("2023-03-29 00:00:00"):
-            self._create_attempts(1)
+        print("SETTINGS:",settings)
+        print("SETTINGS VS:",settings.VERIFY_STUDENT)
+        print("\nFAKE:",FAKE_SETTINGS)
+        with patch('lms.djangoapps.verify_student.models.requests.post') as mock_software_secure_post:
+            with freeze_time("2023-02-28 23:59:59"):
+                self._create_attempts(1)
+            with freeze_time("2023-03-01 00:00:00"):
+                self._create_attempts(4)
+            with freeze_time("2023-03-28 23:59:59"):
+                self._create_attempts(4)
+            with freeze_time("2023-03-29 00:00:00"):
+                self._create_attempts(1)
 
     def _create_attempts(self, num_attempts):
         for _ in range(num_attempts):

@@ -119,16 +119,22 @@ class Command(BaseCommand):
         options = self.get_args_from_database() if options['args_from_database'] else options
         args = options.get('verification_ids', None)
 
+        force_must_retry = False
         if args:
+            force_must_retry = True
             attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(
                 receipt_id__in=options['verification_ids']
             )
             log.info("Fetching retry verification ids from config model")
-            print("\n\n\n\n\n\nBLEH")
-            force_must_retry = True
         else:
+            items = SoftwareSecurePhotoVerification.objects.all()
+            for item in items:
+                print(item.status)
             # Filter by status
             status = options['status']
+            print('STATUS:',status)
+            if status != 'must_retry':
+                force_must_retry = True
             attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(
                 status=status
             )
@@ -153,9 +159,8 @@ class Command(BaseCommand):
                 log.info(
                     f"In date range: `{start_datetime}` to `{end_datetime}`"
                 )
-            print('STATUS:',status)
-            # print('start_datetime:',start_datetime)
-            # print('end_datetime:',end_datetime)
+            print('start_datetime:',start_datetime)
+            print('end_datetime:',end_datetime)
             print("RETRYING:", attempts_to_retry)
 
         # Re-submit attempts_to_retry
@@ -167,7 +172,8 @@ class Command(BaseCommand):
             log.info(f"Re-submitting submission #{index} (ID: {attempt.id}, User: {attempt.user})")
 
             # Set the attempt's status to 'must_retry' so that we can re-submit it
-            attempt.status = 'must_retry'
+            if force_must_retry:
+                attempt.status = 'must_retry'
 
             attempt.submit(copy_id_photo_from=attempt.copy_id_photo_from)
             log.info(f"Retry result: {attempt.status}")
