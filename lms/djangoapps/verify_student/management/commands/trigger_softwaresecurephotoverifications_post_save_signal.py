@@ -78,8 +78,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        status = options['status'][0]
         # Filter by status
+        status = options['status'][0]
         attempts_to_resubmit = SoftwareSecurePhotoVerification.objects.filter(
             status=status
         )
