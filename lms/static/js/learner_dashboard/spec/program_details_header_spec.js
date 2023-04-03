@@ -44,6 +44,10 @@ describe('Program Details Header View', () => {
                     logo_image_url: 'https://example.com/org-logo.jpg',
                 },
             ],
+            subscription_data: {
+                is_eligible_for_subscription: true,
+                subscription_state: 'active',
+            },
         },
     };
 
@@ -70,5 +74,9 @@ describe('Program Details Header View', () => {
             .toEqual(context.programData.authoring_organizations[0].certificate_logo_image_url);
         expect(view.$('.org-logo').attr('alt'))
             .toEqual(`${context.programData.authoring_organizations[0].name}'s logo`);
+    });
+
+    it('should render the subscription badge if subscription is active', () => {
+        expect(view.$('.meta-info .badge').html().trim()).toEqual('Subscribed');
     });
 });
