@@ -1,3 +1,5 @@
+""" Mocked data for testing """
+
 mock_course_data = {
     "courses": [
         {
