@@ -24,7 +24,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             'focus :input': 'inputFocus',
             'blur :input': 'inputUnfocus'
         },
-        initialize: function() {
+        initialize: function(options) {
         //  load template for grading view
             var self = this;
             this.template = HtmlUtils.template(
@@ -40,6 +40,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             this.model.get('graders').on('reset', this.render, this);
             this.model.get('graders').on('add', this.render, this);
             this.selectorToField = _.invert(this.fieldToSelectorMap);
+            this.courseAssignmentLists = options.courseAssignmentLists;
             this.render();
         },
 
@@ -73,10 +74,26 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 },
                 this);
             gradeCollection.each(function(gradeModel) {
-                HtmlUtils.append(gradelist, self.template({model: gradeModel}));
+                var graderType = gradeModel.get('type');
+                var graderTypeAssignmentList = self.courseAssignmentLists[graderType]
+                if (graderTypeAssignmentList === undefined) {
+                    graderTypeAssignmentList = [];
+                }
+
+                HtmlUtils.append(
+                    gradelist,
+                    self.template({
+                        model: gradeModel,
+                        assignmentList: graderTypeAssignmentList
+                    })
+                );
                 var newEle = gradelist.children().last();
-                var newView = new GraderView({el: newEle,
-                    model: gradeModel, collection: gradeCollection});
+                var newView = new GraderView({
+                    el: newEle,
+                    model: gradeModel,
+                    collection: gradeCollection,
+                    courseAssignmentCountInfo: self.courseAssignmentCountInfo,
+                });
                 // Listen in order to rerender when the 'cancel' button is
                 // pressed
                 self.listenTo(newView, 'revert', _.bind(self.render, self));
