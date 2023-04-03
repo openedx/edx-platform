@@ -1817,10 +1817,7 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
         course_uuid = get_course_uuid_for_course(course.id)
         if course_uuid is None:
             return {}
-        catalog_course_data = get_course_data(
-            course_uuid,
-            ['owners', 'url_slug'],
-        )
+        catalog_course_data = get_course_data(course_uuid, None)
         if catalog_course_data is None:
             return {}
 
