@@ -42,6 +42,10 @@ describe('Program card View', () => {
                 name: 'Wageningen University & Research',
             },
         ],
+        subscription_data: {
+            is_eligible_for_subscription: true,
+            subscription_state: 'active',
+        },
     };
     const userProgress = [
         {
@@ -155,5 +159,9 @@ describe('Program card View', () => {
         });
         cardRenders(view.$el);
         expect(view.$el.find('.banner-image').attr('srcset')).toEqual('');
+    });
+
+    it('should render the subscription badge if subscription is active', () => {
+        expect(view.$('.subscription-badge .badge').html().trim()).toEqual('Subscribed');
     });
 });
