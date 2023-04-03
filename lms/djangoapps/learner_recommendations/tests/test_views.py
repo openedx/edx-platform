@@ -4,6 +4,7 @@ Tests for Learner Recommendations views and related functions.
 
 import json
 from django.urls import reverse_lazy
+from django.conf import settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from rest_framework.test import APITestCase
 from unittest import mock
@@ -158,8 +159,6 @@ class TestCrossProductRecommendationsView(APITestCase):
 
     def setUp(self):
         super().setUp()
-        self.user = UserFactory()
-        self.client.login(username=self.user.username, password="test")
         self.associated_course_keys = ["ColumbiaX+BC24FNTC", "MITx+BLN"]
 
     def _get_url(self, course_key):
@@ -283,6 +282,23 @@ class TestCrossProductRecommendationsView(APITestCase):
         Verify an empty array of courses is returned if there are no associated course keys.
         """
         response = self.client.get(self._get_url('No+Associations'))
+        response_content = json.loads(response.content)
+        course_data = response_content["courses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(course_data), 0)
+
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_no_response_from_discovery(self, country_code_from_ip_mock, get_course_data_mock):
+        """
+        Verify an empty array of courses is returned if discovery returns two empty dictionaries.
+        """
+        print(f"SETTINGS VAR: {settings.GENERAL_RECOMMENDATIONS}")
+        country_code_from_ip_mock.return_value = "za"
+        get_course_data_mock.side_effect = [{}, {}]
+
+        response = self.client.get(self._get_url('HKUx+FinTechT1x'))
         response_content = json.loads(response.content)
         course_data = response_content["courses"]
 

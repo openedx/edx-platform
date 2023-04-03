@@ -135,11 +135,13 @@ class CrossProductRecommendationsView(APIView):
     GET api/learner_recommendations/cross_product/{course_id}/
     """
 
-    authentication_classes = (JwtAuthentication, SessionAuthenticationAllowInactiveUser,)
-    permission_classes = (IsAuthenticated,)
-
-    def empty_response(self):
+    def _empty_response(self):
         return Response({"courses": []}, status=200)
+
+    def _filter_empty_courses(self, courses):
+        for course in courses[:]:
+            if not course:
+                courses.remove(course)
 
     def get(self, request, course_id):
         """
@@ -151,7 +153,7 @@ class CrossProductRecommendationsView(APIView):
         associated_course_keys = get_cross_product_recommendations(course_key)
 
         if associated_course_keys is None:
-            return self.empty_response()
+            return self._empty_response()
 
         fields = [
             "key",
@@ -165,6 +167,7 @@ class CrossProductRecommendationsView(APIView):
             "location_restriction",
         ]
         course_data = [get_course_data(key, fields) for key in associated_course_keys]
+        self._filter_empty_courses(course_data)
 
         ip_address = get_client_ip(request)[0]
         user_country_code = country_code_from_ip(ip_address).upper()
@@ -174,7 +177,7 @@ class CrossProductRecommendationsView(APIView):
                 course_data.remove(course)
 
         if len(course_data) == 0:
-            return self.empty_response()
+            return self._empty_response()
 
         for course in course_data:
             course.update({

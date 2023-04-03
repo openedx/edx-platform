@@ -8,6 +8,7 @@ from lms.djangoapps.learner_recommendations.serializers import (
     DashboardRecommendationsSerializer,
     CrossProductRecommendationsSerializer
 )
+from lms.djangoapps.learner_recommendations.tests.test_data import mock_course_data
 
 
 class TestDashboardRecommendationsSerializer(TestCase):
@@ -112,14 +113,14 @@ class TestCrossProductRecommendationsSerializer(TestCase):
                     ],
                     "course_runs": [
                         {
-                            "key": "course-v1:Test+2023_T2",
-                            "marketing_url": "https://www.marketing_url.com",
+                            "key": f"course-v1:Test+2023_T{i}",
+                            "marketing_url": f"https://www.marketing_url{i}.com",
                             "availability": "Current",
                         }
                     ],
                     "active_course_run": {
-                        "key": "course-v1:Test+2023_T2",
-                        "marketing_url": "https://www.marketing_url.com",
+                        "key": f"course-v1:Test+2023_T{i}",
+                        "marketing_url": f"https://www.marketing_url{i}.com",
                         "availability": "Current",
                     },
                     "location_restriction": None
@@ -137,48 +138,7 @@ class TestCrossProductRecommendationsSerializer(TestCase):
 
         self.assertDictEqual(
             serialized_data,
-            {
-                "courses": [
-                    {
-                        "key": serialized_data["courses"][0]["key"],
-                        "uuid": serialized_data["courses"][0]["uuid"],
-                        "title": serialized_data["courses"][0]["title"],
-                        "image": {
-                            "src": serialized_data["courses"][0]["image"]["src"],
-                        },
-                        "prospectusPath": serialized_data["courses"][0]["prospectusPath"],
-                        "owners": [{
-                            "key": serialized_data["courses"][0]["owners"][0]["key"],
-                            "name": serialized_data["courses"][0]["owners"][0]["name"],
-                            "logoImageUrl": serialized_data["courses"][0]["owners"][0]["logoImageUrl"]
-                        }],
-                        "activeCourseRun": {
-                            "key": serialized_data["courses"][0]["activeCourseRun"]["key"],
-                            "marketingUrl": serialized_data["courses"][0]["activeCourseRun"]["marketingUrl"],
-                        },
-                        "courseType": serialized_data["courses"][0]["courseType"]
-                    },
-                    {
-                        "key": serialized_data["courses"][1]["key"],
-                        "uuid": serialized_data["courses"][1]["uuid"],
-                        "title": serialized_data["courses"][1]["title"],
-                        "image": {
-                            "src": serialized_data["courses"][1]["image"]["src"],
-                        },
-                        "prospectusPath": serialized_data["courses"][1]["prospectusPath"],
-                        "owners": [{
-                            "key": serialized_data["courses"][1]["owners"][0]["key"],
-                            "name": serialized_data["courses"][1]["owners"][0]["name"],
-                            "logoImageUrl": serialized_data["courses"][1]["owners"][0]["logoImageUrl"]
-                        }],
-                        "activeCourseRun": {
-                            "key": serialized_data["courses"][1]["activeCourseRun"]["key"],
-                            "marketingUrl": serialized_data["courses"][1]["activeCourseRun"]["marketingUrl"],
-                        },
-                        "courseType": serialized_data["courses"][1]["courseType"],
-                    },
-                ],
-            },
+            mock_course_data
         )
 
     def test_no_course_data_serialization(self):
