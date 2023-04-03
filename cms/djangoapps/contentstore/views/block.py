@@ -171,6 +171,9 @@ def xblock_handler(request, usage_key_string=None):
                      if duplicate_source_locator is not present
               The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
+    return handle_xblock(request, usage_key_string)
+
+def handle_xblock(request, usage_key_string=None):
     if usage_key_string:
         usage_key = usage_key_with_run(usage_key_string)
 
