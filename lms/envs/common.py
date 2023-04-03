@@ -4376,6 +4376,7 @@ JWT_AUTH = {
     'JWT_SECRET_KEY': SECRET_KEY,
 
     'JWT_SIGNING_ALGORITHM': 'RS512',
+    # Use scripts/generate-jwt-keys.py to generate these.
     'JWT_PRIVATE_SIGNING_JWK': None,
     'JWT_PUBLIC_SIGNING_JWK_SET': None,
 

@@ -188,27 +188,21 @@ JWT_AUTH.update({
     }],
     'JWT_SECRET_KEY': 'lms-secret',
     'JWT_AUDIENCE': 'lms-key',
-    'JWT_PUBLIC_SIGNING_JWK_SET': (
-        '{"keys": [{"kid": "devstack_key", "e": "AQAB", "kty": "RSA", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu'
-        '48BUI5VcVtUWIPqzRK_LDSlZYh9D0YFL0ZTxIrlb6Tn3Xz7pYvpIAeYuQv3_H5p8tbz7Fb8r63c1828wXPITVTv8f7oxx5W3lFFgpFAyYMmROC'
-        '4Ee9qG5T38LFe8_oAuFCEntimWxN9F3P-FJQy43TL7wG54WodgiM0EgzkeLr5K6cDnyckWjTuZbWI-4ffcTgTZsL_Kq1owa_J2ngEfxMCObnzG'
-        'y5ZLcTUomo4rZLjghVpq6KZxfS6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw"}]}'
-    ),
-
-    # TODO Remove this once CMS redirects to LMS for Login
-    'JWT_PRIVATE_SIGNING_JWK': (
-        '{"e": "AQAB", "d": "RQ6k4NpRU3RB2lhwCbQ452W86bMMQiPsa7EJiFJUg-qBJthN0FMNQVbArtrCQ0xA1BdnQHThFiUnHcXfsTZUwmwvTu'
-        'iqEGR_MI6aI7h5D8vRj_5x-pxOz-0MCB8TY8dcuK9FkljmgtYvV9flVzCk_uUb3ZJIBVyIW8En7n7nV7JXpS9zey1yVLld2AbRG6W5--Pgqr9J'
-        'CI5-bLdc2otCLuen2sKyuUDHO5NIj30qGTaKUL-OW_PgVmxrwKwccF3w5uGNEvMQ-IcicosCOvzBwdIm1uhdm9rnHU1-fXz8VLRHNhGVv7z6mo'
-        'ghjNI0_u4smhUkEsYeshPv7RQEWTdkOQ", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu48BUI5VcVtUWIPqzRK_LDSlZYh'
-        '9D0YFL0ZTxIrlb6Tn3Xz7pYvpIAeYuQv3_H5p8tbz7Fb8r63c1828wXPITVTv8f7oxx5W3lFFgpFAyYMmROC4Ee9qG5T38LFe8_oAuFCEntimW'
-        'xN9F3P-FJQy43TL7wG54WodgiM0EgzkeLr5K6cDnyckWjTuZbWI-4ffcTgTZsL_Kq1owa_J2ngEfxMCObnzGy5ZLcTUomo4rZLjghVpq6KZxfS'
-        '6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw", "q": "7KWj7l-ZkfCElyfvwsl7kiosvi-ppOO7Imsv90cribf88Dex'
-        'cO67xdMPesjM9Nh5X209IT-TzbsOtVTXSQyEsy42NY72WETnd1_nAGLAmfxGdo8VV4ZDnRsA8N8POnWjRDwYlVBUEEeuT_MtMWzwIKU94bzkWV'
-        'nHCY5vbhBYLeM", "p": "wPkfnjavNV1Hqb5Qqj2crBS9HQS6GDQIZ7WF9hlBb2ofDNe2K2dunddFqCOdvLXr7ydRcK51ZwSeHjcjgD1aJkHA'
-        '9i1zqyboxgd0uAbxVDo6ohnlVqYLtap2tXXcavKm4C9MTpob_rk6FBfEuq4uSsuxFvCER4yG3CYBBa4gZVU", "kid": "devstack_key", "'
-        'kty": "RSA"}'
-    ),
+    'JWT_PUBLIC_SIGNING_JWK_SET': """
+        {
+            "keys": [
+                {
+                    "e": "AQAB",
+                    "key_ops": [
+                        "verify"
+                    ],
+                    "kid": "devstack_key",
+                    "kty": "RSA",
+                    "n": "ptX-wylRklr_xX5YQpYaVMW8vMx-Y1miaGLZAQxeL_TsqNWn40MMMxT2b2dFBTwOIXwgwnoNvZj3vASMpe2TVNyOZvr52QG1vveOiXeGlB5sIelI_qsWKfJlc9K949FS2tdof9xM3mKQDDVj9Bw3B8a9kr8lHfMV6XKnajxnrnsAEZF8o_-9juh6rJKaJXcnBLDHhqmfNiIxqr9Q37rc7eMI3LspZngoIr1zg_mU4PEzMkjIVnpQbsgV_Y_YiYvG-xUbHVg2KhR7wI12u0bzjfLRJ8CoFfSrl1bHZ8iP0eXbSP2x7fCz1J0HagAqWCSiGCbYf-HmypoxTdUzIgj8EQ"
+                }
+            ]
+        }
+    """,
 })
 
 # pylint: enable=unicode-format-string  # lint-amnesty, pylint: disable=bad-option-value
