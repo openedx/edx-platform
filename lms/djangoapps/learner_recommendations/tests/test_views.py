@@ -4,7 +4,6 @@ Tests for Learner Recommendations views and related functions.
 
 import json
 from django.urls import reverse_lazy
-from django.conf import settings
 from edx_toggles.toggles.testutils import override_waffle_flag
 from rest_framework.test import APITestCase
 from unittest import mock
