@@ -293,7 +293,6 @@ class TestCrossProductRecommendationsView(APITestCase):
         """
         Verify an empty array of courses is returned if discovery returns two empty dictionaries.
         """
-        print(f"SETTINGS VAR: {settings.GENERAL_RECOMMENDATIONS}")
         country_code_from_ip_mock.return_value = "za"
         get_course_data_mock.side_effect = [{}, {}]
 
