@@ -103,9 +103,6 @@ class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
     def setUp(self):
         super().setUp()
         # Test that the correct attempts within a date range are called
-        print("SETTINGS:",settings)
-        print("SETTINGS VS:",settings.VERIFY_STUDENT)
-        print("\nFAKE:",FAKE_SETTINGS)
         with patch('lms.djangoapps.verify_student.models.requests.post') as mock_software_secure_post:
             with freeze_time("2023-02-28 23:59:59"):
                 self._create_attempts(1)

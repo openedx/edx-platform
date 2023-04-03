@@ -27,18 +27,12 @@ class TestTriggerSoftwareSecurePhotoVerificationsPostSaveSignal(MockS3Boto3Mixin
     Tests for django admin command `trigger_softwaresecurephotoverifications_post_save_signal`
     in the verify_student module
     """
-
     def setUp(self):
         super().setUp()
-        # Test that the correct attempts within a date range are called
-        with freeze_time("2023-02-28 23:59:59"):
-            self._create_attempts(1)
-        with freeze_time("2023-03-01 00:00:00"):
+        with freeze_time("2021-10-30 12:00:00"):
             self._create_attempts(4)
-        with freeze_time("2023-03-28 23:59:59"):
+        with freeze_time("2021-11-01 03:00:00"):
             self._create_attempts(4)
-        with freeze_time("2023-03-29 00:00:00"):
-            self._create_attempts(1)
 
     def _create_attempts(self, num_attempts):
         for _ in range(num_attempts):
@@ -46,12 +40,7 @@ class TestTriggerSoftwareSecurePhotoVerificationsPostSaveSignal(MockS3Boto3Mixin
 
     @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
     def test_command(self, send_idv_update_mock):
-
-        call_command('trigger_softwaresecurephotoverifications_post_save_signal',
-                     'submitted',
-                     start_datetime="2023-03-01 00:00:00",
-                     end_datetime="2023-03-28 23:59:59"
-                     )
+        call_command('trigger_softwaresecurephotoverifications_post_save_signal', start_date_time='2021-10-31 06:00:00')
 
         # The UserFactory instantiates first_name and last_name using a Sequence, which provide integers to
         # generate unique values. A Sequence maintains its state across test runs, so the value of a given Sequence,
@@ -63,38 +52,22 @@ class TestTriggerSoftwareSecurePhotoVerificationsPostSaveSignal(MockS3Boto3Mixin
         # attempt_id, and user_id, as the signal is tested elsewhere.
         expected_calls = [
             call(
-                sender='idv_update', attempt_id=2, user_id=2, status='submitted',
+                sender='idv_update', attempt_id=5, user_id=5, status='must_retry',
                 photo_id_name=ANY, full_name=ANY
             ),
             call(
-                sender='idv_update', attempt_id=3, user_id=3, status='submitted',
+                sender='idv_update', attempt_id=6, user_id=6, status='must_retry',
                 photo_id_name=ANY, full_name=ANY
             ),
             call(
-                sender='idv_update', attempt_id=4, user_id=4, status='submitted',
+                sender='idv_update', attempt_id=7, user_id=7, status='must_retry',
                 photo_id_name=ANY, full_name=ANY
             ),
             call(
-                sender='idv_update', attempt_id=5, user_id=5, status='submitted',
-                photo_id_name=ANY, full_name=ANY
-            ),
-            call(
-                sender='idv_update', attempt_id=6, user_id=6, status='submitted',
-                photo_id_name=ANY, full_name=ANY
-            ),
-            call(
-                sender='idv_update', attempt_id=7, user_id=7, status='submitted',
-                photo_id_name=ANY, full_name=ANY
-            ),
-            call(
-                sender='idv_update', attempt_id=8, user_id=8, status='submitted',
-                photo_id_name=ANY, full_name=ANY
-            ),
-            call(
-                sender='idv_update', attempt_id=9, user_id=9, status='submitted',
+                sender='idv_update', attempt_id=8, user_id=8, status='must_retry',
                 photo_id_name=ANY, full_name=ANY
             ),
         ]
         print(send_idv_update_mock.mock_calls)
-        self.assertEqual(send_idv_update_mock.call_count, 8)
+        self.assertEqual(send_idv_update_mock.call_count, 4)
         send_idv_update_mock.assert_has_calls(expected_calls, any_order=True)

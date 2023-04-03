@@ -127,21 +127,13 @@ class Command(BaseCommand):
             )
             log.info("Fetching retry verification ids from config model")
         else:
-            items = SoftwareSecurePhotoVerification.objects.all()
-            for item in items:
-                print(item.status)
             # Filter by status
             status = options['status']
-            print('STATUS:',status)
             if status != 'must_retry':
                 force_must_retry = True
             attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(
                 status=status
             )
-
-            print("\nattempts_to_retry after status filter:", attempts_to_retry)
-            for index, attempt in enumerate(attempts_to_retry):
-                print("submitted at:", attempt.submitted_at)
 
             log.info(
                 f"Attempting to re-submit {len(attempts_to_retry)} failed SoftwareSecurePhotoVerification submissions; "
@@ -159,9 +151,6 @@ class Command(BaseCommand):
                 log.info(
                     f"In date range: `{start_datetime}` to `{end_datetime}`"
                 )
-            print('start_datetime:',start_datetime)
-            print('end_datetime:',end_datetime)
-            print("RETRYING:", attempts_to_retry)
 
         # Re-submit attempts_to_retry
         batch_size = options['batch_size']
