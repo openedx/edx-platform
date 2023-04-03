@@ -454,6 +454,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         onNewXBlock: function(xblockElement, scrollOffset, is_duplicate, data) {
             var useNewTextEditor = this.$('.xblock-header-primary').attr('use-new-editor-text'),
                 useNewVideoEditor = this.$('.xblock-header-primary').attr('use-new-editor-video'),
+                useVideoGalleryFlow = this.$('.xblock-header-primary').attr("use-video-gallery-flow"),
                 useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
 
             // find the block type in the locator if availible
@@ -465,7 +466,13 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     || (useNewVideoEditor === 'True' && blockType.includes('video'))
                     ||(useNewProblemEditor === 'True' && blockType.includes('problem'))
             ){
-                var destinationUrl = this.$('.xblock-header-primary').attr('authoring_MFE_base_url') + '/' + blockType[1] + '/' + encodeURI(data.locator);
+                var destinationUrl;
+                if (useVideoGalleryFlow === "True" && blockType.includes("video")) {
+                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/videos';
+                }
+                else {
+                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
+                }
                 window.location.href = destinationUrl;
                 return;
             }
