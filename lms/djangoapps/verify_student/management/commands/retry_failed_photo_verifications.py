@@ -21,9 +21,11 @@ class Command(BaseCommand):
     Use case: Multiple IDVs need to be resubmitted.
 
     Example:
-        ./manage.py lms retry_failed_photo_verifications --status="submitted" --start_datetime="2023-03-01 00:00:00" --end_datetime="2023-03-28 23:59:59"
+        ./manage.py lms retry_failed_photo_verifications --status="submitted" \
+        --start_datetime="2023-03-01 00:00:00" --end_datetime="2023-03-28 23:59:59"
         (This resubmits all 'submitted' SoftwareSecurePhotoVerifications from 2023-03-01 to 2023-03-28)
     """
+
     args = "<SoftwareSecurePhotoVerification id, SoftwareSecurePhotoVerification id, ...>"
     help = (
         "Retries SoftwareSecurePhotoVerifications passed as "
@@ -105,7 +107,7 @@ class Command(BaseCommand):
 
         sspv_retry_config = SSPVerificationRetryConfig.current()
         if not sspv_retry_config.enabled:
-            log.warning('SSPVerificationRetryConfig is disabled or empty, but --args-from-database was requested.')
+            log.error('SSPVerificationRetryConfig is disabled or empty, but --args-from-database was requested.')
             return {}
 
         # We don't need fancy shell-style whitespace/quote handling - none of our arguments are complicated
@@ -117,9 +119,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         options = self.get_args_from_database() if options['args_from_database'] else options
-        args = options.get('verification_ids', None)
+        if options == {}:
+            return
 
+        args = options.get('verification_ids', None)
         force_must_retry = False
+
         if args:
             force_must_retry = True
             attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(

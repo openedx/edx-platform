@@ -24,6 +24,8 @@ from lms.djangoapps.verify_student.tests.test_models import (
 LOGGER_NAME = 'retry_photo_verification'
 
 # Lots of patching to stub in our own settings, and HTTP posting
+
+
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
@@ -54,7 +56,7 @@ class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
     def add_test_config_for_retry_verification(self):
         """Setups verification retry configuration."""
         config = SSPVerificationRetryConfig.current()
-        config.arguments = ('--verification-ids 1 2 3')
+        config.arguments = ('--verification-ids 1 2 3 ')
         config.enabled = True
         config.save()
 
@@ -78,7 +80,8 @@ class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
                     log.check_present(
                         (
                             LOGGER_NAME, 'INFO',
-                            f'Attempting to re-submit {1} failed SoftwareSecurePhotoVerification submissions; \nwith status: must_retry'
+                            f'Attempting to re-submit {1} failed SoftwareSecurePhotoVerification submissions; '
+                            f'\nwith status: must_retry'
                         ),
                     )
 
@@ -96,14 +99,15 @@ class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
 
 @override_settings(VERIFY_STUDENT=FAKE_SETTINGS)
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
-class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):  # TODO rename this to specify date/status stuff
+class TestRetryFailedPhotoVerificationsBetweenDates(MockS3Boto3Mixin, TestVerificationBase):
     """
     insert docs here
     """
+
     def setUp(self):
         super().setUp()
         # Test that the correct attempts within a date range are called
-        with patch('lms.djangoapps.verify_student.models.requests.post') as mock_software_secure_post:
+        with patch('lms.djangoapps.verify_student.models.requests.post'):
             with freeze_time("2023-02-28 23:59:59"):
                 self._create_attempts(1)
             with freeze_time("2023-03-01 00:00:00"):
@@ -120,10 +124,10 @@ class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
     @patch('lms.djangoapps.verify_student.signals.idv_update_signal.send')
     def test_resubmit_in_date_range(self, send_idv_update_mock):
         call_command('retry_failed_photo_verifications',
-                    status="submitted",
-                    start_datetime="2023-03-01 00:00:00",
-                    end_datetime="2023-03-28 23:59:59"
-                    )
+                     status="submitted",
+                     start_datetime="2023-03-01 00:00:00",
+                     end_datetime="2023-03-28 23:59:59"
+                     )
 
         expected_calls = [
             call(
