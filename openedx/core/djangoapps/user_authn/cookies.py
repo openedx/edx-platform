@@ -3,6 +3,7 @@ Utility functions for setting "logged in" cookies used by subdomains.
 """
 
 
+import datetime
 import json
 import logging
 import time
@@ -73,10 +74,14 @@ def delete_logged_in_cookies(response):
         HttpResponse
     """
     for cookie_name in ALL_LOGGED_IN_COOKIE_NAMES:
-        response.delete_cookie(
+        response.set_cookie(
             cookie_name,
+            '',
             path='/',
-            domain=settings.SESSION_COOKIE_DOMAIN
+            domain=settings.SESSION_COOKIE_DOMAIN,
+            secure=True if settings.HTTPS == 'on' else False,
+            max_age=0,
+            expires=datetime.datetime.utcfromtimestamp(0)
         )
 
     return response
