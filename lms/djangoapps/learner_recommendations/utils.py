@@ -204,24 +204,8 @@ def filter_recommended_courses(
     return filtered_recommended_courses
 
 
-class CrossProductRecommendationsDictionary:
-    """
-    Dictionary containing associated course keys
-    """
-    dictionary = {
-        "HKUx+FinTechT1x": ["ColumbiaX+BC24FNTC", "MITx+BLN"],
-        "RITx+CYBER501x": ["UniversityofUtah+BC24CYB", "HarvardX+CYB"],
-        "ColumbiaX+CORPFIN1x": ["ColumbiaX+BC24FNTC", "LSE+MFE"],
-        "BUx+QD602x": ["UniversityofDenver+BC24DV", "MITx+AGM"],
-        "Google+WebML101": ["UniversityofDenver+BC24DV", "MITx+AI"]
-    }
-
-    def get_associated_keys(self, course_key):
-        return self.dictionary.get(course_key)
-
-
 def get_cross_product_recommendations(course_key):
     """
-    Calls the AssociatedCourseKeys dictionary dictionary and return the result of the dictionary
+    Helper method to get associated course keys based on the key passed
     """
-    return CrossProductRecommendationsDictionary().get_associated_keys(course_key)
+    return settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS.get(course_key)

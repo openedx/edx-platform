@@ -14,6 +14,7 @@ from lms.djangoapps.learner_recommendations.utils import (
     get_cross_product_recommendations
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from lms.djangoapps.learner_recommendations.tests.test_data import mock_cross_product_recommendation_keys
 
 
 @ddt.ddt
@@ -221,6 +222,7 @@ class TestGetCrossProductRecommendationsMethod(TestCase):
         ("RITx+CYBER501x", ["UniversityofUtah+BC24CYB", "HarvardX+CYB"]),
         ('NoKeyAssociated', None)
     )
+    @patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
     @ddt.unpack
     def test_get_cross_product_recommendations_method(self, course_key, expected_response):
         assert get_cross_product_recommendations(course_key) == expected_response

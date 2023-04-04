@@ -15,6 +15,7 @@ from lms.djangoapps.learner_recommendations.toggles import (
     ENABLE_COURSE_ABOUT_PAGE_RECOMMENDATIONS,
     ENABLE_DASHBOARD_RECOMMENDATIONS,
 )
+from lms.djangoapps.learner_recommendations.tests.test_data import mock_cross_product_recommendation_keys
 
 
 class TestRecommendationsBase(APITestCase):
@@ -215,6 +216,7 @@ class TestCrossProductRecommendationsView(APITestCase):
 
         return courses
 
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     def test_successful_response(
@@ -234,6 +236,7 @@ class TestCrossProductRecommendationsView(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(course_data), 2)
 
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     def test_one_course_country_restriction_response(
@@ -255,6 +258,7 @@ class TestCrossProductRecommendationsView(APITestCase):
         self.assertEqual(len(course_data), 1)
         self.assertEqual(course_data[0]["title"], "Title 1")
 
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     def test_both_course_country_restriction_response(
@@ -276,6 +280,7 @@ class TestCrossProductRecommendationsView(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(course_data), 0)
 
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
     def test_no_associated_course_response(self):
         """
         Verify an empty array of courses is returned if there are no associated course keys.
@@ -287,6 +292,7 @@ class TestCrossProductRecommendationsView(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(course_data), 0)
 
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     def test_no_response_from_discovery(self, country_code_from_ip_mock, get_course_data_mock):
@@ -403,7 +409,6 @@ class TestDashboardRecommendationsApiView(TestRecommendationsBase):
         """
         Test that if the Amplitude API gives an unexpected error, general recommendations are returned.
         """
-
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 
