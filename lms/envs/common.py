@@ -3265,6 +3265,9 @@ INSTALLED_APPS = [
 
     # MFE API
     'lms.djangoapps.mfe_config_api',
+
+    # Notifications
+    'openedx.core.djangoapps.notifications',
 ]
 
 ######################### CSRF #########################################
