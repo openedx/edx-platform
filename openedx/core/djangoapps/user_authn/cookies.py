@@ -77,11 +77,11 @@ def delete_logged_in_cookies(response):
         response.set_cookie(
             cookie_name,
             '',
+            max_age=0,
+            expires=datetime.datetime.utcfromtimestamp(0),
             path='/',
             domain=settings.SESSION_COOKIE_DOMAIN,
-            secure=True if settings.HTTPS == 'on' else False,
-            max_age=0,
-            expires=datetime.datetime.utcfromtimestamp(0)
+            secure=True if settings.HTTPS == 'on' else False
         )
 
     return response
