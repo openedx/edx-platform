@@ -11,6 +11,7 @@ from rest_framework.fields import empty
 from cms.djangoapps.contentstore.views.assets import update_course_run_asset
 from cms.djangoapps.contentstore.views.course import create_new_course, get_course_and_check_access, rerun_course
 from common.djangoapps.student.models import CourseAccessRole
+from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.lib.courses import course_image_url
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -158,6 +159,7 @@ class CourseRunCreateSerializer(CourseRunSerializer):  # lint-amnesty, pylint: d
 
         with transaction.atomic():
             instance = create_new_course(user, _id['org'], _id['course'], _id['run'], validated_data)
+            update_unit_discussion_state_from_discussion_blocks(instance.id, user.id)
             self.update_team(instance, team)
             return instance
 
