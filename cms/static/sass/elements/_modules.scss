@@ -664,6 +664,13 @@ $outline-indent-width: $baseline;
       vertical-align: middle;
       margin-left: ($baseline/4);
     }
+
+    .status-grading-type-mismatch {
+      display: inline-block;
+      vertical-align: middle;
+      opacity: initial;
+      color: $color-error;
+    }
   }
 
   // outline: units
@@ -738,6 +745,13 @@ $outline-indent-width: $baseline;
     .status-grading-value {
       display: inline-block;
       vertical-align: middle;
+    }
+
+    .status-grading-type-mismatch {
+      display: inline-block;
+      vertical-align: middle;
+      opacity: 1;
+      color: $color-error;
     }
 
     .status-grading-date {

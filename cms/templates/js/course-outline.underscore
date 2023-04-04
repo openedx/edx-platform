@@ -81,6 +81,7 @@ var gradingType = gettext('Ungraded');
 if (xblockInfo.get('graded')) {
     gradingType = xblockInfo.get('format')
 }
+var courseGraders = xblockInfo.get('course_graders');
 
 var is_proctored_exam = xblockInfo.get('is_proctored_exam');
 var is_practice_exam = xblockInfo.get('is_practice_exam');
@@ -244,7 +245,6 @@ if (is_proctored_exam) {
                     <p>
                         <span class="sr status-grading-label"> <%- gettext('Graded as:') %> </span>
                         <span class="icon fa fa-check" aria-hidden="true"></span>
-                        <span class="status-grading-value"> <%- gradingType %> </span>
                          -
                         <span class="sr status-proctored-exam-label"> <%- exam_value %> </span>
                         <span class="status-proctored-exam-value"> <%- exam_value %> </span>
@@ -276,8 +276,16 @@ if (is_proctored_exam) {
                 <div class="status-grading">
                     <p>
                         <span class="sr status-grading-label"> <%- gettext('Graded as:') %> </span>
-                        <span class="icon fa fa-check" aria-hidden="true"></span>
-                        <span class="status-grading-value"> <%- gradingType %> </span>
+                        <% if (!courseGraders.includes(gradingType)) { %>
+                            <span class="status-grading-type-mismatch fa fa-warning" aria-hidden="true"></span>
+                            <span class="status-grading-value"> <%- gradingType %> </span>
+                            <span class="status-grading-type-mismatch">
+                                <%- gettext('There is an issue with this Assignment Type. Please review and update.') %>
+                            </span>
+                        <% } else { %>
+                            <span class="icon fa fa-check" aria-hidden="true"></span>
+                            <span class="status-grading-value"> <%- gradingType %> </span>
+                        <% } %>
                         <% if (xblockInfo.get('due_date') && !course.get('self_paced')) { %>
                             <span class="status-grading-date"> <%- gettext('Due:') %> <%- xblockInfo.get('due_date') %> </span>
                         <% } %>
@@ -306,8 +314,16 @@ if (is_proctored_exam) {
                 <div class="status-grading">
                     <p>
                         <span class="sr status-grading-label"> <%- gettext('Graded as:') %> </span>
-                        <span class="icon fa fa-check" aria-hidden="true"></span>
-                        <span class="status-grading-value"> <%- gradingType %> </span>
+                        <% if (!courseGraders.includes(gradingType)) { %>
+                            <span class="status-grading-type-mismatch fa fa-warning" aria-hidden="true"></span>
+                            <span class="status-grading-value"> <%- gradingType %> </span>
+                            <span class="status-grading-type-mismatch">
+                                <%- gettext('There is an issue with this Assignment Type. Please review and update.') %>
+                            </span>
+                        <% } else { %>
+                            <span class="icon fa fa-check" aria-hidden="true"></span>
+                            <span class="status-grading-value"> <%- gradingType %> </span>
+                        <% } %>
                     </p>
                 </div>
                 <div class="status-grading">
