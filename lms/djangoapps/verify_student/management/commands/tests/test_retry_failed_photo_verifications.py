@@ -23,9 +23,8 @@ from lms.djangoapps.verify_student.tests.test_models import (
 
 LOGGER_NAME = 'retry_photo_verification'
 
+
 # Lots of patching to stub in our own settings, and HTTP posting
-
-
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post)
 class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
@@ -56,7 +55,7 @@ class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
     def add_test_config_for_retry_verification(self):
         """Setups verification retry configuration."""
         config = SSPVerificationRetryConfig.current()
-        config.arguments = ('--verification-ids 1 2 3 ')
+        config.arguments = ('--verification-ids 1 2 3')
         config.enabled = True
         config.save()
 
@@ -92,7 +91,8 @@ class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
                 log.check_present(
                     (
                         LOGGER_NAME, 'INFO',
-                        'Fetching retry verification ids from config model'
+                        f'Attempting to re-submit {0} failed SoftwareSecurePhotoVerification submissions; '
+                        f'with retry verification ids from config model'
                     ),
                 )
 
@@ -101,7 +101,7 @@ class TestRetryFailedPhotoVerifications(MockS3Boto3Mixin, TestVerificationBase):
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 class TestRetryFailedPhotoVerificationsBetweenDates(MockS3Boto3Mixin, TestVerificationBase):
     """
-    insert docs here
+    Tests that the command selects specific objects within a date range
     """
 
     def setUp(self):
@@ -163,6 +163,5 @@ class TestRetryFailedPhotoVerificationsBetweenDates(MockS3Boto3Mixin, TestVerifi
                 photo_id_name=ANY, full_name=ANY
             ),
         ]
-        print(send_idv_update_mock.mock_calls)
         self.assertEqual(send_idv_update_mock.call_count, 8)
         send_idv_update_mock.assert_has_calls(expected_calls, any_order=True)

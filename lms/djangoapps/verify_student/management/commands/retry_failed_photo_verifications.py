@@ -130,7 +130,10 @@ class Command(BaseCommand):
             attempts_to_retry = SoftwareSecurePhotoVerification.objects.filter(
                 receipt_id__in=options['verification_ids']
             )
-            log.info("Fetching retry verification ids from config model")
+            log.info(
+                f"Attempting to re-submit {len(attempts_to_retry)} failed SoftwareSecurePhotoVerification submissions; "
+                f"with retry verification ids from config model"
+            )
         else:
             # Filter by status
             status = options['status']
