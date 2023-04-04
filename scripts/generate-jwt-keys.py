@@ -18,13 +18,14 @@ if len(args) == 1:
     kid = args[0]
 else:
     print("Call this script with an ID for the new key, e.g. lms-prod-20230403")
-    exit(1)
+    sys.exit(1)
 
 
 private_rsa_key = RSA.generate(2048)
 public_rsa_key = private_rsa_key.publickey()
 
 algo = get_default_algorithms()['RS512']
+
 
 def print_key(k):
     pem = k.export_key('PEM').decode()
@@ -33,22 +34,9 @@ def print_key(k):
     jwk_pretty = json.dumps(jwk, indent=4, sort_keys=True)
     print(jwk_pretty)
 
+
 print("Public key, to add to \"keys\" list of JWT_PUBLIC_SIGNING_JWK_SET:\n")
 print_key(public_rsa_key)
 print("\n\n")
 print("Private key, to encrypt and set as JWT_PRIVATE_SIGNING_JWK:\n")
 print_key(private_rsa_key)
-
-# private_jwk_key_dict = json.loads(private_jwk_key_str)
-# public_jwk_key_dict = json.loads(public_jwk_key_str)
-
-
-# ###################################
-# # Storing keys in JWK JSON format #
-# ###################################
-# with open('keys/private_jwk_key.json', 'w') as f:
-#     json.dump(private_jwk_key_dict, f, indent=4, sort_keys=True)
-
-# with open('keys/public_jwk_key.json', 'w') as f:
-#     json.dump(public_jwk_key_dict, f, indent=4, sort_keys=True)
-
