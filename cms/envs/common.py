@@ -1632,6 +1632,9 @@ INSTALLED_APPS = [
     # Discussion
     'openedx.core.djangoapps.django_comment_common',
 
+    # Notifications
+    'openedx.core.djangoapps.notifications',
+
     # for course creator table
     'django.contrib.admin',
 
