@@ -160,7 +160,6 @@ class CourseRunCreateSerializer(CourseRunSerializer):  # lint-amnesty, pylint: d
         with transaction.atomic():
             instance = create_new_course(user, _id['org'], _id['course'], _id['run'], validated_data)
             self.update_team(instance, team)
-        update_unit_discussion_state_from_discussion_blocks(instance.id, user.id)
         return instance
 
 
@@ -204,4 +203,5 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
 
         course_run = get_course_and_check_access(new_course_run_key, user)
         self.update_team(course_run, team)
+        update_unit_discussion_state_from_discussion_blocks(course_run.id, user.id)
         return course_run
