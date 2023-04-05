@@ -280,7 +280,8 @@
         'js/certificates/spec/views/certificate_details_spec',
         'js/certificates/spec/views/certificate_editor_spec',
         'js/certificates/spec/views/certificates_list_spec',
-        'js/certificates/spec/views/certificate_preview_spec'
+        'js/certificates/spec/views/certificate_preview_spec',
+        'js/certificates/spec/views/add_course_mode_spec'
     ];
 
     i = 0;

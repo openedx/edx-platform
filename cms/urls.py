@@ -152,6 +152,8 @@ urlpatterns = oauth2_urlpatterns + [
             contentstore_views.grading_handler, name='grading_handler'),
     re_path(fr'^settings/advanced/{settings.COURSE_KEY_PATTERN}$', contentstore_views.advanced_settings_handler,
             name='advanced_settings_handler'),
+    re_path(fr'^settings/enrollment-tracks/{settings.COURSE_KEY_PATTERN}$', contentstore_views.enrollment_tracks_handler,
+            name='enrollment_tracks_handler'),
     re_path(fr'^textbooks/{settings.COURSE_KEY_PATTERN}$', contentstore_views.textbooks_list_handler,
             name='textbooks_list_handler'),
     re_path(fr'^textbooks/{settings.COURSE_KEY_PATTERN}/(?P<textbook_id>\d[^/]*)$',
@@ -190,6 +192,15 @@ urlpatterns = oauth2_urlpatterns + [
     path('api/val/v0/', include('edxval.urls')),
     path('api/tasks/v0/', include('user_tasks.urls')),
     path('accessibility', contentstore_views.accessibility, name='accessibility'),
+
+    # Course modes API for certificates generation
+    path(
+        'api/course_modes/',
+        include(
+            ('common.djangoapps.course_modes.rest_api.urls', 'common.djangoapps.course_mods'),
+            namespace='course_modes_api',
+        )
+    ),
 ]
 
 if not settings.DISABLE_DEPRECATED_SIGNIN_URL:

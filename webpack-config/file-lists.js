@@ -26,6 +26,7 @@ module.exports = {
         path.resolve(__dirname, '../cms/static/js/certificates/views/certificate_preview.js'),
         path.resolve(__dirname, '../cms/static/js/certificates/views/signatory_details.js'),
         path.resolve(__dirname, '../cms/static/js/certificates/views/signatory_editor.js'),
+        path.resolve(__dirname, '../cms/static/js/certificates/views/add_course_mode.js'),
         path.resolve(__dirname, '../cms/static/js/views/active_video_upload_list.js'),
         path.resolve(__dirname, '../cms/static/js/views/assets.js'),
         path.resolve(__dirname, '../cms/static/js/views/course_video_settings.js'),
