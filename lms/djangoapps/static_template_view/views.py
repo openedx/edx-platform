@@ -8,6 +8,7 @@
 
 import mimetypes
 
+from django.db import transaction
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import redirect
@@ -22,6 +23,7 @@ from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_st
 from common.djangoapps.util.cache import cache_if_anonymous
 from common.djangoapps.util.views import fix_crum_request
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.features.genplus_features.genplus.models import GenError, GenUser
 
 valid_templates = []
 
@@ -122,4 +124,30 @@ def render_429(request, exception=None):  # lint-amnesty, pylint: disable=unused
 
 @fix_crum_request
 def render_500(request):
+    try:
+        with transaction.atomic():
+            gen_user = GenUser.objects.get(user=request.user)
+
+            if gen_user.is_student:
+                gen_error = GenError.objects.create(
+                    email=request.user.email,
+                    name=request.user.profile.name,
+                    role=gen_user.role,
+                    school=gen_user.school,
+                    gen_class=gen_user.student.active_class,
+                    error_code=500,
+                    browser=f'{request.user_agent.browser.family}-{request.user_agent.browser.version_string}'
+                )
+            elif gen_user.is_teacher:
+                gen_error = GenError.objects.create(
+                    email=request.user.email,
+                    name=request.user.profile.name,
+                    role=gen_user.role,
+                    school=gen_user.school,
+                    error_code=500,
+                    browser=f'{request.user_agent.browser.family}-{request.user_agent.browser.version_string}'
+                )
+    except:
+        pass
+
     return HttpResponseServerError(render_to_string('static_templates/server-error.html', {}, request=request))

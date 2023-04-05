@@ -1,11 +1,13 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
 import functools
 
+from django.db import transaction
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseServerError
 
 from common.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from common.djangoapps.util.views import fix_crum_request
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.features.genplus_features.genplus.models import GenError, GenUser
 
 __all__ = ['not_found', 'server_error', 'render_404', 'render_500']
 
@@ -47,4 +49,30 @@ def render_404(request, exception):  # lint-amnesty, pylint: disable=unused-argu
 @fix_crum_request
 @jsonable_error(500, "The Studio servers encountered an error")
 def render_500(request):
+    try:
+        with transaction.atomic():
+            gen_user = GenUser.objects.get(user=request.user)
+
+            if gen_user.is_student:
+                gen_error = GenError.objects.create(
+                    email=request.user.email,
+                    name=request.user.profile.name,
+                    role=gen_user.role,
+                    school=gen_user.school,
+                    gen_class=gen_user.student.active_class,
+                    error_code=500,
+                    browser=f'{request.user_agent.browser.family}-{request.user_agent.browser.version_string}'
+                )
+            elif gen_user.is_teacher:
+                gen_error = GenError.objects.create(
+                    email=request.user.email,
+                    name=request.user.profile.name,
+                    role=gen_user.role,
+                    school=gen_user.school,
+                    error_code=500,
+                    browser=f'{request.user_agent.browser.family}-{request.user_agent.browser.version_string}'
+                )
+    except:
+        pass
+
     return HttpResponseServerError(render_to_string('500.html', {}, request=request))

@@ -1986,7 +1986,7 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
-
+    'django_user_agents.middleware.UserAgentMiddleware',
     # Avoid issue with https://blog.heroku.com/chrome-changes-samesite-cookie
     # Override was found here https://github.com/django/django/pull/11894
     'django_cookies_samesite.middleware.CookiesSameSite',
@@ -3148,6 +3148,7 @@ GENPLUS_INSTALLED_APPS = [
     'tinymce',
     'adminsortable2',
     'drf_multiple_model',
+    'django_user_agents',
 ]
 
 GENPLUS_GOOGLE_ANALYTICS_ID = ''
