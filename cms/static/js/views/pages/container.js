@@ -468,7 +468,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             ){
                 var destinationUrl;
                 if (useVideoGalleryFlow === "True" && blockType.includes("video")) {
-                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/videos';
+                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/course-videos/' + encodeURI(data.locator);
                 }
                 else {
                     destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
