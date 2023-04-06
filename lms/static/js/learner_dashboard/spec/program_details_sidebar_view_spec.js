@@ -29,6 +29,7 @@ describe('Program Progress View', () => {
   /* eslint-enable */
     let programModel;
     let courseData;
+    let subscriptionData;
     let certificateCollection;
 
     const testCircle = (progress) => {
@@ -42,17 +43,40 @@ describe('Program Progress View', () => {
     const testText = (progress) => {
         const $numbers = view.$('.numbers');
         const total = progress.completed.length + progress.in_progress.length +
-      progress.not_started.length;
+            progress.not_started.length;
 
         expect(view.$('.progress-heading').html()).toEqual('XSeries Progress');
         expect(parseInt($numbers.find('.complete').html(), 10)).toEqual(progress.completed.length);
         expect(parseInt($numbers.find('.total').html(), 10)).toEqual(total);
     };
 
+    const testSubscriptionState = (state, heading, body) => {
+        subscriptionData = {
+            ...subscriptionData,
+            is_eligible_for_subscription: true,
+            subscription_state: state,
+        };
+        view = initView();
+        body += ' on the <a class="subscription-link" href="">Orders and subscriptions</a> page';
+        expect(view.$('.js-subscription-info')[0]).toBeInDOM();
+        expect(
+            view.$('.js-subscription-info .divider-heading').text().trim()
+        ).toEqual(heading);
+        expect(
+            view.$('.js-subscription-info .subscription-section p:nth-child(1)')
+        ).toContainHtml(body);
+        expect(
+            view.$('.js-subscription-info .subscription-section p:nth-child(2)')
+        ).toContainText(
+            /Need help\? Check out the.*Learner help centre.*to troubleshoot issues or contact support/
+        );
+    };
+
     const initView = () => new ProgramSidebarView({
         el: '.js-program-sidebar',
         model: programModel,
         courseModel: courseData,
+        subscriptionModel: new Backbone.Model(subscriptionData),
         certificateCollection,
         programRecordUrl: '/foo/bar',
         industryPathways: data.industryPathways,
@@ -66,6 +90,11 @@ describe('Program Progress View', () => {
         programModel = new Backbone.Model(data.programData);
         courseData = new Backbone.Model(data.courseData);
         certificateCollection = new Backbone.Collection(data.certificateData);
+        subscriptionData = {
+            is_eligible_for_subscription: false,
+            subscription_price: '$39',
+            subscription_state: '',
+        };
     });
 
     afterEach(() => {
@@ -160,5 +189,42 @@ describe('Program Progress View', () => {
 
         expect(emptyView.$('.program-credit-pathways .divider-heading')).toHaveLength(0);
         expect(emptyView.$('.program-industry-pathways .divider-heading')).toHaveLength(0);
+    });
+
+    it('should not render subscription info if program is not subscription eligible', () => {
+        view = initView();
+        expect(view.$('.js-subscription-info')[0]).not.toBeInDOM();
+    });
+
+    it('should render subscription info if program is subscription eligible', () => {
+        testSubscriptionState(
+            'pre',
+            'Inactive subscription',
+            'If you had a subscription previously, your payment history is still available'
+        );
+    });
+
+    it('should render active trial subscription info if subscription is active with trial', () => {
+        testSubscriptionState(
+            'active_trial',
+            'Trial subscription',
+            'View your receipts or modify your subscription'
+        );
+    });
+
+    it('should render active subscription info if subscription active', () => {
+        testSubscriptionState(
+            'active',
+            'Active subscription',
+            'View your receipts or modify your subscription'
+        );
+    });
+
+    it('should render inactive subscription info if subscription inactive', () => {
+        testSubscriptionState(
+            'inactive',
+            'Inactive subscription',
+            `Restart your subscription for ${subscriptionData.subscription_price}/month. Your payment history is still available`
+        );
     });
 });
