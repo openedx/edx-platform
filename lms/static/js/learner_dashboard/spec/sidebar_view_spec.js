@@ -26,11 +26,30 @@ describe('Sidebar View', () => {
         expect(view).toBeDefined();
     });
 
+    it('should render the subscription upsell section', () => {
+        expect(view.$('.js-subscription-upsell')[0]).toBeInDOM();
+        expect(view.$('.js-subscription-upsell .badge').html().trim())
+            .toEqual('New');
+        expect(view.$('.js-subscription-upsell h4').html().trim())
+            .toEqual('Monthly program subscriptions now available');
+        expect(view.$('.js-subscription-upsell .advertise-message'))
+            .toContainText(
+                'An easier way to access popular programs with more control over how much you spend.'
+            );
+        expect(view.$('.js-subscription-upsell a span:last').html().trim())
+            .toEqual('Explore subscription options');
+        expect(view.$('.js-subscription-upsell a').attr('href'))
+            .not
+            .toEqual(context.marketingUrl);
+    });
+
     it('should load the exploration panel given a marketing URL', () => {
-        const $sidebar = view.$el;
-        expect($sidebar.find('.program-advertise .advertise-message').html().trim())
-            .toEqual('Browse recently launched courses and see what\'s new in your favorite subjects');
-        expect($sidebar.find('.program-advertise .ad-link a').attr('href')).toEqual(context.marketingUrl);
+        expect(view.$('.program-advertise .advertise-message').html().trim())
+            .toEqual(
+                'Browse recently launched courses and see what\'s new in your favorite subjects'
+            );
+        expect(view.$('.program-advertise a').attr('href'))
+            .toEqual(context.marketingUrl);
     });
 
     it('should not load the advertising panel if no marketing URL is provided', () => {
