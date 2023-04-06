@@ -147,7 +147,7 @@ class CrossProductRecommendationsView(APIView):
 
         associated_course_keys = get_cross_product_recommendations(course_key)
 
-        if associated_course_keys is None:
+        if not associated_course_keys:
             return self._empty_response()
 
         fields = [

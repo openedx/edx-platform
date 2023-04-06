@@ -93,34 +93,34 @@ class TestCrossProductRecommendationsSerializer(TestCase):
 
         recommended_courses = []
 
-        for i in range(num_of_courses):
+        for index in range(num_of_courses):
             recommended_courses.append(
                 {
-                    "key": f"edx+HL{i}",
-                    "uuid": f"{i}f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
-                    "title": f"Title {i}",
+                    "key": f"edx+HL{index}",
+                    "uuid": f"{index}f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
+                    "title": f"Title {index}",
                     "image": {
-                        "src": f"https://www.logo_image_url{i}.com",
+                        "src": f"https://www.logo_image_url{index}.com",
                     },
-                    "url_slug": f"https://www.marketing_url{i}.com",
+                    "url_slug": f"https://www.marketing_url{index}.com",
                     "course_type": "executive-education",
                     "owners": [
                         {
-                            "key": f"org-{i}",
-                            "name": f"org {i}",
-                            "logo_image_url": f"https://discovery.com/organization/logos/org-{i}.png",
+                            "key": f"org-{index}",
+                            "name": f"org {index}",
+                            "logo_image_url": f"https://discovery.com/organization/logos/org-{index}.png",
                         },
                     ],
                     "course_runs": [
                         {
-                            "key": f"course-v1:Test+2023_T{i}",
-                            "marketing_url": f"https://www.marketing_url{i}.com",
+                            "key": f"course-v1:Test+2023_T{index}",
+                            "marketing_url": f"https://www.marketing_url{index}.com",
                             "availability": "Current",
                         }
                     ],
                     "active_course_run": {
-                        "key": f"course-v1:Test+2023_T{i}",
-                        "marketing_url": f"https://www.marketing_url{i}.com",
+                        "key": f"course-v1:Test+2023_T{index}",
+                        "marketing_url": f"https://www.marketing_url{index}.com",
                         "availability": "Current",
                     },
                     "location_restriction": None
@@ -142,10 +142,8 @@ class TestCrossProductRecommendationsSerializer(TestCase):
         )
 
     def test_no_course_data_serialization(self):
-        courses = self.mock_recommended_courses(num_of_courses=0)
-
         serialized_data = CrossProductRecommendationsSerializer({
-            "courses": courses
+            "courses": []
         }).data
 
         self.assertDictEqual(
