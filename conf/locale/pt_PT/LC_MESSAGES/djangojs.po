@@ -6234,9 +6234,8 @@ msgid "Please enter non-negative integer."
 msgstr "Por favor entre um número inteiro não negativo."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%- types %> assignments than are assigned."
+msgid "You must have at least one undroppable <%- types %> assignment."
 msgstr ""
-"Não é possível libertar mais <%- types %> tarefas do que as atribuídas."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."

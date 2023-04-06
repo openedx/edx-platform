@@ -258,7 +258,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-05 20:42+0000\n"
+"POT-Creation-Date: 2023-03-26 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -466,6 +466,17 @@ msgstr ""
 "اختياري: لن يتمكّن المستخدمون بعد هذا التاريخ/الوقت من التسجيل في هذا الوضع."
 " يُرجى ترك هذا الحقل فارغًا في حال سيُسمح للمستخدمين التسجيل في هذا الوضع "
 "لحين إغلَاق باب التسجيل في المساق."
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -13103,6 +13114,10 @@ msgstr "ردود مفتوحة "
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Library Content"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py

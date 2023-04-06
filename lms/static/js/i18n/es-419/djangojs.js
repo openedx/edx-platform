@@ -463,7 +463,6 @@
     "Cancel upload": "Cancelar subida del archivo",
     "Cannot delete when in use by a unit": "No puede borrar cuando esta en uso por una unidad",
     "Cannot delete when in use by an experiment": "No se puede borrar mientras est\u00e9 en uso por un experimento",
-    "Cannot drop more <%- types %> assignments than are assigned.": "No se pueden eliminar m\u00e1s asignaciones de <%- types %> de las asignadas.",
     "Cannot join instructor managed team": "No se puede unir al equipo administrado por el instructor",
     "Cannot update attempt review status": "No es posible actualizar el estado de revisi\u00f3n de los intentos ",
     "Caption": "Leyenda",

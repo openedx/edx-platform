@@ -2,7 +2,7 @@
 Tasks for discussions
 """
 import logging
-
+from django.conf import settings
 from celery import shared_task
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
@@ -112,7 +112,7 @@ def get_discussable_units(course, enable_graded_units, discussable_units=None):
                         unit.discussion_enabled = False
                         store.update_item(unit, unit.published_by, emit_signals=False)
                         continue
-                    if discussable_units and (unit.location not in discussable_units):
+                    if discussable_units and (str(unit.location) not in discussable_units):
                         continue
                     yield DiscussionTopicContext(
                         usage_key=unit.location,
@@ -246,7 +246,7 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         discussion_config.enable_graded_units = enable_graded_subsections
         discussion_config.unit_level_visibility = True
         discussion_config.save()
-    update_discussions_settings_from_course_task(
-        str(course_key),
-        discussable_units=list(discussable_units),
+    update_discussions_settings_from_course_task.apply_async(
+        args=[str(course_key), [str(unit) for unit in discussable_units]],
+        countdown=settings.DISCUSSION_SETTINGS['COURSE_PUBLISH_TASK_DELAY'],
     )

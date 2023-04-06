@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-26 20:35+0000\n"
-"PO-Revision-Date: 2023-03-26 20:35:58.162914\n"
+"POT-Creation-Date: 2023-04-02 20:35+0000\n"
+"PO-Revision-Date: 2023-04-02 20:36:00.673257\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -8236,6 +8236,14 @@ msgstr "Snɔɔǝss"
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Ⱥɔʇᴉøns"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
+"Ȼøɯɯɐ sǝdɐɹɐʇǝd ɟᴉlǝ ʇɥɐʇ ɥɐʌǝ nsǝɹnɐɯǝ ɐnd nsǝɹ_ǝɯɐᴉl øɟ ʇɥǝ nsǝɹs ʇɥɐʇ "
+"nǝǝds ʇø bǝ ɹǝʇᴉɹǝd"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -18132,10 +18140,6 @@ msgstr "Sɔɥøøls"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr "Ɍǝƃᴉsʇǝɹ ɟøɹ ɟɹǝǝ"
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Ɍǝsnɯǝ ʎønɹ lɐsʇ ɔønɹsǝ"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
