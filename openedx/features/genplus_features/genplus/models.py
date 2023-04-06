@@ -295,3 +295,15 @@ class GenLog(TimeStampedModel):
             description=f'user with guid {user_guid} removed from the system',
             metadata=details,
         )
+
+
+class GenError(models.Model):
+    ROLE_CHOICES = GenUserRoles.__MODEL_CHOICES__
+    email = models.EmailField()
+    name = models.CharField(max_length=64)
+    role = models.CharField(blank=True, null=True, max_length=32, choices=ROLE_CHOICES)
+    school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True)
+    gen_class = models.ForeignKey(Class, on_delete=models.SET_NULL, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True, blank=True)
+    error_code = models.IntegerField(null=True, blank=True)
+    browser = models.CharField(max_length=32, null=True, blank=True)

@@ -308,6 +308,8 @@ tox==3.23.0               # via -r requirements/edx/testing.txt, tox-battery
 tqdm==4.60.0              # via -r requirements/edx/testing.txt, nltk
 transifex-client==0.14.2  # via -r requirements/edx/testing.txt
 ua-parser==0.10.0         # via -r requirements/edx/testing.txt, django-cookies-samesite
+user-agents==2.2.0        # via -r requirements/edx/testing.txt, django-cookies-samesite
+django-user-agents==0.4.0 # via -r requirements/edx/testing.txt, django-cookies-samesite
 unicodecsv==0.14.1        # via -r requirements/edx/testing.txt, edx-enterprise
 unidiff==0.6.0            # via -r requirements/edx/testing.txt, coverage-pytest-plugin
 uritemplate==3.0.1        # via -r requirements/edx/testing.txt, coreapi, drf-yasg
