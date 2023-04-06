@@ -11,10 +11,16 @@ describe('Course Card View', () => {
     const endDate = 'May 30, 2017';
 
     const setupView = (data, isEnrolled, collectionCourseStatus) => {
-        const programData = $.extend({}, data);
+        const programData = $.extend({
+            subscription_data: {
+                is_eligible_for_subscription: false,
+            },
+        }, data);
+
         const context = {
             courseData: {},
             collectionCourseStatus,
+            programData,
         };
 
         if (typeof collectionCourseStatus === 'undefined') {

@@ -1,11 +1,22 @@
 /* globals setFixtures */
 
+import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+
 import ProgramDetailsView from '../views/program_details_view';
 
 describe('Program Details Header View', () => {
     let view = null;
     const options = {
         programData: {
+            subscription_data: {
+                is_eligible_for_subscription: false,
+                subscription_price: '$39',
+                subscription_start_date: '2023-03-18',
+                subscription_state: '',
+                trial_end_date: '2023-03-18',
+                trial_end_time: '3:54 pm',
+                trial_length: 7,
+            },
             subtitle: '',
             overview: '',
             weeks_to_complete: null,
@@ -497,6 +508,25 @@ describe('Program Details Header View', () => {
     };
     const data = options.programData;
 
+    const testSubscriptionState = (state, heading, body) => {
+        const subscriptionData = {
+            ...options.programData.subscription_data,
+            is_eligible_for_subscription: true,
+            subscription_state: state,
+        };
+        view = initView({
+            programData: $.extend({}, options.programData, {
+                subscription_data: subscriptionData,
+            }),
+        });
+        view.render();
+        expect(view.$('.upgrade-subscription')[0]).toBeInDOM();
+        expect(view.$('.upgrade-subscription .upgrade-button'))
+            .toContainText(StringUtils.interpolate(heading, subscriptionData));
+        expect(view.$('.upgrade-subscription .subscription-info'))
+            .toContainText(StringUtils.interpolate(body, subscriptionData));
+    };
+
     const initView = (updates) => {
         const viewOptions = $.extend({}, options, updates);
 
@@ -535,9 +565,9 @@ describe('Program Details Header View', () => {
         expect(view.$('.program-heading-title').text()).toEqual('Your Program Journey');
         expect(view.$('.program-heading-message').text().trim()
             .replace(/\s+/g, ' ')).toEqual(
-            'Track and plan your progress through the 3 courses in this program. ' +
-      'To complete the program, you must earn a verified certificate for each course.',
-        );
+                'Track and plan your progress through the 3 courses in this program. ' +
+                'To complete the program, you must earn a verified certificate for each course.',
+            );
     });
 
     it('should render the program heading congratulations message if all courses completed', () => {
@@ -553,8 +583,8 @@ describe('Program Details Header View', () => {
         expect(view.$('.program-heading-title').text()).toEqual('Congratulations!');
         expect(view.$('.program-heading-message').text().trim()
             .replace(/\s+/g, ' ')).toEqual(
-            'You have successfully completed all the requirements for the Test Course Title Test.',
-        );
+                'You have successfully completed all the requirements for the Test Course Title Test.',
+            );
     });
 
     it('should render the course list headings', () => {
@@ -643,6 +673,38 @@ describe('Program Details Header View', () => {
         expect(window.analytics.track).toHaveBeenCalledWith(
             'edx.bi.user.dashboard.program.purchase',
             properties,
+        );
+    });
+
+    it('should render the get subscription link if program is subscription eligible', () => {
+        testSubscriptionState(
+            'pre',
+            'Start {trial_length}-Day free trial',
+            '{subscription_price}/month subscription after trial ends. Cancel anytime.'
+        );
+    });
+
+    it('should render appropriate subscription text when subscription is active with trial', () => {
+        testSubscriptionState(
+            'active_trial',
+            'Manage my subscription',
+            'Active trial ends {trial_end_date} at {trial_end_time}'
+        );
+    });
+
+    it('should render appropriate subscription text when subscription is active', () => {
+        testSubscriptionState(
+            'active',
+            'Manage my subscription',
+            'Your next billing date is {subscription_billing_date}'
+        );
+    });
+
+    it('should render appropriate subscription text when subscription is inactive', () => {
+        testSubscriptionState(
+            'inactive',
+            'Restart my subscription',
+            'Unlock verified access to all courses for {subscription_price}/month. Cancel anytime.'
         );
     });
 });
