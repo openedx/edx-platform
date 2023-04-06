@@ -11,7 +11,6 @@ from rest_framework.fields import empty
 from cms.djangoapps.contentstore.views.assets import update_course_run_asset
 from cms.djangoapps.contentstore.views.course import create_new_course, get_course_and_check_access, rerun_course
 from common.djangoapps.student.models import CourseAccessRole
-from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.lib.courses import course_image_url
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -203,5 +202,4 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
 
         course_run = get_course_and_check_access(new_course_run_key, user)
         self.update_team(course_run, team)
-        update_unit_discussion_state_from_discussion_blocks(course_run.id, user.id)
         return course_run
