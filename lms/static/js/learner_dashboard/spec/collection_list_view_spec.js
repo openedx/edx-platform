@@ -9,6 +9,15 @@ describe('Collection List View', () => {
     let view = null;
     let programCollection;
     let progressCollection;
+    const subscriptionData = {
+        is_eligible_for_subscription: true,
+        subscription_price: '$39',
+        subscription_start_date: '2023-03-18',
+        subscription_state: 'active',
+        trial_end_date: '2023-03-18',
+        trial_end_time: '3:54 pm',
+        trial_length: 7,
+    };
     const context = {
         programsData: [
             {
@@ -46,6 +55,7 @@ describe('Collection List View', () => {
                         name: 'Wageningen University & Research',
                     },
                 ],
+                subscription_data: subscriptionData,
             },
             {
                 uuid: '91d144d2-1bb1-4afe-90df-d5cff63fa6e2',
@@ -82,6 +92,7 @@ describe('Collection List View', () => {
                         name: 'edX',
                     },
                 ],
+                subscription_data: subscriptionData,
             },
         ],
         userProgress: [
