@@ -119,16 +119,18 @@ class HtmlBlock(
         Returns HTML required for rendering the block.
         """
         data = self.data
-        user = None
-        
-        if data is not None and getattr(self.system, 'anonymous_student_id', None) is not None:
-            data = self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
-            if getattr(self.system, 'get_real_user', None):
-                user = self.system.get_real_user(self.system.anonymous_student_id)
-        
-        if user and user.is_authenticated:
+        if self.system.user_is_staff:
+            from django.contrib.auth.models import User
+            user = User.objects.get(id=self.system.user_id)
             data = data.replace("%%USER_EMAIL%%", user.email)
         
+        if self.system.anonymous_student_id:
+            data = data.replace("%%USER_ID%%", self.system.anonymous_student_id)
+            if getattr(self.system, 'get_real_user', None):
+                user = self.system.get_real_user(self.system.anonymous_student_id)
+                if user and user.is_authenticated:
+                    data = data.replace("%%USER_EMAIL%%", user.email)
+
         return data
 
     def studio_view(self, _context):
