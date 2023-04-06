@@ -29,7 +29,7 @@ course_mode_class = course_mode if course_mode else ''
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
 
-            gtag('config', '${ga_4_id}');
+            gtag('config', '${ga_4_id | n, js_escaped_string}');
         </script>
     % endif
 </head>
