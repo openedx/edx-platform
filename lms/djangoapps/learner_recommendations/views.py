@@ -138,11 +138,6 @@ class CrossProductRecommendationsView(APIView):
     def _empty_response(self):
         return Response({"courses": []}, status=200)
 
-    def _filter_empty_courses(self, courses):
-        for course in courses[:]:
-            if not course:
-                courses.remove(course)
-
     def get(self, request, course_id):
         """
         Returns cross product recommendation courses
@@ -167,19 +162,19 @@ class CrossProductRecommendationsView(APIView):
             "location_restriction",
         ]
         course_data = [get_course_data(key, fields) for key in associated_course_keys]
-        self._filter_empty_courses(course_data)
+        filtered_courses = [course for course in course_data if course]
 
         ip_address = get_client_ip(request)[0]
         user_country_code = country_code_from_ip(ip_address).upper()
 
-        for course in course_data[:]:
+        for course in filtered_courses[:]:
             if _has_country_restrictions(course, user_country_code):
-                course_data.remove(course)
+                filtered_courses.remove(course)
 
-        if len(course_data) == 0:
+        if not filtered_courses:
             return self._empty_response()
 
-        for course in course_data:
+        for course in filtered_courses:
             course.update({
                 "active_course_run": course.get("course_runs")[0]
             })
@@ -187,7 +182,7 @@ class CrossProductRecommendationsView(APIView):
         return Response(
             CrossProductRecommendationsSerializer(
                 {
-                    "courses": course_data
+                    "courses": filtered_courses
                 }).data,
             status=200
         )

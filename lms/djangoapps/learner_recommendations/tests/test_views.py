@@ -165,13 +165,12 @@ class TestCrossProductRecommendationsView(APITestCase):
         """
         Returns the url with a sepcific course id
         """
-
         return reverse_lazy(
             "learner_recommendations:cross_product_recommendations",
             kwargs={'course_id': f'course-v1:{course_key}+Test_Course'}
         )
 
-    def _get_recommended_courses(self, has_location_restriction=False, restriction_num=0):
+    def _get_recommended_courses(self, num_of_courses_with_restriction=0):
         """
         Returns an array of 2 discovery courses with or without country restrictions
         """
@@ -182,13 +181,13 @@ class TestCrossProductRecommendationsView(APITestCase):
             "states": []
         }
 
-        for i in enumerate(self.associated_course_keys):
-            location_restriction = restriction_obj if has_location_restriction and restriction_num > 0 else None
+        for course_key in enumerate(self.associated_course_keys):
+            location_restriction = restriction_obj if num_of_courses_with_restriction > 0 else None
 
             courses.append({
-                "key": i[1],
+                "key": course_key[1],
                 "uuid": "6f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
-                "title": f"Title {i[0]}",
+                "title": f"Title {course_key[0]}",
                 "image": {
                         "src": "https://www.logo_image_url.com",
                 },
@@ -211,8 +210,8 @@ class TestCrossProductRecommendationsView(APITestCase):
                 "location_restriction": location_restriction
             })
 
-            if restriction_num > 0:
-                restriction_num -= 1
+            if num_of_courses_with_restriction > 0:
+                num_of_courses_with_restriction -= 1
 
         return courses
 
@@ -247,7 +246,7 @@ class TestCrossProductRecommendationsView(APITestCase):
         if there is a location restriction for one course for the users country
         """
         country_code_from_ip_mock.return_value = "cn"
-        mock_course_data = self._get_recommended_courses(True, 1)
+        mock_course_data = self._get_recommended_courses(1)
         get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
 
         response = self.client.get(self._get_url('HKUx+FinTechT1x'))
@@ -269,7 +268,7 @@ class TestCrossProductRecommendationsView(APITestCase):
         for the users country.
         """
         country_code_from_ip_mock.return_value = "cn"
-        mock_course_data = self._get_recommended_courses(True, 2)
+        mock_course_data = self._get_recommended_courses(2)
 
         get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
 
