@@ -4789,6 +4789,9 @@ GENERAL_RECOMMENDATION = {}
 
 GENERAL_RECOMMENDATIONS = []
 
+### DEFAULT KEY DICTIONARY FOR CROSS_PRODUCT_RECOMMENDATIONS ###
+CROSS_PRODUCT_RECOMMENDATIONS_KEYS = {}
+
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
 # .. setting_default: retired__user_

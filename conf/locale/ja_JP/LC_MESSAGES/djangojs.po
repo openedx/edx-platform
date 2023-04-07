@@ -5640,7 +5640,7 @@ msgid "Please enter non-negative integer."
 msgstr "正の整数を入力してください。"
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%- types %> assignments than are assigned."
+msgid "You must have at least one undroppable <%- types %> assignment."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js

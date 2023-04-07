@@ -461,7 +461,6 @@
     "Cancel upload": "Annulla caricamento",
     "Cannot delete when in use by a unit": "Impossibile da eliminare se viene utilizzato da un'unit\u00e0",
     "Cannot delete when in use by an experiment": "Impossibile da eliminare se viene utilizzato da un esperimento",
-    "Cannot drop more <%- types %> assignments than are assigned.": "Non \u00e8 consentito rinunciare a pi\u00f9 compiti <%- types %> rispetto a quelli assegnati.",
     "Cannot join instructor managed team": "Non puoi unirti al team gestito dall'istruttore",
     "Cannot update attempt review status": "Non \u00e8 possibile aggiornare lo stato di verifica del tentativo",
     "Caption": "Didascalia",

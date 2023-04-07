@@ -8,6 +8,7 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.learning.data import CourseDiscussionConfigurationData, DiscussionTopicContext
 from openedx_events.learning.signals import COURSE_DISCUSSIONS_CHANGED
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from .config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
@@ -112,7 +113,7 @@ def get_discussable_units(course, enable_graded_units, discussable_units=None):
                         unit.discussion_enabled = False
                         store.update_item(unit, unit.published_by, emit_signals=False)
                         continue
-                    if discussable_units and (unit.location not in discussable_units):
+                    if discussable_units and (str(unit.location) not in discussable_units):
                         continue
                     yield DiscussionTopicContext(
                         usage_key=unit.location,
@@ -246,7 +247,8 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         discussion_config.enable_graded_units = enable_graded_subsections
         discussion_config.unit_level_visibility = True
         discussion_config.save()
-    update_discussions_settings_from_course_task(
-        str(course_key),
-        discussable_units=list(discussable_units),
+    # added delay of 30 minutes to allow for the course to be published
+    update_discussions_settings_from_course_task.apply_async(
+        args=[str(course_key), [str(unit) for unit in discussable_units]],
+        countdown=1800,
     )

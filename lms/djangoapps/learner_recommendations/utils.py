@@ -202,3 +202,10 @@ def filter_recommended_courses(
             filtered_recommended_courses.append(course_data)
 
     return filtered_recommended_courses
+
+
+def get_cross_product_recommendations(course_key):
+    """
+    Helper method to get associated course keys based on the key passed
+    """
+    return settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS.get(course_key)

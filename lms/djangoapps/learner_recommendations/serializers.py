@@ -39,6 +39,24 @@ class RecommendedCourseSerializer(serializers.Serializer):
         return f"course/{url_slug}"
 
 
+class CrossProductCourseSerializer(serializers.Serializer):
+    """Serializer for a cross product recommended course"""
+    key = serializers.CharField()
+    uuid = serializers.UUIDField()
+    title = serializers.CharField()
+    image = CourseImageSerializer()
+    prospectusPath = serializers.SerializerMethodField()
+    owners = serializers.ListField(
+        child=CourseOwnersSerializer(), allow_empty=True
+    )
+    activeCourseRun = ActiveCourseRunSerializer(source="active_course_run")
+    courseType = serializers.CharField(source="course_type")
+
+    def get_prospectusPath(self, instance):
+        url_slug = instance.get("url_slug")
+        return f"course/{url_slug}"
+
+
 class AboutPageRecommendationsSerializer(serializers.Serializer):
     """Recommended courses for course about page"""
 
@@ -48,6 +66,13 @@ class AboutPageRecommendationsSerializer(serializers.Serializer):
     isControl = serializers.BooleanField(
         source="is_control",
         default=None
+    )
+
+
+class CrossProductRecommendationsSerializer(serializers.Serializer):
+    """Cross product recommendation courses for course about page"""
+    courses = serializers.ListField(
+        child=CrossProductCourseSerializer(), allow_empty=True
     )
 
 

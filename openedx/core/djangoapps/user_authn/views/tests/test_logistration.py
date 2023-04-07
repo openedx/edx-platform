@@ -289,6 +289,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 "iconClass": None,
                 "iconImage": settings.MEDIA_URL + "icon.svg",
                 "skipHintedLogin": False,
+                "skipRegistrationForm": False,
                 "loginUrl": self._third_party_login_url("dummy", "login", params),
                 "registerUrl": self._third_party_login_url("dummy", "register", params)
             },
@@ -298,6 +299,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 "iconClass": "fa-facebook",
                 "iconImage": None,
                 "skipHintedLogin": False,
+                "skipRegistrationForm": False,
                 "loginUrl": self._third_party_login_url("facebook", "login", params),
                 "registerUrl": self._third_party_login_url("facebook", "register", params)
             },
@@ -307,6 +309,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 "iconClass": "fa-google-plus",
                 "iconImage": None,
                 "skipHintedLogin": False,
+                "skipRegistrationForm": False,
                 "loginUrl": self._third_party_login_url("google-oauth2", "login", params),
                 "registerUrl": self._third_party_login_url("google-oauth2", "register", params)
             },
