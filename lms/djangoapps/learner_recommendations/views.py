@@ -161,7 +161,8 @@ class CrossProductRecommendationsView(APIView):
             "course_runs",
             "location_restriction",
         ]
-        course_data = [get_course_data(key, fields, querystring={'marketable_course_runs_only': 1}) for key in associated_course_keys]
+        query_string = {'marketable_course_runs_only': 1}
+        course_data = [get_course_data(key, fields, query_string) for key in associated_course_keys]
         filtered_courses = [course for course in course_data if course and course.get("course_runs")]
 
         ip_address = get_client_ip(request)[0]
