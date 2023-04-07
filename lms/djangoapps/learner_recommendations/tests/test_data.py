@@ -48,6 +48,6 @@ mock_course_data = {
 }
 
 mock_cross_product_recommendation_keys = {
-    "HKUx+FinTechT1x": ["ColumbiaX+BC24FNTC", "MITx+BLN"],
-    "RITx+CYBER501x": ["UniversityofUtah+BC24CYB", "HarvardX+CYB"],
+    "edx+HL0": ["edx+HL1", "edx+HL2"],
+    "edx+BZ0": ["edx+BZ1", "edx+BZ2"],
 }

@@ -218,8 +218,8 @@ class TestGetCrossProductRecommendationsMethod(TestCase):
     """Test for get_cross_product_recommendations method"""
 
     @ddt.data(
-        ("HKUx+FinTechT1x", ["ColumbiaX+BC24FNTC", "MITx+BLN"]),
-        ("RITx+CYBER501x", ["UniversityofUtah+BC24CYB", "HarvardX+CYB"]),
+        ("edx+HL0", ["edx+HL1", "edx+HL2"]),
+        ("edx+BZ0", ["edx+BZ1", "edx+BZ2"]),
         ('NoKeyAssociated', None)
     )
     @patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)

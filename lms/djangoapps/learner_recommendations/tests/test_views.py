@@ -159,7 +159,7 @@ class TestCrossProductRecommendationsView(APITestCase):
 
     def setUp(self):
         super().setUp()
-        self.associated_course_keys = ["ColumbiaX+BC24FNTC", "MITx+BLN"]
+        self.associated_course_keys = ["edx+HL1", "edx+HL2"]
 
     def _get_url(self, course_key):
         """
@@ -228,7 +228,7 @@ class TestCrossProductRecommendationsView(APITestCase):
         mock_course_data = self._get_recommended_courses()
         get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
 
-        response = self.client.get(self._get_url('HKUx+FinTechT1x'))
+        response = self.client.get(self._get_url('edx+HL0'))
         response_content = json.loads(response.content)
         course_data = response_content["courses"]
 
@@ -249,7 +249,7 @@ class TestCrossProductRecommendationsView(APITestCase):
         mock_course_data = self._get_recommended_courses(1)
         get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
 
-        response = self.client.get(self._get_url('HKUx+FinTechT1x'))
+        response = self.client.get(self._get_url('edx+HL0'))
         response_content = json.loads(response.content)
         course_data = response_content["courses"]
 
@@ -272,7 +272,7 @@ class TestCrossProductRecommendationsView(APITestCase):
 
         get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
 
-        response = self.client.get(self._get_url('HKUx+FinTechT1x'))
+        response = self.client.get(self._get_url('edx+HL0'))
         response_content = json.loads(response.content)
         course_data = response_content["courses"]
 
@@ -301,7 +301,7 @@ class TestCrossProductRecommendationsView(APITestCase):
         country_code_from_ip_mock.return_value = "za"
         get_course_data_mock.side_effect = [{}, {}]
 
-        response = self.client.get(self._get_url('HKUx+FinTechT1x'))
+        response = self.client.get(self._get_url('edx+HL0'))
         response_content = json.loads(response.content)
         course_data = response_content["courses"]
 
