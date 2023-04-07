@@ -12,6 +12,8 @@ from openedx.core.djangoapps.appsembler.multi_tenant_emails.tests.test_utils imp
     create_org_user,
     with_organization_context,
 )
+from student.tests.factories import CourseEnrollmentFactory
+
 
 User = get_user_model()
 
@@ -58,3 +60,26 @@ def test_enroll_by_email_multi_tenant(settings):
 
         assert not CourseEnrollment.enroll_by_email(blue_user.email, course_key), 'Should not enroll in other sites'
         assert not CourseEnrollment.is_enrolled(blue_user, course_key), 'Should not enroll in other sites'
+
+
+@pytest.mark.django_db
+def test_unenroll_by_email_multi_tenant(settings):
+    """
+    Ensure `unenroll_by_email` works with APPSEMBLER_MULTI_TENANT_EMAILS is enabled.
+    """
+    settings.FEATURES = {**settings.FEATURES, 'APPSEMBLER_MULTI_TENANT_EMAILS': True}
+    course = CourseOverviewFactory.create()
+    course_key = course.id
+
+    with with_organization_context(site_color='blue1') as blue_org:
+        blue_user = create_org_user(blue_org)
+        CourseEnrollmentFactory(user=blue_user, course_id=course_key)
+        CourseEnrollment.enroll_by_email(blue_user.email, course_key)
+
+    with with_organization_context(site_color='red1') as red_org:
+        red_user = create_org_user(red_org)
+        CourseEnrollmentFactory(user=red_user, course_id=course_key)
+        assert CourseEnrollment.unenroll_by_email(red_user.email, course_key), 'Should be able to unenroll in same site'
+        assert not CourseEnrollment.is_enrolled(red_user, course_key)
+
+        assert CourseEnrollment.is_enrolled(blue_user, course_key), 'Should not unenroll in other sites'
