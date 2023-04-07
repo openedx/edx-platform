@@ -170,7 +170,7 @@ from openedx.core.djangolib.js_utils import (
       utm_campaign: 'social-share-exp',
     });
     var url = encodeURIComponent(this.href + "?" + utmQuery);
-    const facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u' + url;
+    const facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + url;
     window.open(facebookUrl,'targetWindow','toolbar=no,location=0,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400');
     return false;
   });
