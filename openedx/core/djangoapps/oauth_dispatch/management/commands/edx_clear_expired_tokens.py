@@ -106,10 +106,10 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
 
         if options['access-tokens']:
             logger.info("Removing expired AccessTokens")
-            query_set = AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now)
+            query_set = AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=refresh_expire_at)
             self.clear_table_data(query_set, batch_size, AccessToken, sleep_time)
 
         if options['grants']:
             logger.info("Removing expired Grants")
-            query_set = Grant.objects.filter(expires__lt=now)
+            query_set = Grant.objects.filter(expires__lt=refresh_expire_at)
             self.clear_table_data(query_set, batch_size, Grant, sleep_time)
