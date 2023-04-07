@@ -5,7 +5,7 @@ jobs:
     working_directory: ~/circleci-edx-platform
     docker:
       # CircleCI Python images available at: https://hub.docker.com/r/circleci/python/
-      - image: circleci/python:3.5.4
+      - image: circleci/python:3.5.5-stretch
         environment:
           BASH_ENV: ~/.bashrc
     steps: # steps that comprise the `build` job
@@ -19,7 +19,7 @@ jobs:
           name: "Install apt-get packages"
           command: |
             sudo apt-get update
-            sudo apt-get install -y python-software-properties mongodb curl git python-dev libxml2-dev libxmlsec1-dev libgeos-dev
+            sudo apt-get install -y software-properties-common mongodb curl git python-dev libxml2-dev libxmlsec1-dev libgeos-dev
       - run:
           name: "Install python requirements"
           command: |
