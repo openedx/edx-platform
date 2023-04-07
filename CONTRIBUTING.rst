@@ -55,7 +55,7 @@ To ask technical questions and chat with the community, do not hesitate to join 
 `Open edX discussion forum <https://discuss.openedx.org/>`__. There are different
 categories for different topics:
 
-- `Devops <https://discuss.openedx.org/c/devops>`__ for installation help
+- `Site operators <https://discuss.openedx.org/c/operators>`__ to get help running production sites of Open edX
 - `Development <https://discuss.openedx.org/c/development>`__, where Open edX developers
   unite
 - `Community <https://discuss.openedx.org/c/community>`__ to discuss organizational

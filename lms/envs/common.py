@@ -4216,7 +4216,7 @@ ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
 # Exam Service
-EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
+EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
 TOKEN_SIGNING = {
     'JWT_ISSUER': 'http://127.0.0.1:8740',
@@ -4573,6 +4573,8 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'license_manager_worker',
     'enterprise_catalog_worker',
     'enterprise_channel_worker',
+    'enterprise_access_worker',
+    'enterprise_subsidy_worker',
 ]
 
 
@@ -4786,6 +4788,9 @@ COURSE_ABOUT_PAGE_AMPLITUDE_RECOMMENDATION_ID = ''
 GENERAL_RECOMMENDATION = {}
 
 GENERAL_RECOMMENDATIONS = []
+
+### DEFAULT KEY DICTIONARY FOR CROSS_PRODUCT_RECOMMENDATIONS ###
+CROSS_PRODUCT_RECOMMENDATIONS_KEYS = {}
 
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX

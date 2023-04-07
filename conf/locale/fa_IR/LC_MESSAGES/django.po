@@ -133,7 +133,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-26 20:42+0000\n"
+"POT-Creation-Date: 2023-03-19 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://www.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -341,6 +341,17 @@ msgstr ""
 "اختیاری: بعد از این تاریخ/زمان، کاربران دیگر قادر به ثبت نام در این حالت "
 "نیستند. اگر کاربران می توانند تا زمان بسته شدن ثبت‌نام برای این دوره در این "
 "حالت ثبت‌نام کنند، اینجا را خالی بگذارید."
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -8277,6 +8288,7 @@ msgid "Success"
 msgstr "موفق"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "اقدامات"
@@ -13100,6 +13112,10 @@ msgid "Library Content"
 msgstr "محتوای کتابخانه"
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "جای خالی"
 
@@ -14417,6 +14433,14 @@ msgstr "نشانی رایانامه"
 msgid "Return To %s"
 msgstr "بازگشت به %s"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -14796,6 +14820,12 @@ msgstr "بارگیری‌ها و زیرنویس‌ها"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "بارگیری پرونده تصویری"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr "اشتراک‌گذاری در تویتر"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16117,11 +16147,6 @@ msgstr "روی پیوند کلیک کنید تا گواهی‌نامه مرا ب
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "انتشار در فیس‌بوک"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "اشتراک‌گذاری در تویتر"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
@@ -24041,6 +24066,14 @@ msgstr "تنظیمات دسترسی"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "تنظیم دسترسی"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
