@@ -61,13 +61,30 @@ from openedx.core.djangolib.js_utils import (
                     <br>
                 % endif
                 % if public_video_url:
+                    ${_('Share on:')}
                     <a
                         class="btn-link"
                         id="twitter-share-button"
                         href="${public_video_url}"
                         target="_blank"
                     >
-                        ${_('Share on Twitter')}
+                        ${_('Twitter')}
+                    </a>
+                    <a
+                        class="btn-link"
+                        id="facebook-share-button"
+                        href="${public_video_url}"
+                        target="_blank"
+                    >
+                        ${_('Facebook')}
+                    </a>
+                    <a
+                        class="btn-link"
+                        id="linkedin-share-button"
+                        href="${public_video_url}"
+                        target="_blank"
+                    >
+                        ${_('Linkedin')}
                     </a>
                 % endif
             </div>
@@ -144,6 +161,28 @@ from openedx.core.djangolib.js_utils import (
     var url = encodeURIComponent(this.href + "?" + utmQuery);
     var tweetUrl = "https://twitter.com/intent/tweet?text=" + tweetText + "&url=" + url;
     window.open(tweetUrl,'targetWindow','toolbar=no,location=0,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400');
+    return false;
+  });
+  $("#facebook-share-button").click(function() {
+    var utmQuery =  $.param({
+      utm_source: 'facebook',
+      utm_medium: 'social',
+      utm_campaign: 'social-share-exp',
+    });
+    var url = encodeURIComponent(this.href + "?" + utmQuery);
+    const facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u' + url;
+    window.open(facebookUrl,'targetWindow','toolbar=no,location=0,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400');
+    return false;
+  });
+  $("#linkedin-share-button").click(function() {
+    var utmQuery =  $.param({
+      utm_source: 'linkedin',
+      utm_medium: 'social',
+      utm_campaign: 'social-share-exp',
+    });
+    var url = encodeURIComponent(this.href + "?" + utmQuery);
+    const linkedinUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' + url;
+    window.open(linkedinUrl,'targetWindow','toolbar=no,location=0,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400');
     return false;
   });
 </script>
