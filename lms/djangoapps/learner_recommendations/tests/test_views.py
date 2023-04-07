@@ -15,10 +15,12 @@ from lms.djangoapps.learner_recommendations.toggles import (
     ENABLE_COURSE_ABOUT_PAGE_RECOMMENDATIONS,
     ENABLE_DASHBOARD_RECOMMENDATIONS,
 )
+from lms.djangoapps.learner_recommendations.tests.test_data import mock_cross_product_recommendation_keys
 
 
 class TestRecommendationsBase(APITestCase):
     """Recommendations test base class"""
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
@@ -152,6 +154,161 @@ class TestAboutPageRecommendationsView(TestRecommendationsBase):
         assert segment_mock.call_args[0][1] == "edx.bi.user.recommendations.viewed"
 
 
+class TestCrossProductRecommendationsView(APITestCase):
+    """Unit tests for the Cross Product Recommendations View"""
+
+    def setUp(self):
+        super().setUp()
+        self.associated_course_keys = ["edx+HL1", "edx+HL2"]
+
+    def _get_url(self, course_key):
+        """
+        Returns the url with a sepcific course id
+        """
+        return reverse_lazy(
+            "learner_recommendations:cross_product_recommendations",
+            kwargs={'course_id': f'course-v1:{course_key}+Test_Course'}
+        )
+
+    def _get_recommended_courses(self, num_of_courses_with_restriction=0):
+        """
+        Returns an array of 2 discovery courses with or without country restrictions
+        """
+        courses = []
+        restriction_obj = {
+            "restriction_type": "blocklist",
+            "countries": ["CN"],
+            "states": []
+        }
+
+        for course_key in enumerate(self.associated_course_keys):
+            location_restriction = restriction_obj if num_of_courses_with_restriction > 0 else None
+
+            courses.append({
+                "key": course_key[1],
+                "uuid": "6f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
+                "title": f"Title {course_key[0]}",
+                "image": {
+                        "src": "https://www.logo_image_url.com",
+                },
+                "url_slug": "https://www.marketing_url.com",
+                "course_type": "executive-education",
+                "owners": [
+                    {
+                            "key": "org-1",
+                            "name": "org 1",
+                            "logo_image_url": "https://discovery.com/organization/logos/org-1.png",
+                    },
+                ],
+                "course_runs": [
+                    {
+                        "key": "course-v1:Test+2023_T2",
+                        "marketing_url": "https://www.marketing_url.com",
+                        "availability": "Current",
+                    }
+                ],
+                "location_restriction": location_restriction
+            })
+
+            if num_of_courses_with_restriction > 0:
+                num_of_courses_with_restriction -= 1
+
+        return courses
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_successful_response(
+        self, country_code_from_ip_mock, get_course_data_mock,
+    ):
+        """
+        Verify 2 cross product course recommendations are returned.
+        """
+        country_code_from_ip_mock.return_value = "za"
+        mock_course_data = self._get_recommended_courses()
+        get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
+
+        response = self.client.get(self._get_url('edx+HL0'))
+        response_content = json.loads(response.content)
+        course_data = response_content["courses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(course_data), 2)
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_one_course_country_restriction_response(
+        self, country_code_from_ip_mock, get_course_data_mock,
+    ):
+        """
+        Verify 1 cross product course recommendation is returned
+        if there is a location restriction for one course for the users country
+        """
+        country_code_from_ip_mock.return_value = "cn"
+        mock_course_data = self._get_recommended_courses(1)
+        get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
+
+        response = self.client.get(self._get_url('edx+HL0'))
+        response_content = json.loads(response.content)
+        course_data = response_content["courses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(course_data), 1)
+        self.assertEqual(course_data[0]["title"], "Title 1")
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_both_course_country_restriction_response(
+        self, country_code_from_ip_mock, get_course_data_mock,
+    ):
+        """
+        Verify no courses are returned if both courses have a location restriction
+        for the users country.
+        """
+        country_code_from_ip_mock.return_value = "cn"
+        mock_course_data = self._get_recommended_courses(2)
+
+        get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
+
+        response = self.client.get(self._get_url('edx+HL0'))
+        response_content = json.loads(response.content)
+        course_data = response_content["courses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(course_data), 0)
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    def test_no_associated_course_response(self):
+        """
+        Verify an empty array of courses is returned if there are no associated course keys.
+        """
+        response = self.client.get(self._get_url('No+Associations'))
+        response_content = json.loads(response.content)
+        course_data = response_content["courses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(course_data), 0)
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_no_response_from_discovery(self, country_code_from_ip_mock, get_course_data_mock):
+        """
+        Verify an empty array of courses is returned if discovery returns two empty dictionaries.
+        """
+        country_code_from_ip_mock.return_value = "za"
+        get_course_data_mock.side_effect = [{}, {}]
+
+        response = self.client.get(self._get_url('edx+HL0'))
+        response_content = json.loads(response.content)
+        course_data = response_content["courses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(course_data), 0)
+
+
 @ddt.ddt
 class TestDashboardRecommendationsApiView(TestRecommendationsBase):
     """Unit tests for the course recommendations on learner home page."""
@@ -251,7 +408,6 @@ class TestDashboardRecommendationsApiView(TestRecommendationsBase):
         """
         Test that if the Amplitude API gives an unexpected error, general recommendations are returned.
         """
-
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
 

@@ -10,6 +10,7 @@ from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
 )
 from edx_rest_framework_extensions.permissions import NotJwtRestrictedApplication
+from opaque_keys.edx.keys import CourseKey
 from django.core.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -27,12 +28,15 @@ from lms.djangoapps.learner_recommendations.utils import (
     get_amplitude_course_recommendations,
     filter_recommended_courses,
     is_user_enrolled_in_ut_austin_masters_program,
+    _has_country_restrictions,
 )
+from lms.djangoapps.learner_recommendations.serializers import CrossProductRecommendationsSerializer
+from lms.djangoapps.learner_recommendations.utils import get_cross_product_recommendations
+from openedx.core.djangoapps.catalog.utils import get_course_data
 from lms.djangoapps.learner_recommendations.serializers import (
     AboutPageRecommendationsSerializer,
     DashboardRecommendationsSerializer,
 )
-
 
 log = logging.getLogger(__name__)
 
@@ -121,6 +125,69 @@ class AboutPageRecommendationsView(APIView):
                 }
             ).data,
             status=200,
+        )
+
+
+class CrossProductRecommendationsView(APIView):
+    """
+    **Example Request**
+
+    GET api/learner_recommendations/cross_product/{course_id}/
+    """
+
+    def _empty_response(self):
+        return Response({"courses": []}, status=200)
+
+    def get(self, request, course_id):
+        """
+        Returns cross product recommendation courses
+        """
+        course_locator = CourseKey.from_string(course_id)
+        course_key = f'{course_locator.org}+{course_locator.course}'
+
+        associated_course_keys = get_cross_product_recommendations(course_key)
+
+        if not associated_course_keys:
+            return self._empty_response()
+
+        fields = [
+            "key",
+            "uuid",
+            "title",
+            "owners",
+            "image",
+            "url_slug",
+            "course_type",
+            "course_runs",
+            "location_restriction",
+        ]
+        query_string = {'marketable_course_runs_only': 1}
+        course_data = [get_course_data(key, fields, query_string) for key in associated_course_keys]
+        filtered_courses = [course for course in course_data if course and course.get("course_runs")]
+
+        ip_address = get_client_ip(request)[0]
+        user_country_code = country_code_from_ip(ip_address).upper()
+
+        unrestricted_courses = []
+
+        for course in filtered_courses:
+            if not _has_country_restrictions(course, user_country_code):
+                unrestricted_courses.append(course)
+
+        if not unrestricted_courses:
+            return self._empty_response()
+
+        for course in unrestricted_courses:
+            course.update({
+                "active_course_run": course.get("course_runs")[0]
+            })
+
+        return Response(
+            CrossProductRecommendationsSerializer(
+                {
+                    "courses": unrestricted_courses
+                }).data,
+            status=200
         )
 
 
