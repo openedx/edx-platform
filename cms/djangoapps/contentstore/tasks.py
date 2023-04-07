@@ -122,13 +122,13 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         with store.default_store('split'):
             store.clone_course(source_course_key, destination_course_key, user_id, fields=fields)
 
+        update_unit_discussion_state_from_discussion_blocks(destination_course_key, user_id)
+
         # set initial permissions for the user to access the course.
         initialize_permissions(destination_course_key, User.objects.get(id=user_id))
 
         # update state: Succeeded
         CourseRerunState.objects.succeeded(course_key=destination_course_key)
-
-        update_unit_discussion_state_from_discussion_blocks(destination_course_key, user_id)
 
         # call edxval to attach videos to the rerun
         copy_course_videos(source_course_key, destination_course_key)

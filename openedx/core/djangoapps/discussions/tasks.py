@@ -2,19 +2,16 @@
 Tasks for discussions
 """
 import logging
-from django.conf import settings
+
 from celery import shared_task
 from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 from openedx_events.learning.data import CourseDiscussionConfigurationData, DiscussionTopicContext
 from openedx_events.learning.signals import COURSE_DISCUSSIONS_CHANGED
 
-from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError, CourseRerunUIStateManager
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from .config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
-from common.djangoapps.course_action_state.models import CourseRerunState
 
 from .models import DiscussionsConfiguration, Provider, DiscussionTopicLink
 from .utils import get_accessible_discussion_xblocks_by_course_id
@@ -32,17 +29,6 @@ def update_discussions_settings_from_course_task(course_key_str: str, discussabl
         course_key_str (str): course key string
         discussable_units (List[UsageKey]): list of discussable units
     """
-    try:
-        course_run_state = CourseRerunState.objects.find_first(course_key=course_key_str)
-    except (ItemNotFoundError, CourseActionStateItemNotFoundError):
-        course_run_state = None
-
-    if course_run_state:
-        if course_run_state.action == 'rerun' and course_run_state.state != CourseRerunUIStateManager.State.SUCCEEDED:
-            log.info(f"Skipping task because course rerun is not completed yet for course: {course_key_str}")
-            return
-
-    log.info(f"Continuing task, course rerun is completed for course: {course_key_str}")
     course_key = CourseKey.from_string(course_key_str)
     config_data = update_discussions_settings_from_course(course_key, discussable_units)
     COURSE_DISCUSSIONS_CHANGED.send_event(configuration=config_data)
@@ -210,7 +196,7 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
 
     log.info(f"Migrating legacy discussion config for {course_key}")
 
-    with store.bulk_operations(course_key, emit_signals=False):
+    with store.bulk_operations(course_key):
         discussion_blocks = get_accessible_discussion_xblocks_by_course_id(course_key, include_all=True)
         discussable_units = {
             discussion_block.parent
@@ -255,14 +241,14 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
         course.discussions_settings['provider_type'] = provider
         course.discussions_settings['enable_graded_units'] = enable_graded_subsections
         course.discussions_settings['unit_level_visibility'] = True
-        with store.bulk_operations(course_key, emit_signals=False):
-            store.update_item(course, user_id)
+        store.update_item(course, user_id)
         discussion_config = DiscussionsConfiguration.get(course_key)
         discussion_config.provider_type = provider
         discussion_config.enable_graded_units = enable_graded_subsections
         discussion_config.unit_level_visibility = True
         discussion_config.save()
+    # added delay of 30 minutes to allow for the course to be published
     update_discussions_settings_from_course_task.apply_async(
         args=[str(course_key), [str(unit) for unit in discussable_units]],
-        countdown=settings.DISCUSSION_SETTINGS['COURSE_PUBLISH_TASK_DELAY'],
+        countdown=1800,
     )
