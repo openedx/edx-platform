@@ -59,7 +59,7 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.course_block import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.exceptions import SerializationError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import modulestore, SignalHandler  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import DuplicateCourseError, InvalidProctoringProvider, ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.xml_importer import CourseImportException, import_course_from_xml, import_library_from_xml  # lint-amnesty, pylint: disable=wrong-import-order
@@ -122,13 +122,13 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         with store.default_store('split'):
             store.clone_course(source_course_key, destination_course_key, user_id, fields=fields)
 
+        update_unit_discussion_state_from_discussion_blocks(destination_course_key, user_id)
+
         # set initial permissions for the user to access the course.
         initialize_permissions(destination_course_key, User.objects.get(id=user_id))
 
         # update state: Succeeded
         CourseRerunState.objects.succeeded(course_key=destination_course_key)
-
-        update_unit_discussion_state_from_discussion_blocks(destination_course_key, user_id)
 
         # call edxval to attach videos to the rerun
         copy_course_videos(source_course_key, destination_course_key)
