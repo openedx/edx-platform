@@ -78,6 +78,14 @@ from openedx.core.djangolib.js_utils import (
                     >
                         ${_('Facebook')}
                     </a>
+                    <a
+                        class="btn-link"
+                        id="linkedin-share-button"
+                        href="${public_video_url}"
+                        target="_blank"
+                    >
+                        ${_('Linkedin')}
+                    </a>
                 % endif
             </div>
         % endif
@@ -164,6 +172,17 @@ from openedx.core.djangolib.js_utils import (
     var url = encodeURIComponent(this.href + "?" + utmQuery);
     const facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u' + url;
     window.open(facebookUrl,'targetWindow','toolbar=no,location=0,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400');
+    return false;
+  });
+  $("#linkedin-share-button").click(function() {
+    var utmQuery =  $.param({
+      utm_source: 'linkedin',
+      utm_medium: 'social',
+      utm_campaign: 'social-share-exp',
+    });
+    var url = encodeURIComponent(this.href + "?" + utmQuery);
+    const linkedinUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' + url;
+    window.open(linkedinUrl,'targetWindow','toolbar=no,location=0,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400');
     return false;
   });
 </script>
