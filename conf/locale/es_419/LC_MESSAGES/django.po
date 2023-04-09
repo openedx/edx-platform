@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
+# edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -118,7 +118,7 @@
 # Oliver Schulze <oliver.schulze@vivaidea.org>, 2017
 # Valeria Freire <valtodopds@hotmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
+# edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -8708,6 +8708,12 @@ msgstr "Éxito"
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Acciones"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -18919,10 +18925,6 @@ msgstr "Instituciones"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr "Registrate gratis"
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Reanudar su último curso"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"

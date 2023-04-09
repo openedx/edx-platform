@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-02 20:35+0000\n"
-"PO-Revision-Date: 2023-04-02 20:36:00.673257\n"
+"POT-Creation-Date: 2023-04-09 20:35+0000\n"
+"PO-Revision-Date: 2023-04-09 20:35:51.624974\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -13332,10 +13332,20 @@ msgstr ""
 msgid "Download video file"
 msgstr ""
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
+msgid "Share on:"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Twitter"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Facebook"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Linkedin"
 msgstr ""
 
 #: lms/templates/video.html
@@ -14372,6 +14382,11 @@ msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html

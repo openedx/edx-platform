@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/).
+# edX community translations have been downloaded from Thai (http://app.transifex.com/open-edx/edx-platform/language/th/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -41,7 +41,7 @@
 # Sanyapong Kridakarn <sanyapong@kelanggreen.com>, 2016
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)
+# edX community translations have been downloaded from Thai (http://app.transifex.com/open-edx/edx-platform/language/th/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -89,7 +89,7 @@
 # Schmitt Dhammachote <hyde.139@gmail.com>, 2015
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015-2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)
+# edX community translations have been downloaded from Thai (http://app.transifex.com/open-edx/edx-platform/language/th/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -104,7 +104,7 @@
 # Sira Nokyoongtong <gumaraa@gmail.com>, 2014
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Thai (https://www.transifex.com/open-edx/teams/6205/th/)
+# edX community translations have been downloaded from Thai (https://app.transifex.com/open-edx/teams/6205/th/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -116,10 +116,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-12 20:42+0000\n"
+"POT-Creation-Date: 2023-04-02 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
-"Language-Team: Thai (https://www.transifex.com/open-edx/teams/6205/th/)\n"
+"Language-Team: Thai (https://app.transifex.com/open-edx/teams/6205/th/)\n"
 "Language: th\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -7349,6 +7349,12 @@ msgstr "สำเร็จ"
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "การกระทำ"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -16168,10 +16174,6 @@ msgstr "โรงเรียน"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr "ลงทะเบียนเรียนฟรี"
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr ""
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
