@@ -34,7 +34,7 @@
 # zolboo0411 <zolboo0411@yahoo.com>, 2014
 # zolboo0411 <zolboo0411@yahoo.com>, 2014
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Mongolian (https://www.transifex.com/open-edx/teams/6205/mn/).
+# edX community translations have been downloaded from Mongolian (https://app.transifex.com/open-edx/teams/6205/mn/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -44,7 +44,7 @@
 # Rehan Ahmad <rehan.ahmad@arbisoft.com>, 2020
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Mongolian (http://www.transifex.com/open-edx/edx-platform/language/mn/)
+# edX community translations have been downloaded from Mongolian (http://app.transifex.com/open-edx/edx-platform/language/mn/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #

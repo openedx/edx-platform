@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Persian (Iran) (http://www.transifex.com/open-edx/edx-platform/language/fa_IR/).
+# edX community translations have been downloaded from Persian (Iran) (http://app.transifex.com/open-edx/edx-platform/language/fa_IR/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -58,7 +58,7 @@
 # smsyazdan <smsyazdan@gmail.com>, 2014
 # Somaye Joolaee, 2022
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Persian (Iran) (http://www.transifex.com/open-edx/edx-platform/language/fa_IR/)
+# edX community translations have been downloaded from Persian (Iran) (http://app.transifex.com/open-edx/edx-platform/language/fa_IR/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -8292,6 +8292,12 @@ msgstr "موفق"
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "اقدامات"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -18208,10 +18214,6 @@ msgstr "مدارس"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr ""
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "آخرین دورۀ آموزشی خود را ادامه دهید"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"

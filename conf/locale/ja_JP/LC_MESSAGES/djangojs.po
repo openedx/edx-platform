@@ -37,7 +37,7 @@
 # Toshiboumi Ohta <ohta@securesky-tech.com>, 2015,2018
 # わたカフェの店長, 2013
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Japanese (Japan) (https://www.transifex.com/open-edx/teams/6205/ja_JP/).
+# edX community translations have been downloaded from Japanese (Japan) (https://app.transifex.com/open-edx/teams/6205/ja_JP/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -47,7 +47,7 @@
 # Kyoto University <edxkyotoux@gmail.com>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Japanese (Japan) (http://www.transifex.com/open-edx/edx-platform/language/ja_JP/)
+# edX community translations have been downloaded from Japanese (Japan) (http://app.transifex.com/open-edx/edx-platform/language/ja_JP/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #

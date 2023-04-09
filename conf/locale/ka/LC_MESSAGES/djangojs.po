@@ -24,7 +24,7 @@
 # Lasha Kokilashvili, 2017-2018
 # Salome Gegeshidze <geges0@bp.com>, 2016
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (https://www.transifex.com/open-edx/teams/6205/ka/).
+# edX community translations have been downloaded from Georgian (https://app.transifex.com/open-edx/teams/6205/ka/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -34,7 +34,7 @@
 # Nino Asatiani <niasatiani110@gmail.com>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #

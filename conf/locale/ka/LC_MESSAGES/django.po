@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/).
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -20,7 +20,7 @@
 # Giorgi Goderdzishvili <biggeorgian@gmail.com>, 2016
 # Lasha Kokilashvili, 2018
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -40,7 +40,7 @@
 # Lasha Kokilashvili, 2018
 # Salome Gegeshidze <geges0@bp.com>, 2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -48,7 +48,7 @@
 # Giorgi Goderdzishvili <biggeorgian@gmail.com>, 2016
 # Salome Gegeshidze <geges0@bp.com>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)
+# edX community translations have been downloaded from Georgian (https://app.transifex.com/open-edx/teams/6205/ka/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -60,10 +60,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-12 20:42+0000\n"
+"POT-Creation-Date: 2023-04-02 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
-"Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
+"Language-Team: Georgian (https://app.transifex.com/open-edx/teams/6205/ka/)\n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -7708,6 +7708,12 @@ msgstr "წარმატება"
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "მოქმედებები"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -17156,10 +17162,6 @@ msgstr "სკოლები"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
-msgstr ""
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html

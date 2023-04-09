@@ -22,7 +22,7 @@
 # Gediminas Trakas <gediminas.trakas@gmail.com>, 2013-2014
 # 99ff332f197efc0398f769062a4c5442_2965e21 <ad7ca3c3a61916261d41c81ab558ff7e_129326>, 2013
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Lithuanian (Lithuania) (https://www.transifex.com/open-edx/teams/6205/lt_LT/).
+# edX community translations have been downloaded from Lithuanian (Lithuania) (https://app.transifex.com/open-edx/teams/6205/lt_LT/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -31,7 +31,7 @@
 # Riina <ciairdabar@yahoo.com>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Lithuanian (Lithuania) (http://www.transifex.com/open-edx/edx-platform/language/lt_LT/)
+# edX community translations have been downloaded from Lithuanian (Lithuania) (http://app.transifex.com/open-edx/edx-platform/language/lt_LT/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
