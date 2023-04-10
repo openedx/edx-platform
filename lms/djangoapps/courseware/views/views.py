@@ -87,7 +87,7 @@ from lms.djangoapps.courseware.masquerade import is_masquerading_as_specific_stu
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import BaseStudentModuleHistory, StudentModule
 from lms.djangoapps.courseware.permissions import MASQUERADE_AS_STUDENT, VIEW_COURSE_HOME, VIEW_COURSEWARE
-from lms.djangoapps.courseware.toggles import course_is_invitation_only, PUBLIC_VIDEO_SHARE
+from lms.djangoapps.courseware.toggles import course_is_invitation_only
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
 from lms.djangoapps.courseware.utils import (
     _use_new_financial_assistance_flow,
@@ -101,7 +101,12 @@ from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.survey import views as survey_views
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
+from openedx.core.djangoapps.catalog.utils import (
+    get_course_data,
+    get_course_uuid_for_course,
+    get_programs,
+    get_programs_with_type
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
@@ -115,6 +120,7 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
@@ -1720,14 +1726,14 @@ class XBlockContentInspector:
         return False
 
 
+@method_decorator(ensure_valid_usage_key, name='dispatch')
+@method_decorator(xframe_options_exempt, name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class BasePublicVideoXBlockView(View):
     """
     Base functionality for public video xblock view and embed view
     """
 
-    @method_decorator(ensure_valid_usage_key)
-    @method_decorator(xframe_options_exempt)
-    @method_decorator(transaction.non_atomic_requests)
     def get(self, _, usage_key_string):
         """ Load course and video and render public view """
         course, video_block = self.get_course_and_video_block(usage_key_string)
@@ -1738,7 +1744,7 @@ class BasePublicVideoXBlockView(View):
         """
         Load course and video from modulestore.
         Raises 404 if:
-         - courseware.public_video_share waffle flag is not enabled for this course
+         - video_config.public_video_share waffle flag is not enabled for this course
          - block is not video
          - block is not marked as "public_access"
          """
@@ -1772,6 +1778,9 @@ class BasePublicVideoXBlockView(View):
         return course, video_block
 
 
+@method_decorator(ensure_valid_usage_key, name='dispatch')
+@method_decorator(xframe_options_exempt, name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class PublicVideoXBlockView(BasePublicVideoXBlockView):
     """ View for displaying public videos """
 
@@ -1782,14 +1791,17 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
         fragment = video_block.render('public_view', context={
             'public_video_embed': False,
         })
-        course_about_page_url, enroll_url = self.get_public_video_cta_button_urls(course)
+        catalog_course_data = self.get_catalog_course_data(course)
+        learn_more_url, enroll_url = self.get_public_video_cta_button_urls(course, catalog_course_data)
         social_sharing_metadata = self.get_social_sharing_metadata(course, video_block)
         context = {
             'fragment': fragment,
             'course': course,
+            'org_logo': catalog_course_data.get('org_logo'),
             'social_sharing_metadata': social_sharing_metadata,
-            'learn_more_url': course_about_page_url,
+            'learn_more_url': learn_more_url,
             'enroll_url': enroll_url,
+            'allow_iframing': True,
             'disable_window_wrap': True,
             'disable_register_button': True,
             'edx_notes_enabled': False,
@@ -1797,6 +1809,42 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             'is_mobile_app': False,
         }
         return 'public_video.html', context
+
+    def get_catalog_course_data(self, course):
+        """
+        Get information from the catalog service for this course
+        """
+        course_uuid = get_course_uuid_for_course(course.id)
+        if course_uuid is None:
+            return {}
+        catalog_course_data = get_course_data(course_uuid, None)
+        if catalog_course_data is None:
+            return {}
+
+        return {
+            'org_logo': self._get_catalog_course_owner_logo(catalog_course_data),
+            'marketing_url': self._get_catalog_course_marketing_url(catalog_course_data),
+        }
+
+    def _get_catalog_course_marketing_url(self, catalog_course_data):
+        """
+        Helper to extract url and remove any potential utm queries.
+        The discovery API includes UTM info unless you request it to not be included.
+        The request for the UUIDs will cache the response within the LMS so we need
+        to strip it here.
+        """
+        marketing_url = catalog_course_data.get('marketing_url')
+        if marketing_url is None:
+            return marketing_url
+        url_parts = urlparse(marketing_url)
+        return self._replace_url_query(url_parts, {})
+
+    def _get_catalog_course_owner_logo(self, catalog_course_data):
+        """ Helper to safely extract the course owner image url from the catalog course """
+        owners_data = catalog_course_data.get('owners', [])
+        if len(owners_data) == 0:
+            return None
+        return owners_data[0].get('logo_image_url', None)
 
     def get_social_sharing_metadata(self, course, video_block):
         """
@@ -1818,25 +1866,33 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             )
         }
 
-    def get_public_video_cta_button_urls(self, course):
+    def get_learn_more_button_url(self, course, catalog_course_data, utm_params):
+        """
+        If the marketing site is enabled and a course has a marketing page, use that URL.
+        If not, point to the `about_course` view.
+        Override all with the MKTG_URL_OVERRIDES setting.
+        """
+        base_url = catalog_course_data.get('marketing_url', None)
+        if base_url is None:
+            base_url = reverse('about_course', kwargs={'course_id': str(course.id)})
+        return self.build_url(base_url, {}, utm_params)
+
+    def get_public_video_cta_button_urls(self, course, catalog_course_data):
         """
         Get the links for the 'enroll' and 'learn more' buttons on the public video page
         """
-        course_key = str(course.id)
         utm_params = self.get_utm_params()
-        course_about_page_url = self.build_url(
-            reverse('about_course', kwargs={'course_id': course_key}), {}, utm_params
-        )
+        learn_more_url = self.get_learn_more_button_url(course, catalog_course_data, utm_params)
         enroll_url = self.build_url(
             reverse('register_user'),
             {
-                'course_id': course_key,
+                'course_id': str(course.id),
                 'enrollment_action': 'enroll',
                 'email_opt_in': False,
             },
             utm_params
         )
-        return course_about_page_url, enroll_url
+        return learn_more_url, enroll_url
 
     def get_utm_params(self):
         """
@@ -1854,18 +1910,24 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
         """
         if not params and not utm_params:
             return base_url
-        url_parts = urlparse(base_url)
+        parsed_url = urlparse(base_url)
         full_params = {**params, **utm_params}
+        return self._replace_url_query(parsed_url, full_params)
+
+    def _replace_url_query(self, parsed_url, query):
         return urlunparse((
-            url_parts.scheme,
-            url_parts.netloc,
-            url_parts.path,
-            url_parts.params,
-            urlencode(full_params),
-            url_parts.fragment
+            parsed_url.scheme,
+            parsed_url.netloc,
+            parsed_url.path,
+            parsed_url.params,
+            urlencode(query) if query else '',
+            parsed_url.fragment
         ))
 
 
+@method_decorator(ensure_valid_usage_key, name='dispatch')
+@method_decorator(xframe_options_exempt, name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 class PublicVideoXBlockEmbedView(BasePublicVideoXBlockView):
     """ View for viewing public videos embedded within Twitter or other social media """
     def get_template_and_context(self, course, video_block):

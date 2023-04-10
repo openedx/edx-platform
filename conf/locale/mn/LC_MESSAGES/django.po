@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Mongolian (http://www.transifex.com/open-edx/edx-platform/language/mn/).
+# edX community translations have been downloaded from Mongolian (http://app.transifex.com/open-edx/edx-platform/language/mn/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -19,7 +19,7 @@
 #
 # Translators:
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Mongolian (http://www.transifex.com/open-edx/edx-platform/language/mn/)
+# edX community translations have been downloaded from Mongolian (http://app.transifex.com/open-edx/edx-platform/language/mn/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -49,7 +49,7 @@
 # Myagmarjav Enkhbileg <miigaa.lucky@gmail.com>, 2018-2019
 # Oyunmaa Khorloo <oyunmaax@gmail.com>, 2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Mongolian (http://www.transifex.com/open-edx/edx-platform/language/mn/)
+# edX community translations have been downloaded from Mongolian (http://app.transifex.com/open-edx/edx-platform/language/mn/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -62,7 +62,7 @@
 # zolboo0411 <zolboo0411@yahoo.com>, 2014
 # zolboo0411 <zolboo0411@yahoo.com>, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Mongolian (https://www.transifex.com/open-edx/teams/6205/mn/)
+# edX community translations have been downloaded from Mongolian (https://app.transifex.com/open-edx/teams/6205/mn/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -74,10 +74,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-19 20:42+0000\n"
+"POT-Creation-Date: 2023-04-02 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
-"Language-Team: Mongolian (https://www.transifex.com/open-edx/teams/6205/mn/)\n"
+"Language-Team: Mongolian (https://app.transifex.com/open-edx/teams/6205/mn/)\n"
 "Language: mn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -279,6 +279,17 @@ msgstr ""
 "Сонголтот: Энэ өдөр, цагаас хойш хэрэглэгч энэ горимоор элсэх боломжгүй "
 "болно. Хэрэв энэ сонголтыг хоосон орхивол хэрэглэгч хичээлийн элсэлт "
 "хаагдтал энэ горимоор элсэх боломжтой байна. "
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -7473,6 +7484,12 @@ msgstr "Амжилттай"
 msgid "Actions"
 msgstr "Үйлдлүүд"
 
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
 msgid "Delete failed for user preference '{preference_key}'."
@@ -11728,6 +11745,10 @@ msgid "Library Content"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr ""
 
@@ -12973,6 +12994,14 @@ msgstr "Цахим шуудангийн хаяг"
 msgid "Return To %s"
 msgstr ""
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -13337,6 +13366,12 @@ msgstr ""
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Видео файлыг татаж авах"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -14370,11 +14405,6 @@ msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
-msgstr ""
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
@@ -16212,10 +16242,6 @@ msgstr ""
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr ""
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Сүүлийн хичээлээ үргэлжлүүлэх"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"

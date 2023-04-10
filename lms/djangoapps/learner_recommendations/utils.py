@@ -40,20 +40,19 @@ class AlgoliaClient:
         return cls.algolia_client
 
 
-def _remove_user_enrolled_course_keys(user, course_keys):
+def _get_user_enrolled_course_keys(user):
     """
-    Remove the course keys a user is already enrolled in
-    and returns enrollable course keys.
+    Returns course ids in which the user is enrolled in.
     """
-    user_enrolled_course_keys = set()
     course_enrollments = CourseEnrollment.enrollments_for_user(user)
+    return [str(course_enrollment.course_id) for course_enrollment in course_enrollments]
 
-    for course_enrollment in course_enrollments:
-        course_key = f"{course_enrollment.course_id.org}+{course_enrollment.course_id.course}"
-        user_enrolled_course_keys.add(course_key)
 
-    enrollable_course_keys = [course_key for course_key in course_keys if course_key not in user_enrolled_course_keys]
-    return enrollable_course_keys
+def _is_enrolled_in_course(course_runs, enrolled_course_keys):
+    """
+    Returns True if a user is enrolled in any course run of the course else false.
+    """
+    return any(course_run.get("key", None) in enrolled_course_keys for course_run in course_runs)
 
 
 def _has_country_restrictions(product, user_country):
@@ -83,34 +82,6 @@ def _has_country_restrictions(product, user_country):
             block_list = countries
 
     return user_country in block_list or (bool(allow_list) and user_country not in allow_list)
-
-
-def _get_program_duration(weeks):
-    """
-    Helper method that returns the program duration in textual form.
-    """
-    total_months = round(weeks / 4)
-
-    if total_months < 1:
-        return f'{total_months} weeks'
-
-    if 1 <= total_months < 12:
-        return f'{total_months} months'
-
-    total_years = round(total_months / 12)
-    total_remainder_months = round(total_months % 12)
-
-    if total_remainder_months == 0:
-        return f'{total_years} years'
-
-    if total_years == 1 and total_remainder_months == 1:
-        return f'1 year {total_remainder_months} months'
-
-    if total_remainder_months == 1:
-        return f'{total_years} years 1 months'
-
-    else:
-        return f'{total_years} years {total_remainder_months} months'
 
 
 def get_amplitude_course_recommendations(user_id, recommendation_id):
@@ -178,7 +149,7 @@ def filter_recommended_courses(
     unfiltered_course_keys,
     recommendation_count=10,
     user_country_code=None,
-    request_course=None,
+    request_course_key=None,
 ):
     """
     Returns the filtered course recommendations. The unfiltered course keys
@@ -192,7 +163,7 @@ def filter_recommended_courses(
         unfiltered_course_keys: recommended course keys that needs to be filtered
         recommendation_count: the maximum count of recommendations to be returned
         user_country_code: if provided, will apply location restrictions to recommendations
-        request_course: if provided, will filter out that course from recommendations (used for course about page)
+        request_course_key: if provided, will filter out that course from recommendations (used for course about page)
 
     Returns:
         filtered_recommended_courses (list): A list of filtered course objects.
@@ -211,17 +182,13 @@ def filter_recommended_courses(
         "programs",
     ]
 
-    # Remove the course keys a user is already enrolled in
-    enrollable_course_keys = _remove_user_enrolled_course_keys(user, unfiltered_course_keys)
-
+    # Filter out enrolled courses .
+    course_keys_to_filter_out = _get_user_enrolled_course_keys(user)
     # If user is seeing the recommendations on a course about page, filter that course out of recommendations
-    recommended_course_keys = [
-        course_key
-        for course_key in enrollable_course_keys
-        if course_key != request_course
-    ]
+    if request_course_key:
+        course_keys_to_filter_out.append(request_course_key)
 
-    for course_id in recommended_course_keys:
+    for course_id in unfiltered_course_keys:
         if len(filtered_recommended_courses) >= recommendation_count:
             break
 
@@ -229,6 +196,7 @@ def filter_recommended_courses(
         if (
             course_data
             and course_data.get("course_runs", [])
+            and not _is_enrolled_in_course(course_data.get("course_runs", []), course_keys_to_filter_out)
             and not _has_country_restrictions(course_data, user_country_code)
         ):
             filtered_recommended_courses.append(course_data)
@@ -236,55 +204,8 @@ def filter_recommended_courses(
     return filtered_recommended_courses
 
 
-def get_programs_based_on_course(request_course, country_code, user):
+def get_cross_product_recommendations(course_key):
     """
-    Returns a program for the course. If a course is part of multiple programs,
-    this function returns the program with the highest price.
+    Helper method to get associated course keys based on the key passed
     """
-    max_price, max_price_program = 0, {}
-    programs = get_programs(course=request_course)
-
-    if not programs:
-        return None
-
-    for program in programs:
-        if program.get('status') != 'active' or _has_country_restrictions(program, country_code):
-            continue
-
-        price = program['price_ranges'][0]['total']
-        if price > max_price:
-            if fetch_program_enrollments_by_student(program_uuids=[program.get('uuid')], user=user).exists():
-                continue
-
-            course_keys = [
-                course['key']
-                for course in program.get('courses', [])
-                if course.get('key') and course.get('key') != request_course
-            ]
-            if _remove_user_enrolled_course_keys(user, course_keys):
-                max_price_program = program
-                max_price = price
-
-    if not max_price_program:
-        return None
-
-    course_pacing_type, total_weeks_to_complete = '', 0
-    for course in max_price_program.get('courses'):
-        for course_run in course.get('course_runs'):
-            if course_run.get('status') == 'published':
-                if not course_pacing_type:
-                    course_pacing_type = course_run.get("pacing_type")
-                total_weeks_to_complete += int(course_run.get("weeks_to_complete"))
-
-    program_upsell = {
-        "title": max_price_program.get('title'),
-        "marketing_url": max_price_program.get('marketing_url'),
-        "courses_count": len(max_price_program.get('courses')),
-        "pacing_type": course_pacing_type,
-        "weeks_to_complete": _get_program_duration(total_weeks_to_complete),
-        "min_hours": max_price_program.get('min_hours_effort_per_week'),
-        "max_hours": max_price_program.get('max_hours_effort_per_week'),
-        "type": max_price_program.get('type'),
-    }
-
-    return program_upsell
+    return settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS.get(course_key)

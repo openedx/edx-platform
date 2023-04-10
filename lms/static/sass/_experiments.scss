@@ -514,36 +514,57 @@
 }
 
 // AU 972 Social Video Sharing Page
-.public-video-share-cta {
-  position: relative;
-  float: right;
-  z-index: 1;
+.public-video-page {
 
-  .btn-learn-more{
-    @extend %btn-shims;
-    color: #00262B;
-    background: #FFFFFF;
-    border-color: #F2F0EF;
-    &:hover,
-    &:active,
-    &:focus {
-      background: darken(#FFFFFF, 7%);
-      border-color: darken(#F2F0EF, 7%);
-    }
+  .tc-wrapper{
+    margin: auto;
+    // The edX video player only sets size by width. We want to make sure the video is fully on the page
+    // on-load, so we need to control height via width. This sets the width to either 90% of the horizontal
+    // space (when that's the limiter) or 70% of the vertical space times an approximate aspect ratio.
+    // Assuming the aspect ratio is even close to constistent, this sets the width to what it would need
+    // to be to make the height 70% of the vertical space on the screen
+    width: \min(90vw, 70vh * 1.6739);
   }
 
-  .btn-enroll{
-    @extend %btn-shims;
-    color: #FFFFFF;
-    background: #D23228;
-    border-color: #D23228;
+  .public-video-share-cta {
+    position: relative;
+    z-index: 1;
+    margin-top: 20px;
 
-    &:hover,
-    &:active,
-    &:focus {
-      color: darken(#FFFFFF, 7%);
-      background: darken(#D23228, 7%);
-      border-color: darken(#D23228, 7%);
+    .org-logo{
+      height: 40px;
+    }
+
+    .nav-links{
+      float: right;
+    }
+
+    .btn-learn-more{
+      @extend %btn-shims;
+      color: #00262B;
+      background: #FFFFFF;
+      border-color: #F2F0EF;
+      &:hover,
+      &:active,
+      &:focus {
+        background: darken(#FFFFFF, 7%);
+        border-color: darken(#F2F0EF, 7%);
+      }
+    }
+
+    .btn-enroll{
+      @extend %btn-shims;
+      color: #FFFFFF;
+      background: #D23228;
+      border-color: #D23228;
+
+      &:hover,
+      &:active,
+      &:focus {
+        color: darken(#FFFFFF, 7%);
+        background: darken(#D23228, 7%);
+        border-color: darken(#D23228, 7%);
+      }
     }
   }
 }

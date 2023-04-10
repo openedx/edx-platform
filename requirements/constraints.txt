@@ -25,7 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.61.7
+edx-enterprise==3.61.9
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -81,5 +81,12 @@ pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticke
 # Deprecated version of the AWS SDK;
 # we should stop using this
 boto==2.39.0
-boto3==1.4.8                        # Amazon Web Services SDK for Python
-botocore==1.8.17                    # via boto3, s3transfer
+boto3==1.7.0                       # Amazon Web Services SDK for Python
+botocore==1.10.84                  # via boto3, s3transfer
+
+# adding these constraints to minimize boto3 and botocore changeset
+social-auth-core==4.3.0
+babel==2.11.0
+social-auth-app-django==5.0.0
+algoliasearch==2.6.3
+django-ipware==4.0.2

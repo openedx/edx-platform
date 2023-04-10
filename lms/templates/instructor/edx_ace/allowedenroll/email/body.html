@@ -7,15 +7,17 @@
     <tr>
         <td>
             <h1>
-                {% filter force_escape %}
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
                 {% blocktrans %}You have been invited to {{ course_name }}{% endblocktrans %}
-                {% endfilter %}
+                {% endautoescape %}
             </h1>
 
             <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
+                {% autoescape off %}
+                {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
                 {% blocktrans %}You have been invited to join {{ course_name }} at {{ site_name }} by a member of the course staff.{% endblocktrans %}
-                {% endfilter %}
+                {% endautoescape %}
                 <br />
             </p>
 
@@ -52,18 +54,20 @@
 
             <p style="color: rgba(0,0,0,.75);">
                 {% if auto_enroll %}
-                    {% filter force_escape %}
+                    {% autoescape off %}
+                    {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
                     {% blocktrans %}Once you have registered and activated your account, you will see {{ course_name }} listed on your dashboard.{% endblocktrans %}
-                    {% endfilter %}
+                    {% endautoescape %}
                 {% elif course_about_url is not None %}
                     {% filter force_escape %}
                     {% blocktrans %}Once you have registered and activated your account, you will be able to access this course:{% endblocktrans %}
                     {% endfilter %}
                     {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_name course_cta_url=course_about_url %}
                 {% else %}
-                    {% filter force_escape %}
+                    {% autoescape off %}
+                    {# xss-lint: disable=django-blocktrans-missing-escape-filter #}
                     {% blocktrans %}You can then enroll in {{ course_name }}.{% endblocktrans %}
-                    {% endfilter %}
+                    {% endautoescape %}
                 {% endif %}
                 <br />
             </p>

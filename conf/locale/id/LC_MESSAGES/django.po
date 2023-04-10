@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/).
+# edX community translations have been downloaded from Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -8,7 +8,7 @@
 # Firdaus x, 2014
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2018-2019
 # Ahmad Sofyan <asofyan@niskala.net>, 2013
-# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2022
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2023
 # fizdoonk, 2013
 # hafizhuddin amin, 2013
 # ichs <ichsansp@outlook.com>, 2014
@@ -21,7 +21,7 @@
 # Untag Pranata <untag@unzypsoft.com>, 2018
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/).
+# edX community translations have been downloaded from Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -29,10 +29,10 @@
 # Aldiantoro Nugroho <kriwil@gmail.com>, 2015
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
 # Ahmad Sofyan <asofyan@niskala.net>, 2013
-# Faizar Septiawan <faizarsangster@gmail.com>, 2020,2022
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020,2022-2023
 # fizdoonk, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
+# edX community translations have been downloaded from Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -51,7 +51,7 @@
 # dedy prasetya, 2015
 # Eka Y Saputra <ekajogja@ymail.com>, 2014
 # El Greshard <elgreshard@gmail.com>, 2016
-# Faizar Septiawan <faizarsangster@gmail.com>, 2021
+# Faizar Septiawan <faizarsangster@gmail.com>, 2021,2023
 # fizdoonk, 2013
 # hafizhuddin amin, 2013
 # hafizhuddin amin, 2013
@@ -68,20 +68,20 @@
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
+# edX community translations have been downloaded from Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
 # Ahmad Sofyan <asofyan@niskala.net>, 2013
-# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2022
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2023
 # fizdoonk, 2013
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Prita Ika Dewi <prita.tenda@gmail.com>, 2014
 # Rizky Ariestiyansyah <ariestiyansyah.rizky@gmail.com>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
+# edX community translations have been downloaded from Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -92,7 +92,7 @@
 # Muhammad Redho Ayassa <redhoyasa@gmail.com>, 2016
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)
+# edX community translations have been downloaded from Indonesian (https://app.transifex.com/open-edx/teams/6205/id/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -105,10 +105,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-19 20:42+0000\n"
+"POT-Creation-Date: 2023-04-02 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
-"Language-Team: Indonesian (https://www.transifex.com/open-edx/teams/6205/id/)\n"
+"Language-Team: Indonesian (https://app.transifex.com/open-edx/teams/6205/id/)\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -313,6 +313,17 @@ msgstr ""
 "OPSIONAL: Setelah tanggal/waktu ini, pengguna tidak akan bisa mendaftar "
 "dalam mode ini. Kosongkan jika pengguna bisa mendaftar dalam mode ini sampai"
 " pendaftaran ditutup untuk mata pelajaran."
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -7827,6 +7838,12 @@ msgstr "Berhasil"
 msgid "Actions"
 msgstr "Tindakan"
 
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
 msgid "Delete failed for user preference '{preference_key}'."
@@ -12473,6 +12490,10 @@ msgid "Library Content"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Kosong"
 
@@ -13751,6 +13772,14 @@ msgstr "Email"
 msgid "Return To %s"
 msgstr "Kembali ke %s"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -14134,6 +14163,12 @@ msgstr "Unduh dan transkipsikan"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Unduh file video"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr "Bagikan di Twitter"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -15492,11 +15527,6 @@ msgstr "Klik tautan untuk melihat sertifikat saya."
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Bagikan di Facebook"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "Bagikan di Twitter"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
@@ -17543,10 +17573,6 @@ msgstr "Kampus"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr ""
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Ringkas pelatihan terakhir Anda"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"

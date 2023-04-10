@@ -20,9 +20,14 @@ from django.utils.translation import gettext as _
 <meta data-rh="true" name="twitter:player:height" content="720">
 </%block>
 
+<%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''} public-video-page</%block>
+
 <%block name="body_extra">
-<nav class="public-video-share-cta nav-links" aria-label="Learn More">
-  <div>
+<nav class="public-video-share-cta" aria-label="Learn More">
+  % if org_logo:
+    <img class="org-logo" src="${org_logo}" alt="Organization Logo"/>
+  % endif
+  <div class="nav-links">
     <a class="btn-learn-more btn" href="${learn_more_url}">
       ${_("Learn more about this course")}
     </a>

@@ -33,7 +33,7 @@
 # Prakai Nadee <prakai.na@gmail.com>, 2021
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Thai (https://www.transifex.com/open-edx/teams/6205/th/).
+# edX community translations have been downloaded from Thai (https://app.transifex.com/open-edx/teams/6205/th/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -43,7 +43,7 @@
 # Noppadol Choti <noppadol@thaicyberu.go.th>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)
+# edX community translations have been downloaded from Thai (http://app.transifex.com/open-edx/edx-platform/language/th/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -73,7 +73,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-26 20:42+0000\n"
+"POT-Creation-Date: 2023-03-19 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: edx demo <edx.one2clouds@gmail.com>, 2019\n"
 "Language-Team: Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)\n"
@@ -5654,7 +5654,7 @@ msgid "Please enter non-negative integer."
 msgstr "กรุณากรอกตัวเลขที่ไม่ใช่เชิงลบ"
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%- types %> assignments than are assigned."
+msgid "You must have at least one undroppable <%- types %> assignment."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js

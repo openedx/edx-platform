@@ -42,6 +42,7 @@ from ..videos import (
     ENABLE_VIDEO_UPLOAD_PAGINATION,
     KEY_EXPIRATION_IN_SECONDS,
     VIDEO_IMAGE_UPLOAD_ENABLED,
+    PUBLIC_VIDEO_SHARE,
     StatusDisplayStrings,
     TranscriptProvider,
     _get_default_video_image_url,
@@ -159,11 +160,10 @@ class VideoUploadTestBase:
         )
 
 
-class VideoUploadTestMixin(VideoUploadTestBase):
+class VideoStudioAccessTestsMixin:
     """
-    Test cases for the video upload feature
+    Base Access tests for studio video views
     """
-
     def test_anon_user(self):
         self.client.logout()
         response = self.client.get(self.url)
@@ -184,6 +184,11 @@ class VideoUploadTestMixin(VideoUploadTestBase):
         response = client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
+
+class VideoPipelineStudioAccessTestsMixin:
+    """
+    Access tests for video views that rely on the video pipeline
+    """
     def test_video_pipeline_not_enabled(self):
         settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] = False
         self.assertEqual(self.client.get(self.url).status_code, 404)
@@ -329,7 +334,13 @@ class VideoUploadPostTestsMixin:
 @override_settings(VIDEO_UPLOAD_PIPELINE={
     "VEM_S3_BUCKET": "vem_test_bucket", "BUCKET": "test_bucket", "ROOT_PATH": "test_root"
 })
-class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, CourseTestCase):
+class VideosHandlerTestCase(
+    VideoUploadTestBase,
+    VideoStudioAccessTestsMixin,
+    VideoPipelineStudioAccessTestsMixin,
+    VideoUploadPostTestsMixin,
+    CourseTestCase
+):
     """Test cases for the main video upload endpoint"""
 
     VIEW_NAME = 'videos_handler'
@@ -841,7 +852,11 @@ class VideosHandlerTestCase(VideoUploadTestMixin, VideoUploadPostTestsMixin, Cou
 @override_settings(VIDEO_UPLOAD_PIPELINE={
     "VEM_S3_BUCKET": "vem_test_bucket", "BUCKET": "test_bucket", "ROOT_PATH": "test_root"
 })
-class GenerateVideoUploadLinkTestCase(VideoUploadTestBase, VideoUploadPostTestsMixin, CourseTestCase):
+class GenerateVideoUploadLinkTestCase(
+    VideoUploadTestBase,
+    VideoUploadPostTestsMixin,
+    CourseTestCase
+):
     """
     Test cases for the main video upload endpoint
     """
@@ -1472,7 +1487,12 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
 
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
-class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
+class VideoUrlsCsvTestCase(
+    VideoUploadTestBase,
+    VideoStudioAccessTestsMixin,
+    VideoPipelineStudioAccessTestsMixin,
+    CourseTestCase
+):
     """Test cases for the CSV download endpoint for video uploads"""
 
     VIEW_NAME = "video_encodings_download"
@@ -1550,3 +1570,59 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             response["Content-Disposition"],
             "attachment; filename*=utf-8''n%C3%B3n-%C3%A4scii_video_urls.csv"
         )
+
+
+@ddt.ddt
+class GetVideoFeaturesTestCase(
+    VideoStudioAccessTestsMixin,
+    CourseTestCase
+):
+    """Test cases for the get_video_features endpoint """
+    def setUp(self):
+        super().setUp()
+        self.url = self.get_url_for_course_key()
+
+    def get_url_for_course_key(self, course_id=None):
+        """ Helper to generate a url for a course key """
+        course_id = course_id or str(self.course.id)
+        return reverse_course_url("video_features", course_id)
+
+    def test_basic(self):
+        """ Test for expected return keys """
+        response = self.client.get(self.get_url_for_course_key())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            set(response.json().keys()),
+            {
+                'videoSharingEnabled',
+                'allowThumbnailUpload',
+            }
+        )
+
+    @ddt.data(True, False)
+    def test_video_share_enabled(self, is_enabled):
+        """ Test the public video share flag """
+        self._test_video_feature(
+            PUBLIC_VIDEO_SHARE,
+            'videoSharingEnabled',
+            override_waffle_flag,
+            is_enabled,
+        )
+
+    @ddt.data(True, False)
+    def test_video_image_upload_enabled(self, is_enabled):
+        """ Test the video image upload switch """
+        self._test_video_feature(
+            VIDEO_IMAGE_UPLOAD_ENABLED,
+            'allowThumbnailUpload',
+            override_waffle_switch,
+            is_enabled,
+        )
+
+    def _test_video_feature(self, flag, key, override_fn, is_enabled):
+        """ Test that setting a waffle flag or switch on or off will cause the expected result """
+        with override_fn(flag, is_enabled):
+            response = self.client.get(self.get_url_for_course_key())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[key], is_enabled)

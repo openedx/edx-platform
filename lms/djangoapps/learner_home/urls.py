@@ -12,7 +12,4 @@ app_name = "learner_home"
 urlpatterns = [
     re_path(r"^init/?", views.InitializeView.as_view(), name="initialize"),
     re_path(r"^mock/", include("lms.djangoapps.learner_home.mock.urls")),
-    re_path(
-        r"^recommendation/", include("lms.djangoapps.learner_home.recommendations.urls")
-    ),
 ]

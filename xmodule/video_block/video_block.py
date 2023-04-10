@@ -357,11 +357,8 @@ class VideoBlock(
         # for it, we fall back on whatever we find in the VideoBlock.
         if not download_video_link and self.download_video:
             if self.html5_sources:
-                download_video_link = self.html5_sources[0]
-
-            # don't give the option to download HLS video urls
-            if download_video_link and download_video_link.endswith('.m3u8'):
-                download_video_link = None
+                # If there are multiple html5 sources, we use the first non HLS video urls
+                download_video_link = next((url for url in self.html5_sources if not url.endswith('.m3u8')), None)
 
         transcripts = self.get_transcripts_info()
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student(transcripts=transcripts)
@@ -495,7 +492,7 @@ class VideoBlock(
         Returns the public video url
         """
         if self.public_access and self._is_lms_platform():
-            from lms.djangoapps.courseware.toggles import PUBLIC_VIDEO_SHARE
+            from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
             if PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key):
                 return urljoin(
                     settings.LMS_ROOT_URL,

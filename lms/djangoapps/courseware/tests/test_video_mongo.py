@@ -48,7 +48,7 @@ from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from lms.djangoapps.courseware.tests.helpers import get_context_dict_from_string
-from lms.djangoapps.courseware.toggles import PUBLIC_VIDEO_SHARE
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
@@ -1128,6 +1128,22 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         self.initialize_block(data=video_xml)
         context = self.item_descriptor.render(STUDENT_VIEW).content
         assert "'download_video_link': None" in context
+
+    def test_get_html_non_hls_video_download(self):
+        """
+        Verify that `download_video_link` is available if a non HLS videos is available
+        """
+        video_xml = """
+        <video display_name="Video" download_video="true">
+            <source src="http://example.com/example.m3u8"/>
+            <source src="http://example.com/example.mp4"/>
+            <source src="http://example.com/example.webm"/>
+        </video>
+        """
+
+        self.initialize_block(data=video_xml)
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+        assert "'download_video_link': 'http://example.com/example.mp4'" in context
 
     def test_html_student_public_view(self):
         """

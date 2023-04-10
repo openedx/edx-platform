@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/).
+# edX community translations have been downloaded from French (http://app.transifex.com/open-edx/edx-platform/language/fr/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -146,7 +146,7 @@
 # ytabaa <ytabaa@uae.ac.ma>, 2014
 # d6910e756eb8532754192e6021dc9f83, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
+# edX community translations have been downloaded from French (http://app.transifex.com/open-edx/edx-platform/language/fr/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -288,7 +288,7 @@
 # willyedoo <willyedoo@gmail.com>, 2019
 # PETIT Yannick <yannick.petit@gmail.com>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
+# edX community translations have been downloaded from French (http://app.transifex.com/open-edx/edx-platform/language/fr/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -304,7 +304,7 @@
 # Richard Moch <richard.moch@gmail.com>, 2016
 # Sarina Canelake <sarina@tcril.org>, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from French (https://www.transifex.com/open-edx/teams/6205/fr/)
+# edX community translations have been downloaded from French (https://app.transifex.com/open-edx/teams/6205/fr/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -316,10 +316,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-19 20:42+0000\n"
+"POT-Creation-Date: 2023-04-02 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Alexandre DS <alexandre@cleverm8.com>, 2020\n"
-"Language-Team: French (https://www.transifex.com/open-edx/teams/6205/fr/)\n"
+"Language-Team: French (https://app.transifex.com/open-edx/teams/6205/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -529,6 +529,17 @@ msgstr ""
 "mesure de s'inscrire dans ce mode. Laissez vide si les utilisateurs peuvent "
 "s'inscrire dans ce mode jusqu'à ce que les inscription au cours soient "
 "fermées."
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -8738,6 +8749,12 @@ msgstr "Opération réussie"
 msgid "Actions"
 msgstr "Actions"
 
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
 msgid "Delete failed for user preference '{preference_key}'."
@@ -13716,6 +13733,10 @@ msgid "Library Content"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Vide"
 
@@ -15058,6 +15079,14 @@ msgstr "E-mail"
 msgid "Return To %s"
 msgstr "Retour à %s"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -15446,6 +15475,12 @@ msgstr "Téléchargements et transcriptions"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Télécharger le fichier vidéo"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr "Partager sur Twitter"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16849,11 +16884,6 @@ msgstr "Cliquer sur le lien pour voir mon certificat."
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Poster sur Facebook"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "Partager sur Twitter"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
@@ -18954,10 +18984,6 @@ msgstr "Écoles"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr ""
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Reprendre le dernier cours"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"

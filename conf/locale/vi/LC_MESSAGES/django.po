@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/).
+# edX community translations have been downloaded from Vietnamese (http://app.transifex.com/open-edx/edx-platform/language/vi/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -73,7 +73,7 @@
 # Le Minh Tri <trilm@hihexa.com>, 2020
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
+# edX community translations have been downloaded from Vietnamese (http://app.transifex.com/open-edx/edx-platform/language/vi/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -162,7 +162,7 @@
 # Theodora. Tôn Nữ Quý Thiện <thien.tonnu1001@gmail.com>, 2015-2016
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015-2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
+# edX community translations have been downloaded from Vietnamese (http://app.transifex.com/open-edx/edx-platform/language/vi/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -185,7 +185,7 @@
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015
 # Tuan Nguyen <manhtuanbn12@gmail.com>, 2018
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (https://www.transifex.com/open-edx/teams/6205/vi/)
+# edX community translations have been downloaded from Vietnamese (https://app.transifex.com/open-edx/teams/6205/vi/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -198,10 +198,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-19 20:42+0000\n"
+"POT-Creation-Date: 2023-04-02 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Le Minh Tri <trilm@hihexa.com>, 2020\n"
-"Language-Team: Vietnamese (https://www.transifex.com/open-edx/teams/6205/vi/)\n"
+"Language-Team: Vietnamese (https://app.transifex.com/open-edx/teams/6205/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -371,6 +371,17 @@ msgid ""
 "OPTIONAL: After this date/time, users will no longer be able to enroll in "
 "this mode. Leave this blank if users can enroll in this mode until "
 "enrollment closes for the course."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -7417,6 +7428,12 @@ msgstr "Thành công"
 msgid "Actions"
 msgstr "Actions"
 
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
 msgid "Delete failed for user preference '{preference_key}'."
@@ -11641,6 +11658,10 @@ msgid "Library Content"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Trống "
 
@@ -12923,6 +12944,14 @@ msgstr "E-mail"
 msgid "Return To %s"
 msgstr "Quay lại %s"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -13303,6 +13332,12 @@ msgstr "Tải xuống và bản dịch"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Tải xuống tệp video"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr "Chia sẻ lên Twitter"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -14512,11 +14547,6 @@ msgstr "Nhấn vào link để xem chứng chỉ."
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Post lên Facebook"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "Chia sẻ lên Twitter"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
@@ -16496,10 +16526,6 @@ msgstr "Trường"
 
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
-msgstr ""
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
