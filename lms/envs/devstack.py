@@ -66,6 +66,11 @@ LOGGING['handlers']['local'] = LOGGING['handlers']['tracking'] = {
 
 LOGGING['loggers']['tracking']['handlers'] = ['console']
 
+
+#################### Frontend-rendered XBlocks #######################
+
+FEATURES['ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA'] = True
+
 ################################ EMAIL ########################################
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
