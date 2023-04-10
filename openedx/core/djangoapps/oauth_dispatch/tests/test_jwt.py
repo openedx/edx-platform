@@ -73,7 +73,7 @@ class TestCreateJWTs(AccessTokenMixin, TestCase):
         jwt_token = self._create_jwt_for_token(DOTAdapter(), use_asymmetric_key=True)
         self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=True)
 
-    @override_settings(FORCE_USE_ASYMMETRIC_KEY=True)
+    @override_settings(JWT_AUTH_FORCE_CREATE_ASYMMETRIC=True)
     def test_dot_create_jwt_for_token_forced_asymmetric(self):
         jwt_token = self._create_jwt_for_token(DOTAdapter(), use_asymmetric_key=False)
         self._assert_jwt_is_valid(jwt_token, should_be_asymmetric_key=True)

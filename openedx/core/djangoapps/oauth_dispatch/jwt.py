@@ -161,7 +161,7 @@ def _create_jwt(
     """
     use_asymmetric_key = _get_use_asymmetric_key_value(is_restricted, use_asymmetric_key)
     # Enable monitoring of key type used. Use increment in case there are multiple calls in a transaction.
-    increment('use_asymmetric_key_count') if use_asymmetric_key else increment('use_symmetric_key_count')
+    increment('create_asymmetric_jwt_count') if use_asymmetric_key else increment('create_symmetric_jwt_count')
 
     # Default scopes should only contain non-privileged data.
     # Do not be misled by the fact that `email` and `profile` are default scopes. They
@@ -192,7 +192,7 @@ def _create_jwt(
     return _encode_and_sign(payload, use_asymmetric_key, secret)
 
 
-# .. toggle_name: FORCE_USE_ASYMMETRIC_KEY
+# .. toggle_name: JWT_AUTH_FORCE_CREATE_ASYMMETRIC
 # .. toggle_implementation: SettingToggle
 # .. toggle_default: False
 # .. toggle_description: When True, forces the LMS to only create JWTs signed with the asymmetric
@@ -201,14 +201,16 @@ def _create_jwt(
 # .. toggle_creation_date: 2023-04-10
 # .. toggle_target_removal_date: 2023-07-31
 # .. toggle_tickets: https://github.com/openedx/public-engineering/issues/83
-FORCE_USE_ASYMMETRIC_KEY = SettingToggle('FORCE_USE_ASYMMETRIC_KEY', default=False, module_name=__name__)
+JWT_AUTH_FORCE_CREATE_ASYMMETRIC = SettingToggle(
+    'JWT_AUTH_FORCE_CREATE_ASYMMETRIC', default=False, module_name=__name__
+)
 
 
 def _get_use_asymmetric_key_value(is_restricted, use_asymmetric_key):
     """
     Returns the value to use for use_asymmetric_key.
     """
-    if FORCE_USE_ASYMMETRIC_KEY.is_enabled():
+    if JWT_AUTH_FORCE_CREATE_ASYMMETRIC.is_enabled():
         return True
 
     return use_asymmetric_key or is_restricted
