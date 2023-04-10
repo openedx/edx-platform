@@ -868,6 +868,7 @@ def course_about(request, course_id):  # pylint: disable=too-many-statements
             'course_image_urls': overview.image_urls,
             'sidebar_html_enabled': sidebar_html_enabled,
             'allow_anonymous': allow_anonymous,
+            'show_search': True
         }
 
         course_about_template = 'courseware/course_about.html'

@@ -142,6 +142,38 @@ from six import string_types
 
   <div class="container">
 
+    <%block name="course_search">
+      % if show_search:
+      <%static:require_module module_name="course_search/js/course_search_factory" class_name="CourseSearchFactory">
+          var courseId = $('.courseware-results').data('courseId');
+          CourseSearchFactory({
+              courseId: courseId,
+              searchHeader: $('.search-bar')
+          });
+      </%static:require_module>
+      % endif
+      % if show_search:
+      <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
+        <form class="search-form">
+          <label for="course-search-input" class="sr">${_('Course Search')}</label>
+          <div class="search-field-wrapper">
+            <input id="course-search-input" type="text" class="search-field"/>
+            <button type="submit" class="search-button">${_('Search')}</button>
+            <button type="button" class="cancel-button" title="${_('Clear search')}">
+              <span class="icon fa fa-remove" aria-hidden="true"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+    % endif
+    </%block>
+
+    <section class="courseware-results-wrapper">
+      <div id="loading-message" aria-live="polite" aria-relevant="all"></div>
+      <div id="error-message" aria-live="polite"></div>
+      <div class="courseware-results search-results" data-course-id="${course.id}"></div>
+    </section>
+
     <%block name="course_about_details">
     <div class="details">
       % if staff_access and studio_url is not None:
