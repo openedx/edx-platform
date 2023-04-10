@@ -196,7 +196,7 @@ def _create_jwt(
 # .. toggle_implementation: SettingToggle
 # .. toggle_default: False
 # .. toggle_description: When True, forces the LMS to only create JWTs signed with the asymmetric
-#   key. This is a temporary rollout toggle for DEPR of symmetic JWTs.
+#   key. This is a temporary rollout toggle for DEPR of symmetric JWTs.
 # .. toggle_use_cases: temporary
 # .. toggle_creation_date: 2023-04-10
 # .. toggle_target_removal_date: 2023-07-31
