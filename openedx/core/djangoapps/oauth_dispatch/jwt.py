@@ -161,7 +161,10 @@ def _create_jwt(
     """
     use_asymmetric_key = _get_use_asymmetric_key_value(is_restricted, use_asymmetric_key)
     # Enable monitoring of key type used. Use increment in case there are multiple calls in a transaction.
-    increment('create_asymmetric_jwt_count') if use_asymmetric_key else increment('create_symmetric_jwt_count')
+    if use_asymmetric_key:
+        increment('create_asymmetric_jwt_count')
+    else:
+        increment('create_symmetric_jwt_count')
 
     # Default scopes should only contain non-privileged data.
     # Do not be misled by the fact that `email` and `profile` are default scopes. They
