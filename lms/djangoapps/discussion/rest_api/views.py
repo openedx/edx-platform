@@ -38,6 +38,7 @@ from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.lib.api.authentication import BearerAuthentication, BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
+from .ImageFilter import EdenAIImageExplicitContent
 
 from ..rest_api.api import (
     create_comment,
@@ -634,6 +635,10 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         Implements the POST method for the list endpoint as described in the
         class docstring.
         """
+        try:
+            EdenAIImageExplicitContent().clean_html(request.data["raw_body"])
+        except Exception as e:
+            raise ValidationError(e)
         return Response(create_thread(request, request.data))
 
     def partial_update(self, request, thread_id):
@@ -1061,6 +1066,7 @@ class UploadFileView(DeveloperErrorViewMixin, APIView):
         """
         thread_key = request.POST.get("thread_key", "root")
         unique_file_name = f"{course_id}/{thread_key}/{uuid.uuid4()}"
+
         try:
             file_storage, stored_file_name = store_uploaded_file(
                 request, "uploaded_file", cc_settings.ALLOWED_UPLOAD_FILE_TYPES,
@@ -1069,12 +1075,22 @@ class UploadFileView(DeveloperErrorViewMixin, APIView):
         except ValueError as err:
             raise BadRequest("no `uploaded_file` was provided") from err
 
+
         file_absolute_url = file_storage.url(stored_file_name)
 
         # this is a no-op in production, but is required in development,
         # since the filesystem storage returns the path without a base_url
         file_absolute_url = request.build_absolute_uri(file_absolute_url)
-
+        nsfw_likelihood, labels = EdenAIImageExplicitContent().get_nsfw_likelihood(
+            # file_url='https://edxuploads.s3.amazonaws.com/course-v1%3Aedx%2BIncontext01%2Brun02/63cf9f7b8f9e24049f7b8851/a0f926c0-fc68-4881-a8ed-3faa6c0a6166.jpeg')
+            file_url=file_absolute_url
+        )
+        if nsfw_likelihood > 3:
+            return Response(
+                {"developer_message": "Image Does not meet community guidelines"},
+                content_type="application/json",
+                status=400
+            )
         return Response(
             {"location": file_absolute_url},
             content_type="application/json",
