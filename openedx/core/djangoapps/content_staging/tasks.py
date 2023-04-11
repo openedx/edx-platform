@@ -2,9 +2,7 @@
 Celery tasks for Content Staging.
 """
 from __future__ import annotations  # for list[int] type
-from datetime import timedelta
 import logging
-import random
 
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
