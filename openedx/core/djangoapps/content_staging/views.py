@@ -145,7 +145,7 @@ class ClipboardEndpoint(APIView):
         # Enqueue a (potentially slow) task to delete the old staged content
         try:
             delete_expired_clipboards.delay(expired_ids)
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             log.exception(f"Unable to enqueue cleanup task for StagedContents: {','.join(str(x) for x in expired_ids)}")
         # Return the response:
         return Response(serializer.data)
