@@ -242,11 +242,11 @@ def xblock_handler(request, usage_key_string=None):
                     status=400
                 )
 
-            dest_usage_key = _duplicate_block(
+            dest_usage_key = duplicate_block(
                 parent_usage_key,
                 duplicate_source_usage_key,
                 request.user,
-                request.json.get('display_name'),
+                display_name=request.json.get('display_name'),
             )
             return JsonResponse({
                 'locator': str(dest_usage_key),
@@ -879,47 +879,88 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
         return JsonResponse(context)
 
 
-def _duplicate_block(parent_usage_key, duplicate_source_usage_key, user, display_name=None, is_child=False):
+def gather_block_attributes(source_item, display_name=None, is_child=False):
+    """
+    Gather all the attributes of the source block that need to be copied over to a new or updated block.
+    """
+    # Update the display name to indicate this is a duplicate (unless display name provided).
+    # Can't use own_metadata(), b/c it converts data for JSON serialization -
+    # not suitable for setting metadata of the new block
+    duplicate_metadata = {}
+    for field in source_item.fields.values():
+        if field.scope == Scope.settings and field.is_set_on(source_item):
+            duplicate_metadata[field.name] = field.read_from(source_item)
+
+    if is_child:
+        display_name = display_name or source_item.display_name or source_item.category
+
+    if display_name is not None:
+        duplicate_metadata['display_name'] = display_name
+    else:
+        if source_item.display_name is None:
+            duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
+        else:
+            duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
+
+    asides_to_create = []
+    for aside in source_item.runtime.get_asides(source_item):
+        for field in aside.fields.values():
+            if field.scope in (Scope.settings, Scope.content,) and field.is_set_on(aside):
+                asides_to_create.append(aside)
+                break
+
+    for aside in asides_to_create:
+        for field in aside.fields.values():
+            if field.scope not in (Scope.settings, Scope.content,):
+                field.delete_from(aside)
+    return duplicate_metadata, asides_to_create
+
+
+def update_from_source(*, source_block, destination_block, user_id):
+    """
+    Update a block to have all the settings and attributes of another source.
+
+    Copies over all attributes and settings of a source block to a destination
+    block. Blocks must be the same type. This function does not modify or duplicate
+    children.
+    """
+    duplicate_metadata, asides = gather_block_attributes(source_block, display_name=source_block.display_name)
+    for key, value in duplicate_metadata.items():
+        setattr(destination_block, key, value)
+    for key, value in source_block.get_explicitly_set_fields_by_scope(Scope.content).items():
+        setattr(destination_block, key, value)
+    modulestore().update_item(
+        destination_block,
+        user_id,
+        metadata=duplicate_metadata,
+        asides=asides,
+    )
+
+
+def duplicate_block(
+    parent_usage_key,
+    duplicate_source_usage_key,
+    user,
+    dest_usage_key=None,
+    display_name=None,
+    shallow=False,
+    is_child=False
+):
     """
     Duplicate an existing xblock as a child of the supplied parent_usage_key.
     """
     store = modulestore()
     with store.bulk_operations(duplicate_source_usage_key.course_key):
         source_item = store.get_item(duplicate_source_usage_key)
-        # Change the blockID to be unique.
-        dest_usage_key = source_item.location.replace(name=uuid4().hex)
+        if not dest_usage_key:
+            # Change the blockID to be unique.
+            dest_usage_key = source_item.location.replace(name=uuid4().hex)
+
         category = dest_usage_key.block_type
 
-        # Update the display name to indicate this is a duplicate (unless display name provided).
-        # Can't use own_metadata(), b/c it converts data for JSON serialization -
-        # not suitable for setting metadata of the new block
-        duplicate_metadata = {}
-        for field in source_item.fields.values():
-            if field.scope == Scope.settings and field.is_set_on(source_item):
-                duplicate_metadata[field.name] = field.read_from(source_item)
-
-        if is_child:
-            display_name = display_name or source_item.display_name or source_item.category
-
-        if display_name is not None:
-            duplicate_metadata['display_name'] = display_name
-        else:
-            if source_item.display_name is None:
-                duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
-            else:
-                duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
-
-        asides_to_create = []
-        for aside in source_item.runtime.get_asides(source_item):
-            for field in aside.fields.values():
-                if field.scope in (Scope.settings, Scope.content,) and field.is_set_on(aside):
-                    asides_to_create.append(aside)
-                    break
-
-        for aside in asides_to_create:
-            for field in aside.fields.values():
-                if field.scope not in (Scope.settings, Scope.content,):
-                    field.delete_from(aside)
+        duplicate_metadata, asides_to_create = gather_block_attributes(
+            source_item, display_name=display_name, is_child=is_child,
+        )
 
         dest_block = store.create_item(
             user.id,
@@ -943,10 +984,10 @@ def _duplicate_block(parent_usage_key, duplicate_source_usage_key, user, display
 
         # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
         # Because DAGs are not fully supported, we need to actually duplicate each child as well.
-        if source_item.has_children and not children_handled:
+        if source_item.has_children and not shallow and not children_handled:
             dest_block.children = dest_block.children or []
             for child in source_item.children:
-                dupe = _duplicate_block(dest_block.location, child, user=user, is_child=True)
+                dupe = duplicate_block(dest_block.location, child, user=user, is_child=True)
                 if dupe not in dest_block.children:  # _duplicate_block may add the child for us.
                     dest_block.children.append(dupe)
             store.update_item(dest_block, user.id)
