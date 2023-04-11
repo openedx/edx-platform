@@ -1,0 +1,112 @@
+# Rejects PR if requirements files are inconsistent.
+#
+# This will produce a failing check for any PR that does not produce a
+# clean run of `make compile-requirements` on Linux.
+
+name: Consistent Python dependencies
+
+on:
+  pull_request:
+    paths:
+      - 'requirements/**'
+  push:
+    branches:
+      - master
+    paths:
+      - 'requirements/**'
+
+defaults:
+  run:
+    shell: bash # strict bash
+
+jobs:
+  check-requirements:
+    name: Compile requirements
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - run: |
+          make compile-requirements
+
+      - name: Fail if compiling requirements caused changes
+        run: |
+          SUMMARY_HELP=$(cat <<'EOMARKDOWN'
+          # Inconsistent Python dependencies
+
+          It appears that the Python dependencies in this PR are inconsistent—a re-run of
+          `make compile-requirements` produced changes. This might mean that your PR would
+          fail to deploy properly in production, or could have inconsistent behavior for
+          developers.
+
+          ## Did you run `make upgrade` or `make compile-requirements` on a Mac directly?
+
+          Some packages have different dependencies on Mac vs. Linux—usually not in ways
+          that are relevant in production (they generally have to do with desktop integrations
+          of developer tools) but this does cause "churn" and make it harder to review PRs
+          as dependencies are alternatingly recompiled on Mac and Linux. As edx-platform runs
+          on Linux, we want to ensure that 
+
+          Solutions for Mac users:
+
+          - You can use the upgrade-requirements Github Workflow to upgrade everything:
+            https://github.com/openedx/edx-platform/actions/workflows/upgrade-python-requirements.yml
+          - You can run `make lms-shell` in devstack to get a Linux environment for more
+            complicated operations.
+
+          ## Did you hand-edit the .txt files?
+
+          Hand-editing the .txt requirements files often leads to dependency conflicts,
+          failed deployments, or outages. It's easy to forget to update all the locations
+          where a requirement appears, and it's often not feasible to track down all of
+          the transitive dependencies of the package you want to upgrade.
+
+          Luckily, we have a simple runbook for upgrading or downgrading a single package,
+          which is the most common case:
+          https://github.com/openedx/edx-platform/blob/master/requirements/README.rst#upgradingdowngrading-just-one-dependency
+
+          ## Is there an unpinned git dependency?
+
+          If the diff relates to a dependency that is installed from git rather than from
+          PyPI (such as being a transitive dependency of anything in github.in), check
+          whether any of the dependencies in github.in has failed to pin a specific commit.
+          We want to have as few of these dependencies as possible, as they're a maintenance
+          and performance problem, and there are important instructions at the top of that
+          file for how to manage them.
+
+          ## Help, I didn't change any dependencies, and this is still failing!
+
+          It's possible that someone introduced an inconsistency on the master branch, in
+          which case please submit a new PR off of master after running `make compile-requirements`
+          (but see notes above for Mac users). Or perhaps your branch was made while there was
+          such an inconsistency, in which case please rebase onto master or merge down from
+          master to your branch.
+
+          If neither of those is the case, the check can be bypassed, but we should also
+          ensure the instability is addressed.
+          EOMARKDOWN
+          )
+
+          make_summary () {
+              echo "$SUMMARY_HELP"
+              echo
+              echo "----"
+              echo
+              echo "Diff follows:"
+              echo
+              echo '```'
+              git diff || true
+              echo '```'
+          }
+
+          git diff --quiet --exit-code || {
+              # Job Summaries are cool, but echo to the job log as well, because
+              # that's where the PR checks will actually link to.
+              make_summary | tee -a $GITHUB_STEP_SUMMARY
+              exit 1
+          }
