@@ -14,6 +14,7 @@ from openedx.core.djangolib.js_utils import (
 <%static:webpack entry="ProgramDetailsFactory">
 ProgramDetailsFactory({
     programData: ${program_data | n, dump_js_escaped_json},
+    subscriptionData: ${program_subscription_data | n, dump_js_escaped_json},
     courseData: ${course_data | n, dump_js_escaped_json},
     certificateData: ${certificate_data | n, dump_js_escaped_json},
     urls: ${urls | n, dump_js_escaped_json},
@@ -21,6 +22,7 @@ ProgramDetailsFactory({
     industryPathways: ${industry_pathways | n, dump_js_escaped_json},
     creditPathways: ${credit_pathways | n, dump_js_escaped_json},
     programTabViewEnabled: ${program_tab_view_enabled | n, dump_js_escaped_json},
+    isUserB2CSubscriptionsEnabled: ${is_user_b2c_subscriptions_enabled | n, dump_js_escaped_json},
     discussionFragment: ${discussion_fragment, | n, dump_js_escaped_json},
     live_fragment: ${live_fragment, | n, dump_js_escaped_json}
 });

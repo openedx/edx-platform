@@ -44,11 +44,17 @@ describe('Program Details Header View', () => {
                     logo_image_url: 'https://example.com/org-logo.jpg',
                 },
             ],
-            subscription_data: {
-                is_eligible_for_subscription: true,
+        },
+        subscriptionData: [
+            {
+                trial_end: '1970-01-01T03:25:45Z',
+                next_payment_date: '1970-06-03T07:12:04Z',
+                price: '100.00',
+                currency: 'USD',
                 subscription_state: 'active',
             },
-        },
+        ],
+        isSubscriptionEligible: true,
     };
 
     beforeEach(() => {
