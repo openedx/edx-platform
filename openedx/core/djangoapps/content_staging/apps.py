@@ -24,9 +24,3 @@ class ContentStagingAppConfig(AppConfig):
             },
         },
     }
-
-    def ready(self):
-        """
-        Import signal handler's module to ensure they are registered.
-        """
-        from . import signal_handlers  # pylint: disable=unused-import
