@@ -3,9 +3,10 @@ REST API views for content staging
 """
 import logging
 
-from django.db.transaction import atomic
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 import edx_api_doc_tools as apidocs
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
@@ -51,6 +52,7 @@ class StagedContentOLXEndpoint(APIView):
         })
 
 
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
 @view_auth_classes(is_authenticated=True)
 class ClipboardEndpoint(APIView):
     """
@@ -58,7 +60,6 @@ class ClipboardEndpoint(APIView):
     clipboard or to POST some content to the clipboard.
     """
 
-    @atomic
     @apidocs.schema(
         responses={
             200: UserClipboardSerializer,
@@ -112,7 +113,7 @@ class ClipboardEndpoint(APIView):
         block_data = XBlockSerializer(block)
 
         expired_ids = []
-        with atomic():
+        with transaction.atomic():
             # Mark all of the user's existing StagedContent rows as EXPIRED
             to_expire = StagedContent.objects.filter(
                 user=request.user,
