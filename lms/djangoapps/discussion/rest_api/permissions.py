@@ -109,6 +109,7 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
         "close_reason_code": is_thread and has_moderation_privilege,
         "pinned": is_thread and has_moderation_privilege,
         "read": is_thread,
+        "review_status": is_thread,
     }
     if is_thread:
         editable_fields.update({"copy_link": True})
@@ -134,6 +135,8 @@ def get_editable_fields(cc_content: Union[Thread, Comment], context: Dict) -> Se
         ),
         "anonymous": is_author and context["course"].allow_anonymous,
         "anonymous_to_peers": is_author and context["course"].allow_anonymous_to_peers,
+        "accept_review": is_thread and has_moderation_privilege,
+        "reject_review": is_thread and has_moderation_privilege,
     })
     # Return only editable fields
     return _filter_fields(editable_fields)

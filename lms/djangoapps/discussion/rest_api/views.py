@@ -636,6 +636,9 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         class docstring.
         """
         try:
+            # TODO: instead of error handling here, we should be able
+            #  to pass the threshold score from API and set the
+            #  review_status field to "pending" if the score is below the threshold
             EdenAIImageExplicitContent().clean_html(request.data["raw_body"])
         except Exception as e:
             raise ValidationError(e)

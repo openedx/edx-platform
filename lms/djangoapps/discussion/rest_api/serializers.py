@@ -47,6 +47,7 @@ User = get_user_model()
 
 CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
 EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
+REVIEW_STATUS_CHOICES = getattr(settings, "DISCUSSION_CONTENT_REVIEW_STATUS_CODES", {})
 
 
 class TopicOrdering(TextChoices):
@@ -115,6 +116,15 @@ def validate_close_reason_code(value):
     if value not in CLOSE_REASON_CODES:
         raise ValidationError("Invalid close reason code")
 
+
+def validate_review_status(value):
+    """
+    Validate that the value is a valid review status.
+
+    Raises: ValidationError
+    """
+    if value not in REVIEW_STATUS_CHOICES:
+        raise ValidationError("Invalid review status")
 
 def _validate_privileged_access(context: Dict) -> bool:
     """
@@ -314,6 +324,7 @@ class ThreadSerializer(_ContentSerializer):
     has_endorsed = serializers.BooleanField(source="endorsed", read_only=True)
     response_count = serializers.IntegerField(source="resp_total", read_only=True, required=False)
     close_reason_code = serializers.CharField(required=False, validators=[validate_close_reason_code])
+    review_status = serializers.CharField(required=False, validators=[validate_review_status])
     close_reason = serializers.SerializerMethodField()
     closed_by = serializers.SerializerMethodField()
 
@@ -339,6 +350,12 @@ class ThreadSerializer(_ContentSerializer):
         not have the pinned field set.
         """
         return bool(obj["pinned"])
+
+    def get_review_status(self, obj):
+        """
+        Returns the review status of the thread.
+        """
+        return obj.get("review_status")
 
     def get_group_name(self, obj):
         """

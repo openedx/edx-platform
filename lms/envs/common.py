@@ -5207,6 +5207,12 @@ DISCUSSION_MODERATION_CLOSE_REASON_CODES = {
     "off-topic": _("Post is off-topic"),
 }
 
+DISCUSSION_CONTENT_REVIEW_STATUS_CODES = {
+    "PENDING": _("Review pending on content"),
+    "REJECTED": _("Content violates community guidelines"),
+    "ACCEPTED": _("Content is safe"),
+}
+
 ################# Settings for edx-financial-assistance #################
 IS_ELIGIBLE_FOR_FINANCIAL_ASSISTANCE_URL = '/core/api/course_eligibility/'
 FINANCIAL_ASSISTANCE_APPLICATION_STATUS_URL = "/core/api/financial_assistance_application/status/"

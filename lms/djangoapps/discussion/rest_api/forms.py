@@ -120,7 +120,7 @@ class ThreadActionsForm(Form):
     abuse_flagged = BooleanField(required=False)
     read = BooleanField(required=False)
     pinned = BooleanField(required=False)
-
+    review_status = CharField(required=False)
 
 class CommentListGetForm(_PaginationForm):
     """

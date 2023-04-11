@@ -988,6 +988,7 @@ def get_thread_list(
         "flagged": flagged,
         "thread_type": thread_type,
         "count_flagged": count_flagged,
+        "review_content": Role.user_has_role_for_course(request.user, course_key, allowed_roles)
     }
 
     if view:
@@ -1332,6 +1333,8 @@ def _do_extra_actions(api_content, cc_content, request_fields, actions_form, con
                 _handle_read_field(api_content, form_value, context["cc_requester"], cc_content)
             elif field == "pinned":
                 _handle_pinned_field(form_value, cc_content, context["cc_requester"])
+            elif field == "review_status":
+                _handle_content_review_field(form_value, cc_content, context["cc_requester"])
             else:
                 raise ValidationError({field: ["Invalid Key"]})
 
@@ -1362,6 +1365,13 @@ def _handle_abuse_flagged_field(form_value, user, cc_content, request):
         cc_content.unFlagAbuse(user, cc_content, remove_all)
         track_discussion_unreported_event(request, course, cc_content)
 
+def _handle_content_review_field(form_value, cc_content, user):
+    """
+    mark flag content for review as rejected
+    """
+    if form_value == "ACCEPTED":
+        cc_content.reviewAccept(user, cc_content)
+    cc_content.reviewReject(user, cc_content)
 
 def _handle_voted_field(form_value, cc_content, api_content, request, context):
     """vote or undo vote on thread/comment"""
@@ -1421,6 +1431,7 @@ def create_thread(request, thread_data):
         The created thread; see discussion.rest_api.views.ThreadViewSet for more
         detail.
     """
+    thread_data["review_status"] = "PENDING" # TODO: wire this will the edenAPI response
     course_id = thread_data.get("course_id")
     from_mfe_sidebar = thread_data.pop("enable_in_context_sidebar", False)
     user = request.user

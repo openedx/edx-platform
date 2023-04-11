@@ -22,13 +22,14 @@ class Thread(models.Model):
         'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
         'context', 'last_activity_at', 'closed_by', 'close_reason_code', 'edit_history',
+        'review_status',
     ]
 
     # updateable_fields are sent in PUT requests
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id', 'read',
         'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned', 'thread_type',
-        'close_reason_code', 'edit_reason_code', 'closing_user_id', 'editing_user_id',
+        'close_reason_code', 'edit_reason_code', 'closing_user_id', 'editing_user_id', 'review_status',
     ]
 
     # metric_tag_fields are used by Datadog to record metrics about the model
@@ -198,6 +199,36 @@ class Thread(models.Model):
         )
         voteable._update_from_response(response)
 
+    def reviewAccept(self, user, voteable):
+        if voteable.type == 'thread':
+            url = _url_for_review_accept_thread(voteable.id)
+        else:
+            raise utils.CommentClientRequestError("Can only accept/reject for threads or comments")
+        params = {'user_id': user.id}
+        response = utils.perform_request(
+            'put',
+            url,
+            params,
+            metric_tags=self._metric_tags,
+            metric_action='thread.review_accepted'
+        )
+        voteable._update_from_response(response)
+
+    def reviewReject(self, user, voteable):
+        if voteable.type == 'thread':
+            url = _url_for_review_reject_thread(voteable.id)
+        else:
+            raise utils.CommentClientRequestError("Can only accept/reject for threads or comments")
+        params = {'user_id': user.id}
+        response = utils.perform_request(
+            'put',
+            url,
+            params,
+            metric_tags=self._metric_tags,
+            metric_action='thread.review_rejected'
+        )
+        voteable._update_from_response(response)
+
     def pin(self, user, thread_id):
         url = _url_for_pin_thread(thread_id)
         params = {'user_id': user.id}
@@ -229,6 +260,14 @@ def _url_for_flag_abuse_thread(thread_id):
 
 def _url_for_unflag_abuse_thread(thread_id):
     return f"{settings.PREFIX}/threads/{thread_id}/abuse_unflag"
+
+
+def _url_for_review_accept_thread(thread_id):
+    return f"{settings.PREFIX}/threads/{thread_id}/review_accept"
+
+
+def _url_for_review_reject_thread(thread_id):
+    return f"{settings.PREFIX}/threads/{thread_id}/review_reject"
 
 
 def _url_for_pin_thread(thread_id):
