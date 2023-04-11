@@ -6,7 +6,7 @@ import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import StagedContent
-from .tasks import delete_expired_staged_content
+from .tasks import delete_expired_clipboards
 
 log = logging.getLogger(__name__)
 
@@ -19,4 +19,4 @@ def trigger_celery_task(sender, instance, created, **kwargs):
     """
     if created and (instance.pk % 100) == 0:
         log.info("Enqueuing cleanup of expired StagedContent instances")
-        delete_expired_staged_content.delay()
+        delete_expired_clipboards.delay()

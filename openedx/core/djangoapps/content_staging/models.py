@@ -32,10 +32,6 @@ class StagedContent(models.Model):
     class Meta:
         verbose_name_plural = _("Staged Content")
 
-    class Purpose(models.TextChoices):
-        """ The purpose of this staged content. """
-        CLIPBOARD = "clipboard", _("Clipboard")
-
     class Status(models.TextChoices):
         """ The status of this staged content. """
         # LOADING: We are actively (asynchronously) writing the OLX and related data into the staging area.
@@ -52,8 +48,8 @@ class StagedContent(models.Model):
     # The user that created and owns this staged content. Only this user can read it.
     user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
     created = models.DateTimeField(null=False, auto_now_add=True)
-    # What this StagedContent is for
-    purpose = models.CharField(max_length=32, choices=Purpose.choices)
+    # What this StagedContent is for (e.g. "clipboard" for clipboard)
+    purpose = models.CharField(max_length=64)
     status = models.CharField(max_length=20, choices=Status.choices)
 
     block_type = models.CharField(
@@ -87,6 +83,9 @@ class UserClipboard(models.Model):
     is some OLX content that can be used in a course, such as an XBlock, a Unit,
     or a Subsection.
     """
+    # value of the "purpose" field on underlying StagedContent objects
+    PURPOSE = "clipboard"
+
     # The user that copied something. Clipboards are user-specific and
     # previously copied items are not kept.
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -115,8 +114,10 @@ class UserClipboard(models.Model):
         # These could probably be replaced with constraints in Django 4.1+
         if self.user.id != self.content.user.id:
             raise ValidationError("User ID mismatch.")
-        if self.content.purpose != StagedContent.Purpose.CLIPBOARD:
-            raise ValidationError("StagedContent.purpose must be Purpose.CLIPBOARD to use it as clipboard content.")
+        if self.content.purpose != UserClipboard.PURPOSE:
+            raise ValidationError(
+                f"StagedContent.purpose must be '{UserClipboard.PURPOSE}' to use it as clipboard content."
+            )
 
     def save(self, *args, **kwargs):
         """ Save this model instance """

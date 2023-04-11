@@ -23,6 +23,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from .block_serializer import XBlockSerializer
 from .models import StagedContent, UserClipboard
 from .serializers import UserClipboardSerializer, PostToClipboardSerializer
+from .tasks import delete_expired_clipboards
 
 log = logging.getLogger(__name__)
 
@@ -110,15 +111,23 @@ class ClipboardEndpoint(APIView):
             raise NotFound("The requested usage key does not exist.") from exc
         block_data = XBlockSerializer(block)
 
+        expired_ids = []
         with atomic():
             # Mark all of the user's existing StagedContent rows as EXPIRED
-            StagedContent.objects.filter(user=request.user, purpose=StagedContent.Purpose.CLIPBOARD).update(
+            to_expire = StagedContent.objects.filter(
+                user=request.user,
+                purpose=UserClipboard.PURPOSE,
+            ).exclude(
                 status=StagedContent.Status.EXPIRED,
             )
+            for sc in to_expire:
+                expired_ids.append(sc.id)
+                sc.status = StagedContent.Status.EXPIRED
+                sc.save()
             # Insert a new StagedContent row for this
             staged_content = StagedContent.objects.create(
                 user=request.user,
-                purpose=StagedContent.Purpose.CLIPBOARD,
+                purpose=UserClipboard.PURPOSE,
                 status=StagedContent.Status.READY,
                 block_type=usage_key.block_type,
                 olx=block_data.olx_str,
@@ -133,4 +142,10 @@ class ClipboardEndpoint(APIView):
             serializer = UserClipboardSerializer(clipboard, context={"request": request})
             # Log an event so we can analyze how this feature is used:
             log.info(f"Copied {usage_key.block_type} component \"{usage_key}\" to their clipboard.")
-            return Response(serializer.data)
+        # Enqueue a (potentially slow) task to delete the old staged content
+        try:
+            delete_expired_clipboards.delay(expired_ids)
+        except Exception as err:
+            log.exception(f"Unable to enqueue cleanup task for StagedContents: {','.join(str(x) for x in expired_ids)}")
+        # Return the response:
+        return Response(serializer.data)
