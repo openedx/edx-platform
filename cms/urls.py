@@ -173,6 +173,9 @@ urlpatterns = oauth2_urlpatterns + [
             contentstore_views.transcript_preferences_handler, name='transcript_preferences_handler'),
     re_path(fr'^transcript_credentials/{settings.COURSE_KEY_PATTERN}$',
             contentstore_views.transcript_credentials_handler, name='transcript_credentials_handler'),
+
+    re_path(fr'^transcript_ai_generated/{settings.COURSE_KEY_PATTERN}$',
+            contentstore_views.transcript_ai_generated_handler, name='transcript_ai_generated_handler'),
     path('transcript_download/', contentstore_views.transcript_download_handler, name='transcript_download_handler'),
     path('transcript_upload/', contentstore_views.transcript_upload_handler, name='transcript_upload_handler'),
     re_path(r'^transcript_delete/{}(?:/(?P<edx_video_id>[-\w]+))?(?:/(?P<language_code>[^/]*))?$'.format(
