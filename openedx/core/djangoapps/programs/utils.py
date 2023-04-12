@@ -59,7 +59,6 @@ def get_program_and_course_data(site, user, program_uuid, mobile_only=False):
     course_data = {}
     meter = ProgramProgressMeter(site, user, uuid=program_uuid)
     program_data = meter.programs[0]
-    print(f"Program data is: {program_data}")
     if program_data:
         program_data = ProgramDataExtender(program_data, user, mobile_only=mobile_only).extend()
         course_data = meter.progress(programs=[program_data], count_only=False)[0]
@@ -583,7 +582,6 @@ class ProgramDataExtender:
     def extend(self):
         """Execute extension handlers, returning the extended data."""
         self._execute('_extend')
-        print(f"self.data is: {self.data}")
         self._collect_one_click_purchase_eligibility_data()
         return self.data
 
@@ -693,7 +691,10 @@ class ProgramDataExtender:
         """
         course_uuids = {course['uuid'] for course in courses}
         # Filter the entitlements' modes with a case-insensitive match against applicable seat_types
-        entitlements = []
+        entitlements = self.user.courseentitlement_set.filter(
+            mode__in=self.data['applicable_seat_types'],
+            course_uuid__in=course_uuids,
+        )
         # Here we check the entitlements' expired_at_datetime property rather than filter by the expired_at attribute
         # to ensure that the expiration status is as up to date as possible
         entitlements = [e for e in entitlements if not e.expired_at_datetime]
@@ -711,7 +712,10 @@ class ProgramDataExtender:
         Returns:
             A subset of the given list of course dicts
         """
-        enrollments = []
+        enrollments = self.user.courseenrollment_set.filter(
+            is_active=True,
+            mode__in=self.data['applicable_seat_types']
+        )
         course_runs_with_enrollments = {str(enrollment.course_id) for enrollment in enrollments}
         courses_without_enrollments = []
         for course in courses:
@@ -725,9 +729,9 @@ class ProgramDataExtender:
         Extend the program data with data about learner's eligibility for one click purchase,
         discount data of the program and SKUs of seats that should be added to basket.
         """
-        # if 'professional' in self.data['applicable_seat_types']:
-        #     self.data['applicable_seat_types'].append('no-id-professional')
-        applicable_seat_types = {}
+        if 'professional' in self.data['applicable_seat_types']:
+            self.data['applicable_seat_types'].append('no-id-professional')
+        applicable_seat_types = {seat for seat in self.data['applicable_seat_types'] if seat != 'credit'}
 
         is_learner_eligible_for_one_click_purchase = self.data['is_program_eligible_for_one_click_purchase']
         bundle_uuid = self.data.get('uuid')
