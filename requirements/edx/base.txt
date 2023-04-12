@@ -467,7 +467,7 @@ edx-django-utils==5.3.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions==8.4.1
+edx-drf-extensions==8.5.3
     # via
     #   -r requirements/edx/base.in
     #   edx-completion
