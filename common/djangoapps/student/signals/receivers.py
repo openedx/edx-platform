@@ -24,6 +24,12 @@ from common.djangoapps.student.models import (
 from common.djangoapps.student.models_api import confirm_name_change
 from common.djangoapps.student.signals import USER_EMAIL_CHANGED
 from openedx.features.name_affirmation_api.utils import is_name_affirmation_installed
+from openedx_events.event_bus import get_producer
+from openedx_events.learning.signals import (
+    COURSE_ENROLLMENT_CREATED,
+    COURSE_ENROLLMENT_CHANGED,
+    COURSE_UNENROLLMENT_COMPLETED
+)
 
 logger = logging.getLogger(__name__)
 
@@ -101,6 +107,7 @@ def listen_for_verified_name_approved(sender, user_id, profile_name, **kwargs):
 if is_name_affirmation_installed():
     # pylint: disable=import-error
     from edx_name_affirmation.signals import VERIFIED_NAME_APPROVED
+
     VERIFIED_NAME_APPROVED.connect(listen_for_verified_name_approved)
 
 
@@ -115,5 +122,39 @@ def _listen_for_user_email_changed(sender, user, **kwargs):
         braze_client = get_braze_client()
         if braze_client:
             braze_client.track_user(attributes=attributes)
-    except Exception as exc:   # pylint: disable=broad-except
+    except Exception as exc:  # pylint: disable=broad-except
         logger.exception(f'Unable to sync new email [{email}] with Braze for user [{user_id}]')
+
+
+# Put enrollment events on the event bus.
+@receiver(COURSE_ENROLLMENT_CREATED)
+def _listen_for_course_enrollment_created(sender, user, **kwargs):
+    get_producer().send(
+        signal=COURSE_ENROLLMENT_CREATED,
+        topic='course-enrollment-created',
+        event_key_field='enrollment.id',
+        event_data={'enrollment': kwargs['enrollment']},
+        event_metadata=kwargs['metadata'],
+    )
+
+
+@receiver(COURSE_ENROLLMENT_CHANGED)
+def _listen_for_course_enrollment_changed(sender, user, **kwargs):
+    get_producer().send(
+        signal=COURSE_ENROLLMENT_CHANGED,
+        topic='course-enrollment-changed',
+        event_key_field='enrollment.id',
+        event_data={'enrollment': kwargs['enrollment']},
+        event_metadata=kwargs['metadata'],
+    )
+
+
+@receiver(COURSE_UNENROLLMENT_COMPLETED)
+def _listen_for_course_unenrollment_completed(sender, user, **kwargs):
+    get_producer().send(
+        signal=COURSE_UNENROLLMENT_COMPLETED,
+        topic='course-unenrollment-completed',
+        event_key_field='enrollment.id',
+        event_data={'enrollment': kwargs['enrollment']},
+        event_metadata=kwargs['metadata'],
+    )
