@@ -20,19 +20,24 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
+
+from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
+from openedx.core.djangoapps.django_comment_common.comment_client import Thread
 from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.util.file import store_uploaded_file
 from lms.djangoapps.course_api.blocks.api import get_blocks
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.discussion.django_comment_client import settings as cc_settings
-from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service
+from lms.djangoapps.discussion.django_comment_client.utils import get_group_id_for_comments_service, \
+    get_users_with_moderator_roles, get_users_with_roles
 from lms.djangoapps.instructor.access import update_forum_role
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_NEW_STRUCTURE_DISCUSSIONS
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangoapps.discussions.serializers import DiscussionSettingsSerializer
 from openedx.core.djangoapps.django_comment_common import comment_client
-from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role
+from openedx.core.djangoapps.django_comment_common.models import CourseDiscussionSettings, Role, \
+    FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from openedx.core.djangoapps.user_api.accounts.permissions import CanReplaceUsername, CanRetireUser
 from openedx.core.djangoapps.user_api.models import UserRetirementStatus
 from openedx.core.lib.api.authentication import BearerAuthentication, BearerAuthenticationAllowInactiveUser
@@ -80,9 +85,9 @@ from ..rest_api.serializers import (
 )
 from .utils import (
     create_blocks_params,
-    create_topics_v3_structure,
+    create_topics_v3_structure, get_course_staff_users_list, get_staff_and_moderators,
 )
-
+from ..signals.handlers import send_reported_content_email_notification
 
 log = logging.getLogger(__name__)
 
@@ -635,14 +640,39 @@ class ThreadViewSet(DeveloperErrorViewMixin, ViewSet):
         Implements the POST method for the list endpoint as described in the
         class docstring.
         """
-        try:
+        has_clean_html = EdenAIImageExplicitContent().has_clean_html(request.data["raw_body"])
+        if not has_clean_html:
             # TODO: instead of error handling here, we should be able
             #  to pass the threshold score from API and set the
             #  review_status field to "pending" if the score is below the threshold
-            EdenAIImageExplicitContent().clean_html(request.data["raw_body"])
-        except Exception as e:
-            raise ValidationError(e)
-        return Response(create_thread(request, request.data))
+            request.data['review_status'] = 'PENDING'
+        thread = create_thread(request, request.data)
+        if not has_clean_html:
+            thread_obj = Thread()
+            thread_obj.id = thread['id']
+            thread_obj.course_id = thread['course_id']
+            thread_obj.topic_id = thread['topic_id']
+            thread_obj.created_at = thread['created_at']
+            thread_obj.updated_at = thread['updated_at']
+            thread_obj.type = thread['type']
+            thread_obj.title = thread['title']
+            thread_obj.raw_body = thread['raw_body']
+            thread_obj.pinned = thread['pinned']
+            thread_obj.closed = thread['closed']
+            thread_obj.comment_count = thread['comment_count']
+            thread_obj.unread_comment_count = thread['unread_comment_count']
+            thread_obj.editable_fields = thread['editable_fields']
+            thread_obj.read = thread['read']
+            thread_obj.has_endorsed = thread['has_endorsed']
+            thread_obj.response_count = thread['response_count']
+            thread_obj.abuse_flagged_count = thread['abuse_flagged_count']
+            thread_obj.anonymous = thread['anonymous']
+            thread_obj.anonymous_to_peers = thread['anonymous_to_peers']
+            thread_obj.review_status = thread['review_status']
+
+            send_reported_content_email_notification(self.create, self.request.user, thread_obj)
+
+        return Response(thread)
 
     def partial_update(self, request, thread_id):
         """

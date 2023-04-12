@@ -5,7 +5,7 @@ from django.conf import settings
 from bs4 import BeautifulSoup
 
 log = logging.getLogger(__name__)
-TOLERANCE = 1
+TOLERANCE = 0.5
 
 
 class EdenAIImageExplicitContent:
@@ -44,7 +44,7 @@ class EdenAIImageExplicitContent:
         self.nsfw_labels(responses)
         return self.nsfw_likelihood(responses), self.nsfw_labels(responses)
 
-    def clean_html(self, html):
+    def has_clean_html(self, html):
 
         soup = BeautifulSoup(html, 'html.parser')
         img_tags = soup.find_all('img')
@@ -53,6 +53,13 @@ class EdenAIImageExplicitContent:
 
         for src in src_list:
             total, labels = self.get_nsfw_likelihood(file_url=src)
-            log.info(f"This image has a total of {total} nsfw likelihood. Labels: {labels}")
+            log.info(f""
+                     f"\n\n\n\n\n\n"
+                     f"============================================================================================\n"
+                     f"This image has a total of {total} nsfw likelihood score. Labels: {labels} \n"
+                     f"============================================================================================"
+                     f"\n\n\n\n\n\n"
+                     )
             if total > TOLERANCE:
-                raise Exception(f"This image {src} does not follow community guidelines. Please upload a different image.")
+                return False
+        return True

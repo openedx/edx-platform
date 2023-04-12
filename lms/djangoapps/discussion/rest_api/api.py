@@ -1371,7 +1371,8 @@ def _handle_content_review_field(form_value, cc_content, user):
     """
     if form_value == "ACCEPTED":
         cc_content.reviewAccept(user, cc_content)
-    cc_content.reviewReject(user, cc_content)
+    else:
+        cc_content.reviewReject(user, cc_content)
 
 def _handle_voted_field(form_value, cc_content, api_content, request, context):
     """vote or undo vote on thread/comment"""

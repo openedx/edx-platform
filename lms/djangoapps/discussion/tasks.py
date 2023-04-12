@@ -102,9 +102,9 @@ def send_ace_message_for_reported_content(context):  # lint-amnesty, pylint: dis
     moderators = get_users_with_moderator_roles(context)
     context['site'] = Site.objects.get(id=context['site_id']
                                        )
-    if not _is_content_still_reported(context):
-        log.info('Reported content is no longer in reported state. Email to moderators will not be sent.')
-        return
+    # if not _is_content_still_reported(context):
+    #     log.info('Reported content is no longer in reported state. Email to moderators will not be sent.')
+    #     return
     for moderator in moderators:
         with emulate_http_request(site=context['site'], user=User.objects.get(id=context['user_id'])):
             message_context = _build_message_context_for_reported_content(context, moderator)

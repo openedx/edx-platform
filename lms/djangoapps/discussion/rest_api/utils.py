@@ -6,9 +6,10 @@ from typing import List, Dict
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
 from django.db.models.functions import Length
+from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
-from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
+from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges, get_users_with_roles
 from openedx.core.djangoapps.django_comment_common.models import (
     Role,
     FORUM_ROLE_ADMINISTRATOR,
@@ -351,3 +352,15 @@ def get_archived_topics(filtered_topic_ids: List[str], topics: List[Dict[str, st
             if topic['id'] == topic_id and topic['usage_key'] is not None:
                 archived_topics.append(topic)
     return archived_topics
+
+
+def get_staff_and_moderators(course_id: str) -> List[User]:
+    """
+    Returns a list of staff and moderators for a course.
+    """
+    course_key = CourseKey.from_string(course_id)
+    moderators = get_users_with_roles([FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA],
+                                      course_id)
+    staff = CourseStaffRole(course_key).users_with_role()
+    admins = CourseInstructorRole(course_key).users_with_role()
+    return [moderators + staff + admins]
