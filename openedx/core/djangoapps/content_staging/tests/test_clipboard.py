@@ -171,8 +171,9 @@ class ClipboardTestCase(ModuleStoreTestCase):
 
         # Try copying the video as a non-staff user:
         html_key = course_key.make_usage_key("html", "toyhtml")
-        response = nonstaff_client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(html_key)}, format="json")
-        self.assertEqual(response.status_code, 403)
+        with self.allow_transaction_exception():
+            response = nonstaff_client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(html_key)}, format="json")
+            self.assertEqual(response.status_code, 403)
         response = nonstaff_client.get(CLIPBOARD_ENDPOINT)
         self.assertEqual(response.json()["content"], None)
 
