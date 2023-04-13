@@ -79,7 +79,8 @@ def test_unenroll_by_email_multi_tenant(settings):
     with with_organization_context(site_color='red1') as red_org:
         red_user = create_org_user(red_org)
         CourseEnrollmentFactory(user=red_user, course_id=course_key)
-        assert CourseEnrollment.unenroll_by_email(red_user.email, course_key), 'Should be able to unenroll in same site'
-        assert not CourseEnrollment.is_enrolled(red_user, course_key)
+        CourseEnrollment.unenroll_by_email(red_user.email, course_key)
+        assert not CourseEnrollment.is_enrolled(red_user, course_key), 'Should unenroll in same sites'
 
+        CourseEnrollment.unenroll_by_email(blue_user.email, course_key)
         assert CourseEnrollment.is_enrolled(blue_user, course_key), 'Should not unenroll in other sites'
