@@ -1,6 +1,17 @@
 """
 Bookmarks Python API.
 """
+# Why does this file exist instead of just using api.py?
+# (1) to expose BookmarkService (from .services import BookmarksService) in
+#     api.py; its implementation in services.py requires code from api.py. It
+#     caused a circular import error unless we put the API implementation into
+#     a separate file like this.
+# (2) The code below imports a number of symbols that shouldn't be part of the
+#     public API (DEFAULT_FIELDS, OPTIONAL_FIELDS, Bookmark, BookmarkSerializer,
+#     modulestore, ItemNotFoundError, settings, tracker) and it's much easier
+#     to make them private this way (importing them into api_impl.py without
+#     changes) than it is to import them with an underscore prefix and change
+#     the code to use the prefixed imports.
 from django.conf import settings
 from eventtracking import tracker
 
