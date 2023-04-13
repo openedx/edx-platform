@@ -1656,7 +1656,10 @@ class CourseEnrollment(models.Model):
         RequestCache('get_enrollment').clear()
 
         try:
-            user = User.objects.get(email=email)
+            if settings.FEATURES.get('APPSEMBLER_MULTI_TENANT_EMAILS', False):
+                user = CourseEnrollment.get_user_by_email_within_organization(email)
+            else:
+                user = User.objects.get(email=email)
             return cls.unenroll(user, course_id)
         except User.DoesNotExist:
             log.error(
