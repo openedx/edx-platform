@@ -841,6 +841,8 @@ XQUEUE_INTERFACE = {
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
+    'edx_django_utils.security.csp.middleware.content_security_policy_middleware',
+
     'crum.CurrentRequestUserMiddleware',
 
     # Resets the request cache.
