@@ -6,7 +6,7 @@ import logging
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
-from urllib.parse import urlencode, urljoin, urlparse, urlunparse
+from urllib.parse import urljoin, urlparse, urlunparse
 
 import requests
 from dateutil.parser import parse
@@ -65,26 +65,11 @@ def get_program_and_course_data(site, user, program_uuid, mobile_only=False):
     return program_data, course_data
 
 
-def get_buy_subscription_url(*skus, program_uuid=None):
-    """
-    Construct the url for the subscription purchase page.
-    """
-    query_params = {'sku': skus}
-    print(f"Query Params are: {query_params}")
-    url = '{buy_subscription_path}/{program_uuid}/?{query_params}'.format(
-        buy_subscription_path=settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL,
-        program_uuid=program_uuid,
-        query_params=urlencode(query_params, doseq=True),
-    )
-    return url
-
-
 def get_program_urls(program_data):
     """Returns important urls of program."""
     from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
     program_uuid = program_data.get('uuid')
     skus = program_data.get('skus')
-    subscription_eligible = program_data.get('subscription_eligible')
     ecommerce_service = EcommerceService()
 
     # TODO: Don't have business logic of course-certificate==record-available here in LMS.
@@ -100,11 +85,9 @@ def get_program_urls(program_data):
         'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
         'buy_button_url': ecommerce_service.get_checkout_page_url(*skus),
         'program_record_url': program_record_url,
-        'buy_subscription_url': get_buy_subscription_url(
-            *skus, program_uuid=program_uuid) if subscription_eligible else None,
-        'manage_subscription_url': settings.ORDER_HISTORY_MICROFRONTEND_URL if subscription_eligible else None,
-        'subscriptions_learner_help_center_url': (settings.SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL
-                                                  if subscription_eligible else None,)
+        'buy_subscription_url': settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL,
+        'manage_subscription_url': settings.ORDER_HISTORY_MICROFRONTEND_URL,
+        'subscriptions_learner_help_center_url': settings.SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL
     }
     return urls
 
@@ -1098,7 +1081,7 @@ def get_programs_subscription_data(user, program_uuid=None):
                 next_page = response.json().get('next')
     except Exception as exc:  # pylint: disable=broad-except
         log.exception(
-            f"B2C_SUBSCRIPTIONS: Failed to retrieve Program Subscription Data with error: {exc}"
-            + f" for user: {user} and for program_uuid: {str(program_uuid)}" if program_uuid is not None else ""
+            f"B2C_SUBSCRIPTIONS: Failed to retrieve Program Subscription Data for user: {user} with error: {exc}"
+            + f" for program_uuid: {str(program_uuid)}" if program_uuid is not None else ""
         )
     return subscription_data

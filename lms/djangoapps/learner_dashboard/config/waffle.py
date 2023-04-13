@@ -9,7 +9,7 @@ from edx_toggles.toggles import WaffleFlag
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to enable new Program discussion experience in tab view for course.
-#    This flag is used to decide weather we need to render program data in "tab" view or simple view.
+#    This flag is used to decide whether we need to render program data in "tab" view or simple view.
 #    In the new tab view, we have tabs like "journey", "live", "discussions"
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-08-25
@@ -26,7 +26,7 @@ ENABLE_PROGRAM_TAB_VIEW = WaffleFlag(
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to enable new Masters Program discussion experience for masters program.
-#    This flag is used to decide weather we need to render master program data in "tab" view or simple view.
+#    This flag is used to decide whether we need to render master program data in "tab" view or simple view.
 #    In the new tab view, we have tabs like "journey", "live", "discussions"
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2021-10-19
@@ -42,10 +42,10 @@ ENABLE_MASTERS_PROGRAM_TAB_VIEW = WaffleFlag(
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
 # .. toggle_description: Waffle flag to enable new B2C Subscriptions Program data.
-#    This flag is used to decide weather we need to program subscription related properties in program listing and
-#    detail pages.
+#    This flag is used to decide whether we need to enable program subscription related properties in program listing
+#    and detail pages.
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-04-07
+# .. toggle_creation_date: 2023-04-13
 # .. toggle_target_removal_date: 2023-07-01
 # .. toggle_warning: When the flag is ON, the new B2C Subscriptions Program data will be enabled in program listing
 #    and detail pages.
