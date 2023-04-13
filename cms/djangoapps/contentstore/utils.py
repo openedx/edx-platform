@@ -733,6 +733,7 @@ def translation_language(language):
     else:
         yield
 
+
 def get_subsections_by_assignment_type(course_key):
     """
     Construct a dictionary mapping each found assignment type in the course
