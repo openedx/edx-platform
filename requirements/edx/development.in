@@ -20,3 +20,6 @@ mypy                                    # static type checking
 pywatchman                              # More efficient checking for runserver reload trigger events
 sphinxcontrib-openapi[markdown]         # OpenAPI (fka Swagger) spec renderer for Sphinx
 vulture                                 # Detects possible dead/unused code, used in scripts/find-dead-code.sh
+openai-whisper
+ffmpeg-python
+setuptools-rust
