@@ -7,7 +7,9 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 graders: null,  // CourseGraderCollection
                 grade_cutoffs: null,  // CourseGradeCutoff model
                 grace_period: null, // either null or { hours: n, minutes: m, ...}
-                minimum_grade_credit: null // either null or percentage
+                minimum_grade_credit: null, // either null or percentage
+                assignment_count_info: [], // Object with keys mapping assignment type names to a list of
+                                            //assignment display names
             },
             parse: function(attributes) {
                 if (attributes.graders) {

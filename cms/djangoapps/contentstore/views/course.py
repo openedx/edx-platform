@@ -100,6 +100,7 @@ from ..utils import (
     add_instructor,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
+    get_subsections_by_assignment_type,
     initialize_permissions,
     remove_all_instructors,
     reverse_course_url,
@@ -1343,6 +1344,7 @@ def grading_handler(request, course_key_string, grader_index=None):
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             course_details = CourseGradingModel.fetch(course_key)
+            course_assignment_lists = get_subsections_by_assignment_type(course_key)
             return render_to_response('settings_graders.html', {
                 'context_course': course_block,
                 'course_locator': course_key,
@@ -1350,6 +1352,7 @@ def grading_handler(request, course_key_string, grader_index=None):
                 'grading_url': reverse_course_url('grading_handler', course_key),
                 'is_credit_course': is_credit_course(course_key),
                 'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
+                'course_assignment_lists': dict(course_assignment_lists)
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
