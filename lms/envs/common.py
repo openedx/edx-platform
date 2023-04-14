@@ -2117,6 +2117,8 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
+    'edx_django_utils.security.csp.middleware.content_security_policy_middleware',
+
     'crum.CurrentRequestUserMiddleware',
 
     # Resets the request cache.
@@ -3263,6 +3265,9 @@ INSTALLED_APPS = [
 
     # MFE API
     'lms.djangoapps.mfe_config_api',
+
+    # Notifications
+    'openedx.core.djangoapps.notifications',
 ]
 
 ######################### CSRF #########################################
@@ -5301,3 +5306,10 @@ ENTERPRISE_PLOTLY_SECRET = "I am a secret"
 ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 
 AVAILABLE_DISCUSSION_TOURS = []
+
+######################## Subscriptions API SETTINGS ########################
+SUBSCRIPTIONS_ROOT_URL = ""
+SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
+
+SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
+SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"

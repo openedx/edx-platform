@@ -450,7 +450,7 @@ edx-django-release-util==1.2.0
     #   openedx-blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.in
-edx-django-utils==5.3.0
+edx-django-utils==5.4.0
     # via
     #   -r requirements/edx/base.in
     #   django-config-models
@@ -467,7 +467,7 @@ edx-django-utils==5.3.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions==8.4.1
+edx-drf-extensions==8.5.3
     # via
     #   -r requirements/edx/base.in
     #   edx-completion
@@ -479,7 +479,7 @@ edx-drf-extensions==8.4.1
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.61.9
+edx-enterprise==3.61.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -671,7 +671,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==8.0.1
+lti-consumer-xblock==9.0.2
     # via -r requirements/edx/base.in
 lxml==4.9.2
     # via

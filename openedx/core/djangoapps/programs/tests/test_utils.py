@@ -8,27 +8,25 @@ from copy import deepcopy
 from unittest import mock
 
 import ddt
-from edx_toggles.toggles.testutils import override_waffle_switch
 import httpretty
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+from edx_toggles.toggles.testutils import override_waffle_switch
+from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
 from pytz import utc
 from testfixtures import LogCapture
-from xmodule.data import CertificatesDisplayBehaviors
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.date_utils import strftime_localized
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from lms.djangoapps.commerce.utils import EcommerceService
-from opaque_keys.edx.keys import CourseKey  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.core.djangoapps.catalog.tests.factories import (
     CourseFactory,
     CourseRunFactory,
@@ -47,12 +45,15 @@ from openedx.core.djangoapps.programs.utils import (
     ProgramProgressMeter,
     get_certificates,
     get_logged_in_program_certificate_url,
+    get_programs_subscription_data,
     is_user_enrolled_in_program_type
 )
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from common.djangoapps.student.tests.factories import AnonymousUserFactory, CourseEnrollmentFactory, UserFactory
-from common.djangoapps.util.date_utils import strftime_localized
+from xmodule.data import CertificatesDisplayBehaviors
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 ECOMMERCE_URL_ROOT = 'https://ecommerce.example.com'
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
@@ -1729,3 +1730,71 @@ class TestProgramEnrollment(SharedModuleStoreTestCase):
         )
         mock_get_programs_by_type.return_value = [self.program]
         assert is_user_enrolled_in_program_type(user=self.user, program_type_slug=self.MICROBACHELORS)
+
+
+@skip_unless_lms
+class TestGetProgramsSubscriptionData(TestCase):
+    """
+    Tests for the get_programs_subscription_data utility function.
+    """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.mock_program_subscription_data = [
+            {'id': uuid.uuid4(), 'resource_id': uuid.uuid4(),
+             'resource_type': 'program', 'resource_data': None, 'trial_end': '1970-01-01T00:02:03Z',
+             'price': '100.00', 'currency': 'USD', 'sub_type': 'stripe', 'identifier': 'dummy_1',
+             'next_payment_date': '1970-01-01T00:02:03Z', 'status': 'active',
+             'customer': 1, 'subscription_state': 'active'},
+            {'id': uuid.uuid4(), 'resource_id': uuid.uuid4(),
+             'resource_type': 'program', 'resource_data': None, 'trial_end': '1970-01-01T03:25:12Z',
+             'price': '1000.00', 'currency': 'USD', 'sub_type': 'stripe', 'identifier': 'dummy_2',
+             'next_payment_date': '1970-05-23T12:05:21Z', 'status': 'subscription_initiated',
+             'customer': 1, 'subscription_state': 'notStarted'}
+        ]
+
+    @mock.patch(UTILS_MODULE + ".get_subscription_api_client")
+    @mock.patch(UTILS_MODULE + ".log.info")
+    def test_get_programs_subscription_data(self, mock_log, mock_get_subscription_api_client):
+        # mock return values
+        mock_client = mock.Mock()
+        mock_get_subscription_api_client.return_value = mock_client
+        mock_response = {"results": self.mock_program_subscription_data, "next": None}
+        mock_client.get.return_value = mock.Mock(json=lambda: mock_response, raise_for_status=lambda: None)
+
+        # call the function
+        user = mock.Mock()
+        result = get_programs_subscription_data(user)
+
+        # assert expected behavior
+        mock_log.assert_called_once_with(f"B2C_SUBSCRIPTIONS: Requesting Program subscription data for user: {user}")
+        mock_get_subscription_api_client.assert_called_once_with(user)
+        mock_client.get.assert_called_once_with(settings.SUBSCRIPTIONS_API_PATH, params={"page": 1})
+        assert result == self.mock_program_subscription_data
+
+    @mock.patch(UTILS_MODULE + ".get_subscription_api_client")
+    @mock.patch(UTILS_MODULE + ".log.info")
+    def test_get_programs_subscription_data_with_uuid(self, mock_log, mock_get_subscription_api_client):
+        mock_client = mock.Mock()
+        mock_get_subscription_api_client.return_value = mock_client
+        subscription_data = self.mock_program_subscription_data[0]
+        program_uuid = subscription_data['resource_id']
+
+        mock_response = {"results": subscription_data, "next": None}
+        mock_client.get.return_value = mock.Mock(json=lambda: mock_response, raise_for_status=lambda: None)
+
+        user = mock.Mock()
+        result = get_programs_subscription_data(user, program_uuid=program_uuid)
+
+        mock_log.assert_called_once_with(f"B2C_SUBSCRIPTIONS: Requesting Program subscription data for user: {user}"
+                                         f" for program_uuid: {str(program_uuid)}")
+        mock_get_subscription_api_client.assert_called_once_with(user)
+        mock_client.get.assert_called_once_with(
+            settings.SUBSCRIPTIONS_API_PATH,
+            params={
+                "most_active_and_recent": True,
+                "resource_id": program_uuid,
+            }
+        )
+        assert result == subscription_data

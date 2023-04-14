@@ -120,7 +120,7 @@ class TestAboutPageRecommendationsView(TestRecommendationsBase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.data, None)
 
-    @mock.patch("lms.djangoapps.learner_recommendations.views.segment.track")
+    @mock.patch("lms.djangoapps.learner_dashboard.api.v0.views.segment.track")
     @mock.patch(
         "lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations"
     )
