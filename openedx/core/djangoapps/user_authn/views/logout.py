@@ -64,6 +64,11 @@ class LogoutView(TemplateView):
             target_url = bleach.clean(
                 parse.unquote(parse.quote_plus(target_url))
             )
+            # Check if the target_url starts with a valid protocol (http or https)
+            valid_url_pattern = re.compile(r'^(http|https)://', re.IGNORECASE)
+            if not valid_url_pattern.match(target_url):
+                # If the target_url doesn't start with a valid protocol, either use a default URL or raise an error
+                target_url = self.default_target
 
         use_target_url = target_url and is_safe_login_or_logout_redirect(
             redirect_to=target_url,
