@@ -6,7 +6,7 @@ on:
       - 'pearson-release/olive.main'
 
 jobs:
-  docker:
+  Build:
     runs-on: ubuntu-latest
     steps:
 
@@ -21,9 +21,9 @@ jobs:
         with:
           python-version: ${{ vars.BUILD_PYTHON_VERSION }}
           tutor-version: ${{ vars.BUILD_TUTOR_VERSION }}
-          path-image-to-be-built: '/env/build/openedx'
-          repository-name: ${{ vars.BUILD_MAIN_REPOSITORY_NAME }}
-          image-name: ${{ vars.BUILD_MAIN_IMAGE_NAME }}
+          path-image-to-be-built: 'env/build/openedx'
+          organization-name: ${{ vars.BUILD_ORGANIZATION_NAME }}
+          repository-name: ${{ vars.BUILD_REPOSITORY_NAME }}
           image-tag: ${{ vars.BUILD_TUTOR_VERSION }}-${{ steps.current-time.outputs.formattedTime }}
           docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
           docker-token: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -31,6 +31,8 @@ jobs:
           gh-access-token: ${{ secrets.GH_PAT }}
           theme-repository: ${{ vars.BUILD_THEME_REPOSITORY }}
           theme-branch: ${{ vars.BUILD_THEME_BRANCH }}
+          tutor-pearson-plugin-url: ${{ vars.TUTOR_PEARSON_PLUGIN_URL }}
+          tutor-pearson-plugin-name: 'pearson-plugin-edxapp-prod'
           extra-private-requirements: true
           private-repositories: ${{ vars.BUILD_PRIVATE_REPOSITORIES }}
           branches: ${{ vars.BUILD_BRANCHES }}
