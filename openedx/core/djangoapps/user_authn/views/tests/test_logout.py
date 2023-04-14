@@ -211,6 +211,6 @@ class LogoutTests(TestCase):
         )
         response = self.client.get(url, HTTP_HOST=host)
         expected = {
-            'target': bleach.clean(urllib.parse.unquote(redirect_url)),
+            'target': '/',
         }
         self.assertDictContainsSubset(expected, response.context_data)

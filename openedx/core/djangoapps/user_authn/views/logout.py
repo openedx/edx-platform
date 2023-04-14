@@ -3,6 +3,7 @@
 
 import re
 import bleach
+from urllib.parse import urlparse
 
 import six.moves.urllib.parse as parse  # pylint: disable=import-error
 from django.conf import settings
@@ -15,7 +16,6 @@ from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: dis
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from third_party_auth import pipeline as tpa_pipeline
-
 
 from openedx.core.djangoapps.appsembler.tahoe_idp import helpers as tahoe_idp_helpers
 
@@ -64,10 +64,12 @@ class LogoutView(TemplateView):
             target_url = bleach.clean(
                 parse.unquote(parse.quote_plus(target_url))
             )
-            # Check if the target_url starts with a valid protocol (http or https)
+            parsed_url = urlparse(target_url)
             valid_url_pattern = re.compile(r'^(http|https)://', re.IGNORECASE)
-            if not valid_url_pattern.match(target_url):
-                # If the target_url doesn't start with a valid protocol, either use a default URL or raise an error
+
+            # Allow URLs starting with http or https, as well as relative URLs
+            if parsed_url.scheme not in ('http', 'https') and not valid_url_pattern.match(target_url) and not parsed_url.path.startswith('/'):
+                # If the target_url doesn't start with a valid protocol or is not a relative URL, either use a default URL or raise an error
                 target_url = self.default_target
 
         use_target_url = target_url and is_safe_login_or_logout_redirect(
