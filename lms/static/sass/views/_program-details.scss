@@ -108,9 +108,11 @@ $btn-color-primary: $primary-dark;
     font-family: 'Open Sans';
     font-weight: normal;
     flex-wrap: wrap;
+    flex-direction: column;
     padding: 40px 10px 35px;
 
     @include media-breakpoint-up(md) {
+      flex-direction: row;
       padding: {
         left: 30px;
         right: 30px;
@@ -197,10 +199,12 @@ $btn-color-primary: $primary-dark;
 
     .authoring-organizations {
       text-align: center;
-      display: flex;
+      display: block;
+      padding-left: 24px;
+      width: fit-content;
 
       @include media-breakpoint-up(md) {
-        display: block;
+        padding-left: 0px;
       }
 
       .heading {
@@ -216,15 +220,16 @@ $btn-color-primary: $primary-dark;
         }
       }
 
+      .orgs .org-logo {
+        height: 40px;
+      }
+
       @include media-breakpoint-up(md) {
         margin: initial;
         width: 30%;
 
         .orgs .org-logo {
           @include margin-left(2.5%);
-
-          width: 46.5%;
-          height: auto;
         }
       }
 
@@ -279,11 +284,7 @@ $btn-color-primary: $primary-dark;
       @include margin-left(15px);
 
       font-size: 0.9375em;
-      width: 310px;
-
-      @include media-breakpoint-up(sm) {
-        width: auto;
-      }
+      width: auto;
 
       .motivating-heading {
         margin-bottom: 0;
@@ -638,7 +639,7 @@ $btn-color-primary: $primary-dark;
 
 // CSS for the program sidebar
 .program-sidebar {
-  padding: $baseline*1.5 $baseline*0.5;
+  padding: 40px 40px;
 
   .program-record {
     text-align: left;
@@ -649,11 +650,7 @@ $btn-color-primary: $primary-dark;
     @include margin-left($baseline*0.75);
 
     font-size: 0.9375em;
-    width: $baseline*15.5;
-
-    @include media-breakpoint-up(sm) {
-      width: auto;
-    }
+    width: auto;
 
     .motivating-message {
       color: #414141;
@@ -688,12 +685,9 @@ $btn-color-primary: $primary-dark;
   .pathway-wrapper {
     @include margin-left($baseline*0.75);
 
-    width: $baseline*15.5;
+    width: auto;
     border-bottom: 1px solid $gray-light3;
 
-    @include media-breakpoint-up(sm) {
-      width: auto;
-    }
 
     .pathway-info {
       margin: 15px 0;
@@ -715,6 +709,7 @@ $btn-color-primary: $primary-dark;
     @include float(right);
 
     width: $baseline*15;
+    padding: $baseline*1.5 $baseline*0.5;
     padding-right: $baseline*1.5;
     position: relative;
   }
@@ -729,6 +724,12 @@ $btn-color-primary: $primary-dark;
 
   @media (min-width: map-get($container-max-widths, xl)) {
     @include margin-right(calc((100% - 1180px) / 2));
+  }
+}
+
+.program-sidebar.col-md-4 {
+  @include media-breakpoint-up(md) {
+    width: 100%;
   }
 }
 
