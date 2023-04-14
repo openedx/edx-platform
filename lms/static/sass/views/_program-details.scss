@@ -727,12 +727,6 @@ $btn-color-primary: $primary-dark;
   }
 }
 
-.program-sidebar.col-md-4 {
-  @include media-breakpoint-up(md) {
-    width: 100%;
-  }
-}
-
 .certificate-heading {
   margin-bottom: 10px;
 
