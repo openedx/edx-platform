@@ -64,8 +64,8 @@ pull: ## update the Docker image used by "make shell"
 	docker pull edxops/edxapp:latest
 
 pre-requirements: ## install Python requirements for running pip-tools
-	pip install -qr requirements/pip.txt
-	pip install -qr requirements/edx/pip-tools.txt
+	pip install -r requirements/pip.txt
+	pip install -r requirements/edx/pip-tools.txt
 
 local-requirements:
 # 	edx-platform installs some Python projects from within the edx-platform repo itself.
@@ -74,7 +74,7 @@ local-requirements:
 dev-requirements: pre-requirements
 	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
 	@# of it if it does not.  Shell wildcarding can't do that with default options.
-	pip-sync -q requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
+	pip-sync requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
 	make local-requirements
 
 base-requirements: pre-requirements
@@ -118,7 +118,7 @@ $(COMMON_CONSTRAINTS_TXT):
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
 compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
-	pip install -q pip-tools
+	pip install pip-tools
 	pip-compile --allow-unsafe --upgrade -o requirements/edx/pip.txt requirements/edx/pip.in
 
 	@ export REBUILD='--rebuild'; \
@@ -130,8 +130,8 @@ compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements 
 		export REBUILD=''; \
 	done
 
-	pip install -qr requirements/edx/pip.txt
-	pip install -qr requirements/edx/pip-tools.txt
+	pip install -r requirements/edx/pip.txt
+	pip install -r requirements/edx/pip-tools.txt
 
 upgrade: pre-requirements  ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
