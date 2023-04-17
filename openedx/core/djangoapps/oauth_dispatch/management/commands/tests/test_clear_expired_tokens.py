@@ -102,18 +102,20 @@ class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=mis
         initial_count = 5
         now = timezone.now()
         expires = now - timedelta(days=1)
+        refresh_expire_cutoff = now - timedelta(seconds=3600)
         users = UserFactory.create_batch(initial_count)
         for user in users:
             application = factories.ApplicationFactory(user=user)
             factories.AccessTokenFactory(user=user, application=application, expires=expires)
-        assert AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now).count() == initial_count
+        assert AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=refresh_expire_cutoff).count()\
+               == initial_count
         original_delete = QuerySet.delete
         QuerySet.delete = counter(QuerySet.delete)
         try:
             call_command('edx_clear_expired_tokens', batch_size=1, sleep_time=0)
             # four being the number of tables we'll end up unnecessarily calling .delete on once
             assert QuerySet.delete.invocations == initial_count + 4  # pylint: disable=no-member
-            assert AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now).count() == 0
+            assert AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=refresh_expire_cutoff).count() == 0
         finally:
             QuerySet.delete = original_delete
 
