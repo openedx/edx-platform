@@ -65,9 +65,6 @@ jobs:
         pip install --no-binary mysqlclient mysqlclient
         pip uninstall -y xmlsec
         pip install --no-binary xmlsec xmlsec
-        pip uninstall -y MYSQL-python
-        pip install MYSQL-python
-
 
     - name: Initiate Services
       run: |
@@ -86,6 +83,7 @@ jobs:
       env:
         LMS_CFG: lms/envs/bok_choy.yml
       run: |
+        sudo apt-get install libmysqlclient-dev
         echo "CREATE DATABASE IF NOT EXISTS edxtest;" | sudo mysql -u root
         echo "CREATE DATABASE IF NOT EXISTS student_module_history_test;" | sudo mysql -u root
 
