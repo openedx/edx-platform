@@ -841,6 +841,8 @@ XQUEUE_INTERFACE = {
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
+    'edx_django_utils.security.csp.middleware.content_security_policy_middleware',
+
     'crum.CurrentRequestUserMiddleware',
 
     # Resets the request cache.
@@ -1631,6 +1633,9 @@ INSTALLED_APPS = [
 
     # Discussion
     'openedx.core.djangoapps.django_comment_common',
+
+    # Notifications
+    'openedx.core.djangoapps.notifications',
 
     # for course creator table
     'django.contrib.admin',

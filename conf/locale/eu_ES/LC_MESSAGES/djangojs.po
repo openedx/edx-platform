@@ -19,7 +19,7 @@
 # Abel Camacho <abelcama@gmail.com>, 2015
 # Pedro Lonbide <plonbide@gmail.com>, 2015
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Basque (Spain) (https://www.transifex.com/open-edx/teams/6205/eu_ES/).
+# edX community translations have been downloaded from Basque (Spain) (https://app.transifex.com/open-edx/teams/6205/eu_ES/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -28,7 +28,7 @@
 # Abel Camacho <abelcama@gmail.com>, 2020
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Basque (Spain) (http://www.transifex.com/open-edx/edx-platform/language/eu_ES/)
+# edX community translations have been downloaded from Basque (Spain) (http://app.transifex.com/open-edx/edx-platform/language/eu_ES/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #

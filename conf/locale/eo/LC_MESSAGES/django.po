@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-02 20:35+0000\n"
-"PO-Revision-Date: 2023-04-02 20:36:00.673257\n"
+"POT-Creation-Date: 2023-04-09 20:35+0000\n"
+"PO-Revision-Date: 2023-04-09 20:35:51.624974\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -17060,11 +17060,21 @@ msgstr "Döwnlöäds änd tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 msgid "Download video file"
 msgstr "Döwnlöäd vïdéö fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "Shäré ön Twïttér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "Share on:"
+msgstr "Shäré ön: Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/video.html
+msgid "Twitter"
+msgstr "Twïttér Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/video.html
+msgid "Facebook"
+msgstr "Fäçéßöök Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/video.html
+msgid "Linkedin"
+msgstr "Lïnkédïn Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -18511,6 +18521,11 @@ msgstr ""
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Pöst ön Fäçéßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "Shäré ön Twïttér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."

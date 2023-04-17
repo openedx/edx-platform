@@ -136,7 +136,7 @@
 # d6910e756eb8532754192e6021dc9f83, 2015
 # d6910e756eb8532754192e6021dc9f83, 2015
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from French (https://www.transifex.com/open-edx/teams/6205/fr/).
+# edX community translations have been downloaded from French (https://app.transifex.com/open-edx/teams/6205/fr/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -148,7 +148,7 @@
 # Alexandre DS <alexandre@cleverm8.com>, 2020
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
+# edX community translations have been downloaded from French (http://app.transifex.com/open-edx/edx-platform/language/fr/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #

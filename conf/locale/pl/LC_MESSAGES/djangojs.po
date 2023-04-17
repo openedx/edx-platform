@@ -60,7 +60,7 @@
 # Sebastian <foobarbaz@gazeta.pl>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Polish (https://www.transifex.com/open-edx/teams/6205/pl/).
+# edX community translations have been downloaded from Polish (https://app.transifex.com/open-edx/teams/6205/pl/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -71,7 +71,7 @@
 # Marcin Miłek, 2022
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Polish (http://www.transifex.com/open-edx/edx-platform/language/pl/)
+# edX community translations have been downloaded from Polish (http://app.transifex.com/open-edx/edx-platform/language/pl/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #

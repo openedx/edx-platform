@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-02 20:35+0000\n"
-"PO-Revision-Date: 2023-04-02 20:36:00.673257\n"
+"POT-Creation-Date: 2023-04-09 20:35+0000\n"
+"PO-Revision-Date: 2023-04-09 20:35:51.624974\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -14748,11 +14748,21 @@ msgstr "Đøʍnløɐds ɐnd ʇɹɐnsɔɹᴉdʇs"
 msgid "Download video file"
 msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
+msgid "Share on:"
+msgstr "Sɥɐɹǝ øn:"
+
+#: lms/templates/video.html
+msgid "Twitter"
+msgstr "Ŧʍᴉʇʇǝɹ"
+
+#: lms/templates/video.html
+msgid "Facebook"
+msgstr "Fɐɔǝbøøʞ"
+
+#: lms/templates/video.html
+msgid "Linkedin"
+msgstr "Łᴉnʞǝdᴉn"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16089,6 +16099,11 @@ msgstr "Ȼlᴉɔʞ ʇɥǝ lᴉnʞ ʇø sǝǝ ɯʎ ɔǝɹʇᴉɟᴉɔɐʇǝ."
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Ᵽøsʇ øn Fɐɔǝbøøʞ"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."

@@ -882,6 +882,38 @@
         #field-course-grading-assignment-droppable {
           width: flex-grid(2, 6);
         }
+
+        .assignment-count-info {
+          padding: $baseline;
+          border-radius: 3px;
+          @extend %t-copy-sub2;
+        }
+
+        .assignment-count-warning {
+          background-color: $yellow-l4;
+
+          .assignment-count-warning-header{
+            @extend %t-copy-sub1;
+            font-weight: bold;
+            .header-warning {
+              font-weight: bolder;
+            }
+            margin-bottom: ($baseline / 2);
+          }
+
+          .assignment-count-warning-content {
+
+            ol.assignment_type_count_list {
+              list-style: auto;
+              list-style-position: inside;
+              padding-left: ($baseline*1.5);
+            }
+          }
+        }
+
+        .assignment-count-matches {
+          background-color: $green-l4;
+        }
       }
 
       .actions {

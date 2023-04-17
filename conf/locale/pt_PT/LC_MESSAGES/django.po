@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/).
+# edX community translations have been downloaded from Portuguese (Portugal) (http://app.transifex.com/open-edx/edx-platform/language/pt_PT/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -49,7 +49,7 @@
 # MS, 2016,2018
 # Rui Ribeiro <info@nau.edu.pt>, 2018-2019
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/)
+# edX community translations have been downloaded from Portuguese (Portugal) (http://app.transifex.com/open-edx/edx-platform/language/pt_PT/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -853,6 +853,9 @@ msgid ""
 "{activated_or_confirmed}{html_end}Something went wrong, please <a "
 "href=\"{support_url}\">contact support</a> to resolve this issue."
 msgstr ""
+"{html_start}{account_or_email} não pôde ser "
+"{activated_or_confirmed}{html_end}Ocorreu um erro, por favor <a "
+"href=\"{support_url}\"> contacte o suporte</a> para resolver este problema."
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -860,6 +863,7 @@ msgid ""
 "{html_start}This {account_or_email} has already been "
 "{activated_or_confirmed}.{html_end}"
 msgstr ""
+"{html_start}{account_or_email} já foi {activated_or_confirmed}.{html_end}"
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -867,6 +871,8 @@ msgid ""
 "{html_start}Success{html_end} You have {activated_or_confirmed} your "
 "{account_or_email}."
 msgstr ""
+"{html_start}Sucesso{html_end} {account_or_email} foi "
+"{activated_or_confirmed}."
 
 #: common/djangoapps/student/views/management.py
 #, python-brace-format
@@ -875,6 +881,10 @@ msgid ""
 "{account_or_email}.{html_end}You will now receive email updates and alerts "
 "from us related to the courses you are enrolled in. Sign In to continue."
 msgstr ""
+"{html_start}Sucesso! {account_or_email} foi "
+"{activated_or_confirmed}.{html_end}A partir de agora irá receber emails com "
+"atualizações e alertas relativos aos cursos em que está inscrito. Inicie "
+"sessão para continuar."
 
 #: common/djangoapps/student/views/management.py
 msgid "Valid e-mail address required."
@@ -1801,6 +1811,9 @@ msgid ""
 "engaging, high-quality %(platform_name)s courses. Note that you will not be "
 "able to log back into your account until you have activated it."
 msgstr ""
+"Está quase lá! Use o link para ativar a sua conta e aceder a cursos "
+"interessantes e de alta qualidade da %(platform_name)s. Tenha em atenção que"
+" não poderá iniciar sessão novamente na sua conta até a ativar."
 
 #: common/templates/student/edx_ace/accountactivation/email/body.txt
 #, python-format
@@ -2256,7 +2269,7 @@ msgstr "Centro de Ajuda"
 
 #: lms/djangoapps/branding/api.py
 msgid "Security"
-msgstr ""
+msgstr "Segurança"
 
 #: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
@@ -2588,6 +2601,9 @@ msgid ""
 "the honor code established by {platform_name} and has completed all of the "
 "required tasks for this course under its guidelines. "
 msgstr ""
+"Um certificado {cert_type} significa que um estudante concordou em cumprir o"
+" código de honra estabelecido por {platform_name} e completou todas as "
+"tarefas necessárias para este curso de acordo com as suas directrizes."
 
 #: lms/djangoapps/certificates/views/webview.py
 #, python-brace-format
@@ -2595,6 +2611,8 @@ msgid ""
 "A {cert_type} certificate also indicates that the identity of the learner "
 "has been checked and is valid."
 msgstr ""
+"Um certificado {cert_type} também indica que a identidade do estudante foi "
+"verificada e está válida. "
 
 #. Translators:  This text describes the 'XSeries' course certificate type.
 #. An XSeries is a collection of
@@ -2885,12 +2903,12 @@ msgstr ""
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
 msgid "Proctored Exam"
-msgstr ""
+msgstr "Exame Supervisionado"
 
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
 msgid "Timed Exam"
-msgstr ""
+msgstr "Exame Cronometrado"
 
 #: lms/djangoapps/course_api/blocks/transformers/milestones.py
 #: openedx/core/djangoapps/content/learning_sequences/api/processors/special_exams.py
@@ -2903,6 +2921,9 @@ msgid ""
 "                            There’s still time to reach your goal\n"
 "                        "
 msgstr ""
+"\n"
+"                            Ainda há tempo para alcançar o seu objetivo\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 #, python-format, python-brace-format
@@ -2915,8 +2936,17 @@ msgid_plural ""
 "                            You set a goal of learning {start_bold}%(days_per_week)s times a week in %(course_name)s{end_bold}. You're not quite there, but there's still time to reach that goal!\n"
 "                        "
 msgstr[0] ""
+"\n"
+"                           Você define uma meta de aprender {start_bold}%(days_per_week)s vez por semana em %(course_name)s{end_bold}. Você ainda não chegou lá, mas ainda dá tempo de atingir esse objetivo!\n"
+"                          "
 msgstr[1] ""
+"\n"
+"                           Você define uma meta de aprender {start_bold}%(days_per_week)s vezes por semana em %(course_name)s{end_bold}. Você ainda não chegou lá, mas ainda dá tempo de atingir esse objetivo!\n"
+"                       "
 msgstr[2] ""
+"\n"
+"                           Você define uma meta de aprender {start_bold}%(days_per_week)s vezes por semana em %(course_name)s{end_bold}. Você ainda não chegou lá, mas ainda dá tempo de atingir esse objetivo!\n"
+"                            "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -2924,6 +2954,9 @@ msgid ""
 "                                Jump back in\n"
 "                            "
 msgstr ""
+"\n"
+"                                Voltar a entrar\n"
+"                            "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -2931,6 +2964,9 @@ msgid ""
 "                            Remember, you can always change your learning goal. The best goal is one that you can stick to.\n"
 "                        "
 msgstr ""
+"\n"
+"                            Lembre-se que pode sempre alterar o seu objetivo de aprendizagem. O melhor objetivo é um que possa acompanhar.\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -2938,6 +2974,9 @@ msgid ""
 "                            Adjust my goal\n"
 "                        "
 msgstr ""
+"\n"
+"                            Ajustar o meu objetivo\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.html
 msgid ""
@@ -2945,14 +2984,17 @@ msgid ""
 "                            Unsubscribe from goal reminder emails for this course\n"
 "                        "
 msgstr ""
+"\n"
+"                            Anular a subscrição aos emails de lembrete dos objetivos deste curso\n"
+"                        "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
 msgid "You're almost there!"
-msgstr ""
+msgstr "Está quase lá!"
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
 msgid "There's still time to reach your goal"
-msgstr ""
+msgstr "Ainda há tempo para alcançar o seu objetivo"
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
 #, python-format
@@ -2961,17 +3003,22 @@ msgid ""
 "%(course_name)s. You're not quite there, but there's still time to reach "
 "that goal!"
 msgstr ""
+"Definiu um objetivo de aprendizagem de %(days_per_week)s vezes por semana em"
+" %(course_name)s. Ainda não chegou lá, mas ainda tem tempo de alcançar esse "
+"objetivo!"
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/body.txt
 msgid ""
 "Remember, you can always change your learning goal. The best goal is one "
 "that you can stick to.  "
 msgstr ""
+"Lembre-se que pode sempre alterar o seu objetivo de aprendizagem. O melhor "
+"objetivo é um que possa acompanhar. "
 
 #: lms/djangoapps/course_goals/templates/course_goals/edx_ace/goalreminder/email/subject.txt
 #, python-format
 msgid "You've almost reached your goal in %(course_name)s"
-msgstr ""
+msgstr "Está quase a alcançar o seu objetivo em %(course_name)s"
 
 #: lms/djangoapps/course_home_api/admin.py
 msgid ""
@@ -3028,6 +3075,7 @@ msgstr ""
 "Por favor contacte o administrador do seu curso ou o apoio da plataforma "
 "{platform_name} se tiver dúvidas."
 
+#: lms/djangoapps/course_home_api/outline/views.py
 #: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "O curso está completo"
@@ -3831,6 +3879,9 @@ msgid ""
 "username, full name, country, cohort, and course mode. The last two columns "
 "are optional."
 msgstr ""
+"Os dados na linha #{row_num} devem ter entre quatro e seis colunas: email, "
+"nome de utilizador, nome completo, país, grupo, e modo de curso. As duas "
+"últimas colunas são opcionais."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -3838,18 +3889,24 @@ msgid ""
 "Data in row #{row_num} must have exactly four columns: email, username, full"
 " name, and country."
 msgstr ""
+"Os dados na linha #{row_num} devem ter exatamente quatro colunas: email, "
+"nome de utilizador, nome completo, e país."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Course is not cohorted but cohort provided. Ignoring cohort assignment for "
 "all users."
 msgstr ""
+"Curso não é coorte, mas coorte fornecido. Ignorando a atribuição de coorte "
+"para todos os utilizadores."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
 msgid ""
 "Cohort name not found: {cohort}. Ignoring cohort assignment for all users."
 msgstr ""
+"Nome da coorte não encontrado: {cohort}. Ignorando a atribuição de coorte "
+"para todos os utilizadores."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -3857,6 +3914,8 @@ msgid ""
 "Invalid course mode: {mode}. Falling back to the default mode, or keeping "
 "the current mode in case the user is already enrolled."
 msgstr ""
+"Modo de curso inválido: {mode}. Voltando ao modo padrão, ou mantendo o modo "
+"atual caso o utilizador já esteja registado."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -3864,6 +3923,8 @@ msgid ""
 "Invalid course mode: {mode}.  Failling back to {default_mode}, or resetting "
 "to {default_mode} in case the user is already enrolled."
 msgstr ""
+"Modo de curso inválido: {mode}. Failback para {default_mode} ou redefinição "
+"para {default_mode} caso o utilizador já esteja inscrito."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -5291,15 +5352,15 @@ msgstr "Não pode deixar uma equipa gerida pelo instrutor."
 
 #: lms/djangoapps/user_tours/models.py
 msgid "Show existing user tour"
-msgstr ""
+msgstr "Mostrar visita guiada existente"
 
 #: lms/djangoapps/user_tours/models.py
 msgid "Show new user tour"
-msgstr ""
+msgstr "Mostrar nova visita guiada"
 
 #: lms/djangoapps/user_tours/models.py
 msgid "Do not show user tour"
-msgstr ""
+msgstr "Não mostrar visita guiada"
 
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
@@ -5435,7 +5496,7 @@ msgstr ""
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 msgid "here"
-msgstr ""
+msgstr "aqui"
 
 #: lms/templates/bulk_email/edx_ace/bulkemail/email/body.html
 msgid "unsubscribe"
@@ -5946,8 +6007,9 @@ msgstr ""
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 msgid "Enroll now"
-msgstr ""
+msgstr "Inscreva-se agora"
 
+#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
 msgid "View Course"
@@ -5955,38 +6017,38 @@ msgstr "Ver Curso"
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 msgid "Estimated 6 weeks"
-msgstr ""
+msgstr "Estimativa de 6 semanas"
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 msgid "4-6 hours per week"
-msgstr ""
+msgstr "4-6 horas por semana"
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 msgid "Self-paced"
-msgstr ""
+msgstr "Ritmo definido pelo estudante"
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 msgid "Progress at your own speed"
-msgstr ""
+msgstr "Progresso à sua velocidade"
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 msgid "Optional upgrade available"
-msgstr ""
+msgstr "Atualização opcional disponível"
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
 #, python-format
 msgid "Check out this course on %(platform_name)s."
-msgstr ""
+msgstr "Veja este curso em %(platform_name)s."
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
 #, python-format
 msgid "This email message was automatically sent by %(lms_url)s "
-msgstr ""
+msgstr "Esta mensagem email foi enviada automaticamente por %(lms_url)s"
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
 #, python-format
 msgid "%(display_name)s"
-msgstr ""
+msgstr "%(display_name)s"
 
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
@@ -6599,6 +6661,7 @@ msgstr "ACE Comum"
 msgid "Go to %(platform_name)s Home Page"
 msgstr "Ir para a Página Inicial de %(platform_name)s"
 
+#: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: cms/templates/index.html lms/templates/courseware/courses.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/navbar-not-authenticated.html
@@ -6610,7 +6673,7 @@ msgstr "Cursos"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 msgid "My Account"
-msgstr ""
+msgstr "Minha conta"
 
 #: openedx/core/djangoapps/ace_common/templates/ace_common/edx_ace/common/base_body.html
 #: themes/red-theme/lms/templates/ace_common/edx_ace/common/base_body.html
@@ -7186,21 +7249,21 @@ msgstr "Já existe um grupo com o mesmo nome."
 
 #: openedx/core/djangoapps/course_live/models.py
 msgid "If disabled, the LTI in the associated course will be disabled."
-msgstr ""
+msgstr "Se desabilitado, o LTI no curso associado será desabilitado."
 
 #: openedx/core/djangoapps/course_live/models.py
 msgid "The LTI configuration data for this course/provider."
-msgstr ""
+msgstr "Os dados de configuração de LTI para este curso/provedor."
 
 #: openedx/core/djangoapps/course_live/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "LTI provider"
-msgstr ""
+msgstr "fornecedor de LTI"
 
 #: openedx/core/djangoapps/course_live/models.py
 #: openedx/core/djangoapps/programs/models.py
 msgid "The LTI provider's id"
-msgstr ""
+msgstr "A identificação do fornecedor de LTI"
 
 #: openedx/core/djangoapps/course_live/models.py
 msgid "True, if LTI credential are provided by Org globally"
@@ -7468,16 +7531,23 @@ msgid ""
 "If enabled, discussion topics will be created for each non-graded unit in "
 "the course. A UI for discussions will show up with each unit."
 msgstr ""
+"Se ativado, serão criados tópicos de discussão para cada unidade sem "
+"avaliação do curso. Irá aparecer uma interface gráfica para discussões em "
+"cada unidade."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
 "If enabled, discussion topics will be created for graded units as well."
 msgstr ""
+"Se ativado, serão também criados tópicos de discussão para unidades de "
+"avaliação."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
 "If enabled, discussions will need to be manually enabled for each unit."
 msgstr ""
+"Se ativado, as discussões terão de ser ativadas manualmente para cada "
+"unidade."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The plugin configuration data for this context/provider."
@@ -7494,12 +7564,15 @@ msgstr "A ferramenta de discussão/id do provedor"
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Context key for context in which this discussion topic exists."
 msgstr ""
+"Chave de contexto para o contexto no qual este tópico de discussão existe."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid ""
 "Usage key for in-context discussion topic. Set to null for course-level "
 "topics."
 msgstr ""
+"Chave de uso para tópico de discussão no contexto. Defina como nulo para "
+"tópicos de nível de curso."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Title for discussion topic."
@@ -8413,6 +8486,12 @@ msgstr "Sucesso"
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Ações"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -18487,10 +18566,6 @@ msgstr "Escolas"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr ""
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Retomar o seu último curso"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"

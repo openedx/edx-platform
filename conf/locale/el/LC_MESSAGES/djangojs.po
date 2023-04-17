@@ -41,7 +41,7 @@
 # Theofilos Chamalis <theofxam@gmail.com>, 2014-2015
 # Vassia Kouremenou <Vassiacat@hotmail.com>, 2016
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Greek (https://www.transifex.com/open-edx/teams/6205/el/).
+# edX community translations have been downloaded from Greek (https://app.transifex.com/open-edx/teams/6205/el/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -51,7 +51,7 @@
 # Chris Nikolo <dr_dreezhellas@yahoo.com>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/)
+# edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #

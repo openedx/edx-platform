@@ -177,6 +177,7 @@
       "openedx/core/djangoapps/config_model_utils/",
       "openedx/core/djangoapps/content/",
       "openedx/core/djangoapps/content_libraries/",
+      "openedx/core/djangoapps/content_staging/",
       "openedx/core/djangoapps/contentserver/",
       "openedx/core/djangoapps/cookie_metadata/",
       "openedx/core/djangoapps/course_apps/",

@@ -64,7 +64,6 @@ attrs==22.2.0
     #   lti-consumer-xblock
     #   openedx-blockstore
     #   openedx-events
-    #   outcome
     #   pytest
 babel==2.11.0
     # via
@@ -555,7 +554,7 @@ edx-django-release-util==1.2.0
     #   openedx-blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.txt
-edx-django-utils==5.2.0
+edx-django-utils==5.4.0
     # via
     #   -r requirements/edx/base.txt
     #   django-config-models
@@ -572,7 +571,7 @@ edx-django-utils==5.2.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions==8.4.1
+edx-drf-extensions==8.5.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
@@ -584,7 +583,7 @@ edx-drf-extensions==8.4.1
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.61.9
+edx-enterprise==3.61.11
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -864,7 +863,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==8.0.1
+lti-consumer-xblock==9.0.2
     # via -r requirements/edx/base.txt
 lxml==4.9.2
     # via
