@@ -65,6 +65,9 @@ jobs:
         pip install --no-binary mysqlclient mysqlclient
         pip uninstall -y xmlsec
         pip install --no-binary xmlsec xmlsec
+        pip uninstall -y MYSQL-python
+        pip install MYSQL-python
+
 
     - name: Initiate Services
       run: |
