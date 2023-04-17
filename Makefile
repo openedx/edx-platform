@@ -64,8 +64,8 @@ pull: ## update the Docker image used by "make shell"
 	docker pull edxops/edxapp:latest
 
 pre-requirements: ## install Python requirements for running pip-tools
-	pip install -qr requirements/pip.txt
-	pip install -qr requirements/edx/pip-tools.txt
+	pip install -r requirements/pip.txt
+	pip install -r requirements/pip-tools.txt
 
 local-requirements:
 # 	edx-platform installs some Python projects from within the edx-platform repo itself.
@@ -74,7 +74,7 @@ local-requirements:
 dev-requirements: pre-requirements
 	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
 	@# of it if it does not.  Shell wildcarding can't do that with default options.
-	pip-sync -q requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
+	pip-sync requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
 	make local-requirements
 
 base-requirements: pre-requirements
@@ -96,7 +96,6 @@ shell: ## launch a bash shell in a Docker container with all edx-platform depend
 
 # Order is very important in this list: files must appear after everything they include!
 REQ_FILES = \
-	requirements/edx/pip-tools \
 	requirements/edx/coverage \
 	requirements/edx/doc \
 	requirements/edx/paver \
@@ -117,23 +116,26 @@ $(COMMON_CONSTRAINTS_TXT):
 	echo "$(COMMON_CONSTRAINTS_TEMP_COMMENT)" | cat - $(@) > temp && mv temp $(@)
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
-compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
-	pip install -q pip-tools
-	pip-compile --allow-unsafe --upgrade -o requirements/edx/pip.txt requirements/edx/pip.in
+compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
+	@# Bootstrapping: Rebuild pip and pip-tools first, and then install them
+	@# so that if there are any failures we'll know now, rather than the next
+	@# time someone tries to use the outputs.
+	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
+	pip install -r requirements/pip.txt
+
+	pip-compile -v ${COMPILE_OPTS} -o requirements/pip-tools.txt requirements/pip-tools.in
+	pip install -r requirements/pip-tools.txt
 
 	@ export REBUILD='--rebuild'; \
 	for f in $(REQ_FILES); do \
 		echo ; \
 		echo "== $$f ===============================" ; \
-		echo "pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in"; \
-		pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
+		echo "pip-compile -v $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in"; \
+		pip-compile -v $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
 		export REBUILD=''; \
 	done
 
-	pip install -qr requirements/edx/pip.txt
-	pip install -qr requirements/edx/pip-tools.txt
-
-upgrade: pre-requirements  ## update the pip requirements files to use the latest releases satisfying our constraints
+upgrade:  ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
 
 check-types: ## run static type-checking tests
