@@ -15,10 +15,9 @@ directly in the requirements directory.)
 Upgrading/downgrading just one dependency
 -----------------------------------------
 
-Want to upgrade just *one* dependency without pulling in other upgrades? Here's how:
+Want to upgrade just *one* dependency without pulling in other upgrades? You can use the ``upgrade-package`` make target. Here's an example of how you would do that with the ``ecommerce`` package::
 
-1. Change your dependency to a minimum-version constraint, e.g. ``my-dep>=1.2.3`` (or update the constraint if it already exists)
-2. Run ``make compile-requirements`` to recompute dependencies with this new constraint
+    make upgrade-package package=ecommerce
 
 If you instead need to surgically *downgrade* a dependency, perhaps in order to revert a change which broke things:
 
