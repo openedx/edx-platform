@@ -6,6 +6,7 @@ import uuid
 from collections import namedtuple
 from copy import deepcopy
 from unittest import mock
+from urllib.parse import urlencode
 
 import ddt
 import httpretty
@@ -43,6 +44,7 @@ from openedx.core.djangoapps.programs.utils import (
     ProgramDataExtender,
     ProgramMarketingDataExtender,
     ProgramProgressMeter,
+    get_buy_subscription_url,
     get_certificates,
     get_logged_in_program_certificate_url,
     get_programs_subscription_data,
@@ -1798,3 +1800,24 @@ class TestGetProgramsSubscriptionData(TestCase):
             }
         )
         assert result == subscription_data
+
+
+@ddt.ddt
+class TestBuySubscriptionUrl(TestCase):
+    @ddt.data(
+        {
+            'skus': ['TESTSKU'],
+            'program_uuid': '12345678-9012-3456-7890-123456789012'
+        },
+        {
+            'skus': ['TESTSKU1', 'TESTSKU2', 'TESTSKU3'],
+            'program_uuid': '12345678-9012-3456-7890-123456789012'
+        }
+    )
+    @override_settings(SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL='http://subscription_buy_url')
+    def test_get_buy_subscription_url(skus, program_uuid):
+        """ Verify the subscription purchase page URL is properly constructed and returned. """
+        url = get_buy_subscription_url(program_uuid, skus)
+        formatted_skus = urlencode({'sku': skus}, doseq=True)
+        expected_url = f'{settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL}/{program_uuid}/?{formatted_skus}'
+        assert url == expected_url
