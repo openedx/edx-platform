@@ -22,10 +22,10 @@
                     </div>
                 </div>
             <% } %>
-            <% if (is_eligible_for_subscription) { %>
+            <% if (isSubscriptionEligible) { %>
             <div class="d-flex flex-column align-items-start flex-sm-row  align-items-sm-center upgrade-subscription">
-                <a href="" class="btn-brand btn cta-primary upgrade-button">
-                <% if (subscription_state === 'inactive') { %>
+                <a href="<%- subscriptionUrl %>" class="btn-brand btn cta-primary upgrade-button">
+                <% if (subscriptionState === 'inactive') { %>
                     <div class="d-flex align-items-center">
                         <div class="subscription-icon-restart">
                             <% // xss-lint: disable=underscore-not-escaped %>
@@ -35,29 +35,29 @@
                     </div>
                 <% } else { %>
                     <%- StringUtils.interpolate(gettext(
-                        ['active', 'active_trial'].includes(subscription_state)
+                        subscriptionState === 'active'
                         ? 'Manage my subscription'
-                        : 'Start {trial_length}-Day free trial'
+                        : 'Start {trialLength}-Day free trial'
                     ),
-                    { trial_length } ) %>
+                    { trialLength } ) %>
                 <% } %>
                 </a>
-                <span class="subscription-info">
+                <span class="subscription-info-brief">
                     <%- StringUtils.interpolate(
                         gettext(
-                            subscription_state === 'active'
-                            ? 'Your next billing date is {subscription_billing_date}'
-                            : subscription_state === 'active_trial'
-                            ? 'Active trial ends {trial_end_date} at {trial_end_time}'
-                            : subscription_state === 'inactive'
-                            ? 'Unlock verified access to all courses for {subscription_price}/month. Cancel anytime.'
-                            : '{subscription_price}/month subscription after trial ends. Cancel anytime.'
+                            hasActiveTrial
+                            ? 'Active trial ends {trialEndDate} at {trialEndTime}'
+                            : subscriptionState === 'active'
+                            ? 'Your next billing date is {nextPaymentDate}'
+                            : subscriptionState === 'inactive'
+                            ? 'Unlock verified access to all courses for {subscriptionPrice}/month. Cancel anytime.'
+                            : '{subscriptionPrice}/month subscription after trial ends. Cancel anytime.'
                         ),
                         {
-                            subscription_price,
-                            subscription_billing_date,
-                            trial_end_date,
-                            trial_end_time,
+                            subscriptionPrice,
+                            nextPaymentDate,
+                            trialEndDate,
+                            trialEndTime,
                         }
                     ) %>
                 </span>

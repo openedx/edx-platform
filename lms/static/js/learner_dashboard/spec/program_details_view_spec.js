@@ -1,22 +1,17 @@
 /* globals setFixtures */
-
-import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+import moment from 'moment';
 
 import ProgramDetailsView from '../views/program_details_view';
 
-describe('Program Details Header View', () => {
+describe('Program Details View', () => {
     let view = null;
     const options = {
         programData: {
-            subscription_data: {
-                is_eligible_for_subscription: false,
-                subscription_price: '$39',
-                subscription_start_date: '2023-03-18',
-                subscription_state: '',
-                trial_end_date: '2023-03-18',
-                trial_end_time: '3:54 pm',
-                trial_length: 7,
-            },
+            subscription_eligible: false,
+            subscription_prices: [{
+                price: '100.00',
+                currency: 'USD',
+            }],
             subtitle: '',
             overview: '',
             weeks_to_complete: null,
@@ -473,11 +468,23 @@ describe('Program Details Header View', () => {
                 },
             ],
         },
+        subscriptionData: [
+            {
+                trial_end: '1970-01-01T03:25:45Z',
+                next_payment_date: '1970-06-03T07:12:04Z',
+                price: '100.00',
+                currency: 'USD',
+                subscription_state: 'pre',
+            },
+        ],
         urls: {
             program_listing_url: '/dashboard/programs/',
             commerce_api_url: '/api/commerce/v0/baskets/',
             track_selection_url: '/course_modes/choose/',
             program_record_url: 'http://credentials.example.com/records/programs/UUID',
+            buy_subscription_url: '/subscriptions',
+            manage_subscription_url: '/orders',
+            subscriptions_learner_help_center_url: '/learner',
         },
         userPreferences: {
             'pref-lang': 'en',
@@ -504,27 +511,32 @@ describe('Program Details Header View', () => {
                 destination_url: 'industry.com',
             },
         ],
-        programTabViewEnabled: false
+        programTabViewEnabled: false,
+        isUserB2CSubscriptionsEnabled: false,
     };
     const data = options.programData;
 
-    const testSubscriptionState = (state, heading, body) => {
-        const subscriptionData = {
-            ...options.programData.subscription_data,
-            is_eligible_for_subscription: true,
-            subscription_state: state,
-        };
+    const testSubscriptionState = (state, heading, body, trial = false) => {
         view = initView({
             programData: $.extend({}, options.programData, {
-                subscription_data: subscriptionData,
+                subscription_eligible: true,
             }),
+            isUserB2CSubscriptionsEnabled: true,
+            subscriptionData: [
+                $.extend({}, options.subscriptionData[0], {
+                    subscription_state: state,
+                    ...(trial && {
+                        trial_end: moment().add(3, 'days').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+                    }),
+                }),
+            ],
         });
         view.render();
         expect(view.$('.upgrade-subscription')[0]).toBeInDOM();
         expect(view.$('.upgrade-subscription .upgrade-button'))
-            .toContainText(StringUtils.interpolate(heading, subscriptionData));
-        expect(view.$('.upgrade-subscription .subscription-info'))
-            .toContainText(StringUtils.interpolate(body, subscriptionData));
+            .toContainText(heading);
+        expect(view.$('.upgrade-subscription .subscription-info-brief'))
+            .toContainText(body);
     };
 
     const initView = (updates) => {
@@ -679,16 +691,17 @@ describe('Program Details Header View', () => {
     it('should render the get subscription link if program is subscription eligible', () => {
         testSubscriptionState(
             'pre',
-            'Start {trial_length}-Day free trial',
-            '{subscription_price}/month subscription after trial ends. Cancel anytime.'
+            'Start 7-Day free trial',
+            '$100/month subscription after trial ends. Cancel anytime.'
         );
     });
 
     it('should render appropriate subscription text when subscription is active with trial', () => {
         testSubscriptionState(
-            'active_trial',
+            'active',
             'Manage my subscription',
-            'Active trial ends {trial_end_date} at {trial_end_time}'
+            'Active trial ends',
+            true
         );
     });
 
@@ -696,7 +709,7 @@ describe('Program Details Header View', () => {
         testSubscriptionState(
             'active',
             'Manage my subscription',
-            'Your next billing date is {subscription_billing_date}'
+            'Your next billing date is'
         );
     });
 
@@ -704,7 +717,7 @@ describe('Program Details Header View', () => {
         testSubscriptionState(
             'inactive',
             'Restart my subscription',
-            'Unlock verified access to all courses for {subscription_price}/month. Cancel anytime.'
+            'Unlock verified access to all courses for $100/month. Cancel anytime.'
         );
     });
 });
