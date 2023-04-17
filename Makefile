@@ -64,7 +64,7 @@ pull: ## update the Docker image used by "make shell"
 	docker pull edxops/edxapp:latest
 
 pre-requirements: ## install Python requirements for running pip-tools
-	pip install -qr requirements/pip.txt
+	pip install -qr requirements/edx/pip.txt
 	pip install -qr requirements/edx/pip-tools.txt
 
 local-requirements:
