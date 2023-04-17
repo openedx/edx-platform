@@ -20,7 +20,7 @@ libsass==0.10.0
     # via -r requirements/edx/paver.in
 markupsafe==2.1.2
     # via -r requirements/edx/paver.in
-mock==5.0.1
+mock==5.0.2
     # via -r requirements/edx/paver.in
 path==16.6.0
     # via -r requirements/edx/paver.in
@@ -50,7 +50,7 @@ stevedore==5.0.0
     #   edx-opaque-keys
 urllib3==1.26.15
     # via requests
-watchdog==2.3.1
+watchdog==3.0.0
     # via -r requirements/edx/paver.in
 wrapt==1.15.0
     # via -r requirements/edx/paver.in
