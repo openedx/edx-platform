@@ -527,16 +527,15 @@
   }
 
   .public-video-share-cta {
-    position: relative;
-    z-index: 1;
-    margin-top: 20px;
+    display: flex;
+    padding: $baseline;
+    justify-content: flex-end;
+    flex-direction: row;
+    margin: 0 -12px;
+    text-align: center;
 
     .org-logo{
-      height: 40px;
-    }
-
-    .nav-links{
-      float: right;
+      height: 80px;
     }
 
     .btn-learn-more{
@@ -565,6 +564,12 @@
         background: darken(#D23228, 7%);
         border-color: darken(#D23228, 7%);
       }
+    }
+  }
+
+  @include media-breakpoint-down(sm) {
+    .public-video-share-cta {
+      flex-direction: column;
     }
   }
 }
