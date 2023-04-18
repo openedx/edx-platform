@@ -50,8 +50,10 @@ pygments==2.15.0
     # via sphinx
 python-slugify==8.0.1
     # via code-annotations
-pytz==2023.3
-    # via babel
+pytz==2022.7.1
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   babel
 pyyaml==6.0
     # via code-annotations
 requests==2.28.2
