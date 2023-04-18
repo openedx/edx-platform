@@ -17,7 +17,7 @@ jobs:
           format: YYYY-MM-DD-HH-mm
 
       - name: Build and push Image
-        uses: Pearson-Advance/tutor-build-image-action@0.2.0
+        uses: Pearson-Advance/tutor-build-image-action@v1.0.0
         with:
           python-version: ${{ vars.BUILD_PYTHON_VERSION }}
           tutor-version: ${{ vars.BUILD_TUTOR_VERSION }}
