@@ -115,7 +115,8 @@ class EdxClearExpiredTokensTests(TestCase):  # lint-amnesty, pylint: disable=mis
             call_command('edx_clear_expired_tokens', batch_size=1, sleep_time=0)
             # four being the number of tables we'll end up unnecessarily calling .delete on once
             assert QuerySet.delete.invocations == initial_count + 4  # pylint: disable=no-member
-            assert AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=refresh_expire_cutoff).count() == 0
+            assert AccessToken.objects.filter(refresh_token__isnull=True,
+                                              expires__lt=refresh_expire_cutoff).count() == 0
         finally:
             QuerySet.delete = original_delete
 
