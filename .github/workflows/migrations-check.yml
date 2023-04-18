@@ -78,6 +78,11 @@ jobs:
           UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
           FLUSH PRIVILEGES;
         EOF
+    
+    - name: Install mysqlclient-dev binary
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libmysqlclient-dev
 
     - name: Run Tests
       env:
