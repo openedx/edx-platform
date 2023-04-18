@@ -2955,7 +2955,10 @@ INSTALLED_APPS = [
     'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'django.contrib.staticfiles',
+
+    # Tweaked version of django.contrib.staticfiles
+    'openedx.core.lib.staticfiles_config.EdxPlatformStaticFilesConfig',
+
     'django_celery_results',
 
     # Common Initialization

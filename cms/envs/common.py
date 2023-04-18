@@ -1565,8 +1565,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+
+    # Tweaked version of django.contrib.staticfiles
+    'openedx.core.lib.staticfiles_config.EdxPlatformStaticFilesConfig',
+
     'django_celery_results',
+
     'method_override',
 
     # Common Initialization
