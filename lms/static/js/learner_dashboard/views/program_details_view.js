@@ -1,7 +1,6 @@
 /* globals gettext */
 
 import Backbone from 'backbone';
-import moment from 'moment';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
@@ -12,21 +11,12 @@ import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
 import AlertListView, { mapAlertTypeToAlertHOF } from './program_alert_list_view';
 
+import SubscriptionModel from '../models/program_subscription_model';
+
 import restartIcon from '../../../images/restart-icon.svg';
 import pageTpl from '../../../templates/learner_dashboard/program_details_view.underscore';
 import tabPageTpl from '../../../templates/learner_dashboard/program_details_tab_view.underscore';
 import trackECommerceEvents from '../../commerce/track_ecommerce_events';
-
-// Utility function to get the next billing date for a subscription
-// TODO: may get from api later
-function getNextBillingDate(startDate) {
-    const subscriptionStartDate = moment(startDate, 'YYYY-MM-DD');
-    const currentMonthDifference = moment().diff(subscriptionStartDate, 'months');
-
-    return subscriptionStartDate
-        .add(currentMonthDifference + 1, 'months')
-        .format('MMMM DD, YYYY');
-}
 
 class ProgramDetailsView extends Backbone.View {
     constructor(options) {
@@ -46,29 +36,18 @@ class ProgramDetailsView extends Backbone.View {
         } else {
             this.tpl = HtmlUtils.template(pageTpl);
         }
-
-        const {
-            subscription_data: subscriptionData,
-            ...programData
-        } = this.options.programData;
-
-        // TODO: get from api
-        const alertList = [
-            { type: 'no_enrollment' },
-            { type: 'subscription_trial_expiring' },
-        ];
-
-        this.alertCollection = new Backbone.Collection(
-            alertList.map(mapAlertTypeToAlertHOF('program_details', programData, subscriptionData)),
+        this.options.isSubscriptionEligible = (
+            this.options.isUserB2CSubscriptionsEnabled
+            && this.options.programData.subscription_eligible
         );
-
-        subscriptionData.subscription_billing_date = getNextBillingDate(subscriptionData.subscription_start_date);
-        subscriptionData.trial_end_date = moment(subscriptionData.trial_end_date, 'YYYY-MM-DD').format('MMMM DD, YYYY');
-
         this.programModel = new Backbone.Model(this.options.programData);
-        this.subscriptionModel = new Backbone.Model(subscriptionData);
         this.courseData = new Backbone.Model(this.options.courseData);
-        this.certificateCollection = new Backbone.Collection(this.options.certificateData);
+        this.certificateCollection = new Backbone.Collection(
+            this.options.certificateData
+        );
+        this.subscriptionModel = new SubscriptionModel({
+            context: this.options,
+        });
         this.completedCourseCollection = new CourseCardCollection(
             this.courseData.get('completed') || [],
             this.options.userPreferences,
@@ -108,6 +87,7 @@ class ProgramDetailsView extends Backbone.View {
             this.options.urls.buy_button_url,
             this.options.programData,
         );
+
         let data = {
             totalCount,
             inProgressCount,
@@ -119,6 +99,7 @@ class ProgramDetailsView extends Backbone.View {
             creditPathways: this.options.creditPathways,
             discussionFragment: this.options.discussionFragment,
             live_fragment: this.options.live_fragment,
+            isSubscriptionEligible: this.options.isSubscriptionEligible,
             restartIcon,
         };
         data = $.extend(
@@ -177,10 +158,11 @@ class ProgramDetailsView extends Backbone.View {
             courseModel: this.courseData,
             subscriptionModel: this.subscriptionModel,
             certificateCollection: this.certificateCollection,
-            programRecordUrl: this.options.urls.program_record_url,
             industryPathways: this.options.industryPathways,
             creditPathways: this.options.creditPathways,
             programTabViewEnabled: this.options.programTabViewEnabled,
+            isSubscriptionEligible: this.options.isSubscriptionEligible,
+            urls: this.options.urls,
         });
         let hasIframe = false;
         $('#live-tab').click(() => {

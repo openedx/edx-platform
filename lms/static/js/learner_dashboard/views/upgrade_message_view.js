@@ -8,7 +8,7 @@ import trackECommerceEvents from '../../commerce/track_ecommerce_events';
 
 class UpgradeMessageView extends Backbone.View {
     initialize(options) {
-        if (options.subscriptionModel.get('is_eligible_for_subscription')) {
+        if (options.isSubscriptionEligible) {
             this.messageTpl = HtmlUtils.template(upgradeMessageSubscriptionTpl);
         } else {
             this.messageTpl = HtmlUtils.template(upgradeMessageTpl);
