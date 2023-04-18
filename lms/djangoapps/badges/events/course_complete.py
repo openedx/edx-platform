@@ -113,9 +113,17 @@ def course_badge_check(user, course_key):
     Takes a GeneratedCertificate instance, and checks to see if a badge exists for this course, creating
     it if not, should conditions be right.
     """
+    from figures.sites import get_site_for_course
+    from openedx.features.edly.utils import get_value_from_django_settings_override
+
     if not modulestore().get_course(course_key).issue_badges:
         LOGGER.info("Course is not configured to issue badges.")
         return
+
+    site = get_site_for_course(course_key)
+    badgr_slug = get_value_from_django_settings_override('BADGR_ISSUER_SLUG', None, site)
+    badgr_username = get_value_from_django_settings_override('BADGR_USERNAME', None, site)
+    badgr_password = get_value_from_django_settings_override('BADGR_PASSWORD', None, site)
     badge_class = get_completion_badge(course_key, user)
     if not badge_class:
         # We're not configured to make a badge for this course mode.
@@ -124,5 +132,12 @@ def course_badge_check(user, course_key):
         LOGGER.info("Completion badge already exists for this user on this course.")
         # Badge already exists. Skip.
         return
+
+    badge_class.badgr_config = dict(
+        badgr_slug=badgr_slug,
+        badgr_username=badgr_username,
+        badgr_password=badgr_password,
+    )
+
     evidence = evidence_url(user.id, course_key)
     badge_class.award(user, evidence_url=evidence)

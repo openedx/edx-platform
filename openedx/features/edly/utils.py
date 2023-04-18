@@ -26,7 +26,7 @@ from lms.djangoapps.branding.api import get_privacy_url, get_tos_and_honor_code_
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration.helpers import get_current_site_configuration
-from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
+from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings, get_current_site
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.features.edly.constants import ESSENTIALS
@@ -620,3 +620,19 @@ def get_message_context(site):
     })
 
     return message_context
+
+
+def get_value_from_django_settings_override(key, default=None, site=get_current_site()):
+    """
+    Gets the key value in "DJANGO_SETTINGS_OVERRIDE" from current site configurations.
+
+    Returns:
+        str: value.
+    """
+    value = default
+    current_site_configuration = getattr(site, 'configuration', None)
+    if current_site_configuration:
+        value = current_site_configuration.get_value(
+                'DJANGO_SETTINGS_OVERRIDE', {}).get(key, default)
+
+    return value
