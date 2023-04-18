@@ -1089,3 +1089,16 @@ SURVEY_REPORT_ENDPOINT = ENV_TOKENS.get('SURVEY_REPORT_ENDPOINT',
 ANONYMOUS_SURVEY_REPORT = False
 
 AVAILABLE_DISCUSSION_TOURS = ENV_TOKENS.get('AVAILABLE_DISCUSSION_TOURS', [])
+
+############### Settings for Exams ####################
+# todo: use env_tokens instead (see cms example)
+# todo: add exams service url
+# EXAMS_SERVICE_URL = ENV_TOKENS.get('EXAMS_SERVICE_URL', EXAMS_SERVICE_URL)
+TOKEN_SIGNING.update({
+    'JWT_PUBLIC_SIGNING_JWK_SET': (
+        '{"keys": [{"kty": "RSA", "kid": "prod_exam_token_key", "e": "AQAB", "n": "z7g0Dh2PUvn7jKG0RK_HP79ZZJB7UYLDWGQI'
+        'zsSskvpnnE4kyFv7pUFYvnOQH1KD4SRanRTgP-jKJ1aJ8BeEnx99GwILAyp51FVBC5CdwDXCalV5ugYk5OfvRKz7RpCFuX_chOfE5SgIipBtYE'
+        '5gGtSO6gQjCX-CkwYGmKBsLwFXWSVUSkCGQw7rvY0c8QEwmfYIziq1s1lFmaFTDCs93tSdJZTICKw65cTjclFmkXzwvZcSmeOUIjIpnanXB0sT'
+        'fbmj7Ca-p9Vpxhnnfp2U5xNeSktEfNyqcI1Ur4EpoBChQUHV9diGHc_E3TbudYWjRiDvqCbhLtLP-la4nyoJLw"}]}'
+    )
+})
