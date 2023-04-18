@@ -20,9 +20,8 @@ class SubscriptionUpsellView extends Backbone.View {
 
     render() {
         const data = $.extend(this.context, {
-            // TODO: get from api
-            min_subscription_price: '$39',
-            trial_length: 7,
+            minSubscriptionPrice: '$39',
+            trialLength: 7,
         });
         HtmlUtils.setHtml(this.$el, this.tpl(data));
     }

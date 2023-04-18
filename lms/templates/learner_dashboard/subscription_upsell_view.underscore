@@ -3,9 +3,9 @@
 <p class="advertise-message">
     <%- StringUtils.interpolate(
         gettext(
-            'An easier way to access popular programs with more control over how much you spend. Starting at {min_subscription_price} per month after a {trial_length}-day free trial. Cancel anytime.'
+            'An easier way to access popular programs with more control over how much you spend. Starting at {minSubscriptionPrice} per month after a {trialLength}-day free trial. Cancel anytime.'
         ),
-        { min_subscription_price, trial_length }
+        { minSubscriptionPrice, trialLength }
     ) %>
 </p>
 <a href="" class="btn-brand btn cta-primary view-button align-self-stretch">

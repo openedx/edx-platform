@@ -9,7 +9,7 @@ import CourseCardCollection from '../collections/course_card_collection';
 import CourseCardView from './course_card_view';
 import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
-import AlertListView, { mapAlertTypeToAlertHOF } from './program_alert_list_view';
+import AlertListView from './program_alert_list_view';
 
 import SubscriptionModel from '../models/program_subscription_model';
 
@@ -116,10 +116,18 @@ class ProgramDetailsView extends Backbone.View {
             model: new Backbone.Model(this.options),
         });
 
-        if (this.alertCollection.length > 0) {
-            this.alertListView = new AlertListView({
-                alertCollection: this.alertCollection,
-            });
+        if (this.options.isSubscriptionEligible) {
+            const { enrollmentAlerts, trialEndingAlerts } = this.getAlerts();
+
+            if (enrollmentAlerts.length || trialEndingAlerts.length) {
+                this.alertListView = new AlertListView({
+                    context: {
+                        enrollmentAlerts,
+                        trialEndingAlerts,
+                        pageType: 'programDetails',
+                    },
+                });
+            }
         }
 
         if (this.remainingCourseCollection.length > 0) {
@@ -171,6 +179,33 @@ class ProgramDetailsView extends Backbone.View {
                 hasIframe = true;
             }
         }).bind(this);
+    }
+
+    getAlerts() {
+        const alerts = {
+            enrollmentAlerts: [],
+            trialEndingAlerts: [],
+        };
+        if (this.subscriptionModel.get('subscriptionState') === 'active') {
+            if (
+                this.courseData.get('in_progress').length === 0 &&
+                this.courseData.get('not_started').length >= 1
+            ) {
+                alerts.enrollmentAlerts.push({
+                    title: this.programModel.get('title'),
+                });
+            }
+            if (
+                this.subscriptionModel.get('remainingDays') <= 7 &&
+                this.subscriptionModel.get('hasActiveTrial')
+            ) {
+                alerts.trialEndingAlerts.push({
+                    title: this.programModel.get('title'),
+                    ...this.subscriptionModel.toJSON(),
+                });
+            }
+        }
+        return alerts;
     }
 
     trackPurchase() {

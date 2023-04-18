@@ -11,8 +11,8 @@ class ProgramSubscriptionModel extends Backbone.Model {
         const {
             subscriptionData: [data = {}],
             programData: { subscription_prices },
-            urls,
-            userPreferences,
+            urls = {},
+            userPreferences = {},
         } = context;
 
         const subscriptionState = data.subscription_state?.toLowerCase() ?? '';
@@ -24,15 +24,19 @@ class ProgramSubscriptionModel extends Backbone.Model {
                 ? urls.manage_subscription_url
                 : urls.buy_subscription_url;
 
+        const trialMoment = moment(
+            DateUtils.localizeTime(
+                DateUtils.stringToMoment(data.trial_end),
+                'UTC'
+            )
+        );
+
         const hasActiveTrial =
             subscriptionState === 'active' && data.trial_end
-                ? moment(
-                    DateUtils.localizeTime(
-                        DateUtils.stringToMoment(data.trial_end),
-                        'UTC'
-                    )
-                ).isAfter(moment.utc())
+                ? trialMoment.isAfter(moment.utc())
                 : false;
+
+        const remainingDays = trialMoment.diff(moment.utc(), 'days');
 
         const [nextPaymentDate] = ProgramSubscriptionModel.formatDate(
             data.next_payment_date,
@@ -49,6 +53,7 @@ class ProgramSubscriptionModel extends Backbone.Model {
             {
                 hasActiveTrial,
                 nextPaymentDate,
+                remainingDays,
                 subscriptionPrice,
                 subscriptionState,
                 subscriptionUrl,
@@ -65,8 +70,8 @@ class ProgramSubscriptionModel extends Backbone.Model {
             return ['', ''];
         }
 
-        const userTimezone = userPreferences?.time_zone || 'UTC';
-        const userLanguage = userPreferences?.['pref-lang'] || 'en';
+        const userTimezone = userPreferences.time_zone || 'UTC';
+        const userLanguage = userPreferences['pref-lang'] || 'en';
         const context = {
             datetime: date,
             timezone: userTimezone,
