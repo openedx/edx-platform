@@ -6,7 +6,7 @@ import logging
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
-from urllib.parse import urljoin, urlparse, urlunparse
+from urllib.parse import urlencode, urljoin, urlparse, urlunparse
 
 import requests
 from dateutil.parser import parse
@@ -65,6 +65,15 @@ def get_program_and_course_data(site, user, program_uuid, mobile_only=False):
     return program_data, course_data
 
 
+def get_buy_subscription_url(program_uuid, skus):
+    """
+    Returns the URL to the Subscription Purchase page for the given program UUID and course Skus.
+    """
+    formatted_skus = urlencode({'sku': skus}, doseq=True)
+    url = f'{settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL}/{program_uuid}/?{formatted_skus}'
+    return url
+
+
 def get_program_urls(program_data):
     """Returns important urls of program."""
     from lms.djangoapps.learner_dashboard.utils import FAKE_COURSE_KEY, strip_course_id
@@ -85,7 +94,7 @@ def get_program_urls(program_data):
         'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
         'buy_button_url': ecommerce_service.get_checkout_page_url(*skus),
         'program_record_url': program_record_url,
-        'buy_subscription_url': settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL,
+        'buy_subscription_url': get_buy_subscription_url(program_uuid, skus),
         'manage_subscription_url': settings.ORDER_HISTORY_MICROFRONTEND_URL,
         'subscriptions_learner_help_center_url': settings.SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL
     }
