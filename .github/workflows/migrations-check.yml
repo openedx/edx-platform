@@ -61,10 +61,6 @@ jobs:
     - name: Install Python dependencies
       run: |
         make dev-requirements
-        pip uninstall -y mysqlclient
-        pip install --no-binary mysqlclient mysqlclient
-        pip uninstall -y xmlsec
-        pip install --no-binary xmlsec xmlsec
 
     - name: Initiate Services
       run: |
@@ -78,6 +74,11 @@ jobs:
           UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
           FLUSH PRIVILEGES;
         EOF
+    
+    - name: Install mysqlclient-dev binary
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libmysqlclient-dev
 
     - name: Run Tests
       env:
