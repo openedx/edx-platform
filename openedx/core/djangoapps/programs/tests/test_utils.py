@@ -1802,8 +1802,12 @@ class TestGetProgramsSubscriptionData(TestCase):
         assert result == subscription_data
 
 
+@override_settings(SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL='http://subscription_buy_url')
 @ddt.ddt
 class TestBuySubscriptionUrl(TestCase):
+    """
+    Tests for the BuySubscriptionUrl utility function.
+    """
     @ddt.data(
         {
             'skus': ['TESTSKU'],
@@ -1812,10 +1816,14 @@ class TestBuySubscriptionUrl(TestCase):
         {
             'skus': ['TESTSKU1', 'TESTSKU2', 'TESTSKU3'],
             'program_uuid': '12345678-9012-3456-7890-123456789012'
+        },
+        {
+            'skus': [],
+            'program_uuid': '12345678-9012-3456-7890-123456789012'
         }
     )
-    @override_settings(SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL='http://subscription_buy_url')
-    def test_get_buy_subscription_url(skus, program_uuid):
+    @ddt.unpack
+    def test_get_buy_subscription_url(self, skus, program_uuid):
         """ Verify the subscription purchase page URL is properly constructed and returned. """
         url = get_buy_subscription_url(program_uuid, skus)
         formatted_skus = urlencode({'sku': skus}, doseq=True)
