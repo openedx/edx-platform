@@ -51,10 +51,6 @@ jobs:
     - name: Install Python dependencies
       run: |
         make dev-requirements
-        pip uninstall -y mysqlclient
-        pip install --no-binary mysqlclient mysqlclient
-        pip uninstall -y xmlsec
-        pip install --no-binary xmlsec xmlsec
 
     - name: Initiate Services
       run: |

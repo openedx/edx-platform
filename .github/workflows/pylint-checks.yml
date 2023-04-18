@@ -60,8 +60,7 @@ jobs:
           # trip over some dev-only things like django-debug-toolbar
           # (import debug_toolbar) that aren't in testing.txt.
           make dev-requirements
-          pip uninstall -y mysqlclient
-          pip install --no-binary mysqlclient mysqlclient
+          # After all requirements are installed, check that they're consistent with each other
           pip check
 
       - name: Run quality tests
