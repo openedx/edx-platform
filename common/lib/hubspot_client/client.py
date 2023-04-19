@@ -48,8 +48,15 @@ class HubSpotClient:
         """
         Initialize HubSpot Client.
         """
-        self.api_key = settings.HUBSPOT_API_KEY
+        try:
+            self.api_key = settings.HUBSPOT_API_KEY
+        except AttributeError:
+            self.api_key = None
         self.HUBSPOT_API_URL = 'https://api.hubapi.com'
+        self.headers = {
+            'Content-type': 'application/json',
+            'Authorization': 'Bearer {api_key}'.format(api_key=self.api_key)
+        }
 
     def send_mail(self, email_data):
         """
@@ -60,12 +67,10 @@ class HubSpotClient:
         """
         logger.info('Sending Email With HubSpot, Email Data: {email_data}'.format(email_data=email_data))
 
-        url = '{hubspot_api_url}/marketing/v3/transactional/single-email/send?hapikey={api_key}'.format(
-            hubspot_api_url=self.HUBSPOT_API_URL,
-            api_key=self.api_key
+        url = '{hubspot_api_url}/marketing/v3/transactional/single-email/send'.format(
+            hubspot_api_url=self.HUBSPOT_API_URL
         )
-        headers = {'Content-type': 'application/json'}
-        response = requests.post(url, headers=headers, json=email_data)
+        response = requests.post(url, headers=self.headers, json=email_data)
 
         logger.info(response.json())
         return response
@@ -79,12 +84,10 @@ class HubSpotClient:
         """
         logger.info('Creating HubSpot contact, Data: {user_json}'.format(user_json=user_json))
 
-        url = '{hubspot_api_url}/crm/v3/objects/contacts?hapikey={api_key}'.format(
-            hubspot_api_url=self.HUBSPOT_API_URL,
-            api_key=self.api_key
+        url = '{hubspot_api_url}/crm/v3/objects/contacts?'.format(
+            hubspot_api_url=self.HUBSPOT_API_URL
         )
-        headers = {'Content-type': 'application/json'}
-        response = requests.post(url, headers=headers, json=user_json)
+        response = requests.post(url, headers=self.headers, json=user_json)
 
         logger.info(response.json())
         return response
@@ -101,13 +104,11 @@ class HubSpotClient:
             'Updating HubSpot contact, User: {user} & Data: {user_json}'.format(user=user, user_json=user_json)
         )
 
-        url = '{hubspot_api_url}/crm/v3/objects/contacts/{contact_id}?hapikey={api_key}'.format(
+        url = '{hubspot_api_url}/crm/v3/objects/contacts/{contact_id}'.format(
             hubspot_api_url=self.HUBSPOT_API_URL,
-            api_key=self.api_key,
             contact_id=user.extended_profile.hubspot_contact_id
         )
-        headers = {'Content-type': 'application/json'}
-        response = requests.patch(url, headers=headers, json=user_json)
+        response = requests.patch(url, headers=self.headers, json=user_json)
 
         if response.status_code == 200:
             logger.info('Contact Updated Successfully!')
