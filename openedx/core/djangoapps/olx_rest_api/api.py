@@ -2,6 +2,11 @@
 Public Python API for the OLX REST API app
 """
 from .block_serializer import XBlockSerializer as _XBlockSerializer
+# pylint: disable=unused-import
+# 'adapters' are _temporarily_ part of the public API to keep the code DRY until
+# we can consolidate the two different block_serializer implementations in
+# content_staging and olx_rest_api.
+from . import adapters
 
 
 def serialize_modulestore_block_for_blockstore(block):
