@@ -231,6 +231,8 @@ def upload_transcripts(request):
                 file_data=ContentFile(sjson_subs),
             )
 
+            video.transcripts['en'] = f"{edx_video_id}-en.srt"
+            video.save_with_metadata(request.user)
             if transcript_created is None:
                 response = JsonResponse({'status': 'Invalid Video ID'}, status=400)
 
