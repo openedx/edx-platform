@@ -45,19 +45,24 @@ def enroll_class_students_to_program(self, class_id, program_id, class_student_i
         return
 
     units = program.units.all()
-    students = gen_class.students.select_related('gen_user').all()
-    # if students are already the part of same program then cancel those enrollments
-    ProgramEnrollment.objects\
-                            .filter(program=program, student__in=students)\
-                            .update(status=ProgramEnrollmentStatuses.CANCELED)
+    all_students = gen_class.students.select_related('gen_user').all()
+    # if students are already the part of same program with different class then delete those enrollments
+    ProgramEnrollment.objects \
+        .filter(program=program, student__in=all_students) \
+        .exclude(gen_class=gen_class) \
+        .delete()
+    enrolled_students = ProgramEnrollment.objects \
+        .filter(program=program, gen_class=gen_class, student__in=all_students) \
+        .values_list('student', flat=True)
+    unenrolled_students = all_students.exclude(pk__in=enrolled_students)
 
     if program_unit_ids:
         units = units.filter(program__in=program_unit_ids)
 
     if class_student_ids:
-        students = students.filter(pk__in=class_student_ids)
+        unenrolled_students = unenrolled_students.filter(pk__in=class_student_ids)
 
-    if not students:
+    if not unenrolled_students:
         return
 
     program_enrollments = [
@@ -67,7 +72,7 @@ def enroll_class_students_to_program(self, class_id, program_id, class_student_i
             gen_class=gen_class,
             status=ProgramEnrollmentStatuses.PENDING
         )
-        for student in students
+        for student in unenrolled_students
     ]
     ProgramEnrollment.objects.bulk_create(program_enrollments)
 
@@ -81,7 +86,7 @@ def enroll_class_students_to_program(self, class_id, program_id, class_student_i
 
     courses += [unit.course for unit in units]
 
-    for student in students:
+    for student in unenrolled_students:
         if student.gen_user.user:
             for course in courses:
                 course_enrollment, created = CourseEnrollment.objects.get_or_create(
@@ -110,7 +115,7 @@ def unenroll_class_students_from_program(self, class_id, program_id, class_stude
     removed_class_students = gen_class.students.select_related('gen_user').filter(pk__in=class_student_ids)
 
     for student in removed_class_students:
-        ProgramEnrollment.objects.filter(program=program, student=student).update(ProgramEnrollmentStatuses.CANCELED)
+        ProgramEnrollment.objects.filter(program=program,gen_class=gen_class, student=student).delete()
         if student.active_class.pk == gen_class.pk:
             student.active_class = None
             student.save()
