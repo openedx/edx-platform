@@ -167,7 +167,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Bash wrapper around a call to webpack. The script will accept parameters rather than looking up Django settings itself.
 
-       The print_setting command will still be available for distributions to use to extract ``STATIC_ROOT`` from Django settings, but it will only need to be run once. As described in **Build Configuration** below, unnecessary Django settings will be removed. Some distributions may not even need to look up ``STATIC_ROOT``; Tutor, for example, will probably render ``STATIC_ROOT`` directly into the environment variable ``OPENEDX_BUILD_ASSETS_OPTS`` variable, described in the **Build Configuration**.
+       The print_setting command will still be available for distributions to use to extract ``STATIC_ROOT`` from Django settings, but it will only need to be run once. As described in **Build Configuration** below, unnecessary Django settings will be removed. Some distributions may not even need to look up ``STATIC_ROOT``; Tutor, for example, will probably render ``STATIC_ROOT`` directly into the environment variable ``EDX_PLATFORM_BUILD_ASSETS_OPTS`` variable, described in the **Build Configuration**.
    
    * - + **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
 
@@ -228,12 +228,12 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 Build Configuration
 -------------------
 
-``scripts/build-assets.sh`` will accept various command-line options to configure the build. It will also accept the same options in the form of the ``OPENEDX_BUILD_ASSETS_OPTS`` enviroment variable. Options from the environment variable will be processed first, and then overridden by options provided on the command line. The environment variable allows distributions like Tutor to seed the build script with "defaults" in the event that the upstream defaults are not sufficient, while still allowing individual operators to run the script with whichever options they like.
+``scripts/build-assets.sh`` will accept various command-line options to configure the build. It will also accept the same options in the form of the ``EDX_PLATFORM_BUILD_ASSETS_OPTS`` enviroment variable. Options from the environment variable will be processed first, and then overridden by options provided on the command line. The environment variable allows distributions like Tutor to seed the build script with "defaults" in the event that the upstream defaults are not sufficient, while still allowing individual operators to run the script with whichever options they like.
 
 As a concrete example, the default value of ``--theme-dirs`` will be ``''`` (that is: no themes) and the default value of ``--static-root`` will be ``./test_root/static``. Neither of those are suitable for Tutor. Instead, Tutor will set the environment variable in its Dockerfile::
 
   ...
-  ENV OPENEDX_BUILD_ASSETS_OPTS '--theme-dirs /openedx/themes --static-root /openedx/staticfiles'
+  ENV EDX_PLATFORM_BUILD_ASSETS_OPTS '--theme-dirs /openedx/themes --static-root /openedx/staticfiles'
   ...
 
 Later, in the container, a user might run::
@@ -261,7 +261,7 @@ Furthermore, to facilitate a Python-free build reimplementation, we will remove 
 
      - Set an environment variable before calling build-assets.sh::
 
-         OPENEDX_BUILD_ASSETS_OPTS=\
+         EDX_PLATFORM_BUILD_ASSETS_OPTS=\
          '--webpack-config path/to/webpack.my.config.js'
 
    * - JS_ENV_EXTRA_CONFIG
