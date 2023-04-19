@@ -420,14 +420,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         validateDueIn: function() {
             this.$('#relative_weeks_due_projected').hide();
-            if (this.getValue() > 18){
-                this.$('#relative_weeks_due_warning_max').show();
-                BaseModal.prototype.disableActionButton.call(this.parent, 'save');
-            } else if (this.getValue() < 1){
-                this.$('#relative_weeks_due_warning_min').show()
+            if (this.getValue() < 1) {
+                this.$('#relative_weeks_due_warning_min').show();
                 BaseModal.prototype.disableActionButton.call(this.parent, 'save');
             } else {
-                this.$('#relative_weeks_due_warning_max').hide();
                 this.$('#relative_weeks_due_warning_min').hide();
                 this.showProjectedDate();
                 BaseModal.prototype.enableActionButton.call(this.parent, 'save');
@@ -452,7 +448,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             // Grab all the subsections, map them to their block_ids, then return as an Array
             var subsectionIds = $('.outline-subsection').map(function(){ return this.id; }).get()
             var relative_weeks_due = null;
-            if (this.getValue() < 19 && this.getValue() > 0 && $('#grading_type').val() !== 'notgraded') {
+            if (this.getValue() > 0 && $('#grading_type').val() !== 'notgraded') {
                 relative_weeks_due = this.getValue()
             }
             window.analytics.track('edx.bi.studio.relative_date.saved', {
