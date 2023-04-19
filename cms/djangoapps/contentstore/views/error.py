@@ -51,27 +51,23 @@ def render_404(request, exception):  # lint-amnesty, pylint: disable=unused-argu
 def render_500(request):
     try:
         with transaction.atomic():
-            gen_user = GenUser.objects.get(user=request.user)
+            gen_user = GenUser.objects.filter(user=request.user).first()
+            profile_name = request.user.profile.name if request.user.profile else ''
+            gen_error = GenError.objects.create(
+                email=request.user.email,
+                name=profile_name,
+                error_code=500,
+                device=request.user_agent.device.family,
+                os=f'{request.user_agent.os.family}-{request.user_agent.os.version_string}',
+                browser=f'{request.user_agent.browser.family}-{request.user_agent.browser.version_string}'
+            )
+            if gen_user:
+                gen_error.role = gen_user.role
+                gen_error.school = gen_user.school
+                if gen_user.is_student:
+                    gen_error.gen_class = gen_user.student.active_class
 
-            if gen_user.is_student:
-                gen_error = GenError.objects.create(
-                    email=request.user.email,
-                    name=request.user.profile.name,
-                    role=gen_user.role,
-                    school=gen_user.school,
-                    gen_class=gen_user.student.active_class,
-                    error_code=500,
-                    browser=f'{request.user_agent.browser.family}-{request.user_agent.browser.version_string}'
-                )
-            elif gen_user.is_teacher:
-                gen_error = GenError.objects.create(
-                    email=request.user.email,
-                    name=request.user.profile.name,
-                    role=gen_user.role,
-                    school=gen_user.school,
-                    error_code=500,
-                    browser=f'{request.user_agent.browser.family}-{request.user_agent.browser.version_string}'
-                )
+                gen_error.save()
     except:
         pass
 

@@ -453,4 +453,16 @@ class GenError(admin.ModelAdmin):
     search_fields = ('email',)
     list_filter = ('school', 'gen_class', 'error_code', 'role')
     readonly_fields = ('error_code', 'name', 'email', 'role', 'school', 'gen_class', 'browser',)
-    list_display = ('error_code', 'name', 'email', 'role', 'school', 'gen_class', 'browser', 'timestamp')
+    list_display = ('error_code', 'name', 'email', 'role', 'school', 'gen_class', 'browser', 'os',
+                    'device', 'timestamp', 'social_user_exist')
+
+    def social_user_exist(self, obj):
+        try:
+            if obj.from_private_school:
+                return '-'
+            elif obj.user is None:
+                return 'User not logged in yet.'
+            else:
+                return "Yes" if obj.user.social_auth.count() > 0 else "No"
+        except AttributeError:
+            return '-'

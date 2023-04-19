@@ -307,3 +307,5 @@ class GenError(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True, blank=True)
     error_code = models.IntegerField(null=True, blank=True)
     browser = models.CharField(max_length=32, null=True, blank=True)
+    os = models.CharField(max_length=32, null=True, blank=True)
+    device = models.CharField(max_length=32, null=True, blank=True)
