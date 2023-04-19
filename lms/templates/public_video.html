@@ -27,11 +27,13 @@ from django.utils.translation import gettext as _
   % if org_logo:
     <img class="org-logo" src="${org_logo}" alt="Organization Logo"/>
   % endif
-  <a class="btn-learn-more btn" href="${learn_more_url}">
-    ${_("Learn more about this course")}
-  </a>
-  <a class="btn-enroll btn" href="${enroll_url}">
-    ${_("Enroll in this course")}
-  </a>
+  <div class="nav-links">
+    <a class="btn-learn-more btn" href="${learn_more_url}">
+      ${_("Learn more about this course")}
+    </a>
+    <a class="btn-enroll btn" href="${enroll_url}">
+      ${_("Enroll in this course")}
+    </a>
+  </div>
 </nav>
 </%block>

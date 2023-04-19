@@ -533,9 +533,20 @@
     flex-direction: row;
     margin: 0 -12px;
     text-align: center;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
 
     .org-logo{
       height: 80px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+      width: 100%;
+      justify-content: flex-end;
     }
 
     .btn-learn-more{
@@ -570,6 +581,10 @@
   @include media-breakpoint-down(sm) {
     .public-video-share-cta {
       flex-direction: column;
+
+      .nav-links {
+        flex-direction: column;
+      }
     }
   }
 }
