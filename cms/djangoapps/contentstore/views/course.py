@@ -43,7 +43,12 @@ from common.djangoapps.course_action_state.managers import CourseActionStateItem
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.auth import has_course_author_access, has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.auth import (
+    has_course_author_access,
+    has_studio_read_access,
+    has_studio_write_access,
+    has_studio_advanced_settings_access
+)
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
@@ -147,17 +152,6 @@ class AccessListFallback(Exception):
     available to a user, rather than using a shorter method (i.e. fetching by group)
     """
     pass  # lint-amnesty, pylint: disable=unnecessary-pass
-
-
-def has_advanced_settings_access(user):
-    """
-    If DISABLE_ADVANCED_SETTINGS feature is enabled, only global staff can access "Advanced Settings".
-    """
-    return (
-        not settings.FEATURES.get('DISABLE_ADVANCED_SETTINGS', False)
-        or user.is_staff
-        or user.is_superuser
-    )
 
 
 def get_course_and_check_access(course_key, user, depth=0):
@@ -765,7 +759,6 @@ def course_index(request, course_key):
             'frontend_app_publisher_url': frontend_app_publisher_url,
             'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
             'advance_settings_url': reverse_course_url('advanced_settings_handler', course_block.id),
-            'advance_settings_access': has_advanced_settings_access(request.user),
             'proctoring_errors': proctoring_errors,
         })
 
@@ -1437,7 +1430,7 @@ def advanced_settings_handler(request, course_key_string):
         json: update the Course's settings. The payload is a json rep of the
             metadata dicts.
     """
-    if not has_advanced_settings_access(request.user):
+    if not has_studio_advanced_settings_access(request.user):
         raise PermissionDenied()
 
     course_key = CourseKey.from_string(course_key_string)
