@@ -1472,6 +1472,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous": False,
                 "anonymous_to_peers": False,
                 "last_edit": None,
+                "edit_by_label": None,
             },
             {
                 "id": "test_comment_2",
@@ -1498,6 +1499,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous": True,
                 "anonymous_to_peers": False,
                 "last_edit": None,
+                "edit_by_label": None,
             },
         ]
         actual_comments = self.get_comment_list(
@@ -2232,6 +2234,7 @@ class CreateCommentTest(
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         expected_url = (
@@ -2328,6 +2331,7 @@ class CreateCommentTest(
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         expected_url = (
@@ -3154,6 +3158,7 @@ class UpdateCommentTest(
             "child_count": 0,
             "can_delete": True,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         assert parsed_body(httpretty.last_request()) == {

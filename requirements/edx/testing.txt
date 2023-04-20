@@ -582,7 +582,7 @@ edx-drf-extensions==8.6.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.61.11
+edx-enterprise==3.61.14
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -620,7 +620,7 @@ edx-opaque-keys[django]==2.3.0
     #   outcome-surveys
 edx-organizations==6.11.1
     # via -r requirements/edx/base.txt
-edx-proctoring==4.15.0
+edx-proctoring==4.15.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
@@ -863,7 +863,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==9.0.2
+lti-consumer-xblock==9.0.3
     # via -r requirements/edx/base.txt
 lxml==4.9.2
     # via
