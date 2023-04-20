@@ -1567,7 +1567,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
 
     # Tweaked version of django.contrib.staticfiles
-    'openedx.core.lib.staticfiles_config.EdxPlatformStaticFilesConfig',
+    'openedx.core.djangoapps.staticfiles.apps.EdxPlatformStaticFilesConfig',
 
     'django_celery_results',
 

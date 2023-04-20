@@ -1,5 +1,5 @@
 """
-Configuration utilities for static assets. Shared by LMS and CMS.
+Configuration for static assets. Shared by LMS and CMS.
 """
 from django.contrib.staticfiles.apps import StaticFilesConfig
 
@@ -16,6 +16,7 @@ class EdxPlatformStaticFilesConfig(StaticFilesConfig):
     instead of:
         ./manage.py [lms|cms] collectstatic --ignore geoip --ignore sass ... etc.
     """
+
     ignore_patterns = StaticFilesConfig.ignore_patterns + [
 
         "geoip",  # Geo-IP data, only accessed in Python
