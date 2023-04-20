@@ -9,7 +9,11 @@ $btn-color-primary: $primary-dark;
 .program-details {
   .content-wrapper {
     max-width: 100%;
-    padding-top: 0;
+    padding: 0px 20px 10px 20px;
+
+    @include media-breakpoint-up(lg){
+      padding: 0px 20px 10px 40px;
+    }
   }
 }
 
@@ -109,21 +113,15 @@ $btn-color-primary: $primary-dark;
     font-weight: normal;
     flex-wrap: wrap;
     flex-direction: column;
-    padding: 40px 10px 35px;
+    padding: 40px 10px 35px 0px;
 
     @include media-breakpoint-up(md) {
       flex-direction: row;
-      padding: {
-        left: 30px;
-        right: 30px;
-      }
+      padding-right: 30px;
     }
 
     @media (min-width: map-get($container-max-widths, xl)) {
-      padding: {
-        left: calc(((100% - 1180px) / 2) + 30px);
-        right: calc(((100% - 1180px) / 2) + 30px);
-      }
+      padding-right: calc(((100% - 1180px) / 2) + 30px);
     }
 
     .hd-1 {
@@ -241,16 +239,10 @@ $btn-color-primary: $primary-dark;
 
   .program-details-content {
     margin-bottom: 30px;
-    padding: {
-        left: 40px;
-        right: 40px;
-    };
+    padding-right: 40px;
   }
   .tab-content{
       .tab-pane {
-          .program-details-content {
-              padding-left: 40px;
-          }
           .js-program-pathways {
               padding-left: 40px;
           }
@@ -281,8 +273,6 @@ $btn-color-primary: $primary-dark;
 
   .course-list-headings {
     .motivating-section {
-      @include margin-left(15px);
-
       font-size: 0.9375em;
       width: auto;
 
@@ -447,7 +437,7 @@ $btn-color-primary: $primary-dark;
 
   .program-course-card {
     width: 100%;
-    padding: 15px;
+    padding: 15px 15px 15px 0px;
 
     @include media-breakpoint-up(md) {
       height: auto;
@@ -639,7 +629,7 @@ $btn-color-primary: $primary-dark;
 
 // CSS for the program sidebar
 .program-sidebar {
-  padding: 40px 40px;
+  padding: 40px 40px 40px 0px;
 
   .program-record {
     text-align: left;
@@ -647,8 +637,6 @@ $btn-color-primary: $primary-dark;
   }
 
   .motivating-section {
-    @include margin-left($baseline*0.75);
-
     font-size: 0.9375em;
     width: auto;
 
@@ -682,9 +670,7 @@ $btn-color-primary: $primary-dark;
     padding-bottom: 2em;
   }
 
-  .pathway-wrapper {
-    @include margin-left($baseline*0.75);
-
+  .pathway-wrapper {   
     width: auto;
     border-bottom: 1px solid $gray-light3;
 
