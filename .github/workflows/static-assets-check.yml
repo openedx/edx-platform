@@ -1,4 +1,4 @@
-name: static assets check for lms and cms
+name: Static Assets
 
 on:
   pull_request:
@@ -6,9 +6,13 @@ on:
     branches:
       - master
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   static_assets_check:
-    name: static-assets-check
+    name: Static assets check (legacy)
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -54,7 +58,7 @@ jobs:
 
     - name: Install Required Python Dependencies
       run: |
-        make base-requirements
+        make dev-requirements
 
     - name: Initiate Mongo DB Service
       run: sudo systemctl start mongod
@@ -62,11 +66,150 @@ jobs:
     - name: Add node_modules bin to $Path
       run: echo $GITHUB_WORKSPACE/node_modules/.bin >> $GITHUB_PATH
 
-    - name: Run Static Assets Check
+    - name: Look up Static Root
+      id: look-up-static-root
       env:
         LMS_CFG: lms/envs/bok_choy.yml
         CMS_CFG: cms/envs/bok_choy.yml
+        DJANGO_SETTINGS_MODULE: lms.envs.devstack
+      run: echo "STATIC_ROOT=$(./manage.py lms print_setting STATIC_ROOT)" >> "$GITHUB_OUTPUT"
 
+    - name: Build & Collect Static Assets
+      env:
+        LMS_CFG: lms/envs/bok_choy.yml
+        CMS_CFG: cms/envs/bok_choy.yml
       run: |
-        paver update_assets lms
-        paver update_assets cms
+        paver update_assets lms --debug
+        paver update_assets cms --debug
+
+    - name: Generate List of Collected Staticfiles with Hashes
+      run: find "${{ steps.look-up-static-root.outputs.STATIC_ROOT }}" -type f | sort | xargs sha1sum > staticfiles-hashes-legacy.txt
+
+    - name: Upload List of Collected Staticfiles with Hashes
+      uses: actions/upload-artifact@v3
+      with:
+        name: staticfiles-hashes-legacy
+        path: staticfiles-hashes-legacy.txt
+
+  static_assets_check_new:
+    name: Static assets check (new)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+        python-version: [ 3.8 ]
+        node-version: [ 16 ]
+        npm-version: [ 8.5.x ]
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install system Packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install libxmlsec1-dev pkg-config
+
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Setup npm
+      run: npm i -g npm@${{ matrix.npm-version }}
+
+    - name: Get pip cache dir
+      id: pip-cache-dir
+      run: |
+        echo "::set-output name=dir::$(pip cache dir)"
+
+    - name: Cache pip dependencies
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
+        restore-keys: ${{ runner.os }}-pip-
+
+    - name: Install Required Python Dependencies
+      run: |
+        make dev-requirements
+
+    - name: Initiate Mongo DB Service
+      run: sudo systemctl start mongod
+
+    - name: Add node_modules bin to $Path
+      run: echo $GITHUB_WORKSPACE/node_modules/.bin >> $GITHUB_PATH
+
+    - name: Look up Static Root
+      id: look-up-static-root
+      env:
+        LMS_CFG: lms/envs/bok_choy.yml
+        CMS_CFG: cms/envs/bok_choy.yml
+        DJANGO_SETTINGS_MODULE: lms.envs.devstack
+      run: echo "STATIC_ROOT=$(./manage.py lms print_setting STATIC_ROOT)" >> "$GITHUB_OUTPUT"
+
+    - name: Install Node Modules
+      run: npm clean-install
+
+    - name: Build Static Assets
+      env:
+        LMS_CFG: lms/envs/bok_choy.yml
+        CMS_CFG: cms/envs/bok_choy.yml
+        DJANGO_SETTINGS_MODULE: lms.envs.devstack
+      run: scripts/build-assets.sh --env dev --static-root "${{ steps.look-up-static-root.outputs.STATIC_ROOT }}"
+
+    - name: Collect LMS Static Assets
+      env:
+        LMS_CFG: lms/envs/bok_choy.yml
+        DJANGO_SETTINGS_MODULE: lms.envs.devstack
+      run: ./manage.py lms collectstatic --noinput
+
+    - name: Collect CMS Static Assets
+      env:
+        CMS_CFG: cms/envs/bok_choy.yml
+        DJANGO_SETTINGS_MODULE: cms.envs.devstack
+      run: ./manage.py cms collectstatic --noinput
+
+    - name: Generate List of Collected Staticfiles with Hashes
+      run: find "${{ steps.look-up-static-root.outputs.STATIC_ROOT }}" -type f | sort | xargs sha1sum > staticfiles-hashes-new.txt
+
+    # ... | bash -c 'while read -r path; do echo "$path ::: $(sha1sum "$path")"'
+
+    - name: Upload List of Collected Staticfiles with Hashes
+      uses: actions/upload-artifact@v3
+      with:
+        name: staticfiles-hashes-new
+        path: staticfiles-hashes-new.txt
+
+  compare_legacy_and_new:
+    name: Compare legacy and new asset outputs
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04 ]
+        python-version: [ 3.8 ]
+        node-version: [ 16 ]
+        npm-version: [ 8.5.x ]
+    needs:
+    - static_assets_check
+    - static_assets_check_new
+
+    steps:
+    - name: Download Hashes of Legacy Collected Staticfiles
+      uses: actions/download-artifact@v3
+      with:
+        name: staticfiles-hashes-legacy
+
+    - name: Download Hashes of New Collected Staticfiles
+      uses: actions/download-artifact@v3
+      with:
+        name: staticfiles-hashes-new
+
+    - name: Compare old and new
+      run: diff staticfiles-hashes-legacy.txt staticfiles-hashes-new.txt
