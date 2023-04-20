@@ -8,7 +8,7 @@ from collections import namedtuple
 
 from lxml import etree
 
-from openedx.core.djangoapps.olx_rest_api import adapters
+from openedx.core.djangoapps.olx_rest_api.api import adapters
 
 log = logging.getLogger(__name__)
 

@@ -69,7 +69,7 @@ from lms.djangoapps.grades.api import GradesUtilService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, UserTagsService
 from lms.djangoapps.verify_student.services import XBlockVerificationService
-from openedx.core.djangoapps.bookmarks.services import BookmarksService
+from openedx.core.djangoapps.bookmarks.api import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
