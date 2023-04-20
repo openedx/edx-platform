@@ -53,6 +53,7 @@ from openedx.core.djangolib.js_utils import (
             <div class="wrapper-download-video">
                 <h4 class="hd hd-5">${_('Video')}</h4>
                 % if download_video_link:
+                    <span class="icon fa fa-download" aria-hidden="true"></span>
                     <a class="btn-link video-sources video-download-button" href="${download_video_link}">
                         ${_('Download video file')}
                     </a>
@@ -61,6 +62,7 @@ from openedx.core.djangolib.js_utils import (
                     <br>
                 % endif
                 % if public_video_url:
+                    <span class="icon fa fa-share-alt" aria-hidden="true"></span>
                     ${_('Share on:')}
                     <a
                         class="btn-link"
@@ -99,6 +101,7 @@ from openedx.core.djangolib.js_utils import (
             <ul class="list-download-transcripts">
                 % for item in transcript_download_formats_list:
                     <li class="transcript-option">
+                        <span class="icon fa fa-download" aria-hidden="true"></span>
                         <% dname = _("Download {file}").format(file=item['display_name']) %>
                         <a class="btn btn-link" href="${track}" data-value="${item['value']}">${dname}</a>
                     </li>
