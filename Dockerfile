@@ -10,6 +10,8 @@ FROM ubuntu:focal as minimal-system
 # Long-term goal:
 # * Be a suitable base for production LMS and CMS images (THIS IS NOT YET THE CASE!).
 
+#testing changes
+
 ARG DEBIAN_FRONTEND=noninteractive
 ARG SERVICE_VARIANT
 ARG SERVICE_PORT
