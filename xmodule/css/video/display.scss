@@ -118,6 +118,12 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
         .transcript-option {
           margin: 0;
+          font-size: 16px !important;
+
+          a.btn , a.btn-link{
+            font-size: 16px !important;
+            font-weight: unset;
+          }
         }
       }
     }
