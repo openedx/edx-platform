@@ -68,7 +68,8 @@ from openedx.core.djangolib.js_utils import (
                         href="${public_video_url}"
                         target="_blank"
                     >
-                        ${_('Twitter')}
+                        <span class="icon fa fa-twitter-square" aria-hidden="true"></span>
+                        <span class="sr">${_('Share on Twitter')}</span>
                     </a>
                     <a
                         class="btn-link"
@@ -76,7 +77,8 @@ from openedx.core.djangolib.js_utils import (
                         href="${public_video_url}"
                         target="_blank"
                     >
-                        ${_('Facebook')}
+                        <span class="icon fa fa-facebook-square" aria-hidden="true"></span>
+                        <span class="sr">${_('Share on Facebook')}</span>
                     </a>
                     <a
                         class="btn-link"
@@ -84,7 +86,8 @@ from openedx.core.djangolib.js_utils import (
                         href="${public_video_url}"
                         target="_blank"
                     >
-                        ${_('Linkedin')}
+                        <span class="icon fa fa-linkedin-square" aria-hidden="true"></span>
+                        <span class="sr">${_('Share on LinkedIn')}</span>
                     </a>
                 % endif
             </div>
