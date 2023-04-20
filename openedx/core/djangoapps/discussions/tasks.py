@@ -257,5 +257,5 @@ def update_unit_discussion_state_from_discussion_blocks(course_key: CourseKey, u
     # added delay of 30 minutes to allow for the course to be published
     update_discussions_settings_from_course_task.apply_async(
         args=[str(course_key), [str(unit) for unit in discussable_units]],
-        countdown=100,
+        countdown=1800,
     )
