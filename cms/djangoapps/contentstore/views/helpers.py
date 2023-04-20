@@ -322,7 +322,6 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, user):
     ):
         # Clipboard is empty or expired/error/loading
         return None
-    source_usage_key = user_clipboard.source_usage_key  # TODO: track this somewhere
     block_type = user_clipboard.content.block_type
     olx_str = content_staging_api.get_staged_content_olx(user_clipboard.content.id)
     node = etree.fromstring(olx_str)
@@ -344,6 +343,9 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, user):
         if xblock_class.has_children and temp_xblock.children:
             raise NotImplementedError("We don't yet support pasting XBlocks with children")
         temp_xblock.parent = parent_key
+        # Store a reference to where this block was copied from, in the 'copied_from_block' field (AuthoringMixin)
+        temp_xblock.copied_from_block = user_clipboard.source_usage_key
+        # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
         new_xblock = store.update_item(temp_xblock, user.id, allow_not_found=True)
         parent_xblock.children.append(new_xblock.location)
         store.update_item(parent_xblock, user.id)
