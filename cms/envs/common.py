@@ -652,6 +652,9 @@ OPTIMIZELY_FULLSTACK_SDK_KEY = None
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
 
+######################## HOTJAR ###########################
+HOTJAR_ID = 00000
+
 ############################# TEMPLATE CONFIGURATION #############################
 # Mako templating
 import tempfile
