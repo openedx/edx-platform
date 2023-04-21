@@ -17,11 +17,11 @@ from rest_framework.views import APIView
 from common.djangoapps.student.auth import has_studio_read_access
 
 from openedx.core.lib.api.view_utils import view_auth_classes
+from openedx.core.lib.xblock_serializer.api import serialize_xblock_to_olx
 from xmodule import block_metadata_utils
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from .block_serializer import XBlockSerializer
 from .models import StagedContent, UserClipboard
 from .serializers import UserClipboardSerializer, PostToClipboardSerializer
 from .tasks import delete_expired_clipboards
@@ -110,7 +110,7 @@ class ClipboardEndpoint(APIView):
             block = modulestore().get_item(usage_key)
         except ItemNotFoundError as exc:
             raise NotFound("The requested usage key does not exist.") from exc
-        block_data = XBlockSerializer(block)
+        block_data = serialize_xblock_to_olx(block)
 
         expired_ids = []
         with transaction.atomic():
