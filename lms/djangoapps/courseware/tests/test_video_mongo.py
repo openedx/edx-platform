@@ -96,6 +96,8 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
+            'block_id': str(self.block.location),
+            'course_id': str(self.block.location.course_key),
             'cdn_eval': False,
             'cdn_exp_group': None,
             'display_name': 'A Name',
@@ -179,6 +181,8 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
+            'block_id': str(self.block.location),
+            'course_id': str(self.block.location.course_key),
             'cdn_eval': False,
             'cdn_exp_group': None,
             'display_name': 'A Name',
@@ -454,6 +458,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
+            'block_id': str(self.block.location),
+            'course_id': str(self.block.location.course_key),
             'cdn_eval': False,
             'cdn_exp_group': None,
             'display_name': 'A Name',
@@ -503,6 +509,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                     track_url if data['expected_track_url'] == 'a_sub_file.srt.sjson' else data['expected_track_url']
                 ),
                 'id': self.block.location.html_id(),
+                'block_id': str(self.block.location),
+                'course_id': str(self.block.location.course_key),
                 'metadata': json.dumps(metadata)
             })
 
@@ -574,6 +582,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
+            'block_id': str(self.block.location),
+            'course_id': str(self.block.location.course_key),
             'cdn_eval': False,
             'cdn_exp_group': None,
             'display_name': 'A Name',
@@ -612,6 +622,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             })
             expected_context.update({
                 'id': self.block.location.html_id(),
+                'block_id': str(self.block.location),
+                'course_id': str(self.block.location.course_key),
                 'download_video_link': data['result'].get('download_video_link'),
                 'metadata': json.dumps(expected_context['metadata'])
             })
@@ -701,6 +713,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
+            'block_id': str(self.block.location),
+            'course_id': str(self.block.location.course_key),
             'cdn_eval': False,
             'cdn_exp_group': None,
             'display_name': 'A Name',
@@ -754,6 +768,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         })
         expected_context.update({
             'id': self.block.location.html_id(),
+            'block_id': str(self.block.location),
+            'course_id': str(self.block.location.course_key),
             'download_video_link': data['result']['download_video_link'],
             'metadata': json.dumps(expected_context['metadata'])
         })
@@ -874,6 +890,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'branding_info': None,
             'license': None,
             'bumper_metadata': 'null',
+            'block_id': str(self.block.location),
+            'course_id': str(self.block.location.course_key),
             'cdn_eval': False,
             'cdn_exp_group': None,
             'display_name': 'A Name',
@@ -914,6 +932,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         })
         expected_context.update({
             'id': self.block.location.html_id(),
+            'block_id': str(self.block.location),
+            'course_id': str(self.block.location.course_key),
             'download_video_link': data['result']['download_video_link'],
             'metadata': json.dumps(expected_context['metadata'])
         })
@@ -987,6 +1007,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             },
             'license': None,
             'bumper_metadata': 'null',
+            'block_id': str(self.block.location),
+            'course_id': str(self.block.location.course_key),
             'cdn_eval': False,
             'cdn_exp_group': None,
             'display_name': 'A Name',
@@ -1030,6 +1052,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             })
             expected_context.update({
                 'id': self.block.location.html_id(),
+                'block_id': str(self.block.location),
+                'course_id': str(self.block.location.course_key),
                 'download_video_link': data['result'].get('download_video_link'),
                 'metadata': json.dumps(expected_context['metadata'])
             })
@@ -1134,6 +1158,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             })
             expected_context.update({
                 'id': self.block.location.html_id(),
+                'block_id': str(self.block.location),
+                'course_id': str(self.block.location.course_key),
                 'download_video_link': data['result'].get('download_video_link'),
                 'metadata': json.dumps(expected_context['metadata'])
             })
@@ -2339,6 +2365,8 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
                     self.get_handler_url('publish_completion', ''), 'is_bumper', 1
                 ),
             })),
+            'block_id': str(self.block.location),
+            'course_id': str(self.block.location.course_key),
             'cdn_eval': False,
             'cdn_exp_group': None,
             'display_name': 'A Name',
@@ -2414,6 +2442,8 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
         context = {
             'autoadvance_enabled': autoadvanceenabled_flag,
             'branding_info': None,
+            'block_id': str(self.block.location),
+            'course_id': str(self.block.location.course_key),
             'license': None,
             'cdn_eval': False,
             'cdn_exp_group': None,

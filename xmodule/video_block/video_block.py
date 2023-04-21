@@ -59,6 +59,7 @@ from xmodule.x_module import (
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
 
 from .bumper_utils import bumperize
+from .sharing_sites import sharing_sites_info_for_video
 from .transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,
@@ -471,6 +472,8 @@ class VideoBlock(
             'handout': self.handout,
             'hide_downloads': is_public_view or is_embed,
             'id': self.location.html_id(),
+            'block_id': str(self.location),
+            'course_id': str(self.location.course_key),
             'is_embed': is_embed,
             'license': getattr(self, "license", None),
             'metadata': json.dumps(OrderedDict(metadata)),
@@ -479,6 +482,11 @@ class VideoBlock(
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
         }
+        if self.is_public_sharing_enabled():
+            public_video_url = self.get_public_video_url()
+            template_context['public_sharing_enabled'] = True
+            template_context['public_video_url'] = public_video_url
+            template_context['sharing_sites_info'] = sharing_sites_info_for_video(public_video_url)
 
         # Public video previewing / social media sharing
         if self.is_public_sharing_enabled():
