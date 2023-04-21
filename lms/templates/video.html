@@ -17,6 +17,8 @@ from openedx.core.djangolib.js_utils import (
     data-bumper-metadata='${bumper_metadata}'
     data-autoadvance-enabled="${autoadvance_enabled}"
     data-poster='${poster}'
+    data-block-id='${block_id}'
+    data-course-id='${course_id}'
     tabindex="-1"
 >
     <div class="focus_grabber first"></div>
@@ -46,44 +48,29 @@ from openedx.core.djangolib.js_utils import (
 
     <div class="focus_grabber last"></div>
 
-    % if (download_video_link or track or handout or branding_info or public_video_url) and not hide_downloads:
+    % if (download_video_link or track or handout or branding_info or public_sharing_enabled) and not hide_downloads:
     <h3 class="hd hd-4 downloads-heading sr" id="video-download-transcripts_${id}">${_('Downloads and transcripts')}</h3>
     <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_${id}">
-        % if download_video_link or public_video_url:
+        % if download_video_link or public_sharing_enabled:
             <div class="wrapper-download-video">
                 <h4 class="hd hd-5">${_('Video')}</h4>
-                % if public_video_url:
-                    <span class="icon fa fa-share-alt" aria-hidden="true"></span>
-                    ${_('Share on:')}
-                    <a
-                        class="btn-link"
-                        id="twitter-share-button"
-                        href="${public_video_url}"
-                        target="_blank"
-                    >
-                        <span class="icon fa fa-twitter-square" aria-hidden="true"></span>
-                        <span class="sr">${_('Share on Twitter')}</span>
-                    </a>
-                    <a
-                        class="btn-link"
-                        id="facebook-share-button"
-                        href="${public_video_url}"
-                        target="_blank"
-                    >
-                        <span class="icon fa fa-facebook-square" aria-hidden="true"></span>
-                        <span class="sr">${_('Share on Facebook')}</span>
-                    </a>
-                    <a
-                        class="btn-link"
-                        id="linkedin-share-button"
-                        href="${public_video_url}"
-                        target="_blank"
-                    >
-                        <span class="icon fa fa-linkedin-square" aria-hidden="true"></span>
-                        <span class="sr">${_('Share on LinkedIn')}</span>
-                    </a>
+                % if sharing_sites_info:
+                    <div class="wrapper-social-share">
+                        <span class="icon fa fa-share-alt" aria-hidden="true"></span>
+                        ${_('Share on:')}
+                        % for sharing_site_info in sharing_sites_info:
+                            <a
+                                class="btn-link social-share-link"
+                                data-source="${sharing_site_info['name']}"
+                                href="${sharing_site_info['sharing_url']}"
+                            >
+                                <span class="icon fa ${sharing_site_info['fa_icon_name']}" aria-hidden="true"></span>
+                                <span class="sr">${_("Share on {site}").format(site=sharing_site_info['name'])}</span>
+                            </a>
+                        % endfor
+                    </div>
                 % endif
-                % if download_video_link and public_video_url:
+                % if download_video_link and public_sharing_enabled:
                     <br>
                 % endif
                 % if download_video_link:
@@ -153,43 +140,5 @@ from openedx.core.djangolib.js_utils import (
   if ($("#video_" + id).hasClass("is-initialized")) {
     initializeCDNExperiment();
   }
-</script>
-% endif;
-% if public_video_url:
-<script>
-  $("#twitter-share-button").click(function() {
-    var tweetText = encodeURIComponent("Here\'s a fun clip from a class I\'m taking on @edXonline.\n\n");
-    var utmQuery =  $.param({
-      utm_source: 'twitter',
-      utm_medium: 'social',
-      utm_campaign: 'social-share-exp',
-    });
-    var url = encodeURIComponent(this.href + "?" + utmQuery);
-    var tweetUrl = "https://twitter.com/intent/tweet?text=" + tweetText + "&url=" + url;
-    window.open(tweetUrl,'targetWindow','toolbar=no,location=0,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400');
-    return false;
-  });
-  $("#facebook-share-button").click(function() {
-    var utmQuery =  $.param({
-      utm_source: 'facebook',
-      utm_medium: 'social',
-      utm_campaign: 'social-share-exp',
-    });
-    var url = encodeURIComponent(this.href + "?" + utmQuery);
-    const facebookUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + url;
-    window.open(facebookUrl,'targetWindow','toolbar=no,location=0,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400');
-    return false;
-  });
-  $("#linkedin-share-button").click(function() {
-    var utmQuery =  $.param({
-      utm_source: 'linkedin',
-      utm_medium: 'social',
-      utm_campaign: 'social-share-exp',
-    });
-    var url = encodeURIComponent(this.href + "?" + utmQuery);
-    const linkedinUrl = 'https://www.linkedin.com/sharing/share-offsite/?url=' + url;
-    window.open(linkedinUrl,'targetWindow','toolbar=no,location=0,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400');
-    return false;
-  });
 </script>
 % endif
