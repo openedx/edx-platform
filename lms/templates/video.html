@@ -52,15 +52,6 @@ from openedx.core.djangolib.js_utils import (
         % if download_video_link or public_video_url:
             <div class="wrapper-download-video">
                 <h4 class="hd hd-5">${_('Video')}</h4>
-                % if download_video_link:
-                    <span class="icon fa fa-download" aria-hidden="true"></span>
-                    <a class="btn-link video-sources video-download-button" href="${download_video_link}">
-                        ${_('Download video file')}
-                    </a>
-                % endif
-                % if download_video_link and public_video_url:
-                    <br>
-                % endif
                 % if public_video_url:
                     <span class="icon fa fa-share-alt" aria-hidden="true"></span>
                     ${_('Share on:')}
@@ -90,6 +81,15 @@ from openedx.core.djangolib.js_utils import (
                     >
                         <span class="icon fa fa-linkedin-square" aria-hidden="true"></span>
                         <span class="sr">${_('Share on LinkedIn')}</span>
+                    </a>
+                % endif
+                % if download_video_link and public_video_url:
+                    <br>
+                % endif
+                % if download_video_link:
+                    <span class="icon fa fa-download" aria-hidden="true"></span>
+                    <a class="btn-link video-sources video-download-button" href="${download_video_link}">
+                        ${_('Download video file')}
                     </a>
                 % endif
             </div>
