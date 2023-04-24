@@ -2128,8 +2128,7 @@ class TestEditSplitModule(ItemTest):
         group_id_to_child = split_test.group_id_to_child.copy()
         self.assertEqual(2, len(group_id_to_child))
 
-        # Test environment and Studio use different module systems
-        # (CachingDescriptorSystem is used in tests, PreviewModuleSystem in Studio).
+        # CachingDescriptorSystem is used in tests.
         # CachingDescriptorSystem doesn't have user service, that's needed for
         # SplitTestBlock. So, in this line of code we add this service manually.
         split_test.runtime._services['user'] = DjangoXBlockUserService(self.user)  # pylint: disable=protected-access

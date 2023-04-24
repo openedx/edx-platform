@@ -19,7 +19,7 @@ from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
-from xmodule.tests import get_test_system
+from xmodule.tests import prepare_block_runtime
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
 from xmodule.capa_block import ProblemBlock
@@ -58,20 +58,17 @@ class LibraryContentTest(MixedSplitTestCase):
         """
         Bind a block (part of self.course) so we can access student-specific data.
         """
-        module_system = get_test_system(course_id=block.location.course_key)
-        module_system.descriptor_runtime = block.runtime._descriptor_system  # pylint: disable=protected-access
-        module_system._services['library_tools'] = self.tools  # pylint: disable=protected-access
+        prepare_block_runtime(block.runtime, course_id=block.location.course_key)
+        block.runtime._runtime_services.update({'library_tools': self.tools})  # lint-amnesty, pylint: disable=protected-access
 
         def get_block(descriptor):
             """Mocks module_system get_block function"""
-            sub_module_system = get_test_system(course_id=block.location.course_key)
-            sub_module_system.get_block_for_descriptor = get_block
-            sub_module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
-            descriptor.bind_for_student(sub_module_system, self.user_id)
+            prepare_block_runtime(descriptor.runtime, course_id=block.location.course_key)
+            descriptor.runtime.get_block_for_descriptor = get_block
+            descriptor.bind_for_student(self.user_id)
             return descriptor
 
-        module_system.get_block_for_descriptor = get_block
-        block.xmodule_runtime = module_system
+        block.runtime.get_block_for_descriptor = get_block
 
 
 class TestLibraryContentExportImport(LibraryContentTest):
@@ -99,7 +96,7 @@ class TestLibraryContentExportImport(LibraryContentTest):
 
         # Set the virtual FS to export the olx to.
         self.export_fs = MemoryFS()
-        self.lc_block.runtime._descriptor_system.export_fs = self.export_fs  # pylint: disable=protected-access
+        self.lc_block.runtime.export_fs = self.export_fs  # pylint: disable=protected-access
 
         # Prepare runtime for the import.
         self.runtime = TestImportSystem(load_error_blocks=True, course_id=self.lc_block.location.course_key)
@@ -517,7 +514,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         self._bind_course_block(self.lc_block)
-        self.lc_block.xmodule_runtime.publish = self.publisher
+        self.lc_block.runtime.publish = self.publisher
 
     def _assert_event_was_published(self, event_type):
         """
@@ -571,7 +568,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
             self.lc_block = self.store.get_item(self.lc_block.location)
             self._bind_course_block(self.lc_block)
-            self.lc_block.xmodule_runtime.publish = self.publisher
+            self.lc_block.runtime.publish = self.publisher
             self.test_assigned_event()
 
     def test_assigned_descendants(self):
@@ -590,7 +587,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         # Reload lc_block and set it up for a student:
         self.lc_block = self.store.get_item(self.lc_block.location)
         self._bind_course_block(self.lc_block)
-        self.lc_block.xmodule_runtime.publish = self.publisher
+        self.lc_block.runtime.publish = self.publisher
 
         # Get the keys of each of our blocks, as they appear in the course:
         course_usage_main_vertical = self.lc_block.children[0]
