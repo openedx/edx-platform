@@ -24,6 +24,6 @@ class StudioEditableBlockTestCase(BaseVerticalBlockTest):
         }
 
         # Both children of the vertical should be rendered as reorderable
-        self.course.runtime.render(self.vertical, AUTHOR_VIEW, context).content  # pylint: disable=expression-not-assigned
+        self.module_system.render(self.vertical, AUTHOR_VIEW, context).content  # pylint: disable=expression-not-assigned
         assert self.vertical.get_children()[0].location in reorderable_items
         assert self.vertical.get_children()[1].location in reorderable_items

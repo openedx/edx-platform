@@ -9,7 +9,7 @@ from lxml import etree
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.randomize_block import RandomizeBlock
-from xmodule.tests import prepare_block_runtime
+from xmodule.tests import get_test_system
 
 from .test_course_block import DummySystem as TestImportSystem
 
@@ -42,7 +42,9 @@ class RandomizeBlockTest(MixedSplitTestCase):
         Bind module system to block so we can access student-specific data.
         """
         user = Mock(name='get_test_system.user', id=user_id, is_staff=False)
-        prepare_block_runtime(block.runtime, course_id=block.location.course_key, user=user)
+        module_system = get_test_system(course_id=block.location.course_key, user=user)
+        module_system.descriptor_runtime = block.runtime._descriptor_system  # pylint: disable=protected-access
+        block.xmodule_runtime = module_system
 
     def test_xml_export_import_cycle(self):
         """
@@ -62,7 +64,7 @@ class RandomizeBlockTest(MixedSplitTestCase):
 
         export_fs = MemoryFS()
         # Set the virtual FS to export the olx to.
-        randomize_block.runtime.export_fs = export_fs  # pylint: disable=protected-access
+        randomize_block.runtime._descriptor_system.export_fs = export_fs  # pylint: disable=protected-access
 
         # Export the olx.
         node = etree.Element("unknown_root")

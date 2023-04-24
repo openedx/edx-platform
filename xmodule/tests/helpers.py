@@ -6,10 +6,8 @@ Utility methods for unit tests.
 import filecmp
 import pprint
 
-import pytest
 from path import Path as path
 from xblock.reference.user_service import UserService, XBlockUser
-from xmodule.x_module import DescriptorSystem
 
 
 def directories_equal(directory1, directory2):
@@ -74,7 +72,6 @@ class StubUserService(UserService):
         self.user_role = user_role
         self.anonymous_user_id = anonymous_user_id
         self.request_country_code = request_country_code
-        self._django_user = user
         super().__init__(**kwargs)
 
     def get_current_user(self):
@@ -112,17 +109,3 @@ class StubReplaceURLService:
         Invokes the configured render_template method.
         """
         return text
-
-
-@pytest.fixture
-def override_descriptor_system(monkeypatch):
-    """
-    Fixture to override get_block method of DescriptorSystem
-    """
-
-    def get_block(self, usage_id, for_parent=None):
-        """See documentation for `xblock.runtime:Runtime.get_block`"""
-        block = self.load_item(usage_id, for_parent=for_parent)
-        return block
-
-    monkeypatch.setattr(DescriptorSystem, "get_block", get_block)

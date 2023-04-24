@@ -1487,7 +1487,7 @@ def enclosing_sequence_for_gating_checks(block):
 
     if ancestor:
         # get_parent() returns a parent block instance cached on the block which does not
-        # have user data bound to it so we need to get it again with get_block() which will set up everything.
+        # have the ModuleSystem bound to it so we need to get it again with get_block() which will set up everything.
         return block.runtime.get_block(ancestor.location)
     return None
 

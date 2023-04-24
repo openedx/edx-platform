@@ -16,7 +16,6 @@ from datetime import datetime, timedelta
 from unittest.mock import ANY, MagicMock, Mock, patch
 
 import ddt
-import pytest
 import unicodecsv
 from django.conf import settings
 from django.test.utils import override_settings
@@ -71,8 +70,6 @@ from openedx.core.lib.teams_config import TeamsConfig
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import Group, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
-# noinspection PyUnresolvedReferences
-from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
 
 from ..models import ReportStore
 from ..tasks_helper.utils import UPDATE_STATUS_FAILED, UPDATE_STATUS_SUCCEEDED
@@ -1083,7 +1080,6 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
 
 
 @ddt.ddt
-@pytest.mark.usefixtures("override_descriptor_system")
 class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, InstructorTaskModuleTestCase):
     """
     Test the problem report on a course that has cohorted content.
@@ -1733,7 +1729,6 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
 
 @ddt.ddt
 @patch('lms.djangoapps.instructor_task.tasks_helper.misc.DefaultStorage', new=MockDefaultStorage)
-@pytest.mark.usefixtures("override_descriptor_system")
 class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
     """
     Test that grade report has correct grade values.

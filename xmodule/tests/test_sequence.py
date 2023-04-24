@@ -19,7 +19,7 @@ from web_fragments.fragment import Fragment
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from xmodule.seq_block import TIMED_EXAM_GATING_WAFFLE_FLAG, SequenceBlock
-from xmodule.tests import get_test_system, prepare_block_runtime
+from xmodule.tests import get_test_system
 from xmodule.tests.helpers import StubUserService
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
@@ -94,8 +94,11 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
         self._set_up_module_system(block)
 
-        block.runtime._runtime_services['bookmarks'] = Mock()  # pylint: disable=protected-access
-        block.runtime._runtime_services['user'] = StubUserService(user=Mock())  # pylint: disable=protected-access
+        block.xmodule_runtime._services['bookmarks'] = Mock()  # pylint: disable=protected-access
+        block.xmodule_runtime._services['completion'] = Mock(  # pylint: disable=protected-access
+            return_value=Mock(vertical_is_complete=Mock(return_value=True))
+        )
+        block.xmodule_runtime._services['user'] = StubUserService(user=Mock())  # pylint: disable=protected-access
         block.parent = parent.location
         return block
 
@@ -103,12 +106,14 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """
         Sets up the test module system for the given block.
         """
-        prepare_block_runtime(block.runtime)
+        module_system = get_test_system()
+        module_system.descriptor_runtime = block._runtime  # pylint: disable=protected-access
+        block.xmodule_runtime = module_system
 
         # The render operation will ask modulestore for the current course to get some data. As these tests were
         # originally not written to be compatible with a real modulestore, we've mocked out the relevant return values.
-        block.runtime.modulestore = Mock()
-        block.runtime.modulestore.get_course.return_value = self.course
+        module_system.modulestore = Mock()
+        module_system.modulestore.get_course.return_value = self.course
 
     def _get_rendered_view(self,
                            sequence,
@@ -125,7 +130,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             context.update(extra_context)
 
         self.course.self_paced = self_paced
-        return sequence.runtime.render(sequence, view, context).content
+        return sequence.xmodule_runtime.render(sequence, view, context).content
 
     def _assert_view_at_position(self, rendered_html, expected_position):
         """
@@ -134,10 +139,10 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         assert f"'position': {expected_position}" in rendered_html
 
     def test_student_view_init(self):
-        runtime = get_test_system()
-        runtime.position = 2
-        seq_block = SequenceBlock(runtime=runtime, scope_ids=Mock())
-        seq_block.bind_for_student(34)
+        module_system = get_test_system()
+        module_system.position = 2
+        seq_block = SequenceBlock(runtime=module_system, scope_ids=Mock())
+        seq_block.bind_for_student(module_system, 34)
         assert seq_block.position == 2
         # matches position set in the runtime
 
@@ -330,7 +335,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             False,
             {'url': 'PrereqUrl', 'display_name': 'PrereqSectionName', 'id': 'mockId'}
         ]
-        self.sequence_1_2.runtime._services['gating'] = gating_mock_1_2  # pylint: disable=protected-access
+        self.sequence_1_2.xmodule_runtime._services['gating'] = gating_mock_1_2  # pylint: disable=protected-access
         self.sequence_1_2.display_name = 'sequence_1_2'
 
         html = self._get_rendered_view(
@@ -368,9 +373,6 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     def test_xblock_handler_get_completion_success(self):
         """Test that the completion data is returned successfully on targeted vertical through ajax call"""
-        self.sequence_3_1.runtime._runtime_services['completion'] = Mock(  # pylint: disable=protected-access
-            return_value=Mock(vertical_is_complete=Mock(return_value=True))
-        )
         for child in self.sequence_3_1.get_children():
             usage_key = str(child.location)
             request = RequestFactory().post(
@@ -380,7 +382,6 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             )
             completion_return = self.sequence_3_1.handle('get_completion', request)
             assert completion_return.json == {'complete': True}
-        self.sequence_3_1.runtime._runtime_services['completion'] = None  # pylint: disable=protected-access
 
     def test_xblock_handler_get_completion_bad_key(self):
         """Test that the completion data is returned as False when usage key is None through ajax call"""
@@ -394,14 +395,10 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     def test_handle_ajax_get_completion_success(self):
         """Test that the old-style ajax handler for completion still works"""
-        self.sequence_3_1.runtime._runtime_services['completion'] = Mock(  # pylint: disable=protected-access
-            return_value=Mock(vertical_is_complete=Mock(return_value=True))
-        )
         for child in self.sequence_3_1.get_children():
             usage_key = str(child.location)
             completion_return = self.sequence_3_1.handle_ajax('get_completion', {'usage_key': usage_key})
             assert json.loads(completion_return) == {'complete': True}
-        self.sequence_3_1.runtime._runtime_services['completion'] = None  # pylint: disable=protected-access
 
     def test_xblock_handler_goto_position_success(self):
         """Test that we can set position through ajax call"""
@@ -437,7 +434,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
         """Test that the sequence metadata is returned correctly"""
         # rather than dealing with json serialization of the Mock object,
         # let's just disable the bookmarks service
-        self.sequence_3_1.runtime._services['bookmarks'] = None  # lint-amnesty, pylint: disable=protected-access
+        self.sequence_3_1.xmodule_runtime._services['bookmarks'] = None  # lint-amnesty, pylint: disable=protected-access
         metadata = self.sequence_3_1.get_metadata()
         assert len(metadata['items']) == 3
         assert metadata['tag'] == 'sequential'
@@ -448,7 +445,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
     ))
     def test_get_metadata_content_type_gated_content(self):
         """The contains_content_type_gated_content field tells whether the item contains content type gated content"""
-        self.sequence_5_1.runtime._services['bookmarks'] = None  # pylint: disable=protected-access
+        self.sequence_5_1.xmodule_runtime._services['bookmarks'] = None  # pylint: disable=protected-access
         ContentTypeGatingConfig.objects.create(enabled=True, enabled_as_of=datetime(2018, 1, 1))
         metadata = self.sequence_5_1.get_metadata()
         assert metadata['items'][0]['contains_content_type_gated_content'] is False

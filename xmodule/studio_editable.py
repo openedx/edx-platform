@@ -33,10 +33,7 @@ class StudioEditableBlock(XBlockMixin):
                 'content': rendered_child.content
             })
 
-        # 'lms.' namespace_prefix is required for rendering in studio
-        mako_service = self.runtime.service(self, 'mako')
-        mako_service.namespace_prefix = 'lms.'
-        fragment.add_content(mako_service.render_template("studio_render_children_view.html", {  # pylint: disable=no-member
+        fragment.add_content(self.runtime.service(self, 'mako').render_template("studio_render_children_view.html", {  # pylint: disable=no-member
             'items': contents,
             'xblock_context': context,
             'can_add': can_add,

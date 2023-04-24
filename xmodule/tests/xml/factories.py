@@ -11,6 +11,7 @@ from fs.osfs import OSFS
 from lxml import etree
 from xblock.mixins import HierarchyMixin
 
+from xmodule.modulestore import only_xmodules
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 
@@ -71,6 +72,7 @@ class XmlImportFactory(Factory):
 
     filesystem = OSFS(mkdtemp())
     xblock_mixins = (InheritanceMixin, XModuleMixin, HierarchyMixin)
+    xblock_select = only_xmodules
     url_name = Sequence(str)
     attribs = {}
     policy = {}

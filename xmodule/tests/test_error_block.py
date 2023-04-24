@@ -38,7 +38,7 @@ class TestErrorBlock(SetupTestErrorBlock):
             self.error_msg
         )
         assert isinstance(descriptor, ErrorBlock)
-        descriptor.runtime = self.system
+        descriptor.xmodule_runtime = self.system
         context_repr = self.system.render(descriptor, STUDENT_VIEW).content
         assert self.error_msg in context_repr
         assert repr(self.valid_xml) in context_repr
