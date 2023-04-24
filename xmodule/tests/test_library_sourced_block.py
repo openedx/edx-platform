@@ -6,7 +6,7 @@ from openedx.core.djangoapps.content_libraries.tests.base import ContentLibrarie
 from common.djangoapps.student.roles import CourseInstructorRole
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
-from xmodule.tests import get_test_system
+from xmodule.tests import prepare_block_runtime
 from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=unused-import
 
 
@@ -66,7 +66,6 @@ class LibrarySourcedBlockTestCase(ContentLibrariesRestApiTest):
         """
         context = context or {}
         block = self.store.get_item(block.location)
-        module_system = get_test_system(block)
-        module_system.descriptor_runtime = block._runtime  # pylint: disable=protected-access
-        block.bind_for_student(module_system, self.user.id)
-        return module_system.render(block, view, context).content
+        prepare_block_runtime(block.runtime)
+        block.bind_for_student(self.user.id)
+        return block.runtime.render(block, view, context).content
