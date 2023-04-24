@@ -258,6 +258,9 @@ class TestGetActiveCourseRunMethod(TestCase):
         }
 
     def test_reviewed_course_run_returned(self):
+        """
+        Test that the first course run with the status of reviewed is returned
+        """
         course = self._mock_get_course_data("reviewed")
         active_course_run = get_active_course_run(course)
 
@@ -271,6 +274,10 @@ class TestGetActiveCourseRunMethod(TestCase):
         )
 
     def test_advertised_course_run_returned(self):
+        """
+        Test that if there are no course runs with the status of reviewed
+        that the course run with the uuid that matches the advertised_uuid_course_run_uuid is returned
+        """
         course = self._mock_get_course_data("published")
         active_course_run = get_active_course_run(course)
 
@@ -284,6 +291,10 @@ class TestGetActiveCourseRunMethod(TestCase):
         )
 
     def test_no_course_run_returned(self):
+        """
+        Test that if there are no course runs with the status of reviewed and
+        no advertised_course_run_uuid value, that no course run is returned
+        """
         course = self._mock_get_course_data("archived")
         active_course_run = get_active_course_run(course)
 
