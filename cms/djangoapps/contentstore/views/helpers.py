@@ -16,6 +16,7 @@ from xblock.runtime import IdGenerator
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
 
+from cms.djangoapps.contentstore.views.preview import _load_preview_block
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
@@ -305,7 +306,7 @@ class ImportIdGenerator(IdGenerator):
         return DefinitionLocator(block_type, LocalId(block_type))
 
 
-def import_staged_content_from_user_clipboard(parent_key: UsageKey, user):
+def import_staged_content_from_user_clipboard(parent_key: UsageKey, request):
     """
     Import a block (and any children it has) from "staged" OLX.
     Does not deal with permissions or REST stuff - do that before calling this.
@@ -315,7 +316,7 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, user):
     """
     if not content_staging_api:
         raise RuntimeError("The required content_staging app is not installed")
-    user_clipboard = content_staging_api.get_user_clipboard_status(user.id)
+    user_clipboard = content_staging_api.get_user_clipboard_status(request.user.id)
     if (
         not user_clipboard or
         user_clipboard.content.status != content_staging_api.StagedContentStatus.READY
@@ -327,7 +328,9 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, user):
     node = etree.fromstring(olx_str)
     store = modulestore()
     with store.bulk_operations(parent_key.course_key):
-        parent_xblock = store.get_item(parent_key)
+        parent_descriptor = store.get_item(parent_key)
+        # Some blocks like drag-and-drop only work here with the full XBlock runtime loaded:
+        parent_xblock = _load_preview_block(request, parent_descriptor)
         runtime = parent_xblock.runtime
         # Generate the new ID:
         id_generator = ImportIdGenerator(parent_key.context_key)
@@ -346,9 +349,9 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, user):
         # Store a reference to where this block was copied from, in the 'copied_from_block' field (AuthoringMixin)
         temp_xblock.copied_from_block = user_clipboard.source_usage_key
         # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
-        new_xblock = store.update_item(temp_xblock, user.id, allow_not_found=True)
+        new_xblock = store.update_item(temp_xblock, request.user.id, allow_not_found=True)
         parent_xblock.children.append(new_xblock.location)
-        store.update_item(parent_xblock, user.id)
+        store.update_item(parent_xblock, request.user.id)
         return new_xblock
 
 

@@ -705,7 +705,7 @@ def _create_block(request):
         raise PermissionDenied()
 
     if request.json.get('staged_content') == "clipboard":
-        created_xblock = import_staged_content_from_user_clipboard(parent_key=usage_key, user=request.user)
+        created_xblock = import_staged_content_from_user_clipboard(parent_key=usage_key, request=request)
         if created_xblock is None:
             return HttpResponseBadRequest("User clipboard empty or invalid", content_type="text/plain")
         return JsonResponse(
