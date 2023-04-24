@@ -210,6 +210,7 @@ class TestCrossProductRecommendationsView(APITestCase):
                     }
                 ],
                 "advertised_course_run": "jh76b2c9-589b-4d1e-88c1-b01a02db3a9c",
+                "course_run_statuses": ["published"],
                 "location_restriction": location_restriction,
             })
 
