@@ -235,4 +235,3 @@ def get_active_course_run(course):
                 return course_run
 
     return None
-
