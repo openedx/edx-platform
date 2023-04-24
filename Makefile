@@ -175,3 +175,13 @@ lint-imports:
 # Part of https://github.com/openedx/wg-developer-experience/issues/136
 ubuntu-requirements: ## Install ubuntu 22.04 system packages needed for `pip install` to work on ubuntu.
 	sudo apt install libmysqlclient-dev libxmlsec1-dev
+
+.PHONY:
+static-dev:
+	LMS_CFG=lms/envs/bok_choy.yml CMS_CFG=cms/envs/bok_choy.yml DJANGO_SETTINGS_MODULE=lms.envs.devstack \
+			scripts/build-assets.sh --env dev --static-root "$$(./manage.py lms print_setting STATIC_ROOT)"
+	LMS_CFG=lms/envs/bok_choy.yml CMS_CFG=cms/envs/bok_choy.yml DJANGO_SETTINGS_MODULE=lms.envs.devstack \
+			./manage.py lms collectstatic --noinput
+	LMS_CFG=lms/envs/bok_choy.yml CMS_CFG=cms/envs/bok_choy.yml DJANGO_SETTINGS_MODULE=cms.envs.devstack \
+			./manage.py cms collectstatic --noinput
+
