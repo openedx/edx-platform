@@ -205,9 +205,12 @@ class TestCrossProductRecommendationsView(APITestCase):
                         "key": "course-v1:Test+2023_T2",
                         "marketing_url": "https://www.marketing_url.com",
                         "availability": "Current",
+                        "uuid": "jh76b2c9-589b-4d1e-88c1-b01a02db3a9c",
+                        "status": "published"
                     }
                 ],
-                "location_restriction": location_restriction
+                "advertised_course_run": "jh76b2c9-589b-4d1e-88c1-b01a02db3a9c",
+                "location_restriction": location_restriction,
             })
 
             if num_of_courses_with_restriction > 0:

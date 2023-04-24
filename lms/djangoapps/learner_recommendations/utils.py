@@ -209,3 +209,36 @@ def get_cross_product_recommendations(course_key):
     Helper method to get associated course keys based on the key passed
     """
     return settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS.get(course_key)
+
+
+def get_active_course_run(course):
+    """
+    Returns an active course run based on prospectus frontend logic
+    for what defines an active course run
+    """
+    reviewed_status = "reviewed"
+    course_runs = course.get("course_runs")
+    course_run_statuses = course.get("course_run_statuses")
+    advertised_course_run_uuid = course.get("advertised_course_run_uuid")
+    course_key = course.get("key")
+
+    log.warn(f"We are dealing with {course_key}")
+
+    if (
+        course_run_statuses
+        and len(course_run_statuses) == 1
+        and course_run_statuses[0].lower() == reviewed_status
+    ):
+        log.warn("In this part of the if statement")
+        for course_run in course_runs:
+            if course_run.get("status").lower() == reviewed_status:
+                log.warn("In here for returning first occurance of reviewed course run")
+                return course_run
+    elif advertised_course_run_uuid:
+        for course_run in course_runs:
+            if course_run.get("uuid") == advertised_course_run_uuid:
+                return course_run
+
+    log.warn("Somehow got here")
+    return None
+

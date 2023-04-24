@@ -29,9 +29,10 @@ from lms.djangoapps.learner_recommendations.utils import (
     filter_recommended_courses,
     is_user_enrolled_in_ut_austin_masters_program,
     _has_country_restrictions,
+    get_cross_product_recommendations,
+    get_active_course_run
 )
 from lms.djangoapps.learner_recommendations.serializers import CrossProductRecommendationsSerializer
-from lms.djangoapps.learner_recommendations.utils import get_cross_product_recommendations
 from openedx.core.djangoapps.catalog.utils import get_course_data
 from lms.djangoapps.learner_recommendations.serializers import (
     AboutPageRecommendationsSerializer,
@@ -160,9 +161,10 @@ class CrossProductRecommendationsView(APIView):
             "course_type",
             "course_runs",
             "location_restriction",
+            "advertised_course_run_uuid",
+            "course_run_statuses"
         ]
-        query_string = {'marketable_course_runs_only': 1}
-        course_data = [get_course_data(key, fields, query_string) for key in associated_course_keys]
+        course_data = [get_course_data(key, fields) for key in associated_course_keys]
         filtered_courses = [course for course in course_data if course and course.get("course_runs")]
 
         ip_address = get_client_ip(request)[0]
@@ -179,7 +181,7 @@ class CrossProductRecommendationsView(APIView):
 
         for course in unrestricted_courses:
             course.update({
-                "active_course_run": course.get("course_runs")[0]
+                "active_course_run": get_active_course_run(course)
             })
 
         return Response(
