@@ -40,11 +40,13 @@ jobs:
 
       - name: PR preflight
         run: |
-          # Fail early (and avoid quiet failure of create-pull-request action)
-          git diff --exit-code && {
+          if git diff --exit-code; then
+              # Fail early (and avoid quiet failure of create-pull-request action)
               echo "Error: No changes, so not creating PR." | tee -a "$GITHUB_STEP_SUMMARY"
               exit 1
-          }
+          else
+              : # do nothing; exit code 1 means there are changes (good!)
+          fi
 
       - name: Make a PR
         id: make-pr
