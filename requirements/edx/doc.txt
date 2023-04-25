@@ -46,7 +46,7 @@ packaging==23.1
     # via sphinx
 pbr==5.11.1
     # via stevedore
-pygments==2.15.0
+pygments==2.15.1
     # via sphinx
 python-slugify==8.0.1
     # via code-annotations

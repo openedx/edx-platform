@@ -1092,7 +1092,7 @@ pycryptodomex==3.17
     #   snowflake-connector-python
 pydantic==1.10.7
     # via fastapi
-pygments==2.15.0
+pygments==2.15.1
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt

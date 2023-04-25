@@ -1156,7 +1156,7 @@ pydantic==1.10.7
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
-pygments==2.15.0
+pygments==2.15.1
     # via
     #   -r requirements/edx/testing.txt
     #   diff-cover
