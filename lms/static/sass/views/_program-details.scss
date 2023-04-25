@@ -478,7 +478,7 @@ $btn-color-primary: $primary-dark;
     margin-inline-start: 8px;
   }
 
-  .subscription-info {
+  .subscription-info-brief {
     font-size: 0.9375em;
     color: $gray-500;
   }
@@ -694,7 +694,6 @@ $btn-color-primary: $primary-dark;
     flex-direction: column;
     gap: 16px;
     color: #414141;
-    font-size: 1.125rem;
 
     .subscription-link {
       color: inherit;

@@ -6,6 +6,7 @@ describe('Sidebar View', () => {
     let view = null;
     const context = {
         marketingUrl: 'https://www.example.org/programs',
+        isUserB2CSubscriptionsEnabled: true,
     };
 
     beforeEach(() => {
@@ -24,6 +25,19 @@ describe('Sidebar View', () => {
 
     it('should exist', () => {
         expect(view).toBeDefined();
+    });
+
+    it('should not render the subscription upsell section if B2CSubscriptions are disabled', () => {
+        view.remove();
+        view = new SidebarView({
+            el: '.sidebar',
+            context: {
+                ...context,
+                isUserB2CSubscriptionsEnabled: false,
+            }
+        });
+        view.render();
+        expect(view.$('.js-subscription-upsell')[0]).not.toBeInDOM();
     });
 
     it('should render the subscription upsell section', () => {
@@ -56,7 +70,9 @@ describe('Sidebar View', () => {
         view.remove();
         view = new SidebarView({
             el: '.sidebar',
-            context: {},
+            context: {
+                isUserB2CSubscriptionsEnabled: true,
+            },
         });
         view.render();
         const $ad = view.$el.find('.program-advertise');

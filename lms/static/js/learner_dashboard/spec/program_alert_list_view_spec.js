@@ -1,42 +1,31 @@
 /* globals setFixtures */
 
-import ProgramAlertListView, { mapAlertTypeToAlertHOF } from '../views/program_alert_list_view';
+import ProgramAlertListView from '../views/program_alert_list_view';
 
 describe('Program Alert List View', () => {
     let view = null;
-
-    const programData = {
-        title: 'Test Program',
+    const context = {
+        enrollmentAlerts: [{ title: 'Test Program' }],
+        trialEndingAlerts: [{
+            title: 'Test Program',
+            hasActiveTrial: true,
+            nextPaymentDate: 'May 8, 2023',
+            remainingDays: 2,
+            subscriptionPrice: '$100',
+            subscriptionState: 'active',
+            subscriptionUrl: null,
+            trialEndDate: 'Apr 20, 2023',
+            trialEndTime: '5:59 am',
+            trialLength: 7,
+        }],
+        pageType: 'programDetails',
     };
-
-    const subscriptionData = {
-        is_eligible_for_subscription: true,
-        subscription_price: '$39',
-        subscription_start_date: '2023-03-18',
-        subscription_state: 'active',
-        trial_end_date: '2023-03-18',
-        trial_end_time: '3:54 pm',
-        trial_length: 7,
-    };
-
-    const alertList = [
-        { type: 'no_enrollment' },
-        { type: 'subscription_trial_expiring' },
-    ];
 
     beforeEach(() => {
         setFixtures('<div class="js-program-details-alerts"></div>');
         view = new ProgramAlertListView({
             el: '.js-program-details-alerts',
-            alertCollection: new Backbone.Collection(
-                alertList.map(
-                    mapAlertTypeToAlertHOF(
-                        'program_details',
-                        programData,
-                        subscriptionData
-                    )
-                )
-            ),
+            context,
         });
         view.render();
     });
@@ -50,13 +39,20 @@ describe('Program Alert List View', () => {
     });
 
     it('should render no enrollement alert', () => {
-        expect(view.$('.alert:first .alert-heading').text().trim()).toEqual(`Enroll in a ${programData.title} course`);
-        expect(view.$('.alert:first .alert-message').text().trim()).toEqual(`You have an active subscription to the ${programData.title} program but are not enrolled in any courses. Enroll in a remaining course and enjoy verified access.`);
+        expect(view.$('.alert:first .alert-heading').text().trim()).toEqual(
+            'Enroll in a Test Program course'
+        );
+        expect(view.$('.alert:first .alert-message').text().trim()).toEqual(
+            'You have an active subscription to the Test Program program but are not enrolled in any courses. Enroll in a remaining course and enjoy verified access.'
+        );
     });
 
     it('should render subscription trial is expiring alert', () => {
-        expect(view.$('.alert:last .alert-heading')).toContainText(/Subscription trial expires in.*Day/);
-        expect(view.$('.alert:last .alert-message')).toContainText(`Your ${programData.title} trial will expire`);
-        expect(view.$('.alert:last .alert-message')).toContainText(`and the card on file will be charged ${subscriptionData.subscription_price}/mos.`);
+        expect(view.$('.alert:last .alert-heading').text().trim()).toEqual(
+            'Subscription trial expires in 2 days'
+        );
+        expect(view.$('.alert:last .alert-message').text().trim()).toEqual(
+            'Your Test Program trial will expire in 2 days at 5:59 am on Apr 20, 2023 and the card on file will be charged $100/mos.'
+        );
     });
 });
