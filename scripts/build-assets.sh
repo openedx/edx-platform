@@ -229,7 +229,7 @@ compile_scss_dir ( ) {
 
 	# Add output-style option, depending on environment.
 	if [[ "$scss_env" == dev ]] ; then
-		sassc_options+=("--output-style=nested" "--sourcemap")
+		sassc_options+=("--output-style=nested")
 	else
 		sassc_options+=("--output-style=compressed")
 	fi

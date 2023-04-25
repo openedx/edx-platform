@@ -523,10 +523,8 @@ def _compile_sass(system, theme, debug, force, timing_info):
 
     # determine css out put style and source comments enabling
     if debug:
-        source_comments = True
         output_style = 'nested'
     else:
-        source_comments = False
         output_style = 'compressed'
 
     for dirs in sass_dirs:
@@ -558,7 +556,6 @@ def _compile_sass(system, theme, debug, force, timing_info):
             sass.compile(
                 dirname=(sass_source_dir, css_dir),
                 include_paths=COMMON_LOOKUP_PATHS + lookup_paths,
-                source_comments=source_comments,
                 output_style=output_style,
             )
 
