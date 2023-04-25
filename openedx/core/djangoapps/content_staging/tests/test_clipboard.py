@@ -50,10 +50,10 @@ class ClipboardTestCase(ModuleStoreTestCase):
         ## The Python method for getting the API response should be identical:
         self.assertEqual(
             response.json(),
-            python_api.get_user_clipboard_status_json(self.user.id, response.wsgi_request),
+            python_api.get_user_clipboard_json(self.user.id, response.wsgi_request),
         )
         # And the pure python API should return None
-        self.assertEqual(python_api.get_user_clipboard_status(self.user.id), None)
+        self.assertEqual(python_api.get_user_clipboard(self.user.id), None)
 
     def _setup_course(self):
         """ Set up the "Toy Course" and an APIClient for testing clipboard functionality. """
@@ -113,7 +113,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Get the clipboard status using python:
-        clipboard_data = python_api.get_user_clipboard_status(self.user.id)
+        clipboard_data = python_api.get_user_clipboard(self.user.id)
         self.assertIsNotNone(clipboard_data)
         self.assertEqual(clipboard_data.source_usage_key, video_key)
         # source_context_title is not in the python API because it's easy to retrieve a course's name from python code.
@@ -191,7 +191,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
         self.assertEqual(html_clip_data["source_usage_key"], str(html_key))
         self.assertEqual(html_clip_data["content"]["block_type"], "html")
         ## The Python method for getting the API response should be identical:
-        self.assertEqual(html_clip_data, python_api.get_user_clipboard_status_json(self.user.id, response.wsgi_request))
+        self.assertEqual(html_clip_data, python_api.get_user_clipboard_json(self.user.id, response.wsgi_request))
 
         # The OLX link from the video will no longer work:
         self.assertEqual(client.get(old_olx_url).status_code, 404)

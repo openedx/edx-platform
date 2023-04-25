@@ -316,7 +316,7 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request):
     """
     if not content_staging_api:
         raise RuntimeError("The required content_staging app is not installed")
-    user_clipboard = content_staging_api.get_user_clipboard_status(request.user.id)
+    user_clipboard = content_staging_api.get_user_clipboard(request.user.id)
     if (
         not user_clipboard or
         user_clipboard.content.status != content_staging_api.StagedContentStatus.READY

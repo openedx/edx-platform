@@ -33,7 +33,7 @@ class UserClipboardData(NamedTuple):
     source_usage_key: UsageKey
 
 
-def get_user_clipboard_status(user_id: int) -> UserClipboardData | None:
+def get_user_clipboard(user_id: int) -> UserClipboardData | None:
     """ Get the detailed status of the user's clipboard. """
     try:
         clipboard = _UserClipboard.objects.get(user_id=user_id)
@@ -55,7 +55,7 @@ def get_user_clipboard_status(user_id: int) -> UserClipboardData | None:
     )
 
 
-def get_user_clipboard_status_json(user_id: int, request: HttpRequest = None):
+def get_user_clipboard_json(user_id: int, request: HttpRequest = None):
     """
     Get the detailed status of the user's clipboard, in exactly the same format
     as returned from the
@@ -63,7 +63,7 @@ def get_user_clipboard_status_json(user_id: int, request: HttpRequest = None):
     REST API endpoint. This version of the API is meant for "preloading" that
     REST API endpoint so it can be embedded in a larger response sent to the
     user's browser. If you just want to get the clipboard data from python, use
-    get_user_clipboard_status() instead, since it's fully typed.
+    get_user_clipboard() instead, since it's fully typed.
 
     (request is optional; including it will make the "olx_url" absolute instead
     of relative.)

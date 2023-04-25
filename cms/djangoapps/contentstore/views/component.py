@@ -192,7 +192,7 @@ def container_handler(request, usage_key_string):
 
             # Get the status of the user's clipboard so they can paste components if they have something to paste
             if content_staging_api:
-                user_clipboard = content_staging_api.get_user_clipboard_status_json(request.user.id, request)
+                user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
             else:
                 user_clipboard = {"content": None}
 
