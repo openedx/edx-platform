@@ -1,24 +1,3 @@
-<!--
-
-🎉🎉 Olive has been released! 🎉🎉
-
-🫒🫒
-🫒🫒🫒🫒         🫒 Note: Olive is in support. Fixes you make on master may still
-    🫒🫒🫒🫒     be needed on Olive. If so, make another pull request against the
-🫒🫒🫒🫒         open-release/olive.master branch, or ping @nedbat for help or questions.
-🫒🫒
-
-Please give your pull request a short but descriptive title.
-Use conventional commits to separate and summarize commits logically:
-https://open-edx-proposals.readthedocs.io/en/latest/oep-0051-bp-conventional-commits.html
-
-Use this template as a guide. Omit sections that don't apply.
-You may link to information rather than copy it, but only if the link is publicly
-readable.  If you must linked information must be private (because it has secrets),
-clearly label the link as private.
-
--->
-
 ## Description
 
 Describe what this pull request changes, and why. Include implications for people using this change.
