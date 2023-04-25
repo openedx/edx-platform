@@ -37,13 +37,14 @@ jobs:
           BASE_BRANCH: "${{ inputs.branch }}"
           PACKAGE: "${{ inputs.package }}"
           BOT_USER_NAME: "edX requirements bot"
-          BOT_USER_EMAIL: "${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}"
+          BOT_USER_EMAIL: "${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL || 'none@localhost' }}"
         run: |
           echo "PACKAGE=$PACKAGE" >> "$GITHUB_ENV"
 
       - name: Run make upgrade-package
         run: |
-          make upgrade-package package="$PACKAGE"
+          # make upgrade-package package="$PACKAGE"
+          echo "TODO" >> requirements/base.txt
 
       - name: Make a commit
         run: |
