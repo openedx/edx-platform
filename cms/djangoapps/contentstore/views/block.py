@@ -705,9 +705,14 @@ def _create_block(request):
         raise PermissionDenied()
 
     if request.json.get('staged_content') == "clipboard":
-        created_xblock = import_staged_content_from_user_clipboard(parent_key=usage_key, request=request)
+        # Paste from the user's clipboard (content_staging app clipboard, not browser clipboard) into 'usage_key':
+        try:
+            created_xblock = import_staged_content_from_user_clipboard(parent_key=usage_key, request=request)
+        except Exception:
+            log.exception("Could not paste component into location {}".format(usage_key))
+            return JsonResponse({"error": _('There was a problem pasting your component.')}, status=400)
         if created_xblock is None:
-            return HttpResponseBadRequest("User clipboard empty or invalid", content_type="text/plain")
+            return JsonResponse({"error": _('Your clipboard is empty or invalid.')}, status=400)
         return JsonResponse(
             {'locator': str(created_xblock.location), 'courseKey': str(created_xblock.location.course_key)}
         )
