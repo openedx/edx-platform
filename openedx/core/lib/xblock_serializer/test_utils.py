@@ -1,16 +1,16 @@
 """
-Test the OLX REST API adapters code
+Test the OLX serialization utils
 """
 import unittest
 
 from opaque_keys.edx.keys import CourseKey
 
-from openedx.core.djangoapps.olx_rest_api import adapters
+from . import utils
 
 
-class TestAdapters(unittest.TestCase):
+class TestUtils(unittest.TestCase):
     """
-    Test the OLX REST API adapters code
+    Test the OLX serialization utils
     """
 
     def test_rewrite_absolute_static_urls(self):
@@ -45,5 +45,5 @@ class TestAdapters(unittest.TestCase):
             <img src="https://studio.example.com/asset-v1:OtherCourse+500+2020+type@asset+block@exclude_me.png">
         </problem>
         """
-        olx_out = adapters.rewrite_absolute_static_urls(olx_in, course_id)
+        olx_out = utils.rewrite_absolute_static_urls(olx_in, course_id)
         assert olx_out == olx_expected

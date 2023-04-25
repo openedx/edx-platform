@@ -13,7 +13,7 @@
 # Myagmarjav Enkhbileg <miigaa.lucky@gmail.com>, 2018-2019
 # Otgontsetseg Sukhbaatar <otgontstsg@gmail.com>, 2018
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Mongolian (http://www.transifex.com/open-edx/edx-platform/language/mn/).
+# edX community translations have been downloaded from Mongolian (http://app.transifex.com/open-edx/edx-platform/language/mn/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -41,7 +41,7 @@
 # zolboo0411 <zolboo0411@yahoo.com>, 2017
 # zzz deb <zolboo.deb@gmail.com>, 2018
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Mongolian (http://www.transifex.com/open-edx/edx-platform/language/mn/)
+# edX community translations have been downloaded from Mongolian (http://app.transifex.com/open-edx/edx-platform/language/mn/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -158,6 +158,13 @@ msgstr "\"{language_code}\" хэлний кодтой хөрвүүлэг өмн�
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Хөрвүүлэг файл шаардлагатай."
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Ready"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -5245,6 +5252,7 @@ msgid "Allow"
 msgstr "Зөвшөөрөх"
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/models.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Алдаа"
@@ -6370,6 +6378,37 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "This user already has access to this library."
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Ачаалж байна"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
@@ -11983,12 +12022,6 @@ msgstr "ОР"
 msgid "In Progress"
 msgstr "Явагдаж байна"
 
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr ""
-
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Uploaded"
@@ -12241,16 +12274,6 @@ msgstr "Агуулга"
 #: wiki/templates/wiki/settings.html
 msgid "Settings"
 msgstr "Тохиргоо"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Ачаалж байна"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -13367,10 +13390,20 @@ msgstr ""
 msgid "Download video file"
 msgstr "Видео файлыг татаж авах"
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
+msgid "Share on:"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Twitter"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Facebook"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Linkedin"
 msgstr ""
 
 #: lms/templates/video.html
@@ -14405,6 +14438,11 @@ msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
+msgstr ""
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
@@ -19056,8 +19094,9 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
 
 #: cms/templates/course_outline.html

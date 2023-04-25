@@ -17,7 +17,6 @@ from xblock.fields import Integer, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from xmodule.fields import Date
-from xmodule.modulestore import only_xmodules
 from xmodule.modulestore.inheritance import InheritanceMixin, compute_inherited_metadata
 from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
 from xmodule.tests import DATA_DIR
@@ -52,9 +51,6 @@ class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-metho
             services={'field-data': KvsFieldData(DictKeyValueStore())},
         )
 
-    def render_template(self, _template, _context):  # lint-amnesty, pylint: disable=method-hidden
-        raise Exception("Shouldn't be called")
-
 
 class BaseCourseTestCase(TestCase):
     '''Make sure block imports work properly, including for malformed inputs'''
@@ -72,7 +68,6 @@ class BaseCourseTestCase(TestCase):
             DATA_DIR,
             source_dirs=[name],
             xblock_mixins=(InheritanceMixin,),
-            xblock_select=only_xmodules,
         )
         courses = modulestore.get_courses()
         assert len(courses) == 1

@@ -30,7 +30,6 @@ from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
-from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
@@ -481,17 +480,12 @@ class VideoBlock(
 
         return self.runtime.service(self, 'mako').render_template('video.html', template_context)
 
-    def _is_lms_platform(self):
-        """
-        Returns True if the platform is LMS.
-        """
-        return isinstance(self.xmodule_runtime, LmsModuleSystem)
-
     def _get_public_video_url(self):
         """
         Returns the public video url
         """
-        if self.public_access and self._is_lms_platform():
+        is_studio = getattr(self.runtime, "is_author_mode", False)
+        if self.public_access and not is_studio:
             from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
             if PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key):
                 return urljoin(

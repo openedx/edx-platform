@@ -122,7 +122,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
         # For HTML, we really want to be sure that the OLX is serialized in this exact format (using CDATA), so we check
         # the actual string directly rather than using assertXmlEqual():
         self.assertEqual(olx_response.content.decode(), dedent("""
-            <html display_name="Text"><![CDATA[
+            <html url_name="toyhtml" display_name="Text"><![CDATA[
             <a href='/static/handouts/sample_handout.txt'>Sample</a>
             ]]></html>
         """).lstrip())

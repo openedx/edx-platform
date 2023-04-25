@@ -460,6 +460,10 @@
       code::after {
         @include display-left-to-right();
       }
+
+      blockquote {
+        margin: $baseline*2;
+      }
     }
 
     // STATE: container/component with children - abbreviated preview

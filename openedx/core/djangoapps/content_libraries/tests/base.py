@@ -4,12 +4,10 @@ Tests for Blockstore-based Content Libraries
 from contextlib import contextmanager
 from io import BytesIO
 from urllib.parse import urlencode
-from unittest import mock, skipUnless
-from urllib.parse import urlparse
+from unittest import mock
 
 from django.conf import settings
 from django.test import LiveServerTestCase
-from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from organizations.models import Organization
 from rest_framework.test import APITestCase, APIClient
@@ -20,6 +18,11 @@ from openedx.core.djangoapps.content_libraries.libraries_index import MAX_SIZE
 from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from openedx.core.lib import blockstore_api
+from openedx.core.lib.blockstore_api.tests.base import (
+    BlockstoreAppTestMixin,
+    requires_blockstore,
+    requires_blockstore_app,
+)
 
 # Define the URLs here - don't use reverse() because we want to detect
 # backwards-incompatible changes like changed URLs.
@@ -47,41 +50,6 @@ URL_BLOCK_RENDER_VIEW = '/api/xblock/v2/xblocks/{block_key}/view/{view_name}/'
 URL_BLOCK_GET_HANDLER_URL = '/api/xblock/v2/xblocks/{block_key}/handler_url/{handler_name}/'
 URL_BLOCK_METADATA_URL = '/api/xblock/v2/xblocks/{block_key}/'
 URL_BLOCK_XBLOCK_HANDLER = '/api/xblock/v2/xblocks/{block_key}/handler/{user_id}-{secure_token}/{handler_name}/'
-
-
-# Decorators for tests that require the blockstore service/app
-requires_blockstore = skipUnless(settings.RUN_BLOCKSTORE_TESTS, "Requires a running Blockstore server")
-
-requires_blockstore_app = skipUnless(settings.BLOCKSTORE_USE_BLOCKSTORE_APP_API, "Requires blockstore app")
-
-
-class BlockstoreAppTestMixin:
-    """
-    Sets up the environment for tests to be run using the installed Blockstore app.
-    """
-    def setUp(self):
-        """
-        Ensure there's an active request, so that bundle file URLs can be made absolute.
-        """
-        super().setUp()
-
-        # Patch the blockstore get_current_request to use our live_server_url
-        mock.patch('blockstore.apps.api.methods.get_current_request',
-                   mock.Mock(return_value=self._get_current_request())).start()
-        self.addCleanup(mock.patch.stopall)
-
-    def _get_current_request(self):
-        """
-        Returns a request object using the live_server_url, if available.
-        """
-        request_args = {}
-        if hasattr(self, 'live_server_url'):
-            live_server_url = urlparse(self.live_server_url)
-            name, port = live_server_url.netloc.split(':')
-            request_args['SERVER_NAME'] = name
-            request_args['SERVER_PORT'] = port or '80'
-            request_args['wsgi.url_scheme'] = live_server_url.scheme
-        return RequestFactory().request(**request_args)
 
 
 def elasticsearch_test(func):

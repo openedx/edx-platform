@@ -11,6 +11,14 @@ from django.utils.translation import gettext as _
 <meta data-rh="true" property="og:title" content="${social_sharing_metadata['video_title']}">
 <meta data-rh="true" property="og:description" content="${social_sharing_metadata['video_description']}">
 <meta data-rh="true" property="og:image" content="${social_sharing_metadata['video_thumbnail']}">
+<meta data-rh="true" property="og:url" content="${social_sharing_metadata['video_embed_url']}">
+<meta data-rh="true" property="og:type" content="video.other">
+<meta data-rh="true" property="og:video" content="${social_sharing_metadata['video_embed_url']}">
+<meta data-rh="true" property="og:video:url" content="${social_sharing_metadata['video_embed_url']}">
+<meta data-rh="true" property="og:video:secure_url" content="${social_sharing_metadata['video_embed_url']}">
+<meta data-rh="true" property="og:video:width" content="1280">
+<meta data-rh="true" property="og:video:height" content="720">
+<meta data-rh="true" property="og:video:type" content="text/html">
 
 <!-- Twitter-specific video player tags  -->
 <meta data-rh="true" name="twitter:card" content="player">

@@ -293,38 +293,23 @@ class StudioPermissionsService:
         return has_studio_write_access(self._user, course_key)
 
 
-class StudioEditModuleRuntime:
+def load_services_for_studio(runtime, user):
     """
-    An extremely minimal ModuleSystem shim used for XBlock edits and studio_view.
-    (i.e. whenever we're not using PreviewModuleSystem.) This is required to make information
+    Function to set some required services used for XBlock edits and studio_view.
+    (i.e. whenever we're not loading _prepare_runtime_for_preview.) This is required to make information
     about the current user (especially permissions) available via services as needed.
     """
+    services = {
+        "user": DjangoXBlockUserService(user),
+        "studio_user_permissions": StudioPermissionsService(user),
+        "mako": MakoService(),
+        "settings": SettingsService(),
+        "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
+        "teams_configuration": TeamsConfigurationService(),
+        "library_tools": LibraryToolsService(modulestore(), user.id)
+    }
 
-    def __init__(self, user):
-        self._user = user
-
-    def service(self, block, service_name):
-        """
-        This block is not bound to a user but some blocks (LibraryContentBlock) may need
-        user-specific services to check for permissions, etc.
-        If we return None here, CombinedSystem will load services from the descriptor runtime.
-        """
-        if block.service_declaration(service_name) is not None:
-            if service_name == "user":
-                return DjangoXBlockUserService(self._user)
-            if service_name == "studio_user_permissions":
-                return StudioPermissionsService(self._user)
-            if service_name == "mako":
-                return MakoService()
-            if service_name == "settings":
-                return SettingsService()
-            if service_name == "lti-configuration":
-                return ConfigurationService(CourseAllowPIISharingInLTIFlag)
-            if service_name == "teams_configuration":
-                return TeamsConfigurationService()
-            if service_name == "library_tools":
-                return LibraryToolsService(modulestore(), self._user.id)
-        return None
+    runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
 
 
 @require_http_methods("GET")
@@ -368,8 +353,8 @@ def xblock_view_handler(request, usage_key_string, view_name):
         ))
 
         if view_name in (STUDIO_VIEW, VISIBILITY_VIEW):
-            if view_name == STUDIO_VIEW and xblock.xmodule_runtime is None:
-                xblock.xmodule_runtime = StudioEditModuleRuntime(request.user)
+            if view_name == STUDIO_VIEW:
+                load_services_for_studio(xblock.runtime, request.user)
 
             try:
                 fragment = xblock.render(view_name)
@@ -524,7 +509,7 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
             old_metadata = own_metadata(xblock)
         if old_content is None:
             old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
-        xblock.xmodule_runtime = StudioEditModuleRuntime(user)
+        load_services_for_studio(xblock.runtime, user)
         xblock.editor_saved(user, old_metadata, old_content)
 
     # Update after the callback so any changes made in the callback will get persisted.
@@ -937,7 +922,7 @@ def _duplicate_block(parent_usage_key, duplicate_source_usage_key, user, display
             # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
             # These blocks may handle their own children or parenting if needed. Let them return booleans to
             # let us know if we need to handle these or not.
-            dest_block.xmodule_runtime = StudioEditModuleRuntime(user)
+            load_services_for_studio(dest_block.runtime, user)
             children_handled = dest_block.studio_post_duplicate(store, source_item)
 
         # Children are not automatically copied over (and not all xblocks have a 'children' attribute).

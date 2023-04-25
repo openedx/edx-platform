@@ -692,30 +692,9 @@ def collect_assets(systems, settings, **kwargs):
     `settings` is the Django settings module to use.
     `**kwargs` include arguments for using a log directory for collectstatic output. Defaults to /dev/null.
     """
-    ignore_patterns = [
-        # Karma test related files...
-        "fixtures",
-        "karma_*.js",
-        "spec",
-        "spec_helpers",
-        "spec-helpers",
-        "xmodule_js",  # symlink for tests
-
-        # Geo-IP data, only accessed in Python
-        "geoip",
-
-        # We compile these out, don't need the source files in staticfiles
-        "sass",
-    ]
-
-    ignore_args = " ".join(
-        f'--ignore "{pattern}"' for pattern in ignore_patterns
-    )
-
     for sys in systems:
         collectstatic_stdout_str = _collect_assets_cmd(sys, **kwargs)
-        sh(django_cmd(sys, settings, "collectstatic {ignore_args} --noinput {logfile_str}".format(
-            ignore_args=ignore_args,
+        sh(django_cmd(sys, settings, "collectstatic --noinput {logfile_str}".format(
             logfile_str=collectstatic_stdout_str
         )))
         print(f"\t\tFinished collecting {sys} assets.")

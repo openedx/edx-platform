@@ -507,7 +507,19 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             kwargs=dict(course_id=str(course.id), student_id=user.id)
         )
         user_entry['user_id'] = user.id
-        user_entry['full_name'] = user.profile.name
+
+        def is_masters_student():
+            # If this is a multiple-user lookup (didn't use the username param) we insert
+            # user.enrollment_mode in _get_enrolled_users. If it is a single-user lookup
+            # (did use username) then we'll need to look up the single user's enrollment mode
+            if hasattr(user, 'enrollment_mode'):
+                return user.enrollment_mode == CourseMode.MASTERS
+            else:
+                mode, _ = CourseEnrollment.enrollment_mode_for_user(user, str(course.id))
+                return mode == CourseMode.MASTERS
+
+        if is_masters_student():
+            user_entry['full_name'] = user.profile.name
 
         external_user_key = get_external_key_by_user_and_course(user, course.id)
         if external_user_key:
