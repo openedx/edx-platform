@@ -34,10 +34,7 @@ jobs:
 
       - name: Set up environment variables
         env:
-          BASE_BRANCH: "${{ inputs.branch }}"
           PACKAGE: "${{ inputs.package }}"
-          BOT_USER_NAME: "edX requirements bot"
-          BOT_USER_EMAIL: "${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL || 'none@localhost' }}"
         run: |
           echo "PACKAGE=$PACKAGE" >> "$GITHUB_ENV"
 
@@ -47,6 +44,9 @@ jobs:
           echo "TODO" >> requirements/base.txt
 
       - name: Make a commit
+        env:
+          BOT_USER_NAME: "edX requirements bot"
+          BOT_USER_EMAIL: "${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}"
         run: |
           git diff
 
@@ -55,8 +55,8 @@ jobs:
 
           echo "using '$BOT_USER_NAME' and '$BOT_USER_EMAIL'"
 
-          git config --global user.name "$BOT_USER_NAME"
-          git config --global user.email "$BOT_USER_EMAIL"
+          git config user.name "$BOT_USER_NAME"
+          git config user.email "$BOT_USER_EMAIL"
 
           git checkout -b "$PR_BRANCH"
           git add requirements/
@@ -65,6 +65,7 @@ jobs:
 
       - name: Make PR against branch
         env:
+          BASE_BRANCH: "${{ inputs.branch }}"
           GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
           gh pr create --base "$BASE_BRANCH" --head "$PR_BRANCH" --fill --reviewer "$GITHUB_ACTOR" \
