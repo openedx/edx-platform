@@ -38,6 +38,14 @@ jobs:
         run: |
           make upgrade-package package="$PACKAGE"
 
+      - name: PR preflight
+        run: |
+          # Fail early (and avoid quiet failure of create-pull-request action)
+          git diff --exit-code && {
+              echo "Error: No changes, so not creating PR."
+              exit 1
+          }
+
       - name: Make a PR
         id: make-pr
         uses: peter-evans/create-pull-request@v5
@@ -57,4 +65,9 @@ jobs:
         env:
           PR_URL: "${{ steps.make-pr.outputs.pull-request-url }}"
         run: |
-          echo "PR created or updated: $PR_URL" >> $GITHUB_STEP_SUMMARY
+          if [[ -z "$PR_URL" ]]; then
+              echo "PR not created; see log for more information" >> $GITHUB_STEP_SUMMARY
+              exit 1
+          else
+              echo "PR created or updated: $PR_URL" >> $GITHUB_STEP_SUMMARY
+          fi
