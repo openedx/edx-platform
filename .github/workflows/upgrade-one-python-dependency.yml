@@ -36,7 +36,8 @@ jobs:
         env:
           PACKAGE: "${{ inputs.package }}"
         run: |
-          make upgrade-package package="$PACKAGE"
+          #make upgrade-package package="$PACKAGE"
+          echo do nothing TODO
 
       - name: PR preflight
         run: |
