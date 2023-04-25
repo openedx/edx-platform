@@ -36,10 +36,10 @@ jobs:
         env:
           PACKAGE: "${{ inputs.package }}"
         run: |
-          # make upgrade-package package="$PACKAGE"
-          echo "TODO" >> requirements/base.txt
+          make upgrade-package package="$PACKAGE"
 
       - name: Make a PR
+        id: make-pr
         uses: peter-evans/create-pull-request@v5
         with:
           branch: "${{ github.triggering_actor }}/upgrade-${{ inputs.package }}"
@@ -52,3 +52,9 @@ jobs:
           title: 'feat: Upgrade Python dependency ${{ inputs.package }}"'
           body: "@${{ github.triggering_actor }}: Here's the package upgrade you requested."
           assignees: "${{ github.triggering_actor }}"
+
+      - name: Job summary
+        env:
+          PR_URL: "${{ steps.make-pr.outputs.pull-request-url }}"
+        run: |
+          echo "PR created or updated: $PR_URL" >> $GITHUB_STEP_SUMMARY
