@@ -36,6 +36,8 @@ jobs:
         env:
           BASE_BRANCH: "${{ inputs.branch }}"
           PACKAGE: "${{ inputs.package }}"
+          BOT_USER_NAME: "edX requirements bot"
+          BOT_USER_EMAIL: "${{ secrets.REQUIREMENTS_BOT_GITHUB_EMAIL }}"
         run: |
           echo "PACKAGE=$PACKAGE" >> "$GITHUB_ENV"
 
@@ -49,6 +51,9 @@ jobs:
 
           PR_BRANCH="$GITHUB_ACTOR/upgrade-$PACKAGE-`git rev-parse --short=8 HEAD`"
           echo "PR_BRANCH=$PR_BRANCH" >> "$GITHUB_ENV"
+
+          git config user.name "$BOT_USER_NAME"
+          git config user.email "$BOT_USER_EMAIL"
 
           git checkout -b "$PR_BRANCH"
           git add requirements/
