@@ -59,4 +59,4 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         new_video = modulestore().get_item(new_block_key)
         assert new_video.youtube_id_1_0 == orig_video.youtube_id_1_0
         # The new block should store a reference to where it was copied from
-        assert new_video.copied_from_block == video_key
+        assert new_video.copied_from_block == str(video_key)

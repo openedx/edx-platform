@@ -344,7 +344,7 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request):
             raise NotImplementedError("We don't yet support pasting XBlocks with children")
         temp_xblock.parent = parent_key
         # Store a reference to where this block was copied from, in the 'copied_from_block' field (AuthoringMixin)
-        temp_xblock.copied_from_block = user_clipboard.source_usage_key
+        temp_xblock.copied_from_block = str(user_clipboard.source_usage_key)
         # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
         new_xblock = store.update_item(temp_xblock, request.user.id, allow_not_found=True)
         parent_xblock.children.append(new_xblock.location)

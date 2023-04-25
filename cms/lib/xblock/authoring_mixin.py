@@ -8,7 +8,7 @@ import logging
 from django.conf import settings
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock, XBlockMixin
-from xblock.fields import Reference, Scope
+from xblock.fields import String, Scope
 
 log = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ class AuthoringMixin(XBlockMixin):
         fragment.initialize_js('VisibilityEditorInit')
         return fragment
 
-    copied_from_block = Reference(
+    copied_from_block = String(
         # Note: used by the content_staging app. This field is not needed in the LMS.
         help="ID of the block that this one was copied from, if any. Used when copying and pasting blocks in Studio.",
         scope=Scope.settings,
