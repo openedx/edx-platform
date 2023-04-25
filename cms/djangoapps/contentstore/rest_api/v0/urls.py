@@ -3,7 +3,13 @@
 from django.urls import re_path
 
 from openedx.core.constants import COURSE_ID_PATTERN
-from .views import AdvancedCourseSettingsView, CourseTabSettingsView, CourseTabListView, CourseTabReorderView
+from .views import (
+    AdvancedCourseSettingsView,
+    CourseDetailsSettingsView,
+    CourseTabSettingsView,
+    CourseTabListView,
+    CourseTabReorderView
+)
 
 app_name = "v0"
 
@@ -27,5 +33,10 @@ urlpatterns = [
         fr"^tabs/{COURSE_ID_PATTERN}/reorder$",
         CourseTabReorderView.as_view(),
         name="course_tab_reorder",
+    ),
+    re_path(
+        fr"^details_settings/{COURSE_ID_PATTERN}$",
+        CourseDetailsSettingsView.as_view(),
+        name="course_details_settings",
     ),
 ]
