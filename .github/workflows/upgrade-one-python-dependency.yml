@@ -43,7 +43,7 @@ jobs:
         run: |
           # Fail early (and avoid quiet failure of create-pull-request action)
           git diff --exit-code && {
-              echo "Error: No changes, so not creating PR."
+              echo "Error: No changes, so not creating PR." >> $GITHUB_STEP_SUMMARY
               exit 1
           }
 
