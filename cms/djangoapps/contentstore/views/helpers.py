@@ -101,12 +101,27 @@ def xblock_has_own_studio_page(xblock, parent_xblock=None):
     return xblock.has_children
 
 
-def xblock_studio_url(xblock, parent_xblock=None):
+def xblock_studio_url(xblock, parent_xblock=None, find_parent=False):
     """
     Returns the Studio editing URL for the specified xblock.
+
+    You can pass the parent xblock as an optimization, to avoid needing to load
+    it twice, as sometimes the parent has to be checked.
+
+    If you pass in a leaf block that doesn't have its own Studio page, this will
+    normally return None, but if you use find_parent=True, this will find the
+    nearest ancestor (usually the parent unit) that does have a Studio page and
+    return that URL.
     """
     if not xblock_has_own_studio_page(xblock, parent_xblock):
-        return None
+        if find_parent:
+            while xblock and not xblock_has_own_studio_page(xblock, parent_xblock):
+                xblock = get_parent_xblock(xblock) if not parent_xblock else parent_xblock
+                parent_xblock = None
+            if not xblock:
+                return None
+        else:
+            return None
     category = xblock.category
     if category == 'course':
         return reverse_course_url('course_handler', xblock.location.course_key)

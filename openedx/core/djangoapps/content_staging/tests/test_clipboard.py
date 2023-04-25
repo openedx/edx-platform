@@ -45,7 +45,8 @@ class ClipboardTestCase(ModuleStoreTestCase):
         self.assertEqual(response.json(), {
             "content": None,
             "source_usage_key": "",
-            "source_context_title": ""
+            "source_context_title": "",
+            "source_edit_url": "",
         })
         ## The Python method for getting the API response should be identical:
         self.assertEqual(
@@ -86,6 +87,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
         self.assertEqual(response_data["source_context_title"], "Toy Course")
         self.assertEqual(response_data["content"], {**response_data["content"], **{
             "block_type": "video",
+            "block_type_display": "Video",
             # To ensure API stability, we are hard-coding these expected values:
             "purpose": "clipboard",
             "status": "ready",
@@ -190,6 +192,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
         html_clip_data = response.json()
         self.assertEqual(html_clip_data["source_usage_key"], str(html_key))
         self.assertEqual(html_clip_data["content"]["block_type"], "html")
+        self.assertEqual(html_clip_data["content"]["block_type_display"], "Text")
         ## The Python method for getting the API response should be identical:
         self.assertEqual(html_clip_data, python_api.get_user_clipboard_json(self.user.id, response.wsgi_request))
 
