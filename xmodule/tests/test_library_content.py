@@ -19,7 +19,7 @@ from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
-from xmodule.tests import get_test_system
+from xmodule.tests import prepare_block_runtime
 from xmodule.validation import StudioValidationMessage
 from xmodule.x_module import AUTHOR_VIEW
 from xmodule.capa_block import ProblemBlock
@@ -54,24 +54,21 @@ class LibraryContentTest(MixedSplitTestCase):
             source_library_id=str(self.library.location.library_key)
         )
 
-    def _bind_course_block(self, module):
+    def _bind_course_block(self, block):
         """
-        Bind a module (part of self.course) so we can access student-specific data.
+        Bind a block (part of self.course) so we can access student-specific data.
         """
-        module_system = get_test_system(course_id=module.location.course_key)
-        module_system.descriptor_runtime = module.runtime._descriptor_system  # pylint: disable=protected-access
-        module_system._services['library_tools'] = self.tools  # pylint: disable=protected-access
+        prepare_block_runtime(block.runtime, course_id=block.location.course_key)
+        block.runtime._runtime_services.update({'library_tools': self.tools})  # lint-amnesty, pylint: disable=protected-access
 
-        def get_module(descriptor):
-            """Mocks module_system get_module function"""
-            sub_module_system = get_test_system(course_id=module.location.course_key)
-            sub_module_system.get_module = get_module
-            sub_module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
-            descriptor.bind_for_student(sub_module_system, self.user_id)
+        def get_block(descriptor):
+            """Mocks module_system get_block function"""
+            prepare_block_runtime(descriptor.runtime, course_id=block.location.course_key)
+            descriptor.runtime.get_block_for_descriptor = get_block
+            descriptor.bind_for_student(self.user_id)
             return descriptor
 
-        module_system.get_module = get_module
-        module.xmodule_runtime = module_system
+        block.runtime.get_block_for_descriptor = get_block
 
 
 class TestLibraryContentExportImport(LibraryContentTest):
@@ -99,10 +96,10 @@ class TestLibraryContentExportImport(LibraryContentTest):
 
         # Set the virtual FS to export the olx to.
         self.export_fs = MemoryFS()
-        self.lc_block.runtime._descriptor_system.export_fs = self.export_fs  # pylint: disable=protected-access
+        self.lc_block.runtime.export_fs = self.export_fs  # pylint: disable=protected-access
 
         # Prepare runtime for the import.
-        self.runtime = TestImportSystem(load_error_modules=True, course_id=self.lc_block.location.course_key)
+        self.runtime = TestImportSystem(load_error_blocks=True, course_id=self.lc_block.location.course_key)
         self.runtime.resources_fs = self.export_fs
         self.id_generator = Mock()
 
@@ -207,7 +204,7 @@ class LibraryContentBlockTestMixin:
         # Normally the children get added when the "source_libraries" setting
         # is updated, but the way we do it through a factory doesn't do that.
         assert len(self.lc_block.children) == 0
-        # Update the LibraryContent module:
+        # Update the LibraryContent block:
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         # Check that all blocks from the library are now children of the block:
@@ -280,18 +277,21 @@ class LibraryContentBlockTestMixin:
         assert result.summary
         assert StudioValidationMessage.WARNING == result.summary.type
         assert 'only 4 matching problems' in result.summary.text
+        assert len(self.lc_block.selected_children()) == 4
 
         # Add some capa problems so we can check problem type validation messages
         self.lc_block.max_count = 1
         self._create_capa_problems()
         self.lc_block.refresh_children()
         assert self.lc_block.validate()
+        assert len(self.lc_block.selected_children()) == 1
 
         # Existing problem type should pass validation
         self.lc_block.max_count = 1
         self.lc_block.capa_type = 'multiplechoiceresponse'
         self.lc_block.refresh_children()
         assert self.lc_block.validate()
+        assert len(self.lc_block.selected_children()) == 1
 
         # ... unless requested more blocks than exists in library
         self.lc_block.max_count = 10
@@ -303,6 +303,7 @@ class LibraryContentBlockTestMixin:
         assert result.summary
         assert StudioValidationMessage.WARNING == result.summary.type
         assert 'only 1 matching problem' in result.summary.text
+        assert len(self.lc_block.selected_children()) == 1
 
         # Missing problem type should always fail validation
         self.lc_block.max_count = 1
@@ -314,6 +315,14 @@ class LibraryContentBlockTestMixin:
         assert result.summary
         assert StudioValidationMessage.WARNING == result.summary.type
         assert 'no matching problem types' in result.summary.text
+        assert len(self.lc_block.selected_children()) == 0
+
+        # -1 selects all blocks from the library.
+        self.lc_block.max_count = -1
+        self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
+        self.lc_block.refresh_children()
+        assert self.lc_block.validate()
+        assert len(self.lc_block.selected_children()) == len(self.lc_block.children)
 
     def test_capa_type_filtering(self):
         """
@@ -388,6 +397,8 @@ class LibraryContentBlockTestMixin:
         (True, 8),
         # User resets selected children without reset button on content block
         (False, 8),
+        # User resets selected children with reset button on content block when all library blocks should be selected.
+        (True, -1),
     )
     @ddt.unpack
     def test_reset_selected_children_capa_blocks(self, allow_resetting_children, max_count):
@@ -503,7 +514,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         self.lc_block.refresh_children()
         self.lc_block = self.store.get_item(self.lc_block.location)
         self._bind_course_block(self.lc_block)
-        self.lc_block.xmodule_runtime.publish = self.publisher
+        self.lc_block.runtime.publish = self.publisher
 
     def _assert_event_was_published(self, event_type):
         """
@@ -557,7 +568,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
             self.lc_block = self.store.get_item(self.lc_block.location)
             self._bind_course_block(self.lc_block)
-            self.lc_block.xmodule_runtime.publish = self.publisher
+            self.lc_block.runtime.publish = self.publisher
             self.test_assigned_event()
 
     def test_assigned_descendants(self):
@@ -576,7 +587,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         # Reload lc_block and set it up for a student:
         self.lc_block = self.store.get_item(self.lc_block.location)
         self._bind_course_block(self.lc_block)
-        self.lc_block.xmodule_runtime.publish = self.publisher
+        self.lc_block.runtime.publish = self.publisher
 
         # Get the keys of each of our blocks, as they appear in the course:
         course_usage_main_vertical = self.lc_block.children[0]

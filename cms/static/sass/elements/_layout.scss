@@ -8,6 +8,7 @@
   margin: ($baseline*1.5) 0 0 0;
   padding: 0 $baseline;
   position: relative;
+  z-index: 1;
 
   .mast,
   .metadata {

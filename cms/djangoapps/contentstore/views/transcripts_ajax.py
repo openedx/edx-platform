@@ -2,7 +2,7 @@
 Actions manager for transcripts ajax calls.
 +++++++++++++++++++++++++++++++++++++++++++
 
-Module do not support rollback (pressing "Cancel" button in Studio)
+Blocks do not support rollback (pressing "Cancel" button in Studio)
 All user changes are saved immediately.
 """
 
@@ -143,7 +143,7 @@ def validate_video_block(request, locator):
     try:
         item = _get_item(request, {'locator': locator})
         if item.category != 'video':
-            error = _('Transcripts are supported only for "video" modules.')
+            error = _('Transcripts are supported only for "video" blocks.')
     except (InvalidKeyError, ItemNotFoundError):
         error = _('Cannot find item by locator.')
 
@@ -189,7 +189,7 @@ def validate_transcript_upload_data(request):
 @login_required
 def upload_transcripts(request):
     """
-    Upload transcripts for current module.
+    Upload transcripts for current block.
 
     returns: response dict::
 
@@ -455,7 +455,7 @@ def _validate_transcripts_data(request):
         raise TranscriptsRequestValidationException(_("Can't find item by locator."))  # lint-amnesty, pylint: disable=raise-missing-from
 
     if item.category != 'video':
-        raise TranscriptsRequestValidationException(_('Transcripts are supported only for "video" modules.'))
+        raise TranscriptsRequestValidationException(_('Transcripts are supported only for "video" blocks.'))
 
     # parse data form request.GET.['data']['video'] to useful format
     videos = {'youtube': '', 'html5': {}}

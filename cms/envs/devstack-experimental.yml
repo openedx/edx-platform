@@ -333,7 +333,6 @@ JWT_AUTH:
     -   AUDIENCE: lms-key
         ISSUER: http://edx.devstack.lms:18000/oauth2
         SECRET_KEY: lms-secret
-    JWT_PRIVATE_SIGNING_JWK: None
     JWT_PUBLIC_SIGNING_JWK_SET: ''
     JWT_SECRET_KEY: lms-secret
     JWT_SIGNING_ALGORITHM: null

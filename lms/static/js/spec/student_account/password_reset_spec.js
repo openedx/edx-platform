@@ -8,152 +8,152 @@
         'js/student_account/models/PasswordResetModel',
         'js/student_account/views/PasswordResetView'
     ],
-        function($, _, TemplateHelpers, AjaxHelpers, PasswordResetModel, PasswordResetView) {
-            describe('edx.student.account.PasswordResetView', function() {
-                var model = null,
-                    view = null,
-                    requests = null,
-                    EMAIL = 'xsy@edx.org',
-                    FORM_DESCRIPTION = {
-                        method: 'post',
-                        submit_url: '/account/password',
-                        fields: [{
-                            name: 'email',
-                            label: 'Email',
-                            defaultValue: '',
-                            type: 'text',
-                            required: true,
-                            placeholder: 'place@holder.org',
-                            instructions: 'Enter your email.',
-                            restrictions: {}
-                        }]
-                    };
-
-                var createPasswordResetView = function(that) {
-                // Initialize the password reset model
-                    model = new PasswordResetModel({}, {
-                        url: FORM_DESCRIPTION.submit_url,
-                        method: FORM_DESCRIPTION.method
-                    });
-
-                // Initialize the password reset view
-                    view = new PasswordResetView({
-                        fields: FORM_DESCRIPTION.fields,
-                        model: model
-                    });
-
-                // Spy on AJAX requests
-                    requests = AjaxHelpers.requests(that);
+    function($, _, TemplateHelpers, AjaxHelpers, PasswordResetModel, PasswordResetView) {
+        describe('edx.student.account.PasswordResetView', function() {
+            var model = null,
+                view = null,
+                requests = null,
+                EMAIL = 'xsy@edx.org',
+                FORM_DESCRIPTION = {
+                    method: 'post',
+                    submit_url: '/account/password',
+                    fields: [{
+                        name: 'email',
+                        label: 'Email',
+                        defaultValue: '',
+                        type: 'text',
+                        required: true,
+                        placeholder: 'place@holder.org',
+                        instructions: 'Enter your email.',
+                        restrictions: {}
+                    }]
                 };
 
-                var submitEmail = function(validationSuccess) {
+            var createPasswordResetView = function(that) {
+                // Initialize the password reset model
+                model = new PasswordResetModel({}, {
+                    url: FORM_DESCRIPTION.submit_url,
+                    method: FORM_DESCRIPTION.method
+                });
+
+                // Initialize the password reset view
+                view = new PasswordResetView({
+                    fields: FORM_DESCRIPTION.fields,
+                    model: model
+                });
+
+                // Spy on AJAX requests
+                requests = AjaxHelpers.requests(that);
+            };
+
+            var submitEmail = function(validationSuccess) {
                 // Create a fake click event
-                    var clickEvent = $.Event('click');
+                var clickEvent = $.Event('click');
 
                 // Simulate manual entry of an email address
-                    $('#password-reset-email').val(EMAIL);
+                $('#password-reset-email').val(EMAIL);
 
                 // If validationSuccess isn't passed, we avoid
                 // spying on `view.validate` twice
-                    if (!_.isUndefined(validationSuccess)) {
+                if (!_.isUndefined(validationSuccess)) {
                     // Force validation to return as expected
-                        spyOn(view, 'validate').and.returnValue({
-                            isValid: validationSuccess,
-                            message: 'Submission was validated.'
-                        });
-                    }
+                    spyOn(view, 'validate').and.returnValue({
+                        isValid: validationSuccess,
+                        message: 'Submission was validated.'
+                    });
+                }
 
                 // Submit the email address
-                    view.submitForm(clickEvent);
-                };
+                view.submitForm(clickEvent);
+            };
 
-                beforeEach(function() {
-                    setFixtures('<div id="password-reset-form" class="form-wrapper hidden"></div>');
-                    TemplateHelpers.installTemplate('templates/student_account/password_reset');
-                    TemplateHelpers.installTemplate('templates/student_account/form_field');
-                });
+            beforeEach(function() {
+                setFixtures('<div id="password-reset-form" class="form-wrapper hidden"></div>');
+                TemplateHelpers.installTemplate('templates/student_account/password_reset');
+                TemplateHelpers.installTemplate('templates/student_account/form_field');
+            });
 
-                it('allows the user to request a new password', function() {
-                    var syncSpy, passwordEmailSentSpy;
+            it('allows the user to request a new password', function() {
+                var syncSpy, passwordEmailSentSpy;
 
-                    createPasswordResetView(this);
+                createPasswordResetView(this);
 
                 // We expect these events to be triggered upon a successful password reset
-                    syncSpy = jasmine.createSpy('syncEvent');
-                    passwordEmailSentSpy = jasmine.createSpy('passwordEmailSentEvent');
-                    view.listenTo(view.model, 'sync', syncSpy);
-                    view.listenTo(view, 'password-email-sent', passwordEmailSentSpy);
+                syncSpy = jasmine.createSpy('syncEvent');
+                passwordEmailSentSpy = jasmine.createSpy('passwordEmailSentEvent');
+                view.listenTo(view.model, 'sync', syncSpy);
+                view.listenTo(view, 'password-email-sent', passwordEmailSentSpy);
 
                 // Submit the form, with successful validation
-                    submitEmail(true);
+                submitEmail(true);
 
                 // Verify that the client contacts the server with the expected data
-                    AjaxHelpers.expectRequest(
-                        requests, 'POST',
-                        FORM_DESCRIPTION.submit_url,
-                        $.param({email: EMAIL})
-                    );
+                AjaxHelpers.expectRequest(
+                    requests, 'POST',
+                    FORM_DESCRIPTION.submit_url,
+                    $.param({email: EMAIL})
+                );
 
                 // Respond with status code 200
-                    AjaxHelpers.respondWithJson(requests, {});
+                AjaxHelpers.respondWithJson(requests, {});
 
                 // Verify that the events were triggered
-                    expect(syncSpy).toHaveBeenCalled();
-                    expect(passwordEmailSentSpy).toHaveBeenCalled();
+                expect(syncSpy).toHaveBeenCalled();
+                expect(passwordEmailSentSpy).toHaveBeenCalled();
 
                 // Verify that password reset view has been removed
-                    expect($(view.el).html().length).toEqual(0);
-                });
+                expect($(view.el).html().length).toEqual(0);
+            });
 
-                it('displays a link to the password reset help', function() {
-                    createPasswordResetView(this);
+            it('displays a link to the password reset help', function() {
+                createPasswordResetView(this);
 
                 // Verify that the password reset help link is displayed
-                    expect($('.reset-help')).toBeVisible();
-                });
+                expect($('.reset-help')).toBeVisible();
+            });
 
-                it('validates the email field', function() {
-                    createPasswordResetView(this);
+            it('validates the email field', function() {
+                createPasswordResetView(this);
 
                 // Submit the form, with successful validation
-                    submitEmail(true);
+                submitEmail(true);
 
                 // Verify that validation of the email field occurred
-                    expect(view.validate).toHaveBeenCalledWith($('#password-reset-email')[0]);
+                expect(view.validate).toHaveBeenCalledWith($('#password-reset-email')[0]);
 
                 // Verify that no submission errors are visible
-                    expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
-                });
+                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
+            });
 
-                it('displays password reset validation errors', function() {
-                    createPasswordResetView(this);
+            it('displays password reset validation errors', function() {
+                createPasswordResetView(this);
 
                 // Submit the form, with failed validation
-                    submitEmail(false);
+                submitEmail(false);
 
                 // Verify that submission errors are visible
-                    expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
-                });
+                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
+            });
 
-                it('displays an error if the server returns an error while sending a password reset email', function() {
-                    createPasswordResetView(this);
-                    submitEmail(true);
+            it('displays an error if the server returns an error while sending a password reset email', function() {
+                createPasswordResetView(this);
+                submitEmail(true);
 
                 // Simulate an error from the LMS servers
-                    AjaxHelpers.respondWithError(requests);
+                AjaxHelpers.respondWithError(requests);
 
                 // Expect that an error is displayed
-                    expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
+                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
 
                 // If we try again and succeed, the error should go away
-                    submitEmail();
+                submitEmail();
 
                 // This time, respond with status code 200
-                    AjaxHelpers.respondWithJson(requests, {});
+                AjaxHelpers.respondWithJson(requests, {});
 
                 // Expect that the error is hidden
-                    expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
-                });
+                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
             });
         });
+    });
 }).call(this, define || RequireJS.define);

@@ -15,8 +15,8 @@ define([
     'text!templates/course-video-settings-update-org-credentials-footer.underscore'
 ],
 function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, TranscriptSettingsTemplate,
-         TranscriptPreferencesTemplate, TranscriptProviderEmptyStateTemplate, TranscriptProviderSelectedStateTemplate,
-         OrganizationCredentialsTemplate, UpdateSettingsFooterTemplate, OrganizationCredentialsFooterTemplate) {
+    TranscriptPreferencesTemplate, TranscriptProviderEmptyStateTemplate, TranscriptProviderSelectedStateTemplate,
+    OrganizationCredentialsTemplate, UpdateSettingsFooterTemplate, OrganizationCredentialsFooterTemplate) {
     'use strict';
 
     var CourseVideoSettingsView,
@@ -302,7 +302,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 HtmlUtils.setHtml(
                     $turnaround,
                     HtmlUtils.HTML(new Option(gettext('Select turnaround'), ''))
-                 );
+                );
                 _.each(turnaroundPlan, function(value, key) {
                     var option = new Option(value, key);
                     if (self.selectedTurnaroundPlan === key) {
@@ -346,9 +346,9 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
         renderTargetLanguages: function() {
             var self = this,
-            // Merge active and selected languages, this handles the case when active languages are present and
-            // user also has selected some languages but not saved, user changes organization credentials,
-            // both active and selected languages should be rendered.
+                // Merge active and selected languages, this handles the case when active languages are present and
+                // user also has selected some languages but not saved, user changes organization credentials,
+                // both active and selected languages should be rendered.
                 selectedLanguages = _.union(self.activeLanguages, self.selectedLanguages),
                 $languagesPreferenceContainer = self.$el.find('.transcript-languages-wrapper'),
                 $languagesContainer = self.$el.find('.languages-container');

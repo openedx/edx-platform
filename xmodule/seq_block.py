@@ -1,5 +1,5 @@
 """
-xModule implementation of a learning sequence
+XBlock implementation of a learning sequence
 """
 
 # pylint: disable=abstract-method
@@ -39,7 +39,7 @@ from .exceptions import NotFoundError
 from .fields import Date
 from .mako_block import MakoTemplateBlockBase
 from .progress import Progress
-from .x_module import AUTHOR_VIEW, PUBLIC_VIEW, STUDENT_VIEW
+from .x_module import AUTHOR_VIEW, PUBLIC_VIEW
 from .xml_block import XmlMixin
 
 
@@ -300,16 +300,16 @@ class SequenceBlock(
 
         self.gated_sequence_paywall = None
 
-    def bind_for_student(self, xmodule_runtime, user_id, wrappers=None):
+    def bind_for_student(self, user_id, wrappers=None):
         # The position of the child XBlock to select can also be passed in via the URL.
-        # In such cases the value is set on the ModuleSystem in get_module_system_for_user()
-        # and needs to be read here after the ModuleSystem has been set on the XBlock.
-        super().bind_for_student(xmodule_runtime, user_id, wrappers)
+        # In such cases the value is set in the runtime inside prepare_runtime_for_user()
+        # and needs to be read here after the value has been set.
+        super().bind_for_student(user_id, wrappers)
         # If position is specified in system, then use that instead.
-        position = getattr(self.system, 'position', None)
+        position = getattr(self.runtime, 'position', None)
         if position is not None:
             assert isinstance(position, int)
-            self.position = self.system.position
+            self.position = self.runtime.position
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.
@@ -933,6 +933,12 @@ class SequenceBlock(
             user_role_in_course = 'staff' if user_is_staff else 'student'
             course_id = self.scope_ids.usage_id.context_key
             content_id = self.location
+            course = self._get_course()
+
+            # LTI exam tools are not managed by the edx-proctoring library
+            # Return None rather than reaching into the edx-proctoring subsystem
+            if course.proctoring_provider == 'lti_external':
+                return None
 
             context = {
                 'display_name': self.display_name,

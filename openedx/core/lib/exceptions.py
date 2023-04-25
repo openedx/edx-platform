@@ -21,6 +21,6 @@ class PageNotFoundError(ObjectDoesNotExist):
 
 class DiscussionNotFoundError(ObjectDoesNotExist):
     """
-    Discussion Module was not found.
+    Discussion Block was not found.
     """
     pass  # lint-amnesty, pylint: disable=unnecessary-pass

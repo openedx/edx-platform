@@ -6,23 +6,23 @@ import upgradeMessageTpl from '../../../templates/learner_dashboard/upgrade_mess
 import trackECommerceEvents from '../../commerce/track_ecommerce_events';
 
 class UpgradeMessageView extends Backbone.View {
-  initialize(options) {
-    this.messageTpl = HtmlUtils.template(upgradeMessageTpl);
-    this.$el = options.$el;
-    this.render();
+    initialize(options) {
+        this.messageTpl = HtmlUtils.template(upgradeMessageTpl);
+        this.$el = options.$el;
+        this.render();
 
-    const courseUpsellButtons = this.$el.find('.program_dashboard_course_upsell_button');
-    trackECommerceEvents.trackUpsellClick(courseUpsellButtons, 'program_dashboard_course', {
-      linkType: 'button',
-      pageName: 'program_dashboard',
-      linkCategory: 'green_upgrade',
-    });
-  }
+        const courseUpsellButtons = this.$el.find('.program_dashboard_course_upsell_button');
+        trackECommerceEvents.trackUpsellClick(courseUpsellButtons, 'program_dashboard_course', {
+            linkType: 'button',
+            pageName: 'program_dashboard',
+            linkCategory: 'green_upgrade',
+        });
+    }
 
-  render() {
-    const data = this.model.toJSON();
-    HtmlUtils.setHtml(this.$el, this.messageTpl(data));
-  }
+    render() {
+        const data = this.model.toJSON();
+        HtmlUtils.setHtml(this.$el, this.messageTpl(data));
+    }
 }
 
 export default UpgradeMessageView;

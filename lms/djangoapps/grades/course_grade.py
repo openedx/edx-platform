@@ -158,13 +158,13 @@ class CourseGradeBase:
             possible += section.graded_total.possible
         return compute_percent(earned, possible)
 
-    def score_for_module(self, location):
+    def score_for_block(self, location):
         """
         Calculate the aggregate weighted score for any location in the course.
         This method returns a tuple containing (earned_score, possible_score).
         If the location is of 'problem' type, this method will return the
         possible and earned scores for that problem. If the location refers to a
-        composite module (a vertical or section ) the scores will be the sums of
+        composite block (a vertical or section ) the scores will be the sums of
         all scored problems that are children of the chosen location.
         """
         if location in self.problem_scores:
@@ -173,7 +173,7 @@ class CourseGradeBase:
         children = self.course_data.structure.get_children(location)
         earned, possible = 0.0, 0.0
         for child in children:
-            child_earned, child_possible = self.score_for_module(child)
+            child_earned, child_possible = self.score_for_block(child)
             earned += child_earned
             possible += child_possible
         return earned, possible

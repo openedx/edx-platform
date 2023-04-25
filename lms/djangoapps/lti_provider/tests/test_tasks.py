@@ -121,7 +121,7 @@ class SendCompositeOutcomeTest(BaseOutcomeTest):
     )
     @ddt.unpack
     def test_outcome_with_score_score(self, earned, possible, expected):
-        self.course_grade.score_for_module = MagicMock(return_value=(earned, possible))
+        self.course_grade.score_for_block = MagicMock(return_value=(earned, possible))
         tasks.send_composite_outcome(
             self.user.id, str(self.course_key), self.assignment.id, 1
         )

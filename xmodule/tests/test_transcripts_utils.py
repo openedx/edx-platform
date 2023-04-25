@@ -104,7 +104,7 @@ class YoutubeVideoHTMLResponse:
 
 class TranscriptsUtilsTest(TestCase):
     """
-    Tests utility fucntions for transcripts (in video_module)
+    Tests utility fucntions for transcripts (in video_block)
     """
 
     @mock.patch('requests.get')

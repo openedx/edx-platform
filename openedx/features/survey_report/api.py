@@ -1,10 +1,18 @@
 """
 Contains the logic to manage survey report model.
 """
+import requests
 
 from django.conf import settings
+from django.forms.models import model_to_dict
 
-from openedx.features.survey_report.models import SurveyReport
+from openedx.features.survey_report.models import (
+    SurveyReport,
+    SurveyReportUpload,
+    SurveyReportAnonymousSiteID,
+    SURVEY_REPORT_ERROR,
+    SURVEY_REPORT_GENERATED
+)
 from openedx.features.survey_report.queries import (
     get_course_enrollments,
     get_recently_active_users,
@@ -12,7 +20,6 @@ from openedx.features.survey_report.queries import (
     get_registered_learners,
     get_unique_courses_offered
 )
-from .models import SURVEY_REPORT_ERROR, SURVEY_REPORT_GENERATED
 
 MAX_WEEKS_SINCE_LAST_LOGIN: int = 4
 
@@ -49,6 +56,57 @@ def generate_report() -> None:
     except (Exception, ) as update_report_error:
         update_report(survey_report.id, {"state": SURVEY_REPORT_ERROR})
         raise Exception(update_report_error) from update_report_error
+    return survey_report.id
+
+
+def get_id() -> str:
+    """ Generate id for the survey report."""
+    if not settings.ANONYMOUS_SURVEY_REPORT:
+        return settings.LMS_BASE
+    return str(SurveyReportAnonymousSiteID.objects.get_or_create()[0].id)
+
+
+def send_report_to_external_api(report_id: int) -> None:
+    """
+    Send a report to Openedx endpoint and save the response in the SurveyReportUpload model.
+
+    endpoint: The value of the setting SURVEY_REPORT_ENDPOINT
+
+    content_type: JSON
+
+    payload:
+    - courses_offered: Total number of active unique courses.
+    - learner: Recently active users with login in some weeks.
+    - registered_learners: Total number of users ever registered in the platform.
+    - enrollments: Total number of active enrollments in the platform.
+    - generated_certificates: Total number of generated certificates.
+    - extra_data: Extra information that will be saved in the report, E.g: site_name, openedx-release.
+    - created_at: Date when the report was generated, this date will send with format '%m-%d-%Y %H:%M:%S'
+    """
+    report = SurveyReport.objects.get(id=report_id)
+
+    fields = [
+        "courses_offered",
+        "learners",
+        "registered_learners",
+        "generated_certificates",
+        "enrollments",
+    ]
+
+    data = model_to_dict(report, fields=fields)
+    data["id"] = get_id()
+    data["extra_data"] = report.extra_data
+    data["created_at"] = report.created_at.strftime("%m-%d-%Y %H:%M:%S")
+
+    request = requests.post(settings.SURVEY_REPORT_ENDPOINT, json=data)
+
+    request.raise_for_status()
+
+    SurveyReportUpload.objects.create(
+        report=report,
+        status_code=request.status_code,
+        request_details=request.content
+    )
 
 
 def update_report(survey_report_id: int, data: dict) -> None:

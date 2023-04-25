@@ -2,6 +2,7 @@
 import logging
 
 from django.conf import settings
+from ipware.ip import get_client_ip
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import (
     SessionAuthenticationAllowInactiveUser,
@@ -15,6 +16,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.toggles import show_fallback_recommendations
 from common.djangoapps.track import segment
+from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
 from openedx.core.djangoapps.programs.utils import (
     ProgramProgressMeter,
     get_certificates,
@@ -25,6 +27,7 @@ from openedx.core.djangoapps.programs.utils import (
 from lms.djangoapps.learner_recommendations.utils import (
     filter_recommended_courses,
     get_amplitude_course_recommendations,
+    is_user_enrolled_in_ut_austin_masters_program,
 )
 
 
@@ -385,13 +388,14 @@ class CourseRecommendationApiView(APIView):
                 "course_key_array": [
                     course["course_key"] for course in recommended_courses
                 ],
+                "page": "dashboard",
             },
         )
 
-    def _general_recommendations_response(self, user_id, is_control, recommendations):
+    def _recommendations_response(self, user_id, is_control, recommendations, amplitude_recommendations):
         """Helper method for general recommendations response"""
         self._emit_recommendations_viewed_event(
-            user_id, is_control, recommendations, amplitude_recommendations=False
+            user_id, is_control, recommendations, amplitude_recommendations
         )
         return Response(
             {
@@ -401,12 +405,24 @@ class CourseRecommendationApiView(APIView):
             status=200,
         )
 
+    def _course_data(self, course):
+        """Helper method for personalized recommendation response"""
+        return {
+            "course_key": course.get("key"),
+            "title": course.get("title"),
+            "logo_image_url": course.get("owners")[0]["logo_image_url"] if course.get(
+                "owners") else "",
+            "marketing_url": course.get("marketing_url"),
+        }
+
     def get(self, request):
         """Retrieves course recommendations details of a user in a specified course."""
         user_id = request.user.id
-        fallback_recommendations = (
-            settings.GENERAL_RECOMMENDATIONS if show_fallback_recommendations() else []
-        )
+
+        if is_user_enrolled_in_ut_austin_masters_program(request.user):
+            return self._recommendations_response(user_id, None, [], False)
+
+        fallback_recommendations = settings.GENERAL_RECOMMENDATIONS if show_fallback_recommendations() else []
 
         try:
             (
@@ -416,30 +432,28 @@ class CourseRecommendationApiView(APIView):
             ) = get_amplitude_course_recommendations(user_id, settings.DASHBOARD_AMPLITUDE_RECOMMENDATION_ID)
         except Exception as ex:  # pylint: disable=broad-except
             logger.warning(f"Cannot get recommendations from Amplitude: {ex}")
-            return self._general_recommendations_response(
-                user_id, None, fallback_recommendations
+            return self._recommendations_response(
+                user_id, None, fallback_recommendations, False
             )
 
         is_control = is_control if has_is_control else None
 
         if is_control or is_control is None or not course_keys:
-            return self._general_recommendations_response(
-                user_id, is_control, fallback_recommendations
+            return self._recommendations_response(
+                user_id, is_control, fallback_recommendations, False
             )
 
-        recommended_courses = filter_recommended_courses(request.user, course_keys)
-        if not recommended_courses:
-            return self._general_recommendations_response(
-                user_id, is_control, fallback_recommendations
-            )
-
-        self._emit_recommendations_viewed_event(
-            user_id, is_control, recommended_courses
+        ip_address = get_client_ip(request)[0]
+        user_country_code = country_code_from_ip(ip_address).upper()
+        filtered_courses = filter_recommended_courses(
+            request.user, course_keys, user_country_code=user_country_code, recommendation_count=5
         )
-        return Response(
-            {
-                "courses": recommended_courses,
-                "is_control": is_control,
-            },
-            status=200,
+        if not filtered_courses:
+            return self._recommendations_response(
+                user_id, is_control, fallback_recommendations, False
+            )
+
+        recommended_courses = list(map(self._course_data, filtered_courses))
+        return self._recommendations_response(
+            user_id, is_control, recommended_courses, True
         )

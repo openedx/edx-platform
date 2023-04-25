@@ -103,7 +103,7 @@ define(
 
                 if (state !== 'error') {
                     expect($thumbnail.find('.action-icon').html().trim()).toEqual(
-                         videoThumbnailView.actionsInfo[state].icon
+                        videoThumbnailView.actionsInfo[state].icon
                     );
                 }
 
@@ -269,7 +269,7 @@ define(
 
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
-                .trim()).toEqual(
+                    .trim()).toEqual(
                     'Image upload failed. The selected image must be larger than ' +
                     videoThumbnailView.getVideoImageMinSize().humanize + '.'
                 );
@@ -284,7 +284,7 @@ define(
 
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
-                .trim()).toEqual(
+                    .trim()).toEqual(
                     'Image upload failed. The selected image must be smaller than ' +
                     videoThumbnailView.getVideoImageMaxSize().humanize + '.'
                 );
@@ -321,7 +321,7 @@ define(
 
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
-                .trim()).toEqual(
+                    .trim()).toEqual(
                     'Image upload failed. This image file type is not supported. Supported file types are ' +
                     videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.'
                 );

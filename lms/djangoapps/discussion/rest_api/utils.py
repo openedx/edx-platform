@@ -226,6 +226,25 @@ def create_blocks_params(course_usage_key, user):
     }
 
 
+def add_thread_stats_to_subsection(topics_list):
+    """
+    Add topic stats at subsection by adding stats of all units in
+    the topic
+    """
+    for section in topics_list:
+        for subsection in section.get('children', []):
+            discussions = 0
+            questions = 0
+            for unit in subsection.get('children', []):
+                thread_counts = unit.get('thread_counts', {})
+                discussions += thread_counts.get('discussion', 0)
+                questions += thread_counts.get('question', 0)
+            subsection['thread_counts'] = {
+                'discussion': discussions,
+                'question': questions,
+            }
+
+
 def create_topics_v3_structure(blocks, topics):
     """
     Create V3 topics structure from blocks and v2 topics
@@ -253,6 +272,7 @@ def create_topics_v3_structure(blocks, topics):
                     topics,
                 )
 
+    add_thread_stats_to_subsection(courseware_topics)
     structured_topics = non_courseware_topics + courseware_topics
     topic_ids = get_topic_ids_from_topics(topics)
 

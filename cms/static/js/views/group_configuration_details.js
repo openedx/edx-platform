@@ -89,7 +89,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
                     'Used in {count} location', 'Used in {count} locations',
                     count
                 ),
-                    {count: count}
+                {count: count}
                 );
             }
         }

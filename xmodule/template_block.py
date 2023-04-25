@@ -42,7 +42,7 @@ class CustomTagTemplateBlock(  # pylint: disable=abstract-method
 @XBlock.needs('mako')
 class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
     """
-    This module supports tags of the form
+    This block supports tags of the form
     <customtag option="val" option2="val2" impl="tagname"/>
 
     In this case, $tagname should refer to a file in data/custom_tags, which
@@ -118,7 +118,7 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
 
     @property
     def rendered_html(self):
-        return self.render_template(self.system, self.data)
+        return self.render_template(self.runtime, self.data)
 
     def student_view(self, _context):
         """

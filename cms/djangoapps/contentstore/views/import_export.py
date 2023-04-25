@@ -27,7 +27,6 @@ from edx_django_utils.monitoring import set_custom_attribute, set_custom_attribu
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
-from storages.backends.s3boto import S3BotoStorage
 from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
@@ -76,11 +75,11 @@ def import_handler(request, course_key_string):
     if library:
         successful_url = reverse_library_url('library_handler', courselike_key)
         context_name = 'context_library'
-        courselike_module = modulestore().get_library(courselike_key)
+        courselike_block = modulestore().get_library(courselike_key)
     else:
         successful_url = reverse_course_url('course_handler', courselike_key)
         context_name = 'context_course'
-        courselike_module = modulestore().get_course(courselike_key)
+        courselike_block = modulestore().get_course(courselike_key)
     if not has_course_author_access(request.user, courselike_key):
         raise PermissionDenied()
 
@@ -94,7 +93,7 @@ def import_handler(request, course_key_string):
             "import_status_handler", courselike_key, kwargs={'filename': "fillerName"}
         )
         return render_to_response('import.html', {
-            context_name: courselike_module,
+            context_name: courselike_block,
             'successful_import_redirect_url': successful_url,
             'import_status_url': status_url,
             'library': isinstance(courselike_key, LibraryLocator)
@@ -313,18 +312,18 @@ def export_handler(request, course_key_string):
         raise PermissionDenied()
 
     if isinstance(course_key, LibraryLocator):
-        courselike_module = modulestore().get_library(course_key)
+        courselike_block = modulestore().get_library(course_key)
         context = {
-            'context_library': courselike_module,
+            'context_library': courselike_block,
             'courselike_home_url': reverse_library_url("library_handler", course_key),
             'library': True
         }
     else:
-        courselike_module = modulestore().get_course(course_key)
-        if courselike_module is None:
+        courselike_block = modulestore().get_course(course_key)
+        if courselike_block is None:
             raise Http404
         context = {
-            'context_course': courselike_module,
+            'context_course': courselike_block,
             'courselike_home_url': reverse_course_url("course_handler", course_key),
             'library': False
         }
@@ -381,14 +380,6 @@ def export_status_handler(request, course_key_string):
         artifact = UserTaskArtifact.objects.get(status=task_status, name='Output')
         if isinstance(artifact.file.storage, FileSystemStorage):
             output_url = reverse_course_url('export_output_handler', course_key)
-        elif isinstance(artifact.file.storage, S3BotoStorage):
-            filename = os.path.basename(artifact.file.name)
-            disposition = f'attachment; filename="{filename}"'
-            output_url = artifact.file.storage.url(artifact.file.name, response_headers={
-                'response-content-disposition': disposition,
-                'response-content-encoding': 'application/octet-stream',
-                'response-content-type': 'application/x-tgz'
-            })
         elif isinstance(artifact.file.storage, S3Boto3Storage):
             filename = os.path.basename(artifact.file.name)
             disposition = f'attachment; filename="{filename}"'

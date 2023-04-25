@@ -674,3 +674,12 @@ MFE_CONFIG_OVERRIDES = {
 
 ############## Settings for survey report ##############
 SURVEY_REPORT_EXTRA_DATA = {}
+SURVEY_REPORT_ENDPOINT = "https://example.com/survey_report"
+ANONYMOUS_SURVEY_REPORT = False
+
+######################## Subscriptions API SETTINGS ########################
+SUBSCRIPTIONS_ROOT_URL = "http://localhost:18750"
+SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
+
+SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
+SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe"

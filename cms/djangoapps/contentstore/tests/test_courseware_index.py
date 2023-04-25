@@ -206,7 +206,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
 
     def _test_indexing_course(self, store):
         """ indexing course tests """
-        # Only published modules should be in the index
+        # Only published blocks should be in the index
         added_to_index = self.reindex_course(store)  # This reindex may not be necessary (it may already be indexed)
         self.assertEqual(added_to_index, 3)
         response = self.search()
@@ -1164,7 +1164,7 @@ class GroupConfigurationSearchSplit(CourseTestCase, MixedWithOptionsTestCase):
         Indexing course with content groups added test.
         """
 
-        # Only published modules should be in the index
+        # Only published blocks should be in the index
         added_to_index = self.reindex_course(self.store)
         self.assertEqual(added_to_index, 16)
         response = self.searcher.search(field_dictionary={"course": str(self.course.id)})

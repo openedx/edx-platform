@@ -16,8 +16,8 @@ from xmodule.x_module import STUDIO_VIEW
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from cms.djangoapps.contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
-from cms.djangoapps.contentstore.views.item import _duplicate_item
-from cms.djangoapps.contentstore.views.preview import _load_preview_module
+from cms.djangoapps.contentstore.views.block import _duplicate_block
+from cms.djangoapps.contentstore.views.preview import _load_preview_block
 from cms.djangoapps.contentstore.views.tests.test_library import LIBRARY_REST_URL
 from cms.djangoapps.course_creators.views import add_user_with_status_granted
 from common.djangoapps.student import auth
@@ -50,7 +50,7 @@ class LibraryTestCase(ModuleStoreTestCase):
         self.lib_key = self._create_library()
         self.library = modulestore().get_library(self.lib_key)
 
-        self.session_data = {}  # Used by _bind_module
+        self.session_data = {}  # Used by _bind_block
 
     def _login_as_staff_user(self, logout_first=True):
         """ Login as a staff user """
@@ -114,7 +114,7 @@ class LibraryTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status_code_expected)
         return modulestore().get_item(lib_content_block.location)
 
-    def _bind_module(self, descriptor, user=None):
+    def _bind_block(self, descriptor, user=None):
         """
         Helper to use the CMS's module system so we can access student-specific fields.
         """
@@ -123,9 +123,9 @@ class LibraryTestCase(ModuleStoreTestCase):
         if user not in self.session_data:
             self.session_data[user] = {}
         request = Mock(user=user, session=self.session_data[user])
-        _load_preview_module(request, descriptor)
+        _load_preview_block(request, descriptor)
 
-    def _update_item(self, usage_key, metadata):
+    def _update_block(self, usage_key, metadata):
         """
         Helper method: Uses the REST API to update the fields of an XBlock.
         This will result in the XBlock's editor_saved() method being called.
@@ -178,7 +178,7 @@ class TestLibraries(LibraryTestCase):
         # chosen for a given student.
         # In order to be able to call get_child_descriptors(), we must first
         # call bind_for_student:
-        self._bind_module(lc_block)
+        self._bind_block(lc_block)
         self.assertEqual(len(lc_block.children), num_to_create)
         self.assertEqual(len(lc_block.get_child_descriptors()), num_expected)
 
@@ -209,7 +209,7 @@ class TestLibraries(LibraryTestCase):
             return children[0]
 
         # Check which child a student will see:
-        self._bind_module(lc_block)
+        self._bind_block(lc_block)
         chosen_child = get_child_of_lc_block(lc_block)
         chosen_child_defn_id = chosen_child.definition_locator.definition_id
         lc_block.save()
@@ -223,7 +223,7 @@ class TestLibraries(LibraryTestCase):
             """
             for _ in range(6):  # Repeat many times b/c blocks are randomized
                 lc_block = modulestore().get_item(lc_block_key)  # Reload block from the database
-                self._bind_module(lc_block)
+                self._bind_block(lc_block)
                 current_child = get_child_of_lc_block(lc_block)
                 self.assertEqual(current_child.location, chosen_child.location)
                 self.assertEqual(current_child.data, chosen_child.data)
@@ -352,7 +352,7 @@ class TestLibraries(LibraryTestCase):
         self.assertEqual(len(lc_block.children), 1)
 
         # Now, change the block settings to have an invalid library key:
-        resp = self._update_item(
+        resp = self._update_block(
             lc_block.location,
             {"source_library_id": "library-v1:NOT+FOUND"},
         )
@@ -395,7 +395,7 @@ class TestLibraries(LibraryTestCase):
         self.assertEqual(len(lc_block.children), 1)
 
         # Now, change the block settings to have an invalid library key:
-        resp = self._update_item(
+        resp = self._update_block(
             lc_block.location,
             {"source_library_id": str(library2key)},
         )
@@ -436,7 +436,7 @@ class TestLibraries(LibraryTestCase):
         lc_block = self._refresh_children(lc_block)
         self.assertEqual(len(lc_block.children), 2)
 
-        resp = self._update_item(
+        resp = self._update_block(
             lc_block.location,
             {"capa_type": 'optionresponse'},
         )
@@ -447,7 +447,7 @@ class TestLibraries(LibraryTestCase):
         html_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(html_block.display_name, name1)
 
-        resp = self._update_item(
+        resp = self._update_block(
             lc_block.location,
             {"capa_type": 'multiplechoiceresponse'},
         )
@@ -470,7 +470,7 @@ class TestLibraries(LibraryTestCase):
         self.assertEqual(len(lc_block.children), 0)
 
         # Now, change the block settings to have an invalid library key:
-        resp = self._update_item(
+        resp = self._update_block(
             lc_block.location,
             {"source_library_id": "library-v1:NOT+FOUND"},
         )
@@ -766,7 +766,7 @@ class TestLibraryAccess(LibraryTestCase):
         # Try updating our library content block:
         lc_block = self._add_library_content_block(course, self.lib_key)
         # We must use the CMS's module system in order to get permissions checks.
-        self._bind_module(lc_block, user=self.non_staff_user)
+        self._bind_block(lc_block, user=self.non_staff_user)
         lc_block = self._refresh_children(lc_block, status_code_expected=200 if expected_result else 403)
         self.assertEqual(len(lc_block.children), 1 if expected_result else 0)
 
@@ -947,7 +947,7 @@ class TestOverrides(LibraryTestCase):
         if duplicate:
             # Check that this also works when the RCB is duplicated.
             self.lc_block = modulestore().get_item(
-                _duplicate_item(self.course.location, self.lc_block.location, self.user)
+                _duplicate_block(self.course.location, self.lc_block.location, self.user)
             )
             self.problem_in_course = modulestore().get_item(self.lc_block.children[0])
         else:
@@ -1006,7 +1006,7 @@ class TestOverrides(LibraryTestCase):
 
         # Duplicate self.lc_block:
         duplicate = store.get_item(
-            _duplicate_item(self.course.location, self.lc_block.location, self.user)
+            _duplicate_block(self.course.location, self.lc_block.location, self.user)
         )
         # The duplicate should have identical children to the original:
         self.assertEqual(len(duplicate.children), 1)

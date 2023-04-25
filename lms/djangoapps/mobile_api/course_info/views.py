@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.static_replace import make_static_urls_absolute
-from lms.djangoapps.courseware.courses import get_course_info_section_module
+from lms.djangoapps.courseware.courses import get_course_info_section_block
 from lms.djangoapps.course_goals.models import UserActivity
 from openedx.core.lib.xblock_utils import get_course_update_items
 from openedx.features.course_experience import ENABLE_COURSE_GOALS
@@ -47,8 +47,8 @@ class CourseUpdatesList(generics.ListAPIView):
 
     @mobile_course_access()
     def list(self, request, course, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
-        course_updates_module = get_course_info_section_module(request, request.user, course, 'updates')
-        update_items = get_course_update_items(course_updates_module)
+        course_updates_block = get_course_info_section_block(request, request.user, course, 'updates')
+        update_items = get_course_update_items(course_updates_block)
 
         updates_to_show = [
             update for update in update_items
@@ -56,7 +56,7 @@ class CourseUpdatesList(generics.ListAPIView):
         ]
 
         for item in updates_to_show:
-            item['content'] = apply_wrappers_to_content(item['content'], course_updates_module, request)
+            item['content'] = apply_wrappers_to_content(item['content'], course_updates_block, request)
 
         return Response(updates_to_show)
 
@@ -82,26 +82,26 @@ class CourseHandoutsList(generics.ListAPIView):
 
     @mobile_course_access()
     def list(self, request, course, *args, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
-        course_handouts_module = get_course_info_section_module(request, request.user, course, 'handouts')
-        if course_handouts_module:
-            if course_handouts_module.data == "<ol></ol>":
+        course_handouts_block = get_course_info_section_block(request, request.user, course, 'handouts')
+        if course_handouts_block:
+            if course_handouts_block.data == "<ol></ol>":
                 handouts_html = None
             else:
-                handouts_html = apply_wrappers_to_content(course_handouts_module.data, course_handouts_module, request)
+                handouts_html = apply_wrappers_to_content(course_handouts_block.data, course_handouts_block, request)
             return Response({'handouts_html': handouts_html})
         else:
-            # course_handouts_module could be None if there are no handouts
+            # course_handouts_block could be None if there are no handouts
             return Response({'handouts_html': None})
 
 
-def apply_wrappers_to_content(content, module, request):
+def apply_wrappers_to_content(content, block, request):
     """
     Updates a piece of html content with the filter functions stored in its module system, then replaces any
     static urls with absolute urls.
 
     Args:
         content: The html content to which to apply the content wrappers generated for this module system.
-        module: The module containing a reference to the module system which contains functions to apply to the
+        block: The block containing a reference to the module system which contains functions to apply to the
         content. These functions include:
             * Replacing static url's
             * Replacing course url's
@@ -111,7 +111,7 @@ def apply_wrappers_to_content(content, module, request):
     Returns: A piece of html content containing the original content updated by each wrapper.
 
     """
-    content = module.system.service(module, "replace_urls").replace_urls(content)
+    content = block.runtime.service(block, "replace_urls").replace_urls(content)
 
     return make_static_urls_absolute(request, content)
 

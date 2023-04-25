@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # lint-amnesty, pylint: disable=abstract-method
     """
-    A system that has a cache of a course version's json that it will use to load modules
+    A system that has a cache of a course version's json that it will use to load blocks
     from, with a backup of calling to the underlying modulestore for more data.
 
     Computes the settings (nee 'metadata') inheritance upon creation.
@@ -37,8 +37,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         """
         Computes the settings inheritance and sets up the cache.
 
-        modulestore: the module store that can be used to retrieve additional
-        modules
+        modulestore: the module store that can be used to retrieve additional blocks
 
         course_entry: the originally fetched enveloped course_structure w/ branch and course id info.
         Callers to _load_item provide an override but that function ignores the provided structure and
@@ -112,9 +111,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             version_guid = course_key.version_guid
 
         # look in cache
-        cached_module = self.modulestore.get_cached_block(course_key, version_guid, block_key)
-        if cached_module:
-            return cached_module
+        cached_block = self.modulestore.get_cached_block(course_key, version_guid, block_key)
+        if cached_block:
+            return cached_block
 
         block_data = self.get_module_data(block_key, course_key)
 
@@ -234,7 +233,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             else:
                 field_data = KvsFieldData(kvs)
 
-            module = self.construct_xblock_from_class(
+            block = self.construct_xblock_from_class(
                 class_,
                 ScopeIds(None, block_key.type, definition_id, block_locator),
                 field_data,
@@ -253,24 +252,24 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             )
 
         edit_info = block_data.edit_info
-        module._edited_by = edit_info.edited_by  # pylint: disable=protected-access
-        module._edited_on = edit_info.edited_on  # pylint: disable=protected-access
-        module.previous_version = edit_info.previous_version
-        module.update_version = edit_info.update_version
-        module.source_version = edit_info.source_version
-        module.definition_locator = DefinitionLocator(block_key.type, definition_id)
+        block._edited_by = edit_info.edited_by  # pylint: disable=protected-access
+        block._edited_on = edit_info.edited_on  # pylint: disable=protected-access
+        block.previous_version = edit_info.previous_version
+        block.update_version = edit_info.update_version
+        block.source_version = edit_info.source_version
+        block.definition_locator = DefinitionLocator(block_key.type, definition_id)
 
         for wrapper in self.modulestore.xblock_field_data_wrappers:
-            module._field_data = wrapper(module, module._field_data)  # pylint: disable=protected-access
+            block._field_data = wrapper(block, block._field_data)  # pylint: disable=protected-access
 
         # decache any pending field settings
-        module.save()
+        block.save()
 
         # If this is an in-memory block, store it in this system
         if isinstance(block_locator.block_id, LocalId):
-            self.local_modules[block_locator] = module
+            self.local_modules[block_locator] = block
 
-        return module
+        return block
 
     def get_edited_by(self, xblock):
         """

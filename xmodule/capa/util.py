@@ -191,8 +191,8 @@ def sanitize_html(html_code):
     })
     output = bleach.clean(
         html_code,
-        protocols=bleach.ALLOWED_PROTOCOLS + ['data'],
-        tags=bleach.ALLOWED_TAGS + ['div', 'p', 'audio', 'pre', 'img', 'span'],
+        protocols=bleach.ALLOWED_PROTOCOLS | {'data'},
+        tags=bleach.ALLOWED_TAGS | {'div', 'p', 'audio', 'pre', 'img', 'span'},
         css_sanitizer=CSSSanitizer(allowed_css_properties=["white-space"]),
         attributes=attributes
     )
@@ -216,12 +216,12 @@ def remove_markup(html):
     """
     Return html with markup stripped and text HTML-escaped.
 
-    >>> bleach.clean("<b>Rock & Roll</b>", tags=[], strip=True)
+    >>> bleach.clean("<b>Rock & Roll</b>", tags=set(), strip=True)
     'Rock &amp; Roll'
-    >>> bleach.clean("<b>Rock &amp; Roll</b>", tags=[], strip=True)
+    >>> bleach.clean("<b>Rock &amp; Roll</b>", tags=set(), strip=True)
     'Rock &amp; Roll'
     """
-    return HTML(bleach.clean(html, tags=[], strip=True))
+    return HTML(bleach.clean(html, tags=set(), strip=True))
 
 
 def get_course_id_from_capa_block(capa_block):
@@ -236,7 +236,7 @@ def get_course_id_from_capa_block(capa_block):
         capa_block (ProblemBlock|None)
 
     Returns: str|None
-        The stringified course run key of the module.
+        The stringified course run key of the block.
         If not available, fall back to None.
     """
     if not capa_block:

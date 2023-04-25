@@ -64,7 +64,7 @@ class Command(BaseCommand):
         mstore = modulestore()
 
         course_items = import_course_from_xml(
-            mstore, ModuleStoreEnum.UserID.mgmt_command, data_dir, source_dirs, load_error_modules=False,
+            mstore, ModuleStoreEnum.UserID.mgmt_command, data_dir, source_dirs, load_error_blocks=False,
             static_content_store=contentstore(), verbose=True,
             do_import_static=do_import_static, do_import_python_lib=do_import_python_lib,
             create_if_not_present=True,

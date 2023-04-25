@@ -2,16 +2,13 @@
 Test cases to cover account retirement views
 """
 
-
 import datetime
 import json
-import unittest
 from unittest import mock
 
 import ddt
 import pytz
 from consent.models import DataSharingConsent
-from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.sites.models import Site
 from django.core import mail
@@ -74,6 +71,7 @@ from common.djangoapps.student.tests.factories import (
     SuperuserFactory,
     UserFactory
 )
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -98,7 +96,7 @@ def build_jwt_headers(user):
     return headers
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestAccountDeactivation(TestCase):
     """
     Tests the account deactivation endpoint.
@@ -170,7 +168,7 @@ class TestAccountDeactivation(TestCase):
         )
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestDeactivateLogout(RetirementTestCase):
     """
     Tests the account deactivation/logout endpoint.
@@ -266,7 +264,7 @@ class TestDeactivateLogout(RetirementTestCase):
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestPartnerReportingCleanup(ModuleStoreTestCase):
     """
     Tests the partner reporting cleanup endpoint.
@@ -378,7 +376,7 @@ class TestPartnerReportingCleanup(ModuleStoreTestCase):
         self.assert_status_and_count(statuses, len(statuses))
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
     """
     Tests the partner reporting list endpoint
@@ -474,7 +472,7 @@ class TestPartnerReportingPut(RetirementTestCase, ModuleStoreTestCase):
         assert UserRetirementPartnerReportingStatus.objects.filter(user=retirement.user).exists()
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestPartnerReportingList(ModuleStoreTestCase):
     """
     Tests the partner reporting list endpoint
@@ -687,7 +685,7 @@ class TestPartnerReportingList(ModuleStoreTestCase):
         self.assert_status_and_user_list([])
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestAccountRetirementList(RetirementTestCase):
     """
     Tests the account retirement endpoint.
@@ -778,6 +776,18 @@ class TestAccountRetirementList(RetirementTestCase):
 
         self.assert_status_and_user_list(retirement_values, states_to_request=self._get_non_dead_end_states())
 
+    def test_user_limit_works(self):
+        """
+        Verify that request limiting works to limit returned amount.
+        """
+        state = 'PENDING'
+        for _ in range(5):
+            create_retirement_status(UserFactory(), state=RetirementState.objects.get(state_name=state))
+        data = {'cool_off_days': 0, 'states': state, 'limit': '2'}
+        response = self.client.get(self.url, data, **self.headers)
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.json()) == 2
+
     def test_date_filter(self):
         """
         Verifies the functionality of the `cool_off_days` parameter by creating 1 retirement per day for
@@ -847,7 +857,7 @@ class TestAccountRetirementList(RetirementTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
     """
     Tests the retirements_by_status_and_date endpoint
@@ -995,7 +1005,7 @@ class TestAccountRetirementsByStatusAndDate(RetirementTestCase):
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestAccountRetirementRetrieve(RetirementTestCase):
     """
     Tests the account retirement retrieval endpoint.
@@ -1066,7 +1076,7 @@ class TestAccountRetirementRetrieve(RetirementTestCase):
         self.assert_status_and_user_data(values, username_to_find=original_username)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestAccountRetirementCleanup(RetirementTestCase):
     """
     Tests the account retirement cleanup endpoint.
@@ -1141,7 +1151,7 @@ class TestAccountRetirementCleanup(RetirementTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestAccountRetirementUpdate(RetirementTestCase):
     """
     Tests the account retirement endpoint.
@@ -1281,7 +1291,7 @@ class TestAccountRetirementUpdate(RetirementTestCase):
         self.update_and_assert_status(data, expected_response_code)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestAccountRetirementPost(RetirementTestCase):
     """
     Tests the account retirement endpoint.
@@ -1559,7 +1569,7 @@ class TestAccountRetirementPost(RetirementTestCase):
         assert '' == self.entitlement_support_detail.comments
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestLMSAccountRetirementPost(RetirementTestCase, ModuleStoreTestCase):
     """
     Tests the LMS account retirement (GDPR P2) endpoint.

@@ -113,16 +113,15 @@ class XmlMixin:
     xml_attributes = Dict(help="Map of unhandled xml attributes, used only for storage between import and export",
                           default={}, scope=Scope.settings)
 
-    # The attributes will be removed from the definition xml passed
-    # to definition_from_xml, and from the xml returned by definition_to_xml
-
-    # Note -- url_name isn't in this list because it's handled specially on
-    # import and export.
-
     metadata_to_strip = ('data_dir',
                          'tabs', 'grading_policy',
                          'discussion_blackouts',
-                         # VS[compat] -- remove the below attrs once everything is in the CMS
+                         # VS[compat]
+                         # These attributes should have been removed from here once all 2012-fall courses imported into
+                         # the CMS and "inline" OLX format deprecated. But, it never got deprecated. Moreover, it's
+                         # widely used to this date. So, we still have to strip them. Also, removing of "filename"
+                         # changes OLX returned by `/api/olx-export/v1/xblock/{block_id}/`, which indicates that some
+                         # places in the platform rely on it.
                          'course', 'org', 'url_name', 'filename',
                          # Used for storing xml attributes between import and export, for roundtrips
                          'xml_attributes')
@@ -211,8 +210,9 @@ class XmlMixin:
             id_generator: used to generate the usage_id
         """
 
-        # VS[compat] -- the filename attr should go away once everything is
-        # converted.  (note: make sure html files still work once this goes away)
+        # VS[compat]
+        # The filename attr should have been removed once all 2012-fall courses imported into the CMS and "inline" OLX
+        # format deprecated. This never happened, and `filename` is still used, so we have too keep both formats.
         filename = xml_object.get('filename')
         if filename is None:
             definition_xml = copy.deepcopy(xml_object)
@@ -222,10 +222,9 @@ class XmlMixin:
             filepath = cls._format_filepath(xml_object.tag, filename)
 
             # VS[compat]
-            # TODO (cpennington): If the file doesn't exist at the right path,
-            # give the class a chance to fix it up. The file will be written out
-            # again in the correct format.  This should go away once the CMS is
-            # online and has imported all current (fall 2012) courses from xml
+            # If the file doesn't exist at the right path, give the class a chance to fix it up. The file will be
+            # written out again in the correct format. This should have gone away once the CMS became online and had
+            # imported all 2012-fall courses from XML.
             if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
@@ -311,7 +310,13 @@ class XmlMixin:
         usage_id = id_generator.create_usage(def_id)
         aside_children = []
 
-        # VS[compat] -- detect new-style each-in-a-file mode
+        # VS[compat]
+        # In 2012, when the platform didn't have CMS, and all courses were handwritten XML files, problem tags
+        # contained XML problem descriptions withing themselves. Later, when Studio has been created, and "pointer" tags
+        # became the preferred problem format, edX has to add this compatibility code to 1) support both pre- and
+        # post-Studio course formats simulteneously, and 2) be able to migrate 2012-fall courses to Studio. Old style
+        # support supposed to be removed, but the deprecation process have never been initiated, so this
+        # compatibility must stay, probably forever.
         if is_pointer_tag(node):
             # new style:
             # read the actual definition file--named using url_name.replace(':','/')
@@ -324,8 +329,8 @@ class XmlMixin:
         # Note: removes metadata.
         definition, children = cls.load_definition(definition_xml, runtime, def_id, id_generator)
 
-        # VS[compat] -- make Ike's github preview links work in both old and
-        # new file layouts
+        # VS[compat]
+        # Make Ike's github preview links work in both old and new file layouts.
         if is_pointer_tag(node):
             # new style -- contents actually at filepath
             definition['filename'] = [filepath, filepath]

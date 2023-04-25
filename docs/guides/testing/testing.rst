@@ -183,7 +183,7 @@ How to output coverage locally
 These are examples of how to run a single test and get coverage::
 
     pytest cms/djangoapps/contentstore/tests/test_import.py --cov --cov-config=.coveragerc-local # cms example
-    pytest lms/djangoapps/courseware/tests/test_module_render.py --cov --cov-config=.coveragerc-local # lms example
+    pytest lms/djangoapps/courseware/tests/test_block_render.py --cov --cov-config=.coveragerc-local # lms example
 
 That ``--cov-conifg=.coveragerc-local`` option is important - without it, the coverage
 tool will look for paths that exist on our jenkins test servers, but not on your local devstack.
@@ -235,6 +235,8 @@ If you run into flakiness, check (and feel free to contribute to) this
 
 Running Javascript Unit Tests
 -----------------------------
+
+Before running Javascript unit tests, you will need to be running Firefox or Chrome in a place visible to edx-platform. If running this in devstack, you can run ``make dev.up.firefox`` or ``make dev.up.chrome``. Firefox is the default browser for the tests, so if you decide to use Chrome, you will need to prefix the test command with ``SELENIUM_BROWSER=chrome SELENIUM_HOST=edx.devstack.chrome`` (if using devstack).
 
 We use Jasmine to run JavaScript unit tests. To run all the JavaScript
 tests::

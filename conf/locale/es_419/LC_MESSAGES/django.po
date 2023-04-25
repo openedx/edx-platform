@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
+# edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -34,7 +34,7 @@
 # Jesica Greco, 2022-2023
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020-2022
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020-2023
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan <juan.marrero@utec.edu.uy>, 2015
@@ -78,7 +78,7 @@
 # José Luis <alagunajs@gmail.com>, 2016
 # Zainab Amir <zamir@edx.org>, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
+# edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -118,7 +118,7 @@
 # Oliver Schulze <oliver.schulze@vivaidea.org>, 2017
 # Valeria Freire <valtodopds@hotmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
+# edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -204,7 +204,7 @@
 # José Luis <alagunajs@gmail.com>, 2016
 # Zimeng Chen, 2021
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
+# edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -229,7 +229,7 @@
 # Ismael Saavedra <isma.18.94@gmail.com>, 2014
 # Jesica Greco, 2022
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2023
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # karlman72 <karlman72@gmail.com>, 2014
@@ -274,7 +274,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-08 20:42+0000\n"
+"POT-Creation-Date: 2023-03-26 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -286,8 +286,8 @@ msgstr ""
 "Generated-By: Babel 2.8.0\n"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/item.py xmodule/html_block.py
+#: cms/djangoapps/contentstore/views/block.py
+#: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
 msgid "Text"
 msgstr "Texto"
 
@@ -362,6 +362,13 @@ msgstr "Ya existe una transcripción con el código de idioma \"{language_code}\
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Se requiere un archivo de transcripción."
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Ready"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -487,6 +494,17 @@ msgstr ""
 " este modo hasta el cierre de las inscripciones para el curso."
 
 #: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
 msgid ""
 "OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external "
 "ecommerce service.  Leave this blank if the course has not yet been migrated"
@@ -495,6 +513,26 @@ msgstr ""
 "OPCIONAL: Este es el SKU (número de referencia) de este modo en el sistema "
 "de ecommerce externo. Deje este campo vacío si el curso no ha sido migrado "
 "al servicio de ecommerce."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the Android SKU registered on play store for this mode of "
+"the course. Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+"OPCIONAL: Este es el SKU de Android registrado en Play Store para esta "
+"modalidad del curso. Deje este espacio en blanco si el curso aún no se ha "
+"migrado al servicio de comercio electrónico."
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: This is the iOS SKU registered on app store for this mode of the "
+"course.  Leave this blank if the course has not yet been migrated to the "
+"ecommerce service."
+msgstr ""
+"OPCIONAL: Este es el SKU de iOS registrado en la tienda de aplicaciones para"
+" esta modalidad del curso. Deje este espacio en blanco si el curso aún no se"
+" ha migrado al servicio de comercio electrónico."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -5201,17 +5239,17 @@ msgstr ""
 "del acceso padre."
 
 #: lms/djangoapps/lms_xblock/mixin.py
-msgid "Whether to display this module in the table of contents"
-msgstr "Define si se mostrará este módulo o no en la tabla de contenidos"
+msgid "Whether to display this block in the table of contents"
+msgstr "Mostrar o no este bloque en la tabla de contenido"
 
 #. Translators: "TOC" stands for "Table of Contents"
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
-"What format this module is in (used for deciding which grader to apply, and "
+"What format this block is in (used for deciding which grader to apply, and "
 "what to show in the TOC)"
 msgstr ""
-"Formato en el que se encuentra este módulo (usado para decidir cual grader "
-"aplicar, y que mostrar en la tabla de contenidos)"
+"En qué formato está este bloque (se usa para decidir qué calificador aplicar"
+" y qué mostrar en la tabla de contenido)"
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Course Chrome"
@@ -5743,7 +5781,7 @@ msgstr "Puede acceder a su curso en: %(course_url)s."
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
 #, python-format
 msgid "You have been enrolled in %(course_name)s"
-msgstr "Te has inscrito a %(course_name)s"
+msgstr "Has sido inscrito en %(course_name)s"
 
 #: lms/templates/instructor/edx_ace/addbetatester/email/body.html
 #, python-format
@@ -5982,7 +6020,7 @@ msgid ""
 "of the course staff. This course will no longer appear on your %(site_name)s"
 " dashboard."
 msgstr ""
-"Un miembro del equipo del curso te ha dado de baja de%(course_name)s en "
+"Un miembro del equipo del curso te ha dado de baja de %(course_name)s en "
 "%(site_name)s. Este curso ya no aparecerá en tu panel de usuario de "
 "%(site_name)s."
 
@@ -6011,7 +6049,7 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"                    Te has inscrito a %(course_name)s\n"
+"                    Has sido inscrito en %(course_name)s\n"
 "                "
 
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/body.html
@@ -6161,6 +6199,7 @@ msgid "Allow"
 msgstr "Permitir"
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/models.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Error"
@@ -7388,6 +7427,37 @@ msgstr ""
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "This user already has access to this library."
 msgstr "Este usuario ya tiene acceso a esta librería."
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Cargando"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
+msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -8673,9 +8743,16 @@ msgid "Success"
 msgstr "Éxito"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Acciones"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -10728,8 +10805,8 @@ msgid "Date that enrollment for this class is closed"
 msgstr "Fecha de cierre de inscripciones para esta clase"
 
 #: xmodule/course_block.py
-msgid "Start time when this module is visible"
-msgstr "Hora de inicio, cuando este módulo empieza a ser visible"
+msgid "Start time when this block is visible"
+msgstr "Hora de inicio cuando este bloque es visible"
 
 #: xmodule/course_block.py
 msgid "Date that this class ends"
@@ -11419,8 +11496,9 @@ msgid "Entrance Exam ID"
 msgstr "ID de Examen de Admisión"
 
 #: xmodule/course_block.py
-msgid "Content module identifier (location) of entrance exam."
-msgstr "Contenido identificador del módulo (ubicación) de examen de ingreso."
+msgid "Content block identifier (location) of entrance exam."
+msgstr ""
+"Identificador de bloque de contenido (ubicación) del examen de ingreso."
 
 #: xmodule/course_block.py
 msgid "Social Media Sharing URL"
@@ -11786,8 +11864,8 @@ msgstr ""
 " estará oculto en el LMS."
 
 #: xmodule/html_block.py
-msgid "Html contents to display for this module"
-msgstr "Contenidos HTML para mostrar en este módulo"
+msgid "Html contents to display for this block"
+msgstr "Contenido HTML para mostrar para este bloque"
 
 #: xmodule/html_block.py
 msgid "Source code for LaTeX documents. This feature is not well-supported."
@@ -11867,8 +11945,12 @@ msgid "Count"
 msgstr "Cantidad"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "Ingrese el número de componentes que se mostrará a cada estudiante."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
+"Ingrese el número de componentes para mostrar a cada estudiante. Ajústelo a "
+"-1 para mostrar todos los componentes."
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -12461,24 +12543,25 @@ msgstr ""
 "curso."
 
 #: xmodule/modulestore/inheritance.py
-msgid "Tag this module as part of an Entrance Exam section"
-msgstr "Etiquetar este módulo como parte de un Examen de Ingreso"
+msgid "Tag this block as part of an Entrance Exam section"
+msgstr "Etiquete este bloque como parte de una sección de examen de ingreso"
 
 #: xmodule/modulestore/inheritance.py
 msgid ""
-"Enter true or false. If true, answer submissions for problem modules will be"
-" considered in the Entrance Exam scoring/gating algorithm."
+"Enter true or false. If true, answer submissions for problem blocks will be "
+"considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
-"Ingrese true o false. Si se ingresa true, los envíos realizados para los "
-"problemas serán tenidos en cuenta en la puntuación del Examen de ingreso."
+"Introduzca verdadero o falso. Si es verdadero, los envíos de respuestas para"
+" los bloques de problemas se considerarán en el algoritmo de "
+"puntuación/gating del examen de ingreso."
 
 #: xmodule/modulestore/xml_importer.py
 msgid "Error while reading {}. Check file for XML errors."
 msgstr "Error mientras se leía {}. Verifica el documento para errores."
 
 #: xmodule/modulestore/xml_importer.py
-msgid "Failed to import module: {} at location: {}"
-msgstr "Importación fallida del módulo: {} ubicado en: {}"
+msgid "Failed to import block: {} at location: {}"
+msgstr "No se pudo importar el bloque: {} en la ubicación: {}"
 
 #: xmodule/partitions/enrollment_track_partition_generator.py
 #: cms/templates/group_configurations.html
@@ -12677,10 +12760,10 @@ msgid "Group Configuration"
 msgstr "Configuración de Grupo"
 
 #: xmodule/split_test_block.py
-msgid "Which child module students in a particular group_id should see"
+msgid "Which child block students in a particular group_id should see"
 msgstr ""
-"Define qué módulo hijo debe ser visto por los estudiantes en un group_id "
-"particular"
+"Qué bloque secundario deberían ver los estudiantes que están en un group_id "
+"en particular"
 
 #: xmodule/split_test_block.py
 #, python-brace-format
@@ -13547,6 +13630,92 @@ msgstr ""
 "El archivo {filename} excede el tamaño máximo de {maximum_size_in_megabytes}"
 " MB."
 
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr "Las librerías no pueden tener más de {limit} componentes"
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Invalid data"
+msgstr "Datos inválidos"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "Datos inválidos ({details})"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr "No puedes mover {source_type} dentro de  {target_parent_type}."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Item is already present in target location."
+msgstr "Este elemento ya está presente en la ubicación de destino."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item into itself."
+msgstr "No puedes mover un elemento dentro de él mismo."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item into it's child."
+msgstr "No puedes mover un elemento dentro de un elemento hijo."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "You can not move an item directly into content experiment."
+msgstr ""
+"No puedes mover un elemento directamente dentro del experimento de "
+"contenido."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr "{source_usage_key} no encontrado en {parent_usage_key}."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+"No puedes mover {source_usage_key} en un índice inválido ({target_index})."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr "Debes proveer  target_index ({target_index}) como un entero."
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Duplicado de {0}"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Duplicado de '{0}'"
+
+#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
+#. in many languages. This is used to avoid Transifex's misinterpreting of
+#. '% o'. The percent sign is also translatable as a standalone string.
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+"Los estudiantes deben puntuar  {score}{pct_sign} o más para acceder a los "
+"materiales del curso."
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/views/block.py
+msgid "%"
+msgstr "%"
+
+#: cms/djangoapps/contentstore/views/block.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
+
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
 msgstr "debe tener un nombre para el certificado"
@@ -13573,6 +13742,10 @@ msgstr "Respuesta Abierta"
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Library Content"
 msgstr "Contenido de librerías"
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -13700,92 +13873,6 @@ msgstr ""
 msgid "File upload failed. Please try again"
 msgstr "Error al cargar el archivo. Inténtalo de nuevo"
 
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr "Las librerías no pueden tener más de {limit} componentes"
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "Invalid data"
-msgstr "Datos inválidos"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Datos inválidos ({details})"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr "No puedes mover {source_type} dentro de  {target_parent_type}."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "Item is already present in target location."
-msgstr "Este elemento ya está presente en la ubicación de destino."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item into itself."
-msgstr "No puedes mover un elemento dentro de él mismo."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item into it's child."
-msgstr "No puedes mover un elemento dentro de un elemento hijo."
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "You can not move an item directly into content experiment."
-msgstr ""
-"No puedes mover un elemento directamente dentro del experimento de "
-"contenido."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr "{source_usage_key} no encontrado en {parent_usage_key}."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-"No puedes mover {source_usage_key} en un índice inválido ({target_index})."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr "Debes proveer  target_index ({target_index}) como un entero."
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Duplicado de {0}"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Duplicado de '{0}'"
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-"Los estudiantes deben puntuar  {score}{pct_sign} o más para acceder a los "
-"materiales del curso."
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/item.py
-msgid "%"
-msgstr "%"
-
-#: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\""
-
 #: cms/djangoapps/contentstore/views/library.py
 msgid ""
 "User does not have the permission to create library in this organization or "
@@ -13836,8 +13923,9 @@ msgid "The information you entered is incorrect."
 msgstr "La información que ingreso es correcta."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
-msgid "Transcripts are supported only for \"video\" modules."
-msgstr "Las transcripciones solo están soportadas para los módulos de video."
+msgid "Transcripts are supported only for \"video\" blocks."
+msgstr ""
+"Las transcripciones solo se admiten para bloques de &quot;video&quot;."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Cannot find item by locator."
@@ -13927,12 +14015,6 @@ msgstr "Subiendo"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "In Progress"
 msgstr "En progreso"
-
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "Listo"
 
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
@@ -14198,16 +14280,6 @@ msgstr "Contenido"
 #: wiki/templates/wiki/settings.html
 msgid "Settings"
 msgstr "Configuración"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Cargando"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -15002,6 +15074,21 @@ msgstr "Correo electrónico"
 msgid "Return To %s"
 msgstr "Regresar a %s"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
+#: lms/templates/courseware/courseware-chromeless.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/public_video_share_embed.html
+#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
+msgid "{course_number} Courseware"
+msgstr "Material del curso {course_number}"
+
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
 msgstr "Re suscripción exitosa!"
@@ -15379,6 +15466,22 @@ msgstr "Descargas y transcripciones"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Descargar archivo de video"
+
+#: lms/templates/video.html
+msgid "Share on:"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Twitter"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Facebook"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Linkedin"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -17326,12 +17429,6 @@ msgstr "Refinar su búsqueda"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
-#: openedx/features/course_bookmarks/templates/course_bookmarks/course-bookmarks.html
-msgid "{course_number} Courseware"
-msgstr "Material del curso {course_number}"
-
-#: lms/templates/courseware/courseware-chromeless.html
-#: lms/templates/courseware/courseware.html
 msgid "Course Utilities"
 msgstr "Utilidades de curso"
 
@@ -18866,10 +18963,6 @@ msgstr "Instituciones"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr "Registrate gratis"
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Reanudar su último curso"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
@@ -21970,11 +22063,6 @@ msgstr ""
 msgid "Organization"
 msgstr "Organización"
 
-#. Translators: This is an example for the name of the organization sponsoring
-#. a course, seen when filling out the form to create a new course. The
-#. organization name cannot contain spaces.
-#. Translators: "e.g. UniversityX or OrganizationX" is a placeholder displayed
-#. when user put no data into this field.
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 msgid "e.g. UniversityX or OrganizationX"
 msgstr "Ej: UniversidadX o OrganizaciónX"
@@ -22112,6 +22200,21 @@ msgstr ""
 " de inicio y fin del curso, definir el equipo del curso, revisar las "
 "actualizaciones del curso y otros recursos con fecha, así como de crear y "
 "comenzar las discusiones y la wiki."
+
+#: cms/templates/course_outline.html
+msgid ""
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid " Learn more"
+msgstr "Aprende más"
+
+#: cms/templates/course_outline.html
+msgid "Share feedback"
+msgstr "Compartir comentarios"
 
 #: cms/templates/course_outline.html
 #: cms/templates/widgets/deprecated-course-key-warning.html
@@ -24869,6 +24972,14 @@ msgstr "Configuraciones de Acceso"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Configuración de Acceso"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr "Copiar"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr "Administrar acceso"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

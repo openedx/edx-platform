@@ -290,7 +290,7 @@ class TestCourseRecommendationApiView(TestCase):
         filtered_course = []
         for course_key in self.recommended_courses[:5]:
             filtered_course.append({
-                "course_key": course_key,
+                "key": course_key,
                 "title": f"Title for {course_key}",
                 "logo_image_url": "https://www.logo_image_url.com",
                 "marketing_url": "https://www.marketing_url.com",
@@ -361,6 +361,7 @@ class TestCourseRecommendationApiView(TestCase):
                 "is_control": False,
                 "amplitude_recommendations": False,
                 "course_key_array": self.general_recommendation_courses,
+                "page": "dashboard",
             },
         )
 
@@ -398,7 +399,9 @@ class TestCourseRecommendationApiView(TestCase):
             {
                 "is_control": False,
                 "amplitude_recommendations": True,
-                "course_key_array": self.recommended_courses[:5],
+                "course_key_array": [course.get("key") for course in
+                                     self._get_filtered_courses()[:expected_recommendations]],
+                "page": "dashboard",
             },
         )
 
@@ -436,3 +439,20 @@ class TestCourseRecommendationApiView(TestCase):
         self.assertEqual(
             segment_mock.call_args[0][2]["is_control"], expected_is_control
         )
+
+    @mock.patch(
+        "lms.djangoapps.learner_dashboard.api.v0.views.is_user_enrolled_in_ut_austin_masters_program"
+    )
+    def test_no_recommendations_for_masters_program_learners(
+        self, is_user_enrolled_in_ut_austin_masters_program_mock
+    ):
+        """
+        Verify API returns no recommendations if a user is enrolled in UT Austin masters program.
+        """
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = True
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.get("is_control"), None)
+        self.assertEqual(len(response.data.get("courses")), 0)

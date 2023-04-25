@@ -2,6 +2,7 @@
 Common utility functions useful throughout the contentstore
 """
 
+from collections import defaultdict
 import logging
 from contextlib import contextmanager
 from datetime import datetime
@@ -366,7 +367,7 @@ def reverse_usage_url(handler_name, usage_key, kwargs=None):
 
 def get_split_group_display_name(xblock, course):
     """
-    Returns group name if an xblock is found in user partition groups that are suitable for the split_test module.
+    Returns group name if an xblock is found in user partition groups that are suitable for the split_test block.
 
     Arguments:
         xblock (XBlock): The courseware component.
@@ -731,3 +732,24 @@ def translation_language(language):
             translation.activate(previous)
     else:
         yield
+
+
+def get_subsections_by_assignment_type(course_key):
+    """
+    Construct a dictionary mapping each found assignment type in the course
+    to a list of dictionaries with the display name of the subsection and
+    the display name of the section they are in
+    """
+    subsections_by_assignment_type = defaultdict(list)
+
+    with modulestore().bulk_operations(course_key):
+        course = modulestore().get_course(course_key, depth=3)
+        sections = course.get_children()
+        for section in sections:
+            subsections = section.get_children()
+            for subsection in subsections:
+                if subsection.format:
+                    subsections_by_assignment_type[subsection.format].append(
+                        f'{section.display_name} - {subsection.display_name}'
+                    )
+    return subsections_by_assignment_type

@@ -1,23 +1,22 @@
 """ Test the change_enrollment command line script."""
 
-
-import unittest
 from uuid import uuid4
+
 import ddt
 import pytest
-from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
-from openedx.core.djangoapps.enrollments.api import get_enrollment
 from common.djangoapps.student.tests.factories import UserFactory
+from openedx.core.djangoapps.enrollments.api import get_enrollment
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollManagementCommandTest(SharedModuleStoreTestCase):
     """
     Test the enroll_user_in_course management command

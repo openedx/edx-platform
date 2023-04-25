@@ -39,6 +39,8 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
+# noinspection PyUnresolvedReferences
+from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
 from xmodule.tests.test_import import DummySystem
 from xmodule.tests.test_video import VideoBlockTestBase
 from xmodule.video_block import VideoBlock, bumper_utils, video_utils
@@ -48,12 +50,13 @@ from xmodule.x_module import PUBLIC_VIEW, STUDENT_VIEW
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from lms.djangoapps.courseware.tests.helpers import get_context_dict_from_string
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
 from .test_video_handlers import BaseTestVideoXBlock, TestVideo
-from .test_video_xml import SOURCE_XML
+from .test_video_xml import SOURCE_XML, PUBLIC_SOURCE_XML
 
 MODULESTORES = {
     ModuleStoreEnum.Type.mongo: TEST_DATA_MONGO_MODULESTORE,
@@ -91,7 +94,9 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
             'id': self.item_descriptor.location.html_id(),
+            'is_embed': False,
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
                 'saveStateEnabled': True,
@@ -130,9 +135,10 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
         }
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
+        mako_service = self.item_descriptor.runtime.service(self.item_descriptor, 'mako')
         assert get_context_dict_from_string(context) ==\
                get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
 
@@ -172,6 +178,8 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
@@ -211,15 +219,44 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
         }
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
+        mako_service = self.item_descriptor.runtime.service(self.item_descriptor, 'mako')
         expected_result = get_context_dict_from_string(
             mako_service.render_template('video.html', expected_context)
         )
         assert get_context_dict_from_string(context) == expected_result
         assert expected_result['download_video_link'] == 'example.mp4'
         assert expected_result['display_name'] == 'A Name'
+
+
+@ddt.ddt
+class TestVideoPublicAccess(BaseTestVideoXBlock):
+    """Test video public access."""
+    DATA = PUBLIC_SOURCE_XML
+    MODEL_DATA = {
+        'data': DATA,
+    }
+    METADATA = {}
+
+    @ddt.data(
+        (True, False),
+        (False, False),
+        (False, True),
+        (True, True),
+    )
+    @ddt.unpack
+    def test_public_video_url(self, is_lms_platform, enable_public_share):
+        """Test public video url."""
+        assert self.item_descriptor.public_access is True
+        if not is_lms_platform:
+            self.item_descriptor.runtime.is_author_mode = True
+        with patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=enable_public_share):
+            context = self.item_descriptor.render(STUDENT_VIEW).content
+            # public video url iif PUBLIC_VIDEO_SHARE waffle and is_lms_platform, public_access are true
+            assert bool(get_context_dict_from_string(context)['public_video_url']) \
+                is (is_lms_platform and enable_public_share)
 
 
 @ddt.ddt
@@ -272,7 +309,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         Return the URL for the specified handler on the block represented by
         self.item_descriptor.
         """
-        return self.item_descriptor.xmodule_runtime.handler_url(
+        return self.item_descriptor.runtime.handler_url(
             self.item_descriptor, handler, suffix
         ).rstrip('/?')
 
@@ -341,7 +378,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
             'id': self.item_descriptor.location.html_id(),
+            'is_embed': False,
             'metadata': '',
             'track': None,
             'transcript_download_format': 'srt',
@@ -350,6 +389,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
         }
 
         for data in cases:
@@ -386,7 +426,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(metadata)
             })
 
-            mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
+            mako_service = self.item_descriptor.runtime.service(self.item_descriptor, 'mako')
             assert get_context_dict_from_string(context) ==\
                    get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
 
@@ -459,7 +499,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
             'id': self.item_descriptor.location.html_id(),
+            'is_embed': False,
             'metadata': self.default_metadata_dict,
             'track': None,
             'transcript_download_format': 'srt',
@@ -468,6 +510,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
         }
         initial_context['metadata']['duration'] = None
 
@@ -494,7 +537,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(expected_context['metadata'])
             })
 
-            mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
+            mako_service = self.item_descriptor.runtime.service(self.item_descriptor, 'mako')
             assert get_context_dict_from_string(context) ==\
                    get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
 
@@ -584,6 +627,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': self.item_descriptor.location.html_id(),
             'track': None,
             'transcript_download_format': 'srt',
@@ -592,6 +637,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
             'metadata': metadata
         }
 
@@ -634,7 +680,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'metadata': json.dumps(expected_context['metadata'])
         })
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
+        mako_service = self.item_descriptor.runtime.service(self.item_descriptor, 'mako')
         assert get_context_dict_from_string(context) ==\
                get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
 
@@ -662,7 +708,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         # context returned by get_html when provided with above data
         # expected_context, a dict to assert with context
         context, expected_context = self.helper_get_html_with_edx_video_id(data)
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
+        mako_service = self.item_descriptor.runtime.service(self.item_descriptor, 'mako')
         assert get_context_dict_from_string(context) ==\
                get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
 
@@ -693,7 +739,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         # expected_context, a dict to assert with context
         context, expected_context = self.helper_get_html_with_edx_video_id(data)
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
+        mako_service = self.item_descriptor.runtime.service(self.item_descriptor, 'mako')
         assert get_context_dict_from_string(context) ==\
                get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
 
@@ -755,6 +801,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': self.item_descriptor.location.html_id(),
             'track': None,
             'transcript_download_format': 'srt',
@@ -763,6 +811,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
+            'public_video_url': None,
             'metadata': metadata,
         }
 
@@ -866,6 +915,8 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': None,
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': None,
             'metadata': self.default_metadata_dict,
             'track': None,
@@ -874,6 +925,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
+            'public_video_url': None,
             'poster': 'null',
         }
         initial_context['metadata']['duration'] = None
@@ -888,7 +940,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             self.initialize_block(data=DATA, runtime_kwargs={
                 'user_location': 'CN',
             })
-            user_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'user')
+            user_service = self.item_descriptor.runtime.service(self.item_descriptor, 'user')
             user_location = user_service.get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
             assert user_location == 'CN'
             context = self.item_descriptor.render('student_view').content
@@ -906,7 +958,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(expected_context['metadata'])
             })
 
-            mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
+            mako_service = self.item_descriptor.runtime.service(self.item_descriptor, 'mako')
             assert get_context_dict_from_string(context) ==\
                    get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
 
@@ -960,7 +1012,9 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             'display_name': 'A Name',
             'download_video_link': None,
             'handout': None,
+            'hide_downloads': False,
             'id': None,
+            'is_embed': False,
             'metadata': self.default_metadata_dict,
             'track': None,
             'transcript_download_format': 'srt',
@@ -968,6 +1022,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
+            'public_video_url': None,
             'poster': 'null',
         }
         initial_context['metadata']['duration'] = None
@@ -1008,7 +1063,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 'metadata': json.dumps(expected_context['metadata'])
             })
 
-            mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
+            mako_service = self.item_descriptor.runtime.service(self.item_descriptor, 'mako')
             assert get_context_dict_from_string(context) ==\
                    get_context_dict_from_string(mako_service.render_template('video.html', expected_context))
 
@@ -1077,6 +1132,22 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         self.initialize_block(data=video_xml)
         context = self.item_descriptor.render(STUDENT_VIEW).content
         assert "'download_video_link': None" in context
+
+    def test_get_html_non_hls_video_download(self):
+        """
+        Verify that `download_video_link` is available if a non HLS videos is available
+        """
+        video_xml = """
+        <video display_name="Video" download_video="true">
+            <source src="http://example.com/example.m3u8"/>
+            <source src="http://example.com/example.mp4"/>
+            <source src="http://example.com/example.webm"/>
+        </video>
+        """
+
+        self.initialize_block(data=video_xml)
+        context = self.item_descriptor.render(STUDENT_VIEW).content
+        assert "'download_video_link': 'http://example.com/example.mp4'" in context
 
     def test_html_student_public_view(self):
         """
@@ -1188,7 +1259,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 @ddt.ddt
 class TestVideoBlockInitialization(BaseTestVideoXBlock):
     """
-    Make sure that module initialization works correctly.
+    Make sure that block initialization works correctly.
     """
     CATEGORY = "video"
     DATA = SOURCE_XML
@@ -1786,7 +1857,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         Test that import val data internal works as expected.
         """
         create_profile('mobile')
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
 
         edx_video_id = 'test_edx_video_id'
         sub_id = '0CzPOIIdUsA'
@@ -1889,7 +1960,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         """
         xml_data = """<video><video_asset></video_asset></video>"""
         xml_object = etree.fromstring(xml_data)
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
         id_generator = Mock()
 
         # Verify edx_video_id is empty before.
@@ -1926,7 +1997,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
             val_transcript_provider=val_transcript_provider
         )
         xml_object = etree.fromstring(xml_data)
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
         id_generator = Mock()
 
         # Create static directory in import file system and place transcript files inside it.
@@ -2032,7 +2103,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
         edx_video_id = 'test_edx_video_id'
         language_code = 'en'
 
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
         id_generator = Mock()
 
         # Create static directory in import file system and place transcript files inside it.
@@ -2101,7 +2172,7 @@ class VideoBlockTest(TestCase, VideoBlockTestBase):
 
     def test_import_val_data_invalid(self):
         create_profile('mobile')
-        module_system = DummySystem(load_error_modules=True)
+        module_system = DummySystem(load_error_blocks=True)
 
         # Negative file_size is invalid
         xml_data = """
@@ -2198,6 +2269,8 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': self.item_descriptor.location.html_id(),
             'metadata': json.dumps(OrderedDict({
                 'autoAdvance': False,
@@ -2236,13 +2309,14 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
+            'public_video_url': None,
             'poster': json.dumps(OrderedDict({
                 'url': 'http://img.youtube.com/vi/ZwkTiUPN0mg/0.jpg',
                 'type': 'youtube'
             }))
         }
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
+        mako_service = self.item_descriptor.runtime.service(self.item_descriptor, 'mako')
         expected_content = mako_service.render_template('video.html', expected_context)
         assert get_context_dict_from_string(content) == get_context_dict_from_string(expected_content)
 
@@ -2272,6 +2346,8 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
             'display_name': 'A Name',
             'download_video_link': 'example.mp4',
             'handout': None,
+            'hide_downloads': False,
+            'is_embed': False,
             'id': self.item_descriptor.location.html_id(),
             'bumper_metadata': 'null',
             'metadata': json.dumps(OrderedDict({
@@ -2296,10 +2372,10 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
                 'ytTestTimeout': 1500,
                 'ytApiUrl': 'https://www.youtube.com/iframe_api',
                 'lmsRootURL': settings.LMS_ROOT_URL,
-                'transcriptTranslationUrl': self.item_descriptor.xmodule_runtime.handler_url(
+                'transcriptTranslationUrl': self.item_descriptor.runtime.handler_url(
                     self.item_descriptor, 'transcript', 'translation/__lang__'
                 ).rstrip('/?'),
-                'transcriptAvailableTranslationsUrl': self.item_descriptor.xmodule_runtime.handler_url(
+                'transcriptAvailableTranslationsUrl': self.item_descriptor.runtime.handler_url(
                     self.item_descriptor, 'transcript', 'available_translations'
                 ).rstrip('/?'),
                 'autohideHtml5': False,
@@ -2315,6 +2391,7 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
+            'public_video_url': None,
             'poster': 'null'
         }
         return context
@@ -2334,7 +2411,7 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
             autoadvance_flag=autoadvance_must_be,
         )
 
-        mako_service = self.item_descriptor.xmodule_runtime.service(self.item_descriptor, 'mako')
+        mako_service = self.item_descriptor.runtime.service(self.item_descriptor, 'mako')
         with override_settings(FEATURES=self.FEATURES):
             expected_content = mako_service.render_template('video.html', expected_context)
 

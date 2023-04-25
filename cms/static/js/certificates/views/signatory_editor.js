@@ -15,8 +15,8 @@ define([
     'edx-ui-toolkit/js/utils/html-utils'
 ],
 function($, _, Backbone, gettext,
-          TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog,
-          signatoryEditorTemplate, HtmlUtils) {
+    TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog,
+    signatoryEditorTemplate, HtmlUtils) {
     'use strict';
     var SignatoryEditorView = Backbone.View.extend({
         tagName: 'div',

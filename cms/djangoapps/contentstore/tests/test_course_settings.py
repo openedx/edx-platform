@@ -106,6 +106,7 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
         super().setUp()
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
+        self.non_staff_client, _ = self.create_non_staff_authed_user_client()
 
     @override_settings(FEATURES={'DISABLE_MOBILE_COURSE_AVAILABLE': True})
     def test_mobile_field_available(self):
@@ -143,6 +144,17 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 self.assertEqual('allow_anonymous_to_peers' in response, fields_visible)
                 self.assertEqual('discussion_blackouts' in response, fields_visible)
                 self.assertEqual('discussion_topics' in response, fields_visible)
+
+    @override_settings(FEATURES={'DISABLE_ADVANCED_SETTINGS': True})
+    def test_disable_advanced_settings_feature(self):
+        """
+        If this feature is enabled, only staff should be able to access the advanced settings page.
+        """
+        response = self.non_staff_client.get_html(self.course_setting_url)
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.get_html(self.course_setting_url)
+        self.assertEqual(response.status_code, 200)
 
 
 @ddt.ddt
@@ -547,6 +559,37 @@ class CourseDetailsViewTest(CourseTestCase, MilestonesTestCaseMixin):
         with mock.patch.dict('django.conf.settings.FEATURES', {'EDITABLE_SHORT_DESCRIPTION': False}):
             response = self.client.get_html(settings_details_url)
             self.assertNotContains(response, "Course Short Description")
+
+    def test_empty_course_overview_keep_default_value(self):
+        """
+        Test saving the course with an empty course overview.
+
+        If the overview is empty - the save method should use the default
+        value for the field.
+        """
+        settings_details_url = get_url(self.course.id)
+
+        # add overview with empty value in json request.
+        test_data = {
+            'syllabus': 'none',
+            'short_description': 'test',
+            'overview': '',
+            'effort': '',
+            'intro_video': '',
+            'start_date': '2022-01-01',
+            'end_date': '2022-12-31',
+        }
+
+        response = self.client.post(
+            settings_details_url,
+            data=json.dumps(test_data),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json'
+        )
+        course_details = CourseDetails.fetch(self.course.id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(course_details.overview, '<p>&nbsp;</p>')
 
     def test_regular_site_fetch(self):
         settings_details_url = get_url(self.course.id)

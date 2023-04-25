@@ -48,10 +48,10 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         """
         field_data = DictFieldData({'data': '<h1>Some HTML</h1>'})
         module_system = get_test_system()
-        module = HtmlBlock(module_system, field_data, Mock())
+        block = HtmlBlock(module_system, field_data, Mock())
 
         with override_settings(**settings):
-            assert module.student_view_data() ==\
+            assert block.student_view_data() ==\
                    dict(enabled=False, message='To enable, set FEATURES["ENABLE_HTML_XBLOCK_STUDENT_VIEW_DATA"]')
 
     @ddt.data(
@@ -76,8 +76,8 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         """
         field_data = DictFieldData({'data': html})
         module_system = get_test_system()
-        module = HtmlBlock(module_system, field_data, Mock())
-        assert module.student_view_data() == dict(enabled=True, html=html)
+        block = HtmlBlock(module_system, field_data, Mock())
+        assert block.student_view_data() == dict(enabled=True, html=html)
 
     @ddt.data(
         STUDENT_VIEW,
@@ -90,8 +90,8 @@ class HtmlBlockCourseApiTestCase(unittest.TestCase):
         html = '<p>This is a test</p>'
         field_data = DictFieldData({'data': html})
         module_system = get_test_system()
-        module = HtmlBlock(module_system, field_data, Mock())
-        rendered = module_system.render(module, view, {}).content
+        block = HtmlBlock(module_system, field_data, Mock())
+        rendered = module_system.render(block, view, {}).content
         assert html in rendered
 
 
@@ -101,14 +101,14 @@ class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint:
         sample_xml = '''%%USER_ID%%'''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
-        module = HtmlBlock(module_system, field_data, Mock())
-        assert module.get_html() == str(module_system.anonymous_student_id)
+        block = HtmlBlock(module_system, field_data, Mock())
+        assert block.get_html() == str(module_system.anonymous_student_id)
 
     def test_substitution_course_id(self):
         sample_xml = '''%%COURSE_ID%%'''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
-        module = HtmlBlock(module_system, field_data, Mock())
+        block = HtmlBlock(module_system, field_data, Mock())
         course_key = CourseLocator(
             org='some_org',
             course='some_course',
@@ -119,8 +119,8 @@ class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint:
             block_type='problem',
             block_id='block_id'
         )
-        module.scope_ids.usage_id = usage_key
-        assert module.get_html() == str(course_key)
+        block.scope_ids.usage_id = usage_key
+        assert block.get_html() == str(course_key)
 
     def test_substitution_without_magic_string(self):
         sample_xml = '''
@@ -130,15 +130,15 @@ class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint:
         '''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system()
-        module = HtmlBlock(module_system, field_data, Mock())
-        assert module.get_html() == sample_xml
+        block = HtmlBlock(module_system, field_data, Mock())
+        assert block.get_html() == sample_xml
 
     def test_substitution_without_anonymous_student_id(self):
         sample_xml = '''%%USER_ID%%'''
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system(user=AnonymousUser())
-        module = HtmlBlock(module_system, field_data, Mock())
-        assert module.get_html() == sample_xml
+        block = HtmlBlock(module_system, field_data, Mock())
+        assert block.get_html() == sample_xml
 
 
 class HtmlBlockIndexingTestCase(unittest.TestCase):
@@ -229,7 +229,7 @@ class CourseInfoBlockTestCase(unittest.TestCase):
 
     def test_updates_render(self):
         """
-        Tests that a course info module will render its updates, even if they are malformed.
+        Tests that a course info block will render its updates, even if they are malformed.
         """
         sample_update_data = [
             {
@@ -246,7 +246,7 @@ class CourseInfoBlockTestCase(unittest.TestCase):
                 ]
             )
         ]
-        info_module = CourseInfoBlock(
+        info_block = CourseInfoBlock(
             get_test_system(),
             DictFieldData({'items': sample_update_data, 'data': ""}),
             Mock()
@@ -254,13 +254,13 @@ class CourseInfoBlockTestCase(unittest.TestCase):
 
         # Prior to TNL-4115, an exception would be raised when trying to parse invalid dates in this method
         try:
-            info_module.get_html()
+            info_block.get_html()
         except ValueError:
             self.fail("CourseInfoBlock could not parse an invalid date!")
 
     def test_updates_order(self):
         """
-        Tests that a course info module will render its updates in the correct order.
+        Tests that a course info block will render its updates in the correct order.
         """
         sample_update_data = [
             {
@@ -282,7 +282,7 @@ class CourseInfoBlockTestCase(unittest.TestCase):
                 "status": CourseInfoBlock.STATUS_VISIBLE,
             }
         ]
-        info_module = CourseInfoBlock(
+        info_block = CourseInfoBlock(
             Mock(),
             DictFieldData({'items': sample_update_data, 'data': ""}),
             Mock()
@@ -312,10 +312,10 @@ class CourseInfoBlockTestCase(unittest.TestCase):
             ],
             'hidden_updates': [],
         }
-        template_name = f"{info_module.TEMPLATE_DIR}/course_updates.html"
-        info_module.get_html()
+        template_name = f"{info_block.TEMPLATE_DIR}/course_updates.html"
+        info_block.get_html()
         # Assertion to validate that render function is called with the expected context
-        info_module.runtime.service(info_module, 'mako').render_template.assert_called_once_with(
+        info_block.runtime.service(info_block, 'mako').render_template.assert_called_once_with(
             template_name,
             expected_context
         )

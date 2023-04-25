@@ -16,9 +16,9 @@
                 initialize: function(data) {
                     this.tpl = $(this.tpl).html();
                     this.hintedProvider = (
-                    _.findWhere(data.thirdPartyAuth.providers, {id: data.hintedProvider}) ||
+                        _.findWhere(data.thirdPartyAuth.providers, {id: data.hintedProvider}) ||
                     _.findWhere(data.thirdPartyAuth.secondaryProviders, {id: data.hintedProvider})
-                );
+                    );
                 },
 
                 render: function() {
@@ -35,7 +35,7 @@
                     this.redirect(this.hintedProvider.loginUrl);
                 },
 
-            /**
+                /**
              * Redirect to a URL.  Mainly useful for mocking out in tests.
              * @param  {string} url The URL to redirect to.
              */

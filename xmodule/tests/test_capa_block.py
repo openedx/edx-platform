@@ -42,7 +42,7 @@ from . import get_test_system
 
 class CapaFactory:
     """
-    A helper class to create problem modules with various parameters for testing.
+    A helper class to create problem blocks with various parameters for testing.
     """
 
     sample_problem_xml = textwrap.dedent("""\
@@ -93,8 +93,7 @@ class CapaFactory:
             force_save_button:
             rerandomize: all strings, as specified in the policy for the problem
 
-            problem_state: a dict to to be serialized into the instance_state of the
-                module.
+            problem_state: a dict to be serialized into the instance_state of the block.
 
             attempts: also added to instance state.  Will be converted to an int.
 
@@ -122,23 +121,23 @@ class CapaFactory:
             user_is_staff=kwargs.get('user_is_staff', False),
             render_template=render_template or Mock(return_value="<div>Test Template HTML</div>"),
         )
-        module = ProblemBlock(
+        block = ProblemBlock(
             system,
             DictFieldData(field_data),
             ScopeIds(None, 'problem', location, location),
         )
-        assert module.lcp
+        assert block.lcp
 
         if override_get_score:
             if correct:
                 # TODO: probably better to actually set the internal state properly, but...
-                module.score = Score(raw_earned=1, raw_possible=1)
+                block.score = Score(raw_earned=1, raw_possible=1)
             else:
-                module.score = Score(raw_earned=0, raw_possible=1)
+                block.score = Score(raw_earned=0, raw_possible=1)
 
-        module.graded = 'False'
-        module.weight = 1
-        return module
+        block.graded = 'False'
+        block.weight = 1
+        return block
 
 
 class CapaFactoryWithFiles(CapaFactory):
@@ -198,22 +197,22 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         self.two_day_delta_str = "2 days"
 
     def test_import(self):
-        module = CapaFactory.create()
-        assert module.get_score().raw_earned == 0
+        block = CapaFactory.create()
+        assert block.get_score().raw_earned == 0
 
-        other_module = CapaFactory.create()
-        assert module.get_score().raw_earned == 0
-        assert module.url_name != other_module.url_name, 'Factory should be creating unique names for each problem'
+        other_block = CapaFactory.create()
+        assert block.get_score().raw_earned == 0
+        assert block.url_name != other_block.url_name, 'Factory should be creating unique names for each problem'
 
     def test_correct(self):
         """
         Check that the factory creates correct and incorrect problems properly.
         """
-        module = CapaFactory.create()
-        assert module.get_score().raw_earned == 0
+        block = CapaFactory.create()
+        assert block.get_score().raw_earned == 0
 
-        other_module = CapaFactory.create(correct=True)
-        assert other_module.get_score().raw_earned == 1
+        other_block = CapaFactory.create(correct=True)
+        assert other_block.get_score().raw_earned == 1
 
     def test_get_score(self):
         """
@@ -223,20 +222,20 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         """
         student_answers = {'1_2_1': 'abcd'}
         correct_map = CorrectMap(answer_id='1_2_1', correctness="correct", npoints=0.9)
-        module = CapaFactory.create(correct=True, override_get_score=False)
-        module.lcp.correct_map = correct_map
-        module.lcp.student_answers = student_answers
-        assert module.get_score().raw_earned == 0.0
-        module.set_score(module.score_from_lcp(module.lcp))
-        assert module.get_score().raw_earned == 0.9
+        block = CapaFactory.create(correct=True, override_get_score=False)
+        block.lcp.correct_map = correct_map
+        block.lcp.student_answers = student_answers
+        assert block.get_score().raw_earned == 0.0
+        block.set_score(block.score_from_lcp(block.lcp))
+        assert block.get_score().raw_earned == 0.9
 
         other_correct_map = CorrectMap(answer_id='1_2_1', correctness="incorrect", npoints=0.1)
-        other_module = CapaFactory.create(correct=False, override_get_score=False)
-        other_module.lcp.correct_map = other_correct_map
-        other_module.lcp.student_answers = student_answers
-        assert other_module.get_score().raw_earned == 0.0
-        other_module.set_score(other_module.score_from_lcp(other_module.lcp))
-        assert other_module.get_score().raw_earned == 0.1
+        other_block = CapaFactory.create(correct=False, override_get_score=False)
+        other_block.lcp.correct_map = other_correct_map
+        other_block.lcp.student_answers = student_answers
+        assert other_block.get_score().raw_earned == 0.0
+        other_block.set_score(other_block.score_from_lcp(other_block.lcp))
+        assert other_block.get_score().raw_earned == 0.1
 
     def test_showanswer_default(self):
         """
@@ -625,29 +624,29 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     def test_closed(self):
 
         # Attempts < Max attempts --> NOT closed
-        module = CapaFactory.create(max_attempts="1", attempts="0")
-        assert not module.closed()
+        block = CapaFactory.create(max_attempts="1", attempts="0")
+        assert not block.closed()
 
         # Attempts < Max attempts --> NOT closed
-        module = CapaFactory.create(max_attempts="2", attempts="1")
-        assert not module.closed()
+        block = CapaFactory.create(max_attempts="2", attempts="1")
+        assert not block.closed()
 
         # Attempts = Max attempts --> closed
-        module = CapaFactory.create(max_attempts="1", attempts="1")
-        assert module.closed()
+        block = CapaFactory.create(max_attempts="1", attempts="1")
+        assert block.closed()
 
         # Attempts > Max attempts --> closed
-        module = CapaFactory.create(max_attempts="1", attempts="2")
-        assert module.closed()
+        block = CapaFactory.create(max_attempts="1", attempts="2")
+        assert block.closed()
 
         # Max attempts = 0 --> closed
-        module = CapaFactory.create(max_attempts="0", attempts="2")
-        assert module.closed()
+        block = CapaFactory.create(max_attempts="0", attempts="2")
+        assert block.closed()
 
         # Past due --> closed
-        module = CapaFactory.create(max_attempts="1", attempts="0",
-                                    due=self.yesterday_str)
-        assert module.closed()
+        block = CapaFactory.create(max_attempts="1", attempts="0",
+                                   due=self.yesterday_str)
+        assert block.closed()
 
     def test_parse_get_params(self):
 
@@ -699,7 +698,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
     def test_submit_problem_correct(self):
 
-        module = CapaFactory.create(attempts=1)
+        block = CapaFactory.create(attempts=1)
 
         # Simulate that all answers are marked correct, no matter
         # what the input is, by patching CorrectMap.is_correct()
@@ -711,7 +710,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
                 # Check the problem
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
-                result = module.submit_problem(get_request_dict)
+                result = block.submit_problem(get_request_dict)
 
         # Expect that the problem is marked correct
         assert result['success'] == 'correct'
@@ -720,13 +719,13 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert result['contents'] == 'Test HTML'
 
         # Expect that the number of attempts is incremented by 1
-        assert module.attempts == 2
+        assert block.attempts == 2
         # and that this was considered attempt number 2 for grading purposes
-        assert module.lcp.context['attempt'] == 2
+        assert block.lcp.context['attempt'] == 2
 
     def test_submit_problem_incorrect(self):
 
-        module = CapaFactory.create(attempts=0)
+        block = CapaFactory.create(attempts=0)
 
         # Simulate marking the input incorrect
         with patch('xmodule.capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
@@ -734,18 +733,18 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
             # Check the problem
             get_request_dict = {CapaFactory.input_key(): '0'}
-            result = module.submit_problem(get_request_dict)
+            result = block.submit_problem(get_request_dict)
 
         # Expect that the problem is marked correct
         assert result['success'] == 'incorrect'
 
         # Expect that the number of attempts is incremented by 1
-        assert module.attempts == 1
+        assert block.attempts == 1
         # and that this is considered the first attempt
-        assert module.lcp.context['attempt'] == 1
+        assert block.lcp.context['attempt'] == 1
 
     def test_submit_problem_closed(self):
-        module = CapaFactory.create(attempts=3)
+        block = CapaFactory.create(attempts=3)
 
         # Problem closed -- cannot submit
         # Simulate that ProblemBlock.closed() always returns True
@@ -753,10 +752,10 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             mock_closed.return_value = True
             with pytest.raises(xmodule.exceptions.NotFoundError):
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
-                module.submit_problem(get_request_dict)
+                block.submit_problem(get_request_dict)
 
         # Expect that number of attempts NOT incremented
-        assert module.attempts == 3
+        assert block.attempts == 3
 
     @ddt.data(
         RANDOMIZATION.ALWAYS,
@@ -764,18 +763,18 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     )
     def test_submit_problem_resubmitted_with_randomize(self, rerandomize):
         # Randomize turned on
-        module = CapaFactory.create(rerandomize=rerandomize, attempts=0)
+        block = CapaFactory.create(rerandomize=rerandomize, attempts=0)
 
         # Simulate that the problem is completed
-        module.done = True
+        block.done = True
 
         # Expect that we cannot submit
         with pytest.raises(xmodule.exceptions.NotFoundError):
             get_request_dict = {CapaFactory.input_key(): '3.14'}
-            module.submit_problem(get_request_dict)
+            block.submit_problem(get_request_dict)
 
         # Expect that number of attempts NOT incremented
-        assert module.attempts == 0
+        assert block.attempts == 0
 
     @ddt.data(
         RANDOMIZATION.NEVER,
@@ -784,20 +783,20 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     )
     def test_submit_problem_resubmitted_no_randomize(self, rerandomize):
         # Randomize turned off
-        module = CapaFactory.create(rerandomize=rerandomize, attempts=0, done=True)
+        block = CapaFactory.create(rerandomize=rerandomize, attempts=0, done=True)
 
         # Expect that we can submit successfully
         get_request_dict = {CapaFactory.input_key(): '3.14'}
-        result = module.submit_problem(get_request_dict)
+        result = block.submit_problem(get_request_dict)
 
         assert result['success'] == 'correct'
 
         # Expect that number of attempts IS incremented, still same attempt
-        assert module.attempts == 1
-        assert module.lcp.context['attempt'] == 1
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
 
     def test_submit_problem_queued(self):
-        module = CapaFactory.create(attempts=1)
+        block = CapaFactory.create(attempts=1)
 
         # Simulate that the problem is queued
         multipatch = patch.multiple(
@@ -810,13 +809,13 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             values['get_recentmost_queuetime'].return_value = datetime.datetime.now(UTC)
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
-            result = module.submit_problem(get_request_dict)
+            result = block.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
             assert 'You must wait' in result['success']
 
         # Expect that the number of attempts is NOT incremented
-        assert module.attempts == 1
+        assert block.attempts == 1
 
     @patch.object(XQueueInterface, '_http_post')
     def test_submit_problem_with_files(self, mock_xqueue_post):
@@ -830,7 +829,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         for fileobj in fileobjs:
             self.addCleanup(fileobj.close)
 
-        module = CapaFactoryWithFiles.create()
+        block = CapaFactoryWithFiles.create()
 
         # Mock the XQueueInterface post method
         mock_xqueue_post.return_value = (0, "ok")
@@ -841,7 +840,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             CapaFactoryWithFiles.input_key(response_num=3): 'None',
         }
 
-        module.submit_problem(get_request_dict)
+        block.submit_problem(get_request_dict)
 
         # pylint: disable=line-too-long
         # _http_post is called like this:
@@ -880,7 +879,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         for fileobj in fileobjs:
             self.addCleanup(fileobj.close)
 
-        module = CapaFactoryWithFiles.create()
+        block = CapaFactoryWithFiles.create()
 
         # Mock the XQueueInterface post method
         mock_xqueue_post.return_value = (0, "ok")
@@ -892,7 +891,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         post_data.append((CapaFactoryWithFiles.input_key(response_num=3), 'None'))
         request = webob.Request.blank("/some/fake/url", POST=post_data, content_type='multipart/form-data')
 
-        module.handle('xmodule_handler', request, 'problem_check')
+        block.handle('xmodule_handler', request, 'problem_check')
 
         assert mock_xqueue_post.call_count == 1
         _, kwargs = mock_xqueue_post.call_args
@@ -907,15 +906,15 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                              LoncapaProblemError,
                              ResponseError]
         for exception_class in exception_classes:
-            # Create the module
-            module = CapaFactory.create(attempts=1, user_is_staff=False)
+            # Create the block
+            block = CapaFactory.create(attempts=1, user_is_staff=False)
 
             # Simulate answering a problem that raises the exception
             with patch('xmodule.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
                 mock_grade.side_effect = exception_class('test error')
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
-                result = module.submit_problem(get_request_dict)
+                result = block.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
             expected_msg = 'test error'
@@ -923,9 +922,9 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert expected_msg == result['success']
 
             # Expect that the number of attempts is NOT incremented
-            assert module.attempts == 1
+            assert block.attempts == 1
             # but that this was considered attempt number 2 for grading purposes
-            assert module.lcp.context['attempt'] == 2
+            assert block.lcp.context['attempt'] == 2
 
     def test_submit_problem_error_with_codejail_exception(self):
 
@@ -935,8 +934,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                              ResponseError]
         for exception_class in exception_classes:
 
-            # Create the module
-            module = CapaFactory.create(attempts=1, user_is_staff=False)
+            # Create the block
+            block = CapaFactory.create(attempts=1, user_is_staff=False)
 
             # Simulate a codejail exception "Exception: Couldn't execute jailed code"
             with patch('xmodule.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
@@ -951,16 +950,16 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                 except ResponseError as err:
                     mock_grade.side_effect = exception_class(str(err))
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
-                result = module.submit_problem(get_request_dict)
+                result = block.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success' without the text of the stack trace
             expected_msg = 'Couldn\'t execute jailed code'
             assert expected_msg == result['success']
 
             # Expect that the number of attempts is NOT incremented
-            assert module.attempts == 1
+            assert block.attempts == 1
             # but that this was considered the second attempt for grading purposes
-            assert module.lcp.context['attempt'] == 2
+            assert block.lcp.context['attempt'] == 2
 
     @override_settings(DEBUG=True)
     def test_submit_problem_other_errors(self):
@@ -969,8 +968,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         See also `test_submit_problem_error` for the "expected kinds" or errors.
         """
-        # Create the module
-        module = CapaFactory.create(attempts=1, user_is_staff=False)
+        # Create the block
+        block = CapaFactory.create(attempts=1, user_is_staff=False)
 
         # Simulate answering a problem that raises the exception
         with patch('xmodule.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
@@ -978,7 +977,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             mock_grade.side_effect = Exception(error_msg)
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
-            result = module.submit_problem(get_request_dict)
+            result = block.submit_problem(get_request_dict)
 
         # Expect an AJAX alert message in 'success'
         assert error_msg in result['success']
@@ -987,15 +986,15 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         """
         Test that a capa problem with a max grade of zero doesn't generate an error.
         """
-        # Create the module
-        module = CapaFactory.create(attempts=1)
+        # Create the block
+        block = CapaFactory.create(attempts=1)
 
         # Override the problem score to have a total of zero.
-        module.lcp.get_score = lambda: {'score': 0, 'total': 0}
+        block.lcp.get_score = lambda: {'score': 0, 'total': 0}
 
         # Check the problem
         get_request_dict = {CapaFactory.input_key(): '3.14'}
-        module.submit_problem(get_request_dict)
+        block.submit_problem(get_request_dict)
 
     def test_submit_problem_error_nonascii(self):
 
@@ -1004,15 +1003,15 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                              LoncapaProblemError,
                              ResponseError]
         for exception_class in exception_classes:
-            # Create the module
-            module = CapaFactory.create(attempts=1, user_is_staff=False)
+            # Create the block
+            block = CapaFactory.create(attempts=1, user_is_staff=False)
 
             # Simulate answering a problem that raises the exception
             with patch('xmodule.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
                 mock_grade.side_effect = exception_class("ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
-                result = module.submit_problem(get_request_dict)
+                result = block.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
             expected_msg = 'ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
@@ -1020,9 +1019,9 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert expected_msg == result['success']
 
             # Expect that the number of attempts is NOT incremented
-            assert module.attempts == 1
+            assert block.attempts == 1
             # but that this was considered the second attempt for grading purposes
-            assert module.lcp.context['attempt'] == 2
+            assert block.lcp.context['attempt'] == 2
 
     def test_submit_problem_error_with_staff_user(self):
 
@@ -1030,15 +1029,15 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         for exception_class in [StudentInputError,
                                 LoncapaProblemError,
                                 ResponseError]:
-            # Create the module
-            module = CapaFactory.create(attempts=1, user_is_staff=True)
+            # Create the block
+            block = CapaFactory.create(attempts=1, user_is_staff=True)
 
             # Simulate answering a problem that raises an exception
             with patch('xmodule.capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
                 mock_grade.side_effect = exception_class('test error')
 
                 get_request_dict = {CapaFactory.input_key(): '3.14'}
-                result = module.submit_problem(get_request_dict)
+                result = block.submit_problem(get_request_dict)
 
             # Expect an AJAX alert message in 'success'
             assert 'test error' in result['success']
@@ -1047,9 +1046,9 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             assert 'Traceback' in result['success']
 
             # Expect that the number of attempts is NOT incremented
-            assert module.attempts == 1
+            assert block.attempts == 1
             # but that it was considered the second attempt for grading purposes
-            assert module.lcp.context['attempt'] == 2
+            assert block.lcp.context['attempt'] == 2
 
     @ddt.data(
         ("never", True, None, 'submitted'),
@@ -1061,9 +1060,9 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     )
     @ddt.unpack
     def test_handle_ajax_show_correctness(self, show_correctness, is_correct, expected_score, expected_success):
-        module = CapaFactory.create(show_correctness=show_correctness,
-                                    due=self.tomorrow_str,
-                                    correct=is_correct)
+        block = CapaFactory.create(show_correctness=show_correctness,
+                                   due=self.tomorrow_str,
+                                   correct=is_correct)
 
         # Simulate marking the input correct/incorrect
         with patch('xmodule.capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
@@ -1071,7 +1070,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
             # Check the problem
             get_request_dict = {CapaFactory.input_key(): '0'}
-            json_result = module.handle_ajax('problem_check', get_request_dict)
+            json_result = block.handle_ajax('problem_check', get_request_dict)
             result = json.loads(json_result)
 
         # Expect that the AJAX result withholds correctness and score
@@ -1079,13 +1078,13 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert result['success'] == expected_success
 
         # Expect that the number of attempts is incremented by 1
-        assert module.attempts == 1
-        assert module.lcp.context['attempt'] == 1
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
 
     def test_reset_problem(self):
-        module = CapaFactory.create(done=True)
-        module.new_lcp = Mock(wraps=module.new_lcp)
-        module.choose_new_seed = Mock(wraps=module.choose_new_seed)
+        block = CapaFactory.create(done=True)
+        block.new_lcp = Mock(wraps=block.new_lcp)
+        block.choose_new_seed = Mock(wraps=block.choose_new_seed)
 
         # Stub out HTML rendering
         with patch('xmodule.capa_block.ProblemBlock.get_problem_html') as mock_html:
@@ -1093,7 +1092,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
             # Reset the problem
             get_request_dict = {}
-            result = module.reset_problem(get_request_dict)
+            result = block.reset_problem(get_request_dict)
 
         # Expect that the request was successful
         assert (('success' in result) and result['success'])
@@ -1103,11 +1102,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         assert result['html'] == '<div>Test HTML</div>'
 
         # Expect that the problem was reset
-        module.new_lcp.assert_called_once_with(None)
+        block.new_lcp.assert_called_once_with(None)
 
     def test_reset_problem_closed(self):
         # pre studio default
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS)
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS)
 
         # Simulate that the problem is closed
         with patch('xmodule.capa_block.ProblemBlock.closed') as mock_closed:
@@ -1115,25 +1114,25 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
             # Try to reset the problem
             get_request_dict = {}
-            result = module.reset_problem(get_request_dict)
+            result = block.reset_problem(get_request_dict)
 
         # Expect that the problem was NOT reset
         assert (('success' in result) and (not result['success']))
 
     def test_reset_problem_not_done(self):
         # Simulate that the problem is NOT done
-        module = CapaFactory.create(done=False)
+        block = CapaFactory.create(done=False)
 
         # Try to reset the problem
         get_request_dict = {}
-        result = module.reset_problem(get_request_dict)
+        result = block.reset_problem(get_request_dict)
 
         # Expect that the problem was NOT reset
         assert (('success' in result) and (not result['success']))
 
     def test_rescore_problem_correct(self):
 
-        module = CapaFactory.create(attempts=0, done=True)
+        block = CapaFactory.create(attempts=0, done=True)
 
         # Simulate that all answers are marked correct, no matter
         # what the input is, by patching LoncapaResponse.evaluate_answers()
@@ -1148,91 +1147,91 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
                 # Check the problem
                 get_request_dict = {CapaFactory.input_key(): '1'}
-                module.submit_problem(get_request_dict)
-            module.rescore(only_if_higher=False)
+                block.submit_problem(get_request_dict)
+            block.rescore(only_if_higher=False)
 
         # Expect that the problem is marked correct
-        assert module.is_correct() is True
+        assert block.is_correct() is True
 
         # Expect that the number of attempts is not incremented
-        assert module.attempts == 1
+        assert block.attempts == 1
         # and that this was considered attempt number 1 for grading purposes
-        assert module.lcp.context['attempt'] == 1
+        assert block.lcp.context['attempt'] == 1
 
     def test_rescore_problem_additional_correct(self):
         # make sure it also works when new correct answer has been added
-        module = CapaFactory.create(attempts=0)
+        block = CapaFactory.create(attempts=0)
         answer_id = CapaFactory.answer_key()
 
         # Check the problem
         get_request_dict = {CapaFactory.input_key(): '1'}
-        result = module.submit_problem(get_request_dict)
+        result = block.submit_problem(get_request_dict)
 
         # Expect that the problem is marked incorrect and user didn't earn score
         assert result['success'] == 'incorrect'
-        assert module.get_score() == (0, 1)
-        assert module.correct_map[answer_id]['correctness'] == 'incorrect'
+        assert block.get_score() == (0, 1)
+        assert block.correct_map[answer_id]['correctness'] == 'incorrect'
 
         # Expect that the number of attempts has incremented to 1
-        assert module.attempts == 1
-        assert module.lcp.context['attempt'] == 1
+        assert block.attempts == 1
+        assert block.lcp.context['attempt'] == 1
 
         # Simulate that after making an incorrect answer to the correct answer
         # the new calculated score is (1,1)
         # by patching CorrectMap.is_correct() and NumericalResponse.get_staff_ans()
-        # In case of rescore with only_if_higher=True it should update score of module
+        # In case of rescore with only_if_higher=True it should update score of block
         # if previous score was lower
 
         with patch('xmodule.capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
             mock_is_correct.return_value = True
-            module.set_score(module.score_from_lcp(module.lcp))
+            block.set_score(block.score_from_lcp(block.lcp))
             with patch('xmodule.capa.responsetypes.NumericalResponse.get_staff_ans') as get_staff_ans:
                 get_staff_ans.return_value = 1 + 0j
-                module.rescore(only_if_higher=True)
+                block.rescore(only_if_higher=True)
 
         # Expect that the problem is marked correct and user earned the score
-        assert module.get_score() == (1, 1)
-        assert module.correct_map[answer_id]['correctness'] == 'correct'
+        assert block.get_score() == (1, 1)
+        assert block.correct_map[answer_id]['correctness'] == 'correct'
         # Expect that the number of attempts is not incremented
-        assert module.attempts == 1
+        assert block.attempts == 1
         # and hence that this was still considered the first attempt for grading purposes
-        assert module.lcp.context['attempt'] == 1
+        assert block.lcp.context['attempt'] == 1
 
     def test_rescore_problem_incorrect(self):
         # make sure it also works when attempts have been reset,
         # so add this to the test:
-        module = CapaFactory.create(attempts=0, done=True)
+        block = CapaFactory.create(attempts=0, done=True)
 
         # Simulate that all answers are marked incorrect, no matter
         # what the input is, by patching LoncapaResponse.evaluate_answers()
         with patch('xmodule.capa.responsetypes.LoncapaResponse.evaluate_answers') as mock_evaluate_answers:
             mock_evaluate_answers.return_value = CorrectMap(CapaFactory.answer_key(), 'incorrect')
-            module.rescore(only_if_higher=False)
+            block.rescore(only_if_higher=False)
 
         # Expect that the problem is marked incorrect
-        assert module.is_correct() is False
+        assert block.is_correct() is False
 
         # Expect that the number of attempts is not incremented
-        assert module.attempts == 0
+        assert block.attempts == 0
         # and that this is treated as the first attempt for grading purposes
-        assert module.lcp.context['attempt'] == 1
+        assert block.lcp.context['attempt'] == 1
 
     def test_rescore_problem_not_done(self):
         # Simulate that the problem is NOT done
-        module = CapaFactory.create(done=False)
+        block = CapaFactory.create(done=False)
 
         # Try to rescore the problem, and get exception
         with pytest.raises(xmodule.exceptions.NotFoundError):
-            module.rescore(only_if_higher=False)
+            block.rescore(only_if_higher=False)
 
     def test_rescore_problem_not_supported(self):
-        module = CapaFactory.create(done=True)
+        block = CapaFactory.create(done=True)
 
         # Try to rescore the problem, and get exception
         with patch('xmodule.capa.capa_problem.LoncapaProblem.supports_rescoring') as mock_supports_rescoring:
             mock_supports_rescoring.return_value = False
             with pytest.raises(NotImplementedError):
-                module.rescore(only_if_higher=False)
+                block.rescore(only_if_higher=False)
 
     def capa_factory_for_problem_xml(self, xml):  # lint-amnesty, pylint: disable=missing-function-docstring
         class CustomCapaFactory(CapaFactory):
@@ -1261,19 +1260,19 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
     def _rescore_problem_error_helper(self, exception_class):
         """Helper to allow testing all errors that rescoring might return."""
-        # Create the module
-        module = CapaFactory.create(attempts=1, done=True)
+        # Create the block
+        block = CapaFactory.create(attempts=1, done=True)
 
         # Simulate answering a problem that raises the exception
         with patch('xmodule.capa.capa_problem.LoncapaProblem.get_grade_from_current_answers') as mock_rescore:
             mock_rescore.side_effect = exception_class('test error \u03a9')
             with pytest.raises(exception_class):
-                module.rescore(only_if_higher=False)
+                block.rescore(only_if_higher=False)
 
         # Expect that the number of attempts is NOT incremented
-        assert module.attempts == 1
+        assert block.attempts == 1
         # and that this was considered the first attempt for grading purposes
-        assert module.lcp.context['attempt'] == 1
+        assert block.lcp.context['attempt'] == 1
 
     def test_rescore_problem_student_input_error(self):
         self._rescore_problem_error_helper(StudentInputError)
@@ -1285,21 +1284,21 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         self._rescore_problem_error_helper(ResponseError)
 
     def test_save_problem(self):
-        module = CapaFactory.create(done=False)
+        block = CapaFactory.create(done=False)
 
         # Save the problem
         get_request_dict = {CapaFactory.input_key(): '3.14'}
-        result = module.save_problem(get_request_dict)
+        result = block.save_problem(get_request_dict)
 
         # Expect that answers are saved to the problem
         expected_answers = {CapaFactory.answer_key(): '3.14'}
-        assert module.lcp.student_answers == expected_answers
+        assert block.lcp.student_answers == expected_answers
 
         # Expect that the result is success
         assert (('success' in result) and result['success'])
 
     def test_save_problem_closed(self):
-        module = CapaFactory.create(done=False)
+        block = CapaFactory.create(done=False)
 
         # Simulate that the problem is closed
         with patch('xmodule.capa_block.ProblemBlock.closed') as mock_closed:
@@ -1307,7 +1306,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
             # Try to save the problem
             get_request_dict = {CapaFactory.input_key(): '3.14'}
-            result = module.save_problem(get_request_dict)
+            result = block.save_problem(get_request_dict)
 
         # Expect that the result is failure
         assert (('success' in result) and (not result['success']))
@@ -1318,11 +1317,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     )
     def test_save_problem_submitted_with_randomize(self, rerandomize):
         # Capa XModule treats 'always' and 'true' equivalently
-        module = CapaFactory.create(rerandomize=rerandomize, done=True)
+        block = CapaFactory.create(rerandomize=rerandomize, done=True)
 
         # Try to save
         get_request_dict = {CapaFactory.input_key(): '3.14'}
-        result = module.save_problem(get_request_dict)
+        result = block.save_problem(get_request_dict)
 
         # Expect that we cannot save
         assert (('success' in result) and (not result['success']))
@@ -1333,198 +1332,198 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         RANDOMIZATION.PER_STUDENT
     )
     def test_save_problem_submitted_no_randomize(self, rerandomize):
-        # Capa XModule treats 'false' and 'per_student' equivalently
-        module = CapaFactory.create(rerandomize=rerandomize, done=True)
+        # Capa XBlock treats 'false' and 'per_student' equivalently
+        block = CapaFactory.create(rerandomize=rerandomize, done=True)
 
         # Try to save
         get_request_dict = {CapaFactory.input_key(): '3.14'}
-        result = module.save_problem(get_request_dict)
+        result = block.save_problem(get_request_dict)
 
         # Expect that we succeed
         assert (('success' in result) and result['success'])
 
     def test_submit_button_name(self):
-        module = CapaFactory.create(attempts=0)
-        assert module.submit_button_name() == 'Submit'
+        block = CapaFactory.create(attempts=0)
+        assert block.submit_button_name() == 'Submit'
 
     def test_submit_button_submitting_name(self):
-        module = CapaFactory.create(attempts=1, max_attempts=10)
-        assert module.submit_button_submitting_name() == 'Submitting'
+        block = CapaFactory.create(attempts=1, max_attempts=10)
+        assert block.submit_button_submitting_name() == 'Submitting'
 
     def test_should_enable_submit_button(self):
 
         attempts = random.randint(1, 10)
 
         # If we're after the deadline, disable the submit button
-        module = CapaFactory.create(due=self.yesterday_str)
-        assert not module.should_enable_submit_button()
+        block = CapaFactory.create(due=self.yesterday_str)
+        assert not block.should_enable_submit_button()
 
         # If user is out of attempts, disable the submit button
-        module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
-        assert not module.should_enable_submit_button()
+        block = CapaFactory.create(attempts=attempts, max_attempts=attempts)
+        assert not block.should_enable_submit_button()
 
         # If survey question (max_attempts = 0), disable the submit button
-        module = CapaFactory.create(max_attempts=0)
-        assert not module.should_enable_submit_button()
+        block = CapaFactory.create(max_attempts=0)
+        assert not block.should_enable_submit_button()
 
         # If user submitted a problem but hasn't reset,
         # disable the submit button
         # Note:  we can only reset when rerandomize="always" or "true"
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
-        assert not module.should_enable_submit_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
+        assert not block.should_enable_submit_button()
 
-        module = CapaFactory.create(rerandomize="true", done=True)
-        assert not module.should_enable_submit_button()
+        block = CapaFactory.create(rerandomize="true", done=True)
+        assert not block.should_enable_submit_button()
 
         # Otherwise, enable the submit button
-        module = CapaFactory.create()
-        assert module.should_enable_submit_button()
+        block = CapaFactory.create()
+        assert block.should_enable_submit_button()
 
         # If the user has submitted the problem
         # and we do NOT have a reset button, then we can enable the submit button
         # Setting rerandomize to "never" or "false" ensures that the reset button
         # is not shown
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, done=True)
-        assert module.should_enable_submit_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, done=True)
+        assert block.should_enable_submit_button()
 
-        module = CapaFactory.create(rerandomize="false", done=True)
-        assert module.should_enable_submit_button()
+        block = CapaFactory.create(rerandomize="false", done=True)
+        assert block.should_enable_submit_button()
 
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.PER_STUDENT, done=True)
-        assert module.should_enable_submit_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.PER_STUDENT, done=True)
+        assert block.should_enable_submit_button()
 
     def test_should_show_reset_button(self):
 
         attempts = random.randint(1, 10)
 
         # If we're after the deadline, do NOT show the reset button
-        module = CapaFactory.create(due=self.yesterday_str, done=True)
-        assert not module.should_show_reset_button()
+        block = CapaFactory.create(due=self.yesterday_str, done=True)
+        assert not block.should_show_reset_button()
 
         # If the user is out of attempts, do NOT show the reset button
-        module = CapaFactory.create(attempts=attempts, max_attempts=attempts, done=True)
-        assert not module.should_show_reset_button()
+        block = CapaFactory.create(attempts=attempts, max_attempts=attempts, done=True)
+        assert not block.should_show_reset_button()
 
         # pre studio default value, DO show the reset button
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
-        assert module.should_show_reset_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
+        assert block.should_show_reset_button()
 
         # If survey question for capa (max_attempts = 0),
         # DO show the reset button
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, max_attempts=0, done=True)
-        assert module.should_show_reset_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, max_attempts=0, done=True)
+        assert block.should_show_reset_button()
 
         # If the question is not correct
         # DO show the reset button
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, max_attempts=0, done=True, correct=False)
-        assert module.should_show_reset_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, max_attempts=0, done=True, correct=False)
+        assert block.should_show_reset_button()
 
         # If the question is correct and randomization is never
         # DO not show the reset button
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, max_attempts=0, done=True, correct=True)
-        assert not module.should_show_reset_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, max_attempts=0, done=True, correct=True)
+        assert not block.should_show_reset_button()
 
         # If the question is correct and randomization is always
         # Show the reset button
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, max_attempts=0, done=True, correct=True)
-        assert module.should_show_reset_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, max_attempts=0, done=True, correct=True)
+        assert block.should_show_reset_button()
 
         # Don't show reset button if randomization is turned on and the question is not done
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, show_reset_button=False, done=False)
-        assert not module.should_show_reset_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, show_reset_button=False, done=False)
+        assert not block.should_show_reset_button()
 
         # Show reset button if randomization is turned on and the problem is done
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, show_reset_button=False, done=True)
-        assert module.should_show_reset_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, show_reset_button=False, done=True)
+        assert block.should_show_reset_button()
 
     def test_should_show_save_button(self):
 
         attempts = random.randint(1, 10)
 
         # If we're after the deadline, do NOT show the save button
-        module = CapaFactory.create(due=self.yesterday_str, done=True)
-        assert not module.should_show_save_button()
+        block = CapaFactory.create(due=self.yesterday_str, done=True)
+        assert not block.should_show_save_button()
 
         # If the user is out of attempts, do NOT show the save button
-        module = CapaFactory.create(attempts=attempts, max_attempts=attempts, done=True)
-        assert not module.should_show_save_button()
+        block = CapaFactory.create(attempts=attempts, max_attempts=attempts, done=True)
+        assert not block.should_show_save_button()
 
         # If user submitted a problem but hasn't reset, do NOT show the save button
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
-        assert not module.should_show_save_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
+        assert not block.should_show_save_button()
 
-        module = CapaFactory.create(rerandomize="true", done=True)
-        assert not module.should_show_save_button()
+        block = CapaFactory.create(rerandomize="true", done=True)
+        assert not block.should_show_save_button()
 
         # If the user has unlimited attempts and we are not randomizing,
         # then do NOT show a save button
         # because they can keep using "Check"
-        module = CapaFactory.create(max_attempts=None, rerandomize=RANDOMIZATION.NEVER, done=False)
-        assert not module.should_show_save_button()
+        block = CapaFactory.create(max_attempts=None, rerandomize=RANDOMIZATION.NEVER, done=False)
+        assert not block.should_show_save_button()
 
-        module = CapaFactory.create(max_attempts=None, rerandomize="false", done=True)
-        assert not module.should_show_save_button()
+        block = CapaFactory.create(max_attempts=None, rerandomize="false", done=True)
+        assert not block.should_show_save_button()
 
-        module = CapaFactory.create(max_attempts=None, rerandomize=RANDOMIZATION.PER_STUDENT, done=True)
-        assert not module.should_show_save_button()
+        block = CapaFactory.create(max_attempts=None, rerandomize=RANDOMIZATION.PER_STUDENT, done=True)
+        assert not block.should_show_save_button()
 
         # pre-studio default, DO show the save button
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=False)
-        assert module.should_show_save_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=False)
+        assert block.should_show_save_button()
 
         # If we're not randomizing and we have limited attempts,  then we can save
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, max_attempts=2, done=True)
-        assert module.should_show_save_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, max_attempts=2, done=True)
+        assert block.should_show_save_button()
 
-        module = CapaFactory.create(rerandomize="false", max_attempts=2, done=True)
-        assert module.should_show_save_button()
+        block = CapaFactory.create(rerandomize="false", max_attempts=2, done=True)
+        assert block.should_show_save_button()
 
-        module = CapaFactory.create(rerandomize=RANDOMIZATION.PER_STUDENT, max_attempts=2, done=True)
-        assert module.should_show_save_button()
+        block = CapaFactory.create(rerandomize=RANDOMIZATION.PER_STUDENT, max_attempts=2, done=True)
+        assert block.should_show_save_button()
 
         # If survey question for capa (max_attempts = 0),
         # DO show the save button
-        module = CapaFactory.create(max_attempts=0, done=False)
-        assert module.should_show_save_button()
+        block = CapaFactory.create(max_attempts=0, done=False)
+        assert block.should_show_save_button()
 
     def test_should_show_save_button_force_save_button(self):
         # If we're after the deadline, do NOT show the save button
         # even though we're forcing a save
-        module = CapaFactory.create(due=self.yesterday_str,
-                                    force_save_button="true",
-                                    done=True)
-        assert not module.should_show_save_button()
+        block = CapaFactory.create(due=self.yesterday_str,
+                                   force_save_button="true",
+                                   done=True)
+        assert not block.should_show_save_button()
 
         # If the user is out of attempts, do NOT show the save button
         attempts = random.randint(1, 10)
-        module = CapaFactory.create(attempts=attempts,
-                                    max_attempts=attempts,
-                                    force_save_button="true",
-                                    done=True)
-        assert not module.should_show_save_button()
+        block = CapaFactory.create(attempts=attempts,
+                                   max_attempts=attempts,
+                                   force_save_button="true",
+                                   done=True)
+        assert not block.should_show_save_button()
 
         # Otherwise, if we force the save button,
         # then show it even if we would ordinarily
         # require a reset first
-        module = CapaFactory.create(force_save_button="true",
-                                    rerandomize=RANDOMIZATION.ALWAYS,
-                                    done=True)
-        assert module.should_show_save_button()
+        block = CapaFactory.create(force_save_button="true",
+                                   rerandomize=RANDOMIZATION.ALWAYS,
+                                   done=True)
+        assert block.should_show_save_button()
 
-        module = CapaFactory.create(force_save_button="true",
-                                    rerandomize="true",
-                                    done=True)
-        assert module.should_show_save_button()
+        block = CapaFactory.create(force_save_button="true",
+                                   rerandomize="true",
+                                   done=True)
+        assert block.should_show_save_button()
 
     def test_no_max_attempts(self):
-        module = CapaFactory.create(max_attempts='')
-        html = module.get_problem_html()
+        block = CapaFactory.create(max_attempts='')
+        html = block.get_problem_html()
         assert html is not None
         # assert that we got here without exploding
 
     def test_get_problem_html(self):
         render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaFactory.create(render_template=render_template)
+        block = CapaFactory.create(render_template=render_template)
 
         # We've tested the show/hide button logic in other tests,
         # so here we hard-wire the values
@@ -1532,19 +1531,19 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         show_reset_button = bool(random.randint(0, 1) % 2)
         show_save_button = bool(random.randint(0, 1) % 2)
 
-        module.should_enable_submit_button = Mock(return_value=enable_submit_button)
-        module.should_show_reset_button = Mock(return_value=show_reset_button)
-        module.should_show_save_button = Mock(return_value=show_save_button)
+        block.should_enable_submit_button = Mock(return_value=enable_submit_button)
+        block.should_show_reset_button = Mock(return_value=show_reset_button)
+        block.should_show_save_button = Mock(return_value=show_save_button)
 
         # Patch the capa problem's HTML rendering
         with patch('xmodule.capa.capa_problem.LoncapaProblem.get_html') as mock_html:
             mock_html.return_value = "<div>Test Problem HTML</div>"
 
             # Render the problem HTML
-            html = module.get_problem_html(encapsulate=False)
+            html = block.get_problem_html(encapsulate=False)
 
             # Also render the problem encapsulated in a <div>
-            html_encapsulated = module.get_problem_html(encapsulate=True)
+            html_encapsulated = block.get_problem_html(encapsulate=True)
 
         # Expect that we get the rendered template back
         assert html == '<div>Test Template HTML</div>'
@@ -1586,22 +1585,22 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # HTML generation is mocked out to be meaningless here, so instead we check
         # the context dict passed into HTML generation.
         render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaFactory.create(xml=self.demand_xml, render_template=render_template)
-        module.get_problem_html()  # ignoring html result
+        block = CapaFactory.create(xml=self.demand_xml, render_template=render_template)
+        block.get_problem_html()  # ignoring html result
         context = render_template.call_args[0][1]
         assert context['demand_hint_possible']
         assert context['should_enable_next_hint']
 
         # Check the AJAX call that gets the hint by index
-        result = module.get_demand_hint(0)
+        result = block.get_demand_hint(0)
         assert result['hint_index'] == 0
         assert result['should_enable_next_hint']
 
-        result = module.get_demand_hint(1)
+        result = block.get_demand_hint(1)
         assert result['hint_index'] == 1
         assert not result['should_enable_next_hint']
 
-        result = module.get_demand_hint(2)  # here the server wraps around to index 0
+        result = block.get_demand_hint(2)  # here the server wraps around to index 0
         assert result['hint_index'] == 0
         assert result['should_enable_next_hint']
 
@@ -1624,14 +1623,14 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             </demandhint>
             </problem>"""
         render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaFactory.create(xml=test_xml, render_template=render_template)
-        module.get_problem_html()  # ignoring html result
+        block = CapaFactory.create(xml=test_xml, render_template=render_template)
+        block.get_problem_html()  # ignoring html result
         context = render_template.call_args[0][1]
         assert context['demand_hint_possible']
         assert context['should_enable_next_hint']
 
         # Check the AJAX call that gets the hint by index
-        result = module.get_demand_hint(0)
+        result = block.get_demand_hint(0)
         assert result['hint_index'] == 0
         assert not result['should_enable_next_hint']
 
@@ -1656,14 +1655,14 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             </demandhint>
             </problem>"""
         render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaFactory.create(xml=test_xml, render_template=render_template)
-        module.get_problem_html()  # ignoring html result
+        block = CapaFactory.create(xml=test_xml, render_template=render_template)
+        block.get_problem_html()  # ignoring html result
         context = render_template.call_args[0][1]
         assert context['demand_hint_possible']
         assert context['should_enable_next_hint']
 
         # Check the AJAX call that gets the hint by index
-        result = module.get_demand_hint(0)
+        result = block.get_demand_hint(0)
         assert result['hint_index'] == 0
         assert not result['should_enable_next_hint']
 
@@ -1671,27 +1670,27 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         """
         Test calling get_demand_hunt() results in an event being published.
         """
-        module = CapaFactory.create(xml=self.demand_xml)
-        with patch.object(module.runtime, 'publish') as mock_publish:
-            module.get_problem_html()
-            module.get_demand_hint(0)
+        block = CapaFactory.create(xml=self.demand_xml)
+        with patch.object(block.runtime, 'publish') as mock_publish:
+            block.get_problem_html()
+            block.get_demand_hint(0)
             mock_publish.assert_called_with(
-                module, 'edx.problem.hint.demandhint_displayed',
-                {'hint_index': 0, 'module_id': str(module.location),
+                block, 'edx.problem.hint.demandhint_displayed',
+                {'hint_index': 0, 'module_id': str(block.location),
                  'hint_text': 'Demand 1', 'hint_len': 2}
             )
 
     def test_input_state_consistency(self):
-        module1 = CapaFactory.create()
-        module2 = CapaFactory.create()
+        block1 = CapaFactory.create()
+        block2 = CapaFactory.create()
 
         # check to make sure that the input_state and the keys have the same values
-        module1.set_state_from_lcp()
-        assert list(module1.lcp.inputs.keys()) == list(module1.input_state.keys())
+        block1.set_state_from_lcp()
+        assert list(block1.lcp.inputs.keys()) == list(block1.input_state.keys())
 
-        module2.set_state_from_lcp()
+        block2.set_state_from_lcp()
 
-        intersection = set(module2.input_state.keys()).intersection(set(module1.input_state.keys()))
+        intersection = set(block2.input_state.keys()).intersection(set(block1.input_state.keys()))
         assert len(intersection) == 0
 
     def test_get_problem_html_error(self):
@@ -1701,17 +1700,17 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         message to display to the user.
         """
         render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaFactory.create(render_template=render_template)
+        block = CapaFactory.create(render_template=render_template)
 
         # Save the original problem so we can compare it later
-        original_problem = module.lcp
+        original_problem = block.lcp
 
         # Simulate throwing an exception when the capa problem
         # is asked to render itself as HTML
-        module.lcp.get_html = Mock(side_effect=Exception("Test"))
+        block.lcp.get_html = Mock(side_effect=Exception("Test"))
 
-        # Try to render the module with DEBUG turned off
-        html = module.get_problem_html()
+        # Try to render the block with DEBUG turned off
+        html = block.get_problem_html()
 
         assert html is not None
 
@@ -1720,25 +1719,25 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         context = render_args[1]
         assert 'error' in context['problem']['html']
 
-        # Expect that the module has created a new dummy problem with the error
-        assert original_problem != module.lcp
+        # Expect that the block has created a new dummy problem with the error
+        assert original_problem != block.lcp
 
     def test_get_problem_html_error_preview(self):
         """
         Test the html response when an error occurs with DEBUG off in Studio.
         """
         render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaFactory.create(render_template=render_template)
+        block = CapaFactory.create(render_template=render_template)
 
         # Simulate throwing an exception when the capa problem
         # is asked to render itself as HTML
         error_msg = "Superterrible error happened: ☠"
-        module.lcp.get_html = Mock(side_effect=Exception(error_msg))
+        block.lcp.get_html = Mock(side_effect=Exception(error_msg))
 
-        module.system.is_author_mode = True
+        block.runtime.is_author_mode = True
 
-        # Try to render the module with the author mode turned on
-        html = module.get_problem_html()
+        # Try to render the block with the author mode turned on
+        html = block.get_problem_html()
 
         assert html is not None
 
@@ -1753,15 +1752,15 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         Test the html response when an error occurs with DEBUG on
         """
         render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaFactory.create(render_template=render_template)
+        block = CapaFactory.create(render_template=render_template)
 
         # Simulate throwing an exception when the capa problem
         # is asked to render itself as HTML
         error_msg = "Superterrible error happened: ☠"
-        module.lcp.get_html = Mock(side_effect=Exception(error_msg))
+        block.lcp.get_html = Mock(side_effect=Exception(error_msg))
 
-        # Try to render the module with DEBUG turned on
-        html = module.get_problem_html()
+        # Try to render the block with DEBUG turned on
+        html = block.get_problem_html()
 
         assert html is not None
 
@@ -1782,11 +1781,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Run the test for each possible rerandomize value
 
-        module = CapaFactory.create(rerandomize=rerandomize)
+        block = CapaFactory.create(rerandomize=rerandomize)
 
         # Get the seed
-        # By this point, the module should have persisted the seed
-        seed = module.seed
+        # By this point, the block should have persisted the seed
+        seed = block.seed
         assert seed is not None
 
         # If we're not rerandomizing, the seed is always set
@@ -1796,16 +1795,16 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
 
         # Check the problem
         get_request_dict = {CapaFactory.input_key(): '3.14'}
-        module.submit_problem(get_request_dict)
+        block.submit_problem(get_request_dict)
 
         # Expect that the seed is the same
-        assert seed == module.seed
+        assert seed == block.seed
 
         # Save the problem
-        module.save_problem(get_request_dict)
+        block.save_problem(get_request_dict)
 
         # Expect that the seed is the same
-        assert seed == module.seed
+        assert seed == block.seed
 
     @ddt.data(
         'false',
@@ -1820,22 +1819,22 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         Run the test for each possible rerandomize value
         """
 
-        def _reset_and_get_seed(module):
+        def _reset_and_get_seed(block):
             """
-            Reset the XModule and return the module's seed
+            Reset the XBlock and return the block's seed
             """
 
             # Simulate submitting an attempt
             # We need to do this, or reset_problem() will
             # fail because it won't re-randomize until the problem has been submitted
             # the problem yet.
-            module.done = True
+            block.done = True
 
             # Reset the problem
-            module.reset_problem({})
+            block.reset_problem({})
 
             # Return the seed
-            return module.seed
+            return block.seed
 
         def _retry_and_check(num_tries, test_func):
             '''
@@ -1852,11 +1851,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
                     break
             return success
 
-        module = CapaFactory.create(rerandomize=rerandomize, done=True)
+        block = CapaFactory.create(rerandomize=rerandomize, done=True)
 
         # Get the seed
-        # By this point, the module should have persisted the seed
-        seed = module.seed
+        # By this point, the block should have persisted the seed
+        seed = block.seed
         assert seed is not None
 
         # We do NOT want the seed to reset if rerandomize
@@ -1866,7 +1865,7 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         if rerandomize in [RANDOMIZATION.NEVER,
                            'false',
                            RANDOMIZATION.PER_STUDENT]:
-            assert seed == _reset_and_get_seed(module)
+            assert seed == _reset_and_get_seed(block)
 
         # Otherwise, we expect the seed to change
         # to another valid seed
@@ -1875,9 +1874,9 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             # Since there's a small chance (expected) we might get the
             # same seed again, give it 10 chances
             # to generate a different seed
-            success = _retry_and_check(10, lambda: _reset_and_get_seed(module) != seed)
+            success = _retry_and_check(10, lambda: _reset_and_get_seed(block) != seed)
 
-            assert module.seed is not None
+            assert block.seed is not None
             msg = 'Could not get a new seed from reset after 10 tries'
             assert success, msg
 
@@ -1894,27 +1893,27 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         Run the test for each possible rerandomize value
         """
 
-        def _reset_and_get_seed(module):
+        def _reset_and_get_seed(block):
             """
-            Reset the XModule and return the module's seed
+            Reset the XBlock and return the block's seed
             """
 
             # Reset the problem
             # By default, the problem is instantiated as unsubmitted
-            module.reset_problem({})
+            block.reset_problem({})
 
             # Return the seed
-            return module.seed
+            return block.seed
 
-        module = CapaFactory.create(rerandomize=rerandomize, done=False)
+        block = CapaFactory.create(rerandomize=rerandomize, done=False)
 
         # Get the seed
-        # By this point, the module should have persisted the seed
-        seed = module.seed
+        # By this point, the block should have persisted the seed
+        seed = block.seed
         assert seed is not None
 
         # the seed should never change because the student hasn't finished the problem
-        assert seed == _reset_and_get_seed(module)
+        assert seed == _reset_and_get_seed(block)
 
     @ddt.data(
         RANDOMIZATION.ALWAYS,
@@ -1927,8 +1926,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         # Get a bunch of seeds, they should all be in 0-999.
         i = 200
         while i > 0:
-            module = CapaFactory.create(rerandomize=rerandomize)
-            assert 0 <= module.seed < 1000
+            block = CapaFactory.create(rerandomize=rerandomize)
+            assert 0 <= block.seed < 1000
             i -= 1
 
     @patch('xmodule.capa_block.log')
@@ -1940,8 +1939,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         error_types = [TypeError, ValueError]
         for error_type in error_types:
             mock_progress.side_effect = error_type
-            module = CapaFactory.create()
-            assert module.get_progress() is None
+            block = CapaFactory.create()
+            assert block.get_progress() is None
             mock_log.exception.assert_called_once_with('Got bad progress')
             mock_log.reset_mock()
 
@@ -1951,9 +1950,9 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         Check that if the weight is 0 get_progress does not try to create a Progress object.
         """
         mock_progress.return_value = True
-        module = CapaFactory.create()
-        module.weight = 0
-        progress = module.get_progress()
+        block = CapaFactory.create()
+        block.weight = 0
+        progress = block.get_progress()
         assert progress is None
         assert not mock_progress.called
 
@@ -1962,14 +1961,14 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         """
         Check that score and total are calculated correctly for the progress fraction.
         """
-        module = CapaFactory.create()
-        module.weight = 1
-        module.get_progress()
+        block = CapaFactory.create()
+        block.weight = 1
+        block.get_progress()
         mock_progress.assert_called_with(0, 1)
 
-        other_module = CapaFactory.create(correct=True)
-        other_module.weight = 1
-        other_module.get_progress()
+        other_block = CapaFactory.create(correct=True)
+        other_block.weight = 1
+        other_block.get_progress()
         mock_progress.assert_called_with(1, 1)
 
     @ddt.data(
@@ -1985,11 +1984,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         """
         Check that score and total are calculated correctly for the progress fraction.
         """
-        module = CapaFactory.create(correct=is_correct,
-                                    show_correctness=show_correctness,
-                                    due=self.tomorrow_str)
-        module.weight = 1
-        score, total = module.get_display_progress()
+        block = CapaFactory.create(correct=is_correct,
+                                   show_correctness=show_correctness,
+                                   due=self.tomorrow_str)
+        block.weight = 1
+        score, total = block.get_display_progress()
         assert score == expected_score
         assert total == 1
 
@@ -1997,17 +1996,17 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         """
         Check that get_html() calls get_progress() with no arguments.
         """
-        module = CapaFactory.create()
-        module.get_progress = Mock(wraps=module.get_progress)
-        module.get_html()
-        module.get_progress.assert_called_with()
+        block = CapaFactory.create()
+        block.get_progress = Mock(wraps=block.get_progress)
+        block.get_html()
+        block.get_progress.assert_called_with()
 
     def test_get_problem(self):
         """
         Check that get_problem() returns the expected dictionary.
         """
-        module = CapaFactory.create()
-        assert module.get_problem('data') == {'html': module.get_problem_html(encapsulate=False)}
+        block = CapaFactory.create()
+        assert block.get_problem('data') == {'html': block.get_problem_html(encapsulate=False)}
 
     # Standard question with shuffle="true" used by a few tests
     common_shuffle_xml = textwrap.dedent("""
@@ -2028,10 +2027,10 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         Check that shuffle unmasking is plumbed through: when submit_problem is called,
         unmasked names should appear in the publish event_info.
         """
-        module = CapaFactory.create(xml=self.common_shuffle_xml)
-        with patch.object(module.runtime, 'publish') as mock_publish:
+        block = CapaFactory.create(xml=self.common_shuffle_xml)
+        with patch.object(block.runtime, 'publish') as mock_publish:
             get_request_dict = {CapaFactory.input_key(): 'choice_3'}  # the correct choice
-            module.submit_problem(get_request_dict)
+            block.submit_problem(get_request_dict)
             mock_call = mock_publish.mock_calls[1]
             event_info = mock_call[1][2]
             assert event_info['answers'][CapaFactory.answer_key()] == 'choice_3'
@@ -2043,10 +2042,10 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     @unittest.skip("masking temporarily disabled")
     def test_save_unmask(self):
         """On problem save, unmasked data should appear on publish."""
-        module = CapaFactory.create(xml=self.common_shuffle_xml)
-        with patch.object(module.runtime, 'publish') as mock_publish:
+        block = CapaFactory.create(xml=self.common_shuffle_xml)
+        with patch.object(block.runtime, 'publish') as mock_publish:
             get_request_dict = {CapaFactory.input_key(): 'mask_0'}
-            module.save_problem(get_request_dict)
+            block.save_problem(get_request_dict)
             mock_call = mock_publish.mock_calls[0]
             event_info = mock_call[1][1]
             assert event_info['answers'][CapaFactory.answer_key()] == 'choice_2'
@@ -2055,12 +2054,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     @unittest.skip("masking temporarily disabled")
     def test_reset_unmask(self):
         """On problem reset, unmask names should appear publish."""
-        module = CapaFactory.create(xml=self.common_shuffle_xml)
+        block = CapaFactory.create(xml=self.common_shuffle_xml)
         get_request_dict = {CapaFactory.input_key(): 'mask_0'}
-        module.submit_problem(get_request_dict)
+        block.submit_problem(get_request_dict)
         # On reset, 'old_state' should use unmasked names
-        with patch.object(module.runtime, 'publish') as mock_publish:
-            module.reset_problem(None)
+        with patch.object(block.runtime, 'publish') as mock_publish:
+            block.reset_problem(None)
             mock_call = mock_publish.mock_calls[0]
             event_info = mock_call[1][1]
             assert mock_call[1][0] == 'reset_problem'
@@ -2070,12 +2069,12 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
     @unittest.skip("masking temporarily disabled")
     def test_rescore_unmask(self):
         """On problem rescore, unmasked names should appear on publish."""
-        module = CapaFactory.create(xml=self.common_shuffle_xml)
+        block = CapaFactory.create(xml=self.common_shuffle_xml)
         get_request_dict = {CapaFactory.input_key(): 'mask_0'}
-        module.submit_problem(get_request_dict)
+        block.submit_problem(get_request_dict)
         # On rescore, state/student_answers should use unmasked names
-        with patch.object(module.runtime, 'publish') as mock_publish:
-            module.rescore_problem(only_if_higher=False)  # lint-amnesty, pylint: disable=no-member
+        with patch.object(block.runtime, 'publish') as mock_publish:
+            block.rescore_problem(only_if_higher=False)  # lint-amnesty, pylint: disable=no-member
             mock_call = mock_publish.mock_calls[0]
             event_info = mock_call[1][1]
             assert mock_call[1][0] == 'problem_rescore'
@@ -2096,10 +2095,10 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
             </multiplechoiceresponse>
             </problem>
         """)
-        module = CapaFactory.create(xml=xml)
-        with patch.object(module.runtime, 'publish') as mock_publish:
+        block = CapaFactory.create(xml=xml)
+        with patch.object(block.runtime, 'publish') as mock_publish:
             get_request_dict = {CapaFactory.input_key(): 'choice_2'}  # mask_X form when masking enabled
-            module.submit_problem(get_request_dict)
+            block.submit_problem(get_request_dict)
             mock_call = mock_publish.mock_calls[1]
             event_info = mock_call[1][2]
             assert event_info['answers'][CapaFactory.answer_key()] == 'choice_2'
@@ -2119,8 +2118,8 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         """
         Verify that display_name_with_default works as expected.
         """
-        module = CapaFactory.create(display_name=display_name)
-        assert module.display_name_with_default == expected_display_name
+        block = CapaFactory.create(display_name=display_name)
+        assert block.display_name_with_default == expected_display_name
 
     @ddt.data(
         '',
@@ -2131,11 +2130,11 @@ class ProblemBlockTest(unittest.TestCase):  # lint-amnesty, pylint: disable=miss
         Verify that if problem display name is not provided then a default name is used.
         """
         render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaFactory.create(display_name=display_name, render_template=render_template)
-        module.get_problem_html()
+        block = CapaFactory.create(display_name=display_name, render_template=render_template)
+        block.get_problem_html()
         render_args, _ = render_template.call_args
         context = render_args[1]
-        assert context['problem']['name'] == module.location.block_type
+        assert context['problem']['name'] == block.location.block_type
 
 
 @ddt.ddt
@@ -2941,14 +2940,14 @@ class ProblemCheckTrackingTest(unittest.TestCase):
         # Whitespace screws up comparisons
         xml = ''.join(line.strip() for line in xml.split('\n'))
         factory = self.capa_factory_for_problem_xml(xml)
-        module = factory.create()
+        block = factory.create()
 
         answer_input_dict = {
             factory.input_key(2): 'blue',
             factory.input_key(3): 'choice_0',
             factory.input_key(4): ['choice_0', 'choice_1'],
         }
-        event = self.get_event_for_answers(module, answer_input_dict)
+        event = self.get_event_for_answers(block, answer_input_dict)
 
         assert event['submission'] ==\
                {factory.answer_key(2): {'question': 'What color is the open ocean on a sunny day?',
@@ -2981,9 +2980,9 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
         return CustomCapaFactory
 
-    def get_event_for_answers(self, module, answer_input_dict):  # lint-amnesty, pylint: disable=missing-function-docstring
-        with patch.object(module.runtime, 'publish') as mock_publish:
-            module.submit_problem(answer_input_dict)
+    def get_event_for_answers(self, block, answer_input_dict):  # lint-amnesty, pylint: disable=missing-function-docstring
+        with patch.object(block.runtime, 'publish') as mock_publish:
+            block.submit_problem(answer_input_dict)
 
             assert len(mock_publish.mock_calls) >= 2
             # There are potentially 2 track logs: answers and hint. [-1]=answers.
@@ -2994,13 +2993,13 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
     def test_numerical_textline(self):
         factory = CapaFactory
-        module = factory.create()
+        block = factory.create()
 
         answer_input_dict = {
             factory.input_key(2): '3.14'
         }
 
-        event = self.get_event_for_answers(module, answer_input_dict)
+        event = self.get_event_for_answers(block, answer_input_dict)
         assert event['submission'] ==\
                {factory.answer_key(2): {'question': '', 'answer': '3.14',
                                         'response_type': 'numericalresponse',
@@ -3022,13 +3021,13 @@ class ProblemCheckTrackingTest(unittest.TestCase):
               </optionresponse>
             </problem>
             """.format(group_label, input1_label, input2_label))
-        module = factory.create()
+        block = factory.create()
         answer_input_dict = {
             factory.input_key(2, 1): 'blue',
             factory.input_key(2, 2): 'yellow',
         }
 
-        event = self.get_event_for_answers(module, answer_input_dict)
+        event = self.get_event_for_answers(block, answer_input_dict)
         assert event['submission'] ==\
                {factory.answer_key(2, 1): {'group_label': group_label,
                                            'question': input1_label,
@@ -3084,14 +3083,14 @@ class ProblemCheckTrackingTest(unittest.TestCase):
                  </optionresponse>
             </problem>
             """.format(group_label, input1_label, input2_label))
-        module = factory.create()
+        block = factory.create()
 
         answer_input_dict = {
             factory.input_key(2, 1): 'apple',
             factory.input_key(2, 2): 'cucumber',
         }
 
-        event = self.get_event_for_answers(module, answer_input_dict)
+        event = self.get_event_for_answers(block, answer_input_dict)
         assert event['submission'] ==\
                {factory.answer_key(2, 1): {'group_label': group_label,
                                            'question': input1_label,
@@ -3108,13 +3107,13 @@ class ProblemCheckTrackingTest(unittest.TestCase):
 
     def test_rerandomized_inputs(self):
         factory = CapaFactory
-        module = factory.create(rerandomize=RANDOMIZATION.ALWAYS)
+        block = factory.create(rerandomize=RANDOMIZATION.ALWAYS)
 
         answer_input_dict = {
             factory.input_key(2): '3.14'
         }
 
-        event = self.get_event_for_answers(module, answer_input_dict)
+        event = self.get_event_for_answers(block, answer_input_dict)
         assert event['submission'] ==\
                {factory.answer_key(2): {'question': '',
                                         'answer': '3.14',
@@ -3122,7 +3121,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
                                         'input_type': 'textline',
                                         'correct': True,
                                         'group_label': '',
-                                        'variant': module.seed}}
+                                        'variant': block.seed}}
 
     @patch.object(XQueueInterface, '_http_post')
     def test_file_inputs(self, mock_xqueue_post):
@@ -3133,7 +3132,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
             self.addCleanup(fileobj.close)
 
         factory = CapaFactoryWithFiles
-        module = factory.create()
+        block = factory.create()
 
         # Mock the XQueueInterface post method
         mock_xqueue_post.return_value = (0, "ok")
@@ -3143,7 +3142,7 @@ class ProblemCheckTrackingTest(unittest.TestCase):
             CapaFactoryWithFiles.input_key(response_num=3): 'None',
         }
 
-        event = self.get_event_for_answers(module, answer_input_dict)
+        event = self.get_event_for_answers(block, answer_input_dict)
         assert event['submission'] ==\
                {factory.answer_key(2): {'question': '',
                                         'answer': fpaths,

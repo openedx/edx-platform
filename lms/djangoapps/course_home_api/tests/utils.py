@@ -2,10 +2,8 @@
 Base classes or util functions for use in Course Home API tests
 """
 
-import unittest
 from datetime import datetime
 
-from django.conf import settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 
@@ -15,9 +13,10 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class BaseCourseHomeTests(ModuleStoreTestCase, MasqueradeMixin):
     """
     Base class for Course Home API tests.

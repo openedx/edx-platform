@@ -16,7 +16,7 @@ class StudioEditableBlock(XBlockMixin):
 
     def render_children(self, context, fragment, can_reorder=False, can_add=False):
         """
-        Renders the children of the module with HTML appropriate for Studio. If can_reorder is True,
+        Renders the children of the block with HTML appropriate for Studio. If can_reorder is True,
         then the children will be rendered to support drag and drop.
         """
         contents = []
@@ -33,7 +33,10 @@ class StudioEditableBlock(XBlockMixin):
                 'content': rendered_child.content
             })
 
-        fragment.add_content(self.runtime.service(self, 'mako').render_template("studio_render_children_view.html", {  # pylint: disable=no-member
+        # 'lms.' namespace_prefix is required for rendering in studio
+        mako_service = self.runtime.service(self, 'mako')
+        mako_service.namespace_prefix = 'lms.'
+        fragment.add_content(mako_service.render_template("studio_render_children_view.html", {  # pylint: disable=no-member
             'items': contents,
             'xblock_context': context,
             'can_add': can_add,
@@ -43,7 +46,7 @@ class StudioEditableBlock(XBlockMixin):
     @staticmethod
     def get_preview_view_name(block):
         """
-        Helper method for getting preview view name (student_view or author_view) for a given module.
+        Helper method for getting preview view name (student_view or author_view) for a given block.
         """
         return AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
 

@@ -72,12 +72,12 @@
                 });
 
                 it('open/close the speed menu on mouseenter/mouseleave',
-                   function() {
-                       $speedControl.mouseenter();
-                       expect($speedControl).toHaveClass('is-opened');
-                       $speedControl.mouseleave();
-                       expect($speedControl).not.toHaveClass('is-opened');
-                   });
+                    function() {
+                        $speedControl.mouseenter();
+                        expect($speedControl).toHaveClass('is-opened');
+                        $speedControl.mouseleave();
+                        expect($speedControl).not.toHaveClass('is-opened');
+                    });
 
                 it('do not close the speed menu on mouseleave if a speed ' +
                     'entry has focus', function() {
@@ -117,20 +117,20 @@
                 });
 
                 it('UP and DOWN keydown function as expected on speed entries',
-                   function() {
-                       var speed_0_75 = speedEntries.filter(':contains("0.75x")'),
-                           speed_1_0 = speedEntries.filter(':contains("1.0x")');
+                    function() {
+                        var speed_0_75 = speedEntries.filter(':contains("0.75x")'),
+                            speed_1_0 = speedEntries.filter(':contains("1.0x")');
 
-                    // First open menu
-                       $speedControl.trigger(keyPressEvent(KEY.UP));
-                       expect(speed_0_75).toBeFocused();
+                        // First open menu
+                        $speedControl.trigger(keyPressEvent(KEY.UP));
+                        expect(speed_0_75).toBeFocused();
 
-                       speed_0_75.trigger(keyPressEvent(KEY.UP));
-                       expect(speed_1_0).toBeFocused();
+                        speed_0_75.trigger(keyPressEvent(KEY.UP));
+                        expect(speed_1_0).toBeFocused();
 
-                       speed_1_0.trigger(keyPressEvent(KEY.DOWN));
-                       expect(speed_0_75).toBeFocused();
-                   });
+                        speed_1_0.trigger(keyPressEvent(KEY.DOWN));
+                        expect(speed_0_75).toBeFocused();
+                    });
 
                 it('ESC keydown on speed entry closes menu', function() {
                     // First open menu. Focus is on last speed entry.
@@ -144,36 +144,36 @@
                 });
 
                 it('ENTER keydown on speed entry selects 2.0x speed and closes menu',
-                   function() {
+                    function() {
                     // First open menu.
-                       $speedControl.trigger(keyPressEvent(KEY.UP));
-                    // Focus on 2.0x speed
-                       speedEntries.eq(0).focus();
-                       speedEntries.eq(0).trigger(keyPressEvent(KEY.ENTER));
+                        $speedControl.trigger(keyPressEvent(KEY.UP));
+                        // Focus on 2.0x speed
+                        speedEntries.eq(0).focus();
+                        speedEntries.eq(0).trigger(keyPressEvent(KEY.ENTER));
 
-                    // Menu is closed, focus has been returned to speed
-                    // control and video speed is 2.0x.
-                       expect($speedButton).toBeFocused();
-                       expect($('.video-speeds li[data-speed="2.0"]'))
-                        .toHaveClass('is-active');
-                       expect($('.speeds .value')).toHaveHtml('2.0x');
-                   });
+                        // Menu is closed, focus has been returned to speed
+                        // control and video speed is 2.0x.
+                        expect($speedButton).toBeFocused();
+                        expect($('.video-speeds li[data-speed="2.0"]'))
+                            .toHaveClass('is-active');
+                        expect($('.speeds .value')).toHaveHtml('2.0x');
+                    });
 
                 it('SPACE keydown on speed entry selects 0.75x speed and closes menu',
-                   function() {
+                    function() {
                     // First open menu.
-                       $speedControl.trigger(keyPressEvent(KEY.UP));
-                    // Focus on 0.75x speed
-                       speedEntries.eq(4).focus();
-                       speedEntries.eq(4).trigger(keyPressEvent(KEY.SPACE));
+                        $speedControl.trigger(keyPressEvent(KEY.UP));
+                        // Focus on 0.75x speed
+                        speedEntries.eq(4).focus();
+                        speedEntries.eq(4).trigger(keyPressEvent(KEY.SPACE));
 
-                    // Menu is closed, focus has been returned to speed
-                    // control and video speed is 0.75x.
-                       expect($speedButton).toBeFocused();
-                       expect($('.video-speeds li[data-speed="0.75"]'))
-                        .toHaveClass('is-active');
-                       expect($('.speeds .value')).toHaveHtml('0.75x');
-                   });
+                        // Menu is closed, focus has been returned to speed
+                        // control and video speed is 0.75x.
+                        expect($speedButton).toBeFocused();
+                        expect($('.video-speeds li[data-speed="0.75"]'))
+                            .toHaveClass('is-active');
+                        expect($('.speeds .value')).toHaveHtml('0.75x');
+                    });
             });
         });
 

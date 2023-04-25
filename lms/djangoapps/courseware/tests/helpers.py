@@ -33,7 +33,7 @@ from common.djangoapps.util.date_utils import strftime_localized_html
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE, ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tests import get_test_descriptor_system, get_test_system  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.tests import get_test_descriptor_system, get_test_system, prepare_block_runtime  # lint-amnesty, pylint: disable=wrong-import-order
 
 
 class BaseTestXmodule(ModuleStoreTestCase):
@@ -66,10 +66,12 @@ class BaseTestXmodule(ModuleStoreTestCase):
     METADATA = {}
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
-    def new_module_runtime(self, **kwargs):
+    def new_module_runtime(self, runtime=None, **kwargs):
         """
-        Generate a new ModuleSystem that is minimally set up for testing
+        Generate a new DescriptorSystem that is minimally set up for testing
         """
+        if runtime:
+            return prepare_block_runtime(runtime, course_id=self.course.id, **kwargs)
         return get_test_system(course_id=self.course.id, **kwargs)
 
     def new_descriptor_runtime(self, **kwargs):
@@ -94,7 +96,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         if runtime_kwargs is None:
             runtime_kwargs = {}
-        self.item_descriptor.xmodule_runtime = self.new_module_runtime(**runtime_kwargs)
+        self.new_module_runtime(runtime=self.item_descriptor.runtime, **runtime_kwargs)
 
         self.item_url = str(self.item_descriptor.location)
 
@@ -148,6 +150,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
 class XModuleRenderingTestBase(BaseTestXmodule):  # lint-amnesty, pylint: disable=missing-class-docstring
 
+    # lint-amnesty, pylint: disable=arguments-differ
     def new_module_runtime(self, **kwargs):
         """
         Create a runtime that actually does html rendering

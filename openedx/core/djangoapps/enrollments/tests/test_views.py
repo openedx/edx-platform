@@ -3,11 +3,9 @@
 Tests for user enrollment.
 """
 
-
 import datetime
 import itertools
 import json
-import unittest
 from unittest.mock import patch
 from urllib.parse import quote
 
@@ -39,6 +37,7 @@ from openedx.core.djangoapps.enrollments.errors import CourseEnrollmentError
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.user_api.models import RetirementState, UserOrgTag, UserRetirementStatus
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.django_test_client_utils import get_absolute_url
 from openedx.features.enterprise_support.tests import FAKE_ENTERPRISE_CUSTOMER
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseServiceMockMixin
@@ -155,7 +154,7 @@ class EnrollmentTestMixin:
 
 @override_settings(EDX_API_KEY="i am a key")
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, EnterpriseServiceMockMixin):
     """
     Test user enrollment, especially with different course modes.
@@ -1214,7 +1213,7 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         assert enrollment.attributes.get(namespace='order', name='order_number').value == order_number
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestCase):
     """Test that enrollment is blocked from embargoed countries. """
 
@@ -1346,7 +1345,7 @@ def cross_domain_config(func):
     )
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EnrollmentCrossDomainTest(ModuleStoreTestCase):
     """Test cross-domain calls to the enrollment end-points. """
 
@@ -1405,7 +1404,7 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
     """
     Tests unenrollment functionality. The API being tested is intended to
@@ -1558,7 +1557,7 @@ class UnenrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class UserRoleTest(ModuleStoreTestCase):
     """
     Tests the API call to list user roles.
@@ -1666,7 +1665,7 @@ class UserRoleTest(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
     """
     Test the course enrollments list API.

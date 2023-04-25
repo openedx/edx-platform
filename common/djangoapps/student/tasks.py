@@ -5,6 +5,7 @@ import logging
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.track import segment
@@ -25,11 +26,11 @@ from openedx.features.course_experience import ENABLE_COURSE_GOALS
 User = get_user_model()
 log = logging.getLogger(__name__)
 
-MAX_RETRIES = 1
-COUNTDOWN = 60
+MAX_RETRIES = 3
 
 
 @shared_task(bind=True, ignore_result=True)
+@set_code_owner_attribute
 def send_course_enrollment_email(
     self, user_id, course_id, course_title, short_description, course_ended, pacing_type, track_mode
 ):
@@ -133,4 +134,5 @@ def send_course_enrollment_email(
             )
     except Exception as exc:  # pylint: disable=broad-except
         log.error(f"[Course Enrollment] Email sending failed with exception: {exc}")
-        raise self.retry(exc=exc, countdown=COUNTDOWN, max_retries=MAX_RETRIES)
+        countdown = 60 * (self.request.retries + 1)
+        raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)

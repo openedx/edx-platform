@@ -1,5 +1,5 @@
 """
-Module for running content split tests
+Block for running content split tests
 """
 
 
@@ -107,7 +107,7 @@ class SplitTestFields:
     # Block.  (expected invariant that we'll need to test, and handle
     # authoring tools that mess this up)
     group_id_to_child = ReferenceValueDict(
-        help=_("Which child module students in a particular group_id should see"),
+        help=_("Which child block students in a particular group_id should see"),
         scope=Scope.content
     )
 
@@ -115,7 +115,7 @@ class SplitTestFields:
 def get_split_user_partitions(user_partitions):
     """
     Helper method that filters a list of user_partitions and returns just the
-    ones that are suitable for the split_test module.
+    ones that are suitable for the split_test block.
     """
     return [user_partition for user_partition in user_partitions if user_partition.scheme.name == "random"]
 
@@ -148,7 +148,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     Technical notes:
       - There is more dark magic in this code than I'd like.  The whole varying-children +
         grading interaction is a tangle between super and subclasses of descriptors and
-        modules.
+        blocks.
     """
     resources_dir = 'assets/split_test'
 
@@ -192,7 +192,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         Return the user bound child block for the partition or None.
         """
         if self.child_descriptor is not None:
-            return self.system.get_module(self.child_descriptor)
+            return self.runtime.get_block_for_descriptor(self.child_descriptor)
         else:
             return None
 
@@ -272,7 +272,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
         for child_location in self.children:  # pylint: disable=no-member
             child_descriptor = self.get_child_descriptor_by_location(child_location)
-            child = self.system.get_module(child_descriptor)
+            child = self.runtime.get_block_for_descriptor(child_descriptor)
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_fragment_resources(rendered_child)
             group_name, updated_group_id = self.get_data_for_vertical(child)
@@ -347,7 +347,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         """
         html = ""
         for active_child_descriptor in children:
-            active_child = self.system.get_module(active_child_descriptor)
+            active_child = self.runtime.get_block_for_descriptor(active_child_descriptor)
             rendered_child = active_child.render(StudioEditableBlock.get_preview_view_name(active_child), context)
             if active_child.category == 'vertical':
                 group_name, group_id = self.get_data_for_vertical(active_child)
@@ -381,7 +381,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
             # raise error instead?  In fact, could complain on descriptor load...
             return Fragment(content="<div>Nothing here.  Move along.</div>")
 
-        if self.system.user_is_staff:
+        if self.runtime.user_is_staff:
             return self._staff_view(context)
         else:
             child_fragment = self.child.render(STUDENT_VIEW, context)
@@ -467,7 +467,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
                 descriptor = system.process_xml(etree.tostring(child))
                 children.append(descriptor.scope_ids.usage_id)
             except Exception:  # lint-amnesty, pylint: disable=broad-except
-                msg = "Unable to load child when parsing split_test module."
+                msg = "Unable to load child when parsing split_test block."
                 log.exception(msg)
                 system.error_tracker(msg)
 
@@ -486,7 +486,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     def has_dynamic_children(self):
         """
         Grading needs to know that only one of the children is actually "real".  This
-        makes it use module.get_child_descriptors().
+        makes it use block.get_child_descriptors().
         """
         return True
 
@@ -540,7 +540,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
     def get_selected_partition(self):
         """
-        Returns the partition that this split module is currently using, or None
+        Returns the partition that this split block is currently using, or None
         if the currently selected partition ID does not match any of the defined partitions.
         """
         for user_partition in self.user_partitions:  # lint-amnesty, pylint: disable=not-an-iterable
@@ -637,7 +637,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
                     )
                 )
             else:
-                # If the user_partition selected is not valid for the split_test module, error.
+                # If the user_partition selected is not valid for the split_test block, error.
                 # This can only happen via XML and import/export.
                 if not get_split_user_partitions([user_partition]):
                     split_validation.add(
@@ -704,15 +704,15 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
         if changed:
             # user.id - to be fixed by Publishing team
-            self.system.modulestore.update_item(self, None)
+            self.runtime.modulestore.update_item(self, None)
         return Response()
 
     @property
     def group_configuration_url(self):  # lint-amnesty, pylint: disable=missing-function-docstring
-        assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'get_course'), \
+        assert hasattr(self.runtime, 'modulestore') and hasattr(self.runtime.modulestore, 'get_course'), \
             "modulestore has to be available"
 
-        course_block = self.system.modulestore.get_course(self.location.course_key)
+        course_block = self.runtime.modulestore.get_course(self.location.course_key)
         group_configuration_url = None
         if 'split_test' in course_block.advanced_modules:
             user_partition = self.get_selected_partition()
@@ -732,9 +732,9 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         A mutable modulestore is needed to call this method (will need to update after mixed
         modulestore work, currently relies on mongo's create_item method).
         """
-        assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'create_item'), \
+        assert hasattr(self.runtime, 'modulestore') and hasattr(self.runtime.modulestore, 'create_item'), \
             "editor_saved should only be called when a mutable modulestore is available"
-        modulestore = self.system.modulestore
+        modulestore = self.runtime.modulestore
         dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
         metadata = {'display_name': DEFAULT_GROUP_NAME.format(group_id=group.id)}
         modulestore.create_item(
@@ -744,7 +744,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
             block_id=dest_usage_key.block_id,
             definition_data=None,
             metadata=metadata,
-            runtime=self.system,
+            runtime=self.runtime,
         )
         self.children.append(dest_usage_key)  # pylint: disable=no-member
         self.group_id_to_child[str(group.id)] = dest_usage_key

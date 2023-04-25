@@ -458,7 +458,6 @@
     "Cancel upload": "Annuler l'envoi",
     "Cannot delete when in use by a unit": "Ne peut \u00eatre supprim\u00e9 lorsqu'il est en cours d'utilisation dans une unit\u00e9",
     "Cannot delete when in use by an experiment": "Ne peut \u00eatre supprim\u00e9 lorsqu'il est en cours d'utilisation par une exp\u00e9rience",
-    "Cannot drop more <%- types %> assignments than are assigned.": "Impossible de supprimer plus d'affectations de <%- types %> que ce qui est attribu\u00e9.",
     "Cannot join instructor managed team": "Impossible de rejoindre l'\u00e9quipe dirig\u00e9e par un instructeur",
     "Cannot update attempt review status": "Impossible de mettre \u00e0 jour l'\u00e9tat d'examen de la tentative",
     "Caption": "L\u00e9gende",

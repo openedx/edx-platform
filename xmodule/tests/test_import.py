@@ -17,7 +17,6 @@ from xblock.fields import Integer, Scope, String
 from xblock.runtime import DictKeyValueStore, KvsFieldData
 
 from xmodule.fields import Date
-from xmodule.modulestore import only_xmodules
 from xmodule.modulestore.inheritance import InheritanceMixin, compute_inherited_metadata
 from xmodule.modulestore.xml import ImportSystem, LibraryXMLModuleStore, XMLModuleStore
 from xmodule.tests import DATA_DIR
@@ -32,12 +31,12 @@ RUN = 'test_run'
 class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
 
     @patch('xmodule.modulestore.xml.OSFS', lambda dir: OSFS(mkdtemp()))
-    def __init__(self, load_error_modules, library=False):
+    def __init__(self, load_error_blocks, library=False):
 
         if library:
-            xmlstore = LibraryXMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
+            xmlstore = LibraryXMLModuleStore("data_dir", source_dirs=[], load_error_blocks=load_error_blocks)
         else:
-            xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
+            xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_blocks=load_error_blocks)
         course_id = CourseKey.from_string('/'.join([ORG, COURSE, RUN]))
         course_dir = "test_dir"
         error_tracker = Mock()
@@ -47,22 +46,19 @@ class DummySystem(ImportSystem):  # lint-amnesty, pylint: disable=abstract-metho
             course_id=course_id,
             course_dir=course_dir,
             error_tracker=error_tracker,
-            load_error_modules=load_error_modules,
+            load_error_blocks=load_error_blocks,
             mixins=(InheritanceMixin, XModuleMixin),
             services={'field-data': KvsFieldData(DictKeyValueStore())},
         )
 
-    def render_template(self, _template, _context):  # lint-amnesty, pylint: disable=method-hidden
-        raise Exception("Shouldn't be called")
-
 
 class BaseCourseTestCase(TestCase):
-    '''Make sure module imports work properly, including for malformed inputs'''
+    '''Make sure block imports work properly, including for malformed inputs'''
 
     @staticmethod
-    def get_system(load_error_modules=True, library=False):
+    def get_system(load_error_blocks=True, library=False):
         '''Get a dummy system'''
-        return DummySystem(load_error_modules, library=library)
+        return DummySystem(load_error_blocks, library=library)
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
@@ -72,7 +68,6 @@ class BaseCourseTestCase(TestCase):
             DATA_DIR,
             source_dirs=[name],
             xblock_mixins=(InheritanceMixin,),
-            xblock_select=only_xmodules,
         )
         courses = modulestore.get_courses()
         assert len(courses) == 1
@@ -110,7 +105,7 @@ class PureXBlockImportTest(BaseCourseTestCase):
     )
     @patch('xmodule.x_module.XModuleMixin.location')
     def test_parsing_pure_xblock(self, xml, mock_location):
-        system = self.get_system(load_error_modules=False)
+        system = self.get_system(load_error_blocks=False)
         descriptor = system.process_xml(xml)
         assert isinstance(descriptor, GenericXBlock)
         self.assert_xblocks_are_good(descriptor)
@@ -488,7 +483,7 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
 
     def test_definition_loading(self):
         """When two courses share the same org and course name and
-        both have a module with the same url_name, the definitions shouldn't clash.
+        both have a block with the same url_name, the definitions shouldn't clash.
 
         TODO (vshnayder): once we have a CMS, this shouldn't
         happen--locations should uniquely name definitions.  But in
@@ -592,20 +587,20 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         assert len(sections) == 1
 
         conditional_location = course.id.make_usage_key('conditional', 'condone')
-        module = modulestore.get_item(conditional_location)
-        assert len(module.children) == 1
+        block = modulestore.get_item(conditional_location)
+        assert len(block.children) == 1
 
         poll_location = course.id.make_usage_key('poll_question', 'first_poll')
-        module = modulestore.get_item(poll_location)
-        assert len(module.get_children()) == 0
-        assert module.voted is False
-        assert module.poll_answer == ''
-        assert module.poll_answers == {}
-        assert module.answers ==\
+        block = modulestore.get_item(poll_location)
+        assert len(block.get_children()) == 0
+        assert block.voted is False
+        assert block.poll_answer == ''
+        assert block.poll_answers == {}
+        assert block.answers ==\
                [{'text': 'Yes', 'id': 'Yes'}, {'text': 'No', 'id': 'No'}, {'text': "Don't know", 'id': 'Dont_know'}]
 
     def test_error_on_import(self):
-        '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorBlock'''
+        '''Check that when load_error_block is false, an exception is raised, rather than returning an ErrorBlock'''
 
         bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
         system = self.get_system(False)
@@ -623,10 +618,10 @@ class ImportTestCase(BaseCourseTestCase):  # lint-amnesty, pylint: disable=missi
         assert len(sections) == 1
 
         location = course.id.make_usage_key('word_cloud', 'cloud1')
-        module = modulestore.get_item(location)
-        assert len(module.get_children()) == 0
-        assert module.num_inputs == 5
-        assert module.num_top_words == 250
+        block = modulestore.get_item(location)
+        assert len(block.get_children()) == 0
+        assert block.num_inputs == 5
+        assert block.num_top_words == 250
 
     def test_cohort_config(self):
         """

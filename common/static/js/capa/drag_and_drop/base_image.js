@@ -33,7 +33,7 @@
             state.baseImageEl.error(function() {
                 var errorMsg = HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span style="color: red;">'),
-                        HtmlUtils.HTML('ERROR: Image "'), state.config.baseImage, HtmlUtils.HTML('" was not found!'),
+                    HtmlUtils.HTML('ERROR: Image "'), state.config.baseImage, HtmlUtils.HTML('" was not found!'),
                     HtmlUtils.HTML('</span>')
                 );
                 console.log('ERROR: Image "' + state.config.baseImage + '" was not found!');

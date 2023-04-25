@@ -1,8 +1,6 @@
 """ Test Student helpers """
 
-
 import logging
-import unittest
 from unittest.mock import patch
 
 import ddt
@@ -15,6 +13,7 @@ from testfixtures import LogCapture
 
 from common.djangoapps.student.helpers import get_next_url_for_login_page
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 LOGGER_NAME = "common.djangoapps.student.helpers"
 
@@ -133,7 +132,7 @@ class TestLoginHelper(TestCase):
         with with_site_configuration_context(configuration=dict(THIRD_PARTY_AUTH_HINT=tpa_hint)):
             validate_login()
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @ddt.data(
         (None, '/dashboard'),
         ('invalid-url', '/dashboard'),

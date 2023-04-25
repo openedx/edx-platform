@@ -2,8 +2,6 @@
 Tests for logout
 """
 
-
-import unittest
 import urllib
 from unittest import mock
 import ddt
@@ -14,10 +12,11 @@ from django.test.utils import override_settings
 from django.urls import reverse
 
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @ddt.ddt
 class LogoutTests(TestCase):
     """ Tests for the logout functionality. """

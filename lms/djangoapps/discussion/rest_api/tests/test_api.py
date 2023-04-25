@@ -505,8 +505,8 @@ class GetCourseTopicsTest(CommentsServiceMockMixin, ForumsEnableMixin, UrlResetM
         Test that only topics that a user has access to are returned. The
         ways in which a user may not have access are:
 
-        * Module is visible to staff only
-        * Module is accessible only to a group the user is not in
+        * Block is visible to staff only
+        * Block is accessible only to a group the user is not in
 
         Also, there is a case that ensures that a category with no accessible
         subcategories does not appear in the result.
@@ -1405,6 +1405,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "resp_skip": ["70"],
                 "resp_limit": ["14"],
                 "with_responses": ["True"],
+                "reverse_order": ["False"],
             }
         )
 
@@ -1471,6 +1472,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous": False,
                 "anonymous_to_peers": False,
                 "last_edit": None,
+                "edit_by_label": None,
             },
             {
                 "id": "test_comment_2",
@@ -1497,6 +1499,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous": True,
                 "anonymous_to_peers": False,
                 "last_edit": None,
+                "edit_by_label": None,
             },
         ]
         actual_comments = self.get_comment_list(
@@ -1887,7 +1890,8 @@ class CreateThreadTest(
             'body': 'Test body',
             'url': '',
             'user_forums_roles': [FORUM_ROLE_STUDENT],
-            'user_course_roles': []
+            'user_course_roles': [],
+            'from_mfe_sidebar': False,
         }
 
     def test_basic_in_blackout_period(self):
@@ -1974,6 +1978,7 @@ class CreateThreadTest(
                 "url": "",
                 "user_forums_roles": [FORUM_ROLE_STUDENT, FORUM_ROLE_MODERATOR],
                 "user_course_roles": [],
+                "from_mfe_sidebar": False,
             }
         )
 
@@ -2006,7 +2011,8 @@ class CreateThreadTest(
             'body': 'Test body',
             'url': '',
             'user_forums_roles': [FORUM_ROLE_STUDENT],
-            'user_course_roles': []
+            'user_course_roles': [],
+            'from_mfe_sidebar': False,
         }
 
     @ddt.data(
@@ -2228,6 +2234,7 @@ class CreateCommentTest(
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         expected_url = (
@@ -2256,6 +2263,7 @@ class CreateCommentTest(
             "url": "",
             "user_forums_roles": [FORUM_ROLE_STUDENT],
             "user_course_roles": [],
+            "from_mfe_sidebar": False,
         }
         if parent_id:
             expected_event_data["response"] = {"id": parent_id}
@@ -2323,6 +2331,7 @@ class CreateCommentTest(
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         expected_url = (
@@ -2352,6 +2361,7 @@ class CreateCommentTest(
             "url": "",
             "user_forums_roles": [FORUM_ROLE_STUDENT, FORUM_ROLE_MODERATOR],
             "user_course_roles": [],
+            "from_mfe_sidebar": False,
         }
         if parent_id:
             expected_event_data["response"] = {"id": parent_id}
@@ -3148,6 +3158,7 @@ class UpdateCommentTest(
             "child_count": 0,
             "can_delete": True,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         assert parsed_body(httpretty.last_request()) == {

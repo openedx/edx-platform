@@ -311,7 +311,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
 
     def index_dictionary(self):
         """
-        Return dictionary prepared with module content and type for indexing.
+        Return dictionary prepared with block content and type for indexing.
         """
         # return key/value fields in a Python dict object
         # values may be numeric / string or dict

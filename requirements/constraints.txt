@@ -25,7 +25,7 @@ django-storages<1.9
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.60.15
+edx-enterprise==3.61.14
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -73,8 +73,25 @@ pycodestyle<2.9.0
 # and snowflake-connector-python>2.8.0 is released.
 pyopenssl==22.0.0
 
+cryptography==38.0.4 # greater version has some issues with openssl.
 
-# right now lots of packages have major upgrades and lots of tests failing.
-# so adding following constraints and will unpin one by one.
+pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
 
-cryptography==38.0.4 # greater version has some issues.
+
+# Deprecated version of the AWS SDK;
+# we should stop using this
+boto==2.39.0
+boto3==1.7.0                       # Amazon Web Services SDK for Python
+botocore==1.10.84                  # via boto3, s3transfer
+
+# adding these constraints to minimize boto3 and botocore changeset
+social-auth-core==4.3.0
+babel==2.11.0
+social-auth-app-django==5.0.0
+algoliasearch==2.6.3
+django-ipware==4.0.2
+
+# pytz>2022 has major changes which are causing test failures.
+# Pinning this version for now so this could be fixed in a separate PR later on
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/32093
+pytz<2023
