@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-23 17:28+0000\n"
-"PO-Revision-Date: 2023-01-23 17:28:43.073723\n"
+"POT-Creation-Date: 2023-04-20 20:44+0000\n"
+"PO-Revision-Date: 2023-04-20 20:44:15.413132\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6023,8 +6023,8 @@ msgid "Please enter non-negative integer."
 msgstr "Ᵽlǝɐsǝ ǝnʇǝɹ nøn-nǝƃɐʇᴉʌǝ ᴉnʇǝƃǝɹ."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%- types %> assignments than are assigned."
-msgstr "Ȼɐnnøʇ dɹød ɯøɹǝ <%- types %> ɐssᴉƃnɯǝnʇs ʇɥɐn ɐɹǝ ɐssᴉƃnǝd."
+msgid "You must have at least one undroppable <%- types %> assignment."
+msgstr "Ɏøn ɯnsʇ ɥɐʌǝ ɐʇ lǝɐsʇ ønǝ nndɹøddɐblǝ <%- types %> ɐssᴉƃnɯǝnʇ."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -6612,6 +6612,10 @@ msgstr "Đɐʇǝ ɐddǝd"
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
 msgstr "Ɇdᴉʇᴉnƃ ɐɔɔǝss ɟøɹ: {title}"
+
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr "Ȼødʎᴉnƃ"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -10120,6 +10124,10 @@ msgid "Display Name"
 msgstr "Đᴉsdlɐʎ Nɐɯǝ"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Discussions enabled"
+msgstr "Đᴉsɔnssᴉøns ǝnɐblǝd"
+
+#: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
 msgstr "Ᵽɹøɔʇøɹᴉnƃ Sǝʇʇᴉnƃs"
 
@@ -10323,6 +10331,34 @@ msgstr ""
 "Ŧɥǝ nnɯbǝɹ øɟ ɐssᴉƃnɯǝnʇs øɟ ʇɥᴉs ʇʎdǝ ʇɥɐʇ ʍᴉll bǝ dɹøddǝd. Ŧɥǝ løʍǝsʇ "
 "sɔøɹᴉnƃ ɐssᴉƃnɯǝnʇs ɐɹǝ dɹøddǝd ɟᴉɹsʇ."
 
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr "Wɐɹnᴉnƃ: "
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+"Ŧɥǝ nnɯbǝɹ øɟ {type} ɐssᴉƃnɯǝnʇs dǝɟᴉnǝd ɥǝɹǝ døǝs nøʇ ɯɐʇɔɥ ʇɥǝ ɔnɹɹǝnʇ "
+"nnɯbǝɹ øɟ {type} ɐssᴉƃnɯǝnʇs ᴉn ʇɥǝ ɔønɹsǝ:"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr "Ŧɥǝɹǝ ɐɹǝ nø ɐssᴉƃnɯǝnʇs øɟ ʇɥᴉs ʇʎdǝ ᴉn ʇɥǝ ɔønɹsǝ."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr "{assignment_count} {type} ɐssᴉƃnɯǝnʇ(s) ɟønnd:"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
+"Ŧɥǝ nnɯbǝɹ øɟ {type} ɐssᴉƃnɯǝnʇs ᴉn ʇɥǝ ɔønɹsǝ ɯɐʇɔɥǝs ʇɥǝ nnɯbǝɹ dǝɟᴉnǝd "
+"ɥǝɹǝ."
+
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
 msgstr "Ȼønɹsǝ Ħɐndønʇs"
@@ -10350,6 +10386,14 @@ msgstr "Ᵽøsʇ"
 #: cms/templates/js/discussion-editor.underscore
 msgid "Enable discussion"
 msgstr "Ɇnɐblǝ dᴉsɔnssᴉøn"
+
+#: cms/templates/js/discussion-editor.underscore
+msgid "Topics for unpublished units would not be created"
+msgstr "Ŧødᴉɔs ɟøɹ nndnblᴉsɥǝd nnᴉʇs ʍønld nøʇ bǝ ɔɹǝɐʇǝd"
+
+#: cms/templates/js/discussion-editor.underscore
+msgid "Please enable discussions for graded units from course authoring app"
+msgstr "Ᵽlǝɐsǝ ǝnɐblǝ dᴉsɔnssᴉøns ɟøɹ ƃɹɐdǝd nnᴉʇs ɟɹøɯ ɔønɹsǝ ɐnʇɥøɹᴉnƃ ɐdd"
 
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"

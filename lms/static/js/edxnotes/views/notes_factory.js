@@ -12,7 +12,7 @@
         var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags'],
             getOptions, setupPlugins, getAnnotator;
 
-    /**
+        /**
      * Returns options for the annotator.
      * @param {jQuery Element} The container element.
      * @param {String} params.endpoint The endpoint of the store.
@@ -54,7 +54,7 @@
             };
         };
 
-    /**
+        /**
      * Setups plugins for the annotator.
      * @param {Object} annotator An instance of the annotator.
      * @param {Array} plugins A list of plugins for the annotator.
@@ -67,7 +67,7 @@
             }, this);
         };
 
-    /**
+        /**
      * Factory method that returns Annotator.js instantiates.
      * @param {DOM Element} element The container element.
      * @param {String} params.endpoint The endpoint of the store.

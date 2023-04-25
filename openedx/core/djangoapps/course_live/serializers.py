@@ -60,7 +60,7 @@ class LtiSerializer(serializers.ModelSerializer):
         instance.lti_config = {
             "pii_share_username": share_username,
             "pii_share_email": share_email,
-            "additional_parameters": lti_config['additional_parameters']
+            "additional_parameters": lti_config.get('additional_parameters', {})
         }
         instance.save()
         return instance
@@ -72,7 +72,7 @@ class LtiSerializer(serializers.ModelSerializer):
         instance.config_store = LtiConfiguration.CONFIG_ON_DB
         lti_config = validated_data.pop('lti_config', None)
         if lti_config.get('additional_parameters', None):
-            instance.lti_config['additional_parameters'] = lti_config.get('additional_parameters')
+            instance.lti_config['additional_parameters'] = lti_config.get('additional_parameters', {})
 
         if validated_data.get('lti_1p1_client_secret') == '':
             validated_data['lti_1p1_client_secret'] = instance.lti_1p1_client_secret

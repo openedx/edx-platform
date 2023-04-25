@@ -730,7 +730,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         }
         self.register_get_course_commentable_counts_response(self.course.id, self.thread_counts_map)
 
-    def create_course(self, modules_count, module_store, topics):
+    def create_course(self, blocks_count, module_store, topics):
         """
         Create a course in a specified module store with discussion xblocks and topics
         """
@@ -745,7 +745,7 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
         course_url = reverse("course_topics", kwargs={"course_id": str(course.id)})
         # add some discussion xblocks
-        for i in range(modules_count):
+        for i in range(blocks_count):
             BlockFactory.create(
                 parent_location=course.location,
                 category='discussion',
@@ -804,8 +804,8 @@ class CourseTopicsViewTest(DiscussionAPIViewTestMixin, CommentsServiceMockMixin,
         (10, ModuleStoreEnum.Type.split, 2, {"Test Topic 1": {"id": "test_topic_1"}}),
     )
     @ddt.unpack
-    def test_bulk_response(self, modules_count, module_store, mongo_calls, topics):
-        course_url, course_id = self.create_course(modules_count, module_store, topics)
+    def test_bulk_response(self, blocks_count, module_store, mongo_calls, topics):
+        course_url, course_id = self.create_course(blocks_count, module_store, topics)
         self.register_get_course_commentable_counts_response(course_id, {})
         with check_mongo_calls(mongo_calls):
             with modulestore().default_store(module_store):
@@ -1003,7 +1003,7 @@ class CourseTopicsViewV3Test(DiscussionAPIViewTestMixin, CommentsServiceMockMixi
         assert courseware_topic_keys == expected_courseware_keys
         expected_courseware_keys.remove('courseware')
         sequential_keys = list(data[1]['children'][0].keys())
-        assert sequential_keys == expected_courseware_keys
+        assert sequential_keys == (expected_courseware_keys + ['thread_counts'])
         expected_non_courseware_keys.remove('courseware')
         vertical_keys = list(data[1]['children'][0]['children'][0].keys())
         assert vertical_keys == expected_non_courseware_keys
@@ -1709,6 +1709,8 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "votes": {"up_count": 4},
                 "comments_count": 5,
                 "unread_comments_count": 3,
+                "closed_by_label": None,
+                "edit_by_label": None,
             })],
             "page": 1,
             "num_pages": 1,
@@ -1968,6 +1970,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         response_data.update(overrides or {})
         return response_data
@@ -2030,6 +2033,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
                 "mark_as_read": ["False"],
                 "recursive": ["False"],
                 "with_responses": ["True"],
+                "reverse_order": ["False"],
             }
         )
 
@@ -2064,6 +2068,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
                 "mark_as_read": ["False"],
                 "recursive": ["False"],
                 "with_responses": ["True"],
+                "reverse_order": ["False"],
             }
         )
 
@@ -2279,6 +2284,35 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             assert expected_author_profile_data == response_users[response_comment['author']]
             assert response_comment['endorsed_by'] not in response_users
 
+    def test_reverse_order_sort(self):
+        """
+        Tests if reverse_order param is passed to cs comments service
+        """
+        self.register_get_user_response(self.user, upvoted_ids=["test_comment"])
+        source_comments = [
+            self.create_source_comment({"user_id": str(self.author.id), "username": self.author.username})
+        ]
+        self.register_get_thread_response({
+            "id": self.thread_id,
+            "course_id": str(self.course.id),
+            "thread_type": "discussion",
+            "children": source_comments,
+            "resp_total": 100,
+        })
+        self.client.get(self.url, {"thread_id": self.thread_id, "reverse_order": True})
+        self.assert_query_params_equal(
+            httpretty.httpretty.latest_requests[-2],
+            {
+                "resp_skip": ["0"],
+                "resp_limit": ["10"],
+                "user_id": [str(self.user.id)],
+                "mark_as_read": ["False"],
+                "recursive": ["False"],
+                "with_responses": ["True"],
+                "reverse_order": ["True"],
+            }
+        )
+
 
 @httpretty.activate
 @disable_signal(api, 'comment_deleted')
@@ -2361,6 +2395,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         response = self.client.post(
             self.url,
@@ -2452,6 +2487,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         response_data.update(overrides or {})
         return response_data
@@ -2641,6 +2677,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
 
         response = self.client.get(self.url)

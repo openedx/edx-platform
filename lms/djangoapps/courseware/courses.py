@@ -49,7 +49,7 @@ from lms.djangoapps.courseware.date_summary import (
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect, CourseRunNotFound
 from lms.djangoapps.courseware.masquerade import check_content_start_date_for_masquerade_user
 from lms.djangoapps.courseware.model_data import FieldDataCache
-from lms.djangoapps.courseware.module_render import get_module
+from lms.djangoapps.courseware.block_render import get_block
 from lms.djangoapps.survey.utils import SurveyRequiredAccessError, check_survey_required_and_unanswered
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import get_course_enrollment_details
@@ -370,22 +370,22 @@ def get_course_about_section(request, course, section_key):
 
             # Use an empty cache
             field_data_cache = FieldDataCache([], course.id, request.user)
-            about_module = get_module(
+            about_block = get_block(
                 request.user,
                 request,
                 loc,
                 field_data_cache,
                 log_if_not_found=False,
-                wrap_xmodule_display=False,
+                wrap_xblock_display=False,
                 static_asset_path=course.static_asset_path,
                 course=course
             )
 
             html = ''
 
-            if about_module is not None:
+            if about_block is not None:
                 try:
-                    html = about_module.render(STUDENT_VIEW).content
+                    html = about_block.render(STUDENT_VIEW).content
                 except Exception:  # pylint: disable=broad-except
                     html = render_to_string('courseware/error-message.html', None)
                     log.exception(
@@ -406,14 +406,14 @@ def get_course_about_section(request, course, section_key):
 
 def get_course_info_usage_key(course, section_key):
     """
-    Returns the usage key for the specified section's course info module.
+    Returns the usage key for the specified section's course info block.
     """
     return course.id.make_usage_key('course_info', section_key)
 
 
-def get_course_info_section_module(request, user, course, section_key):
+def get_course_info_section_block(request, user, course, section_key):
     """
-    This returns the course info module for a given section_key.
+    This returns the course info block for a given section_key.
 
     Valid keys:
     - handouts
@@ -426,13 +426,13 @@ def get_course_info_section_module(request, user, course, section_key):
     # Use an empty cache
     field_data_cache = FieldDataCache([], course.id, user)
 
-    return get_module(
+    return get_block(
         user,
         request,
         usage_key,
         field_data_cache,
         log_if_not_found=False,
-        wrap_xmodule_display=False,
+        wrap_xblock_display=False,
         static_asset_path=course.static_asset_path,
         course=course
     )
@@ -449,12 +449,12 @@ def get_course_info_section(request, user, course, section_key):
     - updates
     - guest_updates
     """
-    info_module = get_course_info_section_module(request, user, course, section_key)
+    info_block = get_course_info_section_block(request, user, course, section_key)
 
     html = ''
-    if info_module is not None:
+    if info_block is not None:
         try:
-            html = info_module.render(STUDENT_VIEW).content.strip()
+            html = info_block.render(STUDENT_VIEW).content.strip()
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
@@ -731,7 +731,7 @@ def get_course_syllabus_section(course, section_key):
 
     if section_key in ['syllabus', 'guest_syllabus']:
         try:
-            filesys = course.system.resources_fs
+            filesys = course.runtime.resources_fs
             # first look for a run-specific version
             dirs = [path("syllabus") / course.url_name, path("syllabus")]
             filepath = find_file(filesys, dirs, section_key + ".html")
@@ -879,10 +879,10 @@ def get_problems_in_section(section):
     return problem_descriptors
 
 
-def get_current_child(xmodule, min_depth=None, requested_child=None):
+def get_current_child(xblock, min_depth=None, requested_child=None):
     """
-    Get the xmodule.position's display item of an xmodule that has a position and
-    children.  If xmodule has no position or is out of bounds, return the first
+    Get the xblock.position's display item of an xblock that has a position and
+    children.  If xblock has no position or is out of bounds, return the first
     child with children of min_depth.
 
     For example, if chapter_one has no position set, with two child sections,
@@ -905,13 +905,13 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
         else:
             return children[0]
 
-    def _get_default_child_module(child_modules):
-        """Returns the first child of xmodule, subject to min_depth."""
+    def _get_default_child_block(child_blocks):
+        """Returns the first child of xblock, subject to min_depth."""
         if min_depth is None or min_depth <= 0:
-            return _get_child(child_modules)
+            return _get_child(child_blocks)
         else:
             content_children = [
-                child for child in child_modules
+                child for child in child_blocks
                 if child.has_children_at_depth(min_depth - 1) and child.get_children()
             ]
             return _get_child(content_children) if content_children else None
@@ -921,21 +921,21 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
     try:
         # In python 3, hasattr() catches AttributeErrors only then returns False.
         # All other exceptions bubble up the call stack.
-        has_position = hasattr(xmodule, 'position')  # This conditions returns AssertionError from xblock.fields lib.
+        has_position = hasattr(xblock, 'position')  # This conditions returns AssertionError from xblock.fields lib.
     except AssertionError:
         return child
 
     if has_position:
-        children = xmodule.get_children()
+        children = xblock.get_children()
         if len(children) > 0:
-            if xmodule.position is not None and not requested_child:
-                pos = int(xmodule.position) - 1  # position is 1-indexed
+            if xblock.position is not None and not requested_child:
+                pos = int(xblock.position) - 1  # position is 1-indexed
                 if 0 <= pos < len(children):
                     child = children[pos]
                     if min_depth is not None and (min_depth > 0 and not child.has_children_at_depth(min_depth - 1)):
                         child = None
             if child is None:
-                child = _get_default_child_module(children)
+                child = _get_default_child_block(children)
 
     return child
 

@@ -4,13 +4,13 @@ Additional utilities for Learner Recommendations.
 import logging
 import requests
 
-from algoliasearch.exceptions import RequestException, AlgoliaUnreachableHostException
 from algoliasearch.search_client import SearchClient
 from django.conf import settings
 
 from common.djangoapps.student.models import CourseEnrollment
-from openedx.core.djangoapps.catalog.utils import get_course_data
-
+from lms.djangoapps.program_enrollments.constants import ProgramEnrollmentStatuses
+from openedx.core.djangoapps.catalog.utils import get_course_data, get_programs
+from lms.djangoapps.program_enrollments.api import fetch_program_enrollments_by_student
 
 log = logging.getLogger(__name__)
 
@@ -23,6 +23,7 @@ COURSE_LEVELS = [
 
 class AlgoliaClient:
     """ Class for instantiating an Algolia search client instance. """
+
     algolia_client = None
     algolia_app_id = settings.ALGOLIA_APP_ID
     algolia_search_api_key = settings.ALGOLIA_SEARCH_API_KEY
@@ -39,62 +40,48 @@ class AlgoliaClient:
         return cls.algolia_client
 
 
-def _remove_user_enrolled_course_keys(user, course_keys):
+def _get_user_enrolled_course_keys(user):
     """
-    Remove the course keys a user is already enrolled in
-    and returns enrollable course keys.
+    Returns course ids in which the user is enrolled in.
     """
-    user_enrolled_course_keys = set()
     course_enrollments = CourseEnrollment.enrollments_for_user(user)
-
-    for course_enrollment in course_enrollments:
-        course_key = f"{course_enrollment.course_id.org}+{course_enrollment.course_id.course}"
-        user_enrolled_course_keys.add(course_key)
-
-    enrollable_course_keys = [course_key for course_key in course_keys if course_key not in user_enrolled_course_keys]
-    return enrollable_course_keys
+    return [str(course_enrollment.course_id) for course_enrollment in course_enrollments]
 
 
-def get_algolia_courses_recommendation(course_data):
+def _is_enrolled_in_course(course_runs, enrolled_course_keys):
     """
-    Get courses recommendation from Algolia search.
+    Returns True if a user is enrolled in any course run of the course else false.
+    """
+    return any(course_run.get("key", None) in enrolled_course_keys for course_run in course_runs)
 
+
+def _has_country_restrictions(product, user_country):
+    """
+    Helper method that tell whether the product (course or program) has any country restrictions.
+    A product is restricted for the user if the country in which user is logged in from:
+    - is in the "block list" or
+    - is not in the "allow list" if the "allow list" is not empty. If it is empty, then all locations can access it.
     Args:
-        course_data (dict): Course data to create the search query.
+      product: course/program
+      user_country (string): country the user is logged in from
 
     Returns:
-        Response object with courses recommendation from Algolia search.
+        True if the product is restricted in the country and False otherwise
     """
-    algolia_client = AlgoliaClient.get_algolia_client()
+    if not user_country:
+        return False
 
-    search_query = " ".join(course_data["skill_names"])
-    searchable_course_levels = [
-        f"level:{course_level}"
-        for course_level in COURSE_LEVELS
-        if course_level != course_data["level_type"]
-    ]
-    if algolia_client and search_query:
-        algolia_index = algolia_client.init_index(settings.ALGOLIA_COURSES_RECOMMENDATION_INDEX_NAME)
-        try:
-            # Algolia search filter criteria:
-            # - Product type: Course
-            # - Courses are available (enrollable)
-            # - Courses should not have the same course level as the current course
-            # - Exclude current course from the results
-            results = algolia_index.search(
-                search_query,
-                {
-                    "filters": f"NOT active_run_key:'{course_data['key']}'",
-                    "facetFilters": ["availability:Available now", "product:Course", searchable_course_levels],
-                    "optionalWords": f"{search_query}",
-                }
-            )
+    allow_list, block_list = [], []
+    location_restriction = product.get("location_restriction", None)
+    if location_restriction:
+        restriction_type = location_restriction.get("restriction_type")
+        countries = location_restriction.get("countries")
+        if restriction_type == "allowlist":
+            allow_list = countries
+        elif restriction_type == "blocklist":
+            block_list = countries
 
-            return results
-        except (AlgoliaUnreachableHostException, RequestException) as ex:
-            log.warning(f"Unexpected exception while attempting to fetch courses data from Algolia: {str(ex)}")
-
-    return {}
+    return user_country in block_list or (bool(allow_list) and user_country not in allow_list)
 
 
 def get_amplitude_course_recommendations(user_id, recommendation_id):
@@ -133,37 +120,92 @@ def get_amplitude_course_recommendations(user_id, recommendation_id):
     return True, False, []
 
 
-def filter_recommended_courses(user, unfiltered_course_keys, recommendation_count=5):
+def is_user_enrolled_in_ut_austin_masters_program(user):
+    """
+    Checks if a user is enrolled in any masters program
+
+    Args:
+        user: The user object
+
+    Returns:
+        True if the user is enrolled in UT Austin masters program otherwise False
+    """
+    program_enrollments = fetch_program_enrollments_by_student(
+        user=user,
+        program_enrollment_statuses=ProgramEnrollmentStatuses.__ACTIVE__,
+    )
+    uuids = [enrollment.program_uuid for enrollment in program_enrollments]
+    enrolled_programs = get_programs(uuids=uuids) or []
+    for enrolled_program in enrolled_programs:
+        if enrolled_program.get("type", None) == "Masters":
+            authoring_organizations = enrolled_program.get("authoring_organizations", [])
+            if any(org.get("key", None) == "UTAustinX" for org in authoring_organizations):
+                return True
+    return False
+
+
+def filter_recommended_courses(
+    user,
+    unfiltered_course_keys,
+    recommendation_count=10,
+    user_country_code=None,
+    request_course_key=None,
+):
     """
     Returns the filtered course recommendations. The unfiltered course keys
     pass through the following filters:
-        1. Remove courses that a user is already enrolled in
-        2. <To be added later>
+        1. Remove courses that a user is already enrolled in.
+        2. If user is seeing the recommendations on a course about pages, filter that course out of recommendations.
+        3. Remove the courses which is restricted in user region.
+
+    Args:
+        user: The user for which the recommendations need to be pulled
+        unfiltered_course_keys: recommended course keys that needs to be filtered
+        recommendation_count: the maximum count of recommendations to be returned
+        user_country_code: if provided, will apply location restrictions to recommendations
+        request_course_key: if provided, will filter out that course from recommendations (used for course about page)
 
     Returns:
-        filtered_recommended_courses (list): A list of course objects. Each item has
-        the following details for a course:
-            - course key (course_key)
-            - title
-            - partner image url (logo_image_url)
-            - marketing url for the course (marketing_url)
+        filtered_recommended_courses (list): A list of filtered course objects.
     """
     filtered_recommended_courses = []
-    fields = ["title", "owners", "marketing_url"]
+    fields = [
+        "key",
+        "uuid",
+        "title",
+        "owners",
+        "image",
+        "url_slug",
+        "course_runs",
+        "location_restriction",
+        "marketing_url",
+        "programs",
+    ]
 
-    # Remove the course keys a user is already enrolled in
-    enrollable_course_keys = _remove_user_enrolled_course_keys(user, unfiltered_course_keys)[:recommendation_count]
+    # Filter out enrolled courses .
+    course_keys_to_filter_out = _get_user_enrolled_course_keys(user)
+    # If user is seeing the recommendations on a course about page, filter that course out of recommendations
+    if request_course_key:
+        course_keys_to_filter_out.append(request_course_key)
 
-    for course_id in enrollable_course_keys:
-        course_data = get_course_data(course_id, fields)
-        if course_data:
-            filtered_recommended_courses.append(
-                {
-                    "course_key": course_id,
-                    "title": course_data["title"],
-                    "logo_image_url": course_data["owners"][0]["logo_image_url"],
-                    "marketing_url": course_data.get("marketing_url"),
-                }
-            )
+    for course_id in unfiltered_course_keys:
+        if len(filtered_recommended_courses) >= recommendation_count:
+            break
+
+        course_data = get_course_data(course_id, fields, querystring={'marketable_course_runs_only': 1})
+        if (
+            course_data
+            and course_data.get("course_runs", [])
+            and not _is_enrolled_in_course(course_data.get("course_runs", []), course_keys_to_filter_out)
+            and not _has_country_restrictions(course_data, user_country_code)
+        ):
+            filtered_recommended_courses.append(course_data)
 
     return filtered_recommended_courses
+
+
+def get_cross_product_recommendations(course_key):
+    """
+    Helper method to get associated course keys based on the key passed
+    """
+    return settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS.get(course_key)

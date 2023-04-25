@@ -1,13 +1,12 @@
 """ Tests for setting and displaying the site status message. """
 
-
-import unittest
-
 import ddt
 from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase
 from opaque_keys.edx.locations import CourseLocator
+
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 # Status is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
@@ -25,7 +24,7 @@ class TestStatus(TestCase):
         cache.clear()
         self.course_key = CourseLocator(org='TestOrg', course='TestCourse', run='TestRun')
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @ddt.data(
         ("Test global message", "Test course message"),
         (" Ŧɇsŧ sŧȺŧᵾs", "Ṫëṡẗ ċöüṛṡë ṡẗäẗüṡ "),

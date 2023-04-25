@@ -2,8 +2,6 @@
 Tests for experimentation views
 """
 
-
-import unittest
 from unittest.mock import patch
 
 import six.moves.urllib.parse
@@ -20,6 +18,7 @@ from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreT
 from lms.djangoapps.experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
 from lms.djangoapps.experiments.models import ExperimentData  # lint-amnesty, pylint: disable=unused-import
 from lms.djangoapps.experiments.serializers import ExperimentDataSerializer
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
@@ -189,7 +188,7 @@ def cross_domain_config(func):
     )
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ExperimentCrossDomainTests(APITestCase):
     """Tests for handling cross-domain requests"""
 

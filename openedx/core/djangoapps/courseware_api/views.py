@@ -40,7 +40,7 @@ from lms.djangoapps.courseware.masquerade import (
     is_masquerading_as_non_audit_enrollment,
 )
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
-from lms.djangoapps.courseware.module_render import get_module_by_usage_id
+from lms.djangoapps.courseware.block_render import get_block_by_usage_id
 from lms.djangoapps.courseware.toggles import course_exit_page_is_active
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam_usage_key
@@ -584,7 +584,7 @@ class SequenceMetadata(DeveloperErrorViewMixin, APIView):
             reset_masquerade_data=True,
         )
 
-        sequence, _ = get_module_by_usage_id(
+        sequence, _ = get_block_by_usage_id(
             self.request,
             str(usage_key.course_key),
             str(usage_key),

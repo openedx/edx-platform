@@ -613,7 +613,7 @@ class CourseAboutSearchIndexer(CoursewareSearchIndexer):
             'image_url': course_image_url(course),
         }
 
-        # load data for all of the 'about' modules for this course into a dictionary
+        # load data for all of the 'about' blocks for this course into a dictionary
         about_dictionary = {
             item.location.block_id: item.data
             for item in modulestore.get_items(course.id, qualifiers={"category": "about"})

@@ -400,7 +400,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
         parent = verticals[0]
 
-        # Create a module, and ensure that its `data` field is empty
+        # Create a block, and ensure that its `data` field is empty
         word_cloud = BlockFactory.create(
             parent_location=parent.location, category="word_cloud", display_name="untitled")
         del word_cloud.data
@@ -478,7 +478,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
 
     def test_export_course_no_xml_attributes(self):
         """
-        Test that a module without an `xml_attributes` attr will still be
+        Test that a block without an `xml_attributes` attr will still be
         exported successfully
         """
         content_store = contentstore()
@@ -732,7 +732,7 @@ class MiscCourseTests(ContentStoreTestCase):
     def test_draft_metadata(self):
         """
         This verifies a bug we had where inherited metadata was getting written to the
-        module as 'own-metadata' when publishing. Also verifies the metadata inheritance is
+        block as 'own-metadata' when publishing. Also verifies the metadata inheritance is
         properly computed
         """
         # refetch course so it has all the children correct
@@ -752,7 +752,7 @@ class MiscCourseTests(ContentStoreTestCase):
         self.assertEqual(problem.graceperiod, course.graceperiod)
         self.assertNotIn('graceperiod', own_metadata(problem))
 
-        # publish module
+        # publish block
         self.store.publish(problem.location, self.user.id)
 
         # refetch to check metadata
@@ -831,7 +831,7 @@ class MiscCourseTests(ContentStoreTestCase):
 
     def test_module_preview_in_whitelist(self):
         """
-        Tests the ajax callback to render an XModule
+        Tests the ajax callback to render an XBlock
         """
         with override_settings(COURSES_WITH_UNSAFE_CODE=[str(self.course.id)]):
             # also try a custom response which will trigger the 'is this course in whitelist' logic
@@ -971,7 +971,7 @@ class MiscCourseTests(ContentStoreTestCase):
         # delete the course
         self.store.delete_course(self.course.id, self.user.id)
 
-        # assert that there's absolutely no non-draft modules in the course
+        # assert that there's absolutely no non-draft blocks in the course
         # this should also include all draft items
         with self.assertRaises(ItemNotFoundError):
             self.store.get_items(self.course.id)
@@ -992,7 +992,7 @@ class MiscCourseTests(ContentStoreTestCase):
             }
         )
 
-        # get module info (json)
+        # get block info (json)
         resp = self.client.get(get_url('xblock_handler', handouts.location))
 
         # make sure we got a successful response
@@ -1015,10 +1015,10 @@ class MiscCourseTests(ContentStoreTestCase):
                 course = self.store.get_course(self.course.id, depth=2, lazy=False)
 
             # make sure we pre-fetched a known sequential which should be at depth=2
-            self.assertIn(BlockKey.from_usage_key(self.seq_loc), course.system.module_data)
+            self.assertIn(BlockKey.from_usage_key(self.seq_loc), course.runtime.module_data)
 
             # make sure we don't have a specific vertical which should be at depth=3
-            self.assertNotIn(BlockKey.from_usage_key(self.vert_loc), course.system.module_data)
+            self.assertNotIn(BlockKey.from_usage_key(self.vert_loc), course.runtime.module_data)
 
         # Now, test with the branch set to draft. No extra round trips b/c it doesn't go deep enough to get
         # beyond direct only categories
@@ -1386,7 +1386,7 @@ class ContentStoreTest(ContentStoreTestCase):
             html=True
         )
 
-    def test_create_item(self):
+    def test_create_block(self):
         """Test creating a new xblock instance."""
         course = CourseFactory.create()
 
@@ -1493,11 +1493,11 @@ class ContentStoreTest(ContentStoreTestCase):
 
         import_course_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], target_id=target_id)
 
-        modules = self.store.get_items(target_id)
+        blocks = self.store.get_items(target_id)
 
-        # we should have a number of modules in there
+        # we should have a number of blocks in there
         # we can't specify an exact number since it'll always be changing
-        self.assertGreater(len(modules), 10)
+        self.assertGreater(len(blocks), 10)
 
         #
         # test various re-namespacing elements
@@ -1602,7 +1602,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
         self.assertGreater(len(verticals), 0)
 
-        # crate a new module and add it as a child to a vertical
+        # crate a new block and add it as a child to a vertical
         parent = verticals[0]
         new_block = self.store.create_child(
             self.user.id, parent.location, 'html', 'new_component'
@@ -1743,13 +1743,13 @@ class MetadataSaveTestCase(ContentStoreTestCase):
 
         self.assertNotIn('html5_sources', own_metadata(self.video_descriptor))
         self.store.update_item(self.video_descriptor, self.user.id)
-        module = self.store.get_item(location)
+        block = self.store.get_item(location)
 
-        self.assertNotIn('html5_sources', own_metadata(module))
+        self.assertNotIn('html5_sources', own_metadata(block))
 
     def test_metadata_persistence(self):
         # TODO: create the same test as `test_metadata_not_persistence`,
-        # but check persistence for some other module.
+        # but check persistence for some other block.
         pass
 
 

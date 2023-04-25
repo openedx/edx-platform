@@ -18,7 +18,7 @@ class RawMixin:
     """
     resources_dir = None
 
-    data = String(help="XML data for the module", default="", scope=Scope.content)
+    data = String(help="XML data for the block", default="", scope=Scope.content)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):  # lint-amnesty, pylint: disable=missing-function-docstring, unused-argument
@@ -52,7 +52,7 @@ class RawMixin:
             lines = self.data.split('\n')
             line, offset = err.position
             msg = (
-                "Unable to create xml for module {loc}. "
+                "Unable to create xml for block {loc}. "
                 "Context: '{context}'"
             ).format(
                 context=lines[line - 1][offset - 40:offset + 40],

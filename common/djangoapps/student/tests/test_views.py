@@ -42,6 +42,7 @@ from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration_context
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
 from openedx.features.course_experience.tests.views.helpers import add_course_mode
 from xmodule.data import CertificatesDisplayBehaviors  # lint-amnesty, pylint: disable=wrong-import-order
@@ -62,7 +63,7 @@ CDL_METHOD_NAME = 'openedx.features.course_duration_limits.models.CourseDuration
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
     """
     Test to ensure that the student dashboard does not show the unenroll button for users with certificates.
@@ -178,7 +179,7 @@ class TestStudentDashboardUnenrollments(SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, CompletionWaffleTestMixin):
     """
     Tests for the student dashboard.
@@ -1008,7 +1009,7 @@ class StudentDashboardTests(SharedModuleStoreTestCase, MilestonesTestCaseMixin, 
                     self.assertContains(response, upgrade_message)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid for the LMS')
+@skip_unless_lms
 @unittest.skipUnless(settings.FEATURES.get("ENABLE_NOTICES"), 'Notices plugin is not enabled')
 class TestCourseDashboardNoticesRedirects(SharedModuleStoreTestCase):
     """

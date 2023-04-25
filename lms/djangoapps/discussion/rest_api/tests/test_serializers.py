@@ -188,6 +188,8 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
             "pinned": True,
             "editable_fields": ["abuse_flagged", "copy_link", "following", "read", "voted"],
             "abuse_flagged_count": None,
+            "edit_by_label": None,
+            "closed_by_label": None,
         })
         assert self.serialize(thread) == expected
 
@@ -241,6 +243,118 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         self.register_get_thread_response(thread_data)
         serialized = self.serialize(thread_data)
         assert 'response_count' not in serialized
+
+    @ddt.data(
+        (FORUM_ROLE_MODERATOR, True),
+        (FORUM_ROLE_STUDENT, False),
+        ("author", True),
+    )
+    @ddt.unpack
+    def test_closed_by_label_field(self, role, visible):
+        """
+        Tests if closed by field is visible to author and priviledged users
+        """
+        moderator = UserFactory()
+        request_role = FORUM_ROLE_STUDENT if role == "author" else role
+        author = self.user if role == "author" else self.author
+        self.create_role(FORUM_ROLE_MODERATOR, [moderator])
+        self.create_role(request_role, [self.user])
+
+        thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": str(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(author.id),
+            "username": author.username,
+            "title": "Test Title",
+            "body": "Test body",
+            "pinned": True,
+            "votes": {"up_count": 4},
+            "comments_count": 5,
+            "unread_comments_count": 3,
+            "closed_by": moderator
+        })
+        closed_by_label = "Staff" if visible else None
+        closed_by = moderator if visible else None
+        can_delete = role != FORUM_ROLE_STUDENT
+        editable_fields = ["abuse_flagged", "copy_link", "following", "read", "voted"]
+        if role == "author":
+            editable_fields.extend(['anonymous', 'raw_body', 'title', 'topic_id', 'type'])
+        elif role == FORUM_ROLE_MODERATOR:
+            editable_fields.extend(['close_reason_code', 'closed', 'edit_reason_code', 'pinned',
+                                    'raw_body', 'title', 'topic_id', 'type'])
+        expected = self.expected_thread_data({
+            "author": author.username,
+            "can_delete": can_delete,
+            "vote_count": 4,
+            "comment_count": 6,
+            "unread_comment_count": 3,
+            "pinned": True,
+            "editable_fields": sorted(editable_fields),
+            "abuse_flagged_count": None,
+            "edit_by_label": None,
+            "closed_by_label": closed_by_label,
+            "closed_by": closed_by,
+        })
+        assert self.serialize(thread) == expected
+
+    @ddt.data(
+        (FORUM_ROLE_MODERATOR, True),
+        (FORUM_ROLE_STUDENT, False),
+        ("author", True),
+    )
+    @ddt.unpack
+    def test_edit_by_label_field(self, role, visible):
+        """
+        Tests if closed by field is visible to author and priviledged users
+        """
+        moderator = UserFactory()
+        request_role = FORUM_ROLE_STUDENT if role == "author" else role
+        author = self.user if role == "author" else self.author
+        self.create_role(FORUM_ROLE_MODERATOR, [moderator])
+        self.create_role(request_role, [self.user])
+
+        thread = make_minimal_cs_thread({
+            "id": "test_thread",
+            "course_id": str(self.course.id),
+            "commentable_id": "test_topic",
+            "user_id": str(author.id),
+            "username": author.username,
+            "title": "Test Title",
+            "body": "Test body",
+            "pinned": True,
+            "votes": {"up_count": 4},
+            "edit_history": [{"editor_username": moderator}],
+            "comments_count": 5,
+            "unread_comments_count": 3,
+            "closed_by": None
+        })
+        edit_by_label = "Staff" if visible else None
+        can_delete = role != FORUM_ROLE_STUDENT
+        last_edit = None if role == FORUM_ROLE_STUDENT else {"editor_username": moderator}
+        editable_fields = ["abuse_flagged", "copy_link", "following", "read", "voted"]
+
+        if role == "author":
+            editable_fields.extend(['anonymous', 'raw_body', 'title', 'topic_id', 'type'])
+        elif role == FORUM_ROLE_MODERATOR:
+            editable_fields.extend(['close_reason_code', 'closed', 'edit_reason_code', 'pinned',
+                                    'raw_body', 'title', 'topic_id', 'type'])
+
+        expected = self.expected_thread_data({
+            "author": author.username,
+            "can_delete": can_delete,
+            "vote_count": 4,
+            "comment_count": 6,
+            "unread_comment_count": 3,
+            "pinned": True,
+            "editable_fields": sorted(editable_fields),
+            "abuse_flagged_count": None,
+            "last_edit": last_edit,
+            "edit_by_label": edit_by_label,
+            "closed_by_label": None,
+            "closed_by": None,
+        })
+        assert self.serialize(thread) == expected
 
 
 @ddt.ddt
@@ -318,6 +432,7 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
             "child_count": 0,
             "can_delete": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
 
         assert self.serialize(comment) == expected
@@ -670,7 +785,7 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         }
         self.existing_comment = Comment(**make_minimal_cs_comment({
             "id": "existing_comment",
-            "thread_id": "existing_thread",
+            "thread_id": "dummy",
             "body": "Original body",
             "user_id": str(self.user.id),
             "username": self.user.username,
@@ -870,7 +985,14 @@ class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMoc
         }
         self.register_put_comment_response(cs_response_data)
         data = {"raw_body": "Edited body", "endorsed": True}
+        self.register_get_thread_response(
+            make_minimal_cs_thread({
+                "id": "dummy",
+                "course_id": str(self.course.id),
+            })
+        )
         saved = self.save_and_reserialize(data, instance=self.existing_comment)
+
         assert parsed_body(httpretty.last_request()) == {
             'body': ['Edited body'],
             'course_id': [str(self.course.id)],

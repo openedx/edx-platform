@@ -1409,10 +1409,12 @@ WIKI_ENABLED = True
 ###
 
 COURSE_MODE_DEFAULTS = {
+    'android_sku': None,
     'bulk_sku': None,
     'currency': 'usd',
     'description': None,
     'expiration_datetime': None,
+    'ios_sku': None,
     'min_price': 0,
     'name': _('Audit'),
     'sku': None,
@@ -1513,6 +1515,7 @@ GOOGLE_ANALYTICS_ACCOUNT = None
 GOOGLE_SITE_VERIFICATION_ID = ''
 GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
 GOOGLE_ANALYTICS_TRACKING_ID = None
+GOOGLE_ANALYTICS_4_ID = None
 
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
@@ -2115,6 +2118,8 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
+    'edx_django_utils.security.csp.middleware.content_security_policy_middleware',
+
     'crum.CurrentRequestUserMiddleware',
 
     # Resets the request cache.
@@ -2950,7 +2955,10 @@ INSTALLED_APPS = [
     'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'django.contrib.staticfiles',
+
+    # Tweaked version of django.contrib.staticfiles
+    'openedx.core.djangoapps.staticfiles.apps.EdxPlatformStaticFilesConfig',
+
     'django_celery_results',
 
     # Common Initialization
@@ -3261,6 +3269,9 @@ INSTALLED_APPS = [
 
     # MFE API
     'lms.djangoapps.mfe_config_api',
+
+    # Notifications
+    'openedx.core.djangoapps.notifications',
 ]
 
 ######################### CSRF #########################################
@@ -4213,6 +4224,16 @@ ECOMMERCE_ORDERS_API_CACHE_TIMEOUT = 3600
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
+# Exam Service
+EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
+
+TOKEN_SIGNING = {
+    'JWT_ISSUER': 'http://127.0.0.1:8740',
+    'JWT_SIGNING_ALGORITHM': 'RS512',
+    'JWT_SUPPORTED_VERSION': '1.2.0',
+    'JWT_PUBLIC_SIGNING_JWK_SET': None,
+}
+
 COURSE_CATALOG_URL_ROOT = 'http://localhost:8008'
 COURSE_CATALOG_API_URL = f'{COURSE_CATALOG_URL_ROOT}/api/v1'
 
@@ -4561,6 +4582,8 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'license_manager_worker',
     'enterprise_catalog_worker',
     'enterprise_channel_worker',
+    'enterprise_access_worker',
+    'enterprise_subsidy_worker',
 ]
 
 
@@ -4769,10 +4792,14 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 AMPLITUDE_URL = ''
 AMPLITUDE_API_KEY = ''
 DASHBOARD_AMPLITUDE_RECOMMENDATION_ID = ''
+COURSE_ABOUT_PAGE_AMPLITUDE_RECOMMENDATION_ID = ''
 # Keeping this for back compatibility with learner dashboard api
 GENERAL_RECOMMENDATION = {}
 
 GENERAL_RECOMMENDATIONS = []
+
+### DEFAULT KEY DICTIONARY FOR CROSS_PRODUCT_RECOMMENDATIONS ###
+CROSS_PRODUCT_RECOMMENDATIONS_KEYS = {}
 
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
@@ -4914,13 +4941,6 @@ DISCUSSIONS_MICROFRONTEND_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the discussions micro-frontend google form based feedback.
 DISCUSSIONS_MFE_FEEDBACK_URL = None
-# .. setting_name: LEARNER_RECORD_MFE_URL
-# .. setting_default: None
-# .. setting_description: Base URL of the micro-frontend responsible for displaying Learner Record and Program record
-#     pages. This MFE replaces the legacy frontend originally offered in the Credentials IDA.
-# .. setting_warning: In order to route requests to the MFE correctly you must also create and enable the credentials
-#     app's `USE_LEARNER_RECORD_MFE` waffle flag. See openedx/core/djangoapps/credentials/config.py.
-LEARNER_RECORD_MICROFRONTEND_URL = None
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -5209,8 +5229,6 @@ ENTERPRISE_BACKEND_SERVICE_EDX_OAUTH2_PROVIDER_URL = "http://127.0.0.1:8000/oaut
 # keys for  big blue button live provider
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
 
-PERSONALIZED_RECOMMENDATION_COOKIE_NAME = 'edx-user-personalized-recommendation'
-
 # .. toggle_name: ENABLE_MFE_CONFIG_API
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -5292,3 +5310,10 @@ ENTERPRISE_PLOTLY_SECRET = "I am a secret"
 ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 
 AVAILABLE_DISCUSSION_TOURS = []
+
+######################## Subscriptions API SETTINGS ########################
+SUBSCRIPTIONS_ROOT_URL = ""
+SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
+
+SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
+SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe"

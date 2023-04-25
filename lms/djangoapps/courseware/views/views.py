@@ -8,7 +8,7 @@ import logging
 import urllib
 from collections import OrderedDict, namedtuple
 from datetime import datetime
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlencode, urljoin, urlparse, urlunparse
 
 import bleach
 import requests
@@ -44,6 +44,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
+from token_utils.api import unpack_token_for
 from web_fragments.fragment import Fragment
 from xmodule.course_block import COURSE_VISIBILITY_PUBLIC, COURSE_VISIBILITY_PUBLIC_OUTLINE
 from xmodule.modulestore.django import modulestore
@@ -100,7 +101,12 @@ from lms.djangoapps.instructor.enrollment import uses_shib
 from lms.djangoapps.instructor.views.api import require_global_staff
 from lms.djangoapps.survey import views as survey_views
 from lms.djangoapps.verify_student.services import IDVerificationService
-from openedx.core.djangoapps.catalog.utils import get_programs, get_programs_with_type
+from openedx.core.djangoapps.catalog.utils import (
+    get_course_data,
+    get_course_uuid_for_course,
+    get_programs,
+    get_programs_with_type
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credit.api import (
     get_credit_requirement_status,
@@ -114,6 +120,7 @@ from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.utils import ProgramMarketingDataExtender
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.zendesk_proxy.utils import create_zendesk_ticket
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.courses import get_course_by_id
@@ -129,7 +136,7 @@ from openedx.features.course_experience.utils import dates_banner_should_display
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from openedx.features.enterprise_support.api import data_sharing_consent_required
 
-from ..module_render import get_module, get_module_by_usage_id, get_module_for_descriptor
+from ..block_render import get_block, get_block_by_usage_id, get_block_for_descriptor
 from ..tabs import _get_dynamic_tabs
 from ..toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
 
@@ -1258,16 +1265,16 @@ def get_static_tab_fragment(request, course, tab):
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course.id, request.user, modulestore().get_item(loc), depth=0
     )
-    tab_module = get_module(
+    tab_block = get_block(
         request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path, course=course
     )
 
-    logging.debug('course_block = %s', tab_module)
+    logging.debug('course_block = %s', tab_block)
 
     fragment = Fragment()
-    if tab_module is not None:
+    if tab_block is not None:
         try:
-            fragment = tab_module.render(STUDENT_VIEW, {})
+            fragment = tab_block.render(STUDENT_VIEW, {})
         except Exception:  # pylint: disable=broad-except
             fragment.content = render_to_string('courseware/error-message.html', None)
             log.exception(
@@ -1301,12 +1308,12 @@ def get_course_lti_endpoints(request, course_id):
         return HttpResponse(status=404)
 
     anonymous_user = AnonymousUser()
-    anonymous_user.known = False  # make these "noauth" requests like module_render.handle_xblock_callback_noauth
+    anonymous_user.known = False  # make these "noauth" requests like block_render.handle_xblock_callback_noauth
     lti_descriptors = modulestore().get_items(course.id, qualifiers={'category': 'lti'})
     lti_descriptors.extend(modulestore().get_items(course.id, qualifiers={'category': 'lti_consumer'}))
 
-    lti_noauth_modules = [
-        get_module_for_descriptor(
+    lti_noauth_blocks = [
+        get_block_for_descriptor(
             anonymous_user,
             request,
             descriptor,
@@ -1323,13 +1330,13 @@ def get_course_lti_endpoints(request, course_id):
 
     endpoints = [
         {
-            'display_name': module.display_name,
-            'lti_2_0_result_service_json_endpoint': module.get_outcome_service_url(
+            'display_name': block.display_name,
+            'lti_2_0_result_service_json_endpoint': block.get_outcome_service_url(
                 service_name='lti_2_0_result_rest_handler') + "/user/{anon_user_id}",
-            'lti_1_1_result_service_xml_endpoint': module.get_outcome_service_url(
+            'lti_1_1_result_service_xml_endpoint': block.get_outcome_service_url(
                 service_name='grade_handler'),
         }
-        for module in lti_noauth_modules
+        for block in lti_noauth_blocks
     ]
 
     return HttpResponse(json.dumps(endpoints), content_type='application/json')  # lint-amnesty, pylint: disable=http-response-with-content-type-json, http-response-with-json-dumps
@@ -1480,9 +1487,33 @@ def enclosing_sequence_for_gating_checks(block):
 
     if ancestor:
         # get_parent() returns a parent block instance cached on the block which does not
-        # have the ModuleSystem bound to it so we need to get it again with get_block() which will set up everything.
+        # have user data bound to it so we need to get it again with get_block() which will set up everything.
         return block.runtime.get_block(ancestor.location)
     return None
+
+
+def _check_sequence_exam_access(request, location):
+    """
+    Checks the client request for an exam access token for a sequence.
+    Exam access is always granted at the sequence block. This method of gating is
+    only used by the edx-exams system and NOT edx-proctoring.
+    """
+    if request.user.is_staff or is_masquerading_as_specific_student(request.user, location.course_key):
+        return True
+
+    exam_access_token = request.GET.get('exam_access')
+    if exam_access_token:
+        try:
+            # unpack will validate both expiration and the requesting user matches the
+            # token user
+            exam_access_unpacked = unpack_token_for(exam_access_token, request.user.id)
+        except:  # pylint: disable=bare-except
+            log.exception(f"Failed to validate exam access token. user_id={request.user.id} location={location}")
+            return False
+
+        return str(location) == exam_access_unpacked.get('content_id')
+
+    return False
 
 
 @require_http_methods(["GET", "POST"])
@@ -1539,7 +1570,7 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
 
         # get the block, which verifies whether the user has access to the block.
         recheck_access = request.GET.get('recheck_access') == '1'
-        block, _ = get_module_by_usage_id(
+        block, _ = get_block_by_usage_id(
             request, str(course_key), str(usage_key), disable_staff_debug_info=True, course=course,
             will_recheck_access=recheck_access
         )
@@ -1583,6 +1614,18 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
                     )
                 )
 
+        # For courses using an LTI provider managed by edx-exams:
+        # Access to exam content is determined by edx-exams and passed to the LMS using a
+        # JWT url param. There is no longer a need for exam gating or logic inside the
+        # sequence block or its render call. descendants_are_gated shoule not return true
+        # for these timed exams. Instead, sequences are assumed gated by default and we look for
+        # an access token on the request to allow rendering to continue.
+        if course.proctoring_provider == 'lti_external':
+            seq_block = ancestor_sequence_block if ancestor_sequence_block else block
+            if getattr(seq_block, 'is_time_limited', None):
+                if not _check_sequence_exam_access(request, seq_block.location):
+                    return HttpResponseForbidden("Access to exam content is restricted")
+
         fragment = block.render(requested_view, context=student_view_context)
         optimization_flags = get_optimization_flags_for_content(block, fragment)
 
@@ -1609,58 +1652,6 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             'render_course_wide_assets': True,
 
             **optimization_flags,
-        }
-        return render_to_response('courseware/courseware-chromeless.html', context)
-
-
-@require_http_methods(["GET"])
-@ensure_valid_usage_key
-@xframe_options_exempt
-@transaction.non_atomic_requests
-def render_public_video_xblock(request, usage_key_string):
-    """
-    Returns an HttpResponse with HTML content for the Video xBlock with the given usage_key.
-    The returned HTML is a chromeless rendering of the Video xBlock (excluding content of the containing courseware).
-    """
-    view = 'public_view'
-
-    usage_key = UsageKey.from_string(usage_key_string)
-    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
-    course_key = usage_key.course_key
-
-    # usage key block type must be `video` else raise 404
-    if usage_key.block_type != 'video':
-        raise Http404("Video not found.")
-
-    with modulestore().bulk_operations(course_key):
-        course = get_course_by_id(course_key, 0)
-
-        block, _ = get_module_by_usage_id(
-            request,
-            str(course_key),
-            str(usage_key),
-            disable_staff_debug_info=True,
-            course=course,
-            will_recheck_access=False
-        )
-
-        # video must be public (`Public Access` field set to True) by course author in studio in video advanced settings
-        if not block.public_access:
-            raise Http404("Video not found.")
-
-        fragment = block.render(view, context={})
-
-        context = {
-            'fragment': fragment,
-            'course': course,
-            'disable_accordion': False,
-            'allow_iframing': True,
-            'disable_header': False,
-            'disable_footer': False,
-            'disable_window_wrap': True,
-            'edx_notes_enabled': False,
-            'is_learning_mfe': True,
-            'is_mobile_app': False,
         }
         return render_to_response('courseware/courseware-chromeless.html', context)
 
@@ -1733,6 +1724,222 @@ class XBlockContentInspector:
                 return True
 
         return False
+
+
+@method_decorator(ensure_valid_usage_key, name='dispatch')
+@method_decorator(xframe_options_exempt, name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class BasePublicVideoXBlockView(View):
+    """
+    Base functionality for public video xblock view and embed view
+    """
+
+    def get(self, _, usage_key_string):
+        """ Load course and video and render public view """
+        course, video_block = self.get_course_and_video_block(usage_key_string)
+        template, context = self.get_template_and_context(course, video_block)
+        return render_to_response(template, context)
+
+    def get_course_and_video_block(self, usage_key_string):
+        """
+        Load course and video from modulestore.
+        Raises 404 if:
+         - video_config.public_video_share waffle flag is not enabled for this course
+         - block is not video
+         - block is not marked as "public_access"
+         """
+        usage_key = UsageKey.from_string(usage_key_string)
+        usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+        course_key = usage_key.course_key
+
+        if not PUBLIC_VIDEO_SHARE.is_enabled(course_key):
+            raise Http404("Video not found.")
+
+        # usage key block type must be `video` else raise 404
+        if usage_key.block_type != 'video':
+            raise Http404("Video not found.")
+
+        with modulestore().bulk_operations(course_key):
+            course = get_course_by_id(course_key, 0)
+
+            video_block, _ = get_block_by_usage_id(
+                self.request,
+                str(course_key),
+                str(usage_key),
+                disable_staff_debug_info=True,
+                course=course,
+                will_recheck_access=False
+            )
+
+            # Block must be marked as public to be viewed
+            if not video_block.public_access:
+                raise Http404("Video not found.")
+
+        return course, video_block
+
+
+@method_decorator(ensure_valid_usage_key, name='dispatch')
+@method_decorator(xframe_options_exempt, name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class PublicVideoXBlockView(BasePublicVideoXBlockView):
+    """ View for displaying public videos """
+
+    def get_template_and_context(self, course, video_block):
+        """
+        Render video xblock, gather social media metadata, and generate CTA links
+        """
+        fragment = video_block.render('public_view', context={
+            'public_video_embed': False,
+        })
+        catalog_course_data = self.get_catalog_course_data(course)
+        learn_more_url, enroll_url = self.get_public_video_cta_button_urls(course, catalog_course_data)
+        social_sharing_metadata = self.get_social_sharing_metadata(course, video_block)
+        context = {
+            'fragment': fragment,
+            'course': course,
+            'org_logo': catalog_course_data.get('org_logo'),
+            'social_sharing_metadata': social_sharing_metadata,
+            'learn_more_url': learn_more_url,
+            'enroll_url': enroll_url,
+            'allow_iframing': True,
+            'disable_window_wrap': True,
+            'disable_register_button': True,
+            'edx_notes_enabled': False,
+            'is_learning_mfe': True,
+            'is_mobile_app': False,
+        }
+        return 'public_video.html', context
+
+    def get_catalog_course_data(self, course):
+        """
+        Get information from the catalog service for this course
+        """
+        course_uuid = get_course_uuid_for_course(course.id)
+        if course_uuid is None:
+            return {}
+        catalog_course_data = get_course_data(course_uuid, None)
+        if catalog_course_data is None:
+            return {}
+
+        return {
+            'org_logo': self._get_catalog_course_owner_logo(catalog_course_data),
+            'marketing_url': self._get_catalog_course_marketing_url(catalog_course_data),
+        }
+
+    def _get_catalog_course_marketing_url(self, catalog_course_data):
+        """
+        Helper to extract url and remove any potential utm queries.
+        The discovery API includes UTM info unless you request it to not be included.
+        The request for the UUIDs will cache the response within the LMS so we need
+        to strip it here.
+        """
+        marketing_url = catalog_course_data.get('marketing_url')
+        if marketing_url is None:
+            return marketing_url
+        url_parts = urlparse(marketing_url)
+        return self._replace_url_query(url_parts, {})
+
+    def _get_catalog_course_owner_logo(self, catalog_course_data):
+        """ Helper to safely extract the course owner image url from the catalog course """
+        owners_data = catalog_course_data.get('owners', [])
+        if len(owners_data) == 0:
+            return None
+        return owners_data[0].get('logo_image_url', None)
+
+    def get_social_sharing_metadata(self, course, video_block):
+        """
+        Gather the information for the meta OpenGraph and Twitter-specific tags
+        """
+        video_description = f"Watch a video from the course {course.display_name} "
+        if course.display_organization is not None:
+            video_description += f"by {course.display_organization} "
+        video_description += "on edX.org"
+        video_poster = video_block._poster()  # pylint: disable=protected-access
+
+        return {
+            'video_title': video_block.display_name_with_default,
+            'video_description': video_description,
+            'video_thumbnail': video_poster if video_poster is not None else '',
+            'video_embed_url': urljoin(
+                settings.LMS_ROOT_URL,
+                reverse('render_public_video_xblock_embed', kwargs={'usage_key_string': str(video_block.location)})
+            )
+        }
+
+    def get_learn_more_button_url(self, course, catalog_course_data, utm_params):
+        """
+        If the marketing site is enabled and a course has a marketing page, use that URL.
+        If not, point to the `about_course` view.
+        Override all with the MKTG_URL_OVERRIDES setting.
+        """
+        base_url = catalog_course_data.get('marketing_url', None)
+        if base_url is None:
+            base_url = reverse('about_course', kwargs={'course_id': str(course.id)})
+        return self.build_url(base_url, {}, utm_params)
+
+    def get_public_video_cta_button_urls(self, course, catalog_course_data):
+        """
+        Get the links for the 'enroll' and 'learn more' buttons on the public video page
+        """
+        utm_params = self.get_utm_params()
+        learn_more_url = self.get_learn_more_button_url(course, catalog_course_data, utm_params)
+        enroll_url = self.build_url(
+            reverse('register_user'),
+            {
+                'course_id': str(course.id),
+                'enrollment_action': 'enroll',
+                'email_opt_in': False,
+            },
+            utm_params
+        )
+        return learn_more_url, enroll_url
+
+    def get_utm_params(self):
+        """
+        Helper function to pull all utm_ params from the request and return them as a dict
+        """
+        utm_params = {}
+        for param, value in self.request.GET.items():
+            if param.startswith("utm_"):
+                utm_params[param] = value
+        return utm_params
+
+    def build_url(self, base_url, params, utm_params):
+        """
+        Helper function to combine a base URL, params, and utm params into a full URL
+        """
+        if not params and not utm_params:
+            return base_url
+        parsed_url = urlparse(base_url)
+        full_params = {**params, **utm_params}
+        return self._replace_url_query(parsed_url, full_params)
+
+    def _replace_url_query(self, parsed_url, query):
+        return urlunparse((
+            parsed_url.scheme,
+            parsed_url.netloc,
+            parsed_url.path,
+            parsed_url.params,
+            urlencode(query) if query else '',
+            parsed_url.fragment
+        ))
+
+
+@method_decorator(ensure_valid_usage_key, name='dispatch')
+@method_decorator(xframe_options_exempt, name='dispatch')
+@method_decorator(transaction.non_atomic_requests, name='dispatch')
+class PublicVideoXBlockEmbedView(BasePublicVideoXBlockView):
+    """ View for viewing public videos embedded within Twitter or other social media """
+    def get_template_and_context(self, course, video_block):
+        """ Render the embed view """
+        fragment = video_block.render('public_view', context={
+            'public_video_embed': True,
+        })
+        context = {
+            'fragment': fragment,
+            'course': course,
+        }
+        return 'public_video_share_embed.html', context
 
 
 # Translators: "percent_sign" is the symbol "%". "platform_name" is a

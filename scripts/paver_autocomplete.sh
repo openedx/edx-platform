@@ -1,3 +1,9 @@
+# shellcheck disable=all
+# ^ Paver in edx-platform is on the way out
+#   (https://github.com/openedx/edx-platform/issues/31798)
+#   so we're not going to bother fixing these shellcheck
+#   violations.
+
 # Courtesy of Gregory Nicholas
 
 _subcommand_opts()

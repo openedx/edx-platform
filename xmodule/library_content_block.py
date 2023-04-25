@@ -160,7 +160,7 @@ class LibraryContentBlock(
     )
     max_count = Integer(
         display_name=_("Count"),
-        help=_("Enter the number of components to display to each student."),
+        help=_("Enter the number of components to display to each student. Set it to -1 to display all components."),
         default=1,
         scope=Scope.settings,
     )
@@ -337,7 +337,11 @@ class LibraryContentBlock(
         actual BlockUsageLocators, it is necessary to use self.children,
         because the block_ids alone do not specify the block type.
         """
-        block_keys = self.make_selection(self.selected, self.children, self.max_count, "random")  # pylint: disable=no-member
+        max_count = self.max_count
+        if max_count < 0:
+            max_count = len(self.children)
+
+        block_keys = self.make_selection(self.selected, self.children, max_count, "random")  # pylint: disable=no-member
 
         # Publish events for analytics purposes:
         lib_tools = self.runtime.service(self, 'library_tools')
@@ -433,9 +437,13 @@ class LibraryContentBlock(
         if is_root:
             # User has clicked the "View" link. Show a preview of all possible children:
             if self.children:  # pylint: disable=no-member
+                max_count = self.max_count
+                if max_count < 0:
+                    max_count = len(self.children)
+
                 fragment.add_content(self.runtime.service(self, 'mako').render_template(
                     "library-block-author-preview-header.html", {
-                        'max_count': self.max_count,
+                        'max_count': max_count,
                         'display_name': self.display_name or self.url_name,
                     }))
                 context['can_edit_visibility'] = False

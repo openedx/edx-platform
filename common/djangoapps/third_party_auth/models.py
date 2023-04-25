@@ -992,3 +992,21 @@ class LTIProviderConfig(ProviderConfig):
         app_label = "third_party_auth"
         verbose_name = "Provider Configuration (LTI)"
         verbose_name_plural = verbose_name
+
+
+class AppleMigrationUserIdInfo(models.Model):
+    """
+    Model to store users' Apple Unique Identifier during migration
+    process of Apple team from edx Inc. to edx LLC.
+    """
+    old_apple_id = models.CharField(max_length=255)
+    transfer_id = models.CharField(max_length=255, null=True, blank=True)
+    new_apple_id = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return self.old_apple_id
+
+    class Meta:
+        app_label = "third_party_auth"
+        verbose_name = "Apple User Id Migration Info"
+        verbose_name_plural = verbose_name

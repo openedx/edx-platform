@@ -2,9 +2,7 @@
 Unit tests for the announcements feature.
 """
 
-
 import json
-import unittest
 from unittest.mock import patch
 
 from django.conf import settings
@@ -13,6 +11,7 @@ from django.test.client import Client
 from django.urls import reverse
 
 from common.djangoapps.student.tests.factories import AdminFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.features.announcements.models import Announcement
 
 TEST_ANNOUNCEMENTS = [
@@ -24,7 +23,7 @@ TEST_ANNOUNCEMENTS = [
 ]
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestGlobalAnnouncements(TestCase):
     """
     Test Announcements in LMS

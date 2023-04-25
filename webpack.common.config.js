@@ -41,6 +41,9 @@ var workerConfig = function() {
                     new BundleTracker({
                         path: process.env.STATIC_ROOT_LMS,
                         filename: 'webpack-worker-stats.json'
+                    }),
+                    new webpack.DefinePlugin({
+                        'process.env.JS_ENV_EXTRA_CONFIG': JSON.parse(process.env.JS_ENV_EXTRA_CONFIG),
                     })
                 ],
                 module: {

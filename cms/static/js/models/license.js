@@ -80,10 +80,10 @@ define(['backbone', 'underscore'], function(Backbone, _) {
                 }
                 var eqIndex = optionString.indexOf('=');
                 if (eqIndex == -1) {
-                        // this is a boolean flag
+                    // this is a boolean flag
                     optionsObj[optionString] = true;
                 } else {
-                        // this is a key-value pair
+                    // this is a key-value pair
                     var optionKey = optionString.substring(0, eqIndex);
                     var optionVal = optionString.substring(eqIndex + 1);
                     optionsObj[optionKey] = optionVal;

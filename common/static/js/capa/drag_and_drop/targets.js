@@ -89,7 +89,7 @@
                     borderCss,
                     HtmlUtils.HTML('"aria-dropeffect=""></div>')
                 ).toString()
-        );
+            );
             if (fromTargetField === true) {
                 $targetEl.appendTo(draggableObj.iconEl);
             } else {
@@ -178,8 +178,8 @@
 
             this.draggableList.splice(draggable.onTargetIndex, 1);
 
-        // An item from the array was removed. We need to updated all indexes accordingly.
-        // Shift all indexes down by one if they are higher than the index of the removed item.
+            // An item from the array was removed. We need to updated all indexes accordingly.
+            // Shift all indexes down by one if they are higher than the index of the removed item.
             c1 = 0;
             while (c1 < this.draggableList.length) {
                 if (this.draggableList[c1].onTargetIndex > draggable.onTargetIndex) {
@@ -210,7 +210,7 @@
             this.updateNumTextEl();
         }
 
-    /*
+        /*
      * function cycleDraggableOrder
      *
      * Parameters:

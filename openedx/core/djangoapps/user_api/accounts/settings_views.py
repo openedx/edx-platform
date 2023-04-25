@@ -8,12 +8,14 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
+from openedx_filters.learning.filters import AccountSettingsRenderStarted
 from common.djangoapps import third_party_auth
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.models import UserProfile
@@ -72,7 +74,25 @@ def account_settings(request):
         return redirect(url)
 
     context = account_settings_context(request)
-    return render_to_response('student_account/account_settings.html', context)
+
+    account_settings_template = 'student_account/account_settings.html'
+
+    try:
+        # .. filter_implemented_name: AccountSettingsRenderStarted
+        # .. filter_type: org.openedx.learning.student.settings.render.started.v1
+        context, account_settings_template = AccountSettingsRenderStarted.run_filter(
+            context=context, template_name=account_settings_template,
+        )
+    except AccountSettingsRenderStarted.RenderInvalidAccountSettings as exc:
+        response = render_to_response(exc.account_settings_template, exc.template_context)
+    except AccountSettingsRenderStarted.RedirectToPage as exc:
+        response = HttpResponseRedirect(exc.redirect_to or reverse('dashboard'))
+    except AccountSettingsRenderStarted.RenderCustomResponse as exc:
+        response = exc.response
+    else:
+        response = render_to_response(account_settings_template, context)
+
+    return response
 
 
 def account_settings_context(request):

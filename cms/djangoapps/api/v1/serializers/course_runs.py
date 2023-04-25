@@ -159,7 +159,7 @@ class CourseRunCreateSerializer(CourseRunSerializer):  # lint-amnesty, pylint: d
         with transaction.atomic():
             instance = create_new_course(user, _id['org'], _id['course'], _id['run'], validated_data)
             self.update_team(instance, team)
-            return instance
+        return instance
 
 
 class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTeamSerializerMixin,  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring

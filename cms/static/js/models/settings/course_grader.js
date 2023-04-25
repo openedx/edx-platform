@@ -43,8 +43,8 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                     // FIXME b/c saves don't update the models if validation fails, we should
                     // either revert the field value to the one in the model and make them make room
                     // or figure out a holistic way to balance the vals across the whole
-//                  if ((this.collection.sumWeights() + attrs.weight - this.get('weight')) > 100)
-//                  errors.weight = "The weights cannot add to more than 100.";
+                        //                  if ((this.collection.sumWeights() + attrs.weight - this.get('weight')) > 100)
+                        //                  errors.weight = "The weights cannot add to more than 100.";
                     }
                 }
             }
@@ -61,10 +61,10 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                     errors.drop_count = gettext('Please enter non-negative integer.');
                 } else attrs.drop_count = intDropCount;
             }
-            if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && !_.has(errors, 'min_count') && !_.has(errors, 'drop_count') && attrs.drop_count > attrs.min_count) {
+            if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && !_.has(errors, 'min_count') && !_.has(errors, 'drop_count') && attrs.drop_count >= attrs.min_count) {
                 var template = _.template(
-                gettext('Cannot drop more <%- types %> assignments than are assigned.')
-            );
+                    gettext('You must have at least one undroppable <%- types %> assignment.')
+                );
                 errors.drop_count = template({types: attrs.type});
             }
             if (!_.isEmpty(errors)) return errors;

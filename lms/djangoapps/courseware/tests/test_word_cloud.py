@@ -1,14 +1,19 @@
 """Word cloud integration tests using mongo modulestore."""
 
 
+import pytest
+
 import json
 from operator import itemgetter
 
+# noinspection PyUnresolvedReferences
+from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
 from xmodule.x_module import STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
 
 
+@pytest.mark.usefixtures("override_descriptor_system")
 class TestWordCloud(BaseTestXmodule):
     """Integration test for Word Cloud Block."""
     CATEGORY = "word_cloud"

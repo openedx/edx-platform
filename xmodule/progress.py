@@ -1,5 +1,5 @@
 '''
-Progress class for modules.  Represents where a student is in a module.
+Progress class for blocks.  Represents where a student is in a block.
 
 For most subclassing needs, you should only need to reimplement
 frac() and __str__().
@@ -15,8 +15,8 @@ class Progress:
     a and b must be numeric, but not necessarily integer, with
     0 <= a <= b and b > 0.
 
-    Progress can only represent Progress for modules where that makes sense.  Other
-    modules (e.g. html) should return None from get_progress().
+    Progress can only represent Progress for blocks where that makes sense.  Other
+    blocks (e.g. html) should return None from get_progress().
 
     TODO: add tag for module type?  Would allow for smarter merging.
     '''

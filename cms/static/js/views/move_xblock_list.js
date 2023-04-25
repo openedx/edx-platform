@@ -193,7 +193,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
             return {
                 breadcrumbs: _.map(this.visitedAncestors, function(ancestor) {
                     return ancestor.get('category') === 'course' ?
-                           gettext('Course Outline') : ancestor.get('display_name');
+                        gettext('Course Outline') : ancestor.get('display_name');
                 })
             };
         }

@@ -82,12 +82,12 @@ class ErrorReadingFileException(CourseImportException):
         super().__init__(**kwargs)
 
 
-class ModuleFailedToImport(CourseImportException):
+class BlockFailedToImport(CourseImportException):
     """
-    Raised when a module is failed to import.
+    Raised when a block is failed to import.
     """
 
-    MESSAGE_TEMPLATE = _('Failed to import module: {} at location: {}')
+    MESSAGE_TEMPLATE = _('Failed to import block: {} at location: {}')
 
     def __init__(self, display_name, location, **kwargs):
         self.description = self.MESSAGE_TEMPLATE.format(display_name, location)
@@ -228,7 +228,7 @@ class ImportManager:
         source_dirs: If specified, the list of data_dir subdirectories to load. Otherwise, load
             all dirs
 
-        target_id: is the Locator that all modules should be remapped to
+        target_id: is the Locator that all blocks should be remapped to
             after import off disk. NOTE: this only makes sense if importing only
             one courselike. If there are more than one courselike loaded from data_dir/source_dirs & you
             supply this id, an AssertException will be raised.
@@ -254,14 +254,14 @@ class ImportManager:
         python_lib_filename: The filename of the courselike's python library. Course authors can optionally
             create this file to implement custom logic in their course.
 
-        default_class, load_error_modules: are arguments for constructing the XMLModuleStore (see its doc)
+        default_class, load_error_blocks: are arguments for constructing the XMLModuleStore (see its doc)
     """
     store_class = XMLModuleStore
 
     def __init__(
             self, store, user_id, data_dir, source_dirs=None,
             default_class='xmodule.hidden_block.HiddenBlock',
-            load_error_modules=True, static_content_store=None,
+            load_error_blocks=True, static_content_store=None,
             target_id=None, verbose=False,
             do_import_static=True, do_import_python_lib=True,
             create_if_not_present=False, raise_on_failure=False,
@@ -272,7 +272,7 @@ class ImportManager:
         self.user_id = user_id
         self.data_dir = data_dir
         self.source_dirs = source_dirs
-        self.load_error_modules = load_error_modules
+        self.load_error_blocks = load_error_blocks
         self.static_content_store = static_content_store
         self.target_id = target_id
         self.verbose = verbose
@@ -286,7 +286,7 @@ class ImportManager:
             data_dir,
             default_class=default_class,
             source_dirs=source_dirs,
-            load_error_modules=load_error_modules,
+            load_error_blocks=load_error_blocks,
             xblock_mixins=store.xblock_mixins,
             xblock_select=store.xblock_select,
             target_course_id=target_id,
@@ -406,10 +406,10 @@ class ImportManager:
 
     def import_courselike(self, runtime, courselike_key, dest_id, source_courselike):
         """
-        Import the base module/block
+        Import the base block
         """
         if self.verbose:
-            log.debug("Scanning %s for courselike module...", courselike_key)
+            log.debug("Scanning %s for courselike block...", courselike_key)
 
         # Quick scan to get course block as we need some info from there.
         # Also we need to make sure that the course block is committed
@@ -427,7 +427,7 @@ class ImportManager:
         log.debug('course data_dir=%s', source_courselike.data_dir)
 
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, dest_id):
-            course = _update_and_import_module(
+            course = _update_and_import_block(
                 source_courselike, self.store, self.user_id,
                 courselike_key,
                 dest_id,
@@ -497,10 +497,10 @@ class ImportManager:
                         # ContentStoreTest.test_image_import
                         pass
                     if self.verbose:
-                        log.debug('importing module location %s', child.location)
+                        log.debug('importing block location %s', child.location)
 
                     try:
-                        _update_and_import_module(
+                        _update_and_import_block(
                             child,
                             self.store,
                             self.user_id,
@@ -511,9 +511,9 @@ class ImportManager:
                         )
                     except Exception:
                         log.exception(
-                            f'Course import {dest_id}: failed to import module location {child.location}'
+                            f'Course import {dest_id}: failed to import block location {child.location}'
                         )
-                        raise ModuleFailedToImport(child.display_name, child.location)  # pylint: disable=raise-missing-from
+                        raise BlockFailedToImport(child.display_name, child.location)  # pylint: disable=raise-missing-from
 
                     depth_first(child)
 
@@ -521,10 +521,10 @@ class ImportManager:
 
         for leftover in all_locs:
             if self.verbose:
-                log.debug('importing module location %s', leftover)
+                log.debug('importing block location %s', leftover)
 
             try:
-                _update_and_import_module(
+                _update_and_import_block(
                     self.xml_module_store.get_item(leftover),
                     self.store,
                     self.user_id,
@@ -535,10 +535,10 @@ class ImportManager:
                 )
             except Exception:
                 log.exception(
-                    f'Course import {dest_id}: failed to import module location {leftover}'
+                    f'Course import {dest_id}: failed to import block location {leftover}'
                 )
                 # pylint: disable=raise-missing-from
-                raise ModuleFailedToImport(leftover.display_name, leftover.location)
+                raise BlockFailedToImport(leftover.display_name, leftover.location)
 
     def run_imports(self):
         """
@@ -783,19 +783,19 @@ def import_library_from_xml(*args, **kwargs):
     return list(manager.run_imports())
 
 
-def _update_and_import_module(
-        module, store, user_id,
+def _update_and_import_block(
+        block, store, user_id,
         source_course_id, dest_course_id,
         do_import_static=True, runtime=None):
     """
-    Update all the module reference fields to the destination course id,
-    then import the module into the destination course.
+    Update all the block reference fields to the destination course id,
+    then import the block into the destination course.
     """
-    logging.debug('processing import of module %s...', str(module.location))
+    logging.debug('processing import of blocks %s...', str(block.location))
 
-    def _update_module_references(module, source_course_id, dest_course_id):
+    def _update_block_references(block, source_course_id, dest_course_id):
         """
-        Move the module to a new course.
+        Move the block to a new course.
         """
 
         def _convert_ref_fields_to_new_namespace(reference):
@@ -812,26 +812,26 @@ def _update_and_import_module(
                 return reference
 
         fields = {}
-        for field_name, field in module.fields.items():
-            if field.scope != Scope.parent and field.is_set_on(module):
+        for field_name, field in block.fields.items():
+            if field.scope != Scope.parent and field.is_set_on(block):
                 if isinstance(field, Reference):
-                    value = field.read_from(module)
+                    value = field.read_from(block)
                     if value is None:
                         fields[field_name] = None
                     else:
-                        fields[field_name] = _convert_ref_fields_to_new_namespace(field.read_from(module))
+                        fields[field_name] = _convert_ref_fields_to_new_namespace(field.read_from(block))
                 elif isinstance(field, ReferenceList):
-                    references = field.read_from(module)
+                    references = field.read_from(block)
                     fields[field_name] = [_convert_ref_fields_to_new_namespace(reference) for reference in references]
                 elif isinstance(field, ReferenceValueDict):
-                    reference_dict = field.read_from(module)
+                    reference_dict = field.read_from(block)
                     fields[field_name] = {
                         key: _convert_ref_fields_to_new_namespace(reference)
                         for key, reference
                         in reference_dict.items()
                     }
                 elif field_name == 'xml_attributes':
-                    value = field.read_from(module)
+                    value = field.read_from(block)
                     # remove any export/import only xml_attributes
                     # which are used to wire together draft imports
                     if 'parent_url' in value:
@@ -843,28 +843,28 @@ def _update_and_import_module(
                         del value['index_in_children_list']
                     fields[field_name] = value
                 else:
-                    fields[field_name] = field.read_from(module)
+                    fields[field_name] = field.read_from(block)
         return fields
 
-    if do_import_static and 'data' in module.fields and isinstance(module.fields['data'], xblock.fields.String):
+    if do_import_static and 'data' in block.fields and isinstance(block.fields['data'], xblock.fields.String):
         # we want to convert all 'non-portable' links in the module_data
         # (if it is a string) to portable strings (e.g. /static/)
-        module.data = rewrite_nonportable_content_links(
+        block.data = rewrite_nonportable_content_links(
             source_course_id,
             dest_course_id,
-            module.data
+            block.data
         )
 
-    fields = _update_module_references(module, source_course_id, dest_course_id)
-    asides = module.get_asides() if isinstance(module, XModuleMixin) else None
+    fields = _update_block_references(block, source_course_id, dest_course_id)
+    asides = block.get_asides() if isinstance(block, XModuleMixin) else None
 
-    if module.location.block_type == 'library_content':
+    if block.location.block_type == 'library_content':
         with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.published_only):
-            lib_content_block_already_published = store.has_item(module.location)
+            lib_content_block_already_published = store.has_item(block.location)
 
     block = store.import_xblock(
-        user_id, dest_course_id, module.location.block_type,
-        module.location.block_id, fields, runtime, asides=asides
+        user_id, dest_course_id, block.location.block_type,
+        block.location.block_id, fields, runtime, asides=asides
     )
 
     # TODO: Move this code once the following condition is met.
@@ -952,25 +952,25 @@ def _import_course_draft(
         course_id=source_course_id,
         course_dir=draft_course_dir,
         error_tracker=errorlog.tracker,
-        load_error_modules=False,
+        load_error_blocks=False,
         mixins=xml_module_store.xblock_mixins,
         services={'field-data': KvsFieldData(kvs=DictKeyValueStore())},
         target_course_id=target_id,
     )
 
-    def _import_module(module):
-        # IMPORTANT: Be sure to update the module location in the NEW namespace
-        module_location = module.location.map_into_course(target_id)
-        # Update the module's location to DRAFT revision
+    def _import_block(block):
+        # IMPORTANT: Be sure to update the block location in the NEW namespace
+        block_location = block.location.map_into_course(target_id)
+        # Update the block's location to DRAFT revision
         # We need to call this method (instead of updating the location directly)
         # to ensure that pure XBlock field data is updated correctly.
-        _update_module_location(module, module_location.replace(revision=MongoRevisionKey.draft))
+        _update_block_location(block, block_location.replace(revision=MongoRevisionKey.draft))
 
-        parent_url = get_parent_url(module)
-        index = index_in_children_list(module)
+        parent_url = get_parent_url(block)
+        index = index_in_children_list(block)
 
         # make sure our parent has us in its list of children
-        # this is to make sure private only modules show up
+        # this is to make sure private only blocks show up
         # in the list of children since they would have been
         # filtered out from the non-draft store export.
         if parent_url is not None and index is not None:
@@ -982,19 +982,19 @@ def _import_course_draft(
 
             parent = store.get_item(parent_location, depth=0)
 
-            non_draft_location = module.location.map_into_course(target_id)
-            if not any(child.block_id == module.location.block_id for child in parent.children):
+            non_draft_location = block.location.map_into_course(target_id)
+            if not any(child.block_id == block.location.block_id for child in parent.children):
                 parent.children.insert(index, non_draft_location)
                 store.update_item(parent, user_id)
 
-        _update_and_import_module(
-            module, store, user_id,
+        _update_and_import_block(
+            block, store, user_id,
             source_course_id,
             target_id,
             runtime=mongo_runtime,
         )
-        for child in module.get_children():
-            _import_module(child)
+        for child in block.get_children():
+            _import_block(child)
 
     # Now walk the /drafts directory.
     # Each file in the directory will be a draft copy of the vertical.
@@ -1007,8 +1007,8 @@ def _import_course_draft(
             if filename.startswith('._'):
                 # Skip any OSX quarantine files, prefixed with a '._'.
                 continue
-            module_path = os.path.join(rootdir, filename)
-            with open(module_path) as f:
+            block_path = os.path.join(rootdir, filename)
+            with open(block_path) as f:
                 try:
                     xml = f.read()
 
@@ -1033,7 +1033,7 @@ def _import_course_draft(
                         draft_url = str(descriptor.location)
 
                         draft = draft_node_constructor(
-                            module=descriptor, url=draft_url, parent_url=parent_url, index=index
+                            block=descriptor, url=draft_url, parent_url=parent_url, index=index
                         )
                         drafts.append(draft)
 
@@ -1045,7 +1045,7 @@ def _import_course_draft(
 
     for draft in get_draft_subtree_roots(drafts):
         try:
-            _import_module(draft.module)
+            _import_block(draft.module)
         except Exception:  # pylint: disable=broad-except
             logging.exception(f'Course import {source_course_id}: while importing draft descriptor {draft.module}')
 
@@ -1059,89 +1059,89 @@ def allowed_metadata_by_category(category):
     }.get(category, ['*'])
 
 
-def check_module_metadata_editability(module):
+def check_block_metadata_editability(block):
     """
-    Assert that there is no metadata within a particular module that
+    Assert that there is no metadata within a particular block that
     we can't support editing. However we always allow 'display_name'
     and 'xml_attributes'
     """
-    allowed = allowed_metadata_by_category(module.location.block_type)
+    allowed = allowed_metadata_by_category(block.location.block_type)
     if '*' in allowed:
         # everything is allowed
         return 0
 
     allowed = allowed + ['xml_attributes', 'display_name']
     err_cnt = 0
-    illegal_keys = set(own_metadata(module).keys()) - set(allowed)
+    illegal_keys = set(own_metadata(block).keys()) - set(allowed)
 
     if len(illegal_keys) > 0:
         err_cnt = err_cnt + 1
         print(
             ": found non-editable metadata on {url}. "
             "These metadata keys are not supported = {keys}".format(
-                url=str(module.location), keys=illegal_keys
+                url=str(block.location), keys=illegal_keys
             )
         )
 
     return err_cnt
 
 
-def get_parent_url(module, xml=None):
+def get_parent_url(block, xml=None):
     """
-    Get the parent_url, if any, from module using xml as an alternative source. If it finds it in
-    xml but not on module, it modifies module so that the next call to this w/o the xml will get the parent url
+    Get the parent_url, if any, from block using xml as an alternative source. If it finds it in
+    xml but not on block, it modifies block so that the next call to this w/o the xml will get the parent url
     """
-    if hasattr(module, 'xml_attributes'):
-        return module.xml_attributes.get(
+    if hasattr(block, 'xml_attributes'):
+        return block.xml_attributes.get(
             # handle deprecated old attr
-            'parent_url', module.xml_attributes.get('parent_sequential_url')
+            'parent_url', block.xml_attributes.get('parent_sequential_url')
         )
     if xml is not None:
-        create_xml_attributes(module, xml)
-        return get_parent_url(module)  # don't reparse xml b/c don't infinite recurse but retry above lines
+        create_xml_attributes(block, xml)
+        return get_parent_url(block)  # don't reparse xml b/c don't infinite recurse but retry above lines
     return None
 
 
-def index_in_children_list(module, xml=None):
+def index_in_children_list(block, xml=None):
     """
-    Get the index_in_children_list, if any, from module using xml
-    as an alternative source. If it finds it in xml but not on module,
-    it modifies module so that the next call to this w/o the xml
+    Get the index_in_children_list, if any, from block using xml
+    as an alternative source. If it finds it in xml but not on block,
+    it modifies block so that the next call to this w/o the xml
     will get the field.
     """
-    if hasattr(module, 'xml_attributes'):
-        val = module.xml_attributes.get('index_in_children_list')
+    if hasattr(block, 'xml_attributes'):
+        val = block.xml_attributes.get('index_in_children_list')
         if val is not None:
             return int(val)
         return None
     if xml is not None:
-        create_xml_attributes(module, xml)
-        return index_in_children_list(module)  # don't reparse xml b/c don't infinite recurse but retry above lines
+        create_xml_attributes(block, xml)
+        return index_in_children_list(block)  # don't reparse xml b/c don't infinite recurse but retry above lines
     return None
 
 
-def create_xml_attributes(module, xml):
+def create_xml_attributes(block, xml):
     """
-    Make up for modules which don't define xml_attributes by creating them here and populating
+    Make up for blocks which don't define xml_attributes by creating them here and populating
     """
     xml_attrs = {}
     for attr, val in xml.attrib.items():
-        if attr not in module.fields:
+        if attr not in block.fields:
             # translate obsolete attr
             if attr == 'parent_sequential_url':
                 attr = 'parent_url'
             xml_attrs[attr] = val
 
-    # now cache it on module where it's expected
-    module.xml_attributes = xml_attrs
+    # now cache it on block where it's expected
+    block.xml_attributes = xml_attrs
 
 
 def validate_no_non_editable_metadata(module_store, course_id, category):  # lint-amnesty, pylint: disable=missing-function-docstring
     err_cnt = 0
-    for module_loc in module_store.modules[course_id]:
-        module = module_store.modules[course_id][module_loc]
-        if module.location.block_type == category:
-            err_cnt = err_cnt + check_module_metadata_editability(module)
+    for block_loc in module_store.modules[course_id]:
+        block = module_store.modules[course_id][block_loc]
+        if block.location.block_type == category:
+            err_cnt = err_cnt + check_block_metadata_editability(block)
 
     return err_cnt
 
@@ -1151,10 +1151,10 @@ def validate_category_hierarchy(  # lint-amnesty, pylint: disable=missing-functi
     err_cnt = 0
 
     parents = []
-    # get all modules of parent_category
-    for module in module_store.modules[course_id].values():
-        if module.location.block_type == parent_category:
-            parents.append(module)
+    # get all blocks of parent_category
+    for block in module_store.modules[course_id].values():
+        if block.location.block_type == parent_category:
+            parents.append(block)
 
     for parent in parents:
         for child_loc in parent.children:
@@ -1206,18 +1206,18 @@ def validate_course_policy(module_store, course_id):
 
     Does not add to error count as these are just warnings.
     """
-    # is there a reliable way to get the module location just given the course_id?
+    # is there a reliable way to get the block location just given the course_id?
     warn_cnt = 0
-    for module in module_store.modules[course_id].values():
-        if module.location.block_type == 'course':
-            if not module._field_data.has(module, 'rerandomize'):  # lint-amnesty, pylint: disable=protected-access
+    for block in module_store.modules[course_id].values():
+        if block.location.block_type == 'course':
+            if not block._field_data.has(block, 'rerandomize'):  # lint-amnesty, pylint: disable=protected-access
                 warn_cnt += 1
                 print(
                     'WARN: course policy does not specify value for '
                     '"rerandomize" whose default is now "never". '
                     'The behavior of your course may change.'
                 )
-            if not module._field_data.has(module, 'showanswer'):  # lint-amnesty, pylint: disable=protected-access
+            if not block._field_data.has(block, 'showanswer'):  # lint-amnesty, pylint: disable=protected-access
                 warn_cnt += 1
                 print(
                     'WARN: course policy does not specify value for '
@@ -1230,7 +1230,7 @@ def validate_course_policy(module_store, course_id):
 def perform_xlint(  # lint-amnesty, pylint: disable=missing-function-docstring
         data_dir, source_dirs,
         default_class='xmodule.hidden_block.HiddenBlock',
-        load_error_modules=True,
+        load_error_blocks=True,
         xblock_mixins=(LocationMixin, XModuleMixin)):
     err_cnt = 0
     warn_cnt = 0
@@ -1239,7 +1239,7 @@ def perform_xlint(  # lint-amnesty, pylint: disable=missing-function-docstring
         data_dir,
         default_class=default_class,
         source_dirs=source_dirs,
-        load_error_modules=load_error_modules,
+        load_error_blocks=load_error_blocks,
         xblock_mixins=xblock_mixins
     )
 
@@ -1329,16 +1329,16 @@ def perform_xlint(  # lint-amnesty, pylint: disable=missing-function-docstring
     return err_cnt
 
 
-def _update_module_location(module, new_location):
+def _update_block_location(block, new_location):
     """
-    Update a module's location.
+    Update a block's location.
 
-    If the module is a pure XBlock (not an XModule), then its field data
+    If the block is a pure XBlock (not an XModule), then its field data
     keys will need to be updated to include the new location.
 
     Args:
-        module (XModuleMixin): The module to update.
-        new_location (Location): The new location of the module.
+        block (XModuleMixin): The block to update.
+        new_location (Location): The new location of the block.
 
     Returns:
         None
@@ -1347,12 +1347,12 @@ def _update_module_location(module, new_location):
     # Retrieve the content and settings fields that have been explicitly set
     # to ensure that they are properly re-keyed in the XBlock field data.
     rekey_fields = (
-        list(module.get_explicitly_set_fields_by_scope(Scope.content).keys()) +
-        list(module.get_explicitly_set_fields_by_scope(Scope.settings).keys()) +
-        list(module.get_explicitly_set_fields_by_scope(Scope.children).keys())
+        list(block.get_explicitly_set_fields_by_scope(Scope.content).keys()) +
+        list(block.get_explicitly_set_fields_by_scope(Scope.settings).keys()) +
+        list(block.get_explicitly_set_fields_by_scope(Scope.children).keys())
     )
 
-    module.location = new_location
+    block.location = new_location
 
     # Pure XBlocks store the field data in a key-value store
     # in which one component of the key is the XBlock's location (equivalent to "scope_ids").
@@ -1361,4 +1361,4 @@ def _update_module_location(module, new_location):
     # However, since XBlocks only save "dirty" fields, we need to call
     # XBlock's `force_save_fields_method`
     if len(rekey_fields) > 0:
-        module.force_save_fields(rekey_fields)
+        block.force_save_fields(rekey_fields)

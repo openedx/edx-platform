@@ -61,7 +61,7 @@ from ..entrance_exams import (
 )
 from ..masquerade import check_content_start_date_for_masquerade_user, setup_masquerade
 from ..model_data import FieldDataCache
-from ..module_render import get_module_for_descriptor, toc_for_course
+from ..block_render import get_block_for_descriptor, toc_for_course
 from ..permissions import MASQUERADE_AS_STUDENT
 from ..toggles import ENABLE_OPTIMIZELY_IN_COURSEWARE, courseware_mfe_is_active
 from .views import CourseTabView
@@ -103,7 +103,7 @@ class CoursewareIndex(View):
             course_id (unicode): course id
             chapter (unicode): chapter url_name
             section (unicode): section url_name
-            position (unicode): position in module, eg of <sequential> module
+            position (unicode): position in block, eg of <sequential> block
         """
         self.course_key = CourseKey.from_string(course_id)
 
@@ -357,7 +357,7 @@ class CoursewareIndex(View):
             read_only=CrawlersConfig.is_crawler(request),
         )
 
-        self.course = get_module_for_descriptor(
+        self.course = get_block_for_descriptor(
             self.effective_user,
             self.request,
             self.course,
@@ -377,7 +377,7 @@ class CoursewareIndex(View):
         self.field_data_cache.add_descriptor_descendents(self.section, depth=None)
 
         # Bind section to user
-        self.section = get_module_for_descriptor(
+        self.section = get_block_for_descriptor(
             self.effective_user,
             self.request,
             self.section,
@@ -579,23 +579,23 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule, cour
     Recurses up the course tree starting from a leaf
     Saving the position property based on the previous node as it goes
     """
-    current_module = xmodule
+    current_block = xmodule
 
-    while current_module:
-        parent_location = modulestore().get_parent_location(current_module.location)
+    while current_block:
+        parent_location = modulestore().get_parent_location(current_block.location)
         parent = None
         if parent_location:
             parent_descriptor = modulestore().get_item(parent_location)
-            parent = get_module_for_descriptor(
+            parent = get_block_for_descriptor(
                 user,
                 request,
                 parent_descriptor,
                 field_data_cache,
-                current_module.location.course_key,
+                current_block.location.course_key,
                 course=course
             )
 
         if parent and hasattr(parent, 'position'):
-            save_child_position(parent, current_module.location.block_id)
+            save_child_position(parent, current_block.location.block_id)
 
-        current_module = parent
+        current_block = parent

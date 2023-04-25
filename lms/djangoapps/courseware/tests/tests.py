@@ -95,7 +95,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         Assert that the url loads correctly.
         If expect_redirect, then also check that we were redirected.
         If check_content, then check that we don't get
-        an error message about unavailable modules.
+        an error message about unavailable blocks.
         """
 
         url = reverse(django_url, kwargs=kwargs)

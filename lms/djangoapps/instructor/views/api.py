@@ -124,7 +124,7 @@ from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_c
 from openedx.core.lib.courses import get_course_by_id
 from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 from .tools import (
-    dump_module_extensions,
+    dump_block_extensions,
     dump_student_extensions,
     find_unit,
     get_student_from_identifier,
@@ -2915,7 +2915,7 @@ def show_unit_extensions(request, course_id):
     """
     course = get_course_by_id(CourseKey.from_string(course_id))
     unit = find_unit(course, request.POST.get('url'))
-    return JsonResponse(dump_module_extensions(course, unit))
+    return JsonResponse(dump_block_extensions(course, unit))
 
 
 @handle_dashboard_error

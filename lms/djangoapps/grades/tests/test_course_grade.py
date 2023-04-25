@@ -106,46 +106,46 @@ class TestScoreForModule(SharedModuleStoreTestCase):
         set_current_request(None)
 
     def test_score_chapter(self):
-        earned, possible = self.course_grade.score_for_module(self.a.location)
+        earned, possible = self.course_grade.score_for_block(self.a.location)
         assert earned == 9
         assert possible == 24
 
     def test_score_section_many_leaves(self):
-        earned, possible = self.course_grade.score_for_module(self.b.location)
+        earned, possible = self.course_grade.score_for_block(self.b.location)
         assert earned == 6
         assert possible == 14
 
     def test_score_section_one_leaf(self):
-        earned, possible = self.course_grade.score_for_module(self.c.location)
+        earned, possible = self.course_grade.score_for_block(self.c.location)
         assert earned == 3
         assert possible == 10
 
     def test_score_vertical_two_leaves(self):
-        earned, possible = self.course_grade.score_for_module(self.d.location)
+        earned, possible = self.course_grade.score_for_block(self.d.location)
         assert earned == 5
         assert possible == 10
 
     def test_score_vertical_two_leaves_one_unscored(self):
-        earned, possible = self.course_grade.score_for_module(self.e.location)
+        earned, possible = self.course_grade.score_for_block(self.e.location)
         assert earned == 1
         assert possible == 4
 
     def test_score_vertical_no_score(self):
-        earned, possible = self.course_grade.score_for_module(self.f.location)
+        earned, possible = self.course_grade.score_for_block(self.f.location)
         assert earned == 0
         assert possible == 0
 
     def test_score_vertical_one_leaf(self):
-        earned, possible = self.course_grade.score_for_module(self.g.location)
+        earned, possible = self.course_grade.score_for_block(self.g.location)
         assert earned == 3
         assert possible == 10
 
     def test_score_leaf(self):
-        earned, possible = self.course_grade.score_for_module(self.h.location)
+        earned, possible = self.course_grade.score_for_block(self.h.location)
         assert earned == 2
         assert possible == 5
 
     def test_score_leaf_no_score(self):
-        earned, possible = self.course_grade.score_for_module(self.m.location)
+        earned, possible = self.course_grade.score_for_block(self.m.location)
         assert earned == 0
         assert possible == 0

@@ -2,6 +2,7 @@
 Tests courseware views.py
 """
 
+from contextlib import contextmanager
 import html
 import itertools
 import json
@@ -27,6 +28,7 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from pytz import UTC
+from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
 from rest_framework import status
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -70,12 +72,17 @@ from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.courseware.access_utils import check_course_open_for_learner
 from lms.djangoapps.courseware.model_data import FieldDataCache, set_score
-from lms.djangoapps.courseware.module_render import get_module, handle_xblock_callback
+from lms.djangoapps.courseware.block_render import get_block, handle_xblock_callback
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import MasqueradeMixin, get_expiration_banner_text, set_preview_mode
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
 from lms.djangoapps.courseware.toggles import COURSEWARE_OPTIMIZED_RENDER_XBLOCK
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.views.views import (
+    BasePublicVideoXBlockView,
+    PublicVideoXBlockView,
+    PublicVideoXBlockEmbedView,
+)
 from lms.djangoapps.instructor.access import allow_access
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory as CatalogCourseFactory
@@ -86,6 +93,7 @@ from openedx.core.djangoapps.credit.api import set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import get_mock_request
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.url_utils import quote_slashes
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
@@ -194,46 +202,46 @@ class TestJumpTo(ModuleStoreTestCase):
         assert response.url == expected_redirect_url
 
     @set_preview_mode(True)
-    def test_jump_to_legacy_from_module(self):
+    def test_jump_to_legacy_from_block(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = BlockFactory.create(category='chapter', parent_location=course.location)
             sequence = BlockFactory.create(category='sequential', parent_location=chapter.location)
             vertical1 = BlockFactory.create(category='vertical', parent_location=sequence.location)
             vertical2 = BlockFactory.create(category='vertical', parent_location=sequence.location)
-            module1 = BlockFactory.create(category='html', parent_location=vertical1.location)
-            module2 = BlockFactory.create(category='html', parent_location=vertical2.location)
+            block1 = BlockFactory.create(category='html', parent_location=vertical1.location)
+            block2 = BlockFactory.create(category='html', parent_location=vertical2.location)
 
-        activate_block_id = urlencode({'activate_block_id': str(module1.location)})
+        activate_block_id = urlencode({'activate_block_id': str(block1.location)})
         expected_redirect_url = (
             f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{module1.location}'
+        jumpto_url = f'/courses/{course.id}/jump_to/{block1.location}'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
-        activate_block_id = urlencode({'activate_block_id': str(module2.location)})
+        activate_block_id = urlencode({'activate_block_id': str(block2.location)})
         expected_redirect_url = (
             f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/2?{activate_block_id}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
+        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
     @set_preview_mode(False)
-    def test_jump_to_mfe_from_module(self):
+    def test_jump_to_mfe_from_block(self):
         course = CourseFactory.create()
         chapter = BlockFactory.create(category='chapter', parent_location=course.location)
         sequence = BlockFactory.create(category='sequential', parent_location=chapter.location)
         vertical1 = BlockFactory.create(category='vertical', parent_location=sequence.location)
         vertical2 = BlockFactory.create(category='vertical', parent_location=sequence.location)
-        module1 = BlockFactory.create(category='html', parent_location=vertical1.location)
-        module2 = BlockFactory.create(category='html', parent_location=vertical2.location)
+        block1 = BlockFactory.create(category='html', parent_location=vertical1.location)
+        block2 = BlockFactory.create(category='html', parent_location=vertical2.location)
 
         expected_redirect_url = (
             f'http://learning-mfe/course/{course.id}/{sequence.location}/{vertical1.location}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{module1.location}'
+        jumpto_url = f'/courses/{course.id}/jump_to/{block1.location}'
         response = self.client.get(jumpto_url)
         assert response.status_code == 302
         assert response.url == expected_redirect_url
@@ -241,7 +249,7 @@ class TestJumpTo(ModuleStoreTestCase):
         expected_redirect_url = (
             f'http://learning-mfe/course/{course.id}/{sequence.location}/{vertical2.location}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
+        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}'
         response = self.client.get(jumpto_url)
         assert response.status_code == 302
         assert response.url == expected_redirect_url
@@ -249,7 +257,7 @@ class TestJumpTo(ModuleStoreTestCase):
     # The new courseware experience does not support this sort of course structure;
     # it assumes a simple course->chapter->sequence->unit->component tree.
     @set_preview_mode(True)
-    def test_jump_to_legacy_from_nested_module(self):
+    def test_jump_to_legacy_from_nested_block(self):
         with self.store.default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
             chapter = BlockFactory.create(category='chapter', parent_location=course.location)
@@ -257,17 +265,17 @@ class TestJumpTo(ModuleStoreTestCase):
             vertical = BlockFactory.create(category='vertical', parent_location=sequence.location)
             nested_sequence = BlockFactory.create(category='sequential', parent_location=vertical.location)
             nested_vertical1 = BlockFactory.create(category='vertical', parent_location=nested_sequence.location)
-            # put a module into nested_vertical1 for completeness
+            # put a block into nested_vertical1 for completeness
             BlockFactory.create(category='html', parent_location=nested_vertical1.location)
             nested_vertical2 = BlockFactory.create(category='vertical', parent_location=nested_sequence.location)
-            module2 = BlockFactory.create(category='html', parent_location=nested_vertical2.location)
+            block2 = BlockFactory.create(category='html', parent_location=nested_vertical2.location)
 
-        # internal position of module2 will be 1_2 (2nd item withing 1st item)
-        activate_block_id = urlencode({'activate_block_id': str(module2.location)})
+        # internal position of block2 will be 1_2 (2nd item withing 1st item)
+        activate_block_id = urlencode({'activate_block_id': str(block2.location)})
         expected_redirect_url = (
             f'/courses/{course.id}/courseware/{chapter.url_name}/{sequence.url_name}/1?{activate_block_id}'
         )
-        jumpto_url = f'/courses/{course.id}/jump_to/{module2.location}'
+        jumpto_url = f'/courses/{course.id}/jump_to/{block2.location}'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected_redirect_url, status_code=302, target_status_code=302)
 
@@ -1927,7 +1935,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         """
         Submit the given score to the problem on behalf of the user
         """
-        # Get the module for the problem, as viewed by the user
+        # Get the block for the problem, as viewed by the user
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             self.course.id,
             self.user,
@@ -1935,16 +1943,16 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
             depth=2
         )
         self.addCleanup(set_current_request, None)
-        module = get_module(
+        block = get_block(
             self.user,
             get_mock_request(self.user),
             self.problem.scope_ids.usage_id,
-            field_data_cache,
+            field_data_cache
         )
 
         # Submit the given score/max_score to the problem xmodule
         grade_dict = {'value': value, 'max_value': max_value, 'user_id': self.user.id}
-        module.system.publish(self.problem, 'grade', grade_dict)
+        block.runtime.publish(self.problem, 'grade', grade_dict)
 
     def assert_progress_page_show_grades(self, response, show_correctness, due_date, graded,
                                          show_grades, score, max_score, avg):  # lint-amnesty, pylint: disable=unused-argument
@@ -2723,6 +2731,7 @@ class TestIndexViewWithVerticalPositions(ModuleStoreTestCase):
         self._assert_correct_position(resp, expected_position)
 
 
+@ddt.ddt
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaffleTestMixin):
     """
     Tests for the courseware.render_xblock endpoint.
@@ -2925,18 +2934,90 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase, CompletionWaf
         banner_text = get_expiration_banner_text(self.user, self.course)
         self.assertNotContains(response, banner_text, html=True)
 
+    @ddt.data(
+        ('valid-jwt-for-exam-sequence', 200),
+        ('valid-jwt-for-incorrect-sequence', 403),
+        ('invalid-jwt', 403),
+    )
+    @override_settings(
+        PROCTORING_BACKENDS={
+            'DEFAULT': 'null',
+            'null': {},
+            'lti_external': {}
+        }
+    )
+    @ddt.unpack
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
+    @patch('lms.djangoapps.courseware.views.views.unpack_token_for')
+    def test_render_descendant_of_exam_gated_by_access_token(self, exam_access_token,
+                                                             expected_response, _mock_token_unpack):
+        """
+        Verify blocks inside an exam that requires token access are gated by
+        a valid exam access JWT issued for that exam sequence.
+        """
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            # pylint:disable=attribute-defined-outside-init
+            self.course = CourseFactory.create(proctoring_provider='lti_external', **self.course_options())
+            self.chapter = BlockFactory.create(parent=self.course, category='chapter')
+            self.sequence = BlockFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name='Sequence',
+                is_time_limited=True,
+            )
+            self.vertical_block = BlockFactory.create(
+                parent=self.sequence,
+                category='vertical',
+                display_name="Vertical",
+            )
+            self.problem_block = BlockFactory.create(
+                parent=self.vertical_block,
+                category='problem',
+                display_name='Problem'
+            )
+            self.other_sequence = BlockFactory.create(
+                parent=self.chapter,
+                category='sequential',
+                display_name='Sequence 2',
+            )
+        CourseOverview.load_from_module_store(self.course.id)
+        self.setup_user(admin=False, enroll=True, login=True)
 
-class TestRenderPublicVideoXBlock(ModuleStoreTestCase):
+        def _mock_token_unpack_fn(token, user_id):
+            if token == 'valid-jwt-for-exam-sequence':
+                return {'content_id': str(self.sequence.location)}
+            elif token == 'valid-jwt-for-incorrect-sequence':
+                return {'content_id': str(self.other_sequence.location)}
+            else:
+                raise Exception('invalid JWT')
+
+        _mock_token_unpack.side_effect = _mock_token_unpack_fn
+
+        # Problem and Vertical response should be gated on access token
+        for block in [self.problem_block, self.vertical_block]:
+            response = self.get_response(
+                usage_key=block.location, url_encoded_params=f'exam_access={exam_access_token}')
+            assert response.status_code == expected_response
+
+        # The Sequence itself should also be gated
+        response = self.get_response(
+            usage_key=self.sequence.location, url_encoded_params=f'exam_access={exam_access_token}')
+        assert response.status_code == expected_response
+
+
+class TestBasePublicVideoXBlock(ModuleStoreTestCase):
     """
-    Tests for the courseware.render_public_video_xblock endpoint.
+    Tests for public video xblock.
     """
-    def setup_course(self):
+    def setup_course(self, enable_waffle=True):
         """
         Helper method to create the course.
         """
+        # pylint:disable=attribute-defined-outside-init
+
         with self.store.default_store(self.store.default_modulestore.get_modulestore_type()):
-            course = CourseFactory.create(**{'start': datetime.now() - timedelta(days=1)})
-            chapter = BlockFactory.create(parent=course, category='chapter')
+            self.course = CourseFactory.create(**{'start': datetime.now() - timedelta(days=1)})
+            chapter = BlockFactory.create(parent=self.course, category='chapter')
             vertical_block = BlockFactory.create(
                 parent_location=chapter.location,
                 category='vertical',
@@ -2958,45 +3039,63 @@ class TestRenderPublicVideoXBlock(ModuleStoreTestCase):
                 category='video',
                 display_name='Video with private access'
             )
-        CourseOverview.load_from_module_store(course.id)
+        WaffleFlagCourseOverrideModel.objects.create(
+            waffle_flag=PUBLIC_VIDEO_SHARE.name,
+            course_id=self.course.id,
+            enabled=enable_waffle,
+        )
+        CourseOverview.load_from_module_store(self.course.id)
 
-    def get_response(self, usage_key):
+
+@ddt.ddt
+class TestRenderPublicVideoXBlock(TestBasePublicVideoXBlock):
+    """
+    Tests for the courseware.render_public_video_xblock endpoint.
+    """
+    def get_response(self, usage_key, is_embed):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
-        url = reverse('render_public_video_xblock', kwargs={'usage_key_string': str(usage_key)})
+        view_name = 'render_public_video_xblock'
+        if is_embed:
+            view_name += '_embed'
+        url = reverse(view_name, kwargs={'usage_key_string': str(usage_key)})
         return self.client.get(url)
 
-    def test_render_xblock_with_invalid_usage_key(self):
+    @ddt.data(True, False)
+    def test_render_xblock_with_invalid_usage_key(self, is_embed):
         """
         Verify that endpoint returns expected response with invalid usage key
         """
-        response = self.get_response(usage_key='some_invalid_usage_key')
+        response = self.get_response(usage_key='some_invalid_usage_key', is_embed=is_embed)
         self.assertContains(response, 'Page not found', status_code=404)
 
-    def test_render_xblock_with_non_video_usage_key(self):
+    @ddt.data(True, False)
+    def test_render_xblock_with_non_video_usage_key(self, is_embed):
         """
         Verify that endpoint returns expected response if usage key block type is not `video`
         """
         self.setup_course()
-        response = self.get_response(usage_key=self.html_block.location)
+        response = self.get_response(usage_key=self.html_block.location, is_embed=is_embed)
         self.assertContains(response, 'Page not found', status_code=404)
 
-    def test_render_xblock_with_video_usage_key_with_public_access(self):
-        """
-        Verify that endpoint returns expected response if usage key block type is `video` and video has public access
-        """
-        self.setup_course()
-        response = self.get_response(usage_key=self.video_block_public.location)
-        self.assertContains(response, 'Play video', status_code=200)
+    @ddt.unpack
+    @ddt.data(
+        (True, True, 200),
+        (True, False, 404),
+        (False, True, 404),
+        (False, False, 404),
+    )
+    def test_access(self, is_waffle_enabled, is_public_video, expected_status_code):
+        """ Tests for access control """
+        self.setup_course(enable_waffle=is_waffle_enabled)
+        target_video = self.video_block_public if is_public_video else self.video_block_not_public
 
-    def test_render_xblock_with_video_usage_key_with_non_public_access(self):
-        """
-        Verify that endpoint returns expected response if usage key block type is `video` and video has private access
-        """
-        self.setup_course()
-        response = self.get_response(usage_key=self.video_block_not_public.location)
-        self.assertContains(response, 'Page not found', status_code=404)
+        response = self.get_response(usage_key=target_video.location, is_embed=False)
+        embed_response = self.get_response(usage_key=target_video.location, is_embed=True)
+
+        self.assertEqual(expected_status_code, response.status_code)
+        self.assertEqual(expected_status_code, embed_response.status_code)
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):  # lint-amnesty, pylint: disable=test-inherits-tests
@@ -3362,3 +3461,189 @@ class TestCourseWideResources(ModuleStoreTestCase):
         else:
             assert js_match == [None, None, None]
             assert css_match == [None, None, None]
+
+
+@ddt.ddt
+class TestBasePublicVideoXBlockView(TestBasePublicVideoXBlock):
+    """Test Base Public Video XBlock View tests"""
+    base_block = BasePublicVideoXBlockView(request=MagicMock())
+
+    @ddt.data(
+        (True, True),
+        (True, False),
+        (False, True),
+        (False, False),
+    )
+    @ddt.unpack
+    @patch('lms.djangoapps.courseware.views.views.get_block_by_usage_id')
+    def test_get_course_and_video_block(self, is_waffle_enabled, is_public_video, mock_get_block_by_usage_id):
+        """
+        Test that get_course_and_video_block returns course and video block.
+        """
+
+        self.setup_course(enable_waffle=is_waffle_enabled)
+        target_video = self.video_block_public if is_public_video else self.video_block_not_public
+
+        mock_get_block_by_usage_id.return_value = (target_video, None)
+
+        # get 404 unless waffle is enabled and video is public
+        if is_public_video and is_waffle_enabled:
+            course, video_block = self.base_block.get_course_and_video_block(str(target_video.location))
+            assert course.id == self.course.id
+            assert video_block.location == target_video.location
+        else:
+            with self.assertRaisesRegex(Http404, "Video not found"):
+                course, video_block = self.base_block.get_course_and_video_block(str(target_video.location))
+
+
+@ddt.ddt
+class TestPublicVideoXBlockView(TestBasePublicVideoXBlock):
+    """Test Public Video XBlock View"""
+    request = RequestFactory().get('/?utm_source=edx.org&utm_medium=referral&utm_campaign=video')
+    base_block = PublicVideoXBlockView(request=request)
+    default_utm_params = {'utm_source': 'edx.org', 'utm_medium': 'referral', 'utm_campaign': 'video'}
+
+    @contextmanager
+    def mock_get_learn_more_url(self, **kwargs):
+        """ Helper for mocking get_learn_more_button_url """
+        with patch.object(
+            PublicVideoXBlockView,
+            'get_learn_more_button_url',
+            **kwargs
+        ) as mock_get_url:
+            yield mock_get_url
+
+    @contextmanager
+    def mock_get_catalog_course_data(self, **kwargs):
+        """ Helper for mocking get_catalog_course_data """
+        with patch.object(
+            PublicVideoXBlockView,
+            'get_catalog_course_data',
+            **kwargs
+        ) as mock_get_data:
+            yield mock_get_data
+
+    def test_get_template_and_context(self):
+        """
+        Get template and context.
+        """
+        self.setup_course(enable_waffle=True)
+        fragment = MagicMock()
+        with patch.object(self.video_block_public, "render", return_value=fragment):
+            with self.mock_get_learn_more_url():
+                with self.mock_get_catalog_course_data():
+                    template, context = self.base_block.get_template_and_context(self.course, self.video_block_public)
+        assert template == 'public_video.html'
+        assert context['fragment'] == fragment
+        assert context['course'] == self.course
+
+    @ddt.unpack
+    @ddt.data(
+        (None, None, {}),
+        ('uuid', None, {}),
+        ('uuid', {}, {'org_logo': None, 'marketing_url': None}),
+    )
+    def test_get_catalog_course_data(self, mock_get_uuid, mock_get_data, expected_response):
+        self.setup_course()
+        with patch('lms.djangoapps.courseware.views.views.get_course_uuid_for_course', return_value=mock_get_uuid):
+            with patch('lms.djangoapps.courseware.views.views.get_course_data', return_value=mock_get_data):
+                assert self.base_block.get_catalog_course_data(self.course) == expected_response
+
+    @ddt.unpack
+    @ddt.data(
+        ({}, None),
+        ({'marketing_url': 'www.somesite.com/this'}, 'www.somesite.com/this'),
+        ({'marketing_url': 'www.somesite.com/this?utm_source=jansen'}, 'www.somesite.com/this'),
+    )
+    def test_get_catalog_course_marketing_url(self, input_data, expected_url):
+        url = self.base_block._get_catalog_course_marketing_url(input_data)
+        assert url == expected_url
+
+    @ddt.unpack
+    @ddt.data(
+        ({}, None),
+        ({'owners': []}, None),
+        ({'owners': [{}]}, None),
+        ({'owners': [{'logo_image_url': 'somesite.org/image'}]}, 'somesite.org/image'),
+        ({'owners': [{'logo_image_url': 'firsturl'}, {'logo_image_url': 'secondurl'}]}, 'firsturl'),
+    )
+    def test_get_catalog_course_owner_logo(self, input_data, expected_url):
+        url = self.base_block._get_catalog_course_owner_logo(input_data)
+        assert url == expected_url
+
+    @ddt.data("poster", None)
+    def test_get_social_sharing_metadata(self, poster_url):
+        """
+        Test that get_social_sharing_metadata returns correct metadata.
+        """
+        self.setup_course(enable_waffle=True)
+        # can't mock something that doesn't exist
+        self.video_block_public._post = MagicMock(return_value=poster_url)
+
+        metadata = self.base_block.get_social_sharing_metadata(self.course, self.video_block_public)
+        assert metadata["video_title"] == self.video_block_public.display_name_with_default
+        assert metadata["video_description"] == f"Watch a video from the course {self.course.display_name} on edX.org"
+        assert metadata["video_thumbnail"] == "" if poster_url is None else poster_url
+
+    def test_get_utm_params(self):
+        """
+        Test that get_utm_params returns correct utm params.
+        """
+        utm_params = self.base_block.get_utm_params()
+        assert utm_params == {
+            'utm_source': 'edx.org',
+            'utm_medium': 'referral',
+            'utm_campaign': 'video',
+        }
+
+    def test_build_url(self):
+        """
+        Test that build_url returns correct url.
+        """
+        base_url = 'http://test.server'
+        params = {
+            'param1': 'value1',
+            'param2': 'value2',
+        }
+        utm_params = {
+            "utm_source": "edx.org",
+        }
+        url = self.base_block.build_url(base_url, params, utm_params)
+        assert url == 'http://test.server?param1=value1&param2=value2&utm_source=edx.org'
+
+    def assert_url_with_params(self, url, base_url, params):
+        if params:
+            assert url == base_url + '?' + urlencode(params)
+        else:
+            assert url == base_url
+
+    @ddt.data({}, {'marketing_url': 'some_url'})
+    def test_get_learn_more_button_url(self, catalog_course_info):
+        """
+        If we have a marketing url from the catalog service, use that. Otherwise
+        use the courseware about_course
+        """
+        self.setup_course()
+        url = self.base_block.get_learn_more_button_url(self.course, catalog_course_info, self.default_utm_params)
+        if 'marketing_url' in catalog_course_info:
+            expected_url = catalog_course_info['marketing_url']
+        else:
+            expected_url = reverse('about_course', kwargs={'course_id': str(self.course.id)})
+        self.assert_url_with_params(url, expected_url, self.default_utm_params)
+
+
+class TestPublicVideoXBlockEmbedView(TestBasePublicVideoXBlock):
+    """Test Public Video XBlock Embed View"""
+    base_block = PublicVideoXBlockEmbedView()
+
+    def test_get_template_and_context(self):
+        """
+        Get template and context.
+        """
+        self.setup_course(enable_waffle=True)
+        fragment = MagicMock()
+        with patch.object(self.video_block_public, "render", return_value=fragment):
+            template, context = self.base_block.get_template_and_context(self.course, self.video_block_public)
+            assert template == 'public_video_share_embed.html'
+            assert context['fragment'] == fragment
+            assert context['course'] == self.course

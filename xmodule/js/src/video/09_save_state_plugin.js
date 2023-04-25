@@ -16,7 +16,7 @@
             }
 
             _.bindAll(this, 'onSpeedChange', 'onAutoAdvanceChange', 'saveStateHandler', 'bindUnloadHandler', 'onUnload',
-            'onYoutubeAvailability', 'onLanguageChange', 'destroy');
+                'onYoutubeAvailability', 'onLanguageChange', 'destroy');
             this.state = state;
             this.options = _.extend({events: []}, options);
             this.state.videoSaveStatePlugin = this;

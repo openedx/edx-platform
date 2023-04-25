@@ -2,8 +2,6 @@
 Tests for the course modes Django admin interface.
 """
 
-
-import unittest
 from datetime import datetime, timedelta
 
 import ddt
@@ -20,6 +18,7 @@ from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 # Once the course admin tool is deployed, we can remove this dependency.
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.util.date_utils import get_time_display
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
@@ -29,7 +28,7 @@ from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, p
 # We can only test this in the LMS because the course modes admin relies
 # on verify student, which is not an installed app in Studio, so the verification
 # deadline table will not be created.
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class AdminCourseModePageTest(ModuleStoreTestCase):
     """
     Test the course modes Django admin interface.
@@ -78,7 +77,7 @@ class AdminCourseModePageTest(ModuleStoreTestCase):
         assert course_mode.expiration_datetime.replace(tzinfo=None) == expiration.replace(tzinfo=None)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @ddt.ddt
 class AdminCourseModeFormTest(ModuleStoreTestCase):
     """
@@ -164,6 +163,14 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
             'For other modes, please set the enrollment end date in Studio.'
         ))
 
+    def test_validate_expiration_datetime_is_explicit_only_with_upgrade_deadline(self):
+        # Only allow the expiration_datetime_is_explicit to be True if the upgrade_deadline is
+        # defined with a date, otherwise cause a validation error.
+        form = self._admin_form("verified", expiration_datetime_is_explicit=True)
+        self._assert_form_has_error(form, (
+            "An upgrade deadline must be specified when setting Lock upgrade deadline date to True."
+        ))
+
     @ddt.data("honor", "no-id-professional", "credit")
     def test_validate_verification_deadline_only_for_verified(self, course_mode):
         # Only the verified mode should have a verification deadline set.
@@ -193,7 +200,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
 
         return CourseModeForm(instance=course_mode)
 
-    def _admin_form(self, mode, upgrade_deadline=None):
+    def _admin_form(self, mode, upgrade_deadline=None, expiration_datetime_is_explicit=False):
         """Load the course mode admin form. """
         course_mode = CourseModeFactory.create(
             course_id=self.course.id,
@@ -204,6 +211,7 @@ class AdminCourseModeFormTest(ModuleStoreTestCase):
             "mode_slug": mode,
             "mode_display_name": mode,
             "_expiration_datetime": upgrade_deadline,
+            "expiration_datetime_is_explicit": expiration_datetime_is_explicit,
             "currency": "usd",
             "min_price": 10,
         }, instance=course_mode)

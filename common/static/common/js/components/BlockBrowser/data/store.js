@@ -4,9 +4,9 @@ import thunkMiddleware from 'redux-thunk';
 import rootReducer from './reducers';
 
 const configureStore = initialState => createStore(
-  rootReducer,
-  initialState,
-  applyMiddleware(thunkMiddleware),
+    rootReducer,
+    initialState,
+    applyMiddleware(thunkMiddleware),
 );
 
 

@@ -10,10 +10,11 @@ import requests
 from django.contrib.sites.models import Site
 from django.http import Http404
 from django.utils.functional import cached_property
+from django.utils.datastructures import MultiValueDictKeyError
 from django_countries import countries
 from onelogin.saml2.settings import OneLogin_Saml2_Settings
 from social_core.backends.saml import OID_EDU_PERSON_ENTITLEMENT, SAMLAuth, SAMLIdentityProvider
-from social_core.exceptions import AuthForbidden
+from social_core.exceptions import AuthForbidden, AuthMissingParameter
 
 from openedx.core.djangoapps.theming.helpers import get_current_request
 from common.djangoapps.third_party_auth.exceptions import IncorrectConfigurationException
@@ -84,21 +85,32 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         else:
             return super().generate_saml_config()
 
+    def auth_complete(self, *args, **kwargs):
+        """
+        Handle exceptions that happen during SAML authentication
+        """
+        try:
+            return super().auth_complete(*args, **kwargs)
+        # We are seeing errors of MultiValueDictKeyError looking for the parameter 'RelayState'.
+        # We would like to have a more specific error to handle for observability purposes.
+        except MultiValueDictKeyError as e:
+            raise AuthMissingParameter(self.name, e.args[0]) from e
+
     def get_user_id(self, details, response):
         """
         Calling the parent function and handling the exception properly.
         """
         try:
             return super().get_user_id(details, response)
-        except KeyError as ex:
+        except (KeyError, IndexError) as ex:
             log.warning(
                 '[THIRD_PARTY_AUTH] Error in SAML authentication flow. '
                 'Provider: {idp_name}, Message: {message}'.format(
-                    message=ex.message,  # lint-amnesty, pylint: disable=no-member
+                    message=str(ex),
                     idp_name=response.get('idp_name')
                 )
             )
-            raise IncorrectConfigurationException(self)  # lint-amnesty, pylint: disable=raise-missing-from
+            raise IncorrectConfigurationException(self) from ex
 
     def generate_metadata_xml(self, idp_name=None):  # pylint: disable=arguments-differ
         """

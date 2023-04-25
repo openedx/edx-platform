@@ -399,7 +399,7 @@ class ProblemBlock(
 
     def handle_ajax(self, dispatch, data):
         """
-        This is called by courseware.module_render, to handle an AJAX call.
+        This is called by courseware.block_render, to handle an AJAX call.
 
         `data` is request.POST.
 
@@ -1286,7 +1286,7 @@ class ProblemBlock(
                 id=self.location.html_id(), ajax_url=self.ajax_url, html=HTML(html)
             )
 
-        # Now do all the substitutions which the LMS module_render normally does, but
+        # Now do all the substitutions which the LMS block_render normally does, but
         # we need to do here explicitly since we can get called for our HTML via AJAX
         html = self.runtime.service(self, "replace_urls").replace_urls(html)
 

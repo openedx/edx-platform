@@ -42,17 +42,8 @@ jobs:
         run: sudo chown runner:runner -R .*
 
       - name: checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      # This gives Mongo several chances to start. We started getting flakiness
-      # around 2022-02-15 wherein the start command would sometimes exit with:
-      #
-      #   * Starting database mongodb
-      #     ...fail!
-      #
-      # ...not having produced any logs or other output. We couldn't figure out
-      # what was causing Mongo to fail, so this is a (temporary?) hack to get
-      # PRs unblocked.
       - name: start mongod server for tests
         run: |
           sudo mkdir -p /data/db
@@ -73,6 +64,16 @@ jobs:
 
       - name: Setup and run tests
         uses: ./.github/actions/unit-tests
+
+      - name: Renaming coverage data file
+        run: |
+          mv reports/.coverage reports/${{ matrix.shard_name }}.coverage
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: reports/${{matrix.shard_name}}.coverage
 
   # This job aggregates test results. It's the required check for branch protection.
   # https://github.com/marketplace/actions/alls-green#why
@@ -96,7 +97,7 @@ jobs:
     steps:
       - name: sync directory owner
         run: sudo chown runner:runner -R .*
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: collect pytest warnings files
         uses: actions/download-artifact@v2
         with:
@@ -112,8 +113,41 @@ jobs:
 
       - name: save warning report
         if: success()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: pytest-warning-report-html
           path: |
             reports/pytest_warnings/warning_report_all.html
+
+  # Combine and upload coverage reports.
+  coverage:
+    needs: run-tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.8 ]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage
+          path: reports
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements/edx/coverage.txt
+
+      - name: Run coverage
+        run: |
+          coverage combine reports/*
+          coverage report
+          coverage xml
+      - uses: codecov/codecov-action@v3

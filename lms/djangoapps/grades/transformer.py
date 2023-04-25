@@ -144,15 +144,15 @@ class GradesTransformer(BlockStructureTransformer):
                 cls._collect_max_score(block_structure, block)
 
     @classmethod
-    def _collect_max_score(cls, block_structure, module):
+    def _collect_max_score(cls, block_structure, block):
         """
-        Collect the `max_score` from the given module, storing it as a
+        Collect the `max_score` from the given block, storing it as a
         `transformer_block_field` associated with the `GradesTransformer`.
         """
-        max_score = module.max_score()
-        block_structure.set_transformer_block_field(module.location, cls, 'max_score', max_score)
+        max_score = block.max_score()
+        block_structure.set_transformer_block_field(block.location, cls, 'max_score', max_score)
         if max_score is None:
-            log.warning(f"GradesTransformer: max_score is None for {module.location}")
+            log.warning(f"GradesTransformer: max_score is None for {block.location}")
 
     @classmethod
     def _collect_grading_policy_hash(cls, block_structure):
@@ -168,18 +168,3 @@ class GradesTransformer(BlockStructureTransformer):
             "grading_policy_hash",
             cls.grading_policy_hash(course_block),
         )
-
-    @staticmethod
-    def _iter_scorable_xmodules(block_structure):
-        """
-        Loop through all the blocks locators in the block structure, and
-        retrieve the module (XModule or XBlock) associated with that locator.
-
-        For implementation reasons, we need to pull the max_score from the
-        XModule, even though the data is not user specific.  Here we bind the
-        data to a SystemUser.
-        """
-        for block_locator in block_structure.post_order_traversal():
-            block = block_structure.get_xblock(block_locator)
-            if getattr(block, 'has_score', False):
-                yield block

@@ -50,7 +50,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_studio_url
-from lms.djangoapps.courseware.module_render import get_module_by_usage_id
+from lms.djangoapps.courseware.block_render import get_block_by_usage_id
 from lms.djangoapps.discussion.django_comment_client.utils import has_forum_access
 from lms.djangoapps.grades.api import is_writable_gradebook_enabled
 from lms.djangoapps.instructor.constants import INSTRUCTOR_DASHBOARD_PLUGIN_VIEW_NAME
@@ -662,11 +662,11 @@ def _section_send_email(course, access):
     with patch.object(course.runtime, 'applicable_aside_types', null_applicable_aside_types):
         # This HtmlBlock is only being used to generate a nice text editor.
         html_block = HtmlBlock(
-            course.system,
+            course.runtime,
             DictFieldData({'data': ''}),
             ScopeIds(None, None, None, course_key.make_usage_key('html', 'fake'))
         )
-        fragment = course.system.render(html_block, 'studio_view')
+        fragment = course.runtime.render(html_block, 'studio_view')
     fragment = wrap_xblock(
         'LmsRuntime', html_block, 'studio_view', fragment, None,
         extra_data={"course-id": str(course_key)},
@@ -757,7 +757,7 @@ def _section_open_response_assessment(request, course, openassessment_blocks, ac
         })
 
     openassessment_block = openassessment_blocks[0]
-    block, __ = get_module_by_usage_id(
+    block, __ = get_block_by_usage_id(
         request, str(course_key), str(openassessment_block.location),
         disable_staff_debug_info=True, course=course
     )

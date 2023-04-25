@@ -1,0 +1,129 @@
+## coding=utf-8
+
+<%page expression_filter="h"/>
+<%! main_css = "style-main-v1" %>
+
+<%namespace name='static' file='static_content.html'/>
+<%!
+import six
+from lms.djangoapps.branding import api as branding_api
+from django.utils.translation import gettext as _
+from django.utils.translation import get_language_bidi
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.release import RELEASE_LINE
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%def name="course_name()">
+ <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
+</%def>
+
+<!DOCTYPE html>
+<!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if !IE]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
+<head dir="${static.dir_rtl()}">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <%def name="pagetitle()" />
+  <title>${static.get_page_title_breadcrumbs(course_name())}</title>
+
+  <%
+    jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+    ie11_fix_path = "js/ie11_find_array.js"
+  %>
+  <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
+  <script type="text/javascript" src="${static.url(ie11_fix_path)}"></script>
+  <% favicon_url = branding_api.get_favicon_url() %>
+  <link rel="icon" type="image/x-icon" href="${favicon_url}"/>
+
+  <%static:css group='style-vendor'/>
+  % if '/' in self.attr.main_css:
+    % if get_language_bidi():
+      <%
+      rtl_css_file = self.attr.main_css.replace('.css', '-rtl.css')
+      %>
+      <link rel="stylesheet" href="${six.text_type(static.url(rtl_css_file))}" type="text/css" media="all" />
+    % else:
+      <link rel="stylesheet" href="${static.url(self.attr.main_css)}" type="text/css" media="all" />
+    % endif
+  % else:
+    <%static:css group='${self.attr.main_css}'/>
+  % endif
+
+  <%static:js group='main_vendor'/>
+  <%static:js group='application'/>
+
+  <%static:webpack entry="commons"/>
+
+  <%static:css group='style-course-vendor'/>
+  <%static:css group='style-course'/>
+    
+  <%include file="widgets/segment-io.html" />
+
+  <meta name="path_prefix" content="${EDX_ROOT_URL}">
+  <% google_site_verification_id = configuration_helpers.get_value('GOOGLE_SITE_VERIFICATION_ID', settings.GOOGLE_SITE_VERIFICATION_ID) %>
+  % if google_site_verification_id:
+    <meta name="google-site-verification" content="${google_site_verification_id}" />
+  % endif
+
+  <meta name="openedx-release-line" content="${RELEASE_LINE}" />
+
+<% ga_acct = static.get_value("GOOGLE_ANALYTICS_ACCOUNT", settings.GOOGLE_ANALYTICS_ACCOUNT) %>
+% if ga_acct:
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', '${ga_acct | n, js_escaped_string}']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+% endif
+
+<% ga_4_id = static.get_value("GOOGLE_ANALYTICS_4_ID", settings.GOOGLE_ANALYTICS_4_ID) %>
+% if ga_4_id:
+  <script async src="https://www.googletagmanager.com/gtag/js?id=${ga_4_id}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '${ga_4_id | n, js_escaped_string}');
+  </script>
+% endif
+
+<% branch_key = static.get_value("BRANCH_IO_KEY", settings.BRANCH_IO_KEY) %>
+% if branch_key and not is_from_mobile_app:
+    <script type="text/javascript">
+        (function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setBranchViewData setIdentity track validateCode".split(" "), 0);
+        branch.init('${branch_key | n, js_escaped_string}');
+    </script>
+% endif
+
+<style type="text/css">
+#course-content {
+  margin: 0;
+}
+
+.xmodule_display.xmodule_VideoBlock .video {
+  padding: 0;
+  margin: 0;
+}
+</style>
+</head>
+
+<body class="${static.dir_rtl()} view-in-course view-courseware courseware ${course.css_class or ''} lang_${LANGUAGE_CODE}">
+  <section class="course-content" id="course-content">
+    ${HTML(fragment.body_html())}
+  </section>
+  <script type="text/javascript" src="${static.url('common/js/vendor/jquery.scrollTo.js')}" async></script>
+  <%static:js group='courseware'/>
+  ${HTML(fragment.foot_html())}
+</body>
+</html>

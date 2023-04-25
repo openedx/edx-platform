@@ -245,6 +245,15 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 ############## Exams CONFIGURATION SETTINGS ####################
 EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
 
+TOKEN_SIGNING.update({
+    'JWT_PUBLIC_SIGNING_JWK_SET': (
+        '{"keys": [{"kid": "localdev_exam_token_key", "e": "AQAB", "kty": "RSA", "n": "o5cn3ljSRi6FaDEKTn0PS-oL9EFyv1pI'
+        '7dRgffQLD1qf5D6sprmYfWWokSsrWig8u2y0HChSygR6Jn5KXBqQn6FpM0dDJLnWQDRXHLl3Ey1iPYgDSmOIsIGrV9ZyNCQwk03wAgWbfdBTig'
+        '3QSDYD-sTNOs3pc4UD_PqAvU2nz_1SS2ZiOwOn5F6gulE1L0iE3KEUEvOIagfHNVhz0oxa_VRZILkzV-zr6R_TW1m97h4H8jXl_VJyQGyhMGGy'
+        'puDrQ9_vaY_RLEulLCyY0INglHWQ7pckxBtI5q55-Vio2wgewe2_qYcGsnBGaDNbySAsvYcWRrqDiFyzrJYivodqTQ"}]}'
+    )
+})
+
 ############################### BLOCKSTORE #####################################
 BLOCKSTORE_API_URL = "http://edx.devstack.blockstore:18250/api/v1/"
 
@@ -311,19 +320,23 @@ JWT_AUTH.update({
     }],
     'JWT_SECRET_KEY': 'lms-secret',
     'JWT_SIGNING_ALGORITHM': 'RS512',
-    'JWT_PRIVATE_SIGNING_JWK': (
-        '{"e": "AQAB", "d": "RQ6k4NpRU3RB2lhwCbQ452W86bMMQiPsa7EJiFJUg-qBJthN0FMNQVbArtrCQ0xA1BdnQHThFiUnHcXfsTZUwmwvTu'
-        'iqEGR_MI6aI7h5D8vRj_5x-pxOz-0MCB8TY8dcuK9FkljmgtYvV9flVzCk_uUb3ZJIBVyIW8En7n7nV7JXpS9zey1yVLld2AbRG6W5--Pgqr9J'
-        'CI5-bLdc2otCLuen2sKyuUDHO5NIj30qGTaKUL-OW_PgVmxrwKwccF3w5uGNEvMQ-IcicosCOvzBwdIm1uhdm9rnHU1-fXz8VLRHNhGVv7z6mo'
-        'ghjNI0_u4smhUkEsYeshPv7RQEWTdkOQ", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu48BUI5VcVtUWIPqzRK_LDSlZYh'
-        '9D0YFL0ZTxIrlb6Tn3Xz7pYvpIAeYuQv3_H5p8tbz7Fb8r63c1828wXPITVTv8f7oxx5W3lFFgpFAyYMmROC4Ee9qG5T38LFe8_oAuFCEntimW'
-        'xN9F3P-FJQy43TL7wG54WodgiM0EgzkeLr5K6cDnyckWjTuZbWI-4ffcTgTZsL_Kq1owa_J2ngEfxMCObnzGy5ZLcTUomo4rZLjghVpq6KZxfS'
-        '6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw", "q": "7KWj7l-ZkfCElyfvwsl7kiosvi-ppOO7Imsv90cribf88Dex'
-        'cO67xdMPesjM9Nh5X209IT-TzbsOtVTXSQyEsy42NY72WETnd1_nAGLAmfxGdo8VV4ZDnRsA8N8POnWjRDwYlVBUEEeuT_MtMWzwIKU94bzkWV'
-        'nHCY5vbhBYLeM", "p": "wPkfnjavNV1Hqb5Qqj2crBS9HQS6GDQIZ7WF9hlBb2ofDNe2K2dunddFqCOdvLXr7ydRcK51ZwSeHjcjgD1aJkHA'
-        '9i1zqyboxgd0uAbxVDo6ohnlVqYLtap2tXXcavKm4C9MTpob_rk6FBfEuq4uSsuxFvCER4yG3CYBBa4gZVU", "kid": "devstack_key", "'
-        'kty": "RSA"}'
-    ),
+    'JWT_PRIVATE_SIGNING_JWK': """
+        {
+            "kid": "devstack_key",
+            "kty": "RSA",
+            "key_ops": [
+                "sign"
+            ],
+            "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu48BUI5VcVtUWIPqzRK_LDSlZYh9D0YFL0ZTxIrlb6Tn3Xz7pYvpIAeYuQv3_H5p8tbz7Fb8r63c1828wXPITVTv8f7oxx5W3lFFgpFAyYMmROC4Ee9qG5T38LFe8_oAuFCEntimWxN9F3P-FJQy43TL7wG54WodgiM0EgzkeLr5K6cDnyckWjTuZbWI-4ffcTgTZsL_Kq1owa_J2ngEfxMCObnzGy5ZLcTUomo4rZLjghVpq6KZxfS6I1Vz79ZsMVUWEdXOYePCKKsrQG20ogQEkmTf9FT_SouC6jPcHLXw",
+            "e": "AQAB",
+            "d": "RQ6k4NpRU3RB2lhwCbQ452W86bMMQiPsa7EJiFJUg-qBJthN0FMNQVbArtrCQ0xA1BdnQHThFiUnHcXfsTZUwmwvTuiqEGR_MI6aI7h5D8vRj_5x-pxOz-0MCB8TY8dcuK9FkljmgtYvV9flVzCk_uUb3ZJIBVyIW8En7n7nV7JXpS9zey1yVLld2AbRG6W5--Pgqr9JCI5-bLdc2otCLuen2sKyuUDHO5NIj30qGTaKUL-OW_PgVmxrwKwccF3w5uGNEvMQ-IcicosCOvzBwdIm1uhdm9rnHU1-fXz8VLRHNhGVv7z6moghjNI0_u4smhUkEsYeshPv7RQEWTdkOQ",
+            "p": "7KWj7l-ZkfCElyfvwsl7kiosvi-ppOO7Imsv90cribf88DexcO67xdMPesjM9Nh5X209IT-TzbsOtVTXSQyEsy42NY72WETnd1_nAGLAmfxGdo8VV4ZDnRsA8N8POnWjRDwYlVBUEEeuT_MtMWzwIKU94bzkWVnHCY5vbhBYLeM",
+            "q": "wPkfnjavNV1Hqb5Qqj2crBS9HQS6GDQIZ7WF9hlBb2ofDNe2K2dunddFqCOdvLXr7ydRcK51ZwSeHjcjgD1aJkHA9i1zqyboxgd0uAbxVDo6ohnlVqYLtap2tXXcavKm4C9MTpob_rk6FBfEuq4uSsuxFvCER4yG3CYBBa4gZVU",
+            "dp": "MO9Ppss-Bl-mC1vGyJDBbMgr2GgivGYbHFLt6ERfTGsvcr0RhDjZu16ZpNpBB6B7-K-uJGHxPmmf8P9KRWDBUAwOSaT2a-pTsuux6PKCwVTZfUq5LxAkiyg6WZTGoWASEtoae0XRHEy2TvIKNl5AiX-h_DwDPDbEYcWCZVAb6-E",
+            "dq": "m03j7GkGSWRxMGNCeEBtvvBR4vDS9Her7AtjbNSWnRxDMQrKSdRMaiu-m7tOT3n6D9cM7Cr7wZUtzBOENskprHBu47FgzfXakMWfYhv0TV0voxZERKAN_H7cWt4oLsprEzH9r6THsxFPdKxMYBGeoAOe2l9nlk26m6LaX7_rwqE",
+            "qi": "jnJ0nfARyAcHsezENNrXKnDM-LrMJWMHPh_70ZM_pF5iRMOLojHkTVsUIzYi6Uj2ohX9Jz1zsV207kCuPqQXURbhlt1xEaktwCmySeWU4qkMTptWp4ya2jEwGn8EKJ1iEc0GhDkRyLrgm4ol-sq9DMaKEkhTGy4Y3-8mMCBVqeQ"
+        }
+""",
     'JWT_PUBLIC_SIGNING_JWK_SET': (
         '{"keys": [{"kid": "devstack_key", "e": "AQAB", "kty": "RSA", "n": "smKFSYowG6nNUAdeqH1jQQnH1PmIHphzBmwJ5vRf1vu'
         '48BUI5VcVtUWIPqzRK_LDSlZYh9D0YFL0ZTxIrlb6Tn3Xz7pYvpIAeYuQv3_H5p8tbz7Fb8r63c1828wXPITVTv8f7oxx5W3lFFgpFAyYMmROC'
@@ -369,7 +382,6 @@ ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
-LEARNER_RECORD_MICROFRONTEND_URL = 'http://localhost:1990'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
@@ -482,6 +494,19 @@ WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
 #################### Network configuration ####################
 # Devstack is directly exposed to the caller
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
+
+#################### Event bus backend ########################
+EVENT_BUS_PRODUCER = 'edx_event_bus_kafka.create_producer'
+EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
+EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
+EVENT_BUS_TOPIC_PREFIX = 'dev'
+
+######################## Subscriptions API SETTINGS ########################
+SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"
+SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
+
+SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
+SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe"
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

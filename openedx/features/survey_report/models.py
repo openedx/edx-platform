@@ -2,6 +2,8 @@
 Survey Report models.
 """
 
+import uuid
+
 from django.db import models
 from jsonfield import JSONField
 
@@ -58,3 +60,39 @@ class SurveyReport(models.Model):
     class Meta:
         ordering = ["-created_at"]
         get_latest_by = 'created_at'
+
+
+class SurveyReportUpload(models.Model):
+    """
+    This model stores the result of the POST request made to an external service after generating a survey report.
+
+    .. no_pii:
+
+    fields:
+    - sent_at: Date when the report was sent.
+    - report: The report that was sent.
+    - status: Request status code.
+    - request_details: Information about the send request.
+    """
+    sent_at = models.DateTimeField(auto_now=True, help_text="Date when the report was sent to external api.")
+    report = models.ForeignKey(SurveyReport, on_delete=models.CASCADE, help_text="The report that was sent.")
+    status_code = models.IntegerField(help_text="Request status code.")
+    request_details = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Information about the send request."
+    )
+
+    def is_uploaded(self) -> bool:
+        return 200 <= self.status_code < 300
+
+
+class SurveyReportAnonymousSiteID(models.Model):
+    """
+    This model is just to save the identification which will be send to the external API when
+    the settings ANONYMOUS_SURVEY_REPORT is defined.
+
+    .. no_pii:
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

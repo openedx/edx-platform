@@ -1,12 +1,12 @@
 """
 Tests for courseware API
 """
-import unittest
+
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
 from typing import Optional
-
 from unittest import mock
+
 import ddt
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
 from django.conf import settings
@@ -43,6 +43,7 @@ from common.djangoapps.student.models import (
 from common.djangoapps.student.roles import CourseInstructorRole
 from common.djangoapps.student.tests.factories import CourseEnrollmentCelebrationFactory, UserFactory
 from openedx.core.djangoapps.agreements.api import create_integrity_signature
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 User = get_user_model()
@@ -50,7 +51,7 @@ User = get_user_model()
 _NEXT_WEEK = datetime.now() + timedelta(days=7)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class BaseCoursewareTests(SharedModuleStoreTestCase):
     """
     Base class for courseware API tests
@@ -100,7 +101,7 @@ class BaseCoursewareTests(SharedModuleStoreTestCase):
 @ddt.ddt
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES, active=True)
 @override_waffle_flag(COURSEWARE_MICROFRONTEND_PROGRESS_MILESTONES_STREAK_CELEBRATION, active=True)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class CourseApiTestViews(BaseCoursewareTests, MasqueradeMixin):
     """
     Tests for the courseware REST API
