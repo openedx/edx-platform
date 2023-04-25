@@ -33,14 +33,24 @@ class UserClipboardData(NamedTuple):
     source_usage_key: UsageKey
 
 
-def get_user_clipboard(user_id: int) -> UserClipboardData | None:
-    """ Get the detailed status of the user's clipboard. """
+def get_user_clipboard(user_id: int, only_ready: bool = True) -> UserClipboardData | None:
+    """
+    Get the details of the user's clipboard.
+
+    By default, will only return a value if the clipboard is READY to use for
+    pasting etc. Pass only_ready=False to get the clipboard data regardless.
+
+    To get the actual OLX content, use get_staged_content_olx(content.id)
+    """
     try:
         clipboard = _UserClipboard.objects.get(user_id=user_id)
     except _UserClipboard.DoesNotExist:
         # This user does not have any content on their clipboard.
         return None
     content = clipboard.content
+    if only_ready and content.status != StagedContentStatus.READY:
+        # The clipboard content is LOADING, ERROR, or EXPIRED
+        return None
     return UserClipboardData(
         content=StagedContentData(
             id=content.id,
