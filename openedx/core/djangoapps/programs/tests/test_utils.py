@@ -1802,7 +1802,7 @@ class TestGetProgramsSubscriptionData(TestCase):
         assert result == subscription_data
 
 
-@override_settings(SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL='http://subscription_buy_url')
+@override_settings(SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL='http://subscription_buy_url/')
 @ddt.ddt
 class TestBuySubscriptionUrl(TestCase):
     """
@@ -1827,5 +1827,5 @@ class TestBuySubscriptionUrl(TestCase):
         """ Verify the subscription purchase page URL is properly constructed and returned. """
         url = get_buy_subscription_url(program_uuid, skus)
         formatted_skus = urlencode({'sku': skus}, doseq=True)
-        expected_url = f'{settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL}/{program_uuid}/?{formatted_skus}'
+        expected_url = f'{settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL}{program_uuid}/?{formatted_skus}'
         assert url == expected_url
