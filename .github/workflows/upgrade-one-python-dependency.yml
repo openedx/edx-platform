@@ -53,8 +53,10 @@ jobs:
           PR_BRANCH="$GITHUB_ACTOR/upgrade-$PACKAGE-`git rev-parse --short=8 HEAD`"
           echo "PR_BRANCH=$PR_BRANCH" >> "$GITHUB_ENV"
 
-          git config user.name "$BOT_USER_NAME"
-          git config user.email "$BOT_USER_EMAIL"
+          echo "using '$BOT_USER_NAME' and '$BOT_USER_EMAIL'"
+
+          git config --global user.name "$BOT_USER_NAME"
+          git config --global user.email "$BOT_USER_EMAIL"
 
           git checkout -b "$PR_BRANCH"
           git add requirements/
