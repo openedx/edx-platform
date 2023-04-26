@@ -565,18 +565,18 @@ def component_handler(request, usage_key_string, handler, suffix=''):
 
     try:
         if is_xblock_aside(usage_key):
-            # Get the descriptor for the block being wrapped by the aside (not the aside itself)
-            descriptor = modulestore().get_item(usage_key.usage_key)
-            handler_descriptor = get_aside_from_xblock(descriptor, usage_key.aside_type)
-            asides = [handler_descriptor]
+            # Get the block being wrapped by the aside (not the aside itself)
+            block = modulestore().get_item(usage_key.usage_key)
+            handler_block = get_aside_from_xblock(block, usage_key.aside_type)
+            asides = [handler_block]
         else:
-            descriptor = modulestore().get_item(usage_key)
-            handler_descriptor = descriptor
+            block = modulestore().get_item(usage_key)
+            handler_block = block
             asides = []
-        load_services_for_studio(handler_descriptor.runtime, request.user)
-        resp = handler_descriptor.handle(handler, req, suffix)
+        load_services_for_studio(handler_block.runtime, request.user)
+        resp = handler_block.handle(handler, req, suffix)
     except NoSuchHandlerError:
-        log.info("XBlock %s attempted to access missing handler %r", handler_descriptor, handler, exc_info=True)
+        log.info("XBlock %s attempted to access missing handler %r", handler_block, handler, exc_info=True)
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     # unintentional update to handle any side effects of handle call
@@ -585,7 +585,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
     # TNL 101-62 studio write permission is also checked for editing content.
 
     if has_course_author_access(request.user, usage_key.course_key):
-        modulestore().update_item(descriptor, request.user.id, asides=asides)
+        modulestore().update_item(block, request.user.id, asides=asides)
     else:
         #fail quietly if user is not course author.
         log.warning(

@@ -2159,10 +2159,10 @@ class TestComponentHandler(TestCase):
         self.modulestore = patcher.start()
         self.addCleanup(patcher.stop)
 
-        # component_handler calls modulestore.get_item to get the descriptor of the requested xBlock.
+        # component_handler calls modulestore.get_item to get the requested xBlock.
         # Here, we mock the return value of modulestore.get_item so it can be used to mock the handler
-        # of the xBlock descriptor.
-        self.descriptor = self.modulestore.return_value.get_item.return_value
+        # of the xBlock.
+        self.block = self.modulestore.return_value.get_item.return_value
 
         self.usage_key = BlockUsageLocator(
             CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name'
@@ -2173,7 +2173,7 @@ class TestComponentHandler(TestCase):
         self.request.user = self.user
 
     def test_invalid_handler(self):
-        self.descriptor.handle.side_effect = NoSuchHandlerError
+        self.block.handle.side_effect = NoSuchHandlerError
 
         with self.assertRaises(Http404):
             component_handler(self.request, self.usage_key_string, 'invalid_handler')
@@ -2185,7 +2185,7 @@ class TestComponentHandler(TestCase):
             self.assertEqual(request.method, method)
             return Response()
 
-        self.descriptor.handle = check_handler
+        self.block.handle = check_handler
 
         # Have to use the right method to create the request to get the HTTP method that we want
         req_factory_method = getattr(self.request_factory, method.lower())
@@ -2198,7 +2198,7 @@ class TestComponentHandler(TestCase):
         def create_response(handler, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
             return Response(status_code=status_code)
 
-        self.descriptor.handle = create_response
+        self.block.handle = create_response
 
         self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                          status_code)
@@ -2219,7 +2219,7 @@ class TestComponentHandler(TestCase):
         self.request.user = UserFactory()
         mock_handler = 'dummy_handler'
 
-        self.descriptor.handle = create_response
+        self.block.handle = create_response
 
         with patch(
             'cms.djangoapps.contentstore.views.component.is_xblock_aside',
@@ -2253,7 +2253,7 @@ class TestComponentHandler(TestCase):
                 else self.usage_key_string
             )
 
-        self.descriptor.handle = create_response
+        self.block.handle = create_response
 
         with patch(
             'cms.djangoapps.contentstore.views.component.is_xblock_aside',

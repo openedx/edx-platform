@@ -28,22 +28,22 @@ from xmodule.tests import DATA_DIR
 from xmodule.x_module import XModuleMixin
 
 
-def strip_filenames(descriptor):
+def strip_filenames(block):
     """
     Recursively strips 'filename' from all children's definitions.
     """
-    print(f"strip filename from {str(descriptor.location)}")
-    if descriptor._field_data.has(descriptor, 'filename'):  # lint-amnesty, pylint: disable=protected-access
-        descriptor._field_data.delete(descriptor, 'filename')  # lint-amnesty, pylint: disable=protected-access
+    print(f"strip filename from {str(block.location)}")
+    if block._field_data.has(block, 'filename'):  # lint-amnesty, pylint: disable=protected-access
+        block._field_data.delete(block, 'filename')  # lint-amnesty, pylint: disable=protected-access
 
-    if hasattr(descriptor, 'xml_attributes'):
-        if 'filename' in descriptor.xml_attributes:
-            del descriptor.xml_attributes['filename']
+    if hasattr(block, 'xml_attributes'):
+        if 'filename' in block.xml_attributes:
+            del block.xml_attributes['filename']
 
-    for child in descriptor.get_children():
+    for child in block.get_children():
         strip_filenames(child)
 
-    descriptor.save()
+    block.save()
 
 
 class PureXBlock(XBlock):

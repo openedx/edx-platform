@@ -107,7 +107,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
     def _nr_attribute_name(self, function_name, stat_name, block_type=None):
         """
-        Return an attribute name (string) representing the provided descriptors.
+        Return an attribute name (string) representing the provided blocks.
         The return value is directly usable for New Relic custom attributes.
         """
         if block_type is None:

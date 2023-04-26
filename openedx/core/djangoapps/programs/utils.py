@@ -984,9 +984,9 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         """
         module_store = modulestore()
         course_run_key = CourseKey.from_string(course_run['key'])
-        course_descriptor = module_store.get_course(course_run_key)
-        if course_descriptor:
-            course_instructors = getattr(course_descriptor, 'instructor_info', {})
+        course_block = module_store.get_course(course_run_key)
+        if course_block:
+            course_instructors = getattr(course_block, 'instructor_info', {})
 
             # Deduplicate program instructors using instructor name
             curr_instructors_names = [instructor.get('name', '').strip() for instructor in self.instructors]

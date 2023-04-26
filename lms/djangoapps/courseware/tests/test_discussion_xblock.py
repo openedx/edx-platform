@@ -295,7 +295,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         """
         discussion_xblock = get_block_for_descriptor_internal(
             user=self.user,
-            descriptor=self.discussion,
+            block=self.discussion,
             student_data=mock.Mock(name='student_data'),
             course_id=self.course.id,
             track_function=mock.Mock(name='track_function'),
@@ -335,10 +335,10 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         assert orphan_sequential.location.block_type == root.location.block_type
         assert orphan_sequential.location.block_id == root.location.block_id
 
-        # Get xblock bound to a user and a descriptor.
+        # Get xblock bound to a user and a block.
         discussion_xblock = get_block_for_descriptor_internal(
             user=self.user,
-            descriptor=discussion,
+            block=discussion,
             student_data=mock.Mock(name='student_data'),
             course_id=self.course.id,
             track_function=mock.Mock(name='track_function'),
@@ -388,7 +388,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
 
         discussion_xblock = get_block_for_descriptor_internal(
             user=self.user,
-            descriptor=self.discussion,
+            block=self.discussion,
             student_data=mock.Mock(name='student_data'),
             course_id=self.course.id,
             track_function=mock.Mock(name='track_function'),
@@ -438,7 +438,7 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
         for discussion in discussions:
             discussion_xblock = get_block_for_descriptor_internal(
                 user=user,
-                descriptor=discussion,
+                block=discussion,
                 student_data=mock.Mock(name='student_data'),
                 course_id=course.id,
                 track_function=mock.Mock(name='track_function'),

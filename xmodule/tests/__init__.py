@@ -191,7 +191,7 @@ def prepare_block_runtime(
     add_get_block=False,
 ):
     """
-    Sets properties in the runtime of the specified descriptor that is
+    Sets properties in the runtime of the specified block that is
     required for tests.
     """
 
