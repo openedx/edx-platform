@@ -5,6 +5,22 @@ from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imp
 from django.db import models
 from model_utils.models import TimeStampedModel
 
+from opaque_keys.edx.django.models import CourseKeyField
+
+
+# When notification preferences are updated, we need to update the CONFIG_VERSION.
+NOTIFICATION_PREFERENCE_CONFIG = {
+    "discussion": {
+        "new_post": {
+            "web": False,
+            "push": False,
+            "email": False,
+        },
+    },
+}
+# Update this version when NOTIFICATION_PREFERENCE_CONFIG is updated.
+CONFIG_VERSION = 1
+
 
 class NotificationApplication(models.TextChoices):
     """
@@ -62,3 +78,35 @@ class Notification(TimeStampedModel):
 
     def get_user(self):
         return self.user
+
+
+class NotificationPreference(TimeStampedModel):
+    """
+    Model to store notification preferences for users
+
+    .. no_pii:
+    """
+    user = models.ForeignKey(User, related_name="notification_preferences", on_delete=models.CASCADE)
+    course_id = CourseKeyField(max_length=255, blank=True, default=None)
+    notification_preference_config = models.JSONField(default=NOTIFICATION_PREFERENCE_CONFIG)
+    # This version indicates the current version of this notification preference.
+    config_version = models.IntegerField(blank=True, default=1)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'{self.user.username} - {self.course_id} - {self.notification_preference_config}'
+
+    def get_user(self):
+        return self.user
+
+    def get_course_id(self):
+        return self.course_id
+
+    def get_notification_preference_config(self):
+        return self.notification_preference_config
+
+    def get_config_version(self):
+        return self.config_version
+
+    def get_is_active(self):
+        return self.is_active
