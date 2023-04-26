@@ -21,6 +21,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -753,3 +754,14 @@ def get_subsections_by_assignment_type(course_key):
                         f'{section.display_name} - {subsection.display_name}'
                     )
     return subsections_by_assignment_type
+
+
+def update_course_discussions_settings(course_key):
+    """
+    Updates course provider_type when new course is created
+    """
+    provider = DiscussionsConfiguration.get(context_key=course_key).provider_type
+    store = modulestore()
+    course = store.get_course(course_key)
+    course.discussions_settings['provider_type'] = provider
+    store.update_item(course, course.published_by)

@@ -92,13 +92,13 @@ from openedx.core.djangoapps.content_libraries.signals import (
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_BLOCK_DELETED,
 )
-from openedx.core.djangoapps.olx_rest_api.api import serialize_modulestore_block_for_blockstore
 from openedx.core.djangoapps.xblock.api import (
     get_block_display_name,
     get_learning_context_impl,
     load_block,
     XBlockInclude,
 )
+from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_blockstore
 from openedx.core.lib.blockstore_api import (
     get_bundle,
     get_bundles,
