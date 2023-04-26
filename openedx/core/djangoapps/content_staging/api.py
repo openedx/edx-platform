@@ -2,35 +2,12 @@
 Public python API for content staging
 """
 from __future__ import annotations
-from datetime import datetime
-from typing import NamedTuple
 
 from django.http import HttpRequest
-from opaque_keys.edx.keys import UsageKey
 
+from .data import StagedContentData, StagedContentStatus, UserClipboardData
 from .models import UserClipboard as _UserClipboard, StagedContent as _StagedContent
 from .serializers import UserClipboardSerializer as _UserClipboardSerializer
-
-
-StagedContentStatus = _StagedContent.Status
-CLIPBOARD_PURPOSE = _UserClipboard.PURPOSE
-
-
-class StagedContentData(NamedTuple):
-    """ Read-only data model for StagedContent """
-    id: int
-    user_id: int
-    created: datetime
-    purpose: str
-    status: StagedContentStatus
-    block_type: str
-    display_name: str
-
-
-class UserClipboardData(NamedTuple):
-    """ Read-only data model for StagedContent """
-    content: StagedContentData
-    source_usage_key: UsageKey
 
 
 def get_user_clipboard(user_id: int, only_ready: bool = True) -> UserClipboardData | None:
