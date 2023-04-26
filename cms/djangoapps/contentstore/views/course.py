@@ -106,7 +106,8 @@ from ..utils import (
     reverse_course_url,
     reverse_library_url,
     reverse_url,
-    reverse_usage_url
+    reverse_usage_url,
+    update_course_discussions_settings,
 )
 from .component import ADVANCED_COMPONENT_TYPES
 from .helpers import is_content_creator
@@ -992,6 +993,7 @@ def create_new_course(user, org, number, run, fields):
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
     new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields)
     add_organization_course(org_data, new_course.id)
+    update_course_discussions_settings(new_course.id)
     return new_course
 
 
