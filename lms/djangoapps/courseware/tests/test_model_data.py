@@ -35,13 +35,13 @@ def mock_field(scope, name):
     return field
 
 
-def mock_descriptor(fields=[]):  # lint-amnesty, pylint: disable=dangerous-default-value, missing-function-docstring
-    descriptor = Mock(entry_point=XBlock.entry_point)
-    descriptor.scope_ids = ScopeIds('user1', 'mock_problem', LOCATION('def_id'), LOCATION('usage_id'))
-    descriptor.module_class.fields.values.return_value = fields
-    descriptor.fields.values.return_value = fields
-    descriptor.module_class.__name__ = 'MockProblemModule'
-    return descriptor
+def mock_block(fields=[]):  # lint-amnesty, pylint: disable=dangerous-default-value, missing-function-docstring
+    block = Mock(entry_point=XBlock.entry_point)
+    block.scope_ids = ScopeIds('user1', 'mock_problem', LOCATION('def_id'), LOCATION('usage_id'))
+    block.module_class.fields.values.return_value = fields
+    block.fields.values.return_value = fields
+    block.module_class.__name__ = 'MockProblemModule'
+    return block
 
 # The user ids here are 1 because we make a student in the setUp functions, and
 # they get an id of 1.  There's an assertion in setUp to ensure that assumption
@@ -63,7 +63,7 @@ class TestInvalidScopes(TestCase):  # lint-amnesty, pylint: disable=missing-clas
         super().setUp()
         self.user = UserFactory.create(username='user')
         self.field_data_cache = FieldDataCache(
-            [mock_descriptor([mock_field(Scope.user_state, 'a_field')])],
+            [mock_block([mock_field(Scope.user_state, 'a_field')])],
             COURSE_KEY,
             self.user,
         )
@@ -120,10 +120,10 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
         assert self.user.id == 1
         # check our assumption hard-coded in the key functions above.
 
-        # There should be only one query to load a single descriptor with a single user_state field
+        # There should be only one query to load a single block with a single user_state field
         with self.assertNumQueries(1):
             self.field_data_cache = FieldDataCache(
-                [mock_descriptor([mock_field(Scope.user_state, 'a_field')])],
+                [mock_block([mock_field(Scope.user_state, 'a_field')])],
                 COURSE_KEY,
                 self.user,
             )
@@ -250,10 +250,10 @@ class TestMissingStudentModule(TestCase):  # lint-amnesty, pylint: disable=missi
         assert self.user.id == 1
         # check our assumption hard-coded in the key functions above.
 
-        # The descriptor has no fields, so FDC shouldn't send any queries
+        # The block has no fields, so FDC shouldn't send any queries
         with self.assertNumQueries(0):
             self.field_data_cache = FieldDataCache(
-                [mock_descriptor()],
+                [mock_block()],
                 COURSE_KEY,
                 self.user,
             )
@@ -318,14 +318,14 @@ class StorageTestBase:
             self.user = field_storage.student
         else:
             self.user = UserFactory.create()
-        self.mock_descriptor = mock_descriptor([
+        self.mock_block = mock_block([
             mock_field(self.scope, 'existing_field'),
             mock_field(self.scope, 'other_existing_field')])
         # Each field is stored as a separate row in the table,
         # but we can query them in a single query
         with self.assertNumQueries(1):
             self.field_data_cache = FieldDataCache(
-                [self.mock_descriptor],
+                [self.mock_block],
                 COURSE_KEY,
                 self.user,
             )

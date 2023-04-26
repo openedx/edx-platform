@@ -283,7 +283,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
 
     def test_overriding_non_scorable(self):
         """
-        Tests that override problem score raises an error if module descriptor has not `set_score` method.
+        Tests that override problem score raises an error if block has not `set_score` method.
         """
         input_state = json.dumps({'done': True})
         num_students = 1

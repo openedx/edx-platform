@@ -1936,7 +1936,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
         Submit the given score to the problem on behalf of the user
         """
         # Get the block for the problem, as viewed by the user
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             self.course.id,
             self.user,
             self.course,

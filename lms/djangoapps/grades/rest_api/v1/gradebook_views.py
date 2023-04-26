@@ -442,7 +442,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
         returns a list of grade data broken down by subsection.
 
         Args:
-            course: A Course Descriptor object
+            course: A CourseBlock object
             graded_subsections: A list of graded subsection objects in the given course.
             course_grade: A CourseGrade object.
         """
@@ -494,7 +494,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
 
         Args:
             user: A User object.
-            course: A Course Descriptor object.
+            course: A CourseBlock object.
             graded_subsections: A list of graded subsections in the given course.
             course_grade: A CourseGrade object.
         """

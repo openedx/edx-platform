@@ -372,7 +372,7 @@ def get_split_group_display_name(xblock, course):
 
     Arguments:
         xblock (XBlock): The courseware component.
-        course (XBlock): The course descriptor.
+        course (XBlock): The course block.
 
     Returns:
         group name (String): Group name of the matching group xblock.
@@ -399,14 +399,14 @@ def get_user_partition_info(xblock, schemes=None, course=None):
         schemes (iterable of str): If provided, filter partitions to include only
             schemes with the provided names.
 
-        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+        course (XBlock): The course block.  If provided, uses this to look up the user partitions
             instead of loading the course.  This is useful if we're calling this function multiple
             times for the same course want to minimize queries to the modulestore.
 
     Returns: list
 
     Example Usage:
-    >>> get_user_partition_info(block, schemes=["cohort", "verification"])
+    >>> get_user_partition_info(xblock, schemes=["cohort", "verification"])
     [
         {
             "id": 12345,
@@ -509,7 +509,7 @@ def get_visibility_partition_info(xblock, course=None):
     Arguments:
         xblock (XBlock): The component being edited.
 
-        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+        course (XBlock): The course block.  If provided, uses this to look up the user partitions
             instead of loading the course.  This is useful if we're calling this function multiple
             times for the same course want to minimize queries to the modulestore.
 
@@ -569,8 +569,8 @@ def get_xblock_aside_instance(usage_key):
     :param usage_key: Usage key of aside xblock
     """
     try:
-        descriptor = modulestore().get_item(usage_key.usage_key)
-        for aside in descriptor.runtime.get_asides(descriptor):
+        xblock = modulestore().get_item(usage_key.usage_key)
+        for aside in xblock.runtime.get_asides(xblock):
             if aside.scope_ids.block_type == usage_key.aside_type:
                 return aside
     except ItemNotFoundError:

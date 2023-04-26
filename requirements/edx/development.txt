@@ -567,7 +567,7 @@ edx-celeryutils==1.2.2
     #   super-csv
 edx-codejail==3.3.3
     # via -r requirements/edx/testing.txt
-edx-completion==4.2.0
+edx-completion==4.2.1
     # via -r requirements/edx/testing.txt
 edx-django-release-util==1.2.0
     # via
