@@ -234,7 +234,7 @@ class TestGetActiveCourseRunMethod(TestCase):
 
     advertised_course_run_uuid = "jh76b2c9-589b-4d1e-88c1-b01a02db3a9c"
 
-    def _mock_get_course_data(self, status):
+    def _mock_get_course_data(self, active_course_run=False):
         """
         Returns a course with details based on the status passed
         """
@@ -245,40 +245,23 @@ class TestGetActiveCourseRunMethod(TestCase):
                 {
                     "key": "course-v1:Test+2023_T1",
                     "uuid": "hb86b3cf-589b-4d1e-88c1-b01a02db3a9c",
-                    "status": status
+                    "status": "published",
                 },
                 {
                     "key": "course-v1:Test+2023_T2",
-                    "uuid": self.advertised_course_run_uuid,
-                    "status": status,
+                    "uuid": self.advertised_course_run_uuid if active_course_run else "other-uuid",
+                    "status": "published",
                 }
             ],
-            "course_run_statuses": [status],
-            "advertised_course_run_uuid": self.advertised_course_run_uuid if status != "archived" else None,
+            "course_run_statuses": ["published"],
+            "advertised_course_run_uuid": self.advertised_course_run_uuid if active_course_run else None,
         }
-
-    def test_reviewed_course_run_returned(self):
-        """
-        Test that the first course run with the status of reviewed is returned
-        """
-        course = self._mock_get_course_data("reviewed")
-        active_course_run = get_active_course_run(course)
-
-        self.assertDictEqual(
-            active_course_run,
-            {
-                "key": "course-v1:Test+2023_T1",
-                "uuid": "hb86b3cf-589b-4d1e-88c1-b01a02db3a9c",
-                "status": "reviewed"
-            }
-        )
 
     def test_advertised_course_run_returned(self):
         """
-        Test that if there are no course runs with the status of reviewed
-        that the course run with the uuid that matches the advertised_uuid_course_run_uuid is returned
+        Test that the course run with the uuid that matches the advertised_uuid_course_run_uuid is returned
         """
-        course = self._mock_get_course_data("published")
+        course = self._mock_get_course_data(active_course_run=True)
         active_course_run = get_active_course_run(course)
 
         self.assertDictEqual(
@@ -292,10 +275,9 @@ class TestGetActiveCourseRunMethod(TestCase):
 
     def test_no_course_run_returned(self):
         """
-        Test that if there are no course runs with the status of reviewed and
-        no advertised_course_run_uuid value, that no course run is returned
+        Test that if there is no advertised_course_run_uuid value, no course run is returned
         """
-        course = self._mock_get_course_data("archived")
+        course = self._mock_get_course_data(active_course_run=False)
         active_course_run = get_active_course_run(course)
 
         self.assertIsNone(active_course_run)

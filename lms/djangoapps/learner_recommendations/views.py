@@ -162,7 +162,6 @@ class CrossProductRecommendationsView(APIView):
             "course_runs",
             "location_restriction",
             "advertised_course_run_uuid",
-            "course_run_statuses"
         ]
         course_data = [get_course_data(key, fields) for key in associated_course_keys]
         filtered_courses = [course for course in course_data if course and course.get("course_runs")]
@@ -173,16 +172,16 @@ class CrossProductRecommendationsView(APIView):
         unrestricted_courses = []
 
         for course in filtered_courses:
-            if not _has_country_restrictions(course, user_country_code):
+            if _has_country_restrictions(course, user_country_code):
+                continue
+
+            active_course_run = get_active_course_run(course)
+            if active_course_run:
+                course.update({"active_course_run": active_course_run})
                 unrestricted_courses.append(course)
 
         if not unrestricted_courses:
             return self._empty_response()
-
-        for course in unrestricted_courses:
-            course.update({
-                "active_course_run": get_active_course_run(course)
-            })
 
         return Response(
             CrossProductRecommendationsSerializer(

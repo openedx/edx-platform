@@ -170,7 +170,7 @@ class TestCrossProductRecommendationsView(APITestCase):
             kwargs={'course_id': f'course-v1:{course_key}+Test_Course'}
         )
 
-    def _get_recommended_courses(self, num_of_courses_with_restriction=0):
+    def _get_recommended_courses(self, num_of_courses_with_restriction=0, active_course_run=True):
         """
         Returns an array of 2 discovery courses with or without country restrictions
         """
@@ -183,6 +183,7 @@ class TestCrossProductRecommendationsView(APITestCase):
 
         for course_key in enumerate(self.associated_course_keys):
             location_restriction = restriction_obj if num_of_courses_with_restriction > 0 else None
+            advertised_course_run_uuid = "jh76b2c9-589b-4d1e-88c1-b01a02db3a9c" if active_course_run else None
 
             courses.append({
                 "key": course_key[1],
@@ -209,8 +210,7 @@ class TestCrossProductRecommendationsView(APITestCase):
                         "status": "published"
                     }
                 ],
-                "advertised_course_run": "jh76b2c9-589b-4d1e-88c1-b01a02db3a9c",
-                "course_run_statuses": ["published"],
+                "advertised_course_run_uuid": advertised_course_run_uuid,
                 "location_restriction": location_restriction,
             })
 
@@ -308,6 +308,24 @@ class TestCrossProductRecommendationsView(APITestCase):
         response = self.client.get(self._get_url('edx+HL0'))
         response_content = json.loads(response.content)
         course_data = response_content["courses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(course_data), 0)
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_no_active_course_runs_response(self, country_code_from_ip_mock, get_course_data_mock):
+        """
+        Verify that an empty array of courses is returned if courses do not have an active course run.
+        """
+        country_code_from_ip_mock.return_value = "za"
+        mock_course_data = self._get_recommended_courses(0, active_course_run=False)
+        get_course_data_mock.side_effect = [mock_course_data[0], mock_course_data[1]]
+
+        response = self.client.get(self._get_url('edx+HL0'))
+        reponse_content = json.loads(response.content)
+        course_data = reponse_content["courses"]
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(course_data), 0)

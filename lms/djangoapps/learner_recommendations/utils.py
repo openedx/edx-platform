@@ -216,20 +216,10 @@ def get_active_course_run(course):
     Returns an active course run based on prospectus frontend logic
     for what defines an active course run
     """
-    reviewed_status = "reviewed"
     course_runs = course.get("course_runs")
-    course_run_statuses = course.get("course_run_statuses")
     advertised_course_run_uuid = course.get("advertised_course_run_uuid")
 
-    if (
-        course_run_statuses
-        and len(course_run_statuses) == 1
-        and course_run_statuses[0].lower() == reviewed_status
-    ):
-        for course_run in course_runs:
-            if course_run.get("status").lower() == reviewed_status:
-                return course_run
-    elif advertised_course_run_uuid:
+    if advertised_course_run_uuid:
         for course_run in course_runs:
             if course_run.get("uuid") == advertised_course_run_uuid:
                 return course_run
