@@ -1,6 +1,10 @@
 # Do things in edx-platform
-.PHONY: clean extract_translations help pull pull_translations push_translations requirements shell upgrade
-.PHONY: api-docs docs guides swagger
+.PHONY: api-docs-sphinx api-docs base-requirements check-types clean \
+  compile-requirements detect_changed_source_translations dev-requirements \
+  docker_auth docker_build docker_push docker_tag docs extract_translations \
+  guides help lint-imports local-requirements pre-requirements pull \
+  pull_translations push_translations requirements shell swagger \
+  technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
@@ -137,6 +141,10 @@ compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *
 
 upgrade:  ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
+
+upgrade-package: ## update just one package to the latest usable release
+	@test -n "$(package)" || { echo "\nUsage: make upgrade_package package=...\n"; exit 1; }
+	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade-package $(package)"
 
 check-types: ## run static type-checking tests
 	mypy
