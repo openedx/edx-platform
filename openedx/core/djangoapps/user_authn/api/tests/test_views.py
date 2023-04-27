@@ -42,8 +42,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         hostname = socket.gethostname()
         ip_address = socket.gethostbyname(hostname)
         self.country_code = country_code_from_ip(ip_address)
-        self.pipeline_user_details = {'username': None, 'email': None, 'name': None,
-                                      'firstName': None, 'lastName': None}
+        self.pipeline_user_details = {}
 
         # Several third party auth providers are created for these tests:
         self.configure_google_provider(enabled=True, visible=True)
@@ -97,7 +96,15 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
 
         if add_user_details:
-            self.pipeline_user_details.update({'email': 'test@test.com'})
+            self.pipeline_user_details.update(
+                {
+                    'username': None,
+                    'email': 'test@test.com',
+                    'name': None,
+                    'firstName': None,
+                    'lastName': None
+                }
+            )
 
         return {
             'contextData': {
