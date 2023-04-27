@@ -48,7 +48,8 @@ from openedx.core.djangolib.markup import HTML, Text
             {
                 isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
                 canEdit: true,
-                outlineURL: "${outline_url | n, js_escaped_string}"
+                outlineURL: "${outline_url | n, js_escaped_string}",
+                clipboardData: ${user_clipboard | n, dump_js_escaped_json},
             }
         );
         require(["js/models/xblock_info", "js/views/xblock", "js/views/utils/xblock_utils", "common/js/components/utils/view_utils"], function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils) {

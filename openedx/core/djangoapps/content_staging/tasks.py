@@ -7,7 +7,8 @@ import logging
 from celery import shared_task
 from celery_utils.logged_task import LoggedTask
 
-from .models import StagedContent, UserClipboard
+from .data import CLIPBOARD_PURPOSE
+from .models import StagedContent
 
 log = logging.getLogger(__name__)
 
@@ -21,5 +22,5 @@ def delete_expired_clipboards(staged_content_ids: list[int]):
     for pk in staged_content_ids:
         # Due to signal handlers deleting asset file objects from S3 or similar,
         # this may be "slow" relative to database speed.
-        StagedContent.objects.get(purpose=UserClipboard.PURPOSE, pk=pk).delete()
+        StagedContent.objects.get(purpose=CLIPBOARD_PURPOSE, pk=pk).delete()
     log.info(f"Successfully deleted StagedContent entries ({','.join(str(x) for x in staged_content_ids)})")

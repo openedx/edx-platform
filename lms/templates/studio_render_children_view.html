@@ -1,3 +1,4 @@
+<%! from django.utils.translation import gettext as _ %>
 % if can_reorder:
     <ol class="reorderable-container">
 % endif
@@ -9,4 +10,10 @@
 % endif
 % if can_add:
 <div class="add-xblock-component new-component-item adding"></div>
+<div class="paste-component" style="display: none;">
+    <button type="button" class="button paste-component-button">
+        <span class="icon fa fa-paste" aria-hidden="true"></span>
+        ${_('Paste Component')}
+    </button>
+</div>
 % endif
