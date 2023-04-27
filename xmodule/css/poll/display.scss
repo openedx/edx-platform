@@ -1,3 +1,8 @@
+@import 'bourbon/bourbon';
+@import 'lms/theme/variables';
+@import 'bootstrap/scss/variables';
+@import 'lms/theme/variables-v1';
+
 div.poll_question {
   @media print {
     display: block;
