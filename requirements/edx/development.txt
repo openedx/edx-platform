@@ -469,6 +469,7 @@ django-splash==1.2.1
 django-statici18n==2.3.1
     # via
     #   -r requirements/edx/testing.txt
+    #   lti-consumer-xblock
     #   xblock-drag-and-drop-v2
 django-storages==1.8
     # via
