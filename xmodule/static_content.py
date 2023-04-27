@@ -13,11 +13,12 @@ import os
 import sys
 import textwrap
 from collections import defaultdict
+from pkg_resources import resource_string
 
 import django
 from docopt import docopt
 from path import Path as path
-from pkg_resources import resource_string
+
 from xmodule.annotatable_block import AnnotatableBlock
 from xmodule.capa_block import ProblemBlock
 from xmodule.conditional_block import ConditionalBlock
@@ -90,23 +91,7 @@ XBLOCK_CLASSES = [
 
 def write_module_styles(output_root):
     """Write all registered XModule css, sass, and scss files to output root."""
-    module_styles_lines = [
-        "@import 'vendor/bi-app/bi-app-ltr';",
-        "@import 'bourbon/bourbon';",
-        "@import 'lms/theme/variables';",
-        "@import 'bootstrap/scss/variables';",
-        "@import 'bootstrap/scss/mixins/breakpoints';",
-        "@import 'lms/theme/variables-v1';",
-        "@import 'base/mixins';",
-    ]
-
-    return _write_styles(
-        '.xmodule_display',
-        output_root, XBLOCK_CLASSES,
-        'get_preview_view_css',
-        module_styles_lines,
-        'Preview'
-    )
+    return _write_styles('.xmodule_display', output_root, XBLOCK_CLASSES, 'get_preview_view_css', 'Preview')
 
 
 def write_module_js(output_root):
@@ -116,22 +101,7 @@ def write_module_js(output_root):
 
 def write_descriptor_styles(output_root):
     """Write all registered XModuleDescriptor css, sass, and scss files to output root."""
-    descriptor_styles_lines = [
-        "@import 'bourbon/bourbon';",
-        "@import 'vendor/bi-app/bi-app-ltr';",
-        "@import 'lms/theme/variables';",
-        "@import 'cms/theme/variables-v1';",
-        "@import 'mixins';",
-        "@import 'mixins-inherited';",
-    ]
-
-    return _write_styles(
-        '.xmodule_edit',
-        output_root, XBLOCK_CLASSES,
-        'get_studio_view_css',
-        descriptor_styles_lines,
-        'Studio'
-    )
+    return _write_styles('.xmodule_edit', output_root, XBLOCK_CLASSES, 'get_studio_view_css', 'Studio')
 
 
 def write_descriptor_js(output_root):
@@ -150,7 +120,7 @@ def _ensure_dir(directory):
             raise
 
 
-def _write_styles(selector, output_root, classes, css_attribute, base_module_styles_lines, suffix):
+def _write_styles(selector, output_root, classes, css_attribute, suffix):
     """
     Write the css fragments from all XModules in `classes`
     into `output_root` as individual files, hashed by the contents to remove
@@ -178,7 +148,7 @@ def _write_styles(selector, output_root, classes, css_attribute, base_module_sty
             css_imports[class_].add(fragment_name)
 
     for class_, fragment_names in sorted(css_imports.items()):
-        module_styles_lines = base_module_styles_lines.copy()
+        module_styles_lines = []
 
         fragment_names = sorted(fragment_names)
         module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
