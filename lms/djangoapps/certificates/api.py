@@ -610,7 +610,7 @@ def certificates_viewable_for_course(course):
     Returns True if certificates are viewable for any student enrolled in the course, False otherwise.
 
     Arguments:
-        course (CourseOverview or course descriptor): The course to check if certificates are viewable
+        course (CourseOverview or course block): The course to check if certificates are viewable
 
     Returns:
         boolean: whether the certificates are viewable or not
@@ -879,7 +879,7 @@ def available_date_for_certificate(course, certificate):
     Returns the available date to use with a certificate
 
     Arguments:
-        course (CourseOverview or course descriptor): The course we're checking
+        course (CourseOverview or course block): The course we're checking
         certificate (GeneratedCertificate): The certificate we're getting the date for
     """
     if _course_uses_available_date(course):
@@ -892,7 +892,7 @@ def display_date_for_certificate(course, certificate):
     Returns the display date that a certificate should display.
 
     Arguments:
-        course (CourseOverview or course descriptor): The course we're getting the date for
+        course (CourseOverview or course block): The course we're getting the date for
     Returns:
         datetime.date
     """

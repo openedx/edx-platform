@@ -4,7 +4,7 @@ running state of a course.
 
 At present, these tasks all operate on StudentModule objects in one way or another,
 so they share a visitor architecture.  Each task defines an "update function" that
-takes a module_descriptor, a particular StudentModule object, and xblock_instance_args.
+takes a block, a particular StudentModule object, and xblock_instance_args.
 
 A task may optionally specify a "filter function" that takes a query for StudentModule
 objects, and adds additional filter clauses.

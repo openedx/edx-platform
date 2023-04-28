@@ -163,8 +163,8 @@ class TestCourseDetailSerializer(TestCourseSerializer):  # lint-amnesty, pylint:
         super().setUp()
 
         # update the expected_data to include the 'overview' data.
-        about_descriptor = XBlock.load_class('about')
-        overview_template = about_descriptor.get_template('overview.yaml')
+        about_block = XBlock.load_class('about')
+        overview_template = about_block.get_template('overview.yaml')
         self.expected_data['overview'] = overview_template.get('data')
 
     # override test case

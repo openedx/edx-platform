@@ -71,7 +71,7 @@ def link_video_to_component(video_component, user):
     Links a VAL video to the video component.
 
     Arguments:
-        video_component: video descriptor item.
+        video_component: video block.
         user: A requesting user.
 
     Returns:
@@ -134,7 +134,7 @@ def validate_video_block(request, locator):
         locator: video locator.
 
     Returns:
-        A tuple containing error(or None) and video descriptor(i.e. if validation succeeds).
+        A tuple containing error(or None) and video block(i.e. if validation succeeds).
 
     Raises:
         PermissionDenied: if requesting user does not have access to author the video component.

@@ -51,8 +51,8 @@ class StudioEditableBlock(XBlockMixin):
         return AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
 
 
-def has_author_view(descriptor):
+def has_author_view(block):
     """
-    Returns True if the xmodule linked to the descriptor supports "author_view".
+    Returns True if the xmodule linked to the block supports "author_view".
     """
-    return getattr(descriptor, 'has_author_view', False)
+    return getattr(block, 'has_author_view', False)

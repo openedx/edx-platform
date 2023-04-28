@@ -71,7 +71,7 @@ def edxnotes(request, course_id):
     }
 
     if not has_notes:
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             course.id, request.user, course, depth=2
         )
         course_block = get_block_for_descriptor(
