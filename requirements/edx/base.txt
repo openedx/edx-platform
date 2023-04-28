@@ -778,8 +778,7 @@ openedx-events==8.0.0
     # via
     #   -r requirements/edx/base.in
     #   edx-event-bus-kafka
-    #   edx-event-bus-redis
-openedx-filters==1.3.0
+git+https://github.com/eduNEXT/openedx-filters.git@JDB/add_tenant_aware_filter
     # via
     #   -r requirements/edx/base.in
     #   lti-consumer-xblock

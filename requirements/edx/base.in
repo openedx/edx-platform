@@ -133,7 +133,7 @@ openedx-calc                        # Library supporting mathematical calculatio
 openedx-django-require
 # openedx-events 3.1.0 introduces producer API
 openedx-events>=3.1.0               # Open edX Events from Hooks Extension Framework (OEP-50)
-openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
+git+https://github.com/eduNEXT/openedx-filters.git@JDB/add_tenant_aware_filter        #openedx-filters                      Open edX Filters from Hooks Extension Framework (OEP-50)
 openedx-mongodbproxy
 optimizely-sdk                      # Optimizely full stack SDK for Python
 ora2>=4.5.0
