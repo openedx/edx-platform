@@ -82,7 +82,7 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
 
     def test_video_constructor(self):
         """Make sure that all parameters extracted correctly from xml"""
-        context = self.block.render(STUDENT_VIEW).content
+        context = self.block.student_view(None).content
         sources = ['example.mp4', 'example.webm']
 
         expected_context = {
@@ -167,7 +167,7 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
         """Make sure that if the 'youtube' attribute is omitted in XML, then
             the template generates an empty string for the YouTube streams.
         """
-        context = self.block.render(STUDENT_VIEW).content
+        context = self.block.student_view(None).content
         sources = ['example.mp4', 'example.webm']
 
         expected_context = {
@@ -322,7 +322,7 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
                 'is_public_sharing_enabled',
                 return_value=is_public_sharing_enabled
             ):
-                content = self.block.render(STUDENT_VIEW).content
+                content = self.block.student_view(None).content
         context = get_context_dict_from_string(content)
         assert ('public_sharing_enabled' in context) == is_public_sharing_enabled
         assert ('public_video_url' in context) == is_public_sharing_enabled
@@ -482,7 +482,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             self.initialize_block(data=DATA)
             track_url = self.get_handler_url('transcript', 'download')
 
-            context = self.block.render(STUDENT_VIEW).content
+            context = self.block.student_view(None).content
             metadata.update({
                 'transcriptLanguages': {"en": "English"} if not data['transcripts'] else {"uk": 'Українська'},
                 'transcriptLanguage': 'en' if not data['transcripts'] or data.get('sub') else 'uk',
@@ -606,7 +606,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 name=data['name'],
             )
             self.initialize_block(data=DATA)
-            context = self.block.render(STUDENT_VIEW).content
+            context = self.block.student_view(None).content
 
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
@@ -671,7 +671,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
 
         # Referencing a non-existent VAL ID in courseware won't cause an error --
         # it'll just fall back to the values in the VideoBlock.
-        assert 'example.mp4' in self.block.render(STUDENT_VIEW).content
+        assert 'example.mp4' in self.block.student_view(None).content
 
     def test_get_html_with_mocked_edx_video_id(self):
         # lint-amnesty, pylint: disable=invalid-name, redefined-outer-name
@@ -755,7 +755,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                     }
                 ]
             }
-            context = self.block.render(STUDENT_VIEW).content
+            context = self.block.student_view(None).content
 
         expected_context = dict(initial_context)
         expected_context['metadata'].update({
@@ -918,7 +918,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         )
         self.initialize_block(data=DATA)
         # context returned by get_html
-        context = self.block.render(STUDENT_VIEW).content
+        context = self.block.student_view(None).content
 
         # expected_context, expected context to be returned by get_html
         expected_context = dict(initial_context)
@@ -1040,7 +1040,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
             user_service = self.block.runtime.service(self.block, 'user')
             user_location = user_service.get_current_user().opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE]
             assert user_location == 'CN'
-            context = self.block.render('student_view').content
+            context = self.block.student_view(None).content
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
@@ -1146,7 +1146,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                     'client_video_id': 'external video',
                     'encoded_videos': {}
                 }
-                context = self.block.render(STUDENT_VIEW).content
+                context = self.block.student_view(None).content
             expected_context = dict(initial_context)
             expected_context['metadata'].update({
                 'transcriptTranslationUrl': self.get_handler_url('transcript', 'translation/__lang__'),
@@ -1212,7 +1212,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         }
 
         self.initialize_block(data=video_xml)
-        context = self.block.render(STUDENT_VIEW).content
+        context = self.block.student_view(None).content
 
         assert "'download_video_link': 'https://mp4.com/dm.mp4'" in context
         assert '"streams": "1.00:https://yt.com/?v=v0TFmdO4ZP0"' in context
@@ -1230,7 +1230,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         """
 
         self.initialize_block(data=video_xml)
-        context = self.block.render(STUDENT_VIEW).content
+        context = self.block.student_view(None).content
         assert "'download_video_link': None" in context
 
     def test_get_html_non_hls_video_download(self):
@@ -1246,7 +1246,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         """
 
         self.initialize_block(data=video_xml)
-        context = self.block.render(STUDENT_VIEW).content
+        context = self.block.student_view(None).content
         assert "'download_video_link': 'http://example.com/example.mp4'" in context
 
     def test_html_student_public_view(self):
@@ -1260,7 +1260,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         """
 
         self.initialize_block(data=video_xml)
-        context = self.block.render(STUDENT_VIEW).content
+        context = self.block.student_view(None).content
         assert '"saveStateEnabled": true' in context
         context = self.block.render(PUBLIC_VIEW).content
         assert '"saveStateEnabled": false' in context
@@ -1274,7 +1274,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         get_course_video_image_url.return_value = '/media/video-images/poster.png'
 
         self.initialize_block(data=video_xml)
-        context = self.block.render(STUDENT_VIEW).content
+        context = self.block.student_view(None).content
 
         assert '"poster": "/media/video-images/poster.png"' in context
 
@@ -1287,7 +1287,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         get_course_video_image_url.return_value = '/media/video-images/poster.png'
 
         self.initialize_block(data=video_xml)
-        context = self.block.render(STUDENT_VIEW).content
+        context = self.block.student_view(None).content
 
         assert "'poster': 'null'" in context
 
@@ -1298,7 +1298,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         """
         video_xml = '<video display_name="Video" download_video="true" edx_video_id="12345-67890">[]</video>'
         self.initialize_block(data=video_xml)
-        context = self.block.render(STUDENT_VIEW).content
+        context = self.block.student_view(None).content
         assert '"prioritizeHls": false' in context
 
     @ddt.data(
@@ -1352,7 +1352,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
         with patch.object(WaffleFlagCourseOverrideModel, 'override_value', return_value=data['course_override']):
             with override_waffle_flag(DEPRECATE_YOUTUBE, active=data['waffle_enabled']):
                 self.initialize_block(data=video_xml, metadata=metadata)
-                context = self.block.render(STUDENT_VIEW).content
+                context = self.block.student_view(None).content
                 assert '"prioritizeHls": {}'.format(data['result']) in context
 
 
@@ -2334,7 +2334,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
 
         is_bumper_enabled.return_value = True
 
-        content = self.block.render(STUDENT_VIEW).content
+        content = self.block.student_view(None).content
         sources = ['example.mp4', 'example.webm']
         expected_context = {
             'autoadvance_enabled': False,
@@ -2499,7 +2499,7 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
         """
 
         with override_settings(FEATURES=self.FEATURES):
-            content = self.block.render(STUDENT_VIEW).content
+            content = self.block.student_view(None).content
 
         expected_context = self.prepare_expected_context(
             autoadvanceenabled_flag=autoadvanceenabled_must_be,
@@ -2523,7 +2523,7 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
         self.block.video_auto_advance = new_value
         self.block._reset_dirty_field(self.block.fields['video_auto_advance'])  # pylint: disable=protected-access
         # After this step, render() should see the new value
-        # e.g. use self.block.render(STUDENT_VIEW).content
+        # e.g. use self.block.student_view(None).content
 
     @ddt.data(
         (False, False),
