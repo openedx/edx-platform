@@ -81,6 +81,7 @@
 # AR R1 <e2far1@hotmail.com>, 2016
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016-2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
+# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2023
 # Hassan Husseini <hassan@constructeducation.com>, 2020
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
@@ -102,7 +103,7 @@
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2014-2015
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (https://www.transifex.com/open-edx/teams/6205/ar/).
+# edX community translations have been downloaded from Arabic (https://app.transifex.com/open-edx/teams/6205/ar/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -6788,7 +6789,7 @@ msgstr "وضوح الرؤية"
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: {title}"
-msgstr ""
+msgstr "تعديل: {title}"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Plugins"
@@ -6870,7 +6871,7 @@ msgstr "تاريخ الإضافة "
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
-msgstr ""
+msgstr "تعديل الدخول لـ: {title}"
 
 #: cms/static/js/views/pages/container.js
 msgid "Copying"

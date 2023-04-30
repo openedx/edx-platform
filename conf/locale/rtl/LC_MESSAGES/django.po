@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-20 20:44+0000\n"
-"PO-Revision-Date: 2023-04-20 20:44:15.480257\n"
+"POT-Creation-Date: 2023-04-30 20:35+0000\n"
+"PO-Revision-Date: 2023-04-30 20:35:58.645310\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -130,7 +130,7 @@ msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
 #. Translators: This is the status for a video that the servers have
 #. successfully processed
 #: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Ready"
 msgstr "Ɍǝɐdʎ"
 
@@ -5782,7 +5782,7 @@ msgid "Allow"
 msgstr "Ⱥlløʍ"
 
 #: lms/templates/oauth2_provider/authorize.html
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Ɇɹɹøɹ"
@@ -6991,11 +6991,7 @@ msgstr "Wǝ ɔønld nøʇ ɟᴉnd ɐ nsǝɹ ʍᴉʇɥ ʇɥɐʇ ǝɯɐᴉl ɐddɹ
 msgid "This user already has access to this library."
 msgstr "Ŧɥᴉs nsǝɹ ɐlɹǝɐdʎ ɥɐs ɐɔɔǝss ʇø ʇɥᴉs lᴉbɹɐɹʎ."
 
-#: openedx/core/djangoapps/content_staging/models.py
-msgid "Staged Content"
-msgstr "Sʇɐƃǝd Ȼønʇǝnʇ"
-
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -7006,9 +7002,13 @@ msgstr "Sʇɐƃǝd Ȼønʇǝnʇ"
 msgid "Loading"
 msgstr "Łøɐdᴉnƃ"
 
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
 msgstr "Ɇxdᴉɹǝd"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr "Sʇɐƃǝd Ȼønʇǝnʇ"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid ""
@@ -12988,6 +12988,14 @@ msgid "Invalid data ({details})"
 msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr "Ŧɥǝɹǝ ʍɐs ɐ dɹøblǝɯ dɐsʇᴉnƃ ʎønɹ ɔøɯdønǝnʇ."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr "Ɏønɹ ɔlᴉdbøɐɹd ᴉs ǝɯdʇʎ øɹ ᴉnʌɐlᴉd."
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ {source_type} ᴉnʇø {target_parent_type}."
@@ -14650,6 +14658,10 @@ msgstr "Ᵽɹǝʌᴉøns dɐƃǝ"
 msgid "Next page"
 msgstr "Nǝxʇ dɐƃǝ"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr "Ᵽɐsʇǝ Ȼøɯdønǝnʇ"
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "Ŧɹɐɔʞᴉnƃ Łøƃ"
@@ -14774,24 +14786,28 @@ msgid "Downloads and transcripts"
 msgstr "Đøʍnløɐds ɐnd ʇɹɐnsɔɹᴉdʇs"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
-
-#: lms/templates/video.html
 msgid "Share on:"
 msgstr "Sɥɐɹǝ øn:"
 
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Twitter"
-msgstr "Ŧʍᴉʇʇǝɹ"
+msgid "Share on Twitter"
+msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Facebook"
+msgstr "Sɥɐɹǝ øn Fɐɔǝbøøʞ"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+#: lms/templates/video.html
+msgid "Share on LinkedIn"
+msgstr "Sɥɐɹǝ øn ŁᴉnʞǝdƗn"
 
 #: lms/templates/video.html
-msgid "Facebook"
-msgstr "Fɐɔǝbøøʞ"
-
-#: lms/templates/video.html
-msgid "Linkedin"
-msgstr "Łᴉnʞǝdᴉn"
+msgid "Download video file"
+msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16130,11 +16146,6 @@ msgid "Post on Facebook"
 msgstr "Ᵽøsʇ øn Fɐɔǝbøøʞ"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
-
-#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "Ŧʍǝǝʇ ʇɥᴉs Ⱥɔɔøɯdlᴉsɥɯǝnʇ. Ᵽød nd ʍᴉndøʍ."
 
@@ -17161,10 +17172,6 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "Ⱥdd Ȼǝɹʇᴉɟᴉɔɐʇǝ ʇø ŁᴉnʞǝdƗn Ᵽɹøɟᴉlǝ"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Share on LinkedIn"
-msgstr "Sɥɐɹǝ øn ŁᴉnʞǝdƗn"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr "Ɏøn ɐɹǝ nøʇ ʎǝʇ ǝlᴉƃᴉblǝ ɟøɹ ɐ ɔǝɹʇᴉɟᴉɔɐʇǝ."
 
@@ -17239,10 +17246,6 @@ msgstr "Ɨ'ɯ ʇɐʞᴉnƃ {course_name} ønlᴉnǝ ʍᴉʇɥ {facebook_brand}. 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "Sɥɐɹǝ {course_name} øn Fɐɔǝbøøʞ"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Facebook"
-msgstr "Sɥɐɹǝ øn Fɐɔǝbøøʞ"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
