@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-20 20:44+0000\n"
-"PO-Revision-Date: 2023-04-20 20:44:15.413132\n"
+"POT-Creation-Date: 2023-04-30 20:35+0000\n"
+"PO-Revision-Date: 2023-04-30 20:35:58.386591\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -7449,6 +7449,10 @@ msgstr "Çöürsé Öütlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
 msgstr "Däté äddéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr "Pästïng Ⱡ'σяєм ιρѕυм #"
 
 #. Translators: "title" is the name of the current component or unit being
 #. edited.

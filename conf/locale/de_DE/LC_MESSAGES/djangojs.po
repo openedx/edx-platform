@@ -70,7 +70,7 @@
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2021,2023
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/).
+# edX community translations have been downloaded from German (Germany) (https://app.transifex.com/open-edx/teams/6205/de_DE/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
