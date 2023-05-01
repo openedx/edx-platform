@@ -625,7 +625,7 @@ edx-proctoring==4.15.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
-edx-proctoring-proctortrack==1.0.5
+edx-proctoring-proctortrack==1.2.1
     # via -r requirements/edx/base.txt
 edx-rbac==1.7.0
     # via
