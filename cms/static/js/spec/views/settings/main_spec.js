@@ -50,7 +50,8 @@ define([
                 instructor_info: {
                     instructors: [{name: '', title: '', organization: '', image: '', bio: ''}]
                 },
-                self_paced: false
+                self_paced: false,
+                social_sharing: null,
             },
 
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore'),

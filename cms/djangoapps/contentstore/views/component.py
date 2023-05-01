@@ -61,7 +61,7 @@ CONTAINER_TEMPLATES = [
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-support-legend", "add-xblock-component-support-level", "add-xblock-component-menu-problem",
     "xblock-string-field-editor", "xblock-access-editor", "publish-xblock", "publish-history",
-    "unit-outline", "container-message", "container-access", "license-selector", "copy-clipboard-button",
+    "unit-outline", "container-message", "container-access", "license-selector", "social-sharing-selector", "copy-clipboard-button",
     "edit-title-button",
 ]
 

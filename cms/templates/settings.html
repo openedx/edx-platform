@@ -19,7 +19,7 @@
 %>
 
 <%block name="header_extras">
-% for template_name in ["basic-modal", "modal-button", "upload-dialog", "license-selector", "course-settings-learning-fields", "course-instructor-details"]:
+% for template_name in ["basic-modal", "modal-button", "upload-dialog", "license-selector", "social-sharing-selector", "course-settings-learning-fields", "course-instructor-details"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>

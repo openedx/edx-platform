@@ -18,6 +18,7 @@ from pytz import utc
 from xblock.fields import Boolean, Dict, Float, Integer, List, Scope, String
 from openedx.core.djangoapps.video_pipeline.models import VideoUploadsEnabledByDefault
 from openedx.core.lib.license import LicenseMixin
+from openedx.core.lib.socialSharing import SocialSharingMixin
 from openedx.core.lib.teams_config import TeamsConfig  # lint-amnesty, pylint: disable=unused-import
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_GRADING_POLICY, DEFAULT_START_DATE
@@ -1025,6 +1026,7 @@ class CourseBlock(
     CourseFields,
     SequenceBlock,
     LicenseMixin,
+    SocialSharingMixin,
 ):  # pylint: disable=abstract-method
     """
     The Course XBlock.
@@ -1171,6 +1173,9 @@ class CourseBlock(
 
         # load license if it exists
         definition = LicenseMixin.parse_license_from_xml(definition, xml_object)
+
+        # load social sharing if it exists
+        definition = SocialSharingMixin.parse_social_sharing_from_xml(definition, xml_object)
 
         return definition, children
 

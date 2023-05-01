@@ -62,6 +62,7 @@ class CourseDetails:
         self.intro_video = None  # a video pointer
         self.effort = None  # hours/week
         self.license = "all-rights-reserved"  # default course license is all rights reserved
+        self.social_sharing = ""
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
         self.banner_image_name = ""
@@ -133,6 +134,8 @@ class CourseDetails:
 
         # Default course license is "All Rights Reserved"
         course_details.license = getattr(block, "license", "all-rights-reserved")
+
+        course_details.social_sharing = getattr(block, "social_sharing", "None")
 
         course_details.intro_video = cls.fetch_youtube_video_id(course_key)
 
@@ -282,6 +285,10 @@ class CourseDetails:
 
         if 'license' in jsondict:
             block.license = jsondict['license']
+            dirty = True
+
+        if 'social_sharing' in jsondict:
+            block.social_sharing = jsondict['social_sharing']
             dirty = True
 
         if 'learning_info' in jsondict:

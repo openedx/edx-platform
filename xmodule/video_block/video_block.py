@@ -36,6 +36,7 @@ from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, 
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import request_cached
 from openedx.core.lib.license import LicenseMixin
+from openedx.core.lib.socialSharing import SocialSharingMixin
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
@@ -116,7 +117,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 class VideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
         EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin, HTMLSnippet,
-        ResourceTemplates, XModuleMixin, LicenseMixin):
+        ResourceTemplates, XModuleMixin, LicenseMixin, SocialSharingMixin):
     """
     XML source example:
         <video show_captions="true"
@@ -994,6 +995,9 @@ class VideoBlock(
 
         # load license if it exists
         field_data = LicenseMixin.parse_license_from_xml(field_data, xml)
+
+        # load social sharing if it exists
+        field_data = SocialSharingMixin.parse_social_sharing_from_xml(field_data, xml)
 
         return field_data
 

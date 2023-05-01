@@ -4,13 +4,14 @@ define(
         'js/views/baseview', 'underscore', 'js/models/metadata', 'js/views/abstract_editor',
         'js/models/uploads', 'js/views/uploads',
         'js/models/license', 'js/views/license',
+        'js/models/social_sharing', 'js/views/social_sharing',
         'js/views/video/transcripts/utils',
         'js/views/video/transcripts/metadata_videolist',
         'js/views/video/translations_editor',
         'edx-ui-toolkit/js/utils/html-utils'
     ],
     function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
-        LicenseModel, LicenseView, TranscriptUtils, VideoList, VideoTranslations, HtmlUtils) {
+        LicenseModel, LicenseView, SocialSharingModel, SocialSharingView, TranscriptUtils, VideoList, VideoTranslations, HtmlUtils) {
         'use strict';
         var Metadata = {};
 
