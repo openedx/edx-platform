@@ -185,6 +185,7 @@
 
     .status-release,
     .status-highlights-enabled,
+    .status-video-sharing-enabled,
     .status-studio-frontend {
       @extend %t-copy-base;
 
@@ -200,15 +201,18 @@
       }
     }
 
-    .status-highlights-enabled {
+    .status-highlights-enabled,
+    .status-video-sharing-enabled {
       vertical-align: top;
     }
 
     .status-release-label,
     .status-release-value,
     .status-highlights-enabled-label,
+    .status-video-sharing-enabled-label,
     .status-highlights-enabled-value,
     .status-highlights-enabled-info,
+    .status-video-sharing-enabled-info,
     .status-actions {
       display: inline-block;
       vertical-align: middle;
@@ -216,19 +220,22 @@
     }
 
     .status-release-value,
-    .status-highlights-enabled-value {
+    .status-highlights-enabled-value,
+    .status-video-sharing-enabled-value {
       @extend %t-strong;
 
       font-size: smaller;
     }
 
-    .status-highlights-enabled-info {
+    .status-highlights-enabled-info,
+    .status-video-sharing-enabled-info {
       font-size: smaller;
       margin-left: $baseline / 2;
     }
 
     .status-release-label,
-    .status-highlights-enabled-label {
+    .status-highlights-enabled-label,
+    .status-video-sharing-enabled-label {
       margin-right: ($baseline/4);
     }
 

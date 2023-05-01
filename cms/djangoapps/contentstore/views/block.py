@@ -44,6 +44,7 @@ from common.djangoapps.util.json_request import JsonResponse, expect_json
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core.djangoapps.bookmarks import api as bookmarks_api
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
 from openedx.core.toggles import ENTRANCE_EXAMS
@@ -1239,6 +1240,13 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         'category': xblock.category,
         'has_children': xblock.has_children
     }
+
+    if course is not None and PUBLIC_VIDEO_SHARE.is_enabled(xblock.location.course_key):
+        xblock_info.update({
+            'video_sharing_enabled': True,
+            'video_sharing_options': course.video_sharing_options,
+            'video_sharing_doc_url': HelpUrlExpert.the_one().url_for_token('social_sharing')
+        })
 
     if xblock.category == 'course':
         discussions_config = DiscussionsConfiguration.get(course.id)
