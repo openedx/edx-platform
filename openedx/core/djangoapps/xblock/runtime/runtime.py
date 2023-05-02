@@ -218,6 +218,8 @@ class XBlockRuntime(RuntimeShim, Runtime):
         """
         # TODO: Do these declarations actually help with anything? Maybe this check should
         # be removed from here and from XBlock.runtime
+        print(f"service called from {block.location}")
+
         declaration = block.service_declaration(service_name)
         context_key = block.scope_ids.usage_id.context_key
         if declaration is None:

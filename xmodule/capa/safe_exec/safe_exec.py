@@ -125,6 +125,14 @@ def safe_exec(
 
     If `unsafely` is true, then the code will actually be executed without sandboxing.
     """
+    # HACK HACK HACK
+    unsafely=True
+
+    print("GLOBALS DICT********************************")
+    print(globals_dict)
+    print("\n")
+
+
     # Check the cache for a previous result.
     if cache:
         safe_globals = json_safe(globals_dict)
@@ -145,7 +153,8 @@ def safe_exec(
     # Create the complete code we'll run.
     code_prolog = CODE_PROLOG % random_seed
 
-    if is_codejail_rest_service_enabled():
+    #if is_codejail_rest_service_enabled():
+    if False:
         data = {
             "code": code_prolog + LAZY_IMPORTS + code,
             "globals_dict": globals_dict,

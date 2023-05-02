@@ -2259,6 +2259,8 @@ class CustomResponse(LoncapaResponse):
             'options': self.xml.get('options'),
             'testdat': 'hello world',
         })
+        print("*********************CONTEXT")
+        print(self.context)
 
         # Pass DEBUG to the check function.
         self.context['debug'] = self.capa_system.DEBUG

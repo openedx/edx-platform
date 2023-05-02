@@ -117,7 +117,7 @@ class Randomization(String):
     to_json = from_json
 
 
-@XBlock.needs('user')
+@XBlock.needs('user_with_deprecated_anonymous_ids')
 @XBlock.needs('i18n')
 @XBlock.needs('mako')
 @XBlock.needs('cache')
@@ -165,7 +165,6 @@ class ProblemBlock(
     icon_class = 'problem'
 
     uses_xmodule_styles_setup = True
-    requires_per_student_anonymous_id = True
 
     preview_view_js = {
         'js': [
@@ -804,7 +803,8 @@ class ProblemBlock(
         if self.rerandomize == RANDOMIZATION.NEVER:
             self.seed = 1
         elif self.rerandomize == RANDOMIZATION.PER_STUDENT:
-            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
+            user_service = self.runtime.service(self, 'user_with_deprecated_anonymous_ids')
+            user_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
             # see comment on randomization_bin
             self.seed = randomization_bin(user_id, str(self.location).encode('utf-8'))
         else:
@@ -821,8 +821,12 @@ class ProblemBlock(
         if text is None:
             text = self.data
 
-        user_service = self.runtime.service(self, 'user')
+        # import pdb; pdb.set_trace()
+
+        user_service = self.runtime.service(self, 'user_with_deprecated_anonymous_ids')
         anonymous_student_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+        
+        print(f"!!!! new_lcp generated anonymous_student_id: {anonymous_student_id}")
         seed = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
 
         sandbox_service = self.runtime.service(self, 'sandbox')
@@ -1433,7 +1437,8 @@ class ProblemBlock(
         """
         Is the user allowed to see an answer?
         """
-        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+        user_service = self.runtime.service(self, 'user_with_deprecated_anonymous_ids')
+        user_is_staff = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
         if not self.correctness_available():
             # If correctness is being withheld, then don't show answers either.
             return False
@@ -1481,7 +1486,8 @@ class ProblemBlock(
 
         Limits access to the correct/incorrect flags, messages, and problem score.
         """
-        user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+        user_service = self.runtime.service(self, 'user_with_deprecated_anonymous_ids')
+        user_is_staff = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
         return ShowCorrectness.correctness_available(
             show_correctness=self.show_correctness,
             due_date=self.close_date,
@@ -1797,7 +1803,8 @@ class ProblemBlock(
             # If the user is a staff member, include
             # the full exception, including traceback,
             # in the response
-            user_is_staff = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+            user_service = self.runtime.service(self, 'user_with_deprecated_anonymous_ids')
+            user_is_staff = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
             if user_is_staff:
                 msg = f"Staff debug info: {traceback.format_exc()}"
 

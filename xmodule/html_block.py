@@ -43,7 +43,7 @@ _ = lambda text: text
 
 @XBlock.needs("i18n")
 @XBlock.needs("mako")
-@XBlock.needs("user")
+@XBlock.needs("user_with_deprecated_anonymous_ids")
 class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     XmlMixin, EditingMixin,
     XModuleToXBlockMixin, HTMLSnippet, ResourceTemplates, XModuleMixin,
@@ -119,7 +119,8 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         """ Returns html required for rendering the block. """
         if self.data:
             data = self.data
-            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+            user_service = self.runtime.service(self, 'user_with_deprecated_anonymous_ids')
+            user_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
             if user_id:
                 data = data.replace("%%USER_ID%%", user_id)
             data = data.replace("%%COURSE_ID%%", str(self.scope_ids.usage_id.context_key))
@@ -150,7 +151,6 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     preview_view_css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
     uses_xmodule_styles_setup = True
-    requires_per_student_anonymous_id = True
 
     mako_template = "widgets/html-edit.html"
     resources_dir = None

@@ -47,6 +47,8 @@ class DjangoXBlockUserService(UserService):
         self._anonymous_user_id = kwargs.get('anonymous_user_id', None)
         self._request_country_code = kwargs.get('request_country_code', None)
 
+        print(f"User service created, anonymous_user_id: {self._anonymous_user_id}")
+
     def get_current_user(self):
         """
         Returns the currently-logged in user, as an instance of XBlockUser

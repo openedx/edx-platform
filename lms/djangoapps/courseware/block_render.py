@@ -499,20 +499,36 @@ def prepare_runtime_for_user(
     # while giving selected modules a per-course anonymized id.
     # As we have the time to manually test more modules, we can add to the list
     # of modules that get the per-course anonymized id.
-    if getattr(block, 'requires_per_student_anonymous_id', False):
-        anonymous_student_id = anonymous_id_for_user(user, None)
-    else:
-        anonymous_student_id = anonymous_id_for_user(user, course_id)
+    # import pdb; pdb.set_trace()
+
+    
+    #if getattr(block, 'requires_per_student_anonymous_id', False):
+    #    anonymous_student_id = anonymous_id_for_user(user, None)
+    #    print(f"USER SPECIFIC ANONYMOUS ID {anonymous_student_id} MADE for block {block.location}")
+    #else:
+    #    anonymous_student_id = anonymous_id_for_user(user, course_id)
+    #    print(f"USER + COURSE SPECIFIC ANONYMOUS ID {anonymous_student_id} MADE for block {block.location}")
+
+    #import traceback
+    #for line in traceback.format_stack():
+    #    print(line.strip())
 
     user_is_staff = bool(has_access(user, 'staff', block.location, course_id))
     user_service = DjangoXBlockUserService(
         user,
         user_is_staff=user_is_staff,
         user_role=get_user_role(user, course_id),
-        anonymous_user_id=anonymous_student_id,
+        anonymous_user_id=anonymous_id_for_user(user, course_id),
         request_country_code=user_location,
     )
-
+    user_with_deprecated_anonymous_ids_service = DjangoXBlockUserService(
+        user,
+        user_is_staff=user_is_staff,
+        user_role=get_user_role(user, course_id),
+        anonymous_user_id=anonymous_id_for_user(user, None),
+        request_country_code=user_location,
+    )
+    
     # Rebind module service to deal with noauth modules getting attached to users
     rebind_user_service = RebindUserService(
         user,
@@ -591,6 +607,7 @@ def prepare_runtime_for_user(
         'field-data': field_data,
         'mako': mako_service,
         'user': user_service,
+        'user_with_deprecated_anonymous_ids': user_with_deprecated_anonymous_ids_service,
         'verification': XBlockVerificationService(),
         'proctoring': ProctoringService(),
         'milestones': milestones_helpers.get_service(),
