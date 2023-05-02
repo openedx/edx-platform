@@ -51,7 +51,6 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
-        breakpoint()
         expected_data = CourseEnrollmentSerializer(enrollments, many=True).data
         self.assertEqual(response.data, expected_data)
 
