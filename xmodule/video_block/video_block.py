@@ -36,8 +36,13 @@ from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, 
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
+from xmodule.course_block import (
+    COURSE_VIDEO_SHARING_ALL_VIDEOS,
+    COURSE_VIDEO_SHARING_NONE,
+)
 from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
 from xmodule.mako_block import MakoTemplateBlockBase
@@ -482,20 +487,46 @@ class VideoBlock(
 
         return self.runtime.service(self, 'mako').render_template('video.html', template_context)
 
+    def get_course_video_sharing_override(self):
+        """
+        Return course video sharing options override or None
+        """
+        course = get_course_by_id(self.course_id)
+        course_video_sharing_option = course.video_sharing_options \
+            if hasattr(course, 'video_sharing_options') else None
+
+        return course_video_sharing_option
+
     def is_public_sharing_enabled(self):
         """
         Is public sharing enabled for this video?
-        TODO: course override field
         """
+
+        # Sharing is DISABLED from studio
         is_studio = getattr(self.runtime, "is_author_mode", False)
         if is_studio:
             return False
 
+        # Video share feature must be enabled for sharing settings to take effect
         feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key)
         if not feature_enabled:
             return False
 
-        return self.public_access
+        # Check if the course specifies a general setting
+        course_video_sharing_option = self.get_course_video_sharing_override()
+
+        # Course can override all videos to be shared
+        if course_video_sharing_option == COURSE_VIDEO_SHARING_ALL_VIDEOS:
+            return True
+
+        # ... or no videos to be shared
+        elif course_video_sharing_option == COURSE_VIDEO_SHARING_NONE:
+            return False
+
+        # ... or can fall back to per-video setting
+        # Equivalent to COURSE_VIDEO_SHARING_PER_VIDEO or None / unset
+        else:
+            return self.public_access
 
     def get_public_video_url(self):
         """
