@@ -1,12 +1,11 @@
 """
 Tests for contentstore.views.preview.py
 """
-
-
 import re
 from unittest import mock
 
 import ddt
+from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID, ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -309,7 +308,10 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
             block=block,
             field_data=mock.Mock(),
         )
-        assert block.runtime.anonymous_student_id == '26262401c528d7c4a6bbeabe0455ec46'
+        deprecated_anonymous_user_id = (
+            block.runtime.service(block, 'user').get_current_user().opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
+        )
+        assert deprecated_anonymous_user_id == '26262401c528d7c4a6bbeabe0455ec46'
 
     @override_waffle_flag(INDIVIDUALIZE_ANONYMOUS_USER_ID, active=True)
     def test_anonymous_user_id_individual_per_course(self):
@@ -321,4 +323,8 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
             block=block,
             field_data=mock.Mock(),
         )
-        assert block.runtime.anonymous_student_id == 'ad503f629b55c531fed2e45aa17a3368'
+
+        anonymous_user_id = (
+            block.runtime.service(block, 'user').get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+        )
+        assert anonymous_user_id == 'ad503f629b55c531fed2e45aa17a3368'

@@ -6,6 +6,7 @@ import logging
 from urllib.parse import urljoin  # pylint: disable=import-error
 
 import crum
+from common.djangoapps.student.models import anonymous_id_for_user
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from completion.services import CompletionService
@@ -235,12 +236,19 @@ class XBlockRuntime(RuntimeShim, Runtime):
         elif service_name == "completion":
             return CompletionService(user=self.user, context_key=context_key)
         elif service_name == "user":
+            if self.user.is_anonymous:
+                deprecated_anonymous_student_id = self.user_id
+            else:
+                deprecated_anonymous_student_id = anonymous_id_for_user(self.user, course_id=None)
+
             return DjangoXBlockUserService(
                 self.user,
                 # The value should be updated to whether the user is staff in the context when Blockstore runtime adds
                 # support for courses.
                 user_is_staff=self.user.is_staff,
                 anonymous_user_id=self.anonymous_student_id,
+                # See the docstring of `DjangoXBlockUserService`.
+                deprecated_anonymous_user_id=deprecated_anonymous_student_id
             )
         elif service_name == "mako":
             if self.system.student_data_mode == XBlockRuntimeSystem.STUDENT_DATA_EPHEMERAL:

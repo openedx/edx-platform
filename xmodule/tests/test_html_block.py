@@ -138,6 +138,7 @@ class HtmlBlockSubstitutionTestCase(unittest.TestCase):  # lint-amnesty, pylint:
         field_data = DictFieldData({'data': sample_xml})
         module_system = get_test_system(user=AnonymousUser())
         block = HtmlBlock(module_system, field_data, Mock())
+        block.runtime.service(block, 'user')._deprecated_anonymous_user_id = ''  # pylint: disable=protected-access
         assert block.get_html() == sample_xml
 
 

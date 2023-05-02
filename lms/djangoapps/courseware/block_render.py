@@ -493,23 +493,14 @@ def prepare_runtime_for_user(
             will_recheck_access=will_recheck_access,
         )
 
-    # These modules store data using the anonymous_student_id as a key.
-    # To prevent loss of data, we will continue to provide old modules with
-    # the per-student anonymized id (as we have in the past),
-    # while giving selected modules a per-course anonymized id.
-    # As we have the time to manually test more modules, we can add to the list
-    # of modules that get the per-course anonymized id.
-    if getattr(block, 'requires_per_student_anonymous_id', False):
-        anonymous_student_id = anonymous_id_for_user(user, None)
-    else:
-        anonymous_student_id = anonymous_id_for_user(user, course_id)
-
     user_is_staff = bool(has_access(user, 'staff', block.location, course_id))
     user_service = DjangoXBlockUserService(
         user,
         user_is_staff=user_is_staff,
         user_role=get_user_role(user, course_id),
-        anonymous_user_id=anonymous_student_id,
+        anonymous_user_id=anonymous_id_for_user(user, course_id),
+        # See the docstring of `DjangoXBlockUserService`.
+        deprecated_anonymous_user_id=anonymous_id_for_user(user, None),
         request_country_code=user_location,
     )
 

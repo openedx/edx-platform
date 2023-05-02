@@ -194,16 +194,11 @@ def _prepare_runtime_for_preview(request, block, field_data):
         # stick the license wrapper in front
         wrappers.insert(0, partial(wrap_with_license, mako_service=mako_service))
 
-    preview_anonymous_user_id = 'student'
+    anonymous_user_id = deprecated_anonymous_user_id = 'student'
     if individualize_anonymous_user_id(course_id):
-        # There are blocks (capa, html, and video) where we do not want to scope
-        # the anonymous_user_id to specific courses. These are captured in the
-        # block attribute 'requires_per_student_anonymous_id'. Please note,
-        # the course_id field in AnynomousUserID model is blank if value is None.
-        if getattr(block, 'requires_per_student_anonymous_id', False):
-            preview_anonymous_user_id = anonymous_id_for_user(request.user, None)
-        else:
-            preview_anonymous_user_id = anonymous_id_for_user(request.user, course_id)
+        anonymous_user_id = anonymous_id_for_user(request.user, course_id)
+        # See the docstring of `DjangoXBlockUserService`.
+        deprecated_anonymous_user_id = anonymous_id_for_user(request.user, None)
 
     services = {
         "field-data": field_data,
@@ -213,7 +208,8 @@ def _prepare_runtime_for_preview(request, block, field_data):
         "user": DjangoXBlockUserService(
             request.user,
             user_role=get_user_role(request.user, course_id),
-            anonymous_user_id=preview_anonymous_user_id,
+            anonymous_user_id=anonymous_user_id,
+            deprecated_anonymous_user_id=deprecated_anonymous_user_id,
         ),
         "partitions": StudioPartitionService(course_id=course_id),
         "teams_configuration": TeamsConfigurationService(),

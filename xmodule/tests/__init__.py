@@ -139,6 +139,7 @@ def get_test_system(
     user_service = StubUserService(
         user=user,
         anonymous_user_id='student',
+        deprecated_anonymous_user_id='student',
         user_is_staff=user_is_staff,
         user_role='student',
         request_country_code=user_location,
@@ -202,6 +203,7 @@ def prepare_block_runtime(
     user_service = StubUserService(
         user=user,
         anonymous_user_id='student',
+        deprecated_anonymous_user_id='student',
         user_is_staff=user_is_staff,
         user_role='student',
         request_country_code=user_location,
