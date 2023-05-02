@@ -11,6 +11,9 @@ class SidebarView extends Backbone.View {
     constructor(options) {
         const defaults = {
             el: '.sidebar',
+            events: {
+                'click .js-subscription-upsell-cta ': 'trackSubscriptionUpsellCTA',
+            },
         };
         super(Object.assign({}, defaults, options));
     }
@@ -35,6 +38,12 @@ class SidebarView extends Backbone.View {
         this.newProgramsView = new NewProgramsView({
             context: this.context,
         });
+    }
+
+    trackSubscriptionUpsellCTA() {
+        window.analytics.track(
+            'edx.bi.user.subscription.program-dashboard.upsell.clicked'
+        );
     }
 }
 

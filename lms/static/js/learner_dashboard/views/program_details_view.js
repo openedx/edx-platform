@@ -24,6 +24,7 @@ class ProgramDetailsView extends Backbone.View {
             el: '.js-program-details-wrapper',
             events: {
                 'click .complete-program': 'trackPurchase',
+                'click .js-subscription-cta': 'trackSubscriptionCTA',
             },
         };
         super(Object.assign({}, defaults, options));
@@ -60,6 +61,10 @@ class ProgramDetailsView extends Backbone.View {
             this.courseData.get('not_started') || [],
             this.options.userPreferences,
         );
+        this.subscriptionEventParams = {
+            label: this.options.programData.title,
+            program_uuid: this.options.programData.uuid,
+        };
 
         this.render();
 
@@ -69,6 +74,7 @@ class ProgramDetailsView extends Backbone.View {
             pageName: 'program_dashboard',
             linkCategory: 'green_upgrade',
         });
+        this.trackSubscriptionEligibleProgramView();
     }
 
     static getUrl(base, programData) {
@@ -216,6 +222,37 @@ class ProgramDetailsView extends Backbone.View {
             label: data.title,
             uuid: data.uuid,
         });
+    }
+
+    trackSubscriptionCTA() {
+        const state = this.subscriptionModel.get('subscriptionState');
+
+        if (state === 'active') {
+            window.analytics.track(
+                'edx.bi.user.subscription.program-detail-page.manage.clicked',
+                this.subscriptionEventParams
+            );
+        } else {
+            const isNewSubscription = state !== 'inactive';
+            window.analytics.track(
+                'edx.bi.user.subscription.program-detail-page.subscribe.clicked',
+                {
+                    category: `${this.options.programData.variant} bundle`,
+                    is_new_subscription: isNewSubscription,
+                    is_trial_eligible: isNewSubscription,
+                    ...this.subscriptionEventParams,
+                }
+            );
+        }
+    }
+
+    trackSubscriptionEligibleProgramView() {
+        if (this.options.isSubscriptionEligible) {
+            window.analytics.track(
+                'edx.bi.user.subscription.program-detail-page.viewed',
+                this.subscriptionEventParams
+            );
+        }
     }
 }
 
