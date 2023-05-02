@@ -1071,6 +1071,9 @@ class ModuleSystemShim:
         Returns the anonymous user ID for the current user and course.
 
         Deprecated in favor of the user service.
+
+        NOTE: This method returns a course-specific anonymous user ID. If you are looking for the student-specific one,
+              use `ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID` from the user service.
         """
         warnings.warn(
             'runtime.anonymous_student_id is deprecated. Please use the user service instead.',
