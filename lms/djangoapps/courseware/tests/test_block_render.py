@@ -64,7 +64,7 @@ from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, py
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
 from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
+from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID, ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
 from lms.djangoapps.badges.tests.factories import BadgeClassFactory
 from lms.djangoapps.badges.tests.test_models import get_image
 from lms.djangoapps.courseware import block_render as render
@@ -1858,6 +1858,7 @@ class TestStaffDebugInfo(SharedModuleStoreTestCase):
 
 PER_COURSE_ANONYMIZED_XBLOCKS = (
     LTIBlock,
+    VideoBlock,
 )
 PER_STUDENT_ANONYMIZED_XBLOCKS = [
     AboutBlock,
@@ -1865,7 +1866,6 @@ PER_STUDENT_ANONYMIZED_XBLOCKS = [
     HtmlBlock,
     ProblemBlock,
     StaticTabBlock,
-    VideoBlock,
 ]
 
 
@@ -1886,7 +1886,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         self.user = UserFactory()
 
     @patch('lms.djangoapps.courseware.block_render.has_access', Mock(return_value=True, autospec=True))
-    def _get_anonymous_id(self, course_id, xblock_class):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def _get_anonymous_id(self, course_id, xblock_class, should_get_deprecated_id: bool):  # lint-amnesty, pylint: disable=missing-function-docstring
         location = course_id.make_usage_key('dummy_category', 'dummy_name')
         block = Mock(
             spec=xblock_class,
@@ -1924,21 +1924,24 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
             course=self.course,
         )
         current_user = rendered_block.runtime.service(rendered_block, 'user').get_current_user()
+
+        if should_get_deprecated_id:
+            return current_user.opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
         return current_user.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
 
     @ddt.data(*PER_STUDENT_ANONYMIZED_XBLOCKS)
     def test_per_student_anonymized_id(self, block_class):
         for course_id in ('MITx/6.00x/2012_Fall', 'MITx/6.00x/2013_Spring'):
             assert 'de619ab51c7f4e9c7216b4644c24f3b5' == \
-                   self._get_anonymous_id(CourseKey.from_string(course_id), block_class)
+                   self._get_anonymous_id(CourseKey.from_string(course_id), block_class, True)
 
     @ddt.data(*PER_COURSE_ANONYMIZED_XBLOCKS)
     def test_per_course_anonymized_id(self, xblock_class):
         assert '0c706d119cad686d28067412b9178454' == \
-               self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), xblock_class)
+               self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2012_Fall'), xblock_class, False)
 
         assert 'e9969c28c12c8efa6e987d6dbeedeb0b' == \
-               self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2013_Spring'), xblock_class)
+               self._get_anonymous_id(CourseKey.from_string('MITx/6.00x/2013_Spring'), xblock_class, False)
 
 
 @patch('common.djangoapps.track.views.eventtracker', autospec=True)
@@ -2720,7 +2723,9 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             course=self.course,
         )
         # Ensure the problem block returns a per-user anonymous id
-        assert self.problem_block.runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
+        assert self.problem_block.runtime.service(self.problem_block, 'user').get_current_user().opt_attrs.get(
+            ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
+        ) == anonymous_id_for_user(self.user, None)
 
         _ = render.prepare_runtime_for_user(
             self.user,
@@ -2732,10 +2737,14 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             course=self.course,
         )
         # Ensure the vertical block returns a per-course+user anonymous id
-        assert self.block.runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+        assert self.block.runtime.service(self.block, 'user').get_current_user().opt_attrs.get(
+            ATTR_KEY_ANONYMOUS_USER_ID
+        ) == anonymous_id_for_user(self.user, self.course.id)
 
         # Ensure the problem runtime's anonymous student ID is unchanged after the above call.
-        assert self.problem_block.runtime.anonymous_student_id == anonymous_id_for_user(self.user, None)
+        assert self.problem_block.runtime.service(self.problem_block, 'user').get_current_user().opt_attrs.get(
+            ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
+        ) == anonymous_id_for_user(self.user, None)
 
     def test_user_service_with_anonymous_user(self):
         _ = render.prepare_runtime_for_user(

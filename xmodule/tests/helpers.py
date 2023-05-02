@@ -67,12 +67,14 @@ class StubUserService(UserService):
                  user_is_staff=False,
                  user_role=None,
                  anonymous_user_id=None,
+                 deprecated_anonymous_user_id=None,
                  request_country_code=None,
                  **kwargs):
         self.user = user
         self.user_is_staff = user_is_staff
         self.user_role = user_role
         self.anonymous_user_id = anonymous_user_id
+        self.deprecated_anonymous_user_id = deprecated_anonymous_user_id
         self.request_country_code = request_country_code
         self._django_user = user
         super().__init__(**kwargs)
@@ -84,6 +86,7 @@ class StubUserService(UserService):
         user = XBlockUser()
         if self.user and self.user.is_authenticated:
             user.opt_attrs['edx-platform.anonymous_user_id'] = self.anonymous_user_id
+            user.opt_attrs['edx-platform.deprecated_anonymous_user_id'] = self.deprecated_anonymous_user_id
             user.opt_attrs['edx-platform.request_country_code'] = self.request_country_code
             user.opt_attrs['edx-platform.user_is_staff'] = self.user_is_staff
             user.opt_attrs['edx-platform.user_id'] = self.user.id
