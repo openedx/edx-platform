@@ -128,7 +128,7 @@ class CertificateValidationError(CertificateException):
 class CertificateManager:
     """
     The CertificateManager is responsible for storage, retrieval, and manipulation of Certificates
-    Certificates are not stored in the Django ORM, they are a field/setting on the course descriptor
+    Certificates are not stored in the Django ORM, they are a field/setting on the course block
     """
     @staticmethod
     def parse(json_string):

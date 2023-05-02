@@ -23,12 +23,14 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             'click .move-button': 'showMoveXBlockModal',
             'click .delete-button': 'deleteXBlock',
             'click .show-actions-menu-button': 'showXBlockActionsMenu',
-            'click .new-component-button': 'scrollToNewComponentButtons'
+            'click .new-component-button': 'scrollToNewComponentButtons',
+            'click .paste-component-button': 'pasteComponent',
         },
 
         options: {
             collapsedClass: 'is-collapsed',
-            canEdit: true // If not specified, assume user has permission to make changes
+            canEdit: true, // If not specified, assume user has permission to make changes
+            clipboardData: { content: null },
         },
 
         view: 'container_preview',
@@ -100,6 +102,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
+            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
         },
 
         getViewParameters: function() {
@@ -147,6 +150,11 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
 
                     // Re-enable Backbone events for any updated DOM elements
                     self.delegateEvents();
+
+                    // Show/hide the paste button
+                    if (!self.isLibraryPage) {
+                        self.initializePasteButton();
+                    }
                 },
                 block_added: options && options.block_added
             });
@@ -180,6 +188,59 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             } else {
                 this.$('.add-xblock-component').remove();
             }
+        },
+
+        initializePasteButton() {
+            if (this.options.canEdit) {
+                // We should have the user's clipboard status.
+                const data = this.options.clipboardData;
+                this.refreshPasteButton(data);
+                // Refresh the status when something is copied on another tab:
+                this.clipboardBroadcastChannel.onmessage = (event) => { this.refreshPasteButton(event.data); };
+            } else {
+                this.$(".paste-component").hide();
+            }
+        },
+
+        /**
+         * Given the latest information about the user's clipboard, hide or show the Paste button as appropriate.
+         */
+        refreshPasteButton(data) {
+            // 'data' is the same data returned by the "get clipboard status" API endpoint
+            // i.e. /api/content-staging/v1/clipboard/
+            if (this.options.canEdit && data.content) {
+                // TODO: check if this is suitable for pasting into a unit
+                this.$(".paste-component").show();
+            } else {
+                this.$(".paste-component").hide();
+            }
+        },
+
+        /** The user has clicked on the "Paste Component button" */
+        pasteComponent(event) {
+            event.preventDefault();
+            // Get the ID of the container (usually a unit/vertical) that we're pasting into:
+            const parentElement = this.findXBlockElement(event.target);
+            const parentLocator = parentElement.data('locator');
+            // Create a placeholder XBlock while we're pasting:
+            const $placeholderEl = $(this.createPlaceholderElement());
+            const addComponentsPanel = $(event.target).closest('.paste-component').prev();
+            const listPanel = addComponentsPanel.prev();
+            const scrollOffset = ViewUtils.getScrollOffset(addComponentsPanel);
+            const placeholderElement = $placeholderEl.appendTo(listPanel);
+
+            // Start showing a "Pasting" notification:
+            ViewUtils.runOperationShowingMessage(gettext('Pasting'), () => {
+                return $.postJSON(this.getURLRoot() + '/', {
+                    parent_locator: parentLocator,
+                    staged_content: "clipboard",
+                }).then((data) => {
+                    this.onNewXBlock(placeholderElement, scrollOffset, false, data);
+                }).fail(() => {
+                    // Remove the placeholder if the paste failed
+                    placeholderElement.remove();
+                });
+            });
         },
 
         editXBlock: function(event, options) {
@@ -307,6 +368,8 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     const status = data.content?.status;
                     if (status === "ready") {
                         // The XBlock has been copied and is ready to use.
+                        this.refreshPasteButton(data); // Update our UI
+                        this.clipboardBroadcastChannel.postMessage(data); // And notify any other open tabs
                         return data;
                     } else if (status === "loading") {
                         // The clipboard is being loaded asynchonously.
@@ -316,6 +379,8 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                             $.getJSON(clipboardEndpoint, (pollData) => {
                                 const newStatus = pollData.content?.status;
                                 if (newStatus === "ready") {
+                                    this.refreshPasteButton(data);
+                                    this.clipboardBroadcastChannel.postMessage(pollData);
                                     deferred.resolve(pollData);
                                 } else if (newStatus === "loading") {
                                     setTimeout(checkStatus, 1_000);

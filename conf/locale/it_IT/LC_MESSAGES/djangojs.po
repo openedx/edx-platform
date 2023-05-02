@@ -71,7 +71,7 @@
 # Tiziana Longeri <tiziana.longeri@polimi.it>, 2015
 # Wu Wei <micheleweiwu@gmail.com>, 2016
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Italian (Italy) (https://www.transifex.com/open-edx/teams/6205/it_IT/).
+# edX community translations have been downloaded from Italian (Italy) (https://app.transifex.com/open-edx/teams/6205/it_IT/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.

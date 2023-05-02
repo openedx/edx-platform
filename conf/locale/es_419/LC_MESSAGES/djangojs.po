@@ -94,7 +94,7 @@
 # Yovany Alexander Álvarez Correa <yalvarez@innovapues.com>, 2018
 # Zimeng Chen, 2021
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/).
+# edX community translations have been downloaded from Spanish (Latin America) (https://app.transifex.com/open-edx/teams/6205/es_419/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.

@@ -76,7 +76,7 @@ _Assignment = namedtuple(
 
 def get_course(course_id, depth=0):
     """
-    Given a course id, return the corresponding course descriptor.
+    Given a course id, return the corresponding course block.
 
     If the course does not exist, raises a CourseRunNotFound. This is appropriate
     for internal use.
@@ -92,9 +92,9 @@ def get_course(course_id, depth=0):
 
 def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=False, check_survey_complete=True, check_if_authenticated=False):  # lint-amnesty, pylint: disable=line-too-long
     """
-    Given a course_key, look up the corresponding course descriptor,
+    Given a course_key, look up the corresponding course block,
     check that the user has the access to perform the specified action
-    on the course, and return the descriptor.
+    on the course, and return the block.
 
     Raises a 404 if the course_key is invalid, or the user doesn't have access.
 
@@ -857,26 +857,26 @@ def get_problems_in_section(section):
     """
     This returns a dict having problems in a section.
     Returning dict has problem location as keys and problem
-    descriptor as values.
+    block as values.
     """
 
-    problem_descriptors = defaultdict()
+    problem_blocks = defaultdict()
     if not isinstance(section, UsageKey):
         section_key = UsageKey.from_string(section)
     else:
         section_key = section
     # it will be a Mongo performance boost, if you pass in a depth=3 argument here
     # as it will optimize round trips to the database to fetch all children for the current node
-    section_descriptor = modulestore().get_item(section_key, depth=3)
+    section_block = modulestore().get_item(section_key, depth=3)
 
     # iterate over section, sub-section, vertical
-    for subsection in section_descriptor.get_children():
+    for subsection in section_block.get_children():
         for vertical in subsection.get_children():
             for component in vertical.get_children():
                 if component.location.block_type == 'problem' and getattr(component, 'has_score', False):
-                    problem_descriptors[str(component.location)] = component
+                    problem_blocks[str(component.location)] = component
 
-    return problem_descriptors
+    return problem_blocks
 
 
 def get_current_child(xblock, min_depth=None, requested_child=None):

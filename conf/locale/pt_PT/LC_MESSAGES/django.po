@@ -103,7 +103,7 @@
 # Drew Melim <nokostya.translation@gmail.com>, 2015
 # Rui Ribeiro <info@nau.edu.pt>, 2018-2019
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/)
+# edX community translations have been downloaded from Portuguese (Portugal) (http://app.transifex.com/open-edx/edx-platform/language/pt_PT/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -129,7 +129,7 @@
 # Ricardo Simões <xmcorporation@gmail.com>, 2014
 # Rui Ribeiro <info@nau.edu.pt>, 2019
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Portuguese (Portugal) (https://www.transifex.com/open-edx/teams/6205/pt_PT/)
+# edX community translations have been downloaded from Portuguese (Portugal) (https://app.transifex.com/open-edx/teams/6205/pt_PT/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -141,10 +141,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-26 20:42+0000\n"
+"POT-Creation-Date: 2023-04-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Cátia Lopes <catia.lopes@bridgelk.com>, 2019\n"
-"Language-Team: Portuguese (Portugal) (https://www.transifex.com/open-edx/teams/6205/pt_PT/)\n"
+"Language-Team: Portuguese (Portugal) (https://app.transifex.com/open-edx/teams/6205/pt_PT/)\n"
 "Language: pt_PT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -235,7 +235,7 @@ msgstr "É necessário um ficheiro de transcrição."
 #: cms/djangoapps/contentstore/views/videos.py
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Ready"
-msgstr ""
+msgstr "Concluído"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -7268,8 +7268,9 @@ msgstr "Este utilizador já tem acesso a esta biblioteca."
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Staged Content"
-msgstr ""
+msgstr "Conteúdo Preparado"
 
+#: openedx/core/djangoapps/content_staging/models.py
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -7282,7 +7283,7 @@ msgstr "A carregar"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Expired"
-msgstr ""
+msgstr "Expirado"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid ""
@@ -7292,10 +7293,16 @@ msgid ""
 "            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
 "        "
 msgstr ""
+"\n"
+"            Que tipo de conteúdo é preparado. Só é suportado o conteúdo do OLX e\n"
+"            este campo tem de ser igual à etiqueta de raiz do OLX. \n"
+"            Por exemplo, \"video\" se for um vídeo preparado ou \"vertical\" para uma unidade."
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
+"Chave de utilização/ID original do objecto que se encontra na área de "
+"transferência."
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -8036,9 +8043,9 @@ msgid ""
 " participating in the discussion forums. What do you want to do to keep "
 "learning?"
 msgstr ""
-"Todas as semanas, muitos dos estudantes de %(platform_name)s estão a avançar"
-" na resolução de problemas e a participar ativamente nos fóruns de debate. O"
-" que deseja fazer para continuar a aprender?"
+"Todas as semanas, estudantes da %(platform_name)s estão a avançar na "
+"resolução de problemas e a participar ativamente nos fóruns de debate. O que"
+" deseja fazer para continuar a aprender?"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -8048,10 +8055,9 @@ msgid ""
 "problems every week, and participating in the discussion forums. What do you"
 " want to do to keep learning?"
 msgstr ""
-"Todas as semanas, muitos dos estudantes de %(platform_name)s no curso "
-"%(course_name)s estão a avançar na resolução de problemas e a participar "
-"ativamente nos fóruns de debate. O que deseja fazer para continuar a a "
-"aprender?"
+"Todas as semanas, estudantes da %(platform_name)s no curso %(course_name)s "
+"estão a avançar na resolução de problemas e a participar ativamente nos "
+"fóruns de debate. O que deseja fazer para continuar a a aprender?"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/subject.txt
@@ -8065,7 +8071,7 @@ msgid ""
 " completing more problems every week, and participating in the discussion "
 "forums. What do you want to do to keep learning?"
 msgstr ""
-"Todas as semanas, muitos dos estudantes de {platform_name} no curso "
+"Todas as semanas, estudantes da {platform_name} no curso "
 "{start_strong}{course_name}{end_strong} estão a avançar na resolução de "
 "problemas e a participar ativamente nos fóruns de debate. O que deseja fazer"
 " para continuar a a aprender?"
@@ -21710,10 +21716,8 @@ msgstr "ID de Localização"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
-"Para criar um link para esta unidade a partir de um componente HTML neste "
-"curso, insira \"/jump_to_id/<location ID>\" como o valor URL."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"

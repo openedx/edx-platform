@@ -120,7 +120,7 @@
 # Mehmet Kokoç <kokocmehmet@gmail.com>, 2017
 # a56fc07028489bb2b53400de33ba6a83, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)
+# edX community translations have been downloaded from Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -132,10 +132,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-26 20:42+0000\n"
+"POT-Creation-Date: 2023-04-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
-"Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
+"Language-Team: Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -225,7 +225,7 @@ msgstr "Bir altyazı dosyası gerekiyor."
 #: cms/djangoapps/contentstore/views/videos.py
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Ready"
-msgstr ""
+msgstr "Hazır"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -352,7 +352,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Lock upgrade deadline date"
-msgstr ""
+msgstr "Yükseltme son tarihini kilitle"
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -360,6 +360,9 @@ msgid ""
 "date. Set to False if there is no upgrade deadline or to use the default "
 "upgrade deadline."
 msgstr ""
+"İSTEĞE BAĞLI: Açıkça tanımlanmış yükseltme son tarihini kilitlemek için True"
+" olarak ayarlayın. Yükseltme son tarihi yoksa ya da öntanmlı yükseltme son "
+"tarihini kullanmak için False olarak ayarlayın."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -377,8 +380,8 @@ msgid ""
 "the course. Leave this blank if the course has not yet been migrated to the "
 "ecommerce service."
 msgstr ""
-"İSTEĞE BAĞLI: Bu, kursun bu modu için Play Store'da kayıtlı olan Android SKU"
-" (stok tutma birimi) kodudur. Eğer bu eğitim e-ticaret servisine henüz "
+"İSTEĞE BAĞLI: Bu, dersin bu modu için Play Store'da kayıtlı olan Android SKU"
+" (stok tutma birimi) kodudur. Eğer bu ders e-ticaret servisine henüz "
 "geçirilmemişse boş bırakın."
 
 #: common/djangoapps/course_modes/models.py
@@ -3910,7 +3913,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "A list of usage keys for the blocks to include in the report. "
-msgstr ""
+msgstr "Rapora dahil edilecek xblocklar için kullanım anahtarlarının listesi."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -7130,6 +7133,7 @@ msgstr "Bu kullanıcının bu kütüphaneye zaten erişimi var."
 msgid "Staged Content"
 msgstr ""
 
+#: openedx/core/djangoapps/content_staging/models.py
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -7138,11 +7142,11 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "Loading"
-msgstr "Yükleniyor..."
+msgstr "Yükleniyor"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Expired"
-msgstr ""
+msgstr "Sona Erdi"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid ""
@@ -7630,6 +7634,8 @@ msgid ""
 "Comma-separated list of scopes that this application will be allowed to "
 "request."
 msgstr ""
+"Bu uygulamanın istemesine izin verilecek kapsamların virgülle ayrılmış "
+"listesi."
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -21251,10 +21257,8 @@ msgstr "Konum ID"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
-"Bu ders içindeki bir HTML bileşeninden bu üniteye bağlantı oluşturmak için, "
-"URL değeri olarak \"/jump_to_id/<location ID>\" girin."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"

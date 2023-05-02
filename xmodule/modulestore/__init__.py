@@ -922,7 +922,7 @@ class ModuleStoreRead(ModuleStoreAssetBase, metaclass=ABCMeta):
     def get_course(self, course_id, depth=0, **kwargs):
         '''
         Look for a specific course by its id (:class:`CourseKey`).
-        Returns the course descriptor, or None if not found.
+        Returns the course block, or None if not found.
         '''
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
@@ -1286,8 +1286,8 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         # clone a default 'about' overview block as well
         about_location = self.make_course_key(org, course, run).make_usage_key('about', 'overview')
 
-        about_descriptor = XBlock.load_class('about')
-        overview_template = about_descriptor.get_template('overview.yaml')
+        about_block = XBlock.load_class('about')
+        overview_template = about_block.get_template('overview.yaml')
         self.create_item(
             user_id,
             about_location.course_key,

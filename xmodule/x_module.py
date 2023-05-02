@@ -286,7 +286,7 @@ class XModuleMixin(XModuleFields, XBlock):
 
     Adding this Mixin to an :class:`XBlock` allows it to cooperate with old-style :class:`XModules`
     """
-    # Attributes for inspection of the descriptor
+    # Attributes for inspection of the block
 
     # This indicates whether the xmodule is a problem-type.
     # It should respond to max_score() and grade(). It can be graded or ungraded
@@ -299,7 +299,7 @@ class XModuleMixin(XModuleFields, XBlock):
 
     # Class level variable
 
-    # True if this descriptor always requires recalculation of grades, for
+    # True if this block always requires recalculation of grades, for
     # example if the score can change via an extrnal service, not just when the
     # student interacts with the module on the page.  A specific example is
     # FoldIt, which posts grade-changing updates through a separate API.
@@ -563,10 +563,10 @@ class XModuleMixin(XModuleFields, XBlock):
 
     def has_dynamic_children(self):
         """
-        Returns True if this descriptor has dynamic children for a given
+        Returns True if this block has dynamic children for a given
         student when the module is created.
 
-        Returns False if the children of this descriptor are the same
+        Returns False if the children of this block are the same
         children that the module will return for any student.
         """
         return False
@@ -1002,7 +1002,7 @@ class ConfigurableFragmentWrapper:
 # Runtime.handler_url interface.
 #
 # The monkey-patching happens in cms/djangoapps/xblock_config/apps.py and lms/djangoapps/lms_xblock/apps.py
-def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):
+def block_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):
     """
     See :meth:`xblock.runtime.Runtime.handler_url`.
     """
@@ -1014,7 +1014,7 @@ def descriptor_global_handler_url(block, handler_name, suffix='', query='', thir
 # the Runtime part of its interface. This function matches the Runtime.local_resource_url interface
 #
 # The monkey-patching happens in cms/djangoapps/xblock_config/apps.py and lms/djangoapps/lms_xblock/apps.py
-def descriptor_global_local_resource_url(block, uri):
+def block_global_local_resource_url(block, uri):
     """
     See :meth:`xblock.runtime.Runtime.local_resource_url`.
     """
@@ -1529,7 +1529,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
         # defined for LMS/CMS through the handler_url_override property.
         if getattr(self, 'handler_url_override', None):
             return self.handler_url_override(block, handler_name, suffix, query, thirdparty)
-        return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
+        return block_global_handler_url(block, handler_name, suffix, query, thirdparty)
 
     def local_resource_url(self, block, uri):
         """
@@ -1539,7 +1539,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
         # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
         # that implements the correct local_resource_url. So, for now, instead, we will reference a
         # global function that the application can override.
-        return descriptor_global_local_resource_url(block, uri)
+        return block_global_local_resource_url(block, uri)
 
     def applicable_aside_types(self, block):
         """

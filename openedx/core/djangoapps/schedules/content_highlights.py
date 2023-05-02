@@ -37,7 +37,7 @@ def course_has_highlights(course):
     inaccessible content.
 
     Arguments:
-        course (CourseDescriptor): course object to check
+        course (CourseBlock): course block to check
     """
     if not course.highlights_enabled_for_messaging:
         return False
@@ -106,7 +106,7 @@ def get_next_section_highlights(user, course_key, start_date, target_date):
 
 
 def _get_course_with_highlights(course_key):
-    """ Gets Course descriptor iff highlights are enabled for the course """
+    """ Gets Course descriptor if highlights are enabled for the course """
     course_descriptor = _get_course_descriptor(course_key)
     if not course_descriptor.highlights_enabled_for_messaging:
         raise CourseUpdateDoesNotExist(
@@ -118,12 +118,12 @@ def _get_course_with_highlights(course_key):
 
 def _get_course_descriptor(course_key):
     """ Gets course descriptor from modulestore """
-    course_descriptor = modulestore().get_course(course_key, depth=1)
-    if course_descriptor is None:
+    descriptor = modulestore().get_course(course_key, depth=1)
+    if descriptor is None:
         raise CourseUpdateDoesNotExist(
             f'Course {course_key} not found.'
         )
-    return course_descriptor
+    return descriptor
 
 
 def _get_course_block(course_descriptor, user):
@@ -137,9 +137,9 @@ def _get_course_block(course_descriptor, user):
     request = get_request_or_stub()
     request.user = user
 
-    # Now evil modulestore magic to inflate our descriptor with user state and
+    # Now evil modulestore magic to inflate our block with user state and
     # permissions checks.
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+    field_data_cache = FieldDataCache.cache_for_block_descendents(
         course_descriptor.id, user, course_descriptor, depth=1, read_only=True,
     )
     course_block = get_block_for_descriptor(

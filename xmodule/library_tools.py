@@ -125,9 +125,9 @@ class LibraryToolsService:
         if usage_key.block_type != "problem":
             return False
 
-        descriptor = self.store.get_item(usage_key, depth=0)
-        assert isinstance(descriptor, ProblemBlock)
-        return capa_type in descriptor.problem_types
+        block = self.store.get_item(usage_key, depth=0)
+        assert isinstance(block, ProblemBlock)
+        return capa_type in block.problem_types
 
     def can_use_library_content(self, block):
         """

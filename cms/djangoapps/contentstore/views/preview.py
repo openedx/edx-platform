@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from opaque_keys.edx.keys import UsageKey
+from rest_framework.request import Request
 from web_fragments.fragment import Fragment
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError
@@ -24,7 +25,7 @@ from xmodule.services import SettingsService, TeamsConfigurationService
 from xmodule.studio_editable import has_author_view
 from xmodule.util.sandboxing import SandboxService
 from xmodule.util.xmodule_django import add_webpack_to_fragment
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW
+from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, XModuleMixin
 from cms.djangoapps.xblock_config.models import StudioConfig
 from cms.djangoapps.contentstore.toggles import individualize_anonymous_user_id, ENABLE_COPY_PASTE_FEATURE
 from cms.lib.xblock.field_data import CmsFieldData
@@ -65,8 +66,8 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     """
     usage_key = UsageKey.from_string(usage_key_string)
 
-    descriptor = modulestore().get_item(usage_key)
-    instance = _load_preview_block(request, descriptor)
+    block = modulestore().get_item(usage_key)
+    instance = _load_preview_block(request, block)
 
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
@@ -154,6 +155,7 @@ def _prepare_runtime_for_preview(request, block, field_data):
     required for rendering block previews.
 
     request: The active django request
+    block: An XBlock
     field_data: Wrapped field data for previews
     """
 
@@ -256,29 +258,29 @@ class StudioPartitionService(PartitionService):
         return None
 
 
-def _load_preview_block(request, descriptor):
+def _load_preview_block(request: Request, block: XModuleMixin):
     """
-    Return a preview XBlock instantiated from the supplied descriptor. Will use mutable fields
+    Return a preview XBlock instantiated from the supplied block. Will use mutable fields
     if XBlock supports an author_view. Otherwise, will use immutable fields and student_view.
 
     request: The active django request
-    descriptor: An XModuleDescriptor
+    block: An XModuleMixin
     """
     student_data = KvsFieldData(SessionKeyValueStore(request))
-    if has_author_view(descriptor):
+    if has_author_view(block):
         wrapper = partial(CmsFieldData, student_data=student_data)
     else:
         wrapper = partial(LmsFieldData, student_data=student_data)
 
     # wrap the _field_data upfront to pass to _prepare_runtime_for_preview
-    wrapped_field_data = wrapper(descriptor._field_data)  # pylint: disable=protected-access
-    _prepare_runtime_for_preview(request, descriptor, wrapped_field_data)
+    wrapped_field_data = wrapper(block._field_data)  # pylint: disable=protected-access
+    _prepare_runtime_for_preview(request, block, wrapped_field_data)
 
-    descriptor.bind_for_student(
+    block.bind_for_student(
         request.user.id,
         [wrapper]
     )
-    return descriptor
+    return block
 
 
 def _is_xblock_reorderable(xblock, context):
@@ -332,12 +334,12 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     return frag
 
 
-def get_preview_fragment(request, descriptor, context):
+def get_preview_fragment(request, block, context):
     """
     Returns the HTML returned by the XModule's student_view or author_view (if available),
-    specified by the descriptor and idx.
+    specified by the block and idx.
     """
-    block = _load_preview_block(request, descriptor)
+    block = _load_preview_block(request, block)
 
     preview_view = AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
 

@@ -885,33 +885,33 @@ class CourseGradingTest(CourseTestCase):
     @mock.patch('cms.djangoapps.contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
     def test_update_section_grader_type(self, send_signal, tracker, uuid):
         uuid.return_value = 'mockUUID'
-        # Get the descriptor and the section_grader_type and assert they are the default values
-        descriptor = modulestore().get_item(self.course.location)
+        # Get the block and the section_grader_type and assert they are the default values
+        block = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
-        self.assertEqual(None, descriptor.format)
-        self.assertEqual(False, descriptor.graded)
+        self.assertEqual(None, block.format)
+        self.assertEqual(False, block.graded)
 
         # Change the default grader type to Homework, which should also mark the section as graded
         CourseGradingModel.update_section_grader_type(self.course, 'Homework', self.user)
-        descriptor = modulestore().get_item(self.course.location)
+        block = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
         grading_policy_1 = self._grading_policy_hash_for_course()
 
         self.assertEqual('Homework', section_grader_type['graderType'])
-        self.assertEqual('Homework', descriptor.format)
-        self.assertEqual(True, descriptor.graded)
+        self.assertEqual('Homework', block.format)
+        self.assertEqual(True, block.graded)
 
         # Change the grader type back to notgraded, which should also unmark the section as graded
         CourseGradingModel.update_section_grader_type(self.course, 'notgraded', self.user)
-        descriptor = modulestore().get_item(self.course.location)
+        block = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
         grading_policy_2 = self._grading_policy_hash_for_course()
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
-        self.assertEqual(None, descriptor.format)
-        self.assertEqual(False, descriptor.graded)
+        self.assertEqual(None, block.format)
+        self.assertEqual(False, block.graded)
 
         # one for each call to update_section_grader_type()
         send_signal.assert_has_calls([
