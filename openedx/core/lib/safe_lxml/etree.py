@@ -16,7 +16,7 @@ isort:skip_file
 
 from lxml.etree import XMLParser as _XMLParser
 from lxml.etree import *  # lint-amnesty, pylint: disable=redefined-builtin
-from lxml.etree import _Element, _ElementTree
+from lxml.etree import _Comment, _Element, _ElementTree, _Entity, _ProcessingInstruction
 
 # This should be imported after lxml.etree so that it overrides the following attributes.
 from defusedxml.lxml import XML, fromstring, parse
