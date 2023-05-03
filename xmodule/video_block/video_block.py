@@ -491,11 +491,14 @@ class VideoBlock(
         """
         Return course video sharing options override or None
         """
-        course = get_course_by_id(self.course_id)
-        course_video_sharing_option = course.video_sharing_options \
-            if hasattr(course, 'video_sharing_options') else None
+        try:
+            course = get_course_by_id(self.course_id)
+            return getattr(course, 'video_sharing_options', None)
 
-        return course_video_sharing_option
+        # In case the course / modulestore does something weird
+        except Exception as err: # pylint: disable=broad-except
+            log.exception(f"Error retrieving course for course ID: {self.course_id}")
+            return None
 
     def is_public_sharing_enabled(self):
         """
