@@ -11,9 +11,7 @@ export function markBlocksCompletedOnViewIfNeeded(runtime, containerElement) {
         const tracker = new ViewedEventTracker();
 
         blockElements.forEach((blockElement) => {
-            const markCompletedOnViewAfterDelay = parseInt(
-                blockElement.dataset.markCompletedOnViewAfterDelay, 10,
-            );
+            const markCompletedOnViewAfterDelay = parseInt(blockElement.dataset.markCompletedOnViewAfterDelay, 10,);
             if (markCompletedOnViewAfterDelay >= 0) {
                 tracker.addElement(blockElement, markCompletedOnViewAfterDelay);
             }

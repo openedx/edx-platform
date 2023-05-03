@@ -8,7 +8,9 @@ function createMobileMenu() {
      * Dynamically create a mobile menu from all specified mobile links
      * on the page.
      */
-    'use strict';
+    
+'use strict';
+
     $('.mobile-nav-item').each(function() {
         var mobileNavItem = $(this).clone().addClass('mobile-nav-link');
         mobileNavItem.removeAttr('role');
@@ -20,6 +22,7 @@ function createMobileMenu() {
 
 $(document).ready(function() {
     'use strict';
+
     var $hamburgerMenu;
     var $mobileMenu;
     // Toggling visibility for the user dropdown
@@ -72,10 +75,10 @@ $(document).ready(function() {
     createMobileMenu();
 });
 
-
 // Accessibility keyboard controls for user dropdown and mobile menu
 $('.mobile-menu, .global-header').on('keydown', function(e) {
     'use strict';
+
     var isNext,
         nextLink,
         loopFirst,
@@ -114,8 +117,8 @@ $('.mobile-menu, .global-header').on('keydown', function(e) {
     }
 
     // Enable arrow functionality within the menu.
-    if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && (isDropdownOption || isMobileOption ||
-        (isHamburgerMenu && $hamburgerMenu.hasClass('open')) || isToggle && $toggleUserDropdown.hasClass('open'))) {
+    if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && (isDropdownOption || isMobileOption
+        || (isHamburgerMenu && $hamburgerMenu.hasClass('open')) || isToggle && $toggleUserDropdown.hasClass('open'))) {
         isNext = e.key === 'ArrowDown';
         if (isNext && !isHamburgerMenu && !isToggle && isLastItem) {
             // Loop to the start from the final element
@@ -133,9 +136,9 @@ $('.mobile-menu, .global-header').on('keydown', function(e) {
             if (!isNext && $curTarget.parent().is(':first-child') && !isHamburgerMenu && !isToggle) {
                 nextLink = isDropdownOption ? $toggleUserDropdown : $hamburgerMenu;
             } else {
-                nextLink = isNext ?
-                    $curTarget.parent().next().find('a') : // eslint-disable-line newline-per-chained-call
-                    $curTarget.parent().prev().find('a'); // eslint-disable-line newline-per-chained-call
+                nextLink = isNext
+                    ? $curTarget.parent().next().find('a') // eslint-disable-line newline-per-chained-call
+                    : $curTarget.parent().prev().find('a'); // eslint-disable-line newline-per-chained-call
             }
         }
         nextLink.focus();
@@ -171,8 +174,8 @@ $('.mobile-menu, .global-header').on('keydown', function(e) {
         }
         e.preventDefault();
         if (isDropdownOption || isToggle) {
-            nextLink = loopFirst ? $toggleUserDropdown :
-                $('.global-header .dropdown-user-menu .dropdown-nav-item a').last();
+            nextLink = loopFirst ? $toggleUserDropdown
+                : $('.global-header .dropdown-user-menu .dropdown-nav-item a').last();
         } else {
             nextLink = loopFirst ? $hamburgerMenu : $('.mobile-menu .mobile-nav-link a').last();
         }

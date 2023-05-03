@@ -678,7 +678,6 @@ describe('CourseOutlinePage', function() {
             });
         });
 
-
         describe('Section Highlights', function() {
             var mockHighlightValues, highlightsLink, highlightInputs, openHighlights, saveHighlights,
                 cancelHighlights, setHighlights, expectHighlightLinkNumberToBe, expectHighlightsToBe,

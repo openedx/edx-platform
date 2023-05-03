@@ -2,7 +2,7 @@
 import React from 'react';
 import isFunction from 'lodash/isFunction';
 
-const Page = ({ children }) => children;
+const Page = ({children}) => children;
 const Header = () => null;
 const Closer = () => null;
 const ErrorPage = () => null;
@@ -27,12 +27,12 @@ export default class Wizard extends React.Component {
         const wizardContext = this.props.wizardContext;
         const closer = this.findSubComponentByType(Wizard.Closer.name)[0];
         pages.push(closer);
-        this.setState({ pages, totalPages, wizardContext });
+        this.setState({pages, totalPages, wizardContext});
     }
 
     handleNext() {
         if (this.state.currentPage < this.props.children.length) {
-            this.setState(prevState => ({ currentPage: prevState.currentPage + 1 }))
+            this.setState(prevState => ({currentPage: prevState.currentPage + 1}))
         }
     }
 
@@ -43,7 +43,7 @@ export default class Wizard extends React.Component {
     // this needs to handle the case of no provided header
     renderHeader() {
         const header = this.findSubComponentByType(Wizard.Header.name)[0];
-        return header.props.children({ currentPage: this.state.currentPage, totalPages: this.state.totalPages })
+        return header.props.children({currentPage: this.state.currentPage, totalPages: this.state.totalPages})
     }
 
     renderPage() {
@@ -54,7 +54,7 @@ export default class Wizard extends React.Component {
             }
 
             if (isFunction(page.props.children)) {
-                return page.props.children({ wizardConsumer: this.props.wizardContext });
+                return page.props.children({wizardConsumer: this.props.wizardContext});
             } else {
                 return page.props.children;
             }
@@ -66,12 +66,12 @@ export default class Wizard extends React.Component {
     renderError() {
         const errorPage = this.findSubComponentByType(Wizard.ErrorPage.name)[0];
         return (
-            <div className="wizard-container" role="dialog" aria-label={gettext("demographics questionnaire")}>
+            <div className="wizard-container" role="dialog" aria-label={gettext('demographics questionnaire')}>
                 <div className="wizard-header">
                     {errorPage.props.children}
                 </div>
                 <div className="wizard-footer justify-content-end h-100 d-flex flex-column">
-                    <button className="wizard-button colored" arial-label={gettext("close questionnaire")} onClick={this.props.onWizardComplete}>{gettext("Close")}</button>
+                    <button className="wizard-button colored" arial-label={gettext('close questionnaire')} onClick={this.props.onWizardComplete}>{gettext('Close')}</button>
                 </div>
             </div>
         )
@@ -104,14 +104,14 @@ export default class Wizard extends React.Component {
             return this.renderError();
         }
         return (
-            <div className="wizard-container" role="dialog" aria-label={gettext("demographics questionnaire")}>
+            <div className="wizard-container" role="dialog" aria-label={gettext('demographics questionnaire')}>
                 <div className="wizard-header mb-4">
                     {this.state.totalPages >= this.state.currentPage && this.renderHeader()}
                 </div>
                 {this.renderPage()}
                 <div className="wizard-footer justify-content-end h-100 d-flex flex-column">
-                    <button className={`wizard-button ${finalPage && 'colored'}`} onClick={this.wizardComplete} aria-label={gettext("finish later")}>{finalPage ? gettext("Return to my dashboard") : gettext("Finish later")}</button>
-                    <button className="wizard-button colored" hidden={finalPage} onClick={this.handleNext} aria-label={gettext("next page")}>{gettext("Next")}</button>
+                    <button className={`wizard-button ${finalPage && 'colored'}`} onClick={this.wizardComplete} aria-label={gettext('finish later')}>{finalPage ? gettext('Return to my dashboard') : gettext('Finish later')}</button>
+                    <button className="wizard-button colored" hidden={finalPage} onClick={this.handleNext} aria-label={gettext('next page')}>{gettext('Next')}</button>
                 </div>
             </div>
         );

@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define(['gettext', 'underscore', 'backbone', 'js/edxnotes/views/note_item',
         'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
         'edx-ui-toolkit/js/utils/html-utils'],

@@ -6,7 +6,6 @@
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
-
   This version of the GNU Lesser General Public License incorporates
 the terms and conditions of version 3 of the GNU General Public
 License, supplemented by the additional permissions listed below.
@@ -224,22 +223,21 @@ var Channel = (function() {
     // add a channel to s_boundChans, throwing if a dup exists
     function s_addBoundChan(win, origin, scope, handler) {
         function hasWin(arr) {
-            for (var i = 0; i < arr.length; i++) if (arr[i].win === win) return true;
+            for (var i = 0; i < arr.length; i++) { if (arr[i].win === win) { return true; } }
             return false;
         }
 
         // does she exist?
         var exists = false;
 
-
         if (origin === '*') {
             // we must check all other origins, sadly.
             for (var k in s_boundChans) {
-                if (!s_boundChans.hasOwnProperty(k)) continue;
-                if (k === '*') continue;
+                if (!s_boundChans.hasOwnProperty(k)) { continue; }
+                if (k === '*') { continue; }
                 if (typeof s_boundChans[k][scope] === 'object') {
                     exists = hasWin(s_boundChans[k][scope]);
-                    if (exists) break;
+                    if (exists) { break; }
                 }
             }
         } else {
@@ -251,10 +249,10 @@ var Channel = (function() {
                 exists = hasWin(s_boundChans[origin][scope]);
             }
         }
-        if (exists) throw "A channel is already bound to the same window which overlaps with origin '" + origin + "' and has scope '" + scope + "'";
+        if (exists) { throw "A channel is already bound to the same window which overlaps with origin '" + origin + "' and has scope '" + scope + "'"; }
 
-        if (typeof s_boundChans[origin] !== 'object') s_boundChans[origin] = { };
-        if (typeof s_boundChans[origin][scope] !== 'object') s_boundChans[origin][scope] = [];
+        if (typeof s_boundChans[origin] !== 'object') { s_boundChans[origin] = { }; }
+        if (typeof s_boundChans[origin][scope] !== 'object') { s_boundChans[origin][scope] = []; }
         s_boundChans[origin][scope].push({win: win, handler: handler});
     }
 
@@ -271,8 +269,7 @@ var Channel = (function() {
     }
 
     function s_isArray(obj) {
-        if (Array.isArray) return Array.isArray(obj);
-        else {
+        if (Array.isArray) { return Array.isArray(obj); } else {
             return (obj.constructor.toString().indexOf('Array') != -1);
         }
     }
@@ -290,7 +287,7 @@ var Channel = (function() {
     var s_onMessage = function(e) {
         try {
             var m = JSON.parse(e.data);
-            if (typeof m !== 'object' || m === null) throw 'malformed';
+            if (typeof m !== 'object' || m === null) { throw 'malformed'; }
         } catch (e) {
             // just ignore any posted messages that do not consist of valid JSON
             return;
@@ -310,7 +307,7 @@ var Channel = (function() {
             }
         }
 
-        if (typeof m.id !== 'undefined') i = m.id;
+        if (typeof m.id !== 'undefined') { i = m.id; }
 
         // w is message source window
         // o is message origin
@@ -342,16 +339,16 @@ var Channel = (function() {
                     }
                 }
             }
+        // eslint-disable-next-line brace-style
         }
         // otherwise it must have an id (or be poorly formed
         else if (typeof i !== 'undefined') {
-            if (s_transIds[i]) s_transIds[i](o, meth, m);
+            if (s_transIds[i]) { s_transIds[i](o, meth, m); }
         }
     };
 
     // Setup postMessage event listeners
-    if (window.addEventListener) window.addEventListener('message', s_onMessage, false);
-    else if (window.attachEvent) window.attachEvent('onmessage', s_onMessage);
+    if (window.addEventListener) { window.addEventListener('message', s_onMessage, false); } else if (window.attachEvent) { window.attachEvent('onmessage', s_onMessage); }
 
     /* a messaging channel is constructed from a window and an origin.
      * the channel will assert that all messages received over the
@@ -390,32 +387,33 @@ var Channel = (function() {
             var debug = function(m) {
                 if (cfg.debugOutput && window.console && window.console.log) {
                     // try to stringify, if it doesn't work we'll let javascript's built in toString do its magic
-                    try { if (typeof m !== 'string') m = JSON.stringify(m); } catch (e) { }
+                    try { if (typeof m !== 'string') { m = JSON.stringify(m); } } catch (e) { }
                     console.log('[' + chanId + '] ' + m);
                 }
             };
 
             /* browser capabilities check */
-            if (!window.postMessage) throw ('jschannel cannot run this browser, no postMessage');
-            if (!window.JSON || !window.JSON.stringify || ! window.JSON.parse) {
+            if (!window.postMessage) { throw ('jschannel cannot run this browser, no postMessage'); }
+            if (!window.JSON || !window.JSON.stringify || !window.JSON.parse) {
                 throw ('jschannel cannot run this browser, no JSON parsing/serialization');
             }
 
             /* basic argument validation */
-            if (typeof cfg !== 'object') throw ('Channel build invoked without a proper object argument');
+            if (typeof cfg !== 'object') { throw ('Channel build invoked without a proper object argument'); }
 
-            if (!cfg.window || !cfg.window.postMessage) throw ('Channel.build() called without a valid window argument');
+            if (!cfg.window || !cfg.window.postMessage) { throw ('Channel.build() called without a valid window argument'); }
 
             /* we'd have to do a little more work to be able to run multiple channels that intercommunicate the same
              * window...  Not sure if we care to support that */
-            if (window === cfg.window) throw ('target window is same as present window -- not allowed');
+            if (window === cfg.window) { throw ('target window is same as present window -- not allowed'); }
 
             // let's require that the client specify an origin.  if we just assume '*' we'll be
             // propagating unsafe practices.  that would be lame.
             var validOrigin = false;
             if (typeof cfg.origin === 'string') {
                 var oMatch;
-                if (cfg.origin === '*') validOrigin = true;
+                // eslint-disable-next-line brace-style
+                if (cfg.origin === '*') { validOrigin = true; }
                 // allow valid domains under http and https.  Also, trim paths off otherwise valid origins.
                 else if ((oMatch = cfg.origin.match(/^https?:\/\/(?:[-a-zA-Z0-9_\.])+(?::\d+)?/)) !== null) {
                     cfg.origin = oMatch[0].toLowerCase();
@@ -423,11 +421,11 @@ var Channel = (function() {
                 }
             }
 
-            if (!validOrigin) throw ('Channel.build() called with an invalid origin');
+            if (!validOrigin) { throw ('Channel.build() called with an invalid origin'); }
 
             if (typeof cfg.scope !== 'undefined') {
-                if (typeof cfg.scope !== 'string') throw 'scope, when specified, must be a string';
-                if (cfg.scope.split('::').length > 1) throw "scope may not contain double colons: '::'";
+                if (typeof cfg.scope !== 'string') { throw 'scope, when specified, must be a string'; }
+                if (cfg.scope.split('::').length > 1) { throw "scope may not contain double colons: '::'"; }
             }
 
             /* private variables */
@@ -435,7 +433,7 @@ var Channel = (function() {
             var chanId = (function() {
                 var text = '';
                 var alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                for (var i = 0; i < 5; i++) text += alpha.charAt(Math.floor(Math.random() * alpha.length));
+                for (var i = 0; i < 5; i++) { text += alpha.charAt(Math.floor(Math.random() * alpha.length)); }
                 return text;
             }());
 
@@ -457,11 +455,11 @@ var Channel = (function() {
                     origin: origin,
                     invoke: function(cbName, v) {
                         // verify in table
-                        if (!inTbl[id]) throw 'attempting to invoke a callback of a nonexistent transaction: ' + id;
+                        if (!inTbl[id]) { throw 'attempting to invoke a callback of a nonexistent transaction: ' + id; }
                         // verify that the callback name is valid
                         var valid = false;
-                        for (var i = 0; i < callbacks.length; i++) if (cbName === callbacks[i]) { valid = true; break; }
-                        if (!valid) throw "request supports no such callback '" + cbName + "'";
+                        for (var i = 0; i < callbacks.length; i++) { if (cbName === callbacks[i]) { valid = true; break; } }
+                        if (!valid) { throw "request supports no such callback '" + cbName + "'"; }
 
                         // send callback invocation
                         postMessage({id: id, callback: cbName, params: v});
@@ -469,7 +467,7 @@ var Channel = (function() {
                     error: function(error, message) {
                         completed = true;
                         // verify in table
-                        if (!inTbl[id]) throw 'error called for nonexistent message: ' + id;
+                        if (!inTbl[id]) { throw 'error called for nonexistent message: ' + id; }
 
                         // remove transaction from table
                         delete inTbl[id];
@@ -480,7 +478,7 @@ var Channel = (function() {
                     complete: function(v) {
                         completed = true;
                         // verify in table
-                        if (!inTbl[id]) throw 'complete called for nonexistent message: ' + id;
+                        if (!inTbl[id]) { throw 'complete called for nonexistent message: ' + id; }
                         // remove transaction from table
                         delete inTbl[id];
                         // send complete
@@ -540,7 +538,7 @@ var Channel = (function() {
                                     var pathItems = path.split('/');
                                     for (var j = 0; j < pathItems.length - 1; j++) {
                                         var cp = pathItems[j];
-                                        if (typeof obj[cp] !== 'object') obj[cp] = { };
+                                        if (typeof obj[cp] !== 'object') { obj[cp] = { }; }
                                         obj = obj[cp];
                                     }
                                     obj[pathItems[pathItems.length - 1]] = (function() {
@@ -552,7 +550,7 @@ var Channel = (function() {
                                 }
                             }
                             var resp = regTbl[method](trans, m.params);
-                            if (!trans.delayReturn() && !trans.completed()) trans.complete(resp);
+                            if (!trans.delayReturn() && !trans.completed()) { trans.complete(resp); }
                         } catch (e) {
                             // automagic handling of exceptions:
                             var error = 'runtime_error';
@@ -566,13 +564,12 @@ var Channel = (function() {
                                 if (e && s_isArray(e) && e.length == 2) {
                                     error = e[0];
                                     message = e[1];
+                                // eslint-disable-next-line brace-style
                                 }
                                 // * if it's an object then we'll look form error and message parameters
                                 else if (typeof e.error === 'string') {
                                     error = e.error;
-                                    if (!e.message) message = '';
-                                    else if (typeof e.message === 'string') message = e.message;
-                                    else e = e.message; // let the stringify/toString message give us a reasonable verbose error string
+                                    if (!e.message) { message = ''; } else if (typeof e.message === 'string') { message = e.message; } else { e = e.message; } // let the stringify/toString message give us a reasonable verbose error string
                                 }
                             }
 
@@ -582,7 +579,7 @@ var Channel = (function() {
                                     message = JSON.stringify(e);
                                     /* On MSIE8, this can result in 'out of memory', which
                                      * leaves message undefined. */
-                                    if (typeof(message) === 'undefined') { message = e.toString(); }
+                                    if (typeof message === 'undefined') { message = e.toString(); }
                                 } catch (e2) {
                                     message = e.toString();
                                 }
@@ -606,8 +603,7 @@ var Channel = (function() {
                         if (m.error) {
                             (1, outTbl[m.id].error)(m.error, m.message);
                         } else {
-                            if (m.result !== undefined) (1, outTbl[m.id].success)(m.result);
-                            else (1, outTbl[m.id].success)();
+                            if (m.result !== undefined) { (1, outTbl[m.id].success)(m.result); } else { (1, outTbl[m.id].success)(); }
                         }
                         delete outTbl[m.id];
                         delete s_transIds[m.id];
@@ -629,14 +625,14 @@ var Channel = (function() {
 
             // scope method names based on cfg.scope specified when the Channel was instantiated
             var scopeMethod = function(m) {
-                if (typeof cfg.scope === 'string' && cfg.scope.length) m = [cfg.scope, m].join('::');
+                if (typeof cfg.scope === 'string' && cfg.scope.length) { m = [cfg.scope, m].join('::'); }
                 return m;
             };
 
             // a small wrapper around postmessage whose primary function is to handle the
             // case that clients start sending messages before the other end is "ready"
             var postMessage = function(msg, force) {
-                if (!msg) throw 'postMessage called with null message';
+                if (!msg) { throw 'postMessage called with null message'; }
 
                 // delay posting if we're not ready yet.
                 var verb = (ready ? 'post  ' : 'queue ');
@@ -658,7 +654,7 @@ var Channel = (function() {
 
             var onReady = function(trans, type) {
                 debug('ready msg received');
-                if (ready) throw 'received ready message while in ready state.  help!';
+                if (ready) { throw 'received ready message while in ready state.  help!'; }
 
                 if (type === 'ping') {
                     chanId += '-R';
@@ -680,30 +676,30 @@ var Channel = (function() {
                 }
 
                 // invoke onReady observer if provided
-                if (typeof cfg.onReady === 'function') cfg.onReady(obj);
+                if (typeof cfg.onReady === 'function') { cfg.onReady(obj); }
             };
 
             var obj = {
                 // tries to unbind a bound message handler.  returns false if not possible
                 unbind: function(method) {
                     if (regTbl[method]) {
-                        if (!(delete regTbl[method])) throw ("can't delete method: " + method);
+                        if (!(delete regTbl[method])) { throw ("can't delete method: " + method); }
                         return true;
                     }
                     return false;
                 },
                 bind: function(method, cb) {
-                    if (!method || typeof method !== 'string') throw "'method' argument to bind must be string";
-                    if (!cb || typeof cb !== 'function') throw 'callback missing from bind params';
+                    if (!method || typeof method !== 'string') { throw "'method' argument to bind must be string"; }
+                    if (!cb || typeof cb !== 'function') { throw 'callback missing from bind params'; }
 
-                    if (regTbl[method]) throw "method '" + method + "' is already bound!";
+                    if (regTbl[method]) { throw "method '" + method + "' is already bound!"; }
                     regTbl[method] = cb;
                     return this;
                 },
                 call: function(m) {
-                    if (!m) throw 'missing arguments to call function';
-                    if (!m.method || typeof m.method !== 'string') throw "'method' argument to call must be string";
-                    if (!m.success || typeof m.success !== 'function') throw "'success' callback missing from call";
+                    if (!m) { throw 'missing arguments to call function'; }
+                    if (!m.method || typeof m.method !== 'string') { throw "'method' argument to call must be string"; }
+                    if (!m.success || typeof m.success !== 'function') { throw "'success' callback missing from call"; }
 
                     // now it's time to support the 'callback' feature of jschannel.  We'll traverse the argument
                     // object and pick out all of the functions that were passed as arguments.
@@ -719,7 +715,7 @@ var Channel = (function() {
 
                         if (typeof obj === 'object') {
                             for (var k in obj) {
-                                if (!obj.hasOwnProperty(k)) continue;
+                                if (!obj.hasOwnProperty(k)) { continue; }
                                 var np = path + (path.length ? '/' : '') + k;
                                 if (typeof obj[k] === 'function') {
                                     callbacks[np] = obj[k];
@@ -735,12 +731,13 @@ var Channel = (function() {
 
                     // build a 'request' message and send it
                     var msg = {id: s_curTranId, method: scopeMethod(m.method), params: m.params};
-                    if (callbackNames.length) msg.callbacks = callbackNames;
+                    if (callbackNames.length) { msg.callbacks = callbackNames; }
 
                     if (m.timeout)
                     // XXX: This function returns a timeout ID, but we don't do anything with it.
                     // We might want to keep track of it so we can cancel it using clearTimeout()
                     // when the transaction completes.
+                    // eslint-disable-next-line brace-style
                     { setTransactionTimeout(s_curTranId, m.timeout, scopeMethod(m.method)); }
 
                     // insert into the transaction table
@@ -753,16 +750,15 @@ var Channel = (function() {
                     postMessage(msg);
                 },
                 notify: function(m) {
-                    if (!m) throw 'missing arguments to notify function';
-                    if (!m.method || typeof m.method !== 'string') throw "'method' argument to notify must be string";
+                    if (!m) { throw 'missing arguments to notify function'; }
+                    if (!m.method || typeof m.method !== 'string') { throw "'method' argument to notify must be string"; }
 
                     // no need to go into any transaction table
                     postMessage({method: scopeMethod(m.method), params: m.params});
                 },
                 destroy: function() {
                     s_removeBoundChan(cfg.window, cfg.origin, ((typeof cfg.scope === 'string') ? cfg.scope : ''));
-                    if (window.removeEventListener) window.removeEventListener('message', onMessage, false);
-                    else if (window.detachEvent) window.detachEvent('onmessage', onMessage);
+                    if (window.removeEventListener) { window.removeEventListener('message', onMessage, false); } else if (window.detachEvent) { window.detachEvent('onmessage', onMessage); }
                     ready = false;
                     regTbl = { };
                     inTbl = { };

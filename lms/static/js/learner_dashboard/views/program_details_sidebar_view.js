@@ -29,14 +29,14 @@ class ProgramDetailsSidebarView extends Backbone.View {
         this.industryPathways = options.industryPathways;
         this.creditPathways = options.creditPathways;
         this.programModel = options.model;
-        this.programTabViewEnabled =  options.programTabViewEnabled;
+        this.programTabViewEnabled = options.programTabViewEnabled;
         this.render();
     }
 
     render() {
         const data = $.extend({}, this.model.toJSON(), {
-            programCertificate: this.programCertificate ?
-                this.programCertificate.toJSON() : {},
+            programCertificate: this.programCertificate
+                ? this.programCertificate.toJSON() : {},
             programRecordUrl: this.programRecordUrl,
             industryPathways: this.industryPathways,
             creditPathways: this.creditPathways,

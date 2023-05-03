@@ -266,8 +266,8 @@ mind, or whether to act, and in acting, to live."
                 }
 
                 if (
-                    this.videoProgressSlider.slider &&
-            !this.videoProgressSlider.frozen
+                    this.videoProgressSlider.slider
+            && !this.videoProgressSlider.frozen
                 ) {
                     this.videoProgressSlider.slider
                         .slider('option', 'max', endTime)
@@ -336,12 +336,12 @@ mind, or whether to act, and in acting, to live."
                 minutes = minutes % 60;
 
                 if (hours) {
-                    return i18n(hours, 'hour') + ' ' +
-                    i18n(minutes, 'minute') + ' ' +
-                    i18n(seconds, 'second');
+                    return i18n(hours, 'hour') + ' '
+                    + i18n(minutes, 'minute') + ' '
+                    + i18n(seconds, 'second');
                 } else if (minutes) {
-                    return i18n(minutes, 'minute') + ' ' +
-                    i18n(seconds, 'second');
+                    return i18n(minutes, 'minute') + ' '
+                    + i18n(seconds, 'second');
                 }
 
                 return i18n(seconds, 'second');

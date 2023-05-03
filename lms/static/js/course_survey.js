@@ -27,7 +27,7 @@ $(function() {
             /* see if it is a required field and - if so - make sure user presented all information */
             if (typeof $(this).attr('required') !== typeof undefined) {
                 val = $(this).val();
-                if (typeof(val) === 'string') {
+                if (typeof val === 'string') {
                     if (val.trim().length === 0) {
                         fieldLabel = $(this).parent().find('label');
                         $(this).parent().addClass('field-error');
@@ -35,7 +35,7 @@ $(function() {
                         $('.status.message.submission-error .message-copy').append(edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML("<li class='error-item'>"), fieldLabel.text(), edx.HtmlUtils.HTML('</li>')).toString());
                         cancel_submit = true;
                     }
-                } else if (typeof(val) === 'object') {
+                } else if (typeof val === 'object') {
                     /* for SELECT statements */
                     if (val === null || val.length === 0 || val[0] === '') {
                         fieldLabel = $(this).parent().find('label');

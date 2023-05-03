@@ -44,10 +44,10 @@ _split = _split || (function(undef) {
             return nativeSplit.call(str, separator, limit);
         }
         var output = [],
-            flags = (separator.ignoreCase ? 'i' : '') +
-                    (separator.multiline ? 'm' : '') +
-                    (separator.extended ? 'x' : '') + // Proposed for ES6
-                    (separator.sticky ? 'y' : ''), // Firefox 3+
+            flags = (separator.ignoreCase ? 'i' : '')
+                    + (separator.multiline ? 'm' : '')
+                    + (separator.extended ? 'x' : '') // Proposed for ES6
+                    + (separator.sticky ? 'y' : ''), // Firefox 3+
             lastLastIndex = 0,
             // Make `global` and avoid `lastIndex` issues by working with a copy
             separator = new RegExp(separator.source, flags + 'g'),
@@ -64,9 +64,9 @@ _split = _split || (function(undef) {
          * If negative number: 4294967296 - Math.floor(Math.abs(limit))
          * If other: Type-convert, then use the above rules
          */
-        limit = limit === undef ?
-            -1 >>> 0 : // Math.pow(2, 32) - 1
-            limit >>> 0; // ToUint32(limit)
+        limit = limit === undef
+            ? -1 >>> 0 // Math.pow(2, 32) - 1
+            : limit >>> 0; // ToUint32(limit)
         while (match = separator.exec(str)) {
             // `separator.lastIndex` is not reliable cross-browser
             lastIndex = match.index + match[0].length;
@@ -113,4 +113,3 @@ _split = _split || (function(undef) {
 
     return self;
 }());
-

@@ -8,6 +8,7 @@ define([
 ],
 function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
     'use strict';
+
     var GroupConfigurationDetailsView = BaseView.extend({
         tagName: 'div',
         events: {

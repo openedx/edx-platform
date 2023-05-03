@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     describe('VideoVolumeControl', function() {
         var state, oldOTBD, volumeControl;
 

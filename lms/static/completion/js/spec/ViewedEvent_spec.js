@@ -1,6 +1,5 @@
 import { ElementViewing, ViewedEventTracker } from '../ViewedEvent';
 
-
 describe('ViewedTracker', () => {
     let existingHTML;
     beforeEach(() => {

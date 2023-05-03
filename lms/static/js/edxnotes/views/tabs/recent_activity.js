@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'gettext',
         'js/edxnotes/views/tab_panel',

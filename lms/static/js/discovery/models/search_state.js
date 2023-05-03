@@ -7,7 +7,6 @@
     ], function(_, Backbone, CourseDiscovery, Filters) {
         'use strict';
 
-
         return Backbone.Model.extend({
 
             page: 0,

@@ -10,6 +10,7 @@ such that the value can be defined later than this assignment (file load order).
 
 (function() {
     'use strict';
+
     var AuthListWidget,
         Membership,
         BatchEnrollment,
@@ -104,8 +105,8 @@ such that the value can be defined later than this assignment (file load order).
     }());
 
     AuthListWidget = (function(_super) {
-        __extends(AuthListWidget, _super);  // eslint-disable-line no-use-before-define
-        function AuthListWidget($container, rolename, $errorSection) {  // eslint-disable-line no-shadow
+        __extends(AuthListWidget, _super); // eslint-disable-line no-use-before-define
+        function AuthListWidget($container, rolename, $errorSection) { // eslint-disable-line no-shadow
             var msg,
                 authListWidget = this,
                 labelsList = [gettext('Username'), gettext('Email'), gettext('Revoke access')];
@@ -115,7 +116,7 @@ such that the value can be defined later than this assignment (file load order).
             if (this.rolename === 'Group Moderator') {
                 labelsList = [gettext('Username'), gettext('Email'), gettext('Group'), gettext('Revoke access')];
             }
-            AuthListWidget.__super__.constructor.call(this, $container, {  // eslint-disable-line no-underscore-dangle
+            AuthListWidget.__super__.constructor.call(this, $container, { // eslint-disable-line no-underscore-dangle
                 title: $container.data('display-name'),
                 info: $container.data('info-text'),
                 labels: labelsList,
@@ -171,7 +172,7 @@ such that the value can be defined later than this assignment (file load order).
                     var $revokeBtn, labelTrans;
                     labelTrans = gettext('Revoke access');
 
-                    $revokeBtn = $(_.template('<div class="revoke"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <%- label %></div>')({  // eslint-disable-line max-len
+                    $revokeBtn = $(_.template('<div class="revoke"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <%- label %></div>')({ // eslint-disable-line max-len
                         label: labelTrans
                     }), {
                         class: 'revoke'
@@ -273,7 +274,7 @@ such that the value can be defined later than this assignment (file load order).
                     identifier: data.unique_student_identifier
                 }));
             } else if (data.inactiveUser) {
-                msg = gettext("Error: User '<%- username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role.");  // eslint-disable-line max-len
+                msg = gettext("Error: User '<%- username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role."); // eslint-disable-line max-len
                 return this.show_errors(_.template(msg)({
                     username: data.unique_student_identifier
                 }));
@@ -379,7 +380,7 @@ such that the value can be defined later than this assignment (file load order).
                     if (studentResult.is_general_error) {
                         details.push(studentResult.response);
                     } else {
-                        responseMessage = studentResult.username + '  (' + studentResult.email + '):  ' + '   (' + studentResult.response + ')';   // eslint-disable-line max-len, no-useless-concat
+                        responseMessage = studentResult.username + '  (' + studentResult.email + '):  ' + '   (' + studentResult.response + ')'; // eslint-disable-line max-len, no-useless-concat
                         details.push(responseMessage);
                     }
                 }
@@ -674,14 +675,14 @@ such that the value can be defined later than this assignment (file load order).
                     } else {
                         allowed.push(studentResults);
                     }
-                } else if (dataFromServer.action === 'unenroll' &&
-                      !studentResults.before.enrollment &&
-                      !studentResults.before.allowed) {
+                } else if (dataFromServer.action === 'unenroll'
+                      && !studentResults.before.enrollment
+                      && !studentResults.before.allowed) {
                     notunenrolled.push(studentResults);
                 } else if (!studentResults.after.enrollment) {
                     notenrolled.push(studentResults);
                 } else {
-                    console.warn('student results not reported to user');  // eslint-disable-line no-console
+                    console.warn('student results not reported to user'); // eslint-disable-line no-console
                 }
             }
             renderList = function(label, ids) {
@@ -720,7 +721,7 @@ such that the value can be defined later than this assignment (file load order).
                     } else if (dataFromServer.action === 'unenroll') {
                         return 'There was an error unenrolling:';
                     } else {
-                        console.warn("unknown action from server '" + dataFromServer.action + "'");  // eslint-disable-line no-console, max-len
+                        console.warn("unknown action from server '" + dataFromServer.action + "'"); // eslint-disable-line no-console, max-len
                         return 'There was an error processing:';
                     }
                 }());
@@ -764,7 +765,7 @@ such that the value can be defined later than this assignment (file load order).
             }
             if (allowed.length && emailStudents) {
                 // Translators: A list of users appears after this sentence;
-                renderList(gettext('Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:'), (function() {  // eslint-disable-line max-len
+                renderList(gettext('Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:'), (function() { // eslint-disable-line max-len
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = allowed.length; k < len2; k++) {
@@ -788,7 +789,7 @@ such that the value can be defined later than this assignment (file load order).
             }
             if (autoenrolled.length && emailStudents) {
                 // Translators: A list of users appears after this sentence;
-                renderList(gettext('Successfully sent enrollment emails to the following users. They will be enrolled once they register:'), (function() {  // eslint-disable-line max-len
+                renderList(gettext('Successfully sent enrollment emails to the following users. They will be enrolled once they register:'), (function() { // eslint-disable-line max-len
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = autoenrolled.length; k < len2; k++) {
@@ -812,7 +813,7 @@ such that the value can be defined later than this assignment (file load order).
             }
             if (notenrolled.length && emailStudents) {
                 // Translators: A list of users appears after this sentence;
-                renderList(gettext('Emails successfully sent. The following users are no longer enrolled in the course:'), (function() {  // eslint-disable-line max-len
+                renderList(gettext('Emails successfully sent. The following users are no longer enrolled in the course:'), (function() { // eslint-disable-line max-len
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = notenrolled.length; k < len2; k++) {
@@ -835,7 +836,7 @@ such that the value can be defined later than this assignment (file load order).
                 }()));
             }
             if (notunenrolled.length) {
-                return renderList(gettext('These users were not affiliated with the course so could not be unenrolled:'), (function() {  // eslint-disable-line max-len
+                return renderList(gettext('These users were not affiliated with the course so could not be unenrolled:'), (function() { // eslint-disable-line max-len
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = notunenrolled.length; k < len2; k++) {

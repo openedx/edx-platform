@@ -71,7 +71,6 @@
                 );
             }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
-
             submitReset: function() {
                 var _this;
 
@@ -89,9 +88,9 @@
                         console.log(response);
 
                         if (
-                            (response.hasOwnProperty('status') !== true) ||
-                (typeof response.status !== 'string') ||
-                (response.status.toLowerCase() !== 'success')) {
+                            (response.hasOwnProperty('status') !== true)
+                || (typeof response.status !== 'string')
+                || (response.status.toLowerCase() !== 'success')) {
                             return;
                         }
 
@@ -119,8 +118,8 @@
                 _this = this;
 
                 if (
-                    (this.jsonConfig.poll_answer.length > 0) &&
-        (this.jsonConfig.answers.hasOwnProperty(this.jsonConfig.poll_answer) === false)
+                    (this.jsonConfig.poll_answer.length > 0)
+        && (this.jsonConfig.answers.hasOwnProperty(this.jsonConfig.poll_answer) === false)
                 ) {
                     HtmlUtils.append(this.questionEl, HtmlUtils.joinHtml(
                         HtmlUtils.HTML('<h3>Error!</h3>'),
@@ -275,8 +274,8 @@
                     c1 += 1;
 
                     if (
-                        (tempEl.tagName.toLowerCase() === 'div') &&
-                ($(tempEl).data('block-type') === 'wrapper')
+                        (tempEl.tagName.toLowerCase() === 'div')
+                && ($(tempEl).data('block-type') === 'wrapper')
                     ) {
                         _this.wrapperSectionEl = tempEl;
 

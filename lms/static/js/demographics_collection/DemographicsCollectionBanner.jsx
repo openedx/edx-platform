@@ -1,7 +1,7 @@
 /* global gettext */
 import React from 'react';
 import Cookies from 'js-cookie';
-import { DemographicsCollectionModal } from './DemographicsCollectionModal';
+import {DemographicsCollectionModal} from './DemographicsCollectionModal';
 
 export class DemographicsCollectionBanner extends React.Component {
 
@@ -19,7 +19,7 @@ export class DemographicsCollectionBanner extends React.Component {
    * Utility function that controls hiding the CTA from the Course Dashboard where appropriate.
    * This can be called one of two ways - when a user clicks the "dismiss" button on the CTA
    * itself, or when the learner completes all of the questions within the modal.
-   * 
+   *
    * The dismiss button itself is nested inside of an <a>, so we need to call stopPropagation()
    * here to prevent the Modal from _also_ opening when the Dismiss button is clicked.
    */
@@ -43,16 +43,16 @@ export class DemographicsCollectionBanner extends React.Component {
         };
 
         await fetch(`${this.props.lmsRootUrl}/api/demographics/v1/demographics/status/`, requestOptions);
-        // No matter what the response is from the API call we always allow the learner to dismiss the 
+        // No matter what the response is from the API call we always allow the learner to dismiss the
         // banner when clicking the dismiss button
-        this.setState({ hideBanner: true });
+        this.setState({hideBanner: true});
     }
 
     render() {
         if (!(this.state.hideBanner)) {
             return (
                 <div>
-                    <a id="demographics-banner-link" className="btn" onClick={() => this.setState({ modalOpen: true })}>
+                    <a id="demographics-banner-link" className="btn" onClick={() => this.setState({modalOpen: true})}>
                         <div
                             className="demographics-banner d-flex justify-content-lg-between flex-row py-1 px-2 mb-2 mb-lg-4"
                             role="dialog"
@@ -77,12 +77,12 @@ export class DemographicsCollectionBanner extends React.Component {
                         </div>
                     </a>
                     <div>
-                        {this.state.modalOpen &&
-              <DemographicsCollectionModal
+                        {this.state.modalOpen
+              && <DemographicsCollectionModal
                   {...this.props}
                   user={this.props.user}
                   open={this.state.modalOpen}
-                  closeModal={() => this.setState({ modalOpen: false })}
+                  closeModal={() => this.setState({modalOpen: false})}
                   dismissBanner={this.dismissBanner}
               />
                         }

@@ -1,4 +1,3 @@
-
 import $ from 'jquery';
 import ViewUtils from 'common/js/components/utils/view_utils';
 import edit_helpers from 'js/spec_helpers/edit_helpers';
@@ -11,27 +10,27 @@ describe('ModuleEdit', function() {
         this.stubModule = new ModuleModel({
             id: 'stub-id'
         });
-        setFixtures('<ul>\n' +
-                    '<li class="component" id="stub-id" data-locator="stub-id">\n' +
-                    '  <div class="component-editor">\n' +
-                    '    <div class="module-editor">\n' +
-                    '      ${editor}\n' +
-                    '    </div>\n' +
-                    '    <a href="#" class="save-button">Save</a>\n' +
-                    '    <a href="#" class="cancel-button">Cancel</a>\n' +
-                    '  </div>\n' +
-                    '  <div class="component-actions">\n' +
-                    '    <a href="#" class="edit-button"><span class="edit-icon white"></span>Edit</a>\n' +
-                    '    <a href="#" class="delete-button"><span class="delete-icon white">' +
-                        '</span>Delete</a>\n' +
-                    '  </div>\n' +
-                    '  <span class="drag-handle action"></span>\n' +
-                    '  <section class="xblock xblock-student_view xmodule_display xmodule_stub"' +
-                        ' data-type="StubModule">\n' +
-                    '    <div id="stub-module-content"/>\n' +
-                    '  </section>\n' +
-                    '</li>\n' +
-                    '</ul>');
+        setFixtures('<ul>\n'
+                    + '<li class="component" id="stub-id" data-locator="stub-id">\n'
+                    + '  <div class="component-editor">\n'
+                    + '    <div class="module-editor">\n'
+                    + '      ${editor}\n'
+                    + '    </div>\n'
+                    + '    <a href="#" class="save-button">Save</a>\n'
+                    + '    <a href="#" class="cancel-button">Cancel</a>\n'
+                    + '  </div>\n'
+                    + '  <div class="component-actions">\n'
+                    + '    <a href="#" class="edit-button"><span class="edit-icon white"></span>Edit</a>\n'
+                    + '    <a href="#" class="delete-button"><span class="delete-icon white">'
+                        + '</span>Delete</a>\n'
+                    + '  </div>\n'
+                    + '  <span class="drag-handle action"></span>\n'
+                    + '  <section class="xblock xblock-student_view xmodule_display xmodule_stub"'
+                        + ' data-type="StubModule">\n'
+                    + '    <div id="stub-module-content"/>\n'
+                    + '  </section>\n'
+                    + '</li>\n'
+                    + '</ul>');
         edit_helpers.installEditTemplates(true);
         spyOn($, 'ajax').and.returnValue(this.moduleData);
         this.moduleEdit = new ModuleEdit({

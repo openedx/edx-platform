@@ -4,6 +4,7 @@
 */
 (function() {
     'use strict';
+
     describe('DiscussionThreadView', function() {
         var assertContentVisible, assertExpandedContentVisible, assertResponseCountAndPaginationCorrect,
             createAjaxResponseJson, createTestResponseJson, postResponse, renderWithContent, renderWithTestResponses;
@@ -165,13 +166,13 @@
                     function() { return checkCommentForm(false); }
                 );
                 it(
-                    'Test that  when a closed thread is opened the vote button is displayed and ' +
-                    'vote count is hidden',
+                    'Test that  when a closed thread is opened the vote button is displayed and '
+                    + 'vote count is hidden',
                     function() { return checkVoteDisplay(true); }
                 );
                 it(
-                    'Test that  when a open thread is closed the vote button is hidden and ' +
-                    'vote count is displayed',
+                    'Test that  when a open thread is closed the vote button is hidden and '
+                    + 'vote count is displayed',
                     function() { return checkVoteDisplay(false); }
                 );
             };
@@ -299,8 +300,8 @@
                 expect(view.$('.js-marked-answer-list .discussion-response').length).toEqual(numEndorsed);
                 expect(view.$('.js-response-list .discussion-response').length).toEqual(numNonEndorsed);
                 return assertResponseCountAndPaginationCorrect(
-                    view, '' + numNonEndorsed + ' ' + (numEndorsed ? 'other ' : '') +
-                    (numNonEndorsed === 1 ? 'response' : 'responses'),
+                    view, '' + numNonEndorsed + ' ' + (numEndorsed ? 'other ' : '')
+                    + (numNonEndorsed === 1 ? 'response' : 'responses'),
                     numNonEndorsed ? 'Showing all responses' : null, null
                 );
             };
@@ -315,8 +316,8 @@
                     many: 5
                 }, function(numNonEndorsed, nonEndorsedDesc) {
                     it(
-                        'renders correctly with ' + endorsedDesc + ' marked answer(s) and ' + nonEndorsedDesc +
-                        ' response(s)',
+                        'renders correctly with ' + endorsedDesc + ' marked answer(s) and ' + nonEndorsedDesc
+                        + ' response(s)',
                         function() { return renderTestCase(this.view, numEndorsed, numNonEndorsed); }
                     );
                 });

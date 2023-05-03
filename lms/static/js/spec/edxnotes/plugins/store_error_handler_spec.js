@@ -6,6 +6,7 @@ define([
     'js/edxnotes/utils/notes_collector'
 ], function($, _, Annotator, AjaxHelpers, Helpers, NotesFactory, NotesCollector) {
     'use strict';
+
     describe('Store Error Handler Custom Message', function() {
         beforeEach(function() {
             spyOn(Annotator, 'showNotification');
@@ -14,8 +15,8 @@ define([
         });
 
         afterEach(function() {
-            while (Annotator._instances.length > 0) {  // eslint-disable-line no-underscore-dangle
-                Annotator._instances[0].destroy();  // eslint-disable-line no-underscore-dangle
+            while (Annotator._instances.length > 0) { // eslint-disable-line no-underscore-dangle
+                Annotator._instances[0].destroy(); // eslint-disable-line no-underscore-dangle
             }
         });
 

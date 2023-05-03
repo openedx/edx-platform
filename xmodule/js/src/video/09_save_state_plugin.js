@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/09_save_state_plugin.js', ['underscore', 'time.js'], function(_, Time) {
     /**
      * Save state module.
@@ -25,7 +26,6 @@
 
             return $.Deferred().resolve().promise();
         };
-
 
         SaveStatePlugin.moduleName = 'SaveStatePlugin';
         SaveStatePlugin.prototype = {

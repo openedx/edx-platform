@@ -1,10 +1,11 @@
 (function(define, undefined) {
     'use strict';
+
     define(['jquery', 'underscore', 'annotator_1.2.9'], function($, _, Annotator) {
     /**
      * Adds the Scroller Plugin which scrolls to a note with a certain id and
      * opens it.
-     **/
+     * */
         Annotator.Plugin.Scroller = function() {
         // Call the Annotator.Plugin constructor this sets up the element and
         // options properties.
