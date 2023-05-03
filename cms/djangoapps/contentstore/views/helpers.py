@@ -116,7 +116,7 @@ def xblock_studio_url(xblock, parent_xblock=None, find_parent=False):
     if not xblock_has_own_studio_page(xblock, parent_xblock):
         if find_parent:
             while xblock and not xblock_has_own_studio_page(xblock, parent_xblock):
-                xblock = get_parent_xblock(xblock) if not parent_xblock else parent_xblock
+                xblock = parent_xblock or get_parent_xblock(xblock)
                 parent_xblock = None
             if not xblock:
                 return None

@@ -212,6 +212,9 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 if (["vertical", "sequential", "chapter", "course"].includes(data.content.block_type)) {
                     // This is not suitable for pasting into a unit.
                     this.$(".paste-component").hide();
+                } else if (data.content.status === "expired") {
+                    // This has expired and can no longer be pasted.
+                    this.$(".paste-component").hide();
                 } else {
                     // The thing in the clipboard can be pasted into this unit:
                     const detailsPopupEl = this.$(".clipboard-details-popup")[0];

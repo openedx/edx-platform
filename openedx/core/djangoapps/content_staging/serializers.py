@@ -63,11 +63,9 @@ class UserClipboardSerializer(serializers.Serializer):
         except ItemNotFoundError:
             return ""
         edit_url = xblock_studio_url(block, find_parent=True)
-        if not edit_url:
-            return ""
-        if request:
-            edit_url = request.build_absolute_uri(edit_url)
-        return edit_url
+        if edit_url:
+            return request.build_absolute_uri(edit_url)
+        return ""
 
 
 class PostToClipboardSerializer(serializers.Serializer):
