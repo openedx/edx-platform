@@ -496,7 +496,7 @@ class VideoBlock(
             return getattr(course, 'video_sharing_options', None)
 
         # In case the course / modulestore does something weird
-        except Exception as err: # pylint: disable=broad-except
+        except Exception as err:  # pylint: disable=broad-except
             log.exception(f"Error retrieving course for course ID: {self.course_id}")
             return None
 

@@ -2384,7 +2384,7 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
-                        'poster': json.dumps(OrderedDict({
+            'poster': json.dumps(OrderedDict({
                 'url': 'http://img.youtube.com/vi/ZwkTiUPN0mg/0.jpg',
                 'type': 'youtube'
             }))
