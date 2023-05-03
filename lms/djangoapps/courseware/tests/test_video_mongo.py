@@ -224,7 +224,7 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-                    }
+        }
 
         mako_service = self.block.runtime.service(self.block, 'mako')
         expected_result = get_context_dict_from_string(
