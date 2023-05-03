@@ -327,6 +327,7 @@ def get_course(request, course_key):
 
     return {
         "id": str(course_key),
+        "discussions_restrictions": course_config.discussions_restrictions,
         "blackouts": [
             {
                 "start": _format_datetime(blackout["start"]),

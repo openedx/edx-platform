@@ -517,6 +517,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             200,
             {
                 "id": str(self.course.id),
+                "discussions_restrictions": "disabled",
                 "blackouts": [],
                 "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=course-v1%3Ax%2By%2Bz",
                 "following_thread_list_url": (
