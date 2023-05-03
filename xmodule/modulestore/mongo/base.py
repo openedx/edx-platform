@@ -272,7 +272,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                 block = self.construct_xblock_from_class(class_, scope_ids, field_data, for_parent=for_parent)
 
                 non_draft_loc = as_published(location)
-                metadata_inheritance_tree = self.modulestore._compute_metadata_inheritance_tree(self.course_id)
+                metadata_inheritance_tree = self.modulestore._compute_metadata_inheritance_tree(location.course_key)
                 inherit_metadata(block, metadata_inheritance_tree.get(str(non_draft_loc), {}))
 
                 block._edit_info = json_data.get('edit_info')
