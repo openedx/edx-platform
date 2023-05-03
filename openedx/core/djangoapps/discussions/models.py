@@ -46,6 +46,15 @@ class Provider:
     OPEN_EDX = 'openedx'
 
 
+class DiscussionsRestriction(models.TextChoices):
+    """
+    Discussions Restrictions choices
+    """
+    Enabled = 'enabled'
+    Disabled = 'disabled'
+    Scheduled = 'scheduled'
+
+
 DEFAULT_CONFIG_ENABLED = True
 
 
@@ -412,6 +421,12 @@ class DiscussionsConfiguration(TimeStampedModel):
     enabled = models.BooleanField(
         default=True,
         help_text=_("If disabled, the discussions in the associated learning context/course will be disabled.")
+    )
+    discussions_restrictions = models.CharField(
+        max_length=15,
+        default=DiscussionsRestriction.Disabled,
+        choices=DiscussionsRestriction.choices,
+        help_text=_("If disabled, posting in discussions will be indefinitely disabled.")
     )
     lti_configuration = models.ForeignKey(
         LtiConfiguration,

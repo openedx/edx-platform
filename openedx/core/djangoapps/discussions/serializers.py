@@ -176,6 +176,7 @@ class DiscussionsConfigurationSerializer(serializers.ModelSerializer):
             'enable_in_context',
             'enable_graded_units',
             'unit_level_visibility',
+            'discussions_restrictions',
         ]
         fields = [
             'enabled',
