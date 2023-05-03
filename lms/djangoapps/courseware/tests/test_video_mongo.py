@@ -16,6 +16,7 @@ import pytest
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
+from django.http import Http404
 from django.test import TestCase
 from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -310,6 +311,19 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
             is_public_sharing_enabled = self.block.is_public_sharing_enabled()
 
         # I will get the per-video value
+        self.assertEqual(self.block.public_access, is_public_sharing_enabled)
+
+    @patch('xmodule.video_block.video_block.get_course_by_id')
+    def test_is_public_sharing_course_not_found(self, mock_get_course):
+        # Given a course does not override per-video settings
+        mock_get_course.side_effect = Http404()
+        self.block.public_access = 'some-arbitrary-value'
+
+        # When I try to determine if public sharing is enabled
+        with self.mock_feature_toggle():
+            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+
+        # I will fall-back to per-video values
         self.assertEqual(self.block.public_access, is_public_sharing_enabled)
 
     @ddt.data(False, True)
