@@ -3,6 +3,7 @@ Video xmodule tests in mongo.
 """
 
 
+from contextlib import contextmanager
 import json
 import shutil
 from collections import OrderedDict
@@ -15,6 +16,7 @@ import pytest
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
+from django.http import Http404
 from django.test import TestCase
 from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -35,6 +37,11 @@ from fs.path import combine
 from lxml import etree
 from path import Path as path
 from xmodule.contentstore.content import StaticContent
+from xmodule.course_block import (
+    COURSE_VIDEO_SHARING_ALL_VIDEOS,
+    COURSE_VIDEO_SHARING_NONE,
+    COURSE_VIDEO_SHARING_PER_VIDEO
+)
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
@@ -135,7 +142,6 @@ class TestVideoYouTube(TestVideo):  # lint-amnesty, pylint: disable=missing-clas
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'public_video_url': None,
         }
 
         mako_service = self.block.runtime.service(self.block, 'mako')
@@ -219,7 +225,6 @@ class TestVideoNonYouTube(TestVideo):  # pylint: disable=test-inherits-tests
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'public_video_url': None,
         }
 
         mako_service = self.block.runtime.service(self.block, 'mako')
@@ -240,6 +245,11 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
     }
     METADATA = {}
 
+    @contextmanager
+    def mock_feature_toggle(self, enabled=True):
+        with patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=enabled):
+            yield
+
     @ddt.data(
         (True, False),
         (False, False),
@@ -247,16 +257,87 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
         (True, True),
     )
     @ddt.unpack
-    def test_public_video_url(self, is_lms_platform, enable_public_share):
+    def test_is_public_sharing_enabled(self, is_studio, feature_enabled):
         """Test public video url."""
         assert self.block.public_access is True
-        if not is_lms_platform:
+        if is_studio:
             self.block.runtime.is_author_mode = True
-        with patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=enable_public_share):
-            context = self.block.render(STUDENT_VIEW).content
-            # public video url iif PUBLIC_VIDEO_SHARE waffle and is_lms_platform, public_access are true
-            assert bool(get_context_dict_from_string(context)['public_video_url']) \
-                is (is_lms_platform and enable_public_share)
+
+        with self.mock_feature_toggle(enabled=feature_enabled):
+            assert self.block.is_public_sharing_enabled() == \
+                (not is_studio and feature_enabled)
+
+    def test_is_public_sharing_enabled__not_public(self):
+        self.block.public_access = False
+        with self.mock_feature_toggle():
+            assert not self.block.is_public_sharing_enabled()
+
+    @patch('xmodule.video_block.video_block.VideoBlock.get_course_video_sharing_override')
+    def test_is_public_sharing_enabled_by_course_override(self, mock_course_sharing_override):
+
+        # Given a course overrides all videos to be shared
+        mock_course_sharing_override.return_value = COURSE_VIDEO_SHARING_ALL_VIDEOS
+        self.block.public_access = 'some-arbitrary-value'
+
+        # When I try to determine if public sharing is enabled
+        with self.mock_feature_toggle():
+            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+
+        # Then I will get that course value
+        self.assertTrue(is_public_sharing_enabled)
+
+    @patch('xmodule.video_block.video_block.VideoBlock.get_course_video_sharing_override')
+    def test_is_public_sharing_disabled_by_course_override(self, mock_course_sharing_override):
+        # Given a course overrides no videos to be shared
+        mock_course_sharing_override.return_value = COURSE_VIDEO_SHARING_NONE
+        self.block.public_access = 'some-arbitrary-value'
+
+        # When I try to determine if public sharing is enabled
+        with self.mock_feature_toggle():
+            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+
+        # Then I will get that course value
+        self.assertFalse(is_public_sharing_enabled)
+
+    @ddt.data(COURSE_VIDEO_SHARING_PER_VIDEO, None)
+    @patch('xmodule.video_block.video_block.VideoBlock.get_course_video_sharing_override')
+    def test_is_public_sharing_enabled_per_video(self, mock_override_value, mock_course_sharing_override):
+        # Given a course does not override per-video settings
+        mock_course_sharing_override.return_value = mock_override_value
+        self.block.public_access = 'some-arbitrary-value'
+
+        # When I try to determine if public sharing is enabled
+        with self.mock_feature_toggle():
+            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+
+        # I will get the per-video value
+        self.assertEqual(self.block.public_access, is_public_sharing_enabled)
+
+    @patch('xmodule.video_block.video_block.get_course_by_id')
+    def test_is_public_sharing_course_not_found(self, mock_get_course):
+        # Given a course does not override per-video settings
+        mock_get_course.side_effect = Http404()
+        self.block.public_access = 'some-arbitrary-value'
+
+        # When I try to determine if public sharing is enabled
+        with self.mock_feature_toggle():
+            is_public_sharing_enabled = self.block.is_public_sharing_enabled()
+
+        # I will fall-back to per-video values
+        self.assertEqual(self.block.public_access, is_public_sharing_enabled)
+
+    @ddt.data(False, True)
+    def test_context(self, is_public_sharing_enabled):
+        with self.mock_feature_toggle():
+            with patch.object(
+                self.block,
+                'is_public_sharing_enabled',
+                return_value=is_public_sharing_enabled
+            ):
+                content = self.block.render(STUDENT_VIEW).content
+        context = get_context_dict_from_string(content)
+        assert ('public_sharing_enabled' in context) == is_public_sharing_enabled
+        assert ('public_video_url' in context) == is_public_sharing_enabled
 
 
 @ddt.ddt
@@ -389,7 +470,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'public_video_url': None,
         }
 
         for data in cases:
@@ -510,7 +590,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'public_video_url': None,
         }
         initial_context['metadata']['duration'] = None
 
@@ -637,8 +716,7 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'public_video_url': None,
-            'metadata': metadata
+            'metadata': metadata,
         }
 
         DATA = SOURCE_XML.format(  # lint-amnesty, pylint: disable=invalid-name
@@ -811,7 +889,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
             'poster': 'null',
-            'public_video_url': None,
             'metadata': metadata,
         }
 
@@ -925,7 +1002,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
-            'public_video_url': None,
             'poster': 'null',
         }
         initial_context['metadata']['duration'] = None
@@ -1022,7 +1098,6 @@ class TestGetHtmlMethod(BaseTestVideoXBlock):
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
-            'public_video_url': None,
             'poster': 'null',
         }
         initial_context['metadata']['duration'] = None
@@ -2309,7 +2384,6 @@ class TestVideoWithBumper(TestVideo):  # pylint: disable=test-inherits-tests
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
-            'public_video_url': None,
             'poster': json.dumps(OrderedDict({
                 'url': 'http://img.youtube.com/vi/ZwkTiUPN0mg/0.jpg',
                 'type': 'youtube'
@@ -2391,7 +2465,6 @@ class TestAutoAdvanceVideo(TestVideo):  # lint-amnesty, pylint: disable=test-inh
                 {'display_name': 'SubRip (.srt) file', 'value': 'srt'},
                 {'display_name': 'Text (.txt) file', 'value': 'txt'}
             ],
-            'public_video_url': None,
             'poster': 'null'
         }
         return context
