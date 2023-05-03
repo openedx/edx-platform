@@ -6,18 +6,16 @@ class CircleChartLegend extends React.Component {
     constructor(props) {
         super(props);
     }
-
+  
     getList() {
         const {data} = this.props;
 
-        return data.map(({value, label, sliceIndex}, index) => {
+        return data.map(({ value, label, sliceIndex }, index) => {
             const swatchClass = `swatch-${sliceIndex}`;
             return (
                 <li className="legend-item" key={index}>
-                    <div
-                        className={classNames('color-swatch', swatchClass)}
-                        aria-hidden="true"
-                    />
+                    <div className={classNames('color-swatch', swatchClass)}
+                        aria-hidden="true"></div>
                     <span className="label">{label}</span>
                     <span className="percentage">{this.getPercentage(value)}</span>
                 </li>
@@ -47,6 +45,7 @@ class CircleChartLegend extends React.Component {
         );
     }
 }
+
 
 CircleChartLegend.propTypes = {
     data: PropTypes.array.isRequired

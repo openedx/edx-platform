@@ -72,6 +72,7 @@ describe('Container View', () => {
             $('.is-draggable[data-locator=locator-group-A]').css('height', 800);
             $('.is-draggable[data-locator=locator-group-B]').css('height', 800);
 
+
             // Give the leaf elements some height to mimic actual components. Otherwise
             // drag and drop fails as the elements on bunched on top of each other.
             $('.level-element').css('height', 230);

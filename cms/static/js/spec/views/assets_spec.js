@@ -265,6 +265,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                 }).toThrow();
             });
 
+
             it('make sure selectFilter sets collection filter if undefined', function() {
                 expect(assetsView).toBeDefined();
                 assetsView.collection.filterField = '';

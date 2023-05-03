@@ -7,7 +7,6 @@ define([
     $, _, TemplateHelpers, AjaxHelpers, Logger, TabsCollection, SearchResultsView, Helpers
 ) {
     'use strict';
-
     describe('EdxNotes SearchResultsView', function() {
         var notes = [
                 {

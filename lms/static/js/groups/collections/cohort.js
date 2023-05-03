@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['backbone', 'js/groups/models/cohort'], function(Backbone, CohortModel) {
         var CohortCollection = Backbone.Collection.extend({
             model: CohortModel,

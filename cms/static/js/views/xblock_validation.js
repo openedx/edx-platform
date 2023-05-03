@@ -1,7 +1,6 @@
 define(['jquery', 'underscore', 'js/views/baseview', 'gettext', 'edx-ui-toolkit/js/utils/html-utils'],
     function($, _, BaseView, gettext, HtmlUtils) {
         'use strict';
-
         /**
          * View for xblock validation messages as displayed in Studio.
          */
@@ -64,8 +63,8 @@ define(['jquery', 'underscore', 'js/views/baseview', 'gettext', 'edx-ui-toolkit/
              * @returns string of additional css classes (or empty string)
              */
             getAdditionalClasses: function() {
-                if (this.root && this.model.get('summary').type === this.model.NOT_CONFIGURED
-                    && this.model.get('messages').length === 0) {
+                if (this.root && this.model.get('summary').type === this.model.NOT_CONFIGURED &&
+                    this.model.get('messages').length === 0) {
                     return 'no-container-content';
                 }
                 return '';

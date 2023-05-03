@@ -1,6 +1,5 @@
 (function() {
     'use strict';
-
     describe('Bulk Email Queueing', function() {
         beforeEach(function() {
             var testBody, testSubject;

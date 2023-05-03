@@ -14,7 +14,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
         validate: function(attrs, options) {
             if (attrs.selectedFile && !this.checkTypeValidity(attrs.selectedFile)) {
                 return {
-                    message: _.template(gettext('Only <%- fileTypes %> files can be uploaded. Please select a file ending in <%- (fileExtensions) %> to upload.'))( // eslint-disable-line max-len
+                    message: _.template(gettext('Only <%- fileTypes %> files can be uploaded. Please select a file ending in <%- (fileExtensions) %> to upload.'))(  // eslint-disable-line max-len
                         this.formatValidTypes()
                     ),
                     attributes: {selectedFile: true}
@@ -45,9 +45,9 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                     return RegExp(('(?:.+)\\.(' + formats.join('|') + ')$'), 'i');
                 };
 
-            return (attrs.mimeTypes.length === 0 && attrs.fileFormats.length === 0)
-                || _.contains(attrs.mimeTypes, file.type)
-                || getRegExp(attrs.fileFormats).test(file.name);
+            return (attrs.mimeTypes.length === 0 && attrs.fileFormats.length === 0) ||
+                _.contains(attrs.mimeTypes, file.type) ||
+                getRegExp(attrs.fileFormats).test(file.name);
         },
         // Return strings for the valid file types and extensions this
         // uploader accepts, formatted as natural language

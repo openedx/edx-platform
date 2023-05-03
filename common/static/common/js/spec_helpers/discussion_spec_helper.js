@@ -1,7 +1,6 @@
 /* global _, Content, Discussion, DiscussionCourseSettings, DiscussionUtil, DiscussionUser */
 (function() {
     'use strict';
-
     this.DiscussionSpecHelper = (function() {
         function DiscussionSpecHelper() {
         }
@@ -93,121 +92,121 @@
             var templateFixtures = readFixtures('common/templates/discussion/templates.underscore');
             appendSetFixtures(templateFixtures);
             appendSetFixtures(
-                '<script type="text/template" id="thread-list-template">'
-                + '    <div class="forum-nav-header">'
-                + '        <button type="button" class="forum-nav-browse" id="forum-nav-browse" aria-haspopup="true">'
-                + '            <span class="icon fa fa-bars" aria-hidden="true"></span>'
-                + '            <span class="sr">Discussion topics; currently listing: </span>'
-                + '            <span class="forum-nav-browse-current">All Discussions</span>'
-                + '        </button>'
-                + '        <form class="forum-nav-search">'
-                + '            <label>'
-                + '                <span class="sr">Search all posts</span>'
-                + '                <input'
-                + '                    class="forum-nav-search-input"'
-                + '                    id="forum-nav-search"'
-                + '                    type="text"'
-                + '                    placeholder="Search all posts"'
-                + '                >'
-                + '                <span class="icon fa fa-search" aria-hidden="true"></span>'
-                + '            </label>'
-                + '        </form>'
-                + '    </div>'
-                + '    <div class="forum-nav-browse-menu-wrapper" style="display: none">'
-                + '        <form class="forum-nav-browse-filter">'
-                + '            <label>'
-                + '                <span class="sr">Filter Topics</span>'
-                + '                <input'
-                + '                    type="text"'
-                + '                    class="forum-nav-browse-filter-input"'
-                + '                    placeholder="filter topics"'
-                + '                >'
-                + '            </label>'
-                + '        </form>'
-                + '        <ul class="forum-nav-browse-menu">'
-                + '            <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all">'
-                + '                <a href="#" class="forum-nav-browse-title">All Discussions</a>'
-                + '            </li>'
-                + '            <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">'
-                + '                <a href="#" class="forum-nav-browse-title">'
-                + '                    <span class="icon fa fa-star" aria-hidden="true"></span>'
-                + '                    Posts I\'m Following'
-                + '                </a>'
-                + '            </li>'
-                + '            <li class="forum-nav-browse-menu-item">'
-                + '                <a href="#" class="forum-nav-browse-title">Parent</a>'
-                + '                <ul class="forum-nav-browse-submenu">'
-                + '                    <li class="forum-nav-browse-menu-item">'
-                + '                        <a href="#" class="forum-nav-browse-title">Target</a>'
-                + '                        <ul class="forum-nav-browse-submenu">'
-                + '                            <li'
-                + '                                class="forum-nav-browse-menu-item"'
-                + '                                data-discussion-id="child"'
-                + '                                data-divided="false"'
-                + '                            >'
-                + '                                <a href="#" class="forum-nav-browse-title">Child</a>'
-                + '                            </li>'
-                + '                        </ul>'
-                + '                    <li'
-                + '                        class="forum-nav-browse-menu-item"'
-                + '                        data-discussion-id="sibling"'
-                + '                        data-divided="false"'
-                + '                    >'
-                + '                        <a href="#" class="forum-nav-browse-title">Sibling</a>'
-                + '                    </li>'
-                + '                </ul>'
-                + '            </li>'
-                + '            <li'
-                + '                class="forum-nav-browse-menu-item"'
-                + '                data-discussion-id="other"'
-                + '                data-divided="true"'
-                + '            >'
-                + '                <a href="#" class="forum-nav-browse-title">Other Category</a>'
-                + '            </li>'
-                + '        </ul>'
-                + '    </div>'
-                + '    <div class="forum-nav-thread-list-wrapper" id="sort-filter-wrapper" tabindex="-1">'
-                + '        <div class="forum-nav-refine-bar">'
-                + '            <label class="forum-nav-filter-main">'
-                + '                <select class="forum-nav-filter-main-control">'
-                + '                    <option value="all">Show all</option>'
-                + '                    <option value="unread">Unread</option>'
-                + '                    <option value="unanswered">Unanswered</option>'
-                + '                    <option value="flagged">Flagged</option>'
-                + '                </select>'
-                + '            </label>'
-                + '            <% if (isDiscussionDivisionEnabled && isPrivilegedUser) { %>'
-                + '            <label class="forum-nav-filter-cohort">'
-                + '                <span class="sr">Group:</span>'
-                + '                <select class="forum-nav-filter-cohort-control">'
-                + '                    <option value="">in all groups</option>'
-                + '                    <option value="1">Cohort1</option>'
-                + '                    <option value="2">Cohort2</option>'
-                + '                </select>'
-                + '            </label>'
-                + '            <% } %>'
-                + '            <label class="forum-nav-sort">'
-                + '                <select class="forum-nav-sort-control">'
-                + '                    <option value="activity">by recent activity</option>'
-                + '                    <option value="comments">by most activity</option>'
-                + '                    <option value="votes">by most votes</option>'
-                + '                </select>'
-                + '            </label>'
-                + '        </div>'
-                + '    </div>'
-                + '    <div class="search-alerts"></div>'
-                + '    <ul class="forum-nav-thread-list"></ul>'
-                + '</script>'
+                '<script type="text/template" id="thread-list-template">' +
+                '    <div class="forum-nav-header">' +
+                '        <button type="button" class="forum-nav-browse" id="forum-nav-browse" aria-haspopup="true">' +
+                '            <span class="icon fa fa-bars" aria-hidden="true"></span>' +
+                '            <span class="sr">Discussion topics; currently listing: </span>' +
+                '            <span class="forum-nav-browse-current">All Discussions</span>' +
+                '        </button>' +
+                '        <form class="forum-nav-search">' +
+                '            <label>' +
+                '                <span class="sr">Search all posts</span>' +
+                '                <input' +
+                '                    class="forum-nav-search-input"' +
+                '                    id="forum-nav-search"' +
+                '                    type="text"' +
+                '                    placeholder="Search all posts"' +
+                '                >' +
+                '                <span class="icon fa fa-search" aria-hidden="true"></span>' +
+                '            </label>' +
+                '        </form>' +
+                '    </div>' +
+                '    <div class="forum-nav-browse-menu-wrapper" style="display: none">' +
+                '        <form class="forum-nav-browse-filter">' +
+                '            <label>' +
+                '                <span class="sr">Filter Topics</span>' +
+                '                <input' +
+                '                    type="text"' +
+                '                    class="forum-nav-browse-filter-input"' +
+                '                    placeholder="filter topics"' +
+                '                >' +
+                '            </label>' +
+                '        </form>' +
+                '        <ul class="forum-nav-browse-menu">' +
+                '            <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all">' +
+                '                <a href="#" class="forum-nav-browse-title">All Discussions</a>' +
+                '            </li>' +
+                '            <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">' +
+                '                <a href="#" class="forum-nav-browse-title">' +
+                '                    <span class="icon fa fa-star" aria-hidden="true"></span>' +
+                '                    Posts I\'m Following' +
+                '                </a>' +
+                '            </li>' +
+                '            <li class="forum-nav-browse-menu-item">' +
+                '                <a href="#" class="forum-nav-browse-title">Parent</a>' +
+                '                <ul class="forum-nav-browse-submenu">' +
+                '                    <li class="forum-nav-browse-menu-item">' +
+                '                        <a href="#" class="forum-nav-browse-title">Target</a>' +
+                '                        <ul class="forum-nav-browse-submenu">' +
+                '                            <li' +
+                '                                class="forum-nav-browse-menu-item"' +
+                '                                data-discussion-id="child"' +
+                '                                data-divided="false"' +
+                '                            >' +
+                '                                <a href="#" class="forum-nav-browse-title">Child</a>' +
+                '                            </li>' +
+                '                        </ul>' +
+                '                    <li' +
+                '                        class="forum-nav-browse-menu-item"' +
+                '                        data-discussion-id="sibling"' +
+                '                        data-divided="false"' +
+                '                    >' +
+                '                        <a href="#" class="forum-nav-browse-title">Sibling</a>' +
+                '                    </li>' +
+                '                </ul>' +
+                '            </li>' +
+                '            <li' +
+                '                class="forum-nav-browse-menu-item"' +
+                '                data-discussion-id="other"' +
+                '                data-divided="true"' +
+                '            >' +
+                '                <a href="#" class="forum-nav-browse-title">Other Category</a>' +
+                '            </li>' +
+                '        </ul>' +
+                '    </div>' +
+                '    <div class="forum-nav-thread-list-wrapper" id="sort-filter-wrapper" tabindex="-1">' +
+                '        <div class="forum-nav-refine-bar">' +
+                '            <label class="forum-nav-filter-main">' +
+                '                <select class="forum-nav-filter-main-control">' +
+                '                    <option value="all">Show all</option>' +
+                '                    <option value="unread">Unread</option>' +
+                '                    <option value="unanswered">Unanswered</option>' +
+                '                    <option value="flagged">Flagged</option>' +
+                '                </select>' +
+                '            </label>' +
+                '            <% if (isDiscussionDivisionEnabled && isPrivilegedUser) { %>' +
+                '            <label class="forum-nav-filter-cohort">' +
+                '                <span class="sr">Group:</span>' +
+                '                <select class="forum-nav-filter-cohort-control">' +
+                '                    <option value="">in all groups</option>' +
+                '                    <option value="1">Cohort1</option>' +
+                '                    <option value="2">Cohort2</option>' +
+                '                </select>' +
+                '            </label>' +
+                '            <% } %>' +
+                '            <label class="forum-nav-sort">' +
+                '                <select class="forum-nav-sort-control">' +
+                '                    <option value="activity">by recent activity</option>' +
+                '                    <option value="comments">by most activity</option>' +
+                '                    <option value="votes">by most votes</option>' +
+                '                </select>' +
+                '            </label>' +
+                '        </div>' +
+                '    </div>' +
+                '    <div class="search-alerts"></div>' +
+                '    <ul class="forum-nav-thread-list"></ul>' +
+                '</script>'
             );
 
             appendSetFixtures(
-                '<div id=\'fixture-element\'></div>\n'
-                + '<div id=\'discussion-container\''
-                + '   data-course-name=\'Fake Course\''
-                + '   data-user-create-comment=\'true\''
-                + '   data-user-create-subcomment=\'true\''
-                + '   data-read-only=\'false\''
-                + '></div>'
+                '<div id=\'fixture-element\'></div>\n' +
+                '<div id=\'discussion-container\'' +
+                '   data-course-name=\'Fake Course\'' +
+                '   data-user-create-comment=\'true\'' +
+                '   data-user-create-subcomment=\'true\'' +
+                '   data-read-only=\'false\'' +
+                '></div>'
             );
         };
 

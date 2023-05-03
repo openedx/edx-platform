@@ -1,7 +1,6 @@
 /* globals DiscussionSpecHelper, DiscussionUtil, DiscussionViewSpecHelper, ResponseCommentShowView */
 (function() {
     'use strict';
-
     describe('ResponseCommentShowView', function() {
         beforeEach(function() {
             DiscussionSpecHelper.setUpGlobals();

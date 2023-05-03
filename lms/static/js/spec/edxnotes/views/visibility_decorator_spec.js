@@ -3,7 +3,6 @@ define([
     'js/spec/edxnotes/helpers'
 ], function(Annotator, VisibilityDecorator, Helpers) {
     'use strict';
-
     describe('EdxNotes VisibilityDecorator', function() {
         var params = {
             endpoint: '/test_endpoint',

@@ -1,6 +1,5 @@
 (function() {
     'use strict';
-
     var Metrics;
 
     Metrics = (function() {

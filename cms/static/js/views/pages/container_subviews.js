@@ -217,8 +217,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
                 // allowing it to use the inherited value instead of using false explicitly.
                 return xblockInfo.save({
                     publish: 'republish',
-                    metadata: {visible_to_staff_only: enableStaffLock ? true : null}
-                },
+                    metadata: {visible_to_staff_only: enableStaffLock ? true : null}},
                 {patch: true}
                 ).always(function() {
                     xblockInfo.set('publish', null);

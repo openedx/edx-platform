@@ -1,7 +1,6 @@
 define(['js/dashboard/dropdown', 'jquery.simulate'],
     function() {
         'use strict';
-
         var keys = $.simulate.keyCode,
             toggleButtonSelector = '#actions-dropdown-link-2',
             dropdownSelector = '#actions-dropdown-2',

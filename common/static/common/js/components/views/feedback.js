@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define([
         'jquery',
         'underscore',
@@ -25,14 +24,14 @@
             options: {
                 title: '',
                 message: '',
-                intent: null, // "warning", "confirmation", "error", "announcement", "step-required", etc
+                intent: null,  // "warning", "confirmation", "error", "announcement", "step-required", etc
                 type: null, // "alert", "notification", or "prompt": set by subclass
-                shown: true, // is this view currently being shown?
-                icon: true, // should we render an icon related to the message intent?
-                closeIcon: true, // should we render a close button in the top right corner?
-                minShown: 0, // ms after this view has been shown before it can be hidden
-                maxShown: Infinity, // ms after this view has been shown before it will be automatically hidden
-                outFocusElement: null // element to send focus to on hide
+                shown: true,  // is this view currently being shown?
+                icon: true,  // should we render an icon related to the message intent?
+                closeIcon: true,  // should we render a close button in the top right corner?
+                minShown: 0,  // ms after this view has been shown before it can be hidden
+                maxShown: Infinity,  // ms after this view has been shown before it will be automatically hidden
+                outFocusElement: null  // element to send focus to on hide
 
                 /* Could also have an "actions" hash: here is an example demonstrating
                     the expected structure. For each action, by default the framework
@@ -66,17 +65,17 @@
             initialize: function(options) {
                 this.options = _.extend({}, this.options, options);
                 if (!this.options.type) {
-                    throw 'SystemFeedback: type required (given ' // eslint-disable-line no-throw-literal
-                            + JSON.stringify(this.options) + ')';
+                    throw 'SystemFeedback: type required (given ' +  // eslint-disable-line no-throw-literal
+                            JSON.stringify(this.options) + ')';
                 }
                 if (!this.options.intent) {
-                    throw 'SystemFeedback: intent required (given ' // eslint-disable-line no-throw-literal
-                            + JSON.stringify(this.options) + ')';
+                    throw 'SystemFeedback: intent required (given ' +  // eslint-disable-line no-throw-literal
+                            JSON.stringify(this.options) + ')';
                 }
                 this.setElement($('#page-' + this.options.type));
                 // handle single "secondary" action
-                if (this.options.actions && this.options.actions.secondary
-                            && !_.isArray(this.options.actions.secondary)) {
+                if (this.options.actions && this.options.actions.secondary &&
+                            !_.isArray(this.options.actions.secondary)) {
                     this.options.actions.secondary = [this.options.actions.secondary];
                 }
                 return this;
@@ -130,8 +129,8 @@
             },
 
             hide: function() {
-                if (this.shownAt && $.isNumeric(this.options.minShown)
-                            && this.options.minShown > new Date() - this.shownAt) {
+                if (this.shownAt && $.isNumeric(this.options.minShown) &&
+                            this.options.minShown > new Date() - this.shownAt) {
                     clearTimeout(this.hideTimeout);
                     this.hideTimeout = setTimeout(_.bind(this.hide, this),
                         this.options.minShown - (new Date() - this.shownAt));
@@ -185,7 +184,7 @@
                 secondaryList = actions.secondary;
                 if (!secondaryList) { return; }
                 // which secondary action was clicked?
-                i = 0; // default to the first secondary action (easier for testing)
+                i = 0;  // default to the first secondary action (easier for testing)
                 if (event && event.target) {
                     i = _.indexOf(this.$('.action-secondary'), event.target);
                 }

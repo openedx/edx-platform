@@ -7,7 +7,6 @@ define([
     'common/js/spec_helpers/page_helpers'
 ], function(Backbone, _, TopicTeamsView, AjaxHelpers, TeamSpecHelpers, PageHelpers) {
     'use strict';
-
     describe('Topic Teams View', function() {
         var requests, teamsView;
 
@@ -38,17 +37,17 @@ define([
             requests = AjaxHelpers.requests(this);
             topicTeamsView = new TopicTeamsView({
                 el: '.teams-container',
-                model: isInstructorManagedTopic
-                    ? TeamSpecHelpers.createMockTopic({type: 'public_managed'}) : TeamSpecHelpers.createMockTopic(),
+                model: isInstructorManagedTopic ?
+                    TeamSpecHelpers.createMockTopic({type: 'public_managed'}) : TeamSpecHelpers.createMockTopic(),
                 collection: options.teams || TeamSpecHelpers.createMockTeams({results: []}),
                 context: _.extend({}, TeamSpecHelpers.testContext, options)
             });
             result = topicTeamsView.render();
 
             if (
-                topicTeamsView.context.userInfo.staff
-                || topicTeamsView.context.userInfo.privileged
-                || isInstructorManagedTopic
+                topicTeamsView.context.userInfo.staff ||
+                topicTeamsView.context.userInfo.privileged ||
+                isInstructorManagedTopic
             ) {
                 AjaxHelpers.expectNoRequests(requests);
             } else {
@@ -59,8 +58,8 @@ define([
 
         var verifyActions = function(showActions) {
             var expectedTitle = 'Are you having trouble finding a team to join?',
-                expectedMessage = 'Browse teams in other topics or search teams in this topic. '
-                    + 'If you still can\'t find a team to join, create a new team in this topic.',
+                expectedMessage = 'Browse teams in other topics or search teams in this topic. ' +
+                    'If you still can\'t find a team to join, create a new team in this topic.',
                 title = teamsView.$('.title').text().trim(),
                 message = teamsView.$('.copy').text().trim(),
                 _showActions = showActions === undefined ? true : showActions;

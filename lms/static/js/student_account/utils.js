@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['jquery'], function($) {
         var edxUserCookieUtils = {
             userFromEdxUserCookie: function(edxUserInfoCookieName) {

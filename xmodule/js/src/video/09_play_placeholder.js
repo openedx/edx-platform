@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define('video/09_play_placeholder.js', [], function() {
     /**
      * Play placeholder control module.

@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     // VideoTranscriptDownloadHandler module.
     define(
         'video/035_video_accessible_menu.js', ['underscore'],

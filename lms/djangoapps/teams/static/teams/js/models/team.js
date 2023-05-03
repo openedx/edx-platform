@@ -3,7 +3,6 @@
  */
 (function(define) {
     'use strict';
-
     define(['backbone'], function(Backbone) {
         var Team = Backbone.Model.extend({
             defaults: {

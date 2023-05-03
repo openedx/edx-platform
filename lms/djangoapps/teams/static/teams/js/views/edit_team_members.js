@@ -91,8 +91,8 @@
 
                 ViewUtils.confirmThenRunOperation(
                     gettext('Remove this team member?'),
-                    gettext('This learner will be removed from the team,'
-                            + 'allowing another learner to take the available spot.'),
+                    gettext('This learner will be removed from the team,' +
+                            'allowing another learner to take the available spot.'),
                     gettext('Remove'),
                     function() {
                         $.ajax({

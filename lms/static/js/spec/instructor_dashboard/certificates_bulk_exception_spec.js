@@ -4,7 +4,6 @@ define([
 ],
 function($, CertificateBulkAllowlistView) {
     'use strict';
-
     describe('certificate bulk exceptions generation', function() {
         var certificate_bulk_exception_url = 'test/url/';
         var SELECTORS = {
@@ -19,8 +18,8 @@ function($, CertificateBulkAllowlistView) {
             );
 
             setFixtures(
-                "<script type='text/template' id='certificate-bulk-allowlist-tpl'>" + fixture + '</script>'
-                    + "<div class='bulk-allowlist-exception'></div>"
+                "<script type='text/template' id='certificate-bulk-allowlist-tpl'>" + fixture + '</script>' +
+                    "<div class='bulk-allowlist-exception'></div>"
             );
 
             this.view = new CertificateBulkAllowlistView({
@@ -44,8 +43,8 @@ function($, CertificateBulkAllowlistView) {
             submitCallback = jasmine.createSpy().and.returnValue();
             this.view.$el.find(SELECTORS.bulk_allowlist_exception_form).submit(submitCallback);
             this.view.$el.find(SELECTORS.upload_csv_button).click();
-            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner was successfully added to '
-                    + 'the exception list');
+            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner was successfully added to ' +
+                    'the exception list');
         });
 
         it('bind the ajax call and the result will be general error', function() {
@@ -87,16 +86,16 @@ function($, CertificateBulkAllowlistView) {
             submitCallback = jasmine.createSpy().and.returnValue();
             this.view.$el.find(SELECTORS.bulk_allowlist_exception_form).submit(submitCallback);
             this.view.$el.find(SELECTORS.upload_csv_button).click();
-            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 record is not in the correct format '
-                    + 'and has not been added to the exception list');
-            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner account cannot be found and '
-                    + 'has not been added to the exception list');
-            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner already appears on the '
-                    + 'exception list in this course');
-            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner is not enrolled in this '
-                    + 'course and has not been added to the exception list');
-            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner has an active certificate '
-                    + 'invalidation in this course and has not been added to the exception list');
+            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 record is not in the correct format ' +
+                    'and has not been added to the exception list');
+            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner account cannot be found and ' +
+                    'has not been added to the exception list');
+            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner already appears on the ' +
+                    'exception list in this course');
+            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner is not enrolled in this ' +
+                    'course and has not been added to the exception list');
+            expect($(SELECTORS.bulk_exception_results).text()).toContain('1 learner has an active certificate ' +
+                    'invalidation in this course and has not been added to the exception list');
         });
 
         it('bind the ajax call and the result will be plural form of row errors', function() {
@@ -120,16 +119,16 @@ function($, CertificateBulkAllowlistView) {
             submitCallback = jasmine.createSpy().and.returnValue();
             this.view.$el.find(SELECTORS.bulk_allowlist_exception_form).submit(submitCallback);
             this.view.$el.find(SELECTORS.upload_csv_button).click();
-            expect($(SELECTORS.bulk_exception_results).text()).toContain('2 records are not in the correct '
-                    + 'format and have not been added to the exception list');
-            expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learner accounts cannot be found and '
-                    + 'have not been added to the exception list');
-            expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners already appear on the '
-                    + 'exception list in this course');
-            expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners are not enrolled in this '
-                    + 'course and have not added to the exception list');
-            expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners have an active certificate '
-                    + 'invalidation in this course and have not been added to the exception list');
+            expect($(SELECTORS.bulk_exception_results).text()).toContain('2 records are not in the correct ' +
+                    'format and have not been added to the exception list');
+            expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learner accounts cannot be found and ' +
+                    'have not been added to the exception list');
+            expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners already appear on the ' +
+                    'exception list in this course');
+            expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners are not enrolled in this ' +
+                    'course and have not added to the exception list');
+            expect($(SELECTORS.bulk_exception_results).text()).toContain('2 learners have an active certificate ' +
+                    'invalidation in this course and have not been added to the exception list');
         });
 
         it('toggle message details', function() {

@@ -2,7 +2,6 @@ define([
     'jquery', 'underscore', 'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
 ], function($, _, Annotator, Logger, NotesFactory) {
     'use strict';
-
     describe('EdxNotes CaretNavigation Plugin', function() {
         beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');

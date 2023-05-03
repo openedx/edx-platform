@@ -4,7 +4,6 @@
 // Docs and troubleshooting tips in common/static/common/js/karma.common.conf.js
 
 'use strict';
-
 var path = require('path');
 var configModule = require(path.join(__dirname, 'common_static/common/js/karma.common.conf.js'));
 
@@ -92,6 +91,8 @@ var options = {
     ]
 };
 
+
 module.exports = function(config) {
     configModule.configure(config, options);
 };
+

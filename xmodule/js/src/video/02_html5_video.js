@@ -141,9 +141,9 @@
 
                 Player.prototype.seekTo = function(value) {
                     if (
-                        typeof value === 'number'
-                && value <= this.video.duration
-                && value >= 0
+                        typeof value === 'number' &&
+                value <= this.video.duration &&
+                value >= 0
                     ) {
                         this.video.currentTime = value;
                     }

@@ -2,9 +2,7 @@
 /* eslint-disable react/no-danger */
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-    Button, Modal, Icon, InputText, StatusAlert,
-} from '@edx/paragon/static';
+import { Button, Modal, Icon, InputText, StatusAlert } from '@edx/paragon/static';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 import { deactivate } from '../AccountsClient';
@@ -125,6 +123,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
             },
         );
 
+
         return (
             <div className="delete-confirmation-wrapper">
                 <Modal
@@ -135,8 +134,8 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                     open
                     body={(
                         <div>
-                            {responseError
-                && <StatusAlert
+                            {responseError &&
+                <StatusAlert
                     dialog={(
                         <div className="modal-alert">
                             <div className="icon-wrapper">
@@ -233,10 +232,10 @@ StudentAccountDeletionConfirmationModal.propTypes = {
 
 StudentAccountDeletionConfirmationModal.defaultProps = {
     onClose: () => {},
-    additionalSiteSpecificDeletionText: '',
-    mktgRootLink: '',
-    platformName: '',
-    siteName: '',
+    additionalSiteSpecificDeletionText: "",
+    mktgRootLink: "",
+    platformName: "",
+    siteName: "",
 };
 
 export default StudentAccountDeletionConfirmationModal;

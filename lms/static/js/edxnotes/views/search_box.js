@@ -1,6 +1,5 @@
 (function(define, undefined) {
     'use strict';
-
     define([
         'jquery',
         'underscore',

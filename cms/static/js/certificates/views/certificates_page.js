@@ -9,7 +9,6 @@ define([
 ],
 function($, _, gettext, BasePage, CertificatesListView) {
     'use strict';
-
     var CertificatesPage = BasePage.extend({
 
         initialize: function(options) {

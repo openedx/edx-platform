@@ -1,6 +1,5 @@
 (function(define, undefined) {
     'use strict';
-
     define([
         'jquery', 'underscore', 'backbone', 'gettext',
         'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator', 'js/utils/animation'

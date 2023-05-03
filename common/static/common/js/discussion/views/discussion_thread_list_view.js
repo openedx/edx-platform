@@ -1,7 +1,6 @@
 /* globals _, Backbone, Content, Discussion, DiscussionUtil, DiscussionThreadView, DiscussionThreadListView */
 (function() {
     'use strict';
-
     /* eslint-disable */
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
@@ -308,8 +307,9 @@
                 lastThread = ref ? ref.get('id') : void 0;
                 if (lastThread) {
                     this.once('threads:rendered', function() {
-                        var classSelector = ".forum-nav-thread[data-id='" + lastThread + "'] + .forum-nav-thread "
-                            + '.forum-nav-thread-link';
+                        var classSelector =
+                            ".forum-nav-thread[data-id='" + lastThread + "'] + .forum-nav-thread " +
+                            '.forum-nav-thread-link';
                         return $(classSelector).focus();
                     });
                 } else {
@@ -361,7 +361,7 @@
                     );
                 var $threadHTML = $(this.threadListItemTemplate(context).toString());
                 var previewBody = $threadHTML.find('.thread-preview-body').text();
-                previewBody = new DOMParser().parseFromString(previewBody, 'text/html').documentElement.textContent;
+                previewBody = new DOMParser().parseFromString(previewBody, "text/html").documentElement.textContent;
                 $threadHTML.find('.thread-preview-body').text(previewBody);
                 return $threadHTML;
             };
@@ -524,8 +524,8 @@
                             if (!_.isNull(response.corrected_text)) {
                                 noResponseMsg = _.escape(
                                     gettext(
-                                        'No results found for {original_query}. '
-                                        + 'Showing results for {suggested_query}.'
+                                        'No results found for {original_query}. ' +
+                                        'Showing results for {suggested_query}.'
                                     )
                                 );
                                 message = edx.HtmlUtils.interpolateHtml(

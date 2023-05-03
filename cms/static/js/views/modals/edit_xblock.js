@@ -241,7 +241,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
 
             $input.val(oldTitle);
             $input.change(changeFunc).blur(changeFunc);
-            titleElt.html($input); // xss-lint: disable=javascript-jquery-html
+            titleElt.html($input);  // xss-lint: disable=javascript-jquery-html
             $input.focus().select();
             $(event.target).remove();
             return true;

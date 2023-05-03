@@ -2,7 +2,6 @@ define(
     ['backbone', 'underscore', 'underscore.string', 'js/utils/module'],
     function(Backbone, _, str, ModuleUtils) {
         'use strict';
-
         var XBlockInfo = Backbone.Model.extend({
 
             urlRoot: ModuleUtils.urlRoot,

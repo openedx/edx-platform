@@ -127,12 +127,10 @@ function($, _, moment, TeamSpecHelpers, TeamCardView, Team, Topic) {
             it('displays thumbnails for a nonempty team', function() {
                 var users = [
                     {
-                        username: 'user_1',
-                        image_url: 'user_1_image',
+                        username: 'user_1', image_url: 'user_1_image',
                         last_activity: new Date('2010/1/1').toString()
                     }, {
-                        username: 'user_2',
-                        image_url: 'user_2_image',
+                        username: 'user_2', image_url: 'user_2_image',
                         last_activity: new Date('2011/1/1').toString()
                     }
                 ];
@@ -146,28 +144,22 @@ function($, _, moment, TeamSpecHelpers, TeamCardView, Team, Topic) {
             it('displays thumbnails and an ellipsis for a team with greater than 5 members', function() {
                 var users = [
                     {
-                        username: 'user_1',
-                        image_url: 'user_1_image',
+                        username: 'user_1', image_url: 'user_1_image',
                         last_activity: new Date('2001/1/1').toString()
                     }, {
-                        username: 'user_2',
-                        image_url: 'user_2_image',
+                        username: 'user_2', image_url: 'user_2_image',
                         last_activity: new Date('2006/1/1').toString()
                     }, {
-                        username: 'user_3',
-                        image_url: 'user_3_image',
+                        username: 'user_3', image_url: 'user_3_image',
                         last_activity: new Date('2003/1/1').toString()
                     }, {
-                        username: 'user_4',
-                        image_url: 'user_4_image',
+                        username: 'user_4', image_url: 'user_4_image',
                         last_activity: new Date('2002/1/1').toString()
                     }, {
-                        username: 'user_5',
-                        image_url: 'user_5_image',
+                        username: 'user_5', image_url: 'user_5_image',
                         last_activity: new Date('2005/1/1').toString()
                     }, {
-                        username: 'user_6',
-                        image_url: 'user_6_image',
+                        username: 'user_6', image_url: 'user_6_image',
                         last_activity: new Date('2004/1/1').toString()
                     }
                 ];

@@ -86,7 +86,7 @@ define(
                     spyOn(Editor.prototype, 'getLocator').and.returnValue(component_locator);
 
                     appendSetFixtures(
-                        sandbox({ // eslint-disable-line no-undef
+                        sandbox({  // eslint-disable-line no-undef
                             class: 'wrapper-comp-settings basic_metadata_edit',
                             'data-metadata': JSON.stringify({video_url: VideoListEntry, edx_video_id: VideoIDEntry})
                         })
@@ -250,6 +250,7 @@ define(
                     },
                     metadataCollection,
                     metadataView;
+
 
                 beforeEach(function() {
                     spyOn(MetadataView, 'Editor');

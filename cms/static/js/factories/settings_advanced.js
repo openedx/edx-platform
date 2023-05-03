@@ -2,7 +2,6 @@ define([
     'jquery', 'gettext', 'js/models/settings/advanced', 'js/views/settings/advanced'
 ], function($, gettext, AdvancedSettingsModel, AdvancedSettingsView) {
     'use strict';
-
     return function(advancedDict, advancedSettingsUrl, publisherEnabled) {
         var advancedModel, editor;
 

@@ -5,7 +5,6 @@ define([
     $, _, Annotator, AjaxHelpers, NotesVisibilityFactory, NotesCollector, Helpers
 ) {
     'use strict';
-
     describe('EdxNotes ToggleNotesFactory', function() {
         var params = {
             endpoint: '/test_endpoint/',
@@ -91,8 +90,8 @@ define([
             this.toggleVisibilityButton.click();
             AjaxHelpers.respondWithError(requests);
             expect($errorContainer).toContainText(
-                'An error has occurred. Make sure that you are connected to the Internet, '
-                + 'and then try refreshing the page.'
+                'An error has occurred. Make sure that you are connected to the Internet, ' +
+                'and then try refreshing the page.'
             );
             expect($errorContainer).toBeVisible();
             expect($errorContainer).toHaveClass('annotator-notice-show');

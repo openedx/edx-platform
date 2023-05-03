@@ -2,7 +2,6 @@ define(['backbone', 'URI', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/a
     'teams/js/spec_helpers/team_spec_helpers'],
 function(Backbone, URI, _, AjaxHelpers, TeamSpecHelpers) {
     'use strict';
-
     describe('TopicCollection', function() {
         var topicCollection, testRequestParam;
         beforeEach(function() {

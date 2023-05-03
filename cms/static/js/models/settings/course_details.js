@@ -3,16 +3,15 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
 ],
 function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
     'use strict';
-
     var CourseDetails = Backbone.Model.extend({
         defaults: {
             org: '',
             course_id: '',
             run: '',
             language: '',
-            start_date: null, // maps to 'start'
-            end_date: null, // maps to 'end'
-            certificates_display_behavior: '',
+            start_date: null,	// maps to 'start'
+            end_date: null,		// maps to 'end'
+            certificates_display_behavior: "",
             certificate_available_date: null,
             enrollment_start: null,
             enrollment_end: null,
@@ -24,7 +23,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             short_description: '',
             overview: '',
             intro_video: null,
-            effort: null, // an int or null,
+            effort: null,	// an int or null,
             license: null,
             course_image_name: '', // the filename
             course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
@@ -45,9 +44,9 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
             var errors = {};
             const CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS = {
-                END: 'end',
-                END_WITH_DATE: 'end_with_date',
-                EARLY_NO_INFO: 'early_no_info'
+                END: "end",
+                END_WITH_DATE: "end_with_date",
+                EARLY_NO_INFO: "early_no_info"
             };
 
             newattrs = DateUtils.convertDateStringsToObjects(
@@ -62,14 +61,14 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             if (newattrs.start_date && newattrs.end_date && newattrs.start_date >= newattrs.end_date) {
                 errors.end_date = gettext('The course end date must be later than the course start date.');
             }
-            if (newattrs.start_date && newattrs.enrollment_start
-                  && newattrs.start_date < newattrs.enrollment_start) {
+            if (newattrs.start_date && newattrs.enrollment_start &&
+                  newattrs.start_date < newattrs.enrollment_start) {
                 errors.enrollment_start = gettext(
                     'The course start date must be later than the enrollment start date.'
                 );
             }
-            if (newattrs.enrollment_start && newattrs.enrollment_end
-                  && newattrs.enrollment_start >= newattrs.enrollment_end) {
+            if (newattrs.enrollment_start && newattrs.enrollment_end &&
+                  newattrs.enrollment_start >= newattrs.enrollment_end) {
                 errors.enrollment_end = gettext(
                     'The enrollment start date cannot be after the enrollment end date.'
                 );
@@ -77,21 +76,22 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             if (newattrs.end_date && newattrs.enrollment_end && newattrs.end_date < newattrs.enrollment_end) {
                 errors.enrollment_end = gettext('The enrollment end date cannot be after the course end date.');
             }
-            if (this.showCertificateAvailableDate && newattrs.end_date && newattrs.certificate_available_date
-                    && newattrs.certificate_available_date < newattrs.end_date) {
+            if (this.showCertificateAvailableDate && newattrs.end_date && newattrs.certificate_available_date &&
+                    newattrs.certificate_available_date < newattrs.end_date) {
                 errors.certificate_available_date = gettext(
                     'The certificate available date must be later than the course end date.'
                 );
             }
 
-            if (this.useV2CertDisplaySettings) {
+            if (this.useV2CertDisplaySettings){
                 if (
                     newattrs.certificates_display_behavior
                         && !(Object.values(CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS).includes(newattrs.certificates_display_behavior))
                 ) {
+
                     errors.certificates_display_behavior = StringUtils.interpolate(
                         gettext(
-                            'The certificate display behavior must be one of: {behavior_options}'
+                            "The certificate display behavior must be one of: {behavior_options}"
                         ),
                         {
                             behavior_options: Object.values(CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS).join(', ')
@@ -100,13 +100,13 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
                 }
 
                 // Throw error if there's a value for certificate_available_date
-                if (
+                if(
                     (newattrs.certificate_available_date && newattrs.certificates_display_behavior != CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE)
                         || (!newattrs.certificate_available_date && newattrs.certificates_display_behavior == CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE)
-                ) {
+                ){
                     errors.certificates_display_behavior = StringUtils.interpolate(
                         gettext(
-                            'The certificates display behavior must be {valid_option} if certificate available date is set.'
+                            "The certificates display behavior must be {valid_option} if certificate available date is set."
                         ),
                         {
                             valid_option: CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE
@@ -132,7 +132,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
                     ), range, true);
                 }
             }
-            if (!_.isEmpty(errors)) { return errors; }
+            if (!_.isEmpty(errors)) return errors;
         // NOTE don't return empty errors as that will be interpreted as an error state
         },
 
@@ -141,19 +141,19 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
         set_videosource: function(newsource) {
         // newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
         // returns the videosource for the preview which iss the key whose speed is closest to 1
-            if (_.isEmpty(newsource)
-                  && !_.isEmpty(this.get('intro_video'))) {
-                this.set({intro_video: null}, {validate: true});
-            } else {
-                // TODO remove all whitespace w/in string
-                if (this.get('intro_video') !== newsource) { this.set('intro_video', newsource, {validate: true}); }
+            if (_.isEmpty(newsource) &&
+                  !_.isEmpty(this.get('intro_video'))) this.set({intro_video: null}, {validate: true});
+            // TODO remove all whitespace w/in string
+            else {
+                if (this.get('intro_video') !== newsource) this.set('intro_video', newsource, {validate: true});
             }
 
             return this.videosourceSample();
         },
 
         videosourceSample: function() {
-            if (this.has('intro_video')) { return '//www.youtube.com/embed/' + this.get('intro_video'); } else { return ''; }
+            if (this.has('intro_video')) return '//www.youtube.com/embed/' + this.get('intro_video');
+            else return '';
         },
 
         // Whether or not the course pacing can be toggled. If the course

@@ -3,7 +3,6 @@
  */
 (function(define) {
     'use strict';
-
     define([
         'backbone',
         'text!templates/components/header/header.underscore',

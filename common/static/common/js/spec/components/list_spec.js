@@ -1,7 +1,6 @@
 define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
     function($, Backbone, _, ListView) {
         'use strict';
-
         describe('ListView', function() {
             var Model = Backbone.Model.extend({
                     defaults: {

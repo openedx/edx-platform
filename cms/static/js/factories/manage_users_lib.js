@@ -4,7 +4,6 @@
 define(['underscore', 'gettext', 'js/views/manage_users_and_roles'],
     function(_, gettext, ManageUsersAndRoles) {
         'use strict';
-
         return function(containerName, users, tplUserURL, current_user_id, allow_actions) {
             function updateMessages(messages) {
                 var local_messages = _.extend({}, messages);

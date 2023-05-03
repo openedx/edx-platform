@@ -7,8 +7,8 @@
         });
     };
 
-    var jsOptimize = process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE !== undefined
-        ? process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE : 'uglify2';
+    var jsOptimize = process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE !== undefined ?
+        process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE : 'uglify2';
 
     return {
         /**

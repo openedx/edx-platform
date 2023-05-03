@@ -4,7 +4,6 @@ define(
     ],
     function($, _, Squire) {
         'use strict';
-
         // TODO: fix BLD-1100 Disabled due to intermittent failure on master and in PR builds
         xdescribe('VideoTranslations', function() {
             var TranslationsEntryTemplate = readFixtures(
@@ -95,9 +94,9 @@ define(
                                     model = view.model,
                                     passed;
 
-                                passed = model.getValue() === null
-                                && _.isEqual(model.getDisplayValue(), modelValue)
-                                && _.isEqual(view.getValueFromEditor(), modelValue);
+                                passed = model.getValue() === null &&
+                                _.isEqual(model.getDisplayValue(), modelValue) &&
+                                _.isEqual(view.getValueFromEditor(), modelValue);
 
                                 return {
                                     pass: passed
@@ -117,8 +116,8 @@ define(
                                 expectOriginal = _.isEqual(model.getValue(), originalValue);
                                 view.updateModel();
 
-                                passed = expectOriginal
-                                && _.isEqual(model.getValue(), newValue);
+                                passed = expectOriginal &&
+                                _.isEqual(model.getValue(), newValue);
 
                                 return {
                                     pass: passed
@@ -160,6 +159,7 @@ define(
                                     downloadBtn = item.find('.download-setting'),
                                     removeBtn = item.find('.remove-setting'),
                                     passed;
+
 
                                 upload = upload ? uploadBtn.length : !uploadBtn.length;
                                 download = download ? downloadBtn.length : !downloadBtn.length;

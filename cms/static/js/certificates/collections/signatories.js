@@ -6,7 +6,6 @@ define([
 ],
 function(Backbone, Signatory) {
     'use strict';
-
     var SignatoryCollection = Backbone.Collection.extend({
         model: Signatory
     });

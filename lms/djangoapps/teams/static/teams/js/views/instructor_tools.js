@@ -31,8 +31,8 @@
                 event.preventDefault();
                 ViewUtils.confirmThenRunOperation(
                     gettext('Delete this team?'),
-                    gettext('Deleting a team is permanent and cannot be undone.'
-                            + 'All members are removed from the team, and team discussions can no longer be accessed.'),
+                    gettext('Deleting a team is permanent and cannot be undone.' +
+                            'All members are removed from the team, and team discussions can no longer be accessed.'),
                     gettext('Delete'),
                     _.bind(this.handleDelete, this)
                 );

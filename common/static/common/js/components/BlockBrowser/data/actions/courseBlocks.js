@@ -17,17 +17,18 @@ const changeRoot = blockId => ({
     blockId,
 });
 
-const fetchCourseBlocks = (courseId, excludeBlockTypes) => dispatch => getCourseBlocks(courseId)
-    .then((response) => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error(response);
-    })
-    .then(
-        json => dispatch(fetchCourseBlocksSuccess(json, excludeBlockTypes)),
-        error => console.log(error), // eslint-disable-line no-console
-    );
+const fetchCourseBlocks = (courseId, excludeBlockTypes) => dispatch =>
+    getCourseBlocks(courseId)
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error(response);
+        })
+        .then(
+            json => dispatch(fetchCourseBlocksSuccess(json, excludeBlockTypes)),
+            error => console.log(error), // eslint-disable-line no-console
+        );
 
 export {
     fetchCourseBlocks,

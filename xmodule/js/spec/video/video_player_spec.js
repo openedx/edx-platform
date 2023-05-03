@@ -184,6 +184,7 @@
                         expect(state.videoPlayer.play).not.toHaveBeenCalled();
                     });
 
+
                     it('invalid endTime is reset to null', function() {
                         expect(state.videoPlayer.endTime).toBe(null);
                     });
@@ -655,8 +656,8 @@
                                 jasmine.waitUntil(function() {
                                     duration = state.videoPlayer.duration();
 
-                                    return state.videoPlayer.isPlaying()
-                        && state.videoPlayer.initialSeekToStartTime === false;
+                                    return state.videoPlayer.isPlaying() &&
+                        state.videoPlayer.initialSeekToStartTime === false;
                                 }).then(function() {
                                     expect(state.videoPlayer.startTime).toBe(START_TIME);
                                     expect(state.videoPlayer.endTime).toBe(END_TIME);
@@ -846,8 +847,8 @@
                     });
 
                     $.each(['iPad', 'Android'], function(index, device) {
-                        var message = 'controls become visible after playing starts '
-                    + 'on ' + device;
+                        var message = 'controls become visible after playing starts ' +
+                    'on ' + device;
 
                         it(message, function(done) {
                             var controls;
@@ -1036,7 +1037,7 @@
                     });
 
                     it('hides the play button on play', function(done) {
-                        $(state.videoPlayer.player.videoEl).trigger('click'); // play
+                        $(state.videoPlayer.player.videoEl).trigger('click');  // play
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
                         }).then(function() {
@@ -1045,15 +1046,15 @@
                     });
 
                     it('plays the video when overlay button is clicked', function() {
-                        $('.video-wrapper .btn-play').trigger('click'); // play
+                        $('.video-wrapper .btn-play').trigger('click');  // play
                         expect(state.videoPlayer.player.getPlayerState()).toEqual(STATUS.PLAYING);
                         expect($(playButtonOverlaySelector)).toHaveClass('is-hidden');
                     });
 
                     it('shows the play button on pause', function(done) {
-                        $(state.videoPlayer.player.videoEl).trigger('click'); // play
+                        $(state.videoPlayer.player.videoEl).trigger('click');  // play
                         expect(state.videoPlayer.player.getPlayerState()).toEqual(STATUS.PLAYING);
-                        $(state.videoPlayer.player.videoEl).trigger('click'); // pause
+                        $(state.videoPlayer.player.videoEl).trigger('click');  // pause
                         expect(state.videoPlayer.player.getPlayerState()).toEqual(STATUS.PAUSED);
                         jasmine.waitUntil(function() {
                             return $(playButtonOverlaySelector).attr('class').split(' ')

@@ -1,6 +1,5 @@
 (function(define, undefined) {
     'use strict';
-
     define([
         'gettext', 'underscore', 'backbone'
     ], function(gettext, _, Backbone) {

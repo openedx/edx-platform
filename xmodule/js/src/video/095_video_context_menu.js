@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     // VideoContextMenu module.
     define(
         'video/095_video_context_menu.js',
@@ -638,9 +637,7 @@
                             label: i18n.Speed,
                             items: _.map(state.speeds, function(speed) {
                                 var isSelected = parseFloat(speed) === state.speed;
-                                return {
-                                    label: speed + 'x', callback: speedCallback, speed: speed, isSelected: isSelected
-                                };
+                                return {label: speed + 'x', callback: speedCallback, speed: speed, isSelected: isSelected};
                             }),
                             initialize: function(menuitem) {
                                 state.el.on({

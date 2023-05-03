@@ -1,7 +1,6 @@
 /* globals DiscussionSpecHelper, DiscussionUtil */
 (function() {
     'use strict';
-
     describe('DiscussionUtil', function() {
         beforeEach(function() {
             DiscussionSpecHelper.setUpGlobals();

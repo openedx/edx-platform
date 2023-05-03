@@ -32,7 +32,7 @@
                     // eslint-disable-next-line no-param-reassign
                     errorMessage = response.responseJSON.error || '';
                 } else {
-                    errorMessage = ''; // eslint-disable-line no-param-reassign
+                    errorMessage = '';  // eslint-disable-line no-param-reassign
                 }
                 return errorMessage;
             },
@@ -51,7 +51,7 @@
                     },
                     type: 'POST',
                     success: function(self) {
-                        self.errorMessage = ''; // eslint-disable-line no-param-reassign
+                        self.errorMessage = '';  // eslint-disable-line no-param-reassign
                         self.trigger('search');
                     },
                     error: function(self, response) {
@@ -73,8 +73,8 @@
                     },
                     type: 'POST',
                     success: function(self) {
-                        self.errorMessage = ''; // eslint-disable-line no-param-reassign
-                        self.page += 1; // eslint-disable-line no-param-reassign
+                        self.errorMessage = '';  // eslint-disable-line no-param-reassign
+                        self.page += 1;  // eslint-disable-line no-param-reassign
                         self.trigger('next');
                     },
                     error: function(self, response) {

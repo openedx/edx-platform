@@ -3,7 +3,6 @@
 
 (function(define) {
     'use strict';
-
     define(
         [
             'js/certificates/views/certificate_invalidation_view',

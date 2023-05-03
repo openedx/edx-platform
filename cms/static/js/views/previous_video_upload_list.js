@@ -3,7 +3,6 @@ define(
         'js/views/previous_video_upload', 'text!templates/previous-video-upload-list.underscore'],
     function($, _, Backbone, BaseView, HtmlUtils, PreviousVideoUploadView, previousVideoUploadListTemplate) {
         'use strict';
-
         var PreviousVideoUploadListView = BaseView.extend({
             tagName: 'section',
             className: 'wrapper-assets',

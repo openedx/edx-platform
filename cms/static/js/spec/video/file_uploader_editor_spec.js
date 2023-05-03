@@ -4,7 +4,6 @@ define(
     ],
     function($, _, Squire) {
         'use strict';
-
         describe('FileUploader', function() {
             var FileUploaderTemplate = readFixtures(
                     'metadata-file-uploader-entry.underscore'
@@ -81,9 +80,9 @@ define(
                                     model = view.model,
                                     passed;
 
-                                passed = model.getValue() === null
-                                && _.isEqual(model.getDisplayValue(), modelValue)
-                                && _.isEqual(view.getValueFromEditor(), modelValue);
+                                passed = model.getValue() === null &&
+                                _.isEqual(model.getDisplayValue(), modelValue) &&
+                                _.isEqual(view.getValueFromEditor(), modelValue);
 
                                 return {
                                     pass: passed
@@ -103,8 +102,8 @@ define(
                                 expectOriginal = _.isEqual(model.getValue(), originalValue);
                                 view.updateModel();
 
-                                passed = expectOriginal
-                                && _.isEqual(model.getValue(), newValue);
+                                passed = expectOriginal &&
+                                _.isEqual(model.getValue(), newValue);
 
                                 return {
                                     pass: passed

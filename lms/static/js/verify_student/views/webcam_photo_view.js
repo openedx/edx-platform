@@ -77,8 +77,8 @@ var edx = edx || {},
 
                 getUserMediaFunc: function() {
                     var userMedia = (
-                        navigator.getUserMedia || navigator.webkitGetUserMedia
-                        || navigator.mozGetUserMedia || navigator.msGetUserMedia
+                        navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                        navigator.mozGetUserMedia || navigator.msGetUserMedia
                     );
 
                     if (userMedia) {
@@ -166,17 +166,17 @@ var edx = edx || {},
                         hasCamera = false;
 
                     isLoaded = (
-                        flashObj
-                        && flashObj.hasOwnProperty('percentLoaded')
-                        && flashObj.percentLoaded() === 100
+                        flashObj &&
+                        flashObj.hasOwnProperty('percentLoaded') &&
+                        flashObj.percentLoaded() === 100
                     );
 
                     // On some browsers, the flash object will say it has a camera
                     // even "percentLoaded" isn't defined.
                     hasCamera = (
-                        flashObj
-                        && flashObj.hasOwnProperty('hasCamera')
-                        && flashObj.hasCamera()
+                        flashObj &&
+                        flashObj.hasOwnProperty('hasCamera') &&
+                        flashObj.hasCamera()
                     );
 
                     // If we've fully loaded, and no camera is available,
@@ -185,10 +185,9 @@ var edx = edx || {},
                         this.trigger(
                             'error',
                             gettext('No Webcam Detected'),
-                            gettext("You don't seem to have a webcam connected.") + '  '
-                            + gettext('Double-check that your webcam is connected and working to continue.')
+                            gettext("You don't seem to have a webcam connected.") + '  ' +
+                            gettext('Double-check that your webcam is connected and working to continue.')
                         );
-                    // eslint-disable-next-line brace-style
                     }
 
                     // If we're still waiting for the player to load, check
@@ -271,6 +270,7 @@ var edx = edx || {},
             $('#webcam_capture_button', this.el).removeClass('is-hidden');
             $(this.submitButton).attr('title', '');
         },
+
 
         resetByEnter: function(event) {
             if (event.keyCode == key.enter) {

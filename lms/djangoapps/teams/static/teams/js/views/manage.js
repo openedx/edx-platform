@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define([
         'backbone',
         'underscore',
@@ -55,14 +54,14 @@
 
             uploadCsv: function() {
                 var formData = new FormData();
-                formData.append('csv', this.membershipFile); // xss-lint: disable=javascript-jquery-append
+                formData.append('csv', this.membershipFile);  // xss-lint: disable=javascript-jquery-append
 
                 return $.ajax({
                     type: 'POST',
                     url: this.csvUploadUrl,
                     data: formData,
-                    processData: false, // tell jQuery not to process the data
-                    contentType: false // tell jQuery not to set contentType
+                    processData: false,  // tell jQuery not to process the data
+                    contentType: false   // tell jQuery not to set contentType
                 }).done(
                     this.handleCsvUploadSuccess
                 ).fail(

@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['jquery', 'js/student_account/utils', 'jquery.cookie'], function($, Utils) {
         var MultipleEnterpriseInterface = {
 
@@ -76,7 +75,7 @@
                 var regex;
                 regex = RegExp('/enterprise/.*/course/.*/enroll');
                 if (typeof url !== 'string' || !regex.test(url)) {
-                    return void 0;
+                    return void(0);
                 }
                 return url.split('/')[2];
             },

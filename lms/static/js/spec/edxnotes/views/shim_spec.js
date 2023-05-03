@@ -2,7 +2,6 @@ define([
     'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory'
 ], function($, _, Annotator, NotesFactory) {
     'use strict';
-
     describe('EdxNotes Shim', function() {
         var annotators, highlights;
 
@@ -97,8 +96,8 @@ define([
             });
         });
 
-        it('destroying an instance with an open viewer sets all other instances'
-           + 'to unfrozen and unbinds document click.edxnotes:freeze event handlers', function() {
+        it('destroying an instance with an open viewer sets all other instances' +
+           'to unfrozen and unbinds document click.edxnotes:freeze event handlers', function() {
             // Freeze all instances
             highlights[0].click();
             // Destroy first instance
@@ -113,8 +112,8 @@ define([
             checkAnnotatorIsUnfrozen(annotators[1]);
         });
 
-        it('destroying an instance with an closed viewer only unfreezes that instance'
-           + 'and unbinds one document click.edxnotes:freeze event handlers', function() {
+        it('destroying an instance with an closed viewer only unfreezes that instance' +
+           'and unbinds one document click.edxnotes:freeze event handlers', function() {
             // Freeze all instances
             highlights[0].click();
             annotators[0].onHighlightMouseover.calls.reset();

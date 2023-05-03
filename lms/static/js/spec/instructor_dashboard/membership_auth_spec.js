@@ -4,7 +4,6 @@ define(['jquery',
     'js/instructor_dashboard/membership'],
 function($, AjaxHelpers) {
     'use strict';
-
     describe('Membership.AuthListWidget', function() {
         var membership, // eslint-disable-line no-unused-vars
             changeSelectedList;
@@ -28,8 +27,8 @@ function($, AjaxHelpers) {
                 'templates/instructor/instructor_dashboard_2/membership-list-widget.underscore'
             );
             appendSetFixtures(
-                "<script type='text/template' id='membership-list-widget-tpl'>" + membershipTpl + '</script>'
-                    + membershipMain
+                "<script type='text/template' id='membership-list-widget-tpl'>" + membershipTpl + '</script>' +
+                    membershipMain
             );
             membership = new window.InstructorDashboard.sections.Membership($('#membership'));
         });

@@ -1,7 +1,6 @@
 /* globals DiscussionContentView, DiscussionUtil, ResponseCommentEditView, ResponseCommentShowView */
 (function() {
     'use strict';
-
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {

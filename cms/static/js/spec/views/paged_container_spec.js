@@ -2,12 +2,12 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
     'js/views/paged_container', 'js/views/paging_header',
     'common/js/components/views/paging_footer', 'js/views/xblock'],
 function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, PagingFooter, XBlockView) {
-    var htmlResponseTpl = _.template(''
-            + '<div class="xblock-container-paging-parameters" '
-                + 'data-start="<%= start %>" '
-                + 'data-displayed="<%= displayed %>" '
-                + 'data-total="<%= total %>" '
-                + 'data-previews="<%= previews %>"></div>'
+    var htmlResponseTpl = _.template('' +
+            '<div class="xblock-container-paging-parameters" ' +
+                'data-start="<%= start %>" ' +
+                'data-displayed="<%= displayed %>" ' +
+                'data-total="<%= total %>" ' +
+                'data-previews="<%= previews %>"></div>'
     );
 
     function getResponseHtml(override_options) {
@@ -18,11 +18,11 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
             previews: true
         };
         var options = _.extend(default_options, override_options);
-        return '<div class="xblock" data-request-token="request_token">'
-                + '<div class="container-paging-header"></div>'
-                + htmlResponseTpl(options)
-                + '<div class="container-paging-footer"></div>'
-                + '</div>';
+        return '<div class="xblock" data-request-token="request_token">' +
+                '<div class="container-paging-header"></div>' +
+                htmlResponseTpl(options) +
+                '<div class="container-paging-footer"></div>' +
+                '</div>';
     }
 
     var makePage = function(html_parameters) {
@@ -271,9 +271,9 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
                     pagingContainer.setPage(0);
                     respondWithMockPage(requests);
                     message = pagingContainer.pagingHeader.$('.meta').html().trim();
-                    expect(message).toBe('<p>Showing <span class="count-current-shown">1-3</span>'
-                            + ' out of <span class="count-total">4 total</span>, '
-                            + 'sorted by <span class="sort-order">Date added</span> descending</p>');
+                    expect(message).toBe('<p>Showing <span class="count-current-shown">1-3</span>' +
+                            ' out of <span class="count-total">4 total</span>, ' +
+                            'sorted by <span class="sort-order">Date added</span> descending</p>');
                 });
             });
 

@@ -26,40 +26,41 @@ define([
             };
         };
 
-        createHeaderActionsView = function(
-            requests,
-            courseMaxTeamSize,
-            currentUsername,
-            teamModelData,
-            showEditButton,
-            isInstructorManagedTopic,
-            topicMaxTeamSize
-        ) {
-            var model = new TeamModel(teamModelData, {parse: true}),
-                context = TeamSpecHelpers.createMockContext({
-                    courseMaxTeamSize: courseMaxTeamSize,
-                    userInfo: TeamSpecHelpers.createMockUserInfo({
-                        username: currentUsername
-                    })
-                }),
-                topicOptions = typeof topicMaxTeamSize !== 'undefined'
-                    ? {max_team_size: topicMaxTeamSize} : {},
-                topic;
+        createHeaderActionsView =
+            function(
+                requests,
+                courseMaxTeamSize,
+                currentUsername,
+                teamModelData,
+                showEditButton,
+                isInstructorManagedTopic,
+                topicMaxTeamSize
+            ) {
+                var model = new TeamModel(teamModelData, {parse: true}),
+                    context = TeamSpecHelpers.createMockContext({
+                        courseMaxTeamSize: courseMaxTeamSize,
+                        userInfo: TeamSpecHelpers.createMockUserInfo({
+                            username: currentUsername
+                        })
+                    }),
+                    topicOptions = typeof topicMaxTeamSize !== 'undefined' ?
+                        {max_team_size: topicMaxTeamSize} : {},
+                    topic;
 
-            topicOptions.type = isInstructorManagedTopic ? 'public_managed' : 'open';
-            topic = TeamSpecHelpers.createMockTopic(topicOptions);
+                topicOptions.type = isInstructorManagedTopic ? 'public_managed' : 'open';
+                topic = TeamSpecHelpers.createMockTopic(topicOptions);
 
-            return new TeamProfileHeaderActionsView(
-                {
-                    courseID: TeamSpecHelpers.testCourseID,
-                    teamEvents: TeamSpecHelpers.teamEvents,
-                    context: context,
-                    model: model,
-                    topic: topic,
-                    showEditButton: showEditButton
-                }
-            ).render();
-        };
+                return new TeamProfileHeaderActionsView(
+                    {
+                        courseID: TeamSpecHelpers.testCourseID,
+                        teamEvents: TeamSpecHelpers.teamEvents,
+                        context: context,
+                        model: model,
+                        topic: topic,
+                        showEditButton: showEditButton
+                    }
+                ).render();
+            };
 
         createMembershipData = function(username) {
             return [
@@ -75,12 +76,12 @@ define([
         describe('JoinButton', function() {
             beforeEach(function() {
                 setFixtures(
-                    '<div class="teams-content">\n'
-                        + '<div class="msg-content">\n'
-                            + '<div class="copy"></div>\n'
-                        + '</div>\n'
-                        + '<div class="header-action-view"></div>\n'
-                    + '</div>'
+                    '<div class="teams-content">\n' +
+                        '<div class="msg-content">\n' +
+                            '<div class="copy"></div>\n' +
+                        '</div>\n' +
+                        '<div class="header-action-view"></div>\n' +
+                    '</div>'
                 );
             });
 
@@ -156,8 +157,9 @@ define([
             it('shows already member message', function() {
                 var requests = AjaxHelpers.requests(this);
                 var currentUsername = 'ma1';
-                var view = createHeaderActionsView(
-                    requests, 1, currentUsername, createTeamModelData('teamA', 'teamAlpha', []));
+                var view =
+                    createHeaderActionsView(
+                        requests, 1, currentUsername, createTeamModelData('teamA', 'teamAlpha', []));
 
                 // a get request will be sent to get user membership info
                 // because current user is not member of current team

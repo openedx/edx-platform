@@ -246,8 +246,8 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 title: 'About me',
                 valueAttribute: 'bio',
                 helpMessage: 'Wicked is good',
-                placeholderValue: 'Tell other edX learners a little about yourself: where you live, '
-                        + 'what your interests are, why you’re taking courses on edX, or what you hope to learn.',
+                placeholderValue: 'Tell other edX learners a little about yourself: where you live, ' +
+                        'what your interests are, why you’re taking courses on edX, or what you hope to learn.',
                 editable: 'never',
                 persistChanges: true,
                 messagePosition: 'header'
@@ -278,8 +278,8 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
                 title: 'About me',
                 valueAttribute: 'bio',
                 helpMessage: 'Wicked is good',
-                placeholderValue: 'Tell other edX learners a little about yourself: where you live, '
-                        + 'what your interests are, why you’re taking courses on edX, or what you hope to learn.',
+                placeholderValue: 'Tell other edX learners a little about yourself: where you live, ' +
+                        'what your interests are, why you’re taking courses on edX, or what you hope to learn.',
                 editable: 'toggle',
                 persistChanges: true,
                 messagePosition: 'header'

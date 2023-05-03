@@ -11,9 +11,9 @@ module.exports = {
     rules: {
         'import/prefer-default-export': 'off',
         indent: ['error', 4],
-        'react/jsx-indent': ['error', 4],
-        'react/jsx-indent-props': ['error', 4],
         'import/extensions': 'off',
         'import/no-unresolved': 'off',
+        'react/jsx-indent': 'off',
+        'react/jsx-indent-props': 'off',
     },
 };

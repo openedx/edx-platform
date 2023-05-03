@@ -1,3 +1,4 @@
+
 'use strict';
 
 import * as Time from 'time.js';
@@ -7,7 +8,7 @@ describe('Time', function() {
         describe('with NAN', function() {
             it('return a correct time format', function() {
                 expect(Time.format('string')).toEqual('0:00');
-                expect(Time.format(void 0)).toEqual('0:00');
+                expect(Time.format(void(0))).toEqual('0:00');
             });
         });
 

@@ -1,7 +1,6 @@
 /* globals Discussion, DiscussionCourseSettings, DiscussionUser, DiscussionUtil */
 (function(define) {
     'use strict';
-
     define(
         [
             'underscore',

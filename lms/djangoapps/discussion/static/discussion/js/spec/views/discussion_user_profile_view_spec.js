@@ -12,7 +12,6 @@ define([
 function(_, $, URI, DiscussionUtil, DiscussionThreadProfileView, Discussion,
     DiscussionSpecHelper, DiscussionUserProfileView) {
     'use strict';
-
     describe('DiscussionUserProfileView', function() {
         var createDiscussionUserProfileView = function() {
             var discussion = DiscussionSpecHelper.createTestDiscussion({}),

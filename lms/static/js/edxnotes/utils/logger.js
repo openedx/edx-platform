@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['underscore', 'logger'], function(_, Logger) {
         var loggers = [],
             NotesLogger, now, destroyLogger;

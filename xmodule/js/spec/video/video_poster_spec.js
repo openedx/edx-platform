@@ -1,6 +1,5 @@
 (function(WAIT_TIMEOUT) {
     'use strict';
-
     describe('VideoPoster', function() {
         var state, oldOTBD;
 

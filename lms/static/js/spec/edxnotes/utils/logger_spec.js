@@ -2,7 +2,6 @@ define([
     'logger', 'js/edxnotes/utils/logger'
 ], function(Logger, NotesLogger) {
     'use strict';
-
     describe('Edxnotes NotesLogger', function() {
         var getLogger = function(id, mode) {
             return NotesLogger.getLogger(id, mode);

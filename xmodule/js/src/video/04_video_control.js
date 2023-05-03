@@ -1,6 +1,5 @@
 (function(requirejs, require, define) {
     'use strict';
-
     // VideoControl module.
     define(
         'video/04_video_control.js',

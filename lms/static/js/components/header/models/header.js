@@ -3,7 +3,6 @@
  */
 (function(define) {
     'use strict';
-
     define(['backbone'], function(Backbone) {
         var HeaderModel = Backbone.Model.extend({
             defaults: {

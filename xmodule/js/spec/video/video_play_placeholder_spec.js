@@ -1,6 +1,5 @@
 (function() {
     'use strict';
-
     describe('VideoPlayPlaceholder', function() {
         var state, oldOTBD;
 
@@ -92,8 +91,8 @@
 
         $.each(['iPad', 'Android'], function(index, device) {
             it(
-                'is shown on paused video on ' + device
-                + ' in HTML5 player',
+                'is shown on paused video on ' + device +
+                ' in HTML5 player',
                 function() {
                     var btnPlay;
 
@@ -107,8 +106,8 @@
                 });
 
             it(
-                'is hidden on playing video on ' + device
-                + ' in HTML5 player',
+                'is hidden on playing video on ' + device +
+                ' in HTML5 player',
                 function() {
                     var btnPlay;
 
@@ -121,8 +120,8 @@
                 });
 
             it(
-                'is hidden on paused video on ' + device
-                + ' in YouTube player',
+                'is hidden on paused video on ' + device +
+                ' in YouTube player',
                 function() {
                     var btnPlay;
 

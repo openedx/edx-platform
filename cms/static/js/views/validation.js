@@ -134,8 +134,7 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
                             self.notificationBarShowing = false;
                         }
                     }]
-                }
-            });
+                }});
             this.notificationBarShowing = true;
             this.confirmation.show();
             // Make sure the bar is in the right state

@@ -69,6 +69,7 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
             expect($('.new-course-run').hasClass('placeholder-text-direction')).toBe(true);
         });
 
+
         it('displays an error when saving fails', function() {
             var requests = AjaxHelpers.requests(this);
             $('.new-course-button').click();
@@ -152,7 +153,7 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
             expect($courses_tab).toHaveClass('active');
             expect($libraraies_tab).not.toHaveClass('active');
 
-            $('#course-index-tabs .libraries-tab').click(); // switching to library tab
+            $('#course-index-tabs .libraries-tab').click();  // switching to library tab
             expect($courses_tab).not.toHaveClass('active');
             expect($libraraies_tab).toHaveClass('active');
 

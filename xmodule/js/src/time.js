@@ -1,3 +1,4 @@
+
 function format(time, formatFull) {
     var hours, minutes, seconds;
 
@@ -38,4 +39,4 @@ function _pad(number) {
     }
 }
 
-export {format, formatFull, convert}
+export { format, formatFull, convert }

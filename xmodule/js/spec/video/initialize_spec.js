@@ -40,8 +40,8 @@
                         expect(expected).toBe('en');
                     });
 
-                    msg = 'returns any available language, if current and `en` '
-                    + 'languages aren\'t available for the video';
+                    msg = 'returns any available language, if current and `en` ' +
+                    'languages aren\'t available for the video';
                     it(msg, function() {
                         var expected;
 
@@ -218,6 +218,7 @@
                                 expect(state.speed).toEqual(2.0);
                             });
                         });
+
 
                         describe('when new speed is not available', function() {
                             beforeEach(function() {

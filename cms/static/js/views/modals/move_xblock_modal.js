@@ -150,14 +150,14 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
             // Treat source parent component as vertical to support move child components under content experiment
             // and other similar xblocks.
             if (sourceParentHasChildren && !_.contains(basicBlockTypes, sourceParentType)) {
-                sourceParentType = 'vertical'; // eslint-disable-line no-param-reassign
+                sourceParentType = 'vertical';  // eslint-disable-line no-param-reassign
             }
 
             // Treat target parent component as a vertical to support move to parentable target parent components.
             // Also, moving a component directly to content experiment is not allowed, we need to visit to group level.
-            if (targetParentHasChildren && !_.contains(basicBlockTypes, targetParentType)
-                && targetParentType !== 'split_test') {
-                targetParentType = 'vertical'; // eslint-disable-line no-param-reassign
+            if (targetParentHasChildren && !_.contains(basicBlockTypes, targetParentType) &&
+                targetParentType !== 'split_test') {
+                targetParentType = 'vertical';  // eslint-disable-line no-param-reassign
             }
             return targetParentType === sourceParentType;
         },
@@ -167,9 +167,9 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
 
             // update target parent on navigation
             this.targetParentXBlockInfo = targetParentXBlockInfo;
-            if (this.isValidCategory(targetParentXBlockInfo)
-                && this.sourceParentXBlockInfo.id !== targetParentXBlockInfo.id // same parent case
-                && this.sourceXBlockInfo.id !== targetParentXBlockInfo.id) { // same source item case
+            if (this.isValidCategory(targetParentXBlockInfo) &&
+                this.sourceParentXBlockInfo.id !== targetParentXBlockInfo.id && // same parent case
+                this.sourceXBlockInfo.id !== targetParentXBlockInfo.id) { // same source item case
                 isValidMove = true;
             }
             this.updateMoveState(isValidMove);

@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['jquery', 'underscore', 'backbone', 'gettext', 'js/discussions_management/views/divided_discussions',
         'edx-ui-toolkit/js/utils/html-utils', 'js/vendor/jquery.qubit'],
     function($, _, Backbone, gettext, DividedDiscussionConfigurationView, HtmlUtils) {

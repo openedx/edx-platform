@@ -4,7 +4,6 @@
 define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views/paged_container'],
     function($, _, gettext, XBlockContainerPage, PagedContainerView) {
         'use strict';
-
         var PagedXBlockContainerPage = XBlockContainerPage.extend({
 
             events: _.extend({}, XBlockContainerPage.prototype.events, {

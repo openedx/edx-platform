@@ -118,6 +118,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             delete window.CMS.User;
         });
 
+
         describe('The Certificate Details view', function() {
             it('should parse a JSON string collection into a Backbone model collection', function() {
                 var course_title = 'Test certificate course title override 2';
@@ -139,7 +140,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             });
 
             it('should have empty certificate collection if there is an error parsing certifcate JSON', function() {
-                var CERTIFICATE_INVALID_JSON = '[{"course_title": Test certificate course title override, "signatories":"[]"}]'; // eslint-disable-line max-len
+                var CERTIFICATE_INVALID_JSON = '[{"course_title": Test certificate course title override, "signatories":"[]"}]';  // eslint-disable-line max-len
                 var collection_length = this.collection.length;
                 this.collection.parse(CERTIFICATE_INVALID_JSON);
                 // collection length should remain the same since we have error parsing JSON

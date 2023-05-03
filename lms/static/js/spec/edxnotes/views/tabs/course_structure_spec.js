@@ -6,7 +6,6 @@ define([
     $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, CourseStructureView
 ) {
     'use strict';
-
     describe('EdxNotes CourseStructureView', function() {
         var notes = Helpers.getDefaultNotes(),
             getView, getText;

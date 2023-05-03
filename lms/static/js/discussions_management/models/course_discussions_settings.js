@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['backbone'], function(Backbone) {
         var CourseDiscussionsSettingsModel = Backbone.Model.extend({
             idAttribute: 'id',

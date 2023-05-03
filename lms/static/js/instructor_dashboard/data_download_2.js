@@ -2,7 +2,6 @@
 
 (function() {
     'use strict';
-
     // eslint-disable-next-line no-unused-vars
     var DataDownloadV2, PendingInstructorTasks, ReportDownloads, statusAjaxError;
 
@@ -146,6 +145,7 @@
                     }
                 });
             };
+
 
             this.$downloadProblemReport.click(function() {
                 var data = {problem_location: dataDownloadObj.$list_problem_responses_csv_input.val()};

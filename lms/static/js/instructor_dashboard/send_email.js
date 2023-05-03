@@ -2,7 +2,6 @@
 
 (function() {
     'use strict';
-
     var KeywordValidator, PendingInstructorTasks,
         createEmailContentTable, createEmailMessageViews, createTaskListTable,
         plantTimeout, statusAjaxError;
@@ -65,9 +64,9 @@
                     return targets.push(this.value);
                 });
                 if (subject === '') {
-                    return alert(gettext('Your message must have a subject.')); // eslint-disable-line no-alert
+                    return alert(gettext('Your message must have a subject.'));  // eslint-disable-line no-alert
                 } else if (body === '') {
-                    return alert(gettext('Your message cannot be blank.')); // eslint-disable-line no-alert
+                    return alert(gettext('Your message cannot be blank.'));  // eslint-disable-line no-alert
                 } else if (targets.length === 0) {
                     return alert(gettext( // eslint-disable-line no-alert
                         'Your message must have at least one target.'));
@@ -77,7 +76,7 @@
                         message = gettext(
                             'There are invalid keywords in your email. Check the following keywords and try again.');
                         message += '\n' + validation.invalidKeywords.join('\n');
-                        alert(message); // eslint-disable-line no-alert
+                        alert(message);  // eslint-disable-line no-alert
                         return false;
                     }
                     displayTarget = function(value) {
@@ -95,7 +94,7 @@
                                 .replace('{track_name}', value.slice(value.indexOf(':') + 1));
                         }
                     };
-                    successMessage = gettext('Your email message was successfully queued for sending. In courses with a large number of learners, email messages to learners might take up to an hour to be sent.'); // eslint-disable-line max-len
+                    successMessage = gettext('Your email message was successfully queued for sending. In courses with a large number of learners, email messages to learners might take up to an hour to be sent.');  // eslint-disable-line max-len
                     confirmMessage = gettext(
                         'You are sending an email message with the subject {subject} to the following recipients.');
                     for (i = 0, len = targets.length; i < len; i++) {
@@ -104,7 +103,7 @@
                     }
                     confirmMessage += '\n\n' + gettext('Is this OK?');
                     fullConfirmMessage = confirmMessage.replace('{subject}', subject);
-                    if (confirm(fullConfirmMessage)) { // eslint-disable-line no-alert
+                    if (confirm(fullConfirmMessage)) {  // eslint-disable-line no-alert
                         sendData = {
                             action: 'send',
                             send_to: JSON.stringify(targets),

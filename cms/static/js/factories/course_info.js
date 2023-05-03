@@ -3,7 +3,6 @@ define([
     'js/models/course_info', 'js/views/course_info_edit'
 ], function($, CourseUpdateCollection, ModuleInfoModel, CourseInfoModel, CourseInfoEditView) {
     'use strict';
-
     return function(updatesUrl, handoutsLocator, baseAssetUrl) {
         var course_updates = new CourseUpdateCollection(),
             course_handouts, editor;

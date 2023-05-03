@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     /**
      * Completion handler
      * @exports video/09_completion.js

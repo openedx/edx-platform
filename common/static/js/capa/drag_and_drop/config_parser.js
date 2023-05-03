@@ -151,13 +151,13 @@
 
         function processDraggable(state, obj) {
             if (
-                (attrIsString(obj, 'id') === false)
-            || (attrIsString(obj, 'icon') === false)
-            || (attrIsString(obj, 'label') === false)
+                (attrIsString(obj, 'id') === false) ||
+            (attrIsString(obj, 'icon') === false) ||
+            (attrIsString(obj, 'label') === false) ||
 
-            || (attrIsBoolean(obj, 'can_reuse', false) === false)
+            (attrIsBoolean(obj, 'can_reuse', false) === false) ||
 
-            || (obj.hasOwnProperty('target_fields') === false)
+            (obj.hasOwnProperty('target_fields') === false)
             ) {
                 return false;
             }
@@ -186,13 +186,13 @@
         // 'true' or 'false.
         function processTarget(state, obj, pushToState) {
             if (
-                (attrIsString(obj, 'id') === false)
+                (attrIsString(obj, 'id') === false) ||
 
-            || (attrIsInteger(obj, 'w') === false)
-            || (attrIsInteger(obj, 'h') === false)
+            (attrIsInteger(obj, 'w') === false) ||
+            (attrIsInteger(obj, 'h') === false) ||
 
-            || (attrIsInteger(obj, 'x') === false)
-            || (attrIsInteger(obj, 'y') === false)
+            (attrIsInteger(obj, 'x') === false) ||
+            (attrIsInteger(obj, 'y') === false)
             ) {
                 return false;
             }

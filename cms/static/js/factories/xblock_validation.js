@@ -1,3 +1,4 @@
+
 import * as XBlockValidationView from 'js/views/xblock_validation';
 import * as XBlockValidationModel from 'js/models/xblock_validation';
 

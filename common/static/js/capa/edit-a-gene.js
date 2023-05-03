@@ -4,7 +4,7 @@
     waitForGenex();
 
     function waitForGenex() {
-        if (typeof genex !== 'undefined' && genex) {
+        if (typeof(genex) !== 'undefined' && genex) {
             genex.onInjectionDone('genex');
         } else {
             setTimeout(function() { waitForGenex(); }, timeout);

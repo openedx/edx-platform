@@ -2,7 +2,6 @@
 
 (function() {
     'use strict';
-
     if (Backbone) {
         this.DiscussionTopicMenuView = Backbone.View.extend({
             events: {
@@ -30,7 +29,7 @@
                 context.topics_html = this.renderCategoryMap(this.course_settings.get('category_map'));
                 edx.HtmlUtils.setHtml(this.$el, edx.HtmlUtils.template($('#topic-template').html())(context));
 
-                $general = this.$('.post-topic option:contains(General)'); // always return array.
+                $general = this.$('.post-topic option:contains(General)');  // always return array.
 
                 if (this.getCurrentTopicId()) {
                     this.setTopic(this.$('.post-topic option').filter(

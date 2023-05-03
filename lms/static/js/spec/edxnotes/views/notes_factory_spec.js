@@ -3,7 +3,6 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/edxnotes/utils/notes_collector', 'js/spec/edxnotes/helpers'
 ], function($, _, Annotator, NotesFactory, AjaxHelpers, NotesCollector, Helpers) {
     'use strict';
-
     describe('EdxNotes NotesFactory', function() {
         beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');

@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define([
         'jquery',
         'underscore',
@@ -63,13 +62,15 @@
                 this.autoSubmit = data.thirdPartyAuth.autoSubmitRegForm;
                 this.hideAuthWarnings = data.hideAuthWarnings;
                 this.autoRegisterWelcomeMessage = data.thirdPartyAuth.autoRegisterWelcomeMessage || '';
-                this.registerFormSubmitButtonText = data.thirdPartyAuth.registerFormSubmitButtonText || _('Create Account');
+                this.registerFormSubmitButtonText =
+                        data.thirdPartyAuth.registerFormSubmitButtonText || _('Create Account');
                 this.is_require_third_party_auth_enabled = data.is_require_third_party_auth_enabled;
                 this.enableCoppaCompliance = data.enableCoppaCompliance;
 
                 this.listenTo(this.model, 'sync', this.saveSuccess);
                 this.listenTo(this.model, 'validation', this.renderLiveValidations);
             },
+
 
             renderFields: function(fields, className) {
                 var html = [],
@@ -370,12 +371,12 @@
             },
 
             addValidationErrorMsgForScreenReader: function($el) {
-                var $validation_node = this.$form.find('#' + $el.attr('id') + '-validation-error');
+                var $validation_node =  this.$form.find('#' + $el.attr('id') + '-validation-error');
                 $validation_node.find('.sr-only').text('ERROR:');
             },
 
             removeValidationErrorMsgForScreenReader: function($el) {
-                var $validation_node = this.$form.find('#' + $el.attr('id') + '-validation-error');
+                var $validation_node =  this.$form.find('#' + $el.attr('id') + '-validation-error');
                 $validation_node.find('.sr-only').text('');
             },
 

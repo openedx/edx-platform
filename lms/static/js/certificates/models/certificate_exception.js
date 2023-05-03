@@ -28,8 +28,8 @@
             },
             validate: function(attrs) {
                 if (!str.trim(attrs.user_name) && !str.trim(attrs.user_email)) {
-                    return gettext('Student username/email field is required and can not be empty. '
-                            + 'Kindly fill in username/email and then press "Add to Exception List" button.');
+                    return gettext('Student username/email field is required and can not be empty. ' +
+                            'Kindly fill in username/email and then press "Add to Exception List" button.');
                 }
             }
         });

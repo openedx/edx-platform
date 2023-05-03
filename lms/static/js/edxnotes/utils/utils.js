@@ -1,6 +1,5 @@
 (function(define, undefined) {
     'use strict';
-
     define([], function($, _) {
     /**
      * Replaces all newlines in a string by HTML line breaks.

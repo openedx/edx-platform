@@ -5,7 +5,6 @@ define(['underscore', 'jquery', 'common/js/components/views/feedback_notificatio
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
 function(_, $, NotificationView, Prompt, AjaxHelpers) {
     'use strict';
-
     var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
         verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
         verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,

@@ -6,7 +6,6 @@ define([
     'common/js/components/views/search_field'
 ], function(_, URI, AjaxHelpers, PagingCollection, SearchFieldView) {
     'use strict';
-
     describe('SearchFieldView', function() {
         var searchFieldView,
             mockUrl = '/api/mock_collection';

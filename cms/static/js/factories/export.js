@@ -2,7 +2,6 @@ define([
     'domReady', 'js/views/export', 'jquery', 'gettext'
 ], function(domReady, Export, $, gettext) {
     'use strict';
-
     return function(courselikeHomeUrl, library, statusUrl) {
         var $submitBtn = $('.action-export'),
             unloading = false,

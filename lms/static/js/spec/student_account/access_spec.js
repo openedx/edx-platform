@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define([
         'jquery',
         'underscore',
@@ -47,10 +46,10 @@
                     ]
                 },
                 FORWARD_URL = (
-                    '/account/finish_auth'
-                    + '?course_id=edx%2FDemoX%2FFall'
-                    + '&enrollment_action=enroll'
-                    + '&next=%2Fdashboard'
+                    '/account/finish_auth' +
+                    '?course_id=edx%2FDemoX%2FFall' +
+                    '&enrollment_action=enroll' +
+                    '&next=%2Fdashboard'
                 ),
                 THIRD_PARTY_COMPLETE_URL = '/auth/complete/provider/';
 

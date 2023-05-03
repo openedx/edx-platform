@@ -6,7 +6,6 @@ define([
     'teams/js/spec_helpers/team_spec_helpers'
 ], function($, Backbone, TeamCollection, TeamsView, TeamSpecHelpers) {
     'use strict';
-
     var createTeamsView;
     describe('Teams View', function() {
         beforeEach(function() {

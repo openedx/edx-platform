@@ -12,7 +12,7 @@ define(['backbone'], function(Backbone) {
             default_value: null,
             options: null,
             type: null,
-            custom: false // Used only for non-metadata fields
+            custom: false  // Used only for non-metadata fields
         },
 
         initialize: function() {

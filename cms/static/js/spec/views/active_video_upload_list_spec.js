@@ -12,7 +12,6 @@ define(
     ],
     function($, ActiveVideoUpload, ActiveVideoUploadListView, StringUtils, TemplateHelpers, AjaxHelpers) {
         'use strict';
-
         var concurrentUploadLimit = 2,
             POST_URL = '/test/post/url',
             VIDEO_ID = 'video101',
@@ -53,11 +52,11 @@ define(
         describe('ActiveVideoUploadListView', function() {
             beforeEach(function() {
                 setFixtures(
-                    '<div id="page-prompt"></div>'
-                    + '<div id="page-notification"></div>'
-                    + '<div id="reader-feedback"></div>'
-                    + '<div class="video-transcript-settings-wrapper"></div>'
-                    + '<button class="button course-video-settings-button"></button>'
+                    '<div id="page-prompt"></div>' +
+                    '<div id="page-notification"></div>' +
+                    '<div id="reader-feedback"></div>' +
+                    '<div class="video-transcript-settings-wrapper"></div>' +
+                    '<button class="button course-video-settings-button"></button>'
                 );
                 TemplateHelpers.installTemplate('active-video-upload');
                 TemplateHelpers.installTemplate('active-video-upload-list');
@@ -340,8 +339,8 @@ define(
                             uploadView,
                             'Your file could not be uploaded',
                             StringUtils.interpolate(
-                                '{fileName} is not in a supported file format. Supported file formats are {supportedFormats}.', // eslint-disable-line max-len
-                                {fileName: files[index].name, supportedFormats: videoSupportedFileFormats.join(' and ')} // eslint-disable-line max-len
+                                '{fileName} is not in a supported file format. Supported file formats are {supportedFormats}.',  // eslint-disable-line max-len
+                                {fileName: files[index].name, supportedFormats: videoSupportedFileFormats.join(' and ')}  // eslint-disable-line max-len
                             )
                         );
                     });
@@ -353,7 +352,7 @@ define(
                     [
                         {desc: 'larger than', additionalBytes: 1},
                         {desc: 'equal to', additionalBytes: 0},
-                        {desc: 'smaller than', additionalBytes: -1}
+                        {desc: 'smaller than', additionalBytes: - 1}
                     ],
                     function(caseInfo) {
                         it(caseInfo.desc + 'max file size', function() {
@@ -487,9 +486,9 @@ define(
                                         fileNames[i]
                                     );
                                     expect($.trim($uploadElem.find('.video-detail-status').text())).toEqual(
-                                        queued
-                                            ? ActiveVideoUpload.STATUS_QUEUED
-                                            : ActiveVideoUpload.STATUS_UPLOADING
+                                        queued ?
+                                            ActiveVideoUpload.STATUS_QUEUED :
+                                            ActiveVideoUpload.STATUS_UPLOADING
                                     );
                                     expect($uploadElem.find('.video-detail-progress').val()).toEqual(0);
                                     expect($uploadElem).not.toHaveClass('success');
@@ -553,8 +552,8 @@ define(
 
                                                 it('should update status and progress', function() {
                                                     var $uploadElem = this.view.$('.active-video-upload:first');
-                                                    if (subCaseInfo.isViewRefresh
-                                                        && subCaseInfo.responseStatus === 204) {
+                                                    if (subCaseInfo.isViewRefresh &&
+                                                        subCaseInfo.responseStatus === 204) {
                                                         expect(refreshSpy).toHaveBeenCalled();
                                                         if ($uploadElem.length > 0) {
                                                             expect(

@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['jquery', 'underscore', 'backbone', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
         'js/models/notification', 'js/views/notification'],
     function($, _, Backbone, gettext, HtmlUtils) {
@@ -149,7 +148,7 @@
                         fieldData, {patch: isUpdate, wait: true}
                     ).done(function(result) {
                         cohort.id = result.id;
-                        self.render(); // re-render to remove any now invalid error messages
+                        self.render();    // re-render to remove any now invalid error messages
                         saveOperation.resolve();
                     }).fail(function(result) {
                         var errorMessage = null;

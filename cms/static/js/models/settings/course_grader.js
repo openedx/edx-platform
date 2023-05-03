@@ -1,7 +1,7 @@
 define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
     var CourseGrader = Backbone.Model.extend({
         defaults: {
-            type: '', // must be unique w/in collection (ie. w/in course)
+            type: '',    // must be unique w/in collection (ie. w/in course)
             min_count: 1,
             drop_count: 0,
             short_label: '', // what to use in place of type if space is an issue
@@ -52,14 +52,14 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                 var intMinCount = Math.round(attrs.min_count);
                 if (!isFinite(intMinCount) || /\D+/.test(attrs.min_count) || intMinCount < 1) {
                     errors.min_count = gettext('Please enter an integer greater than 0.');
-                } else { attrs.min_count = intMinCount; }
+                } else attrs.min_count = intMinCount;
             }
             if (_.has(attrs, 'drop_count')) {
                 var dropCount = attrs.drop_count;
                 var intDropCount = Math.round(dropCount);
                 if (!isFinite(intDropCount) || /\D+/.test(dropCount) || (_.isString(dropCount) && _.isEmpty(dropCount.trim())) || intDropCount < 0) {
                     errors.drop_count = gettext('Please enter non-negative integer.');
-                } else { attrs.drop_count = intDropCount; }
+                } else attrs.drop_count = intDropCount;
             }
             if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && !_.has(errors, 'min_count') && !_.has(errors, 'drop_count') && attrs.drop_count >= attrs.min_count) {
                 var template = _.template(
@@ -67,7 +67,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                 );
                 errors.drop_count = template({types: attrs.type});
             }
-            if (!_.isEmpty(errors)) { return errors; }
+            if (!_.isEmpty(errors)) return errors;
         }
     });
 

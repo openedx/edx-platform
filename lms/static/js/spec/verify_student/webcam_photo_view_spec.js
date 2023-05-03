@@ -82,8 +82,8 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'trackLink']);
 
             setFixtures(
-                '<div id="current-step-container"></div>'
-                    + '<input type="button" id="submit_button"></input>'
+                '<div id="current-step-container"></div>' +
+                    '<input type="button" id="submit_button"></input>'
             );
             TemplateHelpers.installTemplate('templates/verify_student/webcam_photo');
         });

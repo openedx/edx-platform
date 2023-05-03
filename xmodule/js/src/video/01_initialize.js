@@ -358,22 +358,22 @@
                             }
                         },
                         savedVideoPosition: function(value) {
-                            return storage.getItem('savedVideoPosition', true)
-                            || Number(value)
-                            || 0;
+                            return storage.getItem('savedVideoPosition', true) ||
+                            Number(value) ||
+                            0;
                         },
                         speed: function(value) {
                             return storage.getItem('speed', true) || value;
                         },
                         generalSpeed: function(value) {
-                            return storage.getItem('general_speed')
-                            || value
-                            || '1.0';
+                            return storage.getItem('general_speed') ||
+                            value ||
+                            '1.0';
                         },
                         transcriptLanguage: function(value) {
-                            return storage.getItem('language')
-                            || value
-                            || 'en';
+                            return storage.getItem('language') ||
+                            value ||
+                            'en';
                         },
                         ytTestTimeout: function(value) {
                             value = parseInt(value, 10);
@@ -443,6 +443,7 @@
             // them available and sets up their context is makeFunctionsPublic().
             // ***************************************************************
 
+
             // function bindTo(methodsDict, obj, context, rewrite)
             // Creates a new function with specific context and assigns it to the provided
             // object.
@@ -477,8 +478,8 @@
                 // alternate sources should automatically play.
                 if (!_prepareHTML5Video(this)) {
                     console.log(
-                        '[Video info]: Continue loading '
-                + 'YouTube video.'
+                        '[Video info]: Continue loading ' +
+                'YouTube video.'
                     );
 
                     // Non-YouTube sources were not found either.
@@ -581,8 +582,8 @@
                     });
                     $(scriptTag).on('error', function() {
                         console.log(
-                            '[Video info]: YouTube returned an error for '
-                    + 'video with id "' + self.id + '".'
+                            '[Video info]: YouTube returned an error for ' +
+                    'video with id "' + self.id + '".'
                         );
                         // If the video is already loaded in `_waitForYoutubeApi` by the
                         // time we get here, then we shouldn't load it again.
@@ -676,7 +677,7 @@
                     '0.50': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
                     0.75: '0.50', // HTML5 or Youtube Flash -> Youtube HTML5
                     1.25: '1.50', // HTML5 or Youtube Flash -> Youtube HTML5
-                    2.0: '1.50' // HTML5 or Youtube HTML5 -> Youtube Flash
+                    2.0: '1.50'   // HTML5 or Youtube HTML5 -> Youtube Flash
                 };
 
                 if (_.contains(this.speeds, newSpeed)) {
@@ -720,9 +721,9 @@
             function youtubeId(speed) {
                 var currentSpeed = this.isFlashMode() ? this.speed : '1.0';
 
-                return this.videos[speed]
-                || this.videos[currentSpeed]
-                || this.videos['1.0'];
+                return this.videos[speed] ||
+                this.videos[currentSpeed] ||
+                this.videos['1.0'];
             }
 
             function getDuration() {

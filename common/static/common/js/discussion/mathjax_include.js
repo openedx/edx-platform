@@ -11,7 +11,6 @@ if (typeof MathJax === 'undefined') {
     vendorScript = document.createElement('script');
     vendorScript.onload = function() {
         'use strict';
-
         var MathJax = window.MathJax,
             setMathJaxDisplayDivSettings;
         MathJax.Hub.Config({

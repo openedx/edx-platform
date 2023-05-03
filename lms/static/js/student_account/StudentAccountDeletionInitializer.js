@@ -1,6 +1,6 @@
 /* eslint-disable no-new */
-import {ReactRenderer} from 'ReactRenderer';
-import {StudentAccountDeletion} from './components/StudentAccountDeletion';
+import { ReactRenderer } from 'ReactRenderer';
+import { StudentAccountDeletion } from './components/StudentAccountDeletion';
 
 const maxWait = 60000;
 const interval = 50;

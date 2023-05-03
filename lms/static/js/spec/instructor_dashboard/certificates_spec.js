@@ -6,14 +6,13 @@ define([
 ],
 function($, AjaxHelpers) {
     'use strict';
-
     describe('edx.instructor_dashboard.certificates.regenerate_certificates', function() {
         var $regenerate_certificates_button = null,
             $certificate_regeneration_status = null,
             requests = null;
         var MESSAGES = {
-            success_message: 'Certificate regeneration task has been started. '
-                    + 'You can view the status of the generation task in the "Pending Tasks" section.',
+            success_message: 'Certificate regeneration task has been started. ' +
+                    'You can view the status of the generation task in the "Pending Tasks" section.',
             error_message: 'Please select one or more certificate statuses that require certificate regeneration.',
             server_error_message: 'Error while regenerating certificates. Please try again.'
         };
@@ -31,32 +30,32 @@ function($, AjaxHelpers) {
         };
 
         beforeEach(function() {
-            var fixture = '<section id="certificates">'
-                    + '<form id="certificate-regenerating-form" method="post" action="' + expected.url + '">'
-                    + '<p class="under-heading">To regenerate certificates for your course, '
-                    + '   chose the learners who will receive regenerated certificates and click <br> '
-                    + '   Regenerate Certificates.'
-                    + '</p>'
-                    + '<input id="certificate_status_downloadable" type="checkbox" name="certificate_statuses" '
-                    + '   value="downloadable">'
-                    + '<label style="display: inline" for="certificate_status_downloadable">'
-                    + '   Regenerate for learners who have already received certificates. (3)'
-                    + '</label><br>'
-                    + '<input id="certificate_status_notpassing" type="checkbox" name="certificate_statuses" '
-                    + '   value="notpassing">'
-                    + '<label style="display: inline" for="certificate_status_notpassing"> '
-                    + '   Regenerate for learners who have not received certificates. (1)'
-                    + '</label><br>'
-                    + '<input id="certificate_status_error" type="checkbox" name="certificate_statuses" '
-                    + '   value="error">'
-                    + '<label style="display: inline" for="certificate_status_error"> '
-                    + '   Regenerate for learners in an error state. (0)'
-                    + '</label><br>'
-                    + '<input type="button" class="btn-blue" id="btn-start-regenerating-certificates" '
-                    + '   value="Regenerate Certificates" data-endpoint="' + expected.url + '">'
-                    + '</form>'
-                    + '<div class="message certificate-regeneration-status"></div>'
-                    + '</section>';
+            var fixture = '<section id="certificates">' +
+                    '<form id="certificate-regenerating-form" method="post" action="' + expected.url + '">' +
+                    '<p class="under-heading">To regenerate certificates for your course, ' +
+                    '   chose the learners who will receive regenerated certificates and click <br> ' +
+                    '   Regenerate Certificates.' +
+                    '</p>' +
+                    '<input id="certificate_status_downloadable" type="checkbox" name="certificate_statuses" ' +
+                    '   value="downloadable">' +
+                    '<label style="display: inline" for="certificate_status_downloadable">' +
+                    '   Regenerate for learners who have already received certificates. (3)' +
+                    '</label><br>' +
+                    '<input id="certificate_status_notpassing" type="checkbox" name="certificate_statuses" ' +
+                    '   value="notpassing">' +
+                    '<label style="display: inline" for="certificate_status_notpassing"> ' +
+                    '   Regenerate for learners who have not received certificates. (1)' +
+                    '</label><br>' +
+                    '<input id="certificate_status_error" type="checkbox" name="certificate_statuses" ' +
+                    '   value="error">' +
+                    '<label style="display: inline" for="certificate_status_error"> ' +
+                    '   Regenerate for learners in an error state. (0)' +
+                    '</label><br>' +
+                    '<input type="button" class="btn-blue" id="btn-start-regenerating-certificates" ' +
+                    '   value="Regenerate Certificates" data-endpoint="' + expected.url + '">' +
+                    '</form>' +
+                    '<div class="message certificate-regeneration-status"></div>' +
+                    '</section>';
 
             setFixtures(fixture);
             onCertificatesReady();

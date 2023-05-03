@@ -2,7 +2,6 @@ define(['domReady', 'jquery', 'underscore', 'js/views/utils/create_course_utils'
     'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils'],
 function(domReady, $, _, CreateCourseUtilsFactory, ViewUtils, HtmlUtils) {
     'use strict';
-
     var CreateCourseUtils = new CreateCourseUtilsFactory({
         name: '.rerun-course-name',
         org: '.rerun-course-org',

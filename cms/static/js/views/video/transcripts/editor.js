@@ -114,6 +114,7 @@ define(
                     return mode === 'html5' && mode;
                 });
 
+
                 // The length of youtube video_id should be 11 characters.
                 if (values.youtube.length === 11) {
                 // Just video id is retrieved from `Advanced` tab field and

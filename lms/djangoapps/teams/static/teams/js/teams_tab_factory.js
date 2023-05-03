@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['jquery', 'teams/js/views/teams_tab'],
         function($, TeamsTabView) {
             return function(options) {

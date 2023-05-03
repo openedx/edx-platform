@@ -6,7 +6,6 @@ define([
     'teams/js/models/topic'
 ], function(Backbone, _, TeamCollection, TopicCollection, TopicModel) {
     'use strict';
-
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
         createMockTopicData, createMockTopicCollection, createMockTopic,
         createMockContext,
@@ -113,6 +112,7 @@ define([
         );
     };
 
+
     /**
      * Verify that the given view shows cards for each of the teams included.
      * If showTeamset is included (true or false), the test will also verify that the teamset
@@ -157,9 +157,7 @@ define([
                 updated_at: '2015-07-29T18:44:56Z',
                 group_name: 'Default Group',
                 pinned: false,
-                votes: {
-                    count: 0, down_count: 0, point: 0, up_count: 0
-                },
+                votes: {count: 0, down_count: 0, point: 0, up_count: 0},
                 user_id: '9',
                 abuse_flaggers: [],
                 closed: false,
@@ -242,9 +240,7 @@ define([
                 resp_skip: 0,
                 id: '55c1323c56c02ce921000001',
                 pinned: false,
-                votes: {
-                    count: 0, down_count: 0, point: 0, up_count: 0
-                },
+                votes: {count: 0, down_count: 0, point: 0, up_count: 0},
                 resp_limit: 25,
                 abuse_flaggers: [],
                 closed: false,

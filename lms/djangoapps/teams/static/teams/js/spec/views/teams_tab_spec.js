@@ -117,8 +117,8 @@ define([
                 AjaxHelpers.respondWithError(requests, 500);
                 expectError(
                     teamsTabView,
-                    'Your request could not be completed due to a server problem. Reload the page and try again. '
-                    + 'If the issue persists, click the Help tab to report the problem.'
+                    'Your request could not be completed due to a server problem. Reload the page and try again. ' +
+                    'If the issue persists, click the Help tab to report the problem.'
                 );
                 expectFocus(teamsTabView.$('.warning'));
             });

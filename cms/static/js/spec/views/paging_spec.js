@@ -316,9 +316,9 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
                     message = pagingHeader.$('.meta').html().trim();
-                    expect(message).toBe('<p>Showing <span class="count-current-shown">1-3</span>'
-                            + ' out of <span class="count-total">4 total</span>, '
-                            + 'sorted by <span class="sort-order">Date</span> descending</p>');
+                    expect(message).toBe('<p>Showing <span class="count-current-shown">1-3</span>' +
+                            ' out of <span class="count-total">4 total</span>, ' +
+                            'sorted by <span class="sort-order">Date</span> descending</p>');
                 });
 
                 it('shows the correct metadata when sorted ascending', function() {
@@ -328,9 +328,9 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                     pagingView.toggleSortOrder('name-col');
                     respondWithMockItems(requests);
                     message = pagingHeader.$('.meta').html().trim();
-                    expect(message).toBe('<p>Showing <span class="count-current-shown">1-3</span>'
-                            + ' out of <span class="count-total">4 total</span>, '
-                            + 'sorted by <span class="sort-order">Name</span> ascending</p>');
+                    expect(message).toBe('<p>Showing <span class="count-current-shown">1-3</span>' +
+                            ' out of <span class="count-total">4 total</span>, ' +
+                            'sorted by <span class="sort-order">Name</span> ascending</p>');
                 });
             });
 

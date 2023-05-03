@@ -8,7 +8,6 @@ define([ // jshint ignore:line
 ],
 function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
     'use strict';
-
     return function(maintenanceViewURL) {
         var showError;
         // Reset values
@@ -81,3 +80,4 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
         });
     };
 });
+

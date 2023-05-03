@@ -34,8 +34,8 @@
                     this.primaryButtonTitle = gettext('Create');
                 } else if (this.action === 'edit') {
                     this.teamModel = options.model;
-                    this.teamModel.url = this.context.teamsDetailUrl.replace('team_id', options.model.get('id'))
-                            + '?expand=user';
+                    this.teamModel.url = this.context.teamsDetailUrl.replace('team_id', options.model.get('id')) +
+                            '?expand=user';
                     this.primaryButtonTitle = gettext('Update');
                 }
 
@@ -53,8 +53,8 @@
                     editable: 'always',
                     showMessages: false,
                     helpMessage: gettext(
-                        'A short description of the team to help other learners understand the '
-                          + 'goals or direction of the team (maximum 300 characters).')
+                        'A short description of the team to help other learners understand the ' +
+                          'goals or direction of the team (maximum 300 characters).')
                 });
 
                 this.teamLanguageField = new FieldViews.DropdownFieldView({

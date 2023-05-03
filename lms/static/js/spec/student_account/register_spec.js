@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define([
         'jquery',
         'underscore',
@@ -396,6 +395,7 @@
                 expect(thirdPartyAuthView).not.toContain(view.$submitButton);
                 expect(thirdPartyAuthView).not.toContain($('form-field'));
             });
+
 
             it('validates registration form fields on form submission', function() {
                 createRegisterView(this);

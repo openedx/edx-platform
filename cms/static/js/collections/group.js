@@ -3,7 +3,6 @@ define([
 ],
 function(_, str, Backbone, gettext, GroupModel) {
     'use strict';
-
     var GroupCollection = Backbone.Collection.extend({
         model: GroupModel,
         comparator: 'order',
@@ -21,7 +20,7 @@ function(_, str, Backbone, gettext, GroupModel) {
         /**
          * Indicates if the collection is empty when all the models are empty
          * or the collection does not include any models.
-         * */
+         **/
         isEmpty: function() {
             return this.length === 0 || this.every(function(m) {
                 return m.isEmpty();
@@ -41,7 +40,7 @@ function(_, str, Backbone, gettext, GroupModel) {
 
             do {
                 name = str.sprintf(gettext('Group %s'), this.getGroupId(index));
-                index++;
+                index ++;
             } while (_.contains(usedNames, name));
 
             return name;

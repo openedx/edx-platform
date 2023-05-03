@@ -30,45 +30,46 @@ const problemResponsesRefreshStatus = timeout => ({
     timeout,
 });
 
-const getTaskStatus = (taskStatusEndpoint, reportDownloadEndpoint, taskId) => dispatch => fetchTaskStatus(taskStatusEndpoint, taskId)
-    .then((response) => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error(response);
-    })
-    .then(
-        (statusData) => {
-            if (statusData.in_progress) {
-                const timeout = setTimeout(
-                    () => dispatch(getTaskStatus(taskStatusEndpoint, reportDownloadEndpoint, taskId)),
-                    2000,
-                );
-                return dispatch(problemResponsesRefreshStatus(timeout));
+const getTaskStatus = (taskStatusEndpoint, reportDownloadEndpoint, taskId) => dispatch =>
+    fetchTaskStatus(taskStatusEndpoint, taskId)
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
             }
-            if (statusData.task_state === 'SUCCESS') {
-                const taskProgress = statusData.task_progress;
-                const reportName = taskProgress && taskProgress.report_name;
-                return fetchDownloadsList(reportDownloadEndpoint, reportName)
-                    .then(response => response.json())
-                    .then(
-                        data => dispatch(
-                            taskStatusSuccess(
-                                true,
-                                statusData.in_progress,
-                                reportName,
-                                data.downloads,
-                            ),
-                        ),
-                        () => dispatch(problemResponsesFailure(gettext('There was an error generating the report link.'))),
+            throw new Error(response);
+        })
+        .then(
+            (statusData) => {
+                if (statusData.in_progress) {
+                    const timeout = setTimeout(
+                        () => dispatch(getTaskStatus(taskStatusEndpoint, reportDownloadEndpoint, taskId)),
+                        2000,
                     );
-            }
-            return dispatch(problemResponsesFailure(gettext('There was an error generating your report.')));
-        },
-        () => dispatch(
-            problemResponsesFailure(gettext('Unable to get report generation status.')),
-        ),
-    );
+                    return dispatch(problemResponsesRefreshStatus(timeout));
+                }
+                if (statusData.task_state === 'SUCCESS') {
+                    const taskProgress = statusData.task_progress;
+                    const reportName = taskProgress && taskProgress.report_name;
+                    return fetchDownloadsList(reportDownloadEndpoint, reportName)
+                        .then(response => response.json())
+                        .then(
+                            data => dispatch(
+                                taskStatusSuccess(
+                                    true,
+                                    statusData.in_progress,
+                                    reportName,
+                                    data.downloads,
+                                ),
+                            ),
+                            () => dispatch(problemResponsesFailure(gettext('There was an error generating the report link.'))),
+                        );
+                }
+                return dispatch(problemResponsesFailure(gettext('There was an error generating your report.')));
+            },
+            () => dispatch(
+                problemResponsesFailure(gettext('Unable to get report generation status.')),
+            ),
+        );
 
 const createProblemResponsesReportTask = (
     problemResponsesEndpoint,

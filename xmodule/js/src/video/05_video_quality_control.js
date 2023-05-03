@@ -1,8 +1,6 @@
 (function(requirejs, require, define) {
 // VideoQualityControl module.
-    
-'use strict';
-
+    'use strict';
     define(
         'video/05_video_quality_control.js',
         ['edx-ui-toolkit/js/utils/html-utils'],

@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['backbone', 'support/js/models/enrollment'],
         function(Backbone, EnrollmentModel) {
             return Backbone.Collection.extend({

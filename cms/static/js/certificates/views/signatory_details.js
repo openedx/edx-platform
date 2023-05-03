@@ -17,7 +17,6 @@ define([
 function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, SignatoryEditorView,
     signatoryDetailsTemplate, signatoryActionsTemplate, HtmlUtils) {
     'use strict';
-
     var SignatoryDetailsView = BaseView.extend({
         tagName: 'div',
         events: {

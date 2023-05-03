@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['backbone', 'support/js/models/certificate'],
         function(Backbone, CertModel) {
             return Backbone.Collection.extend({

@@ -45,8 +45,7 @@ class CollectionListView extends Backbone.View {
             StringUtils.interpolate(this.titleContext.title),
             HtmlUtils.HTML('</'),
             this.titleContext.el,
-            HtmlUtils.HTML('>')
-        );
+            HtmlUtils.HTML('>'));
         return titleHtml;
     }
 }

@@ -188,7 +188,7 @@
             * params:
             *   'position' can be any sequence position.
             */
-            return typeof this.updatedProblems[position] !== 'undefined';
+            return typeof(this.updatedProblems[position]) !== 'undefined';
         };
 
         Sequence.prototype.enableButton = function(buttonClass, buttonAction) {
@@ -252,9 +252,10 @@
 
                 // update the data-attributes with latest contents only for updated problems.
                 this.content_container
-                    .html(currentTab.text()) // xss-lint: disable=javascript-jquery-html
+                    .html(currentTab.text())  // xss-lint: disable=javascript-jquery-html
                     .attr('aria-labelledby', currentTab.attr('aria-labelledby'))
                     .data('bookmarked', bookmarked);
+
 
                 if (this.anyUpdatedProblems(newPosition)) {
                     $.each(this.updatedProblems[newPosition], function(problemId, latestData) {
@@ -327,11 +328,11 @@
                 }
                 this.render(newPosition);
             } else {
-                alertTemplate = gettext('Sequence error! Cannot navigate to %(tab_name)s in the current SequenceModule. Please contact the course staff.'); // eslint-disable-line max-len
+                alertTemplate = gettext('Sequence error! Cannot navigate to %(tab_name)s in the current SequenceModule. Please contact the course staff.');  // eslint-disable-line max-len
                 alertText = interpolate(alertTemplate, {
                     tab_name: newPosition
                 }, true);
-                alert(alertText); // eslint-disable-line no-alert
+                alert(alertText);  // eslint-disable-line no-alert
             }
         };
 

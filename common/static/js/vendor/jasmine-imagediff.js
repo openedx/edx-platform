@@ -74,7 +74,7 @@
     );
   }
   function isType (object, type) {
-    return typeof object === 'object' && !!Object.prototype.toString.apply(object).match(type);
+    return typeof (object) === 'object' && !!Object.prototype.toString.apply(object).match(type);
   }
 
 
@@ -321,7 +321,7 @@
             result = {};
 
           result.pass = imagediff.equal(actual, expected, tolerance);
-          if (typeof document !== UNDEFINED) {
+          if (typeof (document) !== UNDEFINED) {
             result.message = imageDiffEqualMessage(actual, expected);
           }
           return result;

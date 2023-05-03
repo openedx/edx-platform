@@ -1,6 +1,5 @@
 (function(define, undefined) {
     'use strict';
-
     define([
         'jquery', 'underscore', 'backbone', 'js/edxnotes/utils/template',
         'js/edxnotes/utils/logger', 'edx-ui-toolkit/js/utils/html-utils'

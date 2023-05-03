@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['jquery', 'underscore', 'underscore.string', 'common/js/components/views/feedback'],
         function($, _, str, SystemFeedbackView) {
             var Alert = SystemFeedbackView.extend({

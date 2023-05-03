@@ -20,7 +20,6 @@ define([
 ],
 function($, CertificatesCollection, Certificate, CertificatesPage, CertificatePreview) {
     'use strict';
-
     return function(certificatesJson, certificateUrl, courseOutlineUrl, courseModes, certificateWebViewUrl,
         isActive, certificateActivationHandlerUrl) {
         // Initialize the model collection, passing any necessary options to the constructor

@@ -6,7 +6,6 @@ define(
     ],
     function($, _, Utils, _str) {
         'use strict';
-
         describe('Transcripts.Utils', function() {
             var videoId = 'OEoXaMPEzfM',
                 ytLinksList = (function(id) {

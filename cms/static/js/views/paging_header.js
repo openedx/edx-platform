@@ -7,7 +7,6 @@ define([
     'text!templates/paging-header.underscore'
 ], function(_, Backbone, gettext, HtmlUtils, StringUtils, pagingHeaderTemplate) {
     'use strict';
-
     var PagingHeader = Backbone.View.extend({
         events: {
             'click .next-page-link': 'nextPage',
@@ -50,22 +49,22 @@ define([
                 if (this.view.collection.sortDirection === 'asc') {
                     // Translators: sample result:
                     // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added ascending"
-                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, filtered by {assetType}, sorted by {sortName} ascending'); // eslint-disable-line max-len
+                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, filtered by {assetType}, sorted by {sortName} ascending');  // eslint-disable-line max-len
                 } else {
                     // Translators: sample result:
                     // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added descending"
-                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, filtered by {assetType}, sorted by {sortName} descending'); // eslint-disable-line max-len
+                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, filtered by {assetType}, sorted by {sortName} descending');  // eslint-disable-line max-len
                 }
                 assetType = this.filterNameLabel();
             } else {
                 if (this.view.collection.sortDirection === 'asc') {
                     // Translators: sample result:
                     // "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} ascending'); // eslint-disable-line max-len
+                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} ascending');  // eslint-disable-line max-len
                 } else {
                     // Translators: sample result:
                     // "Showing 0-9 out of 25 total, sorted by Date Added descending"
-                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} descending'); // eslint-disable-line max-len
+                    message = gettext('Showing {currentItemRange} out of {totalItemsCount}, sorted by {sortName} descending');  // eslint-disable-line max-len
                 }
             }
 

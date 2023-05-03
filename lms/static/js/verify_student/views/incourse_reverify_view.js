@@ -29,6 +29,7 @@ var edx = edx || {};
             this.platformName = obj.platformName || null;
             this.usageId = obj.usageId || null;
 
+
             this.model = new edx.verify_student.VerificationModel({
                 courseKey: this.courseKey,
                 checkpoint: this.usageId

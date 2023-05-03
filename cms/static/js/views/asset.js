@@ -2,7 +2,6 @@ define(['js/views/baseview', 'underscore', 'gettext', 'common/js/components/view
     'common/js/components/views/feedback_notification', 'edx-ui-toolkit/js/utils/html-utils'],
 function(BaseView, _, gettext, PromptView, NotificationView, HtmlUtils) {
     'use strict';
-
     var AssetView = BaseView.extend({
         initialize: function() {
             this.template = this.loadTemplate('asset');

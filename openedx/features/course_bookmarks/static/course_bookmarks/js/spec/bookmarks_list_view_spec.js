@@ -74,8 +74,8 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
             );
 
             expect(bookmarksView.$('.bookmarks-empty-detail-title').text().trim()).toBe(
-                'Use bookmarks to help you easily return to courseware pages. '
-                    + 'To bookmark a page, click "Bookmark this page" under the page title.'
+                'Use bookmarks to help you easily return to courseware pages. ' +
+                    'To bookmark a page, click "Bookmark this page" under the page title.'
             );
 
             expect(bookmarksView.$('.paging-header').length).toBe(0);

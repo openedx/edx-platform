@@ -1,7 +1,6 @@
 define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce'],
     function(Backbone, $, ExpiryCouponView) {
         'use strict';
-
         var expiryCouponView;
         describe('edx.instructor_dashboard.ecommerce.ExpiryCouponView', function() {
             beforeEach(function() {

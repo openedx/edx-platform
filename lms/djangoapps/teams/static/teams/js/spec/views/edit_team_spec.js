@@ -9,7 +9,6 @@ define([
     'teams/js/spec_helpers/team_spec_helpers'
 ], function($, _, Backbone, AjaxHelpers, PageHelpers, TeamEditView, TeamModel, TeamSpecHelpers) {
     'use strict';
-
     var assertFormRendersCorrectly,
         assertTeamCreateUpdateInfo,
         assertValidationMessagesWhenFieldsEmpty,

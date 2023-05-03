@@ -7,7 +7,7 @@ define([
 ], function($, _, gettext, moment, PromptView, HtmlUtils) {
     'use strict';
 
-    /** ******** Private properties *************************************** */
+    /** ******** Private properties ****************************************/
 
     var COOKIE_NAME = 'lastexport';
 
@@ -39,7 +39,7 @@ define([
         wrapper: $('div.wrapper-status')
     };
 
-    /** ******** Private functions **************************************** */
+    /** ******** Private functions *****************************************/
 
     /**
      * Makes Export feedback status list visible
@@ -181,7 +181,7 @@ define([
         }), {path: window.location.pathname});
     };
 
-    /** ******** Public functions ***************************************** */
+    /** ******** Public functions ******************************************/
 
     var CourseExport = {
         /**
@@ -310,10 +310,10 @@ define([
             if (editUnitUrl) {
                 dialog = new PromptView({
                     title: gettext('There has been an error while exporting.'),
-                    message: gettext('There has been a failure to export to XML at least one component. '
-                        + 'It is recommended that you go to the edit page and repair the error before attempting '
-                        + 'another export. Please check that all components on the page are valid and do not display '
-                        + 'any error messages.'),
+                    message: gettext('There has been a failure to export to XML at least one component. ' +
+                        'It is recommended that you go to the edit page and repair the error before attempting ' +
+                        'another export. Please check that all components on the page are valid and do not display ' +
+                        'any error messages.'),
                     intent: 'error',
                     actions: {
                         primary: {
@@ -333,14 +333,14 @@ define([
                 });
             } else {
                 if (isLibrary) {
-                    msg += gettext('Your library could not be exported to XML. There is not enough information to '
-                        + 'identify the failed component. Inspect your library to identify any problematic components '
-                        + 'and try again.');
+                    msg += gettext('Your library could not be exported to XML. There is not enough information to ' +
+                        'identify the failed component. Inspect your library to identify any problematic components ' +
+                        'and try again.');
                     action = gettext('Take me to the main library page');
                 } else {
-                    msg += gettext('Your course could not be exported to XML. There is not enough information to '
-                        + 'identify the failed component. Inspect your course to identify any problematic components '
-                        + 'and try again.');
+                    msg += gettext('Your course could not be exported to XML. There is not enough information to ' +
+                        'identify the failed component. Inspect your course to identify any problematic components ' +
+                        'and try again.');
                     action = gettext('Take me to the main course page');
                 }
                 msg += ' ' + gettext('The raw error message is:') + ' ' + errMsg;

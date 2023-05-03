@@ -1,7 +1,6 @@
 /* globals $$course_id, Content, Markdown, MathJax, URI, _ */
 (function() {
     'use strict';
-
     this.DiscussionUtil = (function() {
         function DiscussionUtil() {
         }

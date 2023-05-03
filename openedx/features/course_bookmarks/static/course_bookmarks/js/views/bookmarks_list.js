@@ -17,7 +17,7 @@
             coursewareResultsWrapperEl: '.courseware-results-wrapper',
 
             errorIcon: '<span class="fa fa-fw fa-exclamation-triangle message-error" aria-hidden="true"></span>',
-            loadingIcon: '<span class="fa fa-fw fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span>', // eslint-disable-line max-len
+            loadingIcon: '<span class="fa fa-fw fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span>',  // eslint-disable-line max-len
 
             errorMessage: gettext('An error has occurred. Please try again.'),
             loadingMessage: gettext('Loading'),

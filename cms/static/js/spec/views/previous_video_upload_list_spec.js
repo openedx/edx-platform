@@ -3,7 +3,6 @@ define(
         'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
     function($, _, Backbone, PreviousVideoUploadListView, TemplateHelpers, AjaxHelpers) {
         'use strict';
-
         describe('PreviousVideoUploadListView', function() {
             var videoHandlerUrl = '/videos/course-v1:org.0+course_0+Run_0',
                 render = function(numModels) {

@@ -26,6 +26,7 @@ define([
         }
     };
 
+
     describe('discovery.views.RefineSidebar', function() {
         beforeEach(function() {
             loadFixtures('js/fixtures/discovery.html');
@@ -37,9 +38,7 @@ define([
             this.facetOptions.add([
                 {facet: 'language', term: 'es', count: 12},
                 {facet: 'language', term: 'en', count: 10},
-                {
-                    facet: 'modes', term: 'honor', count: 2, selected: true
-                }
+                {facet: 'modes', term: 'honor', count: 2, selected: true}
             ]);
             this.sidebar = new RefineSidebar({collection: this.facetOptions, meanings: MEANINGS});
             this.sidebar.render();
@@ -71,3 +70,4 @@ define([
         });
     });
 });
+

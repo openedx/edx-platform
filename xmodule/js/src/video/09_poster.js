@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define('video/09_poster.js', [], function() {
     /**
      * Poster module.

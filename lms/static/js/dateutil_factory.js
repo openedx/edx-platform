@@ -1,3 +1,4 @@
+
 /**
  *
  * A helper function to utilize DateUtils quickly in display templates.

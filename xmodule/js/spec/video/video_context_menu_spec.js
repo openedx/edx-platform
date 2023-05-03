@@ -1,7 +1,6 @@
 /* globals _ */
 (function() {
     'use strict';
-
     describe('Video Context Menu', function() {
         var state, openMenu, keyPressEvent, openSubmenuMouse, openSubmenuKeyboard, closeSubmenuMouse,
             closeSubmenuKeyboard, menu, menuItems, menuSubmenuItem, submenu, submenuItems, overlay, $playButton;

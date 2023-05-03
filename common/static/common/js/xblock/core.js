@@ -30,8 +30,8 @@
         } else {
             if (runtime || version || initFnName) {
                 console.log(
-                    'Block ' + $element.outerHTML + ' is missing data-runtime, data-runtime-version or data-init, '
-                    + 'and can\'t be initialized'
+                    'Block ' + $element.outerHTML + ' is missing data-runtime, data-runtime-version or data-init, ' +
+                    'and can\'t be initialized'
                 );
             } // else this XBlock doesn't have a JS init function.
             return null;

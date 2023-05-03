@@ -10,7 +10,6 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
     CourseVideoSharingEnableView
 ) {
     'use strict';
-
     var expandedLocators, CourseOutlinePage;
 
     CourseOutlinePage = BasePage.extend({
@@ -128,7 +127,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         scrollToElement: function () {
             this.findElementPollingTimeout -= this.pollingDelay;
 
-            const elementID = window.location.hash.replace('#', '');
+            const elementID = window.location.hash.replace("#", "");
 
             if (this.findElementPollingTimeout > 0) {
                 if (elementID) {

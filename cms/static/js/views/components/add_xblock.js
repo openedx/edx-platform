@@ -6,7 +6,6 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
     'edx-ui-toolkit/js/utils/html-utils'],
 function($, _, gettext, BaseView, ViewUtils, AddXBlockButton, AddXBlockMenu, HtmlUtils) {
     'use strict';
-
     var AddXBlockComponent = BaseView.extend({
         events: {
             'click .new-component .new-component-type .multiple-templates': 'showComponentTemplates',

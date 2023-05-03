@@ -27,6 +27,7 @@ var edx = edx || {};
             );
         });
 
+
         // This event invokes credit request endpoint. It will initiate
         // a credit request for the credit course for the provided user.
         $('.pending-credit-btn').on('click', function(event) {

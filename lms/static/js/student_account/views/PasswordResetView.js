@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define([
         'jquery',
         'js/student_account/views/FormView'

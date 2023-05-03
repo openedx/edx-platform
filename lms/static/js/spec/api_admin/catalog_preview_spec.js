@@ -13,10 +13,10 @@ define([
 
         beforeEach(function() {
             setFixtures(
-                '<div class="catalog-body">'
-                + '<textarea id="id_query"></textarea>'
-                + '<div class="preview-results"></div>'
-                + '</div>'
+                '<div class="catalog-body">' +
+                '<textarea id="id_query"></textarea>' +
+                '<div class="preview-results"></div>' +
+                '</div>'
             );
             view = new CatalogPreviewView({
                 el: '.catalog-body',

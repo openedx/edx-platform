@@ -8,7 +8,6 @@ define([
 ],
 function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, HtmlUtils) {
     'use strict';
-
     // the handouts view is dumb right now; it needs tied to a model and all that jazz
     var CourseInfoHandoutsView = BaseView.extend({
     // collection is CourseUpdateCollection

@@ -37,8 +37,8 @@
                     // search the filtered list of captions in between
                     // the start / end times.
                     // Else, search the unfiltered list.
-                    if (typeof startTime !== 'undefined'
-                && typeof endTime !== 'undefined') {
+                    if (typeof startTime !== 'undefined' &&
+                typeof endTime !== 'undefined') {
                         results = filter(startTime, endTime);
                         start = results.start;
                         max = results.captions.length - 1;
@@ -113,3 +113,4 @@
             return Sjson;
         });
 }(RequireJS.define));
+

@@ -4,7 +4,6 @@
  */
 (function() {
     'use strict';
-
     describe('DiscussionInlineView', function() {
         var createTestView, showDiscussion, setNextAjaxResult,
             TEST_THREAD_TITLE = 'Test thread title';
@@ -12,20 +11,20 @@
         beforeEach(function() {
             DiscussionSpecHelper.setUpGlobals();
             setFixtures(
-                '<div class="discussion-module" data-discussion-id="test-discussion-id"'
-                + '  data-user-create-comment="true"'
-                + '  data-user-create-subcomment="true"'
-                + '  data-read-only="false">'
-                + '  <div class="discussion-module-header">'
-                + '    <h3 class="discussion-module-title">Test Discussion</h3>'
-                + '    <div class="inline-discussion-topic">'
-                + '      <span class="inline-discussion-topic-title">Topic:</span> Category / Target '
-                + '    </div>'
-                + '  </div>'
-                + '  <button class="discussion-show btn btn-brand" data-discussion-id="test-discussion-id">'
-                + '     <span class="button-text">Show Discussion</span>'
-                + '  </button>'
-                + '</div>'
+                '<div class="discussion-module" data-discussion-id="test-discussion-id"' +
+                '  data-user-create-comment="true"' +
+                '  data-user-create-subcomment="true"' +
+                '  data-read-only="false">' +
+                '  <div class="discussion-module-header">' +
+                '    <h3 class="discussion-module-title">Test Discussion</h3>' +
+                '    <div class="inline-discussion-topic">' +
+                '      <span class="inline-discussion-topic-title">Topic:</span> Category / Target ' +
+                '    </div>' +
+                '  </div>' +
+                '  <button class="discussion-show btn btn-brand" data-discussion-id="test-discussion-id">' +
+                '     <span class="button-text">Show Discussion</span>' +
+                '  </button>' +
+                '</div>'
             );
             DiscussionSpecHelper.setUnderscoreFixtures();
             this.ajaxSpy = spyOn($, 'ajax');

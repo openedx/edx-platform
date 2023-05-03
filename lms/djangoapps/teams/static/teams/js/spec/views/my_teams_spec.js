@@ -6,7 +6,6 @@ define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ], function(Backbone, MyTeamsCollection, MyTeamsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
-
     var createMyTeamsView, mockGetTopic;
     describe('My Teams View', function() {
         beforeEach(function() {

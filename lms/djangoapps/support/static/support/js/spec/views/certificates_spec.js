@@ -124,6 +124,7 @@ define([
             expect(results[1][3]).toEqual(REGENERATE_SEARCH_RESULTS[1].grade);
             expect(results[1][4]).toEqual(REGENERATE_SEARCH_RESULTS[1].modified);
 
+
             searchFor('student@example.com', 'edx/test1/2016', requests, GENERATE_SEARCH_RESULTS);
             results = getSearchResults();
             expect(results.length).toEqual(GENERATE_SEARCH_RESULTS.length);

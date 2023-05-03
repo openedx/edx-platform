@@ -3,7 +3,6 @@ define([
     'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
 ], function($, _, AjaxHelpers, Helpers, Annotator, Logger, NotesFactory) {
     'use strict';
-
     describe('EdxNotes Events Plugin', function() {
         var note = {
                 user: 'user-123',

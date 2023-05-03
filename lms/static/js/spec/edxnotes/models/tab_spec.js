@@ -2,7 +2,6 @@ define([
     'js/edxnotes/collections/tabs'
 ], function(TabsCollection) {
     'use strict';
-
     describe('EdxNotes TabModel', function() {
         beforeEach(function() {
             this.collection = new TabsCollection([{}, {}, {}]);

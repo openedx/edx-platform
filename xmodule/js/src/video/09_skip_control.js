@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     // VideoSkipControl module.
     define(
         'video/09_skip_control.js', [],

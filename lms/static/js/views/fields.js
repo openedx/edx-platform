@@ -1,7 +1,6 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_super"] }] */
 (function(define, undef) {
     'use strict';
-
     define([
         'gettext', 'jquery', 'underscore', 'backbone',
         'edx-ui-toolkit/js/utils/html-utils',
@@ -34,27 +33,27 @@
 
             indicators: {
                 canEdit: HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span><span class="sr">'), // eslint-disable-line max-len
+                    HtmlUtils.HTML('<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Editable'),
                     HtmlUtils.HTML('</span>')
                 ),
                 error: HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span><span class="sr">'), // eslint-disable-line max-len
+                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Error'),
                     HtmlUtils.HTML('</span>')
                 ),
                 validationError: HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></span><span class="sr">'), // eslint-disable-line max-len
+                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Validation Error'),
                     HtmlUtils.HTML('</span>')
                 ),
                 inProgress: HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'), // eslint-disable-line max-len
+                    HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('In Progress'),
                     HtmlUtils.HTML('</span>')
                 ),
                 success: HtmlUtils.joinHtml(
-                    HtmlUtils.HTML('<span class="fa fa-check message-success" aria-hidden="true"></span><span class="sr">'), // eslint-disable-line max-len
+                    HtmlUtils.HTML('<span class="fa fa-check message-success" aria-hidden="true"></span><span class="sr">'),  // eslint-disable-line max-len
                     gettext('Success'),
                     HtmlUtils.HTML('</span>')
                 ),
@@ -158,8 +157,8 @@
                 this.lastSuccessMessageContext = context;
 
                 setTimeout(function() {
-                    if ((context === view.lastSuccessMessageContext)
-                        && (view.getNotificationMessage().toString() === successMessage.toString())) {
+                    if ((context === view.lastSuccessMessageContext) &&
+                        (view.getNotificationMessage().toString() === successMessage.toString())) {
                         if (view.editable === 'toggle') {
                             view.showCanEditMessage(true);
                         } else {
@@ -489,9 +488,9 @@
             },
 
             updateValueInField: function() {
-                var value; // str
-                var fieldHasFocus; // bool
-                var fieldChanged; // bool
+                var value;  // str
+                var fieldHasFocus;  // bool
+                var fieldChanged;  // bool
                 if (this.editable !== 'never') {
                     value = this.modelValue() || '';
                     fieldHasFocus = (document.activeElement === this.$('.u-field-value select')[0]);
@@ -552,8 +551,8 @@
             },
 
             createGroupOptions: function() {
-                return !(_.isUndefined(this.options.groupOptions)) ? this.options.groupOptions
-                    : [{
+                return !(_.isUndefined(this.options.groupOptions)) ? this.options.groupOptions :
+                    [{
                         groupTitle: null,
                         selectOptions: this.options.options
                     }];
@@ -602,8 +601,8 @@
                     maxCharacters: this.options.maxCharacters || ''
                 }));
                 this.delegateEvents();
-                this.title((this.modelValue() || this.mode === 'edit')
-                    ? this.options.title : HtmlUtils.joinHtml(this.indicators.plus, this.options.title));
+                this.title((this.modelValue() || this.mode === 'edit') ?
+                    this.options.title : HtmlUtils.joinHtml(this.indicators.plus, this.options.title));
 
                 if (this.editable === 'toggle') {
                     this.showCanEditMessage(this.mode === 'display');

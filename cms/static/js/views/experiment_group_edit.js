@@ -7,7 +7,6 @@ define([
 ],
 function(BaseView, _, str, gettext, groupEditTemplate) {
     'use strict';
-
     var ExperimentGroupEditView = BaseView.extend({
         tagName: 'li',
         events: {

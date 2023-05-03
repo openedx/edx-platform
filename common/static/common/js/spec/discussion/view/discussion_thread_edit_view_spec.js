@@ -4,7 +4,6 @@
 */
 (function() {
     'use strict';
-
     describe('DiscussionThreadEditView', function() {
         var testUpdate, testCancel;
 
@@ -33,6 +32,7 @@
 
         testUpdate = function(view, thread, newTopicId, newTopicName, mode) {
             var discussionMode = mode || 'tab';
+
 
             spyOn($, 'ajax').and.callFake(function(params) {
                 expect(params.url.path()).toEqual(DiscussionUtil.urlFor('update_thread', 'dummy_id'));

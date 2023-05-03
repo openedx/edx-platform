@@ -1,7 +1,6 @@
 /* globals Comments, Content, DiscussionSpecHelper, DiscussionUser, DiscussionUtil, Thread */
 (function() {
     'use strict';
-
     describe('All Content', function() {
         beforeEach(function() {
             return DiscussionSpecHelper.setUpGlobals();

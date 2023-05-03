@@ -13,7 +13,7 @@
                     click: 'toggleBookmark'
                 },
 
-                showBannerInterval: 5000, // time in ms
+                showBannerInterval: 5000,   // time in ms
 
                 initialize: function(options) {
                     this.apiUrl = options.apiUrl;

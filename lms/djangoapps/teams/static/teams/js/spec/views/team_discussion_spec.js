@@ -6,7 +6,6 @@ define([
     'teams/js/views/team_discussion'
 ], function(_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamDiscussionView) {
     'use strict';
-
     describe('TeamDiscussionView', function() {
         var discussionView, createDiscussionView;
 

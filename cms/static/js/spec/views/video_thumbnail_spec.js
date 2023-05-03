@@ -3,7 +3,6 @@ define(
         'js/views/video_thumbnail', 'js/views/previous_video_upload_list', 'common/js/spec_helpers/template_helpers'],
     function($, _, Backbone, AjaxHelpers, VideoThumbnailView, PreviousVideoUploadListView, TemplateHelpers) {
         'use strict';
-
         describe('VideoThumbnailView', function() {
             var IMAGE_UPLOAD_URL = '/videos/upload/image',
                 UPLOADED_IMAGE_URL = 'images/upload_success.jpg',
@@ -13,7 +12,7 @@ define(
                 VIDEO_IMAGE_MAX_HEIGHT = 720,
                 VIDEO_IMAGE_SUPPORTED_FILE_FORMATS = {
                     '.bmp': 'image/bmp',
-                    '.bmp2': 'image/x-ms-bmp', // PIL gives x-ms-bmp format
+                    '.bmp2': 'image/x-ms-bmp',   // PIL gives x-ms-bmp format
                     '.gif': 'image/gif',
                     '.jpg': 'image/jpeg',
                     '.jpeg': 'image/jpeg',
@@ -36,9 +35,9 @@ define(
              * @param {Integer} videoViewIndex  Index of video on which videoThumbnailView would be based.
              */
             createVideoListView = function(videoImageUploadEnabled, modelData, numVideos, videoViewIndex) {
-                var modelData = modelData || {}, // eslint-disable-line no-redeclare
-                    numVideos = numVideos || 1, // eslint-disable-line no-redeclare
-                    videoViewIndex = videoViewIndex || 0, // eslint-disable-line no-redeclare,
+                var modelData = modelData || {},  // eslint-disable-line no-redeclare
+                    numVideos = numVideos || 1,   // eslint-disable-line no-redeclare
+                    videoViewIndex = videoViewIndex || 0,   // eslint-disable-line no-redeclare,
                     defaultData = {
                         client_video_id: 'foo.mp4',
                         duration: 42,
@@ -78,9 +77,10 @@ define(
                 return videoListView;
             };
 
+
             createFakeImageFile = function(size, type) {
-                var size = size || VIDEO_IMAGE_MIN_BYTES, // eslint-disable-line no-redeclare
-                    type = type || 'image/jpeg'; // eslint-disable-line no-redeclare
+                var size = size || VIDEO_IMAGE_MIN_BYTES,   // eslint-disable-line no-redeclare
+                    type = type || 'image/jpeg';    // eslint-disable-line no-redeclare
                 return new Blob([Array(size + 1).join('i')], {type: type});
             };
 
@@ -220,8 +220,8 @@ define(
             });
 
             it('calls readMessage with correct message', function() {
-                var errorMessage = 'Image upload failed. This image file type is not supported. Supported file '
-                    + 'types are ' + videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.',
+                var errorMessage = 'Image upload failed. This image file type is not supported. Supported file ' +
+                    'types are ' + videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.',
                     successData = {
                         files: [createFakeImageFile()],
                         submit: function() {}
@@ -270,8 +270,8 @@ define(
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                     .trim()).toEqual(
-                    'Image upload failed. The selected image must be larger than '
-                    + videoThumbnailView.getVideoImageMinSize().humanize + '.'
+                    'Image upload failed. The selected image must be larger than ' +
+                    videoThumbnailView.getVideoImageMinSize().humanize + '.'
                 );
             });
 
@@ -285,8 +285,8 @@ define(
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                     .trim()).toEqual(
-                    'Image upload failed. The selected image must be smaller than '
-                    + videoThumbnailView.getVideoImageMaxSize().humanize + '.'
+                    'Image upload failed. The selected image must be smaller than ' +
+                    videoThumbnailView.getVideoImageMaxSize().humanize + '.'
                 );
             });
 
@@ -322,8 +322,8 @@ define(
                 // Verify error message
                 expect($videoListEl.find('.thumbnail-error-wrapper').find('.action-text').html()
                     .trim()).toEqual(
-                    'Image upload failed. This image file type is not supported. Supported file types are '
-                    + videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.'
+                    'Image upload failed. This image file type is not supported. Supported file types are ' +
+                    videoThumbnailView.getVideoImageSupportedFileFormats().humanize + '.'
                 );
             });
 

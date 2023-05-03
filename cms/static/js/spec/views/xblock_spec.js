@@ -2,7 +2,6 @@ define(['jquery', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'c
     'js/views/xblock', 'js/models/xblock_info', 'xmodule', 'cms/js/main', 'xblock/cms.runtime.v1'],
 function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
     'use strict';
-
     describe('XBlockView', function() {
         var model, xblockView, mockXBlockHtml;
 

@@ -22,6 +22,7 @@ $(document).ready(function() {
         space: 32
     };
 
+
     // bind menu toggle click for later use
     $dropdownMenuToggle.toggle(function() {
         $dropdownMenu.addClass('expanded').find('.dropdown-menuitem').first()
@@ -67,8 +68,8 @@ $(document).ready(function() {
         }
 
         // if up arrow key pressed or shift+tab else down key or tab is pressed
-        if (event.which === keyCodes.upArrow || event.which === keyCodes.leftArrow
-            || (event.which === keyCodes.tab && event.shiftKey)) {
+        if (event.which === keyCodes.upArrow || event.which === keyCodes.leftArrow ||
+            (event.which === keyCodes.tab && event.shiftKey)) {
             // if first item go to last
             if (focusedItemIndex === 0) {
                 menuItems.last().focus();
@@ -77,8 +78,8 @@ $(document).ready(function() {
                 menuItems.get(itemToFocusIndex).focus();
             }
             event.preventDefault();
-        } else if (event.which === keyCodes.downArrow || event.which === keyCodes.rightArrow
-            || event.which === keyCodes.tab) {
+        } else if (event.which === keyCodes.downArrow || event.which === keyCodes.rightArrow ||
+            event.which === keyCodes.tab) {
             // if last item go to first
             if (focusedItemIndex === numberOfMenuItems - 1) {
                 menuItems.first().focus();

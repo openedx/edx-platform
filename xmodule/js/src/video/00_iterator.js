@@ -4,7 +4,6 @@
         [],
         function() {
             'use strict';
-
             /**
      * Provides convenient way to work with iterable data.
      * @exports video/00_iterator.js
@@ -88,3 +87,4 @@
             return Iterator;
         });
 }(RequireJS.define));
+

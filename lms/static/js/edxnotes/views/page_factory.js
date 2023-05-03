@@ -1,6 +1,5 @@
 (function(define, undefined) {
     'use strict';
-
     define([
         'jquery', 'js/edxnotes/collections/notes', 'js/edxnotes/views/notes_page'
     ], function($, NotesCollection, NotesPageView) {

@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define(['teams/js/collections/team'], function(TeamCollection) {
         var MyTeamsCollection = TeamCollection.extend({
             queryParams: {

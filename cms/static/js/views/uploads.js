@@ -2,7 +2,6 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'edx-ui
     'jquery.form'],
 function($, _, gettext, BaseModal, HtmlUtils) {
     'use strict';
-
     var UploadDialog = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
             'change input[type=file]': 'selectFile',

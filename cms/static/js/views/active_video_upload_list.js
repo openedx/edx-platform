@@ -14,7 +14,6 @@ define([
 function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, CourseVideoSettingsView,
     HtmlUtils, StringUtils, activeVideoUploadListTemplate) {
     'use strict';
-
     var ActiveVideoUploadListView,
         CONVERSION_FACTOR_GBS_TO_BYTES = 1000 * 1000 * 1000;
     ActiveVideoUploadListView = BaseView.extend({
@@ -33,7 +32,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                 spanEnd: HtmlUtils.HTML('</span>')
             }
         ),
-        defaultFailureMessage: gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'), // eslint-disable-line max-len
+        defaultFailureMessage: gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'),  // eslint-disable-line max-len
 
         initialize: function(options) {
             this.template = HtmlUtils.template(activeVideoUploadListTemplate);
@@ -241,7 +240,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                             }),
                             dataType: 'json',
                             type: 'POST',
-                            global: false // Do not trigger global AJAX error handler
+                            global: false   // Do not trigger global AJAX error handler
                         }).done(function(responseData) {
                             _.each(
                                 responseData.files,
@@ -253,7 +252,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                                         url: file.upload_url,
                                         videoId: file.edx_video_id,
                                         multipart: false,
-                                        global: false, // Do not trigger global AJAX error handler
+                                        global: false,  // Do not trigger global AJAX error handler
                                         redirected: true
                                     });
                                 }
@@ -375,14 +374,14 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                 fileName,
                 fileType;
 
-            $.each(data.files, function(index, file) { // eslint-disable-line consistent-return
+            $.each(data.files, function(index, file) {  // eslint-disable-line consistent-return
                 fileName = file.name;
                 fileType = fileName.substr(fileName.lastIndexOf('.'));
                 // validate file type
                 if (!_.contains(self.videoSupportedFileFormats, fileType)) {
                     error = gettext(
-                        '{filename} is not in a supported file format. '
-                            + 'Supported file formats are {supportedFileFormats}.'
+                        '{filename} is not in a supported file format. ' +
+                            'Supported file formats are {supportedFileFormats}.'
                     )
                         .replace('{filename}', fileName)
                         .replace('{supportedFileFormats}', self.videoSupportedFileFormats.join(' and '));
@@ -422,8 +421,8 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
                 if (model.get('status') === ActiveVideoUpload.STATUS_COMPLETED) {
                     completedModels.push(model);
                     completedIndexes.push(index - completedIndexes.length);
-                    completedMessages.push(model.get('fileName')
-                            + gettext(': video upload complete.'));
+                    completedMessages.push(model.get('fileName') +
+                            gettext(': video upload complete.'));
                 }
             });
             for (idx = 0; idx < completedIndexes.length; idx++) {

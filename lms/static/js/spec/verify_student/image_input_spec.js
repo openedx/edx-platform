@@ -90,8 +90,8 @@ define([
 
         beforeEach(function() {
             setFixtures(
-                '<div id="current-step-container"></div>'
-                + '<input type="button" id="submit_button"></input>'
+                '<div id="current-step-container"></div>' +
+                '<input type="button" id="submit_button"></input>'
             );
             TemplateHelpers.installTemplate('templates/verify_student/image_input');
         });

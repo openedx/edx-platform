@@ -1,6 +1,5 @@
 (function(requirejs, require, define) {
     'use strict';
-
     define(
         'video/08_video_auto_advance_control.js', [
             'edx-ui-toolkit/js/utils/html-utils',

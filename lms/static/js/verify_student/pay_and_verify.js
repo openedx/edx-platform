@@ -12,7 +12,6 @@ var edx = edx || {};
 
 (function($, _) {
     'use strict';
-
     var errorView,
         $el = $('#pay-and-verify-container');
 

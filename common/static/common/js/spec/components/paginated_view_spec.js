@@ -7,7 +7,6 @@ define([
     'common/js/components/views/paginated_view'
 ], function($, Backbone, _, PagingCollection, AjaxHelpers, PaginatedView) {
     'use strict';
-
     describe('PaginatedView', function() {
         var TestItemView = Backbone.View.extend({
                 className: 'test-item',

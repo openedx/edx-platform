@@ -9,7 +9,6 @@ define([
 ],
 function(gettext, ListItemView, CertificateDetailsView, CertificateEditorView) {
     'use strict';
-
     var CertificateItemView = ListItemView.extend({
         events: {
             'click .delete': 'deleteItem'

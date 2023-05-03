@@ -184,6 +184,6 @@
     // spec files one by one, otherwise some end up getting nested under others.
     window.requireSerial(specHelpers.concat(testFiles), function() {
         // start test run, once Require.js is done
-        window.__karma__.start(); // eslint-disable-line no-underscore-dangle
+        window.__karma__.start();  // eslint-disable-line no-underscore-dangle
     });
 }).call(this, requirejs, define);

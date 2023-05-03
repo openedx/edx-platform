@@ -4,7 +4,6 @@ define([
     'common/js/components/views/paging_header'
 ], function(_, PagingCollection, PagingHeader) {
     'use strict';
-
     describe('PagingHeader', function() {
         var pagingHeader,
             newCollection = function(size, perPage) {

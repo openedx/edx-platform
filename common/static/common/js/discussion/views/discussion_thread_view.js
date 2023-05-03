@@ -4,7 +4,6 @@
 */
 (function() {
     'use strict';
-
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {
@@ -205,9 +204,9 @@
                             self.isQuestion() ? data.content.non_endorsed_responses : data.content.children
                         );
                         self.renderResponseCountAndPagination(
-                            self.isQuestion()
-                                ? data.content.non_endorsed_resp_total
-                                : data.content.resp_total
+                            self.isQuestion() ?
+                                data.content.non_endorsed_resp_total :
+                                data.content.resp_total
                         );
                         self.trigger('thread:responses:rendered');
                         self.loadedResponses = true;

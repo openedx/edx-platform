@@ -36,7 +36,7 @@ define(
                         icon: '<span class="icon fa fa-pencil" aria-hidden="true"></span>',
                         text: HtmlUtils.interpolateHtml(
                             // Translators: This is a 2 part text which tells the image requirements.
-                            gettext('{InstructionsSpanStart}{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}'), // eslint-disable-line max-len
+                            gettext('{InstructionsSpanStart}{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}'),   // eslint-disable-line max-len
                             {
                                 videoImageResoultion: this.getVideoImageResolution(),
                                 videoImageSupportedFileFormats: this.getVideoImageSupportedFileFormats().humanize,
@@ -61,7 +61,7 @@ define(
                         icon: '',
                         text: HtmlUtils.interpolateHtml(
                             // Translators: This is a 3 part text which tells the image requirements.
-                            gettext('{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}'), // eslint-disable-line max-len
+                            gettext('{ReqTextSpanStart}Requirements{spanEnd}{lineBreak}{InstructionsSpanStart}{videoImageResoultion}{lineBreak} {videoImageSupportedFileFormats}{spanEnd}'),   // eslint-disable-line max-len
                             {
                                 videoImageResoultion: this.getVideoImageResolution(),
                                 videoImageSupportedFileFormats: this.getVideoImageSupportedFileFormats().humanize,
@@ -230,7 +230,7 @@ define(
                 errorMessage = this.validateImageFile(data.files[0]);
                 if (!errorMessage) {
                     // Do not trigger global AJAX error handler
-                    data.global = false; // eslint-disable-line no-param-reassign
+                    data.global = false;    // eslint-disable-line no-param-reassign
                     this.readMessages([gettext('Video image upload started')]);
                     this.showUploadInProgressMessage();
                     data.submit();
@@ -365,9 +365,9 @@ define(
                 this.setActionInfo(this.action, true);
                 this.readMessages([gettext('Could not upload the video image file'), errorText]);
 
-                errorText = gettext('Image upload failed. ') + errorText; // eslint-disable-line no-param-reassign
+                errorText = gettext('Image upload failed. ') + errorText;   // eslint-disable-line no-param-reassign
                 // Add error wrapper html to current video element row.
-                $parentRowEl.before( // xss-lint: disable=javascript-jquery-insertion
+                $parentRowEl.before(    // xss-lint: disable=javascript-jquery-insertion
                     HtmlUtils.ensureHtml(
                         this.thumbnailErrorTemplate({videoId: videoId, errorText: errorText})
                     ).toString()

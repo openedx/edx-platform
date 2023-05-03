@@ -1,5 +1,4 @@
 /* eslint-env node */
-
 'use strict';
 
 // By default, fixtures are loaded from spec/javascripts/fixtures but in karma everything gets served from /base

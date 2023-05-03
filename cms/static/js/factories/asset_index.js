@@ -2,7 +2,6 @@ define([
     'jquery', 'js/collections/asset', 'js/views/assets', 'jquery.fileupload'
 ], function($, AssetCollection, AssetsView) {
     'use strict';
-
     return function(config) {
         var assets = new AssetCollection(),
             assetsView;

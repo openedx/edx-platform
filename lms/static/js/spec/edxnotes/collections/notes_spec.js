@@ -2,7 +2,6 @@ define([
     'js/spec/edxnotes/helpers', 'js/edxnotes/collections/notes'
 ], function(Helpers, NotesCollection) {
     'use strict';
-
     describe('EdxNotes NotesCollection', function() {
         var notes = Helpers.getDefaultNotes();
 

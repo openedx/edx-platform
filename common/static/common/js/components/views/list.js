@@ -3,7 +3,6 @@
  */
 (function(define) {
     'use strict';
-
     define(['backbone', 'underscore'], function(Backbone, _) {
         var ListView = Backbone.View.extend({
             /**

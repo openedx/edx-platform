@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, InputText } from '@edx/paragon';
 import PropTypes from 'prop-types';
 
+
 class Search extends React.Component {
     constructor(props) {
         super(props);

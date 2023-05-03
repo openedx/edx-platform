@@ -55,10 +55,7 @@ define(['js/models/license'], function(LicenseModel) {
         it('can stringify a license with options', function() {
             this.model.set({
                 type: 'abc',
-                options: {
-                    ping: 'pong', bing: true, buzz: true, beep: false
-                }
-            }
+                options: {ping: 'pong', bing: true, buzz: true, beep: false}}
             );
             expect(this.model.toString()).toEqual('abc: ping=pong bing buzz');
         });

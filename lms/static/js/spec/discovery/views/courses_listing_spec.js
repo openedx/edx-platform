@@ -4,6 +4,7 @@ define([
 ], function($, Backbone, TemplateHelpers, CourseCard, CoursesListing) {
     'use strict';
 
+
     var JSON_RESPONSE = {
         total: 365,
         results: [
@@ -28,6 +29,7 @@ define([
             }
         ]
     };
+
 
     describe('discovery.views.CoursesListing', function() {
         beforeEach(function() {

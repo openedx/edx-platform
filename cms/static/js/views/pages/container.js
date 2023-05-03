@@ -11,7 +11,6 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
     EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
     ContainerSubviews, UnitOutlineView, XBlockUtils) {
     'use strict';
-
     var XBlockContainerPage = BasePage.extend({
         // takes XBlockInfo as a model
 
@@ -34,6 +33,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         },
 
         view: 'container_preview',
+
 
         defaultViewClass: ContainerView,
 
@@ -249,16 +249,16 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             if(!options || options.view !== 'visibility_view' ){
                 const primaryHeader = $(event.target).closest('.xblock-header-primary')
 
-                var useNewTextEditor = primaryHeader.attr('use-new-editor-text'),
-                    useNewVideoEditor = primaryHeader.attr('use-new-editor-video'),
-                    useNewProblemEditor = primaryHeader.attr('use-new-editor-problem'),
-                    blockType = primaryHeader.attr('data-block-type');
+                var useNewTextEditor = primaryHeader.attr("use-new-editor-text"),
+                    useNewVideoEditor = primaryHeader.attr("use-new-editor-video"),
+                    useNewProblemEditor = primaryHeader.attr("use-new-editor-problem"),
+                    blockType = primaryHeader.attr("data-block-type");
 
-                if( (useNewTextEditor === 'True' && blockType === 'html')
-                        || (useNewVideoEditor === 'True' && blockType === 'video')
-                        || (useNewProblemEditor === 'True' && blockType === 'problem')
+                if( (useNewTextEditor === "True" && blockType === "html") ||
+                        (useNewVideoEditor === "True" && blockType === "video") ||
+                        (useNewProblemEditor === "True" && blockType === "problem")
                 ) {
-                    var destinationUrl = primaryHeader.attr('authoring_MFE_base_url') + '/' + blockType + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
+                    var destinationUrl = primaryHeader.attr("authoring_MFE_base_url") + '/' + blockType + '/' + encodeURI(primaryHeader.attr("data-usage-id"));
                     window.location.href = destinationUrl;
                     return;
                 }
@@ -280,14 +280,14 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
          * If the new "Actions" menu is enabled, most XBlock actions like
          * Duplicate, Move, Delete, Manage Access, etc. are moved into this
          * menu. For this event, we just toggle displaying the menu.
-         * @param {*} event
+         * @param {*} event 
          */
         showXBlockActionsMenu: function(event) {
             const showActionsButton = event.currentTarget;
-            const subMenu = showActionsButton.parentElement.querySelector('.wrapper-nav-sub');
+            const subMenu = showActionsButton.parentElement.querySelector(".wrapper-nav-sub");
             // Code in 'base.js' normally handles toggling these dropdowns but since this one is
             // not present yet during the domReady event, we have to handle displaying it ourselves.
-            subMenu.classList.toggle('is-shown');
+            subMenu.classList.toggle("is-shown");
             // if propagation is not stopped, the event will bubble up to the
             // body element, which will close the dropdown.
             event.stopPropagation();
@@ -452,20 +452,20 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         },
 
         onNewXBlock: function(xblockElement, scrollOffset, is_duplicate, data) {
-            var useNewTextEditor = this.$('.xblock-header-primary').attr('use-new-editor-text'),
-                useNewVideoEditor = this.$('.xblock-header-primary').attr('use-new-editor-video'),
-                useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
+            var useNewTextEditor = this.$('.xblock-header-primary').attr("use-new-editor-text"),
+                useNewVideoEditor = this.$('.xblock-header-primary').attr("use-new-editor-video"),
+                useNewProblemEditor = this.$('.xblock-header-primary').attr("use-new-editor-problem");
 
-            // find the block type in the locator if availible
+            //find the block type in the locator if availible
             if(data.hasOwnProperty('locator')){
                 var matchBlockTypeFromLocator = /\@(.*?)\+/;
                 var blockType = data.locator.match(matchBlockTypeFromLocator);
             }
-            if((useNewTextEditor === 'True' && blockType.includes('html'))
-                    || (useNewVideoEditor === 'True' && blockType.includes('video'))
-                    ||(useNewProblemEditor === 'True' && blockType.includes('problem'))
+            if((useNewTextEditor === "True" && blockType.includes("html")) ||
+                    (useNewVideoEditor === "True" && blockType.includes("video"))||
+                    (useNewProblemEditor === "True" && blockType.includes("problem"))
             ){
-                var destinationUrl = this.$('.xblock-header-primary').attr('authoring_MFE_base_url') + '/' + blockType[1] + '/' + encodeURI(data.locator);
+                var destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
                 window.location.href = destinationUrl;
                 return;
             }
@@ -529,7 +529,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             return temporaryView.render({
                 success: function() {
                     self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
-                    temporaryView.unbind(); // Remove the temporary view
+                    temporaryView.unbind();  // Remove the temporary view
                 },
                 initRuntimeData: this
             });

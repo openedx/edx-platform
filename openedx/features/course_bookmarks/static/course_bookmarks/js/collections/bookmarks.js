@@ -1,6 +1,5 @@
 (function(define) {
     'use strict';
-
     define([
         'backbone',
         'edx-ui-toolkit/js/pagination/paging-collection',
@@ -26,3 +25,4 @@
         });
     });
 }(define || RequireJS.define));
+

@@ -4,7 +4,6 @@
         [],
         function() {
             'use strict';
-
             /**
  * Provides convenient way to store key value pairs.
  *

@@ -8,7 +8,6 @@
 define(['js/views/baseview', 'js/views/utils/xblock_utils', 'edx-ui-toolkit/js/utils/html-utils'],
     function(BaseView, XBlockViewUtils, HtmlUtils) {
         'use strict';
-
         var XBlockStringFieldEditor = BaseView.extend({
             events: {
                 'click .xblock-field-value-edit': 'showInput',
@@ -119,7 +118,7 @@ define(['js/views/baseview', 'js/views/utils/xblock_utils', 'edx-ui-toolkit/js/u
             },
 
             handleKeyUp: function(event) {
-                if (event.keyCode === 27) { // Revert the changes if the user hits escape
+                if (event.keyCode === 27) {   // Revert the changes if the user hits escape
                     this.cancelInput();
                 }
             }

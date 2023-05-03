@@ -6,7 +6,6 @@ define([
     $, _, AjaxHelpers, TemplateHelpers, Helpers, Logger, NoteModel, NoteItemView
 ) {
     'use strict';
-
     describe('EdxNotes NoteItemView', function() {
         var getView = function(model, scrollToTag, formattedText) {
             model = new NoteModel(_.defaults(model || {}, {

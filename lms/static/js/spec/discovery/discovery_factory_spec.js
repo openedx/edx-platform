@@ -4,6 +4,7 @@ define([
 ], function($, AjaxHelpers, TemplateHelpers, DiscoveryFactory) {
     'use strict';
 
+
     var MEANINGS = {
         org: {
             name: 'Organization',
@@ -25,6 +26,7 @@ define([
             }
         }
     };
+
 
     var JSON_RESPONSE = {
         total: 365,
@@ -91,6 +93,7 @@ define([
             }
         }
     };
+
 
     describe('discovery.DiscoveryFactory', function() {
         beforeEach(function() {

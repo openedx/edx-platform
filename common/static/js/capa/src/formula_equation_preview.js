@@ -1,6 +1,5 @@
 function escapeSelector(id) {
     'use strict';
-
     // Wrapper around window.CSS.escape that uses a fallback method if CSS.escape is not available.  This is designed to
     // serialize a string to be used as a valid css selector.  See
     // https://drafts.csswg.org/cssom/#the-css.escape()-method For example, this can be used with xblock and course ids,
@@ -35,8 +34,8 @@ function escapeSelector(id) {
 }
 
 var formulaEquationPreview = {
-    minDelay: 300, // Minimum time between requests sent out.
-    errorDelay: 1500 // Wait time before showing error (prevent frustration).
+    minDelay: 300,  // Minimum time between requests sent out.
+    errorDelay: 1500  // Wait time before showing error (prevent frustration).
 };
 
 /** Setup the FormulaEquationInputs and associated javascript code. */
@@ -67,10 +66,10 @@ formulaEquationPreview.enable = function() {
 
             // Store the DOM/MathJax elements in which visible output occurs.
             $preview: $preview,
-            jax: null, // Fill this in later.
+            jax: null,  // Fill this in later.
             $img: $preview.find('img.loading'),
 
-            requestCallback: null // Fill it in in a bit.
+            requestCallback: null  // Fill it in in a bit.
         };
 
         // Give callback access to `inputData` (fill in first parameter).
@@ -149,8 +148,8 @@ formulaEquationPreview.enable = function() {
      */
     function updatePage(inputData, response) {
         var requestStart = response.request_start;
-        if (requestStart == inputData.lastSent
-            && !inputData.isWaitingForRequest) {
+        if (requestStart == inputData.lastSent &&
+            !inputData.isWaitingForRequest) {
             // Disable icon.
             inputData.$img.css('visibility', 'hidden');
         }

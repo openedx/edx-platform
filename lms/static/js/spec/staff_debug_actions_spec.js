@@ -6,7 +6,6 @@ define([
 ],
 function(Backbone, $, tmp, AjaxHelpers) {
     'use strict';
-
     var StaffDebug = window.StaffDebug;
 
     describe('StaffDebugActions', function() {

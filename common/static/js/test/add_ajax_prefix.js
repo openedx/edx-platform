@@ -3,3 +3,4 @@
 AjaxPrefix.addAjaxPrefix($, function() {
     return '';
 });
+

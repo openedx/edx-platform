@@ -157,8 +157,8 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             expect($('p.instruction-info:contains("test@example.com")').length).toEqual(0);
             // Verify user gets verification message.
             expect($('p.localized-datetime').attr('data-string')).toEqual(
-                'You can pay now even if you don\'t have the following items available,'
-                    + ' but you will need to have these by {date} to qualify to earn a Verified Certificate.'
+                'You can pay now even if you don\'t have the following items available,' +
+                    ' but you will need to have these by {date} to qualify to earn a Verified Certificate.'
             );
             expect($('p.localized-datetime').attr('data-timezone')).toEqual('PDT');
             expect($('p.localized-datetime').attr('data-language')).toEqual('es-ES');

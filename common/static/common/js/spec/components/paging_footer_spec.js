@@ -7,7 +7,6 @@ define([
     'common/js/components/views/paging_footer'
 ], function($, URI, _, PagingCollection, AjaxHelpers, PagingFooter) {
     'use strict';
-
     describe('PagingFooter', function() {
         var pagingFooter,
             mockPage = function(currentPage, numPages, collectionLength) {

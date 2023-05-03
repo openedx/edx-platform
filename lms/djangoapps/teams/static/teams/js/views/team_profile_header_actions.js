@@ -100,8 +100,8 @@
                 // this.topic.getMaxTeamSize() will return null for a managed team,
                 // but the size is considered to be arbitarily large.
                 var isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type);
-                var teamHasSpace = isInstructorManagedTopic
-                        || (this.model.get('membership').length < this.topic.getMaxTeamSize(courseMaxTeamSize));
+                var teamHasSpace = isInstructorManagedTopic ||
+                        (this.model.get('membership').length < this.topic.getMaxTeamSize(courseMaxTeamSize));
 
                 info.memberOfCurrentTeam = TeamUtils.isUserMemberOfTeam(this.model.get('membership'), username);
                 info.isAdminOrStaff = this.context.userInfo.privileged || this.context.userInfo.staff;

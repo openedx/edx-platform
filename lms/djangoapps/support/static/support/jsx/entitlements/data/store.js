@@ -13,11 +13,13 @@ const defaultState = {
     },
 };
 
-const configureStore = initialState => createStore(
-    rootReducer,
-    initialState,
-    applyMiddleware(thunkMiddleware),
-);
+const configureStore = initialState =>
+    createStore(
+        rootReducer,
+        initialState,
+        applyMiddleware(thunkMiddleware),
+    );
+
 
 const store = configureStore(defaultState);
 

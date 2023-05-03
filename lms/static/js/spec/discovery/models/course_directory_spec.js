@@ -3,6 +3,7 @@ define([
 ], function(AjaxHelpers, CourseDiscovery) {
     'use strict';
 
+
     var JSON_RESPONSE = {
         total: 365,
         results: [
@@ -68,6 +69,7 @@ define([
             }
         }
     };
+
 
     describe('discovery.models.CourseDiscovery', function() {
         beforeEach(function() {

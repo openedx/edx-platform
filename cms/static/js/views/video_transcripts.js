@@ -198,7 +198,7 @@ define(
                 errorMessage = this.validateTranscriptUpload(data.files[0]);
                 if (!errorMessage) {
                     // Do not trigger global AJAX error handler
-                    data.global = false; // eslint-disable-line no-param-reassign
+                    data.global = false;    // eslint-disable-line no-param-reassign
                     data.submit();
                     this.renderMessage($transcriptContainer, 'uploading');
                 } else {
@@ -211,7 +211,7 @@ define(
             transcriptUploadSucceeded: function(event, data) {
                 var languageCode = data.formData.language_code,
                     newLanguageCode = data.formData.new_language_code,
-                    $transcriptContainer = this.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]'); // eslint-disable-line max-len
+                    $transcriptContainer = this.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
 
                 $transcriptContainer.attr('data-language-code', newLanguageCode);
                 $transcriptContainer.find('.download-transcript-button').attr(
@@ -240,7 +240,7 @@ define(
             transcriptUploadFailed: function(event, data) {
                 var errorMessage,
                     languageCode = data.formData.language_code,
-                    $transcriptContainer = this.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]'); // eslint-disable-line max-len
+                    $transcriptContainer = this.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]');  // eslint-disable-line max-len
 
                 try {
                     errorMessage = JSON.parse(data.jqXHR.responseText).error;
@@ -266,7 +266,7 @@ define(
 
                 ViewUtils.confirmThenRunOperation(
                     gettext('Are you sure you want to remove this transcript?'),
-                    gettext('If you remove this transcript, the transcript will not be available for any components that use this video.'), // eslint-disable-line max-len
+                    gettext('If you remove this transcript, the transcript will not be available for any components that use this video.'),  // eslint-disable-line max-len
                     gettext('Remove'),
                     function() {
                         ViewUtils.runOperationShowingMessage(
