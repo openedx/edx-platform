@@ -1573,23 +1573,14 @@ class VideoUrlsCsvTestCase(
 
 
 @ddt.ddt
-class GetVideoFeaturesTestCase(
-    VideoStudioAccessTestsMixin,
-    CourseTestCase
-):
+class GetVideoFeaturesTestCase():
     """Test cases for the get_video_features endpoint """
     def setUp(self):
         super().setUp()
-        self.url = self.get_url_for_course_key()
-
-    def get_url_for_course_key(self, course_id=None):
-        """ Helper to generate a url for a course key """
-        course_id = course_id or str(self.course.id)
-        return reverse_course_url("video_features", course_id)
 
     def test_basic(self):
         """ Test for expected return keys """
-        response = self.client.get(self.get_url_for_course_key())
+        response = self.client.get()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             set(response.json().keys()),
@@ -1622,7 +1613,7 @@ class GetVideoFeaturesTestCase(
     def _test_video_feature(self, flag, key, override_fn, is_enabled):
         """ Test that setting a waffle flag or switch on or off will cause the expected result """
         with override_fn(flag, is_enabled):
-            response = self.client.get(self.get_url_for_course_key())
+            response = self.client.get()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()[key], is_enabled)
