@@ -12,6 +12,7 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
@@ -2769,6 +2770,28 @@ class TestXBlockInfo(ItemTest):
         self.store.update_item(self.course, None)
         course_xblock_info = create_xblock_info(self.course)
         self.assertTrue(course_xblock_info['highlights_enabled_for_messaging'])
+
+    def test_xblock_public_video_sharing_enabled(self):
+        """
+        Public video sharing is included in the xblock info when enable.
+        """
+        self.course.video_sharing_options = 'all-on'
+        with patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=True):
+            self.store.update_item(self.course, None)
+            course_xblock_info = create_xblock_info(self.course)
+            self.assertTrue(course_xblock_info['video_sharing_enabled'])
+            self.assertEqual(course_xblock_info['video_sharing_options'], 'all-on')
+
+    def test_xblock_public_video_sharing_disabled(self):
+        """
+        Public video sharing not is included in the xblock info when disabled.
+        """
+        self.course.video_sharing_options = 'arbitrary'
+        with patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=False):
+            self.store.update_item(self.course, None)
+            course_xblock_info = create_xblock_info(self.course)
+            self.assertNotIn('video_sharing_enabled', course_xblock_info)
+            self.assertNotIn('video_sharing_options', course_xblock_info)
 
     def validate_course_xblock_info(self, xblock_info, has_child_info=True, course_outline=False):
         """
