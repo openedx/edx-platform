@@ -281,16 +281,12 @@ def video_images_upload_enabled(request):
 @ensure_valid_course_key
 @login_required
 @require_GET
-def get_video_features(request, course_key_string):
+def get_video_features(request):
     """ Return a dict with info about which video features are enabled """
-    course_key = CourseKey.from_string(course_key_string)
-    course = get_course_and_check_access(course_key, request.user)
-    if not course:
-        return HttpResponseNotFound()
 
     features = {
         'allowThumbnailUpload': VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled(),
-        'videoSharingEnabled': PUBLIC_VIDEO_SHARE.is_enabled(course_key),
+        'videoSharingEnabled': PUBLIC_VIDEO_SHARE.is_enabled(),
     }
     return JsonResponse(features)
 
