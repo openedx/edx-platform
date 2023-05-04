@@ -22,8 +22,8 @@ function NextArrow(props) {
     return (
         <button {...opts}>
             <span>Next </span>
-            <span className="icon fa fa-chevron-right" aria-hidden="true"></span>
-            <span className="sr">{ 'Scroll carousel forwards' }</span>
+            <span className="icon fa fa-chevron-right" aria-hidden="true" />
+            <span className="sr">Scroll carousel forwards</span>
         </button>
     );
 }
@@ -41,10 +41,10 @@ function PrevArrow(props) {
     }
 
     return (
-        <button {...opts} >
-            <span className="icon fa fa-chevron-left" aria-hidden="true"></span>
+        <button {...opts}>
+            <span className="icon fa fa-chevron-left" aria-hidden="true" />
             <span> Prev</span>
-            <span className="sr">{ 'Scroll carousel backwards' }</span>
+            <span className="sr">Scroll carousel backwards</span>
         </button>
     );
 }
@@ -113,7 +113,7 @@ export default class ExperimentalCarousel extends React.Component {
         };
 
         return (
-            <Slider {...carouselSettings} >
+            <Slider {...carouselSettings}>
                 {this.getCarouselContent()}
             </Slider>
         );

@@ -48,11 +48,12 @@ export const BlockList = ({
                     label={block.display_name}
                 />
                 {block.children
-        && <Button
-            onClick={() => onChangeRoot(block.id)}
-            label={RightIcon}
-        />
-                }
+        && (
+            <Button
+                onClick={() => onChangeRoot(block.id)}
+                label={RightIcon}
+            />
+        )}
             </li>
         ))}
     </ul>

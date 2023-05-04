@@ -29,8 +29,7 @@ class Announcement extends React.Component {
             <div
                 className="announcement"
                 dangerouslySetInnerHTML={{__html: this.props.content}}
-            >
-            </div>
+            />
         );
     }
 }

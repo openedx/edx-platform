@@ -175,6 +175,7 @@ class RenderForm extends React.Component {
             this.scrollToTop();
         }.bind(this);
     }
+
     validateFormData(formData) {
         const { course, subject, message } = formData;
 
@@ -273,21 +274,25 @@ class RenderForm extends React.Component {
         let userElement,
             suggestionsListComponent = null;
         if (this.userInformation) {
-            userElement = (<LoggedInUser
-                userInformation={this.userInformation}
-                onChangeCallback={this.formOnChangeCallback}
-                handleClick={this.handleClick}
-                showWarning={this.showWarningMessage()}
-                showDiscussionButton={this.showDiscussionButton()}
-                reDirectUser={this.reDirectUser}
-                errorList={this.getFormErrorsFromState()}
-            />);
+            userElement = (
+                <LoggedInUser
+                    userInformation={this.userInformation}
+                    onChangeCallback={this.formOnChangeCallback}
+                    handleClick={this.handleClick}
+                    showWarning={this.showWarningMessage()}
+                    showDiscussionButton={this.showDiscussionButton()}
+                    reDirectUser={this.reDirectUser}
+                    errorList={this.getFormErrorsFromState()}
+                />
+            );
         } else {
-            userElement = (<LoggedOutUser
-                platformName={this.props.context.platformName}
-                loginQuery={this.props.context.loginQuery}
-                supportEmail={this.props.context.supportEmail}
-            />);
+            userElement = (
+                <LoggedOutUser
+                    platformName={this.props.context.platformName}
+                    loginQuery={this.props.context.loginQuery}
+                    supportEmail={this.props.context.supportEmail}
+                />
+            );
         }
         if (suggestions !== null && suggestions.length) {
             suggestionsListComponent = (
