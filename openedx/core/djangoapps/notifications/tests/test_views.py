@@ -10,7 +10,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.notifications.models import NotificationPreference
-from openedx.core.djangoapps.notifications.serializers import CourseEnrollmentSerializer
+from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -64,7 +64,7 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
-        expected_data = CourseEnrollmentSerializer(enrollments, many=True).data
+        expected_data = NotificationCourseEnrollmentSerializer(enrollments, many=True).data
         self.assertEqual(response.data, expected_data)
 
     def test_course_enrollment_api_permission(self):

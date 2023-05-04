@@ -17,7 +17,7 @@ class CourseOverviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'display_name')
 
 
-class CourseEnrollmentSerializer(serializers.ModelSerializer):
+class NotificationCourseEnrollmentSerializer(serializers.ModelSerializer):
     """
     Serializer for CourseEnrollment model.
     """
