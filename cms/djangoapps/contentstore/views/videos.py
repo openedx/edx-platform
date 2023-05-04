@@ -278,7 +278,6 @@ def video_images_upload_enabled(request):
     return JsonResponse({'allowThumbnailUpload': True})
 
 
-@ensure_valid_course_key
 @login_required
 @require_GET
 def get_video_features(request):
