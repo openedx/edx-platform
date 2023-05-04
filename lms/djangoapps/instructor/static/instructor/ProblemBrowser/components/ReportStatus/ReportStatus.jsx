@@ -41,7 +41,7 @@ const ReportStatus = ({
             {succeeded && successMessage}
         </div>
     );
-};
+}
 
 ReportStatus.propTypes = {
     error: PropTypes.string,
