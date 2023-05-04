@@ -63,6 +63,8 @@ from openedx.core.djangolib.js_utils import (
                                 class="btn-link social-share-link"
                                 data-source="${sharing_site_info['name']}"
                                 href="${sharing_site_info['sharing_url']}"
+                                target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 <span class="icon fa ${sharing_site_info['fa_icon_name']}" aria-hidden="true"></span>
                                 <span class="sr">${_("Share on {site}").format(site=sharing_site_info['name'])}</span>
