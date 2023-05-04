@@ -45,7 +45,6 @@ from rest_framework.response import Response
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.json_request import JsonResponse, expect_json
-from common.djangoapps.util.views import ensure_valid_course_key
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
