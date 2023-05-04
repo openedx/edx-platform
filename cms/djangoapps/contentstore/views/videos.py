@@ -45,7 +45,6 @@ from rest_framework.response import Response
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.json_request import JsonResponse, expect_json
-from common.djangoapps.util.views import ensure_valid_course_key
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
@@ -278,19 +277,14 @@ def video_images_upload_enabled(request):
     return JsonResponse({'allowThumbnailUpload': True})
 
 
-@ensure_valid_course_key
 @login_required
 @require_GET
-def get_video_features(request, course_key_string):
+def get_video_features(request):
     """ Return a dict with info about which video features are enabled """
-    course_key = CourseKey.from_string(course_key_string)
-    course = get_course_and_check_access(course_key, request.user)
-    if not course:
-        return HttpResponseNotFound()
 
     features = {
         'allowThumbnailUpload': VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled(),
-        'videoSharingEnabled': PUBLIC_VIDEO_SHARE.is_enabled(course_key),
+        'videoSharingEnabled': PUBLIC_VIDEO_SHARE.is_enabled(),
     }
     return JsonResponse(features)
 
