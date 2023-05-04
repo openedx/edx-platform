@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils.text import format_lazy
 from django.utils.safestring import mark_safe
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from .filters import MoreThanOneClassFilter
+from .filters import MoreThanOneClassFilter, DifferentActiveClassFilter
 from django.template.loader import get_template
 from django.shortcuts import redirect, render
 from django.conf.urls import url
@@ -397,8 +397,9 @@ class TeacherAdmin(admin.ModelAdmin):
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
     search_fields = ('gen_user__user__email', 'gen_user__email')
-    list_filter = (MoreThanOneClassFilter, 'gen_user__school',)
+    list_filter = (MoreThanOneClassFilter, DifferentActiveClassFilter, 'gen_user__school',)
     list_display = ('username', 'school', 'enrolled_classes', 'active_class', 'progress')
+    autocomplete_fields = ['active_class']
 
     def username(self, obj):
         return obj.__str__()

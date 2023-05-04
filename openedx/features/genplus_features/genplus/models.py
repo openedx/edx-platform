@@ -114,6 +114,7 @@ class GenUser(models.Model):
 class Student(models.Model):
     gen_user = models.OneToOneField(GenUser, on_delete=models.CASCADE, related_name='student')
     character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True, blank=True)
+    scn = models.CharField(unique=True, null=True, blank=True, max_length=255)
     active_class = models.ForeignKey('genplus.Class', on_delete=models.SET_NULL, null=True, blank=True)
     onboarded = models.BooleanField(default=False)
 

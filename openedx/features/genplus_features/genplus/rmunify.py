@@ -95,7 +95,7 @@ class RmUnify(BaseRmUnify):
                     logger.info('{} has been successfully created.'.format(gen_class.name))
             logger.info('___classes for {} has been successfully fetched___'.format(school.name))
 
-    def fetch_students(self, query=Class.visible_objects.all()):
+    def fetch_students(self, query=Class.visible_objects.filter(school__type=SchoolTypes.RM_UNIFY, type__isnull=False)):
         for gen_class in query:
             logger.info('___Fetching students for {}___'.format(gen_class.name))
             fetch_type = re.sub(r'(?<!^)(?=[A-Z])', '_', gen_class.type).upper()
