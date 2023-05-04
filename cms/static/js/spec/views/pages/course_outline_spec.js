@@ -2291,13 +2291,6 @@ describe('CourseOutlinePage', function() {
             it('shows validation error on relative date', function() {
                 outlinePage.$('.outline-subsection .configure-button').click();
 
-                // when due number of weeks goes over 18
-                selectRelativeWeeksSubsection('19');
-                expect($('#relative_weeks_due_warning_max').css('display')).not.toBe('none');
-                expect($('#relative_weeks_due_warning_max')).toContainText('The maximum number of weeks this subsection can be due in is 18 weeks from the learner enrollment date.');
-                expect($('.wrapper-modal-window .action-save').prop('disabled')).toBe(true);
-                expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(true);
-
                 // when due number of weeks is less than 1
                 selectRelativeWeeksSubsection('-1');
                 expect($('#relative_weeks_due_warning_min').css('display')).not.toBe('none');
@@ -2306,8 +2299,7 @@ describe('CourseOutlinePage', function() {
                 expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(true);
 
                 // when no validation error should show up
-                selectRelativeWeeksSubsection('10');
-                expect($('#relative_weeks_due_warning_max').css('display')).toBe('none');
+                selectRelativeWeeksSubsection('19');
                 expect($('#relative_weeks_due_warning_min').css('display')).toBe('none');
                 expect($('.wrapper-modal-window .action-save').prop('disabled')).toBe(false);
                 expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(false);

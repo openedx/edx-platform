@@ -33,10 +33,16 @@ from xblock.runtime import KvsFieldData
 
 from common.djangoapps.xblock_django.constants import ATTR_KEY_REQUEST_COUNTRY_CODE
 from openedx.core.djangoapps.video_config.models import HLSPlaybackEnabledFlag, CourseYoutubeBlockedFlag
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import DEPRECATE_YOUTUBE
 from openedx.core.lib.cache_utils import request_cached
+from openedx.core.lib.courses import get_course_by_id
 from openedx.core.lib.license import LicenseMixin
 from xmodule.contentstore.content import StaticContent
+from xmodule.course_block import (
+    COURSE_VIDEO_SHARING_ALL_VIDEOS,
+    COURSE_VIDEO_SHARING_NONE,
+)
 from xmodule.editing_block import EditingMixin
 from xmodule.exceptions import NotFoundError
 from xmodule.mako_block import MakoTemplateBlockBase
@@ -53,6 +59,7 @@ from xmodule.x_module import (
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
 
 from .bumper_utils import bumperize
+from .sharing_sites import sharing_sites_info_for_video
 from .transcripts_utils import (
     Transcript,
     VideoTranscriptsMixin,
@@ -465,6 +472,8 @@ class VideoBlock(
             'handout': self.handout,
             'hide_downloads': is_public_view or is_embed,
             'id': self.location.html_id(),
+            'block_id': str(self.location),
+            'course_id': str(self.location.course_key),
             'is_embed': is_embed,
             'license': getattr(self, "license", None),
             'metadata': json.dumps(OrderedDict(metadata)),
@@ -472,26 +481,77 @@ class VideoBlock(
             'track': track_url,
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
-            # provide the video url iif the video is public and we are in LMS.
-            # Reverse render_public_video_xblock is not available in studio.
-            'public_video_url': self._get_public_video_url(),
         }
+        if self.is_public_sharing_enabled():
+            public_video_url = self.get_public_video_url()
+            template_context['public_sharing_enabled'] = True
+            template_context['public_video_url'] = public_video_url
+            template_context['sharing_sites_info'] = sharing_sites_info_for_video(public_video_url)
+
+        # Public video previewing / social media sharing
+        if self.is_public_sharing_enabled():
+            template_context['public_sharing_enabled'] = True
+            template_context['public_video_url'] = self.get_public_video_url()
 
         return self.runtime.service(self, 'mako').render_template('video.html', template_context)
 
-    def _get_public_video_url(self):
+    def get_course_video_sharing_override(self):
+        """
+        Return course video sharing options override or None
+        """
+        try:
+            course = get_course_by_id(self.course_id)
+            return getattr(course, 'video_sharing_options', None)
+
+        # In case the course / modulestore does something weird
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception(f"Error retrieving course for course ID: {self.course_id}")
+            return None
+
+    def is_public_sharing_enabled(self):
+        """
+        Is public sharing enabled for this video?
+        """
+
+        # Sharing is DISABLED from studio
+        is_studio = getattr(self.runtime, "is_author_mode", False)
+        if is_studio:
+            return False
+
+        # Video share feature must be enabled for sharing settings to take effect
+        feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key)
+        if not feature_enabled:
+            return False
+
+        # Check if the course specifies a general setting
+        course_video_sharing_option = self.get_course_video_sharing_override()
+
+        # Course can override all videos to be shared
+        if course_video_sharing_option == COURSE_VIDEO_SHARING_ALL_VIDEOS:
+            return True
+
+        # ... or no videos to be shared
+        elif course_video_sharing_option == COURSE_VIDEO_SHARING_NONE:
+            return False
+
+        # ... or can fall back to per-video setting
+        # Equivalent to COURSE_VIDEO_SHARING_PER_VIDEO or None / unset
+        else:
+            return self.public_access
+
+    def get_public_video_url(self):
         """
         Returns the public video url
         """
-        is_studio = getattr(self.runtime, "is_author_mode", False)
-        if self.public_access and not is_studio:
-            from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
-            if PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key):
-                return urljoin(
-                    settings.LMS_ROOT_URL,
-                    reverse('render_public_video_xblock', kwargs={'usage_key_string': str(self.location)})
-                )
-        return None
+        return urljoin(
+            settings.LMS_ROOT_URL,
+            reverse(
+                'render_public_video_xblock',
+                kwargs={
+                    'usage_key_string': str(self.location)
+                }
+            )
+        )
 
     def validate(self):
         """
