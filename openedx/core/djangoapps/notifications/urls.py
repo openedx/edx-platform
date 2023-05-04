@@ -1,7 +1,10 @@
+"""
+URLs for the notifications API.
+"""
 from django.urls import path
 from rest_framework import routers
-from .views import CourseEnrollmentListView
 
+from .views import CourseEnrollmentListView
 
 router = routers.DefaultRouter()
 

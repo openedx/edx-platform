@@ -2,11 +2,16 @@
 Views for the notifications API.
 """
 from rest_framework import generics, permissions
+
 from common.djangoapps.student.models import CourseEnrollment
+
 from .serializers import CourseEnrollmentSerializer
 
 
 class CourseEnrollmentListView(generics.ListAPIView):
+    """
+    API endpoint that allows CourseEnrollments to be viewed.
+    """
     serializer_class = CourseEnrollmentSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = None
@@ -14,4 +19,3 @@ class CourseEnrollmentListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return CourseEnrollment.objects.filter(user=user, is_active=True)
-

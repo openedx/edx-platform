@@ -8,12 +8,19 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 
 class CourseOverviewSerializer(serializers.ModelSerializer):
+    """
+    Serializer for CourseOverview model.
+    """
+
     class Meta:
         model = CourseOverview
         fields = ('id', 'display_name')
 
 
 class CourseEnrollmentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for CourseEnrollment model.
+    """
     course = CourseOverviewSerializer()
 
     class Meta:
