@@ -4,10 +4,6 @@
  * that the LMS did, so the quick fix was to localize the LMS variables not shared by the CMS.
  * -Abarrett and Vshnayder
  */
-@import 'bourbon/bourbon';
-@import 'lms/theme/variables';
-@import 'lms/theme/variables-v1';
-
 $annotatable--border-color: $gray-l3;
 $annotatable--body-font-size: em(14);
 
