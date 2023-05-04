@@ -29,4 +29,4 @@ export const getCourseBlocks = courseId => fetch(`${COURSE_BLOCKS_API}?${buildQu
     credentials: 'same-origin',
     method: 'get',
     headers: HEADERS,
-},);
+});

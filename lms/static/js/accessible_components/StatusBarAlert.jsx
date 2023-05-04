@@ -19,7 +19,7 @@ export class StatusAlertRenderer {
       */
             ReactDOM.render(
                 <StatusAlert
-                    alertType='warning'
+                    alertType="warning"
                     dismissible={true}
                     open={true}
                     dialog={message}

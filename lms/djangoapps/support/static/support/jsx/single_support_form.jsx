@@ -150,7 +150,7 @@ class RenderForm extends React.Component {
                     {
                         id: this.props.context.customFields.referrer,
                         value: document.referrer ? document.referrer : 'Direct Contact Us Page Request',
-                    }
+                    },
                 ],
                 tags: this.props.context.tags,
             };

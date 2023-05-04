@@ -14,7 +14,7 @@ describe('CourseOutlinePage', function() {
         selectVisibilitySettings, selectDiscussionSettings, selectAdvancedSettings, createMockCourseJSON, createMockSectionJSON,
         createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, setSelfPaced, setSelfPacedCustomPLS,
         mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
-        selectOnboardingExam, createMockCourseJSONWithReviewRules,mockCourseJSONWithReviewRules,
+        selectOnboardingExam, createMockCourseJSONWithReviewRules, mockCourseJSONWithReviewRules,
         mockOutlinePage = readFixtures('templates/mock/mock-course-outline-page.underscore'),
         mockRerunNotification = readFixtures('templates/mock/mock-course-rerun-notification.underscore');
 
@@ -2277,7 +2277,7 @@ describe('CourseOutlinePage', function() {
                 expectShowCorrectness('never');
             });
 
-            it ('does not show relative date input when assignment is not graded', function() {
+            it('does not show relative date input when assignment is not graded', function() {
                 outlinePage.$('.outline-subsection .configure-button').click();
                 $('#grading_type').val('Lab').trigger('change');
                 $('#due_in').val('').trigger('change');

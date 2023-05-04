@@ -21,6 +21,6 @@ export default function ContainerFactory(componentTemplates, XBlockInfoJson, act
         var view = new ContainerPage(_.extend(main_options, options));
         view.render();
     });
-};
+}
 
 export {ContainerFactory};

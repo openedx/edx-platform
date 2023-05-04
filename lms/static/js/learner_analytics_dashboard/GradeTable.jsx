@@ -27,7 +27,7 @@ class GradeTable extends React.Component {
     getTableGroup(type, groupIndex) {
         const {grades} = this.props;
         const groupData = grades.filter(value => {
-            if (value['assignment_type'] === type) {
+            if (value.assignment_type === type) {
                 return value;
             }
         });
@@ -71,7 +71,7 @@ class GradeTable extends React.Component {
             </table>
         );
     }
-};
+}
 
 GradeTable.propTypes = {
     assignmentTypes: PropTypes.array.isRequired,

@@ -72,7 +72,7 @@ class ProgramDetailsView extends Backbone.View {
         const totalCount = completedCount + inProgressCount + remainingCount;
         const buyButtonUrl = ProgramDetailsView.getUrl(
             this.options.urls.buy_button_url,
-            this.options.programData
+            this.options.programData,
         );
         let data = {
             totalCount,

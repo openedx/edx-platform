@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'gettext',
         'jquery',
@@ -42,7 +43,7 @@
                     return HtmlUtils.joinHtml(
                         this.indicators.success,
                         StringUtils.interpolate(
-                            gettext('We\'ve sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.'),  // eslint-disable-line max-len
+                            gettext('We\'ve sent a confirmation message to {new_email_address}. Click the link in the message to update your email address.'), // eslint-disable-line max-len
                             {new_email_address: this.fieldValue()}
                         )
                     );
@@ -52,7 +53,7 @@
                 fieldTemplate: field_dropdown_account_template,
 
                 initialize: function(options) {
-                    this._super(options);   // eslint-disable-line no-underscore-dangle
+                    this._super(options); // eslint-disable-line no-underscore-dangle
                     this.listenTo(this.model, 'revertValue', this.revertValue);
                 },
 
@@ -85,7 +86,7 @@
                             view.showNotificationMessage(
                                 HtmlUtils.joinHtml(
                                     view.indicators.error,
-                                    gettext('You must sign out and sign back in before your language changes take effect.')  // eslint-disable-line max-len
+                                    gettext('You must sign out and sign back in before your language changes take effect.') // eslint-disable-line max-len
                                 )
                             );
                         }
@@ -99,7 +100,7 @@
                 initialize: function(options) {
                     this.options = _.extend({}, options);
                     _.bindAll(this, 'listenToCountryView', 'updateCountrySubheader', 'replaceOrAddGroupOption');
-                    this._super(options);  // eslint-disable-line no-underscore-dangle
+                    this._super(options); // eslint-disable-line no-underscore-dangle
                 },
 
                 listenToCountryView: function(view) {
@@ -191,7 +192,7 @@
                     });
                 },
                 toggleDisableButton: function(disabled) {
-                    var button = this.$('#u-field-link-' + this.options.valueAttribute);
+                    var button = this.$(`#u-field-link-${this.options.valueAttribute}`);
                     if (button) {
                         button.prop('disabled', disabled);
                     }
@@ -206,7 +207,7 @@
                     return HtmlUtils.joinHtml(
                         this.indicators.success,
                         HtmlUtils.interpolateHtml(
-                            gettext('We\'ve sent a message to {email}. Click the link in the message to reset your password. Didn\'t receive the message? Contact {anchorStart}technical support{anchorEnd}.'),  // eslint-disable-line max-len
+                            gettext('We\'ve sent a message to {email}. Click the link in the message to reset your password. Didn\'t receive the message? Contact {anchorStart}technical support{anchorEnd}.'), // eslint-disable-line max-len
                             {
                                 email: this.model.get(this.options.emailAttribute),
                                 anchorStart: HtmlUtils.HTML(
@@ -245,7 +246,7 @@
             SocialLinkTextFieldView: FieldViews.TextFieldView.extend({
                 render: function() {
                     HtmlUtils.setHtml(this.$el, HtmlUtils.template(field_text_account_template)({
-                        id: this.options.valueAttribute + '_' + this.options.platform,
+                        id: `${this.options.valueAttribute}_${this.options.platform}`,
                         title: this.options.title,
                         value: this.modelValue(),
                         message: this.options.helpMessage,
@@ -268,8 +269,10 @@
                     var attributes, value;
                     if (this.persistChanges === true) {
                         attributes = {};
-                        value = this.fieldValue() != null ? [{platform: this.options.platform,
-                            social_link: this.fieldValue()}] : [];
+                        value = this.fieldValue() != null ? [{
+                            platform: this.options.platform,
+                            social_link: this.fieldValue()
+                        }] : [];
                         attributes[this.options.valueAttribute] = value;
                         this.saveAttributes(attributes);
                     }
@@ -278,7 +281,7 @@
             ExtendedFieldTextFieldView: FieldViews.TextFieldView.extend({
                 render: function() {
                     HtmlUtils.setHtml(this.$el, HtmlUtils.template(field_text_account_template)({
-                        id: this.options.valueAttribute + '_' + this.options.field_name,
+                        id: `${this.options.valueAttribute}_${this.options.field_name}`,
                         title: this.options.title,
                         value: this.modelValue(),
                         message: this.options.helpMessage,
@@ -301,8 +304,10 @@
                     var attributes, value;
                     if (this.persistChanges === true) {
                         attributes = {};
-                        value = this.fieldValue() != null ? [{field_name: this.options.fieldName,
-                            field_value: this.fieldValue()}] : [];
+                        value = this.fieldValue() != null ? [{
+                            field_name: this.options.fieldName,
+                            field_value: this.fieldValue()
+                        }] : [];
                         attributes[this.options.valueAttribute] = value;
                         this.saveAttributes(attributes);
                     }
@@ -323,8 +328,10 @@
                     var attributes = {},
                         value;
                     if (this.persistChanges === true) {
-                        value = this.fieldValue() ? [{field_name: this.options.fieldName,
-                            field_value: this.fieldValue()}] : [];
+                        value = this.fieldValue() ? [{
+                            field_name: this.options.fieldName,
+                            field_value: this.fieldValue()
+                        }] : [];
                         attributes[this.options.valueAttribute] = value;
                         this.saveAttributes(attributes);
                     }
@@ -333,7 +340,7 @@
             AuthFieldView: FieldViews.LinkFieldView.extend({
                 fieldTemplate: field_social_link_template,
                 className: function() {
-                    return 'u-field u-field-social u-field-' + this.options.valueAttribute;
+                    return `u-field u-field-social u-field-${this.options.valueAttribute}`;
                 },
                 initialize: function(options) {
                     this.options = _.extend({}, options);
@@ -352,7 +359,7 @@
                         linkTitle = gettext('Unlink This Account');
                         linkClass = 'social-field-linked';
                         subTitle = StringUtils.interpolate(
-                            gettext('You can use your {accountName} account to sign in to your {platformName} account.'),  // eslint-disable-line max-len
+                            gettext('You can use your {accountName} account to sign in to your {platformName} account.'), // eslint-disable-line max-len
                             {accountName: this.options.title, platformName: this.options.platformName}
                         );
                         screenReaderTitle = StringUtils.interpolate(
@@ -363,7 +370,7 @@
                         linkTitle = gettext('Link Your Account');
                         linkClass = 'social-field-unlinked';
                         subTitle = StringUtils.interpolate(
-                            gettext('Link your {accountName} account to your {platformName} account and use {accountName} to sign in to {platformName}.'),  // eslint-disable-line max-len
+                            gettext('Link your {accountName} account to your {platformName} account and use {accountName} to sign in to {platformName}.'), // eslint-disable-line max-len
                             {accountName: this.options.title, platformName: this.options.platformName}
                         );
                     }
