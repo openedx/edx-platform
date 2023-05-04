@@ -204,7 +204,8 @@ def get_theme_sass_dirs(system, theme_dir):
             "css_destination_dir": path("common") / "static" / "css" / "xmodule",
             "lookup_paths": dependencies + [
                 sass_dir / "partials",
-                sass_dir,
+                system_sass_dir / "partials",
+                system_sass_dir,
             ],
         })
 
