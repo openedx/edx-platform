@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
 function Success({
-    platformName, homepageUrl, dashboardUrl, isLoggedIn
+    platformName, homepageUrl, dashboardUrl, isLoggedIn,
 }) {
     let btnText,
         btnUrl;

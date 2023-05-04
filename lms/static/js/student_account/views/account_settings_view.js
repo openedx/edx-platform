@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'gettext',
         'jquery',
@@ -59,7 +60,7 @@
 
                 if (!_.isEmpty(view.options.betaLanguage) && $.cookie('old-pref-lang')) {
                     betaLangMessage = HtmlUtils.interpolateHtml(
-                        gettext('You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.'),  // eslint-disable-line max-len
+                        gettext('You have set your language to {beta_language}, which is currently not fully translated. You can help us translate this language fully by joining the Transifex community and adding translations from English for learners that speak {beta_language}.'), // eslint-disable-line max-len
                         {
                             beta_language: view.options.betaLanguage.name
                         }
@@ -72,11 +73,11 @@
                     );
                     betaLangCode = this.options.betaLanguage.code.split('-');
                     if (betaLangCode.length > 1) {
-                        betaLangCode = betaLangCode[0] + '_' + betaLangCode[1].toUpperCase();
+                        betaLangCode = `${betaLangCode[0]}_${betaLangCode[1].toUpperCase()}`;
                     } else {
                         betaLangCode = betaLangCode[0];
                     }
-                    helpTranslateLink = 'https://www.transifex.com/open-edx/edx-platform/translate/#' + betaLangCode;
+                    helpTranslateLink = `https://www.transifex.com/open-edx/edx-platform/translate/#${betaLangCode}`;
                     oldLangCode = $.cookie('old-pref-lang');
                     // Deleting the cookie
                     document.cookie = 'old-pref-lang=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/account;';
@@ -111,7 +112,7 @@
                         $(tabPanel).addClass('hidden');
                     });
 
-                    $('#' + this.activeTab + '-tabpanel').removeClass('hidden');
+                    $(`#${this.activeTab}-tabpanel`).removeClass('hidden');
 
                     $accountNavLink.attr('tabindex', -1);
                     $accountNavLink.attr('aria-selected', false);
@@ -135,7 +136,7 @@
                     tabName: tabName,
                     tabLabel: tabLabel,
                     sections: tabSections,
-                    el: '#' + tabName + '-tabpanel'
+                    el: `#${tabName}-tabpanel`
                 });
 
                 accountSectionView.render();

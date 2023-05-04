@@ -69,7 +69,7 @@ export function LearnerAnalyticsDashboard(props) {
     }));
 
     // Get a list of assignment types minus duplicates
-    const assignments = gradeBreakdown.map(value => value['label']);
+    const assignments = gradeBreakdown.map(value => value.label);
     const assignmentTypes = [...new Set(assignments)];
     const assignmentCounts = getAssignmentCounts(assignmentTypes, schedule);
 
