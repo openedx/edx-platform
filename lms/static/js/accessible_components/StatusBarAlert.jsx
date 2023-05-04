@@ -20,10 +20,10 @@ export class StatusAlertRenderer {
             ReactDOM.render(
                 <StatusAlert
                     alertType="warning"
-                    dismissible={true}
-                    open={true}
+                    dismissible
+                    open
                     dialog={message}
-                    dismissable={true}
+                    dismissable
                     onClose={() => this.shiftFocus(afterselector)}
                 />,
                 document.querySelector(selector)

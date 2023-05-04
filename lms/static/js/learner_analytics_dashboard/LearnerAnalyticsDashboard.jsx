@@ -43,7 +43,7 @@ function getAssignmentCounts(types, assignments) {
 
 function getStreakIcons(count) {
     return Array.apply(null, {length: count}).map((e, i) => (
-        <span className="fa fa-trophy" aria-hidden="true" key={i}></span>
+        <span className="fa fa-trophy" aria-hidden="true" key={i} />
     ));
 }
 
@@ -82,23 +82,23 @@ export function LearnerAnalyticsDashboard(props) {
                 <div className="analytics-group">
                     <h2 className="group-heading">Grading</h2>
                     {gradeBreakdown
-            && <h3 className="section-heading">Weight</h3>
-                    }
+            && <h3 className="section-heading">Weight</h3>}
                     {gradeBreakdown
-            && <div className="grading-weight-wrapper">
-                <div className="chart-wrapper">
-                    <CircleChart
-                        slices={gradeBreakdown}
-                        centerHole={true}
-                        sliceBorder={{
-                            strokeColor: '#f5f5f5',
-                            strokeWidth: 2
-                        }}
-                    />
+            && (
+                <div className="grading-weight-wrapper">
+                    <div className="chart-wrapper">
+                        <CircleChart
+                            slices={gradeBreakdown}
+                            centerHole
+                            sliceBorder={{
+                                strokeColor: '#f5f5f5',
+                                strokeWidth: 2
+                            }}
+                        />
+                    </div>
+                    <CircleChartLegend data={gradeBreakdown} />
                 </div>
-                <CircleChartLegend data={gradeBreakdown} />
-            </div>
-                    }
+            )}
 
                     <h3 className="section-heading">Graded Assignments</h3>
                     {/* TODO: LEARNER-3854: If implementing Learner Analytics, rename to graded-assignments-wrapper. */}
@@ -121,8 +121,7 @@ export function LearnerAnalyticsDashboard(props) {
                 <div className="week-streak-wrapper">
                     <h3 className="section-heading">Week streak</h3>
                     {week_streak > 0
-            && <div className="streak-icon-wrapper" aria-hidden="true">{getStreakIcons(week_streak)}</div>
-                    }
+            && <div className="streak-icon-wrapper" aria-hidden="true">{getStreakIcons(week_streak)}</div>}
                     <p>{getStreakString(week_streak)}</p>
                     <p className="streak-encouragement">{getStreakEncouragement(week_streak)}</p>
                     <ul className="streak-criteria">
@@ -132,8 +131,8 @@ export function LearnerAnalyticsDashboard(props) {
                     </ul>
                 </div>
                 <div className="active-users-wrapper">
-                    <span className="fa fa-user count-icon" aria-hidden="true"></span>
-                    <span className="user-count">{weekly_active_users.toLocaleString('en', {useGrouping:true})}</span>
+                    <span className="fa fa-user count-icon" aria-hidden="true" />
+                    <span className="user-count">{weekly_active_users.toLocaleString('en', {useGrouping: true})}</span>
                     <p className="label">{getActiveUserString(weekly_active_users)}</p>
                 </div>
             </div>

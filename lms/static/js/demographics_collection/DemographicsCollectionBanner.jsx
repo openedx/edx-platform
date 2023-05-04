@@ -4,7 +4,6 @@ import Cookies from 'js-cookie';
 import {DemographicsCollectionModal} from './DemographicsCollectionModal';
 
 export class DemographicsCollectionBanner extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -65,27 +64,28 @@ export class DemographicsCollectionBanner extends React.Component {
                                     {gettext('Want to make edX better for everyone?')}
                                 </div>
                                 <button className="demographics-banner-btn d-flex align-items-center bg-white font-weight-bold border-0 py-2 px-3 mx-2 mb-3 m-lg-0 shadow justify-content-center">
-                                    <span className="fa fa-thumbs-up px-2" aria-hidden="true"></span>
+                                    <span className="fa fa-thumbs-up px-2" aria-hidden="true" />
                                     {gettext('Get started')}
                                 </button>
                             </div>
                             <div className="demographics-dismiss-container md-flex justify-content-right align-self-start align-self-lg-center  ml-lg-auto">
                                 <button type="button" className="demographics-dismiss-btn btn btn-default px-0" id="demographics-dismiss" aria-label="close">
-                                    <i className="fa fa-times-circle text-white px-2" aria-hidden="true" onClick={this.dismissBanner}></i>
+                                    <i className="fa fa-times-circle text-white px-2" aria-hidden="true" onClick={this.dismissBanner} />
                                 </button>
                             </div>
                         </div>
                     </a>
                     <div>
                         {this.state.modalOpen
-              && <DemographicsCollectionModal
-                  {...this.props}
-                  user={this.props.user}
-                  open={this.state.modalOpen}
-                  closeModal={() => this.setState({modalOpen: false})}
-                  dismissBanner={this.dismissBanner}
-              />
-                        }
+              && (
+                  <DemographicsCollectionModal
+                      {...this.props}
+                      user={this.props.user}
+                      open={this.state.modalOpen}
+                      closeModal={() => this.setState({modalOpen: false})}
+                      dismissBanner={this.dismissBanner}
+                  />
+              )}
                     </div>
                 </div>
             );

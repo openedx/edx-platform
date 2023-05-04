@@ -261,8 +261,7 @@ class DemographicsCollectionModal extends React.Component {
                                                 currentPage: currentPage,
                                                 totalPages: totalPages
                                             }
-                                        )
-                                        }
+                                        )}
                                     </p>
                                     <h2 className="mb-1 mt-4 font-weight-bold text-secondary">
                                         {gettext('Help make edX better for everyone!')}
@@ -282,204 +281,209 @@ class DemographicsCollectionModal extends React.Component {
                             )}
                         </Wizard.Header>
                         <Wizard.Page>
-                            {({wizardConsumer}) => <div className="demographics-form-container" data-hj-suppress>
-                                {/* Gender Identity */}
-                                <SelectWithInput
-                                    selectName={FIELD_NAMES.GENDER}
-                                    selectId={FIELD_NAMES.GENDER}
-                                    selectValue={wizardConsumer[FIELD_NAMES.GENDER]}
-                                    selectOnChange={this.handleSelectChange}
-                                    labelText={gettext('What is your gender identity?')}
-                                    options={[
-                                        <option value="default" key="default">{gettext('Select gender')}</option>,
-                                        this.loadOptions(FIELD_NAMES.GENDER)
-                                    ]}
-                                    showInput={wizardConsumer[FIELD_NAMES.GENDER] == 'self-describe'}
-                                    inputName={FIELD_NAMES.GENDER_DESCRIPTION}
-                                    inputId={FIELD_NAMES.GENDER_DESCRIPTION}
-                                    inputType="text"
-                                    inputValue={wizardConsumer[FIELD_NAMES.GENDER_DESCRIPTION]}
-                                    inputOnChange={this.handleInputChange}
-                                    inputOnBlur={this.handleSelectChange}
-                                    disabled={this.state.fieldError}
-                                />
-                                {/* Ethnicity */}
-                                <MultiselectDropdown
-                                    label={gettext('Which of the following describes you best?')}
-                                    emptyLabel={gettext('Check all that apply')}
-                                    options={get(this.state.options, FIELD_NAMES.ETHNICITY_OPTIONS, {choices: []}).choices}
-                                    selected={wizardConsumer[FIELD_NAMES.ETHNICITY]}
-                                    onChange={this.handleMultiselectChange}
-                                    disabled={this.state.fieldError}
-                                    onBlur={() => {
+                            {({wizardConsumer}) => (
+                                <div className="demographics-form-container" data-hj-suppress>
+                                    {/* Gender Identity */}
+                                    <SelectWithInput
+                                        selectName={FIELD_NAMES.GENDER}
+                                        selectId={FIELD_NAMES.GENDER}
+                                        selectValue={wizardConsumer[FIELD_NAMES.GENDER]}
+                                        selectOnChange={this.handleSelectChange}
+                                        labelText={gettext('What is your gender identity?')}
+                                        options={[
+                                            <option value="default" key="default">{gettext('Select gender')}</option>,
+                                            this.loadOptions(FIELD_NAMES.GENDER)
+                                        ]}
+                                        showInput={wizardConsumer[FIELD_NAMES.GENDER] == 'self-describe'}
+                                        inputName={FIELD_NAMES.GENDER_DESCRIPTION}
+                                        inputId={FIELD_NAMES.GENDER_DESCRIPTION}
+                                        inputType="text"
+                                        inputValue={wizardConsumer[FIELD_NAMES.GENDER_DESCRIPTION]}
+                                        inputOnChange={this.handleInputChange}
+                                        inputOnBlur={this.handleSelectChange}
+                                        disabled={this.state.fieldError}
+                                    />
+                                    {/* Ethnicity */}
+                                    <MultiselectDropdown
+                                        label={gettext('Which of the following describes you best?')}
+                                        emptyLabel={gettext('Check all that apply')}
+                                        options={get(this.state.options, FIELD_NAMES.ETHNICITY_OPTIONS, {choices: []}).choices}
+                                        selected={wizardConsumer[FIELD_NAMES.ETHNICITY]}
+                                        onChange={this.handleMultiselectChange}
+                                        disabled={this.state.fieldError}
+                                        onBlur={() => {
                                         // we create a fake "event", and then use it to call our normal selection handler function that
                                         // is used by the other dropdowns.
-                                        const e = {
-                                            target: {
-                                                name: FIELD_NAMES.ETHNICITY,
-                                                value: wizardConsumer[FIELD_NAMES.ETHNICITY].map(ethnicity => ({ethnicity, value: ethnicity})),
+                                            const e = {
+                                                target: {
+                                                    name: FIELD_NAMES.ETHNICITY,
+                                                    value: wizardConsumer[FIELD_NAMES.ETHNICITY].map(ethnicity => ({ethnicity, value: ethnicity})),
+                                                }
+                                            };
+                                            this.handleSelectChange(e);
+                                        }}
+                                    />
+                                    {/* Family Income */}
+                                    <div className="d-flex flex-column pb-3">
+                                        <label htmlFor={FIELD_NAMES.INCOME}>
+                                            {gettext('What was the total combined income, during the last 12 months, of all members of your family? ')}
+                                        </label>
+                                        <select
+                                            onChange={this.handleSelectChange}
+                                            className="form-control"
+                                            name={FIELD_NAMES.INCOME}
+                                            id={FIELD_NAMES.INCOME}
+                                            value={wizardConsumer[FIELD_NAMES.INCOME]}
+                                            disabled={this.state.fieldError}
+                                        >
+                                            <option value="default">{gettext('Select income')}</option>
+                                            {
+                                                this.loadOptions(FIELD_NAMES.INCOME)
                                             }
-                                        };
-                                        this.handleSelectChange(e);
-                                    }}
-                                />
-                                {/* Family Income */}
-                                <div className="d-flex flex-column pb-3">
-                                    <label htmlFor={FIELD_NAMES.INCOME}>
-                                        {gettext('What was the total combined income, during the last 12 months, of all members of your family? ')}
-                                    </label>
-                                    <select
-                                        onChange={this.handleSelectChange}
-                                        className="form-control"
-                                        name={FIELD_NAMES.INCOME} id={FIELD_NAMES.INCOME}
-                                        value={wizardConsumer[FIELD_NAMES.INCOME]}
-                                        disabled={this.state.fieldError}
-                                    >
-                                        <option value="default">{gettext('Select income')}</option>
-                                        {
-                                            this.loadOptions(FIELD_NAMES.INCOME)
-                                        }
-                                    </select>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            }
+                            )}
                         </Wizard.Page>
                         <Wizard.Page>
-                            {({wizardConsumer}) => <div className="demographics-form-container" data-hj-suppress>
-                                {/* Military History */}
-                                <div className="d-flex flex-column pb-3">
-                                    <label htmlFor={FIELD_NAMES.MILITARY}>
-                                        {gettext('Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?')}
-                                    </label>
-                                    <select
-                                        autoFocus
-                                        className="form-control"
-                                        onChange={this.handleSelectChange}
-                                        name={FIELD_NAMES.MILITARY}
-                                        id={FIELD_NAMES.MILITARY}
-                                        value={wizardConsumer[FIELD_NAMES.MILITARY]}
-                                        disabled={this.state.fieldError}
-                                    >
-                                        <option value="default">{gettext('Select military status')}</option>
-                                        {
-                                            this.loadOptions(FIELD_NAMES.MILITARY)
-                                        }
-                                    </select>
+                            {({wizardConsumer}) => (
+                                <div className="demographics-form-container" data-hj-suppress>
+                                    {/* Military History */}
+                                    <div className="d-flex flex-column pb-3">
+                                        <label htmlFor={FIELD_NAMES.MILITARY}>
+                                            {gettext('Have you ever served on active duty in the U.S. Armed Forces, Reserves, or National Guard?')}
+                                        </label>
+                                        <select
+                                            autoFocus
+                                            className="form-control"
+                                            onChange={this.handleSelectChange}
+                                            name={FIELD_NAMES.MILITARY}
+                                            id={FIELD_NAMES.MILITARY}
+                                            value={wizardConsumer[FIELD_NAMES.MILITARY]}
+                                            disabled={this.state.fieldError}
+                                        >
+                                            <option value="default">{gettext('Select military status')}</option>
+                                            {
+                                                this.loadOptions(FIELD_NAMES.MILITARY)
+                                            }
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            }
+                            )}
                         </Wizard.Page>
                         <Wizard.Page>
-                            {({wizardConsumer}) => <div className="demographics-form-container" data-hj-suppress>
-                                {/* Learner Education Level */}
-                                <div className="d-flex flex-column pb-3">
-                                    <label htmlFor={FIELD_NAMES.EDUCATION_LEVEL}>
-                                        {gettext('What is the highest level of education that you have achieved so far?')}
-                                    </label>
-                                    <select
-                                        className="form-control"
-                                        autoFocus
-                                        onChange={this.handleSelectChange}
-                                        key="self-education"
-                                        name={FIELD_NAMES.EDUCATION_LEVEL}
-                                        id={FIELD_NAMES.EDUCATION_LEVEL}
-                                        value={wizardConsumer[FIELD_NAMES.EDUCATION_LEVEL]}
-                                        disabled={this.state.fieldError}
-                                    >
-                                        <option value="default">{gettext('Select level of education')}</option>
-                                        {
-                                            this.loadOptions(FIELD_NAMES.EDUCATION_LEVEL)
-                                        }
-                                    </select>
+                            {({wizardConsumer}) => (
+                                <div className="demographics-form-container" data-hj-suppress>
+                                    {/* Learner Education Level */}
+                                    <div className="d-flex flex-column pb-3">
+                                        <label htmlFor={FIELD_NAMES.EDUCATION_LEVEL}>
+                                            {gettext('What is the highest level of education that you have achieved so far?')}
+                                        </label>
+                                        <select
+                                            className="form-control"
+                                            autoFocus
+                                            onChange={this.handleSelectChange}
+                                            key="self-education"
+                                            name={FIELD_NAMES.EDUCATION_LEVEL}
+                                            id={FIELD_NAMES.EDUCATION_LEVEL}
+                                            value={wizardConsumer[FIELD_NAMES.EDUCATION_LEVEL]}
+                                            disabled={this.state.fieldError}
+                                        >
+                                            <option value="default">{gettext('Select level of education')}</option>
+                                            {
+                                                this.loadOptions(FIELD_NAMES.EDUCATION_LEVEL)
+                                            }
+                                        </select>
+                                    </div>
+                                    {/* Parent/Guardian Education Level */}
+                                    <div className="d-flex flex-column pb-3">
+                                        <label htmlFor={FIELD_NAMES.PARENT_EDUCATION}>
+                                            {gettext('What is the highest level of education that any of your parents or guardians have achieved?')}
+                                        </label>
+                                        <select
+                                            className="form-control"
+                                            onChange={this.handleSelectChange}
+                                            name={FIELD_NAMES.PARENT_EDUCATION}
+                                            id={FIELD_NAMES.PARENT_EDUCATION}
+                                            value={wizardConsumer[FIELD_NAMES.PARENT_EDUCATION]}
+                                            disabled={this.state.fieldError}
+                                        >
+                                            <option value="default">{gettext('Select guardian education')}</option>
+                                            {
+                                                this.loadOptions(FIELD_NAMES.PARENT_EDUCATION)
+                                            }
+                                        </select>
+                                    </div>
                                 </div>
-                                {/* Parent/Guardian Education Level */}
-                                <div className="d-flex flex-column pb-3">
-                                    <label htmlFor={FIELD_NAMES.PARENT_EDUCATION}>
-                                        {gettext('What is the highest level of education that any of your parents or guardians have achieved?')}
-                                    </label>
-                                    <select
-                                        className="form-control"
-                                        onChange={this.handleSelectChange}
-                                        name={FIELD_NAMES.PARENT_EDUCATION}
-                                        id={FIELD_NAMES.PARENT_EDUCATION}
-                                        value={wizardConsumer[FIELD_NAMES.PARENT_EDUCATION]}
-                                        disabled={this.state.fieldError}
-                                    >
-                                        <option value="default">{gettext('Select guardian education')}</option>
-                                        {
-                                            this.loadOptions(FIELD_NAMES.PARENT_EDUCATION)
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                            }
+                            )}
                         </Wizard.Page>
                         <Wizard.Page>
-                            {({wizardConsumer}) => <div className="demographics-form-container" data-hj-suppress>
-                                {/* Employment Status */}
-                                <SelectWithInput
-                                    selectName={FIELD_NAMES.WORK_STATUS}
-                                    selectId={FIELD_NAMES.WORK_STATUS}
-                                    selectValue={wizardConsumer[FIELD_NAMES.WORK_STATUS]}
-                                    selectOnChange={this.handleSelectChange}
-                                    labelText={'What is your current employment status?'}
-                                    options={[
-                                        <option value="default" key="default">{gettext('Select employment status')}</option>,
-                                        this.loadOptions(FIELD_NAMES.WORK_STATUS)
-                                    ]}
-                                    showInput={wizardConsumer[FIELD_NAMES.WORK_STATUS] == 'other'}
-                                    inputName={FIELD_NAMES.WORK_STATUS_DESCRIPTION}
-                                    inputId={FIELD_NAMES.WORK_STATUS_DESCRIPTION}
-                                    inputType="text"
-                                    inputValue={wizardConsumer[FIELD_NAMES.WORK_STATUS_DESCRIPTION]}
-                                    inputOnChange={this.handleInputChange}
-                                    inputOnBlur={this.handleSelectChange}
-                                    disabled={this.state.fieldError}
-                                />
-                                {/* Current Work Industry */}
-                                <div className="d-flex flex-column pb-3">
-                                    <label htmlFor={FIELD_NAMES.CURRENT_WORK}>
-                                        {gettext('What industry do you currently work in?')}
-                                    </label>
-                                    <select
-                                        className="form-control"
-                                        onChange={this.handleSelectChange}
-                                        name={FIELD_NAMES.CURRENT_WORK}
-                                        id={FIELD_NAMES.CURRENT_WORK}
-                                        value={wizardConsumer[FIELD_NAMES.CURRENT_WORK]}
+                            {({wizardConsumer}) => (
+                                <div className="demographics-form-container" data-hj-suppress>
+                                    {/* Employment Status */}
+                                    <SelectWithInput
+                                        selectName={FIELD_NAMES.WORK_STATUS}
+                                        selectId={FIELD_NAMES.WORK_STATUS}
+                                        selectValue={wizardConsumer[FIELD_NAMES.WORK_STATUS]}
+                                        selectOnChange={this.handleSelectChange}
+                                        labelText="What is your current employment status?"
+                                        options={[
+                                            <option value="default" key="default">{gettext('Select employment status')}</option>,
+                                            this.loadOptions(FIELD_NAMES.WORK_STATUS)
+                                        ]}
+                                        showInput={wizardConsumer[FIELD_NAMES.WORK_STATUS] == 'other'}
+                                        inputName={FIELD_NAMES.WORK_STATUS_DESCRIPTION}
+                                        inputId={FIELD_NAMES.WORK_STATUS_DESCRIPTION}
+                                        inputType="text"
+                                        inputValue={wizardConsumer[FIELD_NAMES.WORK_STATUS_DESCRIPTION]}
+                                        inputOnChange={this.handleInputChange}
+                                        inputOnBlur={this.handleSelectChange}
                                         disabled={this.state.fieldError}
-                                    >
-                                        <option value="default">{gettext('Select current industry')}</option>
-                                        {
-                                            this.loadOptions(FIELD_NAMES.CURRENT_WORK)
-                                        }
-                                    </select>
+                                    />
+                                    {/* Current Work Industry */}
+                                    <div className="d-flex flex-column pb-3">
+                                        <label htmlFor={FIELD_NAMES.CURRENT_WORK}>
+                                            {gettext('What industry do you currently work in?')}
+                                        </label>
+                                        <select
+                                            className="form-control"
+                                            onChange={this.handleSelectChange}
+                                            name={FIELD_NAMES.CURRENT_WORK}
+                                            id={FIELD_NAMES.CURRENT_WORK}
+                                            value={wizardConsumer[FIELD_NAMES.CURRENT_WORK]}
+                                            disabled={this.state.fieldError}
+                                        >
+                                            <option value="default">{gettext('Select current industry')}</option>
+                                            {
+                                                this.loadOptions(FIELD_NAMES.CURRENT_WORK)
+                                            }
+                                        </select>
+                                    </div>
+                                    {/* Future Work Industry */}
+                                    <div className="d-flex flex-column pb-3">
+                                        <label htmlFor={FIELD_NAMES.FUTURE_WORK}>
+                                            {gettext('What industry do you want to work in?')}
+                                        </label>
+                                        <select
+                                            className="form-control"
+                                            onChange={this.handleSelectChange}
+                                            name={FIELD_NAMES.FUTURE_WORK}
+                                            id={FIELD_NAMES.FUTURE_WORK}
+                                            value={wizardConsumer[FIELD_NAMES.FUTURE_WORK]}
+                                            disabled={this.state.fieldError}
+                                        >
+                                            <option value="default">{gettext('Select prospective industry')}</option>
+                                            {
+                                                this.loadOptions(FIELD_NAMES.FUTURE_WORK)
+                                            }
+                                        </select>
+                                    </div>
                                 </div>
-                                {/* Future Work Industry */}
-                                <div className="d-flex flex-column pb-3">
-                                    <label htmlFor={FIELD_NAMES.FUTURE_WORK}>
-                                        {gettext('What industry do you want to work in?')}
-                                    </label>
-                                    <select
-                                        className="form-control"
-                                        onChange={this.handleSelectChange}
-                                        name={FIELD_NAMES.FUTURE_WORK}
-                                        id={FIELD_NAMES.FUTURE_WORK}
-                                        value={wizardConsumer[FIELD_NAMES.FUTURE_WORK]}
-                                        disabled={this.state.fieldError}
-                                    >
-                                        <option value="default">{gettext('Select prospective industry')}</option>
-                                        {
-                                            this.loadOptions(FIELD_NAMES.FUTURE_WORK)
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-                            }
+                            )}
                         </Wizard.Page>
                         <Wizard.Closer>
                             <div className="demographics-modal-closer m-sm-0">
-                                <i className="fa fa-check" aria-hidden="true"></i>
+                                <i className="fa fa-check" aria-hidden="true" />
                                 <h3>
                                     {gettext('Thank you! You’re helping make edX better for everyone.')}
                                 </h3>

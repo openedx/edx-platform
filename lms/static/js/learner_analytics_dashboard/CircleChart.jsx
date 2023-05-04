@@ -81,13 +81,15 @@ class CircleChart extends React.Component {
             lastY = nextY;
 
             // eslint-disable-next-line react/jsx-indent
-            return <path
-                d={d}
-                className={`slice-${sliceIndex}`}
-                key={index}
-                stroke={strokeColor}
-                strokeWidth={strokeWidth}
-            />;
+            return (
+                <path
+                    d={d}
+                    className={`slice-${sliceIndex}`}
+                    key={index}
+                    stroke={strokeColor}
+                    strokeWidth={strokeWidth}
+                />
+            );
         });
     }
 

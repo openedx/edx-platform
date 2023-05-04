@@ -152,7 +152,7 @@ export const ProgramEnrollmentsInspectorPage = props => (
                     dialog={props.error}
                 />
             )}
-            <div id="input_alert" className={'alert alert-danger'} hidden>
+            <div id="input_alert" className="alert alert-danger" hidden>
                 Search either by edx username or email, or Institution user key, but not both
             </div>
             <div key="edX_accounts">
