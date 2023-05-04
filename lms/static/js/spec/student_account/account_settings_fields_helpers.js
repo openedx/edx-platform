@@ -9,7 +9,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers) {
     'use strict';
 
     var verifyAuthField = function(view, data, requests) {
-        var selector = '.u-field-value .u-field-link-title-' + view.options.valueAttribute;
+        var selector = `.u-field-value .u-field-link-title-${view.options.valueAttribute}`;
 
         spyOn(view, 'redirect_to');
 

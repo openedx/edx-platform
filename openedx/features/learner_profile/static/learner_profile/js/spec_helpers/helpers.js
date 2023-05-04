@@ -31,7 +31,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                 expect($($element.find('.u-field-value .u-field-value-readonly')[0]).text()).toBe(view.modelValue());
             }
         } else {
-            throw new Error('Unexpected field type: ' + view.fieldType);
+            throw new Error(`Unexpected field type: ${view.fieldType}`);
         }
     };
 
@@ -150,19 +150,19 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     var expectPage = function(learnerProfileView, pageData) {
         var $badgeListContainer = $('#tabpanel-accomplishments');
         var index = $badgeListContainer.find('span.search-count').text().trim();
-        expect(index).toBe('Showing ' + (pageData.start + 1) + '-' + (pageData.start + pageData.results.length) +
-            ' out of ' + pageData.count + ' total');
-        expect($badgeListContainer.find('.current-page').text()).toBe('' + pageData.current_page);
+        expect(index).toBe(`Showing ${pageData.start + 1}-${pageData.start + pageData.results.length
+        } out of ${pageData.count} total`);
+        expect($badgeListContainer.find('.current-page').text()).toBe(`${pageData.current_page}`);
         _.each(pageData.results, function(badge) {
-            expect($('.badge-display:contains(' + badge.badge_class.display_name + ')').length).toBe(1);
+            expect($(`.badge-display:contains(${badge.badge_class.display_name})`).length).toBe(1);
         });
     };
 
     var expectBadgeLoadingErrorIsRendered = function() {
         var errorMessage = $('.badge-set-display').text();
         expect(errorMessage).toBe(
-            'Your request could not be completed. Reload the page and try again. If the issue persists, click the ' +
-            'Help tab to report the problem.'
+            'Your request could not be completed. Reload the page and try again. If the issue persists, click the '
+            + 'Help tab to report the problem.'
         );
     };
 
@@ -213,9 +213,9 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     function makeBadge(num) {
         return {
             badge_class: {
-                slug: 'test_slug_' + num,
+                slug: `test_slug_${num}`,
                 issuing_component: 'test_component',
-                display_name: 'Test Badge ' + num,
+                display_name: `Test Badge ${num}`,
                 course_id: null,
                 description: "Yay! It's a test badge.",
                 criteria: 'https://example.com/syllabus',

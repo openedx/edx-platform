@@ -19,6 +19,6 @@ export default function TextbooksFactory(textbooksJson) {
             return gettext('You have unsaved changes. Do you really want to leave this page?');
         }
     });
-};
+}
 
 export {TextbooksFactory};

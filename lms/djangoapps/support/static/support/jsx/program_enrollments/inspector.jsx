@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-    Button, InputText, StatusAlert, InputSelect
+    Button, InputText, StatusAlert, InputSelect,
 } from '@edx/paragon';
 
 /*
@@ -112,7 +112,7 @@ const renderEnrollmentsSection = enrollments => (
                                 </div>
                             )}
                         </div>
-                    )
+                    ),
                 )}
             </div>
         ))}
@@ -228,7 +228,7 @@ ProgramEnrollmentsInspectorPage.propTypes = {
                             is_active: PropTypes.bool,
                             mode: PropTypes.string,
                         }),
-                    })
+                    }),
                 ),
             }),
         ),

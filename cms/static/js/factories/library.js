@@ -24,6 +24,6 @@ export default function LibraryFactory(componentTemplates, XBlockInfoJson, optio
         var view = new PagedContainerPage(_.extend(main_options, options));
         view.render();
     });
-};
+}
 
 export {LibraryFactory};

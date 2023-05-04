@@ -45,15 +45,15 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
             AjaxHelpers.respondWithJson(requests, {success: 'true'});
             FieldViewsSpecHelpers.expectMessageContains(
                 view,
-                "We've sent a message to legolas@woodland.middlearth. " +
-                    'Click the link in the message to reset your password.'
+                "We've sent a message to legolas@woodland.middlearth. "
+                    + 'Click the link in the message to reset your password.'
             );
         });
 
         it('update time zone dropdown after country dropdown changes', function() {
             var baseSelector = '.u-field-value > select';
-            var groupsSelector = baseSelector + '> optgroup';
-            var groupOptionsSelector = groupsSelector + '> option';
+            var groupsSelector = `${baseSelector}> optgroup`;
+            var groupOptionsSelector = `${groupsSelector}> option`;
 
             var timeZoneData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.TimeZoneFieldView, {
                 valueAttribute: 'time_zone',

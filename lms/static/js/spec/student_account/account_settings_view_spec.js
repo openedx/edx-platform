@@ -21,8 +21,8 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, FieldViews, User
                 {
                     title: 'Basic Account Information',
                     messageType: 'info',
-                    message: 'Your profile settings are managed by Test Enterprise. ' +
-                        'Contact your administrator or <a href="https://support.edx.org/">edX Support</a> for help.',
+                    message: 'Your profile settings are managed by Test Enterprise. '
+                        + 'Contact your administrator or <a href="https://support.edx.org/">edX Support</a> for help.',
                     fields: [
                         {
                             view: new FieldViews.ReadonlyFieldView({
