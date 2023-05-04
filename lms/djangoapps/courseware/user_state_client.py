@@ -394,7 +394,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
             yield XBlockUserState(username, block_key, state, history_entry.created, scope)
 
-    def iter_all_for_block(self, block_key, scope=Scope.user_state):
+    def iter_all_for_block(self, block_key, scope=Scope.user_state, student_list=None):
         """
         Return an iterator over the data stored in the block (e.g. a problem block).
 
@@ -404,6 +404,7 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         Arguments:
             block_key: an XBlock's locator (e.g. :class:`~BlockUsageLocator`)
             scope (Scope): must be `Scope.user_state`
+            student_list
 
         Returns:
             an iterator over all data. Each invocation returns the next :class:`~XBlockUserState`
@@ -413,6 +414,8 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             raise ValueError("Only Scope.user_state is supported")
 
         results = StudentModule.objects.order_by('id').filter(module_state_key=block_key)
+        if student_list:
+            results = results.filter(student__in=student_list)
         p = Paginator(results, settings.USER_STATE_BATCH_SIZE)
 
         for page_number in p.page_range:

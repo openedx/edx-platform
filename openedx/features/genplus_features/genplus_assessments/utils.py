@@ -157,7 +157,7 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
             if hasattr(block, 'generate_report_data'):
                 try:
                     user_state_iterator = user_state_client.iter_all_for_block(
-                        block_key)
+                        block_key, student_list=student_list)
                     for username, state in block.generate_report_data(user_state_iterator):
                         generated_report_data[username].append(state)
                 except NotImplementedError:
