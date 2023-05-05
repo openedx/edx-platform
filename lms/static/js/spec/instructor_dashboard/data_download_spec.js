@@ -17,7 +17,6 @@ function($, id, AjaxHelper) {
             dataDownload = window.InstructorDashboard.sections;
             dataDownload.DataDownloadV2($('#data_download_2'));
             window.InstructorDashboard.util.PendingInstructorTasks = function() {
-                return;
             };
             requests = AjaxHelper.requests(this);
             $selected = $('<option data-endpoint="api/url/fake"></option>');
