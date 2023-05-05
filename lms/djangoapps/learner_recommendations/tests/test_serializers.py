@@ -102,8 +102,6 @@ class TestCrossProductRecommendationsSerializer(TestCase):
                     "image": {
                         "src": f"https://www.logo_image_url{index}.com",
                     },
-                    "url_slug": f"https://www.marketing_url{index}.com",
-                    "course_type": "executive-education",
                     "owners": [
                         {
                             "key": f"org-{index}",
@@ -123,6 +121,8 @@ class TestCrossProductRecommendationsSerializer(TestCase):
                         "marketing_url": f"https://www.marketing_url{index}.com",
                         "availability": "Current",
                     },
+                    "url_slug": f"https://www.marketing_url{index}.com",
+                    "course_type": "executive-education",
                     "location_restriction": None
                 },
             )
@@ -139,6 +139,22 @@ class TestCrossProductRecommendationsSerializer(TestCase):
         self.assertDictEqual(
             serialized_data,
             mock_course_data
+        )
+
+    def test_course_type_computed_serialization(self):
+        courses =  self.mock_recommended_courses(num_of_courses=1)
+
+        courses[0].update({
+            "course_type": "audit"
+        })
+
+        serialized_data = CrossProductRecommendationsSerializer({
+            "courses": courses
+        }).data
+
+        self.assertEqual(
+            "bootcamp-2u",
+            serialized_data["courses"][0]["courseType"]
         )
 
     def test_no_course_data_serialization(self):

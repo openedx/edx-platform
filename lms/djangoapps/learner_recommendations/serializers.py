@@ -50,11 +50,23 @@ class CrossProductCourseSerializer(serializers.Serializer):
         child=CourseOwnersSerializer(), allow_empty=True
     )
     activeCourseRun = ActiveCourseRunSerializer(source="active_course_run")
-    courseType = serializers.CharField(source="course_type")
+    courseType = serializers.SerializerMethodField()
 
     def get_prospectusPath(self, instance):
         url_slug = instance.get("url_slug")
         return f"course/{url_slug}"
+
+    def get_courseType(self, instance):
+        current_course_type = instance.get("course_type")
+
+        if (
+            current_course_type != "executive-education"
+            or current_course_type != "executive-education-2u"
+            or current_course_type != "bootcamp-2u"
+        ):
+            return "bootcamp-2u"
+
+        return current_course_type
 
 
 class AboutPageRecommendationsSerializer(serializers.Serializer):
