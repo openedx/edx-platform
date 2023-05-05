@@ -82,7 +82,7 @@
                     // inner function generate div and display response messages.
                     $('<div/>', {
                         class: `message ${group}`
-                    }).appendTo('.bulk-exception-results').prepend(
+                    }).appendTo('.bulk-exception-results').prepend(// xss-lint: disable=javascript-jquery-insert-into-target,javascript-jquery-prepend
                         `<button type='button' id= '${group}' class='arrow'> + </button>${heading}`) // xss-lint: disable=javascript-concat-html
                         .append($('<ul/>', {
                             class: group
