@@ -475,7 +475,7 @@ def xblock_outline_handler(request, usage_key_string):
                 include_children_predicate=lambda xblock: not xblock.category == 'vertical'
             ))
     else:
-        return Http404
+        raise Http404
 
 
 @require_http_methods("GET")
@@ -500,7 +500,7 @@ def xblock_container_handler(request, usage_key_string):
             )
         return JsonResponse(response)
     else:
-        return Http404
+        raise Http404
 
 
 def _update_with_callback(xblock, user, old_metadata=None, old_content=None):

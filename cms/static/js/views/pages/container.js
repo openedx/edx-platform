@@ -209,8 +209,27 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             // 'data' is the same data returned by the "get clipboard status" API endpoint
             // i.e. /api/content-staging/v1/clipboard/
             if (this.options.canEdit && data.content) {
-                // TODO: check if this is suitable for pasting into a unit
-                this.$(".paste-component").show();
+                if (["vertical", "sequential", "chapter", "course"].includes(data.content.block_type)) {
+                    // This is not suitable for pasting into a unit.
+                    this.$(".paste-component").hide();
+                } else if (data.content.status === "expired") {
+                    // This has expired and can no longer be pasted.
+                    this.$(".paste-component").hide();
+                } else {
+                    // The thing in the clipboard can be pasted into this unit:
+                    const detailsPopupEl = this.$(".clipboard-details-popup")[0];
+                    detailsPopupEl.querySelector(".detail-block-name").innerText = data.content.display_name;
+                    detailsPopupEl.querySelector(".detail-block-type").innerText = data.content.block_type_display;
+                    detailsPopupEl.querySelector(".detail-course-name").innerText = data.source_context_title;
+                    if (data.source_edit_url) {
+                        detailsPopupEl.setAttribute("href", data.source_edit_url);
+                        detailsPopupEl.classList.remove("no-edit-link");
+                    } else {
+                        detailsPopupEl.setAttribute("href", "#");
+                        detailsPopupEl.classList.add("no-edit-link");
+                    }
+                    this.$(".paste-component").show();
+                }
             } else {
                 this.$(".paste-component").hide();
             }
