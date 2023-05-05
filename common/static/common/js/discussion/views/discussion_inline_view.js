@@ -52,6 +52,7 @@
         loadDiscussions: function($elem, error) {
             var discussionId = this.$el.data('discussion-id'),
                 url = `${DiscussionUtil.urlFor('retrieve_discussion', discussionId)}?page=${this.page}`
+                    // eslint-disable-next-line no-useless-concat
                     + `&sort_key=${this.defaultSortKey}` + `&sort_order=${this.defaultSortOrder}`,
                 self = this;
 

@@ -66,6 +66,7 @@
             });
 
             it('can have functions for cardClass, pennant, title, description, and action', function() {
+                // eslint-disable-next-line new-parens
                 var view = new (CardView.extend({
                     cardClass: function() { return 'test-card'; },
                     pennant: function() { return 'Pennant'; },

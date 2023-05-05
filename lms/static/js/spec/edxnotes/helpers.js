@@ -55,10 +55,15 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                 o1 = data.charCodeAt(i++);
                 o2 = data.charCodeAt(i++);
                 o3 = data.charCodeAt(i++);
+                // eslint-disable-next-line no-bitwise, no-mixed-operators
                 bits = o1 << 16 | o2 << 8 | o3;
+                // eslint-disable-next-line no-bitwise, no-mixed-operators
                 h1 = bits >> 18 & 0x3f;
+                // eslint-disable-next-line no-bitwise, no-mixed-operators
                 h2 = bits >> 12 & 0x3f;
+                // eslint-disable-next-line no-bitwise, no-mixed-operators
                 h3 = bits >> 6 & 0x3f;
+                // eslint-disable-next-line no-bitwise
                 h4 = bits & 0x3f;
                 tmp_arr[ac++] = B64.charAt(h1) + B64.charAt(h2) + B64.charAt(h3) + B64.charAt(h4);
             }

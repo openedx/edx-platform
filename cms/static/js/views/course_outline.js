@@ -48,6 +48,7 @@ function(
         refresh: function(viewState) {
             var getViewToRefresh, view, expandedLocators;
 
+            // eslint-disable-next-line no-shadow
             getViewToRefresh = function(view) {
                 if (view.model.isChapter() || !view.parentView) {
                     return view;

@@ -32,6 +32,7 @@ var workerConfig = function() {
             webworker: {
                 target: 'webworker',
                 context: __dirname,
+                // eslint-disable-next-line global-require
                 entry: require('../workers.json'),
                 output: {
                     filename: '[name].js',

@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals setFixtures */
 
 import Backbone from 'backbone';
@@ -41,6 +46,7 @@ describe('Progress Circle View', () => {
     });
 
     const initView = (progress) => {
+        // eslint-disable-next-line no-undef
         const data = $.extend({}, context, {
             progress,
         });

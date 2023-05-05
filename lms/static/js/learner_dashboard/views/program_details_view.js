@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals gettext */
 
 import Backbone from 'backbone';
@@ -22,6 +27,7 @@ class ProgramDetailsView extends Backbone.View {
                 'click .complete-program': 'trackPurchase',
             },
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -50,6 +56,7 @@ class ProgramDetailsView extends Backbone.View {
 
         this.render();
 
+        // eslint-disable-next-line no-undef
         const $courseUpsellButton = $('#program_dashboard_course_upsell_all_button');
         trackECommerceEvents.trackUpsellClick($courseUpsellButton, 'program_dashboard_program', {
             linkType: 'button',
@@ -87,6 +94,7 @@ class ProgramDetailsView extends Backbone.View {
             live_fragment: this.options.live_fragment,
 
         };
+        // eslint-disable-next-line no-undef
         data = $.extend(data, this.programModel.toJSON());
         HtmlUtils.setHtml(this.$el, this.tpl(data));
         this.postRender();
@@ -102,6 +110,7 @@ class ProgramDetailsView extends Backbone.View {
                 el: '.js-course-list-remaining',
                 childView: CourseCardView,
                 collection: this.remainingCourseCollection,
+                // eslint-disable-next-line no-undef
                 context: $.extend(this.options, { collectionCourseStatus: 'remaining' }),
             }).render();
         }
@@ -111,6 +120,7 @@ class ProgramDetailsView extends Backbone.View {
                 el: '.js-course-list-completed',
                 childView: CourseCardView,
                 collection: this.completedCourseCollection,
+                // eslint-disable-next-line no-undef
                 context: $.extend(this.options, { collectionCourseStatus: 'completed' }),
             }).render();
         }
@@ -121,6 +131,7 @@ class ProgramDetailsView extends Backbone.View {
                 el: '.js-course-list-in-progress',
                 childView: CourseCardView,
                 collection: this.inProgressCourseCollection,
+                // eslint-disable-next-line no-undef
                 context: $.extend(
                     this.options,
                     { enrolled: gettext('Enrolled'), collectionCourseStatus: 'in_progress' },
@@ -139,8 +150,10 @@ class ProgramDetailsView extends Backbone.View {
             programTabViewEnabled: this.options.programTabViewEnabled,
         });
         let hasIframe = false;
+        // eslint-disable-next-line no-undef
         $('#live-tab').click(() => {
             if (!hasIframe) {
+                // eslint-disable-next-line no-undef
                 $('#live').html(HtmlUtils.HTML(this.options.live_fragment.iframe).toString());
                 hasIframe = true;
             }

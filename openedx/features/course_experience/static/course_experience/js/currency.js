@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 import 'jquery.cookie';
 import $ from 'jquery'; // eslint-disable-line import/extensions
 
@@ -33,7 +38,9 @@ export class Currency { // eslint-disable-line import/prefer-default-export
             if (e instanceof SyntaxError) {
                 // If cookie isn't proper JSON, log but continue. This will show the purchase experience
                 // in a non-local currency but will not prevent the user from interacting with the page.
+                // eslint-disable-next-line no-console
                 console.error(e);
+                // eslint-disable-next-line no-console
                 console.error("Ignoring malformed 'edx-price-l10n' cookie.");
             } else {
                 throw e;

@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -49,6 +54,7 @@ const parseEntitlementData = (entitlements, ecommerceUrl, openReissueForm) => en
     const {
         expiredAt, created, modified, orderNumber, enrollmentCourseRun,
     } = entitlement;
+    // eslint-disable-next-line prefer-object-spread
     return Object.assign({}, entitlement, {
         expiredAt: expiredAt ? moment(expiredAt).format('lll') : '',
         createdAt: moment(created).format('lll'),
@@ -66,6 +72,7 @@ const parseEntitlementData = (entitlements, ecommerceUrl, openReissueForm) => en
     });
 });
 
+// eslint-disable-next-line react/function-component-definition
 const EntitlementSupportTable = props => (
     <Table
         data={parseEntitlementData(props.entitlements, props.ecommerceUrl, props.openReissueForm)}

@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
@@ -13,6 +18,7 @@ class CourseEnrollView extends Backbone.View {
                 'change .run-select': 'updateEnrollUrl',
             },
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -94,8 +100,10 @@ class CourseEnrollView extends Backbone.View {
 
     updateEnrollUrl() {
         if (this.model.get('is_mobile_only') === true) {
+            // eslint-disable-next-line no-undef
             const courseRunKey = $('.run-select').val();
             const href = `edxapp://enroll?course_id=${courseRunKey}&email_opt_in=true`;
+            // eslint-disable-next-line no-undef
             $('.enroll-course-button').attr('href', href);
         }
     }

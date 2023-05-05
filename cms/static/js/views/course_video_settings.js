@@ -153,6 +153,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             this.clearPreferenceErrorState($fidelityContainer);
 
             // Clear active and selected languages.
+            // eslint-disable-next-line no-multi-assign
             this.selectedLanguages = this.activeLanguages = [];
             // Also clear selected language.
             this.selectedVideoSourceLanguage = '';
@@ -167,6 +168,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             this.clearPreferenceErrorState($videoSourceLanguageContainer);
 
             // Clear active and selected languages.
+            // eslint-disable-next-line no-multi-assign
             this.selectedLanguages = this.activeLanguages = [];
             this.renderTargetLanguages();
         },
@@ -236,6 +238,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
             $(event.target.parentElement).parent().remove();
 
             // Remove language from selected languages.
+            // eslint-disable-next-line no-multi-assign
             this.selectedLanguages = this.activeLanguages = _.without(this.selectedLanguages, selectedLanguage);
 
             // Populate menu again to reflect latest changes.

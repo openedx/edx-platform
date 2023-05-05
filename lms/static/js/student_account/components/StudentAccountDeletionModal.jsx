@@ -1,5 +1,9 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments, react/no-danger
+*/
 /* globals gettext */
-/* eslint-disable react/no-danger */
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -36,6 +40,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
         window.location.href = this.props.mktgRootLink;
     }
 
+    // eslint-disable-next-line react/sort-comp
     deleteAccount() {
         return this.setState(
             { passwordSubmitted: true },

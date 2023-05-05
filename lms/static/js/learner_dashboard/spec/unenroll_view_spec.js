@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals setFixtures */
 
 import UnenrollView from '../views/unenroll_view';
@@ -29,11 +34,15 @@ describe('Unenroll View', () => {
 
     it('switch between slides', () => {
         view = initView();
+        // eslint-disable-next-line no-undef
         expect($('.slide1').hasClass('hidden')).toEqual(true);
         view.switchToSlideOne();
+        // eslint-disable-next-line no-undef
         expect($('.slide1').hasClass('hidden')).toEqual(false);
+        // eslint-disable-next-line no-undef
         expect($('.slide2').hasClass('hidden')).toEqual(true);
         view.switchToSlideTwo();
+        // eslint-disable-next-line no-undef
         expect($('.slide2').hasClass('hidden')).toEqual(false);
     });
 });

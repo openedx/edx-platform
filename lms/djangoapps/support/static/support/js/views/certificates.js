@@ -145,6 +145,7 @@
                 // it's difficult to show the error message in the UI.
                 // Since this page is used only by internal staff, I think the
                 // quick-and-easy way is reasonable.
+                // eslint-disable-next-line no-alert
                 alert(jqxhr.responseText);
                 this.enableButtons();
             },

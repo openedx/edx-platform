@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals gettext */
 
 import Backbone from 'backbone';
@@ -9,6 +14,7 @@ class EntitlementUnenrollmentView extends Backbone.View {
         const defaults = {
             el: '.js-entitlement-unenrollment-modal',
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
@@ -29,14 +35,20 @@ class EntitlementUnenrollmentView extends Backbone.View {
         this.browseCourses = options.browseCourses;
         this.isEdx = options.isEdx;
 
+        // eslint-disable-next-line no-undef
         this.$submitButton = $(this.submitButtonSelector);
+        // eslint-disable-next-line no-undef
         this.$closeButton = $(this.closeButtonSelector);
+        // eslint-disable-next-line no-undef
         this.$headerText = $(this.headerTextSelector);
+        // eslint-disable-next-line no-undef
         this.$errorText = $(this.errorTextSelector);
 
         this.$submitButton.on('click', this.handleSubmit.bind(this));
 
+        // eslint-disable-next-line no-undef
         $(this.triggerSelector).each(function setUpTrigger() {
+            // eslint-disable-next-line no-undef
             const $trigger = $(this);
 
             $trigger.on('click', view.handleTrigger.bind(view));
@@ -54,6 +66,7 @@ class EntitlementUnenrollmentView extends Backbone.View {
     }
 
     handleTrigger(event) {
+        // eslint-disable-next-line no-undef
         const $trigger = $(event.target);
         const courseName = $trigger.data('courseName');
         const courseNumber = $trigger.data('courseNumber');
@@ -76,6 +89,7 @@ class EntitlementUnenrollmentView extends Backbone.View {
         }
 
         this.$submitButton.prop('disabled', true);
+        // eslint-disable-next-line no-undef
         $.ajax({
             url: apiEndpoint,
             method: 'DELETE',
@@ -170,6 +184,7 @@ class EntitlementUnenrollmentView extends Backbone.View {
     }
 
     onComplete(xhr) {
+        // eslint-disable-next-line prefer-destructuring
         const status = xhr.status;
         const message = xhr.responseJSON && xhr.responseJSON.detail;
 

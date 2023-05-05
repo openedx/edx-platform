@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals setFixtures */
 
 import ReactDOM from 'react-dom';
@@ -26,8 +31,11 @@ describe('PasswordResetConfirmation', () => {
     }
 
     function triggerValidation() {
+        // eslint-disable-next-line no-undef
         $('#new_password1').focus();
+        // eslint-disable-next-line no-undef
         $('#new_password1').val('a');
+        // eslint-disable-next-line no-undef
         $('#new_password2').focus();
 
         expect(window.fetch.calledWithMatch(
@@ -49,8 +57,11 @@ describe('PasswordResetConfirmation', () => {
     it('shows submit error', () => {
         init('Submit error.');
 
+        // eslint-disable-next-line no-undef
         expect($('.alert-dialog')).toExist();
+        // eslint-disable-next-line no-undef
         expect($('.alert-dialog')).not.toBeHidden();
+        // eslint-disable-next-line no-undef
         expect($('.alert-dialog')).toHaveText('Submit error.');
     });
 
@@ -62,6 +73,7 @@ describe('PasswordResetConfirmation', () => {
         });
 
         it('shows validation error', () => {
+            // eslint-disable-next-line no-undef
             expect($('#error-new_password1')).toContainText('Validation error.');
         });
     });

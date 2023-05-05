@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* global gettext */
 import { fetchDownloadsList, fetchTaskStatus, initiateProblemResponsesRequest } from '../api/client';
 import {
@@ -30,6 +35,7 @@ const problemResponsesRefreshStatus = timeout => ({
     timeout,
 });
 
+// eslint-disable-next-line max-len
 const getTaskStatus = (taskStatusEndpoint, reportDownloadEndpoint, taskId) => dispatch => fetchTaskStatus(taskStatusEndpoint, taskId)
     .then((response) => {
         if (response.ok) {

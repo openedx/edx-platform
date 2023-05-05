@@ -1,4 +1,5 @@
 (function(define) {
+    // eslint-disable-next-line lines-around-directive
     'use strict';
     // VideoSocialSharingHandler module.
     define(
@@ -37,12 +38,14 @@
                     this.el.on('click', '.btn-link', this.clickHandler);
                     this.baseVideoUrl = this.el.data('url');
                     this.course_id = this.container.data('courseId');
+                    // eslint-disable-next-line semi
                     this.block_id = this.container.data('blockId')
                 },
 
                 // Fire an analytics event on share button click.
                 clickHandler: function(event) {
                     var self = this;
+                    // eslint-disable-next-line semi
                     var source = $(event.currentTarget).data('source')
                     self.sendAnalyticsEvent(source);
                 },

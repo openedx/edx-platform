@@ -43,15 +43,18 @@
                         modal_id = '#modal_clone';
                     }
 
+                    // eslint-disable-next-line no-shadow
                     $('#lean_overlay').click(function(e) {
                         close_modal(modal_id, e);
                     });
 
+                    // eslint-disable-next-line no-shadow
                     $(o.closeButton).click(function(e) {
                         close_modal(modal_id, e);
                     });
 
                     // To enable closing of email modal when copy button hit
+                    // eslint-disable-next-line no-shadow
                     $(o.copyEmailButton).click(function(e) {
                         close_modal(modal_id, e);
                     });
@@ -103,6 +106,7 @@
         }
     });
 
+    // eslint-disable-next-line no-shadow
     $(document).ready(function($) {
         $('a[rel*=leanModal]').each(function() {
             var $link = $(this),

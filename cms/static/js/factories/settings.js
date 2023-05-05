@@ -26,6 +26,7 @@ define([
         model.useV2CertDisplaySettings = useV2CertDisplaySettings;
         model.set('upgrade_deadline', upgradeDeadline);
         model.fetch({
+            // eslint-disable-next-line no-shadow
             success: function(model) {
                 var editor = new MainView({
                     el: $('.settings-details'),

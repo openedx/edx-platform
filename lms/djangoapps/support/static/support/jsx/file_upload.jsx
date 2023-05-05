@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* global gettext */
 /* eslint one-var: ["error", "always"] */
 
@@ -51,10 +56,12 @@ class FileUpload extends React.Component {
             allowedFileTypes = ['gif', 'png', 'jpg', 'jpeg', 'pdf'];
 
         // remove file from input and upload it to zendesk after validation
+        // eslint-disable-next-line no-undef
         $(e.target).val('');
 
         if (file.size > maxFileSize) {
             errorList.push(gettext('Files that you upload must be smaller than 5MB in size.'));
+        // eslint-disable-next-line no-undef
         } else if ($.inArray(file.name.split('.').pop().toLowerCase(), allowedFileTypes) === -1) {
             errorList.push(gettext('Files that you upload must be PDFs or image files in .gif, .jpg, .jpeg, or .png format.'));
         }
@@ -81,6 +88,7 @@ class FileUpload extends React.Component {
         request.upload.onprogress = function renderProgress(event) {
             if (event.lengthComputable) {
                 const percentComplete = (event.loaded / event.total) * 100;
+                // eslint-disable-next-line no-undef
                 $('.progress-bar-striped').css({ width: `${percentComplete}%` });
             }
         };

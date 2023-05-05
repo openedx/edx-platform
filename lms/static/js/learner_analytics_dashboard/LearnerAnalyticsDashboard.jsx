@@ -20,6 +20,7 @@ function arrayToObject(array) {
 
 function countByType(type, assignments) {
     let count = 0;
+    // eslint-disable-next-line array-callback-return
     assignments.map(({format}) => {
         if (format === type) {
             count += 1;
@@ -42,7 +43,9 @@ function getAssignmentCounts(types, assignments) {
 }
 
 function getStreakIcons(count) {
+    // eslint-disable-next-line prefer-spread
     return Array.apply(null, {length: count}).map((e, i) => (
+        // eslint-disable-next-line react/no-array-index-key
         <span className="fa fa-trophy" aria-hidden="true" key={i} />
     ));
 }
@@ -58,6 +61,7 @@ function getStreakString(count) {
     return (count > 0) ? `Active ${count} ${unit} in a row` : false;
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export function LearnerAnalyticsDashboard(props) {
     const {
         grading_policy, grades, schedule, schedule_raw, week_streak, weekly_active_users, discussion_info, profile_images, passing_grade, percent_grade

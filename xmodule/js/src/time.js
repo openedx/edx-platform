@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow
 function format(time, formatFull) {
     var hours, minutes, seconds;
 
@@ -27,6 +28,7 @@ function formatFull(time) {
 }
 
 function convert(time, oldSpeed, newSpeed) {
+    // eslint-disable-next-line no-mixed-operators
     return (time * oldSpeed / newSpeed).toFixed(3);
 }
 

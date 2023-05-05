@@ -229,6 +229,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         // set min/max widths
             var cachethis = this;
             var widthPerPoint = cachethis.gradeBarWidth / 100;
+            // eslint-disable-next-line no-shadow
             return function(event, ui) {
                 var barIndex = ui.element.index();
                 var offset = 1;
@@ -245,6 +246,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         moveBarClosure: function() {
         // 0th ele doesn't have a bar; so, will never invoke this
             var cachethis = this;
+            // eslint-disable-next-line no-shadow
             return function(event, ui) {
                 var barIndex = ui.element.index();
                 var offset = 1;
@@ -254,6 +256,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                     : offset);
                 // minus 2 b/c minus 1 is the element we're effecting. It's max is just shy of the next one above it
                 var max = (barIndex >= 2 ? cachethis.descendingCutoffs[barIndex - 2].cutoff - offset : 100);
+                // eslint-disable-next-line no-mixed-operators
                 var percentage = Math.min(Math.max(ui.size.width / cachethis.gradeBarWidth * 100, min), max);
                 cachethis.descendingCutoffs[barIndex - 1].cutoff = Math.round(percentage);
                 cachethis.renderGradeRanges();
@@ -272,6 +275,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         stopDragClosure: function() {
             var cachethis = this;
+            // eslint-disable-next-line no-shadow
             return function(event, ui) {
             // for some reason the resize is setting height to 0
                 cachethis.saveCutoffs();
@@ -388,6 +392,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         // Instrument grading scale
         // convert cutoffs to inversely ordered list
             var modelCutoffs = this.model.get('grade_cutoffs');
+            // eslint-disable-next-line guard-for-in
             for (var cutoff in modelCutoffs) {
                 this.descendingCutoffs.push({designation: cutoff, cutoff: Math.round(modelCutoffs[cutoff] * 100)});
             }

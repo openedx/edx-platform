@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals setFixtures */
 
 import ProgramCardView from '../views/program_card_view';
@@ -92,6 +97,7 @@ describe('Program card View', () => {
     });
 
     it('should call reEvaluatePicture if reLoadBannerImage is called', () => {
+        // eslint-disable-next-line no-undef
         spyOn(ProgramCardView, 'reEvaluatePicture');
         view.reLoadBannerImage();
         expect(ProgramCardView.reEvaluatePicture).toHaveBeenCalled();
@@ -100,6 +106,7 @@ describe('Program card View', () => {
     it('should handle exceptions from reEvaluatePicture', () => {
         const message = 'Picturefill had exceptions';
 
+        // eslint-disable-next-line no-undef
         spyOn(ProgramCardView, 'reEvaluatePicture').and.callFake(() => {
             const error = { name: message };
 

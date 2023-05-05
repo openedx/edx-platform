@@ -9,6 +9,7 @@ will drop every database that starts with "test_" or "acceptance_",
 but ignore other databases.
 */
 
+// eslint-disable-next-line no-extend-native
 String.prototype.startsWith = function(substring) {
     return (this.indexOf(substring) === 0);
 };

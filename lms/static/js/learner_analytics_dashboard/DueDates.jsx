@@ -6,6 +6,7 @@ const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 class DueDates extends React.Component {
+    // eslint-disable-next-line no-useless-constructor
     constructor(props) {
         super(props);
     }
@@ -36,6 +37,7 @@ class DueDates extends React.Component {
 
         return dates.sort((a, b) => new Date(a.due) > new Date(b.due))
             .map(({format, due}, index) => (
+                // eslint-disable-next-line react/no-array-index-key
                 <li className="date-item" key={index}>
                     <div className="label">{this.getLabel(format)}</div>
                     <div className="data">{this.getDate(due)}</div>
@@ -44,6 +46,7 @@ class DueDates extends React.Component {
     }
 
     initLabelTracker(list) {
+        // eslint-disable-next-line prefer-const
         let labels = Object.keys(list);
 
         return labels.reduce((accumulator, key) => {
@@ -70,6 +73,7 @@ class DueDates extends React.Component {
 }
 
 DueDates.propTypes = {
+    // eslint-disable-next-line react/forbid-prop-types
     dates: PropTypes.array.isRequired
 };
 

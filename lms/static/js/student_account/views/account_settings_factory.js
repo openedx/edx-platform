@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow-restricted-names
 (function(define, undefined) {
     'use strict';
 
@@ -359,6 +360,7 @@
             // set TimeZoneField to listen to CountryField
 
             getUserField = function(list, search) {
+                // eslint-disable-next-line no-shadow
                 return _.find(list, function(field) {
                     return field.view.options.valueAttribute === search;
                 }).view;
@@ -446,6 +448,7 @@
             accountSettingsView.render();
             focusId = $.cookie('focus_id');
             if (focusId) {
+                // eslint-disable-next-line no-bitwise
                 if (~focusId.indexOf('beta-language')) {
                     tabIndex = -1;
 

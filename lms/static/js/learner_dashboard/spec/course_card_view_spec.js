@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals setFixtures */
 
 import CourseCardModel from '../models/course_card_model';
@@ -11,6 +16,7 @@ describe('Course Card View', () => {
     const endDate = 'May 30, 2017';
 
     const setupView = (data, isEnrolled, collectionCourseStatus) => {
+        // eslint-disable-next-line no-undef
         const programData = $.extend({}, data);
         const context = {
             courseData: {},
@@ -150,6 +156,7 @@ describe('Course Card View', () => {
     });
 
     it('should allow enrollment in future runs when the user has an expired enrollment', () => {
+        // eslint-disable-next-line no-undef
         const newRun = $.extend({}, course.course_runs[0]);
         const newRunKey = 'course-v1:foo+bar+baz';
         const advertisedStart = 'Summer';

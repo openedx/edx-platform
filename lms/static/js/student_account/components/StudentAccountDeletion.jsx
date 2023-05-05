@@ -1,5 +1,9 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments, import/prefer-default-export, react/no-danger
+*/
 /* globals gettext */
-/* eslint-disable react/no-danger, import/prefer-default-export */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Icon, StatusAlert } from '@edx/paragon/static';
@@ -170,6 +174,7 @@ export class StudentAccountDeletion extends React.Component {
 StudentAccountDeletion.propTypes = {
     isActive: PropTypes.bool.isRequired,
     socialAccountLinks: PropTypes.shape({
+        // eslint-disable-next-line react/forbid-prop-types
         providers: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     additionalSiteSpecificDeletionText: PropTypes.string,
