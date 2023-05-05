@@ -10,7 +10,24 @@ from .serializers import NotificationCourseEnrollmentSerializer
 
 class CourseEnrollmentListView(generics.ListAPIView):
     """
-    API endpoint that allows CourseEnrollments to be viewed.
+    API endpoint to get active CourseEnrollments for requester.
+
+    **Permissions**: User must be authenticated.
+
+    **Response Format**:
+        [
+            {
+                "course": {
+                    "id": (int) course_id,
+                    "display_name": (str) course_display_name
+                },
+                "is_active": (bool) is_enrollment_active,
+                "mode": (str) enrollment_mode
+            },
+            ...
+        ]
+    **Response Error Codes**:
+            - 403: The requester cannot access resource.
     """
     serializer_class = NotificationCourseEnrollmentSerializer
     permission_classes = [permissions.IsAuthenticated]
