@@ -80,8 +80,6 @@
                         callbackFunc(draggableObj);
                     }, 0);
                 });
-
-                return;
             } else {
                 if (draggableObj.originalConfigObj.label.length > 0) {
                     draggableObj.iconEl = $(HtmlUtils.joinHtml(
@@ -101,8 +99,6 @@
                     setTimeout(function() {
                         callbackFunc(draggableObj);
                     }, 0);
-
-                    return;
                 }
             }
         }

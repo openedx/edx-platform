@@ -27,7 +27,6 @@ class MultiselectDropdown extends React.Component {
     }
 
     componentWillUnmount() {
-
         document.removeEventListener('keydown', this.handleKeydown, false);
     }
 

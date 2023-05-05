@@ -101,7 +101,6 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             if (options && options.selectCohort) {
                 cohortsView.$('.cohort-select').val(options.selectCohort.toString()).change();
             }
-
         };
 
         respondToRefresh = function(catCount, dogCount) {

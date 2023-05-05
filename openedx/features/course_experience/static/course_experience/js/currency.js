@@ -2,7 +2,6 @@ import 'jquery.cookie';
 import $ from 'jquery'; // eslint-disable-line import/extensions
 
 export class Currency { // eslint-disable-line import/prefer-default-export
-
     editText(price) {
         const l10nCookie = this.countryL10nData;
         const lmsregex = /(\$)([\d|.]*)( USD)/g;

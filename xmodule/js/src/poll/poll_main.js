@@ -315,8 +315,6 @@
                     `ERROR: Invalid JSON config for poll ID "${this.id}".`,
                     `Error messsage: "${err.message}".`
                 );
-
-                return;
             }
         } // End-of: function PollMain(el) {
     }); // End-of: define('PollMain', [], function () {
