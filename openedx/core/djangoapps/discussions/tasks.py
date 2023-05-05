@@ -175,7 +175,6 @@ def is_discussable_unit(unit, store, enable_graded_units, subsection):
         return False
 
     if subsection.is_practice_exam or subsection.is_proctored_enabled or subsection.is_time_limited:
-        print('\n\n\n\n\n is_proctored_enabled \n\n\n\n')
         return False
 
     return True
