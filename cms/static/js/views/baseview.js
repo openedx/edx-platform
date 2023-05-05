@@ -46,8 +46,7 @@ function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
 
             var _this = this;
             // xss-lint: disable=javascript-jquery-insertion
-            // eslint-disable-next-line no-shadow
-            this.render = _.wrap(this.render, function(render, options) {
+            this.render = _.wrap(this.render, function(render, options) { // eslint-disable-line no-shadow
                 _this.beforeRender();
                 render(options);
                 _this.afterRender();
