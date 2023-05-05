@@ -74,7 +74,12 @@ class ClipboardEndpoint(APIView):
             clipboard = UserClipboard.objects.get(user=request.user.id)
         except UserClipboard.DoesNotExist:
             # This user does not have any content on their clipboard.
-            return Response({"content": None, "source_usage_key": "", "source_context_title": ""})
+            return Response({
+                "content": None,
+                "source_usage_key": "",
+                "source_context_title": "",
+                "source_edit_url": "",
+            })
         serializer = UserClipboardSerializer(clipboard, context={"request": request})
         return Response(serializer.data)
 

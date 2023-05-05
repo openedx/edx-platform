@@ -52,6 +52,8 @@ class HelpersTestCase(CourseTestCase):
         video = BlockFactory.create(parent_location=child_vertical.location, category="video",
                                     display_name="My Video")
         self.assertIsNone(xblock_studio_url(video))
+        # Verify video URL with find_parent=True
+        self.assertEqual(xblock_studio_url(video, find_parent=True), f'/container/{child_vertical.location}')
 
         # Verify library URL
         library = LibraryFactory.create()

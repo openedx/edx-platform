@@ -335,6 +335,90 @@
 
     @extend %ui-btn-flat-outline;
   }
+
+  .paste-component-whats-in-clipboard {
+    position: relative;
+    margin-left: auto;
+    width: fit-content;
+    font-size: 1.2rem;
+    margin-top: 4px;
+    cursor: help;
+
+    &:hover, &:focus, &:focus-within {
+      .clipboard-details-popup {
+        display: block;
+      }
+    }
+
+    .clipboard-details-popup {
+      display: none;
+      position: absolute;
+      bottom: 3.3rem;
+      right: calc(50% - 125px);
+      width: 250px;
+      background: white;
+      border-radius: 2px;
+      box-shadow: 0 0 3px #ddd;
+      padding: 15px;
+      color: inherit;
+
+      // The callout triangle below this popup:
+      &::before {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 0;
+        top: 100%;
+        left: calc(50% - 0.4rem);
+        // Use different border widths to render a triangle:
+        border: .8rem solid transparent;
+        border-bottom: none;
+        border-top-color: #fff;
+        filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1))
+      }
+
+      // This invisible rectangle makes it easy for users to move their mouse from the "What's in my clipboard?" widget
+      // to the popover without it disappearing on them.
+      &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 1rem;
+      }
+
+      .fa-external-link {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+
+      &.no-edit-link {
+        // If there is no "edit" URL available, make this not look like a link.
+        .fa-external-link {
+          display: none;
+        }
+
+        cursor: default;
+      }
+
+      .detail-block-name {
+        font-size: 1.5rem;
+      }
+
+      .detail-block-type {
+        color: #888;
+        font-size: 1rem;
+        display: block;
+        margin-top: -0.6rem;
+      }
+
+      .detail-course-name {
+        font-style: italic;
+      }
+    }
+  }
 }
 
 // outline UI
