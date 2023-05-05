@@ -191,8 +191,8 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         """ Test getting the editing HTML for each vertical. """
         # assert is here to make sure that the course being tested actually has verticals (units) to check.
         self.assertGreater(len(items), 0, "Course has no verticals (units) to check")
-        for descriptor in items:
-            resp = self.client.get_html(get_url('container_handler', descriptor.location))
+        for block in items:
+            resp = self.client.get_html(get_url('container_handler', block.location))
             self.assertEqual(resp.status_code, 200)
 
     def assertAssetsEqual(self, asset_son, course1_id, course2_id):

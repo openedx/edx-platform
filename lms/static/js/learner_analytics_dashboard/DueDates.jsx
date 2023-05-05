@@ -29,13 +29,13 @@ class DueDates extends React.Component {
             return type + ' ' + this.renderLabels[type];
         }
     }
-  
+
     getList() {
         const {dates, assignmentCounts} = this.props;
         this.renderLabels = this.initLabelTracker(assignmentCounts);
- 
+
         return dates.sort((a, b) => new Date(a.due) > new Date(b.due))
-            .map(({ format, due }, index) => {
+            .map(({format, due}, index) => {
                 return (
                     <li className="date-item" key={index}>
                         <div className="label">{this.getLabel(format)}</div>
@@ -51,7 +51,7 @@ class DueDates extends React.Component {
         return labels.reduce((accumulator, key) => {
             accumulator[key] = 0;
             return accumulator;
-        }, {}) 
+        }, {})
     }
 
     renderList() {
@@ -70,7 +70,6 @@ class DueDates extends React.Component {
         );
     }
 }
-
 
 DueDates.propTypes = {
     dates: PropTypes.array.isRequired

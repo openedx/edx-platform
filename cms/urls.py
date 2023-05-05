@@ -164,11 +164,7 @@ urlpatterns = oauth2_urlpatterns + [
             contentstore_views.video_images_handler, name='video_images_handler'),
     path('video_images_upload_enabled', contentstore_views.video_images_upload_enabled,
          name='video_images_upload_enabled'),
-    re_path(
-        fr'^video_features/{settings.COURSE_KEY_PATTERN}',
-        contentstore_views.get_video_features,
-        name='video_features'
-    ),
+    path('video_features/', contentstore_views.get_video_features, name='video_features'),
     re_path(fr'^transcript_preferences/{settings.COURSE_KEY_PATTERN}$',
             contentstore_views.transcript_preferences_handler, name='transcript_preferences_handler'),
     re_path(fr'^transcript_credentials/{settings.COURSE_KEY_PATTERN}$',

@@ -17,11 +17,12 @@ from rest_framework.views import APIView
 from common.djangoapps.student.auth import has_studio_read_access
 
 from openedx.core.lib.api.view_utils import view_auth_classes
+from openedx.core.lib.xblock_serializer.api import serialize_xblock_to_olx
 from xmodule import block_metadata_utils
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from .block_serializer import XBlockSerializer
+from .data import CLIPBOARD_PURPOSE, StagedContentStatus
 from .models import StagedContent, UserClipboard
 from .serializers import UserClipboardSerializer, PostToClipboardSerializer
 from .tasks import delete_expired_clipboards
@@ -42,7 +43,7 @@ class StagedContentOLXEndpoint(APIView):
         staged_content = get_object_or_404(StagedContent, pk=id)
         if staged_content.user.id != request.user.id:
             raise PermissionDenied("Users can only access their own staged content")
-        if staged_content.status != StagedContent.Status.READY:
+        if staged_content.status != StagedContentStatus.READY:
             # If the status is LOADING, the OLX may not be generated/valid yet.
             # If the status is ERROR or EXPIRED, this row is no longer usable.
             raise NotFound("The requested content is not available.")
@@ -110,26 +111,26 @@ class ClipboardEndpoint(APIView):
             block = modulestore().get_item(usage_key)
         except ItemNotFoundError as exc:
             raise NotFound("The requested usage key does not exist.") from exc
-        block_data = XBlockSerializer(block)
+        block_data = serialize_xblock_to_olx(block)
 
         expired_ids = []
         with transaction.atomic():
             # Mark all of the user's existing StagedContent rows as EXPIRED
             to_expire = StagedContent.objects.filter(
                 user=request.user,
-                purpose=UserClipboard.PURPOSE,
+                purpose=CLIPBOARD_PURPOSE,
             ).exclude(
-                status=StagedContent.Status.EXPIRED,
+                status=StagedContentStatus.EXPIRED,
             )
             for sc in to_expire:
                 expired_ids.append(sc.id)
-                sc.status = StagedContent.Status.EXPIRED
+                sc.status = StagedContentStatus.EXPIRED
                 sc.save()
             # Insert a new StagedContent row for this
             staged_content = StagedContent.objects.create(
                 user=request.user,
-                purpose=UserClipboard.PURPOSE,
-                status=StagedContent.Status.READY,
+                purpose=CLIPBOARD_PURPOSE,
+                status=StagedContentStatus.READY,
                 block_type=usage_key.block_type,
                 olx=block_data.olx_str,
                 display_name=block_metadata_utils.display_name_with_default(block),

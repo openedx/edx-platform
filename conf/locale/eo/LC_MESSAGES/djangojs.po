@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-09 20:35+0000\n"
-"PO-Revision-Date: 2023-04-09 20:35:51.632939\n"
+"POT-Creation-Date: 2023-04-30 20:35+0000\n"
+"PO-Revision-Date: 2023-04-30 20:35:58.386591\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -7450,11 +7450,19 @@ msgstr "Çöürsé Öütlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 msgid "Date added"
 msgstr "Däté äddéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr "Pästïng Ⱡ'σяєм ιρѕυм #"
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
 msgstr "Édïtïng äççéss för: {title} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr "Çöpýïng Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -11571,6 +11579,38 @@ msgid ""
 msgstr ""
 "Thé nümßér öf ässïgnménts öf thïs týpé thät wïll ßé dröppéd. Thé löwést "
 "sçörïng ässïgnménts äré dröppéd fïrst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr "Wärnïng:  Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+"Thé nümßér öf {type} ässïgnménts défïnéd héré döés nöt mätçh thé çürrént "
+"nümßér öf {type} ässïgnménts ïn thé çöürsé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr ""
+"Théré äré nö ässïgnménts öf thïs týpé ïn thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr ""
+"{assignment_count} {type} ässïgnmént(s) föünd: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢#"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
+"Thé nümßér öf {type} ässïgnménts ïn thé çöürsé mätçhés thé nümßér défïnéd "
+"héré. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"

@@ -206,10 +206,9 @@ class _ContentSerializer(serializers.Serializer):
         """
         is_staff = user_id in self.context["course_staff_user_ids"] or user_id in self.context["moderator_user_ids"]
         is_ta = user_id in self.context["ta_user_ids"]
-        is_global_staff = self.context["is_global_staff"]
 
         return (
-            "Staff" if (is_staff or is_global_staff) else
+            "Staff" if is_staff else
             "Community TA" if is_ta else
             None
         )

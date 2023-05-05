@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 import courseBlocksActions from '../actions/constants';
 
 export const buildBlockTree = (blocks, excludeBlockTypes) => {
-    if (!(blocks && blocks.root)) return null;
+    if (!(blocks && blocks.root)) { return null; }
     const blockTree = (root, parent) => {
         const tree = Object.assign({ parent }, blocks.blocks[root]);
         if (tree.children) {
@@ -35,7 +35,6 @@ export const selectedBlock = (state = '', action) => {
         return state;
     }
 };
-
 
 export const rootBlock = (state = null, action) => {
     switch (action.type) {

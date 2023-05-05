@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-09 20:35+0000\n"
-"PO-Revision-Date: 2023-04-09 20:35:51.632939\n"
+"POT-Creation-Date: 2023-04-30 20:35+0000\n"
+"PO-Revision-Date: 2023-04-30 20:35:58.386591\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -6607,11 +6607,19 @@ msgstr "Ȼønɹsǝ Ønʇlᴉnǝ"
 msgid "Date added"
 msgstr "Đɐʇǝ ɐddǝd"
 
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr "Ᵽɐsʇᴉnƃ"
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
 msgstr "Ɇdᴉʇᴉnƃ ɐɔɔǝss ɟøɹ: {title}"
+
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr "Ȼødʎᴉnƃ"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -10326,6 +10334,34 @@ msgid ""
 msgstr ""
 "Ŧɥǝ nnɯbǝɹ øɟ ɐssᴉƃnɯǝnʇs øɟ ʇɥᴉs ʇʎdǝ ʇɥɐʇ ʍᴉll bǝ dɹøddǝd. Ŧɥǝ løʍǝsʇ "
 "sɔøɹᴉnƃ ɐssᴉƃnɯǝnʇs ɐɹǝ dɹøddǝd ɟᴉɹsʇ."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr "Wɐɹnᴉnƃ: "
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+"Ŧɥǝ nnɯbǝɹ øɟ {type} ɐssᴉƃnɯǝnʇs dǝɟᴉnǝd ɥǝɹǝ døǝs nøʇ ɯɐʇɔɥ ʇɥǝ ɔnɹɹǝnʇ "
+"nnɯbǝɹ øɟ {type} ɐssᴉƃnɯǝnʇs ᴉn ʇɥǝ ɔønɹsǝ:"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr "Ŧɥǝɹǝ ɐɹǝ nø ɐssᴉƃnɯǝnʇs øɟ ʇɥᴉs ʇʎdǝ ᴉn ʇɥǝ ɔønɹsǝ."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr "{assignment_count} {type} ɐssᴉƃnɯǝnʇ(s) ɟønnd:"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
+"Ŧɥǝ nnɯbǝɹ øɟ {type} ɐssᴉƃnɯǝnʇs ᴉn ʇɥǝ ɔønɹsǝ ɯɐʇɔɥǝs ʇɥǝ nnɯbǝɹ dǝɟᴉnǝd "
+"ɥǝɹǝ."
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"

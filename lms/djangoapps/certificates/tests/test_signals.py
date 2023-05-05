@@ -3,10 +3,12 @@ Unit tests for enabling self-generated certificates for self-paced courses
 and disabling for instructor-paced courses.
 """
 
-
+from datetime import datetime, timezone
 from unittest import mock
+from uuid import uuid4
 
 import ddt
+from django.test.utils import override_settings
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -19,10 +21,14 @@ from lms.djangoapps.certificates.models import (
     CertificateGenerationConfiguration,
     GeneratedCertificate
 )
+from lms.djangoapps.certificates.signals import listen_for_certificate_created_event
 from lms.djangoapps.certificates.tests.factories import CertificateAllowlistFactory, GeneratedCertificateFactory
 from lms.djangoapps.grades.course_grade_factory import CourseGradeFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from openedx_events.data import EventsMetadata
+from openedx_events.learning.signals import CERTIFICATE_CREATED
+from openedx_events.learning.data import CourseData, UserData, UserPersonalData, CertificateData
 
 
 class SelfGeneratedCertsSignalTest(ModuleStoreTestCase):
@@ -434,3 +440,78 @@ class EnrollmentModeChangeCertsTest(ModuleStoreTestCase):
         ) as mock_allowlist_task:
             self.verified_enrollment.change_mode('audit')
             mock_allowlist_task.assert_not_called()
+
+
+class CertificateEventBusTests(ModuleStoreTestCase):
+    """
+    Tests for Certificate events that interact with the event bus.
+    """
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.name = f'{self.user.first_name} {self.user.last_name}'
+        self.course = CourseFactory.create(self_paced=True)
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course.id,
+            is_active=True,
+            mode='verified',
+        )
+
+    @override_settings(SEND_CERTIFICATE_CREATED_SIGNAL=False)
+    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
+    def test_event_disabled(self, mock_producer):
+        """
+        Test to verify that we do not push `CERTIFICATE_CREATED` events to the event bus if the
+        `SEND_CERTIFICATE_CREATED_SIGNAL` setting is disabled.
+        """
+        listen_for_certificate_created_event(None, CERTIFICATE_CREATED)
+        mock_producer.assert_not_called()
+
+    @override_settings(SEND_CERTIFICATE_CREATED_SIGNAL=True)
+    @mock.patch('lms.djangoapps.certificates.signals.get_producer', autospec=True)
+    def test_event_enabled(self, mock_producer):
+        """
+        Test to verify that we push `CERTIFICATE_CREATED` events to the event bus if the
+        `SEND_CERTIFICATE_CREATED_SIGNAL` setting is enabled.
+        """
+        expected_course_data = CourseData(course_key=self.course.id)
+        expected_user_data = UserData(
+            pii=UserPersonalData(
+                username=self.user.username,
+                email=self.user.email,
+                name=self.name,
+            ),
+            id=self.user.id,
+            is_active=self.user.is_active
+        )
+        expected_certificate_data = CertificateData(
+            user=expected_user_data,
+            course=expected_course_data,
+            mode='verified',
+            grade='',
+            current_status='downloadable',
+            download_url='',
+            name='',
+        )
+        event_metadata = EventsMetadata(
+            event_type=CERTIFICATE_CREATED.event_type,
+            id=uuid4(),
+            minorversion=0,
+            source='openedx/lms/web',
+            sourcehost='lms.test',
+            time=datetime.now(timezone.utc)
+        )
+
+        event_kwargs = {
+            'certificate': expected_certificate_data,
+            'metadata': event_metadata
+        }
+
+        listen_for_certificate_created_event(None, CERTIFICATE_CREATED, **event_kwargs)
+        # verify that the data sent to the event bus matches what we expect
+        data = mock_producer.return_value.send.call_args.kwargs
+        assert data['signal'].event_type == CERTIFICATE_CREATED.event_type
+        assert data['event_data']['certificate'] == expected_certificate_data
+        assert data['topic'] == 'certificates'
+        assert data['event_key_field'] == 'certificate.course.course_key'

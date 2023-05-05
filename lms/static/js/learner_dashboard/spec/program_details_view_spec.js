@@ -577,9 +577,9 @@ describe('Program Details View', () => {
         expect(view.$('.program-heading-title').text()).toEqual('Your Program Journey');
         expect(view.$('.program-heading-message').text().trim()
             .replace(/\s+/g, ' ')).toEqual(
-                'Track and plan your progress through the 3 courses in this program. ' +
-                'To complete the program, you must earn a verified certificate for each course.',
-            );
+                'Track and plan your progress through the 3 courses in this program. '
+                + 'To complete the program, you must earn a verified certificate for each course.',
+        );
     });
 
     it('should render the program heading congratulations message if all courses completed', () => {

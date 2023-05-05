@@ -22,13 +22,13 @@ def increment_assignment_versions(course_key, usage_key, user_id):
     Update the version numbers for all assignments that are affected by a score
     change event. Returns a list of all affected assignments.
     """
-    problem_descriptor = modulestore().get_item(usage_key)
+    problem_block = modulestore().get_item(usage_key)
     # Get all assignments involving the current problem for which the campus LMS
     # is expecting a grade. There may be many possible graded assignments, if
     # a problem has been added several times to a course at different
     # granularities (such as the unit or the vertical).
     assignments = outcomes.get_assignments_for_problem(
-        problem_descriptor, user_id, course_key
+        problem_block, user_id, course_key
     )
     for assignment in assignments:
         assignment.version_number += 1

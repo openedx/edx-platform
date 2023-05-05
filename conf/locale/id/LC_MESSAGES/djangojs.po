@@ -84,7 +84,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-02 20:42+0000\n"
+"POT-Creation-Date: 2023-04-23 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Faizar Septiawan <faizarsangster@gmail.com>, 2023\n"
 "Language-Team: Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/)\n"
@@ -6504,6 +6504,10 @@ msgstr ""
 msgid "Editing access for: {title}"
 msgstr ""
 
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr ""
+
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
 msgstr ""
@@ -10062,6 +10066,30 @@ msgid ""
 msgstr ""
 "Jumlah tugas jenis ini yang akan dimasukkan. Tugas nilai terendah yang "
 "dimasukkan pertama."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"

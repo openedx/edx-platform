@@ -1,6 +1,7 @@
 (function(define) {
 // VideoCaption module.
-    'use strict';
+    
+'use strict';
 
     define('video/09_video_caption.js', [
         'video/00_sjson.js',
@@ -581,8 +582,8 @@
                         var canFetchWithYoutubeId;
                         console.log('[Video info]: ERROR while fetching captions.');
                         console.log(
-                            '[Video info]: STATUS:', textStatus +
-                            ', MESSAGE:', '' + errorThrown
+                            '[Video info]: STATUS:', textStatus
+                            + ', MESSAGE:', '' + errorThrown
                         );
                         // If initial list of languages has more than 1 item, check
                         // for availability other transcripts.
@@ -594,7 +595,7 @@
                         } else if (!fetchWithYoutubeId && state.videoType === 'html5') {
                             canFetchWithYoutubeId = self.fetchCaption(true);
                             if (canFetchWithYoutubeId) {
-                                console.log('[Video info]: Html5 mode fetching caption with youtubeId.');  // eslint-disable-line max-len, no-console
+                                console.log('[Video info]: Html5 mode fetching caption with youtubeId.'); // eslint-disable-line max-len, no-console
                             } else {
                                 self.hideCaptions(true);
                                 self.languageChooserEl.hide();
@@ -804,7 +805,7 @@
                     self.state.el.addClass('is-captions-rendered');
 
                     self.subtitlesEl
-                        .attr('aria-label', gettext('Activating a link in this group will skip to the corresponding point in the video.'));  // eslint-disable-line max-len
+                        .attr('aria-label', gettext('Activating a link in this group will skip to the corresponding point in the video.')); // eslint-disable-line max-len
 
                     self.subtitlesEl.find('.transcript-title')
                         .text(gettext('Video transcript'));
@@ -818,7 +819,7 @@
                         .attr('lang', $('html').attr('lang'));
 
                     self.container.find('.menu-container .instructions')
-                        .text(gettext('Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.'));  // eslint-disable-line max-len
+                        .text(gettext('Press the UP arrow key to enter the language menu then use UP and DOWN arrow keys to navigate language options. Press ENTER to change to the selected language.')); // eslint-disable-line max-len
                 };
 
                 this.rendered = false;
@@ -836,7 +837,7 @@
                 var topSpacer = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML([
                         '<li class="spacing" style="height: {height}px">',
-                                '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>',  // eslint-disable-line max-len, indent
+                                '<a href="#transcript-end-{id}" id="transcript-start-{id}" class="transcript-start"></a>', // eslint-disable-line max-len, indent
                         '</li>'
                     ].join('')),
                     {
@@ -848,7 +849,7 @@
                 var bottomSpacer = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML([
                         '<li class="spacing" style="height: {height}px">',
-                                '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>',  // eslint-disable-line max-len, indent
+                                '<a href="#transcript-start-{id}" id="transcript-end-{id}" class="transcript-end"></a>', // eslint-disable-line max-len, indent
                         '</li>'
                     ].join('')),
                     {
@@ -940,8 +941,8 @@
                     // The second and second to last elements turn automatic scrolling
                     // off again as it may have been enabled in captionBlur.
                     if (
-                        captionIndex <= 1 ||
-                        captionIndex >= this.sjson.getSize() - 2
+                        captionIndex <= 1
+                        || captionIndex >= this.sjson.getSize() - 2
                     ) {
                         this.autoScrolling = false;
                     }
@@ -965,8 +966,8 @@
                 // direction we are tabbing. So we could be on the first element and
                 // tabbing back out of the captions or on the last element and tabbing
                 // forward out of the captions.
-                if (captionIndex === 0 ||
-                    captionIndex === this.sjson.getSize() - 1) {
+                if (captionIndex === 0
+                    || captionIndex === this.sjson.getSize() - 1) {
                     this.autoScrolling = true;
                 }
             },
@@ -994,9 +995,9 @@
                 // Automatic scrolling gets disabled if one of the captions has
                 // received focus through tabbing.
                 if (
-                    !this.frozen &&
-                    el.length &&
-                    this.autoScrolling
+                    !this.frozen
+                    && el.length
+                    && this.autoScrolling
                 ) {
                     this.subtitlesEl.scrollTo(
                         el,
@@ -1058,9 +1059,9 @@
                     newIndex = this.sjson.search.apply(this.sjson, params);
 
                     if (
-                        typeof newIndex !== 'undefined' &&
-                        newIndex !== -1 &&
-                        this.currentIndex !== newIndex
+                        typeof newIndex !== 'undefined'
+                        && newIndex !== -1
+                        && this.currentIndex !== newIndex
                     ) {
                         if (typeof this.currentIndex !== 'undefined') {
                             this.subtitlesEl
@@ -1359,13 +1360,13 @@
                 var height = 0,
                     state = this.state;
                 // on page load captionHidden = undefined
-                if ((state.captionsHidden === undefined && this.hideCaptionsOnLoad) ||
-                    state.captionsHidden === true
+                if ((state.captionsHidden === undefined && this.hideCaptionsOnLoad)
+                    || state.captionsHidden === true
                 ) {
                     // In case of html5 autoshowing subtitles, we adjust height of
                     // subs, by height of scrollbar.
-                    height = state.el.find('.video-controls').height() +
-                        0.5 * state.el.find('.slider').height();
+                    height = state.el.find('.video-controls').height()
+                        + 0.5 * state.el.find('.slider').height();
                     // Height of videoControl does not contain height of slider.
                     // css is set to absolute, to avoid yanking when slider
                     // autochanges its height.

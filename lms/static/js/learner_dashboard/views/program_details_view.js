@@ -84,7 +84,7 @@ class ProgramDetailsView extends Backbone.View {
         const totalCount = completedCount + inProgressCount + remainingCount;
         const buyButtonUrl = ProgramDetailsView.getUrl(
             this.options.urls.buy_button_url,
-            this.options.programData,
+            this.options.programData
         );
 
         let data = {
@@ -139,7 +139,8 @@ class ProgramDetailsView extends Backbone.View {
                 el: '.js-course-list-in-progress',
                 childView: CourseCardView,
                 collection: this.inProgressCourseCollection,
-                context: $.extend(this.options,
+                context: $.extend(
+                    this.options,
                     { enrolled: gettext('Enrolled'), collectionCourseStatus: 'in_progress' },
                 ),
             }).render();

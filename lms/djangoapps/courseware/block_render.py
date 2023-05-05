@@ -67,9 +67,9 @@ from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.services import UserStateService
 from lms.djangoapps.grades.api import GradesUtilService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
-from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, UserTagsService
+from lms.djangoapps.lms_xblock.runtime import UserTagsService, lms_wrappers_aside, lms_applicable_aside_types
 from lms.djangoapps.verify_student.services import XBlockVerificationService
-from openedx.core.djangoapps.bookmarks.services import BookmarksService
+from openedx.core.djangoapps.bookmarks.api import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
@@ -115,7 +115,7 @@ class LmsModuleRenderError(Exception):
 def make_track_function(request):
     '''
     Make a tracking function that logs what happened.
-    For use in ModuleSystem.
+    For use in DescriptorSystem.
     '''
     from common.djangoapps.track import views as track_views
 
@@ -297,7 +297,7 @@ def get_block(user, request, usage_key, field_data_cache, position=None, log_if_
                                 XModule javascript to be bound correctly
       - depth                 : number of levels of descendents to cache when loading this module.
                                 None means cache all descendents
-      - static_asset_path     : static asset path to use (overrides descriptor's value); needed
+      - static_asset_path     : static asset path to use (overrides block's value); needed
                                 by get_course_info_section, because info section modules
                                 do not have a course as the parent module, and thus do not
                                 inherit this lms key value.
@@ -310,8 +310,8 @@ def get_block(user, request, usage_key, field_data_cache, position=None, log_if_
     if possible.  If not possible, return None.
     """
     try:
-        descriptor = modulestore().get_item(usage_key, depth=depth)
-        return get_block_for_descriptor(user, request, descriptor, field_data_cache, usage_key.course_key,
+        block = modulestore().get_item(usage_key, depth=depth)
+        return get_block_for_descriptor(user, request, block, field_data_cache, usage_key.course_key,
                                         position=position,
                                         wrap_xblock_display=wrap_xblock_display,
                                         grade_bucket_type=grade_bucket_type,
@@ -365,7 +365,7 @@ def display_access_messages(user, block, view, frag, context):  # pylint: disabl
 
 
 # pylint: disable=too-many-statements
-def get_block_for_descriptor(user, request, descriptor, field_data_cache, course_key,
+def get_block_for_descriptor(user, request, block, field_data_cache, course_key,
                              position=None, wrap_xblock_display=True, grade_bucket_type=None,
                              static_asset_path='', disable_staff_debug_info=False,
                              course=None, will_recheck_access=False):
@@ -387,7 +387,7 @@ def get_block_for_descriptor(user, request, descriptor, field_data_cache, course
 
     return get_block_for_descriptor_internal(
         user=user,
-        descriptor=descriptor,
+        block=block,
         student_data=student_data,
         course_id=course_key,
         track_function=track_function,
@@ -403,11 +403,11 @@ def get_block_for_descriptor(user, request, descriptor, field_data_cache, course
     )
 
 
-def get_module_system_for_user(
+def prepare_runtime_for_user(
         user,
         student_data,  # TODO
         # Arguments preceding this comment have user binding, those following don't
-        descriptor,
+        block,
         course_id,
         track_function,
         request_token,
@@ -421,14 +421,13 @@ def get_module_system_for_user(
         will_recheck_access=False,
 ):
     """
-    Helper function that returns a module system and student_data bound to a user and a descriptor.
+    Helper function that binds the given xblock to a user and student_data to a user and the block.
 
     The purpose of this function is to factor out everywhere a user is implicitly bound when creating a module,
-    to allow an existing block to be re-bound to a user.  Most of the user bindings happen when creating the
-    closures that feed the instantiation of ModuleSystem.
+    to allow an existing block to be re-bound to a user.
 
     The arguments fall into two categories: those that have explicit or implicit user binding, which are user
-    and student_data, and those don't and are just present so that ModuleSystem can be instantiated, which
+    and student_data, and those don't and are used to instantiate the service required in LMS, which
     are all the other arguments.  Ultimately, this isn't too different than how get_block_for_descriptor_internal
     was before refactoring.
 
@@ -437,7 +436,7 @@ def get_module_system_for_user(
         request_token (str): A token unique to the request use by xblock initialization
 
     Returns:
-        (LmsModuleSystem, KvsFieldData):  (module system, student_data) bound to, primarily, the user and descriptor
+        KvsFieldData:  student_data bound to, primarily, the user and block
     """
 
     def make_xqueue_callback(dispatch='score_update'):
@@ -449,7 +448,7 @@ def get_module_system_for_user(
             kwargs=dict(
                 course_id=str(course_id),
                 userid=str(user.id),
-                mod_id=str(descriptor.location),
+                mod_id=str(block.location),
                 dispatch=dispatch
             ),
         )
@@ -459,7 +458,7 @@ def get_module_system_for_user(
     # Default queuename is course-specific and is derived from the course that
     #   contains the current block.
     # TODO: Queuename should be derived from 'course_settings.json' of each course
-    xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
+    xqueue_default_queuename = block.location.org + '-' + block.location.course
 
     xqueue_service = XQueueService(
         construct_callback=make_xqueue_callback,
@@ -470,17 +469,17 @@ def get_module_system_for_user(
         waittime=settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS,
     )
 
-    def inner_get_block(descriptor):
+    def inner_get_block(block):
         """
-        Delegate to get_block_for_descriptor_internal() with all values except `descriptor` set.
+        Delegate to get_block_for_descriptor_internal() with all values except `block` set.
 
         Because it does an access check, it may return None.
         """
-        # TODO: fix this so that make_xqueue_callback uses the descriptor passed into
+        # TODO: fix this so that make_xqueue_callback uses the block passed into
         # inner_get_block, not the parent's callback.  Add it as an argument....
         return get_block_for_descriptor_internal(
             user=user,
-            descriptor=descriptor,
+            block=block,
             student_data=student_data,
             course_id=course_id,
             track_function=track_function,
@@ -494,23 +493,14 @@ def get_module_system_for_user(
             will_recheck_access=will_recheck_access,
         )
 
-    # These modules store data using the anonymous_student_id as a key.
-    # To prevent loss of data, we will continue to provide old modules with
-    # the per-student anonymized id (as we have in the past),
-    # while giving selected modules a per-course anonymized id.
-    # As we have the time to manually test more modules, we can add to the list
-    # of modules that get the per-course anonymized id.
-    if getattr(descriptor, 'requires_per_student_anonymous_id', False):
-        anonymous_student_id = anonymous_id_for_user(user, None)
-    else:
-        anonymous_student_id = anonymous_id_for_user(user, course_id)
-
-    user_is_staff = bool(has_access(user, 'staff', descriptor.location, course_id))
+    user_is_staff = bool(has_access(user, 'staff', block.location, course_id))
     user_service = DjangoXBlockUserService(
         user,
         user_is_staff=user_is_staff,
         user_role=get_user_role(user, course_id),
-        anonymous_user_id=anonymous_student_id,
+        anonymous_user_id=anonymous_id_for_user(user, course_id),
+        # See the docstring of `DjangoXBlockUserService`.
+        deprecated_anonymous_user_id=anonymous_id_for_user(user, None),
         request_country_code=user_location,
     )
 
@@ -518,7 +508,7 @@ def get_module_system_for_user(
     rebind_user_service = RebindUserService(
         user,
         course_id,
-        get_module_system_for_user,
+        prepare_runtime_for_user,
         track_function=track_function,
         position=position,
         wrap_xblock_display=wrap_xblock_display,
@@ -552,9 +542,9 @@ def get_module_system_for_user(
         ))
 
     replace_url_service = ReplaceURLService(
-        data_directory=getattr(descriptor, 'data_dir', None),
+        data_directory=getattr(block, 'data_dir', None),
         course_id=course_id,
-        static_asset_path=static_asset_path or descriptor.static_asset_path,
+        static_asset_path=static_asset_path or block.static_asset_path,
         jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''})
     )
 
@@ -578,58 +568,58 @@ def get_module_system_for_user(
             del user.real_user.masquerade_settings
             user.real_user.masquerade_settings = masquerade_settings
         else:
-            staff_access = has_access(user, 'staff', descriptor, course_id)
+            staff_access = has_access(user, 'staff', block, course_id)
         if staff_access:
             block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
-    field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
+    field_data = DateLookupFieldData(block._field_data, course_id, user)  # pylint: disable=protected-access
     field_data = LmsFieldData(field_data, student_data)
 
     store = modulestore()
 
-    system = LmsModuleSystem(
-        get_block=inner_get_block,
-        # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
-        mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
-        wrappers=block_wrappers,
-        services={
-            'fs': FSService(),
-            'field-data': field_data,
-            'mako': mako_service,
-            'user': user_service,
-            'verification': XBlockVerificationService(),
-            'proctoring': ProctoringService(),
-            'milestones': milestones_helpers.get_service(),
-            'credit': CreditService(),
-            'bookmarks': BookmarksService(user=user),
-            'gating': GatingService(),
-            'grade_utils': GradesUtilService(course_id=course_id),
-            'user_state': UserStateService(),
-            'content_type_gating': ContentTypeGatingService(),
-            'cache': CacheService(cache),
-            'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
-            'xqueue': xqueue_service,
-            'replace_urls': replace_url_service,
-            'rebind_user': rebind_user_service,
-            'completion': CompletionService(user=user, context_key=course_id)
-            if user and user.is_authenticated
-            else None,
-            'i18n': XBlockI18nService,
-            'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
-            'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
-            'settings': SettingsService(),
-            'user_tags': UserTagsService(user=user, course_id=course_id),
-            'badging': BadgingService(course_id=course_id, modulestore=store) if badges_enabled() else None,
-            'teams': TeamsService(),
-            'teams_configuration': TeamsConfigurationService(),
-            'call_to_action': CallToActionService(),
-            'publish': EventPublishingService(user, course_id, track_function),
-        },
-        descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
-        request_token=request_token,
-    )
+    services = {
+        'fs': FSService(),
+        'field-data': field_data,
+        'mako': mako_service,
+        'user': user_service,
+        'verification': XBlockVerificationService(),
+        'proctoring': ProctoringService(),
+        'milestones': milestones_helpers.get_service(),
+        'credit': CreditService(),
+        'bookmarks': BookmarksService(user=user),
+        'gating': GatingService(),
+        'grade_utils': GradesUtilService(course_id=course_id),
+        'user_state': UserStateService(),
+        'content_type_gating': ContentTypeGatingService(),
+        'cache': CacheService(cache),
+        'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
+        'xqueue': xqueue_service,
+        'replace_urls': replace_url_service,
+        'rebind_user': rebind_user_service,
+        'completion': CompletionService(user=user, context_key=course_id)
+        if user and user.is_authenticated
+        else None,
+        'i18n': XBlockI18nService,
+        'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
+        'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
+        'settings': SettingsService(),
+        'user_tags': UserTagsService(user=user, course_id=course_id),
+        'badging': BadgingService(course_id=course_id, modulestore=store) if badges_enabled() else None,
+        'teams': TeamsService(),
+        'teams_configuration': TeamsConfigurationService(),
+        'call_to_action': CallToActionService(),
+        'publish': EventPublishingService(user, course_id, track_function),
+    }
 
-    # pass position specified in URL to module through ModuleSystem
+    block.runtime.get_block_for_descriptor = inner_get_block
+
+    block.runtime.wrappers = block_wrappers
+    block.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
+    block.runtime.request_token = request_token
+    block.runtime.wrap_asides_override = lms_wrappers_aside
+    block.runtime.applicable_aside_types_override = lms_applicable_aside_types
+
+    # pass position specified in URL to runtime
     if position is not None:
         try:
             position = int(position)
@@ -637,19 +627,19 @@ def get_module_system_for_user(
             log.exception('Non-integer %r passed as position.', position)
             position = None
 
-    system.set('position', position)
+    block.runtime.set('position', position)
 
-    system.set('user_is_staff', user_is_staff)
-    system.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
-    system.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
-    system.set('days_early_for_beta', descriptor.days_early_for_beta)
+    block.runtime.set('user_is_staff', user_is_staff)
+    block.runtime.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
+    block.runtime.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
+    block.runtime.set('days_early_for_beta', block.days_early_for_beta)
 
-    return system, field_data
+    return field_data
 
 
 # TODO: Find all the places that this method is called and figure out how to
 # get a loaded course passed into it
-def get_block_for_descriptor_internal(user, descriptor, student_data, course_id, track_function, request_token,
+def get_block_for_descriptor_internal(user, block, student_data, course_id, track_function, request_token,
                                       position=None, wrap_xblock_display=True, grade_bucket_type=None,
                                       static_asset_path='', user_location=None, disable_staff_debug_info=False,
                                       course=None, will_recheck_access=False):
@@ -662,10 +652,10 @@ def get_block_for_descriptor_internal(user, descriptor, student_data, course_id,
         request_token (str): A unique token for this request, used to isolate xblock rendering
     """
 
-    (system, student_data) = get_module_system_for_user(
+    student_data = prepare_runtime_for_user(
         user=user,
         student_data=student_data,  # These have implicit user bindings, the rest of args are considered not to
-        descriptor=descriptor,
+        block=block,
         course_id=course_id,
         track_function=track_function,
         position=position,
@@ -679,8 +669,7 @@ def get_block_for_descriptor_internal(user, descriptor, student_data, course_id,
         will_recheck_access=will_recheck_access,
     )
 
-    descriptor.bind_for_student(
-        system,
+    block.bind_for_student(
         user.id,
         [
             partial(DateLookupFieldData, course_id=course_id, user=user),
@@ -689,16 +678,16 @@ def get_block_for_descriptor_internal(user, descriptor, student_data, course_id,
         ],
     )
 
-    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)
+    block.scope_ids = block.scope_ids._replace(user_id=user.id)
 
     # Do not check access when it's a noauth request.
-    # Not that the access check needs to happen after the descriptor is bound
+    # Not that the access check needs to happen after the block is bound
     # for the student, since there may be field override data for the student
     # that affects xblock visibility.
     user_needs_access_check = getattr(user, 'known', True) and not isinstance(user, SystemUser)
     if user_needs_access_check:
-        access = has_access(user, 'load', descriptor, course_id)
-        # A descriptor should only be returned if either the user has access, or the user doesn't have access, but
+        access = has_access(user, 'load', block, course_id)
+        # A block should only be returned if either the user has access, or the user doesn't have access, but
         # the failed access has a message for the user and the caller of this function specifies it will check access
         # again. This allows blocks to show specific error message or upsells when access is denied.
         caller_will_handle_access_error = (
@@ -707,10 +696,10 @@ def get_block_for_descriptor_internal(user, descriptor, student_data, course_id,
             and (access.user_message or access.user_fragment)
         )
         if access or caller_will_handle_access_error:
-            descriptor.has_access_error = bool(caller_will_handle_access_error)
-            return descriptor
+            block.has_access_error = bool(caller_will_handle_access_error)
+            return block
         return None
-    return descriptor
+    return block
 
 
 def load_single_xblock(request, user_id, course_id, usage_key_string, course=None, will_recheck_access=False):
@@ -721,7 +710,7 @@ def load_single_xblock(request, user_id, course_id, usage_key_string, course=Non
     course_key = CourseKey.from_string(course_id)
     usage_key = usage_key.map_into_course(course_key)
     user = User.objects.get(id=user_id)
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+    field_data_cache = FieldDataCache.cache_for_block_descendents(
         course_key,
         user,
         modulestore().get_item(usage_key),
@@ -875,15 +864,15 @@ def _get_usage_key_for_course(course_key, usage_id) -> UsageKey:
         raise Http404("Invalid location") from exc
 
 
-def _get_descriptor_by_usage_key(usage_key):
+def _get_block_by_usage_key(usage_key):
     """
-    Gets a descriptor instance based on a mapped-to-course usage_key
+    Gets a block instance based on a mapped-to-course usage_key
 
     Returns (instance, tracking_context)
     """
     try:
-        descriptor = modulestore().get_item(usage_key)
-        descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
+        block = modulestore().get_item(usage_key)
+        block_orig_usage_key, block_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError as exc:
         log.warning(
             "Invalid location for course id %s: %s",
@@ -895,17 +884,17 @@ def _get_descriptor_by_usage_key(usage_key):
     tracking_context = {
         'module': {
             # xss-lint: disable=python-deprecated-display-name
-            'display_name': descriptor.display_name_with_default_escaped,
-            'usage_key': str(descriptor.location),
+            'display_name': block.display_name_with_default_escaped,
+            'usage_key': str(block.location),
         }
     }
 
     # For blocks that are inherited from a content library, we add some additional metadata:
-    if descriptor_orig_usage_key is not None:
-        tracking_context['module']['original_usage_key'] = str(descriptor_orig_usage_key)
-        tracking_context['module']['original_usage_version'] = str(descriptor_orig_version)
+    if block_orig_usage_key is not None:
+        tracking_context['module']['original_usage_key'] = str(block_orig_usage_key)
+        tracking_context['module']['original_usage_version'] = str(block_orig_version)
 
-    return descriptor, tracking_context
+    return block, tracking_context
 
 
 def get_block_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None,
@@ -917,19 +906,19 @@ def get_block_by_usage_id(request, course_id, usage_id, disable_staff_debug_info
     """
     course_key = CourseKey.from_string(course_id)
     usage_key = _get_usage_key_for_course(course_key, usage_id)
-    descriptor, tracking_context = _get_descriptor_by_usage_key(usage_key)
+    block, tracking_context = _get_block_by_usage_key(usage_key)
 
-    _, user = setup_masquerade(request, course_key, has_access(request.user, 'staff', descriptor, course_key))
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+    _, user = setup_masquerade(request, course_key, has_access(request.user, 'staff', block, course_key))
+    field_data_cache = FieldDataCache.cache_for_block_descendents(
         course_key,
         user,
-        descriptor,
+        block,
         read_only=CrawlersConfig.is_crawler(request),
     )
     instance = get_block_for_descriptor(
         user,
         request,
-        descriptor,
+        block,
         field_data_cache,
         usage_key.course_key,
         disable_staff_debug_info=disable_staff_debug_info,
@@ -980,13 +969,13 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
             block_usage_key = usage_key
 
         # Peek at the handler method to see if it actually wants to check access itself. (The handler may not want
-        # inaccessible blocks stripped from the tree.) This ends up doing two modulestore lookups for the descriptor,
+        # inaccessible blocks stripped from the tree.) This ends up doing two modulestore lookups for the block,
         # but the blocks should be available in the request cache the second time.
         # At the time of writing, this is only used by one handler. If this usage grows, we may want to re-evaluate
         # how we do this to something more elegant. If you are the author of a third party block that decides it wants
         # to set this too, please let us know so we can consider making this easier / better-documented.
-        descriptor, _ = _get_descriptor_by_usage_key(block_usage_key)
-        handler_method = getattr(descriptor, handler, False)
+        block, _ = _get_block_by_usage_key(block_usage_key)
+        handler_method = getattr(block, handler, False)
         will_recheck_access = handler_method and getattr(handler_method, 'will_recheck_access', False)
 
         instance, tracking_context = get_block_by_usage_id(

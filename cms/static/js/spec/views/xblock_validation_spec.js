@@ -39,7 +39,8 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
                 expect(view.$('.validation')).not.toHaveClass(noContainerContent);
 
                 notConfiguredModel = new XBlockValidationModel({
-                    empty: false, summary: {text: 'Not configured', type: model.NOT_CONFIGURED},
+                    empty: false,
+                    summary: {text: 'Not configured', type: model.NOT_CONFIGURED},
                     xblock_id: 'id'
                 },
                 {parse: true}
@@ -63,13 +64,17 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
                 model = new XBlockValidationModel({
                     empty: false,
                     summary: {
-                        text: 'Summary message', type: 'error',
-                        action_label: 'Summary Action', action_class: 'edit-button'
+                        text: 'Summary message',
+                        type: 'error',
+                        action_label: 'Summary Action',
+                        action_class: 'edit-button'
                     },
                     messages: [
                         {
-                            text: 'First message', type: 'warning',
-                            action_label: 'First Message Action', action_runtime_event: 'fix-up'
+                            text: 'First message',
+                            type: 'warning',
+                            action_label: 'First Message Action',
+                            action_runtime_event: 'fix-up'
                         },
                         {text: 'Second message', type: 'error'}
                     ],

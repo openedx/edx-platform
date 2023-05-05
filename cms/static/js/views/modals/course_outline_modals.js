@@ -13,6 +13,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     $, Backbone, _, gettext, BaseView, BaseModal, date, XBlockViewUtils, DateUtils, HtmlUtils, StringUtils
 ) {
     'use strict';
+
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, HighlightsXBlockModal,
         AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, SelfPacedDueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
@@ -109,7 +110,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         keyHandler: function(event) {
-            if (event.which === 27) {  // escape key
+            if (event.which === 27) { // escape key
                 this.hide();
             }
         }
@@ -184,7 +185,6 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('.modal-section .' + tab).show();
         }
     });
-
 
     PublishXBlockModal = CourseOutlineXBlockModal.extend({
         events: _.extend({}, CourseOutlineXBlockModal.prototype.events, {
@@ -405,31 +405,25 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         showProjectedDate: function() {
-            if (!this.getValue() || !course.get('start')) return;
+            if (!this.getValue() || !course.get('start')) { return; }
             var startDate = new Date(course.get('start'));
             // The value returned by toUTCString() is a string in the form Www, dd Mmm yyyy hh:mm:ss GMT
             var startDateList = startDate.toUTCString().split(' ')
             // This text will look like Mmm dd, yyyy (i.e. Jul 26, 2021)
-            this.$("#relative_weeks_due_start_date").text(startDateList[2] + ' ' + startDateList[1] + ', ' + startDateList[3]);
+            this.$('#relative_weeks_due_start_date').text(startDateList[2] + ' ' + startDateList[1] + ', ' + startDateList[3]);
             var projectedDate = new Date(startDate)
             projectedDate.setDate(projectedDate.getDate() + this.getValue()*7);
             var projectedDateList = projectedDate.toUTCString().split(' ');
-            this.$("#relative_weeks_due_projected_due_in").text(projectedDateList[2] + ' ' + projectedDateList[1] + ', ' + projectedDateList[3]);
+            this.$('#relative_weeks_due_projected_due_in').text(projectedDateList[2] + ' ' + projectedDateList[1] + ', ' + projectedDateList[3]);
             this.$('#relative_weeks_due_projected').show();
         },
 
         validateDueIn: function() {
             this.$('#relative_weeks_due_projected').hide();
-            if (this.getValue() > 18){
-                this.$('#relative_weeks_due_warning_max').show();
+            if (this.getValue() < 1) {
+                this.$('#relative_weeks_due_warning_min').show();
                 BaseModal.prototype.disableActionButton.call(this.parent, 'save');
-            }
-            else if (this.getValue() < 1){
-                this.$('#relative_weeks_due_warning_min').show()
-                BaseModal.prototype.disableActionButton.call(this.parent, 'save');
-            }
-            else {
-                this.$('#relative_weeks_due_warning_max').hide();
+            } else {
                 this.$('#relative_weeks_due_warning_min').hide();
                 this.showProjectedDate();
                 BaseModal.prototype.enableActionButton.call(this.parent, 'save');
@@ -440,8 +434,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             AbstractEditor.prototype.afterRender.call(this);
             if (this.model.get('graded')) {
                 this.$('#relative_date_input').show()
-            }
-            else {
+            } else {
                 this.$('#relative_date_input').hide()
             }
             this.$('.field-due-in input').val(this.model.get('relative_weeks_due'));
@@ -451,11 +444,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getRequestData: function() {
             // Grab all the sections, map them to their block_ids, then return as an Array
-            var sectionIds = $('.outline-section').map(function(){return this.id;}).get()
+            var sectionIds = $('.outline-section').map(function(){ return this.id; }).get()
             // Grab all the subsections, map them to their block_ids, then return as an Array
-            var subsectionIds = $('.outline-subsection').map(function(){return this.id;}).get()
+            var subsectionIds = $('.outline-subsection').map(function(){ return this.id; }).get()
             var relative_weeks_due = null;
-            if (this.getValue() < 19 && this.getValue() > 0 && $('#grading_type').val() !== 'notgraded') {
+            if (this.getValue() > 0 && $('#grading_type').val() !== 'notgraded') {
                 relative_weeks_due = this.getValue()
             }
             window.analytics.track('edx.bi.studio.relative_date.saved', {
@@ -1257,7 +1250,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                         advancedTab.editors.push(TimedExaminationPreferenceEditor);
                     }
 
-                    if (typeof(xblockInfo.get('is_prereq')) !== 'undefined') {
+                    if (typeof xblockInfo.get('is_prereq') !== 'undefined') {
                         advancedTab.editors.push(AccessEditor);
                     }
 
@@ -1291,7 +1284,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
          * This function allows comprehensive themes to create custom editors without adding boilerplate code.
          *
          * A simple example theme for this can be found at https://github.com/open-craft/custom-unit-icons-theme
-         **/
+         * */
         getCustomEditModal: function(tabs, editors, xblockInfo, options) {
             return new SettingsXBlockModal($.extend({
                 tabs: tabs,

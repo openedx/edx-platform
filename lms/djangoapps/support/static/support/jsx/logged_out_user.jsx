@@ -13,7 +13,8 @@ function LoggedOutUser({ platformName, loginQuery, supportEmail }) {
                     <p>{StringUtils.interpolate(
                         gettext('Sign in to {platform} so we can help you better.'),
                         { platform: platformName },
-                    )}</p>
+                    )}
+                    </p>
                 </div>
             </div>
 
@@ -30,7 +31,7 @@ function LoggedOutUser({ platformName, loginQuery, supportEmail }) {
 
             <div className="row">
                 <div className="col-sm-12">
-                    <a href="/password_assistance" type="button" class="forgot-password field-link">{gettext('Need help logging in?')}</a>
+                    <a href="/password_assistance" type="button" className="forgot-password field-link">{gettext('Need help logging in?')}</a>
                 </div>
             </div>
         </div>

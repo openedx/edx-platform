@@ -200,8 +200,8 @@
                 user = DiscussionUtil.getUser();
                 flaggers = this.get('abuse_flaggers');
                 return user && (
-                    (__indexOf.call(flaggers, user.id) >= 0) ||
-                    (DiscussionUtil.isPrivilegedUser(user.id) && flaggers.length > 0)
+                    (__indexOf.call(flaggers, user.id) >= 0)
+                    || (DiscussionUtil.isPrivilegedUser(user.id) && flaggers.length > 0)
                 );
             };
 
@@ -388,10 +388,10 @@
                 var user_id;
                 user_id = window.user.get('id');
                 return user_id && (
-                    DiscussionUtil.isPrivilegedUser(user_id) ||
-                    (
-                        this.get('thread').get('thread_type') === 'question' &&
-                        this.get('thread').get('user_id') === user_id
+                    DiscussionUtil.isPrivilegedUser(user_id)
+                    || (
+                        this.get('thread').get('thread_type') === 'question'
+                        && this.get('thread').get('user_id') === user_id
                     )
                 );
             };

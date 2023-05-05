@@ -5,6 +5,7 @@ define([
     'js/financial-assistance/views/financial_assistance_form_view'
 ], function(Backbone, $, FinancialAssistanceModel, FinancialAssistanceFormView) {
     'use strict';
+
     /* jslint maxlen: 500 */
 
     describe('Financial Assistance View', function() {

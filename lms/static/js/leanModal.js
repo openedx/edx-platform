@@ -1,5 +1,7 @@
-(function($) {  // eslint-disable-line wrap-iife
-    'use strict';
+(function($) { // eslint-disable-line wrap-iife
+    
+'use strict';
+
     $.fn.extend({
         /*
          * leanModal prepares an element to be a modal dialog.  Call it once on the
@@ -26,7 +28,7 @@
                 );
             }
 
-            options = $.extend(defaults, options);  // eslint-disable-line no-param-reassign
+            options = $.extend(defaults, options); // eslint-disable-line no-param-reassign
 
             function closeModal(modalId, e) {
                 $('#lean_overlay').fadeOut(200);
@@ -127,11 +129,13 @@
         }
     });
 
-    $(document).ready(function($) {  // eslint-disable-line no-shadow
+    $(document).ready(function($) { // eslint-disable-line no-shadow
         $('button[rel*=leanModal]').each(function() {
             var sep, embed;
 
-            $(this).leanModal({top: 120, overlay: 1, closeButton: '.close-modal', position: 'absolute'});
+            $(this).leanModal({
+                top: 120, overlay: 1, closeButton: '.close-modal', position: 'absolute'
+            });
             embed = $($(this).attr('href')).find('iframe');
             if (embed.length > 0 && embed.attr('src')) {
                 sep = (embed.attr('src').indexOf('?') > 0) ? '&' : '?';

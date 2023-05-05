@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-09 20:35+0000\n"
-"PO-Revision-Date: 2023-04-09 20:35:51.624974\n"
+"POT-Creation-Date: 2023-04-30 20:35+0000\n"
+"PO-Revision-Date: 2023-04-30 20:35:58.645310\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -126,6 +126,13 @@ msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ʍᴉʇɥ ʇɥǝ \"{language_code}\" lɐnƃnɐƃǝ
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
+msgstr "Ɍǝɐdʎ"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -5775,6 +5782,7 @@ msgid "Allow"
 msgstr "Ⱥlløʍ"
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Ɇɹɹøɹ"
@@ -6982,6 +6990,43 @@ msgstr "Wǝ ɔønld nøʇ ɟᴉnd ɐ nsǝɹ ʍᴉʇɥ ʇɥɐʇ ǝɯɐᴉl ɐddɹ
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "This user already has access to this library."
 msgstr "Ŧɥᴉs nsǝɹ ɐlɹǝɐdʎ ɥɐs ɐɔɔǝss ʇø ʇɥᴉs lᴉbɹɐɹʎ."
+
+#: openedx/core/djangoapps/content_staging/data.py
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Łøɐdᴉnƃ"
+
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Expired"
+msgstr "Ɇxdᴉɹǝd"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr "Sʇɐƃǝd Ȼønʇǝnʇ"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+"\n"
+"            Wɥɐʇ ʇʎdǝ øɟ ɔønʇǝnʇ ᴉs sʇɐƃǝd. Ønlʎ ØŁX ɔønʇǝnʇ ᴉs snddøɹʇǝd, ɐnd\n"
+"            ʇɥᴉs ɟᴉǝld ɯnsʇ bǝ ʇɥǝ sɐɯǝ ɐs ʇɥǝ ɹøøʇ ʇɐƃ øɟ ʇɥǝ ØŁX.\n"
+"            ǝ.ƃ. \"ʌᴉdǝø\" ᴉɟ ɐ ʌᴉdǝø ᴉs sʇɐƃǝd, øɹ \"ʌǝɹʇᴉɔɐl\" ɟøɹ ɐ nnᴉʇ.\n"
+"        "
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
+msgstr "Øɹᴉƃᴉnɐl nsɐƃǝ ʞǝʎ/ƗĐ øɟ ʇɥǝ ʇɥᴉnƃ ʇɥɐʇ ᴉs ᴉn ʇɥǝ ɔlᴉdbøɐɹd."
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -12943,6 +12988,14 @@ msgid "Invalid data ({details})"
 msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr "Ŧɥǝɹǝ ʍɐs ɐ dɹøblǝɯ dɐsʇᴉnƃ ʎønɹ ɔøɯdønǝnʇ."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr "Ɏønɹ ɔlᴉdbøɐɹd ᴉs ǝɯdʇʎ øɹ ᴉnʌɐlᴉd."
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ {source_type} ᴉnʇø {target_parent_type}."
@@ -13302,12 +13355,6 @@ msgstr "Ʉdløɐdᴉnƃ"
 msgid "In Progress"
 msgstr "Ɨn Ᵽɹøƃɹǝss"
 
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "Ɍǝɐdʎ"
-
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Uploaded"
@@ -13568,16 +13615,6 @@ msgstr "Ȼønʇǝnʇ"
 #: wiki/templates/wiki/settings.html
 msgid "Settings"
 msgstr "Sǝʇʇᴉnƃs"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Łøɐdᴉnƃ"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -14621,6 +14658,10 @@ msgstr "Ᵽɹǝʌᴉøns dɐƃǝ"
 msgid "Next page"
 msgstr "Nǝxʇ dɐƃǝ"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr "Ᵽɐsʇǝ Ȼøɯdønǝnʇ"
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "Ŧɹɐɔʞᴉnƃ Łøƃ"
@@ -14745,24 +14786,28 @@ msgid "Downloads and transcripts"
 msgstr "Đøʍnløɐds ɐnd ʇɹɐnsɔɹᴉdʇs"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
-
-#: lms/templates/video.html
 msgid "Share on:"
 msgstr "Sɥɐɹǝ øn:"
 
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Twitter"
-msgstr "Ŧʍᴉʇʇǝɹ"
+msgid "Share on Twitter"
+msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Facebook"
+msgstr "Sɥɐɹǝ øn Fɐɔǝbøøʞ"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+#: lms/templates/video.html
+msgid "Share on LinkedIn"
+msgstr "Sɥɐɹǝ øn ŁᴉnʞǝdƗn"
 
 #: lms/templates/video.html
-msgid "Facebook"
-msgstr "Fɐɔǝbøøʞ"
-
-#: lms/templates/video.html
-msgid "Linkedin"
-msgstr "Łᴉnʞǝdᴉn"
+msgid "Download video file"
+msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16101,11 +16146,6 @@ msgid "Post on Facebook"
 msgstr "Ᵽøsʇ øn Fɐɔǝbøøʞ"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
-
-#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "Ŧʍǝǝʇ ʇɥᴉs Ⱥɔɔøɯdlᴉsɥɯǝnʇ. Ᵽød nd ʍᴉndøʍ."
 
@@ -17132,10 +17172,6 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "Ⱥdd Ȼǝɹʇᴉɟᴉɔɐʇǝ ʇø ŁᴉnʞǝdƗn Ᵽɹøɟᴉlǝ"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Share on LinkedIn"
-msgstr "Sɥɐɹǝ øn ŁᴉnʞǝdƗn"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr "Ɏøn ɐɹǝ nøʇ ʎǝʇ ǝlᴉƃᴉblǝ ɟøɹ ɐ ɔǝɹʇᴉɟᴉɔɐʇǝ."
 
@@ -17210,10 +17246,6 @@ msgstr "Ɨ'ɯ ʇɐʞᴉnƃ {course_name} ønlᴉnǝ ʍᴉʇɥ {facebook_brand}. 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "Sɥɐɹǝ {course_name} øn Fɐɔǝbøøʞ"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Facebook"
-msgstr "Sɥɐɹǝ øn Fɐɔǝbøøʞ"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
@@ -21117,10 +21149,10 @@ msgstr "Łøɔɐʇᴉøn ƗĐ"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
 "Ŧø ɔɹǝɐʇǝ ɐ lᴉnʞ ʇø ʇɥᴉs nnᴉʇ ɟɹøɯ ɐn ĦŦMŁ ɔøɯdønǝnʇ ᴉn ʇɥᴉs ɔønɹsǝ, ǝnʇǝɹ "
-"\"/ɾnɯd_ʇø_ᴉd/<location ID>\" ɐs ʇɥǝ ɄɌŁ ʌɐlnǝ."
+"{unit_link} ɐs ʇɥǝ ɄɌŁ ʌɐlnǝ."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -21308,11 +21340,13 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
-"Ŧɥᴉs ɔønɹsǝ ɹnn ᴉs nsᴉnƃ ɐn ndƃɹɐdǝd ʌǝɹsᴉøn øɟ ǝdx dᴉsɔnssᴉøn ɟøɹnɯ. "
-"Đᴉsɔnssᴉøn xbløɔʞs ʍᴉll nø lønƃǝɹ ʍøɹʞ."
+"Ŧɥᴉs ɔønɹsǝ ɹnn ᴉs nsᴉnƃ ɐn ndƃɹɐdǝd ʌǝɹsᴉøn øɟ ǝdx dᴉsɔnssᴉøn ɟøɹnɯ. Ɨn "
+"øɹdǝɹ ʇø dᴉsdlɐʎ ʇɥǝ dᴉsɔnssᴉøns sᴉdǝbɐɹ, dᴉsɔnssᴉøns xɃløɔʞs ʍᴉll nø lønƃǝɹ"
+" bǝ ʌᴉsᴉblǝ ʇø lǝɐɹnǝɹs."
 
 #: cms/templates/course_outline.html
 msgid " Learn more"

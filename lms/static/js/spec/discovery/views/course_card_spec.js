@@ -4,7 +4,6 @@ define([
 ], function($, TemplateHelpers, CourseCard, CourseCardView) {
     'use strict';
 
-
     var JSON_RESPONSE = {
         total: 365,
         results: [

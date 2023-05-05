@@ -102,53 +102,53 @@
 
                     switch (group) {
                     case MESSAGE_GROUP.successfully_added:
-                        text = qty > 1 ?
-                            gettext(qty + ' learners were successfully added to exception list') :
-                            gettext(qty + ' learner was successfully added to the exception list');
+                        text = qty > 1
+                            ? gettext(qty + ' learners were successfully added to exception list')
+                            : gettext(qty + ' learner was successfully added to the exception list');
                         break;
 
                     case MESSAGE_GROUP.data_format_error:
-                        text = qty > 1 ?
-                            gettext(qty + ' records are not in the correct format and have not been added to' +
-                                    ' the exception list') :
-                            gettext(qty + ' record is not in the correct format and has not been added to the' +
-                                    ' exception list');
+                        text = qty > 1
+                            ? gettext(qty + ' records are not in the correct format and have not been added to'
+                                    + ' the exception list')
+                            : gettext(qty + ' record is not in the correct format and has not been added to the'
+                                    + ' exception list');
                         break;
 
                     case MESSAGE_GROUP.user_not_exist:
-                        text = qty > 1 ?
-                            gettext(qty + ' learner accounts cannot be found and have not been added to the ' +
-                                    'exception list') :
-                            gettext(qty + ' learner account cannot be found and has not been added to the' +
-                                    ' exception list');
+                        text = qty > 1
+                            ? gettext(qty + ' learner accounts cannot be found and have not been added to the '
+                                    + 'exception list')
+                            : gettext(qty + ' learner account cannot be found and has not been added to the'
+                                    + ' exception list');
                         break;
 
                     case MESSAGE_GROUP.user_already_allowlisted:
-                        text = qty > 1 ?
-                            gettext(qty + ' learners already appear on the exception list in this course') :
-                            gettext(qty + ' learner already appears on the exception list in this course');
+                        text = qty > 1
+                            ? gettext(qty + ' learners already appear on the exception list in this course')
+                            : gettext(qty + ' learner already appears on the exception list in this course');
                         break;
 
                     case MESSAGE_GROUP.user_not_enrolled:
-                        text = qty > 1 ?
-                            gettext(qty + ' learners are not enrolled in this course and have not added to the' +
-                                    ' exception list') :
-                            gettext(qty + ' learner is not enrolled in this course and has not been added to the' +
-                                    ' exception list');
+                        text = qty > 1
+                            ? gettext(qty + ' learners are not enrolled in this course and have not added to the'
+                                    + ' exception list')
+                            : gettext(qty + ' learner is not enrolled in this course and has not been added to the'
+                                    + ' exception list');
                         break;
 
                     case MESSAGE_GROUP.user_on_certificate_invalidation_list:
-                        text = qty > 1 ?
-                            gettext(qty + ' learners have an active certificate invalidation in this course and' +
-                                    ' have not been added to the exception list') :
-                            gettext(qty + ' learner has an active certificate invalidation in this course and has' +
-                                    ' not been added to the exception list');
+                        text = qty > 1
+                            ? gettext(qty + ' learners have an active certificate invalidation in this course and'
+                                    + ' have not been added to the exception list')
+                            : gettext(qty + ' learner has an active certificate invalidation in this course and has'
+                                    + ' not been added to the exception list');
                         break;
 
                     default:
-                        text = qty > 1 ?
-                            gettext(qty + ' learners encountered unknown errors') :
-                            gettext(qty + ' learner encountered an unknown error');
+                        text = qty > 1
+                            ? gettext(qty + ' learners encountered unknown errors')
+                            : gettext(qty + ' learner encountered an unknown error');
                         break;
                     }
 
@@ -215,8 +215,7 @@
                         );
                     }
                     if (row_errors.user_on_certificate_invalidation_list.length) {
-                        UserOnCertificateInvalidationList =
-                                row_errors.user_on_certificate_invalidation_list;
+                        UserOnCertificateInvalidationList = row_errors.user_on_certificate_invalidation_list;
                         generateDiv(
                             MESSAGE_GROUP.user_on_certificate_invalidation_list,
                             getDisplayText(

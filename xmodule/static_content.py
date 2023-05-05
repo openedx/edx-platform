@@ -147,10 +147,8 @@ def _write_styles(selector, output_root, classes, css_attribute):
         for class_ in classes:
             css_imports[class_].add(fragment_name)
 
-    module_styles_lines = [
-        "@import 'bourbon/bourbon';",
-        "@import 'lms/theme/variables';",
-    ]
+    module_styles_lines = []
+
     for class_, fragment_names in sorted(css_imports.items()):
         fragment_names = sorted(fragment_names)
         module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(

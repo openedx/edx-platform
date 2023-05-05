@@ -14,7 +14,7 @@ class CircleChart extends React.Component {
         this.getCenter = this.getCenter.bind(this);
         this.getSlices = this.getSlices.bind(this);
     }
-  
+
     getCenter() {
         const {centerHole, sliceBorder} = this.props;
         if (centerHole) {
@@ -26,7 +26,7 @@ class CircleChart extends React.Component {
     }
 
     getSlices(slices, sliceBorder) {
-        const total = slices.reduce((totalValue, { value }) => totalValue + value, 0);
+        const total = slices.reduce((totalValue, {value}) => totalValue + value, 0);
         const {strokeColor, strokeWidth} = sliceBorder;
 
         let radSegment = 0;
@@ -34,15 +34,17 @@ class CircleChart extends React.Component {
         let lastY = 0;
 
         // Reverse a copy of the array so order start at 12 o'clock
-        return slices.slice(0).reverse().map(({ value, sliceIndex }, index) => {
+        return slices.slice(0).reverse().map(({value, sliceIndex}, index) => {
             // Should we just draw a circle?
             if (value === total) {
                 return (
-                    <circle r={radius}
+                    <circle
+                        r={radius}
                         cx={center}
                         cy={center}
                         className="slice-1"
-                        key={index} />
+                        key={index}
+                    />
                 );
             }
 
@@ -78,11 +80,14 @@ class CircleChart extends React.Component {
             lastX = nextX;
             lastY = nextY;
 
-            return <path d={d}
+            // eslint-disable-next-line react/jsx-indent
+            return <path
+                d={d}
                 className={`slice-${sliceIndex}`}
                 key={index}
                 stroke={strokeColor}
-                strokeWidth={strokeWidth} />;
+                strokeWidth={strokeWidth}
+            />;
         });
     }
 

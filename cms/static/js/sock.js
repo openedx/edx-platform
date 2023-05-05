@@ -38,4 +38,4 @@ domReady(function () {
     $('.cta-show-sock').bind('click', toggleSock);
 });
 
-export { toggleSock }
+export {toggleSock}

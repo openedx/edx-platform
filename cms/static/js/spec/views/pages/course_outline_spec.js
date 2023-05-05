@@ -41,7 +41,7 @@ describe('CourseOutlinePage', function() {
             user_partitions: [],
             user_partition_info: {},
             highlights_enabled: true,
-            highlights_enabled_for_messaging: false
+            highlights_enabled_for_messaging: false,
         }, options, {child_info: {children: children}});
     };
 
@@ -308,7 +308,7 @@ describe('CourseOutlinePage', function() {
             'staff-lock-editor', 'unit-access-editor', 'discussion-editor', 'content-visibility-editor',
             'settings-modal-tabs', 'timed-examination-preference-editor', 'access-editor',
             'show-correctness-editor', 'highlights-editor', 'highlights-enable-editor',
-            'course-highlights-enable'
+            'course-highlights-enable', 'course-video-sharing-enable'
         ]);
         appendSetFixtures(mockOutlinePage);
         mockCourseJSON = createMockCourseJSON({}, [
@@ -678,7 +678,6 @@ describe('CourseOutlinePage', function() {
             });
         });
 
-
         describe('Section Highlights', function() {
             var mockHighlightValues, highlightsLink, highlightInputs, openHighlights, saveHighlights,
                 cancelHighlights, setHighlights, expectHighlightLinkNumberToBe, expectHighlightsToBe,
@@ -837,6 +836,52 @@ describe('CourseOutlinePage', function() {
                 editedHighlights[2] = 'A New Value';
                 expectHighlightsToUpdate(originalHighlights, editedHighlights);
             });
+        });
+    });
+
+    describe('Video sharing', function() {
+        beforeEach(function() {
+            setSelfPaced();
+        });
+
+        const createCourse = function(courseOptions) {
+            createCourseOutlinePage(this,
+                createMockCourseJSON(courseOptions)
+            );
+        };
+
+        const selectedOption = function() {
+            return $('select#video-sharing-configuration-options>option[selected="true"]');
+        };
+
+        it('displays video sharing link when enabled', function() {
+            createCourse({
+                video_sharing_enabled: true,
+                video_sharing_options: 'all-on',
+                video_sharing_doc_url: 'http://rick.roll'
+            });
+            expect($('.course-video-sharing')).toExist();
+            expect(selectedOption().val()).toEqual('all-on');
+        });
+
+        it('if option invalid, none is selected', function() {
+            createCourse({
+                video_sharing_enabled: true,
+                video_sharing_options: 'invalid-option',
+                video_sharing_doc_url: 'http://rick.roll'
+            });
+            expect($('.course-video-sharing')).toExist();
+            expect(selectedOption()).not.toExist();
+        });
+
+        it('will not display video sharing link when disabled', function() {
+            createCourse({
+                video_sharing_enabled: false,
+                video_sharing_options: 'all-on',
+                video_sharing_doc_url: 'http://rick.roll'
+            });
+            expect($('div.course-video-sharing')).not.toExist();
+            expect(selectedOption()).not.toExist();
         });
     });
 
@@ -2246,13 +2291,6 @@ describe('CourseOutlinePage', function() {
             it('shows validation error on relative date', function() {
                 outlinePage.$('.outline-subsection .configure-button').click();
 
-                // when due number of weeks goes over 18
-                selectRelativeWeeksSubsection('19');
-                expect($('#relative_weeks_due_warning_max').css('display')).not.toBe('none');
-                expect($('#relative_weeks_due_warning_max')).toContainText('The maximum number of weeks this subsection can be due in is 18 weeks from the learner enrollment date.');
-                expect($('.wrapper-modal-window .action-save').prop('disabled')).toBe(true);
-                expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(true);
-
                 // when due number of weeks is less than 1
                 selectRelativeWeeksSubsection('-1');
                 expect($('#relative_weeks_due_warning_min').css('display')).not.toBe('none');
@@ -2261,8 +2299,7 @@ describe('CourseOutlinePage', function() {
                 expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(true);
 
                 // when no validation error should show up
-                selectRelativeWeeksSubsection('10');
-                expect($('#relative_weeks_due_warning_max').css('display')).toBe('none');
+                selectRelativeWeeksSubsection('19');
                 expect($('#relative_weeks_due_warning_min').css('display')).toBe('none');
                 expect($('.wrapper-modal-window .action-save').prop('disabled')).toBe(false);
                 expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(false);

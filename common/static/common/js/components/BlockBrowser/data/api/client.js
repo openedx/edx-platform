@@ -20,15 +20,13 @@ export function buildQueryString(data) {
         .join('&');
 }
 
-export const getCourseBlocks = courseId => fetch(
-    `${COURSE_BLOCKS_API}?${buildQueryString({
-        course_id: courseId,
-        all_blocks: true,
-        depth: 'all',
-        requested_fields: ['name', 'display_name', 'block_type', 'children'],
-    })}`, {
-        credentials: 'same-origin',
-        method: 'get',
-        headers: HEADERS,
-    },
-);
+export const getCourseBlocks = courseId => fetch(`${COURSE_BLOCKS_API}?${buildQueryString({
+    course_id: courseId,
+    all_blocks: true,
+    depth: 'all',
+    requested_fields: ['name', 'display_name', 'block_type', 'children'],
+})}`, {
+    credentials: 'same-origin',
+    method: 'get',
+    headers: HEADERS,
+},);
