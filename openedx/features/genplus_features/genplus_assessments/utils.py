@@ -19,7 +19,7 @@ class StudentResponse:
 
     def __init__(self):
         self.problem_function_map = {
-            ProblemTypes.JOURNAL: self.__create_and_update_journal_post_from_lms,
+            ProblemTypes.JOURNAL: self.create_and_update_journal_post_from_lms,
         }
 
     def save_problem_response(self, problem_block, student_response):
@@ -50,7 +50,7 @@ class StudentResponse:
                     problem_function(student, problem_block, student_response)
                     break
 
-    def __create_and_update_journal_post_from_lms(self, student, problem_block, student_response):
+    def create_and_update_journal_post_from_lms(self, student, problem_block, student_response):
         if not problem_block.is_journal_entry:
             return
 
@@ -71,22 +71,15 @@ class StudentResponse:
         for key, value in student_response.items():
             if not value:
                 continue
-
+            uuid = key.split('input_')[-1]
+            title = problem.find(f".//label[@for='{key}']").text
             answer = json.loads(JOURNAL_STYLE.format(value), strict=False)
-            journal_entry_values = {
-                'title': problem.find(f".//label[@for='{key}']").text,
-                'description': json.dumps(answer),
-            }
-            journal_entry_values.update(defaults)
-            try:
-                obj = JournalPost.objects.get(id=key)
-                for key, value in journal_entry_values.items():
-                    setattr(obj, key, value)
-                obj.save()
-            except JournalPost.DoesNotExist:
-                journal_entry_values['id'] = key
-                obj = JournalPost(**journal_entry_values)
-                obj.save()
+            obj, created = JournalPost.objects.update_or_create(
+                uuid=uuid,
+                title=title,
+                description=json.dumps(answer),
+                defaults=defaults
+            )
 
 
 def build_problem_list(course_blocks, root, path=None):
