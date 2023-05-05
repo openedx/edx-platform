@@ -69,7 +69,7 @@ describe('Program Progress View', () => {
         expect(
             view.$('.js-subscription-info .subscription-section p:nth-child(2)')
         ).toContainText(
-            /Need help\? Check out the.*Learner help centre.*to troubleshoot issues or contact support/
+            /Need help\? Check out the.*Learner Help Center.*to troubleshoot issues or contact support/
         );
         expect(
             view.$('.js-subscription-info .subscription-section p:nth-child(2) .subscription-link').attr('href')

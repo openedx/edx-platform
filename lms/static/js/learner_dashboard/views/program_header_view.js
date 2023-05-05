@@ -41,9 +41,12 @@ class ProgramHeaderView extends Backbone.View {
     }
 
     getIsSubscribed() {
+        const isSubscriptionEligible = this.model.get('isSubscriptionEligible');
+        const subscriptionData = this.model.get('subscriptionData')?.[0];
+
         return (
-            this.model.get('isSubscriptionEligible') &&
-            this.model.get('subscriptionData')?.[0]?.subscription_state === 'active'
+            isSubscriptionEligible &&
+            subscriptionData?.subscription_state === 'active'
         );
     }
 

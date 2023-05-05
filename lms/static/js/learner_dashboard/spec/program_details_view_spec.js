@@ -517,19 +517,21 @@ describe('Program Details View', () => {
     const data = options.programData;
 
     const testSubscriptionState = (state, heading, body, trial = false) => {
+        const subscriptionData = {
+            ...options.subscriptionData[0],
+            subscription_state: state,
+        };
+        if (trial) {
+            subscriptionData.trial_end = moment().add(3, 'days').utc().format(
+                'YYYY-MM-DDTHH:mm:ss[Z]'
+            );
+        }
         view = initView({
             programData: $.extend({}, options.programData, {
                 subscription_eligible: true,
             }),
             isUserB2CSubscriptionsEnabled: true,
-            subscriptionData: [
-                $.extend({}, options.subscriptionData[0], {
-                    subscription_state: state,
-                    ...(trial && {
-                        trial_end: moment().add(3, 'days').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
-                    }),
-                }),
-            ],
+            subscriptionData: [subscriptionData],
         });
         view.render();
         expect(view.$('.upgrade-subscription')[0]).toBeInDOM();
@@ -579,7 +581,7 @@ describe('Program Details View', () => {
             .replace(/\s+/g, ' ')).toEqual(
                 'Track and plan your progress through the 3 courses in this program. '
                 + 'To complete the program, you must earn a verified certificate for each course.',
-        );
+            );
     });
 
     it('should render the program heading congratulations message if all courses completed', () => {

@@ -23,13 +23,13 @@
         <div class="subscription-section">
             <p class="my-0">
                 <%= HtmlUtils.interpolateHtml(
-                    gettext((
+                    gettext(
                         subscriptionState === 'active'
-                        ? 'View your receipts or modify your subscription'
+                        ? 'View your receipts or modify your subscription on the {a_start}Orders and subscriptions{a_end} page'
                         : subscriptionState === 'inactive'
-                        ? 'Restart your subscription for {subscriptionPrice}/month. Your payment history is still available'
-                        : 'If you had a subscription previously, your payment history is still available'
-                    ).concat(' on the {a_start}Orders and subscriptions{a_end} page')),
+                        ? 'Restart your subscription for {subscriptionPrice}/month. Your payment history is still available on the {a_start}Orders and subscriptions{a_end} page'
+                        : 'If you had a subscription previously, your payment history is still available on the {a_start}Orders and subscriptions{a_end} page'
+                    ),
                     {
                         subscriptionPrice,
                         a_start: HtmlUtils.HTML(`<a class="subscription-link" href="${manage_subscription_url}">`),
@@ -40,10 +40,10 @@
             <p class="my-0">
                 <%= HtmlUtils.interpolateHtml(
                     gettext(
-                        'Need help? Check out the {a_start}Learner help centre{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact support '
+                        'Need help? Check out the {a_start}Learner Help Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact support '
                     ),
                     {
-                        a_start: HtmlUtils.HTML(`<a class="subscription-link" href="${subscriptions_learner_help_center_url}">`),
+                        a_start: HtmlUtils.HTML(`<a class="subscription-link" href="${subscriptions_learner_help_center_url}" target="_blank" rel="noopener noreferrer">`),
                         a_end: HtmlUtils.HTML('</a>'),
                         span_start: HtmlUtils.HTML('<span class="subscription-icon-arrow-upright">'),
                         icon: HtmlUtils.HTML(arrowUprightIcon),
