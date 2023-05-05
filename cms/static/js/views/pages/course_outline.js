@@ -4,11 +4,13 @@
 define([
     'jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'js/views/utils/xblock_utils',
     'js/views/course_outline', 'common/js/components/utils/view_utils', 'common/js/components/views/feedback_alert',
-    'common/js/components/views/feedback_notification', 'js/views/course_highlights_enable'],
+    'common/js/components/views/feedback_notification', 'js/views/course_highlights_enable', 'js/views/course_video_sharing_enable'],
 function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView, NoteView,
-    CourseHighlightsEnableView
+    CourseHighlightsEnableView,
+    CourseVideoSharingEnableView
 ) {
     'use strict';
+
     var expandedLocators, CourseOutlinePage;
 
     CourseOutlinePage = BasePage.extend({
@@ -93,6 +95,15 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
                 this.highlightsEnableView.render();
             }
 
+            // if video sharing enable
+            if (this.model.get('video_sharing_enabled')) {
+                this.videoSharingEnableView = new CourseVideoSharingEnableView({
+                    el: this.$('.status-video-sharing-enabled'),
+                    model: this.model
+                });
+                this.videoSharingEnableView.render();
+            }
+
             this.outlineView = new this.outlineViewClass({
                 el: this.$('.outline'),
                 model: this.model,
@@ -117,7 +128,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         scrollToElement: function () {
             this.findElementPollingTimeout -= this.pollingDelay;
 
-            const elementID = window.location.hash.replace("#", "");
+            const elementID = window.location.hash.replace('#', '');
 
             if (this.findElementPollingTimeout > 0) {
                 if (elementID) {

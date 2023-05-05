@@ -320,6 +320,22 @@
     }
   }
 }
+// New "Paste component" menu, shown on the Unit page to users with a component in their clipboard
+.paste-component {
+  margin: $baseline ($baseline/2);
+
+  .paste-component-button {
+    display: block;
+    width: 100%;
+    // Override what we're extending from ui-btn-flat-outline:
+    &.button {
+      font-size: 1.5rem;
+      padding: 10px 0;
+    }
+
+    @extend %ui-btn-flat-outline;
+  }
+}
 
 // outline UI
 // --------------------

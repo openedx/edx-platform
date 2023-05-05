@@ -1,6 +1,7 @@
 /* globals Discussion, DiscussionSpecHelper, DiscussionThreadProfileView, Thread */
 (function() {
     'use strict';
+
     describe('DiscussionThreadProfileView', function() {
         var checkBody, checkPostWithImages, makeThread, makeView, spyConvertMath;
         beforeEach(function() {
@@ -66,8 +67,8 @@
             }
             threadData.body = threadData.body + '<em>' + testText + '</em></p>';
             if (numberOfImages > 1) {
-                expectedHtml = expectedHtml + '<em>' + expectedText +
-                    '</em></p><p><em>Some images in this post have been omitted</em></p>';
+                expectedHtml = expectedHtml + '<em>' + expectedText
+                    + '</em></p><p><em>Some images in this post have been omitted</em></p>';
             } else {
                 expectedHtml = expectedHtml + '<em>' + expectedText + '</em></p>';
             }
@@ -127,8 +128,8 @@
                 for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
                     truncatedText = _ref1[_j];
                     it(
-                        'body with ' + numImages + ' images and ' + (truncatedText ? 'truncated' : 'untruncated') +
-                        ' text',
+                        'body with ' + numImages + ' images and ' + (truncatedText ? 'truncated' : 'untruncated')
+                        + ' text',
                         // eslint-disable no-loop-func
                         function() {
                             return checkPostWithImages(numImages, truncatedText, this.threadData, this.imageTag);

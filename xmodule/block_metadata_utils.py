@@ -34,7 +34,7 @@ def display_name_with_default(block):
     a name based on the URL.
 
     Unlike the rest of this module's functions, this function takes an entire
-    course descriptor/overview as a parameter. This is because a few test cases
+    course block/overview as a parameter. This is because a few test cases
     (specifically, {Text|Image|Video}AnnotationModuleTestCase.test_student_view)
     create scenarios where course.display_name is not None but course.location
     is None, which causes calling course.url_name to fail. So, although we'd

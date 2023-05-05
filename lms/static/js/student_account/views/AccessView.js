@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'utility',
@@ -146,8 +147,8 @@
                         method: data.method,
                         url: data.submit_url
                     });
-                    var isTpaSaml = this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl ?
-                        this.thirdPartyAuth.finishAuthUrl.indexOf('tpa-saml') >= 0 : false;
+                    var isTpaSaml = this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl
+                        ? this.thirdPartyAuth.finishAuthUrl.indexOf('tpa-saml') >= 0 : false;
 
                     this.subview.login = new LoginView({
                         fields: data.fields,

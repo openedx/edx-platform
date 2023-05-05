@@ -93,7 +93,7 @@ class LibrarySourcedBlockPicker extends React.Component {
             searchedLibrary: event.target.value,
         });
         if (!this.debouncedFetchLibraries) {
-            this.debouncedFetchLibraries =  _.debounce(value => {
+            this.debouncedFetchLibraries = _.debounce(value => {
                 this.fetchLibraries(value);
             }, 300);
         }
@@ -103,7 +103,7 @@ class LibrarySourcedBlockPicker extends React.Component {
     onXBlockSearchInput(event) {
         event.persist()
         if (!this.debouncedFetchXblocks) {
-            this.debouncedFetchXblocks =  _.debounce(value => {
+            this.debouncedFetchXblocks = _.debounce(value => {
                 this.fetchXblocks(this.state.selectedLibrary, value);
             }, 300);
         }
@@ -153,14 +153,14 @@ class LibrarySourcedBlockPicker extends React.Component {
         return (
             <section>
                 <div className="container-message wrapper-message">
-                    <div className="message has-warnings" style={{margin: 0, color: "white"}}>
+                    <div className="message has-warnings" style={{margin: 0, color: 'white'}}>
                         <p className="warning">
                             <span className="icon fa fa-warning" aria-hidden="true"></span>
-                Hitting 'Save and Import' will import the latest versions of the selected blocks, overwriting any changes done to this block post-import.
+                            Hitting 'Save and Import' will import the latest versions of the selected blocks, overwriting any changes done to this block post-import.
                         </p>
                     </div>
                 </div>
-                <div style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
+                <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
                     <div className={styles.column}>
                         <input type="text" className={[styles.search]} aria-label="Search for library" placeholder="Search for library" label="Search for library" name="librarySearch" onChange={this.onLibrarySearchInput}/>
                         <div className={styles.elementList} onChange={this.onLibrarySelected}>
@@ -194,7 +194,7 @@ class LibrarySourcedBlockPicker extends React.Component {
                         <ul>
                             {
                                 Array.from(this.state.selectedXblocks).map(block => (
-                                    <li key={block} className={styles.element} style={{display: "flex"}}>
+                                    <li key={block} className={styles.element} style={{display: 'flex'}}>
                                         <label className={styles.elementItem}>
                                             {block}
                                         </label>
@@ -220,4 +220,4 @@ LibrarySourcedBlockPicker.defaultProps = {
     selectedXblocks: [],
 };
 
-export { LibrarySourcedBlockPicker }; // eslint-disable-line import/prefer-default-export
+export {LibrarySourcedBlockPicker}; // eslint-disable-line import/prefer-default-export

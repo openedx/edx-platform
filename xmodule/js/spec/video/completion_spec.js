@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     describe('VideoPlayer completion', function() {
         var state, oldOTBD, completionAjaxCall;
 

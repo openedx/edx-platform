@@ -11,6 +11,7 @@ define(
     ],
     function($, _, Backbone, AjaxHelpers, Utils, Editor, VideoList, MetadataModel, AbstractEditor, MessageManager) {
         'use strict';
+
         describe('CMS.Views.Metadata.VideoList', function() {
             var videoListEntryTemplate = readFixtures(
                     'video/transcripts/metadata-videolist-entry.underscore'
@@ -66,7 +67,6 @@ define(
                 waitForEvent,
                 createVideoListView;
 
-
             var createMockAjaxServer = function() {
                 var mockServer = AjaxHelpers.server(
                     [
@@ -80,7 +80,7 @@ define(
             };
 
             beforeEach(function() {
-                var tpl = sandbox({  // eslint-disable-line no-undef
+                var tpl = sandbox({ // eslint-disable-line no-undef
                     class: 'component',
                     'data-locator': component_locator
                 });
@@ -164,8 +164,8 @@ define(
                 var triggerCallArgs;
                 return jasmine.waitUntil(function() {
                     triggerCallArgs = Backbone.trigger.calls.mostRecent().args;
-                    return Backbone.trigger.calls.count() === 1 &&
-                    triggerCallArgs[0] === 'transcripts:basicTabFieldChanged';
+                    return Backbone.trigger.calls.count() === 1
+                    && triggerCallArgs[0] === 'transcripts:basicTabFieldChanged';
                 });
             };
 
@@ -173,7 +173,7 @@ define(
                 var $container, editor, model, videoListView;
 
                 appendSetFixtures(
-                    sandbox({  // eslint-disable-line no-undef
+                    sandbox({ // eslint-disable-line no-undef
                         class: 'wrapper-comp-settings basic_metadata_edit',
                         'data-metadata': JSON.stringify({video_url: modelStub, edx_video_id: videoIDStub})
                     })
@@ -214,7 +214,6 @@ define(
                 });
             };
 
-
             it('Initialize', function(done) {
                 var view = createVideoListView(this.mockServer),
                     callArgs;
@@ -248,7 +247,7 @@ define(
                         abstractEditor.render.calls.reset();
                         Utils.command.calls.reset();
                         MessageManager.prototype.render.calls.reset();
-                        mockServer.requests.length = 0;  // eslint-disable-line no-param-reassign
+                        mockServer.requests.length = 0; // eslint-disable-line no-param-reassign
                     };
 
                 afterEach(function() {
@@ -643,8 +642,8 @@ define(
                         .always(done);
                 });
 
-                it('On filling less than 3 fields, remaining fields should have ' +
-'placeholders for video types that were not filled yet',
+                it('On filling less than 3 fields, remaining fields should have '
++ 'placeholders for video types that were not filled yet',
                 function(done) {
                     var view = createVideoListView(this.mockServer),
                         defaultPlaceholders = view.placeholders;

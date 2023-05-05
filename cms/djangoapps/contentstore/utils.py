@@ -2,6 +2,7 @@
 Common utility functions useful throughout the contentstore
 """
 
+from collections import defaultdict
 import logging
 from contextlib import contextmanager
 from datetime import datetime
@@ -20,6 +21,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -370,7 +372,7 @@ def get_split_group_display_name(xblock, course):
 
     Arguments:
         xblock (XBlock): The courseware component.
-        course (XBlock): The course descriptor.
+        course (XBlock): The course block.
 
     Returns:
         group name (String): Group name of the matching group xblock.
@@ -397,14 +399,14 @@ def get_user_partition_info(xblock, schemes=None, course=None):
         schemes (iterable of str): If provided, filter partitions to include only
             schemes with the provided names.
 
-        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+        course (XBlock): The course block.  If provided, uses this to look up the user partitions
             instead of loading the course.  This is useful if we're calling this function multiple
             times for the same course want to minimize queries to the modulestore.
 
     Returns: list
 
     Example Usage:
-    >>> get_user_partition_info(block, schemes=["cohort", "verification"])
+    >>> get_user_partition_info(xblock, schemes=["cohort", "verification"])
     [
         {
             "id": 12345,
@@ -507,7 +509,7 @@ def get_visibility_partition_info(xblock, course=None):
     Arguments:
         xblock (XBlock): The component being edited.
 
-        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+        course (XBlock): The course block.  If provided, uses this to look up the user partitions
             instead of loading the course.  This is useful if we're calling this function multiple
             times for the same course want to minimize queries to the modulestore.
 
@@ -567,8 +569,8 @@ def get_xblock_aside_instance(usage_key):
     :param usage_key: Usage key of aside xblock
     """
     try:
-        descriptor = modulestore().get_item(usage_key.usage_key)
-        for aside in descriptor.runtime.get_asides(descriptor):
+        xblock = modulestore().get_item(usage_key.usage_key)
+        for aside in xblock.runtime.get_asides(xblock):
             if aside.scope_ids.block_type == usage_key.aside_type:
                 return aside
     except ItemNotFoundError:
@@ -731,3 +733,35 @@ def translation_language(language):
             translation.activate(previous)
     else:
         yield
+
+
+def get_subsections_by_assignment_type(course_key):
+    """
+    Construct a dictionary mapping each found assignment type in the course
+    to a list of dictionaries with the display name of the subsection and
+    the display name of the section they are in
+    """
+    subsections_by_assignment_type = defaultdict(list)
+
+    with modulestore().bulk_operations(course_key):
+        course = modulestore().get_course(course_key, depth=3)
+        sections = course.get_children()
+        for section in sections:
+            subsections = section.get_children()
+            for subsection in subsections:
+                if subsection.format:
+                    subsections_by_assignment_type[subsection.format].append(
+                        f'{section.display_name} - {subsection.display_name}'
+                    )
+    return subsections_by_assignment_type
+
+
+def update_course_discussions_settings(course_key):
+    """
+    Updates course provider_type when new course is created
+    """
+    provider = DiscussionsConfiguration.get(context_key=course_key).provider_type
+    store = modulestore()
+    course = store.get_course(course_key)
+    course.discussions_settings['provider_type'] = provider
+    store.update_item(course, course.published_by)

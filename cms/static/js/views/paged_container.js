@@ -98,7 +98,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                 success: function(fragment) {
                     var originalDone = options.done;
                     options.done = function() {
-                        self.processPaging({ requested_page: options.page_number });
+                        self.processPaging({requested_page: options.page_number});
                         self.page.updatePreviewButton(self.collection.showChildrenPreviews);
                         self.page.renderAddXBlockComponents();
                         if (options.force_render) {
@@ -257,7 +257,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
         },
 
         sortDisplayName: function() {
-            return gettext('Date added');  // TODO add support for sorting
+            return gettext('Date added'); // TODO add support for sorting
         },
 
         togglePreviews: function() {

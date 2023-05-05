@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'gettext', 'underscore', 'js/edxnotes/views/note_group', 'js/edxnotes/views/tab_panel',
         'js/edxnotes/views/tab_view', 'edx-ui-toolkit/js/utils/html-utils'

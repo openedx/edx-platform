@@ -85,8 +85,8 @@ class UnenrollView extends Backbone.View {
                 encodeURIComponent($('#unenroll_course_id').val())}&enrollment_action=unenroll`;
         } else {
             $('#unenroll_error').text(
-                gettext('Unable to determine whether we should give you a refund because' +
-                ' of System Error. Please try again later.'),
+                gettext('Unable to determine whether we should give you a refund because'
+                + ' of System Error. Please try again later.'),
             ).stop()
                 .css('display', 'block');
         }

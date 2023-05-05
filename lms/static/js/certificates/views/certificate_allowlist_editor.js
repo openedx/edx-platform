@@ -3,6 +3,7 @@
 
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -65,7 +66,7 @@
                         _.template(message)({user: (user_name || user_email)})
                     );
                 } else if (certificate_exception.isValid()) {
-                    message = gettext('<%- user %> has been successfully added to the exception list. Click Generate Exception Certificate below to send the certificate.');  // eslint-disable-line max-len
+                    message = gettext('<%- user %> has been successfully added to the exception list. Click Generate Exception Certificate below to send the certificate.'); // eslint-disable-line max-len
                     certificate_exception.save(
                         null,
                         {

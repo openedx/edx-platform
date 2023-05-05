@@ -17,6 +17,8 @@ from openedx.core.djangolib.js_utils import (
     data-bumper-metadata='${bumper_metadata}'
     data-autoadvance-enabled="${autoadvance_enabled}"
     data-poster='${poster}'
+    data-block-id='${block_id}'
+    data-course-id='${course_id}'
     tabindex="-1"
 >
     <div class="focus_grabber first"></div>
@@ -46,16 +48,40 @@ from openedx.core.djangolib.js_utils import (
 
     <div class="focus_grabber last"></div>
 
-    % if (download_video_link or track or handout or branding_info) and not hide_downloads:
+    % if (download_video_link or track or handout or branding_info or public_sharing_enabled) and not hide_downloads:
     <h3 class="hd hd-4 downloads-heading sr" id="video-download-transcripts_${id}">${_('Downloads and transcripts')}</h3>
     <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_${id}">
-        % if download_video_link:
-        <div class="wrapper-download-video">
-            <h4 class="hd hd-5">${_('Video')}</h4>
-            <a class="btn-link video-sources video-download-button" href="${download_video_link}">
-                ${_('Download video file')}
-            </a>
-        </div>
+        % if download_video_link or public_sharing_enabled:
+            <div class="wrapper-download-video">
+                <h4 class="hd hd-5">${_('Video')}</h4>
+                % if sharing_sites_info:
+                    <div class="wrapper-social-share">
+                        <span class="icon fa fa-share-alt" aria-hidden="true"></span>
+                        ${_('Share on:')}
+                        % for sharing_site_info in sharing_sites_info:
+                            <a
+                                class="btn-link social-share-link"
+                                data-source="${sharing_site_info['name']}"
+                                href="${sharing_site_info['sharing_url']}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <span class="icon fa ${sharing_site_info['fa_icon_name']}" aria-hidden="true"></span>
+                                <span class="sr">${_("Share on {site}").format(site=sharing_site_info['name'])}</span>
+                            </a>
+                        % endfor
+                    </div>
+                % endif
+                % if download_video_link and public_sharing_enabled:
+                    <br>
+                % endif
+                % if download_video_link:
+                    <span class="icon fa fa-download" aria-hidden="true"></span>
+                    <a class="btn-link video-sources video-download-button" href="${download_video_link}">
+                        ${_('Download video file')}
+                    </a>
+                % endif
+            </div>
         % endif
         % if track:
         <div class="wrapper-download-transcripts">
@@ -64,6 +90,7 @@ from openedx.core.djangolib.js_utils import (
             <ul class="list-download-transcripts">
                 % for item in transcript_download_formats_list:
                     <li class="transcript-option">
+                        <span class="icon fa fa-download" aria-hidden="true"></span>
                         <% dname = _("Download {file}").format(file=item['display_name']) %>
                         <a class="btn btn-link" href="${track}" data-value="${item['value']}">${dname}</a>
                     </li>
@@ -116,4 +143,4 @@ from openedx.core.djangolib.js_utils import (
     initializeCDNExperiment();
   }
 </script>
-% endif;
+% endif

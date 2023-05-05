@@ -11,6 +11,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
     EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
     ContainerSubviews, UnitOutlineView, XBlockUtils) {
     'use strict';
+
     var XBlockContainerPage = BasePage.extend({
         // takes XBlockInfo as a model
 
@@ -18,18 +19,21 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             'click .edit-button': 'editXBlock',
             'click .access-button': 'editVisibilitySettings',
             'click .duplicate-button': 'duplicateXBlock',
+            'click .copy-button': 'copyXBlock',
             'click .move-button': 'showMoveXBlockModal',
             'click .delete-button': 'deleteXBlock',
-            'click .new-component-button': 'scrollToNewComponentButtons'
+            'click .show-actions-menu-button': 'showXBlockActionsMenu',
+            'click .new-component-button': 'scrollToNewComponentButtons',
+            'click .paste-component-button': 'pasteComponent',
         },
 
         options: {
             collapsedClass: 'is-collapsed',
-            canEdit: true // If not specified, assume user has permission to make changes
+            canEdit: true, // If not specified, assume user has permission to make changes
+            clipboardData: { content: null },
         },
 
         view: 'container_preview',
-
 
         defaultViewClass: ContainerView,
 
@@ -98,6 +102,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             }
 
             this.listenTo(Backbone, 'move:onXBlockMoved', this.onXBlockMoved);
+            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
         },
 
         getViewParameters: function() {
@@ -145,6 +150,11 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
 
                     // Re-enable Backbone events for any updated DOM elements
                     self.delegateEvents();
+
+                    // Show/hide the paste button
+                    if (!self.isLibraryPage) {
+                        self.initializePasteButton();
+                    }
                 },
                 block_added: options && options.block_added
             });
@@ -180,22 +190,75 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             }
         },
 
+        initializePasteButton() {
+            if (this.options.canEdit) {
+                // We should have the user's clipboard status.
+                const data = this.options.clipboardData;
+                this.refreshPasteButton(data);
+                // Refresh the status when something is copied on another tab:
+                this.clipboardBroadcastChannel.onmessage = (event) => { this.refreshPasteButton(event.data); };
+            } else {
+                this.$(".paste-component").hide();
+            }
+        },
+
+        /**
+         * Given the latest information about the user's clipboard, hide or show the Paste button as appropriate.
+         */
+        refreshPasteButton(data) {
+            // 'data' is the same data returned by the "get clipboard status" API endpoint
+            // i.e. /api/content-staging/v1/clipboard/
+            if (this.options.canEdit && data.content) {
+                // TODO: check if this is suitable for pasting into a unit
+                this.$(".paste-component").show();
+            } else {
+                this.$(".paste-component").hide();
+            }
+        },
+
+        /** The user has clicked on the "Paste Component button" */
+        pasteComponent(event) {
+            event.preventDefault();
+            // Get the ID of the container (usually a unit/vertical) that we're pasting into:
+            const parentElement = this.findXBlockElement(event.target);
+            const parentLocator = parentElement.data('locator');
+            // Create a placeholder XBlock while we're pasting:
+            const $placeholderEl = $(this.createPlaceholderElement());
+            const addComponentsPanel = $(event.target).closest('.paste-component').prev();
+            const listPanel = addComponentsPanel.prev();
+            const scrollOffset = ViewUtils.getScrollOffset(addComponentsPanel);
+            const placeholderElement = $placeholderEl.appendTo(listPanel);
+
+            // Start showing a "Pasting" notification:
+            ViewUtils.runOperationShowingMessage(gettext('Pasting'), () => {
+                return $.postJSON(this.getURLRoot() + '/', {
+                    parent_locator: parentLocator,
+                    staged_content: "clipboard",
+                }).then((data) => {
+                    this.onNewXBlock(placeholderElement, scrollOffset, false, data);
+                }).fail(() => {
+                    // Remove the placeholder if the paste failed
+                    placeholderElement.remove();
+                });
+            });
+        },
+
         editXBlock: function(event, options) {
             event.preventDefault();
 
             if(!options || options.view !== 'visibility_view' ){
                 const primaryHeader = $(event.target).closest('.xblock-header-primary')
 
-                var useNewTextEditor = primaryHeader.attr("use-new-editor-text"),
-                    useNewVideoEditor = primaryHeader.attr("use-new-editor-video"),
-                    useNewProblemEditor = primaryHeader.attr("use-new-editor-problem"),
-                    blockType = primaryHeader.attr("data-block-type");
+                var useNewTextEditor = primaryHeader.attr('use-new-editor-text'),
+                    useNewVideoEditor = primaryHeader.attr('use-new-editor-video'),
+                    useNewProblemEditor = primaryHeader.attr('use-new-editor-problem'),
+                    blockType = primaryHeader.attr('data-block-type');
 
-                if( (useNewTextEditor === "True" && blockType === "html") ||
-                        (useNewVideoEditor === "True" && blockType === "video") ||
-                        (useNewProblemEditor === "True" && blockType === "problem")
+                if( (useNewTextEditor === 'True' && blockType === 'html')
+                        || (useNewVideoEditor === 'True' && blockType === 'video')
+                        || (useNewProblemEditor === 'True' && blockType === 'problem')
                 ) {
-                    var destinationUrl = primaryHeader.attr("authoring_MFE_base_url") + '/' + blockType + '/' + encodeURI(primaryHeader.attr("data-usage-id"));
+                    var destinationUrl = primaryHeader.attr('authoring_MFE_base_url') + '/' + blockType + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
                     window.location.href = destinationUrl;
                     return;
                 }
@@ -211,6 +274,23 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     self.refreshXBlock(xblockElement, false);
                 }
             });
+        },
+
+        /**
+         * If the new "Actions" menu is enabled, most XBlock actions like
+         * Duplicate, Move, Delete, Manage Access, etc. are moved into this
+         * menu. For this event, we just toggle displaying the menu.
+         * @param {*} event
+         */
+        showXBlockActionsMenu: function(event) {
+            const showActionsButton = event.currentTarget;
+            const subMenu = showActionsButton.parentElement.querySelector('.wrapper-nav-sub');
+            // Code in 'base.js' normally handles toggling these dropdowns but since this one is
+            // not present yet during the domReady event, we have to handle displaying it ourselves.
+            subMenu.classList.toggle('is-shown');
+            // if propagation is not stopped, the event will bubble up to the
+            // body element, which will close the dropdown.
+            event.stopPropagation();
         },
 
         editVisibilitySettings: function(event) {
@@ -274,6 +354,51 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 });
         },
 
+        copyXBlock: function(event) {
+            event.preventDefault();
+            const clipboardEndpoint = "/api/content-staging/v1/clipboard/";
+            const element = this.findXBlockElement(event.target);
+            const usageKeyToCopy = element.data('locator');
+            // Start showing a "Copying" notification:
+            ViewUtils.runOperationShowingMessage(gettext('Copying'), () => {
+                return $.postJSON(
+                    clipboardEndpoint,
+                    { usage_key: usageKeyToCopy },
+                ).then((data) => {
+                    const status = data.content?.status;
+                    if (status === "ready") {
+                        // The XBlock has been copied and is ready to use.
+                        this.refreshPasteButton(data); // Update our UI
+                        this.clipboardBroadcastChannel.postMessage(data); // And notify any other open tabs
+                        return data;
+                    } else if (status === "loading") {
+                        // The clipboard is being loaded asynchonously.
+                        // Poll the endpoint until the copying process is complete:
+                        const deferred = $.Deferred();
+                        const checkStatus = () => {
+                            $.getJSON(clipboardEndpoint, (pollData) => {
+                                const newStatus = pollData.content?.status;
+                                if (newStatus === "ready") {
+                                    this.refreshPasteButton(data);
+                                    this.clipboardBroadcastChannel.postMessage(pollData);
+                                    deferred.resolve(pollData);
+                                } else if (newStatus === "loading") {
+                                    setTimeout(checkStatus, 1_000);
+                                } else {
+                                    deferred.reject();
+                                    throw new Error(`Unexpected clipboard status "${newStatus}" in successful API response.`);
+                                }
+                            })
+                        }
+                        setTimeout(checkStatus, 1_000);
+                        return deferred;
+                    } else {
+                        throw new Error(`Unexpected clipboard status "${status}" in successful API response.`);
+                    }
+                });
+            });
+        },
+
         duplicateComponent: function(xblockElement) {
             // A placeholder element is created in the correct location for the duplicate xblock
             // and then onNewXBlock will replace it with a rendering of the xblock. Note that
@@ -320,27 +445,27 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         },
 
         /*
-            After move operation is complete, updates the xblock information from server .
-             */
+         * After move operation is complete, updates the xblock information from server .
+         */
         onXBlockMoved: function() {
             this.model.fetch();
         },
 
         onNewXBlock: function(xblockElement, scrollOffset, is_duplicate, data) {
-            var useNewTextEditor = this.$('.xblock-header-primary').attr("use-new-editor-text"),
-                useNewVideoEditor = this.$('.xblock-header-primary').attr("use-new-editor-video"),
-                useNewProblemEditor = this.$('.xblock-header-primary').attr("use-new-editor-problem");
+            var useNewTextEditor = this.$('.xblock-header-primary').attr('use-new-editor-text'),
+                useNewVideoEditor = this.$('.xblock-header-primary').attr('use-new-editor-video'),
+                useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
 
-            //find the block type in the locator if availible
+            // find the block type in the locator if availible
             if(data.hasOwnProperty('locator')){
                 var matchBlockTypeFromLocator = /\@(.*?)\+/;
                 var blockType = data.locator.match(matchBlockTypeFromLocator);
             }
-            if((useNewTextEditor === "True" && blockType.includes("html")) ||
-                    (useNewVideoEditor === "True" && blockType.includes("video"))||
-                    (useNewProblemEditor === "True" && blockType.includes("problem"))
+            if((useNewTextEditor === 'True' && blockType.includes('html'))
+                    || (useNewVideoEditor === 'True' && blockType.includes('video'))
+                    ||(useNewProblemEditor === 'True' && blockType.includes('problem'))
             ){
-                var destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
+                var destinationUrl = this.$('.xblock-header-primary').attr('authoring_MFE_base_url') + '/' + blockType[1] + '/' + encodeURI(data.locator);
                 window.location.href = destinationUrl;
                 return;
             }
@@ -350,12 +475,12 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         },
 
         /**
-             * Refreshes the specified xblock's display. If the xblock is an inline child of a
-             * reorderable container then the element will be refreshed inline. If not, then the
-             * parent container will be refreshed instead.
-             * @param element An element representing the xblock to be refreshed.
-             * @param block_added Flag to indicate that new block has been just added.
-             */
+         * Refreshes the specified xblock's display. If the xblock is an inline child of a
+         * reorderable container then the element will be refreshed inline. If not, then the
+         * parent container will be refreshed instead.
+         * @param element An element representing the xblock to be refreshed.
+         * @param block_added Flag to indicate that new block has been just added.
+         */
         refreshXBlock: function(element, block_added, is_duplicate) {
             var xblockElement = this.findXBlockElement(element),
                 parentElement = xblockElement.parent(),
@@ -370,13 +495,13 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         },
 
         /**
-             * Refresh an xblock element inline on the page, using the specified xblockInfo.
-             * Note that the element is removed and replaced with the newly rendered xblock.
-             * @param xblockElement The xblock element to be refreshed.
-             * @param block_added Specifies if a block has been added, rather than just needs
-             * refreshing.
-             * @returns {jQuery promise} A promise representing the complete operation.
-             */
+         * Refresh an xblock element inline on the page, using the specified xblockInfo.
+         * Note that the element is removed and replaced with the newly rendered xblock.
+         * @param xblockElement The xblock element to be refreshed.
+         * @param block_added Specifies if a block has been added, rather than just needs
+         * refreshing.
+         * @returns {jQuery promise} A promise representing the complete operation.
+         */
         refreshChildXBlock: function(xblockElement, block_added, is_duplicate) {
             var self = this,
                 xblockInfo,
@@ -404,7 +529,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
             return temporaryView.render({
                 success: function() {
                     self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
-                    temporaryView.unbind();  // Remove the temporary view
+                    temporaryView.unbind(); // Remove the temporary view
                 },
                 initRuntimeData: this
             });

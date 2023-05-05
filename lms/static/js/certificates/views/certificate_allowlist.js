@@ -66,7 +66,7 @@
                     );
                 } else {
                     this.escapeAndShowMessage(
-                        gettext('Could not find Certificate Exception in the allowlist. Please refresh the page and try again')  // eslint-disable-line max-len
+                        gettext('Could not find Certificate Exception in the allowlist. Please refresh the page and try again') // eslint-disable-line max-len
                     );
                 }
             },

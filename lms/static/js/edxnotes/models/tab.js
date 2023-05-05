@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define(['underscore', 'backbone', 'js/edxnotes/utils/logger'], function(_, Backbone, NotesLogger) {
         var TabModel = Backbone.Model.extend({
             defaults: {

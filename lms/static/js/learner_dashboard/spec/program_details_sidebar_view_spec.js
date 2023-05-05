@@ -41,8 +41,8 @@ describe('Program Progress View', () => {
 
     const testText = (progress) => {
         const $numbers = view.$('.numbers');
-        const total = progress.completed.length + progress.in_progress.length +
-      progress.not_started.length;
+        const total = progress.completed.length + progress.in_progress.length
+      + progress.not_started.length;
 
         expect(view.$('.progress-heading').html()).toEqual('XSeries Progress');
         expect(parseInt($numbers.find('.complete').html(), 10)).toEqual(progress.completed.length);

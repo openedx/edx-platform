@@ -1,8 +1,10 @@
-/* globals _, interpolate_text, statusAjaxError, PendingInstructorTasks, createTaskListTable*/
+/* globals _, interpolate_text, statusAjaxError, PendingInstructorTasks, createTaskListTable */
 define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
     function($, StudentAdmin, AjaxHelpers) {
         // 'js/instructor_dashboard/student_admin'
-        'use strict';
+        
+'use strict';
+
         describe('edx.instructor_dashboard.student_admin.StudentAdmin', function() {
             var studentadmin, dashboardApiUrl, uniqStudentIdentifier, alertMsg;
 
@@ -83,8 +85,8 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('initiates rescoring of the entrance exam when the button is clicked', function() {
-                var successMessage = gettext("Started entrance exam rescore task for student '{student_id}'." +
-                    " Click the 'Show Task Status' button to see the status of the task."); //  eslint-disable-line max-len
+                var successMessage = gettext("Started entrance exam rescore task for student '{student_id}'."
+                    + " Click the 'Show Task Status' button to see the status of the task."); //  eslint-disable-line max-len
                 var fullSuccessMessage = interpolate_text(successMessage, {
                     student_id: uniqStudentIdentifier
                 });
@@ -126,8 +128,8 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
                     only_if_higher: false
                 });
                 var errorMessage = gettext(
-                    "Error starting a task to rescore entrance exam for student '{student_id}'." +
-                    ' Make sure that entrance exam has problems in it and student identifier is correct.'
+                    "Error starting a task to rescore entrance exam for student '{student_id}'."
+                    + ' Make sure that entrance exam has problems in it and student identifier is correct.'
                 );
                 var fullErrorMessage = interpolate_text(errorMessage, {
                     student_id: uniqStudentIdentifier
@@ -232,8 +234,8 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
                     unique_student_identifier: uniqStudentIdentifier,
                     delete_module: true
                 });
-                var errorMessage = gettext("Error deleting entrance exam state for student '{student_id}'. " +
-                    'Make sure student identifier is correct.'); //  eslint-disable-line max-len
+                var errorMessage = gettext("Error deleting entrance exam state for student '{student_id}'. "
+                    + 'Make sure student identifier is correct.'); //  eslint-disable-line max-len
                 var fullErrorMessage = interpolate_text(errorMessage, {
                     student_id: uniqStudentIdentifier
                 });
@@ -293,8 +295,8 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
                 var params = $.param({
                     unique_student_identifier: uniqStudentIdentifier
                 });
-                var errorMessage = gettext("Error getting entrance exam task history for student '{student_id}'. " +
-                    'Make sure student identifier is correct.');
+                var errorMessage = gettext("Error getting entrance exam task history for student '{student_id}'. "
+                    + 'Make sure student identifier is correct.');
                 var fullErrorMessage = interpolate_text(errorMessage, {
                     student_id: uniqStudentIdentifier
                 });

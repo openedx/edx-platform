@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
+# edX community translations have been downloaded from Arabic (http://app.transifex.com/open-edx/edx-platform/language/ar/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -30,7 +30,7 @@
 # AzizAhmed <dr.zezo@gmail.com>, 2014
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016-2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
-# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021-2022
+# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021-2023
 # Glib Glugovskiy <glugov1998@gmail.com>, 2021
 # Hamza Madni, 2022
 # HasnaG <hasnaa.elghandor@yahoo.com>, 2014
@@ -69,7 +69,7 @@
 # Tim McCormack, 2022
 # طاهر <charaf.le.prince@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
+# edX community translations have been downloaded from Arabic (http://app.transifex.com/open-edx/edx-platform/language/ar/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -109,7 +109,7 @@
 # soliman osman <solimanosman@windowslive.com>, 2015
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
+# edX community translations have been downloaded from Arabic (http://app.transifex.com/open-edx/edx-platform/language/ar/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -137,8 +137,10 @@
 # baraahadri <baraahadri@gmail.com>, 2014
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
 # طاهر <charaf.le.prince@gmail.com>, 2014
+# Deimer Morales, 2023
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
+# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2023
 # Hamza Madni, 2022
 # Hani <hani0a@hotmail.com>, 2014
 # Hani <hani0a@hotmail.com>, 2014
@@ -174,7 +176,7 @@
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # طاهر <charaf.le.prince@gmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
+# edX community translations have been downloaded from Arabic (http://app.transifex.com/open-edx/edx-platform/language/ar/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -221,7 +223,7 @@
 # soliman osman <solimanosman@windowslive.com>, 2015
 # طاهر <charaf.le.prince@gmail.com>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
+# edX community translations have been downloaded from Arabic (http://app.transifex.com/open-edx/edx-platform/language/ar/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -245,7 +247,7 @@
 # SalmaGhazal <salma-ghazal1@hotmail.com>, 2014
 # SalmaGhazal <salma-ghazal1@hotmail.com>, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)
+# edX community translations have been downloaded from Arabic (https://app.transifex.com/open-edx/teams/6205/ar/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -257,10 +259,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-12 20:42+0000\n"
+"POT-Creation-Date: 2023-04-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
-"Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
+"Language-Team: Arabic (https://app.transifex.com/open-edx/teams/6205/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -343,6 +345,13 @@ msgstr "النص المكتوب برمز اللغة \"{language_code}\" موجو
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr "ملف النص مطلوب."
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Ready"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -465,6 +474,17 @@ msgstr ""
 "اختياري: لن يتمكّن المستخدمون بعد هذا التاريخ/الوقت من التسجيل في هذا الوضع."
 " يُرجى ترك هذا الحقل فارغًا في حال سيُسمح للمستخدمين التسجيل في هذا الوضع "
 "لحين إغلَاق باب التسجيل في المساق."
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -4281,7 +4301,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The requested course does not exist."
-msgstr ""
+msgstr "المساق المطلوب غير موجود."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "URL from which report can be downloaded."
@@ -5918,6 +5938,7 @@ msgid "Allow"
 msgstr "موافق"
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/models.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "حدث خطأ"
@@ -7107,6 +7128,37 @@ msgstr "لم نستطع العثور على مستخدم بذلك البريد �
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "This user already has access to this library."
 msgstr "يمتلك هذا المستخدم حق الوصول للمكتبة"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "جاري التحميل"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
+msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -8327,9 +8379,16 @@ msgid "Success"
 msgstr "جرت العملية بنجاح"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "الإجراءات"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -11393,8 +11452,10 @@ msgid "Count"
 msgstr "العدد"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "يُرجى إدخال عدد المكوِّنات الواجب عرضها على كل طالب."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -13102,6 +13163,10 @@ msgid "Library Content"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "صفحة فارغة"
 
@@ -13350,12 +13415,6 @@ msgstr "جاري التحميل"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "In Progress"
 msgstr "قيد المعالجة"
-
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "مستعدّ"
 
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
@@ -13616,16 +13675,6 @@ msgstr "المحتوى"
 #: wiki/templates/wiki/settings.html
 msgid "Settings"
 msgstr "الإعدادات"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "جاري التحميل"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -14421,6 +14470,14 @@ msgstr "عنوان البريد الإلكتروني"
 msgid "Return To %s"
 msgstr "العودة إلى %s "
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -14800,6 +14857,22 @@ msgstr "التنزيلات والنصوص"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "تنزيل ملف الفيديو "
+
+#: lms/templates/video.html
+msgid "Share on:"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Twitter"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Facebook"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Linkedin"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -17250,7 +17323,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
-msgstr ""
+msgstr "ترقية"
 
 #: lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
@@ -17856,7 +17929,7 @@ msgstr "رقم طلبيتك هو : {order_number}"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Hello {full_name},"
-msgstr ""
+msgstr "مرحبًا {full_name}،"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Your {platform_name} ID verification photos have been approved."
@@ -18118,10 +18191,6 @@ msgstr "المدارس"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr ""
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "استئناف مساقك الأخير"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
@@ -21027,10 +21096,8 @@ msgstr "رمز الموقع"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
-"لإنشاء رابط إلى هذه الوحدة من عنصر HTML في هذا المساق، أدخل "
-"\"/jump_to_id/<location ID>\" كقيمة الرابط."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -21218,8 +21285,9 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -23853,6 +23921,14 @@ msgid "Set Access"
 msgstr "إعدادات ضبط إتاحة الوصول"
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
 msgstr "تحتوي هذه الكتلة على عدة مكوِّنات."
 
@@ -24103,11 +24179,11 @@ msgstr "إنشاء جديد"
 
 #: cms/templates/maintenance/_announcement_index.html
 msgid "previous"
-msgstr ""
+msgstr "السابق"
 
 #: cms/templates/maintenance/_announcement_index.html
 msgid "next"
-msgstr ""
+msgstr "التالي"
 
 #: cms/templates/maintenance/_force_publish_course.html
 msgid "Required data to force publish course."

@@ -121,6 +121,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         store = modulestore()
         with store.default_store('split'):
             store.clone_course(source_course_key, destination_course_key, user_id, fields=fields)
+
         update_unit_discussion_state_from_discussion_blocks(destination_course_key, user_id)
 
         # set initial permissions for the user to access the course.
@@ -342,7 +343,8 @@ def create_export_tarball(course_block, course_key, context, status=None):
     Updates the context with any error information if applicable.
     """
     name = course_block.url_name
-    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")  # lint-amnesty, pylint: disable=consider-using-with
+    export_file = NamedTemporaryFile(prefix=name + '.',
+                                     suffix=".tar.gz")  # lint-amnesty, pylint: disable=consider-using-with
     root_dir = path(mkdtemp())
 
     try:

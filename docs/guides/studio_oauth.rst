@@ -1,17 +1,17 @@
 Enabling OAuth for Studio login
-===============================
+###############################
 
 This is a migration guide for converting Studio login to use OAuth, for use in the Lilac to Maple upgrade.
 
 Background
-----------
+**********
 
 As of Lilac, the Studio by default shares a session cookie with the LMS.  This either forces Studio to be on a subdomain of the LMS or the LMS to set its session cookie on a wide domain, which exposes it to a potentially large number of subdomains.
 
 Maple's configuration assumes that Studio will use LMS's OAuth2-based single-sign-on (SSO). This means that the cookies (and domains) can be decoupled to improve both flexibility and security. However, there are a few steps to take to finish this configuration (otherwise Studio logins will not work.)
 
 Migration
----------
+*********
 
 Studio and LMS need to be configured in each environment to enable the new flow, with the exception of devstack and sandboxes (which will autoconfigure for OAuth.) Migration involves enabling OAuth and separating the session cookies for LMS and Studio. The session cookie split will require Studio users to log in again.
 

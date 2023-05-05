@@ -6,8 +6,9 @@ import logging
 from collections import defaultdict
 from copy import deepcopy
 from itertools import chain
-from urllib.parse import urljoin, urlparse, urlunparse
+from urllib.parse import urlencode, urljoin, urlparse, urlunparse
 
+import requests
 from dateutil.parser import parse
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -15,10 +16,10 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.urls import reverse
 from django.utils.functional import cached_property
+from edx_rest_api_client.auth import SuppliedJwtAuth
 from opaque_keys.edx.keys import CourseKey
 from pytz import utc
 from requests.exceptions import RequestException
-from xmodule.modulestore.django import modulestore
 
 from common.djangoapps.course_modes.api import get_paid_modes_for_course
 from common.djangoapps.course_modes.models import CourseMode
@@ -35,15 +36,17 @@ from openedx.core.djangoapps.catalog.constants import PathwayType
 from openedx.core.djangoapps.catalog.utils import (
     get_fulfillable_course_runs_for_entitlement,
     get_pathways,
-    get_programs,
+    get_programs
 )
 from openedx.core.djangoapps.commerce.utils import get_ecommerce_api_base_url, get_ecommerce_api_client
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_records_url
 from openedx.core.djangoapps.enrollments.api import get_enrollments
 from openedx.core.djangoapps.enrollments.permissions import ENROLL_IN_COURSE
+from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.djangoapps.programs import ALWAYS_CALCULATE_PROGRAM_PRICE_AS_ANONYMOUS_USER
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from xmodule.modulestore.django import modulestore
 
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
@@ -60,6 +63,15 @@ def get_program_and_course_data(site, user, program_uuid, mobile_only=False):
         program_data = ProgramDataExtender(program_data, user, mobile_only=mobile_only).extend()
         course_data = meter.progress(programs=[program_data], count_only=False)[0]
     return program_data, course_data
+
+
+def get_buy_subscription_url(program_uuid, skus):
+    """
+    Returns the URL to the Subscription Purchase page for the given program UUID and course Skus.
+    """
+    formatted_skus = urlencode({'sku': skus}, doseq=True)
+    url = f'{settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL}/{program_uuid}/?{formatted_skus}'
+    return url
 
 
 def get_program_urls(program_data):
@@ -82,6 +94,9 @@ def get_program_urls(program_data):
         'commerce_api_url': reverse('commerce_api:v0:baskets:create'),
         'buy_button_url': ecommerce_service.get_checkout_page_url(*skus),
         'program_record_url': program_record_url,
+        'buy_subscription_url': get_buy_subscription_url(program_uuid, skus),
+        'manage_subscription_url': settings.ORDER_HISTORY_MICROFRONTEND_URL,
+        'subscriptions_learner_help_center_url': settings.SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL
     }
     return urls
 
@@ -151,6 +166,7 @@ class ProgramProgressMeter:
             will only inspect this one program, not all programs the user may be
             engaged with.
     """
+
     def __init__(self, site, user, enrollments=None, uuid=None, mobile_only=False, include_course_entitlements=True):
         self.site = site
         self.user = user
@@ -544,6 +560,7 @@ class ProgramDataExtender:
         program_data (dict): Representation of a program.
         user (User): The user whose enrollments to inspect.
     """
+
     def __init__(self, program_data, user, mobile_only=False):
         self.data = program_data
         self.user = user
@@ -865,6 +882,7 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         program_data (dict): Representation of a program.
         user (User): The user whose enrollments to inspect.
     """
+
     def __init__(self, program_data, user):
         super().__init__(program_data, user)
 
@@ -966,9 +984,9 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         """
         module_store = modulestore()
         course_run_key = CourseKey.from_string(course_run['key'])
-        course_descriptor = module_store.get_course(course_run_key)
-        if course_descriptor:
-            course_instructors = getattr(course_descriptor, 'instructor_info', {})
+        course_block = module_store.get_course(course_run_key)
+        if course_block:
+            course_instructors = getattr(course_block, 'instructor_info', {})
 
             # Deduplicate program instructors using instructor name
             curr_instructors_names = [instructor.get('name', '').strip() for instructor in self.instructors]
@@ -1028,3 +1046,51 @@ def is_user_enrolled_in_program_type(user, program_type_slug, paid_modes_only=Fa
         elif course_run_id in course_runs:
             return True
     return False
+
+
+def get_subscription_api_client(user):
+    """
+    Returns an API client which can be used to make Subscriptions API requests.
+    """
+    scopes = [
+        'user_id',
+        'email',
+        'profile'
+    ]
+    jwt = create_jwt_for_user(user, scopes=scopes)
+    client = requests.Session()
+    client.auth = SuppliedJwtAuth(jwt)
+
+    return client
+
+
+def get_programs_subscription_data(user, program_uuid=None):
+    """
+    Returns the subscription data for a user's program if uuid is specified
+    else return data for user's all subscriptions.
+    """
+    client = get_subscription_api_client(user)
+    api_path = f"{settings.SUBSCRIPTIONS_API_PATH}"
+    subscription_data = []
+
+    log.info(f"B2C_SUBSCRIPTIONS: Requesting Program subscription data for user: {user}" +
+             (f" for program_uuid: {program_uuid}" if program_uuid is not None else ""))
+
+    try:
+        if program_uuid:
+            response = client.get(api_path, params={'resource_id': program_uuid, 'most_active_and_recent': True})
+            response.raise_for_status()
+            subscription_data = response.json().get('results', [])
+        else:
+            next_page = 1
+            while next_page:
+                response = client.get(api_path, params=dict(page=next_page))
+                response.raise_for_status()
+                subscription_data.extend(response.json().get('results', []))
+                next_page = response.json().get('next')
+    except Exception as exc:  # pylint: disable=broad-except
+        log.exception(
+            f"B2C_SUBSCRIPTIONS: Failed to retrieve Program Subscription Data for user: {user} with error: {exc}"
+            + f" for program_uuid: {str(program_uuid)}" if program_uuid is not None else ""
+        )
+    return subscription_data

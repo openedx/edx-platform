@@ -54,6 +54,10 @@ COURSE_VISIBILITY_PRIVATE = 'private'
 COURSE_VISIBILITY_PUBLIC_OUTLINE = 'public_outline'
 COURSE_VISIBILITY_PUBLIC = 'public'
 
+COURSE_VIDEO_SHARING_PER_VIDEO = 'per-video'
+COURSE_VIDEO_SHARING_ALL_VIDEOS = 'all-on'
+COURSE_VIDEO_SHARING_NONE = 'all-off'
+
 
 class StringOrDate(Date):  # lint-amnesty, pylint: disable=missing-class-docstring
     def from_json(self, value):  # lint-amnesty, pylint: disable=arguments-differ
@@ -956,6 +960,22 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
             {"display_name": "public_outline", "value": COURSE_VISIBILITY_PUBLIC_OUTLINE},
             {"display_name": "public", "value": COURSE_VISIBILITY_PUBLIC},
         ],
+    )
+
+    video_sharing_options = String(
+        display_name=_("Video Sharing Options"),
+        help=_(
+            "Specify the video sharing options for the course. "
+            "This can be set to one of three values: "
+            "'all-on', 'all-off' and 'per-video'. with 'per-video' as the default."
+        ),
+        default=COURSE_VIDEO_SHARING_PER_VIDEO,
+        scope=Scope.settings,
+        values=[
+            {"display_name": "all-on", "value": COURSE_VIDEO_SHARING_ALL_VIDEOS},
+            {"display_name": "all-off", "value": COURSE_VIDEO_SHARING_NONE},
+            {"display_name": "per-video", "value": COURSE_VIDEO_SHARING_PER_VIDEO},
+        ]
     )
 
     """

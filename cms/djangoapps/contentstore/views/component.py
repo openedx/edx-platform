@@ -27,12 +27,17 @@ from common.djangoapps.xblock_django.models import XBlockStudioConfigurationFlag
 from cms.djangoapps.contentstore.toggles import use_new_problem_editor
 from openedx.core.lib.xblock_utils import get_aside_from_xblock, is_xblock_aside
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
+try:
+    # Technically this is a django app plugin, so we should not error if it's not installed:
+    import openedx.core.djangoapps.content_staging.api as content_staging_api
+except ImportError:
+    content_staging_api = None
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
 from .helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from .block import StudioEditModuleRuntime, add_container_page_publishing_info, create_xblock_info
+from .block import add_container_page_publishing_info, create_xblock_info, load_services_for_studio
 
 __all__ = [
     'container_handler',
@@ -42,7 +47,7 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 # NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['discussion', 'library', 'html', 'openassessment', 'problem', 'video']
+COMPONENT_TYPES = ['discussion', 'library', 'html', 'openassessment', 'problem', 'video', 'drag-and-drop-v2']
 
 ADVANCED_COMPONENT_TYPES = sorted({name for name, class_ in XBlock.load_classes()} - set(COMPONENT_TYPES))
 
@@ -185,6 +190,12 @@ def container_handler(request, usage_key_string):
                     break
                 index += 1
 
+            # Get the status of the user's clipboard so they can paste components if they have something to paste
+            if content_staging_api:
+                user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
+            else:
+                user_clipboard = {"content": None}
+
             return render_to_response('container.html', {
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
@@ -205,7 +216,9 @@ def container_handler(request, usage_key_string):
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
-                'templates': CONTAINER_TEMPLATES
+                'templates': CONTAINER_TEMPLATES,
+                # Status of the user's clipboard, exactly as would be returned from the "GET clipboard" REST API.
+                'user_clipboard': user_clipboard,
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
@@ -283,6 +296,7 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
         'video': _("Video"),
         'openassessment': _("Open Response"),
         'library': _("Library Content"),
+        'drag-and-drop-v2': _("Drag and Drop"),
     }
 
     component_templates = []
@@ -551,18 +565,18 @@ def component_handler(request, usage_key_string, handler, suffix=''):
 
     try:
         if is_xblock_aside(usage_key):
-            # Get the descriptor for the block being wrapped by the aside (not the aside itself)
-            descriptor = modulestore().get_item(usage_key.usage_key)
-            handler_descriptor = get_aside_from_xblock(descriptor, usage_key.aside_type)
-            asides = [handler_descriptor]
+            # Get the block being wrapped by the aside (not the aside itself)
+            block = modulestore().get_item(usage_key.usage_key)
+            handler_block = get_aside_from_xblock(block, usage_key.aside_type)
+            asides = [handler_block]
         else:
-            descriptor = modulestore().get_item(usage_key)
-            handler_descriptor = descriptor
+            block = modulestore().get_item(usage_key)
+            handler_block = block
             asides = []
-        handler_descriptor.xmodule_runtime = StudioEditModuleRuntime(request.user)
-        resp = handler_descriptor.handle(handler, req, suffix)
+        load_services_for_studio(handler_block.runtime, request.user)
+        resp = handler_block.handle(handler, req, suffix)
     except NoSuchHandlerError:
-        log.info("XBlock %s attempted to access missing handler %r", handler_descriptor, handler, exc_info=True)
+        log.info("XBlock %s attempted to access missing handler %r", handler_block, handler, exc_info=True)
         raise Http404  # lint-amnesty, pylint: disable=raise-missing-from
 
     # unintentional update to handle any side effects of handle call
@@ -571,7 +585,7 @@ def component_handler(request, usage_key_string, handler, suffix=''):
     # TNL 101-62 studio write permission is also checked for editing content.
 
     if has_course_author_access(request.user, usage_key.course_key):
-        modulestore().update_item(descriptor, request.user.id, asides=asides)
+        modulestore().update_item(block, request.user.id, asides=asides)
     else:
         #fail quietly if user is not course author.
         log.warning(

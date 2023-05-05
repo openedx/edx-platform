@@ -217,7 +217,8 @@ describe('Course Enroll View', () => {
         view.enrollSuccess();
 
         expect(CourseEnrollView.redirect).toHaveBeenCalledWith(
-            view.trackSelectionUrl + courseCardModel.get('course_run_key'));
+            view.trackSelectionUrl + courseCardModel.get('course_run_key')
+        );
     });
 
     it('should redirect to track selection when enrollment in an unspecified mode is attempted', () => {

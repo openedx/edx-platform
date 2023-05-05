@@ -13,6 +13,7 @@ define([
 function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeSrcMain,
     SignatoryModel, SignatoryCollection) {
     'use strict';
+
     var Certificate = Backbone.RelationalModel.extend({
         idAttribute: 'id',
         defaults: {

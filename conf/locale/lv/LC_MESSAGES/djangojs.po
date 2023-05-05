@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/).
+# edX community translations have been downloaded from Latvian (http://app.transifex.com/open-edx/edx-platform/language/lv/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -8,13 +8,13 @@
 # Waheed Ahmed <waheed@edx.org>, 2019
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2018
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/).
+# edX community translations have been downloaded from Latvian (http://app.transifex.com/open-edx/edx-platform/language/lv/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Latvian (https://www.transifex.com/open-edx/teams/6205/lv/).
+# edX community translations have been downloaded from Latvian (https://app.transifex.com/open-edx/teams/6205/lv/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -23,14 +23,14 @@
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/)
+# edX community translations have been downloaded from Latvian (http://app.transifex.com/open-edx/edx-platform/language/lv/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2019
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/)
+# edX community translations have been downloaded from Latvian (http://app.transifex.com/open-edx/edx-platform/language/lv/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -40,10 +40,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-19 20:42+0000\n"
+"POT-Creation-Date: 2023-04-16 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: LTMC Latvijas Tiesnešu mācību centrs <ltmc.training@gmail.com>, 2019\n"
-"Language-Team: Latvian (http://www.transifex.com/open-edx/edx-platform/language/lv/)\n"
+"Language-Team: Latvian (http://app.transifex.com/open-edx/edx-platform/language/lv/)\n"
 "Language: lv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -5954,7 +5954,7 @@ msgid "Please enter non-negative integer."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%- types %> assignments than are assigned."
+msgid "You must have at least one undroppable <%- types %> assignment."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
@@ -6510,6 +6510,10 @@ msgstr ""
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -9986,6 +9990,30 @@ msgid ""
 "scoring assignments are dropped first."
 msgstr ""
 
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
+
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
 msgstr "Kursa izdales materiāli"
@@ -10010,6 +10038,14 @@ msgstr ""
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Enable discussion"
+msgstr ""
+
+#: cms/templates/js/discussion-editor.underscore
+msgid "Topics for unpublished units would not be created"
+msgstr ""
+
+#: cms/templates/js/discussion-editor.underscore
+msgid "Please enable discussions for graded units from course authoring app"
 msgstr ""
 
 #: cms/templates/js/due-date-editor.underscore

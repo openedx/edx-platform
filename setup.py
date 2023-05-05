@@ -157,6 +157,7 @@ setup(
             "ace_common = openedx.core.djangoapps.ace_common.apps:AceCommonConfig",
             "course_live = openedx.core.djangoapps.course_live.apps:CourseLiveConfig",
             "content_libraries = openedx.core.djangoapps.content_libraries.apps:ContentLibrariesConfig",
+            "content_staging = openedx.core.djangoapps.content_staging.apps:ContentStagingAppConfig",
             # Importing an LMS app into the Studio process is not a good
             # practice. We're ignoring this for Discussions here because its
             # placement in LMS is a historical artifact. The eventual goal is to

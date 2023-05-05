@@ -24,7 +24,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             'focus :input': 'inputFocus',
             'blur :input': 'inputUnfocus'
         },
-        initialize: function() {
+        initialize: function(options) {
         //  load template for grading view
             var self = this;
             this.template = HtmlUtils.template(
@@ -40,6 +40,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             this.model.get('graders').on('reset', this.render, this);
             this.model.get('graders').on('add', this.render, this);
             this.selectorToField = _.invert(this.fieldToSelectorMap);
+            this.courseAssignmentLists = options.courseAssignmentLists;
             this.render();
         },
 
@@ -73,10 +74,26 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 },
                 this);
             gradeCollection.each(function(gradeModel) {
-                HtmlUtils.append(gradelist, self.template({model: gradeModel}));
+                var graderType = gradeModel.get('type');
+                var graderTypeAssignmentList = self.courseAssignmentLists[graderType]
+                if (graderTypeAssignmentList === undefined) {
+                    graderTypeAssignmentList = [];
+                }
+
+                HtmlUtils.append(
+                    gradelist,
+                    self.template({
+                        model: gradeModel,
+                        assignmentList: graderTypeAssignmentList
+                    })
+                );
                 var newEle = gradelist.children().last();
-                var newView = new GraderView({el: newEle,
-                    model: gradeModel, collection: gradeCollection});
+                var newView = new GraderView({
+                    el: newEle,
+                    model: gradeModel,
+                    collection: gradeCollection,
+                    courseAssignmentCountInfo: self.courseAssignmentCountInfo,
+                });
                 // Listen in order to rerender when the 'cancel' button is
                 // pressed
                 self.listenTo(newView, 'revert', _.bind(self.render, self));
@@ -122,7 +139,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             this.model.set('minimum_grade_credit', newVal, {validate: true});
         },
         updateModel: function(event) {
-            if (!this.selectorToField[event.currentTarget.id]) return;
+            if (!this.selectorToField[event.currentTarget.id]) { return; }
 
             switch (this.selectorToField[event.currentTarget.id]) {
             case 'grace_period':
@@ -147,8 +164,8 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         // A does not have a drag bar (cannot change its upper limit)
         // Need to insert new bars in right place.
-        GRADES: ['A', 'B', 'C', 'D'],	// defaults for new grade designators
-        descendingCutoffs: [],  // array of { designation : , cutoff : }
+        GRADES: ['A', 'B', 'C', 'D'], // defaults for new grade designators
+        descendingCutoffs: [], // array of { designation : , cutoff : }
         gradeBarWidth: null, // cache of value since it won't change (more certain)
 
         renderCutoffBar: function() {
@@ -166,7 +183,8 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                     descriptor: cutoff.designation,
                     width: nextWidth,
                     contenteditable: true,
-                    removable: removable})
+                    removable: removable
+                })
                 );
                 if (draggable) {
                     var newBar = gradelist.children().last(); // get the dom object not the unparsed string
@@ -206,7 +224,6 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             $(event.currentTarget).toggleClass('active');
             $(event.currentTarget).siblings.toggleClass('is-shown');
         },
-
 
         startMoveClosure: function() {
         // set min/max widths
@@ -279,7 +296,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             var _this = this;
             var gradeElements = this.$el.find('.grades .letter-grade[contenteditable=true]');
             _.each(gradeElements, function(element, index) {
-                if (index !== 0) $(element).text(_this.GRADES[index]);
+                if (index !== 0) { $(element).text(_this.GRADES[index]); }
             });
         },
 
@@ -312,7 +329,8 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 descriptor: this.GRADES[gradeLength],
                 width: targetWidth,
                 contenteditable: true,
-                removable: true});
+                removable: true
+            });
             var gradeDom = this.$el.find('.grades');
             gradeDom.children().last().before(HtmlUtils.ensureHtml(newGradeHtml).toString());
             var newEle = gradeDom.children()[gradeLength];
@@ -358,8 +376,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         },
 
         failLabel: function() {
-            if (this.descendingCutoffs.length === 1) return 'Fail';
-            else return 'F';
+            if (this.descendingCutoffs.length === 1) { return 'Fail'; } else { return 'F'; }
         },
         setFailLabel: function() {
             this.$el.find('.grades .letter-grade').last().text(this.failLabel());
@@ -387,7 +404,8 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                     self.renderCutoffBar();
                 },
                 reset: true,
-                silent: true});
+                silent: true
+            });
         },
         showNotificationBar: function() {
         // We always call showNotificationBar with the same args, just

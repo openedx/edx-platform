@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     describe('Logger', function() {
         it('expose window.log_event', function() {
             expect(window.log_event).toBe(Logger.log);

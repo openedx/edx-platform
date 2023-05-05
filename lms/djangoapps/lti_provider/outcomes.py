@@ -97,7 +97,7 @@ def generate_replace_result_xml(result_sourcedid, score):
     return etree.tostring(xml, xml_declaration=True, encoding='UTF-8')
 
 
-def get_assignments_for_problem(problem_descriptor, user_id, course_key):
+def get_assignments_for_problem(problem_block, user_id, course_key):
     """
     Trace the parent hierarchy from a given problem to find all blocks that
     correspond to graded assignment launches for this user. A problem may
@@ -107,13 +107,13 @@ def get_assignments_for_problem(problem_descriptor, user_id, course_key):
     problem and as a problem in a vertical, for example).
 
     Returns a list of GradedAssignment objects that are associated with the
-    given descriptor for the current user.
+    given block for the current user.
     """
     locations = []
-    current_descriptor = problem_descriptor
-    while current_descriptor:
-        locations.append(current_descriptor.location)
-        current_descriptor = current_descriptor.get_parent()
+    current_block = problem_block
+    while current_block:
+        locations.append(current_block.location)
+        current_block = current_block.get_parent()
     assignments = GradedAssignment.objects.filter(
         user=user_id, course_key=course_key, usage_key__in=locations
     )

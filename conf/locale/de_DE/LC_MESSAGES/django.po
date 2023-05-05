@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/).
+# edX community translations have been downloaded from German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -15,6 +15,7 @@
 # Arno <transifex@senlogik.de>, 2013
 # Arno <transifex@senlogik.de>, 2013
 # Bert Krohn <bert.krohn@tum.de>, 2018
+# Daniel Herrmann, 2023
 # Donna Kl <donna@polarstern-education.com>, 2019
 # Donna Kl <donna@polarstern-education.com>, 2019
 # Ettore Atalan <atalanttore@googlemail.com>, 2014,2016
@@ -43,7 +44,7 @@
 # Waheed Ahmed <waheed@edx.org>, 2019
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/).
+# edX community translations have been downloaded from German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -70,7 +71,7 @@
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2020-2021
 # Vassili Simon <vassifht@googlemail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)
+# edX community translations have been downloaded from German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -113,7 +114,7 @@
 # Waheed Ahmed <waheed@edx.org>, 2019
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)
+# edX community translations have been downloaded from German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -144,7 +145,7 @@
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2021
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/)
+# edX community translations have been downloaded from German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -164,7 +165,7 @@
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2014
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)
+# edX community translations have been downloaded from German (Germany) (https://app.transifex.com/open-edx/teams/6205/de_DE/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -176,10 +177,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-12 20:42+0000\n"
+"POT-Creation-Date: 2023-04-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019\n"
-"Language-Team: German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/)\n"
+"Language-Team: German (Germany) (https://app.transifex.com/open-edx/teams/6205/de_DE/)\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -263,6 +264,13 @@ msgstr "Ein Transkript mit dem \"{language_code}\" Sprach-Code existiert bereits
 msgid "A transcript file is required."
 msgstr "Ein Transkript-Dokument ist erforderlich."
 
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Ready"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -320,8 +328,8 @@ msgid ""
 "photos for verification.  This appies ONLY to modes that require "
 "verification."
 msgstr ""
-"OPTIONAL: Nach diesem Datum/Uhrzeit können keine Fotos zur Verifikation mhr "
-"eingereicht werden. Dieses betrifft NUR Teilnahmen die eine Verifikation "
+"OPTIONAL: Nach diesem Datum/Uhrzeit können keine Fotos zur Verifikation mehr"
+" eingereicht werden. Dieses betrifft NUR Teilnahmen die eine Verifikation "
 "benötigen."
 
 #: common/djangoapps/course_modes/helpers.py
@@ -386,6 +394,17 @@ msgstr ""
 "Teilnahmeart einschreiben. Lassen Sie dieses Feld leer, damit sich die "
 "Teilnehmer bis zum Ende der Einschreibungsphase dieses Kurses auf diese Art "
 "einschreiben können. "
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -5851,6 +5870,7 @@ msgid "Allow"
 msgstr "Erlauben"
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/models.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Fehler"
@@ -7056,6 +7076,37 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "This user already has access to this library."
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Ladevorgang"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
@@ -8309,9 +8360,16 @@ msgid "Success"
 msgstr "Operation Erfolgreich"
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Aktionen"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -11468,10 +11526,10 @@ msgid "Count"
 msgstr "Anzahl"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
 msgstr ""
-"Geben Sie die Anzahl der Auswahlmöglichkeiten ein, die jedem Teilnehmer "
-"angezeigt werden sollen."
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -13235,6 +13293,10 @@ msgid "Library Content"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Leer"
 
@@ -13497,12 +13559,6 @@ msgstr "Hochladen"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "In Progress"
 msgstr "In Bearbeitung"
-
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "Bereit"
 
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
@@ -13768,16 +13824,6 @@ msgstr "Inhalt"
 #: wiki/templates/wiki/settings.html
 msgid "Settings"
 msgstr "Einstellungen"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Ladevorgang"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -14559,6 +14605,14 @@ msgstr "E-Mail"
 msgid "Return To %s"
 msgstr "Zurück zu %s"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -14942,6 +14996,22 @@ msgstr "Downloads und Transkripte"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Videodatei herunterladen"
+
+#: lms/templates/video.html
+msgid "Share on:"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Twitter"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Facebook"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Linkedin"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -18432,10 +18502,6 @@ msgid "Register for free"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Letzten Kurs fortsetzen"
-
-#: lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr "Profil"
 
@@ -21436,10 +21502,8 @@ msgstr "Pfad ID"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
-"Um in diesem Kurs einen Link zu dieser Lerneinheit aus einer HTML-Komponente"
-" zu erstellen, geben Sie als URL-Wert \"/jump_to_id/<location ID>\" ein."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -21633,8 +21697,9 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -24376,6 +24441,14 @@ msgstr "Zugriffseinstellungen"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Zugriff festlegen"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

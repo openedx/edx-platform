@@ -11,8 +11,11 @@ from lms.djangoapps.learner_recommendations.utils import (
     _has_country_restrictions,
     filter_recommended_courses,
     get_amplitude_course_recommendations,
+    get_cross_product_recommendations,
+    get_active_course_run
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from lms.djangoapps.learner_recommendations.tests.test_data import mock_cross_product_recommendation_keys
 
 
 @ddt.ddt
@@ -84,10 +87,6 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
     def setUp(self):
         super().setUp()
         self.user = UserFactory()
-        self.unrestricted_course_keys = [
-            "MITx+6.00.1x",
-            "IBM+PY0101EN",
-        ]
         self.recommended_course_keys = [
             "MITx+6.00.1x",
             "IBM+PY0101EN",
@@ -100,36 +99,10 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
             "NYUx+FCS.NET.1",
             "MichinX+101x",
         ]
-        self.course_run_keys = [
-            "course-v1:MITx+6.00.1x+Run_0",
-            "course-v1:IBM+PY0101EN+Run_0",
-            "course-v1:HarvardX+CS50P+Run_0",
-            "course-v1:UQx+IELTSx+Run_0",
-            "course-v1:HarvardX+CS50x+Run_0",
-            "course-v1:Harvard+CS50z+Run_0",
-            "course-v1:BabsonX+EPS03x+Run_0",
-            "course-v1:TUMx+QPLS2x+Run_0",
-            "course-v1:NYUx+FCS.NET.1+Run_0",
-            "course-v1:MichinX+101x+Run_0",
-        ]
-        self.course_keys_with_active_course_runs = [
-            "MITx+6.00.1x",
-            "IBM+PY0101EN",
-            "HarvardX+CS50P",
-            "UQx+IELTSx",
-            "HarvardX+CS50x",
-            "Harvard+CS50z",
-            "BabsonX+EPS03x",
-            "TUMx+QPLS2x",
-        ]
-        self.enrolled_course_run_keys = [
-            "course-v1:HarvardX+CS50x+Run_0",
-            "course-v1:Harvard+CS50z+Run_0",
-            "course-v1:BabsonX+EPS03x+Run_0",
-            "course-v1:TUMx+QPLS2x+Run_0",
-            "course-v1:NYUx+FCS.NET.1+Run_0",
-            "course-v1:MichinX+101x+Run_0",
-        ]
+        self.unrestricted_course_keys = self.recommended_course_keys[0:2]
+        self.course_run_keys = [f"course-v1:{course_key}+Run_0" for course_key in self.recommended_course_keys]
+        self.course_keys_with_active_course_runs = self.recommended_course_keys[0:8]
+        self.enrolled_course_run_keys = self.course_run_keys[4:10]
 
     def _mock_get_course_data(self, course_id, fields=None, querystring=None):  # pylint: disable=unused-argument
         """
@@ -157,7 +130,7 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
                 {
                     "course_runs": [
                         {
-                            "key": "course-v1:MITx+6.00.1x+Run_0",
+                            "key": f"course-v1:{course_id}+Run_0",
                         }
                     ]
                 }
@@ -193,12 +166,12 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
         Test that if the "request course" is one of the recommended courses,
         we filter that from the final recommendation list.
         """
-        request_course = self.recommended_course_keys[0]
+        request_course = self.course_run_keys[0]
         mocked_get_course_data.side_effect = self._mock_get_course_data
         filtered_courses = filter_recommended_courses(
             self.user,
             self.recommended_course_keys,
-            request_course=request_course,
+            request_course_key=request_course,
         )
 
         assert all(course["course_key"] != request_course for course in filtered_courses) is True
@@ -239,3 +212,72 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
             expected_recommendations.append(self._mock_get_course_data(course_key))
 
         assert filtered_courses == expected_recommendations
+
+
+@ddt.ddt
+class TestGetCrossProductRecommendationsMethod(TestCase):
+    """Test for get_cross_product_recommendations method"""
+
+    @ddt.data(
+        ("edx+HL0", ["edx+HL1", "edx+HL2"]),
+        ("edx+BZ0", ["edx+BZ1", "edx+BZ2"]),
+        ('NoKeyAssociated', None)
+    )
+    @patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @ddt.unpack
+    def test_get_cross_product_recommendations_method(self, course_key, expected_response):
+        assert get_cross_product_recommendations(course_key) == expected_response
+
+
+class TestGetActiveCourseRunMethod(TestCase):
+    """Tests for get_active_course_run method"""
+
+    advertised_course_run_uuid = "jh76b2c9-589b-4d1e-88c1-b01a02db3a9c"
+
+    def _mock_get_course_data(self, active_course_run=False):
+        """
+        Returns a course with details based on the status passed
+        """
+        return {
+            "key": "edx+BLN",
+            "uuid": "6f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
+            "course_runs": [
+                {
+                    "key": "course-v1:Test+2023_T1",
+                    "uuid": "hb86b3cf-589b-4d1e-88c1-b01a02db3a9c",
+                    "status": "published",
+                },
+                {
+                    "key": "course-v1:Test+2023_T2",
+                    "uuid": self.advertised_course_run_uuid if active_course_run else "other-uuid",
+                    "status": "published",
+                }
+            ],
+            "course_run_statuses": ["published"],
+            "advertised_course_run_uuid": self.advertised_course_run_uuid if active_course_run else None,
+        }
+
+    def test_advertised_course_run_returned(self):
+        """
+        Test that the course run with the uuid that matches the advertised_uuid_course_run_uuid is returned
+        """
+        course = self._mock_get_course_data(active_course_run=True)
+        active_course_run = get_active_course_run(course)
+
+        self.assertDictEqual(
+            active_course_run,
+            {
+                "key": "course-v1:Test+2023_T2",
+                "uuid": self.advertised_course_run_uuid,
+                "status": "published"
+            }
+        )
+
+    def test_no_course_run_returned(self):
+        """
+        Test that if there is no advertised_course_run_uuid value, no course run is returned
+        """
+        course = self._mock_get_course_data(active_course_run=False)
+        active_course_run = get_active_course_run(course)
+
+        self.assertIsNone(active_course_run)

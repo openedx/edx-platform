@@ -16,7 +16,7 @@ const Main = props => (
             open={!!props.errorMessage}
         />
         <h2>
-      Student Support: Entitlement
+            Student Support: Entitlement
         </h2>
         <MainContent
             isFormOpen={props.isFormOpen}
@@ -43,8 +43,8 @@ const MainContent = (props) => {
                 />
             </div>
             {
-                props.entitlements.length > 0 ?
-                    <EntitlementSupportTableContainer ecommerceUrl={props.ecommerceUrl} /> : null
+                props.entitlements.length > 0
+                    ? <EntitlementSupportTableContainer ecommerceUrl={props.ecommerceUrl} /> : null
             }
         </div>
     );

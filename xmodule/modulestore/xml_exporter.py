@@ -111,7 +111,7 @@ class ExportManager:
 
         `modulestore`: A `ModuleStore` object that is the source of the blocks to export
         `contentstore`: A `ContentStore` object that is the source of the content to export, can be None
-        `courselike_key`: The Locator of the Descriptor to export
+        `courselike_key`: The Locator of the block to export
         `root_dir`: The directory to write the exported xml to
         `target_dir`: The name of the directory inside `root_dir` to write the content to
         """

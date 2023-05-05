@@ -516,6 +516,16 @@ FEATURES = {
     #   in the LMS and CMS.
     # .. toggle_tickets: 'https://github.com/open-craft/edx-platform/pull/429'
     'DISABLE_UNENROLLMENT': False,
+
+    # .. toggle_name: FEATURES['DISABLE_ADVANCED_SETTINGS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Set to `True` to disable the advanced settings page in Studio for all users except those
+    #   having `is_superuser` or `is_staff` set to `True`.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-03-31
+    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/32015
+    'DISABLE_ADVANCED_SETTINGS': False,
 }
 
 # .. toggle_name: ENABLE_COPPA_COMPLIANCE
@@ -641,6 +651,9 @@ OPTIMIZELY_FULLSTACK_SDK_KEY = None
 
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
+
+######################## HOTJAR ###########################
+HOTJAR_ID = 00000
 
 ############################# TEMPLATE CONFIGURATION #############################
 # Mako templating
@@ -831,6 +844,8 @@ XQUEUE_INTERFACE = {
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
+    'edx_django_utils.security.csp.middleware.content_security_policy_middleware',
+
     'crum.CurrentRequestUserMiddleware',
 
     # Resets the request cache.
@@ -1550,8 +1565,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+
+    # Tweaked version of django.contrib.staticfiles
+    'openedx.core.djangoapps.staticfiles.apps.EdxPlatformStaticFilesConfig',
+
     'django_celery_results',
+
     'method_override',
 
     # Common Initialization
@@ -1621,6 +1640,9 @@ INSTALLED_APPS = [
 
     # Discussion
     'openedx.core.djangoapps.django_comment_common',
+
+    # Notifications
+    'openedx.core.djangoapps.notifications',
 
     # for course creator table
     'django.contrib.admin',
@@ -2407,7 +2429,7 @@ ANALYTICS_DASHBOARD_NAME = 'Your Platform Name Here Insights'
 COMMENTS_SERVICE_URL = 'http://localhost:18080'
 COMMENTS_SERVICE_KEY = 'password'
 
-EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
+EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 EXAMS_SERVICE_USERNAME = 'edx_exams_worker'
 
 FINANCIAL_REPORTS = {

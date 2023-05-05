@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/).
+# edX community translations have been downloaded from Vietnamese (http://app.transifex.com/open-edx/edx-platform/language/vi/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -48,7 +48,7 @@
 # vngocdiep <vngocdiep98@gmail.com>, 2014
 # Vu Bach, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/).
+# edX community translations have been downloaded from Vietnamese (http://app.transifex.com/open-edx/edx-platform/language/vi/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -73,7 +73,7 @@
 # Le Minh Tri <trilm@hihexa.com>, 2020
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
+# edX community translations have been downloaded from Vietnamese (http://app.transifex.com/open-edx/edx-platform/language/vi/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -126,7 +126,7 @@
 # gvikei <truckhuyen@gmail.com>, 2014
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015-2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
+# edX community translations have been downloaded from Vietnamese (http://app.transifex.com/open-edx/edx-platform/language/vi/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -162,7 +162,7 @@
 # Theodora. Tôn Nữ Quý Thiện <thien.tonnu1001@gmail.com>, 2015-2016
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015-2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
+# edX community translations have been downloaded from Vietnamese (http://app.transifex.com/open-edx/edx-platform/language/vi/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -185,7 +185,7 @@
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015
 # Tuan Nguyen <manhtuanbn12@gmail.com>, 2018
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (https://www.transifex.com/open-edx/teams/6205/vi/)
+# edX community translations have been downloaded from Vietnamese (https://app.transifex.com/open-edx/teams/6205/vi/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -198,10 +198,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-19 20:42+0000\n"
+"POT-Creation-Date: 2023-04-23 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Le Minh Tri <trilm@hihexa.com>, 2020\n"
-"Language-Team: Vietnamese (https://www.transifex.com/open-edx/teams/6205/vi/)\n"
+"Language-Team: Vietnamese (https://app.transifex.com/open-edx/teams/6205/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -271,6 +271,13 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
+msgstr ""
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Ready"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -371,6 +378,17 @@ msgid ""
 "OPTIONAL: After this date/time, users will no longer be able to enroll in "
 "this mode. Leave this blank if users can enroll in this mode until "
 "enrollment closes for the course."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -6321,6 +6339,37 @@ msgstr ""
 msgid "This user already has access to this library."
 msgstr ""
 
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Đang tải"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -7412,9 +7461,16 @@ msgstr ""
 msgid "Success"
 msgstr "Thành công"
 
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Actions"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -10113,7 +10169,9 @@ msgid "Count"
 msgstr ""
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
 msgstr ""
 
 #: xmodule/library_content_block.py
@@ -11638,6 +11696,10 @@ msgid "Library Content"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Trống "
 
@@ -11889,12 +11951,6 @@ msgstr "tải lên"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "In Progress"
 msgstr "Trong tiến trình"
-
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "Sẳn sàng"
 
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
@@ -12153,16 +12209,6 @@ msgstr "Nội dung"
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "Thiết lập"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Đang tải"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -12920,6 +12966,14 @@ msgstr "E-mail"
 msgid "Return To %s"
 msgstr "Quay lại %s"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -13300,6 +13354,22 @@ msgstr "Tải xuống và bản dịch"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "Tải xuống tệp video"
+
+#: lms/templates/video.html
+msgid "Share on:"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Twitter"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Facebook"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Linkedin"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16496,10 +16566,6 @@ msgid "Register for free"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr ""
-
-#: lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr "Hồ sơ"
 
@@ -19353,10 +19419,8 @@ msgstr "Vị trí ID"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
-"Để tạo liên kết đến đơn vị này từ một thành phần HTML trong khóa học này, "
-"hãy nhập \"/jump_to_id/<location ID>\" làm giá trị URL."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -19546,8 +19610,9 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -22202,6 +22267,14 @@ msgstr "Những Thiết lập Truy cập"
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
 msgstr "Thiết lạp Truy cập"
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

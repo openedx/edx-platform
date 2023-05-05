@@ -8,7 +8,7 @@ import pytest
 from django.test import TestCase
 
 from openedx.core.lib import blockstore_api as api
-from openedx.core.djangoapps.content_libraries.tests.base import (
+from openedx.core.lib.blockstore_api.tests.base import (
     BlockstoreAppTestMixin,
     requires_blockstore,
     requires_blockstore_app,

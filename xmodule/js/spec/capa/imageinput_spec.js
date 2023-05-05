@@ -79,8 +79,10 @@
             event = jQuery.Event(
                 'click',
                 {
-                    offsetX: undefined, offsetY: undefined,
-                    pageX: 35.3, pageY: 42.7
+                    offsetX: undefined,
+                    offsetY: undefined,
+                    pageX: 35.3,
+                    pageY: 42.7
                 }
             );
 

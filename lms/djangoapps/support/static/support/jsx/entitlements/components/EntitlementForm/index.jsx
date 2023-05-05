@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, InputSelect, InputText, TextArea } from '@edx/paragon';
+import {
+    Button, InputSelect, InputText, TextArea
+} from '@edx/paragon';
 import { formTypes } from '../../data/constants/formTypes';
 
 class EntitlementForm extends React.Component {
@@ -54,17 +56,23 @@ class EntitlementForm extends React.Component {
     }
 
     submitForm() {
-        const { courseUuid, username, mode, comments } = this.state;
+        const {
+            courseUuid, username, mode, comments
+        } = this.state;
         const { formType, entitlement } = this.props;
         if (formType === formTypes.REISSUE) { // if there is an active entitlement we are updating an entitlement
             this.props.reissueEntitlement({ entitlement, comments });
         } else { // if there is no active entitlement we are creating a new entitlement
-            this.props.createEntitlement({ courseUuid, username, mode, comments });
+            this.props.createEntitlement({
+                courseUuid, username, mode, comments
+            });
         }
     }
 
     render() {
-        const { courseUuid, username, mode, comments } = this.state;
+        const {
+            courseUuid, username, mode, comments
+        } = this.state;
         const isReissue = this.props.formType === formTypes.REISSUE;
         const title = isReissue ? 'Re-issue Entitlement' : 'Create Entitlement';
 

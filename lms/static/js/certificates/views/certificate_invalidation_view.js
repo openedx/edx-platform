@@ -3,6 +3,7 @@
 
 (function(define) {
     'use strict';
+
     define(
         ['jquery', 'underscore', 'gettext', 'backbone', 'js/certificates/models/certificate_invalidation'],
 
@@ -46,7 +47,7 @@
                     );
 
                     if (this.collection.findWhere({user: user})) {
-                        message = gettext('Certificate of <%= user %> has already been invalidated. Please check your spelling and retry.');  // eslint-disable-line max-len
+                        message = gettext('Certificate of <%= user %> has already been invalidated. Please check your spelling and retry.'); // eslint-disable-line max-len
                         this.escapeAndShowMessage(_.template(message)({user: user}));
                     } else if (certificate_invalidation.isValid()) {
                         var self = this;
@@ -84,7 +85,7 @@
                         model.destroy({
                             success: function() {
                                 self.escapeAndShowMessage(
-                                    gettext('The certificate for this learner has been re-validated and the system is re-running the grade for this learner.')  // eslint-disable-line max-len
+                                    gettext('The certificate for this learner has been re-validated and the system is re-running the grade for this learner.') // eslint-disable-line max-len
                                 );
                             },
                             error: function(model, response) {
@@ -102,7 +103,7 @@
                         });
                     } else {
                         self.escapeAndShowMessage(
-                            gettext('Could not find Certificate Invalidation in the list. Please refresh the page and try again')  // eslint-disable-line max-len
+                            gettext('Could not find Certificate Invalidation in the list. Please refresh the page and try again') // eslint-disable-line max-len
                         );
                     }
                 },

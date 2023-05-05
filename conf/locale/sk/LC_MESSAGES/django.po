@@ -1,12 +1,12 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Slovak (http://www.transifex.com/open-edx/edx-platform/language/sk/).
+# edX community translations have been downloaded from Slovak (http://app.transifex.com/open-edx/edx-platform/language/sk/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # adb712fb58d87c74cf0f50ac3f74745f_5787dfc <f5bd2e80de1f49ebcbfb1ada57f8da8f_182912>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Slovak (http://www.transifex.com/open-edx/edx-platform/language/sk/).
+# edX community translations have been downloaded from Slovak (http://app.transifex.com/open-edx/edx-platform/language/sk/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -16,7 +16,7 @@
 # Peter Sinal <396106@mail.muni.cz>, 2017
 # Vladimír Záhradník <vladimir@zahradnik.io>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Slovak (http://www.transifex.com/open-edx/edx-platform/language/sk/)
+# edX community translations have been downloaded from Slovak (http://app.transifex.com/open-edx/edx-platform/language/sk/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -27,14 +27,14 @@
 # Muhammad Adeel Khan <adeel@edx.org>, 2019
 # Vladimír Záhradník <vladimir@zahradnik.io>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Slovak (http://www.transifex.com/open-edx/edx-platform/language/sk/)
+# edX community translations have been downloaded from Slovak (http://app.transifex.com/open-edx/edx-platform/language/sk/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
 # adb712fb58d87c74cf0f50ac3f74745f_5787dfc <f5bd2e80de1f49ebcbfb1ada57f8da8f_182912>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Slovak (http://www.transifex.com/open-edx/edx-platform/language/sk/)
+# edX community translations have been downloaded from Slovak (http://app.transifex.com/open-edx/edx-platform/language/sk/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -43,7 +43,7 @@
 # Vladimír Záhradník <vladimir@zahradnik.io>, 2014
 # Vladimír Záhradník <vladimir@zahradnik.io>, 2015
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Slovak (https://www.transifex.com/open-edx/teams/6205/sk/)
+# edX community translations have been downloaded from Slovak (https://app.transifex.com/open-edx/teams/6205/sk/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -55,10 +55,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-19 20:42+0000\n"
+"POT-Creation-Date: 2023-04-23 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
-"Language-Team: Slovak (https://www.transifex.com/open-edx/teams/6205/sk/)\n"
+"Language-Team: Slovak (https://app.transifex.com/open-edx/teams/6205/sk/)\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -138,6 +138,13 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
+msgstr ""
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Ready"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
@@ -255,6 +262,17 @@ msgid ""
 "OPTIONAL: After this date/time, users will no longer be able to enroll in "
 "this mode. Leave this blank if users can enroll in this mode until "
 "enrollment closes for the course."
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
@@ -5281,6 +5299,7 @@ msgid "Allow"
 msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/models.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Chyba"
@@ -6380,6 +6399,37 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "This user already has access to this library."
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Načítavanie"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
@@ -7497,9 +7547,16 @@ msgid "Success"
 msgstr ""
 
 #: openedx/core/djangoapps/user_api/admin.py
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Akcie"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -10239,7 +10296,9 @@ msgid "Count"
 msgstr ""
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
 msgstr ""
 
 #: xmodule/library_content_block.py
@@ -11764,6 +11823,10 @@ msgid "Library Content"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Prázdny"
 
@@ -12013,12 +12076,6 @@ msgstr "Odovzdáva sa"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "In Progress"
 msgstr "Spracúva sa"
-
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "Pripravené"
 
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
@@ -12272,16 +12329,6 @@ msgstr "Obsah"
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "Nastavenia"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Načítavanie"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -13029,6 +13076,14 @@ msgstr "E-mail"
 msgid "Return To %s"
 msgstr ""
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -13389,6 +13444,22 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Download video file"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Share on:"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Twitter"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Facebook"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Linkedin"
 msgstr ""
 
 #: lms/templates/video.html
@@ -16267,10 +16338,6 @@ msgid "Register for free"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr ""
-
-#: lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr ""
 
@@ -18893,7 +18960,7 @@ msgstr ""
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
@@ -19055,8 +19122,9 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -21366,6 +21434,14 @@ msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Set Access"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Copy"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

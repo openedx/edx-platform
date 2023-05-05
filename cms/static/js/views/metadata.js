@@ -12,6 +12,7 @@ define(
     function(Backbone, BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog,
         LicenseModel, LicenseView, TranscriptUtils, VideoList, VideoTranslations, HtmlUtils) {
         'use strict';
+
         var Metadata = {};
 
         Metadata.Editor = BaseView.extend({
@@ -233,8 +234,8 @@ define(
                 // This first filtering if statement is take from polyfill to prevent
                 // non-numeric input (for browsers that don't use polyfill because they DO have a number input type).
                 var _ref, _ref1;
-                if (((_ref = e.keyCode) !== 8 && _ref !== 9 && _ref !== 35 && _ref !== 36 && _ref !== 37 && _ref !== 39) &&
-                ((_ref1 = e.which) !== 45 && _ref1 !== 46 && _ref1 !== 48 && _ref1 !== 49 && _ref1 !== 50 && _ref1 !== 51
+                if (((_ref = e.keyCode) !== 8 && _ref !== 9 && _ref !== 35 && _ref !== 36 && _ref !== 37 && _ref !== 39)
+                && ((_ref1 = e.which) !== 45 && _ref1 !== 46 && _ref1 !== 48 && _ref1 !== 49 && _ref1 !== 50 && _ref1 !== 51
                     && _ref1 !== 52 && _ref1 !== 53 && _ref1 !== 54 && _ref1 !== 55 && _ref1 !== 56 && _ref1 !== 57)) {
                     e.preventDefault();
                 }
@@ -561,7 +562,6 @@ define(
                 }
             }
         });
-
 
         /**
      * Provides convenient way to upload/download files in component edit.

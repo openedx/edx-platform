@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'gettext', 'jquery', 'underscore', 'backbone',
         'edx-ui-toolkit/js/utils/html-utils', 'js/views/fields',

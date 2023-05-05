@@ -213,8 +213,8 @@ class ConditionalBlock(
             for block in self.get_required_blocks:
                 if not hasattr(block, attr_name):
                     # We don't throw an exception here because it is possible for
-                    # the descriptor of a required block to have a property but
-                    # for the resulting module to be a (flavor of) ErrorBlock.
+                    # the required block to have a property but
+                    # for the resulting block to be a (flavor of) ErrorBlock.
                     # So just log and return false.
                     if block is not None:
                         # We do not want to log when block is None, and it is when requester
@@ -244,7 +244,7 @@ class ConditionalBlock(
         return fragment
 
     def get_html(self):
-        required_html_ids = [descriptor.location.html_id() for descriptor in self.get_required_blocks]
+        required_html_ids = [block.location.html_id() for block in self.get_required_blocks]
         return self.runtime.service(self, 'mako').render_template('conditional_ajax.html', {
             'element_id': self.location.html_id(),
             'ajax_url': self.ajax_url,
@@ -298,7 +298,7 @@ class ConditionalBlock(
         class_priority = ['video', 'problem']
 
         child_classes = [
-            child_descriptor.get_icon_class() for child_descriptor in self.get_children()
+            child_block.get_icon_class() for child_block in self.get_children()
         ]
         for c in class_priority:
             if c in child_classes:
@@ -318,24 +318,24 @@ class ConditionalBlock(
         Returns a list of bound XBlocks instances upon which XBlock depends.
         """
         return [
-            self.runtime.get_block_for_descriptor(descriptor) for descriptor in self.get_required_block_descriptors()
+            self.runtime.get_block_for_descriptor(block) for block in self.get_required_block_descriptors()
         ]
 
     def get_required_block_descriptors(self):
         """
         Returns a list of unbound XBlocks instances upon which this XBlock depends.
         """
-        descriptors = []
+        blocks = []
         for location in self.sources_list:
             try:
-                descriptor = self.runtime.get_block(location)
-                descriptors.append(descriptor)
+                block = self.runtime.get_block(location)
+                blocks.append(block)
             except ItemNotFoundError:
                 msg = "Invalid module by location."
                 log.exception(msg)
                 self.runtime.error_tracker(msg)
 
-        return descriptors
+        return blocks
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -357,8 +357,8 @@ class ConditionalBlock(
                     show_tag_list.append(location)
             else:
                 try:
-                    descriptor = system.process_xml(etree.tostring(child, encoding='unicode'))
-                    children.append(descriptor.scope_ids.usage_id)
+                    block = system.process_xml(etree.tostring(child, encoding='unicode'))
+                    children.append(block.scope_ids.usage_id)
                 except:  # lint-amnesty, pylint: disable=bare-except
                     msg = "Unable to load child when parsing Conditional."
                     log.exception(msg)
