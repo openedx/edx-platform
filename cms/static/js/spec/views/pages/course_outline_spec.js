@@ -2476,7 +2476,6 @@ describe('CourseOutlinePage', function() {
                 outlinePage.$('.outline-unit .configure-button').click();
                 expect($('.modal-section .edit-discussion')).not.toExist();
             });
-
         });
 
         verifyTypePublishable('unit', function(options) {

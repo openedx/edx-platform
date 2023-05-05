@@ -3,7 +3,6 @@
 import Backbone from 'backbone';
 
 class UnenrollView extends Backbone.View {
-
     constructor(options) {
         const defaults = {
             el: '.unenroll-modal',

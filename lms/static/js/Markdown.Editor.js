@@ -524,7 +524,6 @@
                 var keyCodeChar = String.fromCharCode(keyCode);
 
                 switch (keyCodeChar) {
-
                 case 'y':
                     undoObj.redo();
                     handled = true;
@@ -548,7 +547,6 @@
                 if (window.event) {
                     window.event.returnValue = false;
                 }
-                return;
             }
         };
 
@@ -1575,8 +1573,6 @@
             chunk.before += markup;
             chunk.after = markup + chunk.after;
         }
-
-        return;
     };
 
     commandProto.stripLinkDefs = function(text, defsToAdd) {

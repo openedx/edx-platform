@@ -2,7 +2,7 @@ import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
-import progressViewTpl from '../../../templates/learner_dashboard//progress_circle_view.underscore';
+import progressViewTpl from '../../../templates/learner_dashboard/progress_circle_view.underscore';
 import progressSegmentTpl from '../../../templates/learner_dashboard/progress_circle_segment.underscore';
 
 class ProgressCircleView extends Backbone.View {
