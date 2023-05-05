@@ -178,8 +178,11 @@ class ClassStudents(models.Model):
 
 
 class JournalPost(TimeStampedModel):
-    id = models.CharField(primary_key=True, max_length=64, default=uuid.uuid4, editable=False)
     JOURNAL_TYPE_CHOICES = JournalTypes.__MODEL_CHOICES__
+    class Meta:
+        unique_together = ("uuid", "student",)
+
+    uuid = models.CharField(max_length=64, default=uuid.uuid4, editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="journal_posts")
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True, related_name="journal_feedbacks")
     title = models.CharField(max_length=128)

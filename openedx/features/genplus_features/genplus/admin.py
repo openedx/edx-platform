@@ -467,3 +467,8 @@ class GenError(admin.ModelAdmin):
                 return "Yes" if obj.user.social_auth.count() > 0 else "No"
         except AttributeError:
             return '-'
+
+
+@admin.register(JournalPost)
+class JournalPostAdmin(admin.ModelAdmin):
+    list_display = ('uuid', 'student', 'teacher', 'title', 'description', 'journal_type')
