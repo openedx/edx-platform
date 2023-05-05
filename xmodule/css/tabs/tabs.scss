@@ -1,4 +1,9 @@
 // styles duped from _unit.scss - Edit Header (Component Name, Mode-Editor, Mode-Settings)
+@import 'vendor/bi-app/bi-app-ltr';
+@import 'bourbon/bourbon';
+@import 'lms/theme/variables';
+@import 'cms/theme/variables-v1';
+@import 'mixins';
 
 
 .tabs-wrapper {
