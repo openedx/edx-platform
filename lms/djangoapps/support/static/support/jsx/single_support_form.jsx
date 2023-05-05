@@ -1,7 +1,13 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* global gettext */
 /* eslint one-var: ["error", "always"] */
 /* eslint no-alert: "error" */
 
+// eslint-disable-next-line max-classes-per-file
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -29,6 +35,7 @@ class RenderForm extends React.Component {
         this.zendeskApiUrl = 'https://edxsupport.zendesk.com';
         this.submitButton = null;
         this.state = {
+            // eslint-disable-next-line react/no-unused-state
             currentRequest: null,
             errorList: initialFormErrors,
             success: false,
@@ -70,6 +77,7 @@ class RenderForm extends React.Component {
         return this.state.errorList;
     }
 
+    // eslint-disable-next-line react/sort-comp
     clearErrorState() {
         const formErrorsInState = this.getFormErrorsFromState();
         Object.keys(formErrorsInState).map((index) => {
@@ -120,6 +128,7 @@ class RenderForm extends React.Component {
         window.location.href = this.courseDiscussionURL.replace('{course_id}', formData.course);
     }
 
+    // eslint-disable-next-line consistent-return, react/sort-comp
     handleClick(event) {
         event.preventDefault();
         this.submitButton = event.currentTarget;
@@ -156,6 +165,7 @@ class RenderForm extends React.Component {
             };
         request.open('POST', url, true);
         request.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
+        // eslint-disable-next-line no-undef
         request.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
         request.send(JSON.stringify(data));
         request.onreadystatechange = function success() {
@@ -183,14 +193,18 @@ class RenderForm extends React.Component {
             subjectError,
             messageError;
 
+        // eslint-disable-next-line prefer-const
         courseError = (course === '') ? this.formValidationErrors.course : undefined;
         this.updateErrorInState('course', courseError);
+        // eslint-disable-next-line prefer-const
         subjectError = (subject === '') ? this.formValidationErrors.subject : undefined;
         this.updateErrorInState('subject', subjectError);
+        // eslint-disable-next-line prefer-const
         messageError = (message === '') ? this.formValidationErrors.message : undefined;
         this.updateErrorInState('message', messageError);
     }
 
+    // eslint-disable-next-line react/sort-comp
     renderSuccess() {
         return (
             <Success
@@ -205,6 +219,7 @@ class RenderForm extends React.Component {
     handleInputChange(event) {
         event.preventDefault();
         const queryString = event.target.value;
+        // eslint-disable-next-line one-var
         const { typingTimeout } = this.state;
         if (queryString.length > 3) {
             if (typingTimeout) { clearTimeout(typingTimeout); }
@@ -233,6 +248,7 @@ class RenderForm extends React.Component {
 
     onKeyDown(event) {
         const { activeSuggestion, suggestions } = this.state;
+        // eslint-disable-next-line one-var
         const enterKeyCode = 13,
             upArrowKeyCode = 38,
             downArrowKeyCode = 40;
@@ -240,16 +256,19 @@ class RenderForm extends React.Component {
         if (event.keyCode === enterKeyCode) {
             window.location.href = suggestions[activeSuggestion].html_url;
         } else if (event.keyCode === upArrowKeyCode) {
+            // eslint-disable-next-line no-unused-expressions
             (activeSuggestion === 0)
                 ? this.setState({ activeSuggestion: suggestions.length - 1 })
                 : this.setState({ activeSuggestion: activeSuggestion - 1 });
         } else if (event.keyCode === downArrowKeyCode) {
+            // eslint-disable-next-line no-unused-expressions
             (activeSuggestion + 1 === suggestions.length)
                 ? this.setState({ activeSuggestion: 0 })
                 : this.setState({ activeSuggestion: activeSuggestion + 1 });
         }
     }
 
+    // eslint-disable-next-line no-unused-vars
     handleBlur(event) {
         if (!this.ignoreBlur) {
             this.setState({
@@ -298,13 +317,17 @@ class RenderForm extends React.Component {
             suggestionsListComponent = (
                 <ul className="suggestions">
                     {suggestions.map((suggestion, index) => (
+                        // eslint-disable-next-line max-len
+                        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
                         <li
                             className={index === activeSuggestion ? 'suggestion-active' : null}
+                            // eslint-disable-next-line react/no-array-index-key
                             key={index}
                             onMouseDown={() => this.setIgnoreBlur(true)}
                             onClick={() => this.handleSuggestionClick(suggestion.html_url)}
                             onMouseOver={() => this.setState({ activeSuggestion: index })}
                         >
+                            {/* eslint-disable-next-line react/no-danger */}
                             <div dangerouslySetInnerHTML={{ __html: suggestion.title }} />
                         </li>
                     ))}
@@ -335,6 +358,7 @@ class RenderForm extends React.Component {
 
                 <div className="row">
                     <div className="col-sm-8">
+                        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                         <label className="sr-only">Search the Learner Help Center</label>
                         <input
                             type="search"
@@ -378,6 +402,7 @@ class RenderForm extends React.Component {
 
 RenderForm.propTypes = {
     context: PropTypes.shape({
+        // eslint-disable-next-line react/forbid-prop-types
         customFields: PropTypes.object,
         dashboardUrl: PropTypes.string,
         homepageUrl: PropTypes.string,
@@ -387,6 +412,7 @@ RenderForm.propTypes = {
         submitFormUrl: PropTypes.string,
         supportEmail: PropTypes.string,
         tags: PropTypes.arrayOf(PropTypes.string),
+        // eslint-disable-next-line react/forbid-prop-types
         user: PropTypes.object,
     }).isRequired,
 };

@@ -36,6 +36,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
             placeholderValue: fieldData.placeholderValue || 'I am a placeholder message'
         };
 
+        // eslint-disable-next-line default-case
         switch (fieldType) {
         case FieldViews.DropdownFieldView:
             data.required = fieldData.required || false;
@@ -146,6 +147,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         var view = new fieldClass(fieldData).render();
         var valueInputSelector;
 
+        // eslint-disable-next-line default-case
         switch (fieldClass) {
         case FieldViews.TextFieldView:
             valueInputSelector = '.u-field-value > input';

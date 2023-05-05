@@ -2,6 +2,7 @@
     var output, Converter;
     if (typeof exports === 'object' && typeof require === 'function') { // we're in a CommonJS (e.g. Node.js) module
         output = exports;
+        // eslint-disable-next-line global-require
         Converter = require('./Markdown.Converter').Converter;
     } else {
         output = window.Markdown;
@@ -79,7 +80,7 @@
                 }
             }
 
-            // eslint-disable-next-line brace-style
+            /* eslint-disable-next-line brace-style, no-multi-assign */
             if (match == -1) { needsRemoval = tagremove[ctag] = true; } // mark for removal
             else { tagpaired[match] = true; } // mark paired
         }
@@ -89,6 +90,7 @@
         // delete all orphaned tags from the string
 
         var ctag = 0;
+        // eslint-disable-next-line no-shadow
         html = html.replace(re, function(match) {
             var res = tagremove[ctag] ? '' : match;
             ctag++;

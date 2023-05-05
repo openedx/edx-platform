@@ -1,14 +1,25 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals loadFixtures */
 
 import $ from 'jquery'; // eslint-disable-line import/extensions
+// eslint-disable-next-line object-curly-spacing
 import { Currency } from '../currency';
 
 describe('Currency factory', () => {
+    // eslint-disable-next-line no-unused-vars
     let currency;
+    // eslint-disable-next-line no-unused-vars
     let canadaPosition;
+    // eslint-disable-next-line no-unused-vars
     let usaPosition;
+    // eslint-disable-next-line no-unused-vars
     let japanPosition;
 
+    // eslint-disable-next-line no-undef
     window.analytics = jasmine.createSpyObj('analytics', ['page', 'track', 'trackLink']);
 
     beforeEach(() => {

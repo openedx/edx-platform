@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -35,6 +40,7 @@ class EntitlementForm extends React.Component {
         this.submitForm = this.submitForm.bind(this);
     }
 
+    // eslint-disable-next-line react/sort-comp
     onClose() {
         this.props.closeForm();
     }

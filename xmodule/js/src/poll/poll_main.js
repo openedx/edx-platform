@@ -184,6 +184,7 @@
                     answer.textEl.html(HtmlUtils.HTML(value).toString());
 
                     if (_this.shortVersion === true) {
+                        // eslint-disable-next-line no-shadow
                         $.each(answer, function(index, value) {
                             if (value instanceof jQuery) {
                                 value.addClass('short');

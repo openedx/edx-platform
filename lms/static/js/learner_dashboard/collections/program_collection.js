@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 import Backbone from 'backbone';
 import Program from '../models/program_model';
 
@@ -6,6 +11,7 @@ class ProgramCollection extends Backbone.Collection {
         const defaults = {
             model: Program,
         };
+        // eslint-disable-next-line prefer-object-spread
         super(models, Object.assign({}, defaults, options));
     }
 }

@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals setFixtures */
 import moment from 'moment';
 
@@ -542,6 +547,7 @@ describe('Program Details View', () => {
     };
 
     const initView = (updates) => {
+        // eslint-disable-next-line no-undef
         const viewOptions = $.extend({}, options, updates);
 
         return new ProgramDetailsView(viewOptions);
@@ -587,6 +593,7 @@ describe('Program Details View', () => {
     it('should render the program heading congratulations message if all courses completed', () => {
         view = initView({
             // Remove remaining courses so all courses are complete
+            // eslint-disable-next-line no-undef
             courseData: $.extend({}, options.courseData, {
                 in_progress: [],
                 not_started: [],
@@ -613,26 +620,34 @@ describe('Program Details View', () => {
     it('should render the basic course card information', () => {
         view = initView();
         view.render();
+        // eslint-disable-next-line no-undef
         expect($(view.$('.course-title')[0]).text().trim()).toEqual('Star Trek: The Next Generation');
+        // eslint-disable-next-line no-undef
         expect($(view.$('.enrolled')[0]).text().trim()).toEqual('Enrolled:');
+        // eslint-disable-next-line no-undef
         expect($(view.$('.run-period')[0]).text().trim()).toEqual('Mar 20, 2017 - Mar 31, 2017');
     });
 
     it('should render certificate information', () => {
         view = initView();
         view.render();
+        // eslint-disable-next-line no-undef
         expect($(view.$('.upgrade-message .card-msg')).text().trim()).toEqual('Certificate Status:');
+        // eslint-disable-next-line no-undef
         expect($(view.$('.upgrade-message .price')).text().trim()).toEqual('$10.00');
+        // eslint-disable-next-line no-undef
         expect($(view.$('.upgrade-button.single-course-run')[0]).text().trim()).toEqual('Upgrade to Verified');
     });
 
     it('should render full program purchase link', () => {
         view = initView({
+            // eslint-disable-next-line no-undef
             programData: $.extend({}, options.programData, {
                 is_learner_eligible_for_one_click_purchase: true,
             }),
         });
         view.render();
+        // eslint-disable-next-line no-undef
         expect($(view.$('.upgrade-button.complete-program')).text().trim()
             .replace(/\s+/g, ' '))
             .toEqual(
@@ -642,6 +657,7 @@ describe('Program Details View', () => {
 
     it('should render partial program purchase link', () => {
         view = initView({
+            // eslint-disable-next-line no-undef
             programData: $.extend({}, options.programData, {
                 is_learner_eligible_for_one_click_purchase: true,
                 discount_data: {
@@ -654,6 +670,7 @@ describe('Program Details View', () => {
             }),
         });
         view.render();
+        // eslint-disable-next-line no-undef
         expect($(view.$('.upgrade-button.complete-program')).text().trim()
             .replace(/\s+/g, ' '))
             .toEqual(
@@ -665,7 +682,9 @@ describe('Program Details View', () => {
         view = initView();
         view.render();
         expect(view.$('.run-select')[0].options.length).toEqual(2);
+        // eslint-disable-next-line no-undef
         expect($(view.$('.select-choice')[0]).attr('for')).toEqual($(view.$('.run-select')[0]).attr('id'));
+        // eslint-disable-next-line no-undef
         expect($(view.$('.enroll-button button')[0]).text().trim()).toEqual('Enroll Now');
     });
 
@@ -676,12 +695,14 @@ describe('Program Details View', () => {
             uuid: '0ffff5d6-0177-4690-9a48-aa2fecf94610',
         };
         view = initView({
+            // eslint-disable-next-line no-undef
             programData: $.extend({}, options.programData, {
                 is_learner_eligible_for_one_click_purchase: true,
                 variant: 'partial',
             }),
         });
         view.render();
+        // eslint-disable-next-line no-undef
         $('.complete-program').click();
         // Verify that analytics event fires when the purchase button is clicked.
         expect(window.analytics.track).toHaveBeenCalledWith(

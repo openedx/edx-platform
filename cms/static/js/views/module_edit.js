@@ -23,6 +23,7 @@
             var ModuleEdit = (function(_super) {
                 __extends(ModuleEdit, _super);
 
+                // eslint-disable-next-line no-shadow
                 function ModuleEdit() {
                     return ModuleEdit.__super__.constructor.apply(this, arguments);
                 }

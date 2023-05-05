@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /**
  * Interceptor class to support JWT Token Authentication.
  *
@@ -57,6 +62,7 @@ const createRetryInterceptor = (options = {}) => {
             try {
                 const backoffDelay = getBackoffMilliseconds(nthRetry);
                 // Delay (wrapped in a promise so we can await the setTimeout)
+                // eslint-disable-next-line no-promise-executor-return
                 await new Promise(resolve => setTimeout(resolve, backoffDelay));
                 // Make retry request
                 retryResponse = await httpClient.request(config);

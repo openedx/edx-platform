@@ -16,6 +16,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
                 + (overrides && overrides.name ? overrides.name : this.get('name')) + '/';
         },
         _tagPattern: /[^:]+/g,
+        // eslint-disable-next-line prefer-regex-literals
         _fieldPattern: new RegExp('[^/]+', 'g'),
 
         parse: function(payload) {

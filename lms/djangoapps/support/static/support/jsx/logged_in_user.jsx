@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* global gettext */
 
 import React from 'react';
@@ -178,6 +183,7 @@ LoggedInUser.propTypes = {
         course_id: PropTypes.string,
         username: PropTypes.string,
         email: PropTypes.string,
+        // eslint-disable-next-line react/forbid-prop-types
         enrollments: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     showWarning: PropTypes.bool.isRequired,

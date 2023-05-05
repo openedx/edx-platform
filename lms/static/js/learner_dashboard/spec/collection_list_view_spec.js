@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals setFixtures */
 
 import CollectionListView from '../views/collection_list_view';
@@ -128,7 +133,7 @@ describe('Collection List View', () => {
         const $cards = view.$el.find('.program-card');
         expect($cards.length).toBe(2);
         $cards.each((index, el) => {
-            // eslint-disable-next-line newline-per-chained-call
+            /* eslint-disable-next-line newline-per-chained-call, no-undef */
             expect($(el).find('.title').html().trim()).toEqual(context.programsData[index].title);
         });
     });

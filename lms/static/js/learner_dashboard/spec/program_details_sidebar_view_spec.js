@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals setFixtures */
 
 import Backbone from 'backbone';
@@ -164,6 +169,7 @@ describe('Program Progress View', () => {
         expect(view.$('.course-list-heading').html()).toEqual('Earned Certificates');
         expect($certificates).toHaveLength(certificateCollection.length);
         $certificates.each((i, el) => {
+            // eslint-disable-next-line no-undef
             const $link = $(el).find('.certificate-link');
             const model = certificateCollection.at(i);
 

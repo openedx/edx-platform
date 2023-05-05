@@ -15,6 +15,7 @@ var edx = edx || {};
             ariaExpandedState = ($dropdownButton.attr('aria-expanded') === 'true'),
             menuItems = $dropdown.find('a');
 
+        // eslint-disable-next-line no-shadow
         var catchKeyPress = function(object, event) {
             // get currently focused item
             var $focusedItem = $(':focus');

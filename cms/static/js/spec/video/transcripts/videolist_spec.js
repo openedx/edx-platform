@@ -313,6 +313,7 @@ define(
 
                 it('is rendered without opened extra videos bar', function(done) {
                     var view = createVideoListView(this.mockServer),
+                        // eslint-disable-next-line no-shadow
                         videoList = [
                             {
                                 mode: 'youtube',

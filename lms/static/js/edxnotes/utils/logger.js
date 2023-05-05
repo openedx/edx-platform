@@ -58,11 +58,13 @@
             if (!this.logLevel) {
                 return false;
             }
+            // eslint-disable-next-line prefer-spread
             this.updateHistory.apply(this, arguments);
             // Adds ID at the first place
             Array.prototype.unshift.call(args, this.id);
             if (console && console[logType]) {
                 if (console[logType].apply) {
+                    // eslint-disable-next-line prefer-spread
                     console[logType].apply(console, args);
                 } else { // Do this for IE
                     console[logType](args.join(' '));
@@ -136,6 +138,7 @@
             if (timeout) {
                 args.push(null, {timeout: timeout});
             }
+            // eslint-disable-next-line prefer-spread
             return Logger.log.apply(Logger, args);
         };
 

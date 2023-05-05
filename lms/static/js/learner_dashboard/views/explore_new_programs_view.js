@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
@@ -9,12 +14,14 @@ class ExploreNewProgramsView extends Backbone.View {
         const defaults = {
             el: '.program-advertise',
         };
+        // eslint-disable-next-line prefer-object-spread
         super(Object.assign({}, defaults, options));
     }
 
     initialize(data) {
         this.tpl = HtmlUtils.template(exploreTpl);
         this.context = data.context;
+        // eslint-disable-next-line no-undef
         this.$parentEl = $(this.parentEl);
 
         if (this.context.marketingUrl) {

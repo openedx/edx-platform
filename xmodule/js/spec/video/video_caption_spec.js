@@ -137,6 +137,7 @@
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
                             url: transcriptURL,
                             notifyOnError: false,
+                            // eslint-disable-next-line no-void
                             data: void 0,
                             success: jasmine.any(Function),
                             error: jasmine.any(Function)

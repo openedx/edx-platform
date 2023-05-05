@@ -1,4 +1,5 @@
 (function(define) {
+    // eslint-disable-next-line lines-around-directive
     'use strict';
 
     // VideoSocialSharingHandler module.

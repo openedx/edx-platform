@@ -125,6 +125,7 @@
                         if (this.attrRenderer[attr]) {
                             _results.push(this.attrRenderer[attr].apply(this, [value]));
                         } else {
+                            // eslint-disable-next-line no-void
                             _results.push(void 0);
                         }
                     }
@@ -142,6 +143,7 @@
                         if (this.attrRenderer[attr]) {
                             _results.push(this.attrRenderer[attr].apply(this, [value]));
                         } else {
+                            // eslint-disable-next-line no-void
                             _results.push(void 0);
                         }
                     }

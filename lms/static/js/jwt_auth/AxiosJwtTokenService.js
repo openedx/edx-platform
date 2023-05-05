@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /**
  * Service class to support JWT Token Authentication.
  *
@@ -105,6 +110,7 @@ export default class AxiosJwtTokenService {
     }
 
     async getJwtToken() {
+        // eslint-disable-next-line no-useless-catch
         try {
             const decodedJwtToken = this.decodeJwtCookie(this.tokenCookieName);
             if (!AxiosJwtTokenService.isTokenExpired(decodedJwtToken)) {
@@ -115,6 +121,7 @@ export default class AxiosJwtTokenService {
             throw e;
         }
 
+        // eslint-disable-next-line no-useless-catch
         try {
             return await this.refresh();
         } catch (e) {

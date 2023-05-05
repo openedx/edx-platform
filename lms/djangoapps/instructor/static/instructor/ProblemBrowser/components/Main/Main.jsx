@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* global gettext */
 import { Button, Icon } from '@edx/paragon';
 import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
@@ -17,6 +22,7 @@ export default class Main extends React.Component {
 
     handleToggleDropdown() {
         this.props.fetchCourseBlocks(this.props.courseId, this.props.excludeBlockTypes);
+        // eslint-disable-next-line react/no-access-state-in-setstate
         this.setState({ showDropdown: !this.state.showDropdown });
     }
 
@@ -36,6 +42,7 @@ export default class Main extends React.Component {
     render() {
         const { selectedBlock, onSelectBlock } = this.props;
         let selectorType = <Button onClick={this.handleToggleDropdown} label={gettext('Select a section or problem')} />;
+        // eslint-disable-next-line react/prop-types
         if (this.props.showBtnUi === 'false') {
             selectorType = (
             // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
@@ -62,6 +69,7 @@ export default class Main extends React.Component {
                         name="problem-location"
                         value={selectedBlock}
                         disabled
+                        // eslint-disable-next-line react/prop-types
                         hidden={this.props.showBtnUi === 'false'}
                     />
                     {this.state.showDropdown
@@ -96,11 +104,13 @@ Main.propTypes = {
     selectedBlock: PropTypes.string,
     taskStatusEndpoint: PropTypes.string.isRequired,
     reportDownloadEndpoint: PropTypes.string.isRequired,
+    // eslint-disable-next-line react/no-unused-prop-types
     ShowBtnUi: PropTypes.string.isRequired,
 };
 
 Main.defaultProps = {
     excludeBlockTypes: null,
     selectedBlock: '',
+    // eslint-disable-next-line react/default-props-match-prop-types
     timeout: null,
 };

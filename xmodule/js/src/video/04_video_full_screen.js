@@ -179,6 +179,7 @@
                 return;
             }
 
+            // eslint-disable-next-line no-multi-assign
             this.videoFullScreen.fullScreenState = this.isFullScreen = false;
             fullScreenClassNameEl.removeClass('video-fullscreen');
             $(window).scrollTop(this.scrollPos);
@@ -203,6 +204,7 @@
                 return;
             }
 
+            // eslint-disable-next-line no-multi-assign
             this.videoFullScreen.fullScreenState = this.isFullScreen = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             this.videoFullScreen.fullScreenEl

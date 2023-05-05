@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* globals gettext */
 
 import Backbone from 'backbone';
@@ -34,6 +39,7 @@ class CourseCardModel extends Backbone.Model {
             desiredCourseRun = enrolledCourseRun;
         } else if (openEnrollmentCourseRuns.length > 0) {
             if (openEnrollmentCourseRuns.length === 1) {
+                // eslint-disable-next-line prefer-destructuring
                 desiredCourseRun = openEnrollmentCourseRuns[0];
             } else {
                 desiredCourseRun = CourseCardModel.getUnselectedCourseRun(openEnrollmentCourseRuns);
@@ -56,6 +62,7 @@ class CourseCardModel extends Backbone.Model {
         if (courseRuns && courseRuns.length > 0) {
             const courseRun = courseRuns[0];
 
+            // eslint-disable-next-line no-undef
             $.extend(unselectedRun, {
                 marketing_url: courseRun.marketing_url,
                 is_enrollment_open: courseRun.is_enrollment_open,
@@ -76,6 +83,7 @@ class CourseCardModel extends Backbone.Model {
         ));
 
         // Deep copy to avoid mutating this.context.
+        // eslint-disable-next-line no-undef
         const enrollableCourseRuns = $.extend(true, [], rawCourseRuns);
 
         // These are raw course runs from the server. The start
@@ -128,6 +136,7 @@ class CourseCardModel extends Backbone.Model {
             if (upgradeableSeats.length > 0) {
                 const upgradeableSeat = upgradeableSeats[0];
                 if (upgradeableSeat) {
+                    // eslint-disable-next-line prefer-destructuring
                     const currency = upgradeableSeat.currency;
                     if (currency === 'USD') {
                         return `$${upgradeableSeat.price}`;

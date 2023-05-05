@@ -1,3 +1,8 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -7,6 +12,7 @@ import SearchContainer from '../Search/SearchContainer';
 import EntitlementSupportTableContainer from '../Table/EntitlementSupportTableContainer';
 import EntitlementFormContainer from '../EntitlementForm/container';
 
+// eslint-disable-next-line react/function-component-definition
 const Main = props => (
     <div className="entitlement-support-wrapper">
         <StatusAlert
@@ -27,6 +33,7 @@ const Main = props => (
     </div>
 );
 
+// eslint-disable-next-line react/function-component-definition
 const MainContent = (props) => {
     if (props.isFormOpen) {
         return <EntitlementFormContainer />;

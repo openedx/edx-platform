@@ -13,6 +13,7 @@
         _.each(unfakes, function(u) {
             return u();
         });
+        // eslint-disable-next-line no-return-assign
         return unfakes = [];
     };
 
@@ -21,6 +22,7 @@
         originalThing = owner[thingToFake];
         owner[thingToFake] = newThing;
         return unfakes.push(function() {
+            // eslint-disable-next-line no-return-assign
             return owner[thingToFake] = originalThing;
         });
     };

@@ -1,9 +1,15 @@
+/*
+eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
+import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
+import/named, import/no-useless-path-segments
+*/
 /* global gettext */
 import { Icon } from '@edx/paragon';
 import classNames from 'classnames';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 
+// eslint-disable-next-line react/function-component-definition
 const ReportStatus = ({
     error, succeeded, inProgress, reportPath,
 }) => {
@@ -53,7 +59,9 @@ ReportStatus.propTypes = {
 ReportStatus.defaultProps = {
     error: null,
     reportPath: null,
+    // eslint-disable-next-line react/default-props-match-prop-types
     reportPreview: null,
+    // eslint-disable-next-line react/default-props-match-prop-types
     reportName: null,
 };
 
