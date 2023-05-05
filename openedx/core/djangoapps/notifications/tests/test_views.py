@@ -3,7 +3,7 @@ Tests for the views in the notifications app.
 """
 from django.dispatch import Signal
 from django.urls import reverse
-from edx_toggles.toggles.testutils import override_waffle_flag, override_flag
+from edx_toggles.toggles.testutils import override_waffle_flag
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -105,7 +105,6 @@ class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
             mode='audit'
         )
         self.post_save_signal = Signal()
-
 
     def test_course_enrollment_post_save(self):
         """
