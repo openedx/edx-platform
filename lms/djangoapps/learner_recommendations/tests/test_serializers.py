@@ -102,6 +102,9 @@ class TestCrossProductRecommendationsSerializer(TestCase):
                     "image": {
                         "src": f"https://www.logo_image_url{index}.com",
                     },
+                    "url_slug": f"https://www.marketing_url{index}.com",
+                    "course_type": "executive-education",
+                    "advertised_course_run_uuid": f"{index}f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
                     "owners": [
                         {
                             "key": f"org-{index}",
@@ -121,8 +124,6 @@ class TestCrossProductRecommendationsSerializer(TestCase):
                         "marketing_url": f"https://www.marketing_url{index}.com",
                         "availability": "Current",
                     },
-                    "url_slug": f"https://www.marketing_url{index}.com",
-                    "course_type": "executive-education",
                     "location_restriction": None
                 },
             )

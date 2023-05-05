@@ -61,8 +61,8 @@ class CrossProductCourseSerializer(serializers.Serializer):
 
         if (
             current_course_type != "executive-education"
-            or current_course_type != "executive-education-2u"
-            or current_course_type != "bootcamp-2u"
+            and current_course_type != "executive-education-2u"
+            and current_course_type != "bootcamp-2u"
         ):
             return "bootcamp-2u"
 
