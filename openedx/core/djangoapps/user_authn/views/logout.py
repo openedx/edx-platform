@@ -8,6 +8,7 @@ from urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=impor
 import bleach
 from django.conf import settings
 from django.contrib.auth import logout
+from django.shortcuts import redirect
 from django.utils.http import urlencode
 from django.views.generic import TemplateView
 from oauth2_provider.models import Application
@@ -83,6 +84,17 @@ class LogoutView(TemplateView):
         delete_logged_in_cookies(response)
 
         mark_user_change_as_expected(None)
+
+        # Redirect to tpa_logout_url if TPA_AUTOMATIC_LOGOUT_ENABLED is set to True and if
+        # tpa_logout_url is configured.
+        #
+        # NOTE: This step skips rendering logout.html, which is used to log the user out from the
+        # different IDAs. To ensure the user is logged out of all the IDAs be sure to redirect
+        # back to <LMS>/logout after logging out of the TPA.
+        if settings.TPA_AUTOMATIC_LOGOUT_ENABLED:
+            if self.tpa_logout_url:
+                return redirect(self.tpa_logout_url)
+
         return response
 
     def _build_logout_url(self, url):
