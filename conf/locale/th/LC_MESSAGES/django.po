@@ -201,7 +201,7 @@ msgstr ""
 #. Translators: This is the status for a video that the servers have
 #. successfully processed
 #: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Ready"
 msgstr ""
 
@@ -6259,10 +6259,6 @@ msgstr ""
 msgid "This user already has access to this library."
 msgstr ""
 
-#: openedx/core/djangoapps/content_staging/models.py
-msgid "Staged Content"
-msgstr ""
-
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -6273,8 +6269,12 @@ msgstr ""
 msgid "Loading"
 msgstr "กำลังโหลด"
 
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
 msgstr ""
 
 #: openedx/core/djangoapps/content_staging/models.py
@@ -11509,6 +11509,14 @@ msgid "Invalid data ({details})"
 msgstr "ข้อมูลไม่ถูกต้อง ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr ""
@@ -13108,6 +13116,10 @@ msgstr "เพจหน้าที่แล้ว"
 msgid "Next page"
 msgstr "เพจหน้าถัดไป"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "เข้าสู่ระบบการติดตาม"
@@ -13230,23 +13242,27 @@ msgid "Downloads and transcripts"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr ""
-
-#: lms/templates/video.html
 msgid "Share on:"
 msgstr ""
 
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Twitter"
-msgstr ""
+msgid "Share on Twitter"
+msgstr "แชร์บน Twitter"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Facebook"
+msgstr "แบ่งปันบน Facebook"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+#: lms/templates/video.html
+msgid "Share on LinkedIn"
+msgstr "แชร์บน LinkedIn"
 
 #: lms/templates/video.html
-msgid "Facebook"
-msgstr ""
-
-#: lms/templates/video.html
-msgid "Linkedin"
+msgid "Download video file"
 msgstr ""
 
 #: lms/templates/video.html
@@ -14293,11 +14309,6 @@ msgid "Post on Facebook"
 msgstr "โพสต์บน Facebook"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "แชร์บน Twitter"
-
-#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "ทวีตความสำเร็จนี้ เปิดหน้าต่างใหม่"
 
@@ -15248,10 +15259,6 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "เพิ่มประกาศนียบัตรไปยังประวัติของ LinkedIn"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Share on LinkedIn"
-msgstr "แชร์บน LinkedIn"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr ""
 
@@ -15327,10 +15334,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "แชร์ {course_name} ไปยัง Facebook"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Facebook"
-msgstr "แบ่งปันบน Facebook"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
