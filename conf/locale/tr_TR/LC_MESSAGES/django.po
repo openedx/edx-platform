@@ -223,7 +223,7 @@ msgstr "Bir altyazı dosyası gerekiyor."
 #. Translators: This is the status for a video that the servers have
 #. successfully processed
 #: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Ready"
 msgstr "Hazır"
 
@@ -5914,7 +5914,7 @@ msgid "Allow"
 msgstr "İzin ver"
 
 #: lms/templates/oauth2_provider/authorize.html
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Hata"
@@ -7129,11 +7129,7 @@ msgstr "Bu e-posta adresine sahip bir kullanıcıyı bulamadık."
 msgid "This user already has access to this library."
 msgstr "Bu kullanıcının bu kütüphaneye zaten erişimi var."
 
-#: openedx/core/djangoapps/content_staging/models.py
-msgid "Staged Content"
-msgstr ""
-
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -7144,9 +7140,13 @@ msgstr ""
 msgid "Loading"
 msgstr "Yükleniyor"
 
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
 msgstr "Sona Erdi"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid ""
@@ -12843,6 +12843,7 @@ msgstr "Ders takımı kullanıcısı bulunmuyor"
 msgid ""
 "Number of course outline regenerations successfully requested: {regenerates}"
 msgstr ""
+"Başarıyla talep edilen ders ana hatları yenileme sayısı: {regenerates}"
 
 #: cms/djangoapps/contentstore/admin.py
 msgid "Regenerate selected course outlines"
@@ -13199,6 +13200,14 @@ msgid "Invalid data ({details})"
 msgstr "Geçersiz veri ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr "Bileşeninizi yapıştırırken bir hata gerçekleşti."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr "Panonuz boş veya geçersiz."
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "{source_type} verisini {target_parent_type} üzerine taşıyamazsınız."
@@ -13298,7 +13307,7 @@ msgstr "Kütüphane İçeriği"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Drag and Drop"
-msgstr ""
+msgstr "Sürükle ve Bırak"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -13352,6 +13361,8 @@ msgid ""
 "User does not have the permission to create courses in this organization or "
 "course creation is disabled"
 msgstr ""
+"Kullanıcının bu kurumda ders oluşturma izni yok veya ders oluşturma devre "
+"dışı"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -13422,6 +13433,8 @@ msgid ""
 "User does not have the permission to create library in this organization or "
 "course creation is disabled"
 msgstr ""
+"Kullanıcının bu kurumda kütüphane oluşturma izni yok veya ders oluşturma "
+"devre dışı"
 
 #: cms/djangoapps/contentstore/views/library.py
 #, python-brace-format
@@ -13702,7 +13715,7 @@ msgstr "Kullanıcıya TÜM kuruluşlarda ders oluşturma izni verin"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Dump courses to CourseGraph (respect cache)"
-msgstr ""
+msgstr "Dersleri CourseGraph'a dökün (önbelleğe dikkat edin)"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Error enqueueing dumps for {} course(s): {}"
@@ -13718,7 +13731,7 @@ msgstr "Tüm {} ders(ler) değişmediği için atlandı."
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Dump courses to CourseGraph (override cache)"
-msgstr ""
+msgstr "Dersleri CourseGraph'a dökün (önbelleği geçersizleştirin)"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Enqueued dumps for {} course(s)."
@@ -14595,11 +14608,11 @@ msgstr "%s Sayfasına Geri Dön"
 
 #: lms/templates/public_video.html
 msgid "Learn more about this course"
-msgstr ""
+msgstr "Bu ders hakkında daha fazla bilgi"
 
 #: lms/templates/public_video.html
 msgid "Enroll in this course"
-msgstr ""
+msgstr "Bu derse kaydol"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -14855,6 +14868,10 @@ msgstr "Önceki sayfa"
 msgid "Next page"
 msgstr "Sonraki sayfa"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr "Bileşeni Yapıştır"
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "İzleme geçmişi"
@@ -14980,24 +14997,28 @@ msgid "Downloads and transcripts"
 msgstr "İndirmeler ve altyazılar"
 
 #: lms/templates/video.html
+msgid "Share on:"
+msgstr "Şurada paylaş:"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Twitter"
+msgstr "Twitter'da paylaş"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Facebook"
+msgstr "Facebook'ta Paylaş"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+#: lms/templates/video.html
+msgid "Share on LinkedIn"
+msgstr "LinkedIn'de Paylaş"
+
+#: lms/templates/video.html
 msgid "Download video file"
 msgstr "Video dosyasını indir"
-
-#: lms/templates/video.html
-msgid "Share on:"
-msgstr ""
-
-#: lms/templates/video.html
-msgid "Twitter"
-msgstr ""
-
-#: lms/templates/video.html
-msgid "Facebook"
-msgstr ""
-
-#: lms/templates/video.html
-msgid "Linkedin"
-msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16209,11 +16230,6 @@ msgid "Post on Facebook"
 msgstr "Facebook'ta paylaş"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "Twitter'da paylaş"
-
-#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "Bu Başarı Belgesini Twitle"
 
@@ -16243,7 +16259,7 @@ msgstr "Aşağıdaki kuruluşlar tarafından desteklenmiştir"
 
 #: lms/templates/certificates/_accomplishment-rendering.html
 msgid "Awarded to:"
-msgstr ""
+msgstr "Ödüllendirilen:"
 
 #: lms/templates/certificates/_edx-accomplishment-print-help.html
 msgid ""
@@ -17237,10 +17253,6 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "Sertifikanı Linkedln Profiline Ekle"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Share on LinkedIn"
-msgstr "LinkedIn'de Paylaş"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr "Bir sertifika için uygun değilsiniz."
 
@@ -17322,10 +17334,6 @@ msgid "Share {course_name} on Facebook"
 msgstr "{course_name} dersini Facebook'ta paylaş"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Facebook"
-msgstr "Facebook'ta Paylaş"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
 msgstr ""
 "Çevrimiçi {course_name} dersini {twitter_brand} ile alıyorum. Hadi sen de "
@@ -17337,7 +17345,7 @@ msgstr "{course_name} dersini Twitter'da paylaş"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options for"
-msgstr ""
+msgstr "Ders seçenekleri: "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html

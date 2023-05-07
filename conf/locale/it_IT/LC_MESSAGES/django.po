@@ -219,7 +219,7 @@ msgstr "È richiesto un file di trascrizione."
 #. Translators: This is the status for a video that the servers have
 #. successfully processed
 #: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Ready"
 msgstr ""
 
@@ -6069,7 +6069,7 @@ msgid "Allow"
 msgstr "Permetti"
 
 #: lms/templates/oauth2_provider/authorize.html
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Errore"
@@ -7310,10 +7310,6 @@ msgstr "Impossibile trovare un utente con quell'indirizzo email."
 msgid "This user already has access to this library."
 msgstr "Questo utente ha già accesso a questa libreria."
 
-#: openedx/core/djangoapps/content_staging/models.py
-msgid "Staged Content"
-msgstr ""
-
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -7324,8 +7320,12 @@ msgstr ""
 msgid "Loading"
 msgstr "Caricamento"
 
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
 msgstr ""
 
 #: openedx/core/djangoapps/content_staging/models.py
@@ -13509,6 +13509,14 @@ msgid "Invalid data ({details})"
 msgstr "Dati non validi ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "È possibile spostare {source_type} in {target_parent_type}."
@@ -15203,6 +15211,10 @@ msgstr "Pagina precedente"
 msgid "Next page"
 msgstr "Prossima Pagina"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "Log di Monitoraggio"
@@ -15329,24 +15341,28 @@ msgid "Downloads and transcripts"
 msgstr "Download e trascrizioni"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Scarica file video "
-
-#: lms/templates/video.html
 msgid "Share on:"
 msgstr ""
 
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Twitter"
-msgstr ""
+msgid "Share on Twitter"
+msgstr "Condividi su Twitter"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Facebook"
+msgstr "Condividi su Facebook"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+#: lms/templates/video.html
+msgid "Share on LinkedIn"
+msgstr "Condividi su LinkedIn"
 
 #: lms/templates/video.html
-msgid "Facebook"
-msgstr ""
-
-#: lms/templates/video.html
-msgid "Linkedin"
-msgstr ""
+msgid "Download video file"
+msgstr "Scarica file video "
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16731,11 +16747,6 @@ msgid "Post on Facebook"
 msgstr "Pubblica su Facebook"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "Condividi su Twitter"
-
-#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "Pubblica questo risultato tramite tweet. Finestra a comparsa. "
 
@@ -17774,10 +17785,6 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "Aggiungi il certificato al profilo LinkedIn "
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Share on LinkedIn"
-msgstr "Condividi su LinkedIn"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr "Non sei ancora idoneo per un certificato."
 
@@ -17856,10 +17863,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "Condividi {course_name} su Facebook"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Facebook"
-msgstr "Condividi su Facebook"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"

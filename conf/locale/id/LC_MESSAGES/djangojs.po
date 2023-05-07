@@ -6498,6 +6498,10 @@ msgstr "Garis Besar Kursus"
 msgid "Date added"
 msgstr ""
 
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr ""
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
