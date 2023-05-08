@@ -458,3 +458,23 @@ class TestStudentFromIdentifier(TestCase):
         """Test with invalid identifier"""
         with pytest.raises(User.DoesNotExist):
             assert tools.get_student_from_identifier("invalid")
+
+class TestProfilePrivacy(TestCase):
+    def test_no_feature_list_supplied(self):
+        with pytest.raises(tools.DashboardError):
+            assert tools.keep_field_private(None, "bogus_field_name")
+
+    def test_no_privacy_feature_supplied(self):
+        with pytest.raises(tools.DashboardError):
+            assert tools.keep_field_private(["bogus_field1", "bogus_field2"], None)
+
+    def test_feature_supplied_and_stripped(self):
+        query_fields = ['Name', 'Address', 'Secret']
+        assert 'Secret' in query_fields
+        tools.keep_field_private(query_fields, 'Secret')
+        assert 'Secret' not in query_fields
+
+    def test_feature_absent_and_exception_consumed(self):
+        query_fields = ['Name', 'Address']
+        tools.keep_field_private(query_fields, 'Secret')
+        assert len(query_fields) == 2

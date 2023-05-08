@@ -263,7 +263,7 @@ def keep_field_private(query_features, field_name):
     Keeps the specified field_name private (excluded from report)
     '''
     if (query_features is None) or (field_name is None):
-        return;
+        raise DashboardError("Missing private field specification")
 
     try:
         query_features.remove(field_name)
