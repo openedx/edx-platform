@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-30 20:35+0000\n"
-"PO-Revision-Date: 2023-04-30 20:35:58.386591\n"
+"POT-Creation-Date: 2023-05-07 20:35+0000\n"
+"PO-Revision-Date: 2023-05-07 20:35:59.240148\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -10232,6 +10232,14 @@ msgstr "Ᵽɹǝss ɔløsǝ ʇø ɥᴉdǝ ɔønɹsǝ ʌᴉdǝø sǝʇʇᴉnƃs"
 msgid "Course Video Settings"
 msgstr "Ȼønɹsǝ Vᴉdǝø Sǝʇʇᴉnƃs"
 
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Video Sharing"
+msgstr "Vᴉdǝø Sɥɐɹᴉnƃ"
+
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Learn more"
+msgstr "Łǝɐɹn ɯøɹǝ"
+
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
 msgstr "Ŧɹɐnsɔɹᴉdʇ Ŧnɹnɐɹønnd"
@@ -10836,14 +10844,6 @@ msgid ""
 msgstr ""
 "Ɨɟ ɐ lǝɐɹnǝɹ sʇɐɹʇs øn {startDate}, ʇɥᴉs snbsǝɔʇᴉøn ʍᴉll bǝ dnǝ øn "
 "{projectedDueIn}."
-
-#: cms/templates/js/self-paced-due-date-editor.underscore
-msgid ""
-"The maximum number of weeks this subsection can be due in is 18 weeks from "
-"the learner enrollment date."
-msgstr ""
-"Ŧɥǝ ɯɐxᴉɯnɯ nnɯbǝɹ øɟ ʍǝǝʞs ʇɥᴉs snbsǝɔʇᴉøn ɔɐn bǝ dnǝ ᴉn ᴉs 18 ʍǝǝʞs ɟɹøɯ "
-"ʇɥǝ lǝɐɹnǝɹ ǝnɹøllɯǝnʇ dɐʇǝ."
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""

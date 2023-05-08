@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-30 20:35+0000\n"
-"PO-Revision-Date: 2023-04-30 20:35:58.386591\n"
+"POT-Creation-Date: 2023-05-07 20:35+0000\n"
+"PO-Revision-Date: 2023-05-07 20:35:59.240148\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -9587,6 +9587,14 @@ msgstr ""
 msgid "Course Video Settings"
 msgstr ""
 
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Video Sharing"
+msgstr ""
+
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Learn more"
+msgstr ""
+
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
 msgstr ""
@@ -10154,12 +10162,6 @@ msgstr ""
 msgid ""
 "If a learner starts on {startDate}, this subsection will be due on "
 "{projectedDueIn}."
-msgstr ""
-
-#: cms/templates/js/self-paced-due-date-editor.underscore
-msgid ""
-"The maximum number of weeks this subsection can be due in is 18 weeks from "
-"the learner enrollment date."
 msgstr ""
 
 #: cms/templates/js/self-paced-due-date-editor.underscore

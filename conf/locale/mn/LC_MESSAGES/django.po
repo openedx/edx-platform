@@ -162,7 +162,7 @@ msgstr "Хөрвүүлэг файл шаардлагатай."
 #. Translators: This is the status for a video that the servers have
 #. successfully processed
 #: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Ready"
 msgstr ""
 
@@ -5252,7 +5252,7 @@ msgid "Allow"
 msgstr "Зөвшөөрөх"
 
 #: lms/templates/oauth2_provider/authorize.html
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Алдаа"
@@ -6380,10 +6380,6 @@ msgstr ""
 msgid "This user already has access to this library."
 msgstr ""
 
-#: openedx/core/djangoapps/content_staging/models.py
-msgid "Staged Content"
-msgstr ""
-
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -6394,8 +6390,12 @@ msgstr ""
 msgid "Loading"
 msgstr "Ачаалж байна"
 
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
 msgstr ""
 
 #: openedx/core/djangoapps/content_staging/models.py
@@ -11690,6 +11690,14 @@ msgid "Invalid data ({details})"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr ""
@@ -13273,6 +13281,10 @@ msgstr "Өмнөх хуудас "
 msgid "Next page"
 msgstr "Дараагийн хуудас "
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr ""
@@ -13387,24 +13399,28 @@ msgid "Downloads and transcripts"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Видео файлыг татаж авах"
-
-#: lms/templates/video.html
 msgid "Share on:"
 msgstr ""
 
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Twitter"
+msgid "Share on Twitter"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Facebook"
+msgstr "Фэйсбүүк дээр хуваалцах"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+#: lms/templates/video.html
+msgid "Share on LinkedIn"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Facebook"
-msgstr ""
-
-#: lms/templates/video.html
-msgid "Linkedin"
-msgstr ""
+msgid "Download video file"
+msgstr "Видео файлыг татаж авах"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -14441,11 +14457,6 @@ msgid "Post on Facebook"
 msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr ""
-
-#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr ""
 
@@ -15359,10 +15370,6 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Share on LinkedIn"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr ""
 
@@ -15437,10 +15444,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Facebook"
-msgstr "Фэйсбүүк дээр хуваалцах"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"

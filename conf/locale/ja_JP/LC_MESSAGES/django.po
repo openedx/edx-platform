@@ -202,7 +202,7 @@ msgstr ""
 #. Translators: This is the status for a video that the servers have
 #. successfully processed
 #: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Ready"
 msgstr ""
 
@@ -5315,7 +5315,7 @@ msgid "Allow"
 msgstr "許可"
 
 #: lms/templates/oauth2_provider/authorize.html
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "エラー"
@@ -6399,10 +6399,6 @@ msgstr ""
 msgid "This user already has access to this library."
 msgstr ""
 
-#: openedx/core/djangoapps/content_staging/models.py
-msgid "Staged Content"
-msgstr ""
-
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -6413,8 +6409,12 @@ msgstr ""
 msgid "Loading"
 msgstr "読込中"
 
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
 msgstr ""
 
 #: openedx/core/djangoapps/content_staging/models.py
@@ -11769,6 +11769,14 @@ msgid "Invalid data ({details})"
 msgstr "無効なデータ ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "{source_type}を{target_parent_type}に移動できません。"
@@ -13358,6 +13366,10 @@ msgstr "前の画面"
 msgid "Next page"
 msgstr "次の画面"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "追跡ログ"
@@ -13473,24 +13485,28 @@ msgid "Downloads and transcripts"
 msgstr "ダウンロードおよび字幕"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "動画ファイルをダウンロード"
-
-#: lms/templates/video.html
 msgid "Share on:"
 msgstr ""
 
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Twitter"
-msgstr ""
+msgid "Share on Twitter"
+msgstr "ツイッターで共有"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Facebook"
+msgstr "Facebookでシェア"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+#: lms/templates/video.html
+msgid "Share on LinkedIn"
+msgstr "LinkedInでシェア"
 
 #: lms/templates/video.html
-msgid "Facebook"
-msgstr ""
-
-#: lms/templates/video.html
-msgid "Linkedin"
-msgstr ""
+msgid "Download video file"
+msgstr "動画ファイルをダウンロード"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -14546,11 +14562,6 @@ msgid "Post on Facebook"
 msgstr "フェースブックに投稿"
 
 #: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Twitter"
-msgstr "ツイッターで共有"
-
-#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "この成果をツイートしましょう。ウィンドウをポップアップします。"
 
@@ -15473,10 +15484,6 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "LinkedInプロフィールに修了証を追加"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Share on LinkedIn"
-msgstr "LinkedInでシェア"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr ""
 
@@ -15551,10 +15558,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "Facebookで{course_name}をシェア"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Facebook"
-msgstr "Facebookでシェア"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
