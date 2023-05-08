@@ -68,7 +68,7 @@ pytz==2022.7.1
     #   babel
 pyyaml==6.0
     # via code-annotations
-requests==2.28.2
+requests==2.29.0
     # via sphinx
 smmap==5.0.0
     # via gitdb
