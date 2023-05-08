@@ -45,6 +45,16 @@ describe('Program Details Header View', () => {
                 },
             ],
         },
+        subscriptionData: [
+            {
+                trial_end: '1970-01-01T03:25:45Z',
+                next_payment_date: '1970-06-03T07:12:04Z',
+                price: '100.00',
+                currency: 'USD',
+                subscription_state: 'active',
+            },
+        ],
+        isSubscriptionEligible: true,
     };
 
     beforeEach(() => {
@@ -70,5 +80,9 @@ describe('Program Details Header View', () => {
             .toEqual(context.programData.authoring_organizations[0].certificate_logo_image_url);
         expect(view.$('.org-logo').attr('alt'))
             .toEqual(`${context.programData.authoring_organizations[0].name}'s logo`);
+    });
+
+    it('should render the subscription badge if subscription is active', () => {
+        expect(view.$('.meta-info .badge').html().trim()).toEqual('Subscribed');
     });
 });

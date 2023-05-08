@@ -1,11 +1,17 @@
 /* globals setFixtures */
+import moment from 'moment';
 
 import ProgramDetailsView from '../views/program_details_view';
 
-describe('Program Details Header View', () => {
+describe('Program Details View', () => {
     let view = null;
     const options = {
         programData: {
+            subscription_eligible: false,
+            subscription_prices: [{
+                price: '100.00',
+                currency: 'USD',
+            }],
             subtitle: '',
             overview: '',
             weeks_to_complete: null,
@@ -462,11 +468,23 @@ describe('Program Details Header View', () => {
                 },
             ],
         },
+        subscriptionData: [
+            {
+                trial_end: '1970-01-01T03:25:45Z',
+                next_payment_date: '1970-06-03T07:12:04Z',
+                price: '100.00',
+                currency: 'USD',
+                subscription_state: 'pre',
+            },
+        ],
         urls: {
             program_listing_url: '/dashboard/programs/',
             commerce_api_url: '/api/commerce/v0/baskets/',
             track_selection_url: '/course_modes/choose/',
             program_record_url: 'http://credentials.example.com/records/programs/UUID',
+            buy_subscription_url: '/subscriptions',
+            manage_subscription_url: '/orders',
+            subscriptions_learner_help_center_url: '/learner',
         },
         userPreferences: {
             'pref-lang': 'en',
@@ -493,9 +511,35 @@ describe('Program Details Header View', () => {
                 destination_url: 'industry.com',
             },
         ],
-        programTabViewEnabled: false
+        programTabViewEnabled: false,
+        isUserB2CSubscriptionsEnabled: false,
     };
     const data = options.programData;
+
+    const testSubscriptionState = (state, heading, body, trial = false) => {
+        const subscriptionData = {
+            ...options.subscriptionData[0],
+            subscription_state: state,
+        };
+        if (trial) {
+            subscriptionData.trial_end = moment().add(3, 'days').utc().format(
+                'YYYY-MM-DDTHH:mm:ss[Z]'
+            );
+        }
+        view = initView({
+            programData: $.extend({}, options.programData, {
+                subscription_eligible: true,
+            }),
+            isUserB2CSubscriptionsEnabled: true,
+            subscriptionData: [subscriptionData],
+        });
+        view.render();
+        expect(view.$('.upgrade-subscription')[0]).toBeInDOM();
+        expect(view.$('.upgrade-subscription .upgrade-button'))
+            .toContainText(heading);
+        expect(view.$('.upgrade-subscription .subscription-info-brief'))
+            .toContainText(body);
+    };
 
     const initView = (updates) => {
         const viewOptions = $.extend({}, options, updates);
@@ -535,9 +579,9 @@ describe('Program Details Header View', () => {
         expect(view.$('.program-heading-title').text()).toEqual('Your Program Journey');
         expect(view.$('.program-heading-message').text().trim()
             .replace(/\s+/g, ' ')).toEqual(
-            'Track and plan your progress through the 3 courses in this program. '
-      + 'To complete the program, you must earn a verified certificate for each course.',
-        );
+                'Track and plan your progress through the 3 courses in this program. '
+                + 'To complete the program, you must earn a verified certificate for each course.',
+            );
     });
 
     it('should render the program heading congratulations message if all courses completed', () => {
@@ -553,8 +597,8 @@ describe('Program Details Header View', () => {
         expect(view.$('.program-heading-title').text()).toEqual('Congratulations!');
         expect(view.$('.program-heading-message').text().trim()
             .replace(/\s+/g, ' ')).toEqual(
-            'You have successfully completed all the requirements for the Test Course Title Test.',
-        );
+                'You have successfully completed all the requirements for the Test Course Title Test.',
+            );
     });
 
     it('should render the course list headings', () => {
@@ -643,6 +687,39 @@ describe('Program Details Header View', () => {
         expect(window.analytics.track).toHaveBeenCalledWith(
             'edx.bi.user.dashboard.program.purchase',
             properties,
+        );
+    });
+
+    it('should render the get subscription link if program is subscription eligible', () => {
+        testSubscriptionState(
+            'pre',
+            'Start 7-Day free trial',
+            '$100/month subscription after trial ends. Cancel anytime.'
+        );
+    });
+
+    it('should render appropriate subscription text when subscription is active with trial', () => {
+        testSubscriptionState(
+            'active',
+            'Manage my subscription',
+            'Active trial ends',
+            true
+        );
+    });
+
+    it('should render appropriate subscription text when subscription is active', () => {
+        testSubscriptionState(
+            'active',
+            'Manage my subscription',
+            'Your next billing date is'
+        );
+    });
+
+    it('should render appropriate subscription text when subscription is inactive', () => {
+        testSubscriptionState(
+            'inactive',
+            'Restart my subscription',
+            'Unlock verified access to all courses for $100/month. Cancel anytime.'
         );
     });
 });
