@@ -113,7 +113,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-16 20:42+0000\n"
+"POT-Creation-Date: 2023-04-30 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2022\n"
 "Language-Team: Italian (Italy) (http://app.transifex.com/open-edx/edx-platform/language/it_IT/)\n"
@@ -6855,6 +6855,10 @@ msgstr "Struttura del corso"
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
 msgstr "Data aggiunta"
+
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr ""
 
 #. Translators: "title" is the name of the current component or unit being
 #. edited.

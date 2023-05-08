@@ -330,11 +330,14 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
             # TODO: Once mixins are defined per-application, rather than per-runtime,
             # this should use a cms mixed-in class. (cpennington)
             template_id = None
-            display_name = xblock_type_display_name(category, _('Blank'))  # this is the Blank Advanced problem
+            display_name = xblock_type_display_name(category, _('Blank'))
             # The ORA "blank" assessment should be Peer Assessment Only
             if category == 'openassessment':
                 display_name = _("Peer Assessment Only")
                 template_id = "peer-assessment"
+            elif category == 'problem':
+                # Override generic "Problem" name to describe this blank template:
+                display_name = _("Blank Advanced Problem")
             templates_for_category.append(
                 create_template_dict(display_name, category, support_level_without_template, template_id, 'advanced')
             )

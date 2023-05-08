@@ -101,12 +101,27 @@ def xblock_has_own_studio_page(xblock, parent_xblock=None):
     return xblock.has_children
 
 
-def xblock_studio_url(xblock, parent_xblock=None):
+def xblock_studio_url(xblock, parent_xblock=None, find_parent=False):
     """
     Returns the Studio editing URL for the specified xblock.
+
+    You can pass the parent xblock as an optimization, to avoid needing to load
+    it twice, as sometimes the parent has to be checked.
+
+    If you pass in a leaf block that doesn't have its own Studio page, this will
+    normally return None, but if you use find_parent=True, this will find the
+    nearest ancestor (usually the parent unit) that does have a Studio page and
+    return that URL.
     """
     if not xblock_has_own_studio_page(xblock, parent_xblock):
-        return None
+        if find_parent:
+            while xblock and not xblock_has_own_studio_page(xblock, parent_xblock):
+                xblock = parent_xblock or get_parent_xblock(xblock)
+                parent_xblock = None
+            if not xblock:
+                return None
+        else:
+            return None
     category = xblock.category
     if category == 'course':
         return reverse_course_url('course_handler', xblock.location.course_key)
@@ -127,7 +142,7 @@ def xblock_type_display_name(xblock, default_display_name=None):
     Returns the display name for the specified type of xblock. Note that an instance can be passed in
     for context dependent names, e.g. a vertical beneath a sequential is a Unit.
 
-    :param xblock: An xblock instance or the type of xblock.
+    :param xblock: An xblock instance or the type of xblock (as a string).
     :param default_display_name: The default value to return if no display name can be found.
     :return:
     """
@@ -144,6 +159,13 @@ def xblock_type_display_name(xblock, default_display_name=None):
         return _('Subsection')
     elif category == 'vertical':
         return _('Unit')
+    elif category == 'problem':
+        # The problem XBlock's display_name.default is not helpful ("Blank Advanced Problem") but changing it could have
+        # too many ripple effects in other places, so we have a special case for capa problems here.
+        # Note: With a ProblemBlock instance, we could actually check block.problem_types to give a more specific
+        # description like "Multiple Choice Problem", but that won't work if our 'block' argument is just the block_type
+        # string ("problem").
+        return _('Problem')
     component_class = XBlock.load_class(category)
     if hasattr(component_class, 'display_name') and component_class.display_name.default:
         return _(component_class.display_name.default)  # lint-amnesty, pylint: disable=translation-of-non-string

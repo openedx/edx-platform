@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-30 20:35+0000\n"
-"PO-Revision-Date: 2023-04-30 20:35:58.645310\n"
+"POT-Creation-Date: 2023-05-07 20:35+0000\n"
+"PO-Revision-Date: 2023-05-07 20:35:59.234017\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -68,6 +68,7 @@ msgid "Discussion"
 msgstr "Đᴉsɔnssᴉøn"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr "Ᵽɹøblǝɯ"
@@ -77,6 +78,10 @@ msgstr "Ᵽɹøblǝɯ"
 #: lms/templates/video.html
 msgid "Video"
 msgstr "Vᴉdǝø"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "Ƀlɐnʞ Ⱥdʌɐnɔǝd Ᵽɹøblǝɯ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -9726,10 +9731,6 @@ msgid "Invalid JSON response received from codejail api service."
 msgstr "Ɨnʌɐlᴉd ɈSØN ɹǝsdønsǝ ɹǝɔǝᴉʌǝd ɟɹøɯ ɔødǝɾɐᴉl ɐdᴉ sǝɹʌᴉɔǝ."
 
 #: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Ƀlɐnʞ Ⱥdʌɐnɔǝd Ᵽɹøblǝɯ"
-
-#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Nnɯbǝɹ øɟ ɐʇʇǝɯdʇs ʇɐʞǝn bʎ ʇɥǝ sʇndǝnʇ øn ʇɥᴉs dɹøblǝɯ"
 
@@ -11123,6 +11124,20 @@ msgstr ""
 "'dnblᴉɔ' (ɐlløʍ ɐɔɔǝss ʇø bøʇɥ ønʇlᴉnǝ ɐnd ɔønɹsǝ ɔønʇǝnʇ)."
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr "Vᴉdǝø Sɥɐɹᴉnƃ Ødʇᴉøns"
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+"Sdǝɔᴉɟʎ ʇɥǝ ʌᴉdǝø sɥɐɹᴉnƃ ødʇᴉøns ɟøɹ ʇɥǝ ɔønɹsǝ. Ŧɥᴉs ɔɐn bǝ sǝʇ ʇø ønǝ øɟ "
+"ʇɥɹǝǝ ʌɐlnǝs: 'ɐll-øn', 'ɐll-øɟɟ' ɐnd 'dǝɹ-ʌᴉdǝø'. ʍᴉʇɥ 'dǝɹ-ʌᴉdǝø' ɐs ʇɥǝ "
+"dǝɟɐnlʇ."
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "Ȼønɹsǝ Ɨnsʇɹnɔʇøɹ"
 
@@ -12211,6 +12226,14 @@ msgstr "Ɇnɐblǝ ᴉn-ɔønʇǝxʇ dᴉsɔnssᴉøns ɟøɹ ʇɥǝ Ʉnᴉʇ"
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
 msgstr "Ⱥdd dᴉsɔnssᴉøn ɟøɹ ʇɥǝ Ʉnᴉʇ."
+
+#: xmodule/video_block/sharing_sites.py
+msgid ""
+"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"\n"
+msgstr ""
+"Ħǝɹǝ's ɐ ɟnn ɔlᴉd ɟɹøɯ ɐ ɔlɐss Ɨ'ɯ ʇɐʞᴉnƃ øn @ǝdXønlᴉnǝ.\n"
+"\n"
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
@@ -14662,6 +14685,14 @@ msgstr "Nǝxʇ dɐƃǝ"
 msgid "Paste Component"
 msgstr "Ᵽɐsʇǝ Ȼøɯdønǝnʇ"
 
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr "Fɹøɯ:"
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr "Wɥɐʇ's ᴉn ɯʎ ɔlᴉdbøɐɹd?"
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "Ŧɹɐɔʞᴉnƃ Łøƃ"
@@ -14789,21 +14820,9 @@ msgstr "Đøʍnløɐds ɐnd ʇɹɐnsɔɹᴉdʇs"
 msgid "Share on:"
 msgstr "Sɥɐɹǝ øn:"
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/video.html
-msgid "Share on Facebook"
-msgstr "Sɥɐɹǝ øn Fɐɔǝbøøʞ"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-#: lms/templates/video.html
-msgid "Share on LinkedIn"
-msgstr "Sɥɐɹǝ øn ŁᴉnʞǝdƗn"
+msgid "Share on {site}"
+msgstr "Sɥɐɹǝ øn {site}"
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -16146,6 +16165,11 @@ msgid "Post on Facebook"
 msgstr "Ᵽøsʇ øn Fɐɔǝbøøʞ"
 
 #: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
+
+#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "Ŧʍǝǝʇ ʇɥᴉs Ⱥɔɔøɯdlᴉsɥɯǝnʇ. Ᵽød nd ʍᴉndøʍ."
 
@@ -17172,6 +17196,10 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "Ⱥdd Ȼǝɹʇᴉɟᴉɔɐʇǝ ʇø ŁᴉnʞǝdƗn Ᵽɹøɟᴉlǝ"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Share on LinkedIn"
+msgstr "Sɥɐɹǝ øn ŁᴉnʞǝdƗn"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr "Ɏøn ɐɹǝ nøʇ ʎǝʇ ǝlᴉƃᴉblǝ ɟøɹ ɐ ɔǝɹʇᴉɟᴉɔɐʇǝ."
 
@@ -17246,6 +17274,10 @@ msgstr "Ɨ'ɯ ʇɐʞᴉnƃ {course_name} ønlᴉnǝ ʍᴉʇɥ {facebook_brand}. 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "Sɥɐɹǝ {course_name} øn Fɐɔǝbøøʞ"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Facebook"
+msgstr "Sɥɐɹǝ øn Fɐɔǝbøøʞ"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
