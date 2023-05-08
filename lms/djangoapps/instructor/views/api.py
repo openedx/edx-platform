@@ -1431,7 +1431,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
             'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
             'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
         ]
-    keep_field_private(query_features, 'year_of_birth') # protected information
+    keep_field_private(query_features, 'year_of_birth')  # protected information
 
     # Provide human-friendly and translatable names for these features. These names
     # will be displayed in the table generated in data_download.js. It is not (yet)

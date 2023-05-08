@@ -459,6 +459,7 @@ class TestStudentFromIdentifier(TestCase):
         with pytest.raises(User.DoesNotExist):
             assert tools.get_student_from_identifier("invalid")
 
+
 class TestProfilePrivacy(TestCase):
     def test_no_feature_list_supplied(self):
         with pytest.raises(tools.DashboardError):

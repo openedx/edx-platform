@@ -257,6 +257,7 @@ def dump_student_extensions(course, student):
             student.first_name, student.last_name, student.username),
         "data": data}
 
+
 def keep_field_private(query_features, field_name):
     '''
     Utility to remove a field from a list of field names requested of a report
@@ -269,4 +270,3 @@ def keep_field_private(query_features, field_name):
         query_features.remove(field_name)
     except ValueError:
         pass
-
