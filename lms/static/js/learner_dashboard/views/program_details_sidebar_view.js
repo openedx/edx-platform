@@ -8,6 +8,7 @@ import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import CertificateView from './certificate_list_view';
 import ProgramProgressView from './progress_circle_view';
 
+import arrowUprightIcon from '../../../images/arrow-upright-icon.svg';
 import sidebarTpl from '../../../templates/learner_dashboard/program_details_sidebar.underscore';
 
 class ProgramDetailsSidebarView extends Backbone.View {
@@ -25,23 +26,32 @@ class ProgramDetailsSidebarView extends Backbone.View {
         this.courseModel = options.courseModel || {};
         this.certificateCollection = options.certificateCollection || [];
         this.programCertificate = this.getProgramCertificate();
-        this.programRecordUrl = options.programRecordUrl;
         this.industryPathways = options.industryPathways;
         this.creditPathways = options.creditPathways;
         this.programModel = options.model;
+        this.subscriptionModel = options.subscriptionModel;
         this.programTabViewEnabled = options.programTabViewEnabled;
+        this.isSubscriptionEligible = options.isSubscriptionEligible;
+        this.urls = options.urls;
         this.render();
     }
 
     render() {
-        const data = $.extend({}, this.model.toJSON(), {
-            programCertificate: this.programCertificate
-                ? this.programCertificate.toJSON() : {},
-            programRecordUrl: this.programRecordUrl,
-            industryPathways: this.industryPathways,
-            creditPathways: this.creditPathways,
-            programTabViewEnabled: this.programTabViewEnabled
-        });
+        const data = $.extend(
+            {},
+            this.model.toJSON(),
+            this.subscriptionModel.toJSON(),
+            {
+                programCertificate: this.programCertificate
+                    ? this.programCertificate.toJSON() : {},
+                industryPathways: this.industryPathways,
+                creditPathways: this.creditPathways,
+                programTabViewEnabled: this.programTabViewEnabled,
+                isSubscriptionEligible: this.isSubscriptionEligible,
+                arrowUprightIcon,
+                ...this.urls,
+            },
+        );
 
         HtmlUtils.setHtml(this.$el, this.tpl(data));
         this.postRender();

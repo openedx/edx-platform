@@ -13,8 +13,13 @@ describe('Course Card View', () => {
     const setupView = (data, isEnrolled, collectionCourseStatus) => {
         const programData = $.extend({}, data);
         const context = {
-            courseData: {},
+            programData,
             collectionCourseStatus,
+            courseData: {},
+            subscriptionData: [],
+            urls: {},
+            userPreferences: {},
+            isSubscriptionEligible: false,
         };
 
         if (typeof collectionCourseStatus === 'undefined') {
@@ -31,7 +36,7 @@ describe('Course Card View', () => {
     };
 
     const validateCourseInfoDisplay = () => {
-    // DRY validation for course card in enrolled state
+        // DRY validation for course card in enrolled state
         expect(view.$('.course-details .course-title-link').text().trim()).toEqual(course.title);
         expect(view.$('.course-details .course-title-link').attr('href')).toEqual(
             course.course_runs[0].marketing_url,
@@ -42,8 +47,8 @@ describe('Course Card View', () => {
     };
 
     beforeEach(() => {
-    // NOTE: This data is redefined prior to each test case so that tests
-    // can't break each other by modifying data copied by reference.
+        // NOTE: This data is redefined prior to each test case so that tests
+        // can't break each other by modifying data copied by reference.
         course = {
             key: 'WageningenX+FFESx',
             uuid: '9f8562eb-f99b-45c7-b437-799fd0c15b6a',

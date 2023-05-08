@@ -47,7 +47,47 @@
                         </div>
                     </div>
                 <% } %>
-                <% if (is_learner_eligible_for_one_click_purchase && (typeof is_mobile_only === 'undefined' || is_mobile_only === false)) { %>
+                <% if (isSubscriptionEligible) { %>
+                <div class="d-flex flex-column align-items-start flex-sm-row  align-items-sm-center upgrade-subscription">
+                    <a href="<%- subscriptionUrl %>" class="btn-brand btn cta-primary upgrade-button">
+                    <% if (subscriptionState === 'inactive') { %>
+                        <div class="d-flex align-items-center">
+                            <div class="subscription-icon-restart">
+                                <% // xss-lint: disable=underscore-not-escaped %>
+                                <%= restartIcon %>
+                            </div>
+                            <span><%- gettext('Restart my subscription') %></span>
+                        </div>
+                    <% } else { %>
+                        <%- StringUtils.interpolate(gettext(
+                            subscriptionState === 'active'
+                            ? 'Manage my subscription'
+                            : 'Start {trialLength}-Day free trial'
+                        ),
+                        { trialLength } ) %>
+                    <% } %>
+                    </a>
+                    <span class="subscription-info-brief">
+                        <%- StringUtils.interpolate(
+                            gettext(
+                                hasActiveTrial
+                                ? 'Active trial ends {trialEndDate} at {trialEndTime}'
+                                : subscriptionState === 'active'
+                                ? 'Your next billing date is {nextPaymentDate}'
+                                : subscriptionState === 'inactive'
+                                ? 'Unlock verified access to all courses for {subscriptionPrice}/month. Cancel anytime.'
+                                : '{subscriptionPrice}/month subscription after trial ends. Cancel anytime.'
+                            ),
+                            {
+                                subscriptionPrice,
+                                nextPaymentDate,
+                                trialEndDate,
+                                trialEndTime,
+                            }
+                        ) %>
+                    </span>
+                </div>
+                <% } else if (is_learner_eligible_for_one_click_purchase && (typeof is_mobile_only === 'undefined' || is_mobile_only === false)) { %>
                 <a href="<%- completeProgramURL %>" class="btn-brand btn cta-primary upgrade-button complete-program" id="program_dashboard_course_upsell_all_button">
                     <%- gettext('Upgrade All Remaining Courses (')%>
                     <% if (discount_data.is_discounted) { %>
