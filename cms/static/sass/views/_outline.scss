@@ -247,6 +247,13 @@
       margin-top: 2px;
     }
 
+    #video-sharing-configuration-options {
+      @extend %sizing;
+
+      padding: 5px 8px;
+      margin-top: 2px;
+    }
+
     .status-actions {
       @extend %actions-list;
 

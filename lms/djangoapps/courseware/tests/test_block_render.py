@@ -1,12 +1,13 @@
 """
 Test for lms courseware app, block render unit
 """
-
-
 import json
 import textwrap
 from datetime import datetime
 from functools import partial
+from unittest.mock import MagicMock, Mock, patch
+import warnings
+
 import pytest
 import ddt
 import pytz
@@ -27,7 +28,6 @@ from edx_toggles.toggles.testutils import override_waffle_switch  # lint-amnesty
 from edx_when.field_data import DateLookupFieldData  # lint-amnesty, pylint: disable=wrong-import-order
 from freezegun import freeze_time  # lint-amnesty, pylint: disable=wrong-import-order
 from milestones.tests.utils import MilestonesTestCaseMixin  # lint-amnesty, pylint: disable=wrong-import-order
-from unittest.mock import MagicMock, Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.asides import AsideUsageKeyV2  # lint-amnesty, pylint: disable=wrong-import-order
 from opaque_keys.edx.keys import CourseKey, UsageKey  # lint-amnesty, pylint: disable=wrong-import-order
 from pyquery import PyQuery  # lint-amnesty, pylint: disable=wrong-import-order
@@ -64,7 +64,12 @@ from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, py
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
 from common.djangoapps.student.tests.factories import UserFactory
-from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID, ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
+from common.djangoapps.xblock_django.constants import (
+    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
+    ATTR_KEY_USER_IS_STAFF,
+    ATTR_KEY_USER_ROLE,
+)
 from lms.djangoapps.badges.tests.factories import BadgeClassFactory
 from lms.djangoapps.badges.tests.test_models import get_image
 from lms.djangoapps.courseware import block_render as render
@@ -2224,7 +2229,8 @@ class TestRebindBlock(TestSubmittingProblems):
         user2.id = 2
         block.runtime.service(block, 'rebind_user').rebind_noauth_module_to_user(block, user2)
         assert block
-        assert block.runtime.anonymous_student_id == anonymous_id_for_user(user2, self.course.id)
+        block_user_info = block.runtime.service(block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID) == anonymous_id_for_user(user2, self.course.id)
         assert block.scope_ids.user_id == user2.id
         assert block.scope_ids.user_id == user2.id
 
@@ -2689,8 +2695,13 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.request_token,
             course=self.course,
         )
-        assert self.block.runtime.user_is_staff
-        assert self.block.runtime.get_user_role() == 'student'
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_ROLE) == 'student'
+        with warnings.catch_warnings():  # For now, also test the deprecated accessors for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.user_is_staff
+            assert self.block.runtime.get_user_role() == 'student'
 
     @patch('lms.djangoapps.courseware.block_render.get_user_role', Mock(return_value='instructor', autospec=True))
     def test_get_user_role(self):
@@ -2703,16 +2714,26 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.request_token,
             course=self.course,
         )
-        assert self.block.runtime.get_user_role() == 'instructor'
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_ROLE) == 'instructor'
+        with warnings.catch_warnings():  # For now, also test the deprecated accessor for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.get_user_role() == 'instructor'
 
     def test_anonymous_student_id(self):
-        assert self.block.runtime.anonymous_student_id == anonymous_id_for_user(self.user, self.course.id)
+        expected_anon_id = anonymous_id_for_user(self.user, self.course.id)
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID) == expected_anon_id
+        with warnings.catch_warnings():  # For now, also test the deprecated accessor for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.anonymous_student_id == expected_anon_id
 
     def test_anonymous_student_id_bug(self):
         """
         Verifies that subsequent calls to prepare_runtime_for_user have no effect on each block runtime's
         anonymous_student_id value.
         """
+
         _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
@@ -2756,13 +2777,26 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             self.request_token,
             course=self.course,
         )
-        assert self.block.runtime.anonymous_student_id is None
-        assert self.block.runtime.seed == 0
-        assert self.block.runtime.user_id is None
-        assert not self.block.runtime.user_is_staff
-        assert not self.block.runtime.get_user_role()
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID) is None
+        assert self.block.scope_ids.user_id is None
+        assert not block_user_info.opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
+        assert not block_user_info.opt_attrs.get(ATTR_KEY_USER_ROLE)
+        # Also test the deprecated accessors for backwards compatibility:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.anonymous_student_id is None
+            assert self.block.runtime.seed == 0
+            assert self.block.runtime.user_id is None
+            assert not self.block.runtime.user_is_staff
+            assert not self.block.runtime.get_user_role()
 
     def test_get_real_user(self):
+        """
+        Test the deprecated runtime.get_real_user() method, to ensure backwards compatibility.
+
+        Newer code should use the user service, which gets tested in test_user_service.py
+        """
         _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
@@ -2773,13 +2807,15 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             course=self.course,
         )
         course_anonymous_student_id = anonymous_id_for_user(self.user, self.course.id)
-        assert self.block.runtime.get_real_user(course_anonymous_student_id) == self.user  # pylint: disable=not-callable
-
         no_course_anonymous_student_id = anonymous_id_for_user(self.user, None)
-        assert self.block.runtime.get_real_user(no_course_anonymous_student_id) == self.user  # pylint: disable=not-callable
 
-        # Tests that the default is to use the user service's anonymous_student_id
-        assert self.block.runtime.get_real_user() == self.user  # pylint: disable=not-callable
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            # pylint: disable=not-callable
+            assert self.block.runtime.get_real_user(course_anonymous_student_id) == self.user
+            assert self.block.runtime.get_real_user(no_course_anonymous_student_id) == self.user
+            # Tests that the default is to use the user service's anonymous_student_id
+            assert self.block.runtime.get_real_user() == self.user
 
     def test_render_template(self):
         rendered = self.block.runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
@@ -2882,4 +2918,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         block = BlockFactory(category="pure", parent=self.course)
 
         rendered_block = render.get_block(self.user, Mock(), block.location, None)
-        assert str(rendered_block.runtime.course_id) == self.COURSE_ID
+        assert str(rendered_block.scope_ids.usage_id.context_key) == self.COURSE_ID
+        with warnings.catch_warnings():  # For now, also test the deprecated accessor for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert str(rendered_block.runtime.course_id) == self.COURSE_ID
