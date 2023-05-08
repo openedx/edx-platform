@@ -1094,7 +1094,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.seed is deprecated. Please use the user service `user_id` instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         return self.user_id or 0
 
@@ -1106,8 +1106,8 @@ class ModuleSystemShim:
         Deprecated in favor of the user service.
         """
         warnings.warn(
-            'runtime.user_id is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=3,
+            'runtime.user_id is deprecated. Use block.scope_ids.user_id or the user service instead.',
+            DeprecationWarning, stacklevel=2,
         )
         user_service = self._runtime_services.get('user') or self._services.get('user')
         if user_service:
@@ -1123,7 +1123,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.user_is_staff is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         user_service = self._runtime_services.get('user') or self._services.get('user')
         if user_service:
@@ -1139,7 +1139,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.user_location is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         user_service = self._runtime_services.get('user') or self._services.get('user')
         if user_service:
@@ -1159,7 +1159,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.get_real_user is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         user_service = self._runtime_services.get('user') or self._services.get('user')
         if user_service:
@@ -1177,7 +1177,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.get_user_role is deprecated. Please use the user service instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         user_service = self._runtime_services.get('user') or self._services.get('user')
         if user_service:
@@ -1205,15 +1205,10 @@ class ModuleSystemShim:
     @render_template.setter
     def render_template(self, render_template):
         """
-        Set render_template.
+        Set render_template for backwards compatibility.
 
-        Deprecated in favor of the mako service.
+        Using this is deprecated in favor of the mako service.
         """
-        warnings.warn(
-            'Use of runtime.render_template is deprecated. '
-            'Use MakoService.render_template or a JavaScript-based template instead.',
-            DeprecationWarning, stacklevel=2,
-        )
         self._deprecated_render_template = render_template
 
     @property
@@ -1251,7 +1246,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.can_execute_unsafe_code is deprecated. Please use the sandbox service instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         sandbox_service = self._runtime_services.get('sandbox') or self._services.get('sandbox')
         if sandbox_service:
@@ -1271,7 +1266,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.get_python_lib_zip is deprecated. Please use the sandbox service instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         sandbox_service = self._runtime_services.get('sandbox') or self._services.get('sandbox')
         if sandbox_service:
@@ -1290,7 +1285,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.cache is deprecated. Please use the cache service instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         return self._runtime_services.get('cache') or self._services.get('cache') or DoNothingCache()
 
@@ -1303,7 +1298,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.replace_urls is deprecated. Please use the replace_urls service instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         replace_urls_service = self._runtime_services.get('replace_urls') or self._services.get('replace_urls')
         if replace_urls_service:
@@ -1318,7 +1313,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.replace_course_urls is deprecated. Please use the replace_urls service instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         replace_urls_service = self._runtime_services.get('replace_urls') or self._services.get('replace_urls')
         if replace_urls_service:
@@ -1333,7 +1328,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.replace_jump_to_id_urls is deprecated. Please use the replace_urls service instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         replace_urls_service = self._runtime_services.get('replace_urls') or self._services.get('replace_urls')
         if replace_urls_service:
@@ -1348,7 +1343,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.filestore is deprecated. Please use the runtime.resources_fs service instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         return self.resources_fs
 
@@ -1361,7 +1356,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'node_path is deprecated. Please use other methods of finding the node_modules location.',
-            DeprecationWarning, stacklevel=3
+            DeprecationWarning, stacklevel=2,
         )
 
     @property
@@ -1372,7 +1367,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.hostname is deprecated. Please use `LMS_BASE` from `django.conf.settings`.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         return settings.LMS_BASE
 
@@ -1386,7 +1381,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             "rebind_noauth_module_to_user is deprecated. Please use the 'rebind_user' service instead.",
-            DeprecationWarning, stacklevel=3
+            DeprecationWarning, stacklevel=2,
         )
         rebind_user_service = self._runtime_services.get('rebind_user') or self._services.get('rebind_user')
         if rebind_user_service:
@@ -1401,7 +1396,7 @@ class ModuleSystemShim:
         """
         warnings.warn(
             'runtime.STATIC_URL is deprecated. Please use settings.STATIC_URL instead.',
-            DeprecationWarning, stacklevel=3,
+            DeprecationWarning, stacklevel=2,
         )
         return settings.STATIC_URL
 
@@ -1410,11 +1405,11 @@ class ModuleSystemShim:
         """
         Old API to get the course ID.
 
-        Deprecated in favor of `runtime.scope_ids.usage_id.context_key`.
+        Deprecated in favor of `block.scope_ids.usage_id.context_key`.
         """
         warnings.warn(
-            "`runtime.course_id` is deprecated. Use `context_key` instead: `runtime.scope_ids.usage_id.context_key`.",
-            DeprecationWarning, stacklevel=3,
+            "`runtime.course_id` is deprecated. Use `context_key` instead: `block.scope_ids.usage_id.context_key`.",
+            DeprecationWarning, stacklevel=2,
         )
         if hasattr(self, '_deprecated_course_id'):
             return self._deprecated_course_id.for_branch(None)
@@ -1422,14 +1417,8 @@ class ModuleSystemShim:
     @course_id.setter
     def course_id(self, course_id):
         """
-        Set course_id.
-
-        Deprecated in favor of `runtime.scope_ids.usage_id.context_key`.
+        Set course_id, for backwards compatibility. Reading from this is deprecated.
         """
-        warnings.warn(
-            "`runtime.course_id` is deprecated. Use `context_key` instead: `runtime.scope_ids.usage_id.context_key`.",
-            DeprecationWarning, stacklevel=3,
-        )
         self._deprecated_course_id = course_id
 
 
