@@ -1,6 +1,5 @@
 import { formActions, entitlementActions } from '../constants/actionTypes';
 import { formTypes } from '../constants/formTypes';
-
 const clearFormState = {
     formType: '',
     isOpen: false,

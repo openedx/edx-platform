@@ -265,19 +265,19 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
         editXBlock: function(event, options) {
             event.preventDefault();
 
-            if (!options || options.view !== 'visibility_view') {
-                const primaryHeader = $(event.target).closest('.xblock-header-primary');
+            if(!options || options.view !== 'visibility_view' ){
+                const primaryHeader = $(event.target).closest('.xblock-header-primary')
 
                 var useNewTextEditor = primaryHeader.attr('use-new-editor-text'),
                     useNewVideoEditor = primaryHeader.attr('use-new-editor-video'),
                     useNewProblemEditor = primaryHeader.attr('use-new-editor-problem'),
                     blockType = primaryHeader.attr('data-block-type');
 
-                if((useNewTextEditor === 'True' && blockType === 'html')
+                if( (useNewTextEditor === 'True' && blockType === 'html')
                         || (useNewVideoEditor === 'True' && blockType === 'video')
                         || (useNewProblemEditor === 'True' && blockType === 'problem')
                 ) {
-                    var destinationUrl = `${primaryHeader.attr('authoring_MFE_base_url')}/${blockType}/${encodeURI(primaryHeader.attr('data-usage-id'))}`;
+                    var destinationUrl = primaryHeader.attr('authoring_MFE_base_url') + '/' + blockType + '/' + encodeURI(primaryHeader.attr('data-usage-id'));
                     window.location.href = destinationUrl;
                     return;
                 }
@@ -365,7 +365,7 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 }),
                 placeholderElement;
             placeholderElement = $placeholderEl.appendTo(listPanel);
-            return $.postJSON(`${this.getURLRoot()}/`, requestData,
+            return $.postJSON(this.getURLRoot() + '/', requestData,
                 _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset, false))
                 .fail(function() {
                     // Remove the placeholder if the update failed
@@ -476,15 +476,15 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                 useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
 
             // find the block type in the locator if availible
-            if(data.hasOwnProperty('locator')) {
+            if(data.hasOwnProperty('locator')){
                 var matchBlockTypeFromLocator = /\@(.*?)\+/;
                 var blockType = data.locator.match(matchBlockTypeFromLocator);
             }
             if((useNewTextEditor === 'True' && blockType.includes('html'))
                     || (useNewVideoEditor === 'True' && blockType.includes('video'))
-                    || (useNewProblemEditor === 'True' && blockType.includes('problem'))
-            ) {
-                var destinationUrl = `${this.$('.xblock-header-primary').attr('authoring_MFE_base_url')}/${blockType[1]}/${encodeURI(data.locator)}`;
+                    ||(useNewProblemEditor === 'True' && blockType.includes('problem'))
+            ){
+                var destinationUrl = this.$('.xblock-header-primary').attr('authoring_MFE_base_url') + '/' + blockType[1] + '/' + encodeURI(data.locator);
                 window.location.href = destinationUrl;
                 return;
             }

@@ -15,7 +15,7 @@ function arrayToObject(array) {
         const key = Object.keys(obj)[0];
         accumulator[key] = obj[key];
         return accumulator;
-    }, {});
+    }, {})
 }
 
 function countByType(type, assignments) {
@@ -24,7 +24,7 @@ function countByType(type, assignments) {
         if (format === type) {
             count += 1;
         }
-    });
+    })
     return count;
 }
 
@@ -34,9 +34,11 @@ function getActiveUserString(count) {
 }
 
 function getAssignmentCounts(types, assignments) {
-    const countsArray = types.map((type) => ({
-        [type]: countByType(type, assignments)
-    }));
+    const countsArray = types.map((type) => {
+        return {
+            [type]: countByType(type, assignments)
+        }
+    });
 
     return arrayToObject(countsArray);
 }
@@ -54,7 +56,7 @@ function getStreakEncouragement(count) {
 }
 
 function getStreakString(count) {
-    const unit = (count === 1) ? 'week' : 'weeks';
+    const unit = (count ===1) ? 'week' : 'weeks';
     return (count > 0) ? `Active ${count} ${unit} in a row` : false;
 }
 
@@ -62,11 +64,13 @@ export function LearnerAnalyticsDashboard(props) {
     const {
         grading_policy, grades, schedule, schedule_raw, week_streak, weekly_active_users, discussion_info, profile_images, passing_grade, percent_grade
     } = props;
-    const gradeBreakdown = grading_policy.GRADER.map(({type, weight}, index) => ({
-        value: weight,
-        label: type,
-        sliceIndex: index + 1
-    }));
+    const gradeBreakdown = grading_policy.GRADER.map(({type, weight}, index) => {
+        return {
+            value: weight,
+            label: type,
+            sliceIndex: index + 1
+        }
+    });
 
     // Get a list of assignment types minus duplicates
     const assignments = gradeBreakdown.map(value => value['label']);
@@ -97,7 +101,7 @@ export function LearnerAnalyticsDashboard(props) {
                     />
                 </div>
                 <CircleChartLegend data={gradeBreakdown} />
-            </div>
+               </div>
                     }
 
                     <h3 className="section-heading">Graded Assignments</h3>

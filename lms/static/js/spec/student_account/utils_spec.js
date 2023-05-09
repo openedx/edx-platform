@@ -11,7 +11,7 @@ define(['jquery', 'js/student_account/utils'],
                 };
 
             beforeEach(function() {
-                document.cookie = `${edxUserInfoCookieName}="`
+                document.cookie = edxUserInfoCookieName + '="'
                   + '{\"version\": 1, \"username\": \"local-test-user\"}";'; // eslint-disable-line no-useless-escape
             });
 
