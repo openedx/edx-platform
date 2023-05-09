@@ -60,7 +60,7 @@
                                 data.levels.map(function(level) {
                                     return {
                                         bitrate: level.bitrate,
-                                        resolution: level.width + 'x' + level.height
+                                        resolution: `${level.width}x${level.height}`
                                     };
                                 })
                             );
@@ -72,7 +72,7 @@
                                 '[HLS Video]: LEVEL_SWITCHED, qualityLevelInfo: ',
                                 {
                                     bitrate: level.bitrate,
-                                    resolution: level.width + 'x' + level.height
+                                    resolution: `${level.width}x${level.height}`
                                 }
                             );
                         });

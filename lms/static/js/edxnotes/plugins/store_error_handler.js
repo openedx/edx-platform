@@ -22,7 +22,7 @@
             // if response includes an error message it will take precedence
             if (serverResponse && serverResponse.error_msg) {
                 Annotator.showNotification(serverResponse.error_msg, Annotator.Notification.ERROR);
-                return console.error(Annotator._t('API request failed:') + (" '" + xhr.status + "'"));
+                return console.error(`${Annotator._t('API request failed:')} '${xhr.status}'`);
             }
 
             // Delegate to original error handler

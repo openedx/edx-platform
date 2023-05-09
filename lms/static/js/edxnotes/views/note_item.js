@@ -9,7 +9,7 @@
             tagName: 'article',
             className: 'note',
             id: function() {
-                return 'note-' + _.uniqueId();
+                return `note-${_.uniqueId()}`;
             },
             events: {
                 'click .note-excerpt-more-link': 'moreHandler',

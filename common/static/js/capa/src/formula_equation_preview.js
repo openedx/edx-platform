@@ -20,17 +20,17 @@ function escapeSelector(id) {
                 return '\uFFFD';
             }
             // Control characters and (dependent upon position) numbers get escaped as code points
-            return ch.slice(0, -1) + '\\' + ch.charCodeAt(ch.length - 1).toString(16) + ' ';
+            return `${ch.slice(0, -1)}\\${ch.charCodeAt(ch.length - 1).toString(16)} `;
         }
         // Other potentially-special ASCII characters get backslash-escaped
-        return '\\' + ch;
+        return `\\${ch}`;
     }
 
     if (window.CSS && window.CSS.escape) {
         return window.CSS.escape(id);
     } else {
         // ensure string and then run the replacements
-        return (id + '').replace(rcssescape, fcssescape);
+        return (`${id}`).replace(rcssescape, fcssescape);
     }
 }
 
@@ -49,7 +49,7 @@ formulaEquationPreview.enable = function() {
     function setupInput() {
         var $this = $(this); // cache the jQuery object
 
-        var $preview = $('#' + escapeSelector(this.id) + '_preview');
+        var $preview = $(`#${escapeSelector(this.id)}_preview`);
         var inputData = {
             // These are the mutable values
 
@@ -187,7 +187,7 @@ formulaEquationPreview.enable = function() {
                             console.log('[FormulaEquationInput] Oops no mathjax for ', latex);
                             // Fall back to modifying the actual element.
                             var textNode = previewElement.childNodes[0];
-                            textNode.data = '\\(' + latex + '\\)';
+                            textNode.data = `\\(${latex}\\)`;
                             MathJax.Hub.Queue(['Typeset', MathJax.Hub, previewElement]);
                         }
                     });
@@ -198,7 +198,7 @@ formulaEquationPreview.enable = function() {
         if (response.error) {
             inputData.$img.css('visibility', 'visible');
             inputData.errorWaitTimeout = window.setTimeout(function() {
-                display('\\text{' + response.error + '}');
+                display(`\\text{${response.error}}`);
                 inputData.$img.css('visibility', 'hidden');
             }, formulaEquationPreview.errorDelay);
         } else {

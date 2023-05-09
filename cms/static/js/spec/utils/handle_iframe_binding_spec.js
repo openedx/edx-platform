@@ -12,7 +12,7 @@ define(
             doc.body.innerHTML = iframe_html;
 
             var verify_no_modification = function(src) {
-                iframe_html = '<iframe width="618" height="350" src="' + src + '" frameborder="0" allowfullscreen></iframe>';
+                iframe_html = `<iframe width="618" height="350" src="${src}" frameborder="0" allowfullscreen></iframe>`;
                 doc.body.innerHTML = iframe_html;
 
                 IframeBinding.iframeBinding(doc);

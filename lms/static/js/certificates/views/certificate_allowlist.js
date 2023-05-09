@@ -42,7 +42,7 @@
             },
 
             loadTemplate: function(name) {
-                var templateSelector = '#' + name + '-tpl',
+                var templateSelector = `#${name}-tpl`,
                     templateText = $(templateSelector).text();
                 return _.template(templateText);
             },
@@ -79,7 +79,7 @@
             },
 
             escapeAndShowMessage: function(message) {
-                $(this.message_div + '>p').remove();
+                $(`${this.message_div}>p`).remove();
                 // xss-lint: disable=javascript-jquery-append
                 $(this.message_div).removeClass('hidden').append(HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<p>'),

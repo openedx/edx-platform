@@ -92,7 +92,7 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
                             text: gettext('Take me to the new location'),
                             class: 'action-cancel',
                             click: function() {
-                                redirectLink('/container/' + data.targetParentLocator);
+                                redirectLink(`/container/${data.targetParentLocator}`);
                             }
                         }
                     ]

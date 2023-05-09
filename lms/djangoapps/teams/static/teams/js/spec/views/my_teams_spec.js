@@ -16,7 +16,7 @@ define([
         mockGetTopic = function(topicId) {
             return $.Deferred().resolve(TeamSpecHelpers.createMockTopic({
                 id: topicId,
-                name: 'teamset-name-' + topicId,
+                name: `teamset-name-${topicId}`,
             }));
         };
 

@@ -117,7 +117,7 @@ define(
             });
 
             makeUploadUrl = function(fileName) {
-                return 'http://www.example.com/test_url/' + fileName;
+                return `http://www.example.com/test_url/${fileName}`;
             };
 
             getSentRequests = function() {
@@ -222,7 +222,7 @@ define(
                                 fileInfo
                             ]
                         },
-                        S3Url = 'http://s3.aws.com/upload/videos/' + fileInfo.name,
+                        S3Url = `http://s3.aws.com/upload/videos/${fileInfo.name}`,
                         requests;
 
                     // this is required so that we can use AjaxHelpers ajax mock utils instead of jasmine mock-ajax.js
@@ -356,7 +356,7 @@ define(
                         {desc: 'smaller than', additionalBytes: -1}
                     ],
                     function(caseInfo) {
-                        it(caseInfo.desc + 'max file size', function() {
+                        it(`${caseInfo.desc}max file size`, function() {
                             var maxFileSizeInBytes = this.view.getMaxFileSizeInBytes(),
                                 fileSize = maxFileSizeInBytes + caseInfo.additionalBytes,
                                 fileToUpload = {
@@ -374,7 +374,7 @@ define(
                                 verifyUploadViewInfo(
                                     uploadView,
                                     'Your file could not be uploaded',
-                                    'file.mp4 exceeds maximum size of ' + videoUploadMaxFileSizeInGB + ' GB.'
+                                    `file.mp4 exceeds maximum size of ${videoUploadMaxFileSizeInGB} GB.`
                                 );
                                 verifyA11YMessage(
                                     StringUtils.interpolate(
@@ -415,10 +415,10 @@ define(
                 function(caseInfo) {
                     var fileNames = _.map(
                         _.range(caseInfo.numFiles),
-                        function(i) { return 'test' + i + '.mp4'; }
+                        function(i) { return `test${i}.mp4`; }
                     );
 
-                    describe('on selection of ' + caseInfo.desc, function() {
+                    describe(`on selection of ${caseInfo.desc}`, function() {
                         beforeEach(function() {
                             // The files property cannot be set on a file input for
                             // security reasons, so we must mock the access mechanism
@@ -512,7 +512,7 @@ define(
                                     var refreshDescription = isViewRefresh ? ' (refreshed)' : ' (not refreshed)';
                                     var subCases = [
                                         {
-                                            desc: 'completion' + refreshDescription,
+                                            desc: `completion${refreshDescription}`,
                                             responseStatus: 204,
                                             statusText: ActiveVideoUpload.STATUS_COMPLETED,
                                             progressValue: 1,
@@ -521,7 +521,7 @@ define(
                                             isViewRefresh: isViewRefresh
                                         },
                                         {
-                                            desc: 'failure' + refreshDescription,
+                                            desc: `failure${refreshDescription}`,
                                             responseStatus: 500,
                                             statusText: ActiveVideoUpload.STATUS_FAILED,
                                             progressValue: 0,
@@ -533,7 +533,7 @@ define(
 
                                     _.each(subCases,
                                         function(subCaseInfo) {
-                                            describe('and upload ' + subCaseInfo.desc, function() {
+                                            describe(`and upload ${subCaseInfo.desc}`, function() {
                                                 var refreshSpy = null;
 
                                                 beforeEach(function() {

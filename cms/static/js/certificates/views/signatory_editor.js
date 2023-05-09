@@ -35,7 +35,7 @@ function($, _, Backbone, gettext,
             var index = this.getModelIndex(this.model);
             return [
                 'signatory-edit',
-                'signatory-edit-view-' + index
+                `signatory-edit-view-${index}`
             ].join(' ');
         },
 
@@ -194,7 +194,7 @@ function($, _, Backbone, gettext,
          * @param string modelAttribute - the attribute of the signatory model e.g. name, title.
         */
         toggleValidationErrorMessage: function(modelAttribute) {
-            var selector = 'div.add-signatory-' + modelAttribute;
+            var selector = `div.add-signatory-${modelAttribute}`;
             var errorMessage;
             if (!this.model.isValid() && _.has(this.model.validationError, modelAttribute)) {
                 // Show the error message if it is not exist before.
@@ -206,7 +206,7 @@ function($, _, Backbone, gettext,
             } else {
                 // Remove the error message.
                 $(selector).removeClass('error');
-                $(selector + '>span.message-error').remove();
+                $(`${selector}>span.message-error`).remove();
             }
         }
 

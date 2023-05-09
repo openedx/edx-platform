@@ -41,7 +41,7 @@
         function getUniqueId() {
             this.uniqueId += 1;
 
-            return this.salt + '_' + this.uniqueId.toFixed(0);
+            return `${this.salt}_${this.uniqueId.toFixed(0)}`;
         }
 
         function makeSalt() {

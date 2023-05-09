@@ -42,7 +42,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
         };
 
         verifyNotificationMessage = function(expectedMessage, type) {
-            verifyText('.file-upload-form-result .message-' + type + ' .message-title', expectedMessage);
+            verifyText(`.file-upload-form-result .message-${type} .message-title`, expectedMessage);
         };
 
         mimicUpload = function(test) {

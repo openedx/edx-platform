@@ -156,22 +156,22 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
              * Returns the action bar that contains the modal's action buttons.
              */
             getActionBar: function() {
-                return this.$(this.options.modalWindowClass + ' > div > .modal-actions');
+                return this.$(`${this.options.modalWindowClass} > div > .modal-actions`);
             },
 
             /**
              * Returns the action button of the specified type.
              */
             getActionButton: function(type) {
-                return this.getActionBar().find('.action-' + type);
+                return this.getActionBar().find(`.action-${type}`);
             },
 
             enableActionButton: function(type) {
-                this.getActionBar().find('.action-' + type).prop('disabled', false).removeClass('is-disabled');
+                this.getActionBar().find(`.action-${type}`).prop('disabled', false).removeClass('is-disabled');
             },
 
             disableActionButton: function(type) {
-                this.getActionBar().find('.action-' + type).prop('disabled', true).addClass('is-disabled');
+                this.getActionBar().find(`.action-${type}`).prop('disabled', true).addClass('is-disabled');
             },
 
             resize: function() {

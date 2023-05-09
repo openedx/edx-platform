@@ -22,11 +22,11 @@ class DueDates extends React.Component {
 
     getLabel(type) {
         const {assignmentCounts} = this.props;
-        if (assignmentCounts[type] < 2 ) {
+        if (assignmentCounts[type] < 2) {
             return type;
         } else {
             this.renderLabels[type] += 1;
-            return type + ' ' + this.renderLabels[type];
+            return `${type} ${this.renderLabels[type]}`;
         }
     }
 
@@ -35,14 +35,12 @@ class DueDates extends React.Component {
         this.renderLabels = this.initLabelTracker(assignmentCounts);
 
         return dates.sort((a, b) => new Date(a.due) > new Date(b.due))
-            .map(({format, due}, index) => {
-                return (
-                    <li className="date-item" key={index}>
-                        <div className="label">{this.getLabel(format)}</div>
-                        <div className="data">{this.getDate(due)}</div>
-                    </li>
-                );
-            });
+            .map(({format, due}, index) => (
+                <li className="date-item" key={index}>
+                    <div className="label">{this.getLabel(format)}</div>
+                    <div className="data">{this.getDate(due)}</div>
+                </li>
+            ));
     }
 
     initLabelTracker(list) {
@@ -51,7 +49,7 @@ class DueDates extends React.Component {
         return labels.reduce((accumulator, key) => {
             accumulator[key] = 0;
             return accumulator;
-        }, {})
+        }, {});
     }
 
     renderList() {
@@ -73,6 +71,6 @@ class DueDates extends React.Component {
 
 DueDates.propTypes = {
     dates: PropTypes.array.isRequired
-}
+};
 
 export default DueDates;

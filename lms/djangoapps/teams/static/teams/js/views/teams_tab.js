@@ -230,7 +230,7 @@
             searchTeams: function(topicID) {
                 var view = this;
                 if (!this.teamsCollection) {
-                    this.router.navigate('topics/' + topicID, {trigger: true});
+                    this.router.navigate(`topics/${topicID}`, {trigger: true});
                 } else {
                     this.getTopic(topicID).done(function(topic) {
                         view.mainView = view.createTeamsListView({
@@ -408,7 +408,7 @@
                         description: options.description,
                         breadcrumbs: options.breadcrumbs
                     }),
-                    searchUrl = 'topics/' + topic.get('id') + '/search';
+                    searchUrl = `topics/${topic.get('id')}/search`;
                     // Listen to requests to sync the collection and redirect it as follows:
                     // 1. If the collection includes a search, show the search results page
                     // 2. If we're already on the search page, show the regular
@@ -429,7 +429,7 @@
                             // xss-lint: disable=javascript-jquery-html
                             this.$el.find('.page-description').html(this.searchDescription());
                         } else if (Backbone.history.getFragment() === searchUrl) {
-                            Backbone.history.navigate('topics/' + topic.get('id'), {trigger: true});
+                            Backbone.history.navigate(`topics/${topic.get('id')}`, {trigger: true});
                         }
                     }, this)
                 );
@@ -550,12 +550,12 @@
                 if (topic) {
                     breadcrumbs.push({
                         title: topic.get('name'),
-                        url: '#topics/' + topic.id
+                        url: `#topics/${topic.id}`
                     });
                     if (team) {
                         breadcrumbs.push({
                             title: team.get('name'),
-                            url: '#teams/' + topic.id + '/' + team.id
+                            url: `#teams/${topic.id}/${team.id}`
                         });
                     }
                 }

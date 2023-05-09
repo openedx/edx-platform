@@ -410,7 +410,7 @@
                 expect(view.validate).toHaveBeenCalledWith($password[0]);
 
                 // Verify that no submission errors are visible
-                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
+                expect(view.$formFeedback.find(`.${view.formErrorsJsHook}`).length).toEqual(0);
 
                 // Form button should be disabled on success.
                 expect(view.$submitButton).toHaveAttr('disabled');
@@ -450,7 +450,7 @@
                 submitForm(false);
 
                 // Verify that submission errors are visible
-                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
+                expect(view.$formFeedback.find(`.${view.formErrorsJsHook}`).length).toEqual(1);
 
                 // Expect that auth complete is NOT triggered
                 expect(authComplete).toBe(false);
@@ -496,7 +496,7 @@
                 AjaxHelpers.respondWithError(requests);
 
                 // Expect that an error is displayed and that auth complete is NOT triggered
-                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
+                expect(view.$formFeedback.find(`.${view.formErrorsJsHook}`).length).toEqual(1);
                 expect(authComplete).toBe(false);
 
                 // If we try again and succeed, the error should go away
@@ -506,7 +506,7 @@
                 AjaxHelpers.respondWithJson(requests, {});
 
                 // Expect that the error is hidden and that auth complete is triggered
-                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
+                expect(view.$formFeedback.find(`.${view.formErrorsJsHook}`).length).toEqual(0);
                 expect(authComplete).toBe(true);
 
                 // Form button should be disabled on success.
@@ -514,7 +514,7 @@
             });
 
             it('shows optional exposed fields', function() {
-                var formFields = FORM_DESCRIPTION.fields
+                var formFields = FORM_DESCRIPTION.fields;
                 formFields.push({
                     placeholder: '',
                     name: 'exposed_custom_optional_field',
@@ -525,15 +525,15 @@
                     exposed: true,
                     instructions: 'Check this field if you would like to.',
                     restrictions: {}
-                })
+                });
 
                 createRegisterView(this, formFields);
                 var elementClasses = view.$('.exposed-optional-fields').attr('class');
-                var elementChildren = view.$('.exposed-optional-fields .form-field')
+                var elementChildren = view.$('.exposed-optional-fields .form-field');
                 // Expect the exposed optional fields container does not have other
                 // classes assigned, like .hidden
                 expect(elementClasses).toEqual('exposed-optional-fields');
-                expect(elementChildren.length).toEqual(1)
+                expect(elementChildren.length).toEqual(1);
             });
 
             it('hides optional fields by default', function() {

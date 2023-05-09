@@ -32,7 +32,7 @@
             }
             select.appendChild(option);
         }
-        feedback.innerText = "The currently selected answer is '" + state.selectedChoice + "'.";
+        feedback.innerText = `The currently selected answer is '${state.selectedChoice}'.`;
     }
 
     function getGrade() {
@@ -74,8 +74,8 @@
 
     select.addEventListener('change', function() {
         state.selectedChoice = select.options[select.selectedIndex].text;
-        feedback.innerText = "You have selected '" + state.selectedChoice
-            + "'. Click Submit to grade your answer.";
+        feedback.innerText = `You have selected '${state.selectedChoice
+        }'. Click Submit to grade your answer.`;
     });
 
     return {

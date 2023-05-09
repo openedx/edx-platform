@@ -8,7 +8,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
         urlRoot: '/xblock/',
         url: function() {
             // add ?fields=graderType to the request url (only needed for fetch, but innocuous for others)
-            return Backbone.Model.prototype.url.apply(this) + '?' + $.param({fields: 'graderType'});
+            return `${Backbone.Model.prototype.url.apply(this)}?${$.param({fields: 'graderType'})}`;
         }
     });
     return AssignmentGrade;

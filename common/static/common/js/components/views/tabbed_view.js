@@ -21,7 +21,7 @@
         HtmlUtils
     ) {
         var getTabPanelId = function(id) {
-            return 'tabpanel-' + id;
+            return `tabpanel-${id}`;
         };
 
         var TabPanelView = Backbone.View.extend({
@@ -164,7 +164,7 @@
                 if (index === 0) {
                     $tab = $(focused).parent().find('.tab').last();
                 } else {
-                    $tab = $(focused).parent().find('.tab:eq(' + index + ')').prev();
+                    $tab = $(focused).parent().find(`.tab:eq(${index})`).prev();
                 }
 
                 $panel = $($tab).data('index');
@@ -180,7 +180,7 @@
                 if (index === total) {
                     $tab = $(focused).parent().find('.tab').first();
                 } else {
-                    $tab = $(focused).parent().find('.tab:eq(' + index + ')').next();
+                    $tab = $(focused).parent().find(`.tab:eq(${index})`).next();
                 }
 
                 $panel = $($tab).data('index');
@@ -229,10 +229,10 @@
 
                 if (typeof tabNameOrIndex === 'string') {
                     tab = this.urlMap[tabNameOrIndex];
-                    $element = this.$('button[data-url=' + tabNameOrIndex + ']');
+                    $element = this.$(`button[data-url=${tabNameOrIndex}]`);
                 } else {
                     tab = this.tabs[tabNameOrIndex];
-                    $element = this.$('button[data-index=' + tabNameOrIndex + ']');
+                    $element = this.$(`button[data-index=${tabNameOrIndex}]`);
                 }
                 return {tab: tab, element: $element};
             }

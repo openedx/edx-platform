@@ -9,7 +9,7 @@
         GroupView = Backbone.View.extend({
             tagName: 'section',
             id: function() {
-                return 'note-section-' + _.uniqueId();
+                return `note-section-${_.uniqueId()}`;
             },
 
             initialize: function(options) {
@@ -35,7 +35,7 @@
             tagName: 'section',
             className: 'note-group',
             id: function() {
-                return 'note-group-' + _.uniqueId();
+                return `note-group-${_.uniqueId()}`;
             },
             template: HtmlUtils.template('<h3 class="course-title"><%- chapterName %></h3>'),
 

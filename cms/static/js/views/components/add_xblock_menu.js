@@ -2,7 +2,7 @@ define(['jquery', 'js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
     function($, BaseView, HtmlUtils) {
         return BaseView.extend({
             className: function() {
-                return 'new-component-templates new-component-' + this.model.type;
+                return `new-component-templates new-component-${this.model.type}`;
             },
             initialize: function() {
                 BaseView.prototype.initialize.call(this);

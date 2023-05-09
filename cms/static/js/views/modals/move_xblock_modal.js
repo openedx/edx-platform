@@ -178,7 +178,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
         moveXBlock: function() {
             MoveXBlockUtils.moveXBlock(
                 {
-                    sourceXBlockElement: $("li.studio-xblock-wrapper[data-locator='" + this.sourceXBlockInfo.id + "']"),
+                    sourceXBlockElement: $(`li.studio-xblock-wrapper[data-locator='${this.sourceXBlockInfo.id}']`),
                     sourceDisplayName: this.sourceXBlockInfo.get('display_name'),
                     sourceLocator: this.sourceXBlockInfo.id,
                     sourceParentLocator: this.sourceParentXBlockInfo.id,

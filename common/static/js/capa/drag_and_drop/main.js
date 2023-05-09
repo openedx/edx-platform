@@ -62,10 +62,10 @@
                 }
 
                 try {
-                    config = JSON.parse($('#drag_and_drop_json_' + problemId).html());
+                    config = JSON.parse($(`#drag_and_drop_json_${problemId}`).html());
                 } catch (err) {
                     console.log('ERROR: Could not parse the JSON configuration options.');
-                    console.log('Error message: "' + err.message + '".');
+                    console.log(`Error message: "${err.message}".`);
 
                     return;
                 }

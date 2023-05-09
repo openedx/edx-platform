@@ -31,16 +31,16 @@ define([
 
     var createMockTeamData = function(startIndex, stopIndex) {
         return _.map(_.range(startIndex, stopIndex + 1), function(i) {
-            var id = 'id' + i;
+            var id = `id${i}`;
             return {
-                name: 'team ' + i,
+                name: `team ${i}`,
                 id: id,
                 language: testLanguages[i % 4][0],
                 country: testCountries[i % 4][0],
                 membership: [],
                 last_activity_at: '',
-                topic_id: 'topic_id' + i,
-                url: 'api/team/v0/teams/' + id
+                topic_id: `topic_id${i}`,
+                url: `api/team/v0/teams/${id}`
             };
         });
     };
@@ -91,7 +91,7 @@ define([
             return {
                 user: {
                     username: testUser,
-                    url: 'https://openedx.example.com/api/user/v1/accounts/' + testUser,
+                    url: `https://openedx.example.com/api/user/v1/accounts/${testUser}`,
                     profile_image: {
                         image_url_small: 'test_profile_image'
                     }
@@ -127,7 +127,7 @@ define([
         var teamCards = view.$('.team-card');
         _.each(teams, function(team, index) {
             var currentCard = teamCards.eq(index);
-            var teamsetString = 'teamset-name-' + team.topic_id;
+            var teamsetString = `teamset-name-${team.topic_id}`;
             expect(currentCard.text()).toMatch(team.name);
             expect(currentCard.text()).toMatch(_.object(testLanguages)[team.language]);
             expect(currentCard.text()).toMatch(_.object(testCountries)[team.country]);
@@ -266,9 +266,9 @@ define([
     createMockTopicData = function(startIndex, stopIndex) {
         return _.map(_.range(startIndex, stopIndex + 1), function(i) {
             return {
-                description: 'Test description ' + i,
-                name: 'Test Topic ' + i,
-                id: 'test-topic-' + i,
+                description: `Test description ${i}`,
+                name: `Test Topic ${i}`,
+                id: `test-topic-${i}`,
                 team_count: 0
             };
         });
@@ -301,12 +301,12 @@ define([
         courseMaxTeamSize: 6,
         languages: testLanguages,
         countries: testCountries,
-        topicUrl: '/api/team/v0/topics/topic_id,' + testCourseID,
+        topicUrl: `/api/team/v0/topics/topic_id,${testCourseID}`,
         teamsUrl: '/api/team/v0/teams/',
         teamsAssignmentsUrl: '/api/team/v0/teams/team_id/assignments',
         teamsDetailUrl: '/api/team/v0/teams/team_id',
         teamMembershipsUrl: '/api/team/v0/team_memberships/',
-        teamMembershipDetailUrl: '/api/team/v0/team_membership/team_id,' + testUser,
+        teamMembershipDetailUrl: `/api/team/v0/team_membership/team_id,${testUser}`,
         myTeamsUrl: '/api/team/v0/teams/',
         userInfo: createMockUserInfo()
     };

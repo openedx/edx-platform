@@ -42,7 +42,7 @@
             },
 
             actionUrl: function() {
-                return '#topics/' + this.model.get('id');
+                return `#topics/${this.model.get('id')}`;
             },
 
             configuration: 'square_card',
@@ -58,7 +58,7 @@
                     {topic_name: this.model.get('name')}, true
                 ));
                     // eslint-disable-next-line max-len
-                return '<span class="sr">' + screenReaderText + '</span><span class="icon fa fa-arrow-right" aria-hidden="true"></span>'; // xss-lint: disable=javascript-concat-html
+                return `<span class="sr">${screenReaderText}</span><span class="icon fa fa-arrow-right" aria-hidden="true"></span>`; // xss-lint: disable=javascript-concat-html
             }
         });
 

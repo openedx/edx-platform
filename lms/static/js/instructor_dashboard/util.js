@@ -257,7 +257,7 @@
             $messageContent = $('<section>', {
                 'aria-hidden': 'true',
                 class: 'modal email-modal',
-                id: 'email_message_' + emailId
+                id: `email_message_${emailId}`
             });
             $emailWrapper = $('<div>', {
                 class: 'inner-wrapper email-content-wrapper'
@@ -269,7 +269,7 @@
                 type: 'button',
                 name: 'copy-email-body-text',
                 value: gettext('Copy Email To Editor'),
-                id: 'copy_email_' + emailId
+                id: `copy_email_${emailId}`
             }));
             $closeButton = $('<a>', {
                 href: '#',
@@ -306,16 +306,16 @@
             $emailWrapper.append($emailContent);
             $messageContent.append($emailWrapper);
             $messagesWrapper.append($messageContent);
-            $('#email_message_' + emailInfo.email.id + '_trig').leanModal({
+            $(`#email_message_${emailInfo.email.id}_trig`).leanModal({
                 closeButton: '.close-modal',
-                copyEmailButton: '#copy_email_' + emailId
+                copyEmailButton: `#copy_email_${emailId}`
             });
             setupCopyEmailButton(emailId, emailInfo.email.html_message, emailInfo.email.subject);
         }
     };
 
     setupCopyEmailButton = function(emailId, htmlMessage, subject) {
-        return $('#copy_email_' + emailId).click(function() {
+        return $(`#copy_email_${emailId}`).click(function() {
             var editor;
             editor = tinyMCE.get('mce_0');
             editor.setContent(htmlMessage);

@@ -208,7 +208,7 @@
             Content.prototype.incrementVote = function(increment) {
                 var newVotes;
                 newVotes = _.clone(this.get('votes'));
-                newVotes.up_count = newVotes.up_count + increment;
+                newVotes.up_count += increment;
                 return this.set('votes', newVotes);
             };
 
@@ -237,13 +237,13 @@
                     return DiscussionUtil.urlFor('create_comment', this.id);
                 },
                 unvote: function() {
-                    return DiscussionUtil.urlFor('undo_vote_for_' + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor(`undo_vote_for_${this.get('type')}`, this.id);
                 },
                 upvote: function() {
-                    return DiscussionUtil.urlFor('upvote_' + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor(`upvote_${this.get('type')}`, this.id);
                 },
                 downvote: function() {
-                    return DiscussionUtil.urlFor('downvote_' + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor(`downvote_${this.get('type')}`, this.id);
                 },
                 close: function() {
                     return DiscussionUtil.urlFor('openclose_thread', this.id);
@@ -261,10 +261,10 @@
                     return DiscussionUtil.urlFor('unfollow_thread', this.id);
                 },
                 flagAbuse: function() {
-                    return DiscussionUtil.urlFor('flagAbuse_' + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor(`flagAbuse_${this.get('type')}`, this.id);
                 },
                 unFlagAbuse: function() {
-                    return DiscussionUtil.urlFor('unFlagAbuse_' + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor(`unFlagAbuse_${this.get('type')}`, this.id);
                 },
                 pinThread: function() {
                     return DiscussionUtil.urlFor('pin_thread', this.id);
@@ -350,13 +350,13 @@
                     return DiscussionUtil.urlFor('create_sub_comment', this.id);
                 },
                 unvote: function() {
-                    return DiscussionUtil.urlFor('undo_vote_for_' + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor(`undo_vote_for_${this.get('type')}`, this.id);
                 },
                 upvote: function() {
-                    return DiscussionUtil.urlFor('upvote_' + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor(`upvote_${this.get('type')}`, this.id);
                 },
                 downvote: function() {
-                    return DiscussionUtil.urlFor('downvote_' + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor(`downvote_${this.get('type')}`, this.id);
                 },
                 endorse: function() {
                     return DiscussionUtil.urlFor('endorse_comment', this.id);
@@ -368,10 +368,10 @@
                     return DiscussionUtil.urlFor('delete_comment', this.id);
                 },
                 flagAbuse: function() {
-                    return DiscussionUtil.urlFor('flagAbuse_' + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor(`flagAbuse_${this.get('type')}`, this.id);
                 },
                 unFlagAbuse: function() {
-                    return DiscussionUtil.urlFor('unFlagAbuse_' + (this.get('type')), this.id);
+                    return DiscussionUtil.urlFor(`unFlagAbuse_${this.get('type')}`, this.id);
                 }
             };
 

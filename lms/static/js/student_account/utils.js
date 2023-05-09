@@ -6,7 +6,7 @@
             userFromEdxUserCookie: function(edxUserInfoCookieName) {
                 var cookie, user, userCookie;
 
-                cookie = document.cookie.match('(^|;)\\s*' + edxUserInfoCookieName + '\\s*=\\s*([^;]+)');
+                cookie = document.cookie.match(`(^|;)\\s*${edxUserInfoCookieName}\\s*=\\s*([^;]+)`);
                 userCookie = cookie ? cookie.pop() : $.cookie(edxUserInfoCookieName);
 
                 if (!userCookie) {

@@ -32,7 +32,7 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
             var index = this.model.collection.indexOf(this.model);
             return [
                 'signatory-details',
-                'signatory-details-view-' + index
+                `signatory-details-view-${index}`
             ].join(' ');
         },
 

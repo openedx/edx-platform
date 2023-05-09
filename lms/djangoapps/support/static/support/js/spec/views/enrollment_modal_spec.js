@@ -30,16 +30,16 @@ define([
 
         it('can render itself', function() {
             expect($('.enrollment-modal h1').text()).toContain(
-                'Change enrollment for ' + EnrollmentHelpers.TEST_COURSE
+                `Change enrollment for ${EnrollmentHelpers.TEST_COURSE}`
             );
             expect($('.enrollment-change-field p').first().text()).toContain('Current enrollment mode: audit');
 
             _.each(['verified', 'audit'], function(mode) {
-                expect($('.enrollment-new-mode').html()).toContain('<option value="' + mode + '">');
+                expect($('.enrollment-new-mode').html()).toContain(`<option value="${mode}">`);
             });
 
             _.each(['', 'Financial Assistance', 'Stampeding Buffalo', 'Angry Customer'], function(reason) {
-                expect($('.enrollment-reason').html()).toContain('<option value="' + reason + '">');
+                expect($('.enrollment-reason').html()).toContain(`<option value="${reason}">`);
             });
         });
 

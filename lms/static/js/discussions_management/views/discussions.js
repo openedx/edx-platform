@@ -222,7 +222,7 @@
             },
 
             getSectionCss: function(section) {
-                return ".instructor-nav .nav-item [data-section='" + section + "']";
+                return `.instructor-nav .nav-item [data-section='${section}']`;
             },
 
             renderTopics: function() {

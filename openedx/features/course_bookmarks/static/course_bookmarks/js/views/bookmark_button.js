@@ -65,7 +65,7 @@
 
                 removeBookmark: function() {
                     var view = this;
-                    var deleteUrl = view.apiUrl + view.bookmarkId + '/';
+                    var deleteUrl = `${view.apiUrl + view.bookmarkId}/`;
 
                     $.ajax({
                         type: 'DELETE',

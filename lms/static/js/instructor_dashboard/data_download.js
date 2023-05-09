@@ -75,7 +75,7 @@
             });
             this.$list_issued_certificate_csv_btn.click(function() {
                 dataDownloadCert.clear_ui();
-                location.href = dataDownloadCert.$list_issued_certificate_csv_btn.data('endpoint') + '?csv=true';
+                location.href = `${dataDownloadCert.$list_issued_certificate_csv_btn.data('endpoint')}?csv=true`;
             });
         }
 
@@ -197,7 +197,7 @@
                 });
             });
             this.$list_studs_csv_btn.click(function() {
-                var url = dataDownloadObj.$list_studs_csv_btn.data('endpoint') + '/csv';
+                var url = `${dataDownloadObj.$list_studs_csv_btn.data('endpoint')}/csv`;
                 var errorMessage = gettext('Error generating student profile information. Please try again.');
                 dataDownloadObj.clear_display();
                 return $.ajax({

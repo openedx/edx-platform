@@ -15,7 +15,7 @@ import Course from 'js/models/course';
 import 'jquery.simulate';
 
 function parameterized_suite(label, globalPageOptions) {
-    describe(label + ' ContainerPage', function() {
+    describe(`${label} ContainerPage`, function() {
         var getContainerPage, renderContainerPage, handleContainerPageRefresh, expectComponents,
             respondWithHtml, model, containerPage, requests, initialDisplayName,
             mockContainerPage = readFixtures('templates/mock/mock-container-page.underscore'),
@@ -344,12 +344,12 @@ function parameterized_suite(label, globalPageOptions) {
                 allComponentsInGroup = _.map(
                     _.range(NUM_COMPONENTS_PER_GROUP),
                     function(index) {
-                        return 'locator-component-' + GROUP_TO_TEST + (index + 1);
+                        return `locator-component-${GROUP_TO_TEST}${index + 1}`;
                     }
                 );
 
             getGroupElement = function() {
-                return containerPage.$("[data-locator='locator-group-" + GROUP_TO_TEST + "']");
+                return containerPage.$(`[data-locator='locator-group-${GROUP_TO_TEST}']`);
             };
 
             describe('Deleting an xblock', function() {
@@ -377,7 +377,7 @@ function parameterized_suite(label, globalPageOptions) {
 
                     // first request to delete the component
                     AjaxHelpers.expectJsonRequest(requests, 'DELETE',
-                        '/xblock/locator-component-' + GROUP_TO_TEST + (componentIndex + 1),
+                        `/xblock/locator-component-${GROUP_TO_TEST}${componentIndex + 1}`,
                         null);
                     AjaxHelpers.respondWithNoContent(requests);
 
@@ -489,8 +489,8 @@ function parameterized_suite(label, globalPageOptions) {
 
                     // verify content of request
                     AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
-                        duplicate_source_locator: 'locator-component-' + GROUP_TO_TEST + (componentIndex + 1),
-                        parent_locator: 'locator-group-' + GROUP_TO_TEST
+                        duplicate_source_locator: `locator-component-${GROUP_TO_TEST}${componentIndex + 1}`,
+                        parent_locator: `locator-group-${GROUP_TO_TEST}`
                     });
 
                     // send the response
@@ -568,7 +568,7 @@ function parameterized_suite(label, globalPageOptions) {
                     });
 
                     var updatePreviewButtonTest = function(show_previews, expected_text) {
-                        it('can set preview button to "' + expected_text + '"', function() {
+                        it(`can set preview button to "${expected_text}"`, function() {
                             containerPage = getContainerPage();
                             containerPage.updatePreviewButton(show_previews);
                             expect(getButtonText(containerPage)).toBe(expected_text);

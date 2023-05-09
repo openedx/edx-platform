@@ -22,7 +22,7 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
 
         showError = function(containerElSelector, error) {
             var errorWrapperElSelector, errorHtml;
-            errorWrapperElSelector = containerElSelector + ' .wrapper-error';
+            errorWrapperElSelector = `${containerElSelector} .wrapper-error`;
             errorHtml = HtmlUtils.joinHtml(
                 HtmlUtils.HTML('<div class="error" aria-live="polite" id="course-id-error">'),
                 error,

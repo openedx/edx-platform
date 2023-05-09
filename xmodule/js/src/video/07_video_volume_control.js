@@ -133,7 +133,7 @@
          */
                 render: function() {
                     var container = this.el.find('.volume-slider'),
-                        instructionsId = 'volume-instructions-' + this.state.id;
+                        instructionsId = `volume-instructions-${this.state.id}`;
 
                     HtmlUtils.append(container, HtmlUtils.HTML('<div class="ui-slider-handle volume-handle"></div>'));
 
@@ -473,7 +473,7 @@
                 update: function(volume) {
                     this.liveRegion.text([
                         this.getVolumeDescription(volume),
-                        this.i18n.Volume + '.'
+                        `${this.i18n.Volume}.`
                     ].join(' '));
 
                     $(this.button).parent().find('.volume-slider')

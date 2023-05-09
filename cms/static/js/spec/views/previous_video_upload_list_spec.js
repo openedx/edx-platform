@@ -20,7 +20,7 @@ define(
                             _.range(numModels),
                             function(num, index) {
                                 return new Backbone.Model(
-                                    _.extend({}, modelData, {edx_video_id: 'dummy_id_' + index})
+                                    _.extend({}, modelData, {edx_video_id: `dummy_id_${index}`})
                                 );
                             }
                         )
@@ -66,7 +66,7 @@ define(
                 if (confirmRemove) {
                     // click on Remove button on confirmation popup
                     $('.action-primary').click();
-                    AjaxHelpers.expectJsonRequest(requests, 'DELETE', videoHandlerUrl + '/dummy_id_0');
+                    AjaxHelpers.expectJsonRequest(requests, 'DELETE', `${videoHandlerUrl}/dummy_id_0`);
                     AjaxHelpers.respondWithNoContent(requests);
                     numVideos -= 1;
                     firstVideoId = 'dummy_id_1';

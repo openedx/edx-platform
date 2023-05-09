@@ -45,11 +45,11 @@
         }
 
         spies = {
-            constructor: jasmine.createSpy('' + classToFake + '\'s constructor')
+            constructor: jasmine.createSpy(`${classToFake}'s constructor`)
         };
 
         _.each(methodsToSpy, function(methodName) {
-            spies[methodName] = jasmine.createSpy('' + classToFake + '#' + methodName);
+            spies[methodName] = jasmine.createSpy(`${classToFake}#${methodName}`);
             return fakeClass.prototype[methodName] = function() {
                 return spies[methodName].apply(this, arguments);
             };

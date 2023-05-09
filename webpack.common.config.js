@@ -22,9 +22,9 @@ var defineHeader = /\(function ?\(((define|require|requirejs|\$)(, )?)+\) ?\{/;
 var defineCallFooter = /\}\)\.call\(this, ((define|require)( \|\| RequireJS\.(define|require))?(, )?)+?\);/;
 var defineDirectFooter = /\}\(((window\.)?(RequireJS\.)?(requirejs|define|require|jQuery)(, )?)+\)\);/;
 var defineFancyFooter = /\}\).call\(\s*this(\s|.)*define(\s|.)*\);/;
-var defineFooter = new RegExp('(' + defineCallFooter.source + ')|('
-                             + defineDirectFooter.source + ')|('
-                             + defineFancyFooter.source + ')', 'm');
+var defineFooter = new RegExp(`(${defineCallFooter.source})|(${
+    defineDirectFooter.source})|(${
+    defineFancyFooter.source})`, 'm');
 
 var workerConfig = function() {
     try {
@@ -200,7 +200,7 @@ module.exports = Merge.smart({
                                 },
                                 {
                                     pattern: /\/\* Webpack/g,
-                                    replacement: function(match) { return match + ' */'; }
+                                    replacement: function(match) { return `${match} */`; }
                                 },
                                 {
                                     pattern: /text!(.*?\.underscore)/g,
@@ -387,7 +387,7 @@ module.exports = Merge.smart({
                 // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
                 // (I've tried every other suggestion solution on that page, this
                 // was the only one that worked.)
-                sinon: __dirname + '/node_modules/sinon/pkg/sinon.js',
+                sinon: `${__dirname}/node_modules/sinon/pkg/sinon.js`,
                 hls: 'hls.js/dist/hls.js'
             },
             modules: [

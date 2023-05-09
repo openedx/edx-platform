@@ -19,7 +19,7 @@
                     CUSTOM_MESSAGE = 'custom message';
 
                 var createFixture = function(type, name, required, minlength, maxlength, value) {
-                    setFixtures('<input id="field" type=' + type + '>');
+                    setFixtures(`<input id="field" type=${type}>`);
 
                     field = $('#field');
                     field.prop('required', required);

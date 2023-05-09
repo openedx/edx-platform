@@ -81,7 +81,7 @@ define(
                             gettext('Removing'),
                             function() {
                                 return $.ajax({
-                                    url: videoView.videoHandlerUrl + '/' + videoView.model.get('edx_video_id'),
+                                    url: `${videoView.videoHandlerUrl}/${videoView.model.get('edx_video_id')}`,
                                     type: 'DELETE'
                                 }).done(function() {
                                     videoView.remove();

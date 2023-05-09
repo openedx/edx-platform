@@ -163,7 +163,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
             editorView.selectMode(mode);
             this.$('.editor-modes a').removeClass('is-set');
             if (mode) {
-                buttonSelector = '.' + mode + '-button';
+                buttonSelector = `.${mode}-button`;
                 this.$(buttonSelector).addClass('is-set');
             }
         },

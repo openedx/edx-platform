@@ -90,7 +90,7 @@
 
             return module;
         } catch (error) {
-            console.error('Unable to load ' + moduleType + ': ' + error.message);
+            console.error(`Unable to load ${moduleType}: ${error.message}`);
         }
     };
 

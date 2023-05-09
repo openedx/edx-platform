@@ -204,7 +204,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      * _getYoutubeLink('OEoXaMPEzfM'); => 'http://youtu.be/OEoXaMPEzfM'
      */
         var _getYoutubeLink = function(video_id) {
-            return 'http://youtu.be/' + video_id;
+            return `http://youtu.be/${video_id}`;
         };
 
         /**
@@ -302,7 +302,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                 );
 
                 xhr = $.ajaxQueue({
-                    url: '/transcripts/' + action,
+                    url: `/transcripts/${action}`,
                     data: {data: JSON.stringify(data)},
                     notifyOnError: false,
                     type: 'get'

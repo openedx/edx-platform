@@ -65,9 +65,9 @@
             },
 
             className: function() {
-                var result = 'card '
-                                 + this.switchOnConfiguration('square-card', 'list-card') + ' '
-                                 + this.callIfFunction(this.cardClass);
+                var result = `card ${
+                    this.switchOnConfiguration('square-card', 'list-card')} ${
+                    this.callIfFunction(this.cardClass)}`;
                 if (this.callIfFunction(this.pennant)) {
                     result += ' has-pennant';
                 }
@@ -78,7 +78,7 @@
                 var maxLength = 72,
                     description = this.callIfFunction(this.description);
                 if (description.length > maxLength) {
-                    description = description.substring(0, maxLength).trim() + '...';
+                    description = `${description.substring(0, maxLength).trim()}...`;
                 }
                 HtmlUtils.setHtml(
                     this.$el,

@@ -99,7 +99,7 @@
                 render: function(speeds, currentSpeed) {
                     var speedsContainer = this.speedsContainer,
                         reversedSpeeds = speeds.concat().reverse(),
-                        instructionsId = 'speed-instructions-' + this.state.id,
+                        instructionsId = `speed-instructions-${this.state.id}`,
                         speedsList = $.map(reversedSpeeds, function(speed) {
                             return HtmlUtils.interpolateHtml(
                                 HtmlUtils.HTML(
@@ -236,9 +236,9 @@
                     if (newSpeed !== this.currentSpeed || forceUpdate) {
                         this.speedsContainer
                             .find('li')
-                            .siblings("li[data-speed='" + newSpeed + "']");
+                            .siblings(`li[data-speed='${newSpeed}']`);
 
-                        this.speedButton.find('.value').text(newSpeed + 'x');
+                        this.speedButton.find('.value').text(`${newSpeed}x`);
                         this.currentSpeed = newSpeed;
 
                         if (!silent) {
@@ -261,13 +261,13 @@
                 },
 
                 setActiveSpeed: function(speed) {
-                    var speedOption = this.speedsContainer.find('li[data-speed="' + this.state.speedToString(speed) + '"]');
+                    var speedOption = this.speedsContainer.find(`li[data-speed="${this.state.speedToString(speed)}"]`);
 
                     speedOption.addClass('is-active')
                         .find('.speed-option')
                         .attr('aria-pressed', 'true');
 
-                    this.speedButton.attr('title', gettext('Video speed: ') + this.state.speedToString(speed) + 'x');
+                    this.speedButton.attr('title', `${gettext('Video speed: ') + this.state.speedToString(speed)}x`);
                 },
 
                 /**

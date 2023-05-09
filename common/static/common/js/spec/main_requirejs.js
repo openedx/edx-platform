@@ -171,7 +171,7 @@
     ];
 
     for (i = 0; i < testFiles.length; i++) {
-        testFiles[i] = '/base/' + testFiles[i];
+        testFiles[i] = `/base/${testFiles[i]}`;
     }
 
     specHelpers = [

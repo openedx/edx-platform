@@ -243,7 +243,7 @@
                 createLoginView(this);
 
                 // Verify that the success message is not visible
-                expect(view.$formFeedback.find('.' + view.passwordResetSuccessJsHook).length).toEqual(0);
+                expect(view.$formFeedback.find(`.${view.passwordResetSuccessJsHook}`).length).toEqual(0);
 
                 /* After a successful password reset request, the resetModel will trigger a 'sync'
                  * event, which lets the LoginView know to render the password reset success message.
@@ -251,7 +251,7 @@
                 view.resetModel.trigger('sync');
 
                 // Verify that the success message is visible
-                expect(view.$formFeedback.find('.' + view.passwordResetSuccessJsHook).length).toEqual(1);
+                expect(view.$formFeedback.find(`.${view.passwordResetSuccessJsHook}`).length).toEqual(1);
             });
 
             it('validates login form fields', function() {
@@ -271,7 +271,7 @@
                 submitForm(false);
 
                 // Verify that submission errors are visible
-                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
+                expect(view.$formFeedback.find(`.${view.formErrorsJsHook}`).length).toEqual(1);
 
                 // Expect auth complete NOT to have been triggered
                 expect(authComplete).toBe(false);
@@ -290,7 +290,7 @@
                 AjaxHelpers.respondWithError(requests);
 
                 // Expect that an error is displayed and that auth complete is not triggered
-                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(1);
+                expect(view.$formFeedback.find(`.${view.formErrorsJsHook}`).length).toEqual(1);
 
                 expect(authComplete).toBe(false);
 
@@ -307,7 +307,7 @@
                 AjaxHelpers.respondWithJson(requests, {});
 
                 // Expect that the error is hidden and auth complete is triggered
-                expect(view.$formFeedback.find('.' + view.formErrorsJsHook).length).toEqual(0);
+                expect(view.$formFeedback.find(`.${view.formErrorsJsHook}`).length).toEqual(0);
                 expect(authComplete).toBe(true);
             });
 
@@ -334,7 +334,7 @@
                 clock.tick(timeout + 1);
 
                 // Expect that an error is displayed and that auth complete is not triggered
-                $error = view.$formFeedback.find('.' + view.formErrorsJsHook);
+                $error = view.$formFeedback.find(`.${view.formErrorsJsHook}`);
                 expect($error.length).toEqual(1);
                 expect($error.text()).toContain(
                     'An error has occurred. Check your Internet connection and try again.'
@@ -357,7 +357,7 @@
                 AjaxHelpers.respondWithError(requests, 500);
 
                 // Expect that an error is displayed and that auth complete is not triggered
-                $error = view.$formFeedback.find('.' + view.formErrorsJsHook);
+                $error = view.$formFeedback.find(`.${view.formErrorsJsHook}`);
                 expect($error.length).toEqual(1);
                 expect($error.text()).toContain(
                     'An error has occurred. Try refreshing the page, or check your Internet connection.'

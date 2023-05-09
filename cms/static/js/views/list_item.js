@@ -33,10 +33,10 @@ define([
 
             return [
                 'wrapper-collection',
-                'wrapper-collection-' + index,
+                `wrapper-collection-${index}`,
                 this.baseClassName,
-                this.baseClassName + 's-list-item',
-                this.baseClassName + 's-list-item-' + index
+                `${this.baseClassName}s-list-item`,
+                `${this.baseClassName}s-list-item-${index}`
             ].join(' ');
         },
 

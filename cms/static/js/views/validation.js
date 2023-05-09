@@ -38,7 +38,7 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
             this.clearValidationErrors();
             // error is object w/ fields and error strings
             for (var field in error) {
-                var ele = this.$el.find('#' + this.fieldToSelectorMap[field]);
+                var ele = this.$el.find(`#${this.fieldToSelectorMap[field]}`);
                 this._cacheValidationErrors.push(ele);
                 this.getInputElements(ele).addClass('error');
                 HtmlUtils.append($(ele).parent(), this.errorTemplate({message: error[field]}));
@@ -79,10 +79,10 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
         },
         // these should perhaps go into a superclass but lack of event hash inheritance demotivates me
         inputFocus: function(event) {
-            $("label[for='" + event.currentTarget.id + "']").addClass('is-focused');
+            $(`label[for='${event.currentTarget.id}']`).addClass('is-focused');
         },
         inputUnfocus: function(event) {
-            $("label[for='" + event.currentTarget.id + "']").removeClass('is-focused');
+            $(`label[for='${event.currentTarget.id}']`).removeClass('is-focused');
         },
 
         getInputElements: function(ele) {

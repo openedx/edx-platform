@@ -25,7 +25,7 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
                 xblockInfo = this.model,
                 xblockUrl = xblockInfo.url();
             return $.ajax({
-                url: decodeURIComponent(xblockUrl) + '/' + view,
+                url: `${decodeURIComponent(xblockUrl)}/${view}`,
                 type: 'GET',
                 cache: false,
                 headers: {Accept: 'application/json'},
@@ -220,15 +220,15 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
             if (mimetype === 'text/css') {
                 if (kind === 'text') {
                     // xss-lint: disable=javascript-jquery-append,javascript-concat-html
-                    $head.append('<style type="text/css">' + data + '</style>');
+                    $head.append(`<style type="text/css">${data}</style>`);
                 } else if (kind === 'url') {
                     // xss-lint: disable=javascript-jquery-append,javascript-concat-html
-                    $head.append('<link rel="stylesheet" href="' + data + '" type="text/css">');
+                    $head.append(`<link rel="stylesheet" href="${data}" type="text/css">`);
                 }
             } else if (mimetype === 'application/javascript') {
                 if (kind === 'text') {
                     // xss-lint: disable=javascript-jquery-append,javascript-concat-html
-                    $head.append('<script>' + data + '</script>');
+                    $head.append(`<script>${data}</script>`);
                 } else if (kind === 'url') {
                     return ViewUtils.loadJavaScript(data);
                 }

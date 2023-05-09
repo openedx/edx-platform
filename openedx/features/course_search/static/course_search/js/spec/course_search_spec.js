@@ -248,8 +248,8 @@ define([
             it('rendersItem', function() {
                 expect(this.item.$el).toHaveAttr('role', 'region');
                 expect(this.item.$el).toHaveAttr('aria-label', 'search result');
-                expect(this.item.$el).toContainElement('a[href="' + this.model.get('url') + '"]');
-                expect(this.item.$el.find('.result-type i')).toHaveClass('fa-' + this.item.unitIcon());
+                expect(this.item.$el).toContainElement(`a[href="${this.model.get('url')}"]`);
+                expect(this.item.$el.find('.result-type i')).toHaveClass(`fa-${this.item.unitIcon()}`);
                 expect(this.item.$el.find('.result-excerpt')).toContainHtml(this.model.get('excerpt'));
                 expect(this.item.$el.find('.result-link')).toContainHtml('section / subsection / unit');
             });
@@ -257,8 +257,8 @@ define([
             it('rendersSequentialItem', function() {
                 expect(this.seqItem.$el).toHaveAttr('role', 'region');
                 expect(this.seqItem.$el).toHaveAttr('aria-label', 'search result');
-                expect(this.seqItem.$el).toContainElement('a[href="' + this.seqModel.get('url') + '"]');
-                expect(this.seqItem.$el.find('.result-type i')).toHaveClass('fa-' + this.seqItem.unitIcon());
+                expect(this.seqItem.$el).toContainElement(`a[href="${this.seqModel.get('url')}"]`);
+                expect(this.seqItem.$el.find('.result-type i')).toHaveClass(`fa-${this.seqItem.unitIcon()}`);
                 expect(this.seqItem.$el.find('.result-excerpt')).toBeEmpty();
                 expect(this.seqItem.$el.find('.result-link')).toContainHtml('section / subsection');
             });
@@ -385,9 +385,9 @@ define([
                 expect(this.resultsView.$el.find('ol')[0]).toExist();
                 expect(this.resultsView.$el.find('li').length).toEqual(1);
                 expect(this.resultsView.$el).toContainHtml(
-                    this.collection.totalCount
-                    + ' result found for "'
-                    + this.collection.searchTerm + '"'
+                    `${this.collection.totalCount
+                    } result found for "${
+                        this.collection.searchTerm}"`
                 );
                 expect(this.resultsView.$el).toContainHtml('this is a short excerpt');
 

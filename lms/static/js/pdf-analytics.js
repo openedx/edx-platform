@@ -1,7 +1,7 @@
 function sendLog(name, data, event_type) {
     var message = data || {};
     message.chapter = PDF_URL || '';
-    message.name = 'textbook.pdf.' + name;
+    message.name = `textbook.pdf.${name}`;
     Logger.log(event_type || message.name, message);
 }
 

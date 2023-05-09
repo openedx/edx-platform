@@ -120,7 +120,7 @@
         if (document.createEvent) {
             el.dispatchEvent(event);
         } else {
-            el.fireEvent('on' + event.eventType, event);
+            el.fireEvent(`on${event.eventType}`, event);
         }
     };
 
@@ -180,7 +180,7 @@
                 return {};
             } else if (settings.url === '/save_user_state') {
                 return {success: true};
-            } else if (settings.url.match(new RegExp(jasmine.getFixtures().fixturesPath + '.+', 'g'))) {
+            } else if (settings.url.match(new RegExp(`${jasmine.getFixtures().fixturesPath}.+`, 'g'))) {
                 return origAjax(settings);
             } else {
                 return $.ajax.and.callThrough();

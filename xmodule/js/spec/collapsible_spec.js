@@ -64,7 +64,7 @@
                     state = 'closed';
                 }
 
-                anchors = $el.find('.' + anchorsElClass);
+                anchors = $el.find(`.${anchorsElClass}`);
 
                 if (state === 'closed') {
                     expect($el.find('.longform')).toBeHidden();

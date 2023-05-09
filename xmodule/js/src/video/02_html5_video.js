@@ -342,7 +342,7 @@
                                 );
                             }
 
-                            el.trigger('html5:' + eventName, arguments);
+                            el.trigger(`html5:${eventName}`, arguments);
                         });
                     });
 

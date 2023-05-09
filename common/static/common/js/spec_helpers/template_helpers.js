@@ -6,14 +6,14 @@ define(['jquery', 'underscore'],
         var installTemplate, installTemplates;
 
         installTemplate = function(templateFile, isFirst, templateId) {
-            var template = readFixtures(templateFile + '.underscore'),
+            var template = readFixtures(`${templateFile}.underscore`),
                 templateName = templateFile,
                 slashIndex = _.lastIndexOf(templateName, '/');
             if (slashIndex >= 0) {
                 templateName = templateFile.substring(slashIndex + 1);
             }
             if (!templateId) {
-                templateId = templateName + '-tpl';
+                templateId = `${templateName}-tpl`;
             }
 
             if (isFirst) {

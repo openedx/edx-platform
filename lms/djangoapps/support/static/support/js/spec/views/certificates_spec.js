@@ -63,11 +63,11 @@ define([
 
             searchFor = function(user_filter, course_filter, requests, response) {
             // Enter the search term and submit
-                var url = '/certificates/search?user=' + user_filter;
+                var url = `/certificates/search?user=${user_filter}`;
                 view.setUserFilter(user_filter);
                 if (course_filter) {
                     view.setCourseFilter(course_filter);
-                    url += '&course_id=' + course_filter;
+                    url += `&course_id=${course_filter}`;
                 }
                 view.triggerSearch();
 
@@ -77,12 +77,12 @@ define([
             },
 
             regenerateCerts = function(username, courseKey) {
-                var sel = '.btn-cert-regenerate[data-course-key="' + courseKey + '"]';
+                var sel = `.btn-cert-regenerate[data-course-key="${courseKey}"]`;
                 $(sel).click();
             },
 
             generateCerts = function(username, courseKey) {
-                var sel = '.btn-cert-generate[data-course-key="' + courseKey + '"]';
+                var sel = `.btn-cert-generate[data-course-key="${courseKey}"]`;
                 $(sel).click();
             };
 
