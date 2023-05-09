@@ -1,6 +1,8 @@
 """
 Tests for the views in the notifications app.
 """
+import json
+
 from django.dispatch import Signal
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -123,3 +125,95 @@ class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
 
         self.assertEqual(notification_preferences.count(), 1)
         self.assertEqual(notification_preferences[0].user, self.user)
+
+
+@override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
+    """
+    Test for user notification preference API.
+    """
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.course = CourseFactory.create(
+            org='testorg',
+            number='testcourse',
+            run='testrun'
+        )
+
+        course_overview = CourseOverviewFactory.create(id=self.course.id, org='AwesomeOrg')
+        self.course_enrollment = CourseEnrollment.objects.create(
+            user=self.user,
+            course=course_overview,
+            is_active=True,
+            mode='audit'
+        )
+        self.post_save_signal = Signal()
+        self.client = APIClient()
+        self.path = reverse('notification-preferences', kwargs={'course_key_string': self.course.id})
+        self.post_save_signal.send(
+            sender=self.course_enrollment.__class__,
+            instance=self.course_enrollment,
+            created=True
+        )
+
+    def _expected_api_response(self, overrides=None):
+        """
+        Helper method to return expected API response.
+        """
+        expected_response = {
+            'id': 1,
+            'course_name': 'course-v1:testorg+testcourse+testrun Course',
+            'course_id': 'course-v1:testorg+testcourse+testrun',
+            'notification_preference_config': {
+                'discussion': {
+                    'new_post': {
+                        'web': False,
+                        'push': False,
+                        'email': False
+                    }
+                }
+            }
+        }
+        if overrides:
+            expected_response.update(overrides)
+        return expected_response
+
+    def test_get_user_notification_preference_without_login(self):
+        """
+        Test get user notification preference without login.
+        """
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_user_notification_preference(self):
+        """
+        Test get user notification preference.
+        """
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.get(self.path)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, self._expected_api_response())
+
+    def test_patch_user_notification_preference(self):
+        """
+        Test update of user notification preference.
+        """
+        self.client.login(username=self.user.username, password='test')
+        updated_notification_config_data = {
+            "notification_preference_config": {
+                "discussion": {
+                    "new_post": {
+                        "web": True,
+                        "push": False,
+                        "email": False,
+                    },
+                },
+            },
+        }
+        response = self.client.patch(
+            self.path, json.dumps(updated_notification_config_data), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_data = self._expected_api_response(overrides=updated_notification_config_data)
+        self.assertEqual(response.data, expected_data)
