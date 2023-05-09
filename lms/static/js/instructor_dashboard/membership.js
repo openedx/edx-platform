@@ -380,7 +380,7 @@ such that the value can be defined later than this assignment (file load order).
                     if (studentResult.is_general_error) {
                         details.push(studentResult.response);
                     } else {
-                        responseMessage = studentResult.username + '  (' + studentResult.email + '):  ' + '   (' + studentResult.response + ')'; // eslint-disable-line max-len, no-useless-concat
+                        responseMessage = `${studentResult.username}  (${studentResult.email}):  ` + `   (${studentResult.response})`; // eslint-disable-line max-len, no-useless-concat
                         details.push(responseMessage);
                     }
                 }
@@ -721,7 +721,7 @@ such that the value can be defined later than this assignment (file load order).
                     } else if (dataFromServer.action === 'unenroll') {
                         return 'There was an error unenrolling:';
                     } else {
-                        console.warn("unknown action from server '" + dataFromServer.action + "'"); // eslint-disable-line no-console, max-len
+                        console.warn(`unknown action from server '${dataFromServer.action}'`); // eslint-disable-line no-console, max-len
                         return 'There was an error processing:';
                     }
                 }());
@@ -932,7 +932,7 @@ such that the value can be defined later than this assignment (file load order).
                 },
                 success: loadAuthList,
                 error: statusAjaxError(function() {
-                    return ths.$request_response_error.text("Error fetching list for '" + ths.rolename + "'");
+                    return ths.$request_response_error.text(`Error fetching list for '${ths.rolename}'`);
                 })
             });
         };

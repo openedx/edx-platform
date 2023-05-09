@@ -10,7 +10,7 @@ export class DemographicsCollectionBanner extends React.Component {
         this.state = {
             modalOpen: false,
             hideBanner: false
-        }
+        };
 
         this.dismissBanner = this.dismissBanner.bind(this);
     }
@@ -88,7 +88,7 @@ export class DemographicsCollectionBanner extends React.Component {
                         }
                     </div>
                 </div>
-            )
+            );
         } else {
             return null;
         }

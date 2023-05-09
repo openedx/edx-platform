@@ -51,8 +51,8 @@
 
         loadDiscussions: function($elem, error) {
             var discussionId = this.$el.data('discussion-id'),
-                url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + ('?page=' + this.page)
-                    + ('&sort_key=' + this.defaultSortKey) + ('&sort_order=' + this.defaultSortOrder),
+                url = `${DiscussionUtil.urlFor('retrieve_discussion', discussionId)}?page=${this.page}`
+                    + `&sort_key=${this.defaultSortKey}` + `&sort_order=${this.defaultSortOrder}`,
                 self = this;
 
             DiscussionUtil.safeAjax({
@@ -154,7 +154,7 @@
             });
             this.threadView.render();
             this.listenTo(this.threadView.showView, 'thread:_delete', this.navigateToAllPosts);
-            this.$(".forum-nav-thread[data-id='" + threadId + "']").removeClass('never-read');
+            this.$(`.forum-nav-thread[data-id='${threadId}']`).removeClass('never-read');
             this.threadListView.$el.addClass('is-hidden');
             this.$('.inline-thread').removeClass('is-hidden');
         },

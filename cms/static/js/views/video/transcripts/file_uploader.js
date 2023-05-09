@@ -176,7 +176,7 @@ define(
         *
         */
             xhrProgressHandler: function(event, position, total, percentComplete) {
-                var percentVal = percentComplete + '%';
+                var percentVal = `${percentComplete}%`;
 
                 this.$progress
                     .width(percentVal)

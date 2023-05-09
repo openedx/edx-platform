@@ -34,7 +34,7 @@ define([
             var requests = AjaxHelpers.requests(this);
             view.$('#id_query').val('*');
             view.$('.preview-query').click();
-            AjaxHelpers.expectRequest(requests, 'GET', previewUrl + '?q=*');
+            AjaxHelpers.expectRequest(requests, 'GET', `${previewUrl}?q=*`);
             AjaxHelpers.respondWithJson(requests, {
                 results: [{key: 'TestX', title: 'Test Course'}],
                 count: 1,
@@ -42,7 +42,7 @@ define([
                 prev: null
             });
             expect(view.$('.preview-results').text()).toContain('Test Course');
-            expect(view.$('.preview-results-list li a').attr('href')).toEqual(catalogApiUrl + 'TestX');
+            expect(view.$('.preview-results-list li a').attr('href')).toEqual(`${catalogApiUrl}TestX`);
         });
 
         it('displays an error when courses cannot be retrieved', function() {

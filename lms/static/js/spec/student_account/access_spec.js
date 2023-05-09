@@ -95,7 +95,7 @@
             var selectForm = function(type) {
                 // Create a fake change event to control form toggling
                 var changeEvent = $.Event('change');
-                changeEvent.currentTarget = $('.form-toggle[data-type="' + type + '"]');
+                changeEvent.currentTarget = $(`.form-toggle[data-type="${type}"]`);
 
                 // Load form corresponding to the change event
                 view.toggleForm(changeEvent);

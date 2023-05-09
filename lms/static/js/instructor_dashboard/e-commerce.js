@@ -34,7 +34,7 @@
             this.instructor_tasks = new (PendingInstructorTasks())(this.$section);
             this.$error_msg = this.$section.find('#error-msg');
             this.$list_sale_csv_btn.click(function() {
-                location.href = eCom.$list_sale_csv_btn.data('endpoint') + '/csv';
+                location.href = `${eCom.$list_sale_csv_btn.data('endpoint')}/csv`;
                 return location.href;
             });
             this.$list_order_sale_csv_btn.click(function() {

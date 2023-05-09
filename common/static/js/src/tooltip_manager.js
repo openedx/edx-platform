@@ -4,7 +4,7 @@
     var TooltipManager = function(element) {
         this.element = $(element);
         // If tooltip container already exist, use it.
-        this.tooltip = $('div.' + this.className.split(/\s+/).join('.'));
+        this.tooltip = $(`div.${this.className.split(/\s+/).join('.')}`);
         // Otherwise, create new one.
         if (!this.tooltip.length) {
             this.tooltip = $('<div />', {

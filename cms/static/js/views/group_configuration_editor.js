@@ -27,7 +27,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             return [
                 'collection-edit',
                 'group-configuration-edit',
-                'group-configuration-edit-' + index
+                `group-configuration-edit-${index}`
             ].join(' ');
         },
 

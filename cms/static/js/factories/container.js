@@ -23,4 +23,4 @@ export default function ContainerFactory(componentTemplates, XBlockInfoJson, act
     });
 };
 
-export {ContainerFactory}
+export {ContainerFactory};

@@ -77,10 +77,10 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
             var currentDate;
             if (typeof index !== 'undefined' && view.hasOwnProperty('collection')) {
                 cacheModel = view.collection.models[index];
-                div = view.$el.find('#' + view.collectionSelector(cacheModel.cid));
+                div = view.$el.find(`#${view.collectionSelector(cacheModel.cid)}`);
             } else {
                 cacheModel = view.model;
-                div = view.$el.find('#' + view.fieldToSelectorMap[fieldName]);
+                div = view.$el.find(`#${view.fieldToSelectorMap[fieldName]}`);
             }
             datefield = $(div).find('input.date');
             timefield = $(div).find('input.time');

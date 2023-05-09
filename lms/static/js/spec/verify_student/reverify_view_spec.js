@@ -39,7 +39,7 @@ function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {
 
         var expectStepRendered = function(stepName) {
             // Expect that the step container div rendered
-            expect($('.' + stepName).length > 0).toBe(true);
+            expect($(`.${stepName}`).length > 0).toBe(true);
         };
 
         beforeEach(function() {
@@ -48,7 +48,7 @@ function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {
 
             setFixtures('<div id="reverify-container"></div>');
             $.each(TEMPLATES, function(index, templateName) {
-                TemplateHelpers.installTemplate('templates/verify_student/' + templateName);
+                TemplateHelpers.installTemplate(`templates/verify_student/${templateName}`);
             });
         });
 

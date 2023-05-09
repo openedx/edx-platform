@@ -172,7 +172,7 @@
                             self.complete = false;
                             errmsg = 'Failed to submit completion';
                             if (xhr.responseJSON !== undefined) {
-                                errmsg += ': ' + xhr.responseJSON.error;
+                                errmsg += `: ${xhr.responseJSON.error}`;
                             }
                             console.warn(errmsg);
                             /* eslint-enable no-console */

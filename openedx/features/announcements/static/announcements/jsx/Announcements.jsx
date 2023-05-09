@@ -15,11 +15,11 @@ class AnnouncementSkipLink extends React.Component {
                 this.setState({
                     count: data.count
                 });
-            })
+            });
     }
 
     render() {
-        return (<div>{'Skip to list of ' + this.state.count + ' announcements'}</div>)
+        return (<div>{`Skip to list of ${this.state.count} announcements`}</div>);
     }
 }
 
@@ -54,7 +54,7 @@ class AnnouncementList extends React.Component {
     }
 
     retrievePage(page) {
-        $.get('/announcements/page/' + page)
+        $.get(`/announcements/page/${page}`)
             .then(data => {
                 this.setState({
                     announcements: data.announcements,
@@ -66,7 +66,7 @@ class AnnouncementList extends React.Component {
                     end_index: data.end_index,
                     page: page
                 });
-            })
+            });
     }
 
     renderPrevPage() {
@@ -93,7 +93,7 @@ class AnnouncementList extends React.Component {
                         onClick={() => this.renderPrevPage()}
                         label="← previous"
                     />
-                    <span className="sr-only">{this.state.start_index + ' - ' + this.state.end_index + ') of ' + this.state.count}</span>
+                    <span className="sr-only">{`${this.state.start_index} - ${this.state.end_index}) of ${this.state.count}`}</span>
                 </div>
             );
         }
@@ -105,7 +105,7 @@ class AnnouncementList extends React.Component {
                         onClick={() => this.renderNextPage()}
                         label="next →"
                     />
-                    <span className="sr-only">{this.state.start_index + ' - ' + this.state.end_index + ') of ' + this.state.count}</span>
+                    <span className="sr-only">{`${this.state.start_index} - ${this.state.end_index}) of ${this.state.count}`}</span>
                 </div>
             );
         }
@@ -132,4 +132,4 @@ export default class AnnouncementsView {
     }
 }
 
-export {AnnouncementsView, AnnouncementList, AnnouncementSkipLink}
+export {AnnouncementsView, AnnouncementList, AnnouncementSkipLink};

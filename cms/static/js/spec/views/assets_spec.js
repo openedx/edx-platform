@@ -276,7 +276,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                 expect(assetsView).toBeDefined();
                 var requests = AjaxHelpers.requests(this);
                 $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
-                    var $typeColumn = $('#' + columnID);
+                    var $typeColumn = $(`#${columnID}`);
                     assetsView.pagingView.setPage(1);
                     respondWithMockAssets(requests);
                     var assetsNumber = assetsView.collection.length;
@@ -292,7 +292,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                 expect(assetsView).toBeDefined();
                 setup.call(this, mockExampleAssetsResponse);
                 $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
-                    var $typeColumn = $('#' + columnID);
+                    var $typeColumn = $(`#${columnID}`);
                     expect($typeColumn).toBeVisible();
                     var assetsNumber = $('#asset-table-body .type-col').length;
                     assetsView.openFilterColumn($typeColumn);
@@ -327,7 +327,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                 $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
                     assetsView.pagingView.setPage(1);
                     respondWithMockAssets(requests);
-                    var $typeColumn = $('#' + columnID);
+                    var $typeColumn = $(`#${columnID}`);
                     expect($typeColumn).toBeVisible();
                     var assetsNumber = assetsView.collection.length;
                     $typeColumn.trigger('click');

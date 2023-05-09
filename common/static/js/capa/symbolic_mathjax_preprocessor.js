@@ -24,7 +24,7 @@ window.SymbolicMathjaxPreprocessor = function() {
             // a zero width space--this is an invisible character that no one would
             // use, that gets passed through MathJax and to the server
             var c = '\u200b';
-            eqn = eqn.replace(/__(?:([^\{])|\{([^\}]+)\})/g, '^{' + c + '$1$2}');
+            eqn = eqn.replace(/__(?:([^\{])|\{([^\}]+)\})/g, `^{${c}$1$2}`);
 
             // NOTE: MathJax supports '\class{name}{mathcode}' but not for asciimath
             // input, which is too bad. This would be preferable to this char tag

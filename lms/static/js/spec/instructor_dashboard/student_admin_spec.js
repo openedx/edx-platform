@@ -2,8 +2,8 @@
 define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
     function($, StudentAdmin, AjaxHelpers) {
         // 'js/instructor_dashboard/student_admin'
-        
-'use strict';
+
+        'use strict';
 
         describe('edx.instructor_dashboard.student_admin.StudentAdmin', function() {
             var studentadmin, dashboardApiUrl, uniqStudentIdentifier, alertMsg;
@@ -30,7 +30,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
                 var fullSuccessMessage = interpolate_text(successMessage, {
                     student_id: uniqStudentIdentifier
                 });
-                var url = dashboardApiUrl + '/reset_student_attempts_for_entrance_exam';
+                var url = `${dashboardApiUrl}/reset_student_attempts_for_entrance_exam`;
 
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
@@ -60,7 +60,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('shows an error when resetting of entrance exam fails', function() {
-                var url = dashboardApiUrl + '/reset_student_attempts_for_entrance_exam';
+                var url = `${dashboardApiUrl}/reset_student_attempts_for_entrance_exam`;
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
                 // Verify that the client contacts the server to start instructor task
@@ -90,7 +90,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
                 var fullSuccessMessage = interpolate_text(successMessage, {
                     student_id: uniqStudentIdentifier
                 });
-                var url = dashboardApiUrl + '/rescore_entrance_exam';
+                var url = `${dashboardApiUrl}/rescore_entrance_exam`;
 
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
@@ -119,7 +119,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('shows an error when entrance exam rescoring fails', function() {
-                var url = dashboardApiUrl + '/rescore_entrance_exam';
+                var url = `${dashboardApiUrl}/rescore_entrance_exam`;
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
                 // Verify that the client contacts the server to start instructor task
@@ -151,7 +151,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
                 var fullSuccessMessage = interpolate_text(successMessage, {
                     student_id: uniqStudentIdentifier
                 });
-                var url = dashboardApiUrl + '/mark_student_can_skip_entrance_exam';
+                var url = `${dashboardApiUrl}/mark_student_can_skip_entrance_exam`;
 
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
@@ -179,7 +179,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             it('shows an error when skip entrance exam fails', function() {
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
-                var url = dashboardApiUrl + '/mark_student_can_skip_entrance_exam';
+                var url = `${dashboardApiUrl}/mark_student_can_skip_entrance_exam`;
                 var errorMessage = "An error occurred. Make sure that the student's username or email address is correct and try again."; //  eslint-disable-line max-len
                 studentadmin.$field_exam_grade.val(uniqStudentIdentifier);
                 studentadmin.$btn_skip_entrance_exam.click();
@@ -199,7 +199,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
                 var fullSuccessMessage = interpolate_text(successMessage, {
                     student_id: uniqStudentIdentifier
                 });
-                var url = dashboardApiUrl + '/reset_student_attempts_for_entrance_exam';
+                var url = `${dashboardApiUrl}/reset_student_attempts_for_entrance_exam`;
 
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
@@ -227,7 +227,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('shows an error when delete student state for entrance exam fails', function() {
-                var url = dashboardApiUrl + '/reset_student_attempts_for_entrance_exam';
+                var url = `${dashboardApiUrl}/reset_student_attempts_for_entrance_exam`;
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
                 var params = $.param({
@@ -251,7 +251,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('initiates listing of entrance exam task history when button is clicked', function() {
-                var url = dashboardApiUrl + '/list_entrance_exam_instructor_tasks';
+                var url = `${dashboardApiUrl}/list_entrance_exam_instructor_tasks`;
 
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
@@ -289,7 +289,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('shows an error when listing entrance exam task history fails', function() {
-                var url = dashboardApiUrl + '/list_entrance_exam_instructor_tasks';
+                var url = `${dashboardApiUrl}/list_entrance_exam_instructor_tasks`;
                 // Spy on AJAX requests
                 var requests = AjaxHelpers.requests(this);
                 var params = $.param({

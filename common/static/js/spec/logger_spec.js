@@ -184,7 +184,7 @@
                 spyOn(jQuery, 'ajax');
                 window.onunload();
                 expect(jQuery.ajax).toHaveBeenCalledWith({
-                    url: this.prefix + '/event',
+                    url: `${this.prefix}/event`,
                     type: 'GET',
                     data: {
                         event_type: 'page_close',

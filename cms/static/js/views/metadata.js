@@ -112,7 +112,7 @@ define(
                 // If the model has property `non editable` equals `true`,
                 // the field is disabled, but user is able to clear it.
                 if (this.model.get('non_editable')) {
-                    this.$el.find('#' + this.uniqueId)
+                    this.$el.find(`#${this.uniqueId}`)
                         .prop('readonly', true)
                         .addClass('is-disabled')
                         .attr('aria-disabled', true);
@@ -120,7 +120,7 @@ define(
             },
 
             getValueFromEditor: function() {
-                return this.$el.find('#' + this.uniqueId).val();
+                return this.$el.find(`#${this.uniqueId}`).val();
             },
 
             setValueInEditor: function(value) {
@@ -215,7 +215,7 @@ define(
             templateName: 'metadata-number-entry',
 
             getValueFromEditor: function() {
-                return this.$el.find('#' + this.uniqueId).val();
+                return this.$el.find(`#${this.uniqueId}`).val();
             },
 
             setValueInEditor: function(value) {
@@ -274,7 +274,7 @@ define(
             templateName: 'metadata-option-entry',
 
             getValueFromEditor: function() {
-                var selectedText = this.$el.find('#' + this.uniqueId).find(':selected').text();
+                var selectedText = this.$el.find(`#${this.uniqueId}`).find(':selected').text();
                 var selectedValue;
                 _.each(this.model.getOptions(), function(modelValue) {
                     if (modelValue === selectedText) {
@@ -294,7 +294,7 @@ define(
                         value = modelValue.display_name;
                     }
                 });
-                this.$el.find('#' + this.uniqueId + ' option').filter(function() {
+                this.$el.find(`#${this.uniqueId} option`).filter(function() {
                     return $(this).text() === value;
                 }).prop('selected', true);
             }
@@ -407,7 +407,7 @@ define(
             templateName: 'metadata-string-entry',
 
             getValueFromEditor: function() {
-                var $input = this.$el.find('#' + this.uniqueId);
+                var $input = this.$el.find(`#${this.uniqueId}`);
 
                 return $input.val();
             },
@@ -433,7 +433,7 @@ define(
             parseRelativeTime: function(value) {
             // This function ensure you have two-digits
                 var pad = function(number) {
-                        return (number < 10) ? '0' + number : number;
+                        return (number < 10) ? `0${number}` : number;
                     },
                     // Removes all white-spaces and splits by `:`.
                     list = value.replace(/\s+/g, '').split(':'),
@@ -584,7 +584,7 @@ define(
             },
 
             getValueFromEditor: function() {
-                return this.$('#' + this.uniqueId).val();
+                return this.$(`#${this.uniqueId}`).val();
             },
 
             setValueInEditor: function(value) {
@@ -593,14 +593,14 @@ define(
                     uniqueId: this.uniqueId
                 });
 
-                this.$('#' + this.uniqueId).val(value);
+                this.$(`#${this.uniqueId}`).val(value);
                 this.$('.wrapper-uploader-actions').html(HtmlUtils.HTML((html)).toString());
             },
 
             upload: function(event) {
                 var self = this,
                     $target = $(event.currentTarget),
-                    url = '/assets/' + this.options.courseKey + '/',
+                    url = `/assets/${this.options.courseKey}/`,
                     model = new FileUpload({
                         title: gettext('Upload File')
                     }),

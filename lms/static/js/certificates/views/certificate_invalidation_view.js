@@ -26,7 +26,7 @@
                 },
 
                 loadTemplate: function(name) {
-                    var templateSelector = '#' + name + '-tpl',
+                    var templateSelector = `#${name}-tpl`,
                         templateText = $(templateSelector).text();
                     return _.template(templateText);
                 },
@@ -114,8 +114,8 @@
                 },
 
                 escapeAndShowMessage: function(message) {
-                    $(this.messages + '>p').remove();
-                    this.$(this.messages).removeClass('hidden').append('<p>' + _.escape(message) + '</p>');
+                    $(`${this.messages}>p`).remove();
+                    this.$(this.messages).removeClass('hidden').append(`<p>${_.escape(message)}</p>`);
                 }
 
             });

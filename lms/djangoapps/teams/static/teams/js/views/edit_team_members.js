@@ -27,9 +27,9 @@
                 // The URL ends with team_id,request_username. We want to replace
                 // the last occurrence of team_id with the actual team_id, and remove request_username
                 // as the actual user to be removed from the team will be added on before calling DELETE.
-                this.teamMembershipDetailUrl = options.context.teamMembershipDetailUrl.substring(
+                this.teamMembershipDetailUrl = `${options.context.teamMembershipDetailUrl.substring(
                     0, this.options.context.teamMembershipDetailUrl.lastIndexOf('team_id')
-                ) + this.model.get('id') + ',';
+                ) + this.model.get('id')},`;
 
                 this.teamEvents = options.teamEvents;
             },
@@ -38,7 +38,7 @@
                 if (this.model.get('membership').length === 0) {
                     this.$el.html( // xss-lint: disable=javascript-jquery-html
                         // eslint-disable-next-line max-len
-                        '<p>' + gettext('This team does not have any members.') + '</p>'); // xss-lint: disable=javascript-concat-html
+                        `<p>${gettext('This team does not have any members.')}</p>`); // xss-lint: disable=javascript-concat-html
                 } else {
                     this.$el.html('<ul class="edit-members"></ul>'); // xss-lint: disable=javascript-jquery-html
                     this.renderTeamMembers();
@@ -76,7 +76,7 @@
                     self.$('.edit-members').append(self.teamMemberTemplate({ // xss-lint: disable=javascript-jquery-append
                         imageUrl: membership.user.profile_image.image_url_medium,
                         username: membership.user.username,
-                        memberProfileUrl: '/u/' + membership.user.username,
+                        memberProfileUrl: `/u/${membership.user.username}`,
                         dateJoined: dateJoined,
                         lastActive: lastActivity
                     }));

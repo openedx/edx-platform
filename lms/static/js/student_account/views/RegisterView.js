@@ -338,7 +338,7 @@
             },
 
             getRequiredTextLabel: function($el) {
-                return $('#' + $el.attr('id') + '-required-label');
+                return $(`#${$el.attr('id')}-required-label`);
             },
 
             renderLiveValidations: function($el, decisions) {
@@ -362,29 +362,29 @@
             },
 
             getLabel: function($el) {
-                return this.$form.find('label[for=' + $el.attr('id') + ']');
+                return this.$form.find(`label[for=${$el.attr('id')}]`);
             },
 
             getIcon: function($el) {
-                return $('#' + $el.attr('id') + '-validation-icon');
+                return $(`#${$el.attr('id')}-validation-icon`);
             },
 
             addValidationErrorMsgForScreenReader: function($el) {
-                var $validation_node = this.$form.find('#' + $el.attr('id') + '-validation-error');
+                var $validation_node = this.$form.find(`#${$el.attr('id')}-validation-error`);
                 $validation_node.find('.sr-only').text('ERROR:');
             },
 
             removeValidationErrorMsgForScreenReader: function($el) {
-                var $validation_node = this.$form.find('#' + $el.attr('id') + '-validation-error');
+                var $validation_node = this.$form.find(`#${$el.attr('id')}-validation-error`);
                 $validation_node.find('.sr-only').text('');
             },
 
             getErrorTip: function($el) {
-                return $('#' + $el.attr('id') + '-validation-error-msg');
+                return $(`#${$el.attr('id')}-validation-error-msg`);
             },
 
             getFieldTimeout: function($el) {
-                return $('#' + $el.attr('id')).attr('timeout-id') || null;
+                return $(`#${$el.attr('id')}`).attr('timeout-id') || null;
             },
 
             setFieldTimeout: function($el, time, action) {
@@ -439,7 +439,7 @@
                 $el.addClass(indicator);
                 $label.addClass(indicator);
                 $req.addClass(indicator);
-                $icon.addClass(indicator + ' ' + icon);
+                $icon.addClass(`${indicator} ${icon}`);
                 if (['username', 'email'].indexOf($el.attr('name')) > -1) {
                     $tip.addClass(' data-hj-suppress');
                 }
@@ -450,7 +450,7 @@
                 $el.removeClass(indicator);
                 $label.removeClass(indicator);
                 $req.removeClass(indicator);
-                $icon.removeClass(indicator + ' ' + icon);
+                $icon.removeClass(`${indicator} ${icon}`);
             },
 
             thirdPartyAuth: function(event) {
@@ -515,7 +515,7 @@
                         'We just need a little more information before you start learning with %(platformName)s.'
                     ),
                     fullMsg = _.sprintf(
-                        msgPart1 + ' ' + msgPart2,
+                        `${msgPart1} ${msgPart2}`,
                         {currentProvider: this.currentProvider, platformName: this.platformName}
                     );
 
@@ -586,7 +586,7 @@
                     i;
                 for (i = 0; i < this.liveValidationFields.length; ++i) {
                     field = this.liveValidationFields[i];
-                    data[field] = $('#register-' + field).val();
+                    data[field] = $(`#register-${field}`).val();
                 }
                 FormView.prototype.liveValidate(
                     $el, this.validationUrl, 'json', data, 'POST', this.model

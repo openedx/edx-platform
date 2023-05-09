@@ -127,7 +127,7 @@ define([
             checkAnnotatorIsFrozen(annotators[0]);
 
             // Check that second one doesn't have a bound click.edxnotes:freeze
-            checkClickEventsNotBound('edxnotes:freeze' + annotators[1].uid);
+            checkClickEventsNotBound(`edxnotes:freeze${annotators[1].uid}`);
         });
 
         it('should unbind events on destruction', function() {

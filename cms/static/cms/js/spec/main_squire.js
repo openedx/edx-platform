@@ -199,7 +199,7 @@
     i = 0;
 
     while (i < testFiles.length) {
-        testFiles[i] = '/base/' + testFiles[i] + '.js';
+        testFiles[i] = `/base/${testFiles[i]}.js`;
         i++;
     }
 

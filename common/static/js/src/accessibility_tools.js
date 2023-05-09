@@ -99,7 +99,7 @@ var trapShiftTabFocus = function($last, closeButtonId) {
 var bindReturnFocusListener = function($previouslyFocusedElement, closeButtonId, modalId, mainPageId) {
     // Ensures that on modal close, focus is returned to the element
     // that had focus before the modal was opened.
-    $('#lean_overlay, ' + closeButtonId).click(function() {
+    $(`#lean_overlay, ${closeButtonId}`).click(function() {
         $(mainPageId).attr('aria-hidden', 'false');
         $(modalId).attr('aria-hidden', 'true');
         $previouslyFocusedElement.focus();
@@ -151,7 +151,7 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
     // see http://accessibility.oit.ncsu.edu/blog/2013/09/13/the-incredible-accessible-modal-dialog/
     // for more information on managing modals
     //
-    var initialFocus
+    var initialFocus;
     $(trigger).click(function() {
         $focusedElementBeforeModal = $(trigger);
 
@@ -206,7 +206,7 @@ $(function() {
         function SRAlert() {
             // This initialization sometimes gets done twice, so take to only create a single reader-feedback div.
             var readerFeedbackID = 'reader-feedback',
-                $readerFeedbackSelector = $('#' + readerFeedbackID);
+                $readerFeedbackSelector = $(`#${readerFeedbackID}`);
 
             if ($readerFeedbackSelector.length === 0) {
                 edx.HtmlUtils.append(
@@ -217,7 +217,7 @@ $(function() {
                     )
                 );
             }
-            this.el = $('#' + readerFeedbackID);
+            this.el = $(`#${readerFeedbackID}`);
         }
 
         SRAlert.prototype.clear = function() {

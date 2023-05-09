@@ -43,7 +43,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
 
             // Render the remaining Configuration groups
             for (i = 0; i < this.allGroupViewList.length; i++) {
-                currentClass = '.wrapper-groups.content-groups.' + this.allGroupViewList[i].scheme;
+                currentClass = `.wrapper-groups.content-groups.${this.allGroupViewList[i].scheme}`;
                 this.$(currentClass).append(this.allGroupViewList[i].render().el);
             }
 
@@ -103,7 +103,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
 
             if (groupConfig) {
                 groupConfig.set('showGroups', true);
-                this.$('#' + id).focus();
+                this.$(`#${id}`).focus();
             }
         }
     });

@@ -106,7 +106,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             var $el = $('.payment-button');
             expect($el.length).toEqual(_.size(buttons));
             _.each(buttons, function(expectedText, expectedId) {
-                var $buttonEl = $('#' + expectedId),
+                var $buttonEl = $(`#${expectedId}`),
                     request;
 
                 $buttonEl.removeAttr('disabled');
@@ -119,7 +119,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
                 expect($buttonEl[0]).toHaveClass('is-selected');
                 expectPaymentButtonEnabled(false);
                 request = AjaxHelpers.currentRequest(requests);
-                expect(request.requestBody.split('&')).toContain('processor=' + expectedId);
+                expect(request.requestBody.split('&')).toContain(`processor=${expectedId}`);
                 AjaxHelpers.respondWithJson(requests, {});
             });
         };

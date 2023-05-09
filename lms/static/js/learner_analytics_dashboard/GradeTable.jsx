@@ -1,20 +1,21 @@
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
+
 const exGrades = [
     {
-        'assignment_type':'Exam',
-        'total_possible':6.0,
-        'total_earned':3.0
+        assignment_type: 'Exam',
+        total_possible: 6.0,
+        total_earned: 3.0
     },
     {
-        'assignment_type':'Homework',
-        'total_possible':5.0,
+        assignment_type: 'Homework',
+        total_possible: 5.0,
     },
     {
-        'assignment_type':'Homework',
-        'total_possible':11.0,
-        'total_earned':0.0
+        assignment_type: 'Homework',
+        total_possible: 11.0,
+        total_earned: 0.0
     }
 ];
 
@@ -68,7 +69,7 @@ class GradeTable extends React.Component {
                     </tr>
                 </tfoot>
             </table>
-        )
+        );
     }
 };
 
@@ -77,6 +78,6 @@ GradeTable.propTypes = {
     grades: PropTypes.array.isRequired,
     passingGrade: PropTypes.number.isRequired,
     percentGrade: PropTypes.number.isRequired
-}
+};
 
 export default GradeTable;

@@ -20,9 +20,9 @@
                 },
 
                 url: function() {
-                    var url = '/certificates/search?user=' + this.userFilter;
+                    var url = `/certificates/search?user=${this.userFilter}`;
                     if (this.courseFilter) {
-                        url += '&course_id=' + this.courseFilter;
+                        url += `&course_id=${this.courseFilter}`;
                     }
                     return url;
                 }

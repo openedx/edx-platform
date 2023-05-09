@@ -13,7 +13,7 @@ define([
             ACCOUNTS_API_URL = '/api/user/v1/accounts/';
 
         createTeamsUrl = function(teamId) {
-            return TeamSpecHelpers.testContext.teamsUrl + teamId + '?expand=user';
+            return `${TeamSpecHelpers.testContext.teamsUrl + teamId}?expand=user`;
         };
 
         createTeamModelData = function(teamId, teamName, membership) {
@@ -116,11 +116,11 @@ define([
                 AjaxHelpers.expectRequest(
                     requests,
                     'GET',
-                    TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
+                    `${TeamSpecHelpers.testContext.teamMembershipsUrl}?${$.param({
                         username: currentUsername,
                         course_id: TeamSpecHelpers.testCourseID,
                         teamset_id: 'topic-id'
-                    })
+                    })}`
                 );
 
                 // current user is not a member of any team so we should see the Join Team button
@@ -164,11 +164,11 @@ define([
                 AjaxHelpers.expectRequest(
                     requests,
                     'GET',
-                    TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
+                    `${TeamSpecHelpers.testContext.teamMembershipsUrl}?${$.param({
                         username: currentUsername,
                         course_id: TeamSpecHelpers.testCourseID,
                         teamset_id: 'topic-id'
-                    })
+                    })}`
                 );
 
                 // current user is a member of another team so we should see the correct message
@@ -213,11 +213,11 @@ define([
                 AjaxHelpers.expectRequest(
                     requests,
                     'GET',
-                    TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
+                    `${TeamSpecHelpers.testContext.teamMembershipsUrl}?${$.param({
                         username: currentUsername,
                         course_id: TeamSpecHelpers.testCourseID,
                         teamset_id: 'topic-id'
-                    })
+                    })}`
                 );
 
                 // User is not a member of any teams
@@ -246,11 +246,11 @@ define([
                 AjaxHelpers.expectRequest(
                     requests,
                     'GET',
-                    TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
+                    `${TeamSpecHelpers.testContext.teamMembershipsUrl}?${$.param({
                         username: currentUsername,
                         course_id: TeamSpecHelpers.testCourseID,
                         teamset_id: 'topic-id'
-                    })
+                    })}`
                 );
 
                 // User is not a member of any teams
@@ -277,11 +277,11 @@ define([
                 AjaxHelpers.expectRequest(
                     requests,
                     'GET',
-                    TeamSpecHelpers.testContext.teamMembershipsUrl + '?' + $.param({
+                    `${TeamSpecHelpers.testContext.teamMembershipsUrl}?${$.param({
                         username: currentUsername,
                         course_id: TeamSpecHelpers.testCourseID,
                         teamset_id: 'topic-id'
-                    })
+                    })}`
                 );
 
                 // Mock the response so that current user is not a member of any team

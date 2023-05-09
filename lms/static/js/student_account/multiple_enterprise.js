@@ -29,7 +29,7 @@
                 var userInEnterprise = false;
                 var userWithMultipleEnterprises = false;
                 $.ajax({
-                    url: this.urls.learners + '?username=' + username,
+                    url: `${this.urls.learners}?username=${username}`,
                     type: 'GET',
                     contentType: 'application/json; charset=utf-8',
                     headers: this.headers,

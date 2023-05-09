@@ -57,7 +57,7 @@
                         callback = function() {};
                     }
                     payload.parent_locator = parent;
-                    return $.postJSON(this.model.urlRoot + '/', payload, function(data) {
+                    return $.postJSON(`${this.model.urlRoot}/`, payload, function(data) {
                         _this.model.set({
                             id: data.locator
                         });
@@ -71,7 +71,7 @@
                     var _this = this;
                     if (this.model.id) {
                         return $.ajax({
-                            url: '' + (decodeURIComponent(this.model.url())) + '/' + viewName,
+                            url: `${decodeURIComponent(this.model.url())}/${viewName}`,
                             type: 'GET',
                             cache: false,
                             headers: {

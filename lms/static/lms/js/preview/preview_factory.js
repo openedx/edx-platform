@@ -55,7 +55,7 @@
                         user_name: selectedOption.val() === 'specific student' ? $userNameElement.val() : null
                     };
                     $.ajax({
-                        url: '/courses/' + options.courseId + '/masquerade',
+                        url: `/courses/${options.courseId}/masquerade`,
                         type: 'POST',
                         dataType: 'json',
                         contentType: 'application/json',

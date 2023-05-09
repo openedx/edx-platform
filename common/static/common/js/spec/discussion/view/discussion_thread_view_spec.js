@@ -57,8 +57,8 @@
         createTestResponseJson = function(index) {
             return {
                 user_id: window.user.id,
-                body: 'Response ' + index,
-                id: 'id_' + index,
+                body: `Response ${index}`,
+                id: `id_${index}`,
                 created_at: '2015-01-01T22:20:28Z'
             };
         };
@@ -300,8 +300,8 @@
                 expect(view.$('.js-marked-answer-list .discussion-response').length).toEqual(numEndorsed);
                 expect(view.$('.js-response-list .discussion-response').length).toEqual(numNonEndorsed);
                 return assertResponseCountAndPaginationCorrect(
-                    view, '' + numNonEndorsed + ' ' + (numEndorsed ? 'other ' : '')
-                    + (numNonEndorsed === 1 ? 'response' : 'responses'),
+                    view, `${numNonEndorsed} ${numEndorsed ? 'other ' : ''
+                    }${numNonEndorsed === 1 ? 'response' : 'responses'}`,
                     numNonEndorsed ? 'Showing all responses' : null, null
                 );
             };
@@ -316,8 +316,8 @@
                     many: 5
                 }, function(numNonEndorsed, nonEndorsedDesc) {
                     it(
-                        'renders correctly with ' + endorsedDesc + ' marked answer(s) and ' + nonEndorsedDesc
-                        + ' response(s)',
+                        `renders correctly with ${endorsedDesc} marked answer(s) and ${nonEndorsedDesc
+                        } response(s)`,
                         function() { return renderTestCase(this.view, numEndorsed, numNonEndorsed); }
                     );
                 });

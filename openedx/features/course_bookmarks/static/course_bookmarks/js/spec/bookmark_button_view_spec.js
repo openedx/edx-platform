@@ -62,7 +62,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
                 handler: 'removeBookmark',
                 event: 'bookmark:remove',
                 method: 'DELETE',
-                url: API_URL + 'bilbo,usage_1/',
+                url: `${API_URL}bilbo,usage_1/`,
                 body: null
             };
             var removeBookmarkData = {

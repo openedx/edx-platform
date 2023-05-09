@@ -102,7 +102,7 @@
                                 var $region = $('.video-live-region');
 
                                 var getExpectedText = function(text) {
-                                    return text + ' Volume.';
+                                    return `${text} Volume.`;
                                 };
 
                                 actual.setVolume(volume, true, true);

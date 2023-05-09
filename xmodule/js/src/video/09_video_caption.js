@@ -1,7 +1,7 @@
 (function(define) {
 // VideoCaption module.
-    
-'use strict';
+
+    'use strict';
 
     define('video/09_video_caption.js', [
         'video/00_sjson.js',
@@ -299,7 +299,7 @@
                         .focus();
                 } else {
                     this.languageChooserEl
-                        .find('li:eq(' + index + ')')
+                        .find(`li:eq(${index})`)
                         .next()
                         .find('.control-lang')
                         .focus();
@@ -321,7 +321,7 @@
                         .focus();
                 } else {
                     this.languageChooserEl
-                        .find('li:eq(' + index + ')')
+                        .find(`li:eq(${index})`)
                         .prev()
                         .find('.control-lang')
                         .focus();
@@ -582,8 +582,8 @@
                         var canFetchWithYoutubeId;
                         console.log('[Video info]: ERROR while fetching captions.');
                         console.log(
-                            '[Video info]: STATUS:', textStatus
-                            + ', MESSAGE:', '' + errorThrown
+                            '[Video info]: STATUS:', `${textStatus
+                            }, MESSAGE:`, `${errorThrown}`
                         );
                         // If initial list of languages has more than 1 item, check
                         // for availability other transcripts.
@@ -1070,12 +1070,12 @@
                         }
 
                         this.subtitlesEl
-                            .find("span[data-index='" + newIndex + "']")
+                            .find(`span[data-index='${newIndex}']`)
                             .parent()
                             .addClass('current');
 
                         this.currentIndex = newIndex;
-                        this.captionDisplayEl.text(this.subtitlesEl.find("span[data-index='" + newIndex + "']").text());
+                        this.captionDisplayEl.text(this.subtitlesEl.find(`span[data-index='${newIndex}']`).text());
                         this.scrollCaption();
                     }
                 }

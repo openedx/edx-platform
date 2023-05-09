@@ -29,7 +29,7 @@ class LibrarySourcedBlockPicker extends React.Component {
         this.fetchLibraries();
     }
 
-    fetchLibraries(textSearch='', page=1, append=false) {
+    fetchLibraries(textSearch = '', page = 1, append = false) {
         this.setState({
             libraries: append ? this.state.libraries : [],
             libraryLoading: true,
@@ -42,7 +42,7 @@ class LibrarySourcedBlockPicker extends React.Component {
                     libraryLoading: false,
                 }, () => {
                     if (res.next) {
-                        this.fetchLibraries(textSearch, page+1, true);
+                        this.fetchLibraries(textSearch, page + 1, true);
                     }
                 });
             } catch (error) {
@@ -58,7 +58,7 @@ class LibrarySourcedBlockPicker extends React.Component {
         });
     }
 
-    fetchXblocks(library, textSearch='', page=1, append=false) {
+    fetchXblocks(library, textSearch = '', page = 1, append = false) {
         this.setState({
             xblocks: append ? this.state.xblocks : [],
             xblocksLoading: true,
@@ -71,7 +71,7 @@ class LibrarySourcedBlockPicker extends React.Component {
                     xblocksLoading: false,
                 }, () => {
                     if (res.next) {
-                        this.fetchXblocks(library, textSearch, page+1, true);
+                        this.fetchXblocks(library, textSearch, page + 1, true);
                     }
                 });
             } catch (error) {
@@ -88,7 +88,7 @@ class LibrarySourcedBlockPicker extends React.Component {
     }
 
     onLibrarySearchInput(event) {
-        event.persist()
+        event.persist();
         this.setState({
             searchedLibrary: event.target.value,
         });
@@ -101,7 +101,7 @@ class LibrarySourcedBlockPicker extends React.Component {
     }
 
     onXBlockSearchInput(event) {
-        event.persist()
+        event.persist();
         if (!this.debouncedFetchXblocks) {
             this.debouncedFetchXblocks = _.debounce(value => {
                 this.fetchXblocks(this.state.selectedLibrary, value);

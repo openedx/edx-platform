@@ -34,8 +34,8 @@
                     this.primaryButtonTitle = gettext('Create');
                 } else if (this.action === 'edit') {
                     this.teamModel = options.model;
-                    this.teamModel.url = this.context.teamsDetailUrl.replace('team_id', options.model.get('id'))
-                            + '?expand=user';
+                    this.teamModel.url = `${this.context.teamsDetailUrl.replace('team_id', options.model.get('id'))
+                    }?expand=user`;
                     this.primaryButtonTitle = gettext('Update');
                 }
 
@@ -141,7 +141,7 @@
                             team: result
                         });
                         Backbone.history.navigate(
-                            'teams/' + view.topic.id + '/' + view.teamModel.id,
+                            `teams/${view.topic.id}/${view.teamModel.id}`,
                             {trigger: true}
                         );
                     })
@@ -212,9 +212,9 @@
                 var url;
                 event.preventDefault();
                 if (this.action === 'create') {
-                    url = 'topics/' + this.topic.id;
+                    url = `topics/${this.topic.id}`;
                 } else if (this.action === 'edit') {
-                    url = 'teams/' + this.topic.id + '/' + this.teamModel.get('id');
+                    url = `teams/${this.topic.id}/${this.teamModel.get('id')}`;
                 }
                 Backbone.history.navigate(url, {trigger: true});
             }

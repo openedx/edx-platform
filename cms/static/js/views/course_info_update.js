@@ -72,7 +72,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
         },
 
         collectionSelector: function(uid) {
-            return 'course-update-list li[name=' + uid + ']';
+            return `course-update-list li[name=${uid}]`;
         },
 
         setAndValidate: function(attr, value, event) {
@@ -96,13 +96,13 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
 
         handleValidationError: function(model, error) {
             var self = this,
-                $validationElement = this.$el.find('#course-update-list li[name="' + model.cid + '"]');
+                $validationElement = this.$el.find(`#course-update-list li[name="${model.cid}"]`);
 
             $validationElement.find('.message-error').remove();
             Object.keys(error).forEach(function(field) {
                 if (error.hasOwnProperty(field)) {
                     HtmlUtils.append(
-                        $validationElement.find('#update-date-' + model.cid).parent(),
+                        $validationElement.find(`#update-date-${model.cid}`).parent(),
                         self.errorTemplate({message: error[field]})
                     );
                     HtmlUtils.append(
@@ -116,7 +116,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
         },
 
         validateModel: function(model) {
-            var $validationElement = this.$el.find('#course-update-list li[name="' + model.cid + '"]');
+            var $validationElement = this.$el.find(`#course-update-list li[name="${model.cid}"]`);
             if (model.isValid()) {
                 $validationElement.find('.message-error').remove();
                 $validationElement.find('.save-button').removeClass('is-disabled');

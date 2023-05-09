@@ -67,7 +67,7 @@
 
             onSkip: function(event, doNotShowAgain) {
                 var info = {currentTime: this.getCurrentTime()},
-                    eventName = 'edx.video.bumper.' + (doNotShowAgain ? 'dismissed' : 'skipped');
+                    eventName = `edx.video.bumper.${doNotShowAgain ? 'dismissed' : 'skipped'}`;
                 this.log(eventName, info);
             },
 

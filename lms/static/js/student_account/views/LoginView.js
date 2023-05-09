@@ -285,12 +285,12 @@
             },
 
             clearPasswordResetSuccess: function() {
-                var query = '.' + this.passwordResetSuccessJsHook;
+                var query = `.${this.passwordResetSuccessJsHook}`;
                 this.clearFormFeedbackItems(query);
             },
 
             clearAuthWarning: function() {
-                var query = '.' + this.authWarningJsHook;
+                var query = `.${this.authWarningJsHook}`;
                 this.clearFormFeedbackItems(query);
             }
         });

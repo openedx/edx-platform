@@ -60,7 +60,7 @@ var edx = edx || {};
                     var chapter = self.find_unit(self.hidden, chapter_location);
                     self.sequential_select.html('')
                     // xss-lint: disable=javascript-jquery-append, javascript-concat-html
-                        .append('<option value="all">' + gettext('All subsections') + '</option>')
+                        .append(`<option value="all">${gettext('All subsections')}</option>`)
                         .append(self.schedule_options(chapter.children)); // xss-lint: disable=javascript-jquery-append
                     self.sequential_select.prop('disabled', false);
                     $('#add-unit-button').prop('disabled', false);
@@ -83,7 +83,7 @@ var edx = edx || {};
                         sequential = self.find_unit(self.hidden, chapter, sequential_location);
                     self.vertical_select.html('')
                     // xss-lint: disable=javascript-jquery-append, javascript-concat-html
-                        .append('<option value="all">' + gettext('All units') + '</option>')
+                        .append(`<option value="all">${gettext('All units')}</option>`)
                         .append(self.schedule_options(sequential.children)); // xss-lint: disable=javascript-jquery-append
                     self.vertical_select.prop('disabled', false);
                     self.set_datetime('start', sequential.start);
@@ -184,8 +184,8 @@ var edx = edx || {};
             $('table.ccx-schedule .date button').each(function() {
                 if ($(this).text().trim() === gettext('Click to change')) {
                     // xss-lint: disable=javascript-jquery-html, javascript-concat-html
-                    $(this).html('Set date <span class="sr"> '
-          + gettext('Click to change') + '</span>'); // xss-lint: disable=javascript-concat-html
+                    $(this).html(`Set date <span class="sr"> ${
+                        gettext('Click to change')}</span>`); // xss-lint: disable=javascript-concat-html
                 }
             });
 
@@ -222,7 +222,7 @@ var edx = edx || {};
                 // Populate chapters select, depopulate others
                 this.chapter_select.html('')
                 // xss-lint: disable=javascript-jquery-append, javascript-concat-html
-                    .append('<option value="none">' + gettext('Select a chapter') + '...</option>')
+                    .append(`<option value="none">${gettext('Select a chapter')}...</option>`)
                     .append(self.schedule_options(this.hidden)); // xss-lint: disable=javascript-jquery-append
                 this.sequential_select.html('').prop('disabled', true);
                 this.vertical_select.html('').prop('disabled', true);
@@ -310,11 +310,11 @@ var edx = edx || {};
         },
 
         get_datetime: function(which) {
-            var date = $('form#add-unit input[name=' + which + '_date]').val();
-            var time = $('form#add-unit input[name=' + which + '_time]').val();
+            var date = $(`form#add-unit input[name=${which}_date]`).val();
+            var time = $(`form#add-unit input[name=${which}_time]`).val();
             time = _.isEmpty(time) ? '00:00' : time;
             if (date && time) {
-                return date + ' ' + time;
+                return `${date} ${time}`;
             }
             return null;
         },
@@ -323,8 +323,8 @@ var edx = edx || {};
             var parts = value ? value.split(' ') : ['', ''],
                 date = parts[0],
                 time = parts[1];
-            $('form#add-unit input[name=' + which + '_date]').val(date);
-            $('form#add-unit input[name=' + which + '_time]').val(time);
+            $(`form#add-unit input[name=${which}_date]`).val(date);
+            $(`form#add-unit input[name=${which}_time]`).val(time);
         },
 
         schedule_options: function(nodes) {
@@ -473,12 +473,12 @@ var edx = edx || {};
                         return;
                     }
                     if (what === 'start') {
-                        unit.start = date + ' ' + time;
+                        unit.start = `${date} ${time}`;
                         if (unit.category === 'sequential') {
                             self.updateChildrenDates(unit, what, unit.start);
                         }
                     } else {
-                        unit.due = date + ' ' + time;
+                        unit.due = `${date} ${time}`;
                         if (unit.category === 'sequential') {
                             self.updateChildrenDates(unit, what, unit.due);
                         }

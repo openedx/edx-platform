@@ -153,7 +153,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
         },
 
         videosourceSample: function() {
-            if (this.has('intro_video')) { return '//www.youtube.com/embed/' + this.get('intro_video'); } else { return ''; }
+            if (this.has('intro_video')) { return `//www.youtube.com/embed/${this.get('intro_video')}`; } else { return ''; }
         },
 
         // Whether or not the course pacing can be toggled. If the course

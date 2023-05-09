@@ -211,7 +211,7 @@ define(
             transcriptUploadSucceeded: function(event, data) {
                 var languageCode = data.formData.language_code,
                     newLanguageCode = data.formData.new_language_code,
-                    $transcriptContainer = this.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]'); // eslint-disable-line max-len
+                    $transcriptContainer = this.$el.find(`.video-transcript-content[data-language-code="${languageCode}"]`); // eslint-disable-line max-len
 
                 $transcriptContainer.attr('data-language-code', newLanguageCode);
                 $transcriptContainer.find('.download-transcript-button').attr(
@@ -240,7 +240,7 @@ define(
             transcriptUploadFailed: function(event, data) {
                 var errorMessage,
                     languageCode = data.formData.language_code,
-                    $transcriptContainer = this.$el.find('.video-transcript-content[data-language-code="' + languageCode + '"]'); // eslint-disable-line max-len
+                    $transcriptContainer = this.$el.find(`.video-transcript-content[data-language-code="${languageCode}"]`); // eslint-disable-line max-len
 
                 try {
                     errorMessage = JSON.parse(data.jqXHR.responseText).error;

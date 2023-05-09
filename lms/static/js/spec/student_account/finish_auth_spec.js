@@ -75,7 +75,7 @@
                 // Expect that the view tried to enroll the student
                 expect(EnrollmentInterface.enroll).toHaveBeenCalledWith(
                     COURSE_KEY,
-                    '/course_modes/choose/' + COURSE_KEY + '/'
+                    `/course_modes/choose/${COURSE_KEY}/`
                 );
             });
 
@@ -91,7 +91,7 @@
                 // Expect that the view tried to enroll the student
                 expect(EnrollmentInterface.enroll).toHaveBeenCalledWith(
                     COURSE_KEY,
-                    '/course_modes/choose/' + COURSE_KEY + '/'
+                    `/course_modes/choose/${COURSE_KEY}/`
                 );
             });
 
@@ -109,7 +109,7 @@
                 // mode select flow with the purchase_workflow parameter
                 expect(EnrollmentInterface.enroll).toHaveBeenCalledWith(
                     COURSE_KEY,
-                    '/course_modes/choose/' + COURSE_KEY + '/?purchase_workflow=bulk'
+                    `/course_modes/choose/${COURSE_KEY}/?purchase_workflow=bulk`
                 );
             });
 
@@ -128,7 +128,7 @@
                 // with a redirect into the payment flow.
                 expect(EnrollmentInterface.enroll).toHaveBeenCalledWith(
                     COURSE_KEY,
-                    '/verify_student/start-flow/' + COURSE_KEY + '/'
+                    `/verify_student/start-flow/${COURSE_KEY}/`
                 );
             });
 
@@ -150,7 +150,7 @@
                 // purchase_workflow parameter.
                 expect(EnrollmentInterface.enroll).toHaveBeenCalledWith(
                     COURSE_KEY,
-                    '/verify_student/start-flow/' + COURSE_KEY + '/?purchase_workflow=bulk'
+                    `/verify_student/start-flow/${COURSE_KEY}/?purchase_workflow=bulk`
                 );
             });
 

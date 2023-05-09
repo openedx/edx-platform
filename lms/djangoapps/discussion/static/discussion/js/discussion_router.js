@@ -109,7 +109,7 @@
 
                 navigateToThread: function(threadId) {
                     var thread = this.discussion.get(threadId);
-                    return this.navigate('' + (thread.get('commentable_id')) + '/threads/' + threadId, {
+                    return this.navigate(`${thread.get('commentable_id')}/threads/${threadId}`, {
                         trigger: true
                     });
                 },

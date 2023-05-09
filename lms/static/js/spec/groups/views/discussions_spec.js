@@ -92,7 +92,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
 
         verifyMessage = function(expectedTitle, expectedMessageType, expectedAction, hasDetails) {
             expect(discussionsView.$('.message-title').text().trim()).toBe(expectedTitle);
-            expect(discussionsView.$('div.message')).toHaveClass('message-' + expectedMessageType);
+            expect(discussionsView.$('div.message')).toHaveClass(`message-${expectedMessageType}`);
             if (expectedAction) {
                 expect(discussionsView.$('.message-actions .action-primary').text().trim()).toBe(expectedAction);
             } else {
@@ -133,17 +133,17 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
             expect($inlineDiscussionsForm.length).toBe(1);
             expect($courseWideDiscussionsForm.length).toBe(1);
 
-            expect($courseWideDiscussionsForm.text()).
-                toContain('Course-Wide Discussion Topics');
-            expect($courseWideDiscussionsForm.text()).
-                toContain('Select the course-wide discussion topics that you want to divide.');
+            expect($courseWideDiscussionsForm.text())
+                .toContain('Course-Wide Discussion Topics');
+            expect($courseWideDiscussionsForm.text())
+                .toContain('Select the course-wide discussion topics that you want to divide.');
 
             // Should see the inline discussions form and its content
             expect($inlineDiscussionsForm.length).toBe(1);
-            expect($inlineDiscussionsForm.text()).
-                toContain('Content-Specific Discussion Topics');
-            expect($inlineDiscussionsForm.text()).
-                toContain('Specify whether content-specific discussion topics are divided.');
+            expect($inlineDiscussionsForm.text())
+                .toContain('Content-Specific Discussion Topics');
+            expect($inlineDiscussionsForm.text())
+                .toContain('Specify whether content-specific discussion topics are divided.');
         };
 
         beforeEach(function() {
@@ -171,8 +171,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
             var courseWideView, assertDividedTopics;
 
             assertDividedTopics = function(view, type) {
-                expect($('.check-discussion-subcategory-' + type).length).toBe(2);
-                expect($('.check-discussion-subcategory-' + type + ':checked').length).toBe(1);
+                expect($(`.check-discussion-subcategory-${type}`).length).toBe(2);
+                expect($(`.check-discussion-subcategory-${type}:checked`).length).toBe(1);
             };
 
             it('renders the view properly', function() {

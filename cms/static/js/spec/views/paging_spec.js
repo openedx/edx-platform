@@ -10,7 +10,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
     'use strict';
 
     var createPageableItem = function(index) {
-        var id = 'item_' + index;
+        var id = `item_${index}`;
         return {
             id: id,
             display_name: id,

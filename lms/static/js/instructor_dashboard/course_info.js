@@ -19,7 +19,7 @@
                 this.$course_error_toggle_text = this.$course_error_toggle.find('h2');
                 this.$course_errors = this.$course_errors_wrapper.find('.course-error');
                 this.$course_error_toggle_text.text(
-                    this.$course_error_toggle_text.text() + (" (' + this.$course_errors.length + ')")
+                    `${this.$course_error_toggle_text.text()} (' + this.$course_errors.length + ')`
                 );
                 this.$course_error_toggle.click(function(e) {
                     e.preventDefault();

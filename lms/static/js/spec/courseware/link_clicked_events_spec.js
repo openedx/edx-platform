@@ -19,7 +19,7 @@ define(['jquery', 'logger', 'js/courseware/courseware_factory'], function($, Log
         it('sends an event when an internal link is clicked', function() {
             $('.internal-link').click();
             expect(Logger.log).toHaveBeenCalledWith('edx.ui.lms.link_clicked', {
-                target_url: 'http://' + window.location.host + '/some/internal/link',
+                target_url: `http://${window.location.host}/some/internal/link`,
                 current_url: window.location.toString()
             });
         });

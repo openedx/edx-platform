@@ -81,7 +81,7 @@ define(
                     var elList = ['$form', '$input', '$progress'],
                         validFileExtensions = ['srt', 'sjson'],
                         result = $.map(validFileExtensions, function(item, index) {
-                            return '.' + item;
+                            return `.${item}`;
                         }).join(', ');
 
                     view.validFileExtensions = validFileExtensions;
@@ -169,7 +169,7 @@ define(
                 };
 
                 $.each(data, function(fileType, fileInfo) {
-                    it(fileType + ' file type', function() {
+                    it(`${fileType} file type`, function() {
                         var result = view.checkExtValidity(fileInfo);
 
                         expect(result).toBe(fileInfo.isValid);
@@ -190,8 +190,8 @@ define(
                 spyOn($.fn, 'width').and.callThrough();
 
                 view.xhrProgressHandler(null, null, null, percent);
-                expect(view.$progress.width).toHaveBeenCalledWith(percent + '%');
-                expect(view.$progress.html()).toBe(percent + '%');
+                expect(view.$progress.width).toHaveBeenCalledWith(`${percent}%`);
+                expect(view.$progress.html()).toBe(`${percent}%`);
             });
 
             describe('xhrCompleteHandler', function() {

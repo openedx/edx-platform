@@ -158,7 +158,7 @@ define(['underscore'], function(_) {
         } else if (view.fieldType === 'button') {
             expect($(element).find('button').length).toBe(1);
         } else {
-            throw new Error('Unexpected field type: ' + view.fieldType);
+            throw new Error(`Unexpected field type: ${view.fieldType}`);
         }
     };
 

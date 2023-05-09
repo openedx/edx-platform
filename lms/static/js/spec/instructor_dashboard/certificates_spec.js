@@ -26,13 +26,13 @@ function($, AjaxHelpers) {
 
         var select_options = function(option_values) {
             $.each(option_values, function(index, element) {
-                $('#certificate-regenerating-form input[value=' + element + ']').click();
+                $(`#certificate-regenerating-form input[value=${element}]`).click();
             });
         };
 
         beforeEach(function() {
             var fixture = '<section id="certificates">'
-                    + '<form id="certificate-regenerating-form" method="post" action="' + expected.url + '">'
+                    + `<form id="certificate-regenerating-form" method="post" action="${expected.url}">`
                     + '<p class="under-heading">To regenerate certificates for your course, '
                     + '   chose the learners who will receive regenerated certificates and click <br> '
                     + '   Regenerate Certificates.'
@@ -53,7 +53,7 @@ function($, AjaxHelpers) {
                     + '   Regenerate for learners in an error state. (0)'
                     + '</label><br>'
                     + '<input type="button" class="btn-blue" id="btn-start-regenerating-certificates" '
-                    + '   value="Regenerate Certificates" data-endpoint="' + expected.url + '">'
+                    + `   value="Regenerate Certificates" data-endpoint="${expected.url}">`
                     + '</form>'
                     + '<div class="message certificate-regeneration-status"></div>'
                     + '</section>';

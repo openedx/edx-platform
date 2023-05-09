@@ -48,7 +48,7 @@ function($, _, AjaxHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, XBloc
             showModal();
             expect(
                 modal.$el.find('.modal-header .title').contents().get(0).nodeValue.trim()
-            ).toEqual('Move: ' + DISPLAY_NAME);
+            ).toEqual(`Move: ${DISPLAY_NAME}`);
             expect(
                 modal.$el.find('.modal-sr-title').text().trim()
             ).toEqual('Choose a location to move your component to');

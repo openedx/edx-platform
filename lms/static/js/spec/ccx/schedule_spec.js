@@ -9,7 +9,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
 
                 var scheduleFixture = readFixtures('templates/ccx/schedule.underscore');
                 appendSetFixtures(
-                    '<script id="schedule_template" type="text/template" >' + scheduleFixture + '</script>'
+                    `<script id="schedule_template" type="text/template" >${scheduleFixture}</script>`
                 );
                 schedule_template = _.template($('#schedule_template').html());
                 save_url = 'save_ccx';

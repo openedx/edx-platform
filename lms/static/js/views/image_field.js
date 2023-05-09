@@ -225,7 +225,7 @@
                     size /= 1024;
                     ++i;
                 }
-                return size.toFixed(1) * 1 + ' ' + units[i];
+                return `${size.toFixed(1) * 1} ${units[i]}`;
             }
         });
 

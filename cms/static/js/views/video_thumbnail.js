@@ -105,21 +105,21 @@ define(
                     return item === '.bmp2' || item === '.jpeg';
                 }).sort();
                 return {
-                    humanize: supportedFormats.slice(0, -1).join(', ') + ' or ' + supportedFormats.slice(-1),
+                    humanize: `${supportedFormats.slice(0, -1).join(', ')} or ${supportedFormats.slice(-1)}`,
                     machine: _.values(this.videoImageSettings.supported_file_formats)
                 };
             },
 
             getVideoImageMaxSize: function() {
                 return {
-                    humanize: this.videoImageSettings.max_size / (1024 * 1024) + ' MB',
+                    humanize: `${this.videoImageSettings.max_size / (1024 * 1024)} MB`,
                     machine: this.videoImageSettings.max_size
                 };
             },
 
             getVideoImageMinSize: function() {
                 return {
-                    humanize: this.videoImageSettings.min_size / 1024 + ' KB',
+                    humanize: `${this.videoImageSettings.min_size / 1024} KB`,
                     machine: this.videoImageSettings.min_size
                 };
             },
@@ -210,12 +210,12 @@ define(
             getDurationTextMachine: function(durationSeconds) {
                 var minutes = Math.floor(durationSeconds / 60),
                     seconds = Math.floor(durationSeconds - minutes * 60);
-                return minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+                return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
             },
 
             chooseFile: function() {
                 this.$('.upload-image-input').fileupload({
-                    url: this.imageUploadURL + '/' + encodeURIComponent(this.model.get('edx_video_id')),
+                    url: `${this.imageUploadURL}/${encodeURIComponent(this.model.get('edx_video_id'))}`,
                     add: this.imageSelected,
                     done: this.imageUploadSucceeded,
                     fail: this.imageUploadFailed
@@ -346,7 +346,7 @@ define(
             },
 
             clearErrorMessage: function(videoId) {
-                var $thumbnailWrapperEl = $('.thumbnail-error-wrapper[data-video-id="' + videoId + '"]');
+                var $thumbnailWrapperEl = $(`.thumbnail-error-wrapper[data-video-id="${videoId}"]`);
                 if ($thumbnailWrapperEl.length) {
                     $thumbnailWrapperEl.remove();
                 }

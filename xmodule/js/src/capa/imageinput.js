@@ -24,9 +24,9 @@ window.ImageInput = (function($, undefined) {
     return ImageInput;
 
     function ImageInputConstructor(elementId) {
-        this.el = $('#imageinput_' + elementId);
-        this.crossEl = $('#cross_' + elementId);
-        this.inputEl = $('#input_' + elementId);
+        this.el = $(`#imageinput_${elementId}`);
+        this.crossEl = $(`#cross_${elementId}`);
+        this.inputEl = $(`#input_${elementId}`);
 
         this.el.on('click', this.clickHandler.bind(this));
     }
@@ -43,7 +43,7 @@ window.ImageInput = (function($, undefined) {
             //
             // IE10: `posX` and `posY` - float.
             // Chrome, FF: `posX` and `posY` - integers.
-            result = '[' + Math.round(posX) + ',' + Math.round(posY) + ']';
+            result = `[${Math.round(posX)},${Math.round(posY)}]`;
 
         this.crossEl.css({
             left: posX - 15,

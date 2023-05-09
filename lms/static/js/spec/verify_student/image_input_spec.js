@@ -36,7 +36,7 @@ define([
             if (fileType !== null) {
                 fakeFile = new Blob(
                     [IMAGE_DATA],
-                    {type: 'image/' + fileType}
+                    {type: `image/${fileType}`}
                 );
                 fakeEvent.target.files = [fakeFile];
             }
@@ -61,7 +61,7 @@ define([
         var expectPreview = function(view, fileType) {
             var previewImage = view.$preview.attr('src');
             if (fileType) {
-                expect(previewImage).toContain('data:image/' + fileType);
+                expect(previewImage).toContain(`data:image/${fileType}`);
             } else {
                 expect(previewImage).toEqual('');
             }
@@ -78,7 +78,7 @@ define([
         var expectImageData = function(view, fileType) {
             var imageData = view.model.get(view.modelAttribute);
             if (fileType) {
-                expect(imageData).toContain('data:image/' + fileType);
+                expect(imageData).toContain(`data:image/${fileType}`);
             } else {
                 expect(imageData).toEqual('');
             }

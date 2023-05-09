@@ -50,7 +50,7 @@
                 }(0));
             }
 
-            $('#input_' + state.problemId).val(JSON.stringify(draggables));
+            $(`#input_${state.problemId}`).val(JSON.stringify(draggables));
         }
 
         function addTargetRecursively(tempObj, draggable, target) {
@@ -69,7 +69,7 @@
         function check(state) {
             var inputElVal;
 
-            inputElVal = $('#input_' + state.problemId).val();
+            inputElVal = $(`#input_${state.problemId}`).val();
 
             if (inputElVal.length === 0) {
                 return false;
@@ -189,7 +189,7 @@
                 if (reportError !== false) {
                     console.log(
                         'ERROR: In answer there exists a '
-                    + 'draggable ID "' + draggableId + '". No '
+                    + `draggable ID "${draggableId}". No `
                     + 'draggable with this ID could be found.'
                     );
                 }
@@ -201,7 +201,7 @@
                 if (reportError !== false) {
                     console.log(
                         'ERROR: In answer there exists a target '
-                    + 'ID "' + targetId + '". No target with this '
+                    + `ID "${targetId}". No target with this `
                     + 'ID could be found.'
                     );
                 }
@@ -227,7 +227,7 @@
                         if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                             console.log(
                                 'ERROR: In answer there exists a '
-                            + 'draggable ID "' + draggableId + '". No '
+                            + `draggable ID "${draggableId}". No `
                             + 'draggable with this ID could be found.'
                             );
 

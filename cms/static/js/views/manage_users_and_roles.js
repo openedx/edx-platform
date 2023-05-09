@@ -103,7 +103,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
             var self = this;
             for (var i = 0; i < self.options.roles.length; i++) {
                 var role_name = self.options.roles[i].key;
-                var role_selector = 'click .user-actions .make-' + role_name;
+                var role_selector = `click .user-actions .make-${role_name}`;
 
                 (function(role) {
                     roleEvents[role_selector] = function(event) { self.handleRoleButtonClick(event.target, role); };

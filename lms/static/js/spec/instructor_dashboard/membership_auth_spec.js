@@ -28,8 +28,8 @@ function($, AjaxHelpers) {
                 'templates/instructor/instructor_dashboard_2/membership-list-widget.underscore'
             );
             appendSetFixtures(
-                "<script type='text/template' id='membership-list-widget-tpl'>" + membershipTpl + '</script>'
-                    + membershipMain
+                `<script type='text/template' id='membership-list-widget-tpl'>${membershipTpl}</script>${
+                    membershipMain}`
             );
             membership = new window.InstructorDashboard.sections.Membership($('#membership'));
         });

@@ -71,7 +71,7 @@
             });
             this.view.render();
             expect(this.view.$('.posted-details').text().replace(/\s+/g, ' '))
-                .toMatch('marked as answer less than a minute ago by ' + endorsement.username);
+                .toMatch(`marked as answer less than a minute ago by ${endorsement.username}`);
             return expect(this.view.$('.posted-details > a').attr('href'))
                 .toEqual('/courses/edX/999/test/discussion/forum/users/test_id');
         });
@@ -104,7 +104,7 @@
             });
             this.view.render();
             expect(this.view.$('.posted-details').text().replace(/\s+/g, ' '))
-                .toMatch('endorsed less than a minute ago by ' + endorsement.username);
+                .toMatch(`endorsed less than a minute ago by ${endorsement.username}`);
             return expect(this.view.$('.posted-details > a').attr('href'))
                 .toEqual('/courses/edX/999/test/discussion/forum/users/test_id');
         });

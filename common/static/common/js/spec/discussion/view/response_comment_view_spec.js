@@ -105,7 +105,7 @@
                 expect(this.view._delete).toHaveBeenCalled();
                 this.view.showView.trigger('comment:edit', DiscussionSpecHelper.makeEventSpy());
                 expect(this.view.edit).toHaveBeenCalled();
-                return expect(this.view.$('.edit-post-form#comment_' + this.comment.id))
+                return expect(this.view.$(`.edit-post-form#comment_${this.comment.id}`))
                     .not.toHaveClass('edit-post-form');
             });
         });
@@ -118,7 +118,7 @@
                 expect(this.view.update).toHaveBeenCalled();
                 this.view.editView.trigger('comment:cancel_edit', DiscussionSpecHelper.makeEventSpy());
                 expect(this.view.cancelEdit).toHaveBeenCalled();
-                return expect(this.view.$('.edit-post-form#comment_' + this.comment.id)).toHaveClass('edit-post-form');
+                return expect(this.view.$(`.edit-post-form#comment_${this.comment.id}`)).toHaveClass('edit-post-form');
             });
         });
         describe('edit', function() {

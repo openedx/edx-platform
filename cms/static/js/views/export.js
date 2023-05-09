@@ -118,7 +118,7 @@ define([
 
             $dom.successStage
                 .find('.item-progresspoint-success-date')
-                .text('(' + date + ' at ' + time + ' UTC)');
+                .text(`(${date} at ${time} UTC)`);
 
             break;
 
@@ -343,7 +343,7 @@ define([
                         + 'and try again.');
                     action = gettext('Take me to the main course page');
                 }
-                msg += ' ' + gettext('The raw error message is:') + ' ' + errMsg;
+                msg += ` ${gettext('The raw error message is:')} ${errMsg}`;
                 dialog = new PromptView({
                     title: gettext('There has been an error with your export.'),
                     message: msg,

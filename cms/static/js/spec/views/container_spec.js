@@ -15,7 +15,7 @@ describe('Container View', () => {
             verifyRequest, verifyNumReorderCalls, respondToRequest, notificationSpy,
 
             rootLocator = 'locator-container',
-            containerTestUrl = '/xblock/' + rootLocator,
+            containerTestUrl = `/xblock/${rootLocator}`,
 
             groupAUrl = '/xblock/locator-group-A',
             groupA = 'locator-group-A',
@@ -34,7 +34,7 @@ describe('Container View', () => {
         beforeEach(() => {
             EditHelpers.installMockXBlock();
             EditHelpers.installViewTemplates();
-            appendSetFixtures('<div class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="' + rootLocator + '"></div>');
+            appendSetFixtures(`<div class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="${rootLocator}"></div>`);
             notificationSpy = EditHelpers.createNotificationSpy();
             model = new XBlockInfo({
                 id: rootLocator,
@@ -80,7 +80,7 @@ describe('Container View', () => {
         };
 
         getComponent = function(locator) {
-            return containerView.$('.studio-xblock-wrapper[data-locator="' + locator + '"]');
+            return containerView.$(`.studio-xblock-wrapper[data-locator="${locator}"]`);
         };
 
         getDragHandle = function(locator) {

@@ -118,7 +118,7 @@ define([
             spyOn(Backbone.history, 'navigate');
             teamsView.$('a.create-team').click();
             expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe(
-                'topics/' + TeamSpecHelpers.testTopicID + '/create-team'
+                `topics/${TeamSpecHelpers.testTopicID}/create-team`
             );
         });
 
