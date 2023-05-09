@@ -160,11 +160,11 @@ describe('CourseOutlinePage', function() {
     };
 
     getItemsOfType = function(type) {
-        return outlinePage.$(`.outline-${type}`);
+        return outlinePage.$('.outline-' + type);
     };
 
     getItemHeaders = function(type) {
-        return getItemsOfType(type).find(`> .${type}-header`);
+        return getItemsOfType(type).find('> .' + type + '-header');
     };
 
     verifyItemsExpanded = function(type, isExpanded) {
@@ -210,7 +210,7 @@ describe('CourseOutlinePage', function() {
     setSelfPacedCustomPLS = function() {
         setSelfPaced();
         course.set('is_custom_relative_dates_active', true);
-    };
+    }
 
     createCourseOutlinePage = function(test, courseJSON, createOnly) {
         requests = AjaxHelpers.requests(test);
@@ -247,7 +247,7 @@ describe('CourseOutlinePage', function() {
             createCourseOutlinePageAndShowUnit(this, mockCourseJSON);
             getItemHeaders(type).find('.publish-button').click();
             $('.wrapper-modal-window .action-publish').click();
-            AjaxHelpers.expectJsonRequest(requests, 'POST', `/xblock/mock-${type}`, {
+            AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-' + type, {
                 publish: 'make_public'
             });
             expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
@@ -688,7 +688,7 @@ describe('CourseOutlinePage', function() {
                 var highlights = [],
                     i;
                 for (i = 0; i < numberOfHighlights; i++) {
-                    highlights.push(`Highlight${i + 1}`);
+                    highlights.push('Highlight' + (i + 1));
                 }
                 return highlights;
             };
@@ -1073,7 +1073,7 @@ describe('CourseOutlinePage', function() {
         };
 
         setContentVisibility = function(visibility) {
-            $(`input[name=content-visibility][value=${visibility}]`).prop('checked', true);
+            $('input[name=content-visibility][value=' + visibility + ']').prop('checked', true);
         };
 
         selectDisableSpecialExams = function() {
@@ -1122,7 +1122,7 @@ describe('CourseOutlinePage', function() {
         };
 
         expectShowCorrectness = function(showCorrectness) {
-            expect($(`input[name=show-correctness][value=${showCorrectness}]`).is(':checked')).toBe(true);
+            expect($('input[name=show-correctness][value=' + showCorrectness + ']').is(':checked')).toBe(true);
         };
 
         getMockNoPrereqOrExamsCourseJSON = function() {
@@ -1440,7 +1440,7 @@ describe('CourseOutlinePage', function() {
             $('.wrapper-modal-window .action-save').click();
         });
 
-        it('can select the onboarding exam when a course supports onboarding', function() {
+        it('can select the onboarding exam when a course supports onboarding', function () {
             var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({
                     has_changes: true,
@@ -2090,12 +2090,12 @@ describe('CourseOutlinePage', function() {
             var setShowCorrectness;
 
             setShowCorrectness = function(showCorrectness) {
-                $(`input[name=show-correctness][value=${showCorrectness}]`).click();
+                $('input[name=show-correctness][value=' + showCorrectness + ']').click();
             };
 
             describe('Show correctness set by subsection metadata.', function() {
                 $.each(['always', 'never', 'past_due'], function(index, showCorrectness) {
-                    it(`show_correctness="${showCorrectness}"`, function() {
+                    it('show_correctness="' + showCorrectness + '"', function() {
                         var mockCourseJSONCorrectness = createMockCourseJSON({}, [
                             createMockSectionJSON({}, [
                                 createMockSubsectionJSON({show_correctness: showCorrectness}, [])
@@ -2124,7 +2124,7 @@ describe('CourseOutlinePage', function() {
                 });
 
                 $.each(['never', 'past_due'], function(index, showCorrectness) {
-                    it(`show_correctness="${showCorrectness}" updates settings, republishes`, function() {
+                    it('show_correctness="' + showCorrectness + '" updates settings, republishes', function() {
                         var expectedSettings = $.extend(true, {}, defaultModalSettings, {publish: 'republish'});
                         expectedSettings.metadata.show_correctness = showCorrectness;
 
@@ -2173,7 +2173,7 @@ describe('CourseOutlinePage', function() {
             expect($modalWindow.find('.outline-subsection')).not.toExist();
         });
 
-        describe('Self Paced with Custom Personalized Learner Schedules (PLS)', function() {
+        describe('Self Paced with Custom Personalized Learner Schedules (PLS)', function () {
             beforeEach(function() {
                 var mockCourseJSON = createMockCourseJSON({}, [
                     createMockSectionJSON({}, [
@@ -2192,7 +2192,7 @@ describe('CourseOutlinePage', function() {
 
             selectRelativeWeeksSubsection = function(weeks) {
                 $('#due_in').val(weeks).trigger('keyup');
-            };
+            }
 
             mockCustomPacingServerValuesJson = createMockSectionJSON({
                 release_date: 'Jan 01, 2970 at 05:00 UTC'
@@ -2217,7 +2217,7 @@ describe('CourseOutlinePage', function() {
                 ])
             ]);
 
-            it('can show correct editors for self_paced course with custom pacing', function() {
+            it('can show correct editors for self_paced course with custom pacing', function (){
                 outlinePage.$('.outline-subsection .configure-button').click();
                 expect($('.edit-settings-release').length).toBe(0);
                 // Due date input exists for custom pacing self paced courses
@@ -2286,7 +2286,7 @@ describe('CourseOutlinePage', function() {
                 $('#grading_type').val('notgraded').trigger('change');
                 $('#due_in').val('').trigger('change');
                 expect($('#relative_date_input').css('display')).toBe('none');
-            });
+            })
 
             it('shows validation error on relative date', function() {
                 outlinePage.$('.outline-subsection .configure-button').click();
@@ -2353,7 +2353,7 @@ describe('CourseOutlinePage', function() {
                     'Contains staff only content'
                 );
             });
-        });
+        })
     });
 
     // Note: most tests for units can be found in Bok Choy
@@ -2452,7 +2452,7 @@ describe('CourseOutlinePage', function() {
             expect(messages).toContainText('Contains staff only content');
         });
 
-        describe('discussion settings', function() {
+        describe('discussion settings', function () {
             it('hides discussion settings if unit level discussions are disabled', function() {
                 getUnitStatus({}, {unit_level_discussions: false});
                 outlinePage.$('.outline-unit .configure-button').click();

@@ -126,7 +126,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
         };
 
         selectContentGroup = function(groupId, userPartitionId) {
-            var ids = `${groupId}:${userPartitionId}`;
+            var ids = groupId + ':' + userPartitionId;
             cohortsView.$('.radio-yes').prop('checked', true).change();
             cohortsView.$('.input-cohort-group-association').val(ids).change();
             expect(cohortsView.$('.input-cohort-group-association').prop('disabled')).toBeFalsy();
@@ -140,7 +140,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
 
         verifyMessage = function(expectedTitle, expectedMessageType, expectedAction, hasDetails) {
             expect(cohortsView.$('.message-title').text().trim()).toBe(expectedTitle);
-            expect(cohortsView.$('div.message')).toHaveClass(`message-${expectedMessageType}`);
+            expect(cohortsView.$('div.message')).toHaveClass('message-' + expectedMessageType);
             if (expectedAction) {
                 expect(cohortsView.$('.message-actions .action-primary').text().trim()).toBe(expectedAction);
             } else {
@@ -204,15 +204,15 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
         };
 
         unknownUserMessage = function(name) {
-            return `Unknown username: ${name}`;
+            return 'Unknown username: ' + name;
         };
 
         invalidEmailMessage = function(name) {
-            return `Invalid email address: ${name}`;
+            return 'Invalid email address: ' + name;
         };
 
         notAllowedUserMessage = function(email) {
-            return `Cohort assignment not allowed: ${email}`;
+            return 'Cohort assignment not allowed: ' + email;
         };
 
         beforeEach(function() {
@@ -262,8 +262,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             // But upload form should not be visible until toggle is clicked.
             expect(cohortsView.$(fileUploadFormCss).length).toBe(0);
             uploadCsvToggle = cohortsView.$('.toggle-cohort-management-secondary');
-            expect(uploadCsvToggle.text())
-                .toContain('Assign learners to cohorts by uploading a CSV file');
+            expect(uploadCsvToggle.text()).
+                toContain('Assign learners to cohorts by uploading a CSV file');
             uploadCsvToggle.click();
             // After toggle is clicked, it should be hidden.
             expect(uploadCsvToggle).toHaveClass('hidden');
@@ -455,7 +455,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     {cohorts: createMockCohort(defaultCohortName, 1, 0, null, null, assignmentType)}
                 );
                 verifyMessage(
-                    `The ${defaultCohortName} cohort has been created.`
+                    'The ' + defaultCohortName + ' cohort has been created.'
                             + ' You can manually add students to this cohort below.',
                     'confirmation'
                 );
@@ -704,7 +704,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 addStudents(sixUsers);
                 AjaxHelpers.expectRequest(
                     requests, 'POST', '/mock_service/cohorts/1/add',
-                    `users=${sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+')}`
+                    'users=' + sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+')
                 );
                 respondToAdd({
                     unknown: [
@@ -742,7 +742,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
 
                 addStudents(sixUsers);
                 AjaxHelpers.expectRequest(requests, 'POST', '/mock_service/cohorts/1/add',
-                    `users=${sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+')}`
+                    'users=' + sixUsers.replace(/@/g, '%40').replace(/, /g, '%2C+')
                 );
                 respondToAdd({
                     changed: [

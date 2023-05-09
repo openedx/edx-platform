@@ -49,6 +49,7 @@
     "import/no-dynamic-require": "off",
     "import/no-unresolved": "off",
     "max-len": "off",
+    "newline-per-chained-call": "off",
     "no-console": "off",
     "no-lonely-if": "off",
     "no-param-reassign": "off",
@@ -68,9 +69,11 @@
     "prefer-arrow-callback": "off",
     "prefer-destructuring": "off",
     "prefer-rest-params": "off",
+    "prefer-template": "off",
     "radix": "off",
     "react/jsx-indent-props": ["error", 4],
     "react/prop-types": "off",
+    "semi": "off",
     "vars-on-top": "off"
   }
 }

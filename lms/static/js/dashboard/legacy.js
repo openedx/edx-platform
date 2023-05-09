@@ -272,13 +272,13 @@ var edx = edx || {};
                 display: 'block',
                 'z-index': 0
             });
-            $('#activate-account-modal').focus();
+            $('#activate-account-modal').focus()
         }
 
         $('.action-email-settings').each(function(index) {
-            $(this).attr('id', `email-settings-${index}`);
+            $(this).attr('id', 'email-settings-' + index);
             // a bit of a hack, but gets the unique selector for the modal trigger
-            var trigger = `#${$(this).attr('id')}`;
+            var trigger = '#' + $(this).attr('id');
             accessibleModal(
                 trigger,
                 '#email-settings-modal .close-modal',
@@ -288,9 +288,9 @@ var edx = edx || {};
         });
 
         $('.action-unenroll').each(function(index) {
-            $(this).attr('id', `unenroll-${index}`);
+            $(this).attr('id', 'unenroll-' + index);
             // a bit of a hack, but gets the unique selector for the modal trigger
-            var trigger = `#${$(this).attr('id')}`;
+            var trigger = '#' + $(this).attr('id');
             accessibleModal(
                 trigger,
                 '#unenroll-modal .close-modal',

@@ -6,7 +6,6 @@
 'use strict';
 
 var path = require('path');
-
 var configModule = require(path.join(__dirname, '../../common/static/common/js/karma.common.conf.js'));
 
 var options = {
@@ -14,7 +13,7 @@ var options = {
     useRequireJs: false,
 
     normalizePathsForCoverageFunc: function(appRoot, pattern) {
-        return path.join(appRoot, `/common/static/${pattern}`);
+        return path.join(appRoot, '/common/static/' + pattern);
     },
 
     // Avoid adding files to this list. Use RequireJS.

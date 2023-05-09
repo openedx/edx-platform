@@ -114,11 +114,11 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         },
         renderGracePeriod: function() {
             var format = function(time) {
-                return time >= 10 ? time.toString() : `0${time}`;
+                return time >= 10 ? time.toString() : '0' + time;
             };
             var grace_period = this.model.get('grace_period');
             this.$el.find('#course-grading-graceperiod').val(
-                `${format(grace_period.hours)}:${format(grace_period.minutes)}`
+                format(grace_period.hours) + ':' + format(grace_period.minutes)
             );
         },
         renderMinimumGradeCredit: function() {
@@ -266,7 +266,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             this.$el.find('.range').each(function(i) {
                 var min = (i < cutoffs.length ? cutoffs[i].cutoff : 0);
                 var max = (i > 0 ? cutoffs[i - 1].cutoff : 100);
-                $(this).text(`${min}-${max}`);
+                $(this).text(min + '-' + max);
             });
         },
 
