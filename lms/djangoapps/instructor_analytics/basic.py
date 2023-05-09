@@ -10,7 +10,6 @@ import json
 import logging
 
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Count  # lint-amnesty, pylint: disable=unused-import
@@ -38,6 +37,7 @@ PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
                     'level_of_education', 'mailing_address', 'goals', 'meta',
                     'city', 'country')
 PROGRAM_ENROLLMENT_FEATURES = ('external_user_key', )
+ENROLLMENT_FEATURES = ('enrollment_date', )
 ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'status')
 ORDER_FEATURES = ('purchase_time',)
 
@@ -49,7 +49,7 @@ SALE_ORDER_FEATURES = ('id', 'company_name', 'company_contact_name', 'company_co
                        'bill_to_street2', 'bill_to_city', 'bill_to_state', 'bill_to_postalcode',
                        'bill_to_country', 'order_type', 'created')
 
-AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES
+AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES + ENROLLMENT_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at', 'is_valid')
 COUPON_FEATURES = ('code', 'course_id', 'percentage_discount', 'description', 'expiration_date', 'is_active')
 CERTIFICATE_FEATURES = ('course_id', 'mode', 'status', 'grade', 'created_date', 'is_active', 'error_reason')
@@ -84,7 +84,7 @@ def issued_certificates(course_key, features):
     return generated_certificates
 
 
-def enrolled_students_features(course_key, features):
+def enrolled_students_features(course_key, features):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Return list of student features as dictionaries.
 
@@ -101,18 +101,24 @@ def enrolled_students_features(course_key, features):
     include_enrollment_mode = 'enrollment_mode' in features
     include_verification_status = 'verification_status' in features
     include_program_enrollments = 'external_user_key' in features
+    include_enrollment_date = 'enrollment_date' in features
     external_user_key_dict = {}
 
-    students = User.objects.filter(
-        courseenrollment__course_id=course_key,
-        courseenrollment__is_active=1,
-    ).order_by('username').select_related('profile')
+    enrollments = CourseEnrollment.objects.filter(
+        course_id=course_key,
+        is_active=1,
+    ).select_related('user').order_by('user__username').select_related('user__profile')
 
     if include_cohort_column:
-        students = students.prefetch_related('course_groups')
+        enrollments = enrollments.prefetch_related('user__course_groups')
 
     if include_team_column:
-        students = students.prefetch_related('teams')
+        enrollments = enrollments.prefetch_related('user__teams')
+
+    students = [enrollment.user for enrollment in enrollments]
+
+    student_features = [x for x in STUDENT_FEATURES if x in features]
+    profile_features = [x for x in PROFILE_FEATURES if x in features]
 
     if include_program_enrollments and len(students) > 0:
         program_enrollments = fetch_program_enrollments_by_students(users=students, realized_only=True)
@@ -128,10 +134,9 @@ def enrolled_students_features(course_key, features):
         except TypeError:
             return str(attr)
 
-    def extract_student(student, features):
+    def extract_enrollment_student(enrollment, features):
         """ convert student to dictionary """
-        student_features = [x for x in STUDENT_FEATURES if x in features]
-        profile_features = [x for x in PROFILE_FEATURES if x in features]
+        student = enrollment.user
 
         # For data extractions on the 'meta' field
         # the feature name should be in the format of 'meta.foo' where
@@ -189,9 +194,12 @@ def enrolled_students_features(course_key, features):
             # extra external_user_key
             student_dict['external_user_key'] = external_user_key_dict.get(student.id, '')
 
+        if include_enrollment_date:
+            student_dict['enrollment_date'] = enrollment.created
+
         return student_dict
 
-    return [extract_student(student, features) for student in students]
+    return [extract_enrollment_student(enrollment, features) for enrollment in enrollments]
 
 
 def list_may_enroll(course_key, features):

@@ -1428,7 +1428,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         query_features = [
             'id', 'username', 'name', 'email', 'language', 'location',
             'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-            'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
+            'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key',
+            'enrollment_date'
         ]
 
     # Provide human-friendly and translatable names for these features. These names
@@ -1450,6 +1451,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         'last_login': _('Last Login'),
         'date_joined': _('Date Joined'),
         'external_user_key': _('External User Key'),
+        'enrollment_date': _('Enrollment Date'),
     }
 
     if is_course_cohorted(course.id):
