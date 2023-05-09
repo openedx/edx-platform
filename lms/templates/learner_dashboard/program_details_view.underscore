@@ -1,5 +1,5 @@
 <header class="js-program-header program-header full-width-banner"></header>
-<div class="js-program-details-alerts program-details-alerts program-subscription-alert-wrapper col-12 col-xl-8"></div>
+<div class="js-program-details-alerts program-details-alerts program-subscription-alert-wrapper col-12 col-md-8"></div>
 <!-- TODO: consider if article is the most appropriate element here -->
 
 <div class="col-12 flex-column flex-md-row d-md-flex">
@@ -24,9 +24,24 @@
                 </div>
             <% } %>
             <% if (isSubscriptionEligible) { %>
-            <div class="d-flex flex-column align-items-start flex-sm-row  align-items-sm-center upgrade-subscription">
-                <a href="<%- subscriptionUrl %>" class="js-subscription-cta btn-brand btn cta-primary upgrade-button">
-                <% if (subscriptionState === 'inactive') { %>
+            <div class="d-flex flex-column align-items-start flex-xl-row  align-items-xl-center upgrade-subscription">
+                <a
+                    href="<%- subscriptionUrl %>"
+                    class="js-subscription-cta btn-brand btn cta-primary upgrade-button"
+                    <% if (subscriptionState === 'active') { %>
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    <% } %>
+                >
+                <% if (subscriptionState === 'active') { %>
+                    <div class="d-flex align-items-center">
+                        <span><%- gettext('Manage my subscription') %></span>
+                        <div class="subscription-icon-launch">
+                            <% // xss-lint: disable=underscore-not-escaped %>
+                            <%= launchIcon %>
+                        </div>
+                    </div>
+                <% } else if (subscriptionState === 'inactive') { %>
                     <div class="d-flex align-items-center">
                         <div class="subscription-icon-restart">
                             <% // xss-lint: disable=underscore-not-escaped %>
@@ -35,12 +50,10 @@
                         <span><%- gettext('Restart my subscription') %></span>
                     </div>
                 <% } else { %>
-                    <%- StringUtils.interpolate(gettext(
-                        subscriptionState === 'active'
-                        ? 'Manage my subscription'
-                        : 'Start {trialLength}-Day free trial'
-                    ),
-                    { trialLength } ) %>
+                    <%- StringUtils.interpolate(
+                        gettext('Start {trialLength}-Day free trial'),
+                        { trialLength }
+                    ) %>
                 <% } %>
                 </a>
                 <span class="subscription-info-brief">

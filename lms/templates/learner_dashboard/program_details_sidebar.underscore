@@ -32,7 +32,7 @@
                     ),
                     {
                         subscriptionPrice,
-                        a_start: HtmlUtils.HTML(`<a class="subscription-link" href="${manage_subscription_url}">`),
+                        a_start: HtmlUtils.HTML(`<a class="subscription-link" href="${orders_and_subscriptions_url}">`),
                         a_end: HtmlUtils.HTML('</a>'),
                     }
                 ) %>

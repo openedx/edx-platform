@@ -49,6 +49,8 @@ class ProgramDetailsSidebarView extends Backbone.View {
                 programTabViewEnabled: this.programTabViewEnabled,
                 isSubscriptionEligible: this.isSubscriptionEligible,
                 arrowUprightIcon,
+                // TODO: remove this after url is obtained from backend
+                orders_and_subscriptions_url: '#',
                 ...this.urls,
             },
         );

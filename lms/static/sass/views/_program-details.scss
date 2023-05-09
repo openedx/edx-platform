@@ -93,7 +93,7 @@ $btn-color-primary: $primary-dark;
 .program-details-alerts {
   .page-banner {
     margin: 0;
-    padding: 0px 40px 48px;
+    padding: 0 0 48px;
     gap: 24px;
   }
 }
@@ -101,7 +101,6 @@ $btn-color-primary: $primary-dark;
 .program-details-tab-alerts {
   .page-banner {
     margin: 0;
-    padding: 0 40px;
     gap: 24px;
   }
 }
@@ -451,13 +450,20 @@ $btn-color-primary: $primary-dark;
   }
 
   .upgrade-subscription {
-    margin: 10px 15px 10px 5px;
-    gap: 15px;
+    margin: 16px 0 10px;
+    row-gap: 16px;
+    column-gap: 24px;
+  }
+
+  .subscription-icon-launch {
+    width: 22.5px;
+    height: 22.5px;
+    margin-inline-start: 8px;
   }
 
   .subscription-icon-restart {
-    width: 24px;
-    height: 24px;
+    width: 22.5px;
+    height: 22.5px;
     margin-inline-end: 8px;
   }
 
