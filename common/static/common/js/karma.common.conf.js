@@ -93,7 +93,6 @@ function junitNameFormatter(browser, result) {
     return result.suite[0] + ': ' + result.description;
 }
 
-
 /**
  * Customize the classname attribute in xml testcase element
  * @param {Object} browser
@@ -102,7 +101,6 @@ function junitNameFormatter(browser, result) {
 function junitClassNameFormatter(browser) {
     return 'Javascript.' + browser.name.split(' ')[0];
 }
-
 
 /**
  * Return array containing default and user supplied reporters
@@ -116,7 +114,6 @@ function reporters(config) {
     }
     return defaultReporters;
 }
-
 
 /**
  * Split a filepath into basepath and filename
@@ -142,7 +139,6 @@ function getBasepathAndFilename(filepath) {
     };
 }
 
-
 /**
  * Return coverage reporter settings
  * @param {String} config
@@ -160,7 +156,6 @@ function coverageSettings(config) {
         ]
     };
 }
-
 
 /**
  * Return junit reporter settings
@@ -191,8 +186,8 @@ function defaultNormalizeFunc(appRoot, pattern) { // eslint-disable-line no-shad
     if (pat.match(/^common\/js/)) {
         pat = path.join(appRoot, '/common/static/' + pat);
     } else if (pat.match(/^xmodule_js\/common_static/)) {
-        pat = path.join(appRoot, '/common/static/' +
-            pat.replace(/^xmodule_js\/common_static\//, ''));
+        pat = path.join(appRoot, '/common/static/'
+            + pat.replace(/^xmodule_js\/common_static\//, ''));
     }
     return pat;
 }
@@ -316,7 +311,6 @@ function getBaseConfig(config, useRequireJs) {
             customPlugin
         ],
 
-
         // list of files to exclude
         exclude: [],
 
@@ -329,31 +323,24 @@ function getBaseConfig(config, useRequireJs) {
             showSpecTiming: true
         },
 
-
         coverageReporter: coverageSettings(config),
 
-
         junitReporter: junitSettings(config),
-
 
         // web server hostname and port
         hostname: hostname,
         port: port,
 
-
         // enable / disable colors in the output (reporters and logs)
         colors: true,
-
 
         // level of logging
         /* possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN
          || config.LOG_INFO || config.LOG_DEBUG */
         logLevel: config.LOG_INFO,
 
-
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: false,
-
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher

@@ -6,6 +6,7 @@ import logging
 from urllib.parse import urljoin  # pylint: disable=import-error
 
 import crum
+from common.djangoapps.student.models import anonymous_id_for_user
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from completion.models import BlockCompletion
 from completion.services import CompletionService
@@ -235,12 +236,19 @@ class XBlockRuntime(RuntimeShim, Runtime):
         elif service_name == "completion":
             return CompletionService(user=self.user, context_key=context_key)
         elif service_name == "user":
+            if self.user.is_anonymous:
+                deprecated_anonymous_student_id = self.user_id
+            else:
+                deprecated_anonymous_student_id = anonymous_id_for_user(self.user, course_id=None)
+
             return DjangoXBlockUserService(
                 self.user,
                 # The value should be updated to whether the user is staff in the context when Blockstore runtime adds
                 # support for courses.
                 user_is_staff=self.user.is_staff,
                 anonymous_user_id=self.anonymous_student_id,
+                # See the docstring of `DjangoXBlockUserService`.
+                deprecated_anonymous_user_id=deprecated_anonymous_student_id
             )
         elif service_name == "mako":
             if self.system.student_data_mode == XBlockRuntimeSystem.STUDENT_DATA_EPHEMERAL:
@@ -256,13 +264,13 @@ class XBlockRuntime(RuntimeShim, Runtime):
         elif service_name == 'replace_urls':
             return ReplaceURLService(xblock=block, lookup_asset_url=self._lookup_asset_url)
         elif service_name == 'rebind_user':
-            # this service should ideally be initialized with all the arguments of get_module_system_for_user
+            # this service should ideally be initialized with all the arguments of prepare_runtime_for_user
             # but only the positional arguments are passed here as the other arguments are too
             # specific to the lms.block_render module
             return RebindUserService(
                 self.user,
                 context_key,
-                block_render.get_module_system_for_user,
+                block_render.prepare_runtime_for_user,
                 track_function=make_track_function(),
                 request_token=request_token(crum.get_current_request()),
             )
@@ -304,7 +312,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
                 self.django_field_data_caches[context_key] = field_data_cache
             else:
                 field_data_cache = self.django_field_data_caches[context_key]
-                field_data_cache.add_descriptors_to_cache([block])
+                field_data_cache.add_blocks_to_cache([block])
             student_data_store = KvsFieldData(kvs=DjangoKeyValueStore(field_data_cache))
 
         return SplitFieldData({

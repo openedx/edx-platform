@@ -23,12 +23,12 @@ class MultiselectDropdown extends React.Component {
     }
 
     componentDidMount() {
-        document.addEventListener("keydown", this.handleKeydown, false);
+        document.addEventListener('keydown', this.handleKeydown, false);
     }
 
     componentWillUnmount() {
 
-        document.removeEventListener("keydown", this.handleKeydown, false);
+        document.removeEventListener('keydown', this.handleKeydown, false);
     }
 
     findOption(data) {
@@ -36,17 +36,17 @@ class MultiselectDropdown extends React.Component {
     }
 
     focusButton() {
-        if (this.buttonRef) this.buttonRef.focus();
+        if (this.buttonRef) { this.buttonRef.focus(); }
     }
 
     handleKeydown(event) {
         if (this.state.open && event.keyCode == 27) {
-            this.setState({ open: false }, this.focusButton);
+            this.setState({open: false}, this.focusButton);
         }
     }
 
     handleButtonClick(e) {
-        this.setState({ open: !this.state.open });
+        this.setState({open: !this.state.open});
     }
 
     handleRemoveAllClick(e) {
@@ -94,7 +94,7 @@ class MultiselectDropdown extends React.Component {
 
     renderUnselect() {
         return this.props.selected.length > 0 && (
-            <button id="unselect-button" disabled={this.props.disabled} aria-label="Clear all selected" onClick={this.handleRemoveAllClick}>{gettext("Clear all")}</button>
+            <button id="unselect-button" disabled={this.props.disabled} aria-label="Clear all selected" onClick={this.handleRemoveAllClick}>{gettext('Clear all')}</button>
         )
     }
 
@@ -136,7 +136,7 @@ class MultiselectDropdown extends React.Component {
                     // and close the dropdown.
                     if (!e.currentTarget.contains(e.relatedTarget)) {
                         this.props.onBlur(e);
-                        this.setState({ open: false })
+                        this.setState({open: false})
                     }
                 }}
             >
@@ -155,7 +155,7 @@ class MultiselectDropdown extends React.Component {
     }
 }
 
-export { MultiselectDropdown };
+export {MultiselectDropdown};
 
 MultiselectDropdown.propTypes = {
     label: PropTypes.string,

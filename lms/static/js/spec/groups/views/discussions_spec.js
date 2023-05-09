@@ -147,10 +147,10 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
         };
 
         beforeEach(function() {
-            setFixtures('<ul class="instructor-nav">' +
-                    '<li class="nav-item"><button type="button" data-section="discussion_management" ' +
-                    'class="active-section">Discussions</button></li></ul><div></div>' +
-                    '<div class="discussions-management"></div>');
+            setFixtures('<ul class="instructor-nav">'
+                    + '<li class="nav-item"><button type="button" data-section="discussion_management" '
+                    + 'class="active-section">Discussions</button></li></ul><div></div>'
+                    + '<div class="discussions-management"></div>');
             TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/discussions');
             TemplateHelpers.installTemplate(
                 'templates/instructor/instructor_dashboard_2/divided-discussions-course-wide'

@@ -149,7 +149,7 @@ class RenderForm extends React.Component {
                     },
                     {
                         id: this.props.context.customFields.referrer,
-                        value: document.referrer ? document.referrer : "Direct Contact Us Page Request",
+                        value: document.referrer ? document.referrer : 'Direct Contact Us Page Request',
                     }
                 ],
                 tags: this.props.context.tags,
@@ -239,13 +239,13 @@ class RenderForm extends React.Component {
         if (event.keyCode === enterKeyCode) {
             window.location.href = suggestions[activeSuggestion].html_url;
         } else if (event.keyCode === upArrowKeyCode) {
-            (activeSuggestion === 0) ?
-                this.setState({ activeSuggestion: suggestions.length - 1 }) :
-                this.setState({ activeSuggestion: activeSuggestion - 1 });
+            (activeSuggestion === 0)
+                ? this.setState({ activeSuggestion: suggestions.length - 1 })
+                : this.setState({ activeSuggestion: activeSuggestion - 1 });
         } else if (event.keyCode === downArrowKeyCode) {
-            (activeSuggestion + 1 === suggestions.length) ?
-                this.setState({ activeSuggestion: 0 }) :
-                this.setState({ activeSuggestion: activeSuggestion + 1 });
+            (activeSuggestion + 1 === suggestions.length)
+                ? this.setState({ activeSuggestion: 0 })
+                : this.setState({ activeSuggestion: activeSuggestion + 1 });
         }
     }
 
@@ -348,7 +348,7 @@ class RenderForm extends React.Component {
                             type="button"
                             onClick={() => this.handleSearchButton(document.getElementById('query').value)}
                         >
-              Search
+                            Search
                         </button>
                     </div>
                 </div>

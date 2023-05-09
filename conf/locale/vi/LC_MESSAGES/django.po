@@ -48,7 +48,7 @@
 # vngocdiep <vngocdiep98@gmail.com>, 2014
 # Vu Bach, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/).
+# edX community translations have been downloaded from Vietnamese (http://app.transifex.com/open-edx/edx-platform/language/vi/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -126,7 +126,7 @@
 # gvikei <truckhuyen@gmail.com>, 2014
 # Trung V. Nguyen <trung.ngvan@gmail.com>, 2015-2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/open-edx/edx-platform/language/vi/)
+# edX community translations have been downloaded from Vietnamese (http://app.transifex.com/open-edx/edx-platform/language/vi/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -198,7 +198,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-02 20:42+0000\n"
+"POT-Creation-Date: 2023-04-23 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Le Minh Tri <trilm@hihexa.com>, 2020\n"
 "Language-Team: Vietnamese (https://app.transifex.com/open-edx/teams/6205/vi/)\n"
@@ -271,6 +271,13 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
+msgstr ""
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -6332,6 +6339,37 @@ msgstr ""
 msgid "This user already has access to this library."
 msgstr ""
 
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Đang tải"
+
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -11560,6 +11598,14 @@ msgid "Invalid data ({details})"
 msgstr "Dữ liệu không hợp lệ ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "Bạn không thể di chuyển {source_type} vào {target_parent_type}."
@@ -11914,12 +11960,6 @@ msgstr "tải lên"
 msgid "In Progress"
 msgstr "Trong tiến trình"
 
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "Sẳn sàng"
-
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Uploaded"
@@ -12177,16 +12217,6 @@ msgstr "Nội dung"
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "Thiết lập"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Đang tải"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -13206,6 +13236,10 @@ msgstr "Trang trước"
 msgid "Next page"
 msgstr "Trang sau"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "Tracking Log"
@@ -13330,14 +13364,28 @@ msgid "Downloads and transcripts"
 msgstr "Tải xuống và bản dịch"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Tải xuống tệp video"
+msgid "Share on:"
+msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
 msgid "Share on Twitter"
 msgstr "Chia sẻ lên Twitter"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/video.html
+msgid "Share on Facebook"
+msgstr "Chia sẻ trên Facebook"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+#: lms/templates/video.html
+msgid "Share on LinkedIn"
+msgstr "Chia sẻ trên LinkedIn"
+
+#: lms/templates/video.html
+msgid "Download video file"
+msgstr "Tải xuống tệp video"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -15527,10 +15575,6 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "Thêm chứng chỉ vào hồ sơ LinkedIn"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Share on LinkedIn"
-msgstr "Chia sẻ trên LinkedIn"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr ""
 
@@ -15605,10 +15649,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "Chia sẻ {course_name} trên Facebook"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Share on Facebook"
-msgstr "Chia sẻ trên Facebook"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
@@ -19382,10 +19422,8 @@ msgstr "Vị trí ID"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
-"Để tạo liên kết đến đơn vị này từ một thành phần HTML trong khóa học này, "
-"hãy nhập \"/jump_to_id/<location ID>\" làm giá trị URL."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -19575,8 +19613,9 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
 
 #: cms/templates/course_outline.html

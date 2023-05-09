@@ -12,6 +12,7 @@ define([
 ],
 function($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDialog, HtmlUtils) {
     'use strict';
+
     var InstructorInfoView = Backbone.View.extend({
 
         events: {

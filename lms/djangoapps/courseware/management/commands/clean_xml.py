@@ -17,7 +17,7 @@ from xmodule.modulestore.xml import XMLModuleStore
 
 def traverse_tree(course):
     """
-    Load every descriptor in course.  Return bool success value.
+    Load every block in course.  Return bool success value.
     """
     queue = [course]
     while len(queue) > 0:

@@ -9,6 +9,7 @@ define([
 function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationView,
     CertificateInvalidationCollection) {
     'use strict';
+
     describe('Field validation of invalidation model.', function() {
         var certificate_invalidation = null;
         var assertValid = function(fields, isValid, expectedErrors) {
@@ -23,8 +24,8 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
         };
 
         var EXPECTED_ERRORS = {
-            user_name_or_email_required: 'Student username/email field is required and can not be empty. ' +
-                'Kindly fill in username/email and then press "Invalidate Certificate" button.'
+            user_name_or_email_required: 'Student username/email field is required and can not be empty. '
+                + 'Kindly fill in username/email and then press "Invalidate Certificate" button.'
         };
 
         beforeEach(function() {
@@ -102,17 +103,17 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
 
         var messages = {
             error: {
-                empty_user_name_email: 'Student username/email field is required and can not be empty. ' +
-                        'Kindly fill in username/email and then press "Invalidate Certificate" button.',
-                duplicate_user: 'Certificate of ' + (duplicate_user) + ' has already been invalidated. ' +
-                        'Please check your spelling and retry.',
+                empty_user_name_email: 'Student username/email field is required and can not be empty. '
+                        + 'Kindly fill in username/email and then press "Invalidate Certificate" button.',
+                duplicate_user: 'Certificate of ' + (duplicate_user) + ' has already been invalidated. '
+                        + 'Please check your spelling and retry.',
                 server_error: 'Server Error, Please refresh the page and try again.',
                 from_server: 'Test Message from server'
             },
             success: {
                 saved: 'Certificate has been successfully invalidated for ' + new_user + '.',
-                re_validated: 'The certificate for this learner has been re-validated and ' +
-                        'the system is re-running the grade for this learner.'
+                re_validated: 'The certificate for this learner has been re-validated and '
+                        + 'the system is re-running the grade for this learner.'
             }
         };
 
@@ -140,11 +141,11 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
             );
 
             setFixtures(
-                "<div class='certificate-invalidation-container'>" +
-                    '   <h2>Invalidate Certificates</h2> ' +
-                    "   <div id='certificate-invalidation'></div>" +
-                    '</div>' +
-                    "<script type='text/template' id='certificate-invalidation-tpl'>" + fixture + '</script>'
+                "<div class='certificate-invalidation-container'>"
+                    + '   <h2>Invalidate Certificates</h2> '
+                    + "   <div id='certificate-invalidation'></div>"
+                    + '</div>'
+                    + "<script type='text/template' id='certificate-invalidation-tpl'>" + fixture + '</script>'
             );
 
             var certificate_invalidations = new CertificateInvalidationCollection(certificate_invalidations_json, {
@@ -239,8 +240,8 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
 
         it('verifies certificate re-validation request and success message.', function() {
             var user = 'test1',
-                re_validate_certificate = "div.certificate-invalidation-container table tr:contains('" +
-                        user + "') td .re-validate-certificate";
+                re_validate_certificate = "div.certificate-invalidation-container table tr:contains('"
+                        + user + "') td .re-validate-certificate";
 
             $(re_validate_certificate).click();
             AjaxHelpers.respondWithJson(requests, {});
@@ -250,8 +251,8 @@ function($, AjaxHelpers, CertificateInvalidationModel, CertificateInvalidationVi
 
         it('verifies error message from server is displayed.', function() {
             var user = 'test1',
-                re_validate_certificate = "div.certificate-invalidation-container table tr:contains('" +
-                        user + "') td .re-validate-certificate";
+                re_validate_certificate = "div.certificate-invalidation-container table tr:contains('"
+                        + user + "') td .re-validate-certificate";
 
             $(re_validate_certificate).click();
             AjaxHelpers.respondWithError(requests, 400, {

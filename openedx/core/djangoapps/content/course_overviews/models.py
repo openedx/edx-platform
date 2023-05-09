@@ -159,7 +159,7 @@ class CourseOverview(TimeStampedModel):
         from the given course.
 
         Arguments:
-            course (CourseBlock): any course descriptor object
+            course (CourseBlock): any course block object
 
         Returns:
             CourseOverview: created or updated overview extracted from the given course

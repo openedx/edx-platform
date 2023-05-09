@@ -42,7 +42,7 @@
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2023
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from German (Germany) (http://www.transifex.com/open-edx/edx-platform/language/de_DE/).
+# edX community translations have been downloaded from German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -70,7 +70,7 @@
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2018-2021,2023
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from German (Germany) (https://www.transifex.com/open-edx/teams/6205/de_DE/).
+# edX community translations have been downloaded from German (Germany) (https://app.transifex.com/open-edx/teams/6205/de_DE/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -134,7 +134,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-02 20:42+0000\n"
+"POT-Creation-Date: 2023-04-30 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Alfredo Guillem, 2022\n"
 "Language-Team: German (Germany) (http://app.transifex.com/open-edx/edx-platform/language/de_DE/)\n"
@@ -6903,11 +6903,19 @@ msgstr "Kursübersicht"
 msgid "Date added"
 msgstr "Datum hinzugefügt"
 
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr ""
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
 msgstr "Zugangseinstellungen bearbeiten für: {title}"
+
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -10722,6 +10730,30 @@ msgid ""
 msgstr ""
 "Anzahl der Aufgaben dieses typs, welche wegfallen. Die mit der niedrigsten "
 "Punktezahl werden zuerst gelöscht."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"

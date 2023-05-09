@@ -1,15 +1,15 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import testAnnouncements from "./test-announcements.json"
+import testAnnouncements from './test-announcements.json'
 
-import { AnnouncementSkipLink, AnnouncementList } from "./Announcements"
+import {AnnouncementSkipLink, AnnouncementList} from './Announcements'
 
 describe('Announcements component', () => {
     test('render skip link', () => {
         const component = renderer.create(
             <AnnouncementSkipLink />,
         );
-        component.root.instance.setState({"count": 10})
+        component.root.instance.setState({'count': 10})
         const tree = component.toJSON();
         expect(tree).toMatchSnapshot();
     });

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-09 20:35+0000\n"
-"PO-Revision-Date: 2023-04-09 20:35:51.632939\n"
+"POT-Creation-Date: 2023-05-07 20:35+0000\n"
+"PO-Revision-Date: 2023-05-07 20:35:59.240148\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -6199,10 +6199,18 @@ msgstr ""
 msgid "Date added"
 msgstr ""
 
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr ""
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -9579,6 +9587,14 @@ msgstr ""
 msgid "Course Video Settings"
 msgstr ""
 
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Video Sharing"
+msgstr ""
+
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Learn more"
+msgstr ""
+
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
 msgstr ""
@@ -9670,6 +9686,30 @@ msgstr ""
 msgid ""
 "The number of assignments of this type that will be dropped. The lowest "
 "scoring assignments are dropped first."
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
 msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
@@ -10122,12 +10162,6 @@ msgstr ""
 msgid ""
 "If a learner starts on {startDate}, this subsection will be due on "
 "{projectedDueIn}."
-msgstr ""
-
-#: cms/templates/js/self-paced-due-date-editor.underscore
-msgid ""
-"The maximum number of weeks this subsection can be due in is 18 weeks from "
-"the learner enrollment date."
 msgstr ""
 
 #: cms/templates/js/self-paced-due-date-editor.underscore

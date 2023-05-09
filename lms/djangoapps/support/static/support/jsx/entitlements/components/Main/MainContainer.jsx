@@ -5,7 +5,6 @@ import { openCreationForm } from '../../data/actions/form';
 
 import Main from './Main.jsx';
 
-
 const mapStateToProps = state => ({
     errorMessage: state.error,
     isFormOpen: state.form.isOpen,

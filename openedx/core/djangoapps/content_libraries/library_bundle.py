@@ -10,11 +10,11 @@ from xblock.core import XBlock
 from xblock.plugin import PluginMissingError
 
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
-from openedx.core.djangoapps.xblock.runtime.blockstore_runtime import xml_for_definition
-from openedx.core.djangoapps.xblock.runtime.olx_parsing import (
+from openedx.core.djangoapps.xblock.api import (
     BundleFormatException,
     definition_for_include,
     parse_xblock_include,
+    xml_for_definition,
 )
 from openedx.core.djangolib.blockstore_cache import (
     BundleCache,

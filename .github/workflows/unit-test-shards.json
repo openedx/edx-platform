@@ -126,6 +126,7 @@
       "openedx/core/djangoapps/lang_pref/",
       "openedx/core/djangoapps/models/",
       "openedx/core/djangoapps/monkey_patch/",
+      "openedx/core/djangoapps/notifications/",
       "openedx/core/djangoapps/oauth_dispatch/",
       "openedx/core/djangoapps/olx_rest_api/",
       "openedx/core/djangoapps/password_policy/",

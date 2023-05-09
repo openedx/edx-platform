@@ -45,8 +45,8 @@ describe('Program Progress View', () => {
 
     const testText = (progress) => {
         const $numbers = view.$('.numbers');
-        const total = progress.completed.length + progress.in_progress.length +
-            progress.not_started.length;
+        const total = progress.completed.length + progress.in_progress.length
+            + progress.not_started.length;
 
         expect(view.$('.progress-heading').html()).toEqual('XSeries Progress');
         expect(parseInt($numbers.find('.complete').html(), 10)).toEqual(progress.completed.length);
@@ -69,7 +69,7 @@ describe('Program Progress View', () => {
         expect(
             view.$('.js-subscription-info .subscription-section p:nth-child(2)')
         ).toContainText(
-            /Need help\? Check out the.*Learner help centre.*to troubleshoot issues or contact support/
+            /Need help\? Check out the.*Learner Help Center.*to troubleshoot issues or contact support/
         );
         expect(
             view.$('.js-subscription-info .subscription-section p:nth-child(2) .subscription-link').attr('href')

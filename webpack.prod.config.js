@@ -20,7 +20,7 @@ var optimizedConfig = Merge.smart(commonConfig, {
                 'process.env.NODE_ENV': JSON.stringify('production'),
                 'process.env.JS_ENV_EXTRA_CONFIG': process.env.JS_ENV_EXTRA_CONFIG
             }),
-            new webpack.LoaderOptionsPlugin({  // This may not be needed; legacy option for loaders written for webpack 1
+            new webpack.LoaderOptionsPlugin({ // This may not be needed; legacy option for loaders written for webpack 1
                 minimize: true
             }),
             new webpack.optimize.UglifyJsPlugin(),
@@ -32,7 +32,8 @@ var optimizedConfig = Merge.smart(commonConfig, {
                 minChunks: 3
             })
         ]
-    }});
+    }
+});
 
 // requireCompatConfig only exists so that you can use RequireJS to require a
 // Webpack bundle (but try not to do that if you can help it). RequireJS knows
@@ -61,7 +62,8 @@ var requireCompatConfig = Merge.smart(optimizedConfig, {
                 minChunks: 3
             })
         ]
-    }});
+    }
+});
 
 // Step 2: Remove the plugin entries that generate the webpack-stats.json files
 // that Django needs to look up resources. We never want to accidentally

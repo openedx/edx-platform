@@ -75,7 +75,7 @@ module.exports = Merge.smart({
             // Studio
             Import: './cms/static/js/features/import/factories/import.js',
             CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
-            LibrarySourcedBlockPicker: './xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx',  // eslint-disable-line max-len
+            LibrarySourcedBlockPicker: './xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx', // eslint-disable-line max-len
             'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
             'js/factories/container': './cms/static/js/factories/container.js',
             'js/factories/context_course': './cms/static/js/factories/context_course.js',
@@ -88,10 +88,10 @@ module.exports = Merge.smart({
             SingleSupportForm: './lms/static/support/jsx/single_support_form.jsx',
             AlertStatusBar: './lms/static/js/accessible_components/StatusBarAlert.jsx',
             EntitlementSupportPage: './lms/djangoapps/support/static/support/jsx/entitlements/index.jsx',
-            LinkProgramEnrollmentsSupportPage: './lms/djangoapps/support/static/support/jsx/' +
-                                               'program_enrollments/index.jsx',
-            ProgramEnrollmentsInspectorPage: './lms/djangoapps/support/static/support/jsx/' +
-                                               'program_enrollments/inspector.jsx',
+            LinkProgramEnrollmentsSupportPage: './lms/djangoapps/support/static/support/jsx/'
+                                               + 'program_enrollments/index.jsx',
+            ProgramEnrollmentsInspectorPage: './lms/djangoapps/support/static/support/jsx/'
+                                               + 'program_enrollments/inspector.jsx',
             PasswordResetConfirmation: './lms/static/js/student_account/components/PasswordResetConfirmation.jsx',
             StudentAccountDeletion: './lms/static/js/student_account/components/StudentAccountDeletion.jsx',
             StudentAccountDeletionInitializer: './lms/static/js/student_account/StudentAccountDeletionInitializer.js',
@@ -271,8 +271,8 @@ module.exports = Merge.smart({
                                 {
                                     pattern: /'..\/..\/common\/js\/components\/views\/feedback_notification',/,
                                     replacement: function() {
-                                        return "'../../common/js/components/views/feedback_notification'," +
-                                               "'AjaxPrefix',";
+                                        return "'../../common/js/components/views/feedback_notification',"
+                                               + "'AjaxPrefix',";
                                     }
                                 },
                                 {
@@ -282,8 +282,8 @@ module.exports = Merge.smart({
                                 {
                                     pattern: /'..\/..\/common\/js\/components\/views\/feedback_notification',/,
                                     replacement: function() {
-                                        return "'../../common/js/components/views/feedback_notification'," +
-                                               "'AjaxPrefix',";
+                                        return "'../../common/js/components/views/feedback_notification',"
+                                               + "'AjaxPrefix',";
                                     }
                                 }
                             ]
@@ -300,8 +300,8 @@ module.exports = Merge.smart({
                 },
                 {
                     test: /xblock\/core/,
-                    loader: 'exports-loader?window.XBlock!' +
-                            'imports-loader?jquery,jquery.immediateDescendents,this=>window'
+                    loader: 'exports-loader?window.XBlock!'
+                            + 'imports-loader?jquery,jquery.immediateDescendents,this=>window'
                 },
                 {
                     test: /xblock\/runtime.v1/,
@@ -369,9 +369,9 @@ module.exports = Merge.smart({
                 accessibility: 'accessibility_tools',
                 codemirror: 'codemirror-compressed',
                 datepair: 'timepicker/datepair',
-                'edx-ui-toolkit': 'edx-ui-toolkit/src/',  // @TODO: some paths in toolkit are not valid relative paths
+                'edx-ui-toolkit': 'edx-ui-toolkit/src/', // @TODO: some paths in toolkit are not valid relative paths
                 ieshim: 'ie_shim',
-                jquery: 'jquery/src/jquery',  // Use the non-diqst form of jQuery for better debugging + optimization
+                jquery: 'jquery/src/jquery', // Use the non-diqst form of jQuery for better debugging + optimization
                 'jquery.flot': 'flot/jquery.flot.min',
                 'jquery.ui': 'jquery-ui.min',
                 'jquery.tinymce': 'jquery.tinymce.min',
@@ -415,7 +415,7 @@ module.exports = Merge.smart({
 
         resolveLoader: {
             alias: {
-                text: 'raw-loader'  // Compatibility with RequireJSText's text! loader, uses raw-loader under the hood
+                text: 'raw-loader' // Compatibility with RequireJSText's text! loader, uses raw-loader under the hood
             }
         },
 

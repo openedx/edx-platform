@@ -1,6 +1,6 @@
 <div class="message certificate-status col-12 md-col-8">
-    <span class="card-msg"><%- gettext('Certificate Status') %></span>
-    <div><%- gettext('Needs verified certificate ') %></div>
+    <span class="card-msg"><%- gettext('Certificate Status:') %></span>
+    <span><%- gettext('Needs verified certificate ') %></span>
 </div>
 <% if ( subscriptionState !== 'active' ) { %>
     <div class="action d-flex flex-column align-items-start align-items-md-end">
@@ -12,7 +12,7 @@
                 gettext(
                     subscriptionState === 'inactive'
                     ? 'Pay {subscriptionPrice}/month for all courses in this program'
-                    : 'Pay {subscriptionPrice}/mos after {trialLength}-day free trial'
+                    : 'Pay {subscriptionPrice}/month after {trialLength}-day free trial'
                 ),
                 { subscriptionPrice, trialLength },
             ) %>

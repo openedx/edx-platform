@@ -55,7 +55,7 @@ describe('Course Entitlement View', () => {
     };
 
     afterEach(() => {
-        if (view) view.remove();
+        if (view) { view.remove(); }
     });
 
     describe('Initialization of view', () => {
@@ -83,7 +83,8 @@ describe('Course Entitlement View', () => {
 
         it('Courses with an an enroll by date should indicate so on the selection option.', () => {
             const enrollEndSetOptionIndex = entitlementAvailableSessions.findIndex(
-                session => session.enrollment_end !== null);
+                session => session.enrollment_end !== null
+            );
             const enrollEndSetOption = selectOptions[enrollEndSetOptionIndex];
             expect(enrollEndSetOption && enrollEndSetOption.text.includes('Open until')).toBe(true);
         });
@@ -122,7 +123,8 @@ describe('Course Entitlement View', () => {
 
         it('Currently selected session should be specified in the dropdown options.', () => {
             const selectedSessionIndex = entitlementAvailableSessions.findIndex(
-                session => initialSessionId === session.session_id);
+                session => initialSessionId === session.session_id
+            );
             expect(selectOptions[selectedSessionIndex].text.includes('Currently Selected')).toBe(true);
         });
 

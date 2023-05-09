@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     this.JavascriptLoader = (function() {
         function JavascriptLoader() {
         }

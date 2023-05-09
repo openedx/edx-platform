@@ -4,6 +4,7 @@ Constants used by DjangoXBlockUserService
 
 # Optional attributes stored on the XBlockUser
 ATTR_KEY_ANONYMOUS_USER_ID = 'edx-platform.anonymous_user_id'
+ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID = 'edx-platform.deprecated_anonymous_user_id'
 ATTR_KEY_REQUEST_COUNTRY_CODE = 'edx-platform.request_country_code'
 ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
 ATTR_KEY_USER_ID = 'edx-platform.user_id'

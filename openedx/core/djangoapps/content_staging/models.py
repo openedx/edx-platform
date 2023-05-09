@@ -12,6 +12,8 @@ from opaque_keys.edx.keys import LearningContextKey
 
 from openedx.core.djangoapps.content.course_overviews.api import get_course_overview_or_none
 
+from .data import CLIPBOARD_PURPOSE, StagedContentStatus
+
 log = logging.getLogger(__name__)
 
 User = get_user_model()
@@ -32,25 +34,13 @@ class StagedContent(models.Model):
     class Meta:
         verbose_name_plural = _("Staged Content")
 
-    class Status(models.TextChoices):
-        """ The status of this staged content. """
-        # LOADING: We are actively (asynchronously) writing the OLX and related data into the staging area.
-        # It is not ready to be read.
-        LOADING = "loading", _("Loading")
-        # READY: The content is staged and ready to be read.
-        READY = "ready", _("Ready")
-        # The content has expired and this row can be deleted, along with any associated data.
-        EXPIRED = "expired", _("Expired")
-        # ERROR: The content could not be staged.
-        ERROR = "error", _("Error")
-
     id = models.AutoField(primary_key=True)
     # The user that created and owns this staged content. Only this user can read it.
     user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
     created = models.DateTimeField(null=False, auto_now_add=True)
     # What this StagedContent is for (e.g. "clipboard" for clipboard)
     purpose = models.CharField(max_length=64)
-    status = models.CharField(max_length=20, choices=Status.choices)
+    status = models.CharField(max_length=20, choices=StagedContentStatus.choices)
 
     block_type = models.CharField(
         max_length=100,
@@ -83,9 +73,6 @@ class UserClipboard(models.Model):
     is some OLX content that can be used in a course, such as an XBlock, a Unit,
     or a Subsection.
     """
-    # value of the "purpose" field on underlying StagedContent objects
-    PURPOSE = "clipboard"
-
     # The user that copied something. Clipboards are user-specific and
     # previously copied items are not kept.
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -114,9 +101,9 @@ class UserClipboard(models.Model):
         # These could probably be replaced with constraints in Django 4.1+
         if self.user.id != self.content.user.id:
             raise ValidationError("User ID mismatch.")
-        if self.content.purpose != UserClipboard.PURPOSE:
+        if self.content.purpose != CLIPBOARD_PURPOSE:
             raise ValidationError(
-                f"StagedContent.purpose must be '{UserClipboard.PURPOSE}' to use it as clipboard content."
+                f"StagedContent.purpose must be '{CLIPBOARD_PURPOSE}' to use it as clipboard content."
             )
 
     def save(self, *args, **kwargs):

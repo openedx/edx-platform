@@ -15,21 +15,20 @@ class ProgramSubscriptionModel extends Backbone.Model {
             userPreferences = {},
         } = context;
 
-        const subscriptionState = data.subscription_state?.toLowerCase() ?? '';
-        const subscriptionPrice = '$' + parseFloat(
-            subscription_prices?.find(({ currency }) => currency === 'USD')?.price
-        );
-        const subscriptionUrl =
-            subscriptionState === 'active'
-                ? urls.manage_subscription_url
-                : urls.buy_subscription_url;
-
+        const priceInUSD = subscription_prices?.find(({ currency }) => currency === 'USD')?.price;
         const trialMoment = moment(
             DateUtils.localizeTime(
                 DateUtils.stringToMoment(data.trial_end),
                 'UTC'
             )
         );
+
+        const subscriptionState = data.subscription_state?.toLowerCase() ?? '';
+        const subscriptionPrice = '$' + parseFloat(priceInUSD);
+        const subscriptionUrl =
+            subscriptionState === 'active'
+                ? urls.manage_subscription_url
+                : urls.buy_subscription_url;
 
         const hasActiveTrial =
             subscriptionState === 'active' && data.trial_end
@@ -83,7 +82,7 @@ class ProgramSubscriptionModel extends Backbone.Model {
         const localTime = DateUtils.localizeTime(
             DateUtils.stringToMoment(date),
             userTimezone
-        ).format('h:mm a');
+        ).format('HH:mm');
 
         return [localDate, localTime];
     }

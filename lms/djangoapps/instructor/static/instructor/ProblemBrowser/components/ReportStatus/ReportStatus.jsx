@@ -4,7 +4,9 @@ import classNames from 'classnames';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 
-const ReportStatus = ({ error, succeeded, inProgress, reportPath }) => {
+const ReportStatus = ({
+    error, succeeded, inProgress, reportPath
+}) => {
     const progressMessage = (
         <div className="msg progress">
             {gettext('Your report is being generated...')}
@@ -15,11 +17,13 @@ const ReportStatus = ({ error, succeeded, inProgress, reportPath }) => {
     const successMessage = (
         <div className="msg success">
             {gettext('Your report has been successfully generated.')}
-            {reportPath &&
-      <a href={reportPath}>
-          <Icon hidden className={['fa', 'fa-link']} />
-          {gettext('View Report')}
-      </a>}
+            {reportPath
+      && (
+          <a href={reportPath}>
+              <Icon hidden className={['fa', 'fa-link']} />
+              {gettext('View Report')}
+          </a>
+      )}
         </div>
     );
 

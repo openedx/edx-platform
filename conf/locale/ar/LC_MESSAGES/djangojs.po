@@ -62,7 +62,7 @@
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
 # Zakaria <zakaria.braksa@gmail.com>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
+# edX community translations have been downloaded from Arabic (http://app.transifex.com/open-edx/edx-platform/language/ar/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -81,6 +81,7 @@
 # AR R1 <e2far1@hotmail.com>, 2016
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016-2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
+# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2023
 # Hassan Husseini <hassan@constructeducation.com>, 2020
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
@@ -102,7 +103,7 @@
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2014-2015
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (https://www.transifex.com/open-edx/teams/6205/ar/).
+# edX community translations have been downloaded from Arabic (https://app.transifex.com/open-edx/teams/6205/ar/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -193,7 +194,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-02 20:42+0000\n"
+"POT-Creation-Date: 2023-04-30 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Abderraouf Mehdi Bouhali <armbouhali@gmail.com>, 2022\n"
 "Language-Team: Arabic (http://app.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -6788,7 +6789,7 @@ msgstr "وضوح الرؤية"
 #. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: {title}"
-msgstr ""
+msgstr "تعديل: {title}"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Plugins"
@@ -6866,10 +6867,18 @@ msgstr "مخطّط المساق"
 msgid "Date added"
 msgstr "تاريخ الإضافة "
 
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr ""
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
+msgstr "تعديل الدخول لـ: {title}"
+
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -10570,6 +10579,30 @@ msgid ""
 msgstr ""
 "سيجري تخفيض عدد المهام من هذا النوع. سيتم إلغاء المهام ذات أقل مجموع درجات "
 "أولًا."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"

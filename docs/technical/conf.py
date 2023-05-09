@@ -2,15 +2,15 @@
 Configuration file for the generation of technical documentation.
 """
 import os
+from datetime import datetime
 
-import edx_theme
 import git
 
 # -- Project information -----------------------------------------------------
 
 project = "edx-platform Technical Reference"
-copyright = edx_theme.COPYRIGHT  # pylint: disable=redefined-builtin
-author = edx_theme.AUTHOR
+copyright = f'{datetime.now().year}, Axim Collaborative, Inc'  # pylint: disable=redefined-builtin
+author = 'Axim Collaborative, Inc'
 release = ""
 
 # -- General configuration ---------------------------------------------------
@@ -38,6 +38,39 @@ settings_repo_version = edx_platform_version
 
 # -- Options for HTML output -------------------------------------------------
 
-html_theme = "edx_theme"
-html_theme_path = [edx_theme.get_html_theme_path()]
+html_theme = 'sphinx_book_theme'
 html_static_path = ["_static"]
+html_favicon = "https://logos.openedx.org/open-edx-favicon.ico"
+html_logo = "https://logos.openedx.org/open-edx-logo-color.png"
+
+html_theme_options = {
+    "repository_url": "https://github.com/openedx/edx-platform",
+    "repository_branch": "master",
+    "path_to_docs": "docs/technical",
+    "home_page_in_toc": True,
+    "use_repository_button": True,
+    "use_issues_button": True,
+    "use_edit_page_button": True,
+    # Please don't change unless you know what you're doing.
+    "extra_footer": """
+        <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
+            <img
+                alt="Creative Commons License"
+                style="border-width:0"
+                src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"/>
+        </a>
+        <br>
+        These works by
+            <a
+                xmlns:cc="https://creativecommons.org/ns#"
+                href="https://openedx.org"
+                property="cc:attributionName"
+                rel="cc:attributionURL"
+            >Axim Collaborative, Inc</a>
+        are licensed under a
+            <a
+                rel="license"
+                href="https://creativecommons.org/licenses/by-sa/4.0/"
+            >Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    """
+}

@@ -1262,7 +1262,7 @@ def get_static_tab_fragment(request, course, tab):
         tab.type,
         tab.url_slug,
     )
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+    field_data_cache = FieldDataCache.cache_for_block_descendents(
         course.id, request.user, modulestore().get_item(loc), depth=0
     )
     tab_block = get_block(
@@ -1309,23 +1309,23 @@ def get_course_lti_endpoints(request, course_id):
 
     anonymous_user = AnonymousUser()
     anonymous_user.known = False  # make these "noauth" requests like block_render.handle_xblock_callback_noauth
-    lti_descriptors = modulestore().get_items(course.id, qualifiers={'category': 'lti'})
-    lti_descriptors.extend(modulestore().get_items(course.id, qualifiers={'category': 'lti_consumer'}))
+    lti_blocks = modulestore().get_items(course.id, qualifiers={'category': 'lti'})
+    lti_blocks.extend(modulestore().get_items(course.id, qualifiers={'category': 'lti_consumer'}))
 
     lti_noauth_blocks = [
         get_block_for_descriptor(
             anonymous_user,
             request,
-            descriptor,
-            FieldDataCache.cache_for_descriptor_descendents(
+            block,
+            FieldDataCache.cache_for_block_descendents(
                 course_key,
                 anonymous_user,
-                descriptor
+                block
             ),
             course_key,
             course=course
         )
-        for descriptor in lti_descriptors
+        for block in lti_blocks
     ]
 
     endpoints = [
@@ -1487,7 +1487,7 @@ def enclosing_sequence_for_gating_checks(block):
 
     if ancestor:
         # get_parent() returns a parent block instance cached on the block which does not
-        # have the ModuleSystem bound to it so we need to get it again with get_block() which will set up everything.
+        # have user data bound to it so we need to get it again with get_block() which will set up everything.
         return block.runtime.get_block(ancestor.location)
     return None
 
@@ -1772,7 +1772,7 @@ class BasePublicVideoXBlockView(View):
             )
 
             # Block must be marked as public to be viewed
-            if not video_block.public_access:
+            if not video_block.is_public_sharing_enabled():
                 raise Http404("Video not found.")
 
         return course, video_block

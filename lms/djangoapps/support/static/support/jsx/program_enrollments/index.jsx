@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Cookies from 'js-cookie';
-import { Button, InputText, TextArea, StatusAlert } from '@edx/paragon';
+import {
+    Button, InputText, TextArea, StatusAlert
+} from '@edx/paragon';
 
 export const LinkProgramEnrollmentsSupportPage = props => (
     <form method="post">

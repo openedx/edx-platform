@@ -9,7 +9,11 @@ $btn-color-primary: $primary-dark;
 .program-details {
   .content-wrapper {
     max-width: 100%;
-    padding-top: 0;
+    padding: 0px 20px 10px 20px;
+
+    @include media-breakpoint-up(lg){
+      padding: 0px 20px 10px 40px;
+    }
   }
 }
 
@@ -124,20 +128,16 @@ $btn-color-primary: $primary-dark;
     font-family: 'Open Sans';
     font-weight: normal;
     flex-wrap: wrap;
-    padding: 40px 10px 35px;
+    flex-direction: column;
+    padding: 40px 10px 35px 0px;
 
     @include media-breakpoint-up(md) {
-      padding: {
-        left: 30px;
-        right: 30px;
-      }
+      flex-direction: row;
+      padding-right: 30px;
     }
 
     @media (min-width: map-get($container-max-widths, xl)) {
-      padding: {
-        left: calc(((100% - 1180px) / 2) + 30px);
-        right: calc(((100% - 1180px) / 2) + 30px);
-      }
+      padding-right: calc(((100% - 1180px) / 2) + 30px);
     }
 
     .hd-1 {
@@ -213,10 +213,12 @@ $btn-color-primary: $primary-dark;
 
     .authoring-organizations {
       text-align: center;
-      display: flex;
+      display: block;
+      padding-left: 24px;
+      width: fit-content;
 
       @include media-breakpoint-up(md) {
-        display: block;
+        padding-left: 0px;
       }
 
       .heading {
@@ -232,15 +234,16 @@ $btn-color-primary: $primary-dark;
         }
       }
 
+      .orgs .org-logo {
+        height: 40px;
+      }
+
       @include media-breakpoint-up(md) {
         margin: initial;
         width: 30%;
 
         .orgs .org-logo {
           @include margin-left(2.5%);
-
-          width: 46.5%;
-          height: auto;
         }
       }
 
@@ -252,16 +255,10 @@ $btn-color-primary: $primary-dark;
 
   .program-details-content {
     margin-bottom: 30px;
-    padding: {
-        left: 40px;
-        right: 40px;
-    };
+    padding-right: 40px;
   }
   .tab-content{
       .tab-pane {
-          .program-details-content {
-              padding-left: 40px;
-          }
           .js-program-pathways {
               padding-left: 40px;
           }
@@ -292,14 +289,8 @@ $btn-color-primary: $primary-dark;
 
   .course-list-headings {
     .motivating-section {
-      @include margin-left(15px);
-
       font-size: 0.9375em;
-      width: 310px;
-
-      @include media-breakpoint-up(sm) {
-        width: auto;
-      }
+      width: auto;
 
       .motivating-heading {
         margin-bottom: 0;
@@ -490,7 +481,7 @@ $btn-color-primary: $primary-dark;
 
   .program-course-card {
     width: 100%;
-    padding: 15px;
+    padding: 15px 15px 15px 0px;
 
     @include media-breakpoint-up(md) {
       height: auto;
@@ -682,7 +673,7 @@ $btn-color-primary: $primary-dark;
 
 // CSS for the program sidebar
 .program-sidebar {
-  padding: $baseline*1.5 $baseline*0.5;
+  padding: 40px 40px 40px 0px;
 
   .program-record,.subscription-info {
     text-align: left;
@@ -703,14 +694,8 @@ $btn-color-primary: $primary-dark;
   }
 
   .sidebar-section {
-    @include margin-left($baseline*0.75);
-
     font-size: 0.9375em;
-    width: $baseline*15.5;
-
-    @include media-breakpoint-up(sm) {
-      width: auto;
-    }
+    width: auto;
 
     .motivating-message {
       color: #414141;
@@ -742,15 +727,10 @@ $btn-color-primary: $primary-dark;
     padding-bottom: 2em;
   }
 
-  .pathway-wrapper {
-    @include margin-left($baseline*0.75);
-
-    width: $baseline*15.5;
+  .pathway-wrapper {   
+    width: auto;
     border-bottom: 1px solid $gray-light3;
 
-    @include media-breakpoint-up(sm) {
-      width: auto;
-    }
 
     .pathway-info {
       margin: 15px 0;
@@ -772,7 +752,7 @@ $btn-color-primary: $primary-dark;
     @include float(right);
 
     width: $baseline*15;
-    padding-right: $baseline*1.5;
+    padding: $baseline*1.5 $baseline*1.5 $baseline*1.5 $baseline*0.5;
     position: relative;
   }
 

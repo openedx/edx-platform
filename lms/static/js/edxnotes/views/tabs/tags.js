@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'gettext', 'jquery', 'underscore', 'js/edxnotes/views/note_group', 'js/edxnotes/views/tab_panel',
         'js/edxnotes/views/tab_view', 'edx-ui-toolkit/js/utils/html-utils'
@@ -35,7 +36,7 @@
                 title: view,
                 // Translators: this is a title shown before all Notes that have no associated tags. It is put within
                 // brackets to differentiate it from user-defined tags, but it should still be translated.
-                noTags: gettext('[no tags]'),  // User-defined tags cannot have spaces, so no risk of a collision.
+                noTags: gettext('[no tags]'), // User-defined tags cannot have spaces, so no risk of a collision.
 
                 renderContent: function() {
                     var notesByTag = {},

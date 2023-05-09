@@ -2,6 +2,7 @@
 
 (function() {
     'use strict';
+
     var PendingInstructorTasks, createTaskListTable, findAndAssert, statusAjaxError;
 
     statusAjaxError = function() {
@@ -83,11 +84,11 @@
                         gettext('Please enter a student email address or username.')
                     );
                 }
-                errorMessage = gettext("Error getting enrollment status for '<%- student_id %>'. Make sure that the student identifier is spelled correctly.");  // eslint-disable-line max-len
+                errorMessage = gettext("Error getting enrollment status for '<%- student_id %>'. Make sure that the student identifier is spelled correctly."); // eslint-disable-line max-len
                 fullErrorMessage = _.template(errorMessage)({
                     student_id: uniqStudentIdentifier
                 });
-                studentadmin.$enrollment_status.text(gettext("Retrieving enrollment status..."));
+                studentadmin.$enrollment_status.text(gettext('Retrieving enrollment status...'));
                 return $.ajax({
                     type: 'POST',
                     dataType: 'json',
@@ -114,7 +115,7 @@
                         gettext('Please enter a student email address or username.')
                     );
                 }
-                errorMessage = gettext("Error getting student progress url for '<%- student_id %>'. Make sure that the student identifier is spelled correctly.");  // eslint-disable-line max-len
+                errorMessage = gettext("Error getting student progress url for '<%- student_id %>'. Make sure that the student identifier is spelled correctly."); // eslint-disable-line max-len
                 fullErrorMessage = _.template(errorMessage)({
                     student_id: uniqStudentIdentifier
                 });
@@ -152,8 +153,8 @@
                     problem_to_reset: problemToReset,
                     delete_module: false
                 };
-                successMessage = gettext("Success! Problem attempts reset for problem '<%- problem_id %>' and student '<%- student_id %>'.");  // eslint-disable-line max-len
-                errorMessage = gettext("Error resetting problem attempts for problem '<%- problem_id %>' and student '<%- student_id %>'. Make sure that the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
+                successMessage = gettext("Success! Problem attempts reset for problem '<%- problem_id %>' and student '<%- student_id %>'."); // eslint-disable-line max-len
+                errorMessage = gettext("Error resetting problem attempts for problem '<%- problem_id %>' and student '<%- student_id %>'. Make sure that the problem and student identifiers are complete and correct."); // eslint-disable-line max-len
                 fullSuccessMessage = _.template(successMessage)({
                     problem_id: problemToReset,
                     student_id: uniqStudentIdentifier
@@ -168,7 +169,7 @@
                     url: studentadmin.$btn_reset_attempts_single.data('endpoint'),
                     data: sendData,
                     success: studentadmin.clear_errors_then(function() {
-                        return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                        return alert(fullSuccessMessage); // eslint-disable-line no-alert
                     }),
                     error: statusAjaxError(function() {
                         return studentadmin.$request_err_grade.text(fullErrorMessage);
@@ -195,13 +196,13 @@
                     student_id: uniqStudentIdentifier,
                     problem_id: problemToReset
                 });
-                if (window.confirm(fullConfirmMessage)) {  // eslint-disable-line no-alert
+                if (window.confirm(fullConfirmMessage)) { // eslint-disable-line no-alert
                     sendData = {
                         unique_student_identifier: uniqStudentIdentifier,
                         problem_to_reset: problemToReset,
                         delete_module: true
                     };
-                    errorMessage = gettext("Error deleting student '<%- student_id %>'s state on problem '<%- problem_id %>'. Make sure that the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
+                    errorMessage = gettext("Error deleting student '<%- student_id %>'s state on problem '<%- problem_id %>'. Make sure that the problem and student identifiers are complete and correct."); // eslint-disable-line max-len
                     fullErrorMessage = _.template(errorMessage)({
                         student_id: uniqStudentIdentifier,
                         problem_id: problemToReset
@@ -212,7 +213,7 @@
                         url: studentadmin.$btn_delete_state_single.data('endpoint'),
                         data: sendData,
                         success: studentadmin.clear_errors_then(function() {
-                            return alert(gettext('Module state successfully deleted.'));  // eslint-disable-line no-alert, max-len
+                            return alert(gettext('Module state successfully deleted.')); // eslint-disable-line no-alert, max-len
                         }),
                         error: statusAjaxError(function() {
                             return studentadmin.$request_err_grade.text(fullErrorMessage);
@@ -246,7 +247,7 @@
                     unique_student_identifier: uniqStudentIdentifier,
                     problem_location_str: problemToReset
                 };
-                errorMessage = gettext("Error getting task history for problem '<%- problem_id %>' and student '<%- student_id %>'. Make sure that the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
+                errorMessage = gettext("Error getting task history for problem '<%- problem_id %>' and student '<%- student_id %>'. Make sure that the problem and student identifiers are complete and correct."); // eslint-disable-line max-len
                 fullErrorMessage = _.template(errorMessage)({
                     student_id: uniqStudentIdentifier,
                     problem_id: problemToReset
@@ -287,11 +288,11 @@
                         fullSuccessMessage = interpolate_text(successMessage, {
                             student_id: uniqStudentIdentifier
                         });
-                        return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                        return alert(fullSuccessMessage); // eslint-disable-line no-alert
                     }),
                     error: statusAjaxError(function() {
                         var errorMessage, fullErrorMessage;
-                        errorMessage = gettext("Error resetting entrance exam attempts for student '{student_id}'. Make sure student identifier is correct.");  // eslint-disable-line max-len
+                        errorMessage = gettext("Error resetting entrance exam attempts for student '{student_id}'. Make sure student identifier is correct."); // eslint-disable-line max-len
                         fullErrorMessage = interpolate_text(errorMessage, {
                             student_id: uniqStudentIdentifier
                         });
@@ -311,11 +312,11 @@
                 if (!uniqStudentIdentifier) {
                     return studentadmin.$request_err_ee.text(gettext("Enter a student's username or email address."));
                 }
-                confirmMessage = gettext("Do you want to allow this student ('{student_id}') to skip the entrance exam?");  // eslint-disable-line max-len
+                confirmMessage = gettext("Do you want to allow this student ('{student_id}') to skip the entrance exam?"); // eslint-disable-line max-len
                 fullConfirmMessage = interpolate_text(confirmMessage, {
                     student_id: uniqStudentIdentifier
                 });
-                if (window.confirm(fullConfirmMessage)) {  // eslint-disable-line no-alert
+                if (window.confirm(fullConfirmMessage)) { // eslint-disable-line no-alert
                     sendData = {
                         unique_student_identifier: uniqStudentIdentifier
                     };
@@ -325,11 +326,11 @@
                         data: sendData,
                         type: 'POST',
                         success: studentadmin.clear_errors_then(function(data) {
-                            return alert(data.message);  // eslint-disable-line no-alert
+                            return alert(data.message); // eslint-disable-line no-alert
                         }),
                         error: statusAjaxError(function() {
                             var errorMessage;
-                            errorMessage = gettext("An error occurred. Make sure that the student's username or email address is correct and try again.");  // eslint-disable-line max-len
+                            errorMessage = gettext("An error occurred. Make sure that the student's username or email address is correct and try again."); // eslint-disable-line max-len
                             return studentadmin.$request_err_ee.text(errorMessage);
                         })
                     });
@@ -359,11 +360,11 @@
                         fullSuccessMessage = interpolate_text(successMessage, {
                             student_id: uniqStudentIdentifier
                         });
-                        return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                        return alert(fullSuccessMessage); // eslint-disable-line no-alert
                     }),
                     error: statusAjaxError(function() {
                         var errorMessage, fullErrorMessage;
-                        errorMessage = gettext("Error deleting entrance exam state for student '{student_id}'. Make sure student identifier is correct.");  // eslint-disable-line max-len
+                        errorMessage = gettext("Error deleting entrance exam state for student '{student_id}'. Make sure student identifier is correct."); // eslint-disable-line max-len
                         fullErrorMessage = interpolate_text(errorMessage, {
                             student_id: uniqStudentIdentifier
                         });
@@ -392,7 +393,7 @@
                     }),
                     error: statusAjaxError(function() {
                         var errorMessage, fullErrorMessage;
-                        errorMessage = gettext("Error getting entrance exam task history for student '{student_id}'. Make sure student identifier is correct.");  // eslint-disable-line max-len
+                        errorMessage = gettext("Error getting entrance exam task history for student '{student_id}'. Make sure student identifier is correct."); // eslint-disable-line max-len
                         fullErrorMessage = interpolate_text(errorMessage, {
                             student_id: uniqStudentIdentifier
                         });
@@ -418,11 +419,11 @@
                         all_students: true,
                         problem_to_reset: problemToReset
                     };
-                    successMessage = gettext("Successfully started task to reset attempts for problem '<%- problem_id %>'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
+                    successMessage = gettext("Successfully started task to reset attempts for problem '<%- problem_id %>'. Click the 'Show Task Status' button to see the status of the task."); // eslint-disable-line max-len
                     fullSuccessMessage = _.template(successMessage)({
                         problem_id: problemToReset
                     });
-                    errorMessage = gettext("Error starting a task to reset attempts for all students on problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct.");  // eslint-disable-line max-len
+                    errorMessage = gettext("Error starting a task to reset attempts for all students on problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct."); // eslint-disable-line max-len
                     fullErrorMessage = _.template(errorMessage)({
                         problem_id: problemToReset
                     });
@@ -432,7 +433,7 @@
                         url: studentadmin.$btn_reset_attempts_all.data('endpoint'),
                         data: sendData,
                         success: studentadmin.clear_errors_then(function() {
-                            return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                            return alert(fullSuccessMessage); // eslint-disable-line no-alert
                         }),
                         error: statusAjaxError(function() {
                             return studentadmin.$request_response_error_all.text(fullErrorMessage);
@@ -499,12 +500,12 @@
                 problem_to_reset: problemToReset,
                 only_if_higher: onlyIfHigher
             };
-            successMessage = gettext("Started rescore problem task for problem '<%- problem_id %>' and student '<%- student_id %>'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
+            successMessage = gettext("Started rescore problem task for problem '<%- problem_id %>' and student '<%- student_id %>'. Click the 'Show Task Status' button to see the status of the task."); // eslint-disable-line max-len
             fullSuccessMessage = _.template(successMessage)({
                 student_id: uniqStudentIdentifier,
                 problem_id: problemToReset
             });
-            defaultErrorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
+            defaultErrorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the problem and student identifiers are complete and correct."); // eslint-disable-line max-len
             fullDefaultErrorMessage = _.template(defaultErrorMessage)({
                 student_id: uniqStudentIdentifier,
                 problem_id: problemToReset
@@ -515,7 +516,7 @@
                 url: this.$btn_rescore_problem_single.data('endpoint'),
                 data: sendData,
                 success: this.clear_errors_then(function() {
-                    return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                    return alert(fullSuccessMessage); // eslint-disable-line no-alert
                 }),
                 error: statusAjaxError(function(response) {
                     if (response.responseText) {
@@ -553,12 +554,12 @@
                 problem_to_reset: problemToReset,
                 score: score
             };
-            successMessage = gettext("Started task to override the score for problem '<%- problem_id %>' and student '<%- student_id %>'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
+            successMessage = gettext("Started task to override the score for problem '<%- problem_id %>' and student '<%- student_id %>'. Click the 'Show Task Status' button to see the status of the task."); // eslint-disable-line max-len
             fullSuccessMessage = _.template(successMessage)({
                 student_id: uniqStudentIdentifier,
                 problem_id: problemToReset
             });
-            defaultErrorMessage = gettext("Error starting a task to override score for problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the score and the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
+            defaultErrorMessage = gettext("Error starting a task to override score for problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the score and the problem and student identifiers are complete and correct."); // eslint-disable-line max-len
             fullDefaultErrorMessage = _.template(defaultErrorMessage)({
                 student_id: uniqStudentIdentifier,
                 problem_id: problemToReset
@@ -569,7 +570,7 @@
                 url: this.$btn_override_problem_score_single.data('endpoint'),
                 data: sendData,
                 success: this.clear_errors_then(function() {
-                    return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                    return alert(fullSuccessMessage); // eslint-disable-line no-alert
                 }),
                 error: statusAjaxError(function(response) {
                     if (response.responseText) {
@@ -600,15 +601,15 @@
                 data: sendData,
                 success: this.clear_errors_then(function() {
                     var fullSuccessMessage, successMessage;
-                    successMessage = gettext("Started entrance exam rescore task for student '{student_id}'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
+                    successMessage = gettext("Started entrance exam rescore task for student '{student_id}'. Click the 'Show Task Status' button to see the status of the task."); // eslint-disable-line max-len
                     fullSuccessMessage = interpolate_text(successMessage, {
                         student_id: uniqStudentIdentifier
                     });
-                    return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                    return alert(fullSuccessMessage); // eslint-disable-line no-alert
                 }),
                 error: statusAjaxError(function() {
                     var errorMessage, fullErrorMessage;
-                    errorMessage = gettext("Error starting a task to rescore entrance exam for student '{student_id}'. Make sure that entrance exam has problems in it and student identifier is correct.");  // eslint-disable-line max-len
+                    errorMessage = gettext("Error starting a task to rescore entrance exam for student '{student_id}'. Make sure that entrance exam has problems in it and student identifier is correct."); // eslint-disable-line max-len
                     fullErrorMessage = interpolate_text(errorMessage, {
                         student_id: uniqStudentIdentifier
                     });
@@ -632,17 +633,17 @@
             fullConfirmMessage = _.template(confirmMessage)({
                 problem_id: problemToReset
             });
-            if (window.confirm(fullConfirmMessage)) {  // eslint-disable-line no-alert
+            if (window.confirm(fullConfirmMessage)) { // eslint-disable-line no-alert
                 sendData = {
                     all_students: true,
                     problem_to_reset: problemToReset,
                     only_if_higher: onlyIfHigher
                 };
-                successMessage = gettext("Successfully started task to rescore problem '<%- problem_id %>' for all students. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
+                successMessage = gettext("Successfully started task to rescore problem '<%- problem_id %>' for all students. Click the 'Show Task Status' button to see the status of the task."); // eslint-disable-line max-len
                 fullSuccessMessage = _.template(successMessage)({
                     problem_id: problemToReset
                 });
-                defaultErrorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct.");  // eslint-disable-line max-len
+                defaultErrorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct."); // eslint-disable-line max-len
                 fullDefaultErrorMessage = _.template(defaultErrorMessage)({
                     problem_id: problemToReset
                 });
@@ -652,7 +653,7 @@
                     url: this.$btn_rescore_problem_all.data('endpoint'),
                     data: sendData,
                     success: this.clear_errors_then(function() {
-                        return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                        return alert(fullSuccessMessage); // eslint-disable-line no-alert
                     }),
                     error: statusAjaxError(function(response) {
                         if (response.responseText) {

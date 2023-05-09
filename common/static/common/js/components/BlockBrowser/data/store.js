@@ -9,7 +9,6 @@ const configureStore = initialState => createStore(
     applyMiddleware(thunkMiddleware),
 );
 
-
 const store = configureStore();
 
 export default store;

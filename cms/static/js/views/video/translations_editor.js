@@ -302,7 +302,7 @@ define(
 
                 // This Omits a language from the dropdown's data. It is
                 // needed when an item is going to be removed.
-                if (typeof(omittedLanguage) !== 'undefined') {
+                if (typeof omittedLanguage !== 'undefined') {
                     data = _.omit(data, omittedLanguage);
                 }
 

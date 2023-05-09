@@ -1,5 +1,5 @@
 """
-Helpers required to adapt to differing APIs
+Helper functions for XBlock serialization
 """
 import logging
 import re
@@ -12,20 +12,12 @@ from opaque_keys.edx.keys import AssetKey, CourseKey
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import modulestore as store
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.xml_block import XmlMixin
 
 from common.djangoapps.static_replace import replace_static_urls
 
 log = logging.getLogger(__name__)
-
-
-def get_block(usage_key):
-    """
-    Return an XBlock from modulestore.
-    """
-    return store().get_item(usage_key)
 
 
 def get_asset_content_from_path(course_key, asset_path):
@@ -137,3 +129,23 @@ def override_export_fs(block):
     if hasattr(block, 'export_to_file'):
         block.export_to_file = old_export_to_file
     XmlMixin.export_to_file = old_global_export_to_file
+
+
+def blockstore_def_key_from_modulestore_usage_key(usage_key):
+    """
+    In modulestore, the "definition key" is a MongoDB ObjectID kept in split's
+    definitions table, which theoretically allows the same block to be used in
+    many places (each with a unique usage key). However, that functionality is
+    not exposed in Studio (other than via content libraries). So when we import
+    into Blockstore, we assume that each usage is unique, don't generate a usage
+    key, and create a new "definition key" from the original usage key.
+    So modulestore usage key
+        block-v1:A+B+C+type@html+block@introduction
+    will become Blockstore definition key
+        html/introduction
+    """
+    block_type = usage_key.block_type
+    if block_type == 'vertical':
+        # We transform <vertical> to <unit>
+        block_type = "unit"
+    return block_type + "/" + usage_key.block_id

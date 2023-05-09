@@ -18,6 +18,7 @@ function($, _, Backbone, gettext,
     TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog,
     signatoryEditorTemplate, HtmlUtils) {
     'use strict';
+
     var SignatoryEditorView = Backbone.View.extend({
         tagName: 'div',
         events: {
@@ -61,7 +62,7 @@ function($, _, Backbone, gettext,
             var count = 0;
             this.model.collection.each(function(modelSignatory) {
                 if (!modelSignatory.isNew()) {
-                    count ++;
+                    count++;
                 }
             });
             return count;

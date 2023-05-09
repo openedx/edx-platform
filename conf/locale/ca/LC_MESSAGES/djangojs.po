@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/).
+# edX community translations have been downloaded from Catalan (http://app.transifex.com/open-edx/edx-platform/language/ca/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -11,7 +11,7 @@
 # mcolomer <mcmlilhity@gmail.com>, 2014
 # sandra bonillo <sandraboni13@gmail.com>, 2014-2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/).
+# edX community translations have been downloaded from Catalan (http://app.transifex.com/open-edx/edx-platform/language/ca/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -36,7 +36,7 @@
 # Translators:
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/)
+# edX community translations have been downloaded from Catalan (http://app.transifex.com/open-edx/edx-platform/language/ca/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -48,10 +48,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-19 20:42+0000\n"
+"POT-Creation-Date: 2023-04-30 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
-"Language-Team: Catalan (http://www.transifex.com/open-edx/edx-platform/language/ca/)\n"
+"Language-Team: Catalan (http://app.transifex.com/open-edx/edx-platform/language/ca/)\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -6188,10 +6188,18 @@ msgstr "Esquema del curs"
 msgid "Date added"
 msgstr ""
 
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr ""
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -9859,6 +9867,30 @@ msgid ""
 msgstr ""
 "El nombre de tasques d'aquest tipus que es retiraran. Les assignacions de "
 "puntuació més baixes es deixen caure primer."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"

@@ -1,9 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import { Button } from '@edx/paragon';
+import {Button} from '@edx/paragon';
 import $ from 'jquery';
-
 
 class AnnouncementSkipLink extends React.Component {
     constructor(props) {
@@ -20,10 +19,9 @@ class AnnouncementSkipLink extends React.Component {
     }
 
     render() {
-        return (<div>{"Skip to list of " + this.state.count + " announcements"}</div>)
+        return (<div>{'Skip to list of ' + this.state.count + ' announcements'}</div>)
     }
 }
-
 
 class Announcement extends React.Component {
     render() {
@@ -40,7 +38,6 @@ class Announcement extends React.Component {
 Announcement.propTypes = {
     content: PropTypes.string.isRequired,
 };
-
 
 class AnnouncementList extends React.Component {
     constructor(props) {
@@ -88,29 +85,27 @@ class AnnouncementList extends React.Component {
         var children = this.state.announcements.map(
             (announcement, index) => <Announcement key={index} content={announcement.content} />
         );
-        if (this.state.has_prev)
-        {
+        if (this.state.has_prev) {
             var prev_button = (
                 <div>
                     <Button
-                        className={["announcement-button", "prev"]}
+                        className={['announcement-button', 'prev']}
                         onClick={() => this.renderPrevPage()}
                         label="← previous"
                     />
-                    <span className="sr-only">{this.state.start_index + " - " + this.state.end_index + ") of " + this.state.count}</span>
+                    <span className="sr-only">{this.state.start_index + ' - ' + this.state.end_index + ') of ' + this.state.count}</span>
                 </div>
             );
         }
-        if (this.state.has_next)
-        {
+        if (this.state.has_next) {
             var next_button = (
                 <div>
                     <Button
-                        className={["announcement-button", "next"]}
+                        className={['announcement-button', 'next']}
                         onClick={() => this.renderNextPage()}
                         label="next →"
                     />
-                    <span className="sr-only">{this.state.start_index + " - " + this.state.end_index + ") of " + this.state.count}</span>
+                    <span className="sr-only">{this.state.start_index + ' - ' + this.state.end_index + ') of ' + this.state.count}</span>
                 </div>
             );
         }
@@ -123,7 +118,6 @@ class AnnouncementList extends React.Component {
         );
     }
 }
-
 
 export default class AnnouncementsView {
     constructor() {
@@ -138,4 +132,4 @@ export default class AnnouncementsView {
     }
 }
 
-export { AnnouncementsView, AnnouncementList, AnnouncementSkipLink }
+export {AnnouncementsView, AnnouncementList, AnnouncementSkipLink}
