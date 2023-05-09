@@ -15,6 +15,7 @@ from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint:
     PROFILE_FEATURES,
     PROGRAM_ENROLLMENT_FEATURES,
     STUDENT_FEATURES,
+    ENROLLMENT_FEATURES,
     StudentModule,
     enrolled_students_features,
     get_proctored_exam_results,
@@ -250,8 +251,32 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 assert '' == report['external_user_key']
 
     def test_available_features(self):
-        assert len(AVAILABLE_FEATURES) == len(STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES)
-        assert set(AVAILABLE_FEATURES) == set(STUDENT_FEATURES + PROFILE_FEATURES + PROGRAM_ENROLLMENT_FEATURES)
+        assert len(AVAILABLE_FEATURES) == len(
+            STUDENT_FEATURES +
+            PROFILE_FEATURES +
+            PROGRAM_ENROLLMENT_FEATURES +
+            ENROLLMENT_FEATURES
+        )
+        assert set(AVAILABLE_FEATURES) == set(
+            STUDENT_FEATURES +
+            PROFILE_FEATURES +
+            PROGRAM_ENROLLMENT_FEATURES +
+            ENROLLMENT_FEATURES
+        )
+
+    def test_enrolled_students_enrollment_date(self):
+        query_features = ('username', 'enrollment_date',)
+        for feature in query_features:
+            assert feature in AVAILABLE_FEATURES
+        with self.assertNumQueries(1):
+            userreports = enrolled_students_features(self.course_key, query_features)
+        assert len(userreports) == len(self.users)
+
+        userreports = sorted(userreports, key=lambda u: u["username"])
+        users = sorted(self.users, key=lambda u: u.username)
+        for userreport, user in zip(userreports, users):
+            assert set(userreport.keys()) == set(query_features)
+            assert userreport['enrollment_date'] == CourseEnrollment.enrollments_for_user(user)[0].created
 
     def test_list_may_enroll(self):
         may_enroll = list_may_enroll(self.course_key, ['email'])
