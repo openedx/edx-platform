@@ -604,7 +604,7 @@ edx-drf-extensions==8.7.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.62.2
+edx-enterprise==3.62.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -909,7 +909,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==9.2.1
+lti-consumer-xblock==9.4.0
     # via -r requirements/edx/testing.txt
 lxml==4.9.2
     # via
