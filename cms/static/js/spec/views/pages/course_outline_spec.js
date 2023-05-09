@@ -883,6 +883,24 @@ describe('CourseOutlinePage', function() {
             expect($('div.course-video-sharing')).not.toExist();
             expect(selectedOption()).not.toExist();
         });
+
+        it('tracks changes to video sharing option', function() {
+            createCourse({
+                video_sharing_enabled: true,
+                video_sharing_options: 'all-on',
+                video_sharing_doc_url: 'http://rick.roll'
+            });
+
+            selectedOption().val('per-video').trigger('change');
+
+            expect(window.analytics.track).toHaveBeenCalledWith(
+                'edx.social.video_sharing_options.changed',
+                {
+                    course_id: 'mock-course',
+                    video_sharing_options: 'per-video'
+                }
+            );
+        });
     });
 
     describe('Section', function() {
