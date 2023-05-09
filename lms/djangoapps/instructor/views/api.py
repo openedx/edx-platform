@@ -1443,7 +1443,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         'email': _('Email'),
         'language': _('Language'),
         'location': _('Location'),
-        'year_of_birth': _('Birth Year'),
+        #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683, not to go in reports
         'gender': _('Gender'),
         'level_of_education': _('Level of Education'),
         'mailing_address': _('Mailing Address'),
