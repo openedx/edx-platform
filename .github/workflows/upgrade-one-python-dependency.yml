@@ -19,7 +19,7 @@ defaults:
 
 jobs:
   upgrade-one-python-dependency-workflow:
-    runs-on: ubuntu-20.04
+    runs-on: [self-hosted, linux]
 
     steps:
       - name: Check out target branch

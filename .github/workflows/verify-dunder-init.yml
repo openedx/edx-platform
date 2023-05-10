@@ -10,7 +10,7 @@ jobs:
   verify_dunder_init:
 
     name: Verify __init__.py Files
-    runs-on: ubuntu-20.04
+    runs-on: [self-hosted, linux]
 
     steps:
 
@@ -19,7 +19,7 @@ jobs:
 
     - name: Ensure git is installed
       run: |
-        sudo apt-get update && sudo apt-get install git
+        sudo apt-get update && sudo apt-get -y install git
 
     - name: Verify __init__.py files exist
       run: |
