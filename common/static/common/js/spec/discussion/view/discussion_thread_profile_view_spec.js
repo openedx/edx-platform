@@ -61,7 +61,7 @@
                     if (i === 0) {
                         expectedHtml += imageTag;
                     } else {
-                        expectedHtml = expectedHtml + '<em>image omitted</em>';
+                        expectedHtml += '<em>image omitted</em>';
                     }
                 }
             }

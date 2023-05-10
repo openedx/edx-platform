@@ -19,7 +19,7 @@ class AnnouncementSkipLink extends React.Component {
     }
 
     render() {
-        return (<div>{'Skip to list of ' + this.state.count + ' announcements'}</div>)
+        return (<div>{'Skip to list of ' + this.state.count + ' announcements'}</div>);
     }
 }
 
