@@ -45,16 +45,15 @@ def get_base_template_context(site):
             site_config_name='CONTACT_MAILING_ADDRESS'
         )
 
+    django_settings = get_config_value_from_site_or_settings('DJANGO_SETTINGS_OVERRIDE', site=site) or {}
+    platform_name = django_settings.get('PLATFORM_NAME') or getattr(settings, 'PLATFORM_NAME', None)
+
     return {
         # Platform information
         'homepage_url': marketing_link('ROOT'),
         'dashboard_url': dashboard_url,
         'template_revision': getattr(settings, 'EDX_PLATFORM_REVISION', None),
-        'platform_name': get_config_value_from_site_or_settings(
-            'PLATFORM_NAME',
-            site=site,
-            site_config_name='platform_name',
-        ),
+        'platform_name': platform_name,
         'contact_email': get_config_value_from_site_or_settings(
             'CONTACT_EMAIL', site=site, site_config_name='contact_email'),
         'contact_mailing_address': contact_mailing_address,
