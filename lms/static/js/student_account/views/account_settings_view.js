@@ -73,11 +73,11 @@
                     );
                     betaLangCode = this.options.betaLanguage.code.split('-');
                     if (betaLangCode.length > 1) {
-                        betaLangCode = `${betaLangCode[0]}_${betaLangCode[1].toUpperCase()}`;
+                        betaLangCode = betaLangCode[0] + '_' + betaLangCode[1].toUpperCase();
                     } else {
                         betaLangCode = betaLangCode[0];
                     }
-                    helpTranslateLink = `https://www.transifex.com/open-edx/edx-platform/translate/#${betaLangCode}`;
+                    helpTranslateLink = 'https://www.transifex.com/open-edx/edx-platform/translate/#' + betaLangCode;
                     oldLangCode = $.cookie('old-pref-lang');
                     // Deleting the cookie
                     document.cookie = 'old-pref-lang=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/account;';
@@ -112,7 +112,7 @@
                         $(tabPanel).addClass('hidden');
                     });
 
-                    $(`#${this.activeTab}-tabpanel`).removeClass('hidden');
+                    $('#' + this.activeTab + '-tabpanel').removeClass('hidden');
 
                     $accountNavLink.attr('tabindex', -1);
                     $accountNavLink.attr('aria-selected', false);
@@ -136,7 +136,7 @@
                     tabName: tabName,
                     tabLabel: tabLabel,
                     sections: tabSections,
-                    el: `#${tabName}-tabpanel`
+                    el: '#' + tabName + '-tabpanel'
                 });
 
                 accountSectionView.render();

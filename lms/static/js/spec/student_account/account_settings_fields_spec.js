@@ -52,8 +52,8 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
 
         it('update time zone dropdown after country dropdown changes', function() {
             var baseSelector = '.u-field-value > select';
-            var groupsSelector = `${baseSelector}> optgroup`;
-            var groupOptionsSelector = `${groupsSelector}> option`;
+            var groupsSelector = baseSelector + '> optgroup';
+            var groupOptionsSelector = groupsSelector + '> option';
 
             var timeZoneData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.TimeZoneFieldView, {
                 valueAttribute: 'time_zone',
