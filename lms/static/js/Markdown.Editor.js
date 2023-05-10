@@ -1396,6 +1396,7 @@
                 button.removeAttribute('aria-disabled');
             } else {
                 image.style.backgroundPosition = button.XShift + ' ' + disabledYShift;
+                // eslint-disable-next-line no-multi-assign
                 button.onmouseover = button.onmouseout = button.onclick = function() { };
                 // This line does not appear in vanilla WMD. It was added by edX to improve accessibility.
                 // It should become a separate commit applied to WMD's official HEAD if we remove this edited version

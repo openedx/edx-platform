@@ -388,6 +388,7 @@ module.exports = Merge.smart({
                 // https://github.com/webpack/webpack/issues/304#issuecomment-272150177
                 // (I've tried every other suggestion solution on that page, this
                 // was the only one that worked.)
+                // eslint-disable-next-line no-path-concat
                 sinon: __dirname + '/node_modules/sinon/pkg/sinon.js',
                 hls: 'hls.js/dist/hls.js'
             },

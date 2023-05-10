@@ -238,9 +238,11 @@
                     var funcName, selector;
                     selector = event[0];
                     funcName = event[1];
+                    // eslint-disable-next-line no-shadow
                     obj['click ' + selector] = function(event) {
                         return this[funcName](event);
                     };
+                    // eslint-disable-next-line no-shadow
                     obj['keydown ' + selector] = function(event) {
                         return DiscussionUtil.activateOnSpace(event, this[funcName]);
                     };

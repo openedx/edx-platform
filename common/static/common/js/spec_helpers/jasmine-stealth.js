@@ -52,6 +52,7 @@
 
         _.each(methodsToSpy, function(methodName) {
             spies[methodName] = jasmine.createSpy('' + classToFake + '#' + methodName);
+            // eslint-disable-next-line no-return-assign
             return fakeClass.prototype[methodName] = function() {
                 return spies[methodName].apply(this, arguments);
             };

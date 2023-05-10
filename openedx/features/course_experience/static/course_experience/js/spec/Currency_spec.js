@@ -42,26 +42,31 @@ describe('Currency factory', () => {
                 longitude: 137.737495,
             },
         };
+        // eslint-disable-next-line object-curly-spacing
         $.cookie('edx-price-l10n', null, { path: '/' });
     });
 
     describe('converts price to local currency', () => {
         it('when location is the default (US)', () => {
+            // eslint-disable-next-line object-curly-spacing
             $.cookie('edx-price-l10n', '{"rate":1,"code":"USD","symbol":"$","countryCode":"US"}', { path: '/' });
             currency = new Currency();
             expect($('[name="verified_mode"].no-discount').filter(':visible').text()).toEqual('Pursue a Verified Certificate($100 USD)');
         });
         it('when cookie is set to a different country', () => {
+            // eslint-disable-next-line object-curly-spacing
             $.cookie('edx-price-l10n', '{"rate":2.2,"code":"CAD","symbol":"$","countryCode":"CAN"}', { expires: 1 });
             currency = new Currency();
             expect($('[name="verified_mode"].no-discount').filter(':visible').text()).toEqual('Pursue a Verified Certificate($220 CAD)');
         });
         it('when cookie is set to a different country with a discount', () => {
+            // eslint-disable-next-line object-curly-spacing
             $.cookie('edx-price-l10n', '{"rate":2.2,"code":"CAD","symbol":"$","countryCode":"CAN"}', { expires: 1 });
             currency = new Currency();
             expect($('[name="verified_mode"].discount').filter(':visible').text()).toEqual('Pursue a Verified Certificate($198 CAD $220 CAD)');
         });
         it('should send event on initial load', () => {
+            // eslint-disable-next-line object-curly-spacing
             $.cookie('edx-price-l10n', '{"rate":1,"code":"USD","symbol":"$","countryCode":"US"}', { path: '/' });
             currency = new Currency();
             expect(window.analytics.track).toHaveBeenCalledWith('edx.bi.user.track_selection.local_currency_cookie_set');

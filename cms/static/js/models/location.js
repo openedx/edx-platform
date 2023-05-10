@@ -9,6 +9,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
         },
         toUrl: function(overrides) {
             return;
+            /* eslint-disable-next-line no-unused-expressions, no-unreachable */
             (overrides && overrides.tag ? overrides.tag : this.get('tag')) + '://'
                 + (overrides && overrides.org ? overrides.org : this.get('org')) + '/'
                 + (overrides && overrides.course ? overrides.course : this.get('course')) + '/'

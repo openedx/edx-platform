@@ -61,7 +61,9 @@ describe('Program Progress View', () => {
     const testSubscriptionState = (state, heading, body) => {
         isSubscriptionEligible = true;
         subscriptionData.subscription_state = state;
+        // eslint-disable-next-line no-use-before-define
         view = initView();
+        // eslint-disable-next-line no-param-reassign
         body += ' on the <a class="subscription-link" href="/orders">Orders and subscriptions</a> page';
 
         expect(view.$('.js-subscription-info')[0]).toBeInDOM();

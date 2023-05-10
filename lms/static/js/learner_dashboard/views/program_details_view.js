@@ -108,6 +108,7 @@ class ProgramDetailsView extends Backbone.View {
             isSubscriptionEligible: this.options.isSubscriptionEligible,
             restartIcon,
         };
+        // eslint-disable-next-line no-undef
         data = $.extend(
             data,
             this.programModel.toJSON(),

@@ -31,6 +31,7 @@ class UpgradeMessageView extends Backbone.View {
     }
 
     render() {
+        // eslint-disable-next-line no-undef
         const data = $.extend(
             {},
             this.model.toJSON(),

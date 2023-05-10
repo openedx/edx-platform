@@ -531,7 +531,9 @@ describe('Program Details View', () => {
                 'YYYY-MM-DDTHH:mm:ss[Z]',
             );
         }
+        // eslint-disable-next-line no-use-before-define
         view = initView({
+            // eslint-disable-next-line no-undef
             programData: $.extend({}, options.programData, {
                 subscription_eligible: true,
             }),
