@@ -507,7 +507,7 @@ SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
 
 SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
 SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
-SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-portal/"
+SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

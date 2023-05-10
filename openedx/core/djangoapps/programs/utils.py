@@ -1079,7 +1079,7 @@ def get_programs_subscription_data(user, program_uuid=None):
 
     try:
         if program_uuid:
-            response = client.get(api_path, params={'resource_id': program_uuid, 'most_active_and_recent': True})
+            response = client.get(api_path, params={'resource_id': program_uuid, 'most_active_and_recent': 'true'})
             response.raise_for_status()
             subscription_data = response.json().get('results', [])
         else:
