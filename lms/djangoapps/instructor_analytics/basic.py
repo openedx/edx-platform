@@ -84,6 +84,65 @@ def issued_certificates(course_key, features):
     return generated_certificates
 
 
+def get_student_features_with_custom(course_key):
+    """
+    Allow site operators to include on the export custom fields if platform has an extending
+    User model. This can be used if you have an extended model that include for example
+    an university student number.
+
+    Basic example of adding age:
+    ```python
+    def get_age(self):
+        return datetime.datetime.now().year - self.profile.year_of_birth
+    setattr(User, 'age', property(get_age))
+    ```
+    Then you have to add `age` to both site configurations:
+    - `student_profile_download_fields_custom_student_attributes`
+    - `student_profile_download_fields` site configurations`
+
+    ```json
+    "student_profile_download_fields_custom_student_attributes": ["age"],
+    "student_profile_download_fields": [
+        "id", "username", "name", "email", "language", "location",
+        "year_of_birth", "gender", "level_of_education", "mailing_address",
+        "goals", "enrollment_mode", "last_login", "date_joined", "external_user_key",
+        "enrollment_date", "age"
+    ]
+    ```
+
+    Example if the platform has a custom user extended model like a One-To-One Link
+    with the User Model:
+    ```python
+    def get_user_extended_model_custom_field(self):
+        if hasattr(self, "userextendedmodel"):
+            return self.userextendedmodel.custom_field
+        return None
+    setattr(User, 'user_extended_model_custom_field', property(get_user_extended_model_custom_field))
+    ```
+
+    ```json
+    "student_profile_download_fields_custom_student_attributes": ["user_extended_model_custom_field"],
+    "student_profile_download_fields": [
+        "id", "username", "name", "email", "language", "location",
+        "year_of_birth", "gender", "level_of_education", "mailing_address",
+        "goals", "enrollment_mode", "last_login", "date_joined", "external_user_key",
+        "enrollment_date", "user_extended_model_custom_field"
+    ]
+    ```
+    """
+    return STUDENT_FEATURES + tuple(
+        configuration_helpers.get_value_for_org(
+            course_key.org,
+            "student_profile_download_fields_custom_student_attributes",
+            getattr(
+                settings,
+                "STUDENT_PROFILE_DOWNLOAD_FIELDS_CUSTOM_STUDENT_ATTRIBUTES",
+                (),
+            ),
+        )
+    )
+
+
 def enrolled_students_features(course_key, features):  # lint-amnesty, pylint: disable=too-many-statements
     """
     Return list of student features as dictionaries.
@@ -117,7 +176,7 @@ def enrolled_students_features(course_key, features):  # lint-amnesty, pylint: d
 
     students = [enrollment.user for enrollment in enrollments]
 
-    student_features = [x for x in STUDENT_FEATURES if x in features]
+    student_features = [x for x in get_student_features_with_custom(course_key) if x in features]
     profile_features = [x for x in PROFILE_FEATURES if x in features]
 
     if include_program_enrollments and len(students) > 0:

@@ -5,8 +5,11 @@ Tests for instructor.basic
 
 from unittest.mock import MagicMock, Mock, patch
 
+import random
+import datetime
 import ddt
 import json  # lint-amnesty, pylint: disable=wrong-import-order
+from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from edx_proctoring.api import create_exam
 from edx_proctoring.models import ProctoredExamStudentAttempt
 from opaque_keys.edx.locator import UsageKey
@@ -25,6 +28,7 @@ from lms.djangoapps.instructor_analytics.basic import (  # lint-amnesty, pylint:
 )
 from lms.djangoapps.program_enrollments.tests.factories import ProgramEnrollmentFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
@@ -132,7 +136,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             user.profile.save()
         for feature in query_features:
             assert feature in AVAILABLE_FEATURES
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             userreports = enrolled_students_features(self.course_key, query_features)
         assert len(userreports) == len(self.users)
 
@@ -160,7 +164,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         Assert that we can query individual fields in the 'meta' field in the UserProfile
         """
         query_features = ('meta.position', 'meta.company')
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             userreports = enrolled_students_features(self.course_key, query_features)
         assert len(userreports) == len(self.users)
         for userreport in userreports:
@@ -217,7 +221,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         # enrolled_students_features.  The first query comes from the call to
         # User.objects.filter(...), and the second comes from
         # prefetch_related('course_groups').
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             userreports = enrolled_students_features(course.id, query_features)
         assert len([r for r in userreports if r['username'] in cohorted_usernames]) == len(cohorted_students)
         assert len([r for r in userreports if r['username'] == non_cohorted_student.username]) == 1
@@ -239,7 +243,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 ProgramEnrollmentFactory.create(user=user, external_user_key=external_user_key)
                 username_with_external_user_key_dict[user.username] = external_user_key
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             userreports = enrolled_students_features(self.course_key, query_features)
         assert len(userreports) == 30
         for report in userreports:
@@ -268,7 +272,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         query_features = ('username', 'enrollment_date',)
         for feature in query_features:
             assert feature in AVAILABLE_FEATURES
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             userreports = enrolled_students_features(self.course_key, query_features)
         assert len(userreports) == len(self.users)
 
@@ -277,6 +281,35 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         for userreport, user in zip(userreports, users):
             assert set(userreport.keys()) == set(query_features)
             assert userreport['enrollment_date'] == CourseEnrollment.enrollments_for_user(user)[0].created
+
+    def test_enrolled_students_extended_model_age(self):
+        SiteConfigurationFactory.create(
+            site_values={
+                'course_org_filter': ['robot'],
+                'student_profile_download_fields_custom_student_attributes': ['age'],
+            }
+        )
+
+        def get_age(self):
+            return datetime.datetime.now().year - self.profile.year_of_birth
+        setattr(User, "age", property(get_age))  # lint-amnesty, pylint: disable=literal-used-as-attribute
+
+        for user in self.users:
+            user.profile.year_of_birth = random.randint(1900, 2000)
+            user.profile.save()
+
+        query_features = ('username', 'age',)
+        with self.assertNumQueries(3):
+            userreports = enrolled_students_features(self.course_key, query_features)
+        assert len(userreports) == len(self.users)
+
+        userreports = sorted(userreports, key=lambda u: u["username"])
+        users = sorted(self.users, key=lambda u: u.username)
+        for userreport, user in zip(userreports, users):
+            assert set(userreport.keys()) == set(query_features)
+            assert userreport['age'] == str(user.age)
+
+        delattr(User, "age")  # lint-amnesty, pylint: disable=literal-used-as-attribute
 
     def test_list_may_enroll(self):
         may_enroll = list_may_enroll(self.course_key, ['email'])
