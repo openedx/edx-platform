@@ -25,14 +25,14 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='journalpost',
             name='uuid',
-            field=models.CharField(null=True, unique=False, editable=False, max_length=64),
+            field=models.CharField(null=True, editable=False, max_length=64),
         ),
         # Force uuid on existing records
         migrations.RunPython(force_uuid),
         migrations.AlterField(
             model_name='journalpost',
             name='uuid',
-            field=models.CharField(default=uuid.uuid4, null=False, unique=True, editable=False, max_length=64),
+            field=models.CharField(default=uuid.uuid4, null=False, editable=False, max_length=64),
         ),
         migrations.AlterField(
             model_name='journalpost',
