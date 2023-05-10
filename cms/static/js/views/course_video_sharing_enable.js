@@ -29,6 +29,7 @@ define([
       if (event.type === "change") {
         event.preventDefault();
         this.updateVideoSharingConfiguration(event.target.value);
+        this.trackVideoSharingConfigurationChange(event.target.value);
       }
     },
 
@@ -36,6 +37,16 @@ define([
       XBlockViewUtils.updateXBlockFields(this.model, this.getRequestData(value), {
           success: this.refresh.bind(this)
       });
+    },
+
+    trackVideoSharingConfigurationChange: function (value) {
+      window.analytics.track(
+        'edx.social.video_sharing_options.changed',
+        {
+          course_id: this.model.id,
+          video_sharing_options: value
+        }
+      );
     },
 
     refresh: function () {
