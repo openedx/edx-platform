@@ -381,7 +381,7 @@
                         return {
                             view: new AccountSettingsFieldViews.AuthFieldView({
                                 title: provider.name,
-                                valueAttribute: `auth-${provider.id}`,
+                                valueAttribute: 'auth-' + provider.id,
                                 helpMessage: '',
                                 connected: provider.connected,
                                 connectUrl: provider.connect_url,
@@ -421,7 +421,7 @@
                                 orderId: order.number,
                                 orderDate: order.order_date,
                                 receiptUrl: order.receipt_url,
-                                valueAttribute: `order-${orderNumber}`,
+                                valueAttribute: 'order-' + orderNumber,
                                 lines: order.lines
                             })
                         };

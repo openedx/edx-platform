@@ -33,7 +33,7 @@
             renderFields: function() {
                 var view = this;
 
-                _.each(view.$(`.${view.options.tabName}-section-body`), function(sectionEl, index) {
+                _.each(view.$('.' + view.options.tabName + '-section-body'), function(sectionEl, index) {
                     _.each(view.options.sections[index].fields, function(field) {
                         $(sectionEl).append(field.view.render().el);
                     });

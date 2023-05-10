@@ -192,7 +192,7 @@
                     });
                 },
                 toggleDisableButton: function(disabled) {
-                    var button = this.$(`#u-field-link-${this.options.valueAttribute}`);
+                    var button = this.$('#u-field-link-' + this.options.valueAttribute);
                     if (button) {
                         button.prop('disabled', disabled);
                     }
@@ -246,7 +246,7 @@
             SocialLinkTextFieldView: FieldViews.TextFieldView.extend({
                 render: function() {
                     HtmlUtils.setHtml(this.$el, HtmlUtils.template(field_text_account_template)({
-                        id: `${this.options.valueAttribute}_${this.options.platform}`,
+                        id: this.options.valueAttribute + '_' + this.options.platform,
                         title: this.options.title,
                         value: this.modelValue(),
                         message: this.options.helpMessage,
@@ -281,7 +281,7 @@
             ExtendedFieldTextFieldView: FieldViews.TextFieldView.extend({
                 render: function() {
                     HtmlUtils.setHtml(this.$el, HtmlUtils.template(field_text_account_template)({
-                        id: `${this.options.valueAttribute}_${this.options.field_name}`,
+                        id: this.options.valueAttribute + '_' + this.options.field_name,
                         title: this.options.title,
                         value: this.modelValue(),
                         message: this.options.helpMessage,
@@ -340,7 +340,7 @@
             AuthFieldView: FieldViews.LinkFieldView.extend({
                 fieldTemplate: field_social_link_template,
                 className: function() {
-                    return `u-field u-field-social u-field-${this.options.valueAttribute}`;
+                    return 'u-field u-field-social u-field-' + this.options.valueAttribute;
                 },
                 initialize: function(options) {
                     this.options = _.extend({}, options);
