@@ -42,7 +42,7 @@ class ProgramDetailsView extends Backbone.View {
         this.programModel = new Backbone.Model(this.options.programData);
         this.courseData = new Backbone.Model(this.options.courseData);
         this.certificateCollection = new Backbone.Collection(
-            this.options.certificateData
+            this.options.certificateData,
         );
         this.subscriptionModel = new SubscriptionModel({
             context: this.options,
