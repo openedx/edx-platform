@@ -1,6 +1,6 @@
 .program-list-alerts {
   .page-banner {
-    margin-top: 24px;
+    padding-top: 32px;
     gap: 24px;
   }
 }
@@ -8,14 +8,20 @@
 .program-list-wrapper {
   @include make-row();
   padding: ($baseline*2) ($baseline/2);
+  max-width: 82rem;
+  margin: 0 auto;
 
   @include media-breakpoint-up(md) {
     padding: ($baseline*2) 0;
   }
 
+  @include media-breakpoint-up(lg) {
+    padding: ($baseline*2) $baseline;
+  }
+
   .program-list-container {
-    @include media-breakpoint-up(md) {
-      padding: 0 ($baseline*2);
+    @include media-breakpoint-up(lg) {
+      padding-right: $baseline;
     }
   }
 
@@ -32,6 +38,7 @@
 
 .program-cards-container {
   @include grid-container();
+  padding-top: 32px;
 
   .subscription-badge {
     position: absolute;
@@ -48,8 +55,8 @@
   align-items: stretch;
   gap: 24px;
 
-  @include media-breakpoint-only(md) {
-    padding: 0 ($baseline*2);
+  @include media-breakpoint-up(md) {
+    padding-top: 76px;
   }
 
   .aside {

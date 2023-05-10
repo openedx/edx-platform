@@ -52,7 +52,7 @@ describe('Program Alert List View', () => {
             'Subscription trial expires in 2 days'
         );
         expect(view.$('.alert:last .alert-message').text().trim()).toEqual(
-            'Your Test Program trial will expire in 2 days at 5:59 am on Apr 20, 2023 and the card on file will be charged $100/mos.'
+            'Your Test Program trial will expire in 2 days at 5:59 am on Apr 20, 2023 and the card on file will be charged $100/month.'
         );
     });
 });

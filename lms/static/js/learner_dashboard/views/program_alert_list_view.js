@@ -3,6 +3,7 @@ import Backbone from 'backbone';
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
+import warningIcon from '../../../images/warning-icon.svg';
 import programAlertTpl from '../../../templates/learner_dashboard/program_alert_list_view.underscore';
 
 class ProgramAlertListView extends Backbone.View {
@@ -24,6 +25,7 @@ class ProgramAlertListView extends Backbone.View {
     render() {
         const data = {
             alertList: this.getAlertList(),
+            warningIcon,
         };
         HtmlUtils.setHtml(this.$el, this.tpl(data));
     }
@@ -55,7 +57,7 @@ class ProgramAlertListView extends Backbone.View {
         return alertList.concat(this.trialEndingAlerts.map(
             ({ title: programName, remainingDays, ...data }) => {
                 const title = 'Subscription trial expires in {remainingDays} day';
-                const message = 'Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}/mos.';
+                const message = 'Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}/month.';
 
                 return {
                     title: StringUtils.interpolate(

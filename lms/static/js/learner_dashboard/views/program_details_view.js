@@ -13,6 +13,7 @@ import AlertListView from './program_alert_list_view';
 
 import SubscriptionModel from '../models/program_subscription_model';
 
+import launchIcon from '../../../images/launch-icon.svg';
 import restartIcon from '../../../images/restart-icon.svg';
 import pageTpl from '../../../templates/learner_dashboard/program_details_view.underscore';
 import tabPageTpl from '../../../templates/learner_dashboard/program_details_tab_view.underscore';
@@ -106,6 +107,7 @@ class ProgramDetailsView extends Backbone.View {
             discussionFragment: this.options.discussionFragment,
             live_fragment: this.options.live_fragment,
             isSubscriptionEligible: this.options.isSubscriptionEligible,
+            launchIcon,
             restartIcon,
         };
         data = $.extend(

@@ -485,6 +485,7 @@ describe('Program Details View', () => {
             buy_subscription_url: '/subscriptions',
             manage_subscription_url: '/orders',
             subscriptions_learner_help_center_url: '/learner',
+            orders_and_subscriptions_url: '/orders',
         },
         userPreferences: {
             'pref-lang': 'en',
@@ -693,7 +694,7 @@ describe('Program Details View', () => {
     it('should render the get subscription link if program is subscription eligible', () => {
         testSubscriptionState(
             'pre',
-            'Start 7-Day free trial',
+            'Start 7-day free trial',
             '$100/month subscription after trial ends. Cancel anytime.'
         );
     });
