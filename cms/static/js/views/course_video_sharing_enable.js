@@ -14,12 +14,8 @@ define([
             'change #video-sharing-configuration-options': 'handleVideoSharingConfigurationChange',
         },
 
-        handleVideoSharingConfigurationChange: function(event) {
-            if (event.type === 'change') {
-                event.preventDefault();
-                this.updateVideoSharingConfiguration(event.target.value);
-                this.trackVideoSharingConfigurationChange(event.target.value);
-            }
+        initialize: function() {
+            this.template = TemplateUtils.loadTemplate('course-video-sharing-enable');
         },
 
         getRequestData: function(value) {
@@ -28,6 +24,20 @@ define([
                     video_sharing_options: value,
                 },
             };
+        },
+
+        handleVideoSharingConfigurationChange: function(event) {
+            if (event.type === 'change') {
+                event.preventDefault();
+                this.updateVideoSharingConfiguration(event.target.value);
+                this.trackVideoSharingConfigurationChange(event.target.value);
+            }
+        },
+
+        updateVideoSharingConfiguration: function(value) {
+            XBlockViewUtils.updateXBlockFields(this.model, this.getRequestData(value), {
+                success: this.refresh.bind(this)
+            });
         },
 
         trackVideoSharingConfigurationChange: function(value) {
@@ -40,19 +50,6 @@ define([
             );
         },
 
-        refresh: function() {
-            this.model.fetch({
-                success: this.render.bind(this),
-            });
-        },
-
-        updateVideoSharingConfiguration: function(value) {
-            XBlockViewUtils.updateXBlockFields(this.model, this.getRequestData(value), {
-                success: this.refresh.bind(this)
-            });
-        },
-
-        // eslint-disable-next-line no-dupe-keys
         refresh: function() {
             this.model.fetch({
                 success: this.render.bind(this),
