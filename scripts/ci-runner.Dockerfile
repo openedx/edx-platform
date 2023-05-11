@@ -1,4 +1,5 @@
-FROM ghcr.io/actions/actions-runner:latest as base
+FROM ubuntu:20.04 as base
+#ghcr.io/actions/actions-runner:latest as base
 
 USER root
 
