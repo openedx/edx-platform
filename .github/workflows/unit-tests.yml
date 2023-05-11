@@ -18,6 +18,8 @@ jobs:
         django-version:
           - "pinned"
           #- "4.0"
+        # When updating the shards, remember to make the same changes in
+        # .github/workflows/unit-tests-gh-hosted.yml
         shard_name:
           - "lms-1"
           - "lms-2"
