@@ -97,3 +97,7 @@ pytz<2023
 # which require urllib3<2 for now.
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222
 urllib3<2.0.0
+
+# Sphinx==5.3.0 requires docutils<0.20 
+# Issue to unpin Sphinx to resolve this constraint: https://github.com/openedx/edx-lint/issues/338
+docutils<0.20
