@@ -92,3 +92,12 @@ django-ipware==4.0.2
 # Pinning this version for now so this could be fixed in a separate PR later on
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/32093
 pytz<2023
+
+# urllib3>=2.0.0 conflicts with elastic search && snowflake-connector-python packages
+# which require urllib3<2 for now.
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222
+urllib3<2.0.0
+
+# Sphinx==5.3.0 requires docutils<0.20 
+# Issue to unpin Sphinx to resolve this constraint: https://github.com/openedx/edx-lint/issues/338
+docutils<0.20
