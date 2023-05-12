@@ -54,6 +54,7 @@ _split = _split || (function(undef) {
                     + (separator.sticky ? 'y' : ''), // Firefox 3+
             lastLastIndex = 0,
             // Make `global` and avoid `lastIndex` issues by working with a copy
+            // eslint-disable-next-line no-redeclare
             separator = new RegExp(separator.source, flags + 'g'),
             separator2, match, lastIndex, lastLength;
         str += ''; // Type-convert

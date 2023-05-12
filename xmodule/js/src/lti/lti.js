@@ -19,13 +19,13 @@
         // accept or reject sending their information to a third party
         $(element).on('click', '.link_lti_new_window', function() {
             if (askToSendUsername && askToSendEmail) {
-                // eslint-disable-next-line no-alert
+                /* eslint-disable-next-line no-alert, no-restricted-globals */
                 return confirm(gettext('Click OK to have your username and e-mail address sent to a 3rd party application.\n\nClick Cancel to return to this page without sending your information.'));
             } else if (askToSendUsername) {
-                // eslint-disable-next-line no-alert
+                /* eslint-disable-next-line no-alert, no-restricted-globals */
                 return confirm(gettext('Click OK to have your username sent to a 3rd party application.\n\nClick Cancel to return to this page without sending your information.'));
             } else if (askToSendEmail) {
-                // eslint-disable-next-line no-alert
+                /* eslint-disable-next-line no-alert, no-restricted-globals */
                 return confirm(gettext('Click OK to have your e-mail address sent to a 3rd party application.\n\nClick Cancel to return to this page without sending your information.'));
             } else {
                 return true;

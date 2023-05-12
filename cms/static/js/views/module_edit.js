@@ -6,6 +6,7 @@
         __extends = function(child, parent) {
             // eslint-disable-next-line no-var
             var key;
+            // eslint-disable-next-line no-restricted-syntax
             for (key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];

@@ -34,6 +34,7 @@
 //
 
 /* eslint-env node */
+// eslint-disable-next-line no-redeclare
 /* globals process */
 
 'use strict';
@@ -216,6 +217,7 @@ function normalizePathsForCoverage(files, normalizeFunc, preprocessors) {
     files.forEach(function(file) {
         if (!file.ignoreCoverage) {
             normalizedFile = normalizeFn(appRoot, file.pattern);
+            // eslint-disable-next-line no-prototype-builtins
             if (preprocessors && preprocessors.hasOwnProperty(normalizedFile)) {
                 filesForCoverage[normalizedFile] = ['coverage'].concat(preprocessors[normalizedFile]);
             } else {
@@ -300,6 +302,7 @@ function getBaseConfig(config, useRequireJs) {
         'framework:custom': ['factory', initFrameworks]
     };
 
+    // eslint-disable-next-line no-prototype-builtins
     if (process.env.hasOwnProperty('BOK_CHOY_HOSTNAME')) {
         hostname = process.env.BOK_CHOY_HOSTNAME;
         if (hostname === 'edx.devstack.lms') {

@@ -26,6 +26,7 @@
             ).each(function(index, input) {
                 groupId = parseInt($(input).val(), 10);
 
+                // eslint-disable-next-line no-prototype-builtins
                 if (groupAccess.hasOwnProperty(partitionId)) {
                     groupAccess[partitionId].push(groupId);
                 } else {

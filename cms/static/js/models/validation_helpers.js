@@ -12,6 +12,7 @@ define(['jquery'],
             var isIntegerUnderRange = true;
             // eslint-disable-next-line no-var
             var value = Math.round(attributeVal); // see if this ensures value saved is int
+            // eslint-disable-next-line no-restricted-globals
             if (!isFinite(value) || /\D+/.test(attributeVal) || value < range.min || value > range.max) {
                 isIntegerUnderRange = false;
             }

@@ -161,6 +161,7 @@
                     return MathJax.Hub.Queue(['Typeset', MathJax.Hub, element]);
                 });
             }
+            // eslint-disable-next-line no-prototype-builtins
             if (window.hasOwnProperty('update_schematics')) {
                 window.update_schematics();
             }

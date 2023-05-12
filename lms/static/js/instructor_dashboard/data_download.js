@@ -81,6 +81,7 @@
             });
             this.$list_issued_certificate_csv_btn.click(function() {
                 dataDownloadCert.clear_ui();
+                // eslint-disable-next-line no-restricted-globals
                 location.href = dataDownloadCert.$list_issued_certificate_csv_btn.data('endpoint') + '?csv=true';
             });
         }

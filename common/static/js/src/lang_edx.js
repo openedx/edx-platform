@@ -65,6 +65,7 @@ var Language = (function() {
              */
         refresh: function() {
             // reloading the page so we can get the latest state of released languages from model
+            // eslint-disable-next-line no-restricted-globals
             location.reload();
         }
 

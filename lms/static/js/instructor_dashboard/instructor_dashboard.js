@@ -123,6 +123,7 @@ such that the value can be defined later than this assignment (file load order).
                 $(this).attr('aria-pressed', 'true');
                 $section.addClass(CSS_ACTIVE_SECTION);
                 window.analytics.pageview('instructor_section:' + itemSectionName);
+                // eslint-disable-next-line no-restricted-globals
                 location.hash = '' + HASH_LINK_PREFIX + itemSectionName;
                 sectionsHaveLoaded.afterFor(function() {
                     return $section.data('wrapper').onClickTitle();
@@ -147,7 +148,9 @@ such that the value can be defined later than this assignment (file load order).
             firstLink = $links.eq(0);
             return firstLink.click();
         };
+        // eslint-disable-next-line no-restricted-globals
         if ((new RegExp('^' + HASH_LINK_PREFIX)).test(location.hash)) {
+            // eslint-disable-next-line no-restricted-globals
             rmatch = (new RegExp('^' + HASH_LINK_PREFIX + '(.*)')).exec(location.hash);
             sectionName = rmatch[1];
             link = $links.filter("[data-section='" + sectionName + "']");

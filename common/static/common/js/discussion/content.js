@@ -6,7 +6,7 @@
     var __hasProp = {}.hasOwnProperty;
 
     function __extends(child, parent) {
-        // eslint-disable-next-line no-var
+        /* eslint-disable-next-line no-var, no-restricted-syntax */
         for (var key in parent) {
             if (__hasProp.call(parent, key)) {
                 child[key] = parent[key];
@@ -173,7 +173,9 @@
             Content.loadContentInfos = function(infos) {
                 // eslint-disable-next-line no-var
                 var id, info;
+                // eslint-disable-next-line no-restricted-syntax
                 for (id in infos) {
+                    // eslint-disable-next-line no-prototype-builtins
                     if (infos.hasOwnProperty(id)) {
                         info = infos[id];
                         if (this.getContent(id)) {

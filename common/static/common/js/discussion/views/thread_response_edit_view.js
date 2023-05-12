@@ -5,7 +5,7 @@
     // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
-            // eslint-disable-next-line no-var
+            /* eslint-disable-next-line no-var, no-restricted-syntax */
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];

@@ -1,4 +1,5 @@
 // Backbone.js Application Model: CertificateAllowlist
+// eslint-disable-next-line no-redeclare
 /* global define, RequireJS */
 
 (function(define) {

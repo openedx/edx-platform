@@ -74,6 +74,7 @@ export default class ExperimentalCarousel extends React.Component {
     componentDidUpdate() {
         const {activeIndex} = this.state;
 
+        // eslint-disable-next-line no-restricted-globals
         if (!isNaN(activeIndex)) {
             this.carousels[activeIndex].focus();
         }

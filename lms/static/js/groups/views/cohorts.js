@@ -82,6 +82,7 @@
                 isModelUpdate = function() {
                     // Distinguish whether this is a sync event for just one model, or if it is for
                     // an entire collection.
+                    // eslint-disable-next-line no-prototype-builtins
                     return options && options.patch && response.hasOwnProperty('user_partition_id');
                 };
                 this.hideAddCohortForm();

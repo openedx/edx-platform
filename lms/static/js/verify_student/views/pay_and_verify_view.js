@@ -86,10 +86,12 @@ var edx = edx || {};
                     nextStepTitle = '';
                 }
 
+                // eslint-disable-next-line no-prototype-builtins
                 if (subviewConstructors.hasOwnProperty(stepName)) {
                     stepData = {};
 
                     // Add any info specific to this step
+                    // eslint-disable-next-line no-prototype-builtins
                     if (stepInfo.hasOwnProperty(stepName)) {
                         _.extend(stepData, stepInfo[stepName]);
                     }

@@ -174,6 +174,7 @@
                 };
 
                 Player.prototype.getDuration = function() {
+                    // eslint-disable-next-line no-restricted-globals
                     if (isNaN(this.video.duration)) {
                         return 0;
                     }
@@ -187,6 +188,7 @@
 
                     newSpeed = parseFloat(value);
 
+                    // eslint-disable-next-line no-restricted-globals
                     if (isFinite(newSpeed)) {
                         if (this.video.playbackRate !== value) {
                             this.video.playbackRate = value;

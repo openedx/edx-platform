@@ -68,8 +68,9 @@ define(
                 var metadata = (_.isString(data)) ? JSON.parse(data) : data,
                     models = [];
 
-                // eslint-disable-next-line no-var
+                /* eslint-disable-next-line no-var, no-restricted-syntax */
                 for (var model in metadata) {
+                    // eslint-disable-next-line no-prototype-builtins
                     if (metadata.hasOwnProperty(model)) {
                         models.push(metadata[model]);
                     }

@@ -39,7 +39,7 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
         handleValidationError: function(model, error) {
             this.clearValidationErrors();
             // error is object w/ fields and error strings
-            /* eslint-disable-next-line guard-for-in, no-var */
+            /* eslint-disable-next-line guard-for-in, no-var, no-restricted-syntax */
             for (var field in error) {
                 // eslint-disable-next-line no-var
                 var ele = this.$el.find('#' + this.fieldToSelectorMap[field]);

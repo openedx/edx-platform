@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 /* globals gettext */
 
 import 'whatwg-fetch';

@@ -60,6 +60,7 @@
                     // eslint-disable-next-line no-var
                     var filterInfo = this.filterableColumns[filterColumn];
                     if (!filterInfo) {
+                        // eslint-disable-next-line no-throw-literal
                         throw "Unregistered filter column '" + filterInfo + '"';
                     }
                     return filterInfo;
@@ -99,6 +100,7 @@
                     // eslint-disable-next-line no-var
                     var sortInfo = this.sortableColumns[sortColumn];
                     if (!sortInfo) {
+                        // eslint-disable-next-line no-throw-literal
                         throw "Unregistered sort column '" + sortColumn + '"';
                     }
                     return sortInfo;

@@ -77,6 +77,7 @@ $(function() {
     $('#survey-form').on('ajax:success', function(event, json, xhr) {
         // eslint-disable-next-line no-var
         var url = json.redirect_url;
+        // eslint-disable-next-line no-restricted-globals
         location.href = url;
     });
 

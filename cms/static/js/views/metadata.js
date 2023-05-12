@@ -195,16 +195,19 @@ define(
                     var step = 'step';
                     // eslint-disable-next-line no-var
                     var options = this.model.getOptions();
+                    // eslint-disable-next-line no-prototype-builtins
                     if (options.hasOwnProperty(min)) {
                         this.min = Number(options[min]);
                         this.$el.find('input').attr(min, numToString(this.min));
                     }
+                    // eslint-disable-next-line no-prototype-builtins
                     if (options.hasOwnProperty(max)) {
                         this.max = Number(options[max]);
                         this.$el.find('input').attr(max, numToString(this.max));
                     }
                     /* eslint-disable-next-line no-undef-init, no-var */
                     var stepValue = undefined;
+                    // eslint-disable-next-line no-prototype-builtins
                     if (options.hasOwnProperty(step)) {
                     // Parse step and convert to String. Polyfill doesn't like float values like ".1" (expects "0.1").
                         stepValue = numToString(Number(options[step]));

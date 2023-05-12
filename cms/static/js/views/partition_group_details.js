@@ -70,6 +70,7 @@ define([
             if (count === 0) {
                 return gettext('Not in Use');
             } else {
+                // eslint-disable-next-line no-redeclare
                 /* globals ngettext */
                 return StringUtils.interpolate(ngettext(
                     /*

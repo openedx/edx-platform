@@ -107,8 +107,10 @@ define([
                                         return;
                                     }
 
+                                    // eslint-disable-next-line no-prototype-builtins
                                     errMsg = serverMsg.hasOwnProperty('ErrMsg') ? serverMsg.ErrMsg : '';
 
+                                    // eslint-disable-next-line no-prototype-builtins
                                     if (serverMsg.hasOwnProperty('Stage')) {
                                         stage = Math.abs(serverMsg.Stage);
                                         Import.cancel(defaults[stage] + errMsg, stage);

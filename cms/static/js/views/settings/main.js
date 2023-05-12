@@ -300,7 +300,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 }
                 break;
             case 'pre-requisite-course':
-                // eslint-disable-next-line no-var
+                /* eslint-disable-next-line no-var, no-redeclare */
                 var value = $(event.currentTarget).val();
                 // eslint-disable-next-line eqeqeq
                 value = value == '' ? [] : [value];

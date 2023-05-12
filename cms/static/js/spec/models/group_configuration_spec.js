@@ -78,8 +78,9 @@ define([
                     // eslint-disable-next-line no-var
                     var attributes = {};
 
-                    // eslint-disable-next-line no-var
+                    /* eslint-disable-next-line no-var, no-restricted-syntax */
                     for (var prop in obj) {
+                        // eslint-disable-next-line no-prototype-builtins
                         if (obj.hasOwnProperty(prop)) {
                             attributes[prop] = deepAttributes(obj[prop]);
                         }

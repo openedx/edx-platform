@@ -906,6 +906,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 groupAccess = this.model.attributes.group_access;
                 keys = Object.keys(groupAccess);
                 if (keys.length === 1) { // should be only one partition key
+                    // eslint-disable-next-line no-prototype-builtins
                     if (groupAccess.hasOwnProperty(keys[0]) && groupAccess[keys[0]].length > 0) {
                         // Select the option that has group access, provided there is a specific group within the scheme
                         this.$('.user-partition-select option[value=' + keys[0] + ']').prop('selected', true);
@@ -953,6 +954,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             // eslint-disable-next-line no-var
             var userPartitionId = this.getSelectedEnrollmentTrackId(),
                 groupAccess = {};
+            // eslint-disable-next-line no-restricted-globals
             if (userPartitionId !== -1 && !isNaN(userPartitionId)) {
                 groupAccess[userPartitionId] = this.getSelectedCheckboxesByDivId(userPartitionId);
                 return groupAccess;

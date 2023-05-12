@@ -407,8 +407,10 @@
         var innerWidth, innerHeight;
 
         // It's not very clear which blocks work with which browsers.
+        // eslint-disable-next-line no-restricted-globals
         if (self.innerHeight && self.scrollMaxY) {
             scrollWidth = doc.body.scrollWidth;
+            // eslint-disable-next-line no-restricted-globals
             scrollHeight = self.innerHeight + self.scrollMaxY;
         } else if (doc.body.scrollHeight > doc.body.offsetHeight) {
             scrollWidth = doc.body.scrollWidth;
@@ -418,9 +420,12 @@
             scrollHeight = doc.body.offsetHeight;
         }
 
+        // eslint-disable-next-line no-restricted-globals
         if (self.innerHeight) {
             // Non-IE browser
+            // eslint-disable-next-line no-restricted-globals
             innerWidth = self.innerWidth;
+            // eslint-disable-next-line no-restricted-globals
             innerHeight = self.innerHeight;
         } else if (doc.documentElement && doc.documentElement.clientHeight) {
             // Some versions of IE (IE 6 w/ a DOCTYPE declaration)

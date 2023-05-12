@@ -201,6 +201,7 @@ describe('CourseOutlinePage', function() {
         $(".modal-section .settings-tab-button[data-tab='advanced']").click();
     };
 
+    // eslint-disable-next-line no-redeclare
     function selectDiscussionSettings() {
         $(".modal-section .settings-tab-button[data-tab='discussion']").click();
     }

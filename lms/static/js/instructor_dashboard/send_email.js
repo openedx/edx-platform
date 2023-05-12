@@ -108,6 +108,7 @@
                     }
                     confirmMessage += '\n\n' + gettext('Is this OK?');
                     fullConfirmMessage = confirmMessage.replace('{subject}', subject);
+                    // eslint-disable-next-line no-restricted-globals
                     if (confirm(fullConfirmMessage)) { // eslint-disable-line no-alert
                         sendData = {
                             action: 'send',

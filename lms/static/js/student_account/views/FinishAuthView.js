@@ -58,7 +58,7 @@
                     emailOptIn: $.url('?email_opt_in'),
                     purchaseWorkflow: $.url('?purchase_workflow')
                 };
-                // eslint-disable-next-line no-var
+                /* eslint-disable-next-line no-var, no-restricted-syntax */
                 for (var key in queryParams) {
                     if (queryParams[key]) {
                         queryParams[key] = decodeURIComponent(queryParams[key]);

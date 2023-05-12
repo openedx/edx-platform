@@ -23,6 +23,7 @@
                     this.pagingHeaderView = new PagingHeaderView({collection: this.collection});
                     this.pagingFooterView = new PagingFooterView({collection: this.collection, hideWhenOnePage: true});
                 }
+                // eslint-disable-next-line no-prototype-builtins
                 if (this.hasOwnProperty('collection')) {
                     this.listenTo(this.collection, 'page_changed', this.render);
                 }

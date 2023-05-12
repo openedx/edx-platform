@@ -15,6 +15,7 @@ define(['jquery.form', 'js/index'], function() {
 
         // eslint-disable-next-line no-var
         var reloadPage = function() {
+            // eslint-disable-next-line no-restricted-globals
             location.reload();
         };
 

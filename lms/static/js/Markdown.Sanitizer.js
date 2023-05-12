@@ -111,7 +111,7 @@
 
         // delete all orphaned tags from the string
 
-        /* eslint-disable-next-line block-scoped-var, no-var */
+        /* eslint-disable-next-line block-scoped-var, no-var, no-redeclare */
         var ctag = 0;
         // eslint-disable-next-line no-shadow
         html = html.replace(re, function(match) {

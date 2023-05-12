@@ -36,15 +36,21 @@
             this.instructor_tasks = new (PendingInstructorTasks())(this.$section);
             this.$error_msg = this.$section.find('#error-msg');
             this.$list_sale_csv_btn.click(function() {
+                // eslint-disable-next-line no-restricted-globals
                 location.href = eCom.$list_sale_csv_btn.data('endpoint') + '/csv';
+                // eslint-disable-next-line no-restricted-globals
                 return location.href;
             });
             this.$list_order_sale_csv_btn.click(function() {
+                // eslint-disable-next-line no-restricted-globals
                 location.href = eCom.$list_order_sale_csv_btn.data('endpoint');
+                // eslint-disable-next-line no-restricted-globals
                 return location.href;
             });
             this.$download_coupon_codes.click(function() {
+                // eslint-disable-next-line no-restricted-globals
                 location.href = eCom.$download_coupon_codes.data('endpoint');
+                // eslint-disable-next-line no-restricted-globals
                 return location.href;
             });
             this.$download_registration_codes_form.submit(function() {

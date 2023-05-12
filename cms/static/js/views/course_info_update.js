@@ -85,6 +85,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                 // If the value to be set was typed, validate that entry rather than the current datepicker value
                 if (this.dateEntry(event).length > 0) {
                     value = DateUtils.parseDateFromString(this.dateEntry(event).val());
+                    // eslint-disable-next-line no-restricted-globals
                     if (value && isNaN(value.getTime())) {
                         value = '';
                     }
@@ -108,6 +109,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
 
             $validationElement.find('.message-error').remove();
             Object.keys(error).forEach(function(field) {
+                // eslint-disable-next-line no-prototype-builtins
                 if (error.hasOwnProperty(field)) {
                     HtmlUtils.append(
                         $validationElement.find('#update-date-' + model.cid).parent(),

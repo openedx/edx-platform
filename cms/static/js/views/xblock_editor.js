@@ -73,7 +73,9 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
             metadataEditor = this.$('.metadata_edit');
             if (metadataEditor.length === 1) {
                 metadataData = metadataEditor.data('metadata');
+                // eslint-disable-next-line no-restricted-syntax
                 for (key in metadataData) {
+                    // eslint-disable-next-line no-prototype-builtins
                     if (metadataData.hasOwnProperty(key)) {
                         models.push(metadataData[key]);
                     }

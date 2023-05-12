@@ -120,6 +120,7 @@
          Returns true if the user clicked OK, else false.
          */
         MarkdownEditingDescriptor.prototype.confirmConversionToXml = function() {
+            // eslint-disable-next-line no-restricted-globals
             return confirm(gettext('If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n\nProceed to the Advanced Editor and convert this problem to XML?')); // eslint-disable-line max-len, no-alert
         };
 
@@ -577,6 +578,7 @@
                             if (stringValue.match(/[a-df-z]/i)) {
                                 return false;
                             }
+                            // eslint-disable-next-line no-restricted-globals
                             return !isNaN(parseFloat(stringValue));
                         },
 
@@ -642,6 +644,7 @@
                                     // Do not add additional_answer if additional answer is not numerical (eg. or= ABC)
                                     // or contains range tolerance case (eg. or= (5,7)
                                     // or has tolerance (eg. or= 10 +- 0.02)
+                                    // eslint-disable-next-line no-restricted-globals
                                     if (isNaN(parseFloat(orMatch[1]))
                                         || isRangeToleranceCase(orMatch[1])
                                         || hasTolerance) {

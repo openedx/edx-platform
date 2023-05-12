@@ -176,6 +176,7 @@ var edx = edx || {},
 
                     isLoaded = (
                         flashObj
+                        // eslint-disable-next-line no-prototype-builtins
                         && flashObj.hasOwnProperty('percentLoaded')
                         && flashObj.percentLoaded() === 100
                     );
@@ -184,6 +185,7 @@ var edx = edx || {},
                     // even "percentLoaded" isn't defined.
                     hasCamera = (
                         flashObj
+                        // eslint-disable-next-line no-prototype-builtins
                         && flashObj.hasOwnProperty('hasCamera')
                         && flashObj.hasCamera()
                     );

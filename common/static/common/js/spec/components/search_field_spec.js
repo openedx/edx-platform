@@ -62,6 +62,7 @@ define([
         var assertNotInQueryParams = function(request, param) {
             // eslint-disable-next-line no-var
             var urlParams = new URI(request.url).query(true);
+            // eslint-disable-next-line no-prototype-builtins
             return !urlParams.hasOwnProperty(param);
         };
 

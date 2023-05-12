@@ -22,7 +22,9 @@
 
             // Make a full proper copy of the draggable object, with some modifications.
             draggableObj = {};
+            // eslint-disable-next-line no-restricted-syntax
             for (property in this) {
+                // eslint-disable-next-line no-prototype-builtins
                 if (this.hasOwnProperty(property) === true) {
                     draggableObj[property] = this[property];
                 }

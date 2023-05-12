@@ -212,15 +212,19 @@
             });
 
             it('Descriptor is a proper constructor function', function() {
+                // eslint-disable-next-line no-prototype-builtins
                 expect(obj.hasOwnProperty('element')).toBe(true);
                 expect(obj.element).toBe(el);
 
+                // eslint-disable-next-line no-prototype-builtins
                 expect(obj.hasOwnProperty('update')).toBe(true);
             });
 
             it('Descriptor.onUpdate called for the first time', function() {
+                // eslint-disable-next-line no-prototype-builtins
                 expect(obj.hasOwnProperty('callbacks')).toBe(false);
                 obj.onUpdate(callback);
+                // eslint-disable-next-line no-prototype-builtins
                 expect(obj.hasOwnProperty('callbacks')).toBe(true);
                 expect($.isArray(obj.callbacks)).toBe(true);
 

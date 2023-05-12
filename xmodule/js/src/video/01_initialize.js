@@ -16,7 +16,7 @@
         'video/01_initialize.js',
         ['video/03_video_player.js', 'video/00_i18n.js', 'moment', 'underscore'],
         function(VideoPlayer, i18n, moment, _) {
-            // eslint-disable-next-line no-var
+            /* eslint-disable-next-line no-var, no-redeclare */
             var moment = moment || window.moment;
             /**
      * @function
@@ -396,6 +396,7 @@
                         ytTestTimeout: function(value) {
                             value = parseInt(value, 10);
 
+                            // eslint-disable-next-line no-restricted-globals
                             if (!isFinite(value)) {
                                 value = 1500;
                             }
@@ -404,6 +405,7 @@
                         },
                         startTime: function(value) {
                             value = parseInt(value, 10);
+                            // eslint-disable-next-line no-restricted-globals
                             if (!isFinite(value) || value < 0) {
                                 return 0;
                             }
@@ -413,6 +415,7 @@
                         endTime: function(value) {
                             value = parseInt(value, 10);
 
+                            // eslint-disable-next-line no-restricted-globals
                             if (!isFinite(value) || value === 0) {
                                 return null;
                             }
@@ -859,6 +862,7 @@
                 while (chain.length) {
                     i = chain.shift();
 
+                    // eslint-disable-next-line no-prototype-builtins
                     if (tmpObj.hasOwnProperty(i)) {
                         tmpObj = tmpObj[i];
                     } else {

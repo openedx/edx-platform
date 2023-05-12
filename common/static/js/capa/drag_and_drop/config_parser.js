@@ -39,6 +39,7 @@
         }
 
         function getDraggables(state, config) {
+            // eslint-disable-next-line no-prototype-builtins
             if (config.hasOwnProperty('draggables') === false) {
                 // eslint-disable-next-line no-console
                 console.log('ERROR: "config" does not have a property "draggables".');
@@ -64,6 +65,7 @@
         }
 
         function getBaseImage(state, config) {
+            // eslint-disable-next-line no-prototype-builtins
             if (config.hasOwnProperty('base_image') === false) {
                 // eslint-disable-next-line no-console
                 console.log('ERROR: "config" does not have a property "base_image".');
@@ -78,6 +80,7 @@
         }
 
         function getTargets(state, config) {
+            // eslint-disable-next-line no-prototype-builtins
             if (config.hasOwnProperty('targets') === false) {
             // It is possible that no "targets" were specified. This is not an error.
             // In this case the default value of "[]" (empty array) will be used.
@@ -104,6 +107,7 @@
         }
 
         function getOnePerTarget(state, config) {
+            // eslint-disable-next-line no-prototype-builtins
             if (config.hasOwnProperty('one_per_target') === false) {
                 // eslint-disable-next-line no-console
                 console.log('ERROR: "config" does not have a property "one_per_target".');
@@ -129,6 +133,7 @@
         // It is possible that no "target_outline" was specified. This is not an error.
         // In this case the default value of 'true' (boolean) will be used.
 
+            // eslint-disable-next-line no-prototype-builtins
             if (config.hasOwnProperty('target_outline') === true) {
                 if (typeof config.target_outline === 'string') {
                     if (config.target_outline.toLowerCase() === 'true') {
@@ -152,6 +157,7 @@
         // It is possible that no "label_bg_color" was specified. This is not an error.
         // In this case the default value of '#d6d6d6' (string) will be used.
 
+            // eslint-disable-next-line no-prototype-builtins
             if (config.hasOwnProperty('label_bg_color') === true) {
                 if (typeof config.label_bg_color === 'string') {
                     state.config.labelBgColor = config.label_bg_color;
@@ -182,6 +188,7 @@
             // eslint-disable-next-line no-use-before-define
             || (attrIsBoolean(obj, 'can_reuse', false) === false)
 
+            // eslint-disable-next-line no-prototype-builtins
             || (obj.hasOwnProperty('target_fields') === false)
             ) {
                 return false;
@@ -236,6 +243,7 @@
         }
 
         function attrIsString(obj, attr) {
+            // eslint-disable-next-line no-prototype-builtins
             if (obj.hasOwnProperty(attr) === false) {
                 // eslint-disable-next-line no-console
                 console.log('ERROR: Attribute "obj.' + attr + '" is not present.');
@@ -255,6 +263,7 @@
             // eslint-disable-next-line no-var
             var tempInt;
 
+            // eslint-disable-next-line no-prototype-builtins
             if (obj.hasOwnProperty(attr) === false) {
                 // eslint-disable-next-line no-console
                 console.log('ERROR: Attribute "obj.' + attr + '" is not present.');
@@ -264,6 +273,7 @@
 
             tempInt = parseInt(obj[attr], 10);
 
+            // eslint-disable-next-line no-restricted-globals
             if (isFinite(tempInt) === false) {
                 // eslint-disable-next-line no-console
                 console.log('ERROR: Attribute "obj.' + attr + '" is not an integer.');
@@ -277,6 +287,7 @@
         }
 
         function attrIsBoolean(obj, attr, defaultVal) {
+            // eslint-disable-next-line no-prototype-builtins
             if (obj.hasOwnProperty(attr) === false) {
                 if (defaultVal === undefined) {
                     // eslint-disable-next-line no-console

@@ -1,4 +1,5 @@
 // Backbone.js Page Object Factory: Certificate Invalidation Factory
+// eslint-disable-next-line no-redeclare
 /* global define, RequireJS */
 
 (function(define) {

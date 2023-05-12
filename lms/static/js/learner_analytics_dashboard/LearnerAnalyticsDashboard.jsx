@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable-next-line no-unused-vars, no-redeclare */
 /* global gettext */
 
 // eslint-disable-next-line no-unused-vars

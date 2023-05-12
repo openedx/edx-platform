@@ -74,7 +74,9 @@
             // eslint-disable-next-line no-var
             var id, info, _results;
             _results = [];
+            // eslint-disable-next-line no-restricted-syntax
             for (id in infos) {
+                // eslint-disable-next-line no-prototype-builtins
                 if (infos.hasOwnProperty(id)) {
                     info = infos[id];
                     _results.push(Content.getContent(id).updateInfo(info));
@@ -311,7 +313,9 @@
             // eslint-disable-next-line no-var
             var event, eventSelector, handler, selector, _ref, _results;
             _results = [];
+            // eslint-disable-next-line no-restricted-syntax
             for (eventSelector in eventsHandler) {
+                // eslint-disable-next-line no-prototype-builtins
                 if (eventsHandler.hasOwnProperty(eventSelector)) {
                     handler = eventsHandler[eventSelector];
                     _ref = eventSelector.split(' ');

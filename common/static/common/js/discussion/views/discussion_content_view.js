@@ -5,7 +5,7 @@
     // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
-            // eslint-disable-next-line no-var
+            /* eslint-disable-next-line no-var, no-restricted-syntax */
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -57,7 +57,9 @@
                     var action, selector, _ref, _results;
                     _ref = this.abilityRenderer;
                     _results = [];
+                    // eslint-disable-next-line no-restricted-syntax
                     for (action in _ref) {
+                        // eslint-disable-next-line no-prototype-builtins
                         if (_ref.hasOwnProperty(action)) {
                             selector = _ref[action];
                             if (!ability[action]) {
@@ -127,7 +129,9 @@
                 var attr, value, _ref, _results;
                 _ref = this.model.changedAttributes();
                 _results = [];
+                // eslint-disable-next-line no-restricted-syntax
                 for (attr in _ref) {
+                    // eslint-disable-next-line no-prototype-builtins
                     if (_ref.hasOwnProperty(attr)) {
                         value = _ref[attr];
                         if (this.attrRenderer[attr]) {
@@ -146,7 +150,9 @@
                 var attr, value, _ref, _results;
                 _ref = this.model.attributes;
                 _results = [];
+                // eslint-disable-next-line no-restricted-syntax
                 for (attr in _ref) {
+                    // eslint-disable-next-line no-prototype-builtins
                     if (_ref.hasOwnProperty(attr)) {
                         value = _ref[attr];
                         if (this.attrRenderer[attr]) {

@@ -238,9 +238,9 @@ var Channel = (function() {
 
         if (origin === '*') {
             // we must check all other origins, sadly.
-            /* eslint-disable-next-line camelcase, no-var */
+            /* eslint-disable-next-line camelcase, no-var, no-restricted-syntax */
             for (var k in s_boundChans) {
-                /* eslint-disable-next-line no-continue, camelcase */
+                /* eslint-disable-next-line no-continue, camelcase, no-prototype-builtins */
                 if (!s_boundChans.hasOwnProperty(k)) { continue; }
                 // eslint-disable-next-line no-continue
                 if (k === '*') { continue; }
@@ -264,6 +264,7 @@ var Channel = (function() {
                 exists = hasWin(s_boundChans[origin][scope]);
             }
         }
+        // eslint-disable-next-line no-throw-literal
         if (exists) { throw "A channel is already bound to the same window which overlaps with origin '" + origin + "' and has scope '" + scope + "'"; }
 
         // eslint-disable-next-line camelcase
@@ -315,6 +316,7 @@ var Channel = (function() {
         try {
             // eslint-disable-next-line no-var
             var m = JSON.parse(e.data);
+            // eslint-disable-next-line no-throw-literal
             if (typeof m !== 'object' || m === null) { throw 'malformed'; }
         // eslint-disable-next-line no-shadow
         } catch (e) {
@@ -375,7 +377,7 @@ var Channel = (function() {
 
             // eslint-disable-next-line camelcase
             if (!delivered && s_boundChans['*'] && s_boundChans['*'][s]) {
-                /* eslint-disable-next-line block-scoped-var, camelcase, no-var */
+                /* eslint-disable-next-line block-scoped-var, camelcase, no-var, no-redeclare */
                 for (var j = 0; j < s_boundChans['*'][s].length; j++) {
                     /* eslint-disable-next-line block-scoped-var, camelcase */
                     if (s_boundChans['*'][s][j].win === w) {
@@ -443,18 +445,23 @@ var Channel = (function() {
             };
 
             /* browser capabilities check */
+            // eslint-disable-next-line no-throw-literal
             if (!window.postMessage) { throw ('jschannel cannot run this browser, no postMessage'); }
             if (!window.JSON || !window.JSON.stringify || !window.JSON.parse) {
+                // eslint-disable-next-line no-throw-literal
                 throw ('jschannel cannot run this browser, no JSON parsing/serialization');
             }
 
             /* basic argument validation */
+            // eslint-disable-next-line no-throw-literal
             if (typeof cfg !== 'object') { throw ('Channel build invoked without a proper object argument'); }
 
+            // eslint-disable-next-line no-throw-literal
             if (!cfg.window || !cfg.window.postMessage) { throw ('Channel.build() called without a valid window argument'); }
 
             /* we'd have to do a little more work to be able to run multiple channels that intercommunicate the same
              * window...  Not sure if we care to support that */
+            // eslint-disable-next-line no-throw-literal
             if (window === cfg.window) { throw ('target window is same as present window -- not allowed'); }
 
             // let's require that the client specify an origin.  if we just assume '*' we'll be
@@ -474,10 +481,13 @@ var Channel = (function() {
                 }
             }
 
+            // eslint-disable-next-line no-throw-literal
             if (!validOrigin) { throw ('Channel.build() called with an invalid origin'); }
 
             if (typeof cfg.scope !== 'undefined') {
+                // eslint-disable-next-line no-throw-literal
                 if (typeof cfg.scope !== 'string') { throw 'scope, when specified, must be a string'; }
+                // eslint-disable-next-line no-throw-literal
                 if (cfg.scope.split('::').length > 1) { throw "scope may not contain double colons: '::'"; }
             }
 
@@ -520,12 +530,14 @@ var Channel = (function() {
                     origin: origin,
                     invoke: function(cbName, v) {
                         // verify in table
+                        // eslint-disable-next-line no-throw-literal
                         if (!inTbl[id]) { throw 'attempting to invoke a callback of a nonexistent transaction: ' + id; }
                         // verify that the callback name is valid
                         // eslint-disable-next-line no-var
                         var valid = false;
                         // eslint-disable-next-line no-var
                         for (var i = 0; i < callbacks.length; i++) { if (cbName === callbacks[i]) { valid = true; break; } }
+                        // eslint-disable-next-line no-throw-literal
                         if (!valid) { throw "request supports no such callback '" + cbName + "'"; }
 
                         // send callback invocation
@@ -535,6 +547,7 @@ var Channel = (function() {
                     error: function(error, message) {
                         completed = true;
                         // verify in table
+                        // eslint-disable-next-line no-throw-literal
                         if (!inTbl[id]) { throw 'error called for nonexistent message: ' + id; }
 
                         // remove transaction from table
@@ -547,6 +560,7 @@ var Channel = (function() {
                     complete: function(v) {
                         completed = true;
                         // verify in table
+                        // eslint-disable-next-line no-throw-literal
                         if (!inTbl[id]) { throw 'complete called for nonexistent message: ' + id; }
                         // remove transaction from table
                         delete inTbl[id];
@@ -723,6 +737,7 @@ var Channel = (function() {
             // case that clients start sending messages before the other end is "ready"
             // eslint-disable-next-line no-var
             var postMessage = function(msg, force) {
+                // eslint-disable-next-line no-throw-literal
                 if (!msg) { throw 'postMessage called with null message'; }
 
                 // delay posting if we're not ready yet.
@@ -747,6 +762,7 @@ var Channel = (function() {
             // eslint-disable-next-line no-var
             var onReady = function(trans, type) {
                 debug('ready msg received');
+                // eslint-disable-next-line no-throw-literal
                 if (ready) { throw 'received ready message while in ready state.  help!'; }
 
                 if (type === 'ping') {
@@ -780,22 +796,29 @@ var Channel = (function() {
                 // tries to unbind a bound message handler.  returns false if not possible
                 unbind: function(method) {
                     if (regTbl[method]) {
+                        // eslint-disable-next-line no-throw-literal
                         if (!(delete regTbl[method])) { throw ("can't delete method: " + method); }
                         return true;
                     }
                     return false;
                 },
                 bind: function(method, cb) {
+                    // eslint-disable-next-line no-throw-literal
                     if (!method || typeof method !== 'string') { throw "'method' argument to bind must be string"; }
+                    // eslint-disable-next-line no-throw-literal
                     if (!cb || typeof cb !== 'function') { throw 'callback missing from bind params'; }
 
+                    // eslint-disable-next-line no-throw-literal
                     if (regTbl[method]) { throw "method '" + method + "' is already bound!"; }
                     regTbl[method] = cb;
                     return this;
                 },
                 call: function(m) {
+                    // eslint-disable-next-line no-throw-literal
                     if (!m) { throw 'missing arguments to call function'; }
+                    // eslint-disable-next-line no-throw-literal
                     if (!m.method || typeof m.method !== 'string') { throw "'method' argument to call must be string"; }
+                    // eslint-disable-next-line no-throw-literal
                     if (!m.success || typeof m.success !== 'function') { throw "'success' callback missing from call"; }
 
                     // now it's time to support the 'callback' feature of jschannel.  We'll traverse the argument
@@ -810,14 +833,15 @@ var Channel = (function() {
                     /* eslint-disable-next-line no-shadow, no-var */
                     var pruneFunctions = function(path, obj) {
                         if (seen.indexOf(obj) >= 0) {
+                            // eslint-disable-next-line no-throw-literal
                             throw 'params cannot be a recursive data structure';
                         }
                         seen.push(obj);
 
                         if (typeof obj === 'object') {
-                            // eslint-disable-next-line no-var
+                            /* eslint-disable-next-line no-var, no-restricted-syntax */
                             for (var k in obj) {
-                                // eslint-disable-next-line no-continue
+                                /* eslint-disable-next-line no-continue, no-prototype-builtins */
                                 if (!obj.hasOwnProperty(k)) { continue; }
                                 // eslint-disable-next-line no-var
                                 var np = path + (path.length ? '/' : '') + k;
@@ -858,7 +882,9 @@ var Channel = (function() {
                     postMessage(msg);
                 },
                 notify: function(m) {
+                    // eslint-disable-next-line no-throw-literal
                     if (!m) { throw 'missing arguments to notify function'; }
+                    // eslint-disable-next-line no-throw-literal
                     if (!m.method || typeof m.method !== 'string') { throw "'method' argument to notify must be string"; }
 
                     // no need to go into any transaction table

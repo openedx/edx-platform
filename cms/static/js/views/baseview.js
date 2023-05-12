@@ -40,7 +40,7 @@ function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
             if (!Math.trunc) {
                 Math.trunc = function(v) {
                     v = +v; // eslint-disable-line no-param-reassign
-                    // eslint-disable-next-line no-mixed-operators, no-nested-ternary
+                    /* eslint-disable-next-line no-mixed-operators, no-nested-ternary, no-restricted-globals */
                     return (v - v % 1) || (!isFinite(v) || v === 0 ? v : v < 0 ? -0 : 0);
                 };
             }

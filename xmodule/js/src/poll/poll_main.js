@@ -9,6 +9,7 @@
                 var _this, totalValue;
 
                 totalValue = parseFloat(total);
+                // eslint-disable-next-line no-restricted-globals
                 if (isFinite(totalValue) === false) {
                     return;
                 }
@@ -20,6 +21,7 @@
                     var numValue, percentValue;
 
                     numValue = parseFloat(value);
+                    // eslint-disable-next-line no-restricted-globals
                     if (isFinite(numValue) === false) {
                         return;
                     }
@@ -101,6 +103,7 @@
                         console.log(response);
 
                         if (
+                            // eslint-disable-next-line no-prototype-builtins
                             (response.hasOwnProperty('status') !== true)
                 || (typeof response.status !== 'string')
                 || (response.status.toLowerCase() !== 'success')) {
@@ -133,6 +136,7 @@
 
                 if (
                     (this.jsonConfig.poll_answer.length > 0)
+        // eslint-disable-next-line no-prototype-builtins
         && (this.jsonConfig.answers.hasOwnProperty(this.jsonConfig.poll_answer) === false)
                 ) {
                     HtmlUtils.append(this.questionEl, HtmlUtils.joinHtml(

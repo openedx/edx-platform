@@ -58,6 +58,7 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
                 },
                 success: function() {
                     notification.hide();
+                    // eslint-disable-next-line no-restricted-globals
                     location.reload();
                 }
             });

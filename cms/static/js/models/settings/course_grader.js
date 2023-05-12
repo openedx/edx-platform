@@ -41,6 +41,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             if (_.has(attrs, 'weight')) {
                 // eslint-disable-next-line no-var
                 var intWeight = Math.round(attrs.weight); // see if this ensures value saved is int
+                // eslint-disable-next-line no-restricted-globals
                 if (!isFinite(intWeight) || /\D+/.test(attrs.weight) || intWeight < 0 || intWeight > 100) {
                     errors.weight = gettext('Please enter an integer between 0 and 100.');
                 } else {
@@ -57,6 +58,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             if (_.has(attrs, 'min_count')) {
                 // eslint-disable-next-line no-var
                 var intMinCount = Math.round(attrs.min_count);
+                // eslint-disable-next-line no-restricted-globals
                 if (!isFinite(intMinCount) || /\D+/.test(attrs.min_count) || intMinCount < 1) {
                     errors.min_count = gettext('Please enter an integer greater than 0.');
                 } else { attrs.min_count = intMinCount; }
@@ -66,6 +68,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                 var dropCount = attrs.drop_count;
                 // eslint-disable-next-line no-var
                 var intDropCount = Math.round(dropCount);
+                // eslint-disable-next-line no-restricted-globals
                 if (!isFinite(intDropCount) || /\D+/.test(dropCount) || (_.isString(dropCount) && _.isEmpty(dropCount.trim())) || intDropCount < 0) {
                     errors.drop_count = gettext('Please enter non-negative integer.');
                 } else { attrs.drop_count = intDropCount; }

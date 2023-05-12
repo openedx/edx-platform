@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 /* global gettext */
 import React from 'react';
 import PropTypes from 'prop-types';

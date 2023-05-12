@@ -156,6 +156,7 @@
                     if ('focusNextID' in this.options) {
                         $.cookie('focus_id', this.options.focusNextID);
                     }
+                    // eslint-disable-next-line no-restricted-globals
                     location.reload(true);
                 }
 

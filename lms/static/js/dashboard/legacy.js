@@ -226,11 +226,13 @@ var edx = edx || {};
                 data: $(this).serializeArray(),
                 success: function(data) {
                     if (data.success) {
+                        // eslint-disable-next-line no-restricted-globals
                         location.href = urls.dashboard;
                     }
                 },
                 error: function(xhr) {
                     if (xhr.status === 403) {
+                        // eslint-disable-next-line no-restricted-globals
                         location.href = urls.signInUser;
                     }
                 }

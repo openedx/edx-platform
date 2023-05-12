@@ -10,6 +10,7 @@ var edx = edx || {};
     var self;
 
     edx.ccx.schedule.reloadPage = function() {
+        // eslint-disable-next-line no-restricted-globals
         location.reload();
     };
 
@@ -506,7 +507,7 @@ var edx = edx || {};
                         time = $(this).find('input[name=time]').val();
                     /* eslint-disable-next-line camelcase, no-var */
                     var valid_date = new Date(date);
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-restricted-globals */
                     if (isNaN(valid_date.valueOf())) {
                         // eslint-disable-next-line no-alert
                         alert('Please enter a valid date');

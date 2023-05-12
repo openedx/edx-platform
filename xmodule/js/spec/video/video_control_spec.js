@@ -62,6 +62,7 @@
                     // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0 && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -93,7 +94,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -127,7 +130,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -161,7 +166,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -195,7 +202,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -231,7 +240,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -265,7 +276,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -299,7 +312,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -333,7 +348,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -368,7 +385,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -404,7 +423,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -439,7 +460,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -474,7 +497,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -509,7 +534,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');
@@ -544,7 +571,9 @@
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
+                        // eslint-disable-next-line no-restricted-globals
                         return isFinite(duration) && duration > 0
+                        // eslint-disable-next-line no-restricted-globals
                         && isFinite(state.videoPlayer.startTime);
                     }).then(function() {
                         expectedValue = $('.video-controls').find('.vidtime');

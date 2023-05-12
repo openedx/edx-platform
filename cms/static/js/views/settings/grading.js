@@ -443,7 +443,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         // convert cutoffs to inversely ordered list
             // eslint-disable-next-line no-var
             var modelCutoffs = this.model.get('grade_cutoffs');
-            /* eslint-disable-next-line guard-for-in, no-var */
+            /* eslint-disable-next-line guard-for-in, no-var, no-restricted-syntax */
             for (var cutoff in modelCutoffs) {
                 this.descendingCutoffs.push({designation: cutoff, cutoff: Math.round(modelCutoffs[cutoff] * 100)});
             }

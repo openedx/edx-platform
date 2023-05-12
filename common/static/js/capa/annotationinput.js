@@ -104,9 +104,11 @@
             if (result === null) {
                 result = {};
             }
+            // eslint-disable-next-line no-prototype-builtins
             if (!result.hasOwnProperty('options')) {
                 result.options = [];
             }
+            // eslint-disable-next-line no-prototype-builtins
             if (!result.hasOwnProperty('comment')) {
                 result.comment = '';
             }

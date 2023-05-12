@@ -410,6 +410,7 @@
             function update(time) {
                 this.videoPlayer.currentTime = time || this.videoPlayer.player.getCurrentTime();
 
+                // eslint-disable-next-line no-restricted-globals
                 if (isFinite(this.videoPlayer.currentTime)) {
                     this.videoPlayer.updatePlayTime(this.videoPlayer.currentTime);
 
@@ -932,6 +933,7 @@
                 // Be careful! Often the metadata duration is not very precise. It
                 // might differ by one or two seconds against the actual time as will
                 // be reported later on by the player.getDuration() API function.
+                // eslint-disable-next-line no-restricted-globals
                 if (!isFinite(dur) || dur <= 0) {
                     if (this.isYoutubeType()) {
                         dur = this.getDuration();
@@ -940,6 +942,7 @@
 
                 // Just in case the metadata is garbled, or something went wrong, we
                 // have a final check.
+                // eslint-disable-next-line no-restricted-globals
                 if (!isFinite(dur) || dur <= 0) {
                     dur = 0;
                 }

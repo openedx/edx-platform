@@ -99,6 +99,7 @@
                 return;
             }
 
+            // eslint-disable-next-line no-prototype-builtins
             if (answerSortedByDepth.hasOwnProperty(depth) === false) {
             // We have a depth that ts not valid, we decrease the depth by one.
                 processAnswerTargets(state, answerSortedByDepth, minDepth, maxDepth, depth - 1, 0);
@@ -243,7 +244,9 @@
 
             (function(c1) {
                 while (c1 < answer.length) {
+                    // eslint-disable-next-line no-restricted-syntax
                     for (draggableId in answer[c1]) {
+                        // eslint-disable-next-line no-prototype-builtins
                         if (answer[c1].hasOwnProperty(draggableId) === false) {
                             // eslint-disable-next-line no-continue
                             continue;
@@ -295,6 +298,7 @@
                     maxDepth = depth;
                 }
 
+                // eslint-disable-next-line no-prototype-builtins
                 if (answerSortedByDepth.hasOwnProperty(depth) === false) {
                     answerSortedByDepth[depth] = [];
                 }
@@ -330,7 +334,9 @@
 
             depth += 1;
 
+            // eslint-disable-next-line no-restricted-syntax
             for (i in tempObj) {
+                // eslint-disable-next-line no-prototype-builtins
                 if (tempObj.hasOwnProperty(i) === true) {
                     depth = findDepth(tempObj[i], depth);
                 }

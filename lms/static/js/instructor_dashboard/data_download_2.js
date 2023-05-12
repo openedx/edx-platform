@@ -124,6 +124,7 @@
                 var errorMessage = dataDownloadObj.ERROR_MESSAGES[selectedOption.val()];
 
                 if (selectedOption.data('directdownload')) {
+                    // eslint-disable-next-line no-restricted-globals
                     location.href = selectedOption.data('endpoint') + '?csv=true';
                 } else if (selectedOption.data('datatable')) {
                     dataDownloadObj.renderDataTable(selectedOption);
@@ -235,6 +236,7 @@
                     }
                     return results;
                 }());
+                // eslint-disable-next-line no-prototype-builtins
                 gridData = data.hasOwnProperty('students') ? data.students : data.certificates;
                 $tablePlaceholder = $('<div/>', {
                     class: 'slickgrid'

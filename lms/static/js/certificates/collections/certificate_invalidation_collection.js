@@ -1,4 +1,5 @@
 // Backbone.js Application Collection: CertificateInvalidationCollection
+// eslint-disable-next-line no-redeclare
 /* global define, RequireJS */
 
 (function(define) {

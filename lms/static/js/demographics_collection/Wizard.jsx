@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 /* global gettext */
 import React from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies

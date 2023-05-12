@@ -35,7 +35,7 @@
             // and a "task_progress.duration" key.
             /* eslint-disable-next-line camelcase, no-var */
             var something_in_progress = false;
-            /* eslint-disable-next-line guard-for-in, camelcase, no-undef */
+            /* eslint-disable-next-line guard-for-in, camelcase, no-undef, no-restricted-syntax */
             for (task_id in response) {
                 /* eslint-disable-next-line camelcase, no-undef, no-var */
                 var task_dict = response[task_id];

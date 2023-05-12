@@ -90,6 +90,7 @@ var edx = edx || {};
             responseFromServer: function(data) {
                 // eslint-disable-next-line eqeqeq
                 if (data.is_course_enrollment_closed == true) {
+                    // eslint-disable-next-line no-restricted-globals
                     location.href = '/shoppingcart';
                 } else {
                     this.submitPaymentForm(this.$paymentForm);

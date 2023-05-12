@@ -87,6 +87,7 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
             var setfield;
             // eslint-disable-next-line no-var
             var currentDate;
+            // eslint-disable-next-line no-prototype-builtins
             if (typeof index !== 'undefined' && view.hasOwnProperty('collection')) {
                 cacheModel = view.collection.models[index];
                 div = view.$el.find('#' + view.collectionSelector(cacheModel.cid));

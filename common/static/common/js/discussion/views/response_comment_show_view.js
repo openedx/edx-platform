@@ -6,7 +6,7 @@
     // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
-            // eslint-disable-next-line no-var
+            /* eslint-disable-next-line no-var, no-restricted-syntax */
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -65,6 +65,7 @@
             ResponseCommentShowView.prototype.addReplyLink = function() {
                 // eslint-disable-next-line no-var
                 var html, name;
+                // eslint-disable-next-line no-prototype-builtins
                 if (this.model.hasOwnProperty('parent')) {
                     name = this.model.parent.get('username') || gettext('anonymous');
                     html = edx.HtmlUtils.interpolateHtml(

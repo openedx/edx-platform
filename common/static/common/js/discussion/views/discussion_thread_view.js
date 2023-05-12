@@ -8,7 +8,7 @@
     // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
-            // eslint-disable-next-line no-var
+            /* eslint-disable-next-line no-var, no-restricted-syntax */
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -479,7 +479,7 @@
                 if (!this.model.can('can_delete')) {
                     return;
                 }
-                // eslint-disable-next-line no-alert
+                /* eslint-disable-next-line no-alert, no-restricted-globals */
                 if (!confirm(gettext('Are you sure you want to delete this post?'))) {
                     return;
                 }

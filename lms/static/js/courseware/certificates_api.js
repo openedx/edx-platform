@@ -12,6 +12,7 @@ $(document).ready(function() {
             url: post_url,
             dataType: 'text',
             success: function() {
+                // eslint-disable-next-line no-restricted-globals
                 location.reload();
             },
             // eslint-disable-next-line no-unused-vars

@@ -67,6 +67,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
         getGroupsCountTitle: function() {
             // eslint-disable-next-line no-var
             var count = this.model.get('groups').length,
+                // eslint-disable-next-line no-redeclare
                 /* globals ngettext */
                 message = ngettext(
                     /*

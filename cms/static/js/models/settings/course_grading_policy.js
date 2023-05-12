@@ -73,6 +73,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
             // eslint-disable-next-line camelcase
             parseMinimumGradeCredit: function(minimum_grade_credit) {
                 // get the value of minimum grade credit value in percentage
+                // eslint-disable-next-line no-restricted-globals
                 if (isNaN(minimum_grade_credit)) {
                     return 0;
                 }
@@ -93,6 +94,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 if (this.get('is_credit_course') && _.has(attrs, 'minimum_grade_credit')) {
                     // Getting minimum grade cutoff value
                     minimumGradeCutoff = _.min(_.values(attrs.grade_cutoffs));
+                    // eslint-disable-next-line no-restricted-globals
                     if (isNaN(attrs.minimum_grade_credit) || attrs.minimum_grade_credit === null
                       || attrs.minimum_grade_credit < minimumGradeCutoff) {
                         return {

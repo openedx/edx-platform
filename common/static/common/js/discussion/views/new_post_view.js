@@ -5,7 +5,7 @@
     // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
-            // eslint-disable-next-line no-var
+            /* eslint-disable-next-line no-var, no-restricted-syntax */
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -260,6 +260,7 @@
             NewPostView.prototype.cancel = function(event) {
                 event.preventDefault();
                 if (this.formModified()) {
+                    // eslint-disable-next-line no-restricted-globals
                     if (!confirm(gettext('Your post will be discarded.'))) { // eslint-disable-line no-alert
                         return;
                     }

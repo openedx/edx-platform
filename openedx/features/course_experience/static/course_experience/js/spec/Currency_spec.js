@@ -3,6 +3,7 @@ eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/o
 import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
 import/named, import/no-useless-path-segments
 */
+// eslint-disable-next-line no-redeclare
 /* globals loadFixtures */
 
 import $ from 'jquery'; // eslint-disable-line import/extensions
