@@ -119,6 +119,7 @@ class MultiselectDropdown extends React.Component {
             );
         });
 
+        // eslint-disable-next-line consistent-return
         return (
             <fieldset id="multiselect-dropdown-fieldset" disabled={this.props.disabled}>
                 <legend className="sr-only">{this.props.label}</legend>

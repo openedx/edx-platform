@@ -210,6 +210,7 @@ var Channel = (function() {
     // There is one current transaction counter id per page, and it's shared between
     // channel instances.  That means of all messages posted from a single javascript
     // evaluation context, we'll never have two with the same id.
+    // eslint-disable-next-line camelcase
     var s_curTranId = Math.floor(Math.random() * 1000001);
 
     // no two bound channels in the same javascript evaluation context may have the same origin, scope, and window.
@@ -218,9 +219,11 @@ var Channel = (function() {
     // route messages based on origin and scope.  The s_boundChans maps origins to scopes, to message
     // handlers.  Request and Notification messages are routed using this table.
     // Finally, channels are inserted into this table when built, and removed when destroyed.
+    // eslint-disable-next-line camelcase
     var s_boundChans = { };
 
     // add a channel to s_boundChans, throwing if a dup exists
+    // eslint-disable-next-line camelcase
     function s_addBoundChan(win, origin, scope, handler) {
         function hasWin(arr) {
             for (var i = 0; i < arr.length; i++) { if (arr[i].win === win) { return true; } }
@@ -232,44 +235,59 @@ var Channel = (function() {
 
         if (origin === '*') {
             // we must check all other origins, sadly.
+            // eslint-disable-next-line camelcase
             for (var k in s_boundChans) {
-                // eslint-disable-next-line no-continue
+                /* eslint-disable-next-line no-continue, camelcase */
                 if (!s_boundChans.hasOwnProperty(k)) { continue; }
                 // eslint-disable-next-line no-continue
                 if (k === '*') { continue; }
+                // eslint-disable-next-line camelcase
                 if (typeof s_boundChans[k][scope] === 'object') {
+                    // eslint-disable-next-line camelcase
                     exists = hasWin(s_boundChans[k][scope]);
                     if (exists) { break; }
                 }
             }
         } else {
             // we must check only '*'
+            // eslint-disable-next-line camelcase
             if ((s_boundChans['*'] && s_boundChans['*'][scope])) {
+                // eslint-disable-next-line camelcase
                 exists = hasWin(s_boundChans['*'][scope]);
             }
+            // eslint-disable-next-line camelcase
             if (!exists && s_boundChans[origin] && s_boundChans[origin][scope]) {
+                // eslint-disable-next-line camelcase
                 exists = hasWin(s_boundChans[origin][scope]);
             }
         }
         if (exists) { throw "A channel is already bound to the same window which overlaps with origin '" + origin + "' and has scope '" + scope + "'"; }
 
+        // eslint-disable-next-line camelcase
         if (typeof s_boundChans[origin] !== 'object') { s_boundChans[origin] = { }; }
+        // eslint-disable-next-line camelcase
         if (typeof s_boundChans[origin][scope] !== 'object') { s_boundChans[origin][scope] = []; }
+        // eslint-disable-next-line camelcase
         s_boundChans[origin][scope].push({win: win, handler: handler});
     }
 
+    // eslint-disable-next-line camelcase
     function s_removeBoundChan(win, origin, scope) {
+        // eslint-disable-next-line camelcase
         var arr = s_boundChans[origin][scope];
         for (var i = 0; i < arr.length; i++) {
             if (arr[i].win === win) {
                 arr.splice(i, 1);
             }
         }
+        // eslint-disable-next-line camelcase
         if (s_boundChans[origin][scope].length === 0) {
+            // eslint-disable-next-line camelcase
             delete s_boundChans[origin][scope];
         }
     }
 
+    // eslint-disable-next-line camelcase
     function s_isArray(obj) {
         if (Array.isArray) { return Array.isArray(obj); } else {
             return (obj.constructor.toString().indexOf('Array') != -1);
@@ -280,12 +298,14 @@ var Channel = (function() {
     // mapping "transaction ids" to message handlers, allows efficient routing of Callback, Error, and
     // Response messages.  Entries are added to this table when requests are sent, and removed when
     // responses are received.
+    // eslint-disable-next-line camelcase
     var s_transIds = { };
 
     // class singleton onMessage handler
     // this function is registered once and all incoming messages route through here.  This
     // arrangement allows certain efficiencies, message data is only parsed once and dispatch
     // is more efficient, especially for large numbers of simultaneous channels.
+    // eslint-disable-next-line camelcase
     var s_onMessage = function(e) {
         try {
             var m = JSON.parse(e.data);
@@ -300,16 +320,20 @@ var Channel = (function() {
         var o = e.origin;
         var s, i, meth;
 
+        // eslint-disable-next-line block-scoped-var
         if (typeof m.method === 'string') {
+            // eslint-disable-next-line block-scoped-var
             var ar = m.method.split('::');
             if (ar.length == 2) {
                 s = ar[0];
                 meth = ar[1];
             } else {
+                // eslint-disable-next-line block-scoped-var
                 meth = m.method;
             }
         }
 
+        // eslint-disable-next-line block-scoped-var
         if (typeof m.id !== 'undefined') { i = m.id; }
 
         // w is message source window
@@ -324,9 +348,13 @@ var Channel = (function() {
         // route using s_boundChans
         if (typeof meth === 'string') {
             var delivered = false;
+            // eslint-disable-next-line camelcase
             if (s_boundChans[o] && s_boundChans[o][s]) {
+                /* eslint-disable-next-line block-scoped-var, camelcase */
                 for (var j = 0; j < s_boundChans[o][s].length; j++) {
+                    /* eslint-disable-next-line block-scoped-var, camelcase */
                     if (s_boundChans[o][s][j].win === w) {
+                        /* eslint-disable-next-line block-scoped-var, camelcase */
                         s_boundChans[o][s][j].handler(o, meth, m);
                         delivered = true;
                         break;
@@ -334,9 +362,13 @@ var Channel = (function() {
                 }
             }
 
+            // eslint-disable-next-line camelcase
             if (!delivered && s_boundChans['*'] && s_boundChans['*'][s]) {
+                /* eslint-disable-next-line block-scoped-var, camelcase */
                 for (var j = 0; j < s_boundChans['*'][s].length; j++) {
+                    /* eslint-disable-next-line block-scoped-var, camelcase */
                     if (s_boundChans['*'][s][j].win === w) {
+                        /* eslint-disable-next-line block-scoped-var, camelcase */
                         s_boundChans['*'][s][j].handler(o, meth, m);
                         break;
                     }
@@ -346,6 +378,7 @@ var Channel = (function() {
         }
         // otherwise it must have an id (or be poorly formed
         else if (typeof i !== 'undefined') {
+            /* eslint-disable-next-line block-scoped-var, camelcase */
             if (s_transIds[i]) { s_transIds[i](o, meth, m); }
         }
     };
@@ -508,6 +541,7 @@ var Channel = (function() {
                         var msg = 'timeout (' + timeout + "ms) exceeded on method '" + method + "'";
                         (1, outTbl[transId].error)('timeout_error', msg);
                         delete outTbl[transId];
+                        // eslint-disable-next-line camelcase
                         delete s_transIds[transId];
                     }
                 }, timeout);
@@ -613,6 +647,7 @@ var Channel = (function() {
                             if (m.result !== undefined) { (1, outTbl[m.id].success)(m.result); } else { (1, outTbl[m.id].success)(); }
                         }
                         delete outTbl[m.id];
+                        // eslint-disable-next-line camelcase
                         delete s_transIds[m.id];
                     }
                 } else if (method) {
@@ -739,6 +774,7 @@ var Channel = (function() {
                     pruneFunctions('', m.params);
 
                     // build a 'request' message and send it
+                    // eslint-disable-next-line camelcase
                     var msg = {id: s_curTranId, method: scopeMethod(m.method), params: m.params};
                     if (callbackNames.length) { msg.callbacks = callbackNames; }
 
@@ -750,10 +786,13 @@ var Channel = (function() {
                     { setTransactionTimeout(s_curTranId, m.timeout, scopeMethod(m.method)); }
 
                     // insert into the transaction table
+                    // eslint-disable-next-line camelcase
                     outTbl[s_curTranId] = {callbacks: callbacks, error: m.error, success: m.success};
+                    // eslint-disable-next-line camelcase
                     s_transIds[s_curTranId] = onMessage;
 
                     // increment current id
+                    // eslint-disable-next-line camelcase
                     s_curTranId++;
 
                     postMessage(msg);

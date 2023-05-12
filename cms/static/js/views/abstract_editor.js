@@ -78,6 +78,7 @@ define(['js/views/baseview', 'underscore'], function(BaseView, _) {
                 this.getClearButton().removeClass('active');
             }
 
+            // eslint-disable-next-line consistent-return
             return this;
         },
 

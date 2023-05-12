@@ -17,6 +17,7 @@ define(
                     'video/transcripts/metadata-videolist-entry.underscore'
                 ),
                 abstractEditor = AbstractEditor.prototype,
+                // eslint-disable-next-line camelcase
                 component_locator = 'component_locator',
                 videoList = [
                     {
@@ -82,6 +83,7 @@ define(
             beforeEach(function() {
                 var tpl = sandbox({ // eslint-disable-line no-undef
                     class: 'component',
+                    // eslint-disable-next-line camelcase
                     'data-locator': component_locator
                 });
 

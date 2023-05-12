@@ -113,6 +113,7 @@ define(['js/views/baseview', 'js/views/utils/xblock_utils', 'edx-ui-toolkit/js/u
                     this.cancelInput();
                     return;
                 }
+                // eslint-disable-next-line consistent-return
                 return XBlockViewUtils.updateXBlockField(xblockInfo, this.fieldName, newValue).done(function() {
                     self.refresh();
                 });

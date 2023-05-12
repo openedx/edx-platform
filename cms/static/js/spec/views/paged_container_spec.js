@@ -10,7 +10,9 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
                 + 'data-previews="<%= previews %>"></div>'
     );
 
+    // eslint-disable-next-line camelcase
     function getResponseHtml(override_options) {
+        // eslint-disable-next-line camelcase
         var default_options = {
             start: 0,
             displayed: PAGE_SIZE,
@@ -25,6 +27,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
                 + '</div>';
     }
 
+    // eslint-disable-next-line camelcase
     var makePage = function(html_parameters) {
         return {
             resources: [],
@@ -505,12 +508,17 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
                 var testSendsAjax,
                     defaultUrl = '/preview/xblock/handler/trigger_previews';
 
+                // eslint-disable-next-line camelcase
                 testSendsAjax = function(show_previews) {
+                    // eslint-disable-next-line camelcase
                     it('should send ' + (!show_previews) + ' when showChildrenPreviews was ' + show_previews, function() {
                         var requests = AjaxHelpers.requests(this);
+                        // eslint-disable-next-line camelcase
                         pagingContainer.collection.showChildrenPreviews = show_previews;
                         pagingContainer.togglePreviews();
+                        // eslint-disable-next-line camelcase
                         AjaxHelpers.expectJsonRequest(requests, 'POST', defaultUrl, {showChildrenPreviews: !show_previews});
+                        // eslint-disable-next-line camelcase
                         AjaxHelpers.respondWithJson(requests, {showChildrenPreviews: !show_previews});
                     });
                 };

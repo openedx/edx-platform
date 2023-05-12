@@ -5,6 +5,7 @@ import $ from 'jquery';
 import _ from 'underscore';
 import AjaxHelpers from 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers';
 import TemplateHelpers from 'common/js/spec_helpers/template_helpers';
+// eslint-disable-next-line camelcase
 import modal_helpers from 'js/spec_helpers/modal_helpers';
 import EditXBlockModal from 'js/views/modals/edit_xblock';
 import ComponentTemplates from 'js/collections/component_template';
@@ -78,6 +79,7 @@ mockComponentTemplates = new ComponentTemplates([
 });
 
 installEditTemplates = function(append) {
+    // eslint-disable-next-line camelcase
     modal_helpers.installModalTemplates(append);
 
     // Add templates needed by the add XBlock menu

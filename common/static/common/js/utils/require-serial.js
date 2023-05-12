@@ -4,6 +4,7 @@ Helper function used to require files serially instead of concurrently.
 (function(window, require) {
     'use strict';
 
+    // eslint-disable-next-line consistent-return
     var requireModules = function(paths, callback, modules) {
         // If all the modules have been loaded, call the callback.
         if (paths.length === 0) {

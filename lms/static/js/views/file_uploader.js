@@ -22,6 +22,7 @@
  * @param errorNotification, optional callback that can return a success NotificationModel for display
  *     after a file failed to upload. This method will be passed the attempted file, event, and data.
  */
+// eslint-disable-next-line camelcase
 (function(Backbone, $, _, gettext, interpolate_text, NotificationModel, NotificationView) {
     // Requires JQuery-File-Upload.
     var FileUploaderView = Backbone.View.extend({
@@ -33,8 +34,10 @@
 
         render: function() {
             var options = this.options,
+                // eslint-disable-next-line camelcase
                 get_option_with_default = function(option, default_value) {
                     var optionVal = options[option];
+                    // eslint-disable-next-line camelcase
                     return optionVal || default_value;
                 },
                 submitButton, resultNotification;

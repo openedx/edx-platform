@@ -109,12 +109,15 @@ define([
         });
 
         it('Selecting a course in pre-requisite drop down should save it as part of course details', function() {
+            // eslint-disable-next-line camelcase
             var pre_requisite_courses = ['test/CSS101/2012_T1'];
             var requests = AjaxHelpers.requests(this),
                 expectedJson = $.extend(true, {}, modelData, {
+                    // eslint-disable-next-line camelcase
                     pre_requisite_courses: pre_requisite_courses
                 });
             this.view.$el.find('#pre-requisite-course')
+                // eslint-disable-next-line camelcase
                 .val(pre_requisite_courses[0])
                 .trigger('change');
 
@@ -126,27 +129,35 @@ define([
         });
 
         it('should disallow save with an invalid minimum score percentage', function() {
+            // eslint-disable-next-line camelcase
             var entrance_exam_enabled_field = this.view.$(SELECTORS.entrance_exam_enabled_field),
+                // eslint-disable-next-line camelcase
                 entrance_exam_min_score = this.view.$(SELECTORS.entrance_exam_min_score);
 
             // input some invalid values.
+            // eslint-disable-next-line camelcase
             expect(entrance_exam_min_score.val('101').trigger('input')).toHaveClass('error');
+            // eslint-disable-next-line camelcase
             expect(entrance_exam_min_score.val('invalidVal').trigger('input')).toHaveClass('error');
         });
 
         it('should provide a default value for the minimum score percentage', function() {
+            // eslint-disable-next-line camelcase
             var entrance_exam_min_score = this.view.$(SELECTORS.entrance_exam_min_score);
 
             // if input an empty value, model should be populated with the default value.
+            // eslint-disable-next-line camelcase
             entrance_exam_min_score.val('').trigger('input');
             expect(this.model.get('entrance_exam_minimum_score_pct'))
                 .toEqual(this.model.defaults.entrance_exam_minimum_score_pct);
         });
 
         it('shows and hide the grade requirement section appropriately', function() {
+            // eslint-disable-next-line camelcase
             var entrance_exam_enabled_field = this.view.$(SELECTORS.entrance_exam_enabled_field);
 
             // select the entrance-exam-enabled checkbox. grade requirement section should be visible.
+            // eslint-disable-next-line camelcase
             entrance_exam_enabled_field
                 .prop('checked', true)
                 .trigger('change');
@@ -155,6 +166,7 @@ define([
             expect(this.view.$(SELECTORS.grade_requirement_div)).toBeVisible();
 
             // deselect the entrance-exam-enabled checkbox. grade requirement section should be hidden.
+            // eslint-disable-next-line camelcase
             entrance_exam_enabled_field
                 .prop('checked', false)
                 .trigger('change');
@@ -163,23 +175,31 @@ define([
         });
 
         it('should save entrance exam course details information correctly', function() {
+            // eslint-disable-next-line camelcase
             var entrance_exam_minimum_score_pct = '60',
+                // eslint-disable-next-line camelcase
                 entrance_exam_enabled = 'true',
+                // eslint-disable-next-line camelcase
                 entrance_exam_min_score = this.view.$(SELECTORS.entrance_exam_min_score),
+                // eslint-disable-next-line camelcase
                 entrance_exam_enabled_field = this.view.$(SELECTORS.entrance_exam_enabled_field);
 
             var requests = AjaxHelpers.requests(this),
                 expectedJson = $.extend(true, {}, modelData, {
+                    // eslint-disable-next-line camelcase
                     entrance_exam_enabled: entrance_exam_enabled,
+                    // eslint-disable-next-line camelcase
                     entrance_exam_minimum_score_pct: entrance_exam_minimum_score_pct
                 });
 
             // select the entrance-exam-enabled checkbox.
+            // eslint-disable-next-line camelcase
             entrance_exam_enabled_field
                 .prop('checked', true)
                 .trigger('change');
 
             // input a valid value for entrance exam minimum score.
+            // eslint-disable-next-line camelcase
             entrance_exam_min_score.val(entrance_exam_minimum_score_pct).trigger('input');
 
             this.view.saveView();

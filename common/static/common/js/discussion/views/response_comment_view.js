@@ -62,6 +62,7 @@
                 return view.delegateEvents();
             };
 
+            // eslint-disable-next-line consistent-return
             ResponseCommentView.prototype.renderShowView = function() {
                 if (!this.showView) {
                     if (this.editView) {
@@ -78,6 +79,7 @@
                 }
             };
 
+            // eslint-disable-next-line consistent-return
             ResponseCommentView.prototype.renderEditView = function() {
                 if (!this.editView) {
                     if (this.showView) {
@@ -108,6 +110,7 @@
                 }
                 url = this.model.urlFor('_delete');
                 $elem = $(event.target);
+                // eslint-disable-next-line consistent-return
                 return DiscussionUtil.safeAjax({
                     $elem: $elem,
                     url: url,

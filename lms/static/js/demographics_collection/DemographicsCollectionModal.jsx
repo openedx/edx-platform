@@ -86,7 +86,7 @@ class DemographicsCollectionModal extends React.Component {
         document.body.classList.remove('modal-open');
     }
 
-    // eslint-disable-next-line react/sort-comp
+    /* eslint-disable-next-line react/sort-comp, consistent-return */
     loadOptions(field) {
         const {choices} = get(this.state.options, field, {choices: []});
         if (choices.length) {
@@ -95,6 +95,7 @@ class DemographicsCollectionModal extends React.Component {
         }
     }
 
+    // eslint-disable-next-line consistent-return
     async handleSelectChange(e) {
         const url = `${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/${this.props.user}/`;
         const name = e.target.name;
@@ -178,6 +179,7 @@ class DemographicsCollectionModal extends React.Component {
     }
 
     // We gather the possible answers to any demographics questions from the OPTIONS of the api
+    // eslint-disable-next-line consistent-return
     async getDemographicsQuestionOptions() {
         try {
             const optionsResponse = await fetch(`${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`, {method: 'OPTIONS'});
@@ -222,6 +224,7 @@ class DemographicsCollectionModal extends React.Component {
         return data;
     }
 
+    // eslint-disable-next-line consistent-return
     async createDemographicsEntry() {
         const postUrl = `${this.props.demographicsBaseUrl}/demographics/api/v1/demographics/`;
         const postOptions = {

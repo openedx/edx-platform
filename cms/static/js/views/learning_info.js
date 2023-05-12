@@ -33,11 +33,13 @@ function($, _, Backbone, gettext, TemplateUtils, HtmlUtils) {
             // rendering for this model
             $('li.course-settings-learning-fields').empty();
             var self = this;
+            // eslint-disable-next-line camelcase
             var learning_information = this.model.get('learning_info');
             $.each(learning_information, function(index, info) {
                 var attributes = {
                     index: index,
                     info: info,
+                    // eslint-disable-next-line camelcase
                     info_count: learning_information.length
                 };
                 $(self.el).append(HtmlUtils.HTML(self.template(attributes)).toString());
@@ -50,7 +52,9 @@ function($, _, Backbone, gettext, TemplateUtils, HtmlUtils) {
             * */
             event.preventDefault();
             var index = event.currentTarget.getAttribute('data-index'),
+                // eslint-disable-next-line camelcase
                 existing_info = _.clone(this.model.get('learning_info'));
+            // eslint-disable-next-line camelcase
             existing_info.splice(index, 1);
             this.model.set('learning_info', existing_info);
         }

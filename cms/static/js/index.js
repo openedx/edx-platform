@@ -48,14 +48,17 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         }
 
         var $newCourseForm = $(this).closest('#create-course-form');
+        // eslint-disable-next-line camelcase
         var display_name = $newCourseForm.find('.new-course-name').val();
         var org = $newCourseForm.find('.new-course-org').val();
         var number = $newCourseForm.find('.new-course-number').val();
         var run = $newCourseForm.find('.new-course-run').val();
 
+        // eslint-disable-next-line camelcase
         var course_info = {
             org: org,
             number: number,
+            // eslint-disable-next-line camelcase
             display_name: display_name,
             run: run
         };
@@ -126,13 +129,16 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         }
 
         var $newLibraryForm = $(this).closest('#create-library-form');
+        // eslint-disable-next-line camelcase
         var display_name = $newLibraryForm.find('.new-library-name').val();
         var org = $newLibraryForm.find('.new-library-org').val();
         var number = $newLibraryForm.find('.new-library-number').val();
 
+        // eslint-disable-next-line camelcase
         var lib_info = {
             org: org,
             number: number,
+            // eslint-disable-next-line camelcase
             display_name: display_name
         };
 

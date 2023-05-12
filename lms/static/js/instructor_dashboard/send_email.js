@@ -80,6 +80,7 @@
                         alert(message); // eslint-disable-line no-alert
                         return false;
                     }
+                    // eslint-disable-next-line consistent-return
                     displayTarget = function(value) {
                         if (value === 'myself') {
                             return gettext('Yourself');

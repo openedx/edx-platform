@@ -54,6 +54,7 @@
      * @param  {String} logType The type of the log message.
      * @param  {Arguments} args Information that will be stored.
      */
+        // eslint-disable-next-line consistent-return
         NotesLogger.prototype._log = function(logType, args) {
             if (!this.logLevel) {
                 return false;
@@ -113,6 +114,7 @@
      * Stops a timer that was previously started by calling NotesLogger.prototype.time().
      * @param {String} label Timer name.
      */
+        // eslint-disable-next-line consistent-return
         NotesLogger.prototype.timeEnd = function(label) {
             if (!this.timeStorage[label]) {
                 return null;

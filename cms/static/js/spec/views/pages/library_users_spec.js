@@ -7,12 +7,16 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
 
     describe('Library Instructor Access Page', function() {
         var changeRoleUrl = 'dummy_change_role_url/@@EMAIL@@';
+        // eslint-disable-next-line camelcase
         var team_member_fixture = readFixtures('team-member.underscore');
 
         function setRole(email, role) {
+            // eslint-disable-next-line camelcase
             var $user_li = $('li.user-item[data-email="' + email + '"]');
+            // eslint-disable-next-line camelcase
             var $role_action = $('li.action-role a.make-' + role, $user_li);
             expect($role_action).toBeVisible();
+            // eslint-disable-next-line camelcase
             $role_action.click();
         }
 

@@ -54,8 +54,10 @@ var edx = edx || {};
             self.disableFields($('.ccx_start_date_time_fields'));
             // Add unit handlers
             this.chapter_select.on('change', function() {
+                // eslint-disable-next-line camelcase
                 var chapter_location = self.chapter_select.val();
                 self.vertical_select.html('').prop('disabled', true);
+                // eslint-disable-next-line camelcase
                 if (chapter_location !== 'none') {
                     var chapter = self.find_unit(self.hidden, chapter_location);
                     self.sequential_select.html('')
@@ -77,7 +79,9 @@ var edx = edx || {};
             });
 
             this.sequential_select.on('change', function() {
+                // eslint-disable-next-line camelcase
                 var sequential_location = self.sequential_select.val();
+                // eslint-disable-next-line camelcase
                 if (sequential_location !== 'all') {
                     var chapter = self.chapter_select.val(),
                         sequential = self.find_unit(self.hidden, chapter, sequential_location);
@@ -101,7 +105,9 @@ var edx = edx || {};
             });
 
             this.vertical_select.on('change', function() {
+                // eslint-disable-next-line camelcase
                 var vertical_location = self.vertical_select.val();
+                // eslint-disable-next-line camelcase
                 if (vertical_location !== 'all') {
                     var chapter = self.chapter_select.val(),
                         sequential = self.sequential_select.val();
@@ -257,6 +263,7 @@ var edx = edx || {};
             // save_url defined globally in ccx\schedule.html
             /* globals save_url */
             $.ajax({
+                // eslint-disable-next-line camelcase
                 url: save_url,
                 type: 'POST',
                 contentType: 'application/json',
@@ -465,12 +472,15 @@ var edx = edx || {};
                     var date = $(this).find('input[name=date]').val(),
                         // eslint-disable-next-line no-shadow
                         time = $(this).find('input[name=time]').val();
+                    // eslint-disable-next-line camelcase
                     var valid_date = new Date(date);
+                    // eslint-disable-next-line camelcase
                     if (isNaN(valid_date.valueOf())) {
                         // eslint-disable-next-line no-alert
                         alert('Please enter a valid date');
                         return;
                     }
+                    // eslint-disable-next-line camelcase
                     var valid_time = /^\d{1,2}:\d{2}?$/;
                     if (!time.match(valid_time)) {
                         // eslint-disable-next-line no-alert
@@ -496,11 +506,13 @@ var edx = edx || {};
             };
         },
 
+        // eslint-disable-next-line camelcase
         updateChildrenDates: function(sequential, date_type, date) {
             // This code iterates the children (aka verticals) of a sequential.
             // It updates start and due dates to corresponding dates
             // of sequential (parent).
             _.forEach(sequential.children, function(unit) {
+                // eslint-disable-next-line camelcase
                 if (date_type === 'start') {
                     unit.start = date;
                 } else {
@@ -515,6 +527,7 @@ var edx = edx || {};
         },
 
         find_lineage: function(tree, chapter, sequential, vertical) {
+            /* eslint-disable-next-line camelcase, consistent-return */
             function find_in(seq, location) {
                 for (var i = 0; i < seq.length; i++) {
                     if (seq[i].location === location) {

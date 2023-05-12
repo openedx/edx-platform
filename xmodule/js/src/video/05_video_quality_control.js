@@ -43,6 +43,7 @@
                 _bindHandlers(state);
 
                 dfd.resolve();
+                // eslint-disable-next-line consistent-return
                 return dfd.promise();
             };
 

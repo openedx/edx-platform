@@ -38,10 +38,7 @@
     "strict": "off",
 
     // Temporary Rules (Will be removed one-by-one to minimize file changes)
-    "block-scoped-var": "off",
-    "camelcase": "off",
     "comma-dangle": "off",
-    "consistent-return": "off",
     "eqeqeq": "off",
     "function-call-argument-newline": "off",
     "function-paren-newline": "off",

@@ -1,7 +1,8 @@
 // eslint-disable-next-line no-shadow-restricted-names
 (function($, undefined) {
+    // eslint-disable-next-line camelcase
     var form_ext;
-    // eslint-disable-next-line no-multi-assign
+    /* eslint-disable-next-line no-multi-assign, camelcase */
     $.form_ext = form_ext = {
         ajax: function(options) {
             return $.ajax(options);
@@ -26,6 +27,7 @@
                 }
             };
             if (url) { options.url = url; }
+            // eslint-disable-next-line camelcase
             return form_ext.ajax(options);
         },
         CSRFProtection: function(xhr) {
@@ -33,12 +35,15 @@
             if (token) { xhr.setRequestHeader('X-CSRFToken', token); }
         }
     };
+    // eslint-disable-next-line camelcase
     $.ajaxPrefilter(function(options, originalOptions, xhr) { if (!options.crossDomain) { form_ext.CSRFProtection(xhr); } });
+    // eslint-disable-next-line consistent-return
     $(document).delegate('form', 'submit', function(e) {
         var $form = $(this),
             remote = $form.data('remote') !== undefined;
 
         if (remote) {
+            // eslint-disable-next-line camelcase
             form_ext.handleRemote($form);
             return false;
         }

@@ -62,14 +62,17 @@ define(
          * Returns just the modified metadata values, in the format used to persist to the server.
          */
             getModifiedMetadataValues: function() {
+                // eslint-disable-next-line camelcase
                 var modified_values = {};
                 this.collection.each(
                     function(model) {
                         if (model.isModified()) {
+                            // eslint-disable-next-line camelcase
                             modified_values[model.getFieldName()] = model.getValue();
                         }
                     }
                 );
+                // eslint-disable-next-line camelcase
                 return modified_values;
             },
 
@@ -496,6 +499,7 @@ define(
             getValueFromEditor: function() {
                 var dict = {};
 
+                // eslint-disable-next-line consistent-return
                 _.each(this.$el.find('li'), function(li, index) {
                     var key = $(li).find('.input-key').val().trim(),
                         value = $(li).find('.input-value').val().trim();

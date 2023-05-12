@@ -286,6 +286,7 @@
             }
         };
 
+        // eslint-disable-next-line consistent-return
         Sequence.prototype.goto = function(event) {
             var alertTemplate, alertText, isBottomNav, newPosition, widgetPlacement;
             event.preventDefault();

@@ -139,6 +139,7 @@ var trapFocusForAccessibleModal = function(
     bindEscapeKeyListener(modalId, closeButtonId);
 };
 
+// eslint-disable-next-line camelcase
 var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
     // Modifies a lean modal to optimize focus management.
     // "trigger" is the selector for the link element that triggers the modal.

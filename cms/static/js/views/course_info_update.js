@@ -182,6 +182,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
             this.closeEditor(false);
 
             analytics.track('Saved Course Update', {
+                // eslint-disable-next-line camelcase
                 course: course_location_analytics,
                 date: this.dateEntry(event).val()
             });
@@ -241,6 +242,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                         text: gettext('OK'),
                         click: function() {
                             analytics.track('Deleted Course Update', {
+                                // eslint-disable-next-line camelcase
                                 course: course_location_analytics,
                                 date: self.dateEntry(event).val()
                             });
@@ -316,6 +318,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
             return $(event.currentTarget).closest('li');
         },
 
+        // eslint-disable-next-line consistent-return
         editor: function(event) {
             var li = $(event.currentTarget).closest('li');
             if (li) {
@@ -323,6 +326,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
             }
         },
 
+        // eslint-disable-next-line consistent-return
         dateEntry: function(event) {
             var li = $(event.currentTarget).closest('li');
             if (li) {

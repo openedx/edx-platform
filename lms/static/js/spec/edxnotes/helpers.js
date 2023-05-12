@@ -36,6 +36,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     SHORT_TEXT = 'Adipisicing elit, sed do eiusmod tempor incididunt';
 
     base64Encode = function(data) {
+        // eslint-disable-next-line camelcase
         var ac, bits, enc, h1, h2, h3, h4, i, o1, o2, o3, r, tmp_arr;
         if (btoa) {
             // Gecko and Webkit provide native code for this
@@ -46,6 +47,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
             i = 0;
             ac = 0;
             enc = '';
+            // eslint-disable-next-line camelcase
             tmp_arr = [];
             if (!data) {
                 return data;
@@ -65,8 +67,10 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
                 h3 = bits >> 6 & 0x3f;
                 // eslint-disable-next-line no-bitwise
                 h4 = bits & 0x3f;
+                // eslint-disable-next-line camelcase
                 tmp_arr[ac++] = B64.charAt(h1) + B64.charAt(h2) + B64.charAt(h3) + B64.charAt(h4);
             }
+            // eslint-disable-next-line camelcase
             enc = tmp_arr.join('');
             r = data.length % 3;
             return (r ? enc.slice(0, r - 3) : enc) + '==='.slice(r || 3);

@@ -51,6 +51,7 @@ define(
                     object: testData,
                     string: JSON.stringify(testData)
                 },
+                // eslint-disable-next-line camelcase
                 component_locator = 'component_locator',
                 transcripts, $container, waitForEvent, editor;
 

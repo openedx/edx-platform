@@ -93,6 +93,7 @@
                 var self = this,
                     cohorts = this.cohorts,
                     input = this.$('.cohort-management-group-add-students'),
+                    // eslint-disable-next-line camelcase
                     add_url = this.model.url() + '/add',
                     students = input.val().trim(),
                     cohortId = this.model.id;

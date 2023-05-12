@@ -3,6 +3,7 @@
 
     define(['backbone', 'underscore'], function(Backbone, _) {
         return Backbone.Model.extend({
+            // eslint-disable-next-line camelcase
             updateEnrollment: function(new_mode, reason) {
                 return $.ajax({
                     url: this.url(),
@@ -10,6 +11,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify({
                         course_id: this.get('course_id'),
+                        // eslint-disable-next-line camelcase
                         new_mode: new_mode,
                         old_mode: this.get('mode'),
                         reason: reason

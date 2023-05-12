@@ -14,6 +14,7 @@
             describe('main helper', function() {
                 beforeEach(function() {
                     this.previousAjaxSettings = $.extend(true, {}, $.ajaxSettings);
+                    // eslint-disable-next-line consistent-return
                     spyOn($, 'cookie').and.callFake(function(param) {
                         if (param === 'csrftoken') {
                             return 'stubCSRFToken';

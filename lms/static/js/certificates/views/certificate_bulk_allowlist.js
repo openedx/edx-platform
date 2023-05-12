@@ -65,6 +65,7 @@
                         data: data,
                         processData: false,
                         contentType: false,
+                        // eslint-disable-next-line camelcase
                         success: function(data_from_server) {
                             self.display_response(data_from_server);
                         }
@@ -73,6 +74,7 @@
                 });
             },
 
+            // eslint-disable-next-line camelcase
             display_response: function(data_from_server) {
                 var UserOnCertificateInvalidationList;
 
@@ -156,7 +158,9 @@
                 }
 
                 // Display general error messages
+                // eslint-disable-next-line camelcase
                 if (data_from_server.general_errors.length) {
+                    // eslint-disable-next-line camelcase
                     var errors = data_from_server.general_errors;
                     generateDiv(
                         MESSAGE_GROUP.general_errors,
@@ -166,55 +170,74 @@
                 }
 
                 // Display success message
+                // eslint-disable-next-line camelcase
                 if (data_from_server.success.length) {
+                    // eslint-disable-next-line camelcase
                     var success_data = data_from_server.success;
                     generateDiv(
                         MESSAGE_GROUP.successfully_added,
+                        // eslint-disable-next-line camelcase
                         getDisplayText(success_data.length, MESSAGE_GROUP.successfully_added),
                         success_data
                     );
                 }
 
                 // Display data row error messages
+                // eslint-disable-next-line camelcase
                 if (Object.keys(data_from_server.row_errors).length) {
+                    // eslint-disable-next-line camelcase
                     var row_errors = data_from_server.row_errors;
 
+                    // eslint-disable-next-line camelcase
                     if (row_errors.data_format_error.length) {
+                        // eslint-disable-next-line camelcase
                         var format_errors = row_errors.data_format_error;
                         generateDiv(
                             MESSAGE_GROUP.data_format_error,
+                            // eslint-disable-next-line camelcase
                             getDisplayText(format_errors.length, MESSAGE_GROUP.data_format_error),
                             format_errors
                         );
                     }
+                    // eslint-disable-next-line camelcase
                     if (row_errors.user_not_exist.length) {
+                        // eslint-disable-next-line camelcase
                         var user_not_exist = row_errors.user_not_exist;
                         generateDiv(
                             MESSAGE_GROUP.user_not_exist,
+                            // eslint-disable-next-line camelcase
                             getDisplayText(user_not_exist.length, MESSAGE_GROUP.user_not_exist),
                             user_not_exist
                         );
                     }
+                    // eslint-disable-next-line camelcase
                     if (row_errors.user_already_allowlisted.length) {
+                        // eslint-disable-next-line camelcase
                         var user_already_allowlisted = row_errors.user_already_allowlisted;
                         generateDiv(
                             MESSAGE_GROUP.user_already_allowlisted,
                             getDisplayText(
+                                // eslint-disable-next-line camelcase
                                 user_already_allowlisted.length,
                                 MESSAGE_GROUP.user_already_allowlisted
                             ),
                             user_already_allowlisted
                         );
                     }
+                    // eslint-disable-next-line camelcase
                     if (row_errors.user_not_enrolled.length) {
+                        // eslint-disable-next-line camelcase
                         var user_not_enrolled = row_errors.user_not_enrolled;
                         generateDiv(
                             MESSAGE_GROUP.user_not_enrolled,
+                            // eslint-disable-next-line camelcase
                             getDisplayText(user_not_enrolled.length, MESSAGE_GROUP.user_not_enrolled),
                             user_not_enrolled
                         );
                     }
+                    // eslint-disable-next-line camelcase
                     if (row_errors.user_on_certificate_invalidation_list.length) {
+                        // eslint-disable-next-line camelcase
                         UserOnCertificateInvalidationList = row_errors.user_on_certificate_invalidation_list;
                         generateDiv(
                             MESSAGE_GROUP.user_on_certificate_invalidation_list,

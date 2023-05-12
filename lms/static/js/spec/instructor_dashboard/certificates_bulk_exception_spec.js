@@ -6,6 +6,7 @@ function($, CertificateBulkAllowlistView) {
     'use strict';
 
     describe('certificate bulk exceptions generation', function() {
+        // eslint-disable-next-line camelcase
         var certificate_bulk_exception_url = 'test/url/';
         var SELECTORS = {
             upload_csv_button: '.upload-csv-button',
@@ -24,6 +25,7 @@ function($, CertificateBulkAllowlistView) {
             );
 
             this.view = new CertificateBulkAllowlistView({
+                // eslint-disable-next-line camelcase
                 bulk_exception_url: certificate_bulk_exception_url
             });
             this.view.render();

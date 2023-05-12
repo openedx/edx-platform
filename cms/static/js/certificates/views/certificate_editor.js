@@ -71,11 +71,13 @@ function($, _, Backbone, gettext,
             var self = this;
             // Ensure we have at least one signatory associated with the certificate.
             this.model.get('signatories').each(function(modelSignatory) {
+                // eslint-disable-next-line camelcase
                 var signatory_view = new SignatoryEditorView({
                     model: modelSignatory,
                     isEditingAllCollections: true,
                     eventAgg: self.eventAgg
                 });
+                // eslint-disable-next-line camelcase
                 self.$('div.signatory-edit-list').append(HtmlUtils.HTML((signatory_view.render())).toString());
             });
             this.disableAddSignatoryButton();

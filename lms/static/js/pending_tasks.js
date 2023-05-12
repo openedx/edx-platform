@@ -31,21 +31,30 @@
             // Response should be a dict with an entry for each requested task_id,
             // with a "task-state" and "in_progress" key and optionally a "message"
             // and a "task_progress.duration" key.
+            // eslint-disable-next-line camelcase
             var something_in_progress = false;
-            // eslint-disable-next-line guard-for-in
+            /* eslint-disable-next-line guard-for-in, camelcase */
             for (task_id in response) {
+                // eslint-disable-next-line camelcase
                 var task_dict = response[task_id];
                 // find the corresponding entry, and update it:
+                // eslint-disable-next-line camelcase
                 entry = $(_this.element).find('[data-task-id="' + task_id + '"]');
+                // eslint-disable-next-line camelcase
                 entry.find('.task-state').text(task_dict.task_state);
+                // eslint-disable-next-line camelcase
                 var duration_value = (task_dict.task_progress && task_dict.task_progress.duration_ms
+                                        // eslint-disable-next-line camelcase
                                         && Math.round(task_dict.task_progress.duration_ms / 1000)) || 'unknown';
                 entry.find('.task-duration').text(duration_value);
+                // eslint-disable-next-line camelcase
                 var progress_value = task_dict.message || '';
                 entry.find('.task-progress').text(progress_value);
                 // if the task is complete, then change the entry so it won't
                 // be queried again.  Otherwise set a flag.
+                // eslint-disable-next-line camelcase
                 if (task_dict.in_progress === true) {
+                    // eslint-disable-next-line camelcase
                     something_in_progress = true;
                 } else {
                     entry.data('inProgress', 'False');
@@ -56,6 +65,7 @@
             // Hardcode the refresh interval to be every five seconds.
             // TODO: allow the refresh interval to be set.  (And if it is disabled,
             // then don't set the timeout at all.)
+            // eslint-disable-next-line camelcase
             if (something_in_progress) {
                 window.queuePollerID = window.setTimeout(_this.get_status, 5000);
             } else {
@@ -65,15 +75,19 @@
 
         InstructorTaskProgress.prototype.get_status = function() {
             var _this = this;
+            // eslint-disable-next-line camelcase
             var task_ids = [];
 
             // Construct the array of ids to get status for, by
             // including the subset of entries that are still in progress.
             this.entries.each(function(idx, element) {
+                // eslint-disable-next-line camelcase
                 var task_id = $(element).data('taskId');
+                // eslint-disable-next-line camelcase
                 var in_progress = $(element).data('inProgress');
-                // eslint-disable-next-line no-constant-condition, no-cond-assign
+                /* eslint-disable-next-line no-constant-condition, no-cond-assign, camelcase */
                 if (in_progress = 'True') {
+                    // eslint-disable-next-line camelcase
                     task_ids.push(task_id);
                 }
             });
@@ -82,7 +96,9 @@
             // Note that the keyname here ends up with "[]" being appended
             // in the POST parameter that shows up on the Django server.
             // TODO: add error handler.
+            // eslint-disable-next-line camelcase
             var ajax_url = '/instructor_task_status/';
+            // eslint-disable-next-line camelcase
             var data = {task_ids: task_ids};
             $.post(ajax_url, data).done(this.update_progress);
         };

@@ -72,6 +72,7 @@
             //     these functions will get the 'state' object as a context.
             function _makeFunctionsPublic(state) {
                 var debouncedF = _.debounce(
+                    // eslint-disable-next-line consistent-return
                     function(params) {
                         // Can't cancel a queued debounced function on destroy
                         if (state.videoPlayer) {
@@ -456,6 +457,7 @@
                 this.el.trigger('seek', [time, oldTime, type]);
             }
 
+            // eslint-disable-next-line consistent-return
             function seekTo(time) {
                 // eslint-disable-next-line no-shadow
                 var duration = this.videoPlayer.duration();
@@ -564,6 +566,7 @@
                 this.el.trigger('qualitychange', arguments);
             }
 
+            // eslint-disable-next-line consistent-return
             function onReady() {
                 var _this = this,
                     availablePlaybackRates, baseSpeedSubs,
@@ -790,6 +793,7 @@
                 return time;
             }
 
+            // eslint-disable-next-line camelcase
             function updatePlayTime(time, skip_seek) {
                 var videoPlayer = this.videoPlayer,
                     endTime = this.videoPlayer.duration(),

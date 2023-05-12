@@ -45,6 +45,7 @@
              * should be prefixed with '?'
              */
             var setFakeQueryParams = function(params) {
+                // eslint-disable-next-line consistent-return
                 spyOn($, 'url').and.callFake(function(requestedParam) {
                     if (params.hasOwnProperty(requestedParam)) {
                         return params[requestedParam];

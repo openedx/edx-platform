@@ -27,10 +27,12 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views
                 });
             },
 
+            // eslint-disable-next-line camelcase
             refreshXBlock: function(element, block_added, is_duplicate) {
                 var xblockElement = this.findXBlockElement(element),
                     rootLocator = this.xblockView.model.id;
                 if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
+                    // eslint-disable-next-line camelcase
                     this.render({refresh: true, block_added: block_added});
                 } else {
                     this.refreshChildXBlock(xblockElement, block_added, is_duplicate);
@@ -42,7 +44,9 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views
                 this.xblockView.togglePreviews();
             },
 
+            // eslint-disable-next-line camelcase
             updatePreviewButton: function(show_previews) {
+                // eslint-disable-next-line camelcase
                 var text = (show_previews) ? gettext('Hide Previews') : gettext('Show Previews'),
                     $button = $('.nav-actions .button-toggle-preview');
 

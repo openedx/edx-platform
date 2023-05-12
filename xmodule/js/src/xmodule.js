@@ -88,6 +88,7 @@
                 $(document).trigger('XModule.loaded.display', [element, module]);
             }
 
+            // eslint-disable-next-line consistent-return
             return module;
         } catch (error) {
             console.error('Unable to load ' + moduleType + ': ' + error.message);

@@ -49,6 +49,7 @@ var edx = edx || {},
             },
 
             listenForKeypress: function() {
+                // eslint-disable-next-line consistent-return
                 $('.accordion').on('keydown', '.button-chapter', function(event) {
                     // because we're changing the role of the toggle from an 'a' to a 'button'
                     // we need to ensure it has the same keyboard use cases as a real button.

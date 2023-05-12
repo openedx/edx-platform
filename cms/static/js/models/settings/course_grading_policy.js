@@ -53,17 +53,20 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
 
                 return newDate;
             },
+            // eslint-disable-next-line camelcase
             parseGracePeriod: function(grace_period) {
                 // Enforce hours:minutes format
                 if (!/^\d{2,3}:\d{2}$/.test(grace_period)) {
                     return null;
                 }
+                // eslint-disable-next-line camelcase
                 var pieces = grace_period.split(/:/);
                 return {
                     hours: parseInt(pieces[0], 10),
                     minutes: parseInt(pieces[1], 10)
                 };
             },
+            // eslint-disable-next-line camelcase
             parseMinimumGradeCredit: function(minimum_grade_credit) {
                 // get the value of minimum grade credit value in percentage
                 if (isNaN(minimum_grade_credit)) {
@@ -71,6 +74,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 }
                 return parseInt(minimum_grade_credit);
             },
+            // eslint-disable-next-line consistent-return
             validate: function(attrs) {
                 var minimumGradeCutoff;
                 if (_.has(attrs, 'grace_period')) {

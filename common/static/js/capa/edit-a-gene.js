@@ -33,27 +33,37 @@
     };
 
     genexIsReady = function() {
+        // eslint-disable-next-line camelcase
         var input_field = genexGetInputField();
+        // eslint-disable-next-line camelcase
         var genex_saved_state = input_field.val();
+        // eslint-disable-next-line camelcase
         var genex_default_dna_sequence;
+        // eslint-disable-next-line camelcase
         var genex_dna_sequence;
 
         // Get the DNA sequence from xml file
+        // eslint-disable-next-line camelcase
         genex_default_dna_sequence = $('#genex_dna_sequence').val();
         // Set the default DNA
         genexSetDefaultDNASequence(genex_default_dna_sequence);
 
         // Now load problem
+        // eslint-disable-next-line camelcase
         var genex_problem_number = $('#genex_problem_number').val();
         genexSetProblemNumber(genex_problem_number);
 
         // Set the DNA sequence that is displayed
+        // eslint-disable-next-line camelcase
         if (genex_saved_state === '') {
             // Load DNA sequence from xml file
+            // eslint-disable-next-line camelcase
             genex_dna_sequence = genex_default_dna_sequence;
         } else {
             // Load DNA sequence from saved value
+            // eslint-disable-next-line camelcase
             genex_saved_state = JSON.parse(genex_saved_state);
+            // eslint-disable-next-line camelcase
             genex_dna_sequence = genex_saved_state.genex_dna_sequence;
         }
         genexSetDNASequence(genex_dna_sequence);
@@ -64,8 +74,10 @@
     };
 
     genexStoreAnswer = function(answer) {
+        // eslint-disable-next-line camelcase
         var input_field = genexGetInputField();
         var value = {genex_dna_sequence: genexGetDNASequence(), genex_answer: answer};
+        // eslint-disable-next-line camelcase
         input_field.val(JSON.stringify(value));
     };
 }).call(this);

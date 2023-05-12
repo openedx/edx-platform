@@ -8,7 +8,9 @@ function($, AjaxHelpers) {
     'use strict';
 
     describe('edx.instructor_dashboard.certificates.regenerate_certificates', function() {
+        // eslint-disable-next-line camelcase
         var $regenerate_certificates_button = null,
+            // eslint-disable-next-line camelcase
             $certificate_regeneration_status = null,
             requests = null;
         var MESSAGES = {
@@ -24,6 +26,7 @@ function($, AjaxHelpers) {
             body: 'certificate_statuses=downloadable&certificate_statuses=error'
         };
 
+        // eslint-disable-next-line camelcase
         var select_options = function(option_values) {
             $.each(option_values, function(index, element) {
                 $('#certificate-regenerating-form input[value=' + element + ']').click();
@@ -60,13 +63,16 @@ function($, AjaxHelpers) {
 
             setFixtures(fixture);
             onCertificatesReady();
+            // eslint-disable-next-line camelcase
             $regenerate_certificates_button = $('#btn-start-regenerating-certificates');
+            // eslint-disable-next-line camelcase
             $certificate_regeneration_status = $('.certificate-regeneration-status');
             requests = AjaxHelpers.requests(this);
         });
 
         it('does not regenerate certificates if user cancels operation in confirm popup', function() {
             spyOn(window, 'confirm').and.returnValue(false);
+            // eslint-disable-next-line camelcase
             $regenerate_certificates_button.click();
             expect(window.confirm).toHaveBeenCalled();
             AjaxHelpers.expectNoRequests(requests);
@@ -74,6 +80,7 @@ function($, AjaxHelpers) {
 
         it('sends regenerate certificates request if user accepts operation in confirm popup', function() {
             spyOn(window, 'confirm').and.returnValue(true);
+            // eslint-disable-next-line camelcase
             $regenerate_certificates_button.click();
             expect(window.confirm).toHaveBeenCalled();
             AjaxHelpers.expectRequest(requests, 'POST', expected.url);
@@ -84,6 +91,7 @@ function($, AjaxHelpers) {
 
             select_options(expected.selected_statuses);
 
+            // eslint-disable-next-line camelcase
             $regenerate_certificates_button.click();
             AjaxHelpers.expectRequest(requests, 'POST', expected.url, expected.body);
         });
@@ -92,8 +100,10 @@ function($, AjaxHelpers) {
             spyOn(window, 'confirm').and.returnValue(true);
             select_options(expected.selected_statuses);
 
+            // eslint-disable-next-line camelcase
             $regenerate_certificates_button.click();
             AjaxHelpers.respondWithError(requests, 500, {message: MESSAGES.server_error_message});
+            // eslint-disable-next-line camelcase
             expect($certificate_regeneration_status.text()).toEqual(MESSAGES.server_error_message);
         });
 
@@ -101,8 +111,10 @@ function($, AjaxHelpers) {
             spyOn(window, 'confirm').and.returnValue(true);
             select_options(expected.selected_statuses);
 
+            // eslint-disable-next-line camelcase
             $regenerate_certificates_button.click();
             AjaxHelpers.respondWithError(requests, 400, {message: MESSAGES.error_message});
+            // eslint-disable-next-line camelcase
             expect($certificate_regeneration_status.text()).toEqual(MESSAGES.error_message);
         });
 
@@ -110,8 +122,10 @@ function($, AjaxHelpers) {
             spyOn(window, 'confirm').and.returnValue(true);
             select_options(expected.selected_statuses);
 
+            // eslint-disable-next-line camelcase
             $regenerate_certificates_button.click();
             AjaxHelpers.respondWithJson(requests, {message: MESSAGES.success_message, success: true});
+            // eslint-disable-next-line camelcase
             expect($certificate_regeneration_status.text()).toEqual(MESSAGES.success_message);
         });
     });

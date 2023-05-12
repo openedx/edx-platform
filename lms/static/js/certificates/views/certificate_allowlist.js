@@ -90,18 +90,23 @@
                 $(this.message_div).fadeOut(6000, 'linear');
             },
 
+            // eslint-disable-next-line camelcase
             showSuccess: function(caller_object) {
                 return function(xhr) {
+                    // eslint-disable-next-line camelcase
                     caller_object.escapeAndShowMessage(xhr.message);
                 };
             },
 
+            // eslint-disable-next-line camelcase
             showError: function(caller_object) {
                 return function(xhr) {
                     try {
                         var response = JSON.parse(xhr.responseText);
+                        // eslint-disable-next-line camelcase
                         caller_object.escapeAndShowMessage(response.message);
                     } catch (exception) {
+                        // eslint-disable-next-line camelcase
                         caller_object.escapeAndShowMessage(
                             gettext('Server Error, Please refresh the page and try again.')
                         );

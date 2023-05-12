@@ -92,6 +92,7 @@ class AnnouncementList extends React.Component {
             (announcement, index) => <Announcement key={index} content={announcement.content} />
         );
         if (this.state.has_prev) {
+            // eslint-disable-next-line camelcase
             var prev_button = (
                 <div>
                     <Button
@@ -104,6 +105,7 @@ class AnnouncementList extends React.Component {
             );
         }
         if (this.state.has_next) {
+            // eslint-disable-next-line camelcase
             var next_button = (
                 <div>
                     <Button
@@ -118,7 +120,9 @@ class AnnouncementList extends React.Component {
         return (
             <div className="announcements-list">
                 {children}
+                {/* eslint-disable-next-line block-scoped-var, camelcase */}
                 {prev_button}
+                {/* eslint-disable-next-line block-scoped-var, camelcase */}
                 {next_button}
             </div>
         );

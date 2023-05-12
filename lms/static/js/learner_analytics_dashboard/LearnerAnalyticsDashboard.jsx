@@ -64,8 +64,10 @@ function getStreakString(count) {
 // eslint-disable-next-line import/prefer-default-export
 export function LearnerAnalyticsDashboard(props) {
     const {
+        // eslint-disable-next-line camelcase
         grading_policy, grades, schedule, schedule_raw, week_streak, weekly_active_users, discussion_info, profile_images, passing_grade, percent_grade
     } = props;
+    // eslint-disable-next-line camelcase
     const gradeBreakdown = grading_policy.GRADER.map(({type, weight}, index) => ({
         value: weight,
         label: type,
@@ -110,13 +112,16 @@ export function LearnerAnalyticsDashboard(props) {
                         <GradeTable
                             assignmentTypes={assignmentTypes}
                             grades={grades}
+                            // eslint-disable-next-line camelcase
                             passingGrade={passing_grade}
+                            // eslint-disable-next-line camelcase
                             percentGrade={percent_grade}
                         />
                         <div className="footnote">* Your current grade is calculated based on all assignments, including those you have not yet completed.</div>
                     </div>
                 </div>
                 <div className="analytics-group">
+                    {/* eslint-disable-next-line camelcase */}
                     <Discussions {...discussion_info} profileImages={profile_images} />
                 </div>
             </div>
@@ -124,6 +129,7 @@ export function LearnerAnalyticsDashboard(props) {
                 <h2 className="group-heading">Timing</h2>
                 <div className="week-streak-wrapper">
                     <h3 className="section-heading">Week streak</h3>
+                    {/* eslint-disable-next-line camelcase */}
                     {week_streak > 0
             && <div className="streak-icon-wrapper" aria-hidden="true">{getStreakIcons(week_streak)}</div>}
                     <p>{getStreakString(week_streak)}</p>
@@ -136,6 +142,7 @@ export function LearnerAnalyticsDashboard(props) {
                 </div>
                 <div className="active-users-wrapper">
                     <span className="fa fa-user count-icon" aria-hidden="true" />
+                    {/* eslint-disable-next-line camelcase */}
                     <span className="user-count">{weekly_active_users.toLocaleString('en', {useGrouping: true})}</span>
                     <p className="label">{getActiveUserString(weekly_active_users)}</p>
                 </div>

@@ -424,6 +424,7 @@ define(
                             // security reasons, so we must mock the access mechanism
                             // that jQuery-File-Upload uses to retrieve it.
                             var realProp = $.prop;
+                            // eslint-disable-next-line consistent-return
                             spyOn($, 'prop').and.callFake(function(el, propName) {
                                 if (arguments.length === 2 && propName === 'files') {
                                     return _.map(

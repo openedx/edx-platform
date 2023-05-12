@@ -22,6 +22,7 @@
                     this.url = options.url;
                 },
 
+                // eslint-disable-next-line consistent-return
                 validate: function(attrs) {
                     if (!str.trim(attrs.user)) {
                         // A username or email must be provided for certificate invalidation

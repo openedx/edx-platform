@@ -20,6 +20,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             }
             return attrs;
         },
+        // eslint-disable-next-line consistent-return
         validate: function(attrs) {
             var errors = {};
             if (_.has(attrs, 'type')) {

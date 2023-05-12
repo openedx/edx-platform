@@ -43,6 +43,7 @@
         });
 
         describe('ajax request settings with path_prefix', function() {
+            // eslint-disable-next-line camelcase
             var $meta_tag;
 
             beforeEach(function() {
@@ -54,12 +55,16 @@
 
             afterEach(function() {
                 jQuery.ajaxWithPrefix = this.initialAjaxWithPrefix;
+                // eslint-disable-next-line camelcase
                 $meta_tag.remove();
+                // eslint-disable-next-line camelcase
                 $meta_tag = null;
             });
 
             it('if path_prefix is not defined', function() {
+                // eslint-disable-next-line camelcase
                 $meta_tag = $('<meta name="path_prefix1" content="">');
+                // eslint-disable-next-line camelcase
                 $meta_tag.appendTo('body');
                 spyOn(jQuery, 'ajax');
                 Logger.log('example', 'data');
@@ -77,7 +82,9 @@
             });
 
             it('if path_prefix is defined', function() {
+                // eslint-disable-next-line camelcase
                 $meta_tag = $('<meta name="path_prefix" content="">');
+                // eslint-disable-next-line camelcase
                 $meta_tag.appendTo('body');
                 spyOn(jQuery, 'ajax');
                 Logger.log('example', 'data');
@@ -95,7 +102,9 @@
             });
 
             it('if path_prefix is custom value', function() {
+                // eslint-disable-next-line camelcase
                 $meta_tag = $('<meta name="path_prefix" content="testpath">');
+                // eslint-disable-next-line camelcase
                 $meta_tag.appendTo('body');
                 spyOn(jQuery, 'ajax');
                 Logger.log('example', 'data');

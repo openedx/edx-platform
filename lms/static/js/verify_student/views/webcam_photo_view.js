@@ -75,6 +75,7 @@ var edx = edx || {},
                     this.getVideo().play();
                 },
 
+                // eslint-disable-next-line consistent-return
                 getUserMediaFunc: function() {
                     var userMedia = (
                         navigator.getUserMedia || navigator.webkitGetUserMedia

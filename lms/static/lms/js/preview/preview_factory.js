@@ -18,6 +18,7 @@
                     $userNameElement.val(options.masqueradeUsername);
                 }
 
+                // eslint-disable-next-line consistent-return
                 $selectElement.change(function() {
                     var selectedOption;
                     if ($selectElement.attr('disabled')) {

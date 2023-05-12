@@ -24,6 +24,7 @@
     // [params]
     //     el: container
     function setCollapsibles(el) {
+        // eslint-disable-next-line camelcase
         var linkBottom, linkTop, short_custom;
 
         linkTop = '<a href="#" class="full full-top">See full output</a>';
@@ -34,13 +35,18 @@
         el.find('.shortform').append(linkTop, linkBottom); // xss-lint: disable=javascript-jquery-append
 
         // Custom longform + shortform text pattern.
+        // eslint-disable-next-line camelcase
         short_custom = el.find('.shortform-custom');
 
         // Set up each one individually.
+        // eslint-disable-next-line camelcase
         short_custom.each(function(index, elt) {
+            // eslint-disable-next-line camelcase
             var close_text, open_text;
 
+            // eslint-disable-next-line camelcase
             open_text = $(elt).data('open-text');
+            // eslint-disable-next-line camelcase
             close_text = $(elt).data('close-text');
             edx.HtmlUtils.append(
                 $(elt),
@@ -78,7 +84,9 @@
     //         is open.
     //     close_text: text that should be displayed when the collapsible
     //         is closed.
+    // eslint-disable-next-line camelcase
     function toggleFull(event, open_text, close_text) {
+        // eslint-disable-next-line camelcase
         var $el, new_text, parent;
 
         event.preventDefault();
@@ -87,9 +95,12 @@
         parent.siblings().slideToggle();
         parent.parent().toggleClass('open');
 
+        // eslint-disable-next-line camelcase
         if ($(event.target).text() === open_text) {
+            // eslint-disable-next-line camelcase
             new_text = close_text;
         } else {
+            // eslint-disable-next-line camelcase
             new_text = open_text;
         }
 

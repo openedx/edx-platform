@@ -8,20 +8,26 @@
                 var $toggleActionElements = $('.toggle-visibility-button');
 
                 var updateToggleActionText = function(elementIsHidden, actionElement) {
+                    // eslint-disable-next-line camelcase
                     var show_text = actionElement.data('show'),
+                        // eslint-disable-next-line camelcase
                         hide_text = actionElement.data('hide'),
+                        // eslint-disable-next-line camelcase
                         first_hidden_update = $('.old-updates .toggle-visibility-button').first();
 
                     actionElement.attr('aria-expanded', elementIsHidden);
 
                     if (elementIsHidden) {
+                        // eslint-disable-next-line camelcase
                         if (hide_text) {
                             actionElement.html(actionElement.data('hide')); // xss-lint: disable=javascript-jquery-html
                         } else {
                             actionElement.hide();
+                            // eslint-disable-next-line camelcase
                             first_hidden_update.focus();
                         }
                     } else {
+                        // eslint-disable-next-line camelcase
                         if (show_text) {
                             actionElement.html(actionElement.data('show')); // xss-lint: disable=javascript-jquery-html
                         }

@@ -29,6 +29,7 @@ define(['backbone', 'gettext', 'backbone.associations'], function(Backbone, gett
         },
         // NOTE: validation functions should return non-internationalized error
         // messages. The messages will be passed through gettext in the template.
+        // eslint-disable-next-line consistent-return
         validate: function(attrs, options) {
             if (!attrs.name && !attrs.asset_path) {
                 return {

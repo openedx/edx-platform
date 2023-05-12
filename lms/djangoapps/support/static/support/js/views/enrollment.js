@@ -87,8 +87,10 @@
              */
             changeEnrollment: function(event) {
                 var $button = $(event.currentTarget),
+                    // eslint-disable-next-line camelcase
                     course_id = $button.data('course_id'),
                     modes = $button.data('modes').split(','),
+                    // eslint-disable-next-line camelcase
                     enrollment = this.enrollments.findWhere({course_id: course_id});
                 event.preventDefault();
                 new EnrollmentModal({

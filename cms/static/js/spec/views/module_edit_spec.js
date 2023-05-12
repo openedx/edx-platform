@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import ViewUtils from 'common/js/components/utils/view_utils';
+// eslint-disable-next-line camelcase
 import edit_helpers from 'js/spec_helpers/edit_helpers';
 import ModuleEdit from 'js/views/module_edit';
 import ModuleModel from 'js/models/module_info';
@@ -32,6 +33,7 @@ describe('ModuleEdit', function() {
                     + '  </section>\n'
                     + '</li>\n'
                     + '</ul>');
+        // eslint-disable-next-line camelcase
         edit_helpers.installEditTemplates(true);
         spyOn($, 'ajax').and.returnValue(this.moduleData);
         this.moduleEdit = new ModuleEdit({
@@ -66,6 +68,7 @@ describe('ModuleEdit', function() {
         });
         describe('render', function() {
             beforeEach(function() {
+                // eslint-disable-next-line camelcase
                 edit_helpers.installEditTemplates(true);
                 spyOn(this.moduleEdit, 'loadDisplay');
                 spyOn(this.moduleEdit, 'delegateEvents');

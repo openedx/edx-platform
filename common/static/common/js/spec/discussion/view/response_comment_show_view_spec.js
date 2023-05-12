@@ -37,8 +37,11 @@
                 return expect(this.comment.get('abuse_flaggers')).toEqual(['123', '567']);
             });
             it('can be unflagged for abuse', function() {
+                // eslint-disable-next-line camelcase
                 var temp_array;
+                // eslint-disable-next-line camelcase
                 temp_array = [];
+                // eslint-disable-next-line camelcase
                 temp_array.push(window.user.get('id'));
                 this.comment.set('abuse_flaggers', temp_array);
                 this.comment.unflagAbuse();

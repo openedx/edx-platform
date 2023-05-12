@@ -128,7 +128,9 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             this.$el.find('#video-thumbnail-image-url').val(videoThumbnailImageURL);
             this.$el.find('#video-thumbnail-image').attr('src', videoThumbnailImageURL);
 
+            // eslint-disable-next-line camelcase
             var pre_requisite_courses = this.model.get('pre_requisite_courses');
+            // eslint-disable-next-line camelcase
             pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
             this.$el.find('#' + this.fieldToSelectorMap.pre_requisite_courses).val(pre_requisite_courses);
 
@@ -324,11 +326,14 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 break;
             }
         },
+        // eslint-disable-next-line camelcase
         updateImageField: function(event, image_field, selector) {
             this.setField(event);
             var url = $(event.currentTarget).val();
+            // eslint-disable-next-line camelcase
             var image_name = _.last(url.split('/'));
             // If image path is entered directly, we need to strip the asset prefix
+            // eslint-disable-next-line camelcase
             image_name = _.last(image_name.split('block@'));
             this.model.set(image_field, image_name);
             this.updateImagePreview(event.currentTarget, selector);
@@ -452,26 +457,34 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             event.preventDefault();
             var title = '',
                 selector = '',
+                // eslint-disable-next-line camelcase
                 image_key = '',
+                // eslint-disable-next-line camelcase
                 image_path_key = '';
             // eslint-disable-next-line default-case
             switch (event.currentTarget.id) {
             case 'upload-course-image':
                 title = gettext('Upload your course image.');
                 selector = '#course-image';
+                // eslint-disable-next-line camelcase
                 image_key = 'course_image_name';
+                // eslint-disable-next-line camelcase
                 image_path_key = 'course_image_asset_path';
                 break;
             case 'upload-banner-image':
                 title = gettext('Upload your banner image.');
                 selector = '#banner-image';
+                // eslint-disable-next-line camelcase
                 image_key = 'banner_image_name';
+                // eslint-disable-next-line camelcase
                 image_path_key = 'banner_image_asset_path';
                 break;
             case 'upload-video-thumbnail-image':
                 title = gettext('Upload your video thumbnail image.');
                 selector = '#video-thumbnail-image';
+                // eslint-disable-next-line camelcase
                 image_key = 'video_thumbnail_image_name';
+                // eslint-disable-next-line camelcase
                 image_path_key = 'video_thumbnail_image_asset_path';
                 break;
             }
@@ -486,7 +499,9 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 model: upload,
                 onSuccess: function(response) {
                     var options = {};
+                    // eslint-disable-next-line camelcase
                     options[image_key] = response.asset.display_name;
+                    // eslint-disable-next-line camelcase
                     options[image_path_key] = response.asset.url;
                     self.model.set(options);
                     self.render();

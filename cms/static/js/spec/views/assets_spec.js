@@ -132,7 +132,9 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             var request = AjaxHelpers.currentRequest(requests);
             var url = new URI(request.url);
             var queryParameters = url.query(true); // Returns an object with each query parameter stored as a value
+            // eslint-disable-next-line camelcase
             var asset_type = queryParameters.asset_type;
+            // eslint-disable-next-line camelcase
             var response = asset_type !== '' ? mockExampleFilteredAssetsResponse : mockExampleAssetsResponse;
             AjaxHelpers.respondWithJson(requests, response);
         };
@@ -336,6 +338,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                     var $allFilter = $($typeColumn.find('li.nav-item a')[0]);
                     var $firstFilter = $($typeColumn.find('li.nav-item a')[1]);
                     var $otherFilter = $($typeColumn.find('li.nav-item a[data-assetfilter="OTHER"]')[0]);
+                    // eslint-disable-next-line camelcase
                     var select_filter_and_check = function($filterEl, result) {
                         $filterEl.trigger('click');
                         respondWithMockAssets(requests);

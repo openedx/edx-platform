@@ -26,6 +26,7 @@
                     this.$el,
                     HtmlUtils.HTML(_.escape(StringUtils.interpolate(
                         ngettext('{team_count} Team', '{team_count} Teams', team_count),
+                        // eslint-disable-next-line camelcase
                         {team_count: team_count},
                         true
                     )))

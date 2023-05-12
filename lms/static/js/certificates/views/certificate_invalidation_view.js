@@ -36,6 +36,7 @@
                     var notes = this.$('#certificate-invalidation-notes').val();
                     var message = '';
 
+                    // eslint-disable-next-line camelcase
                     var certificate_invalidation = new CertificateInvalidationModel(
                         {
                             user: user,
@@ -49,8 +50,10 @@
                     if (this.collection.findWhere({user: user})) {
                         message = gettext('Certificate of <%= user %> has already been invalidated. Please check your spelling and retry.'); // eslint-disable-line max-len
                         this.escapeAndShowMessage(_.template(message)({user: user}));
+                    // eslint-disable-next-line camelcase
                     } else if (certificate_invalidation.isValid()) {
                         var self = this;
+                        // eslint-disable-next-line camelcase
                         certificate_invalidation.save(null, {
                             wait: true,
 
@@ -62,7 +65,9 @@
 
                             error: function(model, response) {
                                 try {
+                                    // eslint-disable-next-line camelcase
                                     var response_data = JSON.parse(response.responseText);
+                                    // eslint-disable-next-line camelcase
                                     self.escapeAndShowMessage(response_data.message);
                                 } catch (exception) {
                                     self.escapeAndShowMessage(
@@ -72,11 +77,13 @@
                             }
                         });
                     } else {
+                        // eslint-disable-next-line camelcase
                         this.escapeAndShowMessage(certificate_invalidation.validationError);
                     }
                 },
 
                 reValidateCertificate: function(event) {
+                    // eslint-disable-next-line camelcase
                     var certificate_invalidation = $(event.target).data();
                     var model = this.collection.get(certificate_invalidation),
                         self = this;
@@ -91,7 +98,9 @@
                             // eslint-disable-next-line no-shadow
                             error: function(model, response) {
                                 try {
+                                    // eslint-disable-next-line camelcase
                                     var response_data = JSON.parse(response.responseText);
+                                    // eslint-disable-next-line camelcase
                                     self.escapeAndShowMessage(response_data.message);
                                 } catch (exception) {
                                     self.escapeAndShowMessage(

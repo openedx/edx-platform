@@ -49,7 +49,9 @@
             },
 
             hasProfileImage: function() {
+                // eslint-disable-next-line camelcase
                 var profile_image = this.get('profile_image');
+                // eslint-disable-next-line camelcase
                 return (_.isObject(profile_image) && profile_image.has_image === true);
             },
 

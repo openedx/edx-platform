@@ -25,27 +25,38 @@
 
     function updateProtexField() {
         var problem = $('#protex_container').parents('.problem');
+        // eslint-disable-next-line camelcase
         var input_field = problem.find('input[type=hidden]');
+        // eslint-disable-next-line camelcase
         var protex_answer = protexCheckAnswer();
+        // eslint-disable-next-line camelcase
         var value = {protex_answer: protex_answer};
         // console.log(JSON.stringify(value));
+        // eslint-disable-next-line camelcase
         input_field.val(JSON.stringify(value));
     }
 
     protexIsReady = function() {
         // Load target shape
+        // eslint-disable-next-line camelcase
         var target_shape = $('#target_shape').val();
         protexSetTargetShape(target_shape);
 
         // Get answer from protex and store it into the hidden input field
         // when Check button is clicked
+        // eslint-disable-next-line camelcase
         var $fold_button = $('#fold-button');
+        // eslint-disable-next-line camelcase
         $fold_button.on('click', function() {
             var problem = $('#protex_container').parents('.problem');
+            // eslint-disable-next-line camelcase
             var input_field = problem.find('input[type=hidden]');
+            // eslint-disable-next-line camelcase
             var protex_answer = protexCheckAnswer();
+            // eslint-disable-next-line camelcase
             var value = {protex_answer: protex_answer};
             // console.log(JSON.stringify(value));
+            // eslint-disable-next-line camelcase
             input_field.val(JSON.stringify(value));
         });
         updateProtexField();

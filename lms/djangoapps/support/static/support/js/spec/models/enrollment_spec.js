@@ -17,6 +17,7 @@ define([
 
         it('can save an enrollment to the server and updates itself on success', function() {
             var requests = AjaxHelpers.requests(this),
+                // eslint-disable-next-line camelcase
                 manual_enrollment = {
                     enrolled_by: 'staff@edx.org',
                     reason: 'Financial Assistance'

@@ -53,6 +53,7 @@
                 return this;
             };
 
+            // eslint-disable-next-line consistent-return
             ResponseCommentShowView.prototype.addReplyLink = function() {
                 var html, name;
                 if (this.model.hasOwnProperty('parent')) {

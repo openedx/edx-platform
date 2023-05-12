@@ -47,6 +47,7 @@
                 }
             },
 
+            // eslint-disable-next-line consistent-return
             onKeyUp: function(event) {
                 var annotator = this.annotator,
                     self = this,

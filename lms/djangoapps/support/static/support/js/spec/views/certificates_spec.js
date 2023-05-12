@@ -61,12 +61,16 @@ define([
                 return results;
             },
 
+            // eslint-disable-next-line camelcase
             searchFor = function(user_filter, course_filter, requests, response) {
             // Enter the search term and submit
+                // eslint-disable-next-line camelcase
                 var url = '/certificates/search?user=' + user_filter;
                 view.setUserFilter(user_filter);
+                // eslint-disable-next-line camelcase
                 if (course_filter) {
                     view.setCourseFilter(course_filter);
+                    // eslint-disable-next-line camelcase
                     url += '&course_id=' + course_filter;
                 }
                 view.triggerSearch();

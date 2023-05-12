@@ -109,7 +109,9 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
             var values = ['DemoX', 'DM101', 'Demo library'];
             // Try making each of these three values empty one at a time and ensure the form won't submit:
             for (var i = 0; i < values.length; i++) {
+                // eslint-disable-next-line camelcase
                 var values_with_blank = values.slice();
+                // eslint-disable-next-line camelcase
                 values_with_blank[i] = '';
                 fillInLibraryFields.apply(this, values_with_blank);
                 expect($('.create-library li.field.text input').parent()).toHaveClass('error');
@@ -145,7 +147,9 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
         });
 
         it('can switch tabs', function() {
+            // eslint-disable-next-line camelcase
             var $courses_tab = $('.courses-tab'),
+                // eslint-disable-next-line camelcase
                 $libraraies_tab = $('.libraries-tab');
 
             // precondition check - courses tab is loaded by default

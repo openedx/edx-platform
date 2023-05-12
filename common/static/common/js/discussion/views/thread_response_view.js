@@ -202,6 +202,7 @@
                 view = this.renderComment(comment);
                 this.hideEditorChrome();
                 this.trigger('comment:add', comment);
+                // eslint-disable-next-line consistent-return
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
                     url: url,
@@ -236,6 +237,7 @@
                 this.model.remove();
                 this.$el.remove();
                 $elem = $(event.target);
+                // eslint-disable-next-line consistent-return
                 return DiscussionUtil.safeAjax({
                     $elem: $elem,
                     url: url,
@@ -243,6 +245,7 @@
                 });
             };
 
+            // eslint-disable-next-line consistent-return
             ThreadResponseView.prototype.createEditView = function() {
                 if (this.showView) {
                     this.showView.$el.empty();
@@ -283,6 +286,7 @@
                 return this.$('.comment-form').closest('li').show();
             };
 
+            // eslint-disable-next-line consistent-return
             ThreadResponseView.prototype.createShowView = function() {
                 var self = this;
 

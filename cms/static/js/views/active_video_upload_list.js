@@ -139,6 +139,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
             return this;
         },
 
+        // eslint-disable-next-line consistent-return
         onBeforeUnload: function() {
             // Are there are uploads queued or in progress?
             var uploading = this.collection.filter(function(model) {

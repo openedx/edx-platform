@@ -1,5 +1,6 @@
 /* globals analytics, course_location_analytics */
 
+// eslint-disable-next-line camelcase
 (function(analytics, course_location_analytics) {
     'use strict';
 
@@ -79,8 +80,11 @@
             };
 
             TabsEdit.prototype.toggleVisibilityOfTab = function(event) {
+                // eslint-disable-next-line camelcase
                 var checkbox_element, saving, tab_element;
+                // eslint-disable-next-line camelcase
                 checkbox_element = event.target;
+                // eslint-disable-next-line camelcase
                 tab_element = $(checkbox_element).parents('.course-tab')[0];
                 saving = new NotificationView.Mini({
                     title: gettext('Saving')
@@ -112,6 +116,7 @@
                     });
                 });
                 analytics.track('Reordered Pages', {
+                    // eslint-disable-next-line camelcase
                     course: course_location_analytics
                 });
                 saving = new NotificationView.Mini({
@@ -150,6 +155,7 @@
                     category: 'static_tab'
                 });
                 return analytics.track('Added Page', {
+                    // eslint-disable-next-line camelcase
                     course: course_location_analytics
                 });
             };
@@ -167,6 +173,7 @@
                                 view.hide();
                                 $component = $(event.currentTarget).parents('.component');
                                 analytics.track('Deleted Page', {
+                                    // eslint-disable-next-line camelcase
                                     course: course_location_analytics,
                                     id: $component.data('locator')
                                 });

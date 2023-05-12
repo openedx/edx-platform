@@ -29,6 +29,7 @@ define([
             this.$el.html(HtmlUtils.HTML(template).toString());
         },
 
+        // eslint-disable-next-line consistent-return
         setAndClose: function(event) {
             if (event && event.preventDefault) { event.preventDefault(); }
 

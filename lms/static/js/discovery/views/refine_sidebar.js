@@ -55,6 +55,7 @@
             render: function() {
                 var grouped = this.collection.groupBy('facet');
                 var htmlSnippet = HtmlUtils.joinHtml.apply(
+                    // eslint-disable-next-line consistent-return
                     this, _.map(grouped, function(options, facetKey) {
                         if (options.length > 0) {
                             return this.renderFacet(facetKey, options);

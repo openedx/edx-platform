@@ -67,8 +67,10 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
             if (this.showDetails || showDetails) {
                 var self = this;
                 this.model.get('signatories').each(function(modelSignatory) {
+                    // eslint-disable-next-line camelcase
                     var signatory_detail_view = new SignatoryDetailsView({model: modelSignatory});
                     // xss-lint: disable=javascript-jquery-append
+                    // eslint-disable-next-line camelcase
                     self.$('div.signatory-details-list').append($(signatory_detail_view.render().$el));
                 });
             }

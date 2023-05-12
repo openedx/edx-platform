@@ -458,6 +458,7 @@ describe('CourseOutlinePage', function() {
             var reindexSpy = spyOn(outlinePage, 'startReIndex').and.callThrough();
             var successSpy = spyOn(outlinePage, 'onIndexSuccess').and.callThrough();
             var reindexButton = outlinePage.$('.button.button-reindex');
+            // eslint-disable-next-line camelcase
             var test_url = '/course/5/search_reindex';
             reindexButton.attr('href', test_url);
             reindexButton.trigger('click');
@@ -472,6 +473,7 @@ describe('CourseOutlinePage', function() {
             var reindexSpy = spyOn(outlinePage, 'startReIndex').and.callThrough();
             var errorSpy = spyOn(outlinePage, 'onIndexError').and.callThrough();
             var reindexButton = outlinePage.$('.button.button-reindex');
+            // eslint-disable-next-line camelcase
             var test_url = '/course/5/search_reindex';
             reindexButton.attr('href', test_url);
             reindexButton.trigger('click');
@@ -1094,6 +1096,7 @@ describe('CourseOutlinePage', function() {
             return getItemHeaders('subsection').find('.wrapper-xblock-field');
         };
 
+        // eslint-disable-next-line camelcase
         setEditModalValues = function(start_date, due_date, grading_type) {
             $('#start_date').val(start_date);
             $('#due_date').val(due_date);
@@ -1108,6 +1111,7 @@ describe('CourseOutlinePage', function() {
             $('input.no_special_exam').prop('checked', true).trigger('change');
         };
 
+        // eslint-disable-next-line camelcase
         selectTimedExam = function(time_limit) {
             $('input.timed_exam').prop('checked', true).trigger('change');
             $('.field-time-limit input').val(time_limit);
@@ -1115,18 +1119,21 @@ describe('CourseOutlinePage', function() {
             setContentVisibility('hide_after_due');
         };
 
+        // eslint-disable-next-line camelcase
         selectProctoredExam = function(time_limit) {
             $('input.proctored_exam').prop('checked', true).trigger('change');
             $('.field-time-limit input').val(time_limit);
             $('.field-time-limit input').trigger('focusout');
         };
 
+        // eslint-disable-next-line camelcase
         selectPracticeExam = function(time_limit) {
             $('input.practice_exam').prop('checked', true).trigger('change');
             $('.field-time-limit input').val(time_limit);
             $('.field-time-limit input').trigger('focusout');
         };
 
+        // eslint-disable-next-line camelcase
         selectOnboardingExam = function(time_limit) {
             $('input.onboarding_exam').prop('checked', true).trigger('change');
             $('.field-time-limit input').val(time_limit);
@@ -1144,6 +1151,7 @@ describe('CourseOutlinePage', function() {
         };
 
         // Helper to validate oft-checked additional option fields' visibility
+        // eslint-disable-next-line camelcase
         checkOptionFieldVisibility = function(time_limit, review_rules) {
             expect($('.field-time-limit').is(':visible')).toBe(time_limit);
             expect($('.field-exam-review-rules').is(':visible')).toBe(review_rules);
@@ -1350,17 +1358,25 @@ describe('CourseOutlinePage', function() {
             outlinePage.$('.outline-subsection .configure-button').click();
             selectAdvancedSettings();
 
+            // eslint-disable-next-line camelcase
             var default_time = '00:30';
+            // eslint-disable-next-line camelcase
             var valid_times = ['00:30', '23:00', '24:00', '99:00'];
+            // eslint-disable-next-line camelcase
             var invalid_times = ['00:00', '100:00', '01:60'];
+            // eslint-disable-next-line camelcase
             var time_limit, i;
 
+            // eslint-disable-next-line camelcase
             for (i = 0; i < valid_times.length; i++) {
+                // eslint-disable-next-line camelcase
                 time_limit = valid_times[i];
                 selectTimedExam(time_limit);
                 expect($('.field-time-limit input').val()).toEqual(time_limit);
             }
+            // eslint-disable-next-line camelcase
             for (i = 0; i < invalid_times.length; i++) {
+                // eslint-disable-next-line camelcase
                 time_limit = invalid_times[i];
                 selectTimedExam(time_limit);
                 expect($('.field-time-limit input').val()).not.toEqual(time_limit);
@@ -2216,6 +2232,7 @@ describe('CourseOutlinePage', function() {
                 course.set('start', '2014-07-09T00:00:00Z');
             });
 
+            // eslint-disable-next-line camelcase
             setEditModalValuesForCustomPacing = function(grading_type, due_in) {
                 $('#grading_type').val(grading_type);
                 $('#due_in').val(due_in);

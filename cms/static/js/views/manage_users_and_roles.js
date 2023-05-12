@@ -6,6 +6,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
 function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line camelcase
     var default_messages = {
         defaults: {
             confirmation: gettext('Ok'),
@@ -102,11 +103,14 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
             var roleEvents = {};
             var self = this;
             for (var i = 0; i < self.options.roles.length; i++) {
+                // eslint-disable-next-line camelcase
                 var role_name = self.options.roles[i].key;
+                // eslint-disable-next-line camelcase
                 var role_selector = 'click .user-actions .make-' + role_name;
 
                 // eslint-disable-next-line no-loop-func
                 (function(role) {
+                    // eslint-disable-next-line camelcase
                     roleEvents[role_selector] = function(event) { self.handleRoleButtonClick(event.target, role); };
                 }(role_name));
             }
@@ -126,6 +130,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
             this.initial_role = this.roles[0];
             this.admin_role = this.roles[this.roles.length - 1];
 
+            // eslint-disable-next-line camelcase
             var message_mod = options.messages_modifier || function(messages) { return messages; };
             this.messages = message_mod(default_messages);
 
@@ -148,13 +153,16 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                 };
             for (var i = 0; i < this.users.length; i++) {
                 var user = this.users[i],
+                    // eslint-disable-next-line camelcase
                     is_current_user = this.current_user_id == user.id;
+                // eslint-disable-next-line camelcase
                 var template_data = {
                     user: user,
                     actions: this.getPossibleRoleChangesForRole(user.role, adminRoleCount),
                     roles: roles,
                     allow_delete: !(user.role === this.admin_role.key && adminRoleCount === 1),
                     allow_actions: this.allow_actions,
+                    // eslint-disable-next-line camelcase
                     is_current_user: is_current_user,
                     viewHelpers: viewHelpers
                 };
@@ -170,7 +178,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
 
         getPossibleRoleChangesForRole: function(role, adminRoleCount) {
             var result = [],
-                // eslint-disable-next-line no-shadow
+                /* eslint-disable-next-line no-shadow, camelcase */
                 role_names = _.map(this.roles, function(role) { return role.key; });
             if (role === this.admin_role.key && adminRoleCount === 1) {
                 result.push({notoggle: true});
@@ -178,11 +186,14 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                 var currentRoleIdx = _.indexOf(role_names, role);
                 // in reverse order to show "Add" buttons to the left, "Remove" to the right
                 for (var i = this.roles.length - 1; i >= 0; i--) {
+                    // eslint-disable-next-line camelcase
                     var other_role = this.roles[i];
                     // eslint-disable-next-line no-continue
                     if (Math.abs(currentRoleIdx - i) !== 1) { continue; } // allows moving only to adjacent roles
                     result.push({
+                        // eslint-disable-next-line camelcase
                         to_role: other_role.key,
+                        // eslint-disable-next-line camelcase
                         label: (i < currentRoleIdx) ? this.roles[currentRoleIdx].name : other_role.name,
                         direction: (i < currentRoleIdx) ? 'remove' : 'add'
                     });

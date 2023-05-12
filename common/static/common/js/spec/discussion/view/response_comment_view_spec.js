@@ -2,6 +2,7 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line camelcase
     var $$course_id = '$$course_id';
 
     describe('ResponseCommentView', function() {
@@ -10,6 +11,7 @@
             this.comment = new Comment({
                 id: '01234567',
                 user_id: user.id,
+                // eslint-disable-next-line camelcase
                 course_id: $$course_id,
                 body: 'this is a response',
                 created_at: '2013-04-03T20:08:39Z',

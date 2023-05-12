@@ -2,6 +2,7 @@ define(['js/models/xblock_validation'],
     function(XBlockValidationModel) {
         var verifyModel;
 
+        // eslint-disable-next-line camelcase
         verifyModel = function(model, expected_empty, expected_summary, expected_messages, expected_xblock_id) {
             expect(model.get('empty')).toBe(expected_empty);
             expect(model.get('summary')).toEqual(expected_summary);

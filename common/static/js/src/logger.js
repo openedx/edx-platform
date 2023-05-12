@@ -60,6 +60,7 @@
                 return sendRequest({
                     event_type: eventType,
                     event: JSON.stringify(data),
+                    // eslint-disable-next-line camelcase
                     courserun_key: typeof $$course_id !== 'undefined' ? $$course_id : null,
                     page: window.location.href
                 }, requestOptions);

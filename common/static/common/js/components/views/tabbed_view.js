@@ -190,6 +190,7 @@
                 return false;
             },
 
+            // eslint-disable-next-line consistent-return
             keydownHandler: function(event) {
                 var key = event.which,
                     $focused = $(event.currentTarget),

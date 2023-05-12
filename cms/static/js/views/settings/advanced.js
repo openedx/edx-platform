@@ -144,6 +144,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                     self.render();
                     self.showSavedBar(title, message);
                     analytics.track('Saved Advanced Settings', {
+                        // eslint-disable-next-line camelcase
                         course: course_location_analytics
                     });
                 },

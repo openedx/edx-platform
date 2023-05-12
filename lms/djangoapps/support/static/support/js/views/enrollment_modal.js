@@ -45,6 +45,7 @@
             },
 
             submitEnrollmentChange: function(event) {
+                // eslint-disable-next-line camelcase
                 var new_mode = this.$('.enrollment-new-mode').val(),
                     reason = this.$('.enrollment-reason').val() || this.$('.enrollment-reason-other').val();
                 event.preventDefault();

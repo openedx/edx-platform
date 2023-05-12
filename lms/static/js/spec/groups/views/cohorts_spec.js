@@ -328,9 +328,11 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             });
 
             it('shows an appropriate cohort status message', function() {
+                // eslint-disable-next-line camelcase
                 var createCourseCohortSettingsNotificationView = function(is_cohorted) {
                     var notificationView = new CourseCohortSettingsNotificationView({
                         el: $('.cohort-state-message'),
+                        // eslint-disable-next-line camelcase
                         cohortEnabled: is_cohorted
                     });
                     notificationView.render();
@@ -358,9 +360,11 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             it('renders header correctly', function() {
                 var cohortName = 'Transformers',
                     newCohortName = 'X Men';
+                // eslint-disable-next-line camelcase
                 var expectedRequest = function(assignment_type) {
                     return {
                         name: newCohortName,
+                        // eslint-disable-next-line camelcase
                         assignment_type: assignment_type,
                         group_id: null,
                         user_partition_id: null
@@ -951,9 +955,11 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 it('can update existing cohort settings', function() {
                     var cohortName = 'Transformers',
                         newCohortName = 'X Men';
+                    // eslint-disable-next-line camelcase
                     var expectedRequest = function(assignment_type) {
                         return {
                             name: newCohortName,
+                            // eslint-disable-next-line camelcase
                             assignment_type: assignment_type,
                             group_id: null,
                             user_partition_id: null

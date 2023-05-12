@@ -15,19 +15,29 @@
                 });
             });
             it('anonymous thread should not include login role label', function() {
+                // eslint-disable-next-line camelcase
                 var anon_content;
+                // eslint-disable-next-line camelcase
                 anon_content = new Content();
+                // eslint-disable-next-line camelcase
                 anon_content.initialize();
+                // eslint-disable-next-line camelcase
                 expect(anon_content.get('staff_authored')).toBe(false);
+                // eslint-disable-next-line camelcase
                 return expect(anon_content.get('community_ta_authored')).toBe(false);
             });
             return it('general thread should include login role label', function() {
+                // eslint-disable-next-line camelcase
                 var anon_content;
+                // eslint-disable-next-line camelcase
                 anon_content = new Content({
                     user_id: '567'
                 });
+                // eslint-disable-next-line camelcase
                 anon_content.initialize();
+                // eslint-disable-next-line camelcase
                 expect(anon_content.get('staff_authored')).toBe(true);
+                // eslint-disable-next-line camelcase
                 return expect(anon_content.get('community_ta_authored')).toBe(true);
             });
         });
@@ -71,8 +81,11 @@
                 return expect(this.content.get('abuse_flaggers')).toEqual(['123', '567']);
             });
             return it('can be unflagged for abuse', function() {
+                // eslint-disable-next-line camelcase
                 var temp_array;
+                // eslint-disable-next-line camelcase
                 temp_array = [];
+                // eslint-disable-next-line camelcase
                 temp_array.push(window.user.get('id'));
                 this.content.set('abuse_flaggers', temp_array);
                 this.content.unflagAbuse();

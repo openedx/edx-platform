@@ -70,9 +70,11 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         ViewHelpers.verifyPromptHidden(promptSpy);
     };
 
+    // eslint-disable-next-line camelcase
     var uploadFile = function(file_path, requests) {
         $(SELECTORS.uploadDialogFileInput).change();
         $(SELECTORS.uploadDialogButton).click();
+        // eslint-disable-next-line camelcase
         AjaxHelpers.respondWithJson(requests, {asset: {url: file_path}});
     };
 
@@ -268,13 +270,17 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
 
             it('user can delete those signatories already saved', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
+                // eslint-disable-next-line camelcase
                 var total_signatories = this.model.get('signatories').length;
                 var signatory = this.model.get('signatories').at(0);
+                // eslint-disable-next-line camelcase
                 var signatory_url = '/certificates/signatory';
+                // eslint-disable-next-line camelcase
                 signatory.url = signatory_url;
                 spyOn(signatory, 'isNew').and.returnValue(false);
                 var text = 'Delete "' + signatory.get('name') + '" from the list of signatories?';
                 clickDeleteItem(this, text, SELECTORS.signatoryDeleteButton + ':first', signatory_url);
+                // eslint-disable-next-line camelcase
                 expect(this.model.get('signatories').length).toEqual(total_signatories - 1);
             });
 
@@ -284,8 +290,11 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 spyOn(signatory, 'isNew').and.returnValue(false);
                 // add one more signatory
                 this.view.$(SELECTORS.addSignatoryButton).click();
+                // eslint-disable-next-line camelcase
                 var total_signatories = this.model.get('signatories').length;
+                // eslint-disable-next-line camelcase
                 var signatory_url = '/certificates/signatory';
+                // eslint-disable-next-line camelcase
                 signatory.url = signatory_url;
                 var text = 'Delete "' + signatory.get('name') + '" from the list of signatories?';
                 showConfirmPromptAndClickCancel(this.view, SELECTORS.signatoryDeleteButton + ':first', text);
@@ -318,6 +327,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 });
 
                 this.view.$(SELECTORS.uploadSignatureButton).click();
+                // eslint-disable-next-line camelcase
                 var sinature_image_path = '/c4x/edX/DemoX/asset/Signature-450.png';
                 uploadFile(sinature_image_path, requests);
 

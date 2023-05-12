@@ -11,6 +11,7 @@ import 'xblock/cms.runtime.v1';
 // eslint-disable-next-line no-unused-expressions
 'use strict';
 export default function ContainerFactory(componentTemplates, XBlockInfoJson, action, options) {
+    // eslint-disable-next-line camelcase
     var main_options = {
         el: $('#content'),
         model: new XBlockContainerInfo(XBlockInfoJson, {parse: true}),

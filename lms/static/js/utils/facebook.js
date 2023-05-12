@@ -20,13 +20,18 @@ var FaceBook = (function() {
                 fjs.parentNode.insertBefore(js, fjs);
             }(document, 'script', 'facebook-jssdk'));
         },
+        // eslint-disable-next-line camelcase
         share: function(feed_data) {
             FB.ui( // eslint-disable-line no-undef
                 {
                     method: 'feed',
+                    // eslint-disable-next-line camelcase
                     name: feed_data.share_text,
+                    // eslint-disable-next-line camelcase
                     link: feed_data.share_link,
+                    // eslint-disable-next-line camelcase
                     picture: feed_data.picture_link,
+                    // eslint-disable-next-line camelcase
                     description: feed_data.description
                 },
                 // The Facebook API now requires a callback. Since we weren't doing anything after posting before,

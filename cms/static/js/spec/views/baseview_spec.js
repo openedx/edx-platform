@@ -4,10 +4,12 @@ define(['jquery', 'underscore', 'js/views/baseview', 'js/utils/handle_iframe_bin
             var baseViewPrototype;
 
             describe('BaseView rendering', function() {
+                // eslint-disable-next-line camelcase
                 var iframeBinding_spy;
 
                 beforeEach(function() {
                     baseViewPrototype = BaseView.prototype;
+                    // eslint-disable-next-line camelcase
                     iframeBinding_spy = sinon.spy(IframeBinding, 'iframeBinding');
 
                     spyOn(baseViewPrototype, 'initialize');
@@ -17,6 +19,7 @@ define(['jquery', 'underscore', 'js/views/baseview', 'js/utils/handle_iframe_bin
                 });
 
                 afterEach(function() {
+                    // eslint-disable-next-line camelcase
                     iframeBinding_spy.restore();
                 });
 
@@ -34,11 +37,14 @@ define(['jquery', 'underscore', 'js/views/baseview', 'js/utils/handle_iframe_bin
                     var baseView = new BaseView();
                     baseView.render();
                     expect(baseViewPrototype.afterRender).toHaveBeenCalled();
+                    // eslint-disable-next-line camelcase
                     expect(iframeBinding_spy.called).toEqual(true);
 
                     // check calls count of iframeBinding function
+                    // eslint-disable-next-line camelcase
                     expect(iframeBinding_spy.callCount).toBe(1);
                     IframeBinding.iframeBinding();
+                    // eslint-disable-next-line camelcase
                     expect(iframeBinding_spy.callCount).toBe(2);
                 });
             });

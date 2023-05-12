@@ -8,6 +8,7 @@
      * if sent by server
      */
         var originalErrorHandler = Annotator.Plugin.Store.prototype._onError;
+        // eslint-disable-next-line consistent-return
         Annotator.Plugin.Store.prototype._onError = function(xhr) {
             var serverResponse;
 

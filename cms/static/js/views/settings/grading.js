@@ -116,12 +116,15 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             var format = function(time) {
                 return time >= 10 ? time.toString() : '0' + time;
             };
+            // eslint-disable-next-line camelcase
             var grace_period = this.model.get('grace_period');
             this.$el.find('#course-grading-graceperiod').val(
+                // eslint-disable-next-line camelcase
                 format(grace_period.hours) + ':' + format(grace_period.minutes)
             );
         },
         renderMinimumGradeCredit: function() {
+            // eslint-disable-next-line camelcase
             var minimum_grade_credit = this.model.get('minimum_grade_credit');
             this.$el.find('#course-minimum_grade_credit').val(
                 Math.round(parseFloat(minimum_grade_credit) * 100)

@@ -31,15 +31,19 @@
                 $(this).click(function(e) {
                     $('.modal, .js-modal').hide();
 
+                    // eslint-disable-next-line camelcase
                     var modal_id = $(this).attr('href');
 
                     if ($(modal_id).hasClass('video-modal')) {
                         // Video modals need to be cloned before being presented as a modal
                         // This is because actions on the video get recorded in the history.
                         // Deleting the video (clone) prevents the odd back button behavior.
+                        // eslint-disable-next-line camelcase
                         var modal_clone = $(modal_id).clone(true, true);
+                        // eslint-disable-next-line camelcase
                         modal_clone.attr('id', 'modal_clone');
                         $(modal_id).after(modal_clone); // xss-lint: disable=javascript-jquery-insertion
+                        // eslint-disable-next-line camelcase
                         modal_id = '#modal_clone';
                     }
 
@@ -59,7 +63,9 @@
                         close_modal(modal_id, e);
                     });
 
+                    // eslint-disable-next-line camelcase
                     var modal_height = $(modal_id).outerHeight();
+                    // eslint-disable-next-line camelcase
                     var modal_width = $(modal_id).outerWidth();
 
                     $('#lean_overlay').css({display: 'block', opacity: 0});
@@ -82,6 +88,7 @@
                             opacity: 0,
                             'z-index': 11000,
                             left: 50 + '%',
+                            // eslint-disable-next-line camelcase
                             'margin-left': -(modal_width / 2) + 'px',
                             top: o.top + 'px'
                         });
@@ -94,10 +101,12 @@
                 });
             });
 
+            // eslint-disable-next-line camelcase
             function close_modal(modal_id, e) {
                 $('#lean_overlay').fadeOut(200);
                 $('iframe', modal_id).attr('src', '');
                 $(modal_id).css({display: 'none'});
+                // eslint-disable-next-line camelcase
                 if (modal_id == '#modal_clone') {
                     $(modal_id).remove();
                 }

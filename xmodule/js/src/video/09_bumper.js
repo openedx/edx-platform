@@ -10,6 +10,7 @@
      * @param {Object} state The object containing the state of the video
      * @return {jquery Promise}
      */
+        // eslint-disable-next-line consistent-return
         var VideoBumper = function(player, state) {
             if (!(this instanceof VideoBumper)) {
                 return new VideoBumper(player, state);

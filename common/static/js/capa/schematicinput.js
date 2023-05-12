@@ -26,6 +26,7 @@ $(function() {
         editingCircuit = $(this).children('input.schematic').get(0);
 
         editingCircuit.schematic.update_value();
+        // eslint-disable-next-line camelcase
         var circuit_so_far = $(editingCircuit).val();
 
         var n = editorCircuit.schematic.components.length;
@@ -38,6 +39,7 @@ $(function() {
     $('#circuit_save_btn').click(function() {
         // Take the circuit from the editor and put it back into editingCircuit
         editorCircuit.schematic.update_value();
+        // eslint-disable-next-line camelcase
         var saving_circuit = $(editorCircuit).val();
 
         var n = editingCircuit.schematic.components.length;

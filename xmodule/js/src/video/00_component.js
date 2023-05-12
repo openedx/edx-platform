@@ -37,6 +37,7 @@
      * @constructor
      * @return {jquery Promise}
      */
+            // eslint-disable-next-line consistent-return
             var Component = function() {
                 if ($.isFunction(this.initialize)) {
                     // eslint-disable-next-line prefer-spread
@@ -53,6 +54,7 @@
      */
             Component.extend = function(protoProps, staticProps) {
                 var Parent = this,
+                    // eslint-disable-next-line consistent-return
                     Child = function() {
                         if ($.isFunction(this.initialize)) {
                             // eslint-disable-next-line prefer-spread

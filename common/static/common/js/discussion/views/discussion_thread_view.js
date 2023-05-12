@@ -172,6 +172,7 @@
                 }
             });
 
+            // eslint-disable-next-line consistent-return
             DiscussionThreadView.prototype.cleanup = function() {
                 // jQuery.ajax after 1.5 returns a jqXHR which doesn't implement .abort
                 // but I don't feel confident enough about what's going on here to remove this code
@@ -242,6 +243,7 @@
                 return this.loadResponses(INITIAL_RESPONSE_PAGE_SIZE, this.$el.find('.js-response-list'), true);
             };
 
+            // eslint-disable-next-line consistent-return
             DiscussionThreadView.prototype.renderResponseCountAndPagination = function(responseTotal) {
                 var buttonText, $loadMoreButton, responseCountFormat, responseLimit, responsePagination,
                     responsesRemaining, showingResponsesText,
@@ -375,6 +377,7 @@
                 });
                 this.model.addComment();
                 this.renderAddResponseButton();
+                // eslint-disable-next-line consistent-return
                 return DiscussionUtil.safeAjax({
                     $elem: $(event.target),
                     url: url,
@@ -465,6 +468,7 @@
                 this.undelegateEvents();
                 this.$el.empty();
                 $elem = $(event.target);
+                // eslint-disable-next-line consistent-return
                 return DiscussionUtil.safeAjax({
                     $elem: $elem,
                     url: url,

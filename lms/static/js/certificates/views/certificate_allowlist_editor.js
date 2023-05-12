@@ -35,21 +35,30 @@
             addException: function() {
                 var value = this.$('#certificate-exception').val();
                 var notes = this.$('#notes').val();
+                // eslint-disable-next-line camelcase
                 var user_email = '',
+                    // eslint-disable-next-line camelcase
                     user_name = '',
                     model = {};
 
                 if (this.isEmailAddress(value)) {
+                    // eslint-disable-next-line camelcase
                     user_email = value;
+                    // eslint-disable-next-line camelcase
                     model = {user_email: user_email};
                 } else {
+                    // eslint-disable-next-line camelcase
                     user_name = value;
+                    // eslint-disable-next-line camelcase
                     model = {user_name: user_name};
                 }
 
+                // eslint-disable-next-line camelcase
                 var certificate_exception = new CertificateExceptionModel(
                     {
+                        // eslint-disable-next-line camelcase
                         user_name: user_name,
+                        // eslint-disable-next-line camelcase
                         user_email: user_email,
                         notes: notes,
                         new: true
@@ -63,22 +72,27 @@
                 if (this.collection.findWhere(model)) {
                     message = gettext('<%- user %> already in exception list.');
                     this.escapeAndShowMessage(
+                        // eslint-disable-next-line camelcase
                         _.template(message)({user: (user_name || user_email)})
                     );
+                // eslint-disable-next-line camelcase
                 } else if (certificate_exception.isValid()) {
                     message = gettext('<%- user %> has been successfully added to the exception list. Click Generate Exception Certificate below to send the certificate.'); // eslint-disable-line max-len
+                    // eslint-disable-next-line camelcase
                     certificate_exception.save(
                         null,
                         {
                             success: this.showSuccess(
                                 this,
                                 true,
+                                // eslint-disable-next-line camelcase
                                 _.template(message)({user: (user_name || user_email)})
                             ),
                             error: this.showError(this)
                         }
                     );
                 } else {
+                    // eslint-disable-next-line camelcase
                     this.escapeAndShowMessage(certificate_exception.validationError);
                 }
             },
@@ -94,8 +108,10 @@
                 this.$(this.message_div).removeClass('hidden').append(HtmlUtils.joinHtml(HtmlUtils.HTML('<p>'), message, HtmlUtils.HTML('</p>')).toString());
             },
 
+            // eslint-disable-next-line camelcase
             showSuccess: function(caller, add_model, message) {
                 return function(model) {
+                    // eslint-disable-next-line camelcase
                     if (add_model) {
                         caller.collection.add(model);
                     }
@@ -106,7 +122,9 @@
             showError: function(caller) {
                 return function(model, response) {
                     try {
+                        // eslint-disable-next-line camelcase
                         var response_data = JSON.parse(response.responseText);
+                        // eslint-disable-next-line camelcase
                         caller.escapeAndShowMessage(response_data.message);
                     } catch (exception) {
                         caller.escapeAndShowMessage(

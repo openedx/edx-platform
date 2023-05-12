@@ -13,6 +13,7 @@ $(function() {
 
     toggleSubmitButton(true);
 
+    // eslint-disable-next-line consistent-return
     $('#survey-form').on('submit', function() {
         /* validate required fields */
 
@@ -20,6 +21,7 @@ $(function() {
 
         $('.status.message.submission-error .message-copy').empty();
 
+        // eslint-disable-next-line camelcase
         var cancel_submit = false;
 
         $inputs.each(function() {
@@ -33,6 +35,7 @@ $(function() {
                         $(this).parent().addClass('field-error');
                         // eslint-disable-next-line max-len
                         $('.status.message.submission-error .message-copy').append(edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML("<li class='error-item'>"), fieldLabel.text(), edx.HtmlUtils.HTML('</li>')).toString());
+                        // eslint-disable-next-line camelcase
                         cancel_submit = true;
                     }
                 } else if (typeof val === 'object') {
@@ -42,12 +45,14 @@ $(function() {
                         $(this).parent().addClass('field-error');
                         // eslint-disable-next-line max-len
                         $('.status.message.submission-error .message-copy').append(edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML("<li class='error-item'>"), fieldLabel.text(), edx.HtmlUtils.HTML('</li>')).toString());
+                        // eslint-disable-next-line camelcase
                         cancel_submit = true;
                     }
                 }
             }
         });
 
+        // eslint-disable-next-line camelcase
         if (cancel_submit) {
             $('.status.message.submission-error')
                 .removeClass('is-hidden')

@@ -120,16 +120,20 @@
 
                 it('UP and DOWN keydown function as expected on speed entries',
                     function() {
+                        // eslint-disable-next-line camelcase
                         var speed_0_75 = speedEntries.filter(':contains("0.75x")'),
+                            // eslint-disable-next-line camelcase
                             speed_1_0 = speedEntries.filter(':contains("1.0x")');
 
                         // First open menu
                         $speedControl.trigger(keyPressEvent(KEY.UP));
                         expect(speed_0_75).toBeFocused();
 
+                        // eslint-disable-next-line camelcase
                         speed_0_75.trigger(keyPressEvent(KEY.UP));
                         expect(speed_1_0).toBeFocused();
 
+                        // eslint-disable-next-line camelcase
                         speed_1_0.trigger(keyPressEvent(KEY.DOWN));
                         expect(speed_0_75).toBeFocused();
                     });

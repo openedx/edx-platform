@@ -410,6 +410,7 @@
                 ).always(this.trigger('comment:endorse'));
             };
 
+            // eslint-disable-next-line consistent-return
             DiscussionContentShowView.prototype.toggleVote = function(event) {
                 var isVoting, updates, url, user,
                     self = this;

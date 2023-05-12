@@ -12,7 +12,9 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      * @param {Any} data Data that should be stored.
      * @return {Object} Object itself for chaining.
      */
+        // eslint-disable-next-line camelcase
         Storage.set = function(data_id, data) {
+            // eslint-disable-next-line camelcase
             Storage[data_id] = data;
             return this;
         };
@@ -23,7 +25,9 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      * @param {String} data_id Unique identifier of the data.
      * @return {Any} Stored data.
      */
+        // eslint-disable-next-line camelcase
         Storage.get = function(data_id) {
+            // eslint-disable-next-line camelcase
             return Storage[data_id];
         };
 
@@ -33,7 +37,9 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      * @param {String} data_id Unique identifier of the data.
      * @return {Boolean} Boolean value that indicate if data is removed.
      */
+        // eslint-disable-next-line camelcase
         Storage.remove = function(data_id) {
+            // eslint-disable-next-line camelcase
             return (delete Storage[data_id]);
         };
 
@@ -48,11 +54,14 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      *    Undefined:     When model doesn't exist.
      * }
      */
+        // eslint-disable-next-line camelcase
         var _getField = function(collection, field_name) {
             var model;
 
+            // eslint-disable-next-line camelcase
             if (collection && field_name) {
                 model = collection.findWhere({
+                    // eslint-disable-next-line camelcase
                     field_name: field_name
                 });
             }
@@ -207,7 +216,9 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      * @examples
      * _getYoutubeLink('OEoXaMPEzfM'); => 'http://youtu.be/OEoXaMPEzfM'
      */
+        // eslint-disable-next-line camelcase
         var _getYoutubeLink = function(video_id) {
+            // eslint-disable-next-line camelcase
             return 'http://youtu.be/' + video_id;
         };
 
@@ -230,6 +241,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      *       {mode: `html5`, type: `webm`, ...}
      *     ]
      */
+        // eslint-disable-next-line consistent-return
         var _getVideoList = function(links) {
             if ($.isArray(links)) {
                 var arr = [],

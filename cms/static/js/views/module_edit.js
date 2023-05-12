@@ -44,6 +44,7 @@
                     return this.render();
                 };
 
+                // eslint-disable-next-line consistent-return
                 ModuleEdit.prototype.loadDisplay = function() {
                     var xblockElement;
                     xblockElement = this.$el.find('.xblock-student_view');
@@ -68,6 +69,7 @@
                     }).success(callback);
                 };
 
+                // eslint-disable-next-line consistent-return
                 ModuleEdit.prototype.loadView = function(viewName, target, callback) {
                     var _this = this;
                     if (this.model.id) {

@@ -40,6 +40,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             self_paced: null
         },
 
+        // eslint-disable-next-line consistent-return
         validate: function(newattrs) {
         // Returns either nothing (no return call) so that validate works or an object of {field: errorstring} pairs
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.

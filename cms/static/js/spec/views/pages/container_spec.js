@@ -14,6 +14,7 @@ import ComponentTemplates from 'js/collections/component_template';
 import Course from 'js/models/course';
 import 'jquery.simulate';
 
+// eslint-disable-next-line camelcase
 function parameterized_suite(label, globalPageOptions) {
     describe(label + ' ContainerPage', function() {
         var getContainerPage, renderContainerPage, handleContainerPageRefresh, expectComponents,
@@ -79,6 +80,7 @@ function parameterized_suite(label, globalPageOptions) {
         };
 
         getContainerPage = function(options, componentTemplates) {
+            // eslint-disable-next-line camelcase
             var default_options = {
                 model: model,
                 templates: componentTemplates === undefined
@@ -112,7 +114,9 @@ function parameterized_suite(label, globalPageOptions) {
             // verify expected components (in expected order) by their locators
             var components = $(container).find('.studio-xblock-wrapper');
             expect(components.length).toBe(locators.length);
+            // eslint-disable-next-line camelcase
             _.each(locators, function(locator, locator_index) {
+                // eslint-disable-next-line camelcase
                 expect($(components[locator_index]).data('locator')).toBe(locator);
             });
         };
@@ -570,7 +574,9 @@ function parameterized_suite(label, globalPageOptions) {
                         expect(getButtonText(containerPage)).toBe('');
                     });
 
+                    // eslint-disable-next-line camelcase
                     var updatePreviewButtonTest = function(show_previews, expected_text) {
+                        // eslint-disable-next-line camelcase
                         it('can set preview button to "' + expected_text + '"', function() {
                             containerPage = getContainerPage();
                             containerPage.updatePreviewButton(show_previews);

@@ -35,6 +35,7 @@ define([
             };
         },
 
+        // eslint-disable-next-line consistent-return
         validate: function(attrs) {
             if (!str.trim(attrs.name)) {
                 return {

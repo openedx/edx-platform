@@ -21,11 +21,14 @@
     }
 
     // (tags that can be opened/closed) | (tags that stand alone)
+    // eslint-disable-next-line camelcase
     var basic_tag_whitelist = /^(<\/?(b|blockquote|code|del|dd|dl|dt|em|h1|h2|h3|i|kbd|li|ol|p|pre|s|sup|sub|strong|strike|ul)>|<(br|hr)\s?\/?>)$/i;
     // <a href="url..." optional title>|</a>
+    // eslint-disable-next-line camelcase
     var a_white = /^(<a\shref="((https?|ftp):\/\/|\/)[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)]+"(\stitle="[^"<>]+")?\s?>|<\/a>)$/i;
 
     // <img src="url..." optional width  optional height  optional alt  optional title
+    // eslint-disable-next-line camelcase
     var img_white = /^(<img\ssrc="(https?:\/\/|\/)[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)]+"(\swidth="\d{1,3}")?(\sheight="\d{1,3}")?(\salt="[^"<>]*")?(\stitle="[^"<>]*")?\s?\/?>)$/i;
 
     function sanitizeTag(tag) {
@@ -90,10 +93,13 @@
 
         // delete all orphaned tags from the string
 
+        // eslint-disable-next-line block-scoped-var
         var ctag = 0;
         // eslint-disable-next-line no-shadow
         html = html.replace(re, function(match) {
+            // eslint-disable-next-line block-scoped-var
             var res = tagremove[ctag] ? '' : match;
+            // eslint-disable-next-line block-scoped-var
             ctag++;
             return res;
         });

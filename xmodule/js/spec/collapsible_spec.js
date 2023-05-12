@@ -3,6 +3,7 @@
     'use strict';
 
     describe('Collapsible', function() {
+        // eslint-disable-next-line camelcase
         var $el, html, html_custom,
             initialize = function(template) {
                 setFixtures(template);
@@ -24,6 +25,7 @@
                         + '<p>longform is visible</p>'
                     + '</div>'
                 + '</section>';
+            // eslint-disable-next-line camelcase
             html_custom = ''
                 + '<section class="collapsible">'
                     + '<div '

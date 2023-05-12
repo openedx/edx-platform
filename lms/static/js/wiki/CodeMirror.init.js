@@ -16,6 +16,7 @@ $(document).ready(function() {
     // to leave that alone).
     editor.getInputField().setAttribute('id', 'id_codemirror_content');
     $(".control-label[for='id_content']")[0].setAttribute('for', 'id_codemirror_content');
+    // eslint-disable-next-line consistent-return
     window.onbeforeunload = function askConfirm() { // Warn the user before they navigate away
         if (editor.getValue() != initialContents) {
             return 'You have made changes to the article that have not been saved yet.';

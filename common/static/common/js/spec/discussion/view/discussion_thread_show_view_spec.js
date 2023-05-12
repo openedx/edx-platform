@@ -2,6 +2,7 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line camelcase
     var $$course_id = '$$course_id';
     describe('DiscussionThreadShowView', function() {
         beforeEach(function() {
@@ -12,6 +13,7 @@
                 id: 'dummy',
                 user_id: this.user.id,
                 username: this.user.get('username'),
+                // eslint-disable-next-line camelcase
                 course_id: $$course_id,
                 title: 'dummy title',
                 body: 'this is a thread',
@@ -140,11 +142,14 @@
             beforeEach(function() {
                 return this.thread.set('user_url', 'test_user_url');
             });
+            // eslint-disable-next-line camelcase
             checkUserLink = function(element, is_ta, is_staff) {
                 expect(element.find('.username').length).toEqual(1);
                 expect(element.find('.username').text()).toEqual('test_user');
                 expect(element.find('.username').attr('href')).toEqual('test_user_url');
+                // eslint-disable-next-line camelcase
                 expect(element.find('.user-label-community-ta').length).toEqual(is_ta ? 1 : 0);
+                // eslint-disable-next-line camelcase
                 return expect(element.find('.user-label-staff').length).toEqual(is_staff ? 1 : 0);
             };
             it('renders correctly for a student-authored thread', function() {

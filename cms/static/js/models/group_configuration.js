@@ -85,6 +85,7 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
             };
         },
 
+        // eslint-disable-next-line consistent-return
         validate: function(attrs) {
             if (!attrs.name.trim()) {
                 return {

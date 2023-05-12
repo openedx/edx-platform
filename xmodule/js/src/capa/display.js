@@ -727,6 +727,7 @@
             return $.postWithPrefix('' + this.url + '/problem_show', function(response) {
                 var answers;
                 answers = response.answers;
+                // eslint-disable-next-line consistent-return
                 $.each(answers, function(key, value) {
                     var safeKey = key.replace(':', '\\:'); // fix for courses which use url_names with colons, e.g. problem:question1
                     var answer;

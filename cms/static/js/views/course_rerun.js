@@ -31,15 +31,18 @@ function(domReady, $, _, CreateCourseUtilsFactory, ViewUtils, HtmlUtils) {
         }
 
         var $newCourseForm = $(this).closest('#rerun-course-form');
+        // eslint-disable-next-line camelcase
         var display_name = $newCourseForm.find('.rerun-course-name').val();
         var org = $newCourseForm.find('.rerun-course-org').val();
         var number = $newCourseForm.find('.rerun-course-number').val();
         var run = $newCourseForm.find('.rerun-course-run').val();
 
         courseInfo = {
+            // eslint-disable-next-line camelcase
             source_course_key: source_course_key,
             org: org,
             number: number,
+            // eslint-disable-next-line camelcase
             display_name: display_name,
             run: run
         };

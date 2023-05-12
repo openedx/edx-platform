@@ -51,8 +51,10 @@
 
             template: HtmlUtils.template(cardTemplate),
 
+            // eslint-disable-next-line camelcase
             switchOnConfiguration: function(square_result, list_result) {
                 return this.callIfFunction(this.configuration) === 'square_card'
+                    // eslint-disable-next-line camelcase
                     ? square_result : list_result;
             },
 

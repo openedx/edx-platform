@@ -3,6 +3,7 @@
  */
 var edx = edx || {};
 
+// eslint-disable-next-line camelcase
 (function($, _, gettext, interpolate_text) {
     'use strict';
 

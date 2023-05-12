@@ -71,6 +71,7 @@ function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeS
             }
         },
 
+        // eslint-disable-next-line consistent-return
         validate: function(attrs) {
             // Ensure the provided attributes set meets our expectations for format, type, etc.
             if (!attrs.name.trim()) {

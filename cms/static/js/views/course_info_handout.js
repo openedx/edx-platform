@@ -76,6 +76,7 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
                 this.closeEditor();
 
                 analytics.track('Saved Course Handouts', { // eslint-disable-line no-undef
+                    // eslint-disable-next-line camelcase
                     course: course_location_analytics // eslint-disable-line no-undef
                 });
             } else {

@@ -47,17 +47,23 @@ var onCertificatesReady = null;
                 return;
             }
 
+            // eslint-disable-next-line camelcase
             var $btn_generating_certs = $(this),
+                // eslint-disable-next-line camelcase
                 $certificate_generation_status = $('.certificate-generation-status');
+            // eslint-disable-next-line camelcase
             var url = $btn_generating_certs.data('endpoint');
             $.ajax({
                 type: 'POST',
                 url: url,
                 success: function(data) {
+                    // eslint-disable-next-line camelcase
                     $btn_generating_certs.attr('disabled', 'disabled');
+                    // eslint-disable-next-line camelcase
                     $certificate_generation_status.text(data.message);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
+                    // eslint-disable-next-line camelcase
                     $certificate_generation_status.text(gettext('Error while generating certificates. Please try again.'));
                 }
             });
@@ -73,8 +79,11 @@ var onCertificatesReady = null;
                 return;
             }
 
+            // eslint-disable-next-line camelcase
             var $btn_regenerating_certs = $(this),
+                // eslint-disable-next-line camelcase
                 $certificate_regeneration_status = $('.certificate-regeneration-status'),
+                // eslint-disable-next-line camelcase
                 url = $btn_regenerating_certs.data('endpoint');
 
             $.ajax({
@@ -82,18 +91,23 @@ var onCertificatesReady = null;
                 data: $('#certificate-regenerating-form').serializeArray(),
                 url: url,
                 success: function(data) {
+                    // eslint-disable-next-line camelcase
                     $btn_regenerating_certs.attr('disabled', 'disabled');
                     if (data.success) {
+                        // eslint-disable-next-line camelcase
                         $certificate_regeneration_status.text(data.message).addClass('message');
                     } else {
+                        // eslint-disable-next-line camelcase
                         $certificate_regeneration_status.text(data.message).addClass('message');
                     }
                 },
                 error: function(jqXHR) {
                     try {
                         var response = JSON.parse(jqXHR.responseText);
+                        // eslint-disable-next-line camelcase
                         $certificate_regeneration_status.text(gettext(response.message)).addClass('message');
                     } catch (error) {
+                        // eslint-disable-next-line camelcase
                         $certificate_regeneration_status
                             .text(gettext('Error while regenerating certificates. Please try again.'))
                             .addClass('message');

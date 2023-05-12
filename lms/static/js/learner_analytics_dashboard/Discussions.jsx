@@ -10,16 +10,25 @@ class Discussions extends React.Component {
 
     getComparisons() {
         const experiments = window.experimentVariables || {};
+        // eslint-disable-next-line camelcase
         const {content_authored, profileImages} = this.props;
+        // eslint-disable-next-line camelcase
         const content_average = experiments.learnerAnalyticsDiscussionAverage || 4;
+        // eslint-disable-next-line camelcase
         let average_percent = 1;
+        // eslint-disable-next-line camelcase
         let authored_percent = 0;
 
+        // eslint-disable-next-line camelcase
         if (content_average > content_authored) {
+            // eslint-disable-next-line camelcase
             average_percent = 1;
+            // eslint-disable-next-line camelcase
             authored_percent = content_authored / content_average;
         } else {
+            // eslint-disable-next-line camelcase
             authored_percent = 1;
+            // eslint-disable-next-line camelcase
             average_percent = content_average / content_authored;
         }
 
@@ -63,6 +72,7 @@ class Discussions extends React.Component {
     }
 
     render() {
+        // eslint-disable-next-line camelcase
         const {content_authored, thread_votes} = this.props;
 
         return (
@@ -75,6 +85,7 @@ class Discussions extends React.Component {
                 <div className="post-counts">
                     <div className="votes-wrapper">
                         <span className="fa fa-plus-square-o count-icon" aria-hidden="true" />
+                        {/* eslint-disable-next-line camelcase */}
                         <span className="user-count">{thread_votes}</span>
                         <p className="label">Votes on your posts, comments, and replies</p>
                     </div>

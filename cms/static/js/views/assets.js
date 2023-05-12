@@ -17,6 +17,7 @@ define([
     'jquery.fileupload-validate'
 ],
 function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, PagingHeader, PagingFooter,
+    // eslint-disable-next-line camelcase
     ModalUtils, ViewUtils, NotificationView, asset_library_template) {
     var CONVERSION_FACTOR_MBS_TO_BYTES = 1000 * 1000;
 
@@ -132,6 +133,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
         handleDestroy: function(model) {
             this.collection.fetch({reset: true}); // reload the collection to get a fresh page full of items
             analytics.track('Deleted Asset', {
+                // eslint-disable-next-line camelcase
                 course: course_location_analytics,
                 id: model.get('url')
             });
@@ -145,6 +147,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
             this.pagingView.setPage(1);
 
             analytics.track('Uploaded a File', {
+                // eslint-disable-next-line camelcase
                 course: course_location_analytics,
                 asset_url: model.get('url')
             });

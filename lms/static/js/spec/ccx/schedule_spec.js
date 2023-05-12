@@ -11,7 +11,9 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                 appendSetFixtures(
                     '<script id="schedule_template" type="text/template" >' + scheduleFixture + '</script>'
                 );
+                // eslint-disable-next-line camelcase
                 schedule_template = _.template($('#schedule_template').html());
+                // eslint-disable-next-line camelcase
                 save_url = 'save_ccx';
 
                 $.fn.leanModal = function(param) {

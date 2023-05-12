@@ -13,9 +13,11 @@ define(['jquery', 'js/spec_helpers/modal_helpers', 'common/js/spec_helpers/templ
         checkErrorContents = function(validationModal, errorObjects) {
             var errorItems = validationModal.$('.error-item-message');
             var i, item;
+            // eslint-disable-next-line camelcase
             var num_items = errorItems.length;
             expect(num_items).toBe(errorObjects.length);
 
+            // eslint-disable-next-line camelcase
             for (i = 0; i < num_items; i++) {
                 item = errorItems[i];
                 expect(item.value).toBe(errorObjects[i].message);

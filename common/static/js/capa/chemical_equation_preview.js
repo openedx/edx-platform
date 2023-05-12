@@ -1,5 +1,6 @@
 (function() {
     update = function() {
+        // eslint-disable-next-line camelcase
         function create_handler(saved_div) {
             return (function(response) {
                 if (response.error) {
@@ -12,17 +13,21 @@
                         )
                     );
                 } else {
+                    // eslint-disable-next-line camelcase
                     saved_div.html(edx.HtmlUtils.HTML(response.preview).toString());
                 }
             });
         }
 
+        // eslint-disable-next-line camelcase
         prev_id = '#' + this.id + '_preview';
+        // eslint-disable-next-line camelcase
         preview_div = $(prev_id);
 
         // find the closest parent problems-wrapper and use that url
         url = $(this).closest('.problems-wrapper').data('url');
         // grab the input id from the input
+        // eslint-disable-next-line camelcase
         input_id = $(this).data('input-id');
 
         Problem.inputAjax(url, input_id, 'preview_chemcalc', {formula: this.value}, create_handler(preview_div));

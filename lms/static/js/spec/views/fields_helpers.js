@@ -55,12 +55,17 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         return data;
     };
 
+    // eslint-disable-next-line camelcase
     var createErrorMessage = function(attribute, user_message) {
+        // eslint-disable-next-line camelcase
         var field_errors = {};
+        // eslint-disable-next-line camelcase
         field_errors[attribute] = {
+            // eslint-disable-next-line camelcase
             user_message: user_message
         };
         return {
+            // eslint-disable-next-line camelcase
             field_errors: field_errors
         };
     };
@@ -168,6 +173,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
     };
 
     var verifyEditableField = function(view, data, requests) {
+        // eslint-disable-next-line camelcase
         var request_data = {};
         var url = view.model.url;
 
@@ -191,6 +197,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         expect(view.fieldValue()).toBe(data.validValue);
         expectMessageContains(view, view.indicators.inProgress);
         expectMessageContains(view, view.messages.inProgress);
+        // eslint-disable-next-line camelcase
         request_data[data.valueAttribute] = data.validValue;
         AjaxHelpers.expectJsonRequest(
             requests, 'PATCH', url, request_data
@@ -207,6 +214,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
 
         view.$(data.valueInputSelector).val(data.invalidValue1).change();
         view.$(data.valueInputSelector).focusout();
+        // eslint-disable-next-line camelcase
         request_data[data.valueAttribute] = data.invalidValue1;
         AjaxHelpers.expectJsonRequest(
             requests, 'PATCH', url, request_data
@@ -219,6 +227,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
 
         view.$(data.valueInputSelector).val(data.invalidValue2).change();
         view.$(data.valueInputSelector).focusout();
+        // eslint-disable-next-line camelcase
         request_data[data.valueAttribute] = data.invalidValue2;
         AjaxHelpers.expectJsonRequest(
             requests, 'PATCH', url, request_data
@@ -233,6 +242,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         view.$(data.valueInputSelector).focusout();
         // When the value in the field is changed
         expect(view.fieldValue()).toBe(data.defaultValue);
+        // eslint-disable-next-line camelcase
         request_data[data.valueAttribute] = data.defaultValue;
         AjaxHelpers.expectJsonRequest(
             requests, 'PATCH', url, request_data

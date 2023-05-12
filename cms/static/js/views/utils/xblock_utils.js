@@ -53,6 +53,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
             function() {
                 var addOperation = $.Deferred();
                 analytics.track('Created a ' + category, {
+                    // eslint-disable-next-line camelcase
                     course: course_location_analytics,
                     display_name: displayName
                 });

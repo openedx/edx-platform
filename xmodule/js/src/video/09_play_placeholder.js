@@ -46,6 +46,7 @@
             },
 
             /** Initializes the module. */
+            // eslint-disable-next-line consistent-return
             initialize: function() {
                 if (!this.shouldBeShown()) {
                     return false;

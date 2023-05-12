@@ -27,7 +27,7 @@ class GradeTable extends React.Component {
 
     getTableGroup(type, groupIndex) {
         const {grades} = this.props;
-        // eslint-disable-next-line array-callback-return
+        /* eslint-disable-next-line array-callback-return, consistent-return */
         const groupData = grades.filter(value => {
             if (value.assignment_type === type) {
                 return value;
@@ -36,14 +36,18 @@ class GradeTable extends React.Component {
         const multipleAssignments = groupData.length > 1;
 
         const rows = groupData.map(({
+            // eslint-disable-next-line camelcase
             assignment_type, total_possible, total_earned, passing_grade
         }, index) => {
+            // eslint-disable-next-line camelcase
             const label = multipleAssignments ? `${assignment_type} ${index + 1}` : assignment_type;
             return (
                 // eslint-disable-next-line react/no-array-index-key
                 <tr key={index}>
                     <td>{label}</td>
+                    {/* eslint-disable-next-line camelcase */}
                     <td>{passing_grade}/{total_possible}</td>
+                    {/* eslint-disable-next-line camelcase */}
                     <td>{total_earned}/{total_possible}</td>
                 </tr>
             );

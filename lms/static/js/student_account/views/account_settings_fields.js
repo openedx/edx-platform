@@ -19,26 +19,36 @@
     ], function(
         gettext, $, _, Backbone,
         FieldViews,
+        // eslint-disable-next-line camelcase
         field_text_account_template,
+        // eslint-disable-next-line camelcase
         field_readonly_account_template,
+        // eslint-disable-next-line camelcase
         field_link_account_template,
+        // eslint-disable-next-line camelcase
         field_dropdown_account_template,
+        // eslint-disable-next-line camelcase
         field_social_link_template,
+        // eslint-disable-next-line camelcase
         field_order_history_template,
         StringUtils,
         HtmlUtils
     ) {
         var AccountSettingsFieldViews = {
             ReadonlyFieldView: FieldViews.ReadonlyFieldView.extend({
+                // eslint-disable-next-line camelcase
                 fieldTemplate: field_readonly_account_template
             }),
             TextFieldView: FieldViews.TextFieldView.extend({
+                // eslint-disable-next-line camelcase
                 fieldTemplate: field_text_account_template
             }),
             DropdownFieldView: FieldViews.DropdownFieldView.extend({
+                // eslint-disable-next-line camelcase
                 fieldTemplate: field_dropdown_account_template
             }),
             EmailFieldView: FieldViews.TextFieldView.extend({
+                // eslint-disable-next-line camelcase
                 fieldTemplate: field_text_account_template,
                 successMessage: function() {
                     return HtmlUtils.joinHtml(
@@ -51,6 +61,7 @@
                 }
             }),
             LanguagePreferenceFieldView: FieldViews.DropdownFieldView.extend({
+                // eslint-disable-next-line camelcase
                 fieldTemplate: field_dropdown_account_template,
 
                 initialize: function(options) {
@@ -96,6 +107,7 @@
 
             }),
             TimeZoneFieldView: FieldViews.DropdownFieldView.extend({
+                // eslint-disable-next-line camelcase
                 fieldTemplate: field_dropdown_account_template,
 
                 initialize: function(options) {
@@ -158,6 +170,7 @@
             }),
             PasswordFieldView: FieldViews.LinkFieldView.extend({
                 fieldType: 'button',
+                // eslint-disable-next-line camelcase
                 fieldTemplate: field_link_account_template,
                 events: {
                     'click button': 'linkClicked'
@@ -225,6 +238,7 @@
                 }
             }),
             LanguageProficienciesFieldView: FieldViews.DropdownFieldView.extend({
+                // eslint-disable-next-line camelcase
                 fieldTemplate: field_dropdown_account_template,
                 modelValue: function() {
                     var modelValue = this.model.get(this.options.valueAttribute);
@@ -315,6 +329,7 @@
                 }
             }),
             ExtendedFieldListFieldView: FieldViews.DropdownFieldView.extend({
+                // eslint-disable-next-line camelcase
                 fieldTemplate: field_dropdown_account_template,
                 modelValue: function() {
                     var extendedProfileFields = this.model.get(this.options.valueAttribute);
@@ -339,6 +354,7 @@
                 }
             }),
             AuthFieldView: FieldViews.LinkFieldView.extend({
+                // eslint-disable-next-line camelcase
                 fieldTemplate: field_social_link_template,
                 className: function() {
                     return 'u-field u-field-social u-field-' + this.options.valueAttribute;
@@ -438,6 +454,7 @@
 
             OrderHistoryFieldView: FieldViews.ReadonlyFieldView.extend({
                 fieldType: 'orderHistory',
+                // eslint-disable-next-line camelcase
                 fieldTemplate: field_order_history_template,
 
                 initialize: function(options) {

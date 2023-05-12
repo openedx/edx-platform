@@ -6,13 +6,20 @@ define(
     function($, _, IframeBinding) {
         describe('IframeBinding', function() {
             var doc = document.implementation.createHTMLDocument('New Document');
+            // eslint-disable-next-line camelcase
             var iframe_html = '<iframe src="http://www.youtube.com/embed/NHd27UvY-lw" frameborder="0" height="350" width="618"></iframe>';
+            // eslint-disable-next-line camelcase
             iframe_html += '<iframe src="http://www.youtube.com/embed/NHd27UvY-lw?allowFullScreen=false" frameborder="0" height="350" width="618"></iframe>';
+            // eslint-disable-next-line camelcase
             iframe_html += '<embed type="application/x-shockwave-flash" src="http://www.youtube.com/embed/NHd27UvY-lw" height="315" width="560">';
+            // eslint-disable-next-line camelcase
             doc.body.innerHTML = iframe_html;
 
+            // eslint-disable-next-line camelcase
             var verify_no_modification = function(src) {
+                // eslint-disable-next-line camelcase
                 iframe_html = '<iframe width="618" height="350" src="' + src + '" frameborder="0" allowfullscreen></iframe>';
+                // eslint-disable-next-line camelcase
                 doc.body.innerHTML = iframe_html;
 
                 IframeBinding.iframeBinding(doc);
@@ -33,6 +40,7 @@ define(
                 expect($(doc).find('iframe')[1].src).toEqual('http://www.youtube.com/embed/NHd27UvY-lw?wmode=transparent&allowFullScreen=false');
                 expect($(doc).find('embed')[0].hasAttribute('wmode')).toBe(true);
 
+                // eslint-disable-next-line camelcase
                 iframe_html = IframeBinding.iframeBindingHtml(iframe_html);
 
                 // after calling iframeBinding function: src url of iframes should have "wmode=transparent" in its querystring

@@ -168,6 +168,7 @@
                     return module;
                 };
 
+                // eslint-disable-next-line consistent-return
                 var removeCallback = function(func) {
                     var index = $.inArray(func, callbacksList);
 

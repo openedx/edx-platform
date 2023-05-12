@@ -18,6 +18,7 @@
              * @param  {string} redirectUrl The URL to redirect to once enrollment completes.
              */
             enroll: function(courseKey, redirectUrl) {
+                // eslint-disable-next-line camelcase
                 var data_obj = {course_id: courseKey},
                     data = JSON.stringify(data_obj);
 

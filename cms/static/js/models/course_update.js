@@ -5,9 +5,13 @@ define(['backbone', 'jquery', 'jquery.ui'], function(Backbone, $) {
             date: $.datepicker.formatDate('MM d, yy', new Date()),
             content: ''
         },
+        // eslint-disable-next-line consistent-return
         validate: function(attrs) {
+            // eslint-disable-next-line camelcase
             var date_exists = (attrs.date !== null && attrs.date !== '');
+            // eslint-disable-next-line camelcase
             var date_is_valid_string = ($.datepicker.formatDate('MM d, yy', new Date(attrs.date)) === attrs.date);
+            // eslint-disable-next-line camelcase
             if (!(date_exists && date_is_valid_string)) {
                 return {date_required: gettext('Action required: Enter a valid date.')};
             }

@@ -279,6 +279,7 @@
 
     // Returns true if the DOM element is visible, false if it's hidden.
     // Checks if display is anything other than none.
+    // eslint-disable-next-line consistent-return
     util.isVisible = function(elem) {
         if (window.getComputedStyle) {
             // Most browsers
@@ -496,6 +497,7 @@
         };
 
         // Push the input area state to the stack.
+        // eslint-disable-next-line consistent-return
         var saveState = function() {
             var currState = inputStateObj || new TextareaState(panels);
 
@@ -506,6 +508,7 @@
                 if (!lastState) {
                     lastState = currState;
                 }
+                // eslint-disable-next-line consistent-return
                 return;
             }
             if (lastState) {
@@ -879,6 +882,7 @@
 
         var previewSetter;
 
+        // eslint-disable-next-line consistent-return
         var previewSet = function(text) {
             if (previewSetter) { return previewSetter(text); }
 
@@ -1276,6 +1280,7 @@
 
         // special handler because IE clears the context of the textbox on ESC
         if (uaSniffed.isIE) {
+            // eslint-disable-next-line consistent-return
             util.addEvent(inputBox, 'keydown', function(key) {
                 var code = key.keyCode;
                 if (code === 27) {
@@ -1777,6 +1782,7 @@
                     linkEnteredCallback
                 );
             }
+            // eslint-disable-next-line consistent-return
             return true;
         }
     };

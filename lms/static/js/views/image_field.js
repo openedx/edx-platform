@@ -209,6 +209,7 @@
                 $(window).on('beforeunload', this.onBeforeUnload);
             },
 
+            // eslint-disable-next-line consistent-return
             onBeforeUnload: function() {
                 var status = this.getCurrentStatus();
                 if (status === 'uploading') {

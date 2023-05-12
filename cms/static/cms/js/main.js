@@ -52,6 +52,7 @@ define([
                 response: jqXHR.responseText,
                 status: jqXHR.status
             });
+            // eslint-disable-next-line consistent-return
             return msg.show();
         });
         sendJSON = function(url, data, callback, type) { // eslint-disable-line no-param-reassign

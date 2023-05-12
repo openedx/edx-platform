@@ -68,6 +68,7 @@
                 return false;
             };
 
+            // eslint-disable-next-line consistent-return
             Content.prototype.updateInfo = function(info) {
                 if (info) {
                     this.set('ability', info.ability);
@@ -77,11 +78,14 @@
             };
 
             Content.prototype.addComment = function(comment, options) {
+                // eslint-disable-next-line camelcase
                 var comments_count, model, thread;
                 options = (options) || {};
                 if (!options.silent) {
                     thread = this.get('thread');
+                    // eslint-disable-next-line camelcase
                     comments_count = parseInt(thread.get('comments_count'));
+                    // eslint-disable-next-line camelcase
                     thread.set('comments_count', comments_count + 1);
                 }
                 this.get('children').push(comment);
@@ -94,9 +98,12 @@
             };
 
             Content.prototype.removeComment = function(comment) {
+                // eslint-disable-next-line camelcase
                 var comments_count, thread;
                 thread = this.get('thread');
+                // eslint-disable-next-line camelcase
                 comments_count = parseInt(thread.get('comments_count'));
+                // eslint-disable-next-line camelcase
                 thread.set('comments_count', comments_count - 1 - comment.getCommentsCount());
                 return this.trigger('comment:remove');
             };
@@ -183,8 +190,11 @@
             };
 
             Content.prototype.flagAbuse = function() {
+                // eslint-disable-next-line camelcase
                 var temp_array;
+                // eslint-disable-next-line camelcase
                 temp_array = this.get('abuse_flaggers');
+                // eslint-disable-next-line camelcase
                 temp_array.push(window.user.get('id'));
                 this.set('abuse_flaggers', temp_array);
                 return this.trigger('change', this);
@@ -312,7 +322,9 @@
             };
 
             Thread.prototype.toJSON = function() {
+                // eslint-disable-next-line camelcase
                 var json_attributes;
+                // eslint-disable-next-line camelcase
                 json_attributes = _.clone(this.attributes);
                 return _.extend(json_attributes, {
                     title: this.display_title(),
@@ -386,12 +398,16 @@
             };
 
             Comment.prototype.canBeEndorsed = function() {
+                // eslint-disable-next-line camelcase
                 var user_id;
+                // eslint-disable-next-line camelcase
                 user_id = window.user.get('id');
+                // eslint-disable-next-line camelcase
                 return user_id && (
                     DiscussionUtil.isPrivilegedUser(user_id)
                     || (
                         this.get('thread').get('thread_type') === 'question'
+                        // eslint-disable-next-line camelcase
                         && this.get('thread').get('user_id') === user_id
                     )
                 );

@@ -56,8 +56,10 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         },
 
         setCollapseExpandVisibility: function() {
+            // eslint-disable-next-line camelcase
             var has_content = this.hasContent(),
                 $collapseExpandButton = $('.button-toggle-expand-collapse');
+            // eslint-disable-next-line camelcase
             if (has_content) {
                 $collapseExpandButton.removeClass('is-hidden');
             } else {
@@ -182,8 +184,10 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
                 .always(function() { $target.css('cursor', 'pointer'); });
         },
 
+        // eslint-disable-next-line camelcase
         startReIndex: function(reindex_url) {
             return $.ajax({
+                // eslint-disable-next-line camelcase
                 url: reindex_url,
                 method: 'GET',
                 global: false,

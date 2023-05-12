@@ -11,6 +11,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             mimeTypes: [],
             fileFormats: []
         },
+        // eslint-disable-next-line consistent-return
         validate: function(attrs, options) {
             if (attrs.selectedFile && !this.checkTypeValidity(attrs.selectedFile)) {
                 return {

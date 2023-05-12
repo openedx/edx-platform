@@ -3,6 +3,7 @@ define(['backbone'], function(Backbone) {
         defaults: {
             name: ''
         },
+        // eslint-disable-next-line consistent-return
         validate: function(attrs, options) {
             if (!attrs.name) {
                 return gettext('You must specify a name');

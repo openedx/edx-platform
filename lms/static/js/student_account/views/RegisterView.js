@@ -372,12 +372,16 @@
             },
 
             addValidationErrorMsgForScreenReader: function($el) {
+                // eslint-disable-next-line camelcase
                 var $validation_node = this.$form.find('#' + $el.attr('id') + '-validation-error');
+                // eslint-disable-next-line camelcase
                 $validation_node.find('.sr-only').text('ERROR:');
             },
 
             removeValidationErrorMsgForScreenReader: function($el) {
+                // eslint-disable-next-line camelcase
                 var $validation_node = this.$form.find('#' + $el.attr('id') + '-validation-error');
+                // eslint-disable-next-line camelcase
                 $validation_node.find('.sr-only').text('');
             },
 
@@ -479,6 +483,7 @@
                             } else {
                                 return _.map(
                                     errorList,
+                                    // eslint-disable-next-line consistent-return
                                     function(errorItem) {
                                         if (errorItem.user_message) {
                                             return StringUtils.interpolate('<li {suppressAttr} >{error}</li>', {

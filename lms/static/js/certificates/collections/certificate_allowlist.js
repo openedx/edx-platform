@@ -33,13 +33,16 @@
                 return undefined;
             },
 
+            // eslint-disable-next-line camelcase
             sync: function(options, appended_url) {
                 var filtered = [];
+                // eslint-disable-next-line camelcase
                 if (appended_url === 'new') {
                     filtered = this.filter(function(model) {
                         return model.get('new');
                     });
                 }
+                // eslint-disable-next-line camelcase
                 var url = this.generate_certificates_url + appended_url;
                 Backbone.sync(
                     'create',
@@ -50,7 +53,9 @@
 
             update: function(data) {
                 _.each(data, function(item) {
+                    // eslint-disable-next-line camelcase
                     var certificate_exception_model = this.getModel({user_name: item.user_name, user_email: item.user_email});
+                    // eslint-disable-next-line camelcase
                     certificate_exception_model.set(item);
                 }, this);
             }

@@ -90,14 +90,19 @@
                 return expect(view.$el.find('.load-response-button').length).toEqual(0);
             }
         };
+        // eslint-disable-next-line camelcase
         createAjaxResponseJson = function(content, can_act) {
             return {
                 content: content,
                 annotated_content_info: {
                     ability: {
+                        // eslint-disable-next-line camelcase
                         editable: can_act,
+                        // eslint-disable-next-line camelcase
                         can_delete: can_act,
+                        // eslint-disable-next-line camelcase
                         can_reply: can_act,
+                        // eslint-disable-next-line camelcase
                         can_vote: can_act
                     }
                 }

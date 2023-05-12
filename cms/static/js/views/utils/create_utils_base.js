@@ -29,7 +29,9 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
                 );
             };
 
+            // eslint-disable-next-line camelcase
             this.toggleSaveButton = function(is_enabled) {
+                // eslint-disable-next-line camelcase
                 var is_disabled = !is_enabled;
                 $(self.selectors.save).toggleClass(self.classes.disabled, is_disabled).attr('aria-disabled', is_disabled);
             };

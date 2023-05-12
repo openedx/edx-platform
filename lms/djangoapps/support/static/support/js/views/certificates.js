@@ -166,6 +166,7 @@
                 return $('.certificates-form > #certificate-course-filter-input').val();
             },
 
+            // eslint-disable-next-line camelcase
             setCourseFilter: function(course_id) {
                 $('.certificates-form > #certificate-course-filter-input').val(course_id);
             },

@@ -116,6 +116,7 @@ var edx = edx || {};
 
     $(document).ready(function() {
         // (click on the payment submit button).
+        // eslint-disable-next-line consistent-return
         $('.cart-view form input[type="submit"]').click(function(event) {
             // check if there is code exists in the inout_code field
             // before going to make payment

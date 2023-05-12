@@ -2,6 +2,7 @@
     define('PollMain', ['edx-ui-toolkit/js/utils/html-utils'], function(HtmlUtils) {
         PollMain.prototype = {
 
+            // eslint-disable-next-line camelcase
             showAnswerGraph: function(poll_answers, total) {
                 var _this, totalValue;
 

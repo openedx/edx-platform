@@ -6,9 +6,12 @@ define(['jquery', 'js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
             },
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
+                // eslint-disable-next-line camelcase
                 var template_name = this.model.type === 'problem' ? 'add-xblock-component-menu-problem'
                     : 'add-xblock-component-menu';
+                // eslint-disable-next-line camelcase
                 var support_indicator_template = this.loadTemplate('add-xblock-component-support-level');
+                // eslint-disable-next-line camelcase
                 var support_legend_template = this.loadTemplate('add-xblock-component-support-legend');
                 this.template = this.loadTemplate(template_name);
                 HtmlUtils.setHtml(
@@ -17,7 +20,9 @@ define(['jquery', 'js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
                         type: this.model.type,
                         templates: this.model.templates,
                         support_legend: this.model.support_legend,
+                        // eslint-disable-next-line camelcase
                         support_indicator_template: support_indicator_template,
+                        // eslint-disable-next-line camelcase
                         support_legend_template: support_legend_template,
                         HtmlUtils: HtmlUtils
                     }))

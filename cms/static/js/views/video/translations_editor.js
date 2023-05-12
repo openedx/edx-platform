@@ -101,6 +101,7 @@ define(
                 var dict = {},
                     items = this.$el.find('ol').find('.list-settings-item');
 
+                // eslint-disable-next-line consistent-return
                 _.each(items, function(element, index) {
                     var key = $(element).find('select option:selected').val(),
                         value = $(element).find('.input').val();

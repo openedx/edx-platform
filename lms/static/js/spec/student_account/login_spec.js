@@ -164,6 +164,7 @@
 
                 // Simulate that the user is attempting to enroll in a course
                 // by setting the course_id query string param.
+                // eslint-disable-next-line consistent-return
                 spyOn($, 'url').and.callFake(function(param) {
                     if (param === '?course_id') {
                         return encodeURIComponent(COURSE_ID);

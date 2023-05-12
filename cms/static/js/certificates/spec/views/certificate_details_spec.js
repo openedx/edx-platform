@@ -120,7 +120,9 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
 
         describe('The Certificate Details view', function() {
             it('should parse a JSON string collection into a Backbone model collection', function() {
+                // eslint-disable-next-line camelcase
                 var course_title = 'Test certificate course title override 2';
+                // eslint-disable-next-line camelcase
                 var CERTIFICATE_JSON = '[{"course_title": "' + course_title + '", "signatories":"[]"}]';
                 this.collection.parse(CERTIFICATE_JSON);
                 var model = this.collection.at(1);
@@ -128,8 +130,10 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             });
 
             it('should parse a JSON object collection into a Backbone model collection', function() {
+                // eslint-disable-next-line camelcase
                 var course_title = 'Test certificate course title override 2';
                 var CERTIFICATE_JSON_OBJECT = [{
+                    // eslint-disable-next-line camelcase
                     course_title: course_title,
                     signatories: '[]'
                 }];
@@ -140,6 +144,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
 
             it('should have empty certificate collection if there is an error parsing certifcate JSON', function() {
                 var CERTIFICATE_INVALID_JSON = '[{"course_title": Test certificate course title override, "signatories":"[]"}]'; // eslint-disable-line max-len
+                // eslint-disable-next-line camelcase
                 var collection_length = this.collection.length;
                 this.collection.parse(CERTIFICATE_INVALID_JSON);
                 // collection length should remain the same since we have error parsing JSON

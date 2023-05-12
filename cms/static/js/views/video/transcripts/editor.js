@@ -84,9 +84,11 @@ define(
         *                                    setting editors in `Advanced` tab.
         *
         */
+            // eslint-disable-next-line consistent-return
             syncBasicTab: function(metadataCollection, metadataView) {
                 var result = [],
                     getField = Utils.getField,
+                    // eslint-disable-next-line camelcase
                     component_locator = this.$el.closest('[data-locator]').data('locator'),
                     values = {},
                     videoUrl, metadata, modifiedValues;
@@ -144,6 +146,7 @@ define(
         *                                    setting editors in `Advanced` tab.
         *
         */
+            // eslint-disable-next-line consistent-return
             syncAdvancedTab: function(metadataCollection, metadataView) {
                 var getField = Utils.getField,
                     html5Sources, youtube, videoUrlValue, result;

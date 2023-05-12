@@ -102,6 +102,7 @@
                 },
 
                 /** Initializes the module. */
+                // eslint-disable-next-line consistent-return
                 initialize: function() {
                     var volume;
 
@@ -202,6 +203,7 @@
          * triggering `volumechange` event and updating the cookie.
          * @param {Boolean} [withoutSlider] Disables updating the slider.
          */
+                // eslint-disable-next-line consistent-return
                 setVolume: function(volume, silent, withoutSlider) {
                     if (volume === this.getVolume()) {
                         return false;

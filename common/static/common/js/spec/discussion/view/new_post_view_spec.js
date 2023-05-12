@@ -8,20 +8,25 @@
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
             window.$$course_id = 'edX/999/test';
+            // eslint-disable-next-line camelcase
             spyOn(DiscussionUtil, 'makeWmdEditor').and.callFake(function($content, $local, cls_identifier) {
+                // eslint-disable-next-line camelcase
                 return $local('.' + cls_identifier).html('<textarea></textarea>');
             });
             this.discussion = new Discussion([], {
                 pages: 1
             });
         });
+        // eslint-disable-next-line consistent-return
         checkVisibility = function(view, expectedVisible, expectedDisabled, render) {
+            // eslint-disable-next-line camelcase
             var disabled, group_disabled;
             if (render) {
                 view.render();
             }
             expect(view.$('.group-selector-wrapper').is(':visible') || false).toEqual(expectedVisible);
             disabled = view.$('.js-group-select').prop('disabled') || false;
+            // eslint-disable-next-line camelcase
             group_disabled = view.$('.group-selector-wrapper').hasClass('disabled');
             if (expectedVisible && !expectedDisabled) {
                 expect(disabled).toEqual(false);
@@ -217,11 +222,13 @@
                     }
                 });
             });
+            /* eslint-disable-next-line camelcase, consistent-return */
             checkPostCancelReset = function(mode, discussion, course_settings) {
                 var eventSpy, view;
                 view = new NewPostView({
                     el: $('#fixture-element'),
                     collection: discussion,
+                    // eslint-disable-next-line camelcase
                     course_settings: course_settings,
                     mode: mode
                 });

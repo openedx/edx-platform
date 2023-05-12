@@ -14,6 +14,7 @@ export default function TextbooksFactory(textbooksJson) {
     $('.nav-actions .new-button').click(function(event) {
         tbView.addOne(event);
     });
+    // eslint-disable-next-line consistent-return
     $(window).on('beforeunload', function() {
         var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
         if (dirty) {

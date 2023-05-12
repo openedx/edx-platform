@@ -44,7 +44,9 @@ define(
                 });
             },
 
+            // eslint-disable-next-line camelcase
             render: function(template_id, params) {
+                // eslint-disable-next-line camelcase
                 var tplHtml = $(this.templates[template_id]).text(),
                     videoList = this.options.parent.getVideoObjectsList(),
                     // Change list representation format to more convenient and group
@@ -202,6 +204,7 @@ define(
         */
             processCommand: function(action, errorMessage, videoId) {
                 var self = this,
+                    // eslint-disable-next-line camelcase
                     component_locator = this.component_locator,
                     videoList = this.options.parent.getVideoObjectsList(),
                     extraParam, xhr;

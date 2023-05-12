@@ -45,10 +45,14 @@
         };
 
         DiscussionViewSpecHelper.checkVoteClasses = function(view) {
+            // eslint-disable-next-line camelcase
             var action_button, display_button;
             view.render();
+            // eslint-disable-next-line camelcase
             display_button = view.$el.find('.display-vote');
+            // eslint-disable-next-line camelcase
             expect(display_button.hasClass('is-hidden')).toBe(true);
+            // eslint-disable-next-line camelcase
             action_button = view.$el.find('.action-vote');
             return expect(action_button).not.toHaveAttr('style', 'display: inline; ');
         };

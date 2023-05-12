@@ -31,6 +31,7 @@
                     _makeFunctionsPublic(state);
 
                     state.initialize(element)
+                        // eslint-disable-next-line consistent-return
                         .done(function() {
                             if (state.isYoutubeType()) {
                                 state.parseSpeed();
@@ -317,6 +318,7 @@
             // eslint-disable-next-line no-shadow
             function _initializeModules(state, i18n) {
                 var dfd = $.Deferred(),
+                    // eslint-disable-next-line consistent-return
                     modulesList = $.map(state.modules, function(module) {
                         var options = state.options[module.moduleName] || {};
                         if (_.isFunction(module)) {

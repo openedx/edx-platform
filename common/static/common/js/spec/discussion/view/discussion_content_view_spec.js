@@ -47,8 +47,11 @@
         });
 
         it('can be unflagged for abuse', function() {
+            // eslint-disable-next-line camelcase
             var temp_array;
+            // eslint-disable-next-line camelcase
             temp_array = [];
+            // eslint-disable-next-line camelcase
             temp_array.push(window.user.get('id'));
             this.thread.set('abuse_flaggers', temp_array);
             this.thread.unflagAbuse();

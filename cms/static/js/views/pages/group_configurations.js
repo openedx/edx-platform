@@ -73,6 +73,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
             return false;
         },
 
+        // eslint-disable-next-line consistent-return
         onBeforeUnload: function() {
             var dirty = this.areAnyConfigurationsDirty()
                 || (this.experimentsEnabled && this.experimentGroupConfigurations.find(function(configuration) {
