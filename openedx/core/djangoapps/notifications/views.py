@@ -1,21 +1,27 @@
 """
 Views for the notifications API.
 """
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import generics, permissions, status, viewsets
+from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.models import NotificationPreference
 
-from .serializers import NotificationCourseEnrollmentSerializer, UserNotificationPreferenceSerializer
+from .models import Notification
+from .serializers import (
+    NotificationCourseEnrollmentSerializer,
+    NotificationSerializer,
+    UserNotificationPreferenceSerializer
+)
 
 User = get_user_model()
-from .models import Notification
-from .serializers import NotificationCourseEnrollmentSerializer, NotificationSerializer
 
 
 class CourseEnrollmentListView(generics.ListAPIView):
@@ -134,6 +140,7 @@ class UserNotificationPreferenceView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class NotificationListAPIView(generics.ListAPIView):
     """
     API view for listing notifications for a user.
@@ -163,7 +170,7 @@ class NotificationListAPIView(generics.ListAPIView):
         }
 
     Response Error Codes:
-        - 403: The requester cannot access resource.
+    - 403: The requester cannot access resource.
     """
 
     queryset = Notification.objects.all()
@@ -194,16 +201,17 @@ class NotificationCountViewSet(viewsets.ViewSet):
 
         **Permissions**: User must be authenticated.
         **Response Format**:
-            {
-                "count": (int) total_number_of_unseen_notifications,
-                "count_by_app_name": {
-                    (str) app_name: (int) number_of_unseen_notifications,
-                    ...
-                }
+        ```json
+        {
+            "count": (int) total_number_of_unseen_notifications,
+            "count_by_app_name": {
+                (str) app_name: (int) number_of_unseen_notifications,
+                ...
             }
-
-        Response Error Codes:
-            - 403: The requester cannot access resource.
+        }
+        ```
+        **Response Error Codes**:
+        - 403: The requester cannot access resource.
         """
         # Get the unseen notifications count for each app name.
         count_by_app_name = (
@@ -227,3 +235,37 @@ class NotificationCountViewSet(viewsets.ViewSet):
             "count": count_total,
             "count_by_app_name": count_by_app_name_dict,
         })
+
+
+class MarkNotificationsUnseenAPIView(UpdateAPIView):
+    """
+    API view for marking user's all notifications unseen for a provided app_name.
+    """
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def update(self, request, *args, **kwargs):
+        """
+        Marks all notifications for the given app name unseen for the authenticated user.
+
+        **Args:**
+            app_name: The name of the app to mark notifications unseen for.
+        **Response Format:**
+            A `Response` object with a 200 OK status code if the notifications were successfully marked unseen.
+        **Response Error Codes**:
+        - 400: Bad Request status code if the app name is invalid.
+        """
+        app_name = self.kwargs.get('app_name')
+
+        if not app_name:
+            return Response({'message': 'Invalid app name.'}, status=400)
+
+        notifications = Notification.objects.filter(
+            user=request.user,
+            app_name=app_name,
+            last_seen__isnull=True,
+        )
+
+        notifications.update(last_seen=datetime.now())
+
+        return Response({'message': 'Notifications marked unseen.'}, status=200)
