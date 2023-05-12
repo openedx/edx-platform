@@ -78,6 +78,7 @@
                     var captions = getCaptions();
 
                     if (startTimes.length !== captions.length) {
+                        // eslint-disable-next-line no-console
                         console.warn('video caption and start time arrays do not match in length');
                     }
 
@@ -88,6 +89,7 @@
                         end = startTimes[startTimes.length - 1];
                     }
 
+                    // eslint-disable-next-line no-undef
                     _.filter(startTimes, function(currentStartTime, i) {
                         if (currentStartTime >= start && currentStartTime <= end) {
                             filteredTimes.push(currentStartTime);

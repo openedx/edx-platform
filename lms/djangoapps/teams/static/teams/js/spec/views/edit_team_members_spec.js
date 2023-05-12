@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'underscore',
@@ -72,7 +73,9 @@ define([
 
         beforeEach(function() {
             setFixtures('<div id="page-prompt"></div><div class="teams-content"></div>');
+            // eslint-disable-next-line no-undef
             spyOn(Backbone.history, 'navigate');
+            // eslint-disable-next-line no-undef
             spyOn(TeamUtils, 'showMessage');
         });
 
@@ -85,6 +88,7 @@ define([
             var requests = AjaxHelpers.requests(this),
                 view = createEditTeamMembersView(DEFAULT_MEMBERSHIP);
 
+            // eslint-disable-next-line no-undef
             spyOn(view.teamEvents, 'trigger');
             verifyTeamMembersView(view);
 
@@ -111,6 +115,7 @@ define([
             var requests = AjaxHelpers.requests(this),
                 view = createEditTeamMembersView(DEFAULT_MEMBERSHIP);
 
+            // eslint-disable-next-line no-undef
             spyOn(view.teamEvents, 'trigger');
             verifyTeamMembersView(view);
 
@@ -133,6 +138,7 @@ define([
             var requests = AjaxHelpers.requests(this);
             var view = createEditTeamMembersView(DEFAULT_MEMBERSHIP);
 
+            // eslint-disable-next-line no-undef
             spyOn(view.teamEvents, 'trigger');
             verifyTeamMembersView(view);
 

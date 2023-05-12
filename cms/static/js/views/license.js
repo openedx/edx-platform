@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'js/views/baseview',
     'underscore',
@@ -97,6 +98,7 @@ define([
             var licenseType = $li.data('license');
 
             // Check that we've selected a different license type than what's currently selected
+            // eslint-disable-next-line eqeqeq
             if (licenseType != this.model.attributes.type) {
                 this.model.set({
                     type: licenseType,
@@ -132,6 +134,7 @@ define([
                 for (var i = 0; i < conflicts.length; i++) {
                     // Uncheck all conflicts
                     licenseOptions[conflicts[i]] = false;
+                    // eslint-disable-next-line no-console
                     console.log(licenseOptions);
                 }
             }

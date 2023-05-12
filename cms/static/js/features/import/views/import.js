@@ -1,6 +1,7 @@
 /**
  * Course import-related js.
  */
+// eslint-disable-next-line no-undef
 define(
     ['jquery', 'underscore', 'gettext', 'moment', 'edx-ui-toolkit/js/utils/html-utils', 'jquery.cookie'],
     function($, _, gettext, moment, HtmlUtils) {

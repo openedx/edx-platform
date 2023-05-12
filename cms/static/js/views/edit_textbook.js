@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'common/js/components/views/feedback_notification'],
     function(BaseView, _, $, EditChapterView, NotificationView) {
         var EditTextbook = BaseView.extend({

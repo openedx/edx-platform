@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/components/utils/view_utils',
     'js/views/xblock', 'js/models/xblock_info', 'xmodule', 'cms/js/main', 'xblock/cms.runtime.v1'],
 function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
@@ -94,6 +95,7 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
                 var requests = AjaxHelpers.requests(this),
                     missingJavaScriptUrl = 'no_such_file.js',
                     promise;
+                // eslint-disable-next-line no-undef
                 spyOn(ViewUtils, 'loadJavaScript').and.returnValue($.Deferred().reject().promise());
                 promise = postXBlockRequest(requests, [
                     ['xblock_spec_hash5', {
@@ -104,6 +106,7 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
             });
 
             it('Triggers an event to the runtime when a notification-action-button is clicked', function() {
+                // eslint-disable-next-line no-undef
                 var notifySpy = spyOn(xblockView, 'notifyRuntime').and.callThrough();
 
                 postXBlockRequest(AjaxHelpers.requests(this), []);

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'jquery', 'underscore', 'edx-ui-toolkit/js/utils/html-utils', 'js/views/video/transcripts/utils',
@@ -35,6 +36,7 @@ define(
                     languageMap = {};
 
                 if (!tpl) {
+                    // eslint-disable-next-line no-console
                     console.error("Couldn't load template for item: " + templateName);
                 }
 

@@ -117,12 +117,14 @@
                 // metadata is loaded, which normally happens just after the video
                 // starts playing. Just after that configurations can be applied.
                 state.videoPlayer.ready = _.once(function() {
+                    // eslint-disable-next-line eqeqeq
                     if (!state.isFlashMode() && state.speed != '1.0') {
                         state.videoPlayer.setPlaybackRate(state.speed);
                     }
                 });
 
                 if (state.isYoutubeType()) {
+                    // eslint-disable-next-line no-undef
                     state.videoPlayer.PlayerState = YT.PlayerState;
                     state.videoPlayer.PlayerState.UNSTARTED = -1;
                 } else {
@@ -199,6 +201,7 @@
                 } else {
                     youTubeId = state.youtubeId();
 
+                    // eslint-disable-next-line no-undef
                     state.videoPlayer.player = new YT.Player(state.id, {
                         playerVars: state.videoPlayer.playerVars,
                         videoId: youTubeId,
@@ -322,6 +325,7 @@
                 delete state.videoPlayer.playerVars.html5;
 
                 // Request for the creation of a new Flash player
+                // eslint-disable-next-line no-undef
                 state.videoPlayer.player = new YT.Player(state.id, {
                     playerVars: state.videoPlayer.playerVars,
                     videoId: state.youtubeId(),

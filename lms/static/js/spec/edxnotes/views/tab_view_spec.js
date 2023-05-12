@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'backbone',
@@ -30,6 +31,7 @@ define([
 
         getView = function(tabsCollection, options) {
             var view;
+            // eslint-disable-next-line no-undef
             options = _.defaults(options || {}, {
                 el: $('.wrapper-student-notes'),
                 collection: [],
@@ -80,6 +82,7 @@ define([
 
         it('can remove the content if tab is closed', function() {
             var view = getView(this.tabsCollection);
+            // eslint-disable-next-line no-undef
             view.onClose = jasmine.createSpy();
             view.$('.tab .action-close').click();
             expect(view.$('.tab')).toHaveLength(0);

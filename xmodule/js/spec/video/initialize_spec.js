@@ -81,6 +81,7 @@
                                 '1.50': 'videoId'
                             },
                             youtubeId: Initialize.prototype.youtubeId,
+                            // eslint-disable-next-line no-undef
                             isFlashMode: jasmine.createSpy().and.returnValue(false)
                         };
                     });
@@ -125,6 +126,7 @@
                                 '1.0': 'cogebirgzzM',
                                 '1.50': 'abcdefghijkl'
                             },
+                            // eslint-disable-next-line no-undef
                             isFlashMode: jasmine.createSpy().and.returnValue(false)
                         };
                     });
@@ -174,6 +176,7 @@
                         beforeEach(function() {
                             state = {
                                 speeds: ['0.25', '0.50', '1.0', '1.50', '2.0'],
+                                // eslint-disable-next-line no-undef
                                 storage: jasmine.createSpyObj('storage', ['setItem'])
                             };
                         });
@@ -195,6 +198,7 @@
                         beforeEach(function() {
                             state = {
                                 speeds: ['0.75', '1.0', '1.25', '1.50', '2.0'],
+                                // eslint-disable-next-line no-undef
                                 storage: jasmine.createSpyObj('storage', ['setItem'])
                             };
                         });
@@ -285,6 +289,7 @@
                 describe('isFlashMode', function() {
                     it('returns `true` if player in `flash` mode', function() {
                         var testState = {
+                                // eslint-disable-next-line no-undef
                                 getPlayerMode: jasmine.createSpy().and.returnValue('flash')
                             },
                             isFlashMode = Initialize.prototype.isFlashMode,
@@ -295,6 +300,7 @@
 
                     it('returns `false` if player is not in `flash` mode', function() {
                         var testState = {
+                                // eslint-disable-next-line no-undef
                                 getPlayerMode: jasmine.createSpy().and.returnValue('html5')
                             },
                             isFlashMode = Initialize.prototype.isFlashMode,
@@ -307,6 +313,7 @@
                 describe('isHtml5Mode', function() {
                     it('returns `true` if player in `html5` mode', function() {
                         var testState = {
+                                // eslint-disable-next-line no-undef
                                 getPlayerMode: jasmine.createSpy().and.returnValue('html5')
                             },
                             isHtml5Mode = Initialize.prototype.isHtml5Mode,
@@ -317,6 +324,7 @@
 
                     it('returns `false` if player is not in `html5` mode', function() {
                         var testState = {
+                                // eslint-disable-next-line no-undef
                                 getPlayerMode: jasmine.createSpy().and.returnValue('flash')
                             },
                             isHtml5Mode = Initialize.prototype.isHtml5Mode,

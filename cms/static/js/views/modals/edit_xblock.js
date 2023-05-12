@@ -3,6 +3,7 @@
  * It is invoked using the edit method which is passed an existing rendered xblock,
  * and upon save an optional refresh function can be invoked to update the display.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_modal',
     'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils', 'js/views/xblock_editor'],
 function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockEditorView) {

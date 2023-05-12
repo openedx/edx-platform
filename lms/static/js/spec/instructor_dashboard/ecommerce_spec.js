@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce'],
     function(Backbone, $, ExpiryCouponView) {
         'use strict';
@@ -15,6 +16,7 @@ define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce'],
 
             it('triggers the callback when the checkbox is clicked', function() {
                 var target = expiryCouponView.$el.find('input[type="checkbox"]');
+                // eslint-disable-next-line no-undef
                 spyOn(expiryCouponView, 'clicked');
                 expiryCouponView.delegateEvents();
                 target.click();

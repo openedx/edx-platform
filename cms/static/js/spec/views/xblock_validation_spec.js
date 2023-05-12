@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', 'common/js/spec_helpers/template_helpers'],
     function($, XBlockValidationModel, XBlockValidationView, TemplateHelpers) {
         beforeEach(function() {

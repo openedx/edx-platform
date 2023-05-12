@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'backbone',
@@ -57,18 +58,22 @@ define([
             beforeEach(function() {
                 this.collection = new SearchCollection();
 
+                // eslint-disable-next-line no-undef
                 this.onSearch = jasmine.createSpy('onSearch');
                 this.collection.on('search', this.onSearch);
 
+                // eslint-disable-next-line no-undef
                 this.onNext = jasmine.createSpy('onNext');
                 this.collection.on('next', this.onNext);
 
+                // eslint-disable-next-line no-undef
                 this.onError = jasmine.createSpy('onError');
                 this.collection.on('error', this.onError);
             });
 
             it('sends a request without a course ID', function() {
                 var collection = new SearchCollection([]);
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajax');
                 collection.performSearch('search string');
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual('/search/');
@@ -76,6 +81,7 @@ define([
 
             it('sends a request with course ID', function() {
                 var collection = new SearchCollection([], {courseId: 'edx101'});
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajax');
                 collection.performSearch('search string');
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual('/search/edx101');
@@ -131,6 +137,7 @@ define([
                 AjaxHelpers.respondWithJson(requests, response);
                 this.collection.loadNextPage();
                 AjaxHelpers.respondWithJson(requests, response);
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajax');
                 this.collection.loadNextPage();
                 expect($.ajax.calls.mostRecent().args[0].url).toEqual(this.collection.url);
@@ -200,6 +207,7 @@ define([
         describe('SearchRouter', function() {
             beforeEach(function() {
                 this.router = new SearchRouter();
+                // eslint-disable-next-line no-undef
                 this.onSearch = jasmine.createSpy('onSearch');
                 this.router.on('search', this.onSearch);
             });
@@ -267,7 +275,9 @@ define([
                 this.model.collection = new SearchCollection([this.model], {course_id: 'edx101'});
                 this.item.render();
                 // Mock the redirect call
+                // eslint-disable-next-line no-undef
                 spyOn(this.item, 'redirect').and.callFake(function() {});
+                // eslint-disable-next-line no-undef
                 spyOn(Logger, 'log').and.returnValue($.Deferred().resolve());
                 this.item.$el.find('a').trigger('click');
                 expect(this.item.redirect).toHaveBeenCalled();
@@ -330,7 +340,9 @@ define([
                     this.form = new SearchForm({
                         el: '.search-bar'
                     });
+                    // eslint-disable-next-line no-undef
                     this.onClear = jasmine.createSpy('onClear');
+                    // eslint-disable-next-line no-undef
                     this.onSearch = jasmine.createSpy('onSearch');
                     this.form.on('clear', this.onClear);
                     this.form.on('search', this.onSearch);
@@ -410,6 +422,7 @@ define([
             }
 
             function triggersNextPageEvent() {
+                // eslint-disable-next-line no-undef
                 var onNext = jasmine.createSpy('onNext');
                 this.resultsView.on('next', onNext);
                 this.collection.totalCount = 123;
@@ -588,6 +601,7 @@ define([
                         courseId: courseId,
                         searchHeader: $('.search-bar')
                     });
+                    // eslint-disable-next-line no-undef
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = $('#course-content');
                     this.contentElementDisplayValue = 'table-cell';
@@ -613,6 +627,7 @@ define([
                     loadFixtures('course_search/fixtures/dashboard_search_page.html');
                     DashboardSearchFactory();
 
+                    // eslint-disable-next-line no-undef
                     spyOn(Backbone.history, 'navigate');
                     this.contentElementDisplayValue = 'block';
                     this.$searchResults = $('.search-results');
@@ -661,6 +676,7 @@ define([
                         courseId: courseId,
                         searchHeader: $('.page-header-search')
                     });
+                    // eslint-disable-next-line no-undef
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = null; // The search results page does not show over a content element
                     this.contentElementDisplayValue = 'table-cell';

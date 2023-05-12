@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'], function(_, URI, AjaxHelpers) {
     'use strict';
 
@@ -231,7 +232,9 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         expect(view.$('.search-count.listing-count').text().trim()).toBe(headerMessage);
         expect(view.$('.pagination.bottom').parent().hasClass('hidden')).toBe(footerHidden);
         if (!footerHidden) {
+            // eslint-disable-next-line radix
             expect(parseInt(view.$('.pagination span.current-page').text().trim())).toBe(currentPage);
+            // eslint-disable-next-line radix
             expect(parseInt(view.$('.pagination span.total-pages').text().trim())).toBe(totalPages);
         }
     };

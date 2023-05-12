@@ -9,13 +9,16 @@ import * as Time from 'time.js';
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice')
                 .and.returnValue(null);
 
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer({
                 recordedYoutubeIsAvailable: true
             });
+            // eslint-disable-next-line no-undef
             spyOn(state.storage, 'setItem');
         });
 
@@ -260,6 +263,7 @@ import * as Time from 'time.js';
 
         it('can destroy itself', function() {
             var plugin = state.videoSaveStatePlugin;
+            // eslint-disable-next-line no-undef
             spyOn($.fn, 'off').and.callThrough();
             state.videoSaveStatePlugin.destroy();
             expect(state.videoSaveStatePlugin).toBeUndefined();

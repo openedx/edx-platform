@@ -15,10 +15,12 @@
  */
             var AsyncProcess = {
                 array: function(list, process) {
+                    // eslint-disable-next-line no-undef
                     if (!_.isArray(list)) {
                         return $.Deferred().reject().promise();
                     }
 
+                    // eslint-disable-next-line no-undef
                     if (!_.isFunction(process) || !list.length) {
                         return $.Deferred().resolve(list).promise();
                     }

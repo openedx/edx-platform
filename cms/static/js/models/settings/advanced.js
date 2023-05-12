@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone'], function(Backbone) {
     var Advanced = Backbone.Model.extend({
 

@@ -19,6 +19,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.Discussion = (function(_super) {
             __extends(Discussion, _super);
@@ -48,6 +49,7 @@
             };
 
             Discussion.prototype.find = function(id) {
+                // eslint-disable-next-line no-undef
                 return _.first(this.where({
                     id: id
                 }));
@@ -97,6 +99,7 @@
                 data = {
                     page: this.current_page + 1
                 };
+                // eslint-disable-next-line no-undef
                 if (_.contains(['unread', 'unanswered', 'flagged'], options.filter)) {
                     data[options.filter] = true;
                 }
@@ -149,7 +152,7 @@
                                 return _results;
                             }())
                         ][0];
-                        // eslint-disable-next-line camelcase
+                        /* eslint-disable-next-line camelcase, no-undef */
                         new_collection = _.union(models, new_threads);
                         Content.loadContentInfos(response.annotated_content_info);
                         self.pages = response.num_pages;
@@ -182,9 +185,9 @@
             Discussion.prototype.sortByVotes = function(thread1, thread2) {
                 // eslint-disable-next-line camelcase
                 var thread1_count, thread2_count;
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, radix */
                 thread1_count = parseInt(thread1.get('votes').up_count);
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, radix */
                 thread2_count = parseInt(thread2.get('votes').up_count);
                 return this.pinnedThreadsSortComparatorWithCount(thread1, thread2, thread1_count, thread2_count);
             };
@@ -192,9 +195,9 @@
             Discussion.prototype.sortByComments = function(thread1, thread2) {
                 // eslint-disable-next-line camelcase
                 var thread1_count, thread2_count;
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, radix */
                 thread1_count = parseInt(thread1.get('comments_count'));
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, radix */
                 thread2_count = parseInt(thread2.get('comments_count'));
                 return this.pinnedThreadsSortComparatorWithCount(thread1, thread2, thread1_count, thread2_count);
             };
@@ -241,6 +244,7 @@
             };
 
             return Discussion;
+        // eslint-disable-next-line no-undef
         }(Backbone.Collection));
     }
 }).call(window);

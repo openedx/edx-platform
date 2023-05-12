@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/edxnotes/collections/notes', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/recent_activity',
@@ -41,6 +42,7 @@ define([
         getView = function(collection, tabsCollection, options) {
             var view;
 
+            // eslint-disable-next-line no-undef
             options = _.defaults(options || {}, {
                 el: $('.wrapper-student-notes'),
                 collection: collection,

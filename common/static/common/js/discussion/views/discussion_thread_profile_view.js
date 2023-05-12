@@ -19,6 +19,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionThreadProfileView = (function(_super) {
             __extends(DiscussionThreadProfileView, _super);
@@ -63,6 +64,7 @@
             };
 
             return DiscussionThreadProfileView;
+        // eslint-disable-next-line no-undef
         }(Backbone.View));
     }
 }).call(window);

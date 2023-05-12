@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'js/certificates/views/certificate_bulk_allowlist'
@@ -33,6 +34,7 @@ function($, CertificateBulkAllowlistView) {
 
         it('bind the ajax call and the result will be success', function() {
             var submitCallback;
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {
                 params.success({
                     row_errors: {},
@@ -43,6 +45,7 @@ function($, CertificateBulkAllowlistView) {
                     always: function() {}
                 };
             });
+            // eslint-disable-next-line no-undef
             submitCallback = jasmine.createSpy().and.returnValue();
             this.view.$el.find(SELECTORS.bulk_allowlist_exception_form).submit(submitCallback);
             this.view.$el.find(SELECTORS.upload_csv_button).click();
@@ -52,6 +55,7 @@ function($, CertificateBulkAllowlistView) {
 
         it('bind the ajax call and the result will be general error', function() {
             var submitCallback;
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {
                 params.success({
                     row_errors: {},
@@ -62,6 +66,7 @@ function($, CertificateBulkAllowlistView) {
                     always: function() {}
                 };
             });
+            // eslint-disable-next-line no-undef
             submitCallback = jasmine.createSpy().and.returnValue();
             this.view.$el.find(SELECTORS.bulk_allowlist_exception_form).submit(submitCallback);
             this.view.$el.find(SELECTORS.upload_csv_button).click();
@@ -70,6 +75,7 @@ function($, CertificateBulkAllowlistView) {
 
         it('bind the ajax call and the result will be singular form of row errors', function() {
             var submitCallback;
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {
                 params.success({
                     general_errors: [],
@@ -86,6 +92,7 @@ function($, CertificateBulkAllowlistView) {
                     always: function() {}
                 };
             });
+            // eslint-disable-next-line no-undef
             submitCallback = jasmine.createSpy().and.returnValue();
             this.view.$el.find(SELECTORS.bulk_allowlist_exception_form).submit(submitCallback);
             this.view.$el.find(SELECTORS.upload_csv_button).click();
@@ -103,6 +110,7 @@ function($, CertificateBulkAllowlistView) {
 
         it('bind the ajax call and the result will be plural form of row errors', function() {
             var submitCallback;
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {
                 params.success({
                     general_errors: [],
@@ -119,6 +127,7 @@ function($, CertificateBulkAllowlistView) {
                     always: function() {}
                 };
             });
+            // eslint-disable-next-line no-undef
             submitCallback = jasmine.createSpy().and.returnValue();
             this.view.$el.find(SELECTORS.bulk_allowlist_exception_form).submit(submitCallback);
             this.view.$el.find(SELECTORS.upload_csv_button).click();
@@ -136,6 +145,7 @@ function($, CertificateBulkAllowlistView) {
 
         it('toggle message details', function() {
             var submitCallback;
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {
                 params.success({
                     row_errors: {},
@@ -146,6 +156,7 @@ function($, CertificateBulkAllowlistView) {
                     always: function() {}
                 };
             });
+            // eslint-disable-next-line no-undef
             submitCallback = jasmine.createSpy().and.returnValue();
             this.view.$el.find(SELECTORS.bulk_allowlist_exception_form).submit(submitCallback);
             this.view.$el.find(SELECTORS.upload_csv_button).click();

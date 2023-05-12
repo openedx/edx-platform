@@ -1,6 +1,7 @@
 /**
  * CourseVideoSettingsView shows a sidebar containing course wide video settings which we show on Video Uploads page.
  */
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'backbone', 'underscore', 'gettext', 'moment',
     'common/js/components/utils/view_utils',

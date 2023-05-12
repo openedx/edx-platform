@@ -355,4 +355,5 @@
             }
         }
     });
+// eslint-disable-next-line no-undef
 }).call(this, require, define);

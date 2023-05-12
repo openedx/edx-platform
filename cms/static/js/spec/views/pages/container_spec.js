@@ -488,6 +488,7 @@ function parameterized_suite(label, globalPageOptions) {
                 };
 
                 duplicateComponentWithSuccess = function(componentIndex) {
+                    // eslint-disable-next-line no-undef
                     refreshXBlockSpies = spyOn(containerPage, 'refreshXBlock');
 
                     clickDuplicate(componentIndex);
@@ -543,6 +544,7 @@ function parameterized_suite(label, globalPageOptions) {
                 it('does not duplicate an xblock upon failure', function() {
                     var notificationSpy = EditHelpers.createNotificationSpy();
                     renderContainerPage(this, mockContainerXBlockHtml);
+                    // eslint-disable-next-line no-undef
                     refreshXBlockSpies = spyOn(containerPage, 'refreshXBlock');
                     clickDuplicate(0);
                     EditHelpers.verifyNotificationShowing(notificationSpy, /Duplicating/);
@@ -590,6 +592,7 @@ function parameterized_suite(label, globalPageOptions) {
                     it('triggers underlying view togglePreviews when preview button clicked', function() {
                         containerPage = getContainerPage();
                         containerPage.render();
+                        // eslint-disable-next-line no-undef
                         spyOn(containerPage.xblockView, 'togglePreviews');
 
                         containerPage.$('.toggle-preview-button').click();
@@ -609,6 +612,7 @@ function parameterized_suite(label, globalPageOptions) {
                     containerPage = getContainerPage();
                     containerPage.render();
                     // Stub jQuery.scrollTo module.
+                    // eslint-disable-next-line no-undef
                     $.scrollTo = jasmine.createSpy('jQuery.scrollTo');
                     containerPage.$('.new-component-button').click();
                     expect($.scrollTo).toHaveBeenCalled();

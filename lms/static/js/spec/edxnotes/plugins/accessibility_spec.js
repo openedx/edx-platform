@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
 ], function($, _, Annotator, Logger, NotesFactory) {
@@ -33,6 +34,7 @@ define([
                 }
             );
             this.plugin = this.annotator.plugins.Accessibility;
+            // eslint-disable-next-line no-undef
             spyOn(Logger, 'log');
         });
 
@@ -44,7 +46,9 @@ define([
 
         describe('destroy', function() {
             it('should unbind all events', function() {
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'off');
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator, 'unsubscribe').and.callThrough();
                 this.plugin.destroy();
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
@@ -116,8 +120,11 @@ define([
                     highlights: [highlight.get(0)]
                 };
                 highlight.data('annotation', annotation);
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator, 'showViewer').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator.viewer, 'hide').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(this.plugin, 'focusOnGrabber').and.callThrough();
             });
 
@@ -176,6 +183,7 @@ define([
                 edit = this.annotator.element.find('.annotator-edit').first();
                 del = this.annotator.element.find('.annotator-delete').first();
                 close = this.annotator.element.find('.annotator-close').first();
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator.viewer, 'hide').and.callThrough();
             });
 
@@ -244,7 +252,9 @@ define([
                 tags = annotatorItems.first().next().children('input');
                 save = this.annotator.element.find('.annotator-save');
                 cancel = this.annotator.element.find('.annotator-cancel');
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator.editor, 'submit').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator.editor, 'hide').and.callThrough();
             });
 

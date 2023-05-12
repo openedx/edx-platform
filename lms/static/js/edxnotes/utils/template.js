@@ -12,6 +12,7 @@
             var templateSelector = '#' + name + '-tpl',
                 templateText = $(templateSelector).text();
             if (!templateText) {
+                // eslint-disable-next-line no-console
                 console.error('Failed to load ' + name + ' template');
             }
             return _.template(templateText);
@@ -21,4 +22,5 @@
             loadTemplate: loadTemplate
         };
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

@@ -19,6 +19,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ThreadResponseShowView = (function(_super) {
             __extends(ThreadResponseShowView, _super);
@@ -34,6 +35,7 @@
 
             ThreadResponseShowView.prototype.renderTemplate = function() {
                 var template = edx.HtmlUtils.template($('#thread-response-show-template').html()),
+                    // eslint-disable-next-line no-undef
                     context = _.extend({
                         cid: this.model.cid,
                         author_display: this.getAuthorDisplay(),

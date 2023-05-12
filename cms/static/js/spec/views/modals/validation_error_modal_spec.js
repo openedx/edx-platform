@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/modals/validation_error_modal'],
     function($, _, ValidationHelpers, ValidationErrorModal) {
         describe('ValidationErrorModal', function() {

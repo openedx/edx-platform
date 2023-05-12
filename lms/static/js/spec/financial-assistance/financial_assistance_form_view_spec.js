@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone',
     'jquery',
@@ -158,6 +159,7 @@ define([
         beforeEach(function() {
             setFixtures('<div class="financial-assistance-wrapper"></div>');
 
+            // eslint-disable-next-line no-undef
             spyOn(FinancialAssistanceModel.prototype, 'save');
 
             view = new FinancialAssistanceFormView({

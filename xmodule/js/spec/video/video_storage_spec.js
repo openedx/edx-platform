@@ -20,6 +20,7 @@
                     });
 
                     it('without namespace and id', function() {
+                        // eslint-disable-next-line no-undef
                         spyOn(Number.prototype, 'toString').and.returnValue('0.abcdedg');
                         var storage = VideoStorage();
 
@@ -83,4 +84,5 @@
                 });
             });
         });
+// eslint-disable-next-line no-undef
 }(require, define));

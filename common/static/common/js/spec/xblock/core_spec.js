@@ -34,11 +34,16 @@
                 this.runtimeZ = {
                     name: 'runtimeZ'
                 };
+                // eslint-disable-next-line no-undef
                 window.TestRuntime.vA = jasmine.createSpy().and.returnValue(this.runtimeA);
+                // eslint-disable-next-line no-undef
                 window.TestRuntime.vZ = jasmine.createSpy().and.returnValue(this.runtimeZ);
+                // eslint-disable-next-line no-undef
                 window.initFnA = jasmine.createSpy();
+                // eslint-disable-next-line no-undef
                 window.initFnZ = jasmine.createSpy();
                 this.fakeChildren = ['list', 'of', 'children'];
+                // eslint-disable-next-line no-undef
                 spyOn(XBlock, 'initializeXBlocks').and.returnValue(this.fakeChildren);
                 this.vANode = $('#vA')[0];
                 this.vZNode = $('#vZ')[0];
@@ -90,6 +95,7 @@
         });
         describe('initializeBlocks', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 spyOn(XBlock, 'initializeBlock');
                 this.vANode = $('#vA')[0];
                 this.vZNode = $('#vZ')[0];
@@ -105,6 +111,7 @@
 
             it('only initializes matching request tokens', function() {
                 XBlock.initializeBlocks($('#jasmine-fixtures'), 'req-token-z');
+                // eslint-disable-next-line no-undef
                 expect(XBlock.initializeBlock).not.toHaveBeenCalledWith(this.vANode, jasmine.any(Object));
                 expect(XBlock.initializeBlock).toHaveBeenCalledWith(this.vZNode, 'req-token-z');
             });

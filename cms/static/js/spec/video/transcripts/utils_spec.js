@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'jquery', 'underscore',
@@ -72,6 +73,7 @@ define(
                     testFieldName = 'test_field';
 
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     collection = jasmine.createSpyObj(
                         'Collection',
                         [
@@ -125,6 +127,7 @@ define(
 
                 describe('Wrong arguments ', function() {
                     beforeEach(function() {
+                        // eslint-disable-next-line no-undef
                         spyOn(console, 'log');
                     });
 
@@ -185,6 +188,7 @@ define(
 
                 describe('Wrong arguments ', function() {
                     beforeEach(function() {
+                        // eslint-disable-next-line no-undef
                         spyOn(console, 'log');
                     });
 

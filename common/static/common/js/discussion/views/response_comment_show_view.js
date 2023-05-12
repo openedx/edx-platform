@@ -19,6 +19,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ResponseCommentShowView = (function(_super) {
             __extends(ResponseCommentShowView, _super);
@@ -38,6 +39,7 @@
 
             ResponseCommentShowView.prototype.render = function() {
                 var template = edx.HtmlUtils.template($('#response-comment-show-template').html());
+                // eslint-disable-next-line no-undef
                 var context = _.extend({
                     cid: this.model.cid,
                     author_display: this.getAuthorDisplay(),

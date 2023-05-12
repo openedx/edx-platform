@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'js/views/settings/grading', 'js/models/settings/course_grading_policy'
 ], function($, GradingView, CourseGradingPolicyModel) {

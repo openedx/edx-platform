@@ -1,6 +1,7 @@
 /**
  * Mixin class for creation of things like courses and libraries.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_utils'],
     function($, _, gettext, ViewUtils) {
         return function(selectors, classes, keyLengthViolationMessage, keyFieldSelectors, nonEmptyCheckFieldSelectors) {

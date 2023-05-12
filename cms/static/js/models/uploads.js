@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
     var FileUpload = Backbone.Model.extend({
         defaults: {

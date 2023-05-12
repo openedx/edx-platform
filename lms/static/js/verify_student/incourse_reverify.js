@@ -25,4 +25,5 @@ var edx = edx || {};
         usageId: $el.data('usage-id'),
         errorModel: errorView.model
     }).render();
+// eslint-disable-next-line no-undef
 }(jQuery, _));

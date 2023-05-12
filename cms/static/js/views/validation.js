@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['edx-ui-toolkit/js/utils/html-utils',
     'js/views/baseview',
     'underscore',
@@ -69,6 +70,7 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
             this.clearValidationErrors();
             var field = this.selectorToField[event.currentTarget.id];
             var newVal = '';
+            // eslint-disable-next-line eqeqeq
             if (event.currentTarget.type == 'checkbox') {
                 newVal = $(event.currentTarget).is(':checked').toString();
             } else {

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'js/discovery/views/search_form'], function($, SearchForm) {
     'use strict';
 
@@ -5,6 +6,7 @@ define(['jquery', 'js/discovery/views/search_form'], function($, SearchForm) {
         beforeEach(function() {
             loadFixtures('js/fixtures/discovery.html');
             this.form = new SearchForm();
+            // eslint-disable-next-line no-undef
             this.onSearch = jasmine.createSpy('onSearch');
             this.form.on('search', this.onSearch);
         });

@@ -80,6 +80,7 @@
                 } else {
                     this.facets = [];
                 }
+                // eslint-disable-next-line no-undef
                 return _.map(results, function(result) {
                     return result.data;
                 });
@@ -102,4 +103,5 @@
 
         });
     });
+// eslint-disable-next-line no-undef
 }(define || RequireJS.define));

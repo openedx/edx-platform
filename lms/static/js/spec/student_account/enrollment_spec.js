@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account/enrollment'],
     function(AjaxHelpers, EnrollmentInterface) {
         'use strict';
@@ -10,6 +11,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account
 
             beforeEach(function() {
                 // Mock the redirect call
+                // eslint-disable-next-line no-undef
                 spyOn(EnrollmentInterface, 'redirect').and.callFake(function() {});
             });
 

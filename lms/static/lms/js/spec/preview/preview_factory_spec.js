@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
@@ -48,6 +49,7 @@ define(
 
             it('can switch to view as a student', function() {
                 var requests = AjaxHelpers.requests(this),
+                    // eslint-disable-next-line no-undef
                     reloadSpy = spyOn(ViewUtils, 'reload');
                 showPreview({
                     courseId: 'test_course'
@@ -68,6 +70,7 @@ define(
 
             it('can switch to view as a content group', function() {
                 var requests = AjaxHelpers.requests(this),
+                    // eslint-disable-next-line no-undef
                     reloadSpy = spyOn(ViewUtils, 'reload');
                 showPreview({
                     courseId: 'test_course'
@@ -90,6 +93,7 @@ define(
 
             it('can switch to masquerade as a specific student', function() {
                 var requests = AjaxHelpers.requests(this),
+                    // eslint-disable-next-line no-undef
                     reloadSpy = spyOn(ViewUtils, 'reload');
                 showPreview({
                     courseId: 'test_course'

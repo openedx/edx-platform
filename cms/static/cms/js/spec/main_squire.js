@@ -187,6 +187,7 @@
         }
     });
 
+    // eslint-disable-next-line no-undef
     jasmine.getFixtures().fixturesPath = '/base/templates';
 
     testFiles = [

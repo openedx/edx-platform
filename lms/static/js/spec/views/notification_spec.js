@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'jquery', 'js/models/notification', 'js/views/notification', 'common/js/spec_helpers/template_helpers'],
     function(Backbone, $, NotificationModel, NotificationView, TemplateHelpers) {
         describe('NotificationView', function() {
@@ -88,6 +89,7 @@ define(['backbone', 'jquery', 'js/models/notification', 'js/views/notification',
             });
 
             it('triggers the callback when the action button is clicked', function() {
+                // eslint-disable-next-line no-undef
                 var actionCallback = jasmine.createSpy('Spy on callback');
                 var view = createNotification({actionText: 'action text', actionCallback: actionCallback});
                 notificationView.$('button.action-primary').click();

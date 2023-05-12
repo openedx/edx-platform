@@ -1,6 +1,7 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
     'js/views/utils/xblock_utils', 'js/views/utils/move_xblock_utils', 'edx-ui-toolkit/js/utils/html-utils'],
 function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, HtmlUtils) {

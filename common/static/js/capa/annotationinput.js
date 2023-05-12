@@ -14,6 +14,7 @@
         init: function() {
             var that = this;
 
+            // eslint-disable-next-line no-console
             if (this.debug) { console.log('annotation input loaded: '); }
 
             $(this.inputSelector).each(function(index, el) {

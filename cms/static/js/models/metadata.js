@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone'], function(Backbone) {
     /**
      * Model used for metadata setting editors. This model does not do its own saving,

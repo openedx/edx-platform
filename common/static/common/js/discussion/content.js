@@ -29,6 +29,7 @@
         return -1;
     };
 
+    // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.Content = (function(_super) {
             __extends(Content, _super);
@@ -83,7 +84,7 @@
                 options = (options) || {};
                 if (!options.silent) {
                     thread = this.get('thread');
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, radix */
                     comments_count = parseInt(thread.get('comments_count'));
                     // eslint-disable-next-line camelcase
                     thread.set('comments_count', comments_count + 1);
@@ -101,7 +102,7 @@
                 // eslint-disable-next-line camelcase
                 var comments_count, thread;
                 thread = this.get('thread');
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, radix */
                 comments_count = parseInt(thread.get('comments_count'));
                 // eslint-disable-next-line camelcase
                 thread.set('comments_count', comments_count - 1 - comment.getCommentsCount());
@@ -217,6 +218,7 @@
 
             Content.prototype.incrementVote = function(increment) {
                 var newVotes;
+                // eslint-disable-next-line no-undef
                 newVotes = _.clone(this.get('votes'));
                 newVotes.up_count += increment;
                 return this.set('votes', newVotes);
@@ -231,6 +233,7 @@
             };
 
             return Content;
+        // eslint-disable-next-line no-undef
         }(Backbone.Model));
         this.Thread = (function(_super) {
             __extends(Thread, _super);
@@ -290,6 +293,7 @@
             };
 
             Thread.prototype.comment = function() {
+                // eslint-disable-next-line radix
                 return this.set('comments_count', parseInt(this.get('comments_count')) + 1);
             };
 
@@ -324,8 +328,9 @@
             Thread.prototype.toJSON = function() {
                 // eslint-disable-next-line camelcase
                 var json_attributes;
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-undef */
                 json_attributes = _.clone(this.attributes);
+                // eslint-disable-next-line no-undef
                 return _.extend(json_attributes, {
                     title: this.display_title(),
                     body: this.display_body()
@@ -433,12 +438,14 @@
             };
 
             Comments.prototype.find = function(id) {
+                // eslint-disable-next-line no-undef
                 return _.first(this.where({
                     id: id
                 }));
             };
 
             return Comments;
+        // eslint-disable-next-line no-undef
         }(Backbone.Collection));
     }
 }).call(window);

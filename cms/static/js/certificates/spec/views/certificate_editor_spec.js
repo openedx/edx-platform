@@ -1,5 +1,6 @@
 // Jasmine Test Suite: Certifiate Editor View
 
+// eslint-disable-next-line no-undef
 define([
     'underscore',
     'js/models/course',
@@ -277,6 +278,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 var signatory_url = '/certificates/signatory';
                 // eslint-disable-next-line camelcase
                 signatory.url = signatory_url;
+                // eslint-disable-next-line no-undef
                 spyOn(signatory, 'isNew').and.returnValue(false);
                 var text = 'Delete "' + signatory.get('name') + '" from the list of signatories?';
                 clickDeleteItem(this, text, SELECTORS.signatoryDeleteButton + ':first', signatory_url);
@@ -287,6 +289,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             it('can cancel deletion of signatories', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
                 var signatory = this.model.get('signatories').at(0);
+                // eslint-disable-next-line no-undef
                 spyOn(signatory, 'isNew').and.returnValue(false);
                 // add one more signatory
                 this.view.$(SELECTORS.addSignatoryButton).click();

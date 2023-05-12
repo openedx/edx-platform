@@ -1,6 +1,7 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore'],
     function($, _) {
         var installTemplate, installTemplates;

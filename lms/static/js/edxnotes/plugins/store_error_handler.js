@@ -24,6 +24,7 @@
             // if response includes an error message it will take precedence
             if (serverResponse && serverResponse.error_msg) {
                 Annotator.showNotification(serverResponse.error_msg, Annotator.Notification.ERROR);
+                // eslint-disable-next-line no-console
                 return console.error(Annotator._t('API request failed:') + (" '" + xhr.status + "'"));
             }
 
@@ -31,4 +32,5 @@
             originalErrorHandler(xhr);
         };
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

@@ -290,6 +290,7 @@ var Channel = (function() {
     // eslint-disable-next-line camelcase
     function s_isArray(obj) {
         if (Array.isArray) { return Array.isArray(obj); } else {
+            // eslint-disable-next-line eqeqeq
             return (obj.constructor.toString().indexOf('Array') != -1);
         }
     }
@@ -324,6 +325,7 @@ var Channel = (function() {
         if (typeof m.method === 'string') {
             // eslint-disable-next-line block-scoped-var
             var ar = m.method.split('::');
+            // eslint-disable-next-line eqeqeq
             if (ar.length == 2) {
                 s = ar[0];
                 meth = ar[1];
@@ -425,6 +427,7 @@ var Channel = (function() {
                     // try to stringify, if it doesn't work we'll let javascript's built in toString do its magic
                     // eslint-disable-next-line no-empty
                     try { if (typeof m !== 'string') { m = JSON.stringify(m); } } catch (e) { }
+                    // eslint-disable-next-line no-console
                     console.log('[' + chanId + '] ' + m);
                 }
             };
@@ -601,6 +604,7 @@ var Channel = (function() {
                             } else if (typeof e === 'object') {
                                 // either an array or an object
                                 // * if it's an array of length two, then  array[0] is the code, array[1] is the error message
+                                // eslint-disable-next-line eqeqeq
                                 if (e && s_isArray(e) && e.length == 2) {
                                     error = e[0];
                                     message = e[1];

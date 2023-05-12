@@ -48,6 +48,7 @@
             var event, posX, posY, cssLeft, cssTop;
 
             // Set up of 'click' event.
+            // eslint-disable-next-line no-undef
             event = jQuery.Event(
                 'click',
                 {offsetX: 35.3, offsetY: 42.7}
@@ -58,6 +59,7 @@
             posY = event.offsetY;
 
             // Triggering 'click' event.
+            // eslint-disable-next-line no-undef
             jQuery(state.el).trigger(event);
 
             // Getting actual (new) coordinates, and testing them against the
@@ -77,6 +79,7 @@
                 event, posX, posY, cssLeft, cssTop;
 
             // Set up of 'click' event.
+            // eslint-disable-next-line no-undef
             event = jQuery.Event(
                 'click',
                 {
@@ -92,6 +95,7 @@
             posY = event.pageY - offset.top;
 
             // Triggering 'click' event.
+            // eslint-disable-next-line no-undef
             jQuery(state.el).trigger(event);
 
             // Getting actual (new) coordinates, and testing them against the

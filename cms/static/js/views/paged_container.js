@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/views/container', 'js/utils/module', 'gettext',
     'common/js/components/views/feedback_notification', 'js/views/paging_header', 'common/js/components/views/paging_footer'],
 function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView, PagingHeader, PagingFooter) {
@@ -226,6 +227,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
             }
             this.collection.totalCount += 1;
             this.collection._size += 1;
+            // eslint-disable-next-line eqeqeq
             if (this.collection.totalCount == 1) {
                 this.render();
                 return;
@@ -234,7 +236,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
             // eslint-disable-next-line camelcase
             var target_page = this.collection.totalPages - 1;
             // If we're on a new page due to overflow, or this is the first item, set the page.
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, eqeqeq */
             if (((this.collection.currentPage) != target_page) || this.collection.totalCount == 1) {
                 // eslint-disable-next-line camelcase
                 var force_render = xblockView.model.id;
@@ -272,7 +274,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                 // Also, be mindful of the off-by-one.
                 // eslint-disable-next-line camelcase
                 this.setPage(total_pages - 1);
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, eqeqeq */
             } else if ((current_page + 1) != total_pages) {
                 // Refresh page to get any blocks shifted from the next page.
                 this.setPage(current_page);

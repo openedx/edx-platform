@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/discovery/collections/filters',
     'js/discovery/views/filter_bar'
@@ -37,7 +38,9 @@ define([
         });
 
         it('triggers events', function() {
+            // eslint-disable-next-line no-undef
             this.onClearFilter = jasmine.createSpy('onClearFilter');
+            // eslint-disable-next-line no-undef
             this.onClearAll = jasmine.createSpy('onClearAll');
             this.filterBar.on('clearFilter', this.onClearFilter);
             this.filterBar.on('clearAll', this.onClearAll);

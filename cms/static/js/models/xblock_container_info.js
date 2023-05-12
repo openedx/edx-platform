@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/models/custom_sync_xblock_info'],
     function(CustomSyncXBlockInfo) {
         var XBlockContainerInfo = CustomSyncXBlockInfo.extend({

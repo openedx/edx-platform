@@ -22,6 +22,7 @@
         });
 
         it('should make an AJAX request to the correct URL', function() {
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.returnValue(deferred);
             Language.init();
             // eslint-disable-next-line camelcase
@@ -30,6 +31,7 @@
         });
 
         it('should make an AJAX request with correct type', function() {
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.returnValue(deferred);
             Language.init();
             // eslint-disable-next-line camelcase
@@ -38,6 +40,7 @@
         });
 
         it('should make an AJAX request with correct data', function() {
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.returnValue(deferred);
             Language.init();
             // eslint-disable-next-line camelcase
@@ -55,12 +58,14 @@
         });
 
         it('should call refresh on ajax failure', function() {
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function() {
                 var d = $.Deferred();
                 d.reject();
                 return d.promise();
             });
             Language.init();
+            // eslint-disable-next-line no-undef
             spyOn(Language, 'refresh');
             // eslint-disable-next-line camelcase
             $lang_selector.trigger('change');

@@ -4,6 +4,7 @@
 // These files assume that several libraries are available and bound to
 // variables in the global context, so we load those libraries with requirejs
 // and attach them to the global context manually.
+// eslint-disable-next-line no-undef
 define(
     [
         'jquery', 'underscore', 'codemirror', 'tinymce', 'scriptjs',
@@ -48,6 +49,7 @@ define(
         window.RequireJS = {
             requirejs: {}, // This is never used by current xmodules
             require: $script, // $script([deps], callback) acts approximately like the require function
+            // eslint-disable-next-line no-undef
             define: define
         };
         /**

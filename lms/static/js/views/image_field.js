@@ -168,6 +168,7 @@
                 if (imageBytes < this.options.imageMinBytes) {
                     humanReadableSize = this.bytesToHumanReadable(this.options.imageMinBytes);
                     this.showErrorMessage(
+                        // eslint-disable-next-line no-undef
                         interpolate_text(
                             gettext('The file must be at least {size} in size.'), {size: humanReadableSize}
                         )
@@ -176,6 +177,7 @@
                 } else if (imageBytes > this.options.imageMaxBytes) {
                     humanReadableSize = this.bytesToHumanReadable(this.options.imageMaxBytes);
                     this.showErrorMessage(
+                        // eslint-disable-next-line no-undef
                         interpolate_text(
                             gettext('The file must be smaller than {size} in size.'), {size: humanReadableSize}
                         )
@@ -232,4 +234,5 @@
 
         return ImageFieldView;
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

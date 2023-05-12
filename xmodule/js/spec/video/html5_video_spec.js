@@ -10,9 +10,11 @@
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
 
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer('video_html5.html');
         });
 
@@ -24,19 +26,23 @@
             window.onTouchBasedDevice = oldOTBD;
         });
 
+        // eslint-disable-next-line no-undef
         describeInfo = new jasmine.DescribeInfo('on non-Touch devices ', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state.videoPlayer.player.config.events.onReady = jasmine.createSpy('onReady');
             });
 
             describe('events:', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer.player, 'callStateChangeCallback').and.callThrough();
                 });
 
                 describe('[click]', function() {
                     describe('when player is paused', function() {
                         beforeEach(function() {
+                            // eslint-disable-next-line no-undef
                             spyOn(state.videoPlayer.player.video, 'play').and.callThrough();
                             state.videoPlayer.player.playerState = STATUS.PAUSED;
                             $(state.videoPlayer.player.videoEl).trigger('click');
@@ -47,6 +53,7 @@
                         });
 
                         it('player state was changed', function(done) {
+                            // eslint-disable-next-line no-undef
                             jasmine.waitUntil(function() {
                                 return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
                             }).always(done);
@@ -55,6 +62,7 @@
 
                     describe('[player is playing]', function() {
                         beforeEach(function() {
+                            // eslint-disable-next-line no-undef
                             spyOn(state.videoPlayer.player.video, 'pause').and.callThrough();
                             state.videoPlayer.player.playerState = STATUS.PLAYING;
                             $(state.videoPlayer.player.videoEl).trigger('click');
@@ -65,6 +73,7 @@
                         });
 
                         it('player state was changed', function(done) {
+                            // eslint-disable-next-line no-undef
                             jasmine.waitUntil(function() {
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.PLAYING;
                             }).then(function() {
@@ -74,6 +83,7 @@
                         });
 
                         it('callback was not called', function(done) {
+                            // eslint-disable-next-line no-undef
                             jasmine.waitUntil(function() {
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.PLAYING;
                             }).then(function() {
@@ -86,6 +96,7 @@
 
                 describe('[play]', function() {
                     beforeEach(function() {
+                        // eslint-disable-next-line no-undef
                         spyOn(state.videoPlayer.player.video, 'play').and.callThrough();
                         state.videoPlayer.player.playerState = STATUS.PAUSED;
                         state.videoPlayer.player.playVideo();
@@ -96,6 +107,7 @@
                     });
 
                     it('player state was changed', function(done) {
+                        // eslint-disable-next-line no-undef
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                         }).then(function() {
@@ -106,6 +118,7 @@
                     });
 
                     it('callback was called', function(done) {
+                        // eslint-disable-next-line no-undef
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
                         }).then(function() {
@@ -117,10 +130,12 @@
 
                 describe('[pause]', function() {
                     beforeEach(function(done) {
+                        // eslint-disable-next-line no-undef
                         spyOn(state.videoPlayer.player.video, 'pause').and.callThrough();
                         state.videoPlayer.player.playerState = STATUS.UNSTARTED;
                         state.videoPlayer.player.playVideo();
 
+                        // eslint-disable-next-line no-undef
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
                         }).done(done);
@@ -133,6 +148,7 @@
                     });
 
                     it('player state was changed', function(done) {
+                        // eslint-disable-next-line no-undef
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PLAYING;
                         }).then(function() {
@@ -142,6 +158,7 @@
                     });
 
                     it('callback was called', function(done) {
+                        // eslint-disable-next-line no-undef
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PLAYING;
                         }).then(function() {
@@ -155,7 +172,9 @@
                     it(
                         'player state was changed, start/end was defined, '
                         + 'onReady called', function(done) {
+                            // eslint-disable-next-line no-undef
                             jasmine.fireEvent(state.videoPlayer.player.video, 'loadedmetadata');
+                            // eslint-disable-next-line no-undef
                             jasmine.waitUntil(function() {
                                 return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
                             }).then(function() {
@@ -171,17 +190,20 @@
                 describe('[ended]', function() {
                     beforeEach(function(done) {
                         state.videoPlayer.player.playVideo();
+                        // eslint-disable-next-line no-undef
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
                         }).done(done);
                     });
 
                     it('player state was changed', function() {
+                        // eslint-disable-next-line no-undef
                         jasmine.fireEvent(state.videoPlayer.player.video, 'ended');
                         expect(state.videoPlayer.player.getPlayerState()).toBe(STATUS.ENDED);
                     });
 
                     it('callback was called', function() {
+                        // eslint-disable-next-line no-undef
                         jasmine.fireEvent(state.videoPlayer.player.video, 'ended');
                         expect(state.videoPlayer.player.callStateChangeCallback)
                             .toHaveBeenCalled();
@@ -197,6 +219,7 @@
                 });
 
                 it('pauseVideo', function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer.player.video, 'pause').and.callThrough();
                     state.videoPlayer.player.pauseVideo();
                     expect(state.videoPlayer.player.video.pause).toHaveBeenCalled();
@@ -205,6 +228,7 @@
                 describe('seekTo', function() {
                     it('set new correct value', function(done) {
                         state.videoPlayer.player.playVideo();
+                        // eslint-disable-next-line no-undef
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
                         }).then(function() {
@@ -243,6 +267,7 @@
 
                 it('getCurrentTime', function(done) {
                     state.videoPlayer.player.playVideo();
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
                     }).then(function() {
@@ -253,6 +278,7 @@
                 });
 
                 it('playVideo', function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer.player.video, 'play').and.callThrough();
                     state.videoPlayer.player.playVideo();
                     expect(state.videoPlayer.player.video.play).toHaveBeenCalled();
@@ -273,6 +299,7 @@
 
                 it('getDuration', function(done) {
                     state.videoPlayer.player.playVideo();
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
                     }).then(function() {
@@ -313,10 +340,12 @@
 
                 it('_getLogs', function(done) {
                     state.videoPlayer.player.playVideo();
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
                     }).then(function() {
                         var logs = state.videoPlayer.player._getLogs();
+                        // eslint-disable-next-line no-undef
                         expect(logs).toEqual(jasmine.any(Array));
                         expect(logs.length).toBeGreaterThan(0);
                     }).done(done);
@@ -335,21 +364,26 @@
 
         describe('non-hls encoding', function() {
             beforeEach(function(done) {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer('video_html5.html');
                 done();
             });
+            // eslint-disable-next-line no-undef
             jasmine.getEnv().describe(describeInfo.description, describeInfo.specDefinitions);
         });
 
         describe('hls encoding', function() {
             beforeEach(function(done) {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializeHLSPlayer();
                 done();
             });
+            // eslint-disable-next-line no-undef
             jasmine.getEnv().describe(describeInfo.description, describeInfo.specDefinitions);
         });
 
         it('does not show poster for html5 video if url is not present', function() {
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer(
                 'video_html5.html',
                 {
@@ -361,6 +395,7 @@
         });
 
         it('does not show poster for hls video if url is not present', function() {
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer(
                 'video_hls.html',
                 {
@@ -374,8 +409,10 @@
         it('native controls are used on  iPhone', function() {
             window.onTouchBasedDevice.and.returnValue(['iPhone']);
 
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer('video_html5.html');
 
+            // eslint-disable-next-line no-undef
             state.videoPlayer.player.config.events.onReady = jasmine.createSpy('onReady');
 
             expect($('video')).toHaveAttr('controls');

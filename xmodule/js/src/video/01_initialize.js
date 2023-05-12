@@ -516,6 +516,7 @@
                     id = this.id,
                     container = el.find('.video-wrapper'),
                     __dfd__ = $.Deferred(),
+                    // eslint-disable-next-line no-undef
                     isTouch = onTouchBasedDevice() || '';
 
                 if (isTouch) {

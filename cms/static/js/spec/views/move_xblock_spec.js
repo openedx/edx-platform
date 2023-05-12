@@ -491,6 +491,7 @@ describe('MoveXBlock', function() {
      * @returns {Object}
      */
     getSentRequests = function() {
+        // eslint-disable-next-line no-undef
         return jasmine.Ajax.requests.filter(function(request) {
             return request.readyState > 0;
         });

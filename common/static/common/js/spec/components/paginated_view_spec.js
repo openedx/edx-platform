@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'backbone',
@@ -161,6 +162,7 @@ define([
 
         it('sets focus for screen readers', function() {
             var requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-undef
             spyOn($.fn, 'focus');
             testView.$(nextPageButtonCss).click();
             AjaxHelpers.respondWithJson(requests, {

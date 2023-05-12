@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore'], function($, _) {
     /**
      * Loads the named template from the page, or logs an error if it fails.
@@ -8,6 +9,7 @@ define(['jquery', 'underscore'], function($, _) {
         var templateSelector = '#' + name + '-tpl',
             templateText = $(templateSelector).text();
         if (!templateText) {
+            // eslint-disable-next-line no-console
             console.error('Failed to load ' + name + ' template');
         }
         return _.template(templateText);

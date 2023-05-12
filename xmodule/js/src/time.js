@@ -2,6 +2,7 @@
 function format(time, formatFull) {
     var hours, minutes, seconds;
 
+    // eslint-disable-next-line no-undef
     if (!_.isFinite(time) || time < 0) {
         time = 0;
     }

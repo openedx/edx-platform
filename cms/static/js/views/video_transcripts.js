@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     ['underscore', 'gettext', 'js/views/baseview', 'common/js/components/views/feedback_prompt',
         'edx-ui-toolkit/js/utils/html-utils', 'edx-ui-toolkit/js/utils/string-utils',

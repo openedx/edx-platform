@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/edxnotes/utils/notes_collector', 'js/spec/edxnotes/helpers'
@@ -40,6 +41,7 @@ define([
                 expect(annotator.options.store.annotationData).toEqual(options);
                 expect(annotator.options.store.loadFromSearch).toEqual(options);
             });
+            // eslint-disable-next-line no-undef
             jasmine.waitUntil(function() {
                 return requests.length === 1;
             }).done(function() {

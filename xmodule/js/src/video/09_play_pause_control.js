@@ -15,6 +15,7 @@
                 return new PlayPauseControl(state, i18n);
             }
 
+            // eslint-disable-next-line no-undef
             _.bindAll(this, 'play', 'pause', 'onClick', 'destroy');
             this.state = state;
             this.state.videoPlayPauseControl = this;

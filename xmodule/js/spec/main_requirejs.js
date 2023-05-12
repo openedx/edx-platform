@@ -24,6 +24,7 @@
                     define(name, [], function() { return globalValue; });
                 }
             } else {
+                // eslint-disable-next-line no-console
                 console.error('Expected library to be included on page, but not found on window object: ' + name);
             }
         };

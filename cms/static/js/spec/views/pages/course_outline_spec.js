@@ -455,7 +455,9 @@ describe('CourseOutlinePage', function() {
 
         it('can start reindex of a course', function() {
             createCourseOutlinePage(this, mockSingleSectionCourseJSON);
+            // eslint-disable-next-line no-undef
             var reindexSpy = spyOn(outlinePage, 'startReIndex').and.callThrough();
+            // eslint-disable-next-line no-undef
             var successSpy = spyOn(outlinePage, 'onIndexSuccess').and.callThrough();
             var reindexButton = outlinePage.$('.button.button-reindex');
             // eslint-disable-next-line camelcase
@@ -470,7 +472,9 @@ describe('CourseOutlinePage', function() {
 
         it('shows an error message when reindexing fails', function() {
             createCourseOutlinePage(this, mockSingleSectionCourseJSON);
+            // eslint-disable-next-line no-undef
             var reindexSpy = spyOn(outlinePage, 'startReIndex').and.callThrough();
+            // eslint-disable-next-line no-undef
             var errorSpy = spyOn(outlinePage, 'onIndexError').and.callThrough();
             var reindexButton = outlinePage.$('.button.button-reindex');
             // eslint-disable-next-line camelcase
@@ -1079,6 +1083,7 @@ describe('CourseOutlinePage', function() {
             getItemHeaders('section').first().find('.publish-button').click();
             var $modalWindow = $('.wrapper-modal-window');
             expect($modalWindow.find('.outline-unit').length).toBe(3);
+            // eslint-disable-next-line no-undef
             expect(_.compact(_.map($modalWindow.find('.outline-unit').text().split('\n'), $.trim))).toEqual(
                 ['Unit 100', 'Unit 50', 'Unit 1']
             );
@@ -1246,6 +1251,7 @@ describe('CourseOutlinePage', function() {
         it('can add a unit', function() {
             var redirectSpy;
             createCourseOutlinePage(this, mockCourseJSON);
+            // eslint-disable-next-line no-undef
             redirectSpy = spyOn(ViewUtils, 'redirect');
             getItemsOfType('subsection').find('> .outline-content > .add-unit .button-new').click();
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
@@ -2213,6 +2219,7 @@ describe('CourseOutlinePage', function() {
             getItemHeaders('subsection').first().find('.publish-button').click();
             $modalWindow = $('.wrapper-modal-window');
             expect($modalWindow.find('.outline-unit').length).toBe(2);
+            // eslint-disable-next-line no-undef
             expect(_.compact(_.map($modalWindow.find('.outline-unit').text().split('\n'), $.trim))).toEqual(
                 ['Unit 100', 'Unit 50']
             );

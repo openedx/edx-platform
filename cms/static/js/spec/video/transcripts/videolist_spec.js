@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'jquery', 'underscore', 'backbone',
@@ -101,18 +102,29 @@ define(
                 // create mock server
                 this.mockServer = createMockAjaxServer();
 
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'on').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(Backbone, 'trigger').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(Utils, 'command').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(abstractEditor, 'initialize').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(abstractEditor, 'render').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(console, 'error');
 
+                // eslint-disable-next-line no-undef
                 spyOn(MessageManager.prototype, 'initialize').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(MessageManager.prototype, 'render').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(MessageManager.prototype, 'showError').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(MessageManager.prototype, 'hideError').and.callThrough();
 
+                // eslint-disable-next-line no-undef
                 jasmine.addMatchers({
                     assertValueInView: function() {
                         return {
@@ -164,6 +176,7 @@ define(
 
             waitForEvent = function() {
                 var triggerCallArgs;
+                // eslint-disable-next-line no-undef
                 return jasmine.waitUntil(function() {
                     triggerCallArgs = Backbone.trigger.calls.mostRecent().args;
                     return Backbone.trigger.calls.count() === 1
@@ -186,6 +199,7 @@ define(
                     el: $container
                 });
 
+                // eslint-disable-next-line no-undef
                 spyOn(editor, 'getLocator').and.returnValue(component_locator);
 
                 // reset
@@ -208,6 +222,7 @@ define(
             };
 
             var waitsForResponse = function(mockServer) {
+                // eslint-disable-next-line no-undef
                 return jasmine.waitUntil(function() {
                     var requests = mockServer.requests,
                         len = requests.length;
@@ -287,7 +302,9 @@ define(
                             }
                         ];
 
+                    // eslint-disable-next-line no-undef
                     spyOn(VideoList.prototype, 'getVideoObjectsList').and.returnValue(videoListLength);
+                    // eslint-disable-next-line no-undef
                     spyOn(VideoList.prototype, 'openExtraVideosBar');
 
                     resetSpies(this.mockServer);
@@ -324,7 +341,9 @@ define(
                             }
                         ];
 
+                    // eslint-disable-next-line no-undef
                     spyOn(VideoList.prototype, 'getVideoObjectsList').and.returnValue(videoList);
+                    // eslint-disable-next-line no-undef
                     spyOn(VideoList.prototype, 'closeExtraVideosBar');
 
                     resetSpies(this.mockServer);
@@ -480,6 +499,7 @@ define(
 
                 it('All works okay if arguments are not passed', function(done) {
                     var view = createVideoListView(this.mockServer);
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'getVideoObjectsList').and.returnValue(videoList);
 
                     waitsForResponse(this.mockServer)
@@ -497,6 +517,7 @@ define(
             describe('checkValidity', function() {
                 it('Error message is shown', function(done) {
                     var view = createVideoListView(this.mockServer);
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
 
                     waitsForResponse(this.mockServer)
@@ -513,6 +534,7 @@ define(
 
                 it('Error message is shown when flag is not passed', function(done) {
                     var view = createVideoListView(this.mockServer);
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
 
                     waitsForResponse(this.mockServer)
@@ -528,6 +550,7 @@ define(
 
                 it('All works okay if correct data is passed', function(done) {
                     var view = createVideoListView(this.mockServer);
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
 
                     waitsForResponse(this.mockServer)
@@ -701,15 +724,24 @@ define(
                 };
 
                 var setUp = function(view) {
+                    // eslint-disable-next-line no-undef
                     eventObject = jQuery.Event('input');
 
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'updateModel');
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'closeExtraVideosBar');
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'checkValidity');
+                    // eslint-disable-next-line no-undef
                     spyOn($.fn, 'hasClass');
+                    // eslint-disable-next-line no-undef
                     spyOn($.fn, 'addClass');
+                    // eslint-disable-next-line no-undef
                     spyOn($.fn, 'removeClass');
+                    // eslint-disable-next-line no-undef
                     spyOn($.fn, 'prop').and.callThrough();
+                    // eslint-disable-next-line no-undef
                     spyOn(_, 'isEqual');
 
                     resetSpies(view);

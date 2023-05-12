@@ -1,5 +1,6 @@
 // Jasmine Test Suite: Certifiate Model
 
+// eslint-disable-next-line no-undef
 define([
     'js/certificates/models/certificate',
     'js/certificates/collections/certificates'

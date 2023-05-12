@@ -78,4 +78,5 @@
 
         return {GroupView: GroupView, ChapterView: ChapterView};
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

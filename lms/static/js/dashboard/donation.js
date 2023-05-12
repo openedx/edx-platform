@@ -27,6 +27,7 @@ var edx = edx || {};
             $('input', form).remove();
             form.attr('action', url);
             form.attr('method', method);
+            // eslint-disable-next-line no-undef
             _.each(params, function(value, key) {
                 $('<input>').attr({
                     type: 'hidden',
@@ -43,6 +44,7 @@ var edx = edx || {};
         * @param {string} course - The course ID for the donation.
         */
         var firePaymentAnalyticsEvent = function(course) {
+            // eslint-disable-next-line no-undef
             analytics.track(
                 'edx.bi.user.payment_processor.visited',
                 {
@@ -85,6 +87,7 @@ var edx = edx || {};
             initialize: function(params) {
                 this.$el = params.el;
                 this.course = params.course;
+                // eslint-disable-next-line no-undef
                 _.bindAll(view,
                     'render', 'donate', 'startPayment',
                     'validate', 'startPayment',
@@ -99,6 +102,7 @@ var edx = edx || {};
             * @returns {DonationView}
             */
             render: function() {
+                // eslint-disable-next-line no-undef
                 var html = _.template($('#donation-tpl').html())({});
                 this.$el.html(html); // xss-lint: disable=javascript-jquery-html
                 this.$amount = $('input[name="amount"]', this.$el);
@@ -238,4 +242,5 @@ var edx = edx || {};
             }).render();
         });
     });
+// eslint-disable-next-line no-undef
 }(jQuery));

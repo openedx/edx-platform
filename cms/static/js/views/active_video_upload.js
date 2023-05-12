@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     ['underscore', 'js/models/active_video_upload', 'js/views/baseview', 'common/js/components/views/feedback_prompt',
         'edx-ui-toolkit/js/utils/html-utils'],
@@ -31,6 +32,7 @@ define(
                 _.each(
                     STATUS_CLASSES,
                     function(statusClass) {
+                        // eslint-disable-next-line eqeqeq
                         $el.toggleClass(statusClass.cls, status == statusClass.status);
                     }
                 );

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery.form', 'js/index'], function() {
     'use strict';
 

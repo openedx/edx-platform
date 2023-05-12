@@ -32,6 +32,7 @@
 
         function getDraggables(state, config) {
             if (config.hasOwnProperty('draggables') === false) {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: "config" does not have a property "draggables".');
                 state.config.foundErrors = true;
             } else if ($.isArray(config.draggables) === true) {
@@ -47,6 +48,7 @@
                     return true;
                 });
             } else {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: The type of config.draggables is no supported.');
                 state.config.foundErrors = true;
             }
@@ -54,11 +56,13 @@
 
         function getBaseImage(state, config) {
             if (config.hasOwnProperty('base_image') === false) {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: "config" does not have a property "base_image".');
                 state.config.foundErrors = true;
             } else if (typeof config.base_image === 'string') {
                 state.config.baseImage = config.base_image;
             } else {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: Property config.base_image is not of type "string".');
                 state.config.foundErrors = true;
             }
@@ -83,6 +87,7 @@
                     return true;
                 });
             } else {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: Property config.targets is not of a supported type.');
                 state.config.foundErrors = true;
             }
@@ -90,6 +95,7 @@
 
         function getOnePerTarget(state, config) {
             if (config.hasOwnProperty('one_per_target') === false) {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: "config" does not have a property "one_per_target".');
                 state.config.foundErrors = true;
             } else if (typeof config.one_per_target === 'string') {
@@ -98,10 +104,12 @@
                 } else if (config.one_per_target.toLowerCase() === 'false') {
                     state.config.onePerTarget = false;
                 } else {
+                    // eslint-disable-next-line no-console
                     console.log('ERROR: Property config.one_per_target can either be "true", or "false".');
                     state.config.foundErrors = true;
                 }
             } else {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: Property config.one_per_target is not of a supported type.');
                 state.config.foundErrors = true;
             }
@@ -118,10 +126,12 @@
                     } else if (config.target_outline.toLowerCase() === 'false') {
                         state.config.targetOutline = false;
                     } else {
+                        // eslint-disable-next-line no-console
                         console.log('ERROR: Property config.target_outline can either be "true", or "false".');
                         state.config.foundErrors = true;
                     }
                 } else {
+                    // eslint-disable-next-line no-console
                     console.log('ERROR: Property config.target_outline is not of a supported type.');
                     state.config.foundErrors = true;
                 }
@@ -136,6 +146,7 @@
                 if (typeof config.label_bg_color === 'string') {
                     state.config.labelBgColor = config.label_bg_color;
                 } else {
+                    // eslint-disable-next-line no-console
                     console.log('ERROR: Property config.label_bg_color is not of a supported type.');
                 }
             }
@@ -206,10 +217,12 @@
 
         function attrIsString(obj, attr) {
             if (obj.hasOwnProperty(attr) === false) {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: Attribute "obj.' + attr + '" is not present.');
 
                 return false;
             } else if (typeof obj[attr] !== 'string') {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: Attribute "obj.' + attr + '" is not a string.');
 
                 return false;
@@ -222,6 +235,7 @@
             var tempInt;
 
             if (obj.hasOwnProperty(attr) === false) {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: Attribute "obj.' + attr + '" is not present.');
 
                 return false;
@@ -230,6 +244,7 @@
             tempInt = parseInt(obj[attr], 10);
 
             if (isFinite(tempInt) === false) {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: Attribute "obj.' + attr + '" is not an integer.');
 
                 return false;
@@ -243,6 +258,7 @@
         function attrIsBoolean(obj, attr, defaultVal) {
             if (obj.hasOwnProperty(attr) === false) {
                 if (defaultVal === undefined) {
+                    // eslint-disable-next-line no-console
                     console.log('ERROR: Attribute "obj.' + attr + '" is not present.');
 
                     return false;
@@ -260,6 +276,7 @@
             } else if ((obj[attr] === 'true') || (obj[attr] === true)) {
                 obj[attr] = true;
             } else {
+                // eslint-disable-next-line no-console
                 console.log('ERROR: Attribute "obj.' + attr + '" is not a boolean.');
 
                 return false;

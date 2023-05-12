@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/shoppingcart'],
     function(AjaxHelpers) {
         'use strict';
@@ -13,6 +14,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/sh
                     el: $('.confirm-enrollment.cart-view form')
                 });
 
+                // eslint-disable-next-line no-undef
                 spyOn(view, 'responseFromServer').and.callFake(function() {});
 
                 // Spy on AJAX requests

@@ -2,6 +2,7 @@
  * This class defines a simple display view for a partition group.
  * It is expected to be backed by a Group model.
  */
+// eslint-disable-next-line no-undef
 define([
     'js/views/baseview', 'underscore', 'gettext', 'underscore.string',
     'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'

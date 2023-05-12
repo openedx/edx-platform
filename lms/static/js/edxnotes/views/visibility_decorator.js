@@ -23,6 +23,7 @@
         };
 
         cleanup = function(ids) {
+            // eslint-disable-next-line no-undef
             var list = _.clone(Annotator._instances);
             ids = ids || [];
 
@@ -74,4 +75,5 @@
             }
         };
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

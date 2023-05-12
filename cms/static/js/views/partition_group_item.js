@@ -4,6 +4,7 @@
  * of the underlying model.
  * It is expected to be backed by a Group model.
  */
+// eslint-disable-next-line no-undef
 define([
     'js/views/list_item', 'js/views/content_group_editor', 'js/views/partition_group_details',
     'gettext', 'common/js/components/utils/view_utils'

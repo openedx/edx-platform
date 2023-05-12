@@ -40,4 +40,5 @@ var edx = edx || {};
             }
         }
     });
+// eslint-disable-next-line no-undef
 }($, _, Backbone));

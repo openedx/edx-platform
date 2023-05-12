@@ -8,6 +8,7 @@
             initialize = function(template) {
                 setFixtures(template);
                 $el = $('.collapsible');
+                // eslint-disable-next-line no-undef
                 Collapsible.setCollapsibles($el);
             },
             disableFx = function() {
@@ -97,13 +98,16 @@
 
                 initialize(html);
 
+                // eslint-disable-next-line no-undef
                 event = jQuery.Event('click', {
                     target: $el.find('.full').get(0)
                 });
 
+                // eslint-disable-next-line no-undef
                 Collapsible.toggleFull(event, 'See full output', 'Hide output');
                 assertChanges('opened', 'full', 'See full output', 'Hide output');
 
+                // eslint-disable-next-line no-undef
                 Collapsible.toggleFull(event, 'See full output', 'Hide output');
                 assertChanges('closed', 'full', 'See full output', 'Hide output');
             });
@@ -113,13 +117,16 @@
 
                 initialize(html_custom);
 
+                // eslint-disable-next-line no-undef
                 event = jQuery.Event('click', {
                     target: $el.find('.full-custom').get(0)
                 });
 
+                // eslint-disable-next-line no-undef
                 Collapsible.toggleFull(event, 'Show shortform-custom', 'Hide shortform-custom');
                 assertChanges('opened', 'full-custom', 'Show shortform-custom', 'Hide shortform-custom');
 
+                // eslint-disable-next-line no-undef
                 Collapsible.toggleFull(event, 'Show shortform-custom', 'Hide shortform-custom');
                 assertChanges('closed', 'full-custom', 'Show shortform-custom', 'Hide shortform-custom');
             });

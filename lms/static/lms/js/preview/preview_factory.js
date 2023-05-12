@@ -77,4 +77,5 @@
                 }
             };
         });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

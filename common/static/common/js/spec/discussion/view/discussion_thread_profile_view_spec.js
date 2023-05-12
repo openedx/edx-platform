@@ -35,6 +35,7 @@
             return thread;
         };
         spyConvertMath = function(view) {
+            // eslint-disable-next-line no-undef
             return spyOn(view, 'convertMath').and.callFake(function() {
                 return this.model.set('markdownBody', this.model.get('body'));
             });

@@ -6,7 +6,9 @@
         var state;
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer('video_all.html');
+            // eslint-disable-next-line no-undef
             window.analytics = jasmine.createSpyObj('analytics', ['track']);
         });
 
@@ -21,7 +23,7 @@
                 // eslint-disable-next-line object-curly-spacing
                 { source: 'linkedin' },
             ];
-            // eslint-disable-next-line object-curly-spacing
+            /* eslint-disable-next-line object-curly-spacing, no-undef */
             _.each(testCases, ({ source }) => {
                 it(source, () => {
                     var siteShareButton = $(`.social-share-link[data-source="${source}"]`);

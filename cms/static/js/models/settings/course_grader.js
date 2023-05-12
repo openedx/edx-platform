@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
     var CourseGrader = Backbone.Model.extend({
         defaults: {
@@ -28,6 +29,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                     errors.type = gettext('The assignment type must have a name.');
                 } else {
                 // FIXME somehow this.collection is unbound sometimes. I can't track down when
+                    // eslint-disable-next-line eqeqeq
                     var existing = this.collection && this.collection.some(function(other) { return (other.cid != this.cid) && (other.get('type') == attrs.type); }, this);
                     if (existing) {
                         errors.type = gettext("There's already another assignment type with this name.");

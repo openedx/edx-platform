@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone', 'jquery', 'underscore',
     'learner_profile/js/spec_helpers/helpers',
@@ -49,6 +50,7 @@ function(Backbone, $, _, LearnerProfileHelpers, BadgeView) {
         it('click on share button calls createModal function', function() {
             var shareButton;
             view = createView(true);
+            // eslint-disable-next-line no-undef
             spyOn(view, 'createModal');
             view.delegateEvents();
             expect(view.context.ownProfile).toBeTruthy();
@@ -72,6 +74,7 @@ function(Backbone, $, _, LearnerProfileHelpers, BadgeView) {
             shareButton.click();
             // Note: this element should have appeared in the dom during: shareButton.click();
             $modalElement = $('.badges-modal');
+            // eslint-disable-next-line no-undef
             jasmine.waitUntil(function() {
                 return $modalElement.is(':visible');
             }).always(done);

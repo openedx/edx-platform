@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'js/spec/edxnotes/helpers', 'js/edxnotes/collections/notes'
 ], function(Helpers, NotesCollection) {

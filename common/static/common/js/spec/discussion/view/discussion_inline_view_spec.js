@@ -28,10 +28,13 @@
                 + '</div>'
             );
             DiscussionSpecHelper.setUnderscoreFixtures();
+            // eslint-disable-next-line no-undef
             this.ajaxSpy = spyOn($, 'ajax');
 
             // Don't attempt to render markdown
+            // eslint-disable-next-line no-undef
             spyOn(DiscussionUtil, 'makeWmdEditor');
+            // eslint-disable-next-line no-undef
             spyOn(DiscussionThreadShowView.prototype, 'convertMath');
         });
 

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/edxnotes/collections/tabs',
     'js/edxnotes/views/tabs_list'

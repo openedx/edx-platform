@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator',
     'js/spec/edxnotes/helpers'
@@ -28,6 +29,7 @@ define([
 
         it('can initialize Notes if it visibility equals True', function() {
             var note = VisibilityDecorator.factory(this.wrapper, params, true);
+            // eslint-disable-next-line no-undef
             expect(note).toEqual(jasmine.any(Annotator));
         });
 

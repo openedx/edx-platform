@@ -38,7 +38,9 @@ var edx = edx || {};
                 });
             });
 
+            // eslint-disable-next-line no-undef
             $('#next_step_button').on('click', _.bind(this.nextStep, this));
         }
     });
+// eslint-disable-next-line no-undef
 }(jQuery));

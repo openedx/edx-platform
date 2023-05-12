@@ -96,6 +96,7 @@
                 state.videoQualityControl.el.on('click',
                     state.videoQualityControl.toggleQuality
                 );
+                // eslint-disable-next-line no-undef
                 state.el.on('play.quality', _.once(
                     state.videoQualityControl.fetchAvailableQualities
                 ));
@@ -130,6 +131,7 @@
             function fetchAvailableQualities() {
                 var qualities = this.videoPlayer.player.getAvailableQualityLevels();
 
+                // eslint-disable-next-line no-undef
                 this.config.availableHDQualities = _.intersection(
                     qualities, ['highres', 'hd1080', 'hd720']
                 );
@@ -150,6 +152,7 @@
             function onQualityChange(value) {
                 var controlStateStr;
                 this.videoQualityControl.quality = value;
+                // eslint-disable-next-line no-undef
                 if (_.contains(this.config.availableHDQualities, value)) {
                     controlStateStr = gettext('on');
                     this.videoQualityControl.el
@@ -170,6 +173,7 @@
             function toggleQuality(event) {
                 var newQuality,
                     value = this.videoQualityControl.quality,
+                    // eslint-disable-next-line no-undef
                     isHD = _.contains(this.config.availableHDQualities, value);
 
                 event.preventDefault();

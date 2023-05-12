@@ -2,6 +2,7 @@
  * This class defines a list view for content experiment group configurations.
  * It is expected to be backed by a GroupConfiguration collection.
  */
+// eslint-disable-next-line no-undef
 define([
     'js/views/list', 'js/views/group_configuration_item', 'gettext'
 ], function(ListView, GroupConfigurationItemView, gettext) {

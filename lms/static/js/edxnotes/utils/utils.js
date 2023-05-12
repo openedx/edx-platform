@@ -23,4 +23,5 @@
             nl2br: nl2br
         };
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

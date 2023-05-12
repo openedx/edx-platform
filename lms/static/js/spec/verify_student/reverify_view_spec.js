@@ -1,6 +1,7 @@
 /**
 * Tests for the reverification view.
 * */
+// eslint-disable-next-line no-undef
 define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/views/review_photos_step_view',
     'js/verify_student/views/reverify_view'],
 function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {
@@ -43,7 +44,9 @@ function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {
         };
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'trackLink']);
+            // eslint-disable-next-line no-undef
             navigator.getUserMedia = jasmine.createSpy();
 
             setFixtures('<div id="reverify-container"></div>');

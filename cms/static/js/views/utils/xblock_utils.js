@@ -1,6 +1,7 @@
 /**
  * Provides utilities for views to work with xblocks.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_utils', 'js/utils/module',
     'js/models/xblock_info', 'edx-ui-toolkit/js/utils/string-utils'],
 function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
@@ -52,8 +53,9 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         return ViewUtils.runOperationShowingMessage(gettext('Adding'),
             function() {
                 var addOperation = $.Deferred();
+                // eslint-disable-next-line no-undef
                 analytics.track('Created a ' + category, {
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-undef */
                     course: course_location_analytics,
                     display_name: displayName
                 });

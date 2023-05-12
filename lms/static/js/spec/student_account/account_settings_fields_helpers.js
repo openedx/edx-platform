@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone',
     'jquery',
     'underscore',
@@ -11,6 +12,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers) {
     var verifyAuthField = function(view, data, requests) {
         var selector = '.u-field-value .u-field-link-title-' + view.options.valueAttribute;
 
+        // eslint-disable-next-line no-undef
         spyOn(view, 'redirect_to');
 
         FieldViewsSpecHelpers.expectTitleAndMessageToContain(view, data.title, data.helpMessage);

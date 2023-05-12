@@ -95,7 +95,7 @@
 
                     _.each(sortedTagNames, function(tagName) {
                         noteGroup = notesByTag[tagName];
-                        // eslint-disable-next-line no-shadow
+                        /* eslint-disable-next-line no-shadow, no-undef */
                         var tagTitle = interpolate_text(
                             '{tagName} ({numberOfNotesWithTag})',
                             {tagName: tagName, numberOfNotesWithTag: noteGroup.length}
@@ -136,4 +136,5 @@
 
         return TagsView;
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

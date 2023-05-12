@@ -90,4 +90,5 @@ var edx = edx || {};
         edx.dashboard.dropdown.bindToggleButtons('.action-more');
         edx.dashboard.dropdown.bindToggleButtons('.js-entitlement-action-more');
     });
+// eslint-disable-next-line no-undef
 }(jQuery));

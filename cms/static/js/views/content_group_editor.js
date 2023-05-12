@@ -2,6 +2,7 @@
  * This class defines an editing view for content groups.
  * It is expected to be backed by a Group model.
  */
+// eslint-disable-next-line no-undef
 define([
     'js/views/list_item_editor', 'underscore'
 ],

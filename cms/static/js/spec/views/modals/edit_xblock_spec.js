@@ -36,6 +36,7 @@ describe('EditXBlockModal', function() {
 
         beforeEach(function() {
             EditHelpers.installMockXBlock();
+            // eslint-disable-next-line no-undef
             spyOn(Backbone, 'trigger').and.callThrough();
         });
 
@@ -81,6 +82,7 @@ describe('EditXBlockModal', function() {
             modal.editorView.notifyRuntime('save', {state: 'end'});
             expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
             expect(refreshed).toBeTruthy();
+            // eslint-disable-next-line no-undef
             expect(Backbone.trigger).toHaveBeenCalledWith('xblock:editorModalHidden');
         });
 
@@ -94,6 +96,7 @@ describe('EditXBlockModal', function() {
             modal.editorView.notifyRuntime('cancel');
             expect(EditHelpers.isShowingModal(modal)).toBeFalsy();
             expect(refreshed).toBeFalsy();
+            // eslint-disable-next-line no-undef
             expect(Backbone.trigger).toHaveBeenCalledWith('xblock:editorModalHidden');
         });
 

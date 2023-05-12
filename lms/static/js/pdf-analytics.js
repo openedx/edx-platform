@@ -1,9 +1,10 @@
 // eslint-disable-next-line camelcase
 function sendLog(name, data, event_type) {
     var message = data || {};
+    // eslint-disable-next-line no-undef
     message.chapter = PDF_URL || '';
     message.name = 'textbook.pdf.' + name;
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-undef */
     Logger.log(event_type || message.name, message);
 }
 
@@ -16,6 +17,7 @@ $(function() {
 
     $(window).bind('pagechange', function(event) {
     // log every page render
+        // eslint-disable-next-line no-undef
         var page = PDFViewerApplication.page;
         // eslint-disable-next-line camelcase
         var old_page = event.originalEvent.previousPageNumber;
@@ -35,11 +37,13 @@ $(function() {
 
     $('#viewerContainer').bind('DOMMouseScroll mousewheel', function(event) {
         scroll.timeStamp = event.timeStamp;
+        // eslint-disable-next-line no-undef
         scroll.direction = PDFViewerApplication.pdfViewer.scroll.down ? 'down' : 'up';
     });
 });
 
 $('#viewThumbnail,#sidebarToggle').on('click', function() {
+    // eslint-disable-next-line no-undef
     sendLog('thumbnails.toggled', {page: PDFViewerApplication.page});
 });
 
@@ -48,18 +52,22 @@ $('#thumbnailView a').live('click', function() {
 });
 
 $('#viewOutline').on('click', function() {
+    // eslint-disable-next-line no-undef
     sendLog('outline.toggled', {page: PDFViewerApplication.page});
 });
 
 $('#previous').on('click', function() {
+    // eslint-disable-next-line no-undef
     sendLog('page.navigatednext', {type: 'prevpage', new: PDFViewerApplication.page - 1}, 'book');
 });
 
 $('#next').on('click', function() {
+    // eslint-disable-next-line no-undef
     sendLog('page.navigatednext', {type: 'nextpage', new: PDFViewerApplication.page + 1}, 'book');
 });
 
 $('#zoomIn,#zoomOut').on('click', function() {
+    /* eslint-disable-next-line eqeqeq, no-undef */
     sendLog('zoom.buttons.changed', {direction: $(this).attr('id') == 'zoomIn' ? 'in' : 'out', page: PDFViewerApplication.page});
 });
 
@@ -73,6 +81,7 @@ $(window).bind('scalechange', function(event) {
     var amount = event.originalEvent.scale;
     // eslint-disable-next-line camelcase
     if (amount !== old_amount) {
+        // eslint-disable-next-line no-undef
         sendLog('display.scaled', {amount: amount, page: PDFViewerApplication.page});
         // eslint-disable-next-line camelcase
         old_amount = amount;
@@ -80,13 +89,14 @@ $(window).bind('scalechange', function(event) {
 });
 
 $('#scaleSelect').on('change', function() {
+    // eslint-disable-next-line no-undef
     sendLog('zoom.menu.changed', {amount: $('#scaleSelect').val(), page: PDFViewerApplication.page});
 });
 
 // eslint-disable-next-line camelcase
 var search_event = null;
 $(window).bind('find findhighlightallchange findagain findcasesensitivitychange', function(event) {
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, eqeqeq */
     if (search_event && event.type == 'find') {
         clearTimeout(search_event);
     }
@@ -94,6 +104,7 @@ $(window).bind('find findhighlightallchange findagain findcasesensitivitychange'
     search_event = setTimeout(function() {
         var message = event.originalEvent.detail;
         message.status = $('#findMsg').text();
+        // eslint-disable-next-line no-undef
         message.page = PDFViewerApplication.page;
         // eslint-disable-next-line camelcase
         var event_name = 'search';

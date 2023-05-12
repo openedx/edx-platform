@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone',
     'jquery',
@@ -23,7 +24,9 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
             TemplateHelpers.installTemplates([
                 'templates/fields/message_banner'
             ]);
+            // eslint-disable-next-line no-undef
             spyOn(Logger, 'log').and.returnValue($.Deferred().resolve());
+            // eslint-disable-next-line no-undef
             jasmine.addMatchers({
                 toHaveBeenCalledWithUrl: function() {
                     return {
@@ -106,6 +109,7 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
         });
 
         it('calls bookmarks list render on page_changed event', function() {
+            // eslint-disable-next-line no-undef
             var renderSpy = spyOn(BookmarksListView.prototype, 'render');
             var listView = new BookmarksListView({
                 collection: new BookmarksCollection([], {
@@ -241,6 +245,7 @@ function(Backbone, $, _, Logger, URI, AjaxHelpers, TemplateHelpers, MessageBanne
             var requests = AjaxHelpers.requests(this);
             var bookmarksView = createBookmarksView();
             var url;
+            // eslint-disable-next-line no-undef
             spyOn(bookmarksView, 'visitBookmark');
             bookmarksView.showBookmarks();
             AjaxHelpers.respondWithJson(requests, BookmarkHelpers.createBookmarksData({numBookmarksToCreate: 1}));

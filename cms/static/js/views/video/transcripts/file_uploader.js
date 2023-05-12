@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'jquery', 'backbone', 'underscore',
@@ -36,6 +37,7 @@ define(
 
                 if (tplContainer.length) {
                     if (!tpl) {
+                        // eslint-disable-next-line no-console
                         console.error('Couldn\'t load Transcripts File Upload template');
 
                         return;

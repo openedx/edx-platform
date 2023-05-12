@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'js/api_admin/views/catalog_preview',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'

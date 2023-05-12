@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['sinon', 'js/utils/drag_and_drop', 'common/js/components/views/feedback_notification',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'jquery', 'underscore'],
 function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
@@ -14,7 +15,9 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                         handleClass: '.unit-drag-handle',
                         droppableClass: 'ol.sortable-unit-list',
                         parentLocationSelector: 'li.courseware-subsection',
+                        // eslint-disable-next-line no-undef
                         refresh: jasmine.createSpy('Spy on Unit'),
+                        // eslint-disable-next-line no-undef
                         ensureChildrenRendered: jasmine.createSpy('Spy on Unit')
                     });
                 }
@@ -27,7 +30,9 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                         handleClass: '.subsection-drag-handle',
                         droppableClass: '.sortable-subsection-list',
                         parentLocationSelector: 'section',
+                        // eslint-disable-next-line no-undef
                         refresh: jasmine.createSpy('Spy on Subsection'),
+                        // eslint-disable-next-line no-undef
                         ensureChildrenRendered: jasmine.createSpy('Spy on Subsection')
                     });
                 }
@@ -179,6 +184,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
         });
         describe('onDragMove', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 this.redirectSpy = spyOn(window, 'scrollBy').and.callThrough();
             });
             it('adds the correct CSS class to the drop destination', function() {
@@ -239,6 +245,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
         });
         describe('onDragEnd', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 this.reorderSpy = spyOn(ContentDragger, 'handleReorder');
             });
             afterEach(function() {
@@ -282,6 +289,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 expect($('#subsection-1')).not.toHaveClass('expand-on-drop');
             });
             it('expands a collapsed element when something is dropped in it', function() {
+                // eslint-disable-next-line no-undef
                 var expandElementSpy = spyOn(ContentDragger, 'expandElement').and.callThrough();
                 expect(expandElementSpy).not.toHaveBeenCalled();
                 expect($('#subsection-2').data('ensureChildrenRendered')).not.toHaveBeenCalled();
@@ -304,12 +312,14 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
         });
         describe('AJAX', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 this.savingSpies = jasmine.stealth.spyOnConstructor(Notification, 'Mini', ['show', 'hide']);
                 this.savingSpies.show.and.returnValue(this.savingSpies);
                 this.clock = sinon.useFakeTimers();
             });
             afterEach(function() {
                 this.clock.restore();
+                // eslint-disable-next-line no-undef
                 jasmine.stealth.clearSpies();
             });
             it('should send an update on reorder from one parent to another', function() {

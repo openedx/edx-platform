@@ -6,10 +6,13 @@
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(['iPad']);
 
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer();
+            // eslint-disable-next-line no-undef
             spyOn(state.videoCommands, 'execute');
         });
 
@@ -41,13 +44,16 @@
         ];
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             jasmine.stubRequests();
+            // eslint-disable-next-line no-undef
             spyOn(window.YT, 'Player').and.callThrough();
         });
 
         it('works correctly on calling proper methods', function() {
             var btnPlay;
 
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer();
             btnPlay = state.el.find('.btn-play');
 
@@ -79,6 +85,7 @@
                 var btnPlay;
 
                 window.onTouchBasedDevice.and.returnValue(data.isTouch);
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 btnPlay = state.el.find('.btn-play');
 
@@ -98,6 +105,7 @@
                     var btnPlay;
 
                     window.onTouchBasedDevice.and.returnValue([device]);
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                     btnPlay = state.el.find('.btn-play');
 
@@ -113,6 +121,7 @@
                     var btnPlay;
 
                     window.onTouchBasedDevice.and.returnValue([device]);
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                     btnPlay = state.el.find('.btn-play');
 
@@ -127,6 +136,7 @@
                     var btnPlay;
 
                     window.onTouchBasedDevice.and.returnValue([device]);
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayerYouTube();
                     btnPlay = state.el.find('.btn-play');
 

@@ -127,4 +127,5 @@
     });
 
     this.FileUploaderView = FileUploaderView;
+// eslint-disable-next-line no-undef
 }).call(this, Backbone, $, _, gettext, interpolate_text, NotificationModel, NotificationView);

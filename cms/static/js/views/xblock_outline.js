@@ -13,6 +13,7 @@
  *  - scroll_offset - the scroll offset to use for the locator being shown
  *  - edit_display_name - true if the shown xblock's display name should be in inline edit mode
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
     'js/views/utils/xblock_utils', 'js/views/xblock_string_field_editor',
     'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'],
@@ -258,6 +259,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 if (locatorElement.length > 0) {
                     ViewUtils.setScrollOffset(locatorElement, scrollOffset);
                 } else {
+                    // eslint-disable-next-line no-console
                     console.error('Failed to show item with locator ' + locatorToShow + '');
                 }
                 if (editDisplayName) {

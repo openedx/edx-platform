@@ -15,6 +15,7 @@
                 return new VideoPoster(element, options);
             }
 
+            // eslint-disable-next-line no-undef
             _.bindAll(this, 'onClick', 'destroy');
             this.element = element;
             this.container = element.find('.video-player');
@@ -24,6 +25,7 @@
 
         VideoPoster.moduleName = 'Poster';
         VideoPoster.prototype = {
+            // eslint-disable-next-line no-undef
             template: _.template([
                 '<div class="video-pre-roll is-<%- type %> poster" ',
                 'style="background-image: url(<%- url %>)">',
@@ -54,6 +56,7 @@
             },
 
             onClick: function() {
+                // eslint-disable-next-line no-undef
                 if (_.isFunction(this.options.onClick)) {
                     this.options.onClick();
                 }

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js/utils/date_utils',
     'edx-ui-toolkit/js/utils/string-utils'
 ],
@@ -102,7 +103,9 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
 
                 // Throw error if there's a value for certificate_available_date
                 if (
+                    // eslint-disable-next-line eqeqeq
                     (newattrs.certificate_available_date && newattrs.certificates_display_behavior != CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE)
+                        // eslint-disable-next-line eqeqeq
                         || (!newattrs.certificate_available_date && newattrs.certificates_display_behavior == CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS.END_WITH_DATE)
                 ) {
                     errors.certificates_display_behavior = StringUtils.interpolate(

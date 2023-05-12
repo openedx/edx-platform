@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/views/baseview', 'underscore'], function(BaseView, _) {
     var AbstractEditor = BaseView.extend({
 
@@ -91,6 +92,7 @@ define(['js/views/baseview', 'underscore'], function(BaseView, _) {
             var templateSelector = '#' + name,
                 templateText = $(templateSelector).text();
             if (!templateText) {
+                // eslint-disable-next-line no-console
                 console.error('Failed to load ' + name + ' template');
             }
             return _.template(templateText);

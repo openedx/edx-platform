@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/template_helpers'],
     function(LicenseView, LicenseModel, TemplateHelpers) {
         describe('License view', function() {
@@ -127,7 +128,9 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                 );
 
                 // try to turn on ND option
+                // eslint-disable-next-line no-undef
                 ND = this.view.$('li[data-option=ND]');
+                // eslint-disable-next-line no-undef
                 ND.click();
                 expect(this.model.get('options')).toEqual(
                     {

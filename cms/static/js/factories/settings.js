@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'js/models/settings/course_details', 'js/views/settings/main'
 ], function($, CourseDetailsModel, MainView) {

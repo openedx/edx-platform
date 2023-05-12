@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'logger', 'js/edxnotes/utils/logger'
 ], function(Logger, NotesLogger) {
@@ -9,8 +10,11 @@ define([
         };
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             spyOn(window.console, 'log');
+            // eslint-disable-next-line no-undef
             spyOn(window.console, 'error');
+            // eslint-disable-next-line no-undef
             spyOn(Logger, 'log');
         });
 
@@ -95,7 +99,9 @@ define([
             var logger = getLogger('id', 1),
                 logs, log;
 
+            // eslint-disable-next-line no-undef
             spyOn(performance, 'now').and.returnValue(1);
+            // eslint-disable-next-line no-undef
             spyOn(Date, 'now').and.returnValue(1);
             logger.time('timer');
             performance.now.and.returnValue(201);

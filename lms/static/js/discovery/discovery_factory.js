@@ -6,6 +6,7 @@
         'js/discovery/views/filter_bar', 'js/discovery/views/refine_sidebar'],
     function(Backbone, SearchState, Filters, SearchForm, CoursesListing, FilterBar, RefineSidebar) {
         return function(meanings, searchQuery, userLanguage, userTimezone) {
+            // eslint-disable-next-line no-undef
             var dispatcher = _.extend({}, Backbone.Events);
             var search = new SearchState();
             var filters = new Filters();
@@ -94,4 +95,5 @@
             }
         };
     });
+// eslint-disable-next-line no-undef
 }(define || RequireJS.define));

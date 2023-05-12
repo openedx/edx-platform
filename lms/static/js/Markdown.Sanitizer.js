@@ -44,6 +44,7 @@
     // / adapted from CODESNIPPET: A8591DBA-D1D3-11DE-947C-BA5556D89593
     // / </summary>
     function balanceTags(html) {
+        // eslint-disable-next-line eqeqeq
         if (html == '') { return ''; }
 
         var re = /<\/?\w+[^>]*(\s|$|>)/g;
@@ -53,6 +54,7 @@
 
         // no HTML tags present? nothing to do; exit now
         var tagcount = (tags || []).length;
+        // eslint-disable-next-line eqeqeq
         if (tagcount == 0) { return html; }
 
         var tagname, tag;
@@ -84,7 +86,7 @@
                 }
             }
 
-            /* eslint-disable-next-line brace-style, no-multi-assign */
+            /* eslint-disable-next-line brace-style, no-multi-assign, eqeqeq */
             if (match == -1) { needsRemoval = tagremove[ctag] = true; } // mark for removal
             else { tagpaired[match] = true; } // mark paired
         }

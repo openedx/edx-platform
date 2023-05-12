@@ -2,6 +2,7 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-undef
     define(['jquery', 'common/js/components/views/feedback', 'common/js/components/views/feedback_notification',
         'common/js/components/views/feedback_alert', 'common/js/components/views/feedback_prompt',
         'common/js/spec_helpers/view_helpers', 'sinon', 'jquery.simulate'],
@@ -14,12 +15,15 @@
         };
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             setFixtures(sandbox({
                 id: 'page-alert'
             }));
+            // eslint-disable-next-line no-undef
             appendSetFixtures(sandbox({
                 id: 'page-notification'
             }));
+            // eslint-disable-next-line no-undef
             appendSetFixtures(sandbox({
                 id: 'page-prompt'
             }));
@@ -27,6 +31,7 @@
                 id: 'system-feedback-tpl',
                 type: 'text/template'
             }).text(tpl));
+            // eslint-disable-next-line no-undef
             return jasmine.addMatchers({
                 toBeShown: function() {
                     return {
@@ -54,8 +59,11 @@
                     title: 'Portal',
                     message: 'Welcome to the Aperture Science Computer-Aided Enrichment Center'
                 };
+                // eslint-disable-next-line no-undef
                 this.renderSpy = spyOn(AlertView.Confirmation.prototype, 'render').and.callThrough();
+                // eslint-disable-next-line no-undef
                 this.showSpy = spyOn(AlertView.Confirmation.prototype, 'show').and.callThrough();
+                // eslint-disable-next-line no-undef
                 this.hideSpy = spyOn(AlertView.Confirmation.prototype, 'hide').and.callThrough();
                 // eslint-disable-next-line no-return-assign
                 return this.clock = sinon.useFakeTimers();
@@ -133,13 +141,16 @@
                         }
                     }
                 };
+                // eslint-disable-next-line no-undef
                 this.inFocusSpy = spyOn(PromptView.Confirmation.prototype, 'inFocus').and.callThrough();
+                // eslint-disable-next-line no-undef
                 this.outFocusSpy = spyOn(PromptView.Confirmation.prototype, 'outFocus').and.callThrough();
             });
             it('is focused on show', function(done) {
                 var view;
                 view = new PromptView.Confirmation(this.options).show();
                 expect(this.inFocusSpy).toHaveBeenCalled();
+                // eslint-disable-next-line no-undef
                 jasmine.waitUntil(function() {
                     return isFocused(view.$('.wrapper-prompt'));
                 }).always(done);
@@ -149,6 +160,7 @@
                 view = new PromptView.Confirmation(this.options).hide();
                 expect(this.outFocusSpy).toHaveBeenCalled();
 
+                // eslint-disable-next-line no-undef
                 jasmine.waitUntil(function() {
                     return !isFocused(view.$('.wrapper-prompt'));
                 }).always(done);
@@ -162,6 +174,7 @@
                     {keyCode: $.simulate.keyCode.TAB}
                 );
 
+                // eslint-disable-next-line no-undef
                 jasmine.waitUntil(function() {
                     return isFocused(view.$('.action-primary'));
                 }).always(done);
@@ -174,6 +187,7 @@
                     'keydown',
                     {keyCode: $.simulate.keyCode.TAB, shiftKey: true}
                 );
+                // eslint-disable-next-line no-undef
                 jasmine.waitUntil(function() {
                     return isFocused(view.$('.action-secondary'));
                 }).always(done);
@@ -201,7 +215,9 @@
         });
         xdescribe('SystemFeedback click events', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 this.primaryClickSpy = jasmine.createSpy('primaryClick');
+                // eslint-disable-next-line no-undef
                 this.secondaryClickSpy = jasmine.createSpy('secondaryClick');
                 this.view = new NotificationView.Warning({
                     title: 'Unsaved',
@@ -250,6 +266,7 @@
         });
         xdescribe('SystemFeedback not preventing events', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 this.clickSpy = jasmine.createSpy('clickSpy');
                 this.view = new AlertView.Confirmation({
                     title: "It's all good",
@@ -273,7 +290,9 @@
         });
         xdescribe('SystemFeedback multiple secondary actions', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 this.secondarySpyOne = jasmine.createSpy('secondarySpyOne');
+                // eslint-disable-next-line no-undef
                 this.secondarySpyTwo = jasmine.createSpy('secondarySpyTwo');
                 this.view = new NotificationView.Warning({
                     title: 'No Primary',
@@ -314,8 +333,10 @@
         });
         return describe('NotificationView minShown and maxShown', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 this.showSpy = spyOn(NotificationView.Confirmation.prototype, 'show');
                 this.showSpy.and.callThrough();
+                // eslint-disable-next-line no-undef
                 this.hideSpy = spyOn(NotificationView.Confirmation.prototype, 'hide');
                 this.hideSpy.and.callThrough();
                 // eslint-disable-next-line no-return-assign

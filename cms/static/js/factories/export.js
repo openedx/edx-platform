@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'domReady', 'js/views/export', 'jquery', 'gettext'
 ], function(domReady, Export, $, gettext) {

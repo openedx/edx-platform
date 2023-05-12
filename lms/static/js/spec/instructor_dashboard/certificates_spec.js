@@ -71,6 +71,7 @@ function($, AjaxHelpers) {
         });
 
         it('does not regenerate certificates if user cancels operation in confirm popup', function() {
+            // eslint-disable-next-line no-undef
             spyOn(window, 'confirm').and.returnValue(false);
             // eslint-disable-next-line camelcase
             $regenerate_certificates_button.click();
@@ -79,6 +80,7 @@ function($, AjaxHelpers) {
         });
 
         it('sends regenerate certificates request if user accepts operation in confirm popup', function() {
+            // eslint-disable-next-line no-undef
             spyOn(window, 'confirm').and.returnValue(true);
             // eslint-disable-next-line camelcase
             $regenerate_certificates_button.click();
@@ -87,6 +89,7 @@ function($, AjaxHelpers) {
         });
 
         it('sends regenerate certificates request with selected certificate statuses', function() {
+            // eslint-disable-next-line no-undef
             spyOn(window, 'confirm').and.returnValue(true);
 
             select_options(expected.selected_statuses);
@@ -97,6 +100,7 @@ function($, AjaxHelpers) {
         });
 
         it('displays error message in case of server side error', function() {
+            // eslint-disable-next-line no-undef
             spyOn(window, 'confirm').and.returnValue(true);
             select_options(expected.selected_statuses);
 
@@ -108,6 +112,7 @@ function($, AjaxHelpers) {
         });
 
         it('displays error message returned by the server in case of unsuccessful request', function() {
+            // eslint-disable-next-line no-undef
             spyOn(window, 'confirm').and.returnValue(true);
             select_options(expected.selected_statuses);
 
@@ -119,6 +124,7 @@ function($, AjaxHelpers) {
         });
 
         it('displays success message returned by the server in case of successful request', function() {
+            // eslint-disable-next-line no-undef
             spyOn(window, 'confirm').and.returnValue(true);
             select_options(expected.selected_statuses);
 

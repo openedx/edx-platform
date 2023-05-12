@@ -5,6 +5,7 @@
 (function(requirejs, require, define) {
 // HACK: this should be removed when it is safe to do so
     if (window.baseUrl) {
+        // eslint-disable-next-line no-undef
         requirejs.config({baseUrl: baseUrl});
     }
 

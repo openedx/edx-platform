@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'js/student_account/utils'],
     function($, Utils) {
         'use strict';
@@ -29,6 +30,7 @@ define(['jquery', 'js/student_account/utils'],
             });
 
             it('returns empty user information when cookie is absent', function() {
+                // eslint-disable-next-line no-undef
                 spyOn($, 'cookie').and.returnValue(null);
                 user = Utils.userFromEdxUserCookie();
                 expect(user).toEqual({});

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/view_helpers',
     'js/views/modals/move_xblock_modal', 'js/models/xblock_info'],
@@ -60,6 +61,7 @@ function($, _, AjaxHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, XBloc
                 renderViewsSpy;
             showModal();
             expect(modal.$el.find('.ui-loading.is-hidden')).not.toExist();
+            // eslint-disable-next-line no-undef
             renderViewsSpy = spyOn(modal, 'renderViews');
             expect(requests.length).toEqual(2);
             AjaxHelpers.expectRequest(requests, 'GET', OUTLINE_URL);

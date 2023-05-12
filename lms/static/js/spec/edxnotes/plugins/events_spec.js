@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec/edxnotes/helpers',
     'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
@@ -28,6 +29,7 @@ define([
                     eventStringLimit: 300
                 }
             );
+            // eslint-disable-next-line no-undef
             spyOn(Logger, 'log');
         });
 

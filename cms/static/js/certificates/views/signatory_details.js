@@ -1,5 +1,6 @@
 // Backbone Application View:  Signatory Details
 
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'underscore',

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['codemirror',
     'js/utils/modal',
     'js/utils/date_utils',
@@ -181,8 +182,9 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
             });
             this.closeEditor(false);
 
+            // eslint-disable-next-line no-undef
             analytics.track('Saved Course Update', {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-undef */
                 course: course_location_analytics,
                 date: this.dateEntry(event).val()
             });
@@ -241,8 +243,9 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                     primary: {
                         text: gettext('OK'),
                         click: function() {
+                            // eslint-disable-next-line no-undef
                             analytics.track('Deleted Course Update', {
-                                // eslint-disable-next-line camelcase
+                                /* eslint-disable-next-line camelcase, no-undef */
                                 course: course_location_analytics,
                                 date: self.dateEntry(event).val()
                             });

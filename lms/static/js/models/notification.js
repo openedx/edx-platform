@@ -42,4 +42,5 @@
     });
 
     this.NotificationModel = NotificationModel;
+// eslint-disable-next-line no-undef
 }).call(this, Backbone);

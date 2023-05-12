@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory'
 ], function($, _, Annotator, NotesFactory) {
@@ -30,8 +31,11 @@ define([
             ];
 
             highlights = _.map(annotators, function(annotator) {
+                // eslint-disable-next-line no-undef
                 spyOn(annotator, 'onHighlightClick').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(annotator, 'onHighlightMouseover').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(annotator, 'startViewerHideTimer').and.callThrough();
                 return $('<span></span>', {
                     class: 'annotator-hl',
@@ -40,7 +44,9 @@ define([
                 }).appendTo(annotator.element);
             });
 
+            // eslint-disable-next-line no-undef
             spyOn(annotators[0].plugins.Scroller, 'getIdFromLocationHash').and.returnValue('abc123');
+            // eslint-disable-next-line no-undef
             spyOn($.fn, 'unbind').and.callThrough();
         });
 

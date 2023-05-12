@@ -49,6 +49,7 @@
             toggleHandler: function(event) {
                 event.preventDefault();
                 this.visibility = !this.visibility;
+                // eslint-disable-next-line no-undef
                 AnimationUtil.triggerAnimation(this.actionToggleMessage);
                 this.toggleNotes(this.visibility);
             },
@@ -123,4 +124,5 @@
             VisibilityDecorator: VisibilityDecorator
         };
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

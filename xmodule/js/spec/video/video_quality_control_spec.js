@@ -13,6 +13,7 @@
 
         describe('constructor, YouTube mode', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayerYouTube();
                 qualityControl = state.videoQualityControl;
                 videoPlayer = state.videoPlayer;
@@ -114,6 +115,7 @@
 
         describe('constructor, HTML5 mode', function() {
             it('does not contain the quality control', function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
 
                 expect(state.el.find('.quality-control').length).toBe(0);

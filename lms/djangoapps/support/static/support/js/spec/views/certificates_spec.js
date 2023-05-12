@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
@@ -91,6 +92,7 @@ define([
             };
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             spyOn(window.history, 'pushState');
             setFixtures('<div class="certificates-content"></div>');
             view = new CertificatesView({

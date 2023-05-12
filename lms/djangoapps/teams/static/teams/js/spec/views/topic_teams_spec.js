@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone',
     'underscore',
@@ -101,6 +102,7 @@ define([
 
         it('can browse all teams', function() {
             teamsView = createTopicTeamsView();
+            // eslint-disable-next-line no-undef
             spyOn(Backbone.history, 'navigate');
             teamsView.$('.browse-teams').click();
             expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe('browse');
@@ -108,6 +110,7 @@ define([
 
         it('gives the search field focus when clicking on the search teams link', function() {
             teamsView = createTopicTeamsView();
+            // eslint-disable-next-line no-undef
             spyOn($.fn, 'focus').and.callThrough();
             teamsView.$('.search-teams').click();
             expect(teamsView.$('.search-field').first().focus).toHaveBeenCalled();
@@ -115,6 +118,7 @@ define([
 
         it('can show the create team modal', function() {
             teamsView = createTopicTeamsView();
+            // eslint-disable-next-line no-undef
             spyOn(Backbone.history, 'navigate');
             teamsView.$('a.create-team').click();
             expect(Backbone.history.navigate.calls.mostRecent().args[0]).toBe(

@@ -1,6 +1,7 @@
 /**
  * The MoveXblockModal to move XBlocks in course.
  */
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'backbone',

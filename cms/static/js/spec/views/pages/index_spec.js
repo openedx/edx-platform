@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/view_helpers', 'js/index',
@@ -32,6 +33,7 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
 
         it('can dismiss notifications', function() {
             var requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-undef
             var reloadSpy = spyOn(ViewUtils, 'reload');
             $('.dismiss-button').click();
             AjaxHelpers.expectJsonRequest(requests, 'DELETE', 'dummy_dismiss_url');
@@ -41,6 +43,7 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
 
         it('saves new courses', function() {
             var requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-undef
             var redirectSpy = spyOn(ViewUtils, 'redirect');
             $('.new-course-button').click();
             AjaxHelpers.expectJsonRequest(requests, 'GET', '/organizations');
@@ -88,6 +91,7 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
 
         it('saves new libraries', function() {
             var requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-undef
             var redirectSpy = spyOn(ViewUtils, 'redirect');
             $('.new-library-button').click();
             fillInLibraryFields('DemoX', 'DM101', 'Demo library');

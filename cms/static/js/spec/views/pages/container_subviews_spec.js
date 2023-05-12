@@ -166,10 +166,12 @@ describe('Container Subviews', function() {
         };
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             promptSpies = jasmine.stealth.spyOnConstructor(Prompt, 'Warning', ['show', 'hide']);
             promptSpies.show.and.returnValue(this.promptSpies);
         });
 
+        // eslint-disable-next-line no-undef
         afterEach(jasmine.stealth.clearSpies);
 
         it('renders correctly with private content', function() {
@@ -294,6 +296,7 @@ describe('Container Subviews', function() {
             var notificationSpy, renderPageSpy, numRequests;
             createContainerPage(this);
             notificationSpy = EditHelpers.createNotificationSpy();
+            // eslint-disable-next-line no-undef
             renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').and.callThrough();
 
             sendDiscardChangesToServer();
@@ -313,6 +316,7 @@ describe('Container Subviews', function() {
         it('does not fetch if discard changes fails', function() {
             var renderPageSpy, numRequests;
             createContainerPage(this);
+            // eslint-disable-next-line no-undef
             renderPageSpy = spyOn(containerPage.xblockPublisher, 'renderPage').and.callThrough();
 
             sendDiscardChangesToServer();

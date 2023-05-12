@@ -5,6 +5,7 @@
  * and upon save parent invokes refresh function that fetches updated model and
  * re-renders edited course outline.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     'js/views/modals/base_modal', 'date', 'js/views/utils/xblock_utils',
     'js/utils/date_utils', 'edx-ui-toolkit/js/utils/html-utils',
@@ -402,6 +403,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getValue: function() {
+            // eslint-disable-next-line radix
             return parseInt(this.$('#due_in').val());
         },
 

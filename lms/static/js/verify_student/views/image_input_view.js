@@ -110,4 +110,5 @@ var edx = edx || {};
                 .attr('aria-disabled', !isEnabled);
         }
     });
+// eslint-disable-next-line no-undef
 }(jQuery, _, Backbone, gettext));

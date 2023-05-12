@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'js/collections/group_configuration', 'js/models/group_configuration', 'js/views/pages/group_configurations'
 ], function(GroupConfigurationCollection, GroupConfigurationModel, GroupConfigurationsPage) {

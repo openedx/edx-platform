@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
     function(AjaxHelpers) {
         describe('edx.ccx.schedule.ScheduleView', function() {
@@ -11,9 +12,9 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                 appendSetFixtures(
                     '<script id="schedule_template" type="text/template" >' + scheduleFixture + '</script>'
                 );
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-undef */
                 schedule_template = _.template($('#schedule_template').html());
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-undef */
                 save_url = 'save_ccx';
 
                 $.fn.leanModal = function(param) {
@@ -206,11 +207,15 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             });
 
             it('saves schedule changes', function() {
+                // eslint-disable-next-line no-undef
                 requests = AjaxHelpers.requests(this);
                 view.save();
+                // eslint-disable-next-line no-undef
                 expect(requests.length).toEqual(1);
+                // eslint-disable-next-line no-undef
                 AjaxHelpers.expectJsonRequest(requests, 'POST', 'save_ccx', view.schedule);
                 expect($('#dirty-schedule #save-changes').text()).toEqual('Saving');
+                // eslint-disable-next-line no-undef
                 AjaxHelpers.respondWithJson(requests, {
                     data: view.schedule
                 });
@@ -219,8 +224,10 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             });
 
             it('displays an error if the sync fails', function() {
+                // eslint-disable-next-line no-undef
                 requests = AjaxHelpers.requests(this);
                 view.save();
+                // eslint-disable-next-line no-undef
                 requests[0].respond(500);
                 expect($('#ajax-error')).toHaveCss({display: 'block'});
             });

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'backbone',
@@ -38,9 +39,12 @@ define([
         beforeEach(function() {
             setFixtures('<div id="page-prompt"></div>');
             PageHelpers.preventBackboneChangingUrl();
+            // eslint-disable-next-line no-undef
             spyOn(Backbone.history, 'navigate');
+            // eslint-disable-next-line no-undef
             spyOn(TeamUtils, 'showMessage');
             view = createInstructorTools().render();
+            // eslint-disable-next-line no-undef
             spyOn(view.teamEvents, 'trigger');
         });
 

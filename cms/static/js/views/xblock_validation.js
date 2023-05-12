@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'js/views/baseview', 'gettext', 'edx-ui-toolkit/js/utils/html-utils'],
     function($, _, BaseView, gettext, HtmlUtils) {
         'use strict';

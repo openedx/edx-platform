@@ -3,6 +3,7 @@
  * Subsection, and Unit within the Unit Outline component on the unit
  * page.
  */
+// eslint-disable-next-line no-undef
 define(['underscore', 'js/views/xblock_outline'],
     function(_, XBlockOutlineView) {
         var UnitOutlineChildView = XBlockOutlineView.extend({

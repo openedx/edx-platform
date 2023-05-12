@@ -13,6 +13,7 @@
          */
         var Descriptor = function(element) {
             this.element = element;
+            // eslint-disable-next-line no-undef
             this.update = _.bind(this.update, this);
         };
 
@@ -91,6 +92,7 @@
             // eslint-disable-next-line consistent-return
             return module;
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('Unable to load ' + moduleType + ': ' + error.message);
         }
     };

@@ -81,6 +81,7 @@
         triggerVoteEvent = function(view, event, expectedUrl) {
             var deferred;
             deferred = $.Deferred();
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {
                 expect(params.url.toString()).toEqual(expectedUrl);
                 return deferred;
@@ -114,6 +115,7 @@
 
         DiscussionViewSpecHelper.checkButtonEvents = function(view, viewFunc, buttonSelector) {
             var button, spy;
+            // eslint-disable-next-line no-undef
             spy = spyOn(view, viewFunc);
             button = view.$el.find(buttonSelector);
             button.click();

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone'],
     function(Backbone) {
         'use strict';
@@ -33,11 +34,13 @@ define(['backbone'],
             };
 
             // Stub out the Backbone router so that the browser doesn't actually navigate
+            // eslint-disable-next-line no-undef
             spyOn(Backbone.history, '_updateHash').and.callFake(function(location, fragment) {
                 history.currentFragment = fragment;
             });
 
             // Stub out getHash so that Backbone thinks that the browser has navigated
+            // eslint-disable-next-line no-undef
             spyOn(Backbone.history, 'getHash').and.callFake(function() {
                 return history.currentFragment;
             });

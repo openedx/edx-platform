@@ -61,8 +61,10 @@ var edx = edx || {};
         },
 
         _getPaymentButtonText: function(processorName) {
+            // eslint-disable-next-line eqeqeq
             if (processorName.toLowerCase().substr(0, 11) == 'cybersource') {
                 return gettext('Checkout');
+            // eslint-disable-next-line eqeqeq
             } else if (processorName.toLowerCase() == 'paypal') {
                 return gettext('Checkout with PayPal');
             } else {
@@ -283,4 +285,5 @@ var edx = edx || {};
         }
 
     });
+// eslint-disable-next-line no-undef
 }(jQuery, _, gettext, interpolate_text));

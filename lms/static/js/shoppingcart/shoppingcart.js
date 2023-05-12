@@ -44,6 +44,7 @@ var edx = edx || {};
             // eslint-disable-next-line no-shadow
             initialize: function(params) {
                 this.$el = params.el;
+                // eslint-disable-next-line no-undef
                 _.bindAll(view,
                     'submit', 'responseFromServer',
                     'submitPaymentForm', 'errorFromServer'
@@ -84,6 +85,7 @@ var edx = edx || {};
             * @param {boolean} data.is_course_enrollment_closed
             */
             responseFromServer: function(data) {
+                // eslint-disable-next-line eqeqeq
                 if (data.is_course_enrollment_closed == true) {
                     location.href = '/shoppingcart';
                 } else {
@@ -122,6 +124,7 @@ var edx = edx || {};
             // before going to make payment
             // if exists then trigger click event of the apply code button
             var code = $('div.code-input input#input_code').val();
+            // eslint-disable-next-line eqeqeq
             if (typeof code !== 'undefined' && code != '') {
                 $('div.code-input #submit-code').trigger('click');
                 return false;
@@ -132,4 +135,5 @@ var edx = edx || {};
             }).submit(event);
         });
     });
+// eslint-disable-next-line no-undef
 }(jQuery));

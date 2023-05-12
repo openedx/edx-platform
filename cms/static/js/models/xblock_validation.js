@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'gettext', 'underscore'], function(Backbone, gettext, _) {
     /**
      * Model for xblock validation messages as displayed in Studio.

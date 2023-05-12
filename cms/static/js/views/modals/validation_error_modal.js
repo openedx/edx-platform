@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
     function($, _, gettext, BaseModal) {
         var ValidationErrorModal = BaseModal.extend({

@@ -330,6 +330,7 @@ mind, or whether to act, and in acting, to live."
                             msg = ngettext('%(value)s second', '%(value)s seconds', value);
                             break;
                         }
+                        // eslint-disable-next-line no-undef
                         return interpolate(msg, {value: value}, true);
                     };
 

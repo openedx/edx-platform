@@ -15,11 +15,13 @@ describe('Tests for accessibility_tools.js', function() {
         beforeEach(function() {
             var $focusedElementBeforeModal;
             loadFixtures('js/fixtures/dashboard-fixture.html');
+            // eslint-disable-next-line no-undef
             accessible_modal('#trigger', '#close-modal', '#modalId', '#mainPageId');
             $('#trigger').click();
         });
 
         it('sets focusedElementBeforeModal to trigger', function() {
+            // eslint-disable-next-line no-undef
             expect($focusedElementBeforeModal).toHaveAttr('id', 'trigger');
         });
 
@@ -87,6 +89,7 @@ describe('Tests for accessibility_tools.js', function() {
             // for some reason, toBeFocused tests don't pass with js-test-tool
             // (they do when run locally on browsers), so we're skipping them temporarily
             xit('returns focus to focusedElementBeforeModal', function() {
+                // eslint-disable-next-line no-undef
                 expect(focusedElementBeforeModal).toBeFocused();
             });
         });

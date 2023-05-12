@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/dashboard/dropdown', 'jquery.simulate'],
     function() {
         'use strict';
@@ -16,6 +17,7 @@ define(['js/dashboard/dropdown', 'jquery.simulate'],
                 expect($(dropdownSelector)).not.toBeVisible();
             },
             waitForElementToBeFocused = function(element, done) {
+                // eslint-disable-next-line no-undef
                 jasmine.waitUntil(function() {
                     return element === document.activeElement;
                 }).always(done);

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'js/models/xblock_info',
     'js/views/paged_container', 'js/views/paging_header',
     'common/js/components/views/paging_footer', 'js/views/xblock'],
@@ -78,6 +79,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
         beforeEach(function() {
             pagingContainer = new MockPagingView({
                 page_size: PAGE_SIZE,
+                // eslint-disable-next-line no-undef
                 page: jasmine.createSpyObj('page', ['updatePreviewButton', 'renderAddXBlockComponents'])
             });
         });
@@ -526,6 +528,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
                 testSendsAjax(false);
 
                 it('should trigger render on success', function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(pagingContainer, 'render');
                     var requests = AjaxHelpers.requests(this);
 
@@ -536,6 +539,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
                 });
 
                 it('should not trigger render on failure', function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(pagingContainer, 'render');
                     var requests = AjaxHelpers.requests(this);
 
@@ -549,6 +553,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
                     var requests = AjaxHelpers.requests(this);
                     pagingContainer.setPage(0);
                     respondWithMockPage(requests);
+                    // eslint-disable-next-line no-undef
                     spyOn(pagingContainer, 'render');
                     var mockXBlockInfo = new XBlockInfo({id: 'mock-location'});
                     var mockXBlockView = new XBlockView({model: mockXBlockInfo});

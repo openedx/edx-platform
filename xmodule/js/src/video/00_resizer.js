@@ -28,6 +28,7 @@
                     config = $.extend(true, {}, config, params);
 
                     if (!config.element) {
+                        // eslint-disable-next-line no-console
                         console.log(
                             'Required parameter `element` is not passed.'
                         );
@@ -117,6 +118,7 @@
                 };
 
                 var setMode = function(param) {
+                    // eslint-disable-next-line no-undef
                     if (_.isString(param)) {
                         mode = param;
                         align();
@@ -135,6 +137,7 @@
                     if ($.isFunction(func)) {
                         callbacksList.push(func);
                     } else {
+                        // eslint-disable-next-line no-console
                         console.error('[Video info]: TypeError: Argument is not a function.');
                     }
 
@@ -150,6 +153,7 @@
 
                         addCallback(decorator);
                     } else {
+                        // eslint-disable-next-line no-console
                         console.error('TypeError: Argument is not a function.');
                     }
 
@@ -185,6 +189,7 @@
                 };
 
                 var addDelta = function(value, side) {
+                    // eslint-disable-next-line no-undef
                     if (_.isNumber(value) && _.isNumber(delta[side])) {
                         delta[side] += value;
                     }
@@ -193,6 +198,7 @@
                 };
 
                 var substractDelta = function(value, side) {
+                    // eslint-disable-next-line no-undef
                     if (_.isNumber(value) && _.isNumber(delta[side])) {
                         delta[side] -= value;
                     }

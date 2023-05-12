@@ -13,6 +13,7 @@
         }
 
         this.hide();
+        // eslint-disable-next-line no-undef
         _.bindAll(this, 'show', 'hide', 'showTooltip', 'moveTooltip', 'hideTooltip', 'click');
         this.bindEvents();
     };

@@ -25,6 +25,7 @@
         // eslint-disable-next-line no-shadow
         openSubmenuMouse = function(menuSubmenuItem) {
             menuSubmenuItem.mouseover();
+            // eslint-disable-next-line no-undef
             jasmine.clock().tick(200);
             expect(menuSubmenuItem).toHaveClass('is-opened');
         };
@@ -39,6 +40,7 @@
         // eslint-disable-next-line no-shadow
         closeSubmenuMouse = function(menuSubmenuItem) {
             menuSubmenuItem.mouseleave();
+            // eslint-disable-next-line no-undef
             jasmine.clock().tick(200);
             expect(menuSubmenuItem).not.toHaveClass('is-opened');
         };
@@ -51,9 +53,11 @@
         };
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             jasmine.clock().install();
             // $.cookie is mocked, make sure we have a state with an unmuted volume.
             $.cookie.and.returnValue('100');
+            // eslint-disable-next-line no-undef
             jasmine.addMatchers({
                 toHaveCorrectLabels: function() {
                     return {
@@ -74,11 +78,13 @@
             _.result(state.storage, 'clear');
             _.result($('video').data('contextmenu'), 'destroy');
             _.result(state.videoPlayer, 'destroy');
+            // eslint-disable-next-line no-undef
             jasmine.clock().uninstall();
         });
 
         describe('constructor', function() {
             it('the structure should be created on first `contextmenu` call', function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 expect(menu).not.toExist();
                 openMenu();
@@ -105,6 +111,7 @@
             });
 
             it('add ARIA attributes to menu, menu items, submenu and submenu items', function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 openMenu();
                 // Menu and its items.
@@ -131,6 +138,7 @@
             });
 
             it('is not used by Youtube type of video player', function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer('video.html');
                 expect($('video, iframe')).not.toHaveData('contextmenu');
             });
@@ -138,6 +146,7 @@
 
         describe('methods:', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 openMenu();
             });
@@ -177,7 +186,9 @@
 
         describe('when video is right-clicked', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
+                // eslint-disable-next-line no-undef
                 jasmine.mockFullscreenAPI();
                 openMenu();
             });
@@ -211,6 +222,7 @@
             });
 
             it('mouse right-clicking inside video but outside of context menu will not close it', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(menu.data('menu'), 'pointInContainerBox').and.returnValue(true);
                 overlay.trigger('contextmenu');
                 expect(menu).toHaveClass('is-opened');
@@ -218,6 +230,7 @@
             });
 
             it('mouse right-clicking inside video but outside of context menu will close submenus', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(menu.data('menu'), 'pointInContainerBox').and.returnValue(true);
                 openSubmenuMouse(menuSubmenuItem);
                 expect(menuSubmenuItem).toHaveClass('is-opened');
@@ -227,11 +240,14 @@
 
             it('mouse left/right-clicking behaves as expected on play/pause menu item', function() {
                 var menuItem = menuItems.first();
+                // eslint-disable-next-line no-undef
                 spyOn(state.videoPlayer, 'isPlaying');
+                // eslint-disable-next-line no-undef
                 spyOn(state.videoPlayer, 'play').and.callFake(function() {
                     state.videoPlayer.isPlaying.and.returnValue(true);
                     state.el.trigger('play');
                 });
+                // eslint-disable-next-line no-undef
                 spyOn(state.videoPlayer, 'pause').and.callFake(function() {
                     state.videoPlayer.isPlaying.and.returnValue(false);
                     state.el.trigger('pause');
@@ -327,6 +343,7 @@
 
         describe('Keyboard interactions', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 openMenu();
             });

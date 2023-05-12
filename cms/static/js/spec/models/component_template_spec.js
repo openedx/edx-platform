@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/models/component_template'],
     function(ComponentTemplate) {
         describe('ComponentTemplates', function() {

@@ -1,6 +1,7 @@
 /**
  * MoveXBlockBreadcrumb show breadcrumbs to move back to parent.
  */
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'backbone', 'underscore', 'gettext',
     'edx-ui-toolkit/js/utils/html-utils',

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
     'common/js/spec_helpers/view_helpers', 'js/models/course', 'js/models/group_configuration', 'js/models/group',
@@ -152,6 +153,7 @@ define([
             revision: 'course_rev'
         });
 
+        // eslint-disable-next-line no-undef
         jasmine.addMatchers({
             toContainText: function() {
                 return {
@@ -452,6 +454,7 @@ define([
         });
 
         it('should be removed on cancel if it is a new item', function() {
+            // eslint-disable-next-line no-undef
             spyOn(this.model, 'isNew').and.returnValue(true);
             setValuesToInputs(this.view, {
                 inputName: 'New Configuration',

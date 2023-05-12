@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/views/validation',
     'jquery',
     'underscore',
@@ -143,8 +144,9 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                     var message = gettext('No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.'); // eslint-disable-line max-len
                     self.render();
                     self.showSavedBar(title, message);
+                    // eslint-disable-next-line no-undef
                     analytics.track('Saved Advanced Settings', {
-                        // eslint-disable-next-line camelcase
+                        /* eslint-disable-next-line camelcase, no-undef */
                         course: course_location_analytics
                     });
                 },

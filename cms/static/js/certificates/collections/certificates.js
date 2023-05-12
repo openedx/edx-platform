@@ -1,5 +1,6 @@
 // Backbone.js Application Collection: Certificates
 
+// eslint-disable-next-line no-undef
 define([
     'backbone',
     'gettext',

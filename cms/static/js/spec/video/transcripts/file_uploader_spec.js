@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'jquery', 'underscore', 'backbone',
@@ -30,6 +31,7 @@ define(
                     ).text(fileUploadTemplate)
                 );
 
+                // eslint-disable-next-line no-undef
                 var messenger = jasmine.createSpyObj(
                         'MessageManager',
                         ['render', 'showError', 'hideError']
@@ -40,6 +42,7 @@ define(
                     .append('<div class="transcripts-file-uploader" />')
                     .append('<a class="setting-upload" href="#">Upload</a>');
 
+                // eslint-disable-next-line no-undef
                 spyOn(FileUploader.prototype, 'render').and.callThrough();
 
                 view = new FileUploader({
@@ -56,14 +59,17 @@ define(
 
             describe('Render', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(_, 'template').and.callThrough();
                 });
 
                 it('Template doesn\'t exist', function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(console, 'error');
                     view.uploadTpl = '';
 
                     expect(view.render).not.toThrow();
+                    // eslint-disable-next-line no-console
                     expect(console.error).toHaveBeenCalled();
                     expect(_.template).not.toHaveBeenCalled();
                 });
@@ -102,6 +108,7 @@ define(
                 });
 
                 it('File is not chosen', function() {
+                    // eslint-disable-next-line no-undef
                     spyOn($.fn, 'ajaxSubmit');
                     view.upload();
 
@@ -109,12 +116,14 @@ define(
                 });
 
                 it('File is chosen', function() {
+                    // eslint-disable-next-line no-undef
                     spyOn($.fn, 'ajaxSubmit');
 
                     view.file = {};
                     view.upload();
 
                     expect(view.$form.ajaxSubmit).toHaveBeenCalled();
+                    // eslint-disable-next-line no-undef
                     expect(view.$form.ajaxSubmit).toHaveBeenCalledWith(jasmine.objectContaining({
                         data: {edx_video_id: videoId}
                     }));
@@ -122,6 +131,7 @@ define(
             });
 
             it('clickHandler', function() {
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'trigger');
 
                 $('.setting-upload').click();
@@ -132,10 +142,12 @@ define(
 
             describe('changeHadler', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'upload');
                 });
 
                 it('Valid File Type - error should be hided', function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'checkExtValidity').and.returnValue(true);
 
                     view.$input.change();
@@ -146,6 +158,7 @@ define(
                 });
 
                 it('Invalid File Type - error should be shown', function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'checkExtValidity').and.returnValue(false);
 
                     view.$input.change();
@@ -187,6 +200,7 @@ define(
             it('xhrProgressHandler', function() {
                 var percent = 26;
 
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'width').and.callThrough();
 
                 view.xhrProgressHandler(null, null, null, percent);
@@ -203,6 +217,7 @@ define(
                             edx_video_id: 'test_video_id'
                         })
                     };
+                    // eslint-disable-next-line no-undef
                     spyOn(Backbone, 'trigger');
                     view.xhrCompleteHandler(xhr);
 

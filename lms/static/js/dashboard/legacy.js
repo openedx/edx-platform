@@ -305,4 +305,5 @@ var edx = edx || {};
             $('#unenroll_course_name').text($(event.target).data('course-name'));
         });
     };
+// eslint-disable-next-line no-undef
 }(jQuery, gettext, Logger, accessible_modal, interpolate));

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
     'js/discovery/discovery_factory'
@@ -104,10 +105,12 @@ define([
             ]);
             DiscoveryFactory(MEANINGS);
 
+            // eslint-disable-next-line no-undef
             jasmine.clock().install();
         });
 
         afterEach(function() {
+            // eslint-disable-next-line no-undef
             jasmine.clock().uninstall();
         });
 
@@ -129,6 +132,7 @@ define([
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.courses-listing article').length).toEqual(1);
             expect($('.courses-listing .course-title')).toContainHtml('edX Demonstration Course');
+            // eslint-disable-next-line no-undef
             jasmine.clock().tick(500);
             window.scroll(0, $(document).height());
             $(window).trigger('scroll');

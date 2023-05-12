@@ -54,6 +54,7 @@ var edx = edx || {},
                     // because we're changing the role of the toggle from an 'a' to a 'button'
                     // we need to ensure it has the same keyboard use cases as a real button.
                     // this is useful for screenreader users primarily.
+                    // eslint-disable-next-line eqeqeq
                     if (event.which == 32) { // spacebar
                         event.preventDefault();
                         $(event.currentTarget).trigger('click');
@@ -68,12 +69,15 @@ var edx = edx || {},
                     toggle;
 
                 $('.accordion .button-chapter').each(function(index, element) {
+                    // eslint-disable-next-line no-undef
                     $toggle = $(element);
 
+                    // eslint-disable-next-line no-undef
                     $toggle
                         .removeClass('is-open')
                         .attr('aria-expanded', 'false');
 
+                    // eslint-disable-next-line no-undef
                     $toggle
                         .children('.group-heading')
                         .removeClass('active')
@@ -81,6 +85,7 @@ var edx = edx || {},
                         .addClass('fa-caret-right')
                         .removeClass('fa-caret-down');
 
+                    // eslint-disable-next-line no-undef
                     $toggle
                         .next('.chapter-content-container')
                         .removeClass('is-open')

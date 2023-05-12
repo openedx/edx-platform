@@ -16,6 +16,7 @@
                 return new VideoBumper(player, state);
             }
 
+            // eslint-disable-next-line no-undef
             _.bindAll(
                 this, 'showMainVideoHandler', 'destroy', 'skipByDuration', 'destroyAndResolve'
             );
@@ -86,6 +87,7 @@
             saveState: function() {
                 var info = {bumper_last_view_date: true};
                 if (this.doNotShowAgain) {
+                    // eslint-disable-next-line no-undef
                     _.extend(info, {bumper_do_not_show_again: true});
                 }
                 if (this.state.videoSaveStatePlugin) {
@@ -101,6 +103,7 @@
                     initialize: this.destroyAndResolve
                 });
                 this.element.removeClass('is-bumper');
+                // eslint-disable-next-line no-undef
                 if (_.isFunction(this.state.videoPlayer.destroy)) {
                     this.state.videoPlayer.destroy();
                 }

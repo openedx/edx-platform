@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'js/views/modals/base_modal', 'js/spec_helpers/modal_helpers'],
     function($, _, BaseModal, ModelHelpers) {
         describe('BaseModal', function() {
@@ -33,6 +34,7 @@ define(['jquery', 'underscore', 'js/views/modals/base_modal', 'js/spec_helpers/m
                 it('sends focus to the modal window after show is called', function(done) {
                     showMockModal();
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         var modalWindow = ModelHelpers.getModalWindow(modal);
                         return ($(modalWindow)[0] === $(modalWindow)[0].ownerDocument.activeElement);

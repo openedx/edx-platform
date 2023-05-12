@@ -19,6 +19,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ThreadResponseEditView = (function(_super) {
             __extends(ThreadResponseEditView, _super);
@@ -63,6 +64,7 @@
             };
 
             return ThreadResponseEditView;
+        // eslint-disable-next-line no-undef
         }(Backbone.View));
     }
 }).call(window);

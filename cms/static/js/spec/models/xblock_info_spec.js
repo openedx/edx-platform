@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'js/models/xblock_info'],
     function(Backbone, XBlockInfo) {
         describe('XblockInfo isEditableOnCourseOutline', function() {

@@ -127,6 +127,7 @@ var edx = edx || {},
 
                 isSupported: function() {
                     try {
+                        // eslint-disable-next-line no-undef
                         var flashObj = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
                         if (flashObj) {
                             return true;
@@ -274,6 +275,7 @@ var edx = edx || {},
         },
 
         resetByEnter: function(event) {
+            // eslint-disable-next-line eqeqeq
             if (event.keyCode == key.enter) {
                 this.reset();
             }
@@ -387,4 +389,5 @@ var edx = edx || {},
         // allow users to take a photo with the camera.
         return new edx.verify_student.ImageInputView(obj);
     };
+// eslint-disable-next-line no-undef
 }(jQuery, _, Backbone, gettext));

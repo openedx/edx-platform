@@ -27,11 +27,15 @@
                 view = new FinishAuthView({});
 
                 // Mock the redirect call
+                // eslint-disable-next-line no-undef
                 spyOn(view, 'redirect').and.callFake(function() {});
 
                 // Mock the enrollment and shopping cart interfaces
+                // eslint-disable-next-line no-undef
                 spyOn(EnrollmentInterface, 'enroll').and.callFake(function() {});
+                // eslint-disable-next-line no-undef
                 spyOn(ShoppingCartInterface, 'addCourseToCart').and.callFake(function() {});
+                // eslint-disable-next-line no-undef
                 spyOn(EmailOptInInterface, 'setPreference')
                     .and.callFake(function() { return {always: function(r) { r(); }}; });
 
@@ -45,7 +49,7 @@
              * should be prefixed with '?'
              */
             var setFakeQueryParams = function(params) {
-                // eslint-disable-next-line consistent-return
+                /* eslint-disable-next-line consistent-return, no-undef */
                 spyOn($, 'url').and.callFake(function(requestedParam) {
                     if (params.hasOwnProperty(requestedParam)) {
                         return params[requestedParam];
@@ -55,6 +59,7 @@
 
             beforeEach(function() {
                 // Stub analytics tracking
+                // eslint-disable-next-line no-undef
                 window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'pageview', 'trackLink']);
             });
 
@@ -214,4 +219,5 @@
             });
         });
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

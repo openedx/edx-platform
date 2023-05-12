@@ -18,6 +18,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionCourseSettings = (function(_super) {
             __extends(DiscussionCourseSettings, _super);
@@ -27,6 +28,7 @@
             }
 
             return DiscussionCourseSettings;
+        // eslint-disable-next-line no-undef
         }(Backbone.Model));
     }
 }).call(this);

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery',
     'underscore',
     'teams/js/views/topic_card',
@@ -19,6 +20,7 @@ function($, _, TopicCardView, Topic) {
         };
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             spyOn(TopicCardView.prototype, 'action');
         });
 

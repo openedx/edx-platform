@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'underscore',
@@ -132,8 +133,9 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
 
         handleDestroy: function(model) {
             this.collection.fetch({reset: true}); // reload the collection to get a fresh page full of items
+            // eslint-disable-next-line no-undef
             analytics.track('Deleted Asset', {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-undef */
                 course: course_location_analytics,
                 id: model.get('url')
             });
@@ -146,8 +148,9 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
             this.pagingView.setInitialFilterColumn('js-asset-type-col');
             this.pagingView.setPage(1);
 
+            // eslint-disable-next-line no-undef
             analytics.track('Uploaded a File', {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-undef */
                 course: course_location_analytics,
                 asset_url: model.get('url')
             });

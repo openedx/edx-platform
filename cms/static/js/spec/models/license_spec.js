@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/models/license'], function(LicenseModel) {
     describe('License model constructor', function() {
         it('accepts no arguments', function() {

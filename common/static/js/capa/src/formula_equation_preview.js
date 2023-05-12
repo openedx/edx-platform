@@ -74,9 +74,11 @@ formulaEquationPreview.enable = function() {
         };
 
         // Give callback access to `inputData` (fill in first parameter).
+        // eslint-disable-next-line no-undef
         inputData.requestCallback = _.partial(updatePage, inputData);
 
         // Limit `sendRequest` and have it show the loading icon.
+        // eslint-disable-next-line no-undef
         var throttledRequest = _.throttle(
             sendRequest,
             formulaEquationPreview.minDelay,
@@ -119,6 +121,7 @@ formulaEquationPreview.enable = function() {
 
         if (formula) {
             // Send the request.
+            // eslint-disable-next-line no-undef
             Problem.inputAjax(
                 inputData.url,
                 inputData.inputId,
@@ -149,6 +152,7 @@ formulaEquationPreview.enable = function() {
      */
     function updatePage(inputData, response) {
         var requestStart = response.request_start;
+        // eslint-disable-next-line eqeqeq
         if (requestStart == inputData.lastSent
             && !inputData.isWaitingForRequest) {
             // Disable icon.
@@ -169,25 +173,32 @@ formulaEquationPreview.enable = function() {
         }
 
         function display(latex) {
+            // eslint-disable-next-line no-undef
             MathJax.Hub.Startup.signal.Interest(function(message) {
                 if (message === 'End') {
                     var previewElement = inputData.$preview[0];
+                    // eslint-disable-next-line no-undef
                     MathJax.Hub.Queue(function() {
+                        // eslint-disable-next-line no-undef
                         inputData.jax = MathJax.Hub.getAllJax(previewElement)[0];
                     });
 
+                    // eslint-disable-next-line no-undef
                     MathJax.Hub.Queue(function() {
                         // Check if MathJax is loaded
                         if (inputData.jax) {
                             // Set the text as the latex code, and then update the MathJax.
+                            // eslint-disable-next-line no-undef
                             MathJax.Hub.Queue(
                                 ['Text', inputData.jax, latex]
                             );
                         } else if (latex) {
+                            // eslint-disable-next-line no-console
                             console.log('[FormulaEquationInput] Oops no mathjax for ', latex);
                             // Fall back to modifying the actual element.
                             var textNode = previewElement.childNodes[0];
                             textNode.data = '\\(' + latex + '\\)';
+                            // eslint-disable-next-line no-undef
                             MathJax.Hub.Queue(['Typeset', MathJax.Hub, previewElement]);
                         }
                     });

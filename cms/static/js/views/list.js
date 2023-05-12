@@ -13,6 +13,7 @@
  * - emptyMessage (string): Text to render when the list is empty.
  * - restrictEditing (bool) : Boolean flag for hiding edit and remove options, defaults to false.
  */
+// eslint-disable-next-line no-undef
 define([
     'js/views/baseview'
 ], function(BaseView) {
@@ -97,6 +98,7 @@ define([
             var canCreateNewItem = true;
             if (collection.length > 0) {
                 var maxAllowed = collection.maxAllowed;
+                // eslint-disable-next-line no-undef
                 if (!_.isUndefined(maxAllowed) && collection.length >= maxAllowed) {
                     canCreateNewItem = false;
                 }

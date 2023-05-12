@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'js/views/assets',
     'js/collections/asset', 'common/js/spec_helpers/view_helpers'],
 function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
@@ -13,8 +14,10 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             setFixtures($('<script>', {id: 'asset-library-tpl', type: 'text/template'}).text(assetLibraryTpl));
             appendSetFixtures($('<script>', {id: 'asset-tpl', type: 'text/template'}).text(assetTpl));
             appendSetFixtures(uploadModalTpl);
+            // eslint-disable-next-line no-undef
             appendSetFixtures(sandbox({id: 'asset_table_body'}));
 
+            // eslint-disable-next-line no-undef
             spyOn($.fn, 'fileupload').and.returnValue('');
 
             var TestAssetsCollection = AssetCollection.extend({
@@ -192,6 +195,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             it('uploads file properly', function() {
                 var requests = setup.call(this);
                 expect(assetsView).toBeDefined();
+                // eslint-disable-next-line no-undef
                 spyOn(assetsView, 'addAsset').and.callFake(function() {
                     assetsView.collection.add(mockAssetUploadResponse.asset);
                     assetsView.pagingView.renderPageItems();

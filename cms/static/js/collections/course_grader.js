@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'js/models/settings/course_grader'], function(Backbone, CourseGrader) {
     var CourseGraderCollection = Backbone.Collection.extend({
         model: CourseGrader,

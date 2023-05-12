@@ -6,10 +6,12 @@
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice')
                 .and.returnValue(null);
 
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer({
                 recordedYoutubeIsAvailable: true,
                 completionEnabled: true,
@@ -23,7 +25,9 @@
                 contentType: 'application/json',
                 dataType: 'json',
                 data: JSON.stringify({completion: 1.0}),
+                // eslint-disable-next-line no-undef
                 success: jasmine.any(Function),
+                // eslint-disable-next-line no-undef
                 error: jasmine.any(Function)
             };
         });
@@ -46,6 +50,7 @@
         });
 
         it('calls the completion api on the LMS when the time updates', function() {
+            // eslint-disable-next-line no-undef
             spyOn(state.completionHandler, 'markCompletion').and.callThrough();
             state.el.trigger('timeupdate', 24.0);
             expect(state.completionHandler.markCompletion).toHaveBeenCalled();
@@ -56,6 +61,7 @@
         });
 
         it('does not call the completion api on the LMS when the video is loaded but not seen', function() {
+            // eslint-disable-next-line no-undef
             spyOn(window, 'VerticalStudentView').and.callThrough();
             // The VerticalStudentView object is created to kick off the function that checks if
             // each vertical is completable by viewing, and, if so, sends an ajax call to mark completion
@@ -66,13 +72,16 @@
         });
 
         it('calls the completion api on the LMS when the video ends', function() {
+            // eslint-disable-next-line no-undef
             spyOn(state.completionHandler, 'markCompletion').and.callThrough();
             state.el.trigger('ended');
             expect(state.completionHandler.markCompletion).toHaveBeenCalled();
         });
 
         it('calls the completion api if the video is age restricted', function() {
+            // eslint-disable-next-line no-undef
             spyOn(state, 'youtubeId').and.returnValue('fakeYouTubeID');
+            // eslint-disable-next-line no-undef
             spyOn(state.completionHandler, 'markCompletion').and.callThrough();
             state.metadata = {fakeYouTubeID: {contentRating: {}}};
 

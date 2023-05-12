@@ -1,6 +1,7 @@
 /**
  * Provide helper methods for modal validation.
 */
+// eslint-disable-next-line no-undef
 define(['jquery'],
     function($) {
         var validateIntegerRange = function(attributeVal, range) {

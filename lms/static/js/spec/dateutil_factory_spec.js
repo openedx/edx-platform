@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['../dateutil_factory.js'], function(DateUtilIterator) {
     'use strict';
 

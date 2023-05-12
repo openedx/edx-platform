@@ -26,6 +26,7 @@
                         processedArray = result;
                     });
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return processedArray;
                     }).then(function() {
@@ -41,6 +42,7 @@
                         isError = true;
                     });
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return isError;
                     }).then(function() {
@@ -56,6 +58,7 @@
                         processedArray = result;
                     });
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return processedArray;
                     }).then(function() {
@@ -70,6 +73,7 @@
                         processedArray = result;
                     });
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return processedArray;
                     }).then(function() {

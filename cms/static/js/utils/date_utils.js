@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timepicker'],
     function($, date, TriggerChangeEventOnEnter) {
         'use strict';

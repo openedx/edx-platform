@@ -3,6 +3,7 @@
 'use strict';
 
 // By default, fixtures are loaded from spec/javascripts/fixtures but in karma everything gets served from /base
+// eslint-disable-next-line no-undef
 jasmine.getFixtures().fixturesPath = '/base/';
 
 // https://github.com/edx/js-test-tool/blob/master/js_test_tool/templates/jasmine_test_runner.html#L10

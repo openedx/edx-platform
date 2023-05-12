@@ -6,8 +6,9 @@ describe('Tests for split_test staff view switching', function() {
     beforeEach(function() {
         loadFixtures('split_test_staff.html');
         $elem = $('#split-test');
+        // eslint-disable-next-line no-undef
         window.XBlock = jasmine.createSpyObj('XBlock', ['initializeBlocks']);
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-undef */
         ab_module = ABTestSelector(null, $elem);
     });
 

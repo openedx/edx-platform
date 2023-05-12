@@ -11,6 +11,7 @@
  * - createDetailsView (function): Render and append the details view
  *   to the DOM.
  */
+// eslint-disable-next-line no-undef
 define([
     'js/views/baseview', 'jquery', 'gettext',
     'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils'
@@ -46,11 +47,13 @@ define([
             var model = this.model,
                 itemDisplayName = this.itemDisplayName;
             ViewUtils.confirmThenRunOperation(
+                // eslint-disable-next-line no-undef
                 interpolate(
                     // Translators: "item_display_name" is the name of the item to be deleted.
                     gettext('Delete this %(item_display_name)s?'),
                     {item_display_name: itemDisplayName}, true
                 ),
+                // eslint-disable-next-line no-undef
                 interpolate(
                     // Translators: "item_display_name" is the name of the item to be deleted.
                     gettext('Deleting this %(item_display_name)s is permanent and cannot be undone.'),

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone',
     'jquery',
     'underscore',
@@ -20,11 +21,14 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
             data;
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             timerCallback = jasmine.createSpy('timerCallback');
+            // eslint-disable-next-line no-undef
             jasmine.clock().install();
         });
 
         afterEach(function() {
+            // eslint-disable-next-line no-undef
             jasmine.clock().uninstall();
         });
 

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'jquery.ui', 'underscore', 'gettext', 'draggabilly',
     'js/utils/module', 'common/js/components/views/feedback_notification'],
 function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {

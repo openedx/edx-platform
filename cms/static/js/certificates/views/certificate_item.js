@@ -1,6 +1,7 @@
 // Backbone Application View: Certificate Item
 // Renders an editor view or a details view depending on the state of the underlying model.
 
+// eslint-disable-next-line no-undef
 define([
     'gettext',
     'js/views/list_item',

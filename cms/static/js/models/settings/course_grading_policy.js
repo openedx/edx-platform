@@ -1,4 +1,5 @@
 /* globals _ */
+// eslint-disable-next-line no-undef
 define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-ui-toolkit/js/utils/string-utils'],
     function(Backbone, Location, CourseGraderCollection, StringUtils) {
         'use strict';
@@ -72,6 +73,7 @@ define(['backbone', 'js/models/location', 'js/collections/course_grader', 'edx-u
                 if (isNaN(minimum_grade_credit)) {
                     return 0;
                 }
+                // eslint-disable-next-line radix
                 return parseInt(minimum_grade_credit);
             },
             // eslint-disable-next-line consistent-return

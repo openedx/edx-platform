@@ -32,6 +32,7 @@
                 model: this.thread
             });
             this.view.setElement($('#fixture-element'));
+            // eslint-disable-next-line no-undef
             return spyOn(this.view, 'convertMath');
         });
         describe('voting', function() {

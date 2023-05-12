@@ -1,6 +1,7 @@
 $(document).ready(function() {
     var $container = $('.requirement-container');
     var collapse = $container.data('eligible');
+    // eslint-disable-next-line eqeqeq
     if (collapse == 'not_eligible') {
         $container.addClass('is-hidden');
         $('.detail-collapse').find('.fa').toggleClass('fa-caret-up fa-caret-down');

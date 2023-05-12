@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/discovery/models/search_state'
 ], function(AjaxHelpers, SearchState) {
@@ -31,8 +32,11 @@ define([
     describe('discovery.models.SearchState', function() {
         beforeEach(function() {
             this.search = new SearchState();
+            // eslint-disable-next-line no-undef
             this.onSearch = jasmine.createSpy('onSearch');
+            // eslint-disable-next-line no-undef
             this.onNext = jasmine.createSpy('onNext');
+            // eslint-disable-next-line no-undef
             this.onError = jasmine.createSpy('onError');
             this.search.on('search', this.onSearch);
             this.search.on('next', this.onNext);

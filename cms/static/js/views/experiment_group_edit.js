@@ -2,6 +2,7 @@
  * This class defines an edit view for groups within content experiment group configurations.
  * It is expected to be backed by a Group model.
  */
+// eslint-disable-next-line no-undef
 define([
     'js/views/baseview', 'underscore', 'underscore.string', 'gettext', 'text!templates/group-edit.underscore'
 ],

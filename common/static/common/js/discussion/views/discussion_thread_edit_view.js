@@ -2,7 +2,9 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-undef
     if (Backbone) {
+        // eslint-disable-next-line no-undef
         this.DiscussionThreadEditView = Backbone.View.extend({
             tagName: 'form',
             events: {
@@ -22,11 +24,13 @@
                 this.threadType = this.model.get('thread_type');
                 this.topicId = this.model.get('commentable_id');
                 this.context = options.context || 'course';
+                // eslint-disable-next-line no-undef
                 _.bindAll(this, 'updateHandler', 'cancelHandler');
                 return this;
             },
 
             render: function() {
+                // eslint-disable-next-line no-undef
                 var formId = _.uniqueId('form-'),
                     threadTypeTemplate = edx.HtmlUtils.template($('#thread-type-template').html()),
                     $threadTypeSelector = $(threadTypeTemplate({form_id: formId}).toString()),

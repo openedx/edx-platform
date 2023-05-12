@@ -10,9 +10,11 @@
 }()), function(window, $) {
     'use strict';
 
+    // eslint-disable-next-line no-undef
     var MAX_TIMEOUT = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     var realSetTimeout = setTimeout;
     var realClearTimeout = clearTimeout;
+    // eslint-disable-next-line no-undef
     jasmine.waitUntil = function(conditionalFn, maxTimeout, message) {
         var deferred = $.Deferred(),
             elapsedTimeInMs = 0,
@@ -29,6 +31,7 @@
             } else {
                 if (elapsedTimeInMs >= maxTimeout) {
                     // explicitly fail the spec with the given message
+                    // eslint-disable-next-line no-undef
                     fail(message);
 
                     // clear timeout and reject the promise

@@ -1,4 +1,5 @@
 /* global _ */
+// eslint-disable-next-line no-undef
 define(
     [
         'jquery',
@@ -64,12 +65,14 @@ define(
                 $courseVideoSettingsButton = $('.course-video-settings-button');
                 this.view = createActiveUploadListView(true);
                 this.view.render();
+                // eslint-disable-next-line no-undef
                 jasmine.Ajax.install();
             });
 
             // Remove window unload handler triggered by the upload requests
             afterEach(function() {
                 $(window).off('beforeunload');
+                // eslint-disable-next-line no-undef
                 jasmine.Ajax.uninstall();
 
                 if (this.view.courseVideoSettingsView) {
@@ -92,6 +95,7 @@ define(
             });
 
             it('should trigger file selection when the drop zone is clicked', function() {
+                // eslint-disable-next-line no-undef
                 var clickSpy = jasmine.createSpy();
                 clickSpy.and.callFake(function(event) { event.preventDefault(); });
                 this.view.$('.js-file-input').on('click', clickSpy);
@@ -121,6 +125,7 @@ define(
             };
 
             getSentRequests = function() {
+                // eslint-disable-next-line no-undef
                 return jasmine.Ajax.requests.filter(function(request) {
                     return request.readyState > 0;
                 });
@@ -226,6 +231,7 @@ define(
                         requests;
 
                     // this is required so that we can use AjaxHelpers ajax mock utils instead of jasmine mock-ajax.js
+                    // eslint-disable-next-line no-undef
                     jasmine.Ajax.uninstall();
 
                     requests = AjaxHelpers.requests(this);
@@ -267,6 +273,7 @@ define(
 
                     // this is required otherwise mock-ajax will throw an exception when it tries to uninstall Ajax in
                     // outer afterEach
+                    // eslint-disable-next-line no-undef
                     jasmine.Ajax.install();
                 });
             });
@@ -297,6 +304,7 @@ define(
 
                     // upload_cancelled request should be sent
                     this.view.onUnload();
+                    // eslint-disable-next-line no-undef
                     uploadCancelledRequest = jasmine.Ajax.requests.mostRecent();
                     expect(uploadCancelledRequest.params).toEqual(
                         JSON.stringify(
@@ -424,7 +432,7 @@ define(
                             // security reasons, so we must mock the access mechanism
                             // that jQuery-File-Upload uses to retrieve it.
                             var realProp = $.prop;
-                            // eslint-disable-next-line consistent-return
+                            /* eslint-disable-next-line consistent-return, no-undef */
                             spyOn($, 'prop').and.callFake(function(el, propName) {
                                 if (arguments.length === 2 && propName === 'files') {
                                     return _.map(
@@ -436,14 +444,17 @@ define(
                                 }
                             });
                             this.view.$('.js-file-input').change();
+                            // eslint-disable-next-line no-undef
                             this.request = jasmine.Ajax.requests.mostRecent();
                         });
 
                         it('should trigger the correct request', function() {
                             var request,
                                 self = this;
+                            // eslint-disable-next-line no-undef
                             expect(jasmine.Ajax.requests.count()).toEqual(caseInfo.numFiles);
                             _.each(_.range(caseInfo.numFiles), function(index) {
+                                // eslint-disable-next-line no-undef
                                 request = jasmine.Ajax.requests.at(index);
                                 expect(request.url).toEqual(POST_URL);
                                 expect(request.method).toEqual('POST');
@@ -457,6 +468,7 @@ define(
 
                         describe('and successful server response', function() {
                             beforeEach(function() {
+                                // eslint-disable-next-line no-undef
                                 jasmine.Ajax.requests.reset();
                                 sendUploadPostResponse(this.request, fileNames);
                                 this.$uploadElems = this.view.$('.active-video-upload');
@@ -538,6 +550,7 @@ define(
                                                 var refreshSpy = null;
 
                                                 beforeEach(function() {
+                                                    // eslint-disable-next-line no-undef
                                                     refreshSpy = subCaseInfo.isViewRefresh ? jasmine.createSpy() : null;
                                                     this.view.onFileUploadDone = refreshSpy;
                                                     getSentRequests()[0].respondWith(

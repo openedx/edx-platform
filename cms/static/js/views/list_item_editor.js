@@ -9,6 +9,7 @@
  * - getSaveableModel (function): Return the model which should be
  *   saved by this view.  Note this may be a parent model.
  */
+// eslint-disable-next-line no-undef
 define([
     'js/views/baseview', 'common/js/components/utils/view_utils', 'underscore', 'gettext',
     'edx-ui-toolkit/js/utils/html-utils'

@@ -10,4 +10,5 @@
             return new ManageUserView(params).render();
         };
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

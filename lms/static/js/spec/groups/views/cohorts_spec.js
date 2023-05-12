@@ -1,5 +1,6 @@
 /* globals _ */
 
+// eslint-disable-next-line no-undef
 define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers',
     'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group',
@@ -167,12 +168,14 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             var header = cohortsView.$('.cohort-management-group-header');
             expect(cohortsView.$('.cohort-select').val()).toBe(expectedCohortId.toString());
             expect(cohortsView.$('.cohort-select option:selected').text()).toBe(
+                // eslint-disable-next-line no-undef
                 interpolate_text(
                     '{title} ({count})', {title: expectedTitle, count: expectedCount}
                 )
             );
             expect(header.find('.title-value').text()).toBe(expectedTitle);
             expect(header.find('.group-count').text()).toBe(
+                // eslint-disable-next-line no-undef
                 interpolate_ntext(
                     '(contains {count} student)',
                     '(contains {count} students)',

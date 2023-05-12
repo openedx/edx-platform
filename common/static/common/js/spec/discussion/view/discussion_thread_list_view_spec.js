@@ -159,6 +159,7 @@
                 })
             ];
             deferred = $.Deferred();
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.returnValue(deferred);
             this.discussion = new Discussion([]);
             this.view = new DiscussionThreadListView({
@@ -549,10 +550,12 @@
             var testCorrection;
 
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 return spyOn(this.view, 'searchForUser');
             });
 
             testCorrection = function(view, correctedText) {
+                // eslint-disable-next-line no-undef
                 spyOn(view, 'addSearchAlert');
                 $.ajax.and.callFake(function(params) {
                     params.success({
@@ -583,14 +586,18 @@
             });
 
             it('clears search alerts when a new search is performed', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'clearSearchAlerts');
+                // eslint-disable-next-line no-undef
                 spyOn(DiscussionUtil, 'safeAjax');
                 this.view.searchFor('dummy');
                 return expect(this.view.clearSearchAlerts).toHaveBeenCalled();
             });
 
             it('clears search alerts when the underlying collection changes', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'clearSearchAlerts');
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'renderThread');
                 this.view.collection.trigger('change', new Thread({
                     id: 1
@@ -640,6 +647,7 @@
             };
 
             it('gets called after a thread search succeeds', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'searchForUser').and.callThrough();
                 setAjaxResults(true, []);
                 this.view.searchFor('gizmo');
@@ -648,6 +656,7 @@
             });
 
             it('does not get called after a thread search fails', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'searchForUser').and.callThrough();
                 setAjaxResults(false, []);
                 this.view.searchFor('gizmo');
@@ -655,6 +664,7 @@
             });
 
             it('adds a search alert when an username was matched', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'addSearchAlert');
                 setAjaxResults(true, [
                     {
@@ -669,6 +679,7 @@
             });
 
             it('does not add a search alert when no username was matched', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'addSearchAlert');
                 setAjaxResults(true, []);
                 this.view.searchForUser('dummy');

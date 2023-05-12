@@ -105,6 +105,7 @@
 
             getSelectedCohort: function() {
                 var id = this.$('.cohort-select').val();
+                // eslint-disable-next-line radix
                 return id && this.model.get(parseInt(id));
             },
 
@@ -164,8 +165,10 @@
             },
 
             showNotification: function(options, beforeElement) {
+                // eslint-disable-next-line no-undef
                 var model = new NotificationModel(options);
                 this.removeNotification();
+                // eslint-disable-next-line no-undef
                 this.notification = new NotificationView({
                     model: model
                 });
@@ -235,6 +238,7 @@
                         self.model.fetch().done(function() {
                             self.showNotification({
                                 type: 'confirmation',
+                                // eslint-disable-next-line no-undef
                                 title: interpolate_text(
                                     gettext('The {cohortGroupName} cohort has been created. You can manually add students to this cohort below.'),
                                     {cohortGroupName: newCohort.get('name')}
@@ -264,6 +268,7 @@
                 var uploadElement = this.$('.csv-upload').removeClass(hiddenClass);
 
                 if (!this.fileUploaderView) {
+                    // eslint-disable-next-line no-undef
                     this.fileUploaderView = new FileUploaderView({
                         el: uploadElement,
                         title: gettext('Assign students to cohorts by uploading a CSV file.'),
@@ -274,9 +279,11 @@
                         url: this.context.uploadCohortsCsvUrl,
                         // eslint-disable-next-line no-shadow
                         successNotification: function(file, event, data) {
+                            // eslint-disable-next-line no-undef
                             var message = interpolate_text(gettext(
                                 "Your file '{file}' has been uploaded. Allow a few minutes for processing."
                             ), {file: file});
+                            // eslint-disable-next-line no-undef
                             return new NotificationModel({
                                 type: 'confirmation',
                                 title: message
@@ -292,4 +299,5 @@
         });
         return CohortsView;
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

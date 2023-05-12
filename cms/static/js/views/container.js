@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'js/views/xblock', 'js/utils/module',
     'gettext', 'edx-ui-toolkit/js/utils/string-utils',

@@ -1,4 +1,5 @@
 /* eslint-disable vars-on-top */
+// eslint-disable-next-line no-undef
 define(
     [
         'backbone', 'jquery', 'underscore',
@@ -52,6 +53,7 @@ define(
             it('profile field parts are actually rendered for public profile', function() {
                 var view = createSectionTwoView(false, true);
                 _.each(view.options.viewList, function(fieldView) {
+                    // eslint-disable-next-line no-undef
                     spyOn(fieldView, 'render').and.callThrough();
                 });
                 view.render();
@@ -81,6 +83,7 @@ define(
             var testProfilePrivatePartsDoNotRender = function(ownProfile) {
                 var view = createSectionTwoView(ownProfile, false);
                 _.each(view.options.viewList, function(fieldView) {
+                    // eslint-disable-next-line no-undef
                     spyOn(fieldView, 'render');
                 });
                 view.render();

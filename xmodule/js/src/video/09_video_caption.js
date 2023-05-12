@@ -581,7 +581,9 @@
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         var canFetchWithYoutubeId;
+                        // eslint-disable-next-line no-console
                         console.log('[Video info]: ERROR while fetching captions.');
+                        // eslint-disable-next-line no-console
                         console.log(
                             '[Video info]: STATUS:', textStatus
                             + ', MESSAGE:', '' + errorThrown
@@ -1287,6 +1289,7 @@
                     // eslint-disable-next-line no-new
                     new Draggabilly(captions, {containment: true});
                 } else {
+                    // eslint-disable-next-line no-console
                     console.log('Closed captioning available but not draggable');
                 }
             },

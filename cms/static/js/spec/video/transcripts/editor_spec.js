@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'jquery', 'backbone', 'underscore',
@@ -56,6 +57,7 @@ define(
                 transcripts, $container, waitForEvent, editor;
 
             var waitsForDisplayName = function(collection) {
+                // eslint-disable-next-line no-undef
                 return jasmine.waitUntil(function() {
                     var displayNameValue = collection[0].getValue();
                     return displayNameValue !== '' && displayNameValue !== 'video_id';
@@ -63,6 +65,7 @@ define(
             };
 
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 var tpl = sandbox({
                     class: 'wrapper-comp-settings basic_metadata_edit',
                     'data-metadata': JSON.stringify(metadataDict.object)
@@ -71,6 +74,7 @@ define(
                 appendSetFixtures(tpl);
                 $container = $('.basic_metadata_edit');
 
+                // eslint-disable-next-line no-undef
                 spyOn(Utils, 'command');
             });
 
@@ -81,9 +85,13 @@ define(
             describe('Events', function() {
                 beforeEach(function() {
                     Utils.command.and.callThrough();
+                    // eslint-disable-next-line no-undef
                     spyOn(Backbone, 'trigger').and.callThrough();
+                    // eslint-disable-next-line no-undef
                     spyOn(Editor.prototype, 'destroy').and.callThrough();
+                    // eslint-disable-next-line no-undef
                     spyOn(Editor.prototype, 'handleFieldChanged').and.callThrough();
+                    // eslint-disable-next-line no-undef
                     spyOn(Editor.prototype, 'getLocator').and.returnValue(component_locator);
 
                     appendSetFixtures(
@@ -123,6 +131,7 @@ define(
 
                 waitForEvent = function(eventName) {
                     var triggerCallArgs;
+                    // eslint-disable-next-line no-undef
                     return jasmine.waitUntil(function() {
                         triggerCallArgs = Backbone.trigger.calls.mostRecent().args;
                         return Backbone.trigger.calls.count() === 1 && triggerCallArgs[0] === eventName;
@@ -168,7 +177,9 @@ define(
 
             describe('Test initialization', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(MetadataView, 'Editor');
+                    // eslint-disable-next-line no-undef
                     spyOn(Editor.prototype, 'handleFieldChanged');
 
                     transcripts = new Editor({
@@ -253,7 +264,9 @@ define(
                     metadataView;
 
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(MetadataView, 'Editor');
+                    // eslint-disable-next-line no-undef
                     spyOn(Editor.prototype, 'handleFieldChanged');
 
                     transcripts = new Editor({
@@ -270,6 +283,7 @@ define(
                         ]
                     );
 
+                    // eslint-disable-next-line no-undef
                     metadataView = jasmine.createSpyObj(
                         'MetadataView.Editor',
                         [

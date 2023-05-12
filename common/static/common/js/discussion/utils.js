@@ -37,6 +37,7 @@
                 this.roleIds = {};
             }
             staff = _.union(this.roleIds.Moderator, this.roleIds.Administrator);
+            // eslint-disable-next-line radix
             return _.include(staff, parseInt(userId));
         };
 
@@ -47,6 +48,7 @@
                 userId = this.user ? this.user.id : void 0;
             }
             ta = _.union(this.roleIds['Community TA']);
+            // eslint-disable-next-line radix
             return _.include(ta, parseInt(userId));
         };
 
@@ -552,7 +554,7 @@
         DiscussionUtil.abbreviateHTML = function(htmlSnippet, maxLength) {
             // eslint-disable-next-line camelcase
             var $result, imagesToReplace, truncated_text;
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-undef */
             truncated_text = edx.HtmlUtils.HTML(jQuery.truncate(htmlSnippet.toString(), {
                 length: maxLength,
                 noBreaks: true,

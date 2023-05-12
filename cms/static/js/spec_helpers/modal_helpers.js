@@ -1,6 +1,7 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/view_helpers'],
     function($, TemplateHelpers, ViewHelpers) {
         var installModalTemplates, getModalElement, getModalWindow, getModalTitle, isShowingModal,

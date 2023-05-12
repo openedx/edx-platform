@@ -36,6 +36,7 @@
                     HtmlUtils.HTML('ERROR: Image "'), state.config.baseImage, HtmlUtils.HTML('" was not found!'),
                     HtmlUtils.HTML('</span>')
                 );
+                // eslint-disable-next-line no-console
                 console.log('ERROR: Image "' + state.config.baseImage + '" was not found!');
                 HtmlUtils.setHtml($baseImageElContainer, errorMsg);
                 $baseImageElContainer.appendTo(state.containerEl);

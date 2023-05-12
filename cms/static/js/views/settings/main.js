@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/views/validation', 'codemirror', 'underscore', 'jquery', 'jquery.ui', 'js/utils/date_utils',
     'js/models/uploads', 'js/views/uploads', 'js/views/license', 'js/models/license',
     'common/js/components/views/feedback_notification', 'jquery.timepicker', 'date', 'gettext',
@@ -134,6 +135,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
             this.$el.find('#' + this.fieldToSelectorMap.pre_requisite_courses).val(pre_requisite_courses);
 
+            // eslint-disable-next-line eqeqeq
             if (this.model.get('entrance_exam_enabled') == 'true') {
                 this.$('#' + this.fieldToSelectorMap.entrance_exam_enabled).attr('checked', this.model.get('entrance_exam_enabled'));
                 this.$('.div-grade-requirements').show();
@@ -286,6 +288,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                 break;
             case 'pre-requisite-course':
                 var value = $(event.currentTarget).val();
+                // eslint-disable-next-line eqeqeq
                 value = value == '' ? [] : [value];
                 this.model.set('pre_requisite_courses', value);
                 break;
@@ -379,6 +382,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
                     mirror.save();
                     cachethis.clearValidationErrors();
                     var newVal = mirror.getValue();
+                    // eslint-disable-next-line eqeqeq
                     if (cachethis.model.get(field) != newVal) {
                         cachethis.setAndValidate(field, newVal);
                     }
@@ -396,7 +400,7 @@ function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel,
             if (!this.useV2CertDisplaySettings) {
                 return;
             }
-            // eslint-disable-next-line prefer-const
+            /* eslint-disable-next-line prefer-const, eqeqeq */
             let showDatepicker = this.model.get('certificates_display_behavior') == 'end_with_date';
             // eslint-disable-next-line prefer-const
             let datepicker = this.$el.find('#certificate-available-date');

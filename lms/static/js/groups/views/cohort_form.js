@@ -16,8 +16,10 @@
             },
 
             showNotification: function(options, beforeElement) {
+                // eslint-disable-next-line no-undef
                 var model = new NotificationModel(options);
                 this.removeNotification();
+                // eslint-disable-next-line no-undef
                 this.notification = new NotificationView({
                     model: model
                 });
@@ -74,7 +76,9 @@
                     return null;
                 }
                 ids = selectValue.split(':');
+                // eslint-disable-next-line radix
                 groupId = parseInt(ids[0]);
+                // eslint-disable-next-line radix
                 userPartitionId = parseInt(ids[1]);
                 for (i = 0; i < this.contentGroups.length; i++) {
                     contentGroup = this.contentGroups[i];
@@ -171,4 +175,5 @@
         });
         return CohortFormView;
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     ['jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/views/video_thumbnail', 'js/views/previous_video_upload_list', 'common/js/spec_helpers/template_helpers'],
@@ -234,6 +235,7 @@ define(
                         }
                     };
 
+                // eslint-disable-next-line no-undef
                 spyOn(videoThumbnailView, 'readMessages');
 
                 videoThumbnailView.imageSelected({}, successData);

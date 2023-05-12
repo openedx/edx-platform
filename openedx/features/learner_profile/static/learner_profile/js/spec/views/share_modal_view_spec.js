@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'backbone', 'jquery', 'underscore', 'moment',
@@ -41,6 +42,7 @@ define(
             });
 
             it('modal view closes on escape', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(view, 'close');
                 view.delegateEvents();
                 expect(view.close).not.toHaveBeenCalled();
@@ -50,6 +52,7 @@ define(
 
             it('modal view closes click on close', function() {
                 var $closeButton;
+                // eslint-disable-next-line no-undef
                 spyOn(view, 'close');
                 view.delegateEvents();
                 $closeButton = view.$el.find('button.close');

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/utils/module'],
     function(ModuleUtils) {
         describe('urlRoot ', function() {

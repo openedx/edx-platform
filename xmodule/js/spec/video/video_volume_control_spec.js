@@ -12,6 +12,7 @@
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
                 .and.returnValue(null);
         });
@@ -25,6 +26,7 @@
 
         it('Volume level has correct value even if cookie is broken', function() {
             $.cookie.and.returnValue('broken_cookie');
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer();
             volumeControl = state.videoVolumeControl;
             expect(volumeControl.volume).toEqual(100);
@@ -32,8 +34,10 @@
 
         describe('constructor', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'slider').and.callThrough();
                 $.cookie.and.returnValue('75');
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 volumeControl = state.videoVolumeControl;
             });
@@ -52,6 +56,7 @@
                     range: 'min',
                     min: 0,
                     max: 100,
+                    // eslint-disable-next-line no-undef
                     slide: jasmine.any(Function)
                 }]);
                 expect($.fn.slider).toHaveBeenCalledWith(
@@ -92,9 +97,11 @@
 
         describe('setVolume', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 volumeControl = state.videoVolumeControl;
 
+                // eslint-disable-next-line no-undef
                 jasmine.addMatchers({
                     assertLiveRegionState: function() {
                         return {
@@ -117,6 +124,7 @@
 
             it('update is not called, if new volume equals current', function() {
                 volumeControl.volume = 60;
+                // eslint-disable-next-line no-undef
                 spyOn(volumeControl, 'updateSliderView');
                 volumeControl.setVolume(60, false, true);
                 expect(volumeControl.updateSliderView).not.toHaveBeenCalled();
@@ -195,6 +203,7 @@
 
         describe('increaseVolume', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 volumeControl = state.videoVolumeControl;
             });
@@ -218,6 +227,7 @@
 
         describe('decreaseVolume', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 volumeControl = state.videoVolumeControl;
             });
@@ -241,6 +251,7 @@
 
         describe('toggleMute', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 volumeControl = state.videoVolumeControl;
             });
@@ -275,12 +286,14 @@
 
         describe('keyDownHandler', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 volumeControl = state.videoVolumeControl;
             });
 
             var assertVolumeIsNotChanged = function(eventObject) {
                 volumeControl.volume = 60;
+                // eslint-disable-next-line no-undef
                 state.el.trigger(jQuery.Event('keydown', eventObject));
                 expect(volumeControl.volume).toEqual(60);
             };
@@ -309,12 +322,14 @@
 
         describe('keyDownButtonHandler', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 volumeControl = state.videoVolumeControl;
             });
 
             it('nothing happens if ALT+ENTER are pushed down', function() {
                 var isMuted = volumeControl.getMuteStatus();
+                // eslint-disable-next-line no-undef
                 $('.volume .control').trigger(jQuery.Event('keydown', {
                     keyCode: KEY.ENTER,
                     altKey: true

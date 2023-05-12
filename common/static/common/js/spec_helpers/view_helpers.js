@@ -1,6 +1,7 @@
 /**
  * Provides helper methods for invoking Studio modal windows in Jasmine tests.
  */
+// eslint-disable-next-line no-undef
 define(['underscore', 'jquery', 'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
 function(_, $, NotificationView, Prompt, AjaxHelpers) {
@@ -17,9 +18,11 @@ function(_, $, NotificationView, Prompt, AjaxHelpers) {
     };
 
     createFeedbackSpy = function(type, intent) {
+        // eslint-disable-next-line no-undef
         var feedbackSpy = jasmine.stealth.spyOnConstructor(type, intent, ['show', 'hide']);
         feedbackSpy.show.and.returnValue(feedbackSpy);
         if (afterEach) {
+            // eslint-disable-next-line no-undef
             afterEach(jasmine.stealth.clearSpies);
         }
         return feedbackSpy;
@@ -72,7 +75,9 @@ function(_, $, NotificationView, Prompt, AjaxHelpers) {
     };
 
     installMockAnalytics = function() {
+        // eslint-disable-next-line no-undef
         window.analytics = jasmine.createSpyObj('analytics', ['track']);
+        // eslint-disable-next-line no-undef
         window.course_location_analytics = jasmine.createSpy();
     };
 

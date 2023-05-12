@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'underscore',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
@@ -46,6 +47,7 @@ define([
         it('re-renders itself when its collection changes', function() {
             var requests = AjaxHelpers.requests(this);
             enrollmentView = createEnrollmentView().render();
+            // eslint-disable-next-line no-undef
             spyOn(enrollmentView, 'render').and.callThrough();
             AjaxHelpers.respondWithJson(requests, [EnrollmentHelpers.mockEnrollmentData]);
             expect(enrollmentView.render).toHaveBeenCalled();

@@ -327,4 +327,5 @@
             loadJavaScript: loadJavaScript
         };
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define, require || RequireJS.require);

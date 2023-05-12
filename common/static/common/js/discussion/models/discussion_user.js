@@ -18,6 +18,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionUser = (function(_super) {
             __extends(DiscussionUser, _super);
@@ -27,10 +28,12 @@
             }
 
             DiscussionUser.prototype.following = function(thread) {
+                // eslint-disable-next-line no-undef
                 return _.include(this.get('subscribed_thread_ids'), thread.id);
             };
 
             DiscussionUser.prototype.voted = function(thread) {
+                // eslint-disable-next-line no-undef
                 return _.include(this.get('upvoted_ids'), thread.id);
             };
 
@@ -40,11 +43,13 @@
             };
 
             DiscussionUser.prototype.unvote = function(thread) {
+                // eslint-disable-next-line no-undef
                 this.set('upvoted_ids', _.without(this.get('upvoted_ids'), thread.id));
                 return thread.unvote();
             };
 
             return DiscussionUser;
+        // eslint-disable-next-line no-undef
         }(Backbone.Model));
     }
 }).call(this);

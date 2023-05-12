@@ -75,6 +75,7 @@ $(function() {
 
     $('#survey-form').on('ajax:error', function(event, jqXHR, textStatus) {
         toggleSubmitButton(true);
+        // eslint-disable-next-line no-undef
         json = $.parseJSON(jqXHR.responseText);
         $('.status.message.submission-error').addClass('is-shown').focus();
         $('.status.message.submission-error .message-copy')

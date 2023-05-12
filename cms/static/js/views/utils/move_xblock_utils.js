@@ -1,6 +1,7 @@
 /**
  * Provides utilities for move xblock.
  */
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'underscore',

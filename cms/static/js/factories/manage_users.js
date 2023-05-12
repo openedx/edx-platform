@@ -1,6 +1,7 @@
 /*
     Code for editing users and assigning roles within a course team context.
 */
+// eslint-disable-next-line no-undef
 define(['underscore', 'gettext', 'js/views/manage_users_and_roles'],
     function(_, gettext, ManageUsersAndRoles) {
         'use strict';

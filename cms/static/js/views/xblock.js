@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery',
     'underscore',
     'common/js/components/utils/view_utils',
@@ -69,6 +70,7 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
                         successCallback(xblock);
                     }
                 } catch (e) {
+                    // eslint-disable-next-line no-console
                     console.error(e, e.stack);
                     // Add 'xblock-initialization-failed' class to every xblock
                     self.$('.xblock').addClass('xblock-initialization-failed');
@@ -142,14 +144,17 @@ function($, _, ViewUtils, BaseView, XBlock, HtmlUtils) {
             // that at least the rendered HTML will be in place.
             try {
                 return this.addXBlockFragmentResources(resources).done(function() {
+                    // eslint-disable-next-line no-console
                     console.log('Updating HTML');
                     try {
                         blockView.updateHtml(element, html);
                     } catch (e) {
+                        // eslint-disable-next-line no-console
                         console.error(e, e.stack);
                     }
                 });
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.error(e, e.stack);
                 return $.Deferred().resolve();
             }

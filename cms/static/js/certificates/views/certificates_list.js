@@ -1,5 +1,6 @@
 // Backbone Application View: Certificates List
 
+// eslint-disable-next-line no-undef
 define([
     'gettext',
     'js/views/list',

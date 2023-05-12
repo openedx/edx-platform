@@ -1,5 +1,6 @@
 // Jasmine Test Suite: Certificate List View
 
+// eslint-disable-next-line no-undef
 define([
     'underscore',
     'js/models/course',

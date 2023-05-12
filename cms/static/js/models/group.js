@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone', 'underscore', 'underscore.string', 'gettext',
     'backbone.associations'

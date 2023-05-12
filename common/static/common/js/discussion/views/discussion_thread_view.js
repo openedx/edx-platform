@@ -22,6 +22,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionThreadView = (function(_super) {
             var INITIAL_RESPONSE_PAGE_SIZE, SUBSEQUENT_RESPONSE_PAGE_SIZE;
@@ -83,6 +84,7 @@
                 DiscussionThreadView.__super__.initialize.call(this);
                 this.mode = options.mode || 'inline';
                 this.context = options.context || 'course';
+                // eslint-disable-next-line no-undef
                 this.options = _.extend({}, options);
                 this.startHeader = options.startHeader;
                 // eslint-disable-next-line no-cond-assign
@@ -125,11 +127,13 @@
             DiscussionThreadView.prototype.renderTemplate = function() {
                 var $container,
                     templateData;
+                // eslint-disable-next-line no-undef
                 this.template = _.template($('#thread-template').html());
                 $container = $('#discussion-container');
                 if (!$container.length) {
                     $container = $('.discussion-module');
                 }
+                // eslint-disable-next-line no-undef
                 templateData = _.extend(this.model.toJSON(), {
                     readOnly: this.readOnly,
                     startHeader: this.startHeader + 1, // this is a child so headers should be increased

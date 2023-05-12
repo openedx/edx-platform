@@ -58,6 +58,7 @@
                 // spying on `view.validate` twice
                 if (!_.isUndefined(validationSuccess)) {
                     // Force validation to return as expected
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'validate').and.returnValue({
                         isValid: validationSuccess,
                         message: 'Submission was validated.'
@@ -80,7 +81,9 @@
                 createPasswordResetView(this);
 
                 // We expect these events to be triggered upon a successful password reset
+                // eslint-disable-next-line no-undef
                 syncSpy = jasmine.createSpy('syncEvent');
+                // eslint-disable-next-line no-undef
                 passwordEmailSentSpy = jasmine.createSpy('passwordEmailSentEvent');
                 view.listenTo(view.model, 'sync', syncSpy);
                 view.listenTo(view, 'password-email-sent', passwordEmailSentSpy);
@@ -157,4 +160,5 @@
             });
         });
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

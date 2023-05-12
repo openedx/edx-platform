@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
 ], function($, _, Annotator, Logger, NotesFactory) {
@@ -12,6 +13,7 @@ define([
                 }
             );
             this.plugin = this.annotator.plugins.CaretNavigation;
+            // eslint-disable-next-line no-undef
             spyOn(Logger, 'log');
         });
 
@@ -23,6 +25,7 @@ define([
 
         describe('destroy', function() {
             it('should unbind all events', function() {
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'off');
                 this.plugin.destroy();
                 expect($.fn.off).toHaveBeenCalledWith('keyup', this.plugin.onKeyUp);
@@ -84,17 +87,27 @@ define([
 
                 this.mockOffset = {top: 0, left: 0};
 
+                // eslint-disable-next-line no-undef
                 this.mockSubscriber = jasmine.createSpy();
                 this.annotator.subscribe('annotationCreated', this.mockSubscriber);
 
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'position').and.returnValue(this.mockOffset);
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator, 'createAnnotation').and.returnValue(this.annotation);
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator, 'setupAnnotation').and.returnValue(this.annotation);
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator, 'getSelectedRanges').and.returnValue([{}]);
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator, 'deleteAnnotation');
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator, 'showEditor');
+                // eslint-disable-next-line no-undef
                 spyOn(Annotator.Util, 'readRangeViaSelection');
+                // eslint-disable-next-line no-undef
                 spyOn(this.plugin, 'saveSelection');
+                // eslint-disable-next-line no-undef
                 spyOn(this.plugin, 'restoreSelection');
             });
 
@@ -111,6 +124,7 @@ define([
             });
 
             it('should display the Annotation#editor correctly if the Annotation#adder is hidden', function() {
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'is').and.returnValue(false);
                 triggerEvent(this.element);
                 expect($('annotator-hl-temporary').position.calls.count()).toBe(1);
@@ -120,6 +134,7 @@ define([
             });
 
             it('should display the Annotation#editor in the same place as the Annotation#adder', function() {
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'is').and.returnValue(true);
                 triggerEvent(this.element);
                 expect(this.annotator.adder.position.calls.count()).toBe(1);
@@ -129,7 +144,9 @@ define([
             });
 
             it('should hide the Annotation#adder', function() {
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'is').and.returnValue(true);
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'hide');
                 triggerEvent(this.element);
                 expect(this.annotator.adder.hide).toHaveBeenCalled();
@@ -193,6 +210,7 @@ define([
             });
 
             it('should do nothing if selection is in Annotator', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(this.annotator, 'isAnnotator').and.returnValue(true);
                 triggerEvent(this.element);
                 expect(this.annotator.showEditor).not.toHaveBeenCalled();

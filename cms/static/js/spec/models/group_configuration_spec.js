@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone', 'cms/js/main', 'js/models/group_configuration',
     'js/models/group', 'js/collections/group', 'squire'

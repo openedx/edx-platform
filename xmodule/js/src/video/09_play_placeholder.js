@@ -15,6 +15,7 @@
                 return new PlayPlaceholder(state, i18n);
             }
 
+            // eslint-disable-next-line no-undef
             _.bindAll(this, 'onClick', 'hide', 'show', 'destroy');
             this.state = state;
             this.state.videoPlayPlaceholder = this;

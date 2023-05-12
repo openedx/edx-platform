@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'logger', 'js/courseware/courseware_factory'], function($, Logger, coursewareFactory) {
     'use strict';
 
@@ -5,6 +6,7 @@ define(['jquery', 'logger', 'js/courseware/courseware_factory'], function($, Log
         beforeEach(function() {
             loadFixtures('js/fixtures/courseware/link_clicked_events.html');
             coursewareFactory();
+            // eslint-disable-next-line no-undef
             spyOn(Logger, 'log');
         });
 

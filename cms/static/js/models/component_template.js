@@ -1,6 +1,7 @@
 /**
  * Simple model for adding a component of a given type (for example, "video" or "html").
  */
+// eslint-disable-next-line no-undef
 define(['backbone'], function(Backbone) {
     return Backbone.Model.extend({
         defaults: {

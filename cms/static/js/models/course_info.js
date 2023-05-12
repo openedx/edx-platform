@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone'], function(Backbone) {
     // single per course holds the updates and handouts
     var CourseInfo = Backbone.Model.extend({

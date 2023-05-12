@@ -58,6 +58,7 @@
 
                 problemId = $(value).attr('data-plain-id');
                 if (typeof problemId !== 'string') {
+                    // eslint-disable-next-line no-console
                     console.log('ERROR: Could not find the ID of the problem DOM element.');
 
                     return;
@@ -66,7 +67,9 @@
                 try {
                     config = JSON.parse($('#drag_and_drop_json_' + problemId).html());
                 } catch (err) {
+                    // eslint-disable-next-line no-console
                     console.log('ERROR: Could not parse the JSON configuration options.');
+                    // eslint-disable-next-line no-console
                     console.log('Error message: "' + err.message + '".');
 
                     return;
@@ -75,6 +78,7 @@
                 state = State(problemId);
 
                 if (configParser(state, config) !== true) {
+                    // eslint-disable-next-line no-console
                     console.log('ERROR: Could not make sense of the JSON configuration options.');
 
                     return;

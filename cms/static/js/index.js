@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/views/utils/create_course_utils',
     'js/views/utils/create_library_utils', 'common/js/components/utils/view_utils'],
 function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibraryUtilsFactory, ViewUtils) {
@@ -63,6 +64,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
             run: run
         };
 
+        // eslint-disable-next-line no-undef
         analytics.track('Created a Course', course_info);
         CreateCourseUtils.create(course_info, function(errorMessage) {
             var msg = edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML('<p>'), errorMessage, edx.HtmlUtils.HTML('</p>'));
@@ -142,6 +144,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
             display_name: display_name
         };
 
+        // eslint-disable-next-line no-undef
         analytics.track('Created a Library', lib_info);
         CreateLibraryUtils.create(lib_info, function(errorMessage) {
             var msg = edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML('<p>'), errorMessage, edx.HtmlUtils.HTML('</p>'));

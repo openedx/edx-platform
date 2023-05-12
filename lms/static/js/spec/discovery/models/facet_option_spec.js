@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/discovery/models/facet_option'], function(FacetOption) {
     'use strict';
 

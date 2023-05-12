@@ -1,5 +1,6 @@
 // Backbone.js Application Model: Certificate
 
+// eslint-disable-next-line no-undef
 define([
     'underscore',
     'backbone',

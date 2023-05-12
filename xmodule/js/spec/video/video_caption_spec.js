@@ -11,6 +11,7 @@
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
                 .and.returnValue(null);
 
@@ -32,15 +33,18 @@
         describe('constructor', function() {
             describe('always', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     spyOn($, 'ajaxWithPrefix').and.callThrough();
                 });
 
                 it('create the transcript element', function() {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                     expect($('.video')).toContainElement('.subtitles');
                 });
 
                 it('has appropriate lang attributes', function() {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
 
                     $('.video .toggle-captions').trigger('click');
@@ -54,12 +58,14 @@
                 });
 
                 it('add transcript control to video player', function() {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                     expect($('.video')).toContainElement('.toggle-transcript');
                 });
 
                 it('add ARIA attributes to transcript control', function() {
                     var $captionControl;
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                     $captionControl = $('.toggle-transcript');
                     expect($captionControl).toHaveAttrs({
@@ -74,6 +80,7 @@
                 });
 
                 it('adds the captioning control to the video player', function() {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                     expect($('.video')).toContainElement('.toggle-captions');
                     expect($('.video')).toContainElement('.closed-captions');
@@ -81,6 +88,7 @@
 
                 it('add ARIA attributes to caption control', function() {
                     var $toggleCaption;
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                     $toggleCaption = $('.toggle-captions');
                     expect($toggleCaption).toHaveAttrs({
@@ -97,31 +105,37 @@
                 it('adds "closed" class to the main element if transcript setting is off', function() {
                     // No cookie, showCaptions setting is off: hide transcripts panel.
                     $.cookie.and.returnValue(null);
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer('video_all.html', {showCaptions: false});
                     expect(state.el).toHaveClass('closed');
 
                     // No cookie, showCaptions setting is on: show transcripts panel.
                     $.cookie.and.returnValue(null);
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer('video_all.html', {showCaptions: true});
                     expect(state.el).not.toHaveClass('closed');
 
                     // Cookie preference is on, showCaptions setting is off: hide transcripts panel.
                     $.cookie.and.returnValue('true');
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer('video_all.html', {showCaptions: false});
                     expect(state.el).toHaveClass('closed');
 
                     // Cookie preference is on, showCaptions setting is on: show transcripts panel.
                     $.cookie.and.returnValue('true');
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer('video_all.html', {showCaptions: true});
                     expect(state.el).not.toHaveClass('closed');
 
                     // Cookie preference is off, showCaptions setting is off: hide transcripts panel.
                     $.cookie.and.returnValue('false');
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer('video_all.html', {showCaptions: false});
                     expect(state.el).toHaveClass('closed');
 
                     // Cookie preference is off, showCaptions setting is on: hide transcripts panel.
                     $.cookie.and.returnValue('false');
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer('video_all.html', {showCaptions: true});
                     expect(state.el).toHaveClass('closed');
                 });
@@ -129,8 +143,10 @@
                 it('fetch the transcript in HTML5 mode', function(done) {
                     var transcriptURL = '/transcript/translation/en',
                         transcriptCall;
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return state.videoCaption.loaded;
                     }).then(function() {
@@ -139,7 +155,9 @@
                             notifyOnError: false,
                             // eslint-disable-next-line no-void
                             data: void 0,
+                            // eslint-disable-next-line no-undef
                             success: jasmine.any(Function),
+                            // eslint-disable-next-line no-undef
                             error: jasmine.any(Function)
                         });
                         transcriptCall = $.ajaxWithPrefix.calls.all().find(function(call) {
@@ -150,18 +168,24 @@
                 });
 
                 it('fetch the transcript in Flash mode', function(done) {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayerYouTube();
+                    // eslint-disable-next-line no-undef
                     spyOn(state, 'isFlashMode').and.returnValue(true);
                     state.videoCaption.fetchCaption();
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return state.videoCaption.loaded;
                     }).then(function() {
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
                             url: '/transcript/translation/en',
                             notifyOnError: false,
+                            // eslint-disable-next-line no-undef
                             data: jasmine.any(Object),
+                            // eslint-disable-next-line no-undef
                             success: jasmine.any(Function),
+                            // eslint-disable-next-line no-undef
                             error: jasmine.any(Function)
                         });
                         expect($.ajaxWithPrefix.calls.mostRecent().args[0].data)
@@ -172,16 +196,21 @@
                 });
 
                 it('fetch the transcript in Youtube mode', function(done) {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayerYouTube();
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return state.videoCaption.loaded;
                     }).then(function() {
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
                             url: '/transcript/translation/en',
                             notifyOnError: false,
+                            // eslint-disable-next-line no-undef
                             data: jasmine.any(Object),
+                            // eslint-disable-next-line no-undef
                             success: jasmine.any(Function),
+                            // eslint-disable-next-line no-undef
                             error: jasmine.any(Function)
                         });
                         expect($.ajaxWithPrefix.calls.mostRecent().args[0].data)
@@ -192,6 +221,7 @@
                 });
 
                 it('bind the mouse movement', function() {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                     expect($('.subtitles-menu')).toHandle('mouseover');
                     expect($('.subtitles-menu')).toHandle('mouseout');
@@ -201,6 +231,7 @@
                 });
 
                 it('bind the scroll', function() {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                     expect($('.subtitles-menu'))
                         .toHandleWith('scroll', state.videoControl.showControls);
@@ -209,10 +240,13 @@
 
             it('can destroy itself', function() {
                 var plugin;
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajaxWithPrefix');
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 plugin = state.videoCaption;
 
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'off').and.callThrough();
                 state.videoCaption.destroy();
 
@@ -238,6 +272,7 @@
                         };
 
                     it('toggles the captions on control click', function() {
+                        // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer();
 
                         $('.toggle-captions').click();
@@ -250,6 +285,7 @@
                     });
 
                     it('toggles the captions on keypress ENTER', function() {
+                        // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer();
 
                         $('.toggle-captions').focus().trigger(keyPressEvent(KEY.ENTER));
@@ -262,6 +298,7 @@
                     });
 
                     it('toggles the captions on keypress SPACE', function() {
+                        // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer();
 
                         $('.toggle-captions').focus().trigger(keyPressEvent(KEY.SPACE));
@@ -285,6 +322,7 @@
 
                     it('if languages more than 1', function() {
                         var transcripts, langCodes, langLabels;
+                        // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer();
                         transcripts = state.config.transcriptLanguages;
                         langCodes = _.keys(transcripts);
@@ -305,11 +343,14 @@
 
                     it('when clicking on link with new language', function() {
                         var Caption, $link;
+                        // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer();
                         Caption = state.videoCaption;
                         $link = $('.langs-list li[data-lang-code="de"] .control-lang');
 
+                        // eslint-disable-next-line no-undef
                         spyOn(Caption, 'fetchCaption');
+                        // eslint-disable-next-line no-undef
                         spyOn(state.storage, 'setItem');
 
                         state.lang = 'en';
@@ -332,11 +373,14 @@
                     it('when clicking on link with current language', function() {
                         var Caption, $link;
 
+                        // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer();
                         Caption = state.videoCaption;
                         $link = $('.langs-list li[data-lang-code="en"] .control-lang');
 
+                        // eslint-disable-next-line no-undef
                         spyOn(Caption, 'fetchCaption');
+                        // eslint-disable-next-line no-undef
                         spyOn(state.storage, 'setItem');
 
                         state.lang = 'en';
@@ -351,6 +395,7 @@
                     });
 
                     it('open the language toggle on hover', function() {
+                        // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer();
                         $('.lang').mouseenter();
                         expect($('.lang')).toHaveClass('is-opened');
@@ -359,6 +404,7 @@
                     });
 
                     it('opens the language menu on arrow up', function() {
+                        // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer();
                         $('.language-menu').focus();
                         $('.language-menu').trigger(keyPressEvent(KEY.UP));
@@ -371,6 +417,7 @@
                     });
 
                     it('closes the language menu on ESC', function() {
+                        // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer();
                         $('.language-menu').trigger(keyPressEvent(KEY.UP));
                         expect($('.lang')).toHaveClass('is-opened');
@@ -382,6 +429,7 @@
 
                 describe('is not rendered', function() {
                     it('if just 1 language', function() {
+                        // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer(null, {
                             transcriptLanguages: {en: 'English'}
                         });
@@ -395,14 +443,17 @@
 
             describe('when on a non touch-based device', function() {
                 beforeEach(function(done) {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return state.videoCaption.rendered;
                     }).then(done);
                 });
 
                 it('render the transcript', function() {
+                    // eslint-disable-next-line no-undef
                     var captionsData = jasmine.stubbedCaption,
                         $items = $('.subtitles li span[data-index]');
 
@@ -430,6 +481,7 @@
                     ];
 
                     $.each(handlerList, function(index, handler) {
+                        // eslint-disable-next-line no-undef
                         spyOn(state.videoCaption, handler);
                     });
                     $('.subtitles li span[data-index]').each(
@@ -459,8 +511,10 @@
                 });
 
                 it('set rendered to true', function(done) {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return state.videoCaption.rendered;
                     }).then(function() {
@@ -473,6 +527,7 @@
                 beforeEach(function() {
                     window.onTouchBasedDevice.and.returnValue(['iPad']);
 
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                     $.fn.scrollTo.calls.reset();
                 });
@@ -486,9 +541,11 @@
                 it('show transcript on play', function(done) {
                     state.el.trigger('play');
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return state.videoCaption.rendered;
                     }).then(function() {
+                        // eslint-disable-next-line no-undef
                         var captionsData = jasmine.stubbedCaption,
                             $items = $('.subtitles li span[data-index]');
 
@@ -510,6 +567,7 @@
 
             describe('when no transcripts file was specified', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer('video_all.html', {
                         sub: '',
                         transcriptLanguages: {}
@@ -526,20 +584,26 @@
             var originalClearTimeout;
 
             beforeEach(function(done) {
+                // eslint-disable-next-line no-undef
                 jasmine.clock().install();
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
+                // eslint-disable-next-line no-undef
                 jasmine.clock().tick(50);
+                // eslint-disable-next-line no-undef
                 jasmine.waitUntil(function() {
                     return state.videoCaption.rendered;
                 }).then(done);
 
                 // Why we can't use spyOn(): https://github.com/jasmine/jasmine/issues/826
                 originalClearTimeout = window.clearTimeout;
+                // eslint-disable-next-line no-undef
                 window.clearTimeout = jasmine.createSpy().and.callFake(originalClearTimeout);
             });
 
             afterEach(function() {
                 window.clearTimeout = originalClearTimeout;
+                // eslint-disable-next-line no-undef
                 jasmine.clock().uninstall();
             });
 
@@ -551,10 +615,15 @@
 
             describe('when cursor is in the transcript box', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoCaption, 'onMouseLeave');
+                    // eslint-disable-next-line no-undef
                     $(window).trigger(jQuery.Event('mousemove'));
+                    // eslint-disable-next-line no-undef
                     jasmine.clock().tick(state.config.captionsFreezeTime);
+                    // eslint-disable-next-line no-undef
                     $('.subtitles-menu').trigger(jQuery.Event('mouseenter'));
+                    // eslint-disable-next-line no-undef
                     jasmine.clock().tick(state.config.captionsFreezeTime);
                 });
 
@@ -565,6 +634,7 @@
 
                 describe('when the cursor is moving', function() {
                     it('reset the freezing timeout', function() {
+                        // eslint-disable-next-line no-undef
                         $('.subtitles-menu').trigger(jQuery.Event('mousemove'));
                         expect(window.clearTimeout).toHaveBeenCalled();
                     });
@@ -572,6 +642,7 @@
 
                 describe('when the mouse is scrolling', function() {
                     it('reset the freezing timeout', function() {
+                        // eslint-disable-next-line no-undef
                         $('.subtitles-menu').trigger(jQuery.Event('mousewheel'));
                         expect(window.clearTimeout).toHaveBeenCalled();
                     });
@@ -588,6 +659,7 @@
 
                     describe('always', function() {
                         beforeEach(function() {
+                            // eslint-disable-next-line no-undef
                             $('.subtitles-menu').trigger(jQuery.Event('mouseout'));
                         });
 
@@ -606,6 +678,7 @@
                             $('.subtitles-menu span[data-index]:first')
                                 .parent()
                                 .addClass('current');
+                            // eslint-disable-next-line no-undef
                             $('.subtitles-menu').trigger(jQuery.Event('mouseout'));
                         });
 
@@ -617,6 +690,7 @@
                     describe('when the player is not playing', function() {
                         beforeEach(function() {
                             state.videoCaption.playing = false;
+                            // eslint-disable-next-line no-undef
                             $('.subtitles-menu').trigger(jQuery.Event('mouseout'));
                         });
 
@@ -631,13 +705,20 @@
             var Caption, msg;
 
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 Caption = state.videoCaption;
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajaxWithPrefix').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'renderCaption');
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'bindHandlers');
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'updatePlayTime');
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'hideCaptions');
+                // eslint-disable-next-line no-undef
                 spyOn(state, 'youtubeId').and.returnValue('Z5KLxerq05Y');
             });
 
@@ -733,6 +814,7 @@
 
             msg = 'on error: transcripts are hidden if there are no transcripts';
             it(msg, function() {
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'fetchAvailableTranslations');
                 $.ajax.and.callFake(function(settings) {
                     _.result(settings, 'error');
@@ -750,8 +832,11 @@
             msg = 'on error: for Html5 player an attempt to fetch transcript '
                     + 'with youtubeId if there are no additional transcripts';
             it(msg, function() {
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'fetchAvailableTranslations');
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'fetchCaption').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'hideClosedCaptions').and.callThrough();
                 $.ajax.and.callFake(function(settings) {
                     _.result(settings, 'error');
@@ -772,7 +857,9 @@
             msg = 'on success: when fetchCaption called with fetch_with_youtubeId to '
                     + 'get transcript with youtubeId for html5';
             it(msg, function() {
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'fetchAvailableTranslations');
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'fetchCaption').and.callThrough();
 
                 Caption.loaded = true;
@@ -802,6 +889,7 @@
                     uk: 'Ukrainian'
                 };
 
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'fetchAvailableTranslations');
                 Caption.fetchCaption();
 
@@ -814,11 +902,16 @@
             var Caption, msg;
 
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 Caption = state.videoCaption;
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajaxWithPrefix').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'hideCaptions');
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'fetchCaption');
+                // eslint-disable-next-line no-undef
                 spyOn(Caption, 'renderLanguageMenu');
             });
 
@@ -828,7 +921,9 @@
                 expect($.ajaxWithPrefix).toHaveBeenCalledWith({
                     url: '/transcript/available_translations',
                     notifyOnError: false,
+                    // eslint-disable-next-line no-undef
                     success: jasmine.any(Function),
+                    // eslint-disable-next-line no-undef
                     error: jasmine.any(Function)
                 });
             });
@@ -884,9 +979,11 @@
                 beforeEach(function(done) {
                     window.onTouchBasedDevice.and.returnValue(['iPad']);
 
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                     state.videoCaption.play();
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         return state.videoCaption.rendered;
                     }).then(function() {
@@ -897,6 +994,7 @@
                 it('render the transcript', function() {
                     var captionsData;
 
+                    // eslint-disable-next-line no-undef
                     captionsData = jasmine.stubbedCaption;
 
                     $('.subtitles li span[data-index]').each(
@@ -925,6 +1023,7 @@
 
         describe('pause', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 state.videoCaption.playing = true;
                 state.videoCaption.pause();
@@ -937,8 +1036,10 @@
 
         describe('updatePlayTime', function() {
             beforeEach(function(done) {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
 
+                // eslint-disable-next-line no-undef
                 jasmine.waitUntil(function() {
                     return state.videoCaption.rendered;
                 }).then(done);
@@ -950,6 +1051,7 @@
                     expect(state.videoCaption.currentIndex).toEqual(5);
 
                     // Flash mode
+                    // eslint-disable-next-line no-undef
                     spyOn(state, 'isFlashMode').and.returnValue(true);
                     state.speed = '1.0';
                     state.videoCaption.updatePlayTime(25.000);
@@ -968,6 +1070,7 @@
 
                     // Flash mode
                     state.speed = '2.0';
+                    // eslint-disable-next-line no-undef
                     spyOn(state, 'isFlashMode').and.returnValue(true);
                     state.videoCaption.updatePlayTime(25.000);
                     expect(state.videoCaption.currentIndex).toEqual(9);
@@ -1016,8 +1119,10 @@
 
         describe('resize', function() {
             beforeEach(function(done) {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
 
+                // eslint-disable-next-line no-undef
                 jasmine.waitUntil(function() {
                     return state.videoCaption.rendered;
                 }).then(function() {
@@ -1084,10 +1189,13 @@
 
         xdescribe('scrollCaption', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 runs(function() {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                 });
 
+                // eslint-disable-next-line no-undef
                 waitsFor(function() {
                     return state.videoCaption.rendered;
                 }, 'Transcripts are not rendered', WAIT_TIMEOUT);
@@ -1095,6 +1203,7 @@
 
             describe('when frozen', function() {
                 it('does not scroll the transcript', function() {
+                    // eslint-disable-next-line no-undef
                     runs(function() {
                         state.videoCaption.frozen = true;
                         $('.subtitles li span[data-index=1]').addClass('current');
@@ -1106,6 +1215,7 @@
 
             describe('when not frozen', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     runs(function() {
                         state.videoCaption.frozen = false;
                     });
@@ -1113,6 +1223,7 @@
 
                 describe('when there is no current transcript', function() {
                     it('does not scroll the transcript', function() {
+                        // eslint-disable-next-line no-undef
                         runs(function() {
                             state.videoCaption.scrollCaption();
                             expect($.fn.scrollTo).not.toHaveBeenCalled();
@@ -1122,6 +1233,7 @@
 
                 describe('when there is a current transcript', function() {
                     it('scroll to current transcript', function() {
+                        // eslint-disable-next-line no-undef
                         runs(function() {
                             $('.subtitles li span[data-index=1]').addClass('current');
                             state.videoCaption.scrollCaption();
@@ -1134,10 +1246,13 @@
 
         xdescribe('seekPlayer', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 runs(function() {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
                 });
 
+                // eslint-disable-next-line no-undef
                 waitsFor(function() {
                     var duration = state.videoPlayer.duration(),
                         isRendered = state.videoCaption.rendered;
@@ -1148,6 +1263,7 @@
 
             describe('when the video speed is 1.0x', function() {
                 it('trigger seek event with the correct time', function() {
+                    // eslint-disable-next-line no-undef
                     runs(function() {
                         state.videoSpeedControl.currentSpeed = '1.0';
                         $('.subtitles li span[data-start="14910"]').trigger('click');
@@ -1158,6 +1274,7 @@
 
             describe('when the video speed is not 1.0x', function() {
                 it('trigger seek event with the correct time', function() {
+                    // eslint-disable-next-line no-undef
                     runs(function() {
                         state.videoSpeedControl.currentSpeed = '0.75';
                         $('.subtitles li span[data-start="14910"]').trigger('click');
@@ -1169,6 +1286,7 @@
             describe('when the player type is Flash at speed 0.75x',
                 function() {
                     it('trigger seek event with the correct time', function() {
+                        // eslint-disable-next-line no-undef
                         runs(function() {
                             state.videoSpeedControl.currentSpeed = '0.75';
                             state.currentPlayerMode = 'flash';
@@ -1181,6 +1299,7 @@
 
         describe('toggleTranscript', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
                 $('.subtitles li span[data-index=1]').addClass('current');
             });
@@ -1188,6 +1307,7 @@
             describe('when the transcript is visible', function() {
                 beforeEach(function() {
                     state.el.removeClass('closed');
+                    // eslint-disable-next-line no-undef
                     state.videoCaption.toggleTranscript(jQuery.Event('click'));
                 });
 
@@ -1199,11 +1319,14 @@
             describe('when the transcript is hidden', function() {
                 beforeEach(function() {
                     state.el.addClass('closed');
+                    // eslint-disable-next-line no-undef
                     state.videoCaption.toggleTranscript(jQuery.Event('click'));
+                    // eslint-disable-next-line no-undef
                     jasmine.clock().install();
                 });
 
                 afterEach(function() {
+                    // eslint-disable-next-line no-undef
                     jasmine.clock().uninstall();
                 });
 
@@ -1215,12 +1338,14 @@
                 xit('scroll the transcript', function() {
                     // After transcripts are shown, and the video plays for a
                     // bit.
+                    // eslint-disable-next-line no-undef
                     jasmine.clock().tick(1000);
 
                     // The transcripts should have advanced by at least one
                     // position. When they advance, the list scrolls. The
                     // current transcript position should be constantly
                     // visible.
+                    // eslint-disable-next-line no-undef
                     runs(function() {
                         expect($.fn.scrollTo).toHaveBeenCalled();
                     });
@@ -1230,8 +1355,10 @@
 
         describe('transcript accessibility', function() {
             beforeEach(function(done) {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
 
+                // eslint-disable-next-line no-undef
                 jasmine.waitUntil(function() {
                     return state.videoCaption.rendered;
                 }).then(done);
@@ -1241,6 +1368,7 @@
                 beforeEach(function() {
                     state.videoCaption.isMouseFocus = false;
                     $('.subtitles li span[data-index=0]').trigger(
+                        // eslint-disable-next-line no-undef
                         jQuery.Event('focus')
                     );
                 });
@@ -1258,6 +1386,7 @@
             describe('when loosing focus through TAB key', function() {
                 beforeEach(function() {
                     $('.subtitles li span[data-index=0]').trigger(
+                        // eslint-disable-next-line no-undef
                         jQuery.Event('blur')
                     );
                 });
@@ -1279,8 +1408,10 @@
                     beforeEach(function() {
                         state.videoCaption.isMouseFocus = false;
                         $('.subtitles li span[data-index=0]')
+                            // eslint-disable-next-line no-undef
                             .trigger(jQuery.Event('focus'));
                         $('.subtitles li span[data-index=0]')
+                            // eslint-disable-next-line no-undef
                             .trigger(jQuery.Event('mousedown'));
                     });
 
@@ -1306,11 +1437,14 @@
 
                         state.videoCaption.isMouseFocus = false;
 
+                        // eslint-disable-next-line no-undef
                         $subDataLiIdx0.trigger(jQuery.Event('focus'));
+                        // eslint-disable-next-line no-undef
                         $subDataLiIdx0.trigger(jQuery.Event('blur'));
 
                         state.videoCaption.isMouseFocus = true;
 
+                        // eslint-disable-next-line no-undef
                         $subDataLiIdx1.trigger(jQuery.Event('mousedown'));
                     });
 

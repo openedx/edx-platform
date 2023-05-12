@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'backbone',
@@ -194,6 +195,7 @@ define(
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     imageView.render();
 
+                    // eslint-disable-next-line no-undef
                     spyOn(imageView, 'clickedRemoveButton');
 
                     // Remove button should not be present for default image
@@ -236,7 +238,9 @@ define(
                     var imageView = createImageView({ownProfile: true, hasImage: false, yearOfBirth: ''});
                     imageView.render();
 
+                    // eslint-disable-next-line no-undef
                     spyOn(imageView, 'clickedUploadButton');
+                    // eslint-disable-next-line no-undef
                     spyOn(imageView, 'clickedRemoveButton');
 
                     expect(imageView.$('.u-field-upload-button').css('display') === 'none').toBeTruthy();
@@ -253,7 +257,9 @@ define(
                     var imageView = createImageView({ownProfile: false});
                     imageView.render();
 
+                    // eslint-disable-next-line no-undef
                     spyOn(imageView, 'clickedUploadButton');
+                    // eslint-disable-next-line no-undef
                     spyOn(imageView, 'clickedRemoveButton');
 
                     expect(imageView.$('.u-field-upload-button').css('display') === 'none').toBeTruthy();
@@ -268,6 +274,7 @@ define(
 
                 it('shows message if we try to navigate away during image upload/remove', function() {
                     var imageView = createImageView({ownProfile: true, hasImage: false});
+                    // eslint-disable-next-line no-undef
                     spyOn(imageView, 'onBeforeUnload');
                     imageView.render();
 

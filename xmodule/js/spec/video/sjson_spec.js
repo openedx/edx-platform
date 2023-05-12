@@ -3,6 +3,7 @@
         ['video/00_sjson.js'],
         function(Sjson) {
             describe('Sjson', function() {
+                // eslint-disable-next-line no-undef
                 var data = jasmine.stubbedCaption,
                     sjson;
                 var videoStops = [0, 3120, 6270, 8490, 21620, 24920];

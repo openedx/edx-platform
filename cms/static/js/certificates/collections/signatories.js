@@ -1,5 +1,6 @@
 // Backbone.js Application Collection: Certificate Signatories
 
+// eslint-disable-next-line no-undef
 define([
     'backbone',
     'js/certificates/models/signatory'

@@ -22,6 +22,7 @@
  *   primaryActionButtonTitle: A string to be used as title for primary action button.
  *   showEditorModeButtons: Whether to show editor mode button in the modal header.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
     function($, _, gettext, BaseView) {
         var BaseModal = BaseView.extend({

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/views/pay_and_verify_view'],
     function($, TemplateHelpers, PayAndVerifyView) {
         'use strict';
@@ -50,6 +51,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 return new PayAndVerifyView({
                     displaySteps: displaySteps,
                     currentStep: currentStep,
+                    // eslint-disable-next-line no-undef
                     errorModel: new (Backbone.Model.extend({}))()
                 }).render();
             };
@@ -60,7 +62,9 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
             };
 
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'trackLink']);
+                // eslint-disable-next-line no-undef
                 navigator.getUserMedia = jasmine.createSpy();
 
                 setFixtures('<div id="pay-and-verify-container"></div>');

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'edx-ui-toolkit/js/utils/html-utils',
     'jquery.form'],
 function($, _, gettext, BaseModal, HtmlUtils) {
@@ -55,6 +56,7 @@ function($, _, gettext, BaseModal, HtmlUtils) {
 
         getContentHtml: function() {
             return this.template({
+                // eslint-disable-next-line no-undef
                 url: this.options.url || CMS.URL.UPLOAD_ASSET,
                 message: this.model.get('message'),
                 selectedFile: this.model.get('selectedFile'),

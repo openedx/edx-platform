@@ -1,5 +1,6 @@
 /* global course */
 
+// eslint-disable-next-line no-undef
 define(['underscore', 'jquery', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
     'js/views/baseview', 'js/models/uploads', 'js/views/uploads', 'text!templates/edit-chapter.underscore'],
 function(_, $, gettext, HtmlUtils, BaseView, FileUploadModel, UploadDialogView, editChapterTemplate) {

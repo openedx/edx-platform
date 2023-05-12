@@ -15,6 +15,7 @@
                 return new PlaySkipControl(state, i18n);
             }
 
+            // eslint-disable-next-line no-undef
             _.bindAll(this, 'play', 'onClick', 'destroy');
             this.state = state;
             this.state.videoPlaySkipControl = this;

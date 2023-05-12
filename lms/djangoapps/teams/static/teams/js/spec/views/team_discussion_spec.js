@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'underscore',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',

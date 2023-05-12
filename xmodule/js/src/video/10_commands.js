@@ -17,6 +17,7 @@
                 return new VideoCommands(state, i18n);
             }
 
+            // eslint-disable-next-line no-undef
             _.bindAll(this, 'destroy');
             this.state = state;
             this.state.videoCommands = this;
@@ -42,9 +43,11 @@
             execute: function(command) {
                 var args = [].slice.call(arguments, 1) || [];
 
+                // eslint-disable-next-line no-undef
                 if (_.has(this.commands, command)) {
                     this.commands[command].execute.apply(this, [this.state].concat(args));
                 } else {
+                    // eslint-disable-next-line no-console
                     console.log('Command "' + command + '" is not available.');
                 }
             },
@@ -57,6 +60,7 @@
                         skipCommand
                     ];
 
+                // eslint-disable-next-line no-undef
                 _.each(commandsList, function(command) {
                     commands[command.name] = command;
                 }, this);

@@ -19,6 +19,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ResponseCommentView = (function(_super) {
             __extends(ResponseCommentView, _super);

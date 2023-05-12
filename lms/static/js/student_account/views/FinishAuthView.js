@@ -87,6 +87,7 @@
             updateTaskDescription: function(desc) {
                 // We don't display any detailed status updates to the user
                 // but we do log them to the console to help with debugging.
+                // eslint-disable-next-line no-console
                 console.log(desc);
             },
 
@@ -175,4 +176,5 @@
         });
         return FinishAuthView;
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

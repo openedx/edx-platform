@@ -139,6 +139,7 @@ class LibrarySourcedBlockPicker extends React.Component {
 
     onDeleteClick(event) {
         let value;
+        // eslint-disable-next-line eqeqeq
         if (event.target.tagName == 'SPAN') {
             value = event.target.parentElement.dataset.value;
         } else {

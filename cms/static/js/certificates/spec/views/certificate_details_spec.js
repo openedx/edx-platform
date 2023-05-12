@@ -1,5 +1,6 @@
 // Jasmine Test Suite: Certifiate Details View
 
+// eslint-disable-next-line no-undef
 define([
     'underscore',
     'js/models/course',
@@ -197,6 +198,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             });
 
             it('should scroll to top after rendering if necessary', function() {
+                // eslint-disable-next-line no-undef
                 $.smoothScroll = jasmine.createSpy('jQuery.smoothScroll');
                 appendSetFixtures(this.view.render().el);
                 expect($.smoothScroll).toHaveBeenCalled();

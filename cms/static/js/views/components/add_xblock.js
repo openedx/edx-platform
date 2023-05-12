@@ -1,6 +1,7 @@
 /**
  * This is a simple component that renders add buttons for all available XBlock template types.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/utils/view_utils',
     'js/views/components/add_xblock_button', 'js/views/components/add_xblock_menu',
     'edx-ui-toolkit/js/utils/html-utils'],

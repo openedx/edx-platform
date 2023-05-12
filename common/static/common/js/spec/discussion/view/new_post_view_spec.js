@@ -8,7 +8,7 @@
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
             window.$$course_id = 'edX/999/test';
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-undef */
             spyOn(DiscussionUtil, 'makeWmdEditor').and.callFake(function($content, $local, cls_identifier) {
                 // eslint-disable-next-line camelcase
                 return $local('.' + cls_identifier).html('<textarea></textarea>');
@@ -128,6 +128,7 @@
                 DiscussionSpecHelper.makeAjaxSpy(function(params) {
                     expect(params.data.group_id).toEqual(expectedGroupId);
                 });
+                // eslint-disable-next-line no-undef
                 return _.each(['1', '2', ''], function(groupIdStr) {
                     expectedGroupId = groupIdStr;
                     self.view.$('.js-group-select').val(groupIdStr);
@@ -233,6 +234,7 @@
                     mode: mode
                 });
                 view.render();
+                // eslint-disable-next-line no-undef
                 eventSpy = jasmine.createSpy('eventSpy');
                 view.listenTo(view, 'newPost:cancel', eventSpy);
                 view.$('.post-errors').html("<li class='post-error'>Title can't be empty</li>");
@@ -260,6 +262,7 @@
                     return expect(view.$('.post-topic option:selected').text()).toEqual('General');
                 }
             };
+            // eslint-disable-next-line no-undef
             return _.each(['tab', 'inline'], function(mode) {
                 it('resets the form in ' + mode + ' mode', function() {
                     return checkPostCancelReset(mode, this.discussion, this.course_settings);
@@ -311,6 +314,7 @@
                     mode: 'tab'
                 });
                 view.render();
+                // eslint-disable-next-line no-undef
                 eventSpy = jasmine.createSpy('eventSpy');
                 view.listenTo(view, 'newPost:cancel', eventSpy);
                 view.$('.post-errors').html("<li class='post-error'>Title can't be empty</li>");
@@ -329,6 +333,7 @@
         it('posts to the correct URL', function() {
             var topicId, view;
             topicId = 'test_topic';
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {
                 expect(params.url.path()).toEqual(DiscussionUtil.urlFor('create_thread', topicId));
                 return {

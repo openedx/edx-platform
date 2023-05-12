@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers', 'course_bookmarks/js/views/bookmark_button'
@@ -18,11 +19,14 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
                 ]
             );
 
+            // eslint-disable-next-line no-undef
             jasmine.createSpy('timerCallback');
+            // eslint-disable-next-line no-undef
             jasmine.clock().install();
         });
 
         afterEach(function() {
+            // eslint-disable-next-line no-undef
             jasmine.clock().uninstall();
         });
 
@@ -83,6 +87,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
                 var bookmarkButtonView = createBookmarkButtonView(firstActionData.bookmarked);
                 verifyBookmarkButtonState(bookmarkButtonView, firstActionData.bookmarked);
 
+                // eslint-disable-next-line no-undef
                 spyOn(bookmarkButtonView, firstActionData.handler).and.callThrough();
                 spyOnEvent(bookmarkButtonView.$el, firstActionData.event);
 
@@ -104,6 +109,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
                 expect(bookmarkButtonView.$el).not.toHaveAttr('disabled');
                 verifyBookmarkButtonState(bookmarkButtonView, secondActionData.bookmarked);
 
+                // eslint-disable-next-line no-undef
                 spyOn(bookmarkButtonView, secondActionData.handler).and.callThrough();
                 spyOnEvent(bookmarkButtonView.$el, secondActionData.event);
 
@@ -156,6 +162,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, BookmarkButtonView) {
 
             expect($messageBanner.text().trim()).toBe(bookmarkButtonView.errorMessage);
 
+            // eslint-disable-next-line no-undef
             jasmine.clock().tick(5001);
             expect($messageBanner.text().trim()).toBe('');
         });

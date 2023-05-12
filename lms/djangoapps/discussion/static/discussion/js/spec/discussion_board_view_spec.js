@@ -38,6 +38,7 @@
                 describe('goHome view', function() {
                     it('Ensure no ajax request when digests are unavailable', function() {
                         var discussionBoardView = createDiscussionBoardView();
+                        // eslint-disable-next-line no-undef
                         spyOn(DiscussionUtil, 'safeAjax').and.callThrough();
                         window.ENABLE_FORUM_DAILY_DIGEST = false;
 
@@ -47,6 +48,7 @@
                     it('Verify the ajax request when digests are available', function() {
                         var discussionBoardView = createDiscussionBoardView();
                         discussionBoardView.render();
+                        // eslint-disable-next-line no-undef
                         spyOn(DiscussionUtil, 'safeAjax').and.callThrough();
 
                         discussionBoardView.goHome();
@@ -68,6 +70,7 @@
                             threadListView;
                         discussionBoardView.render();
                         threadListView = discussionBoardView.discussionThreadListView;
+                        // eslint-disable-next-line no-undef
                         spyOn(threadListView, 'performSearch');
                         discussionBoardView.$('.search-input').trigger($.Event('keydown', {
                             which: constants.keyCodes.enter
@@ -80,6 +83,7 @@
                             threadListView;
                         discussionBoardView.render();
                         threadListView = discussionBoardView.discussionThreadListView;
+                        // eslint-disable-next-line no-undef
                         spyOn(threadListView, 'performSearch');
                         discussionBoardView.$el.find('.search-button').click();
                         expect(threadListView.performSearch).toHaveBeenCalled();
@@ -87,4 +91,5 @@
                 });
             });
         });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

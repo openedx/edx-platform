@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    // eslint-disable-next-line no-undef
     var editor = CodeMirror.fromTextArea(document.getElementById('id_content'), {
         mode: 'edx_markdown',
         matchBrackets: true,
@@ -18,6 +19,7 @@ $(document).ready(function() {
     $(".control-label[for='id_content']")[0].setAttribute('for', 'id_codemirror_content');
     // eslint-disable-next-line consistent-return
     window.onbeforeunload = function askConfirm() { // Warn the user before they navigate away
+        // eslint-disable-next-line eqeqeq
         if (editor.getValue() != initialContents) {
             return 'You have made changes to the article that have not been saved yet.';
         }

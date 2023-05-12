@@ -1,5 +1,6 @@
 // Jasmine Test Suite: Certificate Web Preview
 
+// eslint-disable-next-line no-undef
 define([
     'underscore',
     'jquery',
@@ -56,6 +57,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
 
         describe('Certificate preview', function() {
             it('course mode event should call when user choose a new mode', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'courseModeChanged');
                 this.view.delegateEvents();
                 selectDropDownByText(this.view.$(SELECTORS.course_modes), 'test3');
@@ -77,6 +79,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
             });
 
             it('toggle certificate activation event works fine', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'toggleCertificateActivation');
                 this.view.delegateEvents();
                 this.view.$(SELECTORS.activate_certificate).click();
@@ -115,6 +118,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
             });
 
             it('method "show" should call the render function', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'render');
                 this.view.show();
                 expect(this.view.render).toHaveBeenCalled();

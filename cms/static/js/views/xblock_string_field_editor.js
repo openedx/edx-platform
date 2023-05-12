@@ -5,6 +5,7 @@
  * XBlock field's value if it has been changed. If the user presses Escape, then any changes will
  * be removed and the input hidden again.
  */
+// eslint-disable-next-line no-undef
 define(['js/views/baseview', 'js/views/utils/xblock_utils', 'edx-ui-toolkit/js/utils/html-utils'],
     function(BaseView, XBlockViewUtils, HtmlUtils) {
         'use strict';

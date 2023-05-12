@@ -228,4 +228,5 @@
             }
         }
     });
+// eslint-disable-next-line no-undef
 }).call(this, require || RequireJS.require, define || RequireJS.define);

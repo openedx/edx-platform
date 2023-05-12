@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'logger', 'js/courseware/toggle_element_visibility', 'moment'],
     function($, Logger, ToggleElementVisibility, moment) {
         'use strict';
@@ -6,6 +7,7 @@ define(['jquery', 'logger', 'js/courseware/toggle_element_visibility', 'moment']
             beforeEach(function() {
                 loadFixtures('js/fixtures/courseware/course_updates.html');
                 ToggleElementVisibility();
+                // eslint-disable-next-line no-undef
                 spyOn(Logger, 'log');
             });
 

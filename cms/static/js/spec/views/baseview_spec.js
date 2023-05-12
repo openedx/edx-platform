@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'js/views/baseview', 'js/utils/handle_iframe_binding', 'sinon'],
     function($, _, BaseView, IframeBinding, sinon) {
         describe('BaseView', function() {
@@ -12,9 +13,13 @@ define(['jquery', 'underscore', 'js/views/baseview', 'js/utils/handle_iframe_bin
                     // eslint-disable-next-line camelcase
                     iframeBinding_spy = sinon.spy(IframeBinding, 'iframeBinding');
 
+                    // eslint-disable-next-line no-undef
                     spyOn(baseViewPrototype, 'initialize');
+                    // eslint-disable-next-line no-undef
                     spyOn(baseViewPrototype, 'beforeRender');
+                    // eslint-disable-next-line no-undef
                     spyOn(baseViewPrototype, 'render').and.callThrough();
+                    // eslint-disable-next-line no-undef
                     spyOn(baseViewPrototype, 'afterRender').and.callThrough();
                 });
 

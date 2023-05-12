@@ -22,6 +22,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ThreadResponseView = (function(_super) {
             __extends(ThreadResponseView, _super);
@@ -68,11 +69,13 @@
 
             ThreadResponseView.prototype.renderTemplate = function() {
                 var $container, templateData, _ref;
+                // eslint-disable-next-line no-undef
                 this.template = _.template($('#thread-response-template').html());
                 $container = $('#discussion-container');
                 if (!$container.length) {
                     $container = $('.discussion-module');
                 }
+                // eslint-disable-next-line no-undef
                 templateData = _.extend(this.model.toJSON(), {
                     wmdId: typeof this.model.id !== 'undefined' ? this.model.id : (new Date()).getTime(),
                     create_sub_comment: $container.data('user-create-subcomment'),
@@ -273,6 +276,7 @@
             };
 
             ThreadResponseView.prototype.cancelCommentEdits = function() {
+                // eslint-disable-next-line no-undef
                 return _.each(this.commentViews, function(view) {
                     return view.cancelEdit();
                 });

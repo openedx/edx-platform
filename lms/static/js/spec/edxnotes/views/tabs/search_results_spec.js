@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
@@ -127,6 +128,7 @@ define([
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
+            // eslint-disable-next-line no-undef
             spyOn(Logger, 'log');
             submitForm(view.searchBox, 'test_query');
             AjaxHelpers.respondWithJson(requests, responseJson);
@@ -146,6 +148,7 @@ define([
         it('can clear search results if tab is closed', function() {
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-undef
             spyOn(view.searchBox, 'clearInput').and.callThrough();
 
             submitForm(view.searchBox, 'test_query');

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers', 'js/views/fields', 'js/spec/views/fields_helpers',
     'string_utils'],
@@ -23,11 +24,14 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpe
         ];
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             timerCallback = jasmine.createSpy('timerCallback');
+            // eslint-disable-next-line no-undef
             jasmine.clock().install();
         });
 
         afterEach(function() {
+            // eslint-disable-next-line no-undef
             jasmine.clock().uninstall();
         });
 

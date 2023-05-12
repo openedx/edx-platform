@@ -1,6 +1,7 @@
 /*
  Code for editing users and assigning roles within a course or library team context.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/components/views/feedback_prompt',
     'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils'],
 function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
@@ -153,7 +154,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                 };
             for (var i = 0; i < this.users.length; i++) {
                 var user = this.users[i],
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, eqeqeq */
                     is_current_user = this.current_user_id == user.id;
                 // eslint-disable-next-line camelcase
                 var template_data = {
@@ -287,6 +288,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
         },
 
         keyUpHandler: function(event) {
+            // eslint-disable-next-line no-undef
             if (event.which === jQuery.ui.keyCode.ESCAPE && this.$createUserFormWrapper.is('.is-shown')) {
                 this.$cancelButton.click();
             }

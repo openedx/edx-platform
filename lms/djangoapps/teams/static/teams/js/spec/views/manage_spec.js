@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'backbone',
@@ -19,7 +20,9 @@ define([
                 teamEvents: TeamSpecHelpers.teamEvents,
                 teamMembershipManagementUrl: '/manage-test-url'
             }).render();
+            // eslint-disable-next-line no-undef
             spyOn(view, 'handleCsvUploadSuccess');
+            // eslint-disable-next-line no-undef
             spyOn(view, 'handleCsvUploadFailure');
         });
 

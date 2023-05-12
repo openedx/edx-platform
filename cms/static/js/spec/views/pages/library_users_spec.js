@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/view_helpers',
     'js/factories/manage_users_lib', 'common/js/components/utils/view_utils'
@@ -49,6 +50,7 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                     true
                 );
 
+                // eslint-disable-next-line no-undef
                 jasmine.waitUntil(function() {
                     return ($('.ui-loading').length === 0);
                 }).then(done);
@@ -61,6 +63,7 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             it('can give a user permission to use the library', function() {
                 var email = 'other@example.com';
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-undef
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 $('.create-user-button').click();
                 expect($('.wrapper-create-user')).toHaveClass('is-shown');
@@ -74,6 +77,7 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             it('can promote user', function() {
                 var email = 'staff@example.com';
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-undef
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 setRole('staff@example.com', 'staff');
                 AjaxHelpers.expectJsonRequest(requests, 'POST', getUrl(email), {role: 'staff'});
@@ -112,6 +116,7 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             it("can remove a user's permission to access the library", function() {
                 var requests = AjaxHelpers.requests(this);
                 var promptSpy = ViewHelpers.createPromptSpy();
+                // eslint-disable-next-line no-undef
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 var email = 'honor@example.com';
                 $('.user-item[data-email="' + email + '"] .action-delete .delete').click();

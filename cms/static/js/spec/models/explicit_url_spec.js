@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/models/explicit_url'],
     function(Model) {
         describe('Model ', function() {

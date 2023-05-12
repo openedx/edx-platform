@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/view_helpers',
     'js/views/course_rerun', 'js/views/utils/create_course_utils', 'common/js/components/utils/view_utils',
     'jquery.simulate'],
@@ -158,6 +159,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
 
         it('saves course reruns', function() {
             var requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-undef
             var redirectSpy = spyOn(ViewUtils, 'redirect');
             fillInFields('DemoX', 'DM101', '2014', 'Demo course');
             $(selectors.save).click();
@@ -198,6 +200,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
         });
 
         it('can be canceled', function() {
+            // eslint-disable-next-line no-undef
             var redirectSpy = spyOn(ViewUtils, 'redirect');
             $(selectors.cancel).click();
             expect(redirectSpy).toHaveBeenCalledWith('/course/');

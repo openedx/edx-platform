@@ -60,6 +60,7 @@
                 expect(this.content.get('id')).toEqual('01234567');
                 expect(this.content.get('user_url')).toEqual('/courses/edX/999/test/discussion/forum/users/567');
                 expect(this.content.get('children')).toEqual([]);
+                // eslint-disable-next-line no-undef
                 return expect(this.content.get('comments')).toEqual(jasmine.any(Comments));
             });
             it('can update info', function() {

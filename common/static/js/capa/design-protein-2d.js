@@ -4,7 +4,9 @@
     waitForProtex();
 
     function waitForProtex() {
+        // eslint-disable-next-line no-undef
         if (typeof protex !== 'undefined' && protex) {
+            // eslint-disable-next-line no-undef
             protex.onInjectionDone('protex');
         // eslint-disable-next-line brace-style
         }
@@ -27,7 +29,7 @@
         var problem = $('#protex_container').parents('.problem');
         // eslint-disable-next-line camelcase
         var input_field = problem.find('input[type=hidden]');
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-undef */
         var protex_answer = protexCheckAnswer();
         // eslint-disable-next-line camelcase
         var value = {protex_answer: protex_answer};
@@ -36,10 +38,12 @@
         input_field.val(JSON.stringify(value));
     }
 
+    // eslint-disable-next-line no-undef
     protexIsReady = function() {
         // Load target shape
         // eslint-disable-next-line camelcase
         var target_shape = $('#target_shape').val();
+        // eslint-disable-next-line no-undef
         protexSetTargetShape(target_shape);
 
         // Get answer from protex and store it into the hidden input field
@@ -51,7 +55,7 @@
             var problem = $('#protex_container').parents('.problem');
             // eslint-disable-next-line camelcase
             var input_field = problem.find('input[type=hidden]');
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-undef */
             var protex_answer = protexCheckAnswer();
             // eslint-disable-next-line camelcase
             var value = {protex_answer: protex_answer};

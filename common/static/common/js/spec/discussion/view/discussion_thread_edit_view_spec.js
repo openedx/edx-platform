@@ -11,6 +11,7 @@
         beforeEach(function() {
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
+            // eslint-disable-next-line no-undef
             spyOn(DiscussionUtil, 'makeWmdEditor');
             this.threadData = DiscussionViewSpecHelper.makeThreadWithProps({
                 commentable_id: 'test_topic',
@@ -20,6 +21,7 @@
             this.course_settings = DiscussionSpecHelper.createTestCourseSettings();
 
             this.createEditView = function(options) {
+                // eslint-disable-next-line no-undef
                 options = _.extend({
                     container: $('#fixture-element'),
                     model: this.thread,
@@ -34,6 +36,7 @@
         testUpdate = function(view, thread, newTopicId, newTopicName, mode) {
             var discussionMode = mode || 'tab';
 
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {
                 expect(params.url.path()).toEqual(DiscussionUtil.urlFor('update_thread', 'dummy_id'));
                 expect(params.data.thread_type).toBe('discussion');

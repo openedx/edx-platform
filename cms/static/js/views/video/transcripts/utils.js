@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
     'use strict';
 

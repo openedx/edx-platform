@@ -148,4 +148,5 @@ var onCertificatesReady = null;
     _.defaults(window.InstructorDashboard.sections, {
         Certificates: Certificates
     });
+// eslint-disable-next-line no-undef
 }($, gettext, _));

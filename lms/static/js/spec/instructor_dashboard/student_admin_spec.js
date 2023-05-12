@@ -1,4 +1,5 @@
 /* globals _, interpolate_text, statusAjaxError, PendingInstructorTasks, createTaskListTable */
+// eslint-disable-next-line no-undef
 define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],
     function($, StudentAdmin, AjaxHelpers) {
         // 'js/instructor_dashboard/student_admin'
@@ -20,6 +21,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
                 dashboardApiUrl = '/courses/PU/FSc/2014_T4/instructor/api';
                 uniqStudentIdentifier = 'test@example.com';
                 alertMsg = '';
+                // eslint-disable-next-line no-undef
                 spyOn(window, 'alert').and.callFake(function(message) {
                     alertMsg = message;
                 });

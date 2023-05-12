@@ -63,11 +63,14 @@
             this.updateHistory.apply(this, arguments);
             // Adds ID at the first place
             Array.prototype.unshift.call(args, this.id);
+            // eslint-disable-next-line no-console
             if (console && console[logType]) {
+                // eslint-disable-next-line no-console
                 if (console[logType].apply) {
-                    // eslint-disable-next-line prefer-spread
+                    /* eslint-disable-next-line prefer-spread, no-console */
                     console[logType].apply(console, args);
                 } else { // Do this for IE
+                    // eslint-disable-next-line no-console
                     console[logType](args.join(' '));
                 }
             }
@@ -153,4 +156,5 @@
             destroyLogger: destroyLogger
         };
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

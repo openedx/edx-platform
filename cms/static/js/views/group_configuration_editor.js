@@ -2,6 +2,7 @@
  * This class defines an editing view for content experiment group configurations.
  * It is expected to be backed by a GroupConfiguration model.
  */
+// eslint-disable-next-line no-undef
 define([
     'js/views/list_item_editor', 'underscore', 'jquery', 'gettext',
     'js/views/experiment_group_edit'

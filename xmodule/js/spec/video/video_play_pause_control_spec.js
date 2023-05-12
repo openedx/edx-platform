@@ -6,10 +6,14 @@
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer();
+            // eslint-disable-next-line no-undef
             spyOn(state.videoCommands, 'execute');
+            // eslint-disable-next-line no-undef
             spyOn(state.videoSaveStatePlugin, 'saveState');
         });
 

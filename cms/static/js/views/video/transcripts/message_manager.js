@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'jquery', 'backbone', 'underscore',
@@ -71,6 +72,7 @@ define(
                     template;
 
                 if (!tplHtml) {
+                    // eslint-disable-next-line no-console
                     console.error('Couldn\'t load Transcripts status template');
 
                     return this;

@@ -1,4 +1,5 @@
 /* globals Discussion, DiscussionCourseSettings */
+// eslint-disable-next-line no-undef
 define([
     'underscore',
     'jquery',

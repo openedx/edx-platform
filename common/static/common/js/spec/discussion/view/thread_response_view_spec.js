@@ -17,7 +17,9 @@
                 model: this.response,
                 el: $('#fixture-element')
             });
+            // eslint-disable-next-line no-undef
             spyOn(ThreadResponseShowView.prototype, 'render');
+            // eslint-disable-next-line no-undef
             return spyOn(ResponseCommentView.prototype, 'render');
         });
         describe('closed and open Threads', function() {
@@ -103,7 +105,9 @@
                     el: $('#fixture-element'),
                     collapseComments: true
                 });
+                // eslint-disable-next-line no-undef
                 spyOn(_, 'extend').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(window, 'Date').and.callFake(function() {
                     return {
                         getTime: function() {
@@ -112,18 +116,24 @@
                     };
                 });
                 this.view.render();
+                // eslint-disable-next-line no-undef
                 expect(_.extend).toHaveBeenCalledWith(jasmine.any(Object), jasmine.objectContaining({
                     wmdId: 1
                 }));
             });
             it('populates commentViews and binds events', function() {
                 this.view.createEditView();
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'cancelEdit');
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'cancelCommentEdits');
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'hideCommentForm');
+                // eslint-disable-next-line no-undef
                 spyOn(this.view, 'showCommentForm');
                 this.view.renderComments();
                 expect(this.view.commentViews.length).toEqual(2);
+                // eslint-disable-next-line no-undef
                 this.view.commentViews[0].trigger('comment:edit', jasmine.createSpyObj('event', ['preventDefault']));
                 expect(this.view.cancelEdit).toHaveBeenCalled();
                 expect(this.view.cancelCommentEdits).toHaveBeenCalled();
@@ -137,6 +147,7 @@
                 this.view.renderComments();
                 expect(this.view.commentViews.length).toEqual(2);
                 _.each(this.view.commentViews, function(commentView) {
+                    // eslint-disable-next-line no-undef
                     return spyOn(commentView, 'cancelEdit');
                 });
                 this.view.cancelCommentEdits();

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     ['jquery', 'underscore', 'backbone', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/views/course_video_settings', 'common/js/spec_helpers/template_helpers'],

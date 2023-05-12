@@ -26,6 +26,7 @@
             showCohortStateMessage: function() {
                 var actionToggleMessage = this.$('.action-toggle-message');
 
+                // eslint-disable-next-line no-undef
                 AnimationUtil.triggerAnimation(actionToggleMessage);
                 if (this.cohortEnabled) {
                     actionToggleMessage.text(gettext('Cohorts Enabled'));
@@ -36,4 +37,5 @@
         });
         return CourseCohortSettingsNotificationView;
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

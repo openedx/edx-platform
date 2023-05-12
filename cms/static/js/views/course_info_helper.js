@@ -1,6 +1,8 @@
+// eslint-disable-next-line no-undef
 define(['codemirror', 'js/utils/handle_iframe_binding', 'utility'],
     function(CodeMirror, IframeBinding) {
         var editWithCodeMirror = function(model, contentName, baseAssetUrl, textArea) {
+            // eslint-disable-next-line no-undef
             var content = rewriteStaticLinks(model.get(contentName), baseAssetUrl, '/static/');
             model.set(contentName, content);
             var $codeMirror = CodeMirror.fromTextArea(textArea, {
@@ -18,6 +20,7 @@ define(['codemirror', 'js/utils/handle_iframe_binding', 'utility'],
         };
 
         var changeContentToPreview = function(model, contentName, baseAssetUrl) {
+            // eslint-disable-next-line no-undef
             var content = rewriteStaticLinks(model.get(contentName), '/static/', baseAssetUrl);
             // Modify iframe (add wmode=transparent in url querystring) and embed (add wmode=transparent as attribute)
             // tags in html string (content) so both tags will attach to dom and don't create z-index problem for other popups

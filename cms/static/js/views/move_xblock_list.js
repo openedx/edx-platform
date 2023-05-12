@@ -1,6 +1,7 @@
 /**
  * XBlockListView shows list of XBlocks in a particular category(section, subsection, vertical etc).
  */
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'backbone', 'underscore', 'gettext',
     'edx-ui-toolkit/js/utils/html-utils',

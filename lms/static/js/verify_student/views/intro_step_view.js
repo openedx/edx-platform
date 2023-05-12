@@ -35,4 +35,5 @@ var edx = edx || {};
         }
 
     });
+// eslint-disable-next-line no-undef
 }(jQuery));

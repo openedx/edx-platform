@@ -8,14 +8,19 @@
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice')
                 .and.returnValue(null);
 
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer('video_with_bumper.html');
+            // eslint-disable-next-line no-undef
             spyOn(Logger, 'log');
             $('.poster .btn-play').click();
+            // eslint-disable-next-line no-undef
             spyOn(state.bumperState.videoEventsBumperPlugin, 'getCurrentTime').and.returnValue(10);
+            // eslint-disable-next-line no-undef
             spyOn(state.bumperState.videoEventsBumperPlugin, 'getDuration').and.returnValue(20);
         });
 
@@ -139,6 +144,7 @@
 
         it('can destroy itself', function() {
             var plugin = state.bumperState.videoEventsBumperPlugin;
+            // eslint-disable-next-line no-undef
             spyOn($.fn, 'off').and.callThrough();
             plugin.destroy();
             expect(state.bumperState.videoEventsBumperPlugin).toBeUndefined();

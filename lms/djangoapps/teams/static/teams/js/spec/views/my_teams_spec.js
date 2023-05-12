@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone',
     'teams/js/collections/my_teams',

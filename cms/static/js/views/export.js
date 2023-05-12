@@ -1,6 +1,7 @@
 /**
  * Course export-related js.
  */
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'gettext', 'moment', 'common/js/components/views/feedback_prompt',
     'edx-ui-toolkit/js/utils/html-utils', 'jquery.cookie'

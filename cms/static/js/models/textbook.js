@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'underscore', 'gettext', 'js/models/chapter', 'js/collections/chapter',
     'backbone.associations', 'cms/js/main'],
 function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
@@ -32,6 +33,7 @@ function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
         isEmpty: function() {
             return !this.get('name') && this.get('chapters').isEmpty();
         },
+        // eslint-disable-next-line no-undef
         urlRoot: function() { return CMS.URL.TEXTBOOKS; },
         parse: function(response) {
             var ret = $.extend(true, {}, response);

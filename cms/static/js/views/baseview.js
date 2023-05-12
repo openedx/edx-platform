@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'backbone', 'gettext', 'js/utils/handle_iframe_binding', 'js/utils/templates',
     'common/js/components/utils/view_utils'],
 function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {

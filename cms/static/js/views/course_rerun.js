@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['domReady', 'jquery', 'underscore', 'js/views/utils/create_course_utils',
     'common/js/components/utils/view_utils', 'edx-ui-toolkit/js/utils/html-utils'],
 function(domReady, $, _, CreateCourseUtilsFactory, ViewUtils, HtmlUtils) {
@@ -38,7 +39,7 @@ function(domReady, $, _, CreateCourseUtilsFactory, ViewUtils, HtmlUtils) {
         var run = $newCourseForm.find('.rerun-course-run').val();
 
         courseInfo = {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-undef */
             source_course_key: source_course_key,
             org: org,
             number: number,

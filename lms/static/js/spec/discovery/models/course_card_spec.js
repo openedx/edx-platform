@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/discovery/models/course_card'], function(CourseCard) {
     'use strict';
 

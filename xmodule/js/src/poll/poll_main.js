@@ -43,6 +43,7 @@
 
                 _this = this;
 
+                // eslint-disable-next-line no-console
                 console.log('submit answer');
 
                 answerObj.buttonEl.addClass('answered');
@@ -52,7 +53,9 @@
                 $.postWithPrefix(
                     _this.ajax_url + '/' + answer, {},
                     function(response) {
+                        // eslint-disable-next-line no-console
                         console.log('success! response = ');
+                        // eslint-disable-next-line no-console
                         console.log(response);
 
                         _this.showAnswerGraph(response.poll_answers, response.total);
@@ -77,6 +80,7 @@
 
                 _this = this;
 
+                // eslint-disable-next-line no-console
                 console.log('submit reset');
 
                 // Send the data to the server as an AJAX request. Attach a callback that will
@@ -86,7 +90,9 @@
                     this.ajax_url + '/' + 'reset_poll',
                     {},
                     function(response) {
+                        // eslint-disable-next-line no-console
                         console.log('success! response = ');
+                        // eslint-disable-next-line no-console
                         console.log(response);
 
                         if (
@@ -188,6 +194,7 @@
                     if (_this.shortVersion === true) {
                         // eslint-disable-next-line no-shadow
                         $.each(answer, function(index, value) {
+                            // eslint-disable-next-line no-undef
                             if (value instanceof jQuery) {
                                 value.addClass('short');
                             }
@@ -210,6 +217,7 @@
                     }
                 });
 
+                // eslint-disable-next-line no-console
                 console.log(this.jsonConfig.reset);
 
                 if ((typeof this.jsonConfig.reset === 'string') && (this.jsonConfig.reset.toLowerCase() === 'true')) {
@@ -245,6 +253,7 @@
             this.questionEl = $(el).find('.poll_question');
             if (this.questionEl.length !== 1) {
                 // We require one question DOM element.
+                // eslint-disable-next-line no-console
                 console.log('ERROR: PollMain constructor requires one question DOM element.');
 
                 return;
@@ -253,6 +262,7 @@
             // Just a safety precussion. If we run this code more than once, multiple 'click' callback handlers will be
             // attached to the same DOM elements. We don't want this to happen.
             if (this.questionEl.attr('poll_main_processed') === 'true') {
+                // eslint-disable-next-line no-console
                 console.log(
                     'ERROR: PolMain JS constructor was called on a DOM element that has already been processed once.'
                 );
@@ -315,6 +325,7 @@
 
                 return;
             } catch (err) {
+                // eslint-disable-next-line no-console
                 console.log(
                     'ERROR: Invalid JSON config for poll ID "' + this.id + '".',
                     'Error messsage: "' + err.message + '".'

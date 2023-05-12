@@ -12,8 +12,10 @@
                 render: function() {
                     if (!window.$body) { window.$body = $(document.body); }
                     if (this.options.shown) {
+                        // eslint-disable-next-line no-undef
                         $body.addClass('prompt-is-shown');
                     } else {
+                        // eslint-disable-next-line no-undef
                         $body.removeClass('prompt-is-shown');
                     }
                     // super() in Javascript has awkward syntax :(
@@ -46,4 +48,5 @@
 
             return Prompt;
         });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

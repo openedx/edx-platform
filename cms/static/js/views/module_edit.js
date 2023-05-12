@@ -18,6 +18,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     define(['jquery', 'underscore', 'gettext', 'xblock/runtime.v1', 'js/views/xblock', 'js/views/modals/edit_xblock'],
         function($, _, gettext, XBlock, XBlockView, EditXBlockModal) {
             var ModuleEdit = (function(_super) {

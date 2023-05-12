@@ -1,5 +1,6 @@
 // Backbone Application View: Certificates Page
 
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'underscore',

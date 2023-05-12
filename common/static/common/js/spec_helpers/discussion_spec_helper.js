@@ -39,6 +39,7 @@
         };
 
         DiscussionSpecHelper.makeAjaxSpy = function(fakeAjax) {
+            // eslint-disable-next-line no-undef
             return spyOn($, 'ajax').and.callFake(function(params) {
                 fakeAjax(params);
                 return {
@@ -49,6 +50,7 @@
         };
 
         DiscussionSpecHelper.makeEventSpy = function() {
+            // eslint-disable-next-line no-undef
             return jasmine.createSpyObj('event', ['preventDefault', 'target']);
         };
 

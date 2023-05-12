@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers', 'js/spec/edxnotes/helpers', 'logger',
@@ -27,6 +28,7 @@ define([
 
         beforeEach(function() {
             TemplateHelpers.installTemplate('templates/edxnotes/note-item');
+            // eslint-disable-next-line no-undef
             spyOn(Logger, 'log').and.callThrough();
         });
 
@@ -104,6 +106,7 @@ define([
             var scrollToTagSpy = {
                 scrollToTag: function(tagName) {}
             };
+            // eslint-disable-next-line no-undef
             spyOn(scrollToTagSpy, 'scrollToTag');
             var view = getView({tags: ['only']}, scrollToTagSpy.scrollToTag);
             view.$('a.reference-tags').click();
@@ -113,6 +116,7 @@ define([
         it('should log the edx.course.student_notes.used_unit_link event properly', function() {
             var requests = AjaxHelpers.requests(this),
                 view = getView();
+            // eslint-disable-next-line no-undef
             spyOn(view, 'redirectTo');
             view.$('.reference-unit-link').click();
             expect(Logger.log).toHaveBeenCalledWith(

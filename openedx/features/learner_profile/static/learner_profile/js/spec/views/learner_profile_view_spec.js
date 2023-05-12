@@ -1,4 +1,5 @@
 /* eslint-disable vars-on-top */
+// eslint-disable-next-line no-undef
 define(
     [
         'gettext',

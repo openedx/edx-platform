@@ -17,6 +17,7 @@
                 this.options = options;
                 this.tabsCollection = new TabsCollection();
 
+                // eslint-disable-next-line no-undef
                 if (!_.contains(this.options.disabledTabs, 'tags')) {
                 // Must create the Tags view first to get the "scrollToTag" method.
                     this.tagsView = new TagsView({
@@ -38,6 +39,7 @@
                     scrollToTag: scrollToTag
                 });
 
+                // eslint-disable-next-line no-undef
                 if (!_.contains(this.options.disabledTabs, 'course_structure')) {
                     this.courseStructureView = new CourseStructureView({
                         el: this.el,
@@ -47,6 +49,7 @@
                     });
                 }
 
+                // eslint-disable-next-line no-undef
                 if (!_.contains(this.options.disabledTabs, 'tags')) {
                 // Add the Tags model after the Course Structure model.
                     this.tabsCollection.push(tagsModel);
@@ -70,4 +73,5 @@
 
         return NotesPageView;
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

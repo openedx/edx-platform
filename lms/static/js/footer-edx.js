@@ -46,4 +46,5 @@ var edx = edx || {};
     }());
 
     edx.footer.analytics();
+// eslint-disable-next-line no-undef
 }(jQuery));

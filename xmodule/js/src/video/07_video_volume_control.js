@@ -18,6 +18,7 @@
                     return new VolumeControl(state, i18n);
                 }
 
+                // eslint-disable-next-line no-undef
                 _.bindAll(this, 'keyDownHandler', 'updateVolumeSilently',
                     'onVolumeChangeHandler', 'openMenu', 'closeMenu',
                     'toggleMuteHandler', 'keyDownButtonHandler', 'destroy'
@@ -161,6 +162,7 @@
                 /** Bind any necessary function callbacks to DOM events. */
                 bindHandlers: function() {
                     this.state.el.on({
+                        // eslint-disable-next-line no-undef
                         'play.volume': _.once(this.updateVolumeSilently),
                         volumechange: this.onVolumeChangeHandler
                     });
@@ -310,6 +312,7 @@
                     if (volume <= this.min) {
                         this.updateMuteButtonView(true);
                         this.state.el.off('volumechange.is-muted');
+                        // eslint-disable-next-line no-undef
                         this.state.el.on('volumechange.is-muted', _.once(function() {
                             this.updateMuteButtonView(false);
                         }.bind(this)));
@@ -529,6 +532,7 @@
                 getVolume: function() {
                     var volume = parseInt($.cookie(this.cookieName), 10);
 
+                    // eslint-disable-next-line no-undef
                     if (_.isFinite(volume)) {
                         volume = Math.max(volume, this.min);
                         volume = Math.min(volume, this.max);

@@ -21,6 +21,7 @@
             return child;
         };
 
+    // eslint-disable-next-line no-undef
     define(['underscore', 'jquery', 'jquery.ui', 'backbone', 'common/js/components/views/feedback_prompt',
         'common/js/components/views/feedback_notification', 'js/views/module_edit',
         'js/models/module_info', 'js/utils/module'],

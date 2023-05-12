@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'backbone', 'common/js/spec_helpers/template_helpers',
     'js/discovery/models/course_card', 'js/discovery/views/courses_listing'
@@ -31,6 +32,7 @@ define([
 
     describe('discovery.views.CoursesListing', function() {
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             jasmine.clock().install();
             loadFixtures('js/fixtures/discovery.html');
             TemplateHelpers.installTemplate('templates/discovery/course_card');
@@ -46,6 +48,7 @@ define([
         });
 
         afterEach(function() {
+            // eslint-disable-next-line no-undef
             jasmine.clock().uninstall();
         });
 
@@ -58,16 +61,19 @@ define([
         });
 
         it('scrolling triggers an event for next page', function() {
+            // eslint-disable-next-line no-undef
             this.onNext = jasmine.createSpy('onNext');
             this.view.on('next', this.onNext);
             this.view.render();
             window.scroll(0, $(document).height());
             $(window).trigger('scroll');
+            // eslint-disable-next-line no-undef
             jasmine.clock().tick(500);
             expect(this.onNext).toHaveBeenCalled();
 
             // should not be triggered again (while it is loading)
             $(window).trigger('scroll');
+            // eslint-disable-next-line no-undef
             jasmine.clock().tick(500);
             expect(this.onNext.calls.count()).toEqual(1);
         });

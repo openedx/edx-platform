@@ -79,7 +79,9 @@ export function LearnerAnalyticsDashboard(props) {
     const assignmentTypes = [...new Set(assignments)];
     const assignmentCounts = getAssignmentCounts(assignmentTypes, schedule);
 
+    // eslint-disable-next-line no-console
     console.log(schedule_raw);
+    // eslint-disable-next-line no-console
     console.log(grades);
 
     return (

@@ -61,10 +61,11 @@
     // - getConverter() returns the markdown converter object that was passed to the constructor
     // - run() actually starts the editor; should be called after all necessary plugins are registered. Calling this more than once is a no-op.
     // - refreshPreview() forces the preview to be updated. This method is only available after run() was called.
+    // eslint-disable-next-line no-undef
     Markdown.Editor = function(markdownConverter, idPostfix, help, imageUploadHandler) {
         idPostfix = idPostfix || '';
 
-        // eslint-disable-next-line no-multi-assign
+        /* eslint-disable-next-line no-multi-assign, no-undef */
         var hooks = this.hooks = new Markdown.HookCollection();
         hooks.addNoop('onPreviewPush'); // called with no arguments after the preview has been refreshed
         hooks.addNoop('postBlockquoteCreation'); // called with the user's selection *after* the blockquote was created; should return the actual to-be-inserted text
@@ -243,6 +244,7 @@
         var toolbars = doc.getElementsByClassName(toolbarClassName);
         for (var i = 0; i < toolbars.length; ++i) {
             var aToolbar = toolbars[i];
+            // eslint-disable-next-line eqeqeq
             if (aToolbar.children.length == 0) {
                 var anEmptyToolbar = aToolbar;
                 return anEmptyToolbar;
@@ -423,6 +425,7 @@
 
         // Set the mode for later logic steps.
         var setMode = function(newMode, noSave) {
+            // eslint-disable-next-line eqeqeq
             if (mode != newMode) {
                 mode = newMode;
                 if (!noSave) {
@@ -430,6 +433,7 @@
                 }
             }
 
+            // eslint-disable-next-line eqeqeq
             if (!uaSniffed.isIE || mode != 'moving') {
                 timer = setTimeout(refreshState, 1);
             } else {
@@ -504,6 +508,7 @@
             if (!currState) {
                 return false;
             }
+            // eslint-disable-next-line eqeqeq
             if (mode == 'moving') {
                 if (!lastState) {
                     lastState = currState;
@@ -512,6 +517,7 @@
                 return;
             }
             if (lastState) {
+                // eslint-disable-next-line eqeqeq
                 if (undoStack[stackPtr - 1].text != lastState.text) {
                     undoStack[stackPtr++] = lastState;
                 }
@@ -569,17 +575,21 @@
                     // 33 - 40: page up/dn and arrow keys
                     // 63232 - 63235: page up/dn and arrow keys on safari
                     setMode('moving');
+                // eslint-disable-next-line eqeqeq
                 } else if (keyCode == 8 || keyCode == 46 || keyCode == 127) {
                     // 8: backspace
                     // 46: delete
                     // 127: delete
                     setMode('deleting');
+                // eslint-disable-next-line eqeqeq
                 } else if (keyCode == 13) {
                     // 13: Enter
                     setMode('newlines');
+                // eslint-disable-next-line eqeqeq
                 } else if (keyCode == 27) {
                     // 27: escape
                     setMode('escape');
+                // eslint-disable-next-line eqeqeq
                 } else if ((keyCode < 16 || keyCode > 20) && keyCode != 91) {
                     // 16-20 are shift, etc.
                     // 91: left window key
@@ -594,13 +604,16 @@
             util.addEvent(panels.input, 'keypress', function(event) {
                 // keyCode 89: y
                 // keyCode 90: z
+                // eslint-disable-next-line eqeqeq
                 if ((event.ctrlKey || event.metaKey) && (event.keyCode == 89 || event.keyCode == 90)) {
                     event.preventDefault();
                 }
             });
 
             var handlePaste = function() {
+                // eslint-disable-next-line eqeqeq
                 if (uaSniffed.isIE || (inputStateObj && inputStateObj.text != panels.input.value)) {
+                    // eslint-disable-next-line eqeqeq
                     if (timer == undefined) {
                         mode = 'paste';
                         saveState();
@@ -724,6 +737,7 @@
 
         // Restore this state into the input area.
         this.restore = function() {
+            // eslint-disable-next-line eqeqeq
             if (stateObj.text != undefined && stateObj.text != inputArea.value) {
                 inputArea.value = stateObj.text;
             }
@@ -797,6 +811,7 @@
             if (!panels.preview) { return; }
 
             var text = panels.input.value;
+            // eslint-disable-next-line eqeqeq
             if (text && text == oldInputText) {
                 return; // Input text hasn't changed.
             } else {
@@ -1060,6 +1075,7 @@
                 }
 
                 document.getElementById('wmd-editor-dialog-form-errors').textContent = [
+                    // eslint-disable-next-line no-undef
                     interpolate( // xss-lint: disable=javascript-interpolate
                         ngettext(
                             // Translators: 'errorCount' is the number of errors found in the form.
@@ -1081,6 +1097,7 @@
         var createDialog = function() {
             // The main dialog box.
             dialog = doc.createElement('div');
+            // eslint-disable-next-line no-undef
             dialog.innerHTML = _.template(
                 document.getElementById('customwmd-prompt-template').innerHTML)({
                 title: title,
@@ -1384,6 +1401,7 @@
                     };
                     util.addEvent(button, 'keydown', function(event) {
                         var keyCode = event.charCode || event.keyCode;
+                        // eslint-disable-next-line eqeqeq
                         if (keyCode == 32 || keyCode == 13) {
                             if (event.preventDefault) {
                                 event.preventDefault();
@@ -1568,6 +1586,7 @@
         var prevStars = Math.min(starsBefore.length, starsAfter.length);
 
         // Remove stars if we have to since the button acts as a toggle.
+        // eslint-disable-next-line eqeqeq
         if ((prevStars >= nStars) && (prevStars != 2 || nStars != 1)) {
             chunk.before = chunk.before.replace(re('[*]{' + nStars + '}$', ''), '');
             chunk.after = chunk.after.replace(re('^[*]{' + nStars + '}', ''), '');
@@ -2092,6 +2111,7 @@
                 // Have to renumber the bullet points if this is a numbered list.
                 chunk.after = chunk.after.replace(nextItemsRegex, getPrefixedItem);
             }
+            // eslint-disable-next-line eqeqeq
             if (isNumberedList == hasDigits) {
                 return;
             }
@@ -2172,6 +2192,7 @@
         // We make a level 2 header if there is no current header.
         // If there is a header level, we substract one from the header level.
         // If it's already a level 1 header, it's removed.
+        // eslint-disable-next-line eqeqeq
         var headerLevelToCreate = headerLevel == 0 ? 2 : headerLevel - 1;
 
         if (headerLevelToCreate > 0) {

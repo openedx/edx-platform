@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'js/spec/edxnotes/helpers', 'js/edxnotes/collections/notes'
 ], function(Helpers, NotesCollection) {
@@ -38,6 +39,7 @@ define([
                 'i4x://unit/3': [this.collection.at(4)]
             };
 
+            // eslint-disable-next-line no-undef
             _.each(units, function(value, key) {
                 compareUnits(structure.units[key], value);
             });

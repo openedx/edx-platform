@@ -144,14 +144,18 @@ function($, id, AjaxHelper) {
 
         it('calls renderDataTable function if data-datatable is true', function() {
             $selected = $selected.attr('data-datatable', true);
+            // eslint-disable-next-line no-undef
             spyOn(dataDownload, 'selectedOption').and.returnValue($selected);
+            // eslint-disable-next-line no-undef
             spyOn(dataDownload, 'renderDataTable');
             dataDownload.downloadReportClickHandler();
             expect(dataDownload.renderDataTable).toHaveBeenCalled();
         });
 
         it('calls downloadCSV function if no other data type is specified', function() {
+            // eslint-disable-next-line no-undef
             spyOn(dataDownload, 'selectedOption').and.returnValue($selected);
+            // eslint-disable-next-line no-undef
             spyOn(dataDownload, 'downloadCSV');
             dataDownload.downloadReportClickHandler();
             expect(dataDownload.downloadCSV).toHaveBeenCalled();

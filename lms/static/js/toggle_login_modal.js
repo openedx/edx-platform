@@ -18,6 +18,7 @@
                 position: 'fixed'
             };
 
+            // eslint-disable-next-line eqeqeq
             if ($('#lean_overlay').length == 0) {
                 var $overlay = $("<div id='lean_overlay'></div>");
                 $('body').append($overlay);
@@ -106,7 +107,7 @@
                 $('#lean_overlay').fadeOut(200);
                 $('iframe', modal_id).attr('src', '');
                 $(modal_id).css({display: 'none'});
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, eqeqeq */
                 if (modal_id == '#modal_clone') {
                     $(modal_id).remove();
                 }
@@ -133,4 +134,5 @@
             }
         });
     });
+// eslint-disable-next-line no-undef
 }(jQuery));

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/discovery/models/filter',
     'js/discovery/views/filter_label'

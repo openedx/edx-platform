@@ -79,10 +79,13 @@
                 view = new AccessView(_.extend(options, {el: $logistrationElement}));
 
                 // Mock the redirect call
+                // eslint-disable-next-line no-undef
                 spyOn(view, 'redirect').and.callFake(function() {});
 
                 // Mock the enrollment and shopping cart interfaces
+                // eslint-disable-next-line no-undef
                 spyOn(EnrollmentInterface, 'enroll').and.callFake(function() {});
+                // eslint-disable-next-line no-undef
                 spyOn(ShoppingCartInterface, 'addCourseToCart').and.callFake(function() {});
             };
 
@@ -102,6 +105,7 @@
             };
 
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 spyOn(window.history, 'pushState');
                 setFixtures('<div id="login-and-registration-container" class="login-register" />');
                 TemplateHelpers.installTemplate('templates/student_account/access');
@@ -113,6 +117,7 @@
                 TemplateHelpers.installTemplate('templates/student_account/institution_register');
 
                 // Stub analytics tracking
+                // eslint-disable-next-line no-undef
                 window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'pageview', 'trackLink']);
             });
 
@@ -233,4 +238,5 @@
             });
         });
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

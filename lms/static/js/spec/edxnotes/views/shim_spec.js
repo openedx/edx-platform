@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/views/notes_factory'
 ], function($, _, Annotator, NotesFactory) {
@@ -39,10 +40,14 @@ define([
             ];
             _.each(annotators, function(annotator) {
                 highlights.push($('<span class="annotator-hl" />').appendTo(annotator.element));
+                // eslint-disable-next-line no-undef
                 spyOn(annotator, 'onHighlightClick').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(annotator, 'onHighlightMouseover').and.callThrough();
+                // eslint-disable-next-line no-undef
                 spyOn(annotator, 'startViewerHideTimer').and.callThrough();
             });
+            // eslint-disable-next-line no-undef
             spyOn($.fn, 'off').and.callThrough();
         });
 
@@ -60,6 +65,7 @@ define([
         });
 
         it('clicking on highlights does not open the viewer when the editor is opened', function() {
+            // eslint-disable-next-line no-undef
             spyOn(annotators[1].editor, 'isShown').and.returnValue(false);
             highlights[0].click();
             annotators[1].editor.isShown.and.returnValue(true);
@@ -164,16 +170,23 @@ define([
                     element: $element
                 };
 
+                // eslint-disable-next-line no-undef
                 mockViewer.on = jasmine.createSpy().and.returnValue(mockViewer);
+                // eslint-disable-next-line no-undef
                 mockViewer.hide = jasmine.createSpy().and.returnValue(mockViewer);
+                // eslint-disable-next-line no-undef
                 mockViewer.destroy = jasmine.createSpy().and.returnValue(mockViewer);
+                // eslint-disable-next-line no-undef
                 mockViewer.addField = jasmine.createSpy().and.callFake(function(options) {
                     mockViewer.fields.push(options);
                     return mockViewer;
                 });
 
+                // eslint-disable-next-line no-undef
                 spyOn($element, 'bind').and.returnValue($element);
+                // eslint-disable-next-line no-undef
                 spyOn($element, 'appendTo').and.returnValue($element);
+                // eslint-disable-next-line no-undef
                 spyOn(Annotator, 'Viewer').and.returnValue(mockViewer);
 
                 annotators[0]._setupViewer();
@@ -213,6 +226,7 @@ define([
             it('should setup the default text field to publish an event on load', function() {
                 var field = document.createElement('div'),
                     annotation = {text: ''},
+                    // eslint-disable-next-line no-undef
                     callback = jasmine.createSpy();
 
                 annotators[0].on('annotationViewerTextField', callback);

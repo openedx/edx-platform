@@ -186,4 +186,5 @@
         // start test run, once Require.js is done
         window.__karma__.start(); // eslint-disable-line no-underscore-dangle
     });
+// eslint-disable-next-line no-undef
 }).call(this, requirejs, define);

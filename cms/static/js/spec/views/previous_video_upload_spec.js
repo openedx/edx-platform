@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     ['jquery', 'underscore', 'backbone', 'js/views/previous_video_upload', 'common/js/spec_helpers/template_helpers',
         'common/js/spec_helpers/view_helpers'],
@@ -38,6 +39,7 @@ define(
 
             it('should render created timestamp correctly', function() {
                 var fakeDate = 'fake formatted date';
+                // eslint-disable-next-line no-undef
                 spyOn(Date.prototype, 'toLocaleString').and.callFake(
                     function(locales, options) {
                         expect(locales).toEqual([]);

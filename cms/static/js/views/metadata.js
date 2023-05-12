@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'backbone',
@@ -258,6 +259,7 @@ define(
                 if (value) {
                     if ((this.max !== undefined) && value > this.max) {
                         value = this.max;
+                    // eslint-disable-next-line eqeqeq
                     } else if ((this.min != undefined) && value < this.min) {
                         value = this.min;
                     }

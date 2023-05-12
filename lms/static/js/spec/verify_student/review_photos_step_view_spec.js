@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'underscore',
@@ -60,6 +61,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, ReviewPhotosStepView, Ver
         };
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'trackLink']);
 
             setFixtures('<div id="current-step-container"></div>');

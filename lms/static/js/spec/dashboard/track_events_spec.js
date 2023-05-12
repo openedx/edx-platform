@@ -9,6 +9,7 @@
         describe('edx.dashboard.trackEvents', function() {
             beforeEach(function() {
                 // Stub the analytics event tracker
+                // eslint-disable-next-line no-undef
                 window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'trackLink']);
                 loadFixtures('js/fixtures/dashboard/dashboard.html');
             });

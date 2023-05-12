@@ -5,6 +5,7 @@ var FaceBook = (function() {
         init: function(Args) {
             _args = Args;
             window.fbAsyncInit = function() {
+                // eslint-disable-next-line no-undef
                 FB.init({
                     appId: _args.facebook_app_id,
                     xfbml: true,

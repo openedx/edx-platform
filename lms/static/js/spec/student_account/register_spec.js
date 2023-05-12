@@ -305,12 +305,14 @@
                 // spying on `view.validate` twice
                 if (!_.isUndefined(validationSuccess)) {
                     // Force validation to return as expected
+                    // eslint-disable-next-line no-undef
                     spyOn(view, 'validate').and.returnValue({
                         isValid: validationSuccess,
                         message: 'Submission was validated.'
                     });
                     // Successful validation means there's no need to use AJAX calls from liveValidate,
                     if (validationSuccess) {
+                        // eslint-disable-next-line no-undef
                         spyOn(view, 'liveValidate').and.callFake(function() {});
                     }
                 }
@@ -355,6 +357,7 @@
 
                 // Simulate that the user is attempting to enroll in a course
                 // by setting the course_id query string param.
+                // eslint-disable-next-line no-undef
                 spyOn($, 'url').and.callFake(function(param) {
                     if (param === '?course_id') {
                         return encodeURIComponent(COURSE_ID);
@@ -613,4 +616,5 @@
             });
         });
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

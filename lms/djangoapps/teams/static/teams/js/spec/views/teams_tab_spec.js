@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'underscore',
@@ -53,7 +54,9 @@ define([
 
         beforeEach(function() {
             setFixtures('<div class="teams-content"></div>');
+            // eslint-disable-next-line no-undef
             spyOn($.fn, 'focus');
+            // eslint-disable-next-line no-undef
             spyOn(Logger, 'log');
         });
 
@@ -130,6 +133,7 @@ define([
                     collection: collection,
                     topic: TeamSpecHelpers.createMockTopic()
                 });
+                // eslint-disable-next-line no-undef
                 spyOn(Backbone.history, 'navigate');
                 collection.trigger('sync');
                 expect(Backbone.history.navigate).not.toHaveBeenCalled();

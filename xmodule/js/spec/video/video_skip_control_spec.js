@@ -6,10 +6,13 @@
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer('video_with_bumper.html');
             $('.poster .btn-play').click();
+            // eslint-disable-next-line no-undef
             spyOn(state.bumperState.videoCommands, 'execute').and.callThrough();
         });
 
@@ -32,6 +35,7 @@
         });
 
         it('can skip the video on click', function() {
+            // eslint-disable-next-line no-undef
             spyOn(state.bumperState.videoBumper, 'skipAndDoNotShowAgain');
             state.el.trigger('play');
             $('.skip-control').click();

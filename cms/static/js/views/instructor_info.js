@@ -1,5 +1,6 @@
 // Backbone Application View: Instructor Information
 
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'underscore',

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/template_helpers',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/models/notification', 'string_utils'],
 function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, NotificationModel) {
@@ -124,6 +125,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
             fileUploaderView = new FileUploaderView({
                 url: url,
                 errorNotification: function(file, event, data) {
+                    // eslint-disable-next-line no-undef
                     var message = interpolate_text("Custom error for '{file}'", {file: file});
                     return new NotificationModel({
                         type: 'customized',
@@ -152,6 +154,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
             fileUploaderView = new FileUploaderView({
                 url: url,
                 successNotification: function(file, event, data) {
+                    // eslint-disable-next-line no-undef
                     var message = interpolate_text("Custom success message for '{file}'", {file: file});
                     return new NotificationModel({
                         type: 'customized',

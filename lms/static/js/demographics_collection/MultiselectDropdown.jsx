@@ -32,6 +32,7 @@ class MultiselectDropdown extends React.Component {
 
     // eslint-disable-next-line react/sort-comp
     findOption(data) {
+        // eslint-disable-next-line eqeqeq
         return this.props.options.find((o) => o.value == data || o.display_name == data);
     }
 
@@ -40,6 +41,7 @@ class MultiselectDropdown extends React.Component {
     }
 
     handleKeydown(event) {
+        // eslint-disable-next-line eqeqeq
         if (this.state.open && event.keyCode == 27) {
             this.setState({open: false}, this.focusButton);
         }
@@ -81,6 +83,7 @@ class MultiselectDropdown extends React.Component {
     }
 
     renderSelected() {
+        // eslint-disable-next-line eqeqeq
         if (this.props.selected.length == 0) {
             return this.props.emptyLabel;
         }

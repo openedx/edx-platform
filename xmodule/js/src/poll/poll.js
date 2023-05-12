@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['poll/poll_main.js'], function(PollMain) {
     'use strict';
 

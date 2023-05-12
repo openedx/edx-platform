@@ -12,20 +12,28 @@
             var deferred;
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
+            // eslint-disable-next-line no-undef
             jasmine.clock().install();
             this.threadData = DiscussionViewSpecHelper.makeThreadWithProps({});
             this.thread = new Thread(this.threadData);
             this.discussion = new Discussion(this.thread);
             deferred = $.Deferred();
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.returnValue(deferred);
+            // eslint-disable-next-line no-undef
             spyOn(DiscussionThreadShowView.prototype, 'convertMath');
+            // eslint-disable-next-line no-undef
             spyOn(DiscussionContentView.prototype, 'makeWmdEditor');
+            // eslint-disable-next-line no-undef
             spyOn(DiscussionUtil, 'makeWmdEditor');
+            // eslint-disable-next-line no-undef
             spyOn(DiscussionUtil, 'setWmdContent');
+            // eslint-disable-next-line no-undef
             return spyOn(ThreadResponseShowView.prototype, 'convertMath');
         });
         afterEach(function() {
             $.ajax.calls.reset();
+            // eslint-disable-next-line no-undef
             return jasmine.clock().uninstall();
         });
 
@@ -38,6 +46,7 @@
                 };
             });
             view.render();
+            // eslint-disable-next-line no-undef
             return jasmine.clock().tick(100);
         };
         renderWithTestResponses = function(view, count, options) {
@@ -112,6 +121,7 @@
             var responseText, testResponseJson;
             testResponseJson = createTestResponseJson(index);
             responseText = testResponseJson.body;
+            // eslint-disable-next-line no-undef
             spyOn(view, 'getWmdContent').and.returnValue(responseText);
             $.ajax.and.callFake(function(params) {
                 expect(params.type).toEqual('POST');
@@ -139,6 +149,7 @@
                     course_settings: DiscussionSpecHelper.createTestCourseSettings()
                 });
                 renderWithTestResponses(view, 1);
+                // eslint-disable-next-line no-undef
                 spyOn(DiscussionUtil, 'updateWithUndo').and.callFake(function(model, updates) {
                     return model.set(updates);
                 });
@@ -190,6 +201,7 @@
                     el: $('#fixture-element'),
                     course_settings: DiscussionSpecHelper.createTestCourseSettings()
                 });
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'focus');
             });
             describe('responses', function() {

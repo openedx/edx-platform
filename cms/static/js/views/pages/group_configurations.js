@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'gettext', 'js/views/pages/base_page',
     'js/views/group_configurations_list', 'js/views/partition_group_list'
@@ -99,6 +100,7 @@ function($, _, gettext, BasePage, GroupConfigurationsListView, PartitionGroupLis
          */
         expandConfiguration: function(id) {
             var groupConfig = this.experimentsEnabled && this.experimentGroupConfigurations.findWhere({
+                // eslint-disable-next-line radix
                 id: parseInt(id)
             });
 

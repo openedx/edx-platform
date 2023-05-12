@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone', 'underscore', 'gettext', 'js/models/group', 'js/collections/group',
     'backbone.associations', 'cms/js/main'

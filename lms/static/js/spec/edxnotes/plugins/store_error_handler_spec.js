@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'underscore', 'annotator_1.2.9',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
@@ -9,6 +10,7 @@ define([
 
     describe('Store Error Handler Custom Message', function() {
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             spyOn(Annotator, 'showNotification');
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             NotesCollector.cleanup();

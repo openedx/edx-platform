@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['common/js/spec_helpers/template_helpers',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/dashboard/donation'],
@@ -30,9 +31,11 @@ function(TemplateHelpers, AjaxHelpers) {
             // This function gets passed the dynamically constructed
             // form with signed payment parameters from the LMS server,
             // so we can verify that the form is constructed correctly.
+            // eslint-disable-next-line no-undef
             spyOn(view, 'submitPaymentForm').and.callFake(function() {});
 
             // Stub the analytics event tracker
+            // eslint-disable-next-line no-undef
             window.analytics = jasmine.createSpyObj('analytics', ['track']);
         });
 

@@ -18,6 +18,7 @@
             this.view = new ResponseCommentShowView({
                 model: this.comment
             });
+            // eslint-disable-next-line no-undef
             return spyOn(this.view, 'convertMath');
         });
         it('defines the tag', function() {
@@ -30,6 +31,7 @@
         });
         describe('rendering', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 return spyOn(this.view, 'renderAttrs');
             });
             it('can be flagged for abuse', function() {
@@ -61,6 +63,7 @@
             });
             it('triggers the delete event', function() {
                 var triggerTarget;
+                // eslint-disable-next-line no-undef
                 triggerTarget = jasmine.createSpy();
                 this.view.bind('comment:_delete', triggerTarget);
                 this.view._delete();
@@ -80,6 +83,7 @@
             });
             it('triggers comment:edit when the edit button is clicked', function() {
                 var triggerTarget;
+                // eslint-disable-next-line no-undef
                 triggerTarget = jasmine.createSpy();
                 this.view.bind('comment:edit', triggerTarget);
                 this.view.edit();

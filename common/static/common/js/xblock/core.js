@@ -29,6 +29,7 @@
             return new window[runtime]['v' + version]();
         } else {
             if (runtime || version || initFnName) {
+                // eslint-disable-next-line no-console
                 console.log(
                     'Block ' + $element.outerHTML + ' is missing data-runtime, data-runtime-version or data-init, '
                     + 'and can\'t be initialized'

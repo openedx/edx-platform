@@ -139,6 +139,7 @@
                     createBaseDraggableOnTarget(state, baseDraggableId, baseTargetId, true, function() {
                         // eslint-disable-next-line no-cond-assign
                         if ((baseDraggable = getById(state, 'draggables', baseDraggableId, null, false, baseTargetId)) === null) {
+                            // eslint-disable-next-line no-console
                             console.log('ERROR: Could not successfully create a base draggable on a base target.');
                         } else {
                             baseTarget = baseDraggable.onTarget;
@@ -193,6 +194,7 @@
             // eslint-disable-next-line no-cond-assign
             if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                 if (reportError !== false) {
+                    // eslint-disable-next-line no-console
                     console.log(
                         'ERROR: In answer there exists a '
                     + 'draggable ID "' + draggableId + '". No '
@@ -206,6 +208,7 @@
             // eslint-disable-next-line no-cond-assign
             if ((target = getById(state, 'targets', targetId)) === null) {
                 if (reportError !== false) {
+                    // eslint-disable-next-line no-console
                     console.log(
                         'ERROR: In answer there exists a target '
                     + 'ID "' + targetId + '". No target with this '
@@ -234,6 +237,7 @@
 
                         // eslint-disable-next-line no-cond-assign
                         if ((draggable = getById(state, 'draggables', draggableId)) === null) {
+                            // eslint-disable-next-line no-console
                             console.log(
                                 'ERROR: In answer there exists a '
                             + 'draggable ID "' + draggableId + '". No '

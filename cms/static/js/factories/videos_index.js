@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'backbone', 'js/views/active_video_upload_list',
     'js/views/previous_video_upload_list', 'js/views/active_video_upload'

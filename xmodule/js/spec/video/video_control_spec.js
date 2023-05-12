@@ -6,6 +6,7 @@
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
         });
@@ -20,6 +21,7 @@
         describe('constructor', function() {
             beforeEach(function() {
                 window.VideoState = {};
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
             });
 
@@ -45,13 +47,16 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         start: 10,
                         savedVideoPosition: 0
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
                         return isFinite(duration) && duration > 0 && isFinite(state.videoPlayer.startTime);
@@ -71,13 +76,16 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         start: 10,
                         savedVideoPosition: 15
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -101,13 +109,16 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         start: 10,
                         savedVideoPosition: -15
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -131,13 +142,16 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         start: 10,
                         savedVideoPosition: 'a'
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -161,13 +175,16 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         start: 10,
                         savedVideoPosition: 10000
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -193,13 +210,16 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         end: 20,
                         savedVideoPosition: 0
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -223,13 +243,16 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         end: 20,
                         savedVideoPosition: 15
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -253,13 +276,16 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         end: 20,
                         savedVideoPosition: -15
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -283,13 +309,16 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         end: 20,
                         savedVideoPosition: 'a'
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -314,13 +343,16 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         end: 20,
                         savedVideoPosition: 10000
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -345,14 +377,17 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
                         savedVideoPosition: 0
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -376,14 +411,17 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
                         savedVideoPosition: 15
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -407,14 +445,17 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
                         savedVideoPosition: -15
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -438,14 +479,17 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
                         savedVideoPosition: 'a'
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -469,14 +513,17 @@
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer({
                         start: 10,
                         end: 20,
                         savedVideoPosition: 10000
                     });
                     sliderEl = state.videoProgressSlider.slider;
+                    // eslint-disable-next-line no-undef
                     spyOn(state.videoPlayer, 'duration').and.returnValue(60);
 
+                    // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
                         duration = state.videoPlayer.duration();
 
@@ -496,6 +543,7 @@
 
         it('show', function() {
             var controls;
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer();
             controls = state.el.find('.video-controls');
             controls.addClass('is-hidden');
@@ -505,6 +553,7 @@
         });
 
         it('can destroy itself', function() {
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer();
             state.videoControl.destroy();
             expect(state.videoControl).toBeUndefined();
@@ -512,8 +561,10 @@
 
         it('can focus the first control', function(done) {
             var btnPlay;
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer({focusFirstControl: true});
             btnPlay = state.el.find('.video-controls .play');
+            // eslint-disable-next-line no-undef
             jasmine.waitUntil(function() {
                 return state.el.hasClass('is-initialized');
             }).then(function() {

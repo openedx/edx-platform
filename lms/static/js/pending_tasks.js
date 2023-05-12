@@ -33,22 +33,24 @@
             // and a "task_progress.duration" key.
             // eslint-disable-next-line camelcase
             var something_in_progress = false;
-            /* eslint-disable-next-line guard-for-in, camelcase */
+            /* eslint-disable-next-line guard-for-in, camelcase, no-undef */
             for (task_id in response) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-undef */
                 var task_dict = response[task_id];
                 // find the corresponding entry, and update it:
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-undef */
                 entry = $(_this.element).find('[data-task-id="' + task_id + '"]');
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-undef */
                 entry.find('.task-state').text(task_dict.task_state);
                 // eslint-disable-next-line camelcase
                 var duration_value = (task_dict.task_progress && task_dict.task_progress.duration_ms
                                         // eslint-disable-next-line camelcase
                                         && Math.round(task_dict.task_progress.duration_ms / 1000)) || 'unknown';
+                // eslint-disable-next-line no-undef
                 entry.find('.task-duration').text(duration_value);
                 // eslint-disable-next-line camelcase
                 var progress_value = task_dict.message || '';
+                // eslint-disable-next-line no-undef
                 entry.find('.task-progress').text(progress_value);
                 // if the task is complete, then change the entry so it won't
                 // be queried again.  Otherwise set a flag.
@@ -57,6 +59,7 @@
                     // eslint-disable-next-line camelcase
                     something_in_progress = true;
                 } else {
+                    // eslint-disable-next-line no-undef
                     entry.data('inProgress', 'False');
                 }
             }
@@ -110,5 +113,6 @@
 // once the page is rendered, create the progress object
 var instructorTaskProgress;
 $(document).ready(function() {
+    // eslint-disable-next-line no-undef
     instructorTaskProgress = new InstructorTaskProgress($('#task-progress-wrapper'));
 });

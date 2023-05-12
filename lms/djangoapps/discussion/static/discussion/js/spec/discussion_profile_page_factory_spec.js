@@ -1,5 +1,6 @@
 /* globals Discussion */
 
+// eslint-disable-next-line no-undef
 define(
     [
         'underscore',

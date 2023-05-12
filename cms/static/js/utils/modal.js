@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery'], function($) {
     /**
      * Hides the modal and modal cover, using the standard selectors.
@@ -26,6 +27,7 @@ define(['jquery'], function($) {
      * This method also unbinds the click handler on the modal cover.
      */
     var hideModalCover = function(modalCover) {
+        // eslint-disable-next-line eqeqeq
         if (modalCover == undefined) {
             modalCover = getModalCover();
         }

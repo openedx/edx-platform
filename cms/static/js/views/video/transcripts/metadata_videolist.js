@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'jquery', 'backbone', 'underscore', 'js/views/abstract_editor',

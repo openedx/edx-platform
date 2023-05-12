@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([ // jshint ignore:line
     'jquery',
     'underscore',

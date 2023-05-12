@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'underscore',
@@ -101,6 +102,7 @@ define([
         beforeEach(function() {
             setFixtures('<div class="teams-content"></div>');
             PageHelpers.preventBackboneChangingUrl();
+            // eslint-disable-next-line no-undef
             spyOn(Backbone.history, 'navigate');
         });
 

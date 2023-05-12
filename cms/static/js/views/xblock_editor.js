@@ -2,6 +2,7 @@
  * XBlockEditorView displays the authoring view of an xblock, and allows the user to switch between
  * the available modes.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'js/views/xblock', 'js/views/metadata', 'js/collections/metadata',
     'jquery.inputnumber'],
 function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) {
@@ -117,6 +118,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
                 }
                 // ... else log an error
             } else {
+                // eslint-disable-next-line no-console
                 console.error('Cannot save xblock as it has no save method');
             }
             return data;

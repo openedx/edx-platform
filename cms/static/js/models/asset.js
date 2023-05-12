@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone'], function(Backbone) {
     /**
    * Simple model for an asset.

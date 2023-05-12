@@ -48,12 +48,15 @@
                     'Viewing %s courses',
                     count
                 );
+                // eslint-disable-next-line no-undef
                 this.$message.html(interpolate(msg, [count]));
             },
 
             showNotFoundMessage: function(term) {
+                // eslint-disable-next-line no-undef
                 var msg = interpolate(
                     gettext('We couldn\'t find any results for "%s".'),
+                    // eslint-disable-next-line no-undef
                     [_.escape(term)]
                 );
                 this.$message.html(msg);
@@ -66,4 +69,5 @@
 
         });
     });
+// eslint-disable-next-line no-undef
 }(define || RequireJS.define));

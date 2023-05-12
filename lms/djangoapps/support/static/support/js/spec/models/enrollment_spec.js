@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'support/js/spec_helpers/enrollment_helpers',

@@ -16,9 +16,11 @@
                 return new EventsBumperPlugin(state, i18n, options);
             }
 
+            // eslint-disable-next-line no-undef
             _.bindAll(this, 'onReady', 'onPlay', 'onEnded', 'onShowLanguageMenu', 'onHideLanguageMenu', 'onSkip',
                 'onShowCaptions', 'onHideCaptions', 'destroy');
             this.state = state;
+            // eslint-disable-next-line no-undef
             this.options = _.extend({}, options);
             this.state.videoEventsBumperPlugin = this;
             this.i18n = i18n;
@@ -98,12 +100,14 @@
             },
 
             log: function(eventName, data) {
+                // eslint-disable-next-line no-undef
                 var logInfo = _.extend({
                     host_component_id: this.state.id,
                     bumper_id: this.state.config.sources[0] || '',
                     duration: this.getDuration(),
                     code: 'html5'
                 }, data, this.options.data);
+                // eslint-disable-next-line no-undef
                 Logger.log(eventName, logInfo);
             }
         };

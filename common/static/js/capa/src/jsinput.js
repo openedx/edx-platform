@@ -62,6 +62,7 @@ var JSInput = (function($, undefined) {
         sop = (sop !== 'false');
 
         if (!sop) {
+            // eslint-disable-next-line no-undef
             channel = Channel.build({
                 window: cWindow,
                 origin: path,
@@ -179,6 +180,7 @@ var JSInput = (function($, undefined) {
                         setTimeout(function() { whileloop(n - 1); }, 200);
                     }
                 } else {
+                    // eslint-disable-next-line no-console
                     console.debug('Error: could not set state');
                 }
             }

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'backbone',
@@ -25,10 +26,12 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             * cross-browser manual testing to verify that this works correctly.
             */
         var StubBackend = function(name, isSupported, snapshotSuccess) {
+            // eslint-disable-next-line no-undef
             if (_.isUndefined(isSupported)) {
                 isSupported = true;
             }
 
+            // eslint-disable-next-line no-undef
             if (_.isUndefined(snapshotSuccess)) {
                 snapshotSuccess = true;
             }
@@ -79,6 +82,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
         };
 
         beforeEach(function() {
+            // eslint-disable-next-line no-undef
             window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'trackLink']);
 
             setFixtures(
@@ -92,6 +96,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             var view = createView(new StubBackend('html5'));
 
             // Spy on the backend
+            // eslint-disable-next-line no-undef
             spyOn(view.backend, 'snapshot').and.callThrough();
 
             // Initially, only the snapshot button is shown
@@ -123,6 +128,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             var view = createView(new StubBackend('html5'));
 
             // Spy on the backend
+            // eslint-disable-next-line no-undef
             spyOn(view.backend, 'reset').and.callThrough();
 
             // Take the snapshot, then reset

@@ -114,4 +114,5 @@ var edx = edx || {};
             this.render();
         }
     });
+// eslint-disable-next-line no-undef
 }(jQuery, _, Backbone, gettext));

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery',
     'underscore',
@@ -26,9 +27,13 @@ define([
             options = _.defaults(options || {}, {
                 el: $('#search-notes-form').get(0),
                 perPage: 10,
+                // eslint-disable-next-line no-undef
                 beforeSearchStart: jasmine.createSpy(),
+                // eslint-disable-next-line no-undef
                 search: jasmine.createSpy(),
+                // eslint-disable-next-line no-undef
                 error: jasmine.createSpy(),
+                // eslint-disable-next-line no-undef
                 complete: jasmine.createSpy()
             });
 
@@ -54,6 +59,7 @@ define([
 
         beforeEach(function() {
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
+            // eslint-disable-next-line no-undef
             spyOn(Logger, 'log');
             this.searchBox = getSearchBox();
         });
@@ -83,6 +89,7 @@ define([
             AjaxHelpers.respondWithJson(requests, searchResponse);
             assertBoxIsEnabled(this.searchBox);
             expect(this.searchBox.options.search).toHaveBeenCalledWith(
+                // eslint-disable-next-line no-undef
                 jasmine.any(NotesCollection), 'test_text'
             );
             expect(this.searchBox.options.complete).toHaveBeenCalledWith(
@@ -95,6 +102,7 @@ define([
             submitForm(this.searchBox, 'test_text');
             AjaxHelpers.respondWithJson(requests, searchResponse);
 
+            // eslint-disable-next-line no-undef
             expect(Logger.log).toHaveBeenCalledWith('edx.course.student_notes.searched', {
                 number_of_results: 2,
                 search_string: 'test_text'

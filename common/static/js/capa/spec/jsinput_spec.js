@@ -6,6 +6,7 @@ describe('JSInput', function() {
         loadFixtures('js/capa/fixtures/jsinput.html');
         $jsinputContainers = $('.jsinput');
         $inputFields = $('input[id^="input_"]');
+        // eslint-disable-next-line no-undef
         JSInput.walkDOM();
     });
 

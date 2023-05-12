@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone',
     'jquery',
     'underscore',
@@ -128,6 +129,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         expectMessageContains(view, view.helpMessage);
         view.showSuccessMessage();
         expectMessageContains(view, view.indicators.success);
+        // eslint-disable-next-line no-undef
         jasmine.clock().tick(7000);
         // Message gets reset
         expectMessageContains(view, view.helpMessage);
@@ -136,6 +138,7 @@ function(Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         expectMessageContains(view, view.indicators.success);
         // But if we change the message, it should not get reset.
         view.showHelpMessage('Do not reset this!');
+        // eslint-disable-next-line no-undef
         jasmine.clock().tick(7000);
         expectMessageContains(view, 'Do not reset this!');
     };

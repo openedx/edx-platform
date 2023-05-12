@@ -51,6 +51,7 @@
                 });
 
                 // Mock the redirect call
+                // eslint-disable-next-line no-undef
                 spyOn(view, 'redirect').and.callFake(function() {});
 
                 view.render();
@@ -87,4 +88,5 @@
             });
         });
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

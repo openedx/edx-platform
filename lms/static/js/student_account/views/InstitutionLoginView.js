@@ -7,6 +7,7 @@
                 el: '#institution_login-form',
 
                 initialize: function(data) {
+                    // eslint-disable-next-line eqeqeq
                     var tpl = data.mode == 'register' ? '#institution_register-tpl' : '#institution_login-tpl';
                     this.tpl = $(tpl).html();
                     this.providers = data.thirdPartyAuth.secondaryProviders || [];
@@ -27,4 +28,5 @@
                 }
             });
         });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

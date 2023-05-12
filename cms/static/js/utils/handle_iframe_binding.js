@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery'], function($) {
     var iframeBinding = function(e) {
         // eslint-disable-next-line camelcase

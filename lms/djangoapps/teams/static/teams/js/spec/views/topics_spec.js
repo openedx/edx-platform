@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone', 'underscore', 'teams/js/collections/topic', 'teams/js/views/topics',
     'teams/js/spec_helpers/team_spec_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'

@@ -5,8 +5,10 @@
         var state, oldOTBD;
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
+            // eslint-disable-next-line no-undef
             jasmine.clock().install();
         });
         afterEach(function() {
@@ -17,10 +19,12 @@
                 state.videoPlayer.destroy();
             }
             window.onTouchBasedDevice = oldOTBD;
+            // eslint-disable-next-line no-undef
             jasmine.clock().uninstall();
         });
         describe('when auto-advance feature is unset (default behaviour)', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer('video.html');
                 appendLoadFixtures('sequence.html');
             });
@@ -37,6 +41,7 @@
                 expect('click').not.toHaveBeenTriggeredOn($nextButton);
 
                 state.el.trigger('ended');
+                // eslint-disable-next-line no-undef
                 jasmine.clock().tick(2);
 
                 // still not auto-clicked
@@ -46,6 +51,7 @@
         describe('when auto-advance feature is set', function() {
             describe('and auto-advance is enabled', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer('video_autoadvance.html');
                     appendLoadFixtures('sequence.html');
                 });
@@ -68,6 +74,7 @@
                     expect('click').not.toHaveBeenTriggeredOn($nextButton);
 
                     state.el.trigger('ended');
+                    // eslint-disable-next-line no-undef
                     jasmine.clock().tick(2);
 
                     // now it was auto-clicked
@@ -77,6 +84,7 @@
 
             describe('when auto-advance is disabled', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer('video_autoadvance_disabled.html');
                     appendLoadFixtures('sequence.html');
                 });
@@ -99,6 +107,7 @@
                     expect('click').not.toHaveBeenTriggeredOn($nextButton);
 
                     state.el.trigger('ended');
+                    // eslint-disable-next-line no-undef
                     jasmine.clock().tick(2);
 
                     // still not auto-clicked

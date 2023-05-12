@@ -30,6 +30,7 @@
                         element: $element
                     };
 
+                    // eslint-disable-next-line no-undef
                     spyOn(console, 'log');
                 });
 
@@ -37,6 +38,7 @@
                     function() {
                         // eslint-disable-next-line no-new
                         new Resizer({ });
+                        // eslint-disable-next-line no-console
                         expect(console.log).toHaveBeenCalled();
                     }
                 );
@@ -117,6 +119,7 @@
                         var spiesCount = _.range(3);
 
                         spiesList = $.map(spiesCount, function() {
+                            // eslint-disable-next-line no-undef
                             return jasmine.createSpy();
                         });
 
@@ -176,12 +179,15 @@
                                 errorMessage = '[Video info]: TypeError: Argument is not a function.',
                                 arg = {};
 
+                            // eslint-disable-next-line no-undef
                             spyOn(console, 'error');
 
                             $.each(methods, function(index, methodName) {
                                 resizer.callbacks[methodName](arg);
+                                // eslint-disable-next-line no-console
                                 expect(console.error).toHaveBeenCalledWith(errorMessage);
                                 // reset spy
+                                // eslint-disable-next-line no-console
                                 console.log.calls.reset();
                             });
                         });

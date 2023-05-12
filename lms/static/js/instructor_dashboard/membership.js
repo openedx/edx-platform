@@ -81,6 +81,7 @@ such that the value can be defined later than this assignment (file load order).
             for (i = 0, len = rowArray.length; i < len; i++) {
                 item = rowArray[i];
                 $td = $('<td>');
+                // eslint-disable-next-line no-undef
                 if (item instanceof jQuery) {
                     edx.HtmlUtils.append($td, edx.HtmlUtils.HTML(item));
                 } else {

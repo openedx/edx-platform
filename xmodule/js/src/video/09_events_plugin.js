@@ -16,12 +16,14 @@
                 return new EventsPlugin(state, i18n, options);
             }
 
+            // eslint-disable-next-line no-undef
             _.bindAll(this, 'onReady', 'onPlay', 'onPause', 'onComplete', 'onEnded', 'onSeek',
                 'onSpeedChange', 'onAutoAdvanceChange', 'onShowLanguageMenu', 'onHideLanguageMenu',
                 'onSkip', 'onShowTranscript', 'onHideTranscript', 'onShowCaptions', 'onHideCaptions',
                 'destroy');
 
             this.state = state;
+            // eslint-disable-next-line no-undef
             this.options = _.extend({}, options);
             this.state.videoEventsPlugin = this;
             this.i18n = i18n;
@@ -153,12 +155,14 @@
             },
 
             log: function(eventName, data) {
+                // eslint-disable-next-line no-undef
                 var logInfo = _.extend({
                     id: this.state.id,
                     // eslint-disable-next-line no-nested-ternary
                     code: this.state.isYoutubeType() ? this.state.youtubeId() : this.state.canPlayHLS ? 'hls' : 'html5',
                     duration: this.state.duration
                 }, data, this.options.data);
+                // eslint-disable-next-line no-undef
                 Logger.log(eventName, logInfo);
             }
         };

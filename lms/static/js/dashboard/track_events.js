@@ -96,4 +96,5 @@ var edx = edx || {};
             {category: 'dashboard', label: 'header'}
         );
     });
+// eslint-disable-next-line no-undef
 }(jQuery));

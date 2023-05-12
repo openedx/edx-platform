@@ -30,6 +30,7 @@
                 model: this.comment,
                 $el: $('#fixture-element')
             });
+            // eslint-disable-next-line no-undef
             spyOn(ThreadResponseShowView.prototype, 'convertMath');
             return this.view.render();
         });
@@ -124,8 +125,10 @@
             return expect(this.view.$('.posted-details').text()).not.toMatch('\sby\s');
         });
         it('re-renders correctly when endorsement changes', function() {
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.returnValue($.Deferred());
             DiscussionUtil.loadRoles({
+                // eslint-disable-next-line radix
                 Moderator: [parseInt(window.user.id)]
             });
             this.thread.set('thread_type', 'question');
@@ -142,12 +145,15 @@
         });
         it('allows a moderator to mark an answer in a question thread', function() {
             var endorseButton;
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.returnValue($.Deferred());
             DiscussionUtil.loadRoles({
+                // eslint-disable-next-line radix
                 Moderator: [parseInt(window.user.id)]
             });
             this.thread.set({
                 thread_type: 'question',
+                // eslint-disable-next-line radix
                 user_id: (parseInt(window.user.id) + 1).toString()
             });
             this.view.render();
@@ -159,6 +165,7 @@
         });
         it('allows the author of a question thread to mark an answer', function() {
             var endorseButton;
+            // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.returnValue($.Deferred());
             this.thread.set({
                 thread_type: 'question',
@@ -186,6 +193,7 @@
             var endorseButton;
             this.thread.set({
                 thread_type: 'question',
+                // eslint-disable-next-line radix
                 user_id: (parseInt(window.user.id) + 1).toString()
             });
             this.view.render();
@@ -232,6 +240,7 @@
                     username: 'test_endorser',
                     time: new Date().toISOString()
                 });
+                // eslint-disable-next-line no-undef
                 return spyOn(DiscussionUtil, 'urlFor').and.returnValue('test_endorser_url');
             });
             // eslint-disable-next-line camelcase
@@ -255,12 +264,14 @@
             });
             it('renders correctly for a community TA-endorsed response', function() {
                 var $el;
+                // eslint-disable-next-line no-undef
                 spyOn(DiscussionUtil, 'isTA').and.returnValue(true);
                 $el = $('#fixture-element').html(this.view.getEndorserDisplay());
                 return checkUserLink($el, true, false);
             });
             it('renders correctly for a staff-endorsed response', function() {
                 var $el;
+                // eslint-disable-next-line no-undef
                 spyOn(DiscussionUtil, 'isStaff').and.returnValue(true);
                 $el = $('#fixture-element').html(this.view.getEndorserDisplay());
                 return checkUserLink($el, false, true);

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/views/paged_container'],
     function(PagedContainerView) {
         // To be extended with Library-specific features later.

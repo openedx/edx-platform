@@ -307,6 +307,7 @@ class DemographicsCollectionModal extends React.Component {
                                             <option value="default" key="default">{gettext('Select gender')}</option>,
                                             this.loadOptions(FIELD_NAMES.GENDER)
                                         ]}
+                                        // eslint-disable-next-line eqeqeq
                                         showInput={wizardConsumer[FIELD_NAMES.GENDER] == 'self-describe'}
                                         inputName={FIELD_NAMES.GENDER_DESCRIPTION}
                                         inputId={FIELD_NAMES.GENDER_DESCRIPTION}
@@ -446,6 +447,7 @@ class DemographicsCollectionModal extends React.Component {
                                             <option value="default" key="default">{gettext('Select employment status')}</option>,
                                             this.loadOptions(FIELD_NAMES.WORK_STATUS)
                                         ]}
+                                        // eslint-disable-next-line eqeqeq
                                         showInput={wizardConsumer[FIELD_NAMES.WORK_STATUS] == 'other'}
                                         inputName={FIELD_NAMES.WORK_STATUS_DESCRIPTION}
                                         inputId={FIELD_NAMES.WORK_STATUS_DESCRIPTION}

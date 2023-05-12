@@ -58,6 +58,7 @@
             );
 
             $(elt).find('.full-custom').click(function(event) {
+                // eslint-disable-next-line no-undef
                 Collapsible.toggleFull(event, open_text, close_text);
             });
         });
@@ -67,8 +68,10 @@
 
         // Set up triggers.
         el.find('.full').click(function(event) {
+            // eslint-disable-next-line no-undef
             Collapsible.toggleFull(event, 'See full output', 'Hide output');
         });
+        // eslint-disable-next-line no-undef
         el.find('.collapsible header a').click(Collapsible.toggleHint);
     }
 

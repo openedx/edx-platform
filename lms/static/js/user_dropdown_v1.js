@@ -43,6 +43,7 @@ $(document).ready(function() {
 
     function catchKeyPress(object, event) {
         // get currently focused item
+        // eslint-disable-next-line no-undef
         var focusedItem = jQuery(':focus');
 
         // get the number of focusable items

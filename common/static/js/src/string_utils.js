@@ -49,4 +49,5 @@
     };
     // eslint-disable-next-line camelcase
     this.interpolate_text = interpolate_text;
+// eslint-disable-next-line no-undef
 }).call(this, _);

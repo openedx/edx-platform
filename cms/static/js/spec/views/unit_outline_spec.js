@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/js/spec_helpers/template_helpers',
     'common/js/spec_helpers/view_helpers', 'common/js/components/utils/view_utils', 'js/models/course',
     'js/views/unit_outline', 'js/models/xblock_info'],
@@ -114,6 +115,7 @@ function($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils,
         it('can add a unit', function() {
             var redirectSpy;
             createUnitOutlineView(this, createMockXBlockInfo('Mock Unit'));
+            // eslint-disable-next-line no-undef
             redirectSpy = spyOn(ViewUtils, 'redirect');
             unitOutlineView.$('.outline-subsection > .outline-content  > .add-unit .button-new').click();
             AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {

@@ -96,7 +96,7 @@ var edx = edx || {};
             var url = $(this).data('endpoint');
             // eslint-disable-next-line camelcase
             var lookup_registration_code = $('#set_regcode_status_form input[name="regcode_code"]').val();
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, eqeqeq */
             if (lookup_registration_code == '') {
                 // eslint-disable-next-line camelcase
                 $registration_code_status_form_error.show();
@@ -123,7 +123,7 @@ var edx = edx || {};
 
                     // eslint-disable-next-line camelcase
                     $lookup_button.removeAttr('disabled');
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, eqeqeq */
                     if (is_registration_code_exists == 'false') {
                         // eslint-disable-next-line camelcase
                         $registration_code_status_form_error.hide();
@@ -135,7 +135,7 @@ var edx = edx || {};
                         // eslint-disable-next-line camelcase
                         var actions_links = '';
                         var actions = [];
-                        // eslint-disable-next-line camelcase
+                        /* eslint-disable-next-line camelcase, eqeqeq */
                         if (is_registration_code_valid == true) {
                             actions.push(
                                 {
@@ -157,7 +157,7 @@ var edx = edx || {};
                                 }
                             );
                         }
-                        // eslint-disable-next-line camelcase
+                        /* eslint-disable-next-line camelcase, eqeqeq */
                         if (is_registration_code_redeemed == true) {
                             actions.push(
                                 {
@@ -257,4 +257,5 @@ var edx = edx || {};
             });
         });
     });
+// eslint-disable-next-line no-undef
 }(Backbone, $, _, gettext));

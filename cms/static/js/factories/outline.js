@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'js/views/pages/course_outline', 'js/models/xblock_outline_info'
 ], function(CourseOutlinePage, XBlockOutlineInfo) {

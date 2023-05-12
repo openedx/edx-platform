@@ -1,5 +1,6 @@
 /* globals AjaxPrefix */
 
+// eslint-disable-next-line no-undef
 define([
     'domReady',
     'jquery',
@@ -14,6 +15,7 @@ define([
 
     var main, sendJSON;
     main = function() {
+        // eslint-disable-next-line no-undef
         AjaxPrefix.addAjaxPrefix(jQuery, function() {
             return $("meta[name='path_prefix']").attr('content');
         });

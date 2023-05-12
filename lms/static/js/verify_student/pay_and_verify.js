@@ -92,4 +92,5 @@ var edx = edx || {};
             }
         }
     }).render();
+// eslint-disable-next-line no-undef
 }(jQuery, _));

@@ -29,6 +29,7 @@
 
             it('can render child views', function() {
                 var testChildView = new (Backbone.View.extend({className: 'test-view'}))();
+                // eslint-disable-next-line no-undef
                 spyOn(testChildView, 'render');
                 var view = new (CardView.extend({details: [testChildView]}))();
                 expect(testChildView.render).toHaveBeenCalled();
@@ -36,6 +37,7 @@
             });
 
             it('calls action when clicked', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(CardView.prototype, 'action');
                 var view = new CardView({configuration: 'square_card'});
                 view.$el.find('.action').trigger('click');
@@ -80,4 +82,5 @@
             });
         });
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

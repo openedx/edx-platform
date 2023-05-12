@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'underscore',
     'edx-ui-toolkit/js/pagination/paging-collection',

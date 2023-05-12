@@ -39,7 +39,6 @@
 
     // Temporary Rules (Will be removed one-by-one to minimize file changes)
     "comma-dangle": "off",
-    "eqeqeq": "off",
     "function-call-argument-newline": "off",
     "function-paren-newline": "off",
     "import/extensions": "off",
@@ -47,7 +46,6 @@
     "import/no-dynamic-require": "off",
     "import/no-unresolved": "off",
     "max-len": "off",
-    "no-console": "off",
     "no-lonely-if": "off",
     "no-param-reassign": "off",
     "no-proto": "off",
@@ -56,7 +54,6 @@
     "no-restricted-globals": "off",
     "no-restricted-syntax": "off",
     "no-throw-literal": "off",
-    "no-undef": "off",
     "no-underscore-dangle": "off",
     "no-unused-vars": "off",
     "no-use-before-define": "off",
@@ -67,7 +64,6 @@
     "prefer-destructuring": "off",
     "prefer-rest-params": "off",
     "prefer-template": "off",
-    "radix": "off",
     "react/prop-types": "off",
     "vars-on-top": "off"
   }

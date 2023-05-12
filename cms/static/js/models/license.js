@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'underscore'], function(Backbone, _) {
     var LicenseModel = Backbone.Model.extend({
         defaults: {
@@ -51,7 +52,9 @@ define(['backbone', 'underscore'], function(Backbone, _) {
 
             // a string without a colon could be a custom license, or a license
             // type without options
+            // eslint-disable-next-line eqeqeq
             if (colonIndex == -1) {
+                // eslint-disable-next-line eqeqeq
                 if (spaceIndex == -1) {
                     // if there's no space, it's a license type without options
                     return this.set({
@@ -79,6 +82,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
                     return;
                 }
                 var eqIndex = optionString.indexOf('=');
+                // eslint-disable-next-line eqeqeq
                 if (eqIndex == -1) {
                     // this is a boolean flag
                     optionsObj[optionString] = true;

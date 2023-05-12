@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(
     [
         'jquery', 'underscore', 'squire'
@@ -45,9 +46,11 @@ define(
             };
 
             var createPromptSpy = function(name) {
+                // eslint-disable-next-line no-undef
                 var spy = jasmine.createSpyObj(name, ['constructor', 'show', 'hide']);
                 spy.constructor.and.returnValue(spy);
                 spy.show.and.returnValue(spy);
+                // eslint-disable-next-line no-undef
                 spy.extend = jasmine.createSpy().and.returnValue(spy.constructor);
 
                 return spy;
@@ -56,6 +59,7 @@ define(
             beforeEach(function(done) {
                 self = this;
 
+                // eslint-disable-next-line no-undef
                 jasmine.addMatchers({
                     assertValueInView: function() {
                         return {

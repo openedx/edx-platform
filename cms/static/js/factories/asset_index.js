@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'js/collections/asset', 'js/views/assets', 'jquery.fileupload'
 ], function($, AssetCollection, AssetsView) {

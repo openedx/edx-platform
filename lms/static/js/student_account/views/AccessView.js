@@ -174,6 +174,7 @@
                     this.listenTo(this.subview.login, 'password-help', this.resetPassword);
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
+                    // eslint-disable-next-line eqeqeq
                     if (this.isEnterpriseEnable == true && !isTpaSaml) {
                         this.listenTo(this.subview.login, 'auth-complete', this.loginComplete);
                     } else {
@@ -261,6 +262,7 @@
                     $form = $('#' + type + '-form'),
                     scrollX = window.scrollX,
                     scrollY = window.scrollY,
+                    // eslint-disable-next-line no-undef
                     queryParams = url('?'),
                     queryStr = queryParams.length > 0 ? '?' + queryParams : '';
 
@@ -271,6 +273,7 @@
                 });
 
                 // Load the form. Institution login is always refreshed since it changes based on the previous form.
+                // eslint-disable-next-line eqeqeq
                 if (!this.form.isLoaded($form) || type == 'institution_login') {
                     // We need a special case for loading reset form as there is mismatch of form id
                     // value ie 'password-reset' vs load function name ie 'reset'
@@ -286,9 +289,11 @@
                 this.element.show($form);
 
                 // Update url without reloading page
+                // eslint-disable-next-line eqeqeq
                 if (type != 'institution_login' && type != 'reset') {
                     History.pushState(null, document.title, '/' + type + queryStr);
                 }
+                // eslint-disable-next-line no-undef
                 analytics.page('login_and_registration', type);
 
                 // Focus on the form
@@ -366,4 +371,5 @@
             }
         });
     });
+// eslint-disable-next-line no-undef
 }).call(this, define || RequireJS.define);

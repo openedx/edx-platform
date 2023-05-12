@@ -27,6 +27,7 @@
          * @return {boolean}
          */
                 _isValid: function(index) {
+                    // eslint-disable-next-line no-undef
                     return _.isNumber(index) && index < this.size && index >= 0;
                 },
 

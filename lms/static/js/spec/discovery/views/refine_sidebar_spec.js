@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'jquery', 'common/js/spec_helpers/template_helpers', 'js/discovery/models/facet_option',
     'js/discovery/views/refine_sidebar'
@@ -33,6 +34,7 @@ define([
                 'templates/discovery/facet',
                 'templates/discovery/facet_option'
             ]);
+            // eslint-disable-next-line no-undef
             this.facetOptions = new Backbone.Collection([], {model: FacetOption});
             this.facetOptions.add([
                 {facet: 'language', term: 'es', count: 12},
@@ -50,6 +52,7 @@ define([
         });
 
         it('styles active filter', function() {
+            // eslint-disable-next-line no-undef
             this.onSelect = jasmine.createSpy('onSelect');
             this.sidebar.on('selectOption', this.onSelect);
             this.sidebar.$el.find('button[data-value="en"]').click();
@@ -57,6 +60,7 @@ define([
         });
 
         it('expands and collapses facet', function() {
+            // eslint-disable-next-line no-undef
             var options = _.range(20).map(function(number) {
                 return {facet: 'org', term: 'test' + number, count: 1};
             });

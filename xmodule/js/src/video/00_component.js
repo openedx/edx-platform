@@ -18,9 +18,11 @@
                     if (arguments.length > 1) {
                         throw Error('Second argument not supported');
                     }
+                    // eslint-disable-next-line no-undef
                     if (_.isNull(o) || _.isUndefined(o)) {
                         throw Error('Cannot set a null [[Prototype]]');
                     }
+                    // eslint-disable-next-line no-undef
                     if (!_.isObject(o)) {
                         throw TypeError('Argument must be an object');
                     }

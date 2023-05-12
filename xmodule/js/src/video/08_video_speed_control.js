@@ -18,6 +18,7 @@
                     return new SpeedControl(state);
                 }
 
+                // eslint-disable-next-line no-undef
                 _.bindAll(this, 'onSetSpeed', 'onRenderSpeed', 'clickLinkHandler',
                     'keyDownLinkHandler', 'mouseEnterHandler', 'mouseLeaveHandler',
                     'clickMenuHandler', 'keyDownMenuHandler', 'destroy'
@@ -74,6 +75,7 @@
                     var state = this.state;
 
                     if (!this.isPlaybackRatesSupported(state)) {
+                        // eslint-disable-next-line no-console
                         console.log(
                             '[Video info]: playbackRate is not supported.'
                         );

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'js/student_account/multiple_enterprise',
@@ -14,7 +15,9 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
 
         beforeEach(function() {
             // Mock the redirect call
+            // eslint-disable-next-line no-undef
             spyOn(MultipleEnterpriseInterface, 'redirect').and.callFake(function() {});
+            // eslint-disable-next-line no-undef
             spyOn(Utils, 'userFromEdxUserCookie').and.returnValue({username: 'test-learner'});
         });
 
@@ -43,7 +46,9 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
         it('checks bypass of enterprise selection page in case of enterprise in URL', function() {
             // Spy on Ajax requests
             var requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-undef
             spyOn(MultipleEnterpriseInterface, 'getEnterpriseFromUrl').and.returnValue('SomeEnterprise');
+            // eslint-disable-next-line no-undef
             spyOn(MultipleEnterpriseInterface, 'checkEnterpriseExists').and.returnValue(true);
 
             // Attempt to fetch a learner
@@ -77,7 +82,9 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
         it('checks enterprise selection page redirect in case of enterprise activation failure', function() {
             // Spy on Ajax requests
             var requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-undef
             spyOn(MultipleEnterpriseInterface, 'getEnterpriseFromUrl').and.returnValue('SomeEnterprise');
+            // eslint-disable-next-line no-undef
             spyOn(MultipleEnterpriseInterface, 'checkEnterpriseExists').and.returnValue(true);
 
             // Attempt to fetch a learner

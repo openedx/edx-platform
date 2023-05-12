@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/discovery/collections/filters'], function(Filters) {
     'use strict';
 

@@ -1,4 +1,5 @@
 window.gettext = function(s) { return s; };
+// eslint-disable-next-line eqeqeq
 window.ngettext = function(singular, plural, num) { return num == 1 ? singular : plural; };
 
 function interpolate(fmt, obj, named) {

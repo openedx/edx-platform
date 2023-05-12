@@ -1,6 +1,7 @@
 /**
  * Provides utilities for validating libraries during creation.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/utils/create_utils_base'],
     function($, gettext, ViewUtils, CreateUtilsFactory) {
         'use strict';

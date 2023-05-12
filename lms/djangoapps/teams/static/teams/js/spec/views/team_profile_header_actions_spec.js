@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'teams/js/models/team',
     'teams/js/views/team_profile_header_actions', 'teams/js/spec_helpers/team_spec_helpers'
@@ -366,6 +367,7 @@ define([
             it('can navigate to correct url', function() {
                 var requests = AjaxHelpers.requests(this),
                     editButton;
+                // eslint-disable-next-line no-undef
                 spyOn(Backbone.history, 'navigate');
                 createAndAssertView(requests, true);
                 editButton = view.$('.action-edit-team');

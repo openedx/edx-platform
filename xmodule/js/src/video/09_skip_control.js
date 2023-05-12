@@ -18,6 +18,7 @@
                     return new SkipControl(state, i18n);
                 }
 
+                // eslint-disable-next-line no-undef
                 _.bindAll(this, 'onClick', 'render', 'destroy');
                 this.state = state;
                 this.state.videoSkipControl = this;
@@ -60,6 +61,7 @@
                 bindHandlers: function() {
                     this.el.on('click', this.onClick);
                     this.state.el.on({
+                        // eslint-disable-next-line no-undef
                         'play.skip': _.once(this.render),
                         'destroy.skip': this.destroy
                     });

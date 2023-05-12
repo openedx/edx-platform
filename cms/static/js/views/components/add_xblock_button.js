@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
     function(BaseView, HtmlUtils) {
         'use strict';

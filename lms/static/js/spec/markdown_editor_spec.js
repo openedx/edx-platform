@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['Markdown.Editor'], function(MarkdownEditor) {
     'use strict';
 

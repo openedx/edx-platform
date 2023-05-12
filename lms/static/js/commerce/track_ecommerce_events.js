@@ -34,5 +34,6 @@
         return TrackECommerceEvents;
     });
 }).call(this,
+    // eslint-disable-next-line no-undef
     typeof define === 'function' && define.amd ? define : RequireJS.define
 );

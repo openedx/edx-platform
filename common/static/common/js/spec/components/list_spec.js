@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
     function($, Backbone, _, ListView) {
         'use strict';

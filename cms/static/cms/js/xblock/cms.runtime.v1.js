@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['jquery', 'backbone', 'xblock/runtime.v1', 'URI', 'gettext', 'js/utils/modal',
     'common/js/components/views/feedback_notification'],
 function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
@@ -43,6 +44,7 @@ function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
 
         function v1() {
             v1.__super__.constructor.call(this);
+            // eslint-disable-next-line no-undef
             this.dispatcher = _.clone(Backbone.Events);
             this.listenTo('save', this._handleSave);
             this.listenTo('cancel', this._handleCancel);

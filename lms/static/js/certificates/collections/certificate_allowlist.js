@@ -52,6 +52,7 @@
             },
 
             update: function(data) {
+                // eslint-disable-next-line no-undef
                 _.each(data, function(item) {
                     // eslint-disable-next-line camelcase
                     var certificate_exception_model = this.getModel({user_name: item.user_name, user_email: item.user_email});

@@ -35,10 +35,12 @@ describe('ModuleEdit', function() {
                     + '</ul>');
         // eslint-disable-next-line camelcase
         edit_helpers.installEditTemplates(true);
+        // eslint-disable-next-line no-undef
         spyOn($, 'ajax').and.returnValue(this.moduleData);
         this.moduleEdit = new ModuleEdit({
             el: $('.component'),
             model: this.stubModule,
+            // eslint-disable-next-line no-undef
             onDelete: jasmine.createSpy()
         });
         return this.moduleEdit;
@@ -54,10 +56,12 @@ describe('ModuleEdit', function() {
     describe('methods', function() {
         describe('initialize', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 spyOn(ModuleEdit.prototype, 'render');
                 this.moduleEdit = new ModuleEdit({
                     el: $('.component'),
                     model: this.stubModule,
+                    // eslint-disable-next-line no-undef
                     onDelete: jasmine.createSpy()
                 });
                 return this.moduleEdit;
@@ -70,9 +74,13 @@ describe('ModuleEdit', function() {
             beforeEach(function() {
                 // eslint-disable-next-line camelcase
                 edit_helpers.installEditTemplates(true);
+                // eslint-disable-next-line no-undef
                 spyOn(this.moduleEdit, 'loadDisplay');
+                // eslint-disable-next-line no-undef
                 spyOn(this.moduleEdit, 'delegateEvents');
+                // eslint-disable-next-line no-undef
                 spyOn($.fn, 'append');
+                // eslint-disable-next-line no-undef
                 spyOn(ViewUtils, 'loadJavaScript').and.returnValue($.Deferred().resolve().promise());
                 window.MockXBlock = function() {
                     return {};
@@ -135,6 +143,7 @@ describe('ModuleEdit', function() {
                     headers: {
                         Accept: 'application/json'
                     },
+                    // eslint-disable-next-line no-undef
                     success: jasmine.any(Function)
                 });
                 expect($.ajax).not.toHaveBeenCalledWith({
@@ -143,6 +152,7 @@ describe('ModuleEdit', function() {
                     headers: {
                         Accept: 'application/json'
                     },
+                    // eslint-disable-next-line no-undef
                     success: jasmine.any(Function)
                 });
                 expect(this.moduleEdit.loadDisplay).toHaveBeenCalled();
@@ -157,9 +167,11 @@ describe('ModuleEdit', function() {
                     headers: {
                         Accept: 'application/json'
                     },
+                    // eslint-disable-next-line no-undef
                     success: jasmine.any(Function)
                 });
                 this.moduleEdit.clickEditButton({
+                    // eslint-disable-next-line no-undef
                     preventDefault: jasmine.createSpy('event.preventDefault')
                 });
                 mockXBlockEditorHtml = readFixtures('templates/mock/mock-xblock-editor.underscore');
@@ -212,6 +224,7 @@ describe('ModuleEdit', function() {
                     headers: {
                         Accept: 'application/json'
                     },
+                    // eslint-disable-next-line no-undef
                     success: jasmine.any(Function)
                 });
                 return expect(this.moduleEdit.delegateEvents).toHaveBeenCalled();
@@ -256,6 +269,7 @@ describe('ModuleEdit', function() {
         });
         describe('loadDisplay', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 spyOn(XBlock, 'initializeBlock');
                 return this.moduleEdit.loadDisplay();
             });

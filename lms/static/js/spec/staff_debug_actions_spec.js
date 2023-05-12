@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define([
     'backbone',
     'jquery',
@@ -114,6 +115,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
             it('makes an ajax call with the expected parameters', function() {
                 $('body').append($usernameFixture);
 
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajax');
                 StaffDebug.reset(courseId, locationName, location);
 
@@ -135,6 +137,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
             it('makes an ajax call with the expected parameters', function() {
                 $('body').append($usernameFixture);
 
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajax');
                 StaffDebug.deleteStudentState(courseId, locationName, location);
 
@@ -157,6 +160,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
             it('makes an ajax call with the expected parameters', function() {
                 $('body').append($usernameFixture);
 
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajax');
                 StaffDebug.rescore(courseId, locationName, location);
 
@@ -178,6 +182,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
             it('makes an ajax call with the expected parameters', function() {
                 $('body').append($usernameFixture);
 
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajax');
                 StaffDebug.rescoreIfHigher(courseId, locationName, location);
 
@@ -200,6 +205,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
                 $('body').append($usernameFixture);
                 $('body').append($scoreFixture);
                 $('#' + scoreFixtureID).val('1');
+                // eslint-disable-next-line no-undef
                 spyOn($, 'ajax');
                 StaffDebug.overrideScore(courseId, locationName, location);
 

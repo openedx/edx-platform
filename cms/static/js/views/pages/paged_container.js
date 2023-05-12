@@ -1,6 +1,7 @@
 /**
  * PagedXBlockContainerPage is a variant of XBlockContainerPage that supports Pagination.
  */
+// eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views/paged_container'],
     function($, _, gettext, XBlockContainerPage, PagedContainerView) {
         'use strict';

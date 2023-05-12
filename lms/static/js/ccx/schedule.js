@@ -278,6 +278,7 @@ var edx = edx || {};
                     $('#grading-policy').text(data.grading_policy);
                 },
                 error: function(jqXHR) {
+                    // eslint-disable-next-line no-console
                     console.log(jqXHR.responseText);
                     $('#ajax-error').show().focus();
                     $('#dirty-schedule').hide();
@@ -557,4 +558,5 @@ var edx = edx || {};
             );
         }
     });
+// eslint-disable-next-line no-undef
 }(jQuery, _, Backbone, gettext));

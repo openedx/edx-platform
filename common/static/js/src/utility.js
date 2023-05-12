@@ -33,7 +33,9 @@ window.rewriteStaticLinks = function(content, from, to) {
     // change all relative urls only which may be embedded inside other tags in content.
     // handle http and https
     // escape all regex interpretable chars
+    // eslint-disable-next-line no-undef
     fromRe = from.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    // eslint-disable-next-line no-undef
     var regex = new RegExp('(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9@:%_\+.~#?&//=]*))?' + fromRe, 'g');
     return content.replace(regex, replacer);
 };

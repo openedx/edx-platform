@@ -12,12 +12,14 @@ var setupFullScreenModal = function() {
                 largeALT: smallImageObject.attr('alt'),
                 largeSRC: largeImageSRC
             };
+            // eslint-disable-next-line no-undef
             var html = _.template($('#image-modal-tpl').text())(data);
             // xss-lint: disable=javascript-jquery-insertion
             $(this).replaceWith(html);
         }
     });
     $('.wrapper-modal-image .image-wrapper img').each(function() {
+        // eslint-disable-next-line no-undef
         var draggie = new Draggabilly(this, {containment: true});
         draggie.disable();
         $(this).closest('.image-modal').data('draggie', draggie);

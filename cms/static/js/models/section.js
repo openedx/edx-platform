@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 define(['backbone', 'gettext', 'common/js/components/views/feedback_notification', 'js/utils/module'],
     function(Backbone, gettext, NotificationView, ModuleUtils) {
         var Section = Backbone.Model.extend({

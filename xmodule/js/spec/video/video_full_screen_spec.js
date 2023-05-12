@@ -6,6 +6,7 @@
 
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
+            // eslint-disable-next-line no-undef
             window.onTouchBasedDevice = jasmine
                 .createSpy('onTouchBasedDevice').and.returnValue(null);
         });
@@ -19,7 +20,9 @@
 
         describe('constructor', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-undef
                 state = jasmine.initializePlayer();
+                // eslint-disable-next-line no-undef
                 jasmine.mockFullscreenAPI();
             });
 
@@ -37,7 +40,9 @@
             });
 
             it('correctly triggers the event handler to toggle fullscreen mode', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(state.videoFullScreen, 'exit');
+                // eslint-disable-next-line no-undef
                 spyOn(state.videoFullScreen, 'enter');
 
                 state.videoFullScreen.fullScreenState = false;
@@ -62,6 +67,7 @@
             });
 
             it('correctly can out of fullscreen by pressing esc', function() {
+                // eslint-disable-next-line no-undef
                 spyOn(state.videoCommands, 'execute');
                 var esc = $.Event('keyup');
                 esc.keyCode = 27;
@@ -85,10 +91,13 @@
         });
 
         it('Controls height is actual on switch to fullscreen', function() {
+            // eslint-disable-next-line no-undef
             spyOn($.fn, 'height').and.callFake(function(val) {
+                // eslint-disable-next-line no-undef
                 return _.isUndefined(val) ? 100 : this;
             });
 
+            // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer();
 
             state.videoFullScreen.enter();
