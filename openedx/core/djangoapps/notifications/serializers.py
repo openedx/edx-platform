@@ -5,8 +5,7 @@ from rest_framework import serializers
 
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.notifications.models import NotificationPreference
-from openedx.core.djangoapps.notifications.models import Notification
+from openedx.core.djangoapps.notifications.models import Notification, NotificationPreference
 
 
 class CourseOverviewSerializer(serializers.ModelSerializer):

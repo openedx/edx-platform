@@ -2,8 +2,9 @@
 Views for the notifications API.
 """
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -178,3 +179,51 @@ class NotificationListAPIView(generics.ListAPIView):
         if app_name:
             queryset = queryset.filter(app_name=app_name, user=self.request.user)
         return queryset
+
+
+class NotificationCountViewSet(viewsets.ViewSet):
+    """
+    API view for getting the unseen notifications count for a user.
+    """
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request):
+        """
+        Get the unseen notifications count for a user.
+
+        **Permissions**: User must be authenticated.
+        **Response Format**:
+            {
+                "count": (int) total_number_of_unseen_notifications,
+                "count_by_app_name": {
+                    (str) app_name: (int) number_of_unseen_notifications,
+                    ...
+                }
+            }
+
+        Response Error Codes:
+            - 403: The requester cannot access resource.
+        """
+        # Get the unseen notifications count for each app name.
+        count_by_app_name = (
+            Notification.objects
+            .filter(user_id=request.user, last_seen__isnull=True)
+            .values('app_name')
+            .annotate(count=Count('*'))
+        )
+        count_total = 0
+        count_by_app_name_dict = {}
+
+        for item in count_by_app_name:
+            app_name = item['app_name']
+            count = item['count']
+
+            count_total += count
+            count_by_app_name_dict[app_name] = count
+        # Return the unseen notifications count for the user and the unseen notifications count for each app name.
+
+        return Response({
+            "count": count_total,
+            "count_by_app_name": count_by_app_name_dict,
+        })

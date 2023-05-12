@@ -229,6 +229,9 @@ class NotificationListAPIViewTest(APITestCase):
         self.url = reverse('notifications-list')
 
     def test_list_notifications(self):
+        """
+        Test that the view can list notifications.
+        """
         # Create a notification for the user.
         Notification.objects.create(
             user=self.user,
@@ -252,6 +255,9 @@ class NotificationListAPIViewTest(APITestCase):
         self.assertEqual(data[0]['content'], 'This is a notification.')
 
     def test_list_notifications_with_app_name_filter(self):
+        """
+        Test that the view can filter notifications by app name.
+        """
         # Create two notifications for the user, one for each app name.
         Notification.objects.create(
             user=self.user,
@@ -281,8 +287,58 @@ class NotificationListAPIViewTest(APITestCase):
         self.assertEqual(data[0]['content'], 'This is a notification for app1.')
 
     def test_list_notifications_without_authentication(self):
+        """
+        Test that the view returns 403 if the user is not authenticated.
+        """
         # Make a request to the view without authenticating.
         response = self.client.get(self.url)
 
         # Assert that the response is unauthorized.
         self.assertEqual(response.status_code, 403)
+
+
+class NotificationCountViewSetTestCase(APITestCase):
+    """
+    Tests for the NotificationCountViewSet.
+    """
+
+    def setUp(self):
+        # Create a user.
+        self.user = UserFactory()
+        self.url = reverse('notifications-count')
+        # Create some notifications for the user.
+        Notification.objects.create(user=self.user, app_name='App Name 1', notification_type='Type A')
+        Notification.objects.create(user=self.user, app_name='App Name 1', notification_type='Type B')
+        Notification.objects.create(user=self.user, app_name='App Name 2', notification_type='Type A')
+        Notification.objects.create(user=self.user, app_name='App Name 3', notification_type='Type C')
+
+    def test_get_unseen_notifications_count(self):
+        """
+        Test that the endpoint returns the correct count of unseen notifications.
+        """
+        self.client.login(username=self.user.username, password='test')
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 4)
+        self.assertEqual(response.data['count_by_app_name'], {'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1})
+
+    def test_get_unseen_notifications_count_for_unauthenticated_user(self):
+        """
+        Test that the endpoint returns 403 for an unauthenticated user.
+        """
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_unseen_notifications_count_for_user_with_no_notifications(self):
+        """
+        Test that the endpoint returns 0 for a user with no notifications.
+        """
+        # Create a user with no notifications.
+        user = UserFactory()
+        self.client.login(username=user.username, password='test')
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 0)
+        self.assertEqual(response.data['count_by_app_name'], {})
