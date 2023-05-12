@@ -7,13 +7,13 @@ from django.dispatch import Signal
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from rest_framework import status
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from openedx.core.djangoapps.notifications.models import NotificationPreference
+from openedx.core.djangoapps.notifications.models import Notification, NotificationPreference
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -217,3 +217,72 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_data = self._expected_api_response(overrides=updated_notification_config_data)
         self.assertEqual(response.data, expected_data)
+
+
+class NotificationListAPIViewTest(APITestCase):
+    """
+    Tests suit for the NotificationListAPIView.
+    """
+
+    def setUp(self):
+        self.user = self.user = UserFactory()
+        self.url = reverse('notifications-list')
+
+    def test_list_notifications(self):
+        # Create a notification for the user.
+        Notification.objects.create(
+            user=self.user,
+            app_name='app1',
+            notification_type='info',
+            content='This is a notification.',
+        )
+        self.client.login(username=self.user.username, password='test')
+
+        # Make a request to the view.
+        response = self.client.get(self.url)
+
+        # Assert that the response is successful.
+
+        self.assertEqual(response.status_code, 200)
+        data = response.data['results']
+        # Assert that the response contains the notification.
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]['app_name'], 'app1')
+        self.assertEqual(data[0]['notification_type'], 'info')
+        self.assertEqual(data[0]['content'], 'This is a notification.')
+
+    def test_list_notifications_with_app_name_filter(self):
+        # Create two notifications for the user, one for each app name.
+        Notification.objects.create(
+            user=self.user,
+            app_name='app1',
+            notification_type='info',
+            content='This is a notification for app1.',
+        )
+        Notification.objects.create(
+            user=self.user,
+            app_name='app2',
+            notification_type='info',
+            content='This is a notification for app2.',
+        )
+        self.client.login(username=self.user.username, password='test')
+
+        # Make a request to the view with the app_name query parameter set to 'app1'.
+        response = self.client.get(self.url + "?app_name=app1")
+
+        # Assert that the response is successful.
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains only the notification for app1.
+        data = response.data['results']
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]['app_name'], 'app1')
+        self.assertEqual(data[0]['notification_type'], 'info')
+        self.assertEqual(data[0]['content'], 'This is a notification for app1.')
+
+    def test_list_notifications_without_authentication(self):
+        # Make a request to the view without authenticating.
+        response = self.client.get(self.url)
+
+        # Assert that the response is unauthorized.
+        self.assertEqual(response.status_code, 403)

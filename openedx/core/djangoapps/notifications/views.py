@@ -13,6 +13,8 @@ from openedx.core.djangoapps.notifications.models import NotificationPreference
 from .serializers import NotificationCourseEnrollmentSerializer, UserNotificationPreferenceSerializer
 
 User = get_user_model()
+from .models import Notification
+from .serializers import NotificationCourseEnrollmentSerializer, NotificationSerializer
 
 
 class CourseEnrollmentListView(generics.ListAPIView):
@@ -130,3 +132,49 @@ class UserNotificationPreferenceView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class NotificationListAPIView(generics.ListAPIView):
+    """
+    API view for listing notifications for a user.
+
+    **Permissions**: User must be authenticated.
+    **Response Format** (paginated):
+
+        {
+            "results" : [
+                {
+                    "id": (int) notification_id,
+                    "app_name": (str) app_name,
+                    "notification_type": (str) notification_type,
+                    "content": (str) content,
+                    "content_context": (dict) content_context,
+                    "content_url": (str) content_url,
+                    "last_read": (datetime) last_read,
+                    "last_seen": (datetime) last_seen
+                },
+                ...
+            ],
+            "count": (int) total_number_of_notifications,
+            "next": (str) url_to_next_page_of_notifications,
+            "previous": (str) url_to_previous_page_of_notifications,
+            "page_size": (int) number_of_notifications_per_page,
+
+        }
+
+    Response Error Codes:
+        - 403: The requester cannot access resource.
+    """
+
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        """
+        Override the get_queryset method to filter the queryset by app name and request.user.
+        """
+        queryset = super().get_queryset()
+        app_name = self.request.query_params.get('app_name')
+        if app_name:
+            queryset = queryset.filter(app_name=app_name, user=self.request.user)
+        return queryset

@@ -6,6 +6,7 @@ from rest_framework import serializers
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.notifications.models import NotificationPreference
+from openedx.core.djangoapps.notifications.models import Notification
 
 
 class CourseOverviewSerializer(serializers.ModelSerializer):
@@ -52,3 +53,22 @@ class UserNotificationPreferenceSerializer(serializers.ModelSerializer):
             setattr(instance, key, val)
         instance.save()
         return instance
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Notification model.
+    """
+
+    class Meta:
+        model = Notification
+        fields = (
+            'id',
+            'app_name',
+            'notification_type',
+            'content',
+            'content_context',
+            'content_url',
+            'last_read',
+            'last_seen',
+        )

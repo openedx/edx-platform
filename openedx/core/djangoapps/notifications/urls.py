@@ -5,7 +5,7 @@ from django.urls import path
 from django.urls import re_path
 from django.conf import settings
 from rest_framework import routers
-from .views import CourseEnrollmentListView, UserNotificationPreferenceView
+from .views import CourseEnrollmentListView, NotificationListAPIView, UserNotificationPreferenceView
 
 router = routers.DefaultRouter()
 
@@ -17,6 +17,7 @@ urlpatterns = [
         UserNotificationPreferenceView.as_view(),
         name='notification-preferences'
     ),
+    path('', NotificationListAPIView.as_view(), name='notifications-list'),
 ]
 
 urlpatterns += router.urls
