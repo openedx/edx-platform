@@ -11,6 +11,8 @@ from contextlib import contextmanager
 from smtplib import SMTPException
 
 import pytz
+from ccx_keys.locator import CCXLocator
+from crum import get_current_request
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -28,6 +30,8 @@ from lms.djangoapps.instructor.views.api import _split_input_list
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.courses import get_course_by_id
+from openedx.core.djangoapps.plugins.plugins_hooks import run_extension_point
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger("edx.ccx")
 
@@ -251,6 +255,11 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
         course_locator = course_key.to_course_locator()
         staff = CourseStaffRole(course_locator).users_with_role()
         admins = CourseInstructorRole(course_locator).users_with_role()
+        is_course_licensing_enabled = run_extension_point('PCO_ENABLE_COURSE_LICENSING')
+
+        # If Course Licensing is enabled, current request is obtained.
+        if is_course_licensing_enabled:
+            current_request = get_current_request()
 
         for identifier in identifiers:
             must_enroll = False
@@ -262,6 +271,20 @@ def ccx_students_enrolling_center(action, identifiers, email_students, course_ke
                 log.info("%s", exp)
                 errors.append(f"{exp}")
                 continue
+
+            if (
+                is_course_licensing_enabled and
+                not must_enroll and
+                not run_extension_point(
+                    'PCO_ENFORCE_LICENSE_LIMITS',
+                    course_key=course_key,
+                    email=email,
+                    student=student,
+                    request=current_request,
+                )
+            ):
+                # If License limit is reached, block enrollment.
+                break
 
             if CourseEnrollment.objects.is_course_full(ccx_course_overview) and not must_enroll:
                 error = _('The course is full: the limit is {max_student_enrollments_allowed}').format(
@@ -433,3 +456,76 @@ def remove_master_course_staff_from_ccx(master_course, ccx_key, display_name, se
                     email_students=send_email,
                     email_params=email_params,
                 )
+
+
+def get_master_course_by_ccx_id(ccx_id):
+    """
+    Return the master course id by the given CCX course id.
+    Args:
+        ccx_id: CCXLocator instance.
+    Returns:
+        None or a CourseLocator instance.
+    """
+    return ccx_id.to_course_locator() if ccx_id else None
+
+
+def exclude_master_course_staff_users(users, course_key, model='User'):
+    """
+    Return a new filtered queryset depending on weather the user is a staff member of the master course.
+
+    This is for CCX courses only, so if the course_key is not an instance of CCXLocator
+    will return the same users object.
+
+    Users will be interpreted as a staff members
+    if they have any entry in the Course Access Role model for the master course.
+
+    The model argument dictates how the lookup filter should be applied on the provided queryset.
+
+    Args:
+        users: django.db.models.query.QuerySet instance.
+        course_key: CCXLocator instance.
+        model: Dictates how to apply the lookup filter. Defaults to 'User'.
+            'User': Applies the lookup filter on the courseaccessrole model.
+            'CourseEnrollment': Applies the lookup filter on the user and then on
+                                the courseaccessrole model.
+
+    Returns:
+        Filtered django.db.models.query.QuerySet instance.
+        If course_key is not a CCXLocator instance it will return the users argument.
+        If model value is not recognized will it return the users argument.
+    """
+    if not isinstance(course_key, CCXLocator):
+        return users
+
+    if model == 'User':
+        return users.exclude(
+            courseaccessrole__course_id=get_master_course_by_ccx_id(course_key),
+        )
+
+    if model == 'CourseEnrollment':
+        return users.exclude(
+            user__courseaccessrole__course_id=get_master_course_by_ccx_id(course_key),
+        )
+
+    return users
+
+
+def multiple_ccx_per_coach(course):
+    """
+    Return if the feature to allows coaches to have multiple CCX
+    courses for the same main course is enabled for the site and the course.
+
+    This feature must be enabled at site-level and course-level.
+
+    Args:
+        Course: Course object.
+    Returns:
+        True or False.
+    """
+    return (
+        course.enable_ccx
+        and configuration_helpers.get_value(
+            'ALLOW_MULTIPLE_CCX_PER_COACH',
+            False,
+        )
+    )

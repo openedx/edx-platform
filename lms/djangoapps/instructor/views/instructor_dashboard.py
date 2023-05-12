@@ -58,6 +58,7 @@ from openedx.core.djangoapps.course_groups.cohorts import DEFAULT_COHORT_NAME, g
 from openedx.core.djangoapps.discussions.config.waffle_utils import legacy_discussion_experience_enabled
 from openedx.core.djangoapps.discussions.utils import available_division_schemes
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, CourseDiscussionSettings
+from openedx.core.djangoapps.plugins.plugins_hooks import run_extension_point
 from openedx.core.djangoapps.plugins.constants import ProjectType
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.markup import HTML, Text
@@ -462,7 +463,16 @@ def _section_membership(course, access):
     course_key = course.id
     ccx_enabled = settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and course.enable_ccx
 
+    # if Course Licensing is enabled, hide the membership tab for licensed CCXs from their staff users.
+    is_course_licensing_enabled = run_extension_point('PCO_ENABLE_COURSE_LICENSING')
+
+    is_licensed_ccx = run_extension_point(
+        'PCO_IS_LICENSED_CCX',
+        course_id=course.id,
+    ) if is_course_licensing_enabled else False
+
     section_data = {
+        'is_hidden': is_licensed_ccx and not access.get('admin', False),
         'section_key': 'membership',
         'section_display_name': _('Membership'),
         'access': access,
