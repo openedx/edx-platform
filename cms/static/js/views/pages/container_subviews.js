@@ -26,6 +26,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
             }
         },
 
+        // eslint-disable-next-line no-unused-vars
         shouldRefresh: function(model) {
             return false;
         },

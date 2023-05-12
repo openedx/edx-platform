@@ -28,6 +28,7 @@
      * @param {DOM element} element Container of the entire Video DOM element.
      */
             var Initialize = function(state, element) {
+                    // eslint-disable-next-line no-use-before-define
                     _makeFunctionsPublic(state);
 
                     state.initialize(element)
@@ -38,12 +39,14 @@
                             }
                             // On iPhones and iPods native controls are used.
                             if (/iP(hone|od)/i.test(state.isTouch[0])) {
+                                // eslint-disable-next-line no-use-before-define
                                 _hideWaitPlaceholder(state);
                                 state.el.trigger('initialize', arguments);
 
                                 return false;
                             }
 
+                            // eslint-disable-next-line no-use-before-define
                             _initializeModules(state, i18n)
                                 .done(function() {
                                     // On iPad ready state occurs just after start playing.
@@ -57,6 +60,7 @@
                                         state.trigger('videoControl.show', null);
                                     }
 
+                                    // eslint-disable-next-line no-use-before-define
                                     _hideWaitPlaceholder(state);
                                     state.el.trigger('initialize', arguments);
                                 });
@@ -111,6 +115,7 @@
      *     methods, modules) of the Video player.
      */
             function _makeFunctionsPublic(state) {
+                // eslint-disable-next-line no-use-before-define
                 bindTo(methodsDict, state, state);
             }
 
@@ -274,6 +279,7 @@
                 // If none of the supported video formats can be played and there is no
                 // short-hand video links, than hide the spinner and show error message.
                 if (!state.config.sources.length) {
+                    // eslint-disable-next-line no-use-before-define
                     _hideWaitPlaceholder(state);
                     state.el
                         .find('.video-player div')
@@ -642,6 +648,7 @@
 
                 this.metadata = {};
 
+                // eslint-disable-next-line no-unused-vars
                 metadataXHRs = _.map(this.videos, function(url, speed) {
                     return self.getVideoMetadata(url, function(data) {
                         if (data.items.length > 0) {

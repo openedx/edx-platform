@@ -12,8 +12,11 @@
 
                 state.videoControl = {};
 
+                // eslint-disable-next-line no-use-before-define
                 _makeFunctionsPublic(state);
+                // eslint-disable-next-line no-use-before-define
                 _renderElements(state);
+                // eslint-disable-next-line no-use-before-define
                 _bindHandlers(state);
 
                 dfd.resolve();
@@ -30,11 +33,17 @@
             //     get the 'state' object as a context.
             function _makeFunctionsPublic(state) {
                 var methodsDict = {
+                    // eslint-disable-next-line no-use-before-define
                     destroy: destroy,
+                    // eslint-disable-next-line no-use-before-define
                     hideControls: hideControls,
+                    // eslint-disable-next-line no-use-before-define
                     show: show,
+                    // eslint-disable-next-line no-use-before-define
                     showControls: showControls,
+                    // eslint-disable-next-line no-use-before-define
                     focusFirst: focusFirst,
+                    // eslint-disable-next-line no-use-before-define
                     updateVcrVidTime: updateVcrVidTime
                 };
 
@@ -105,6 +114,7 @@
                 this.el.trigger('controls:show', arguments);
             }
 
+            // eslint-disable-next-line no-unused-vars
             function showControls(event) {
                 if (!this.controlShowLock) {
                     if (!this.captionsHidden) {

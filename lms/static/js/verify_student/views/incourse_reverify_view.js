@@ -4,6 +4,7 @@
  * This view is responsible for rendering the page
  * template, including any subviews (for photo capture).
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($, _, _s, Backbone, gettext, HtmlUtils) {

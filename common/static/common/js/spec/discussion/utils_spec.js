@@ -23,6 +23,7 @@
                 updates = {
                     hello: 'world'
                 };
+                // eslint-disable-next-line no-unused-vars
                 res = DiscussionUtil.updateWithUndo(model, updates, {
                     foo: 'bar'
                 }, 'error message');

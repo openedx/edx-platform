@@ -21,6 +21,7 @@
     // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionUser = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(DiscussionUser, _super);
 
             function DiscussionUser() {

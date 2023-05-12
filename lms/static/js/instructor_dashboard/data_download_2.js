@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 /* globals _, DataDownloadV2, PendingInstructorTasks, ReportDownloads */
 
 (function() {
@@ -6,6 +7,7 @@
     // eslint-disable-next-line no-unused-vars
     var DataDownloadV2, PendingInstructorTasks, ReportDownloads, statusAjaxError;
 
+    // eslint-disable-next-line no-unused-vars
     statusAjaxError = function() {
         return window.InstructorDashboard.util.statusAjaxError.apply(this, arguments);
     };

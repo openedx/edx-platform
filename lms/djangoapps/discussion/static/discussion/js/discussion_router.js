@@ -84,6 +84,7 @@
                 },
 
                 showMain: function() {
+                    // eslint-disable-next-line no-unused-vars
                     var self = this;
                     if (this.main) {
                         this.main.cleanup();

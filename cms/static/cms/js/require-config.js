@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 /* globals _, requirejs */
 /* eslint-disable quote-props, no-console, no-plusplus */
 

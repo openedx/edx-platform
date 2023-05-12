@@ -85,6 +85,7 @@ define([
         function expectFooter(options) {
             var footerEl = testView.$('.test-paging-footer');
             expect(footerEl.text())
+                // eslint-disable-next-line no-useless-escape
                 .toMatch(new RegExp(options.currentPage + '\\s+out of\\s+\/\\s+' + options.totalPages));
             expect(footerEl.hasClass('hidden')).toBe(options.isHidden);
         }

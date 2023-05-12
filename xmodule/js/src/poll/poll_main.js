@@ -1,5 +1,6 @@
 (function(requirejs, require, define) {
     define('PollMain', ['edx-ui-toolkit/js/utils/html-utils'], function(HtmlUtils) {
+        // eslint-disable-next-line no-use-before-define
         PollMain.prototype = {
 
             // eslint-disable-next-line camelcase
@@ -244,6 +245,7 @@
             } // End-of: 'postInit': function () {
         }; // End-of: PollMain.prototype = {
 
+        // eslint-disable-next-line no-use-before-define
         return PollMain;
 
         function PollMain(el, runtime) {

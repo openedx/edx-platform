@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-unused-vars
 import $ from 'jquery';
+// eslint-disable-next-line no-unused-vars
 import _ from 'underscore';
 import AjaxHelpers from 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers';
 import EditHelpers from 'js/spec_helpers/edit_helpers';

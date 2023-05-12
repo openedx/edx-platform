@@ -43,6 +43,7 @@
                     var notesByTag = {},
                         noTags = this.noTags,
                         addNoteForTag, noteList, tags, i,
+                        // eslint-disable-next-line no-unused-vars
                         sortedTagNames, container, group, noteGroup, tagTitle, titleMap;
 
                     // Iterate through all the notes and build up a dictionary structure by tag.

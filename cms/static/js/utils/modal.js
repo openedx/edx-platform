@@ -10,12 +10,15 @@ define(['jquery'], function($) {
             e.preventDefault();
         }
 
+        // eslint-disable-next-line no-use-before-define
         var $modalCover = getModalCover();
 
         // Unit editors (module_edit) do not want the modal cover to hide when users click outside
         // of the editor. Users must press Cancel or Save to exit the editor.
         if (!$modalCover.hasClass('is-fixed')) {
+            // eslint-disable-next-line no-use-before-define
             getModal().hide();
+            // eslint-disable-next-line no-use-before-define
             hideModalCover($modalCover);
         }
     };
@@ -29,6 +32,7 @@ define(['jquery'], function($) {
     var hideModalCover = function(modalCover) {
         // eslint-disable-next-line eqeqeq
         if (modalCover == undefined) {
+            // eslint-disable-next-line no-use-before-define
             modalCover = getModalCover();
         }
         modalCover.hide();
@@ -40,7 +44,9 @@ define(['jquery'], function($) {
      * Shows the modal and modal cover, using the standard selectors.
      */
     var showModal = function() {
+        // eslint-disable-next-line no-use-before-define
         getModal().show();
+        // eslint-disable-next-line no-use-before-define
         showModalCover();
     };
 
@@ -53,6 +59,7 @@ define(['jquery'], function($) {
      * This method returns the modal cover element.
      */
     var showModalCover = function(addFixed, clickHandler) {
+        // eslint-disable-next-line no-use-before-define
         var $modalCover = getModalCover();
         $modalCover.show();
         if (addFixed) {

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 var setupFullScreenModal = function() {
     // Setup full screen image modal.
     // Executed from HTMLModule in display.js.

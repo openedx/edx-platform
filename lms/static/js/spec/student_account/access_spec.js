@@ -16,6 +16,7 @@
     function($, _, Backbone, TemplateHelpers, AjaxHelpers, AccessView, FormView, EnrollmentInterface,
         ShoppingCartInterface) {
         describe('edx.student.account.AccessView', function() {
+            // eslint-disable-next-line no-unused-vars
             var requests = null,
                 view = null,
                 FORM_DESCRIPTION = {

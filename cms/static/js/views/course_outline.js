@@ -47,6 +47,7 @@ function(
              * @returns {jQuery promise} A promise representing the refresh operation.
              */
         refresh: function(viewState) {
+            // eslint-disable-next-line no-unused-vars
             var getViewToRefresh, view, expandedLocators;
 
             // eslint-disable-next-line no-shadow

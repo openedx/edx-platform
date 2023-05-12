@@ -16,7 +16,9 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
         // eslint-disable-next-line camelcase
         var default_options = {
             start: 0,
+            // eslint-disable-next-line no-use-before-define
             displayed: PAGE_SIZE,
+            // eslint-disable-next-line no-use-before-define
             total: PAGE_SIZE + 1,
             previews: true
         };
@@ -462,6 +464,7 @@ function($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, Pagin
             });
 
             describe('Page input field', function() {
+                // eslint-disable-next-line no-unused-vars
                 var input;
 
                 it('should initially have a blank page input', function() {

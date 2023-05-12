@@ -25,6 +25,7 @@
     // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ThreadResponseView = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(ThreadResponseView, _super);
 
             function ThreadResponseView() {
@@ -68,6 +69,7 @@
             };
 
             ThreadResponseView.prototype.renderTemplate = function() {
+                // eslint-disable-next-line no-unused-vars
                 var $container, templateData, _ref;
                 // eslint-disable-next-line no-undef
                 this.template = _.template($('#thread-response-template').html());

@@ -21,6 +21,7 @@
 
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionContentView = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(DiscussionContentView, _super);
 
             function DiscussionContentView() {
@@ -184,6 +185,7 @@
             return DiscussionContentView;
         }(Backbone.View));
         this.DiscussionContentShowView = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(DiscussionContentShowView, _super);
 
             function DiscussionContentShowView() {

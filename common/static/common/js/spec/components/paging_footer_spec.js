@@ -155,6 +155,7 @@ define([
             });
 
             it('should handle invalid page requests', function() {
+                // eslint-disable-next-line no-unused-vars
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.$(pageNumberInputCss).val('abc');
                 pagingFooter.$(pageNumberInputCss).trigger('change');

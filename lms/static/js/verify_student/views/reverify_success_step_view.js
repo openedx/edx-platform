@@ -3,6 +3,7 @@
  * submitted photos for reverification.
  */
 
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function() {

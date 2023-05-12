@@ -14,6 +14,7 @@ $(document).ready(function() {
             success: function() {
                 location.reload();
             },
+            // eslint-disable-next-line no-unused-vars
             error: function(jqXHR, textStatus, errorThrown) {
                 $('#errors-info').text(jqXHR.responseText);
                 $('.generate_certs').attr('disabled', false).removeClass('is-disabled').attr('aria-disabled', false);

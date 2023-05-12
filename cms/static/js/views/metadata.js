@@ -501,7 +501,7 @@ define(
             getValueFromEditor: function() {
                 var dict = {};
 
-                // eslint-disable-next-line consistent-return
+                /* eslint-disable-next-line consistent-return, no-unused-vars */
                 _.each(this.$el.find('li'), function(li, index) {
                     var key = $(li).find('.input-key').val().trim(),
                         value = $(li).find('.input-value').val().trim();
@@ -615,6 +615,7 @@ define(
                     model = new FileUpload({
                         title: gettext('Upload File')
                     }),
+                    // eslint-disable-next-line no-unused-vars
                     view = new UploadDialog({
                         model: model,
                         url: url,
@@ -632,6 +633,7 @@ define(
 
         Metadata.License = AbstractEditor.extend({
 
+            // eslint-disable-next-line no-unused-vars
             initialize: function(options) {
                 this.licenseModel = new LicenseModel({asString: this.model.getValue()});
                 this.licenseView = new LicenseView({model: this.licenseModel});

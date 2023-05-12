@@ -103,6 +103,7 @@
             });
             it('does not show on initalize', function() {
                 var view;
+                // eslint-disable-next-line no-unused-vars
                 view = new AlertView.Confirmation(this.options);
                 expect(this.renderSpy).not.toHaveBeenCalled();
                 return expect(this.showSpy).not.toHaveBeenCalled();

@@ -225,7 +225,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
                         msg: gettext('Max file size exceeded')
                     });
                 },
-                // eslint-disable-next-line no-shadow
+                /* eslint-disable-next-line no-shadow, no-unused-vars */
                 processdone: function(event, data) {
                     self.largeFileErrorMsg = null;
                 }

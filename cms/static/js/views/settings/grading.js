@@ -27,6 +27,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         },
         initialize: function(options) {
         //  load template for grading view
+            // eslint-disable-next-line no-unused-vars
             var self = this;
             this.template = HtmlUtils.template(
                 $('#course_grade_policy-tpl').text()
@@ -279,7 +280,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         stopDragClosure: function() {
             var cachethis = this;
-            // eslint-disable-next-line no-shadow
+            /* eslint-disable-next-line no-shadow, no-unused-vars */
             return function(event, ui) {
             // for some reason the resize is setting height to 0
                 cachethis.saveCutoffs();

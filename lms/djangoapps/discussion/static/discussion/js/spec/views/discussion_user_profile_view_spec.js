@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 /* globals Discussion, DiscussionCourseSettings */
 // eslint-disable-next-line no-undef
 define([

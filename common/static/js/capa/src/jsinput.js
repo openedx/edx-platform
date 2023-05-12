@@ -6,7 +6,7 @@
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Same_origin_policy_for_JavaScript
  */
 
-// eslint-disable-next-line no-shadow-restricted-names
+/* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 var JSInput = (function($, undefined) {
     // Initialize js inputs on current page.
     // N.B.: No library assumptions about the iframe can be made (including,

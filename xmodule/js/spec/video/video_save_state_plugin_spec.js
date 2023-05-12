@@ -52,6 +52,7 @@ import * as Time from 'time.js';
             });
 
             it('data is not an object, async is true', function() {
+                // eslint-disable-next-line no-use-before-define
                 itSpec({
                     asyncVal: true,
                     speedVal: undefined,
@@ -64,6 +65,7 @@ import * as Time from 'time.js';
             });
 
             it('data contains speed, async is false', function() {
+                // eslint-disable-next-line no-use-before-define
                 itSpec({
                     asyncVal: false,
                     speedVal: speed,
@@ -78,6 +80,7 @@ import * as Time from 'time.js';
             });
 
             it('data contains float position, async is true', function() {
+                // eslint-disable-next-line no-use-before-define
                 itSpec({
                     asyncVal: true,
                     speedVal: undefined,
@@ -92,6 +95,7 @@ import * as Time from 'time.js';
             });
 
             it('data contains speed and rounded position, async is false', function() {
+                // eslint-disable-next-line no-use-before-define
                 itSpec({
                     asyncVal: false,
                     speedVal: speed,
@@ -108,6 +112,7 @@ import * as Time from 'time.js';
             });
 
             it('data contains empty object, async is true', function() {
+                // eslint-disable-next-line no-use-before-define
                 itSpec({
                     asyncVal: true,
                     speedVal: undefined,
@@ -118,6 +123,7 @@ import * as Time from 'time.js';
             });
 
             it('data contains position 0, async is true', function() {
+                // eslint-disable-next-line no-use-before-define
                 itSpec({
                     asyncVal: true,
                     speedVal: undefined,

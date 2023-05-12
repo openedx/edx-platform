@@ -221,6 +221,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
             var self = this;
             var url = this.tplUserURL.replace('@@EMAIL@@', email);
             var errMessage = opts.errMessage || this.messages.defaults.changeRoleError;
+            // eslint-disable-next-line no-unused-vars
             var onSuccess = opts.onSuccess || function(data) { ViewUtils.reload(); };
             var onError = opts.onError || function() {};
             $.ajax({
@@ -230,6 +231,7 @@ function($, _, gettext, BaseView, PromptView, ViewUtils, HtmlUtils) {
                 contentType: 'application/json',
                 data: JSON.stringify({role: newRole}),
                 success: onSuccess,
+                // eslint-disable-next-line no-unused-vars
                 error: function(jqXHR, textStatus, errorThrown) {
                     var message, prompt;
                     try {

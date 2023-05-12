@@ -72,7 +72,7 @@ class Discussions extends React.Component {
     }
 
     render() {
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-unused-vars */
         const {content_authored, thread_votes} = this.props;
 
         return (

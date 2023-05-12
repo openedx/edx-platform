@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* globals
  _, Discussion, DiscussionCourseSettings, DiscussionViewSpecHelper, DiscussionSpecHelper,
  DiscussionInlineView, DiscussionUtil, DiscussionThreadShowView, Thread

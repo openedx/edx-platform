@@ -83,12 +83,16 @@
         this.run = function() {
             if (panels) { return; } // already initialized
 
+            // eslint-disable-next-line no-use-before-define
             panels = new PanelCollection(idPostfix);
+            // eslint-disable-next-line no-use-before-define
             var commandManager = new CommandManager(hooks);
+            // eslint-disable-next-line no-use-before-define
             var previewManager = new PreviewManager(markdownConverter, panels, function(text, previewSet) { hooks.onPreviewPush(text, previewSet); });
             var undoManager, uiManager;
 
             if (!/\?noundo/.test(doc.location.href)) {
+                // eslint-disable-next-line no-use-before-define
                 undoManager = new UndoManager(function() {
                     previewManager.refresh();
                     // not available on the first call
@@ -101,6 +105,7 @@
                 };
             }
 
+            // eslint-disable-next-line no-use-before-define
             uiManager = new UIManager(idPostfix, panels, undoManager, previewManager, commandManager, help, imageUploadHandler);
             uiManager.setUndoRedoButtonStates();
 
@@ -429,12 +434,14 @@
             if (mode != newMode) {
                 mode = newMode;
                 if (!noSave) {
+                    // eslint-disable-next-line no-use-before-define
                     saveState();
                 }
             }
 
             // eslint-disable-next-line eqeqeq
             if (!uaSniffed.isIE || mode != 'moving') {
+                // eslint-disable-next-line no-use-before-define
                 timer = setTimeout(refreshState, 1);
             } else {
                 inputStateObj = null;
@@ -442,12 +449,14 @@
         };
 
         var refreshState = function(isInitialState) {
+            // eslint-disable-next-line no-use-before-define
             inputStateObj = new TextareaState(panels, isInitialState);
             timer = undefined;
         };
 
         this.setCommandMode = function() {
             mode = 'command';
+            // eslint-disable-next-line no-use-before-define
             saveState();
             timer = setTimeout(refreshState, 0);
         };
@@ -471,6 +480,7 @@
                     lastState.restore();
                     lastState = null;
                 } else {
+                    // eslint-disable-next-line no-use-before-define
                     undoStack[stackPtr] = new TextareaState(panels);
                     undoStack[--stackPtr].restore();
 
@@ -503,6 +513,7 @@
         // Push the input area state to the stack.
         // eslint-disable-next-line consistent-return
         var saveState = function() {
+            // eslint-disable-next-line no-use-before-define
             var currState = inputStateObj || new TextareaState(panels);
 
             if (!currState) {
@@ -772,6 +783,7 @@
     }
 
     function PreviewManager(converter, panels, previewPushCallback) {
+        // eslint-disable-next-line no-unused-vars
         var managerObj = this;
         var timeout;
         var elapsedTime;
@@ -827,6 +839,7 @@
             var currTime = new Date().getTime();
             elapsedTime = currTime - prevTime;
 
+            // eslint-disable-next-line no-use-before-define
             pushPreviewHtml(text);
         };
 
@@ -1021,6 +1034,7 @@
         var checkEscape = function(key) {
             var code = (key.charCode || key.keyCode);
             if (code === 27) {
+                // eslint-disable-next-line no-use-before-define
                 close(true);
             }
         };
@@ -1214,6 +1228,7 @@
         var inputBox = panels.input,
             buttons = {}; // buttons.undo, buttons.link, etc. The actual DOM elements.
 
+        // eslint-disable-next-line no-use-before-define
         makeSpritedButtonRow();
 
         var keyEvent = 'keydown';
@@ -1229,42 +1244,55 @@
 
                 switch (keyCodeStr) {
                 case 'b':
+                    // eslint-disable-next-line no-use-before-define
                     doClick(buttons.bold);
                     break;
                 case 'i':
+                    // eslint-disable-next-line no-use-before-define
                     doClick(buttons.italic);
                     break;
                 case 'l':
+                    // eslint-disable-next-line no-use-before-define
                     doClick(buttons.link);
                     break;
                 case 'q':
+                    // eslint-disable-next-line no-use-before-define
                     doClick(buttons.quote);
                     break;
                 case 'k':
+                    // eslint-disable-next-line no-use-before-define
                     doClick(buttons.code);
                     break;
                 case 'g':
+                    // eslint-disable-next-line no-use-before-define
                     doClick(buttons.image);
                     break;
                 case 'o':
+                    // eslint-disable-next-line no-use-before-define
                     doClick(buttons.olist);
                     break;
                 case 'u':
+                    // eslint-disable-next-line no-use-before-define
                     doClick(buttons.ulist);
                     break;
                 case 'h':
+                    // eslint-disable-next-line no-use-before-define
                     doClick(buttons.heading);
                     break;
                 case 'r':
+                    // eslint-disable-next-line no-use-before-define
                     doClick(buttons.hr);
                     break;
                 case 'y':
+                    // eslint-disable-next-line no-use-before-define
                     doClick(buttons.redo);
                     break;
                 case 'z':
                     if (key.shiftKey) {
+                        // eslint-disable-next-line no-use-before-define
                         doClick(buttons.redo);
                     } else {
+                        // eslint-disable-next-line no-use-before-define
                         doClick(buttons.undo);
                     }
                     break;
@@ -1289,7 +1317,9 @@
                 // Character 13 is Enter
                 if (keyCode === 13) {
                     var fakeButton = {};
+                    // eslint-disable-next-line no-use-before-define
                     fakeButton.textOp = bindCommand('doAutoindent');
+                    // eslint-disable-next-line no-use-before-define
                     doClick(fakeButton);
                 }
             }
@@ -1436,8 +1466,11 @@
         function makeSpritedButtonRow() {
             var buttonBar = panels.buttonBar;
 
+            // eslint-disable-next-line no-unused-vars
             var normalYShift = '0px';
+            // eslint-disable-next-line no-unused-vars
             var disabledYShift = '-20px';
+            // eslint-disable-next-line no-unused-vars
             var highlightYShift = '-40px';
 
             var buttonRow = document.createElement('div');
@@ -1519,6 +1552,7 @@
                 buttons.help = helpButton;
             }
 
+            // eslint-disable-next-line no-use-before-define
             setUndoRedoButtonStates();
         }
 
@@ -1635,6 +1669,7 @@
         chunk.after = this.stripLinkDefs(chunk.after, defsToAdd);
 
         var defs = '';
+        // eslint-disable-next-line no-useless-escape
         var regex = /(\[)((?:\[[^\]]*\]|[^\[\]])*)(\][ ]?(?:\n[ ]*)?\[)(\d+)(\])/g;
 
         var addDefNumber = function(def) {
@@ -1808,6 +1843,7 @@
 
     // When making a list, hitting shift-enter will put your cursor on the next line
     // at the current indent level.
+    // eslint-disable-next-line no-unused-vars
     commandProto.doAutoindent = function(chunk, postProcessing) {
         var commandMgr = this,
             fakeSelection = false;
@@ -1850,6 +1886,7 @@
         }
     };
 
+    // eslint-disable-next-line no-unused-vars
     commandProto.doBlockquote = function(chunk, postProcessing) {
         chunk.selection = chunk.selection.replace(/^(\n*)([^\r]+?)(\n*)$/,
             function(totalMatch, newlinesBefore, text, newlinesAfter) {
@@ -1992,6 +2029,7 @@
         }
     };
 
+    // eslint-disable-next-line no-unused-vars
     commandProto.doCode = function(chunk, postProcessing) {
         var hasTextBefore = /\S[ ]*$/.test(chunk.before);
         var hasTextAfter = /^[ ]*\S/.test(chunk.after);
@@ -2086,6 +2124,7 @@
 
             // Renumber/bullet the list element.
             itemText = itemText.replace(/^[ ]{0,3}([*+-]|\d+[.])\s/gm,
+                // eslint-disable-next-line no-unused-vars
                 function(_) {
                     return getItemPrefix();
                 });
@@ -2150,6 +2189,7 @@
         chunk.selection = chunk.selection.replace(/\n/g, '\n' + spaces);
     };
 
+    // eslint-disable-next-line no-unused-vars
     commandProto.doHeading = function(chunk, postProcessing) {
         // Remove leading/trailing whitespace and reduce internal spaces to single spaces.
         chunk.selection = chunk.selection.replace(/\s+/g, ' ');
@@ -2210,6 +2250,7 @@
         }
     };
 
+    // eslint-disable-next-line no-unused-vars
     commandProto.doHorizontalRule = function(chunk, postProcessing) {
         chunk.startTag = '----------\n';
         chunk.selection = '';

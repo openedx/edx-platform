@@ -24,6 +24,7 @@ window.SymbolicMathjaxPreprocessor = function() {
             // a zero width space--this is an invisible character that no one would
             // use, that gets passed through MathJax and to the server
             var c = '\u200b';
+            // eslint-disable-next-line no-useless-escape
             eqn = eqn.replace(/__(?:([^\{])|\{([^\}]+)\})/g, '^{' + c + '$1$2}');
 
             // NOTE: MathJax supports '\class{name}{mathcode}' but not for asciimath

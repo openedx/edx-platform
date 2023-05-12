@@ -28,6 +28,7 @@
     function(_, $, ui, Backbone, PromptView, NotificationView, ModuleEditView, ModuleModel, ModuleUtils) {
         var TabsEdit;
         TabsEdit = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(TabsEdit, _super);
 
             // eslint-disable-next-line no-shadow

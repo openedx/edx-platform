@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-shadow-restricted-names
+/* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(require, define, undefined) {
     require(
         ['video/00_video_storage.js'],
@@ -13,6 +13,7 @@
 
                 describe('initialize', function() {
                     it('with namespace and id', function() {
+                        // eslint-disable-next-line no-unused-vars
                         var storage = VideoStorage(namespace, id);
 
                         expect(window[namespace]).toBeDefined();
@@ -22,6 +23,7 @@
                     it('without namespace and id', function() {
                         // eslint-disable-next-line no-undef
                         spyOn(Number.prototype, 'toString').and.returnValue('0.abcdedg');
+                        // eslint-disable-next-line no-unused-vars
                         var storage = VideoStorage();
 
                         expect(window.VideoStorage).toBeDefined();

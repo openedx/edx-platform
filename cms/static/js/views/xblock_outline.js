@@ -193,6 +193,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
              * @param element The root element of this view.
              */
         addButtonActions: function(element) {
+            // eslint-disable-next-line no-unused-vars
             var self = this;
             element.find('.delete-button').click(_.bind(this.handleDeleteEvent, this));
             element.find('.duplicate-button').click(_.bind(this.handleDuplicateEvent, this));
@@ -223,6 +224,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
             }, options));
         },
 
+        // eslint-disable-next-line no-unused-vars
         onSync: function(event) {
             var hasChangedAttributes = ViewUtils.hasChangedAttributes(
                 this.model,

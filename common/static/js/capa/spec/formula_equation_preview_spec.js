@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 describe('escapeSelector', function() {
     'use strict';
 

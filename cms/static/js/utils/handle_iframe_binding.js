@@ -15,6 +15,7 @@ define(['jquery'], function($) {
                 target_element = e.$('iframe, embed');
             }
         }
+        // eslint-disable-next-line no-use-before-define
         modifyTagContent(target_element);
     };
 

@@ -8,7 +8,9 @@
             var dfd = $.Deferred(),
                 VideoPlayer = function(state) {
                     state.videoPlayer = {};
+                    // eslint-disable-next-line no-use-before-define
                     _makeFunctionsPublic(state);
+                    // eslint-disable-next-line no-use-before-define
                     _initialize(state);
                     // No callbacks to DOM events (click, mousemove, etc.).
 
@@ -76,6 +78,7 @@
                     function(params) {
                         // Can't cancel a queued debounced function on destroy
                         if (state.videoPlayer) {
+                            // eslint-disable-next-line no-use-before-define
                             return onSeek.call(this, params);
                         }
                     }.bind(state),
@@ -94,7 +97,9 @@
                     videoWidth = player[0].videoWidth || player.width(),
                     videoHeight = player[0].videoHeight || player.height();
 
+                // eslint-disable-next-line no-use-before-define
                 _resize(this, videoWidth, videoHeight);
+                // eslint-disable-next-line no-use-before-define
                 _updateVcrAndRegion(this);
             }
 
@@ -221,7 +226,9 @@
 
                         player.on('remove', state.videoPlayer.destroy);
 
+                        // eslint-disable-next-line no-use-before-define
                         _resize(state, videoWidth, videoHeight);
+                        // eslint-disable-next-line no-use-before-define
                         _updateVcrAndRegion(state, true);
                     });
                 }
@@ -574,6 +581,7 @@
             function onReady() {
                 var _this = this,
                     availablePlaybackRates, baseSpeedSubs,
+                    // eslint-disable-next-line no-unused-vars
                     player, videoWidth, videoHeight;
 
                 dfd.resolve();
@@ -645,6 +653,7 @@
                         // and their associated subs.
 
                         // First clear the dictionary.
+                        // eslint-disable-next-line no-unused-vars
                         $.each(this.videos, function(index, value) {
                             delete _this.videos[index];
                         });
@@ -797,10 +806,12 @@
                 return time;
             }
 
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-unused-vars */
             function updatePlayTime(time, skip_seek) {
+                // eslint-disable-next-line no-unused-vars
                 var videoPlayer = this.videoPlayer,
                     endTime = this.videoPlayer.duration(),
+                    // eslint-disable-next-line no-unused-vars
                     youTubeId;
 
                 if (this.config.endTime) {

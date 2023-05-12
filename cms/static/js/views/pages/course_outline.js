@@ -90,6 +90,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
                 this.expandedLocators.addAll(this.initialState.expanded_locators);
             }
 
+            // eslint-disable-next-line no-unused-vars
             /* globals course */
             if (this.model.get('highlights_enabled')) {
                 this.highlightsEnableView = new CourseHighlightsEnableView({

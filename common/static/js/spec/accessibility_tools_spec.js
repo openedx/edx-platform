@@ -1,5 +1,6 @@
 describe('Tests for accessibility_tools.js', function() {
     describe('Tests for accessible modals', function() {
+        // eslint-disable-next-line no-unused-vars
         var pressTabOnLastElt = function(firstElt, lastElt) {
             firstElt.focus();
         };
@@ -13,6 +14,7 @@ describe('Tests for accessibility_tools.js', function() {
         };
 
         beforeEach(function() {
+            // eslint-disable-next-line no-unused-vars
             var $focusedElementBeforeModal;
             loadFixtures('js/fixtures/dashboard-fixture.html');
             // eslint-disable-next-line no-undef
@@ -66,6 +68,7 @@ describe('Tests for accessibility_tools.js', function() {
 
         it("pressing ESC calls 'click' on close-modal element", function() {
             var clicked = false;
+            // eslint-disable-next-line no-unused-vars
             $('#close-modal').click(function(theEvent) {
                 clicked = true;
             });

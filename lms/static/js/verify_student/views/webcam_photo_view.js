@@ -2,6 +2,7 @@
  * Interface for retrieving webcam photos.
  * Supports HTML5 and Flash.
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {},
     key = {
         enter: 13
@@ -303,6 +304,7 @@ var edx = edx || {},
             }
         },
 
+        // eslint-disable-next-line no-unused-vars
         handleWebcamLoaded: function(errorTitle, errorMsg) {
             // Hide the text behind camera
             $('#camera .placeholder-art', this.el).hide();

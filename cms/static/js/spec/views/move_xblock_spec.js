@@ -6,6 +6,7 @@ import TemplateHelpers from 'common/js/spec_helpers/template_helpers';
 import ViewHelpers from 'common/js/spec_helpers/view_helpers';
 import MoveXBlockModal from 'js/views/modals/move_xblock_modal';
 import ContainerPage from 'js/views/pages/container';
+// eslint-disable-next-line no-unused-vars
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 import XBlockInfo from 'js/models/xblock_info';

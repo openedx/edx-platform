@@ -77,6 +77,7 @@
         };
 
         InstructorTaskProgress.prototype.get_status = function() {
+            // eslint-disable-next-line no-unused-vars
             var _this = this;
             // eslint-disable-next-line camelcase
             var task_ids = [];
@@ -88,7 +89,7 @@
                 var task_id = $(element).data('taskId');
                 // eslint-disable-next-line camelcase
                 var in_progress = $(element).data('inProgress');
-                /* eslint-disable-next-line no-constant-condition, no-cond-assign, camelcase */
+                /* eslint-disable-next-line no-constant-condition, no-cond-assign, camelcase, no-unused-vars */
                 if (in_progress = 'True') {
                     // eslint-disable-next-line camelcase
                     task_ids.push(task_id);
@@ -111,6 +112,7 @@
 }).call(this);
 
 // once the page is rendered, create the progress object
+// eslint-disable-next-line no-unused-vars
 var instructorTaskProgress;
 $(document).ready(function() {
     // eslint-disable-next-line no-undef

@@ -17,6 +17,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                 /* eslint-disable-next-line camelcase, no-undef */
                 save_url = 'save_ccx';
 
+                // eslint-disable-next-line no-unused-vars
                 $.fn.leanModal = function(param) {
                     return true;
                 };

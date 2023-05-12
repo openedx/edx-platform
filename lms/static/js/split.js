@@ -33,6 +33,7 @@
 var _split; // instead of split for a less common name; avoid conflict
 
 // Avoid running twice; that would break the `nativeSplit` reference
+// eslint-disable-next-line no-unused-vars
 _split = _split || (function(undef) {
     var nativeSplit = String.prototype.split,
         compliantExecNpcg = /()??/.exec('')[1] === undef, // NPCG: nonparticipating capturing group

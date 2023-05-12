@@ -6,8 +6,10 @@
  * to subviews to render individual steps.
  *
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
+// eslint-disable-next-line no-unused-vars
 (function($, _, Backbone, gettext) {
     'use strict';
 
@@ -74,6 +76,7 @@ var edx = edx || {};
 
             for (i = 0; i < this.displaySteps.length; i++) {
                 stepName = this.displaySteps[i].name;
+                // eslint-disable-next-line no-unused-vars
                 subview = null;
 
                 if (i < this.displaySteps.length - 1) {

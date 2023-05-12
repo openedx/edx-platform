@@ -34,10 +34,12 @@
          * Notify registered callbacks that the state of this descriptor has changed
          */
         Descriptor.prototype.update = function() {
+            // eslint-disable-next-line no-unused-vars
             var data, callbacks, i, length;
 
             data = this.save();
             callbacks = this.callbacks;
+            // eslint-disable-next-line no-unused-vars
             length = callbacks.length;
 
             $.each(callbacks, function(index, callback) {

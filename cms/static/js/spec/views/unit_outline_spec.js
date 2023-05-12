@@ -103,6 +103,7 @@ function($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils,
 
         it('highlights the current unit', function() {
             createUnitOutlineView(this, createMockXBlockInfo('Mock Unit'));
+            // eslint-disable-next-line no-unused-vars
             $('.outline-unit').each(function(i) {
                 if ($(this).data('locator') === model.get('id')) {
                     expect($(this)).toHaveClass('is-current');

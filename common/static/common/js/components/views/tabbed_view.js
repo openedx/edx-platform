@@ -167,6 +167,7 @@
                     $tab = $(focused).parent().find('.tab:eq(' + index + ')').prev();
                 }
 
+                // eslint-disable-next-line no-unused-vars
                 $panel = $($tab).data('index');
 
                 $tab.focus();
@@ -183,6 +184,7 @@
                     $tab = $(focused).parent().find('.tab:eq(' + index + ')').next();
                 }
 
+                // eslint-disable-next-line no-unused-vars
                 $panel = $($tab).data('index');
 
                 $tab.focus();

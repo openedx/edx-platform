@@ -1,6 +1,7 @@
 /**
  * View for the "id photo" step of the payment/verification flow.
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($) {

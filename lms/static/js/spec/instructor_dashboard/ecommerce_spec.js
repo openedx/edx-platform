@@ -30,6 +30,7 @@ define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce'],
             });
 
             it('hides the input field when the checkbox is unchecked', function() {
+                // eslint-disable-next-line no-unused-vars
                 var target = expiryCouponView.$el.find('input[type="checkbox"]');
                 expect(expiryCouponView.$el.find('#coupon_expiration_date')).toHaveAttr('style', 'display: none;');
             });

@@ -1,8 +1,10 @@
 /**
  * View for the "intro step" of the payment/verification flow.
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
+// eslint-disable-next-line no-unused-vars
 (function($) {
     'use strict';
 

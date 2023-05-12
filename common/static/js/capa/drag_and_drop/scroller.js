@@ -1,5 +1,6 @@
 (function(requirejs, require, define) {
     define(['edx-ui-toolkit/js/utils/html-utils'], function(HtmlUtils) {
+        // eslint-disable-next-line no-use-before-define
         return Scroller;
 
         function Scroller(state) {
@@ -54,6 +55,7 @@
                 state.sliderEl.animate({
                     'margin-left': showElLeftMargin + 'px'
                 }, 100, function() {
+                    // eslint-disable-next-line no-use-before-define
                     updateArrowOpacity();
                 });
             });
@@ -125,6 +127,7 @@
                 state.sliderEl.animate({
                     'margin-left': showElLeftMargin + 'px'
                 }, 100, function() {
+                    // eslint-disable-next-line no-use-before-define
                     updateArrowOpacity();
                 });
             });
@@ -141,6 +144,7 @@
             // 2.) When creating draggable elements, the scroller's right and left
             // arrows opacity must be updated according to the number of
             // draggables.
+            // eslint-disable-next-line no-use-before-define
             state.updateArrowOpacity = updateArrowOpacity;
 
             // eslint-disable-next-line no-useless-return

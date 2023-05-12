@@ -38,8 +38,11 @@
 
                 state.videoQualityControl = {};
 
+                // eslint-disable-next-line no-use-before-define
                 _makeFunctionsPublic(state);
+                // eslint-disable-next-line no-use-before-define
                 _renderElements(state);
+                // eslint-disable-next-line no-use-before-define
                 _bindHandlers(state);
 
                 dfd.resolve();
@@ -57,10 +60,15 @@
             //     get the 'state' object as a context.
             function _makeFunctionsPublic(state) {
                 var methodsDict = {
+                    // eslint-disable-next-line no-use-before-define
                     destroy: destroy,
+                    // eslint-disable-next-line no-use-before-define
                     fetchAvailableQualities: fetchAvailableQualities,
+                    // eslint-disable-next-line no-use-before-define
                     onQualityChange: onQualityChange,
+                    // eslint-disable-next-line no-use-before-define
                     showQualityControl: showQualityControl,
+                    // eslint-disable-next-line no-use-before-define
                     toggleQuality: toggleQuality
                 };
 

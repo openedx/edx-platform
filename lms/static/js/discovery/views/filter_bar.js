@@ -61,6 +61,7 @@
                 this.trigger('clearFilter', filter.id);
             },
 
+            // eslint-disable-next-line no-unused-vars
             clearAll: function(event) {
                 this.trigger('clearAll');
             },

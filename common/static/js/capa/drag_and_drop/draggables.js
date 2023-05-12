@@ -3,11 +3,13 @@
         'edx-ui-toolkit/js/utils/html-utils'],
     function(draggableEvents, draggableLogic, HtmlUtils) {
         return {
+            // eslint-disable-next-line no-use-before-define
             init: init
         };
 
         function init(state) {
             state.config.draggables.every(function(draggable) {
+                // eslint-disable-next-line no-use-before-define
                 processDraggable(state, draggable);
 
                 return true;

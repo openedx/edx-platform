@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($) {
@@ -130,6 +131,7 @@ var edx = edx || {};
                 return false;
             }
             var $container = $('.confirm-enrollment.cart-view form');
+            // eslint-disable-next-line no-unused-vars
             var view = new edx.shoppingcart.showcart.CartView({
                 el: $container
             }).submit(event);

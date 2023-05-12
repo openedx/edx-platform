@@ -13,12 +13,15 @@
  * ~ Chinese Proverb
  */
 
-// eslint-disable-next-line no-shadow-restricted-names
+/* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 window.ImageInput = (function($, undefined) {
+    // eslint-disable-next-line no-use-before-define
     var ImageInput = ImageInputConstructor;
 
     ImageInput.prototype = {
+        // eslint-disable-next-line no-use-before-define
         constructor: ImageInputConstructor,
+        // eslint-disable-next-line no-use-before-define
         clickHandler: clickHandler
     };
 

@@ -58,7 +58,7 @@ function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
         },
         // NOTE: validation functions should return non-internationalized error
         // messages. The messages will be passed through gettext in the template.
-        // eslint-disable-next-line consistent-return
+        /* eslint-disable-next-line consistent-return, no-unused-vars */
         validate: function(attrs, options) {
             if (!attrs.name) {
                 return {

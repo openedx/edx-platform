@@ -64,6 +64,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                 lineNumbers: false,
                 lineWrapping: false
             });
+            // eslint-disable-next-line no-unused-vars
             cm.on('change', function(instance, changeobj) {
                 instance.save();
                 // this event's being called even when there's no change :-(
@@ -74,6 +75,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                         _.bind(self.revertView, self));
                 }
             });
+            // eslint-disable-next-line no-unused-vars
             cm.on('focus', function(mirror) {
                 $(textarea).parent().children('label').addClass('is-focused');
             });
@@ -151,6 +153,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                     });
                 },
                 silent: true,
+                // eslint-disable-next-line no-unused-vars
                 error: function(model, response, options) {
                     var jsonResponse;
 

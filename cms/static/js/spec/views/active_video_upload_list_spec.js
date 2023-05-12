@@ -340,6 +340,7 @@ define(
                         unSupportedFiles = {
                             files: files
                         },
+                        // eslint-disable-next-line no-unused-vars
                         self = this;
 
                     this.view.$uploadForm.fileupload('add', unSupportedFiles);
@@ -450,6 +451,7 @@ define(
 
                         it('should trigger the correct request', function() {
                             var request,
+                                // eslint-disable-next-line no-unused-vars
                                 self = this;
                             // eslint-disable-next-line no-undef
                             expect(jasmine.Ajax.requests.count()).toEqual(caseInfo.numFiles);
@@ -475,6 +477,7 @@ define(
                             });
 
                             it('should start uploads', function() {
+                                // eslint-disable-next-line no-unused-vars
                                 var spec = this;
                                 var sentRequests = getSentRequests();
                                 expect(sentRequests.length).toEqual(

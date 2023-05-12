@@ -1,5 +1,6 @@
 (function(requirejs, require, define) {
     define([], function() {
+        // eslint-disable-next-line no-use-before-define
         return configParser;
 
         function configParser(state, config) {
@@ -14,13 +15,20 @@
                 foundErrors: false // Whether or not we find errors while processing the config.
             };
 
+            // eslint-disable-next-line no-use-before-define
             getDraggables(state, config);
+            // eslint-disable-next-line no-use-before-define
             getBaseImage(state, config);
+            // eslint-disable-next-line no-use-before-define
             getTargets(state, config);
+            // eslint-disable-next-line no-use-before-define
             getOnePerTarget(state, config);
+            // eslint-disable-next-line no-use-before-define
             getTargetOutline(state, config);
+            // eslint-disable-next-line no-use-before-define
             getLabelBgColor(state, config);
 
+            // eslint-disable-next-line no-use-before-define
             setIndividualTargets(state);
 
             if (state.config.foundErrors !== false) {
@@ -37,6 +45,7 @@
                 state.config.foundErrors = true;
             } else if ($.isArray(config.draggables) === true) {
                 config.draggables.every(function(draggable) {
+                    // eslint-disable-next-line no-use-before-define
                     if (processDraggable(state, draggable) !== true) {
                         state.config.foundErrors = true;
 
@@ -76,6 +85,7 @@
             // get an answer in the form of (x, y) coordinates for each draggable.
             } else if ($.isArray(config.targets) === true) {
                 config.targets.every(function(target) {
+                    // eslint-disable-next-line no-use-before-define
                     if (processTarget(state, target) !== true) {
                         state.config.foundErrors = true;
 
@@ -162,10 +172,14 @@
 
         function processDraggable(state, obj) {
             if (
+                // eslint-disable-next-line no-use-before-define
                 (attrIsString(obj, 'id') === false)
+            // eslint-disable-next-line no-use-before-define
             || (attrIsString(obj, 'icon') === false)
+            // eslint-disable-next-line no-use-before-define
             || (attrIsString(obj, 'label') === false)
 
+            // eslint-disable-next-line no-use-before-define
             || (attrIsBoolean(obj, 'can_reuse', false) === false)
 
             || (obj.hasOwnProperty('target_fields') === false)
@@ -177,6 +191,7 @@
             // We will be testing the return value from .every() call (it can be 'true' or 'false').
             if (obj.target_fields.every(
                 function(targetObj) {
+                    // eslint-disable-next-line no-use-before-define
                     return processTarget(state, targetObj, false);
                 }
             ) === false) {
@@ -197,12 +212,17 @@
         // 'true' or 'false.
         function processTarget(state, obj, pushToState) {
             if (
+                // eslint-disable-next-line no-use-before-define
                 (attrIsString(obj, 'id') === false)
 
+            // eslint-disable-next-line no-use-before-define
             || (attrIsInteger(obj, 'w') === false)
+            // eslint-disable-next-line no-use-before-define
             || (attrIsInteger(obj, 'h') === false)
 
+            // eslint-disable-next-line no-use-before-define
             || (attrIsInteger(obj, 'x') === false)
+            // eslint-disable-next-line no-use-before-define
             || (attrIsInteger(obj, 'y') === false)
             ) {
                 return false;

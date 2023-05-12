@@ -4,6 +4,7 @@ define(['js/views/baseview', 'underscore'], function(BaseView, _) {
 
         // Model is MetadataModel
         initialize: function() {
+            // eslint-disable-next-line no-unused-vars
             var self = this;
             var templateName = _.result(this, 'templateName');
             // Backbone model cid is only unique within the collection.
@@ -28,6 +29,7 @@ define(['js/views/baseview', 'underscore'], function(BaseView, _) {
         /**
          * Sets the value currently displayed in the editor/view. Subclasses should implement this method.
          */
+        // eslint-disable-next-line no-unused-vars
         setValueInEditor: function(value) {},
 
         /**

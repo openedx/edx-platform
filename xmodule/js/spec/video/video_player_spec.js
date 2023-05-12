@@ -168,7 +168,7 @@
                     });
 
                     describe('when not on a touch based device', function() {
-                        // eslint-disable-next-line no-shadow
+                        /* eslint-disable-next-line no-shadow, no-unused-vars */
                         var oldOTBD;
 
                         beforeEach(function() {
@@ -315,6 +315,7 @@
                     });
 
                     describe('when the video is paused', function() {
+                        // eslint-disable-next-line no-unused-vars
                         var currentUpdateIntrval;
 
                         beforeEach(function() {

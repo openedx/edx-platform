@@ -11,6 +11,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
     'use strict';
 
     describe('edx.verify_student.MakePaymentStepView', function() {
+        // eslint-disable-next-line no-unused-vars
         var PAYMENT_PARAMS = {
             orderId: 'test-order',
             signature: 'abcd1234'

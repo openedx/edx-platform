@@ -3,6 +3,7 @@
 */
 // eslint-disable-next-line no-undef
 define(['jquery'],
+    // eslint-disable-next-line no-unused-vars
     function($) {
         var validateIntegerRange = function(attributeVal, range) {
             // Validating attribute should have an integer value and should be under the given range.

@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable-next-line no-undef, no-unused-vars */
 define(['backbone', 'underscore'], function(Backbone, _) {
     var AssignmentGrade = Backbone.Model.extend({
         defaults: {

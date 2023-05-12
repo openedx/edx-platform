@@ -10,6 +10,7 @@
                         start: data.start.concat(),
                         text: data.text.concat()
                     },
+                    // eslint-disable-next-line no-unused-vars
                     module = {};
 
                 var getter = function(propertyName) {
@@ -39,6 +40,7 @@
                     // Else, search the unfiltered list.
                     if (typeof startTime !== 'undefined'
                 && typeof endTime !== 'undefined') {
+                        // eslint-disable-next-line no-use-before-define
                         results = filter(startTime, endTime);
                         start = results.start;
                         max = results.captions.length - 1;

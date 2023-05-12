@@ -2,6 +2,7 @@
 /**
  * View for the "review photos" step of the payment/verification flow.
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($, gettext) {

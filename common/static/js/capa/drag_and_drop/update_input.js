@@ -1,7 +1,9 @@
 (function(requirejs, require, define) {
     define([], function() {
         return {
+            // eslint-disable-next-line no-use-before-define
             check: check,
+            // eslint-disable-next-line no-use-before-define
             update: update
         };
 
@@ -37,6 +39,7 @@
                                 if (state.targets[c1].type === 'base') {
                                     tempObj[state.targets[c1].draggableList[c2].id] = state.targets[c1].id;
                                 } else {
+                                    // eslint-disable-next-line no-use-before-define
                                     addTargetRecursively(tempObj, state.targets[c1].draggableList[c2], state.targets[c1]);
                                 }
                                 draggables.push(tempObj);
@@ -76,12 +79,14 @@
                 return false;
             }
 
+            // eslint-disable-next-line no-use-before-define
             repositionDraggables(state, JSON.parse(inputElVal));
 
             return true;
         }
 
         function processAnswerTargets(state, answerSortedByDepth, minDepth, maxDepth, depth, i) {
+            // eslint-disable-next-line no-unused-vars
             var baseDraggableId, baseDraggable, baseTargetId, baseTarget,
                 layeredDraggableId, layeredDraggable, layeredTargetId, layeredTarget,
                 chain;
@@ -128,16 +133,18 @@
                 baseTargetId = chain[layeredDraggableId][layeredTargetId][baseDraggableId];
             }
 
+            // eslint-disable-next-line no-use-before-define
             checkBaseDraggable();
 
             // eslint-disable-next-line no-useless-return
             return;
 
             function checkBaseDraggable() {
-                // eslint-disable-next-line no-cond-assign
+                /* eslint-disable-next-line no-cond-assign, no-use-before-define */
                 if ((baseDraggable = getById(state, 'draggables', baseDraggableId, null, false, baseTargetId)) === null) {
+                    // eslint-disable-next-line no-use-before-define
                     createBaseDraggableOnTarget(state, baseDraggableId, baseTargetId, true, function() {
-                        // eslint-disable-next-line no-cond-assign
+                        /* eslint-disable-next-line no-cond-assign, no-use-before-define */
                         if ((baseDraggable = getById(state, 'draggables', baseDraggableId, null, false, baseTargetId)) === null) {
                             // eslint-disable-next-line no-console
                             console.log('ERROR: Could not successfully create a base draggable on a base target.');
@@ -147,6 +154,7 @@
                             if ((layeredTargetId === null) || (layeredDraggableId === null)) {
                                 processAnswerTargets(state, answerSortedByDepth, minDepth, maxDepth, depth, i + 1);
                             } else {
+                                // eslint-disable-next-line no-use-before-define
                                 checklayeredDraggable();
                             }
                         }
@@ -157,14 +165,16 @@
                     if ((layeredTargetId === null) || (layeredDraggableId === null)) {
                         processAnswerTargets(state, answerSortedByDepth, minDepth, maxDepth, depth, i + 1);
                     } else {
+                        // eslint-disable-next-line no-use-before-define
                         checklayeredDraggable();
                     }
                 }
             }
 
             function checklayeredDraggable() {
-                // eslint-disable-next-line no-cond-assign
+                /* eslint-disable-next-line no-cond-assign, no-use-before-define */
                 if ((layeredDraggable = getById(state, 'draggables', layeredDraggableId, null, false, layeredTargetId, baseDraggableId, baseTargetId)) === null) {
+                    // eslint-disable-next-line no-use-before-define
                     layeredDraggable = getById(state, 'draggables', layeredDraggableId);
                     layeredTarget = null;
                     baseDraggable.targetField.every(function(target) {
@@ -191,7 +201,7 @@
         function createBaseDraggableOnTarget(state, draggableId, targetId, reportError, funcCallback) {
             var draggable, target;
 
-            // eslint-disable-next-line no-cond-assign
+            /* eslint-disable-next-line no-cond-assign, no-use-before-define */
             if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                 if (reportError !== false) {
                     // eslint-disable-next-line no-console
@@ -205,7 +215,7 @@
                 return false;
             }
 
-            // eslint-disable-next-line no-cond-assign
+            /* eslint-disable-next-line no-cond-assign, no-use-before-define */
             if ((target = getById(state, 'targets', targetId)) === null) {
                 if (reportError !== false) {
                     // eslint-disable-next-line no-console
@@ -235,7 +245,7 @@
                             continue;
                         }
 
-                        // eslint-disable-next-line no-cond-assign
+                        /* eslint-disable-next-line no-cond-assign, no-use-before-define */
                         if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                             // eslint-disable-next-line no-console
                             console.log(
@@ -269,6 +279,7 @@
             answer.every(function(chain) {
                 var depth;
 
+                // eslint-disable-next-line no-use-before-define
                 depth = findDepth(chain, 0);
 
                 if (depth < minDepth) {

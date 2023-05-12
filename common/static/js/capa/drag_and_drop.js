@@ -2,6 +2,7 @@
 // define() functions from Require JS available inside the anonymous function.
 //
 // See https://openedx.atlassian.net/wiki/display/PLAT/Integration+of+Require+JS+into+the+system
+// eslint-disable-next-line no-unused-vars
 (function(requirejs, require, define) {
 // HACK: this should be removed when it is safe to do so
     if (window.baseUrl) {

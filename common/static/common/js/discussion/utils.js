@@ -87,6 +87,7 @@
                 .click(function() { return handler(this); });
         };
 
+        // eslint-disable-next-line no-unused-vars
         DiscussionUtil.urlFor = function(name, param, param1, param2) {
             return {
                 // eslint-disable-next-line camelcase
@@ -351,7 +352,9 @@
 
         DiscussionUtil.postMathJaxProcessor = function(htmlSnippet) {
             var RE_DISPLAYMATH, RE_INLINEMATH;
+            // eslint-disable-next-line no-useless-escape
             RE_INLINEMATH = /^\$([^\$]*)\$/g;
+            // eslint-disable-next-line no-useless-escape
             RE_DISPLAYMATH = /^\$\$([^\$]*)\$\$/g;
             return this.processEachMathAndCode(htmlSnippet, function(s, type) {
                 if (type === 'display') {
@@ -426,10 +429,13 @@
             return this.getWmdEditor($content, $local, cls_identifier).refreshPreview();
         };
 
+        // eslint-disable-next-line no-useless-escape
         var RE_DISPLAYMATH = /^([^\$]*?)\$\$([^\$]*?)\$\$(.*)$/m,
+            // eslint-disable-next-line no-useless-escape
             RE_INLINEMATH = /^([^\$]*?)\$([^\$]+?)\$(.*)$/m,
             ESCAPED_DOLLAR = '@@ESCAPED_D@@',
             ESCAPED_BACKSLASH = '@@ESCAPED_B@@',
+            // eslint-disable-next-line no-useless-escape
             LATEX_SCRIPT = '\{javascript\:(.+?)\}';
 
         /**
@@ -492,7 +498,9 @@
         DiscussionUtil.unescapeHighlightTag = function(htmlSnippet) {
             return edx.HtmlUtils.HTML(
                 htmlSnippet.toString().replace(
+                    // eslint-disable-next-line no-useless-escape
                     /\&lt\;highlight\&gt\;/g,
+                    // eslint-disable-next-line no-useless-escape
                     "<span class='search-highlight'>").replace(/\&lt\;\/highlight\&gt\;/g, '</span>'
                 )
             );
@@ -500,7 +508,9 @@
 
         DiscussionUtil.stripHighlight = function(htmlString) {
             return htmlString
+                // eslint-disable-next-line no-useless-escape
                 .replace(/\&(amp\;)?lt\;highlight\&(amp\;)?gt\;/g, '')
+                // eslint-disable-next-line no-useless-escape
                 .replace(/\&(amp\;)?lt\;\/highlight\&(amp\;)?gt\;/g, '');
         };
 
@@ -515,6 +525,7 @@
          */
         DiscussionUtil.markdownWithHighlight = function(unsafeText) {
             var converter;
+            // eslint-disable-next-line no-useless-escape
             unsafeText = unsafeText.replace(/^\&gt\;/gm, '>');
             converter = Markdown.getMathCompatibleConverter();
             /*

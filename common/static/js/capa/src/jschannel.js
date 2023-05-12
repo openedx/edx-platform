@@ -203,6 +203,7 @@ Library.
  *    + (optional) any params
  */
 
+// eslint-disable-next-line no-unused-vars
 var Channel = (function() {
     'use strict';
 
@@ -427,7 +428,7 @@ var Channel = (function() {
                     // try to stringify, if it doesn't work we'll let javascript's built in toString do its magic
                     // eslint-disable-next-line no-empty
                     try { if (typeof m !== 'string') { m = JSON.stringify(m); } } catch (e) { }
-                    // eslint-disable-next-line no-console
+                    /* eslint-disable-next-line no-console, no-use-before-define */
                     console.log('[' + chanId + '] ' + m);
                 }
             };
@@ -455,7 +456,7 @@ var Channel = (function() {
                 // eslint-disable-next-line brace-style
                 if (cfg.origin === '*') { validOrigin = true; }
                 // allow valid domains under http and https.  Also, trim paths off otherwise valid origins.
-                // eslint-disable-next-line no-cond-assign
+                /* eslint-disable-next-line no-cond-assign, no-useless-escape */
                 else if ((oMatch = cfg.origin.match(/^https?:\/\/(?:[-a-zA-Z0-9_\.])+(?::\d+)?/)) !== null) {
                     cfg.origin = oMatch[0].toLowerCase();
                     validOrigin = true;
@@ -503,6 +504,7 @@ var Channel = (function() {
                         if (!valid) { throw "request supports no such callback '" + cbName + "'"; }
 
                         // send callback invocation
+                        // eslint-disable-next-line no-use-before-define
                         postMessage({id: id, callback: cbName, params: v});
                     },
                     error: function(error, message) {
@@ -514,6 +516,7 @@ var Channel = (function() {
                         delete inTbl[id];
 
                         // send error
+                        // eslint-disable-next-line no-use-before-define
                         postMessage({id: id, error: error, message: message});
                     },
                     complete: function(v) {
@@ -523,6 +526,7 @@ var Channel = (function() {
                         // remove transaction from table
                         delete inTbl[id];
                         // send complete
+                        // eslint-disable-next-line no-use-before-define
                         postMessage({id: id, result: v});
                     },
                     delayReturn: function(delay) {
@@ -708,11 +712,13 @@ var Channel = (function() {
                     chanId += '-L';
                 }
 
+                // eslint-disable-next-line no-use-before-define
                 obj.unbind('__ready'); // now this handler isn't needed any more.
                 ready = true;
                 debug('ready msg accepted.');
 
                 if (type === 'ping') {
+                    // eslint-disable-next-line no-use-before-define
                     obj.notify({method: '__ready', params: 'pong'});
                 }
 
@@ -722,6 +728,7 @@ var Channel = (function() {
                 }
 
                 // invoke onReady observer if provided
+                // eslint-disable-next-line no-use-before-define
                 if (typeof cfg.onReady === 'function') { cfg.onReady(obj); }
             };
 

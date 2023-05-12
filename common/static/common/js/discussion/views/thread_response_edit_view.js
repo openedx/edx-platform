@@ -22,6 +22,7 @@
     // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ThreadResponseEditView = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(ThreadResponseEditView, _super);
 
             function ThreadResponseEditView() {

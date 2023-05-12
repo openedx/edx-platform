@@ -1,5 +1,5 @@
 describe('Tests for split_test staff view switching', function() {
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-unused-vars */
     var ab_module;
     var $elem;
 

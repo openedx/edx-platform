@@ -1,6 +1,7 @@
 /**
  * Credit-related utilities
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($, _) {

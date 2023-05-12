@@ -3,6 +3,7 @@
     'use strict';
 
     describe('VideoSocialSharingHandler', function() {
+        // eslint-disable-next-line no-unused-vars
         var state;
 
         beforeEach(function() {

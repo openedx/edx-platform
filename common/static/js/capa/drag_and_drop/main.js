@@ -6,6 +6,7 @@
             'js/capa/drag_and_drop/draggables', 'js/capa/drag_and_drop/targets',
             'js/capa/drag_and_drop/update_input'],
         function(State, configParser, Container, BaseImage, Scroller, Draggables, Targets, updateInput) {
+            // eslint-disable-next-line no-use-before-define
             return Main;
 
             function Main() {
@@ -41,6 +42,7 @@
                     };
                 }
 
+                // eslint-disable-next-line no-use-before-define
                 $('.drag_and_drop_problem_div').each(processProblem);
             }
 

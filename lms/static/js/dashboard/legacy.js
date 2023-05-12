@@ -9,8 +9,10 @@
 
 /* globals Logger, accessible_modal, interpolate */
 
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
+// eslint-disable-next-line no-unused-vars
 (function($, gettext, Logger, accessibleModal, interpolate) {
     'use strict';
 
@@ -49,9 +51,11 @@ var edx = edx || {};
         //  1. I don't know who is relying on it and it is viewable separately in GA.
         //  2. The other event doesn't yet have the benefit of the timeout of trackLink(), so
         //     the other event might under-report as compared to this event.
+        // eslint-disable-next-line no-use-before-define
         window.analytics.trackLink($upgradeButtonLinks, 'edx.bi.dashboard.upgrade_button.clicked', generateProperties);
 
         // Track clicks of the "verify now" button.
+        // eslint-disable-next-line no-use-before-define
         window.analytics.trackLink($verifyButtonLinks, 'edx.bi.user.verification.resumed', generateProperties);
 
         // Track clicks of the LinkedIn "Add to Profile" button
@@ -85,6 +89,7 @@ var edx = edx || {};
         }
 
         function setDialogAttributes(isPaidCourse, isCourseVoucherRefundable, certNameLong,
+            // eslint-disable-next-line no-unused-vars
             courseNumber, courseName, enrollmentMode, showRefundOption, courseKey) {
             var diagAttr = {};
 

@@ -17,6 +17,7 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
             // Fields that must not be empty on your model.
             this.nonEmptyCheckFieldSelectors = nonEmptyCheckFieldSelectors;
 
+            // eslint-disable-next-line no-unused-vars
             this.create = function(courseInfo, errorHandler) {
                 // Replace this with a function that will make a request to create the object.
             };

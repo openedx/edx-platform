@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 var onCertificatesReady = null;
 
@@ -62,6 +63,7 @@ var onCertificatesReady = null;
                     // eslint-disable-next-line camelcase
                     $certificate_generation_status.text(data.message);
                 },
+                // eslint-disable-next-line no-unused-vars
                 error: function(jqXHR, textStatus, errorThrown) {
                     // eslint-disable-next-line camelcase
                     $certificate_generation_status.text(gettext('Error while generating certificates. Please try again.'));

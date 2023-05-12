@@ -27,6 +27,7 @@
         this.DiscussionThreadView = (function(_super) {
             var INITIAL_RESPONSE_PAGE_SIZE, SUBSEQUENT_RESPONSE_PAGE_SIZE;
 
+            // eslint-disable-next-line no-use-before-define
             __extends(DiscussionThreadView, _super);
 
             function DiscussionThreadView() {

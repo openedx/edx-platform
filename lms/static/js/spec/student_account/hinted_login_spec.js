@@ -11,6 +11,7 @@
     function($, _, TemplateHelpers, AjaxHelpers, HintedLoginView) {
         describe('edx.student.account.HintedLoginView', function() {
             var view = null,
+                // eslint-disable-next-line no-unused-vars
                 requests = null,
                 PLATFORM_NAME = 'edX',
                 THIRD_PARTY_AUTH = {

@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-shadow-restricted-names
+/* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(define, undefined) {
     'use strict';
 
@@ -16,6 +16,7 @@
                 'click .action-close': 'closeHandler'
             },
 
+            // eslint-disable-next-line no-unused-vars
             initialize: function(options) {
                 this.template = templateUtils.loadTemplate('tab-item');
                 this.$el.attr('id', this.model.get('identifier'));

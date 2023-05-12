@@ -132,10 +132,12 @@
 
             it('can save new data correctly for current discussion id with dots', function() {
                 this.createEditView({topicId: '6.00.1x_General'});
+                // eslint-disable-next-line no-useless-escape
                 testUpdate(this.view, this.thread, "6>00\'1x\"Basic_Question", 'Basic Question');
             });
 
             it('can save new data correctly for current discussion id with special characters', function() {
+                // eslint-disable-next-line no-useless-escape
                 this.createEditView({topicId: "6>00\'1x\"Basic_Question"});
                 testUpdate(this.view, this.thread, '6.00.1x_General', 'General');
             });

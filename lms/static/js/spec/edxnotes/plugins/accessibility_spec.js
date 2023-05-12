@@ -110,6 +110,7 @@ define([
         });
 
         describe('keydown events on highlighted text', function() {
+            // eslint-disable-next-line no-unused-vars
             var highlight, annotation, note;
 
             beforeEach(function() {

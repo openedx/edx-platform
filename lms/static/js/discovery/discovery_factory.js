@@ -33,6 +33,7 @@
             dispatcher.listenTo(refineSidebar, 'selectOption', function(type, query, name) {
                 form.showLoadingIndicator();
                 if (filters.get(type)) {
+                    // eslint-disable-next-line no-use-before-define
                     removeFilter(type);
                 } else {
                     filters.add({type: type, query: query, name: name});
@@ -40,6 +41,7 @@
                 }
             });
 
+            // eslint-disable-next-line no-use-before-define
             dispatcher.listenTo(filterBar, 'clearFilter', removeFilter);
 
             dispatcher.listenTo(filterBar, 'clearAll', function() {
@@ -59,6 +61,7 @@
                     form.showFoundMessage(total);
                     if (query) {
                         filters.add(
+                            // eslint-disable-next-line no-use-before-define
                             {type: 'search_query', query: query, name: quote(query)},
                             {merge: true}
                         );

@@ -2,4 +2,5 @@
 // longer necessary, but the pipeline requires it for whatever reason.
 // Until the pipeline issue is resolved this file is here. It shouldn't
 // conflict with anything.
+// eslint-disable-next-line no-unused-vars
 var nothingtoseehere;

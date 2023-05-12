@@ -29,6 +29,7 @@
                         $userNameContainer.css('display', 'inline-block');
                     } else {
                         $userNameContainer.hide();
+                        // eslint-disable-next-line no-use-before-define
                         masquerade(selectedOption);
                     }
                 });
@@ -45,6 +46,7 @@
                 });
 
                 $userNameElement.change(function() {
+                    // eslint-disable-next-line no-use-before-define
                     masquerade($selectElement.find('option:selected'));
                 });
 

@@ -28,9 +28,11 @@
                 this.fetchXhr = this.fetch({
                     data: data,
                     type: 'POST',
+                    // eslint-disable-next-line no-unused-vars
                     success: function(self, xhr) {
                         self.trigger('search');
                     },
+                    // eslint-disable-next-line no-unused-vars
                     error: function(self, xhr) {
                         self.trigger('error');
                     }
@@ -44,10 +46,12 @@
                 this.fetchXhr = this.fetch({
                     data: data,
                     type: 'POST',
+                    // eslint-disable-next-line no-unused-vars
                     success: function(self, xhr) {
                         self.page += 1;
                         self.trigger('next');
                     },
+                    // eslint-disable-next-line no-unused-vars
                     error: function(self, xhr) {
                         self.trigger('error');
                     },

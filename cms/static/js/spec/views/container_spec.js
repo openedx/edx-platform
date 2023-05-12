@@ -88,6 +88,7 @@ describe('Container View', () => {
             return $(component.find('.drag-handle')[0]);
         };
 
+        // eslint-disable-next-line no-unused-vars
         dragComponentVertically = function(locator, dy) {
             var handle = getDragHandle(locator);
             handle.simulate('drag', {dy: dy});
@@ -175,6 +176,7 @@ describe('Container View', () => {
 
         describe('Shows a saving message', () => {
             it('hides saving message upon success', () => {
+                // eslint-disable-next-line no-unused-vars
                 var requests, savingOptions;
                 requests = init(this);
 

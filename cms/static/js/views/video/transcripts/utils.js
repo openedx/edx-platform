@@ -90,6 +90,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      */
         var _youtubeParser = (function() {
             var cache = {},
+                // eslint-disable-next-line no-useless-escape
                 regExp = /(?:http|https|)(?:\:\/\/|)(?:www.|)(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/ytscreeningroom\?v=|\/feeds\/api\/videos\/|\/user\S*[^\w\-\s]|\S*[^\w\-\s]))([\w\-]+)/i;
 
             return function(url) {
@@ -140,6 +141,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                 link.href = url;
                 // The regular expression try catches file name and file extension.
                 // '[scheme://hostname/pathname/]filename.extension[?query#hash]'
+                // eslint-disable-next-line no-useless-escape
                 match = link.pathname.match(/\/{1}([^\/]+)\.([^\/]+)$/);
                 if (match) {
                     cache[url] = {
@@ -150,6 +152,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                 // Links like http://goo.gl/pxxZrg
                 // The regular expression try catches file name.
                 // '[scheme://hostname/pathname/]filename[?query#hash]'
+                    // eslint-disable-next-line no-useless-escape
                     match = link.pathname.match(/\/{1}([^\/\.]+)$/);
                     if (match) {
                         cache[url] = {

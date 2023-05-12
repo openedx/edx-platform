@@ -8,6 +8,7 @@
  * to move to the next step).
  *
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($, _, Backbone, gettext) {

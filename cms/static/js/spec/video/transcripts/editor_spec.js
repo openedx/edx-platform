@@ -6,6 +6,7 @@ define(
         'js/views/metadata', 'js/models/metadata', 'js/collections/metadata',
         'underscore.string', 'xmodule', 'js/views/video/transcripts/metadata_videolist'
     ],
+    // eslint-disable-next-line no-unused-vars
     function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCollection, _str) {
         describe('Transcripts.Editor', function() {
             var VideoListEntry = {
@@ -54,6 +55,7 @@ define(
                 },
                 // eslint-disable-next-line camelcase
                 component_locator = 'component_locator',
+                // eslint-disable-next-line no-unused-vars
                 transcripts, $container, waitForEvent, editor;
 
             var waitsForDisplayName = function(collection) {

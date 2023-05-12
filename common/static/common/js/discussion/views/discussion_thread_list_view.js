@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 /* globals _, Backbone, Content, Discussion, DiscussionUtil, DiscussionThreadView, DiscussionThreadListView */
 (function() {
     'use strict';
@@ -23,6 +24,7 @@
 
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionThreadListView = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(DiscussionThreadListView, _super);
 
             function DiscussionThreadListView() {

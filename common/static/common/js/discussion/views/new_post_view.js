@@ -21,6 +21,7 @@
 
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.NewPostView = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(NewPostView, _super);
 
             function NewPostView() {

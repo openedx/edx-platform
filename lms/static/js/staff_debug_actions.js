@@ -40,6 +40,7 @@ var StaffDebug = (function() {
             type: 'POST',
             url: getURL(action.courseId, action.method),
             data: pdata,
+            // eslint-disable-next-line no-unused-vars
             success: function(data) {
                 var text = _.template(action.success_msg, {interpolate: /\{(.+?)\}/g})(
                     {user: user}
@@ -52,6 +53,7 @@ var StaffDebug = (function() {
                     edx.HtmlUtils.HTML(html)
                 );
             },
+            // eslint-disable-next-line no-unused-vars
             error: function(request, status, error) {
                 var responseJSON;
                 var errorMsg = _.template(action.error_msg, {interpolate: /\{(.+?)\}/g})(

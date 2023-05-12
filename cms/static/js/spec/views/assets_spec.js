@@ -193,6 +193,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             });
 
             it('uploads file properly', function() {
+                // eslint-disable-next-line no-unused-vars
                 var requests = setup.call(this);
                 expect(assetsView).toBeDefined();
                 // eslint-disable-next-line no-undef
@@ -281,6 +282,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             it('make sure _toggleFilterColumn filters asset list', function() {
                 expect(assetsView).toBeDefined();
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-unused-vars
                 $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
                     var $typeColumn = $('#' + columnID);
                     assetsView.pagingView.setPage(1);
@@ -297,9 +299,11 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             it('opens and closes select type menu', function() {
                 expect(assetsView).toBeDefined();
                 setup.call(this, mockExampleAssetsResponse);
+                // eslint-disable-next-line no-unused-vars
                 $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
                     var $typeColumn = $('#' + columnID);
                     expect($typeColumn).toBeVisible();
+                    // eslint-disable-next-line no-unused-vars
                     var assetsNumber = $('#asset-table-body .type-col').length;
                     assetsView.openFilterColumn($typeColumn);
                     expect($typeColumn.find('.wrapper-nav-sub')).toHaveClass('is-shown');
@@ -330,6 +334,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             it('shows type select menu, selects type, and filters results', function() {
                 expect(assetsView).toBeDefined();
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-unused-vars
                 $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
                     assetsView.pagingView.setPage(1);
                     respondWithMockAssets(requests);

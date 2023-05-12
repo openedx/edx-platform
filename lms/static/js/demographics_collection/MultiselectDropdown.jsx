@@ -47,6 +47,7 @@ class MultiselectDropdown extends React.Component {
         }
     }
 
+    // eslint-disable-next-line no-unused-vars
     handleButtonClick(e) {
         // eslint-disable-next-line react/no-access-state-in-setstate
         this.setState({open: !this.state.open});

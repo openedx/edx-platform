@@ -14,6 +14,7 @@
     function($, url, utility, AjaxHelpers, FinishAuthView, EnrollmentInterface, ShoppingCartInterface,
         EmailOptInInterface) {
         describe('FinishAuthView', function() {
+            // eslint-disable-next-line no-unused-vars
             var requests = null,
                 view = null,
                 FORWARD_URL = '/courseware/next',

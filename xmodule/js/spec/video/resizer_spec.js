@@ -44,6 +44,7 @@
                 );
 
                 it('`alignByWidthOnly` works correctly', function() {
+                    // eslint-disable-next-line no-unused-vars
                     var resizer = new Resizer(config).alignByWidthOnly(),
                         expectedWidth = $container.width(),
                         realWidth = $element.width();
@@ -52,6 +53,7 @@
                 });
 
                 it('`alignByHeightOnly` works correctly', function() {
+                    // eslint-disable-next-line no-unused-vars
                     var resizer = new Resizer(config).alignByHeightOnly(),
                         expectedHeight = $container.height(),
                         realHeight = $element.height();

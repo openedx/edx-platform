@@ -1,14 +1,18 @@
 (function(requirejs, require, define) {
     define(['edx-ui-toolkit/js/utils/html-utils'], function(HtmlUtils) {
         return {
+            // eslint-disable-next-line no-use-before-define
             initializeBaseTargets: initializeBaseTargets,
+            // eslint-disable-next-line no-use-before-define
             initializeTargetField: initializeTargetField,
+            // eslint-disable-next-line no-use-before-define
             destroyTargetField: destroyTargetField
         };
 
         function initializeBaseTargets(state) {
             (function(c1) {
                 while (c1 < state.config.targets.length) {
+                    // eslint-disable-next-line no-use-before-define
                     processTarget(state, state.config.targets[c1]);
 
                     c1 += 1;
@@ -21,6 +25,7 @@
 
             if (draggableObj.targetField.length === 0) {
                 draggableObj.originalConfigObj.target_fields.every(function(targetObj) {
+                    // eslint-disable-next-line no-use-before-define
                     processTarget(draggableObj.state, targetObj, true, draggableObj);
 
                     return true;
@@ -138,9 +143,12 @@
                 targetEl: $targetEl,
 
                 numTextEl: $numTextEl,
+                // eslint-disable-next-line no-use-before-define
                 updateNumTextEl: updateNumTextEl,
 
+                // eslint-disable-next-line no-use-before-define
                 removeDraggable: removeDraggable,
+                // eslint-disable-next-line no-use-before-define
                 addDraggable: addDraggable,
 
                 type: 'base',
@@ -162,6 +170,7 @@
                     event.preventDefault();
                 });
                 $numTextEl.mouseup(function() {
+                    // eslint-disable-next-line no-use-before-define
                     cycleDraggableOrder.call(targetObj);
                 });
             }

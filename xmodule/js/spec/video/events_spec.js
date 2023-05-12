@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-shadow-restricted-names
+/* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(undefined) {
     describe('VideoPlayer Events', function() {
         var state, oldOTBD;

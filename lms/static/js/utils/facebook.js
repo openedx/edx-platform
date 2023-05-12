@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 var FaceBook = (function() {
     var _args = {};
 

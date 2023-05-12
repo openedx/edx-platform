@@ -89,9 +89,10 @@ define(
             syncBasicTab: function(metadataCollection, metadataView) {
                 var result = [],
                     getField = Utils.getField,
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-unused-vars */
                     component_locator = this.$el.closest('[data-locator]').data('locator'),
                     values = {},
+                    // eslint-disable-next-line no-unused-vars
                     videoUrl, metadata, modifiedValues;
 
                 // If metadataCollection is not passed, just exit.
@@ -102,6 +103,7 @@ define(
                 // Get field that should be synchronized with `Advanced` tab fields.
                 videoUrl = getField(this.collection, 'video_url');
 
+                // eslint-disable-next-line no-unused-vars
                 modifiedValues = metadataView.getModifiedMetadataValues();
 
                 // Get values from `Advanced` tab fields (`html5_sources`,
@@ -147,7 +149,7 @@ define(
         *                                    setting editors in `Advanced` tab.
         *
         */
-            // eslint-disable-next-line consistent-return
+            /* eslint-disable-next-line consistent-return, no-unused-vars */
             syncAdvancedTab: function(metadataCollection, metadataView) {
                 var getField = Utils.getField,
                     html5Sources, youtube, videoUrlValue, result;

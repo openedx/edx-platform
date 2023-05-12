@@ -148,9 +148,11 @@
                 this.render();
             },
 
+            // eslint-disable-next-line no-unused-vars
             imageChangeFailed: function(e, data) {
             },
 
+            // eslint-disable-next-line no-unused-vars
             showImageChangeFailedMessage: function(status, responseText) {
             },
 

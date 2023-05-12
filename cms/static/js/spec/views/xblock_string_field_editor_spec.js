@@ -54,6 +54,7 @@ describe('XBlockStringFieldEditorView', function() {
         };
 
         expectEditCanceled = function(test, fieldEditorView, options) {
+            // eslint-disable-next-line no-unused-vars
             var requests, initialRequests, displayNameInput;
             requests = AjaxHelpers.requests(test);
             displayNameInput = EditHelpers.inlineEdit(fieldEditorView.$el, options.newTitle);
@@ -86,6 +87,7 @@ describe('XBlockStringFieldEditorView', function() {
         });
 
         it('does not change the title when a display name update fails', function() {
+            // eslint-disable-next-line no-unused-vars
             var requests, fieldEditorView, initialRequests;
             requests = AjaxHelpers.requests(this);
             fieldEditorView = getFieldEditorView().render();

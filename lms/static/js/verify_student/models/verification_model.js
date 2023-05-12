@@ -6,6 +6,7 @@
  * to the server.
  *
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($, Backbone) {

@@ -16,6 +16,7 @@
             loadFixtures('imageinput.html');
             $el = $('#imageinput_12345');
 
+            // eslint-disable-next-line no-use-before-define
             $el.append(createTestImage('cross_12345', 300, 400, 'red'));
 
             state = new ImageInput('12345');
@@ -64,7 +65,9 @@
 
             // Getting actual (new) coordinates, and testing them against the
             // expected.
+            // eslint-disable-next-line no-use-before-define
             cssLeft = stripPx(state.crossEl.css('left'));
+            // eslint-disable-next-line no-use-before-define
             cssTop = stripPx(state.crossEl.css('top'));
 
             expect(cssLeft).toBeCloseTo(posX - 15, 1);
@@ -100,7 +103,9 @@
 
             // Getting actual (new) coordinates, and testing them against the
             // expected.
+            // eslint-disable-next-line no-use-before-define
             cssLeft = stripPx(state.crossEl.css('left'));
+            // eslint-disable-next-line no-use-before-define
             cssTop = stripPx(state.crossEl.css('top'));
 
             expect(cssLeft).toBeCloseTo(posX - 15, 1);

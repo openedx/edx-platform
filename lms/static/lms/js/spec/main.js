@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 /* globals requirejs, requireSerial, MathJax */
 /* eslint-disable quote-props */
 

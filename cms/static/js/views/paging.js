@@ -2,6 +2,7 @@
     'use strict';
 
     define(['underscore', 'backbone', 'gettext'],
+        // eslint-disable-next-line no-unused-vars
         function(_, Backbone, gettext) {
             var PagingView = Backbone.View.extend({
                 // takes a Backbone Paginator as a model

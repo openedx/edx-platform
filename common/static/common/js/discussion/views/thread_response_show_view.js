@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 /* globals DiscussionContentShowView, DiscussionUtil, MathJax */
 (function() {
     'use strict';
@@ -22,6 +23,7 @@
     // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ThreadResponseShowView = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(ThreadResponseShowView, _super);
 
             function ThreadResponseShowView() {

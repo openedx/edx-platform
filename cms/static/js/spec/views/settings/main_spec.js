@@ -130,7 +130,7 @@ define([
         });
 
         it('should disallow save with an invalid minimum score percentage', function() {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-unused-vars */
             var entrance_exam_enabled_field = this.view.$(SELECTORS.entrance_exam_enabled_field),
                 // eslint-disable-next-line camelcase
                 entrance_exam_min_score = this.view.$(SELECTORS.entrance_exam_min_score);

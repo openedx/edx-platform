@@ -22,8 +22,10 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
                     model: Model
                 }),
                 expectListNames = function(names) {
+                    // eslint-disable-next-line no-use-before-define
                     expect(listView.$('.my-view').length).toBe(names.length);
                     _.each(names, function(name, index) {
+                        // eslint-disable-next-line no-use-before-define
                         expect($(listView.$('.my-view')[index]).text()).toContain(name);
                     });
                 },

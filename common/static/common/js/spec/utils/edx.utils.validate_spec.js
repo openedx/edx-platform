@@ -4,6 +4,7 @@
     define(['jquery', 'common/js/utils/edx.utils.validate'],
         function($, EdxUtilsValidate) {
             describe('EdxUtilsValidate', function() {
+                // eslint-disable-next-line no-unused-vars
                 var fixture = null,
                     field = null,
                     result = null,

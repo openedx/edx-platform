@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-shadow-restricted-names
+/* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(undefined) {
     describe('Video HTML5Video', function() {
         var STATUS = window.STATUS;
@@ -212,6 +212,7 @@
             });
 
             describe('methods', function() {
+                // eslint-disable-next-line no-unused-vars
                 var volume, seek, duration, playbackRate;
 
                 beforeEach(function() {

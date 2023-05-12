@@ -1,6 +1,7 @@
 (function() {
     var timeout = 1000;
 
+    // eslint-disable-next-line no-use-before-define
     waitForProtex();
 
     function waitForProtex() {

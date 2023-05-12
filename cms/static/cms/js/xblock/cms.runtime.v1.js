@@ -25,8 +25,10 @@ function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
         StudioRuntime = {};
 
     BaseRuntime.v1 = (function(_super) {
+        // eslint-disable-next-line no-use-before-define
         __extends(v1, _super);
 
+        // eslint-disable-next-line no-use-before-define
         v1.prototype.handlerUrl = function(element, handlerName, suffix, query) {
             var uri;
             uri = URI(this.handlerPrefix)
@@ -154,6 +156,7 @@ function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
     }(XBlock.Runtime.v1));
 
     PreviewRuntime.v1 = (function(_super) {
+        // eslint-disable-next-line no-use-before-define
         __extends(v1, _super);
 
         function v1() {
@@ -166,6 +169,7 @@ function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
     }(BaseRuntime.v1));
 
     StudioRuntime.v1 = (function(_super) {
+        // eslint-disable-next-line no-use-before-define
         __extends(v1, _super);
 
         function v1() {

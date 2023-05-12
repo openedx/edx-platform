@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-shadow-restricted-names
+/* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(undefined) {
     'use strict';
 
@@ -8,8 +8,11 @@
     //     Set of library functions that provide a simple way to add
     //     collapsible functionality to elements.
     this.Collapsible = {
+        // eslint-disable-next-line no-use-before-define
         setCollapsibles: setCollapsibles,
+        // eslint-disable-next-line no-use-before-define
         toggleFull: toggleFull,
+        // eslint-disable-next-line no-use-before-define
         toggleHint: toggleHint
     };
 

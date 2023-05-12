@@ -172,6 +172,7 @@
             });
 
             $.each(miniTestSuite, function(index, test) {
+                // eslint-disable-next-line no-use-before-define
                 itFabrique(test.itDescription, test.data, test.expectData);
             });
 
@@ -194,6 +195,7 @@
 
         // Disabled 11/25/13 due to flakiness in master
         xdescribe('multiple YT on page', function() {
+            // eslint-disable-next-line no-unused-vars
             var state1, state2, state3;
 
             beforeEach(function() {

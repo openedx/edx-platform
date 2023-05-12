@@ -3,6 +3,7 @@
         'video/00_resizer.js',
         [],
         function() {
+            // eslint-disable-next-line no-unused-vars
             var Resizer = function(params) {
                 var defaults = {
                         container: window,
@@ -68,22 +69,27 @@
 
                     switch (mode) {
                     case 'height':
+                        // eslint-disable-next-line no-use-before-define
                         alignByHeightOnly();
                         break;
 
                     case 'width':
+                        // eslint-disable-next-line no-use-before-define
                         alignByWidthOnly();
                         break;
 
                     default:
                         if (data.containerRatio >= data.elementRatio) {
+                            // eslint-disable-next-line no-use-before-define
                             alignByHeightOnly();
                         } else {
+                            // eslint-disable-next-line no-use-before-define
                             alignByWidthOnly();
                         }
                         break;
                     }
 
+                    // eslint-disable-next-line no-use-before-define
                     fireCallbacks();
 
                     return module;
@@ -148,6 +154,7 @@
                     if ($.isFunction(func)) {
                         var decorator = function() {
                             func();
+                            // eslint-disable-next-line no-use-before-define
                             removeCallback(func);
                         };
 

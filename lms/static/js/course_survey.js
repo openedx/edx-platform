@@ -11,6 +11,7 @@ $(function() {
 
     $('.status.message.submission-error').addClass('is-hidden');
 
+    // eslint-disable-next-line no-use-before-define
     toggleSubmitButton(true);
 
     // eslint-disable-next-line consistent-return
@@ -61,19 +62,24 @@ $(function() {
             return false;
         }
 
+        // eslint-disable-next-line no-use-before-define
         toggleSubmitButton(false);
     });
 
     $('#survey-form').on('ajax:error', function() {
+        // eslint-disable-next-line no-use-before-define
         toggleSubmitButton(true);
     });
 
+    // eslint-disable-next-line no-unused-vars
     $('#survey-form').on('ajax:success', function(event, json, xhr) {
         var url = json.redirect_url;
         location.href = url;
     });
 
+    // eslint-disable-next-line no-unused-vars
     $('#survey-form').on('ajax:error', function(event, jqXHR, textStatus) {
+        // eslint-disable-next-line no-use-before-define
         toggleSubmitButton(true);
         // eslint-disable-next-line no-undef
         json = $.parseJSON(jqXHR.responseText);

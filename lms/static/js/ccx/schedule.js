@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($, _, Backbone, gettext) {
@@ -111,6 +112,7 @@ var edx = edx || {};
                 if (vertical_location !== 'all') {
                     var chapter = self.chapter_select.val(),
                         sequential = self.sequential_select.val();
+                    // eslint-disable-next-line no-unused-vars
                     var vertical = self.find_unit(
                         self.hidden, chapter, sequential, vertical_location);
                     // When a unit (aka vertical) is selected, all date fields are disabled because units

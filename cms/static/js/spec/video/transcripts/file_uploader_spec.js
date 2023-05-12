@@ -86,6 +86,7 @@ define(
                 it('All works okay if all data is okay', function() {
                     var elList = ['$form', '$input', '$progress'],
                         validFileExtensions = ['srt', 'sjson'],
+                        // eslint-disable-next-line no-unused-vars
                         result = $.map(validFileExtensions, function(item, index) {
                             return '.' + item;
                         }).join(', ');

@@ -32,6 +32,7 @@
     // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.Content = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(Content, _super);
 
             function Content() {
@@ -236,6 +237,7 @@
         // eslint-disable-next-line no-undef
         }(Backbone.Model));
         this.Thread = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(Thread, _super);
 
             function Thread() {
@@ -352,6 +354,7 @@
             return Thread;
         }(this.Content));
         this.Comment = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(Comment, _super);
 
             function Comment() {
@@ -422,6 +425,7 @@
         }(this.Content));
 
         this.Comments = (function(_super) {
+            // eslint-disable-next-line no-use-before-define
             __extends(Comments, _super);
 
             function Comments() {

@@ -1,5 +1,6 @@
 (function(requirejs, require, define) {
     define(['edx-ui-toolkit/js/utils/html-utils'], function(HtmlUtils) {
+        // eslint-disable-next-line no-use-before-define
         return BaseImage;
 
         function BaseImage(state) {

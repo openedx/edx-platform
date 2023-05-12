@@ -124,6 +124,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
         it('handles errors with custom message', function() {
             fileUploaderView = new FileUploaderView({
                 url: url,
+                // eslint-disable-next-line no-unused-vars
                 errorNotification: function(file, event, data) {
                     // eslint-disable-next-line no-undef
                     var message = interpolate_text("Custom error for '{file}'", {file: file});
@@ -153,6 +154,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
         it('handles success with custom message', function() {
             fileUploaderView = new FileUploaderView({
                 url: url,
+                // eslint-disable-next-line no-unused-vars
                 successNotification: function(file, event, data) {
                     // eslint-disable-next-line no-undef
                     var message = interpolate_text("Custom success message for '{file}'", {file: file});

@@ -16,6 +16,7 @@ export default function EditTabsFactory(courseLocation, explicitUrl) {
             }),
             editView;
 
+        // eslint-disable-next-line no-unused-vars
         editView = new TabsEditView({
             el: $('.tab-list'),
             model: model,

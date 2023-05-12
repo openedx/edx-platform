@@ -14,10 +14,13 @@ function format(time, formatFull) {
     minutes %= 60;
 
     if (formatFull) {
+        // eslint-disable-next-line no-use-before-define
         return '' + _pad(hours) + ':' + _pad(minutes) + ':' + _pad(seconds % 60);
     } else if (hours) {
+        // eslint-disable-next-line no-use-before-define
         return '' + hours + ':' + _pad(minutes) + ':' + _pad(seconds % 60);
     } else {
+        // eslint-disable-next-line no-use-before-define
         return '' + minutes + ':' + _pad(seconds % 60);
     }
 }

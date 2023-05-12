@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 /* global MathJax, Collapsible, interpolate, JavascriptLoader, Logger, CodeMirror */
 // Note: this code was originally converted from CoffeeScript, and thus follows some
 // coding conventions that are discouraged by eslint. Some warnings have been suppressed

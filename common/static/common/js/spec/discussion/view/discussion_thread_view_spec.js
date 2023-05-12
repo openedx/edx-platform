@@ -80,6 +80,7 @@
                 return expect($(elem).is(':visible')).toEqual(visible);
             });
         };
+        // eslint-disable-next-line no-unused-vars
         assertExpandedContentVisible = function(view, expanded) {
             expect(view.$el.hasClass('expanded')).toEqual(expanded);
             assertContentVisible(view, '.post-extended-content', expanded);
@@ -142,6 +143,7 @@
                     closed: originallyClosed
                 });
                 thread = new Thread(threadData);
+                // eslint-disable-next-line no-unused-vars
                 discussion = new Discussion(thread);
                 view = new DiscussionThreadView({
                     model: thread,

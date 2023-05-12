@@ -18,6 +18,7 @@ function(Backbone, $, tmp, AjaxHelpers) {
         var $usernameFixture = $('<input>', {id: usernameFixtureID, placeholder: 'userman'});
         var scoreFixtureID = 'sd_fs_' + locationName;
         var $scoreFixture = $('<input>', {id: scoreFixtureID, placeholder: '0'});
+        // eslint-disable-next-line no-useless-escape
         var escapableLocationName = 'test\.\*\+\?\^\:\$\{\}\(\)\|\]\[loc';
         var escapableFixtureID = 'sd_fu_' + escapableLocationName;
         var $escapableFixture = $('<input>', {id: escapableFixtureID, placeholder: 'userman'});

@@ -4,8 +4,11 @@
 // eslint-disable-next-line no-undef
 define(['jquery', 'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
     'common/js/spec_helpers/template_helpers'],
+// eslint-disable-next-line no-unused-vars
 function($, NotificationView, Prompt, TemplateHelpers) {
+    // eslint-disable-next-line no-unused-vars
     var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
+        // eslint-disable-next-line no-unused-vars
         verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
         verifyNotificationHidden, createPromptSpy, confirmPrompt, inlineEdit, verifyInlineEditChange,
         installMockAnalytics, removeMockAnalytics, verifyPromptShowing, verifyPromptHidden;

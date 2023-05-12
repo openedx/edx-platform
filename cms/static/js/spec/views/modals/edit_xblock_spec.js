@@ -1,9 +1,11 @@
 'use strict';
 
 import $ from 'jquery';
+// eslint-disable-next-line no-unused-vars
 import _ from 'underscore';
 import AjaxHelpers from 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers';
 import EditHelpers from 'js/spec_helpers/edit_helpers';
+// eslint-disable-next-line no-unused-vars
 import EditXBlockModal from 'js/views/modals/edit_xblock';
 import XBlockInfo from 'js/models/xblock_info';
 

@@ -1,12 +1,17 @@
+// eslint-disable-next-line no-unused-vars
 /* global gettext */
 
+// eslint-disable-next-line no-unused-vars
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-unused-vars
 import ReactDOM from 'react-dom';
+// eslint-disable-next-line no-unused-vars
 import classNames from 'classnames';
 import CircleChart from './CircleChart';
 import CircleChartLegend from './CircleChartLegend';
 import GradeTable from './GradeTable';
+// eslint-disable-next-line no-unused-vars
 import DueDates from './DueDates';
 import Discussions from './Discussions';
 
@@ -77,6 +82,7 @@ export function LearnerAnalyticsDashboard(props) {
     // Get a list of assignment types minus duplicates
     const assignments = gradeBreakdown.map(value => value.label);
     const assignmentTypes = [...new Set(assignments)];
+    // eslint-disable-next-line no-unused-vars
     const assignmentCounts = getAssignmentCounts(assignmentTypes, schedule);
 
     // eslint-disable-next-line no-console

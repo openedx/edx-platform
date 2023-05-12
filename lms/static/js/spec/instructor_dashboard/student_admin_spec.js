@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 /* globals _, interpolate_text, statusAjaxError, PendingInstructorTasks, createTaskListTable */
 // eslint-disable-next-line no-undef
 define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'],

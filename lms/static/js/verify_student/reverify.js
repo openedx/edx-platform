@@ -5,8 +5,10 @@
  * to re-submit face and ID photos.  It re-uses most of the same sub-views
  * as the payment/verification flow.
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
+// eslint-disable-next-line no-unused-vars
 (function($, _) {
     'use strict';
 

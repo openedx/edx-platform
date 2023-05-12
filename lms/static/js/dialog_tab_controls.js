@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 var DialogTabControls = (function() {
     'use strict';
 

@@ -11,12 +11,15 @@
 
     output.getSanitizingConverter = function() {
         var converter = new Converter();
+        // eslint-disable-next-line no-use-before-define
         converter.hooks.chain('postConversion', sanitizeHtml);
+        // eslint-disable-next-line no-use-before-define
         converter.hooks.chain('postConversion', balanceTags);
         return converter;
     };
 
     function sanitizeHtml(html) {
+        // eslint-disable-next-line no-use-before-define
         return html.replace(/<[^>]*>?/gi, sanitizeTag);
     }
 
@@ -24,11 +27,11 @@
     // eslint-disable-next-line camelcase
     var basic_tag_whitelist = /^(<\/?(b|blockquote|code|del|dd|dl|dt|em|h1|h2|h3|i|kbd|li|ol|p|pre|s|sup|sub|strong|strike|ul)>|<(br|hr)\s?\/?>)$/i;
     // <a href="url..." optional title>|</a>
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-useless-escape */
     var a_white = /^(<a\shref="((https?|ftp):\/\/|\/)[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)]+"(\stitle="[^"<>]+")?\s?>|<\/a>)$/i;
 
     // <img src="url..." optional width  optional height  optional alt  optional title
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-useless-escape */
     var img_white = /^(<img\ssrc="(https?:\/\/|\/)[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)]+"(\swidth="\d{1,3}")?(\sheight="\d{1,3}")?(\salt="[^"<>]*")?(\stitle="[^"<>]*")?\s?\/?>)$/i;
 
     function sanitizeTag(tag) {

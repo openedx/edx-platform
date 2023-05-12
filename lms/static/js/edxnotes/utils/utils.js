@@ -1,7 +1,8 @@
-// eslint-disable-next-line no-shadow-restricted-names
+/* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(define, undefined) {
     'use strict';
 
+    // eslint-disable-next-line no-unused-vars
     define([], function($, _) {
     /**
      * Replaces all newlines in a string by HTML line breaks.

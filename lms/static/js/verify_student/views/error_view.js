@@ -1,6 +1,7 @@
 /**
  * Display top-level errors in the payment/verification flow.
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($, _, Backbone) {

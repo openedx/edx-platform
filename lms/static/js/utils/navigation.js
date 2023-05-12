@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {},
 
     Navigation = (function() {
@@ -66,6 +67,7 @@ var edx = edx || {},
 
             closeAccordions: function(button, section) {
                 var menu = $(section).find('.chapter-menu'),
+                    // eslint-disable-next-line no-unused-vars
                     toggle;
 
                 $('.accordion .button-chapter').each(function(index, element) {
@@ -103,6 +105,7 @@ var edx = edx || {},
 
             openAccordion: function(button, section) {
                 var $sectionEl = $(section),
+                    // eslint-disable-next-line no-unused-vars
                     firstLink = $sectionEl.find('.menu-item').first(),
                     $buttonEl = $(button);
 

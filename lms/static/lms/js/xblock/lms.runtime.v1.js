@@ -23,6 +23,7 @@
     this.LmsRuntime = {};
 
     this.LmsRuntime.v1 = (function(_super) {
+        // eslint-disable-next-line no-use-before-define
         __extends(v1, _super);
 
         function v1() {

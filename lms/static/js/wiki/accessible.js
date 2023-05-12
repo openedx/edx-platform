@@ -3,7 +3,7 @@
    "accessible" removes the "tab" from CodeMirror's default KeyMap to remedy this problem */
 
 (function() {
-    /* eslint-disable-next-line no-multi-assign, no-undef */
+    /* eslint-disable-next-line no-multi-assign, no-undef, no-unused-vars */
     var keyMap = CodeMirror.keyMap.accessible = {
         Tab: false,
         'Shift-Tab': false,

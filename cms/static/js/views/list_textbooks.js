@@ -45,6 +45,7 @@ define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_
                 // activate the text box (so user can go ahead and start typing straight away)
                 $inputEl.focus().select();
             },
+            // eslint-disable-next-line no-unused-vars
             handleDestroy: function(model, collection, options) {
                 collection.remove(model);
             }

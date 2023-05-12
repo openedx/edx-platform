@@ -32,6 +32,7 @@ define(['jquery.form', 'js/index'], function() {
             success: reloadPage
         });
 
+        // eslint-disable-next-line no-unused-vars
         $('#request-coursecreator-submit').click(function(event) {
             $(this)
                 .toggleClass('is-disabled is-submitting')

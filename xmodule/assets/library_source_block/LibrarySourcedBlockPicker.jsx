@@ -153,6 +153,7 @@ class LibrarySourcedBlockPicker extends React.Component {
         }, this.updateList);
     }
 
+    // eslint-disable-next-line no-unused-vars
     updateList(list) {
         $('#library-sourced-block-picker').trigger('selected-xblocks', {
             sourceBlockIds: Array.from(this.state.selectedXblocks),

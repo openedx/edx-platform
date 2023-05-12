@@ -4,6 +4,7 @@
         'backbone',
         'js/discovery/models/course_discovery',
         'js/discovery/collections/filters'
+    // eslint-disable-next-line no-unused-vars
     ], function(_, Backbone, CourseDiscovery, Filters) {
         'use strict';
 
@@ -75,6 +76,7 @@
                 this.errorMessage = '';
             },
 
+            // eslint-disable-next-line no-unused-vars
             onError: function(collection, response, options) {
                 if (response.statusText !== 'abort') {
                     this.errorMessage = response.responseJSON.error;
@@ -132,6 +134,7 @@
                             page_size: this.pageSize,
                             page_index: 0
                         },
+                        // eslint-disable-next-line no-unused-vars
                         success: function(model, response, options) {
                             deferred.resolveWith(self, [model]);
                         }

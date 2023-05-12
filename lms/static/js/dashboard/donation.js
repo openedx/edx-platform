@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($) {
@@ -236,6 +237,7 @@ var edx = edx || {};
         $('.donate-container').each(function() {
             var $container = $(this);
             var course = $container.data('course');
+            // eslint-disable-next-line no-unused-vars
             var view = new edx.dashboard.donation.DonationView({
                 el: $container,
                 course: course

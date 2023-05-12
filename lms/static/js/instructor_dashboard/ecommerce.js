@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function(Backbone, $, _, gettext) {
@@ -44,6 +45,7 @@ var edx = edx || {};
         $('#coupon_expiration_date').datepicker({
             minDate: 0
         });
+        // eslint-disable-next-line no-unused-vars
         var view = new edx.instructor_dashboard.ecommerce.ExpiryCouponView();
         $('input[name="user-enrollment-report"]').click(function() {
             var url = $(this).data('endpoint');
@@ -57,7 +59,7 @@ var edx = edx || {};
                         display: 'block'
                     });
                 },
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-unused-vars */
                 error: function(std_ajax_err) {
                     $('#enrollment-report-request-response-error').text(gettext('There was a problem creating the report. Select "Create Executive Summary" to try again.'));
                     return $('#enrollment-report-request-response-error').css({
@@ -78,7 +80,7 @@ var edx = edx || {};
                         display: 'block'
                     });
                 },
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-unused-vars */
                 error: function(std_ajax_err) {
                     $('#exec-summary-report-request-response-error').text(gettext('There was a problem creating the report. Select "Create Executive Summary" to try again.'));
                     return $('#exec-summary-report-request-response-error').css({
@@ -132,7 +134,7 @@ var edx = edx || {};
                         // eslint-disable-next-line camelcase
                         $registration_code_status_form_error.text(gettext(data.message));
                     } else {
-                        // eslint-disable-next-line camelcase
+                        /* eslint-disable-next-line camelcase, no-unused-vars */
                         var actions_links = '';
                         var actions = [];
                         /* eslint-disable-next-line camelcase, eqeqeq */
@@ -197,6 +199,7 @@ var edx = edx || {};
                         edx.HtmlUtils.append($registration_code_status_form, $(registration_code_lookup_actions));
                     }
                 },
+                // eslint-disable-next-line no-unused-vars
                 error: function(jqXHR, textStatus, errorThrown) {
                     var data = $.parseJSON(jqXHR.responseText);
                     // eslint-disable-next-line camelcase
@@ -243,6 +246,7 @@ var edx = edx || {};
                     // eslint-disable-next-line camelcase
                     $registration_code_status_form_success.fadeOut(3000);
                 },
+                // eslint-disable-next-line no-unused-vars
                 error: function(jqXHR, textStatus, errorThrown) {
                     var data = $.parseJSON(jqXHR.responseText);
                     // eslint-disable-next-line camelcase

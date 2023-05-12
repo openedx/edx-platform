@@ -37,7 +37,7 @@
     };
     // eslint-disable-next-line camelcase
     $.ajaxPrefilter(function(options, originalOptions, xhr) { if (!options.crossDomain) { form_ext.CSRFProtection(xhr); } });
-    // eslint-disable-next-line consistent-return
+    /* eslint-disable-next-line consistent-return, no-unused-vars */
     $(document).delegate('form', 'submit', function(e) {
         var $form = $(this),
             remote = $form.data('remote') !== undefined;

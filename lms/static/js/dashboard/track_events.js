@@ -2,6 +2,7 @@
  * Track interaction with the student dashboard..
  */
 
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($) {

@@ -132,6 +132,7 @@
                     self.render();
                     self.renderCourseCohortSettingsNotificationView();
                     self.pubSub.trigger('cohorts:state', fieldData);
+                // eslint-disable-next-line no-unused-vars
                 }).fail(function(result) {
                     self.showNotification({
                         type: 'error',
@@ -277,7 +278,7 @@
                         submitButtonText: gettext('Upload File and Assign Students'),
                         extensions: '.csv',
                         url: this.context.uploadCohortsCsvUrl,
-                        // eslint-disable-next-line no-shadow
+                        /* eslint-disable-next-line no-shadow, no-unused-vars */
                         successNotification: function(file, event, data) {
                             // eslint-disable-next-line no-undef
                             var message = interpolate_text(gettext(

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 /* globals _, NotificationModel, NotificationView, interpolate_text */
 (function(define) {
     'use strict';

@@ -86,6 +86,7 @@ define(
 
                     dropdown = document.createElement('select');
                     dropdown.options.add(new Option());
+                    // eslint-disable-next-line no-unused-vars
                     _.each(this.model.get('languages'), function(lang, index) {
                         var option = new Option();
 
@@ -103,7 +104,7 @@ define(
                 var dict = {},
                     items = this.$el.find('ol').find('.list-settings-item');
 
-                // eslint-disable-next-line consistent-return
+                /* eslint-disable-next-line consistent-return, no-unused-vars */
                 _.each(items, function(element, index) {
                     var key = $(element).find('select option:selected').val(),
                         value = $(element).find('.input').val();

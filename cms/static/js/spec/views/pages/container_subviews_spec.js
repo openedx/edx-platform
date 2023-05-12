@@ -1,11 +1,13 @@
 import $ from 'jquery';
 import _ from 'underscore';
+// eslint-disable-next-line no-unused-vars
 import str from 'underscore.string';
 import AjaxHelpers from 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers';
 import TemplateHelpers from 'common/js/spec_helpers/template_helpers';
 import EditHelpers from 'js/spec_helpers/edit_helpers';
 import Prompt from 'common/js/components/views/feedback_prompt';
 import ContainerPage from 'js/views/pages/container';
+// eslint-disable-next-line no-unused-vars
 import ContainerSubviews from 'js/views/pages/container_subviews';
 import XBlockInfo from 'js/models/xblock_info';
 import XBlockUtils from 'js/views/utils/xblock_utils';
@@ -99,6 +101,7 @@ describe('Container Subviews', function() {
 
     describe('ViewLiveButtonController', function() {
         var viewPublishedCss = '.button-view',
+            // eslint-disable-next-line no-unused-vars
             visibilityNoteCss = '.note-visibility';
 
         it('renders correctly for unscheduled unit', function() {
@@ -314,6 +317,7 @@ describe('Container Subviews', function() {
         });
 
         it('does not fetch if discard changes fails', function() {
+            // eslint-disable-next-line no-unused-vars
             var renderPageSpy, numRequests;
             createContainerPage(this);
             // eslint-disable-next-line no-undef

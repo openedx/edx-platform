@@ -18,6 +18,7 @@ var installMockXBlock, uninstallMockXBlock, installMockXModule, uninstallMockXMo
     mockComponentTemplates, installEditTemplates, showEditModal, verifyXBlockRequest;
 
 installMockXBlock = function(mockResult) {
+    // eslint-disable-next-line no-unused-vars
     window.MockXBlock = function(runtime, element) {
         var block = {
             runtime: runtime

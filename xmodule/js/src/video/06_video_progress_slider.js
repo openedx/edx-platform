@@ -22,7 +22,9 @@ mind, or whether to act, and in acting, to live."
                 var dfd = $.Deferred();
 
                 state.videoProgressSlider = {};
+                // eslint-disable-next-line no-use-before-define
                 _makeFunctionsPublic(state);
+                // eslint-disable-next-line no-use-before-define
                 _renderElements(state);
 
                 dfd.resolve();
@@ -79,6 +81,7 @@ mind, or whether to act, and in acting, to live."
 
                 state.el.find('.video-controls').prepend(state.videoProgressSlider.el);
                 state.videoProgressSlider.buildSlider();
+                // eslint-disable-next-line no-use-before-define
                 _buildHandle(state);
                 bindHandlers(state);
             }
@@ -98,6 +101,7 @@ mind, or whether to act, and in acting, to live."
                 state.videoProgressSlider.handle.attr({
                     role: 'slider',
                     'aria-disabled': false,
+                    // eslint-disable-next-line no-use-before-define
                     'aria-valuetext': getTimeDescription(state.videoProgressSlider
                         .slider.slider('option', 'value')),
                     'aria-valuemax': state.videoPlayer.duration(),
@@ -181,6 +185,7 @@ mind, or whether to act, and in acting, to live."
                 // This will ensure that visually, the start-end range aligns nicely
                 // with actual starting and ending point of the video.
 
+                /* eslint-disable-next-line no-use-before-define, no-unused-vars */
                 rangeParams = getRangeParams(start, end, duration);
             }
 
@@ -224,6 +229,7 @@ mind, or whether to act, and in acting, to live."
 
                 // ARIA
                 this.videoProgressSlider.handle.attr(
+                    // eslint-disable-next-line no-use-before-define
                     'aria-valuetext', getTimeDescription(this.videoPlayer.currentTime)
                 );
             }
@@ -246,6 +252,7 @@ mind, or whether to act, and in acting, to live."
 
                 // ARIA
                 this.videoProgressSlider.handle.attr(
+                    // eslint-disable-next-line no-use-before-define
                     'aria-valuetext', getTimeDescription(this.videoPlayer.currentTime)
                 );
 

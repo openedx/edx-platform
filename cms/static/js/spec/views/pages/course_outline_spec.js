@@ -11,6 +11,7 @@ import Course from 'js/models/course';
 describe('CourseOutlinePage', function() {
     var createCourseOutlinePage, displayNameInput, model, outlinePage, requests, getItemsOfType, getItemHeaders,
         verifyItemsExpanded, expandItemsAndVerifyState, collapseItemsAndVerifyState, selectBasicSettings,
+        // eslint-disable-next-line no-unused-vars
         selectVisibilitySettings, selectDiscussionSettings, selectAdvancedSettings, createMockCourseJSON, createMockSectionJSON,
         createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, setSelfPaced, setSelfPacedCustomPLS,
         mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
@@ -228,6 +229,7 @@ describe('CourseOutlinePage', function() {
     verifyTypePublishable = function(type, getMockCourseJSON) {
         var createCourseOutlinePageAndShowUnit, verifyPublishButton;
 
+        // eslint-disable-next-line no-unused-vars
         createCourseOutlinePageAndShowUnit = function(test, courseJSON, createOnly) {
             outlinePage = createCourseOutlinePage.apply(this, arguments);
             if (type === 'unit') {
@@ -235,6 +237,7 @@ describe('CourseOutlinePage', function() {
             }
         };
 
+        // eslint-disable-next-line no-unused-vars
         verifyPublishButton = function(test, courseJSON, createOnly) {
             createCourseOutlinePageAndShowUnit.apply(this, arguments);
             expect(getItemHeaders(type).find('.publish-button')).toExist();
@@ -578,6 +581,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('remains empty if an add fails', function() {
+            // eslint-disable-next-line no-unused-vars
             var requestCount;
             createCourseOutlinePage(this, mockEmptyCourseJSON);
             $('.no-content .button-new').click();
@@ -955,6 +959,7 @@ describe('CourseOutlinePage', function() {
 
         it('remains visible if its deletion fails', function() {
             var promptSpy = EditHelpers.createPromptSpy(),
+                // eslint-disable-next-line no-unused-vars
                 requestCount;
             createCourseOutlinePage(this, mockSingleSectionCourseJSON);
             getItemHeaders('section').find('.delete-button').click();
@@ -1077,6 +1082,7 @@ describe('CourseOutlinePage', function() {
                         ])
                     ])
                 ]),
+                // eslint-disable-next-line no-unused-vars
                 modalWindow;
 
             createCourseOutlinePage(this, mockCourseJSON, false);

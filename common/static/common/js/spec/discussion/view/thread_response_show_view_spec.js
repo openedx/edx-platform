@@ -89,6 +89,7 @@
             });
             this.view.render();
             expect(this.view.$('.posted-details').text()).toMatch('marked as answer less than a minute ago');
+            // eslint-disable-next-line no-useless-escape
             return expect(this.view.$('.posted-details').text()).not.toMatch('\sby\s');
         });
         it('renders endorsement correctly for an endorsed response in a discussion thread', function() {
@@ -122,6 +123,7 @@
             });
             this.view.render();
             expect(this.view.$('.posted-details').text()).toMatch('endorsed less than a minute ago');
+            // eslint-disable-next-line no-useless-escape
             return expect(this.view.$('.posted-details').text()).not.toMatch('\sby\s');
         });
         it('re-renders correctly when endorsement changes', function() {

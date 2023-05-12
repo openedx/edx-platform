@@ -219,6 +219,7 @@
                     this.listenTo(this.subview.register, 'auth-complete', this.authComplete);
                 },
 
+                // eslint-disable-next-line no-unused-vars
                 institution_login: function(unused) {
                     this.subview.institutionLogin = new InstitutionLoginView({
                         thirdPartyAuth: this.thirdPartyAuth,
@@ -229,6 +230,7 @@
                     this.subview.institutionLogin.render();
                 },
 
+                // eslint-disable-next-line no-unused-vars
                 hinted_login: function(unused) {
                     this.subview.hintedLogin = new HintedLoginView({
                         thirdPartyAuth: this.thirdPartyAuth,

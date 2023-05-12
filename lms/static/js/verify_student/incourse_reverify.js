@@ -5,8 +5,10 @@
  * and uses these to initialize the top-level views
  * on the page.
  */
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
+// eslint-disable-next-line no-unused-vars
 (function($, _) {
     'use strict';
 

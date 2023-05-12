@@ -5,7 +5,7 @@ define(['backbone', 'gettext', 'common/js/components/views/feedback_notification
             defaults: {
                 name: ''
             },
-            // eslint-disable-next-line consistent-return
+            /* eslint-disable-next-line consistent-return, no-unused-vars */
             validate: function(attrs, options) {
                 if (!attrs.name) {
                     return gettext('You must specify a name');

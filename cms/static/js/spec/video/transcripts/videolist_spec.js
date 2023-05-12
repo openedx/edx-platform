@@ -272,6 +272,7 @@ define(
                 });
 
                 it('is rendered in correct way', function(done) {
+                    // eslint-disable-next-line no-unused-vars
                     var view = createVideoListView(this.mockServer);
                     waitsForResponse(this.mockServer)
                         .then(function() {

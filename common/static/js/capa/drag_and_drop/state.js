@@ -1,5 +1,6 @@
 (function(requirejs, require, define) {
     define([], function() {
+        // eslint-disable-next-line no-use-before-define
         return State;
 
         function State(problemId) {
@@ -26,12 +27,15 @@
                 updateArrowOpacity: null,
 
                 uniqueId: 0,
+                // eslint-disable-next-line no-use-before-define
                 salt: makeSalt(),
 
+                // eslint-disable-next-line no-use-before-define
                 getUniqueId: getUniqueId
             };
 
             $(document).mousemove(function(event) {
+                // eslint-disable-next-line no-use-before-define
                 documentMouseMove(state, event);
             });
 

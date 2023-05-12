@@ -63,6 +63,7 @@
                 autoUpload: false,
                 replaceFileInput: false,
                 add: function(e, data) {
+                    // eslint-disable-next-line no-unused-vars
                     var file = data.files[0];
                     submitButton.removeClass('is-disabled').attr('aria-disabled', false);
                     submitButton.unbind('click');

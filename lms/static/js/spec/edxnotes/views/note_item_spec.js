@@ -104,6 +104,7 @@ define([
 
         xit('should handle a click event on the tag', function() {
             var scrollToTagSpy = {
+                // eslint-disable-next-line no-unused-vars
                 scrollToTag: function(tagName) {}
             };
             // eslint-disable-next-line no-undef

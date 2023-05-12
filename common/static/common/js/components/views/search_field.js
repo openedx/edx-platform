@@ -56,10 +56,12 @@
                 return this;
             },
 
+            // eslint-disable-next-line no-unused-vars
             setMouseOverState: function(event) {
                 this.mouseOverClear = true;
             },
 
+            // eslint-disable-next-line no-unused-vars
             setMouseOutState: function(event) {
                 this.mouseOverClear = false;
             },

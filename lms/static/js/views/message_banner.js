@@ -15,6 +15,7 @@
                 'click .close-btn': 'closeBanner'
             },
 
+            // eslint-disable-next-line no-unused-vars
             closeBanner: function(event) {
                 sessionStorage.setItem('isBannerClosed', true);
                 this.hideMessage();

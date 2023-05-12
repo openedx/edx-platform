@@ -74,12 +74,13 @@ formulaEquationPreview.enable = function() {
         };
 
         // Give callback access to `inputData` (fill in first parameter).
-        // eslint-disable-next-line no-undef
+        /* eslint-disable-next-line no-undef, no-use-before-define */
         inputData.requestCallback = _.partial(updatePage, inputData);
 
         // Limit `sendRequest` and have it show the loading icon.
         // eslint-disable-next-line no-undef
         var throttledRequest = _.throttle(
+            // eslint-disable-next-line no-use-before-define
             sendRequest,
             formulaEquationPreview.minDelay,
             {leading: false}

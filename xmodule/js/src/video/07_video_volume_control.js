@@ -117,7 +117,9 @@
                     // So, we disallow focusing on iframe.
                     this.state.el.find('iframe').attr('tabindex', -1);
                     this.button = this.el.children('.control');
+                    // eslint-disable-next-line no-use-before-define
                     this.cookie = new CookieManager(this.min, this.max);
+                    // eslint-disable-next-line no-use-before-define
                     this.a11y = new Accessibility(
                         this.button, this.min, this.max, this.i18n
                     );

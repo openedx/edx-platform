@@ -36,8 +36,11 @@
 
                 state.focusGrabber = {};
 
+                // eslint-disable-next-line no-use-before-define
                 _makeFunctionsPublic(state);
+                // eslint-disable-next-line no-use-before-define
                 _renderElements(state);
+                // eslint-disable-next-line no-use-before-define
                 _bindHandlers(state);
 
                 dfd.resolve();
@@ -48,8 +51,11 @@
 
             function _makeFunctionsPublic(state) {
                 var methodsDict = {
+                    // eslint-disable-next-line no-use-before-define
                     disableFocusGrabber: disableFocusGrabber,
+                    // eslint-disable-next-line no-use-before-define
                     enableFocusGrabber: enableFocusGrabber,
+                    // eslint-disable-next-line no-use-before-define
                     onFocus: onFocus
                 };
 
@@ -123,6 +129,7 @@
                 this.focusGrabber.elLast.attr('tabindex', -1);
             }
 
+            // eslint-disable-next-line no-unused-vars
             function onFocus(event, params) {
                 // Once the Focus Grabber placeholder elements will gain focus, we will
                 // trigger 'mousemove' event so that the autohidden controls will

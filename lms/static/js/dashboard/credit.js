@@ -2,6 +2,7 @@
  * Student dashboard credit messaging.
  */
 
+// eslint-disable-next-line no-use-before-define
 var edx = edx || {};
 
 (function($, analytics) {

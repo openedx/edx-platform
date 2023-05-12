@@ -23,7 +23,7 @@
  * - The specified 'nextUrl' if safe, or
  * - The dashboard
  */
-// eslint-disable-next-line no-shadow-restricted-names
+/* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(define, undefined) {
     'use strict';
 
@@ -46,6 +46,7 @@
                 trackSelection: '/course_modes/choose/'
             },
 
+            // eslint-disable-next-line no-unused-vars
             initialize: function(obj) {
                 var queryParams = {
                     next: $.url('?next'),
