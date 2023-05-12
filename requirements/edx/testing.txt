@@ -571,7 +571,7 @@ edx-django-utils==5.4.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions==8.7.0
+edx-drf-extensions @ git+https://github.com/openedx/edx-drf-extensions.git@umar/replace-jwkest-with-pyjwt
     # via
     #   -r requirements/edx/base.txt
     #   edx-completion
