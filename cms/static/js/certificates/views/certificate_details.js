@@ -71,8 +71,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
                     // eslint-disable-next-line camelcase
                     var signatory_detail_view = new SignatoryDetailsView({model: modelSignatory});
                     // xss-lint: disable=javascript-jquery-append
-                    // eslint-disable-next-line camelcase
-                    self.$('div.signatory-details-list').append($(signatory_detail_view.render().$el));
+                    self.$('div.signatory-details-list').append($(signatory_detail_view.render().$el)); // eslint-disable-line camelcase
                 });
             }
 
