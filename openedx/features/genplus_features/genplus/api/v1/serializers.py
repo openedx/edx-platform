@@ -149,7 +149,7 @@ class JournalListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = JournalPost
-        fields = ('id', 'title', 'skill', 'description', 'teacher', 'journal_type', 'is_editable', 'created')
+        fields = ('id', 'title', 'skill', 'description', 'teacher', 'journal_type', 'is_editable', 'modified')
 
 
 class StudentPostSerializer(serializers.ModelSerializer):

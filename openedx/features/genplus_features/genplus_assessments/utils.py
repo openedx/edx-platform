@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.models import StudentModule
 from openedx.features.genplus_features.genplus.constants import JournalTypes
 from openedx.features.genplus_features.genplus.models import Student, JournalPost
 from openedx.features.genplus_features.genplus_learning.models import Unit
@@ -61,23 +62,37 @@ class StudentResponse:
         unit = Unit.objects.filter(course__id=course_key).first()
         skill = unit.skill if unit else None
 
-        defaults = {
-            'skill': skill,
-            'student': student,
-            'journal_type': JournalTypes.STUDENT_POST,
-            'is_editable': False
-        }
+        try:
+            student_module = StudentModule.objects.get(
+                student=student.user,
+                course_id=course_key,
+                module_state_key=problem_block.scope_ids.usage_id,
+            )
+
+        except StudentModule.DoesNotExist:
+            student_module = None
+            print(f"===============Student module not found===================")
 
         for key, value in student_response.items():
             if not value:
                 continue
-            uuid = key.split('input_')[-1]
+            uuid = key.replace('input_', '')
             title = problem.find(f".//label[@for='{key}']").text
             answer = json.loads(JOURNAL_STYLE.format(value), strict=False)
+            defaults = {
+                'skill': skill,
+                'journal_type': JournalTypes.STUDENT_POST,
+                'is_editable': False,
+                'title': title,
+                'description': json.dumps(answer),
+            }
+            if student_module:
+                defaults['created'] = student_module.created
+                defaults['modified'] = student_module.modified
+
             obj, created = JournalPost.objects.update_or_create(
                 uuid=uuid,
-                title=title,
-                description=json.dumps(answer),
+                student=student,
                 defaults=defaults
             )
 
