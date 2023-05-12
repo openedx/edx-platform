@@ -40,7 +40,12 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from lms.djangoapps.discussion.views import is_privileged_user
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.models import (
+    DiscussionsConfiguration,
+    DiscussionTopicLink,
+    Provider,
+    PostingRestriction
+)
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
@@ -319,15 +324,28 @@ def get_course(request, course_key):
         """
         return dt.isoformat().replace('+00:00', 'Z')
 
+    def get_posting_status(posting_restrictions, blackout_schedules):
+        now = datetime.now(UTC)
+        if posting_restrictions == PostingRestriction.Disabled:
+            return True
+        elif posting_restrictions == PostingRestriction.Scheduled:
+            return not any(schedule["start"] <= now <= schedule["end"] for schedule in blackout_schedules)
+        else:
+            return False
+
     course = _get_course(course_key, request.user)
     user_roles = get_user_role_names(request.user, course_key)
     course_config = DiscussionsConfiguration.get(course_key)
     EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
     CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
+    is_posting_enabled = get_posting_status(
+        course_config.posting_restrictions,
+        course.get_discussion_blackout_datetimes()
+    )
 
     return {
         "id": str(course_key),
-        "discussions_restrictions": course_config.discussions_restrictions,
+        "is_posting_enabled": is_posting_enabled,
         "blackouts": [
             {
                 "start": _format_datetime(blackout["start"]),
