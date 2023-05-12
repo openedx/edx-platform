@@ -6,7 +6,7 @@
  * to subviews to render individual steps.
  *
  */
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 // eslint-disable-next-line no-unused-vars
@@ -40,6 +40,7 @@ var edx = edx || {};
         },
 
         initializeStepViews: function(stepInfo) {
+            // eslint-disable-next-line no-var
             var i,
                 stepName,
                 stepData,
@@ -123,6 +124,7 @@ var edx = edx || {};
         },
 
         renderCurrentStep: function() {
+            // eslint-disable-next-line no-var
             var stepName, stepView, $stepEl;
 
             // Get or create the step container
@@ -152,6 +154,7 @@ var edx = edx || {};
         },
 
         goToStep: function(stepName) {
+            // eslint-disable-next-line no-var
             var stepIndex = _.indexOf(
                 _.pluck(this.displaySteps, 'name'),
                 stepName

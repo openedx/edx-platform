@@ -20,6 +20,7 @@
             certificate_exception_view_url, generate_bulk_certificate_exceptions_url,
             // eslint-disable-next-line camelcase
             active_certificate) {
+            // eslint-disable-next-line no-var
             var certificateAllowlist = new CertificateAllowlistCollection(certificate_allowlist_json, {
                 parse: true,
                 canBeEmpty: true,
@@ -29,6 +30,7 @@
                 generate_certificates_url: generate_certificate_exceptions_url
             });
 
+            // eslint-disable-next-line no-var
             var certificateAllowlistEditorView = new CertificateAllowlistEditorView({
                 collection: certificateAllowlist
             });

@@ -50,7 +50,7 @@
         });
 
         describe('ajax request settings with path_prefix', function() {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var $meta_tag;
 
             beforeEach(function() {
@@ -181,6 +181,7 @@
             });
 
             it('can catch exceptions', function() {
+                // eslint-disable-next-line no-var
                 var callback = function() {
                     // eslint-disable-next-line no-undef
                     Logger.log('exception', 'data');

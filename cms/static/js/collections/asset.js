@@ -6,6 +6,7 @@ define([
 ], function(_, PagingCollection, AssetModel) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var AssetCollection = PagingCollection.extend({
         assetType: '',
         model: AssetModel,

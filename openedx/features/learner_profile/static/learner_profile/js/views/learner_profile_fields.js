@@ -14,6 +14,7 @@
         'text!learner_profile/templates/social_icons.underscore',
         'backbone-super'
     ], function(gettext, $, _, Backbone, StringUtils, HtmlUtils, FieldViews, ImageFieldView, socialIconsTemplate) {
+        // eslint-disable-next-line no-var
         var LearnerProfileFieldViews = {};
 
         LearnerProfileFieldViews.AccountPrivacyFieldView = FieldViews.DropdownFieldView.extend({
@@ -31,6 +32,7 @@
             },
 
             showNotificationMessage: function() {
+                // eslint-disable-next-line no-var
                 var accountSettingsLink = HtmlUtils.joinHtml(
                     HtmlUtils.interpolateHtml(
                         HtmlUtils.HTML('<a href="{settings_url}">'), {settings_url: this.options.accountSettingsPageUrl}
@@ -85,6 +87,7 @@
             },
 
             imageChangeSucceeded: function() {
+                // eslint-disable-next-line no-var
                 var view = this;
                 // Update model to get the latest urls of profile image.
                 this.model.fetch().done(function() {
@@ -103,6 +106,7 @@
             },
 
             showImageChangeFailedMessage: function(status, responseText) {
+                // eslint-disable-next-line no-var
                 var errors;
                 if (_.contains([400, 404], status)) {
                     try {
@@ -146,9 +150,12 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var socialLinks = {};
+                // eslint-disable-next-line no-var
                 for (var platformName in this.options.socialPlatforms) { // eslint-disable-line no-restricted-syntax, guard-for-in, vars-on-top, max-len
                     socialLinks[platformName] = null;
+                    // eslint-disable-next-line no-var
                     for (var link in this.model.get('social_links')) { // eslint-disable-line no-restricted-syntax, vars-on-top, max-len
                         if (platformName === this.model.get('social_links')[link].platform) {
                             socialLinks[platformName] = this.model.get('social_links')[link].social_link;

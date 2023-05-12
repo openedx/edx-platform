@@ -3,6 +3,7 @@
 
     define(['jquery', 'underscore', 'underscore.string', 'common/js/components/views/feedback'],
         function($, _, str, SystemFeedbackView) {
+            // eslint-disable-next-line no-var
             var Alert = SystemFeedbackView.extend({
                 options: $.extend({}, SystemFeedbackView.prototype.options, {
                     type: 'alert'
@@ -24,10 +25,12 @@
             });
 
             // create Alert.Warning, Alert.Confirmation, etc
+            // eslint-disable-next-line no-var
             var capitalCamel, intents;
             capitalCamel = _.compose(str.capitalize, str.camelize);
             intents = ['warning', 'error', 'confirmation', 'announcement', 'step-required', 'help', 'mini'];
             _.each(intents, function(intent) {
+                // eslint-disable-next-line no-var
                 var subclass;
                 subclass = Alert.extend({
                     options: $.extend({}, Alert.prototype.options, {

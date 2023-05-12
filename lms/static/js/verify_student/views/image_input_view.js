@@ -6,7 +6,7 @@
  * a file.
  */
 
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function($, _, Backbone, gettext) {
@@ -25,6 +25,7 @@ var edx = edx || {};
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var renderedHtml = edx.HtmlUtils.template($(this.template).html())({});
             edx.HtmlUtils.setHtml(
                 $(this.el),
@@ -44,6 +45,7 @@ var edx = edx || {};
         },
 
         handleInputChange: function(event) {
+            // eslint-disable-next-line no-var
             var files = event.target.files,
                 reader = new FileReader();
             if (files[0] && files[0].type.match('image.[png|jpg|jpeg]')) {
@@ -58,6 +60,7 @@ var edx = edx || {};
         },
 
         handleImageUpload: function(event) {
+            // eslint-disable-next-line no-var
             var imageData = event.target.result;
             this.model.set(this.modelAttribute, imageData);
             this.displayImage(imageData);

@@ -21,6 +21,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
     CustomMatchers) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var SELECTORS = {
         itemView: '.certificates-list-item',
         itemEditView: '.certificate-edit',
@@ -29,6 +30,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
     };
 
     describe('Certificates list view', function() {
+        // eslint-disable-next-line no-var
         var emptyMessage = 'You have not created any certificates yet.';
 
         beforeEach(function() {

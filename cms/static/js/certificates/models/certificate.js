@@ -15,6 +15,7 @@ function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeS
     SignatoryModel, SignatoryCollection) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var Certificate = Backbone.RelationalModel.extend({
         idAttribute: 'id',
         defaults: {
@@ -81,6 +82,7 @@ function(_, Backbone, BackboneRelational, BackboneAssociations, gettext, CoffeeS
                     attributes: {name: true}
                 };
             }
+            // eslint-disable-next-line no-var
             var allSignatoriesValid = _.every(attrs.signatories.models, function(signatory) {
                 return signatory.isValid();
             });

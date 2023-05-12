@@ -16,6 +16,7 @@
         'text!discussion/templates/fake-breadcrumbs.underscore'
     ],
     function(Backbone, gettext, HtmlUtils, breadcrumbsTemplate) {
+        // eslint-disable-next-line no-var
         var DiscussionFakeBreadcrumbs = Backbone.View.extend({
             initialize: function() {
                 this.template = HtmlUtils.template(breadcrumbsTemplate);
@@ -23,6 +24,7 @@
                 this.render();
             },
             render: function() {
+                // eslint-disable-next-line no-var
                 var json = this.model.attributes;
                 HtmlUtils.setHtml(this.$el, this.template(json));
                 return this;

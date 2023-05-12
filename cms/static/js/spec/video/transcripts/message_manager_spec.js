@@ -10,6 +10,7 @@ define(
         'use strict';
 
         describe('Transcripts.MessageManager', function() {
+            // eslint-disable-next-line no-var
             var videoListEntryTemplate = readFixtures(
                     'video/transcripts/metadata-videolist-entry.underscore'
                 ),
@@ -24,6 +25,7 @@ define(
                 view, fileUploader, sinonXhr;
 
             beforeEach(function() {
+                // eslint-disable-next-line no-var
                 var videoList, $container;
 
                 fileUploader = FileUploader.prototype;
@@ -101,6 +103,7 @@ define(
             });
 
             describe('showError', function() {
+                // eslint-disable-next-line no-var
                 var errorMessage = 'error',
                     $error, $buttons;
 
@@ -145,6 +148,7 @@ define(
             it('hideError', function() {
                 view.render('found');
 
+                // eslint-disable-next-line no-var
                 var $error = view.$el.find('.transcripts-error-message'),
                     $buttons = view.$el.find('.wrapper-transcripts-buttons');
 
@@ -154,7 +158,7 @@ define(
 
             $.each(handlers, function(key, value) {
                 it(key, function() {
-                    // eslint-disable-next-line no-undef
+                    /* eslint-disable-next-line no-undef, no-var */
                     var eventObj = jasmine.createSpyObj('event', ['preventDefault']);
                     // eslint-disable-next-line no-undef
                     spyOn($.fn, 'data').and.returnValue('video_id');
@@ -166,6 +170,7 @@ define(
             });
 
             describe('processCommand', function() {
+                // eslint-disable-next-line no-var
                 var action = 'replace',
                     errorMessage = 'errorMessage',
                     // eslint-disable-next-line no-void
@@ -189,13 +194,16 @@ define(
                     sinonXhr.restore();
                 });
 
+                // eslint-disable-next-line no-var
                 var assertCommand = function(config) {
+                    // eslint-disable-next-line no-var
                     var defaults = {
                         action: 'replace',
                         errorMessage: 'errorMessage',
                         // eslint-disable-next-line no-void
                         extraParamas: void 0
                     };
+                    // eslint-disable-next-line no-var
                     var args = $.extend({}, defaults, config);
 
                     return view

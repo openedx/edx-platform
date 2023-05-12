@@ -5,8 +5,10 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
+            // eslint-disable-next-line no-var
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -25,12 +27,14 @@
     // eslint-disable-next-line no-undef
     if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionThreadView = (function(_super) {
+            // eslint-disable-next-line no-var
             var INITIAL_RESPONSE_PAGE_SIZE, SUBSEQUENT_RESPONSE_PAGE_SIZE;
 
             // eslint-disable-next-line no-use-before-define
             __extends(DiscussionThreadView, _super);
 
             function DiscussionThreadView() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this._delete = function() {
                     return DiscussionThreadView.prototype._delete.apply(self, arguments);
@@ -80,6 +84,7 @@
             };
 
             DiscussionThreadView.prototype.initialize = function(options) {
+                // eslint-disable-next-line no-var
                 var _ref,
                     self = this;
                 DiscussionThreadView.__super__.initialize.call(this);
@@ -94,6 +99,7 @@
                 }
                 this.readOnly = $('.discussion-module').data('read-only');
                 this.model.collection.on('reset', function(collection) {
+                    // eslint-disable-next-line no-var
                     var id;
                     id = self.model.get('id');
                     if (collection.get(id)) {
@@ -126,6 +132,7 @@
             };
 
             DiscussionThreadView.prototype.renderTemplate = function() {
+                // eslint-disable-next-line no-var
                 var $container,
                     templateData;
                 // eslint-disable-next-line no-undef
@@ -144,7 +151,9 @@
             };
 
             DiscussionThreadView.prototype.render = function() {
+                // eslint-disable-next-line no-var
                 var self = this;
+                // eslint-disable-next-line no-var
                 var $element = $(this.renderTemplate());
                 this.$el.empty();
                 this.$el.append($element);
@@ -188,6 +197,7 @@
             };
 
             DiscussionThreadView.prototype.loadResponses = function(responseLimit, $elem, firstLoad) {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.responsesRequest = DiscussionUtil.safeAjax({
                     url: DiscussionUtil.urlFor(
@@ -250,6 +260,7 @@
 
             // eslint-disable-next-line consistent-return
             DiscussionThreadView.prototype.renderResponseCountAndPagination = function(responseTotal) {
+                // eslint-disable-next-line no-var
                 var buttonText, $loadMoreButton, responseCountFormat, responseLimit, responsePagination,
                     responsesRemaining, showingResponsesText,
                     self = this;
@@ -313,6 +324,7 @@
             };
 
             DiscussionThreadView.prototype.renderResponseToList = function(response, listSelector, options) {
+                // eslint-disable-next-line no-var
                 var view;
                 response.set('thread', this.model);
                 view = new ThreadResponseView($.extend({
@@ -341,6 +353,7 @@
             };
 
             DiscussionThreadView.prototype.scrollToAddResponse = function(event) {
+                // eslint-disable-next-line no-var
                 var form;
                 event.preventDefault();
                 form = $(event.target).parents('article.discussion-article').find('form.discussion-reply-new');
@@ -357,6 +370,7 @@
             };
 
             DiscussionThreadView.prototype.submitComment = function(event) {
+                // eslint-disable-next-line no-var
                 var body, comment, url, view;
                 event.preventDefault();
                 url = this.model.urlFor('reply');
@@ -459,6 +473,7 @@
             };
 
             DiscussionThreadView.prototype._delete = function(event) {
+                // eslint-disable-next-line no-var
                 var $elem, url;
                 url = this.model.urlFor('_delete');
                 if (!this.model.can('can_delete')) {

@@ -4,7 +4,9 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/sh
         'use strict';
 
         describe('edx.shoppingcart.showcart.CartView', function() {
+            // eslint-disable-next-line no-var
             var view = null;
+            // eslint-disable-next-line no-var
             var requests = null;
 
             beforeEach(function() {
@@ -38,6 +40,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/sh
                 });
 
                 expect(view.responseFromServer).toHaveBeenCalled();
+                // eslint-disable-next-line no-var
                 var data = view.responseFromServer.calls.mostRecent().args[0];
                 expect(data.is_course_enrollment_closed).toBe(true);
             });
@@ -51,6 +54,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/shoppingcart/sh
                 });
 
                 expect(view.responseFromServer).toHaveBeenCalled();
+                // eslint-disable-next-line no-var
                 var data = view.responseFromServer.calls.mostRecent().args[0];
                 expect(data.is_course_enrollment_closed).toBe(false);
             });

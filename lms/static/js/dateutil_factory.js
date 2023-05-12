@@ -21,13 +21,21 @@
         'edx-ui-toolkit/js/utils/date-utils',
         'edx-ui-toolkit/js/utils/string-utils'
     ], function($, DateUtils, StringUtils) {
+        // eslint-disable-next-line no-var
         var DateUtilFactory;
+        // eslint-disable-next-line no-var
         var localizedTime;
+        // eslint-disable-next-line no-var
         var stringHandler;
+        // eslint-disable-next-line no-var
         var displayDatetime;
+        // eslint-disable-next-line no-var
         var isValid;
+        // eslint-disable-next-line no-var
         var transform;
+        // eslint-disable-next-line no-var
         var dueDateFormat;
+        // eslint-disable-next-line no-var
         var dateFormat;
 
         dueDateFormat = Object.freeze({
@@ -38,6 +46,7 @@
         });
 
         transform = function(iterationKey) {
+            // eslint-disable-next-line no-var
             var context;
             $(iterationKey).each(function() {
                 if (isValid($(this).data('datetime'))) {
@@ -71,8 +80,11 @@
         };
 
         stringHandler = function(localTimeString, containerString, token) {
+            // eslint-disable-next-line no-var
             var returnString;
+            // eslint-disable-next-line no-var
             var interpolateDict = {};
+            // eslint-disable-next-line no-var
             var dateToken;
             if (isValid(token)) {
                 dateToken = token;

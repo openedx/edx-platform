@@ -26,8 +26,10 @@
         'common/js/components/views/list',
         'text!common/templates/components/paginated-view.underscore'
     ], function(Backbone, _, HtmlUtils, PagingHeader, PagingFooter, ListView, paginatedViewTemplate) {
+        // eslint-disable-next-line no-var
         var PaginatedView = Backbone.View.extend({
             initialize: function() {
+                // eslint-disable-next-line no-var
                 var ItemListView = this.listViewClass.extend({
                     tagName: 'div',
                     className: this.type + '-container',

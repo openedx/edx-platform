@@ -8,6 +8,7 @@
         };
 
         function update(state) {
+            // eslint-disable-next-line no-var
             var draggables, tempObj;
 
             draggables = [];
@@ -71,6 +72,7 @@
         // Check if input has an answer from server. If yes, then position
         // all draggables according to answer.
         function check(state) {
+            // eslint-disable-next-line no-var
             var inputElVal;
 
             inputElVal = $('#input_' + state.problemId).val();
@@ -86,7 +88,7 @@
         }
 
         function processAnswerTargets(state, answerSortedByDepth, minDepth, maxDepth, depth, i) {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var baseDraggableId, baseDraggable, baseTargetId, baseTarget,
                 layeredDraggableId, layeredDraggable, layeredTargetId, layeredTarget,
                 chain;
@@ -199,6 +201,7 @@
         }
 
         function createBaseDraggableOnTarget(state, draggableId, targetId, reportError, funcCallback) {
+            // eslint-disable-next-line no-var
             var draggable, target;
 
             /* eslint-disable-next-line no-cond-assign, no-use-before-define */
@@ -235,6 +238,7 @@
         }
 
         function processAnswerPositions(state, answer) {
+            // eslint-disable-next-line no-var
             var draggableId, draggable;
 
             (function(c1) {
@@ -270,6 +274,7 @@
         }
 
         function repositionDraggables(state, answer) {
+            // eslint-disable-next-line no-var
             var answerSortedByDepth, minDepth, maxDepth;
 
             answerSortedByDepth = {};
@@ -277,6 +282,7 @@
             maxDepth = 0;
 
             answer.every(function(chain) {
+                // eslint-disable-next-line no-var
                 var depth;
 
                 // eslint-disable-next-line no-use-before-define
@@ -315,6 +321,7 @@
         }
 
         function findDepth(tempObj, depth) {
+            // eslint-disable-next-line no-var
             var i;
 
             if ($.isPlainObject(tempObj) === false) {

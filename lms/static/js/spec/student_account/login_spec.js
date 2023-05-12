@@ -13,6 +13,7 @@
     ],
     function($, _, sinon, TemplateHelpers, AjaxHelpers, LoginModel, LoginView, PasswordResetModel) {
         describe('edx.student.account.LoginView', function() {
+            // eslint-disable-next-line no-var
             var model = null,
                 resetModel = null,
                 view = null,
@@ -72,6 +73,7 @@
                 },
                 COURSE_ID = 'edX/demoX/Fall';
 
+            // eslint-disable-next-line no-var
             var createLoginView = function(test) {
                 // Initialize the login model
                 model = new LoginModel({}, {
@@ -106,8 +108,10 @@
                 });
             };
 
+            // eslint-disable-next-line no-var
             var submitForm = function(validationSuccess) {
                 // Create a fake click event
+                // eslint-disable-next-line no-var
                 var clickEvent = $.Event('click');
 
                 // Simulate manual entry of login form data
@@ -159,6 +163,7 @@
             });
 
             it('sends analytics info containing the enrolled course ID', function() {
+                // eslint-disable-next-line no-var
                 var expectedData;
 
                 createLoginView(this);
@@ -199,6 +204,7 @@
             });
 
             it('does not display the login form', function() {
+                // eslint-disable-next-line no-var
                 var thirdPartyAuthView = new LoginView({
                     fields: FORM_DESCRIPTION.fields,
                     model: model,
@@ -214,6 +220,7 @@
             });
 
             it('does not display the enterprise login button', function() {
+                // eslint-disable-next-line no-var
                 var enterpriseDisabledLoginView = new LoginView({
                     fields: FORM_DESCRIPTION.fields,
                     model: model,
@@ -314,6 +321,7 @@
             });
 
             it('displays an error if there is no internet connection', function() {
+                // eslint-disable-next-line no-var
                 var clock,
                     oldTimeout,
                     timeout,
@@ -349,6 +357,7 @@
             });
 
             it('displays an error if there is a server error', function() {
+                // eslint-disable-next-line no-var
                 var $error;
                 createLoginView(this);
 

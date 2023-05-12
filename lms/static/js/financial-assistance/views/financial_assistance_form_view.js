@@ -39,6 +39,7 @@
             submitButton: '.js-submit-form',
 
             initialize: function(data) {
+                // eslint-disable-next-line no-var
                 var context = data.context,
                     fields = context.fields;
 
@@ -72,6 +73,7 @@
             },
 
             render: function(html) {
+                // eslint-disable-next-line no-var
                 var data = _.extend(this.model.toJSON(), this.context, {
                     fields: html || ''
                 });
@@ -95,6 +97,7 @@
 
             saveError: function(error) {
                 /* jslint maxlen: 500 */
+                // eslint-disable-next-line no-var
                 var txt = [
                         'An error has occurred. Wait a few minutes and then try to submit the application again.',
                         'If you continue to have issues please contact support.'
@@ -117,6 +120,7 @@
             },
 
             validateCountry: function() {
+                // eslint-disable-next-line no-var
                 var $countryLabel = $('#user-country-title'),
                     txt = [
                         'Please go to your {link_start}profile page{link_end} ',

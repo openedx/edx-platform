@@ -6,6 +6,7 @@
     'use strict';
 
     describe('DiscussionThreadEditView', function() {
+        // eslint-disable-next-line no-var
         var testUpdate, testCancel;
 
         beforeEach(function() {
@@ -34,6 +35,7 @@
         });
 
         testUpdate = function(view, thread, newTopicId, newTopicName, mode) {
+            // eslint-disable-next-line no-var
             var discussionMode = mode || 'tab';
 
             // eslint-disable-next-line no-undef

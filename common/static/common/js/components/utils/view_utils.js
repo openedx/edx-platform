@@ -15,6 +15,7 @@
         function($, _, gettext, NotificationView, PromptView, $script) {
     /* End Webpack */
 
+        // eslint-disable-next-line no-var
         var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
             runOperationShowingMessage, showErrorMeassage, withDisabledElement, disableElementWhileRunning,
             getScrollOffset, setScrollOffset, setScrollTop, redirect, reload, hasChangedAttributes,
@@ -22,6 +23,7 @@
             validateTotalKeyLength, checkTotalKeyLengthViolations, loadJavaScript;
 
         // see https://openedx.atlassian.net/browse/TNL-889 for what is it and why it's 65
+        // eslint-disable-next-line no-var
         var MAX_SUM_KEY_LENGTH = 65;
 
         /**
@@ -29,6 +31,7 @@
              */
         toggleExpandCollapse = function(target, collapsedClass) {
             // Support the old 'collapsed' option until fully switched over to is-collapsed
+            // eslint-disable-next-line no-var
             var collapsed = collapsedClass || 'collapsed';
             target.closest('.expand-collapse').toggleClass('expand collapse');
             target.closest('.is-collapsible, .window').toggleClass(collapsed);
@@ -85,6 +88,7 @@
              * @param operation A function that returns a promise representing the operation.
              */
         runOperationShowingMessage = function(message, operation) {
+            // eslint-disable-next-line no-var
             var notificationView;
             notificationView = new NotificationView.Mini({
                 title: gettext(message)
@@ -102,6 +106,7 @@
              * @param timeInterval The time interval to hide the notification.
              */
         showErrorMeassage = function(heading, message, timeInterval) {
+            // eslint-disable-next-line no-var
             var errorNotificationView = new NotificationView.Error({
                 title: gettext(heading),
                 message: gettext(message)
@@ -121,6 +126,7 @@
              */
         withDisabledElement = function(functionName) {
             return function(event) {
+                // eslint-disable-next-line no-var
                 var view = this;
                 disableElementWhileRunning($(event.currentTarget), function() {
                     // call view.functionName(event), with view as the current this
@@ -173,6 +179,7 @@
              * @param element The element in question.
              */
         getScrollOffset = function(element) {
+            // eslint-disable-next-line no-var
             var elementTop = element.offset().top;
             return elementTop - $(window).scrollTop();
         };
@@ -184,6 +191,7 @@
              * @param offset The amount by which the element should be scrolled from the top of the view port.
              */
         setScrollOffset = function(element, offset) {
+            // eslint-disable-next-line no-var
             var elementTop = element.offset().top,
                 newScrollTop = elementTop - offset;
             setScrollTop(newScrollTop);
@@ -210,6 +218,7 @@
              * @returns {boolean} Returns true if attribute changes are found.
              */
         hasChangedAttributes = function(model, attributes) {
+            // eslint-disable-next-line no-var
             var i,
                 changedAttributes = model.changedAttributes();
             if (!changedAttributes) {
@@ -235,6 +244,7 @@
              * Check that a course (org, number, run) doesn't use any special characters
              */
         validateURLItemEncoding = function(item, allowUnicode) {
+            // eslint-disable-next-line no-var
             var required = validateRequiredField(item);
             if (required) {
                 return required;
@@ -253,6 +263,7 @@
 
         // Ensure that sum length of key field values <= ${MAX_SUM_KEY_LENGTH} chars.
         validateTotalKeyLength = function(keyFieldSelectors) {
+            // eslint-disable-next-line no-var
             var totalLength = _.reduce(
                 keyFieldSelectors,
                 function(sum, ele) { return sum + $(ele).val().length; },
@@ -262,6 +273,7 @@
         };
 
         checkTotalKeyLengthViolations = function(selectors, classes, keyFieldSelectors, messageTpl) {
+            // eslint-disable-next-line no-var
             var tempHtml;
             if (!validateTotalKeyLength(keyFieldSelectors)) {
                 $(selectors.errorWrapper).addClass(classes.shown).removeClass(classes.hiding);
@@ -286,6 +298,7 @@
              * @returns {Promise} A promise indicating when the URL has been loaded.
              */
         loadJavaScript = function(url) {
+            // eslint-disable-next-line no-var
             var deferred = $.Deferred();
             /* RequireJS */
             require([url],

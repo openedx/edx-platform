@@ -6,17 +6,24 @@
         'js/discovery/views/filter_bar', 'js/discovery/views/refine_sidebar'],
     function(Backbone, SearchState, Filters, SearchForm, CoursesListing, FilterBar, RefineSidebar) {
         return function(meanings, searchQuery, userLanguage, userTimezone) {
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var dispatcher = _.extend({}, Backbone.Events);
+            // eslint-disable-next-line no-var
             var search = new SearchState();
+            // eslint-disable-next-line no-var
             var filters = new Filters();
+            // eslint-disable-next-line no-var
             var form = new SearchForm();
+            // eslint-disable-next-line no-var
             var filterBar = new FilterBar({collection: filters});
+            // eslint-disable-next-line no-var
             var refineSidebar = new RefineSidebar({
                 collection: search.discovery.facetOptions,
                 meanings: meanings
             });
+            // eslint-disable-next-line no-var
             var listing;
+            // eslint-disable-next-line no-var
             var courseListingModel = search.discovery;
             courseListingModel.userPreferences = {
                 userLanguage: userLanguage,

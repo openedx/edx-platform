@@ -5,6 +5,7 @@
     'use strict';
 
     define(['backbone', 'underscore'], function(Backbone, _) {
+        // eslint-disable-next-line no-var
         var ListView = Backbone.View.extend({
             /**
              * Override with the view used to render models in the collection.
@@ -32,6 +33,7 @@
                  * to ensure garbage collection works.
                  */
                 this.collection.each(function(model) {
+                    // eslint-disable-next-line no-var
                     var itemView = new this.itemViewClass({model: model});
                     this.$el.append(itemView.render().el);
                     this.itemViews.push(itemView);

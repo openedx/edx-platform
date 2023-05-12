@@ -7,6 +7,7 @@ function($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils,
     'use strict';
 
     describe('UnitOutlineView', function() {
+        // eslint-disable-next-line no-var
         var createUnitOutlineView, createMockXBlockInfo,
             requests, model, unitOutlineView;
 
@@ -114,6 +115,7 @@ function($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils,
         });
 
         it('can add a unit', function() {
+            // eslint-disable-next-line no-var
             var redirectSpy;
             createUnitOutlineView(this, createMockXBlockInfo('Mock Unit'));
             // eslint-disable-next-line no-undef
@@ -132,6 +134,7 @@ function($, AjaxHelpers, TemplateHelpers, ViewHelpers, ViewUtils,
         });
 
         it('refreshes when the XBlockInfo model syncs', function() {
+            // eslint-disable-next-line no-var
             var updatedDisplayName = 'Mock Unit Updated';
             createUnitOutlineView(this, createMockXBlockInfo('Mock Unit'));
             unitOutlineView.refresh();

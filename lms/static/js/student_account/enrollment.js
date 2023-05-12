@@ -2,6 +2,7 @@
     'use strict';
 
     define(['jquery', 'jquery.cookie'], function($) {
+        // eslint-disable-next-line no-var
         var EnrollmentInterface = {
 
             urls: {
@@ -18,7 +19,7 @@
              * @param  {string} redirectUrl The URL to redirect to once enrollment completes.
              */
             enroll: function(courseKey, redirectUrl) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var data_obj = {course_id: courseKey},
                     data = JSON.stringify(data_obj);
 
@@ -30,6 +31,7 @@
                     headers: this.headers,
                     context: this
                 }).fail(function(jqXHR) {
+                    // eslint-disable-next-line no-var
                     var responseData = JSON.parse(jqXHR.responseText);
                     if (jqXHR.status === 403 && responseData.user_message_url) {
                         // Check if we've been blocked from the course

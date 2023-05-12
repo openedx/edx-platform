@@ -8,7 +8,9 @@
         'js/edxnotes/views/tab_view',
         'edx-ui-toolkit/js/utils/html-utils'
     ], function(gettext, TabPanelView, TabView, HtmlUtils) {
+        // eslint-disable-next-line no-var
         var view = 'Recent Activity';
+        // eslint-disable-next-line no-var
         var RecentActivityView = TabView.extend({
             PanelConstructor: TabPanelView.extend({
                 id: 'recent-panel',

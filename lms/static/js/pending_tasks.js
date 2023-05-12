@@ -7,6 +7,7 @@
 // it is not included in any further polling.
 
 (function() {
+    // eslint-disable-next-line no-var
     var __bind = function(fn, me) { return function() { return fn.apply(me, arguments); }; };
 
     this.InstructorTaskProgress = (function() {
@@ -27,28 +28,29 @@
         };
 
         InstructorTaskProgress.prototype.update_progress = function(response) {
+            // eslint-disable-next-line no-var
             var _this = this;
             // Response should be a dict with an entry for each requested task_id,
             // with a "task-state" and "in_progress" key and optionally a "message"
             // and a "task_progress.duration" key.
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var something_in_progress = false;
             /* eslint-disable-next-line guard-for-in, camelcase, no-undef */
             for (task_id in response) {
-                /* eslint-disable-next-line camelcase, no-undef */
+                /* eslint-disable-next-line camelcase, no-undef, no-var */
                 var task_dict = response[task_id];
                 // find the corresponding entry, and update it:
                 /* eslint-disable-next-line camelcase, no-undef */
                 entry = $(_this.element).find('[data-task-id="' + task_id + '"]');
                 /* eslint-disable-next-line camelcase, no-undef */
                 entry.find('.task-state').text(task_dict.task_state);
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var duration_value = (task_dict.task_progress && task_dict.task_progress.duration_ms
                                         // eslint-disable-next-line camelcase
                                         && Math.round(task_dict.task_progress.duration_ms / 1000)) || 'unknown';
                 // eslint-disable-next-line no-undef
                 entry.find('.task-duration').text(duration_value);
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var progress_value = task_dict.message || '';
                 // eslint-disable-next-line no-undef
                 entry.find('.task-progress').text(progress_value);
@@ -77,17 +79,17 @@
         };
 
         InstructorTaskProgress.prototype.get_status = function() {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var _this = this;
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var task_ids = [];
 
             // Construct the array of ids to get status for, by
             // including the subset of entries that are still in progress.
             this.entries.each(function(idx, element) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var task_id = $(element).data('taskId');
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var in_progress = $(element).data('inProgress');
                 /* eslint-disable-next-line no-constant-condition, no-cond-assign, camelcase, no-unused-vars */
                 if (in_progress = 'True') {
@@ -100,9 +102,9 @@
             // Note that the keyname here ends up with "[]" being appended
             // in the POST parameter that shows up on the Django server.
             // TODO: add error handler.
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var ajax_url = '/instructor_task_status/';
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var data = {task_ids: task_ids};
             $.post(ajax_url, data).done(this.update_progress);
         };
@@ -112,7 +114,7 @@
 }).call(this);
 
 // once the page is rendered, create the progress object
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable-next-line no-unused-vars, no-var */
 var instructorTaskProgress;
 $(document).ready(function() {
     // eslint-disable-next-line no-undef

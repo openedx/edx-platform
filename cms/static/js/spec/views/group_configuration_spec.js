@@ -14,6 +14,7 @@ define([
 ) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var SELECTORS = {
         detailsView: '.group-configuration-details',
         editView: '.group-configuration-edit',
@@ -42,23 +43,28 @@ define([
         note: '.wrapper-delete-button'
     };
 
+    // eslint-disable-next-line no-var
     var assertTheDetailsView = function(view, text) {
         expect(view.$el).toContainText(text);
         expect(view.$el).toContainText('ID: 0');
         expect(view.$('.delete')).toExist();
     };
+    // eslint-disable-next-line no-var
     var assertShowEmptyUsages = function(view, usageText) {
         expect(view.$(SELECTORS.usageCount)).not.toExist();
         expect(view.$(SELECTORS.usageText)).toContainText(usageText);
         expect(view.$(SELECTORS.usageTextAnchor)).toExist();
         expect(view.$(SELECTORS.usageUnit)).not.toExist();
     };
+    // eslint-disable-next-line no-var
     var assertHideEmptyUsages = function(view) {
         expect(view.$(SELECTORS.usageText)).not.toExist();
         expect(view.$(SELECTORS.usageUnit)).not.toExist();
         expect(view.$(SELECTORS.usageCount)).toContainText('Not in Use');
     };
+    // eslint-disable-next-line no-var
     var assertShowNonEmptyUsages = function(view, usageText, toolTipText) {
+        // eslint-disable-next-line no-var
         var usageUnitAnchors = view.$(SELECTORS.usageUnitAnchor);
 
         expect(view.$(SELECTORS.note)).toHaveAttr(
@@ -74,23 +80,27 @@ define([
         expect(usageUnitAnchors.eq(1)).toContainText('label2');
         expect(usageUnitAnchors.eq(1).attr('href')).toBe('url2');
     };
+    // eslint-disable-next-line no-var
     var assertHideNonEmptyUsages = function(view) {
         expect(view.$('.delete')).toHaveClass('is-disabled');
         expect(view.$(SELECTORS.usageText)).not.toExist();
         expect(view.$(SELECTORS.usageUnit)).not.toExist();
         expect(view.$(SELECTORS.usageCount)).toContainText('Used in 2 locations');
     };
+    // eslint-disable-next-line no-var
     var setUsageInfo = function(model) {
         model.set('usage', [
             {label: 'label1', url: 'url1'},
             {label: 'label2', url: 'url2'}
         ]);
     };
+    // eslint-disable-next-line no-var
     var assertHideValidationContent = function(view) {
         expect(view.$(SELECTORS.usageUnitMessage)).not.toExist();
         expect(view.$(SELECTORS.usageUnitWarningIcon)).not.toExist();
         expect(view.$(SELECTORS.usageUnitErrorIcon)).not.toExist();
     };
+    // eslint-disable-next-line no-var
     var assertControllerView = function(view, detailsView, editView) {
         // Details view by default
         expect(view.$(detailsView)).toExist();
@@ -101,7 +111,9 @@ define([
         expect(view.$(detailsView)).toExist();
         expect(view.$(editView)).not.toExist();
     };
+    // eslint-disable-next-line no-var
     var assertAndDeleteItemError = function(that, url, promptText) {
+        // eslint-disable-next-line no-var
         var requests = AjaxHelpers.requests(that),
             promptSpy = ViewHelpers.createPromptSpy(),
             notificationSpy = ViewHelpers.createNotificationSpy();
@@ -114,7 +126,9 @@ define([
         ViewHelpers.verifyNotificationHidden(notificationSpy);
         expect($(SELECTORS.itemView)).not.toExist();
     };
+    // eslint-disable-next-line no-var
     var assertAndDeleteItemWithError = function(that, url, listItemView, promptText) {
+        // eslint-disable-next-line no-var
         var requests = AjaxHelpers.requests(that),
             promptSpy = ViewHelpers.createPromptSpy(),
             notificationSpy = ViewHelpers.createNotificationSpy();
@@ -126,6 +140,7 @@ define([
         ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
         expect($(listItemView)).toExist();
     };
+    // eslint-disable-next-line no-var
     var assertCannotDeleteUsed = function(that, toolTipText, warningText) {
         setUsageInfo(that.model);
         that.view.render();
@@ -136,6 +151,7 @@ define([
         expect(that.view.$(SELECTORS.warningIcon)).toExist();
         expect(that.view.$('.delete')).toHaveClass('is-disabled');
     };
+    // eslint-disable-next-line no-var
     var assertUnusedOptions = function(that) {
         that.model.set('usage', []);
         that.view.render();
@@ -158,6 +174,7 @@ define([
             toContainText: function() {
                 return {
                     compare: function(actual, text) {
+                        // eslint-disable-next-line no-var
                         var trimmedText = $.trim(actual.text()),
                             passed;
 
@@ -176,12 +193,14 @@ define([
             toBeCorrectValuesInInputs: function() {
                 return {
                     compare: function(actual, values) {
+                        // eslint-disable-next-line no-var
                         var expected = {
                             name: actual.$(SELECTORS.inputName).val(),
                             description: actual
                                 .$(SELECTORS.inputDescription).val()
                         };
 
+                        // eslint-disable-next-line no-var
                         var passed = _.isEqual(values, expected);
 
                         return {
@@ -193,6 +212,7 @@ define([
             toBeCorrectValuesInModel: function() {
                 return {
                     compare: function(actual, values) {
+                        // eslint-disable-next-line no-var
                         var passed = _.every(values, function(value, key) {
                             return actual.get(key) === value;
                         });
@@ -206,10 +226,12 @@ define([
             toHaveDefaultNames: function() {
                 return {
                     compare: function(actual, values) {
+                        // eslint-disable-next-line no-var
                         var actualValues = $.map(actual, function(item) {
                             return $(item).val();
                         });
 
+                        // eslint-disable-next-line no-var
                         var passed = _.isEqual(actualValues, values);
 
                         return {
@@ -359,6 +381,7 @@ define([
     });
 
     describe('Experiment group configurations editor view', function() {
+        // eslint-disable-next-line no-var
         var setValuesToInputs = function(view, values) {
             _.each(values, function(value, selector) {
                 if (SELECTORS[selector]) {
@@ -396,12 +419,14 @@ define([
         });
 
         it('should allow you to create new groups', function() {
+            // eslint-disable-next-line no-var
             var numGroups = this.model.get('groups').length;
             this.view.$('.action-add-group').click();
             expect(this.model.get('groups').length).toEqual(numGroups + 1);
         });
 
         it('should save properly', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 notificationSpy = ViewHelpers.createNotificationSpy(),
                 groups;
@@ -426,6 +451,7 @@ define([
         });
 
         it('does not hide saving message if failure', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 notificationSpy = ViewHelpers.createNotificationSpy();
 
@@ -466,6 +492,7 @@ define([
         });
 
         it('should be possible to correct validation errors', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
 
             // Set incorrect value
@@ -494,6 +521,7 @@ define([
 
         describe('removes all newly created groups on cancel', function() {
             it('if the model has a non-empty groups', function() {
+                // eslint-disable-next-line no-var
                 var groups = this.model.get('groups');
 
                 this.view.render();
@@ -505,6 +533,7 @@ define([
             });
 
             it('if the model has no non-empty groups', function() {
+                // eslint-disable-next-line no-var
                 var groups = this.model.get('groups');
 
                 this.view.render();
@@ -517,6 +546,7 @@ define([
         });
 
         it('groups have correct default names', function() {
+            // eslint-disable-next-line no-var
             var group1 = new GroupModel({name: 'Group A'}),
                 group2 = new GroupModel({name: 'Group B'}),
                 collection = this.model.get('groups');
@@ -561,6 +591,7 @@ define([
     });
 
     describe('Experiment group configurations list view', function() {
+        // eslint-disable-next-line no-var
         var emptyMessage = 'You have not created any group configurations yet.';
 
         beforeEach(function() {
@@ -668,6 +699,7 @@ define([
     });
 
     describe('Content groups list view', function() {
+        // eslint-disable-next-line no-var
         var newGroupCss = '.new-button',
             addGroupCss = '.action-add',
             inputCss = '.collection-name-input',
@@ -678,6 +710,7 @@ define([
             verifyEditingGroup, respondToSave, expectGroupsVisible, correctValidationError;
 
         scopedGroupSelector = function(groupIndex, additionalSelectors) {
+            // eslint-disable-next-line no-var
             var groupSelector = '.partition-groups-list-item-' + groupIndex;
             if (additionalSelectors) {
                 return groupSelector + ' ' + additionalSelectors;
@@ -687,6 +720,7 @@ define([
         };
 
         createGroups = function(groupNamesWithId) {
+            // eslint-disable-next-line no-var
             var groups = new GroupCollection(_.map(groupNamesWithId, function(groupName, id) {
                     return {id: id, name: groupName};
                 })),
@@ -701,6 +735,7 @@ define([
         };
 
         renderView = function(groupNamesWithId) {
+            // eslint-disable-next-line no-var
             var view = new GroupList({collection: createGroups(groupNamesWithId || {})}).render();
             appendSetFixtures(view.el);
             return view;
@@ -715,6 +750,7 @@ define([
         };
 
         editNewGroup = function(view, options) {
+            // eslint-disable-next-line no-var
             var newGroupIndex;
             if (view.collection.length === 0) {
                 view.$(newGroupCss).click();
@@ -728,6 +764,7 @@ define([
         };
 
         editExistingGroup = function(view, options) {
+            // eslint-disable-next-line no-var
             var groupIndex = options.groupIndex || 0;
             view.$(scopedGroupSelector(groupIndex, '.edit')).click();
             view.$(scopedGroupSelector(groupIndex, inputCss)).val(options.newName);
@@ -756,6 +793,7 @@ define([
         };
 
         respondToSave = function(requests, view) {
+            // eslint-disable-next-line no-var
             var request = AjaxHelpers.currentRequest(requests);
             expect(request.method).toBe('POST');
             expect(request.url).toBe('/mock_url/0');
@@ -794,6 +832,7 @@ define([
         });
 
         it('can render groups', function() {
+            // eslint-disable-next-line no-var
             var groupNames = ['Group 1', 'Group 2', 'Group 3'];
             renderView(groupNames).$('.partition-group-details').each(function(index) {
                 expect($(this)).toContainText(groupNames[index]);
@@ -801,6 +840,7 @@ define([
         });
 
         it('can create an initial group and save', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 newGroupName = 'New Group Name',
                 view = renderView();
@@ -811,6 +851,7 @@ define([
         });
 
         it('can add another group and save', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 oldGroupName = 'Old Group Name',
                 newGroupName = 'New Group Name',
@@ -822,6 +863,7 @@ define([
         });
 
         it('can cancel adding a group', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 newGroupName = 'New Group Name',
                 view = renderView();
@@ -832,6 +874,7 @@ define([
         });
 
         it('can cancel editing a group', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 originalGroupName = 'Original Group Name',
                 view = renderView([originalGroupName]);
@@ -842,6 +885,7 @@ define([
         });
 
         it('can show and correct a validation error', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 newGroupName = 'New Group Name',
                 view = renderView();
@@ -851,6 +895,7 @@ define([
         });
 
         it('can not invalidate an existing content group', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 oldGroupName = 'Old Group Name',
                 view = renderView([oldGroupName]);
@@ -860,6 +905,7 @@ define([
         });
 
         it('trims whitespace', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 newGroupName = 'New Group Name',
                 view = renderView();
@@ -869,6 +915,7 @@ define([
         });
 
         it('only edits one form at a time', function() {
+            // eslint-disable-next-line no-var
             var view = renderView();
             view.collection.add({name: 'Editing Group', editing: true});
             verifyEditingGroup(view, true);
@@ -880,6 +927,7 @@ define([
             TemplateHelpers.installTemplate('partition-group-details', true);
             this.model = new GroupModel({name: 'Content Group', id: 0, courseOutlineUrl: 'CourseOutlineUrl'});
 
+            // eslint-disable-next-line no-var
             var saveableModel = new GroupConfigurationModel({
                 name: 'Content Group Configuration',
                 id: 0,
@@ -966,6 +1014,7 @@ define([
         });
 
         it('should save properly', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 notificationSpy = ViewHelpers.createNotificationSpy();
 
@@ -981,6 +1030,7 @@ define([
         });
 
         it('does not hide saving message if failure', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 notificationSpy = ViewHelpers.createNotificationSpy();
             this.view.$(SELECTORS.inputName).val('New Content Group');

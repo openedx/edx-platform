@@ -9,6 +9,7 @@
         'text!common/templates/components/paging-footer.underscore'
     ],
     function(_, gettext, Backbone, HtmlUtils, pagingFooterTemplate) {
+        // eslint-disable-next-line no-var
         var PagingFooter = Backbone.View.extend({
             events: {
                 'click .next-page-link': 'nextPage',
@@ -26,6 +27,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var onFirstPage = !this.collection.hasPreviousPage(),
                     onLastPage = !this.collection.hasNextPage();
                 if (this.hideWhenOnePage) {
@@ -50,6 +52,7 @@
             },
 
             changePage: function() {
+                // eslint-disable-next-line no-var
                 var collection = this.collection,
                     currentPage = collection.getPageNumber(),
                     pageInput = this.$('#page-number-input'),

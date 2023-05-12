@@ -7,14 +7,15 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
     'use strict';
 
     describe('Library Instructor Access Page', function() {
+        // eslint-disable-next-line no-var
         var changeRoleUrl = 'dummy_change_role_url/@@EMAIL@@';
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var team_member_fixture = readFixtures('team-member.underscore');
 
         function setRole(email, role) {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var $user_li = $('li.user-item[data-email="' + email + '"]');
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var $role_action = $('li.action-role a.make-' + role, $user_li);
             expect($role_action).toBeVisible();
             // eslint-disable-next-line camelcase
@@ -26,6 +27,7 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
         }
 
         describe('read-write access', function() {
+            // eslint-disable-next-line no-var
             var mockHTML = readFixtures('mock/mock-manage-users-lib.underscore');
 
             beforeEach(function(done) {
@@ -61,9 +63,11 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it('can give a user permission to use the library', function() {
+                // eslint-disable-next-line no-var
                 var email = 'other@example.com';
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 $('.create-user-button').click();
                 expect($('.wrapper-create-user')).toHaveClass('is-shown');
@@ -75,9 +79,11 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it('can promote user', function() {
+                // eslint-disable-next-line no-var
                 var email = 'staff@example.com';
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 setRole('staff@example.com', 'staff');
                 AjaxHelpers.expectJsonRequest(requests, 'POST', getUrl(email), {role: 'staff'});
@@ -92,9 +98,11 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it('displays an error when the required field is blank', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 $('.create-user-button').click();
                 $('.user-email-input').val('');
+                // eslint-disable-next-line no-var
                 var errorPromptSelector = '.wrapper-prompt.is-shown .prompt.error';
                 expect($(errorPromptSelector).length).toEqual(0);
                 $('.form-create.create-user .action-primary').click();
@@ -104,7 +112,9 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it('displays an error when the user has already been added', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var promptSpy = ViewHelpers.createPromptSpy();
                 $('.create-user-button').click();
                 $('.user-email-input').val('honor@example.com');
@@ -114,10 +124,13 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it("can remove a user's permission to access the library", function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var promptSpy = ViewHelpers.createPromptSpy();
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var reloadSpy = spyOn(ViewUtils, 'reload');
+                // eslint-disable-next-line no-var
                 var email = 'honor@example.com';
                 $('.user-item[data-email="' + email + '"] .action-delete .delete').click();
                 ViewHelpers.verifyPromptShowing(promptSpy, 'Are you sure?');
@@ -130,6 +143,7 @@ function($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
         });
 
         describe('read-only access', function() {
+            // eslint-disable-next-line no-var
             var mockHTML = readFixtures('mock/mock-manage-users-lib-ro.underscore');
 
             beforeEach(function() {

@@ -12,6 +12,7 @@ define([
 ) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var GroupConfigurationItemView = ListItemView.extend({
         events: {
             'click .delete': 'deleteItem'

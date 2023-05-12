@@ -7,9 +7,11 @@
         'common/js/components/views/feedback_alert', 'common/js/components/views/feedback_prompt',
         'common/js/spec_helpers/view_helpers', 'sinon', 'jquery.simulate'],
     function($, SystemFeedback, NotificationView, AlertView, PromptView, ViewHelpers, sinon) {
+        // eslint-disable-next-line no-var
         var tpl;
         tpl = readFixtures('common/templates/components/system-feedback.underscore');
 
+        // eslint-disable-next-line no-var
         var isFocused = function(actual) {
             return $(actual)[0] === $(actual)[0].ownerDocument.activeElement;
         };
@@ -72,24 +74,28 @@
                 return this.clock.restore();
             });
             it('requires a type and an intent', function() {
+                // eslint-disable-next-line no-var
                 var both, neither, noIntent, noType,
                     _this = this;
                 neither = function() {
                     return new SystemFeedback(_this.options);
                 };
                 noType = function() {
+                    // eslint-disable-next-line no-var
                     var options;
                     options = $.extend({}, _this.options);
                     options.intent = 'confirmation';
                     return new SystemFeedback(options);
                 };
                 noIntent = function() {
+                    // eslint-disable-next-line no-var
                     var options;
                     options = $.extend({}, _this.options);
                     options.type = 'alert';
                     return new SystemFeedback(options);
                 };
                 both = function() {
+                    // eslint-disable-next-line no-var
                     var options;
                     options = $.extend({}, _this.options);
                     options.type = 'alert';
@@ -102,6 +108,7 @@
                 return expect(both).not.toThrow();
             });
             it('does not show on initalize', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 // eslint-disable-next-line no-unused-vars
                 view = new AlertView.Confirmation(this.options);
@@ -109,6 +116,7 @@
                 return expect(this.showSpy).not.toHaveBeenCalled();
             });
             xit('renders the template', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new AlertView.Confirmation(this.options);
                 view.show();
@@ -118,6 +126,7 @@
                 return expect(view.$el).toContainText(this.options.message);
             });
             return xit('close button sends a .hide() message', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new AlertView.Confirmation(this.options).show();
                 view.$('.action-close').click();
@@ -148,6 +157,7 @@
                 this.outFocusSpy = spyOn(PromptView.Confirmation.prototype, 'outFocus').and.callThrough();
             });
             it('is focused on show', function(done) {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new PromptView.Confirmation(this.options).show();
                 expect(this.inFocusSpy).toHaveBeenCalled();
@@ -157,6 +167,7 @@
                 }).always(done);
             });
             it('is not focused on hide', function(done) {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new PromptView.Confirmation(this.options).hide();
                 expect(this.outFocusSpy).toHaveBeenCalled();
@@ -167,6 +178,7 @@
                 }).always(done);
             });
             it('traps keyboard focus when moving forward', function(done) {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new PromptView.Confirmation(this.options).show();
                 expect(this.inFocusSpy).toHaveBeenCalled();
@@ -181,6 +193,7 @@
                 }).always(done);
             });
             it('traps keyboard focus when moving backward', function(done) {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new PromptView.Confirmation(this.options).show();
                 expect(this.inFocusSpy).toHaveBeenCalled();
@@ -194,6 +207,7 @@
                 }).always(done);
             });
             return it('changes class on body', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new PromptView.Confirmation({
                     title: 'Portal',
@@ -203,6 +217,7 @@
             });
         });
         xdescribe('NotificationView.Mini', function() {
+            // eslint-disable-next-line no-var
             var view;
             beforeEach(function() {
                 view = new NotificationView.Mini();
@@ -347,12 +362,14 @@
                 return this.clock.restore();
             });
             xit('should not have minShown or maxShown by default', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new NotificationView.Confirmation();
                 expect(view.options.minShown).toEqual(0);
                 return expect(view.options.maxShown).toEqual(Infinity);
             });
             xit('a minShown view should not hide too quickly', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new NotificationView.Confirmation({
                     minShown: 1000
@@ -365,6 +382,7 @@
                 return expect(view.$('.wrapper')).toBeHiding();
             });
             xit('a maxShown view should hide by itself', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new NotificationView.Confirmation({
                     maxShown: 1000
@@ -375,6 +393,7 @@
                 return expect(view.$('.wrapper')).toBeHiding();
             });
             xit('a minShown view can stay visible longer', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new NotificationView.Confirmation({
                     minShown: 1000
@@ -388,6 +407,7 @@
                 return expect(view.$('.wrapper')).toBeHiding();
             });
             xit('a maxShown view can hide early', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new NotificationView.Confirmation({
                     maxShown: 1000
@@ -401,6 +421,7 @@
                 return expect(view.$('.wrapper')).toBeHiding();
             });
             return it('a view can have both maxShown and minShown', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 view = new NotificationView.Confirmation({
                     minShown: 1000,

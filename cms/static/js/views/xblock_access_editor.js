@@ -7,6 +7,7 @@ define(['js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
     function(BaseView, HtmlUtils) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var XBlockAccessEditor = BaseView.extend({
             // takes XBlockInfo as a model
             initialize: function() {

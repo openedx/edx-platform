@@ -8,6 +8,7 @@ define(
         VideoStatusView, ViewUtils, HtmlUtils, previousVideoUploadTemplate) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var PreviousVideoUploadView = BaseView.extend({
             tagName: 'div',
 
@@ -49,6 +50,7 @@ define(
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var renderedAttributes = {
                     videoImageUploadEnabled: this.videoImageUploadEnabled,
                     created: DateUtils.renderDate(this.model.get('created')),
@@ -70,6 +72,7 @@ define(
             },
 
             removeVideo: function(event) {
+                // eslint-disable-next-line no-var
                 var videoView = this;
                 event.preventDefault();
 

@@ -6,7 +6,9 @@ define(
         'use strict';
 
         describe('PreviousVideoUploadView', function() {
+            // eslint-disable-next-line no-var
             var render = function(modelData) {
+                // eslint-disable-next-line no-var
                 var defaultData = {
                         client_video_id: 'foo.mp4',
                         duration: 42,
@@ -32,12 +34,15 @@ define(
             });
 
             it('should render video name correctly', function() {
+                // eslint-disable-next-line no-var
                 var testName = 'test name';
+                // eslint-disable-next-line no-var
                 var $el = render({client_video_id: testName});
                 expect($el.find('.name-col').text()).toEqual(testName);
             });
 
             it('should render created timestamp correctly', function() {
+                // eslint-disable-next-line no-var
                 var fakeDate = 'fake formatted date';
                 // eslint-disable-next-line no-undef
                 spyOn(Date.prototype, 'toLocaleString').and.callFake(
@@ -48,23 +53,29 @@ define(
                         return fakeDate;
                     }
                 );
+                // eslint-disable-next-line no-var
                 var $el = render({});
                 expect($el.find('.date-col').text()).toEqual(fakeDate);
             });
 
             it('should render video id correctly', function() {
+                // eslint-disable-next-line no-var
                 var testId = 'test_id';
+                // eslint-disable-next-line no-var
                 var $el = render({edx_video_id: testId});
                 expect($el.find('.video-id-col').text()).toEqual(testId);
             });
 
             it('should render status correctly', function() {
+                // eslint-disable-next-line no-var
                 var testStatus = 'Test Status';
+                // eslint-disable-next-line no-var
                 var $el = render({status: testStatus});
                 expect($el.find('.video-status').text()).toEqual(testStatus);
             });
 
             it('should render remove button correctly', function() {
+                // eslint-disable-next-line no-var
                 var $el = render(),
                     removeButton = $el.find('.actions-list .action-remove a.remove-video-button');
 
@@ -73,6 +84,7 @@ define(
             });
 
             it('shows a confirmation popup when the remove button is clicked', function() {
+                // eslint-disable-next-line no-var
                 var $el = render();
                 $el.find('a.remove-video-button').click();
                 expect($('.prompt.warning .title').text()).toEqual('Are you sure you want to remove this video from the list?'); // eslint-disable-line max-len
@@ -86,6 +98,7 @@ define(
             });
 
             it('shows a notification when the remove button is clicked', function() {
+                // eslint-disable-next-line no-var
                 var notificationSpy = ViewHelpers.createNotificationSpy(),
                     $el = render();
                 $el.find('a.remove-video-button').click();

@@ -12,6 +12,7 @@ function escapeSelector(id) {
     // This code borrowed from https://api.jquery.com/jQuery.escapeSelector/ (source:
     // https://github.com/jquery/jquery/blob/3edfa1bc/src/selector/escapeSelector.js). When we upgrade to jQuery 3.0, we
     // can use $.escapeSelector() instead of this shim escapeSelector function.
+    // eslint-disable-next-line no-var
     var rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\x80-\uFFFF\w-]/g; // eslint-disable-line no-control-regex
     function fcssescape(ch, asCodePoint) {
         if (asCodePoint) {
@@ -34,6 +35,7 @@ function escapeSelector(id) {
     }
 }
 
+// eslint-disable-next-line no-var
 var formulaEquationPreview = {
     minDelay: 300, // Minimum time between requests sent out.
     errorDelay: 1500 // Wait time before showing error (prevent frustration).
@@ -47,9 +49,12 @@ formulaEquationPreview.enable = function() {
      * its callback.
      */
     function setupInput() {
+        // eslint-disable-next-line no-var
         var $this = $(this); // cache the jQuery object
 
+        // eslint-disable-next-line no-var
         var $preview = $('#' + escapeSelector(this.id) + '_preview');
+        // eslint-disable-next-line no-var
         var inputData = {
             // These are the mutable values
 
@@ -78,7 +83,7 @@ formulaEquationPreview.enable = function() {
         inputData.requestCallback = _.partial(updatePage, inputData);
 
         // Limit `sendRequest` and have it show the loading icon.
-        // eslint-disable-next-line no-undef
+        /* eslint-disable-next-line no-undef, no-var */
         var throttledRequest = _.throttle(
             // eslint-disable-next-line no-use-before-define
             sendRequest,
@@ -86,6 +91,7 @@ formulaEquationPreview.enable = function() {
             {leading: false}
         );
         // The following acts as a closure of `inputData`.
+        // eslint-disable-next-line no-var
         var initializeRequest = function() {
             // Show the loading icon.
             inputData.$img.css('visibility', 'visible');
@@ -115,6 +121,7 @@ formulaEquationPreview.enable = function() {
      */
     function sendRequest(inputData, formula) {
         // Save the time.
+        // eslint-disable-next-line no-var
         var now = Date.now();
         inputData.lastSent = now;
         // We're sending it.
@@ -152,6 +159,7 @@ formulaEquationPreview.enable = function() {
      * -Save which request is visible
      */
     function updatePage(inputData, response) {
+        // eslint-disable-next-line no-var
         var requestStart = response.request_start;
         // eslint-disable-next-line eqeqeq
         if (requestStart == inputData.lastSent
@@ -177,6 +185,7 @@ formulaEquationPreview.enable = function() {
             // eslint-disable-next-line no-undef
             MathJax.Hub.Startup.signal.Interest(function(message) {
                 if (message === 'End') {
+                    // eslint-disable-next-line no-var
                     var previewElement = inputData.$preview[0];
                     // eslint-disable-next-line no-undef
                     MathJax.Hub.Queue(function() {
@@ -197,6 +206,7 @@ formulaEquationPreview.enable = function() {
                             // eslint-disable-next-line no-console
                             console.log('[FormulaEquationInput] Oops no mathjax for ', latex);
                             // Fall back to modifying the actual element.
+                            // eslint-disable-next-line no-var
                             var textNode = previewElement.childNodes[0];
                             textNode.data = '\\(' + latex + '\\)';
                             // eslint-disable-next-line no-undef

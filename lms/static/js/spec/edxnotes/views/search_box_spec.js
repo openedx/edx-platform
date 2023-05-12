@@ -11,6 +11,7 @@ define([
     'use strict';
 
     describe('EdxNotes SearchBoxView', function() {
+        // eslint-disable-next-line no-var
         var getSearchBox, submitForm, assertBoxIsEnabled, assertBoxIsDisabled, searchResponse;
 
         searchResponse = {
@@ -65,6 +66,7 @@ define([
         });
 
         it('sends a request with proper information on submit the form', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 form = this.searchBox.el,
                 request;
@@ -80,6 +82,7 @@ define([
         });
 
         it('returns success result', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             expect(this.searchBox.options.beforeSearchStart).toHaveBeenCalledWith(
@@ -98,6 +101,7 @@ define([
         });
 
         it('should log the edx.course.student_notes.searched event properly', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             AjaxHelpers.respondWithJson(requests, searchResponse);
@@ -110,6 +114,7 @@ define([
         });
 
         it('returns default error message if received data structure is wrong', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             AjaxHelpers.respondWithJson(requests, {});
@@ -123,6 +128,7 @@ define([
         });
 
         it('returns default error message if network error occurs', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             AjaxHelpers.respondWithError(requests);
@@ -136,6 +142,7 @@ define([
         });
 
         it('returns error message if server error occurs', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             assertBoxIsDisabled(this.searchBox);
@@ -158,6 +165,7 @@ define([
         });
 
         it('does not send second request during current search', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, 'test_text');
             assertBoxIsDisabled(this.searchBox);
@@ -168,6 +176,7 @@ define([
         });
 
         it('returns error message if the field is empty', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             submitForm(this.searchBox, '   ');
             expect(requests).toHaveLength(0);

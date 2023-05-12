@@ -6,6 +6,7 @@
 
     'use strict';
 
+    // eslint-disable-next-line no-var
     var OldExceptionFormatter = jasmineRequire.ExceptionFormatter(),
         oldExceptionFormatter = new OldExceptionFormatter(),
         MAX_STACK_TRACE_LINES = 10;
@@ -14,6 +15,7 @@
         function ExceptionFormatter() {
             this.message = oldExceptionFormatter.message;
             this.stack = function(error) {
+                // eslint-disable-next-line no-var
                 var errorMsg = null;
 
                 if (error) {

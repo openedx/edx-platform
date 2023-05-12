@@ -8,8 +8,10 @@
     ],
     function($, _, HeaderView, HeaderModel) {
         describe('header component view', function() {
+            // eslint-disable-next-line no-var
             var model, view;
 
+            // eslint-disable-next-line no-var
             var testBreadcrumbs = function(breadcrumbs) {
                 model.set('breadcrumbs', breadcrumbs);
                 expect(view.$('nav.breadcrumbs').length).toBe(1);

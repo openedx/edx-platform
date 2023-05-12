@@ -23,7 +23,9 @@ define([
         });
 
         it('can handle custom error if sent from server', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-var
             var token = Helpers.makeToken();
             _.each($('.edx-notes-wrapper'), function(wrapper) {
                 NotesFactory.factory(wrapper, {
@@ -36,6 +38,7 @@ define([
                 });
             });
 
+            // eslint-disable-next-line no-var
             var errorMsg = 'can\'t create more notes';
             AjaxHelpers.respondWithError(requests, 400, {error_msg: errorMsg});
             expect(Annotator.showNotification).toHaveBeenCalledWith(errorMsg, Annotator.Notification.ERROR);

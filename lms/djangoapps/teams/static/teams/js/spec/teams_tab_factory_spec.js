@@ -5,7 +5,9 @@ function($, Backbone, TeamsTabFactory, TeamsTabView, PageHelpers, TeamSpecHelper
     'use strict';
 
     describe('Teams Tab Factory', function() {
+        // eslint-disable-next-line no-var
         var initializeTeamsTabFactory = function(hasOpenTopic, hasPublicManagedTopic) {
+            // eslint-disable-next-line no-var
             var context = TeamSpecHelpers.createMockContext();
             context.hasOpenTopic = hasOpenTopic;
             context.hasPublicManagedTopic = hasPublicManagedTopic;

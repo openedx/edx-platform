@@ -2,6 +2,7 @@
     define([], function() {
         return {
             attachMouseEventsTo: function(element) {
+                // eslint-disable-next-line no-var
                 var self;
 
                 self = this;

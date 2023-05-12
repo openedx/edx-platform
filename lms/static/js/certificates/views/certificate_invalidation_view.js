@@ -21,22 +21,27 @@
                 },
 
                 render: function() {
+                    // eslint-disable-next-line no-var
                     var template = this.loadTemplate('certificate-invalidation');
                     this.$el.html(template({certificate_invalidations: this.collection.models}));
                 },
 
                 loadTemplate: function(name) {
+                    // eslint-disable-next-line no-var
                     var templateSelector = '#' + name + '-tpl',
                         templateText = $(templateSelector).text();
                     return _.template(templateText);
                 },
 
                 invalidateCertificate: function() {
+                    // eslint-disable-next-line no-var
                     var user = this.$('#certificate-invalidation-user').val();
+                    // eslint-disable-next-line no-var
                     var notes = this.$('#certificate-invalidation-notes').val();
+                    // eslint-disable-next-line no-var
                     var message = '';
 
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-var */
                     var certificate_invalidation = new CertificateInvalidationModel(
                         {
                             user: user,
@@ -52,6 +57,7 @@
                         this.escapeAndShowMessage(_.template(message)({user: user}));
                     // eslint-disable-next-line camelcase
                     } else if (certificate_invalidation.isValid()) {
+                        // eslint-disable-next-line no-var
                         var self = this;
                         // eslint-disable-next-line camelcase
                         certificate_invalidation.save(null, {
@@ -65,7 +71,7 @@
 
                             error: function(model, response) {
                                 try {
-                                    // eslint-disable-next-line camelcase
+                                    /* eslint-disable-next-line camelcase, no-var */
                                     var response_data = JSON.parse(response.responseText);
                                     // eslint-disable-next-line camelcase
                                     self.escapeAndShowMessage(response_data.message);
@@ -83,8 +89,9 @@
                 },
 
                 reValidateCertificate: function(event) {
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-var */
                     var certificate_invalidation = $(event.target).data();
+                    // eslint-disable-next-line no-var
                     var model = this.collection.get(certificate_invalidation),
                         self = this;
 
@@ -98,7 +105,7 @@
                             // eslint-disable-next-line no-shadow
                             error: function(model, response) {
                                 try {
-                                    // eslint-disable-next-line camelcase
+                                    /* eslint-disable-next-line camelcase, no-var */
                                     var response_data = JSON.parse(response.responseText);
                                     // eslint-disable-next-line camelcase
                                     self.escapeAndShowMessage(response_data.message);
@@ -119,6 +126,7 @@
                 },
 
                 isEmailAddress: function validateEmail(email) {
+                    // eslint-disable-next-line no-var
                     var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
                     return re.test(email);
                 },

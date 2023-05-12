@@ -15,7 +15,7 @@
                 });
             });
             it('anonymous thread should not include login role label', function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var anon_content;
                 // eslint-disable-next-line camelcase
                 anon_content = new Content();
@@ -27,7 +27,7 @@
                 return expect(anon_content.get('community_ta_authored')).toBe(false);
             });
             return it('general thread should include login role label', function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var anon_content;
                 // eslint-disable-next-line camelcase
                 anon_content = new Content({
@@ -82,7 +82,7 @@
                 return expect(this.content.get('abuse_flaggers')).toEqual(['123', '567']);
             });
             return it('can be unflagged for abuse', function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var temp_array;
                 // eslint-disable-next-line camelcase
                 temp_array = [];
@@ -103,6 +103,7 @@
                 });
             });
             it('can contain multiple comments', function() {
+                // eslint-disable-next-line no-var
                 var myComments;
                 myComments = new Comments();
                 expect(myComments.length).toEqual(0);
@@ -112,6 +113,7 @@
                 return expect(myComments.length).toEqual(2);
             });
             it('returns results to the find method', function() {
+                // eslint-disable-next-line no-var
                 var myComments;
                 myComments = new Comments();
                 myComments.add(this.comment1);

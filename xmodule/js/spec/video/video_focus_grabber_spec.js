@@ -1,6 +1,7 @@
 /* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(undefined) {
     describe('Video FocusGrabber', function() {
+        // eslint-disable-next-line no-var
         var state;
 
         beforeEach(function() {
@@ -41,6 +42,7 @@
         it(
             'check existence of focus grabber elements and their position',
             function() {
+                // eslint-disable-next-line no-var
                 var firstFGEl = state.el.find('.focus_grabber.first'),
                     lastFGEl = state.el.find('.focus_grabber.last'),
                     tcWrapperEl = state.el.find('.tc-wrapper');

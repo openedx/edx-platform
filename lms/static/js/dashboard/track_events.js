@@ -2,7 +2,7 @@
  * Track interaction with the student dashboard..
  */
 
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function($) {
@@ -12,6 +12,7 @@ var edx = edx || {};
 
     // Generate the properties object to be passed along with business intelligence events.
     edx.dashboard.generateTrackProperties = function(element) {
+        // eslint-disable-next-line no-var
         var $el = $(element),
             properties = {};
 
@@ -23,6 +24,7 @@ var edx = edx || {};
 
     // Emit an event when the 'course title link' is clicked.
     edx.dashboard.trackCourseTitleClicked = function($courseTitleLink, properties) {
+        // eslint-disable-next-line no-var
         var trackProperty = properties || edx.dashboard.generateTrackProperties;
 
         window.analytics.trackLink(
@@ -34,6 +36,7 @@ var edx = edx || {};
 
     // Emit an event  when the 'course image' is clicked.
     edx.dashboard.trackCourseImageLinkClicked = function($courseImageLink, properties) {
+        // eslint-disable-next-line no-var
         var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
             $courseImageLink,
@@ -44,6 +47,7 @@ var edx = edx || {};
 
     // Emit an event  when the 'View Course' button is clicked.
     edx.dashboard.trackEnterCourseLinkClicked = function($enterCourseLink, properties) {
+        // eslint-disable-next-line no-var
         var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
             $enterCourseLink,
@@ -54,6 +58,7 @@ var edx = edx || {};
 
     // Emit an event when the options dropdown is engaged.
     edx.dashboard.trackCourseOptionDropdownClicked = function($optionsDropdown, properties) {
+        // eslint-disable-next-line no-var
         var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
             $optionsDropdown,
@@ -64,6 +69,7 @@ var edx = edx || {};
 
     // Emit an event  when the 'Learn about verified' link is clicked.
     edx.dashboard.trackLearnVerifiedLinkClicked = function($courseLearnVerified, properties) {
+        // eslint-disable-next-line no-var
         var trackProperty = properties || edx.dashboard.generateTrackProperties;
         window.analytics.trackLink(
             $courseLearnVerified,
@@ -74,6 +80,7 @@ var edx = edx || {};
 
     // Emit an event  when the 'Find Courses' button is clicked.
     edx.dashboard.trackFindCourseBtnClicked = function($findCoursesBtn, properties) {
+        // eslint-disable-next-line no-var
         var trackProperty = properties || {category: 'dashboard', label: 'sidebar'};
         window.analytics.trackLink(
             $findCoursesBtn,

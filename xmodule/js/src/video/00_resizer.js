@@ -3,8 +3,9 @@
         'video/00_resizer.js',
         [],
         function() {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var Resizer = function(params) {
+                // eslint-disable-next-line no-var
                 var defaults = {
                         container: window,
                         element: null,
@@ -20,7 +21,7 @@
                     mode = null,
                     config;
 
-                // eslint-disable-next-line no-shadow
+                /* eslint-disable-next-line no-shadow, no-var */
                 var initialize = function(params) {
                     if (!config) {
                         config = defaults;
@@ -38,7 +39,9 @@
                     return module;
                 };
 
+                // eslint-disable-next-line no-var
                 var getData = function() {
+                    // eslint-disable-next-line no-var
                     var $container = $(config.container),
                         containerWidth = $container.width() + delta.width,
                         containerHeight = $container.height() + delta.height,
@@ -64,7 +67,9 @@
                     };
                 };
 
+                // eslint-disable-next-line no-var
                 var align = function() {
+                    // eslint-disable-next-line no-var
                     var data = getData();
 
                     switch (mode) {
@@ -95,7 +100,9 @@
                     return module;
                 };
 
+                // eslint-disable-next-line no-var
                 var alignByWidthOnly = function() {
+                    // eslint-disable-next-line no-var
                     var data = getData(),
                         height = data.containerWidth / data.elementRatio;
 
@@ -109,7 +116,9 @@
                     return module;
                 };
 
+                // eslint-disable-next-line no-var
                 var alignByHeightOnly = function() {
+                    // eslint-disable-next-line no-var
                     var data = getData(),
                         width = data.containerHeight * data.elementRatio;
 
@@ -123,6 +132,7 @@
                     return module;
                 };
 
+                // eslint-disable-next-line no-var
                 var setMode = function(param) {
                     // eslint-disable-next-line no-undef
                     if (_.isString(param)) {
@@ -133,12 +143,14 @@
                     return module;
                 };
 
+                // eslint-disable-next-line no-var
                 var setElement = function(element) {
                     config.element = element;
 
                     return module;
                 };
 
+                // eslint-disable-next-line no-var
                 var addCallback = function(func) {
                     if ($.isFunction(func)) {
                         callbacksList.push(func);
@@ -150,8 +162,10 @@
                     return module;
                 };
 
+                // eslint-disable-next-line no-var
                 var addOnceCallback = function(func) {
                     if ($.isFunction(func)) {
+                        // eslint-disable-next-line no-var
                         var decorator = function() {
                             func();
                             // eslint-disable-next-line no-use-before-define
@@ -167,20 +181,23 @@
                     return module;
                 };
 
+                // eslint-disable-next-line no-var
                 var fireCallbacks = function() {
                     $.each(callbacksList, function(index, callback) {
                         callback();
                     });
                 };
 
+                // eslint-disable-next-line no-var
                 var removeCallbacks = function() {
                     callbacksList.length = 0;
 
                     return module;
                 };
 
-                // eslint-disable-next-line consistent-return
+                /* eslint-disable-next-line consistent-return, no-var */
                 var removeCallback = function(func) {
+                    // eslint-disable-next-line no-var
                     var index = $.inArray(func, callbacksList);
 
                     if (index !== -1) {
@@ -188,6 +205,7 @@
                     }
                 };
 
+                // eslint-disable-next-line no-var
                 var resetDelta = function() {
                     // eslint-disable-next-line no-multi-assign
                     delta.height = delta.width = 0;
@@ -195,6 +213,7 @@
                     return module;
                 };
 
+                // eslint-disable-next-line no-var
                 var addDelta = function(value, side) {
                     // eslint-disable-next-line no-undef
                     if (_.isNumber(value) && _.isNumber(delta[side])) {
@@ -204,6 +223,7 @@
                     return module;
                 };
 
+                // eslint-disable-next-line no-var
                 var substractDelta = function(value, side) {
                     // eslint-disable-next-line no-undef
                     if (_.isNumber(value) && _.isNumber(delta[side])) {
@@ -213,7 +233,9 @@
                     return module;
                 };
 
+                // eslint-disable-next-line no-var
                 var destroy = function() {
+                    // eslint-disable-next-line no-var
                     var data = getData();
                     data.element.css({
                         height: '', width: '', top: '', left: ''

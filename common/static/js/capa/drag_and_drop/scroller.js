@@ -4,6 +4,7 @@
         return Scroller;
 
         function Scroller(state) {
+            // eslint-disable-next-line no-var
             var $parentEl, $moveLeftEl, $showEl, $moveRightEl, showElLeftMargin;
 
             $parentEl = $(HtmlUtils.HTML(

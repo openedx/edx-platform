@@ -2,6 +2,7 @@
     'use strict';
 
     describe('VideoSkipControl', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
 
         beforeEach(function() {

@@ -16,13 +16,20 @@
         HtmlUtils, StringUtils, BaseDashboardView) {
         /* global NotificationModel, NotificationView */
 
+        // eslint-disable-next-line no-var
         var HIDDEN_CLASS = 'hidden';
+        // eslint-disable-next-line no-var
         var TWO_COLUMN_CLASS = 'two-column-layout';
+        // eslint-disable-next-line no-var
         var THREE_COLUMN_CLASS = 'three-column-layout';
+        // eslint-disable-next-line no-var
         var COHORT = 'cohort';
+        // eslint-disable-next-line no-var
         var NONE = 'none';
+        // eslint-disable-next-line no-var
         var ENROLLMENT_TRACK = 'enrollment_track';
 
+        // eslint-disable-next-line no-var
         var DiscussionsView = BaseDashboardView.extend({
             events: {
                 'click .division-scheme': 'divisionSchemeChanged',
@@ -37,6 +44,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var numberAvailableSchemes = this.discussionSettings.attributes.available_division_schemes.length;
 
                 HtmlUtils.setHtml(this.$el, this.template({
@@ -85,6 +93,7 @@
             },
 
             showMessage: function(message, type) {
+                // eslint-disable-next-line no-var
                 var model = new NotificationModel({type: type || 'confirmation', title: message});
                 this.removeNotification();
                 this.notification = new NotificationView({
@@ -95,6 +104,7 @@
             },
 
             cohortStateUpdate: function(state) {
+                // eslint-disable-next-line no-var
                 var cohortIndex;
                 if (state.is_cohorted && !this.isSchemeAvailable(COHORT)) {
                     this.discussionSettings.attributes.available_division_schemes.push(COHORT);
@@ -153,6 +163,7 @@
             },
 
             divisionSchemeChanged: function() {
+                // eslint-disable-next-line no-var
                 var selectedScheme = this.getSelectedScheme(),
                     topicNav = this.getTopicNav(),
                     fieldData = {
@@ -164,6 +175,7 @@
             },
 
             saveDivisionScheme: function($element, fieldData, selectedScheme) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     discussionSettingsModel = this.discussionSettings,
                     showErrorMessage,
@@ -198,6 +210,7 @@
                         )
                     );
                 }).fail(function(result) {
+                    // eslint-disable-next-line no-var
                     var errorMessage = null,
                         jsonResponse;
                     try {
@@ -226,6 +239,7 @@
             },
 
             renderTopics: function() {
+                // eslint-disable-next-line no-var
                 var dividedDiscussionsElement = this.$('.discussions-nav');
                 if (!this.CourseWideDiscussionsView) {
                     this.CourseWideDiscussionsView = new CourseWideDiscussionsView({

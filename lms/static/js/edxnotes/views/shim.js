@@ -5,6 +5,7 @@
     define([
         'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/utils/utils', 'edx-ui-toolkit/js/utils/html-utils'
     ], function($, _, Annotator, Utils, HtmlUtils) {
+        // eslint-disable-next-line no-var
         var _t = Annotator._t;
 
         /**
@@ -36,6 +37,7 @@
      * token format.
      * */
         Annotator.Plugin.Auth.prototype.timeToExpiry = function() {
+            // eslint-disable-next-line no-var
             var now = new Date().getTime() / 1000,
                 expiry = this._unsafeToken.exp,
                 timeToExpiry = expiry - now;
@@ -47,6 +49,7 @@
             function() {
             // Add screen reader label for edit mode. Note that the id of the tags element will not always be "1".
             // It depends on the number of annotatable components on the page.
+                // eslint-disable-next-line no-var
                 var tagsField = $('li.annotator-item >input', this.annotator.editor.element).attr('id');
                 if ($("label.sr[for='" + tagsField + "']", this.annotator.editor.element).length === 0) {
                     HtmlUtils.prepend(
@@ -157,6 +160,7 @@
      * improve line breaks.
      * */
         Annotator.prototype._setupViewer = function() {
+            // eslint-disable-next-line no-var
             var self = this;
             this.viewer = new Annotator.Viewer({readOnly: this.options.readOnly});
             this.viewer.element.on('click', _.bind(this.onNoteClick, this));
@@ -215,6 +219,7 @@
             function(event) {
             // Add screen reader label for the note area. Note that the id of the tags element will not always be "0".
             // It depends on the number of annotatable components on the page.
+                // eslint-disable-next-line no-var
                 var noteField = $('li.annotator-item >textarea', this.element).attr('id');
                 if ($("label.sr[for='" + noteField + "']", this.element).length === 0) {
                     HtmlUtils.prepend(
@@ -286,6 +291,7 @@
             },
 
             onNoteClick: function(event) {
+                // eslint-disable-next-line no-var
                 var $target = $(event.target);
                 event.stopPropagation();
                 Annotator.Util.preventEventDefault(event);

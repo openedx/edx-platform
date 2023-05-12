@@ -7,6 +7,7 @@ define([
     'use strict';
 
     describe('EnrollmentCollection', function() {
+        // eslint-disable-next-line no-var
         var enrollmentCollection;
 
         beforeEach(function() {

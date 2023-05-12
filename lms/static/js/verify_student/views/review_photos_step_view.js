@@ -2,7 +2,7 @@
 /**
  * View for the "review photos" step of the payment/verification flow.
  */
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function($, gettext) {
@@ -51,6 +51,7 @@ var edx = edx || {};
         },
 
         submitPhotos: function() {
+            // eslint-disable-next-line no-var
             var fullName = $('#new-name').val();
 
             // Disable the submit button to prevent duplicate submissions
@@ -70,6 +71,7 @@ var edx = edx || {};
         },
 
         handleSubmissionError: function(xhr) {
+            // eslint-disable-next-line no-var
             var errorMsg = gettext('An error has occurred. Please try again later.');
 
             // Re-enable the submit button to allow the user to retry
@@ -87,6 +89,7 @@ var edx = edx || {};
         },
 
         expandCallback: function(event) {
+            // eslint-disable-next-line no-var
             var $link = $(this),
                 $title = $link.closest('.help-tip'),
                 expanded = $title.hasClass('is-expanded');

@@ -32,6 +32,7 @@
             },
 
             refreshState: function() {
+                // eslint-disable-next-line no-var
                 var searchField = this.$('.search-field'),
                     clearButton = this.$('.action-clear'),
                     searchString = $.trim(searchField.val());
@@ -75,6 +76,7 @@
             },
 
             performSearch: function(event) {
+                // eslint-disable-next-line no-var
                 var searchField = this.$('.search-field'),
                     searchString = $.trim(searchField.val());
                 event.preventDefault();

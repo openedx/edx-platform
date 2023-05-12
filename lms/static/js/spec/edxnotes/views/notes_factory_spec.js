@@ -18,6 +18,7 @@ define([
         });
 
         it('can initialize annotator correctly', function(done) {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 token = Helpers.makeToken(),
                 options = {
@@ -27,6 +28,7 @@ define([
                 };
 
             _.each($('.edx-notes-wrapper'), function(wrapper) {
+                // eslint-disable-next-line no-var
                 var annotator = NotesFactory.factory(wrapper, {
                     endpoint: '/test_endpoint',
                     user: 'a user',

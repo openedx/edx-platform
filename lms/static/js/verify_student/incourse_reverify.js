@@ -5,13 +5,14 @@
  * and uses these to initialize the top-level views
  * on the page.
  */
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 // eslint-disable-next-line no-unused-vars
 (function($, _) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var errorView,
         $el = $('#incourse-reverify-container');
 

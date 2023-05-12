@@ -2,6 +2,7 @@
 define(['js/models/license'], function(LicenseModel) {
     describe('License model constructor', function() {
         it('accepts no arguments', function() {
+            // eslint-disable-next-line no-var
             var model = new LicenseModel();
             expect(model.get('type')).toBeNull();
             expect(model.get('options')).toEqual({});
@@ -9,6 +10,7 @@ define(['js/models/license'], function(LicenseModel) {
         });
 
         it('accepts normal arguments', function() {
+            // eslint-disable-next-line no-var
             var model = new LicenseModel({
                 type: 'creative-commons',
                 options: {'fake-boolean': true, version: 'your momma'}
@@ -18,6 +20,7 @@ define(['js/models/license'], function(LicenseModel) {
         });
 
         it('accepts a license string argument', function() {
+            // eslint-disable-next-line no-var
             var model = new LicenseModel({asString: 'all-rights-reserved'});
             expect(model.get('type')).toEqual('all-rights-reserved');
             expect(model.get('options')).toEqual({});
@@ -25,6 +28,7 @@ define(['js/models/license'], function(LicenseModel) {
         });
 
         it('accepts a custom license argument', function() {
+            // eslint-disable-next-line no-var
             var model = new LicenseModel({asString: 'Mozilla Public License 2.0'});
             expect(model.get('type')).toBeNull();
             expect(model.get('options')).toEqual({});

@@ -55,6 +55,7 @@
             },
 
             render: function(html) {
+                // eslint-disable-next-line no-var
                 var fields = html || '';
 
                 HtmlUtils.setHtml(
@@ -72,6 +73,7 @@
             },
 
             postRender: function() {
+                // eslint-disable-next-line no-var
                 var $container = $(this.el);
                 this.$form = $container.find('form');
                 this.$formFeedback = $container.find('.js-form-feedback');
@@ -79,6 +81,7 @@
             },
 
             buildForm: function(data) {
+                // eslint-disable-next-line no-var
                 var html = [],
                     i,
                     len = data.length,
@@ -144,6 +147,7 @@
             },
 
             getFormData: function() {
+                // eslint-disable-next-line no-var
                 var obj = {},
                     $form = this.$form,
                     elements = $form[0].elements,
@@ -206,6 +210,7 @@
                 return obj;
             },
             remove_validation_error: function($el, $form) {
+                // eslint-disable-next-line no-var
                 var $validationNode = this.get_error_validation_node($el, $form);
                 if ($validationNode && $validationNode.find('li').length > 0) {
                     $validationNode.empty();
@@ -213,6 +218,7 @@
             },
 
             get_error_validation_node: function($el, $form) {
+                // eslint-disable-next-line no-var
                 var $node = $form.find('#' + $el.attr('id') + '-validation-error-msg');
                 return $node.find('ul');
             },
@@ -222,7 +228,9 @@
             },
 
             toggleHelp: function(event, $help) {
+                // eslint-disable-next-line no-var
                 var $el = $(event.currentTarget);
+                // eslint-disable-next-line no-var
                 var $i = $el.find('i');
 
                 if ($help.css('display') === 'block') {
@@ -260,6 +268,7 @@
             },
 
             renderFormFeedback: function(template, context) {
+                // eslint-disable-next-line no-var
                 var tpl = HtmlUtils.template(template);
                 HtmlUtils.prepend(this.$formFeedback, tpl(context));
             },
@@ -272,6 +281,7 @@
             },
 
             submitForm: function(event) {
+                // eslint-disable-next-line no-var
                 var data = this.getFormData();
 
                 if (!_.isUndefined(event)) {
@@ -306,11 +316,13 @@
             },
 
             clearFormErrors: function() {
+                // eslint-disable-next-line no-var
                 var query = '.' + this.formErrorsJsHook;
                 this.clearFormFeedbackItems(query);
             },
 
             clearFormFeedbackItems: function(query) {
+                // eslint-disable-next-line no-var
                 var $items = this.$formFeedback.find(query);
                 if ($items.length > 0) {
                     $items.remove();
@@ -332,6 +344,7 @@
             },
 
             scrollToFormFeedback: function() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 // Scroll to feedback container
                 $('html,body').animate({
@@ -361,6 +374,7 @@
             },
 
             inLiveValidationFields: function($el) {
+                // eslint-disable-next-line no-var
                 var i,
                     name = $el.attr('name') || false;
                 for (i = 0; i < this.liveValidationFields.length; ++i) {

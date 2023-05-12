@@ -2,6 +2,7 @@
 define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'], function(_, URI, AjaxHelpers) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
         LONG_TEXT, PRUNED_TEXT, TRUNCATED_TEXT, SHORT_TEXT,
         base64Encode, makeToken, getChapter, getSection, getUnit, getDefaultNotes,
@@ -37,7 +38,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     SHORT_TEXT = 'Adipisicing elit, sed do eiusmod tempor incididunt';
 
     base64Encode = function(data) {
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var ac, bits, enc, h1, h2, h3, h4, i, o1, o2, o3, r, tmp_arr;
         if (btoa) {
             // Gecko and Webkit provide native code for this
@@ -79,6 +80,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     makeToken = function() {
+        // eslint-disable-next-line no-var
         var now = (new Date()).getTime() / 1000,
             rawToken = {
                 sub: 'sub',
@@ -186,6 +188,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     verifyRequestParams = function(requestUrl, expectedParams) {
+        // eslint-disable-next-line no-var
         var urlParams = (new URI(requestUrl)).query(true);
         _.each(expectedParams, function(value, key) {
             expect(urlParams[key]).toBe(value);
@@ -193,6 +196,7 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     };
 
     createNotesData = function(options) {
+        // eslint-disable-next-line no-var
         var data = {
             count: options.count || 0,
             num_pages: options.num_pages || 1,
@@ -201,7 +205,9 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
             results: []
         };
 
+        // eslint-disable-next-line no-var
         for (var i = 0; i < options.numNotesToCreate; i++) {
+            // eslint-disable-next-line no-var
             var notesInfo = {
                 chapter: getChapter('First Chapter__' + i, 1, 0, [2]),
                 section: getSection('First Section__' + i, 2, [3]),

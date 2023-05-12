@@ -15,6 +15,7 @@ define([
 function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPreviewTemplate, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CertificateWebPreview = BaseView.extend({
         el: $('.preview-certificate'),
         events: {
@@ -39,6 +40,7 @@ function(_, gettext, BaseView, ViewUtils, NotificationView, certificateWebPrevie
         },
 
         toggleCertificateActivation: function() {
+            // eslint-disable-next-line no-var
             var notification = new NotificationView.Mini({
                 title: gettext(this.is_active ? 'Deactivating' : 'Activating')
             });

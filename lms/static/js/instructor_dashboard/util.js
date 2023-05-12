@@ -3,12 +3,14 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var IntervalManager, KeywordValidator,
         createEmailContentTable, createEmailMessageViews,
         findAndAssert, pWrapper, plantInterval, plantTimeout,
         sentToFormatter, setupCopyEmailButton, subjectFormatter,
         unknownIfNullFormatter, unknownP,
         anyOf = [].indexOf || function(item) {
+            // eslint-disable-next-line no-var
             var i, l;
             for (i = 0, l = this.length; i < l; i++) {
                 if (i in this && this[i] === item) {
@@ -27,6 +29,7 @@
     };
 
     findAndAssert = function($root, selector) {
+        // eslint-disable-next-line no-var
         var item, msg;
         item = $root.find(selector);
         if (item.length !== 1) {
@@ -44,6 +47,7 @@
     };
 
     this.createTaskListTable = function($tableTasks, tasksData) {
+        // eslint-disable-next-line no-var
         var $tablePlaceholder, columns, options, tableData;
         $tableTasks.empty();
         options = {
@@ -146,6 +150,7 @@
     };
 
     subjectFormatter = function(row, cell, value) {
+        // eslint-disable-next-line no-var
         var subjectText;
         if (value === null) {
             return gettext('An error occurred retrieving your email. Please try again later, and contact technical support if the problem persists.'); // eslint-disable-line max-len
@@ -183,6 +188,7 @@
     };
 
     createEmailContentTable = function($tableEmails, $tableEmailsInner, emailData) {
+        // eslint-disable-next-line no-var
         var $tablePlaceholder, columns, options, tableData;
         $tableEmailsInner.empty();
         $tableEmails.show();
@@ -244,6 +250,7 @@
     };
 
     createEmailMessageViews = function($messagesWrapper, emails) {
+        // eslint-disable-next-line no-var
         var $closeButton, $created, $emailContent, $emailContentHeader,
             $emailHeader, $emailWrapper, $message, $messageContent,
             $requester, $sentTo, $subject, emailId, emailInfo, interpolateHeader, i, len;
@@ -316,6 +323,7 @@
 
     setupCopyEmailButton = function(emailId, htmlMessage, subject) {
         return $('#copy_email_' + emailId).click(function() {
+            // eslint-disable-next-line no-var
             var editor;
             editor = tinyMCE.get('mce_0');
             editor.setContent(htmlMessage);
@@ -360,6 +368,7 @@
 
     this.PendingInstructorTasks = (function() {
         function PendingInstructorTasks($section) {
+            // eslint-disable-next-line no-var
             var TASK_LIST_POLL_INTERVAL,
                 ths = this;
             this.$section = $section;
@@ -381,6 +390,7 @@
         }
 
         PendingInstructorTasks.prototype.reload_running_tasks_list = function() {
+            // eslint-disable-next-line no-var
             var listEndpoint,
                 ths = this;
             listEndpoint = this.$table_running_tasks.data('endpoint');
@@ -419,6 +429,7 @@
         ];
 
         keywordValidator.validate_string = function(string) {
+            // eslint-disable-next-line no-var
             var foundKeyword, foundKeywords, invalidKeywords, isValid,
                 keywords, regexMatch, validation, i, len;
             regexMatch = string.match(KeywordValidator.keyword_regex);
@@ -454,6 +465,7 @@
       */
 
         function ReportDownloads($section) {
+            // eslint-disable-next-line no-var
             var POLL_INTERVAL,
                 reportdownloads = this;
             this.$section = $section;
@@ -465,6 +477,7 @@
         }
 
         ReportDownloads.prototype.reload_report_downloads = function() {
+            // eslint-disable-next-line no-var
             var endpoint,
                 ths = this;
             endpoint = this.$report_downloads_table.data('endpoint');
@@ -486,6 +499,7 @@
         };
 
         ReportDownloads.prototype.create_report_downloads_table = function(reportDownloadsData) {
+            // eslint-disable-next-line no-var
             var $tablePlaceholder, columns, grid, options;
             this.$report_downloads_table.empty();
             options = {
@@ -517,6 +531,7 @@
             this.$report_downloads_table.append($tablePlaceholder);
             grid = new Slick.Grid($tablePlaceholder, reportDownloadsData, columns, options);
             grid.onClick.subscribe(function(event) {
+                // eslint-disable-next-line no-var
                 var reportUrl;
                 reportUrl = event.target.href;
                 if (reportUrl) {

@@ -5,6 +5,7 @@ define([
     'use strict';
 
     describe('EdxNotes NotesCollection', function() {
+        // eslint-disable-next-line no-var
         var notes = Helpers.getDefaultNotes();
 
         beforeEach(function() {
@@ -12,6 +13,7 @@ define([
         });
 
         it('can return correct course structure', function() {
+            // eslint-disable-next-line no-var
             var structure = this.collection.getCourseStructure();
 
             expect(structure.chapters).toEqual([
@@ -25,13 +27,16 @@ define([
                 'i4x://section/2': Helpers.getSection('First Section', 2, [3])
             });
 
+            // eslint-disable-next-line no-var
             var compareUnits = function(structureUnits, collectionUnits) {
                 expect(structureUnits.length === collectionUnits.length).toBeTruthy();
+                // eslint-disable-next-line no-var
                 for (var i = 0; i < structureUnits.length; i++) {
                     expect(structureUnits[i].attributes).toEqual(collectionUnits[i].attributes);
                 }
             };
 
+            // eslint-disable-next-line no-var
             var units = {
                 'i4x://unit/0': [this.collection.at(0), this.collection.at(1)],
                 'i4x://unit/1': [this.collection.at(2)],

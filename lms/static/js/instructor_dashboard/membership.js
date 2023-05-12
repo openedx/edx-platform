@@ -11,6 +11,7 @@ such that the value can be defined later than this assignment (file load order).
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var AuthListWidget,
         Membership,
         BatchEnrollment,
@@ -31,7 +32,9 @@ such that the value can be defined later than this assignment (file load order).
     };
 
     enableAddButton = function(enable, parent) {
+        // eslint-disable-next-line no-var
         var $addButton = parent.$('input[type="button"].add');
+        // eslint-disable-next-line no-var
         var $addField = parent.$('input[type="text"].add-field');
         if (enable) {
             $addButton.removeAttr('disabled');
@@ -46,6 +49,7 @@ such that the value can be defined later than this assignment (file load order).
 
     MemberListWidget = (function() {
         function memberListWidget($container, params) {
+            // eslint-disable-next-line no-var
             var templateHtml, condition,
                 memberListParams = params || {},
                 memberlistwidget = this;
@@ -75,6 +79,7 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         memberListWidget.prototype.add_row = function(rowArray) {
+            // eslint-disable-next-line no-var
             var $tbody, $td, $tr, item, i, len;
             $tbody = this.$('table tbody');
             $tr = $('<tr>');
@@ -93,6 +98,7 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         memberListWidget.prototype.$ = function(selector) {
+            // eslint-disable-next-line no-var
             var s;
             if (this.debug != null) {
                 s = this.$container.find(selector);
@@ -108,6 +114,7 @@ such that the value can be defined later than this assignment (file load order).
     AuthListWidget = (function(_super) {
         __extends(AuthListWidget, _super); // eslint-disable-line no-use-before-define
         function AuthListWidget($container, rolename, $errorSection) { // eslint-disable-line no-shadow
+            // eslint-disable-next-line no-var
             var msg,
                 authListWidget = this,
                 labelsList = [gettext('Username'), gettext('Email'), gettext('Revoke access')];
@@ -144,6 +151,7 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         AuthListWidget.prototype.add_handler = function(input) {
+            // eslint-disable-next-line no-var
             var authListWidgetAddHandler = this;
             if ((input != null) && input !== '') {
                 return this.modify_member_access(input, 'allow', function(error) {
@@ -160,6 +168,7 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         AuthListWidget.prototype.reload_list = function() {
+            // eslint-disable-next-line no-var
             var authListWidgetReloadList = this,
                 $selectedOption;
             return this.get_member_list(function(error, memberList, divisionScheme) {
@@ -170,6 +179,7 @@ such that the value can be defined later than this assignment (file load order).
                 authListWidgetReloadList.clear_rows();
 
                 _.each(memberList, function(member) {
+                    // eslint-disable-next-line no-var
                     var $revokeBtn, labelTrans;
                     labelTrans = gettext('Revoke access');
 
@@ -215,18 +225,21 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         AuthListWidget.prototype.clear_errors = function() {
+            // eslint-disable-next-line no-var
             var result;
             result = this.$errorSection !== undefined ? this.$errorSection.text('') : undefined;
             return result;
         };
 
         AuthListWidget.prototype.show_errors = function(msg) {
+            // eslint-disable-next-line no-var
             var result;
             result = this.$errorSection !== undefined ? this.$errorSection.text(msg) : undefined;
             return result;
         };
 
         AuthListWidget.prototype.get_member_list = function(cb) {
+            // eslint-disable-next-line no-var
             var authlistwidgetgetmemberlist = this;
             $.ajax({
                 type: 'POST',
@@ -246,6 +259,7 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         AuthListWidget.prototype.modify_member_access = function(uniqueStudentIdentifier, action, cb) {
+            // eslint-disable-next-line no-var
             var authlistwidgetmemberaccess = this;
             return $.ajax({
                 type: 'POST',
@@ -266,6 +280,7 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         AuthListWidget.prototype.member_response = function(data) {
+            // eslint-disable-next-line no-var
             var msg;
             this.clear_errors();
             this.clear_input();
@@ -293,6 +308,7 @@ such that the value can be defined later than this assignment (file load order).
 
     this.AutoEnrollmentViaCsv = (function() {
         function AutoEnrollmentViaCsv($container) {
+            // eslint-disable-next-line no-var
             var autoenrollviacsv = this;
             this.$container = $container;
             this.$student_enrollment_form = this.$container.find('#student-auto-enroll-form');
@@ -313,6 +329,7 @@ such that the value can be defined later than this assignment (file load order).
             });
             this.$enrollment_signup_button.click(function() {
                 return autoenrollviacsv.$student_enrollment_form.submit(function(event) {
+                    // eslint-disable-next-line no-var
                     var data;
                     if (autoenrollviacsv.processing) {
                         return false;
@@ -338,6 +355,7 @@ such that the value can be defined later than this assignment (file load order).
         }
 
         AutoEnrollmentViaCsv.prototype.display_response = function(dataFromServer) {
+            // eslint-disable-next-line no-var
             var error, errors, generalError, renderResponse,
                 resultFromServerIsSuccess, warning, warnings,
                 i, j, k, len, len1, len2, ref, ref1, ref2,
@@ -374,6 +392,7 @@ such that the value can be defined later than this assignment (file load order).
                 }
             }
             renderResponse = function(title, message, type, studentResults) {
+                // eslint-disable-next-line no-var
                 var details, responseMessage, studentResult, l, len3;
                 details = [];
                 for (l = 0, len3 = studentResults.length; l < len3; l++) {
@@ -408,6 +427,7 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         AutoEnrollmentViaCsv.prototype.render_notification_view = function(type, title, message, details) {
+            // eslint-disable-next-line no-var
             var notificationModel, view;
             notificationModel = new NotificationModel();
             notificationModel.set({
@@ -428,6 +448,7 @@ such that the value can be defined later than this assignment (file load order).
 
     BetaTesterBulkAddition = (function() {
         function betaTesterBulkAddition($container) {
+            // eslint-disable-next-line no-var
             var betatest = this;
             this.$container = $container;
             this.$identifier_input = this.$container.find("textarea[name='student-ids-for-beta']");
@@ -437,6 +458,7 @@ such that the value can be defined later than this assignment (file load order).
             this.$task_response = this.$container.find('.request-response');
             this.$request_response_error = this.$container.find('.request-response-error');
             this.$btn_beta_testers.click(function(event) {
+                // eslint-disable-next-line no-var
                 var autoEnroll, sendData;
                 emailStudents = betatest.$checkbox_emailstudents.is(':checked');
                 autoEnroll = betatest.$checkbox_autoenroll.is(':checked');
@@ -475,6 +497,7 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         betaTesterBulkAddition.prototype.display_response = function(dataFromServer) {
+            // eslint-disable-next-line no-var
             var errors, noUsers, renderList, sr, studentResults, successes, i, len, ref,
                 displayResponse = this;
             this.clear_input();
@@ -495,6 +518,7 @@ such that the value can be defined later than this assignment (file load order).
                 }
             }
             renderList = function(label, ids) {
+                // eslint-disable-next-line no-var
                 var identifier, $idsList, $taskResSection, j, len1;
                 $taskResSection = $('<div/>', {
                     class: 'request-res-section'
@@ -513,6 +537,7 @@ such that the value can be defined later than this assignment (file load order).
                 return displayResponse.$task_response.append($taskResSection);
             };
             if (successes.length && dataFromServer.action === 'add') {
+                // eslint-disable-next-line no-var
                 var j, len1, inActiveUsers, activeUsers; // eslint-disable-line vars-on-top
                 activeUsers = [];
                 inActiveUsers = [];
@@ -538,7 +563,7 @@ such that the value can be defined later than this assignment (file load order).
             if (successes.length && dataFromServer.action === 'remove') {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('These users were successfully removed as beta testers:'), (function() {
-                    // eslint-disable-next-line no-shadow
+                    /* eslint-disable-next-line no-shadow, no-var */
                     var j, len1, results;
                     results = [];
                     for (j = 0, len1 = successes.length; j < len1; j++) {
@@ -551,7 +576,7 @@ such that the value can be defined later than this assignment (file load order).
             if (errors.length && dataFromServer.action === 'add') {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('These users were not added as beta testers:'), (function() {
-                    // eslint-disable-next-line no-shadow
+                    /* eslint-disable-next-line no-shadow, no-var */
                     var j, len1, results;
                     results = [];
                     for (j = 0, len1 = errors.length; j < len1; j++) {
@@ -564,7 +589,7 @@ such that the value can be defined later than this assignment (file load order).
             if (errors.length && dataFromServer.action === 'remove') {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('These users were not removed as beta testers:'), (function() {
-                    // eslint-disable-next-line no-shadow
+                    /* eslint-disable-next-line no-shadow, no-var */
                     var j, len1, results;
                     results = [];
                     for (j = 0, len1 = errors.length; j < len1; j++) {
@@ -579,7 +604,7 @@ such that the value can be defined later than this assignment (file load order).
                     gettext('Users must create and activate their account before they can be promoted to beta tester.'))
                 );
                 return renderList(gettext('Could not find users associated with the following identifiers:'), (function() { // eslint-disable-line max-len
-                    // eslint-disable-next-line no-shadow
+                    /* eslint-disable-next-line no-shadow, no-var */
                     var j, len1, results;
                     results = [];
                     for (j = 0, len1 = noUsers.length; j < len1; j++) {
@@ -596,6 +621,7 @@ such that the value can be defined later than this assignment (file load order).
 
     BatchEnrollment = (function() {
         function batchEnrollment($container) {
+            // eslint-disable-next-line no-var
             var batchEnroll = this;
             this.$container = $container;
             this.$identifier_input = this.$container.find("textarea[name='student-ids']");
@@ -607,6 +633,7 @@ such that the value can be defined later than this assignment (file load order).
             this.$task_response = this.$container.find('.request-response');
             this.$request_response_error = this.$container.find('.request-response-error');
             this.$enrollment_button.click(function(event) {
+                // eslint-disable-next-line no-var
                 var sendData;
                 if (batchEnroll.$reason_field.length && !batchEnroll.$reason_field.val()) {
                     batchEnroll.fail_with_error(gettext('Reason field should not be left blank.'));
@@ -651,6 +678,7 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         batchEnrollment.prototype.display_response = function(dataFromServer) {
+            // eslint-disable-next-line no-var
             var allowed, autoenrolled, enrolled, errors, errorsLabel,
                 invalidIdentifier, notenrolled, notunenrolled, renderList, sr, studentResults,
                 i, j, len, len1, ref, renderIdsLists,
@@ -691,6 +719,7 @@ such that the value can be defined later than this assignment (file load order).
                 }
             }
             renderList = function(label, ids) {
+                // eslint-disable-next-line no-var
                 var identifier, $idsList, $taskResSection, h, len3;
                 $taskResSection = $('<div/>', {
                     class: 'request-res-section'
@@ -710,6 +739,7 @@ such that the value can be defined later than this assignment (file load order).
             };
             if (invalidIdentifier.length) {
                 renderList(gettext('The following email addresses and/or usernames are invalid:'), (function() {
+                    // eslint-disable-next-line no-var
                     var m, len4, results;
                     results = [];
                     for (m = 0, len4 = invalidIdentifier.length; m < len4; m++) {
@@ -731,6 +761,7 @@ such that the value can be defined later than this assignment (file load order).
                     }
                 }());
                 renderIdsLists = function(errs) {
+                    // eslint-disable-next-line no-var
                     var srItem,
                         k = 0,
                         results = [];
@@ -747,6 +778,7 @@ such that the value can be defined later than this assignment (file load order).
             }
             if (enrolled.length && emailStudents) {
                 renderList(gettext('Successfully enrolled and sent email to the following users:'), (function() {
+                    // eslint-disable-next-line no-var
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = enrolled.length; k < len2; k++) {
@@ -759,6 +791,7 @@ such that the value can be defined later than this assignment (file load order).
             if (enrolled.length && !emailStudents) {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('Successfully enrolled the following users:'), (function() {
+                    // eslint-disable-next-line no-var
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = enrolled.length; k < len2; k++) {
@@ -771,6 +804,7 @@ such that the value can be defined later than this assignment (file load order).
             if (allowed.length && emailStudents) {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:'), (function() { // eslint-disable-line max-len
+                    // eslint-disable-next-line no-var
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = allowed.length; k < len2; k++) {
@@ -783,6 +817,7 @@ such that the value can be defined later than this assignment (file load order).
             if (allowed.length && !emailStudents) {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('These users will be allowed to enroll once they register:'), (function() {
+                    // eslint-disable-next-line no-var
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = allowed.length; k < len2; k++) {
@@ -795,6 +830,7 @@ such that the value can be defined later than this assignment (file load order).
             if (autoenrolled.length && emailStudents) {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('Successfully sent enrollment emails to the following users. They will be enrolled once they register:'), (function() { // eslint-disable-line max-len
+                    // eslint-disable-next-line no-var
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = autoenrolled.length; k < len2; k++) {
@@ -807,6 +843,7 @@ such that the value can be defined later than this assignment (file load order).
             if (autoenrolled.length && !emailStudents) {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('These users will be enrolled once they register:'), (function() {
+                    // eslint-disable-next-line no-var
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = autoenrolled.length; k < len2; k++) {
@@ -819,6 +856,7 @@ such that the value can be defined later than this assignment (file load order).
             if (notenrolled.length && emailStudents) {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('Emails successfully sent. The following users are no longer enrolled in the course:'), (function() { // eslint-disable-line max-len
+                    // eslint-disable-next-line no-var
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = notenrolled.length; k < len2; k++) {
@@ -831,6 +869,7 @@ such that the value can be defined later than this assignment (file load order).
             if (notenrolled.length && !emailStudents) {
                 // Translators: A list of users appears after this sentence;
                 renderList(gettext('The following users are no longer enrolled in the course:'), (function() {
+                    // eslint-disable-next-line no-var
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = notenrolled.length; k < len2; k++) {
@@ -842,6 +881,7 @@ such that the value can be defined later than this assignment (file load order).
             }
             if (notunenrolled.length) {
                 return renderList(gettext('These users were not affiliated with the course so could not be unenrolled:'), (function() { // eslint-disable-line max-len
+                    // eslint-disable-next-line no-var
                     var k, len2, results;
                     results = [];
                     for (k = 0, len2 = notunenrolled.length; k < len2; k++) {
@@ -859,6 +899,7 @@ such that the value can be defined later than this assignment (file load order).
 
     this.AuthList = (function() {
         function authList($container, rolename) {
+            // eslint-disable-next-line no-var
             var authlist = this;
             this.$container = $container;
             this.rolename = rolename;
@@ -877,9 +918,11 @@ such that the value can be defined later than this assignment (file load order).
         }
 
         authList.prototype.reload_auth_list = function() {
+            // eslint-disable-next-line no-var
             var loadAuthList,
                 ths = this;
             loadAuthList = function(data) {
+                // eslint-disable-next-line no-var
                 var $tablePlaceholder, WHICH_CELL_IS_REVOKE, columns, grid, options, tableData;
                 ths.$request_response_error.empty();
                 ths.$display_table.empty();
@@ -918,6 +961,7 @@ such that the value can be defined later than this assignment (file load order).
                 ths.$display_table.append($tablePlaceholder);
                 grid = new window.Slick.Grid($tablePlaceholder, tableData, columns, options);
                 return grid.onClick.subscribe(function(e, args) {
+                    // eslint-disable-next-line no-var
                     var item;
                     item = args.grid.getDataItem(args.row);
                     if (args.cell === WHICH_CELL_IS_REVOKE) {
@@ -948,6 +992,7 @@ such that the value can be defined later than this assignment (file load order).
         };
 
         authList.prototype.access_change = function(email, action, cb) {
+            // eslint-disable-next-line no-var
             var ths = this;
             return $.ajax({
                 dataType: 'json',
@@ -972,6 +1017,7 @@ such that the value can be defined later than this assignment (file load order).
 
     Membership = (function() {
         function membership($section) {
+            // eslint-disable-next-line no-var
             var authList, i, len, ref,
                 thismembership = this;
             this.$section = $section;
@@ -990,6 +1036,7 @@ such that the value can be defined later than this assignment (file load order).
             this.$auth_list_errors = this.$section.find('.member-lists-management .request-response-error');
 
             this.auth_lists = _.map(this.$auth_list_containers, function(authListContainer) {
+                // eslint-disable-next-line no-var
                 var rolename;
                 rolename = $(authListContainer).data('rolename');
                 return new AuthListWidget($(authListContainer), rolename, thismembership.$auth_list_errors);
@@ -1010,6 +1057,7 @@ such that the value can be defined later than this assignment (file load order).
                 this.$list_selector.hide();
             }
             this.$list_selector.change(function() {
+                // eslint-disable-next-line no-var
                 var $opt, j, len1, ref1;
                 $opt = thismembership.$list_selector.children('option:selected');
                 if (!($opt.length > 0)) {
@@ -1038,6 +1086,7 @@ such that the value can be defined later than this assignment (file load order).
         }
 
         membership.prototype.onClickTitle = function() {
+            // eslint-disable-next-line no-var
             var list;
             // When the title is clicked refresh all the authorization lists as the member list
             // may have changed since render.

@@ -8,6 +8,7 @@
     ],
     function(gettext, $, _, Backbone, Logger, _moment, HtmlUtils,
         PagingHeaderView, PagingFooterView, bookmarksListTemplate) {
+        // eslint-disable-next-line no-var
         var moment = _moment || window.moment;
 
         return Backbone.View.extend({
@@ -40,6 +41,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var data = {
                     bookmarksCollection: this.collection,
                     humanFriendlyDate: this.humanFriendlyDate
@@ -53,6 +55,7 @@
             },
 
             showBookmarks: function() {
+                // eslint-disable-next-line no-var
                 var view = this;
 
                 this.hideErrorMessage();
@@ -67,6 +70,7 @@
             },
 
             visitBookmark: function(event) {
+                // eslint-disable-next-line no-var
                 var $bookmarkedComponent = $(event.currentTarget),
                     bookmarkId = $bookmarkedComponent.data('bookmarkId'),
                     componentUsageId = $bookmarkedComponent.data('usageId'),

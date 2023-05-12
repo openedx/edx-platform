@@ -8,6 +8,7 @@ define([
 ], function($, Backbone, TeamCollection, TeamsView, TeamSpecHelpers) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var createTeamsView;
     describe('Teams View', function() {
         beforeEach(function() {
@@ -15,6 +16,7 @@ define([
         });
 
         createTeamsView = function(options) {
+            // eslint-disable-next-line no-var
             var MockTeamsView = TeamsView.extend({
                 // eslint-disable-next-line no-unused-vars
                 getTopic: function(topicId) {
@@ -34,12 +36,14 @@ define([
         };
 
         it('can render itself', function() {
+            // eslint-disable-next-line no-var
             var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5),
                 teamsView = createTeamsView({
                     teams: TeamSpecHelpers.createMockTeams({
                         results: testTeamData
                     })
                 });
+            // eslint-disable-next-line no-var
             var footerEl = teamsView.$('.teams-paging-footer');
 
             expect(teamsView.$('.teams-paging-header').text()).toMatch('Showing 1-5 out of 6 total');
@@ -50,6 +54,7 @@ define([
         });
 
         it('forwards the showTeamset option to loaded team cards)', function() {
+            // eslint-disable-next-line no-var
             var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5),
                 teamsView = createTeamsView({
                     teams: TeamSpecHelpers.createMockTeams({

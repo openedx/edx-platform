@@ -1,12 +1,15 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var Logger = (function() {
         // listeners[event_type][element] -> list of callbacks
+        // eslint-disable-next-line no-var
         var listeners = {},
             sendRequest, has;
 
         sendRequest = function(data, options) {
+            // eslint-disable-next-line no-var
             var request = $.ajaxWithPrefix ? $.ajaxWithPrefix : $.ajax;
 
             options = $.extend(true, {
@@ -30,6 +33,7 @@
              * proper deprecation and notification for external authors.
              */
             log: function(eventType, data, element, requestOptions) {
+                // eslint-disable-next-line no-var
                 var callbacks;
 
                 if (!element) {

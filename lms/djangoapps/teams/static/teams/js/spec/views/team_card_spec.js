@@ -10,7 +10,9 @@ function($, _, moment, TeamSpecHelpers, TeamCardView, Team, Topic) {
     'use strict';
 
     describe('TeamCardView', function() {
+        // eslint-disable-next-line no-var
         var createTeamCardView, view;
+        // eslint-disable-next-line no-var
         var teamName = 'Test Team',
             teamID = 'test-team',
             courseID = TeamSpecHelpers.testCourseID,
@@ -19,6 +21,7 @@ function($, _, moment, TeamSpecHelpers, TeamCardView, Team, Topic) {
             description = 'A team for testing';
 
         createTeamCardView = function(topicOptions) {
+            // eslint-disable-next-line no-var
             var model = new Team({
                     id: teamID,
                     name: teamName,
@@ -89,6 +92,7 @@ function($, _, moment, TeamSpecHelpers, TeamCardView, Team, Topic) {
                  * teams membership accordingly and re-renders the
                  * view.
                  */
+            // eslint-disable-next-line no-var
             var setMemberships, expectThumbnailsOrder;
 
             setMemberships = function(memberships) {
@@ -111,6 +115,7 @@ function($, _, moment, TeamSpecHelpers, TeamCardView, Team, Topic) {
                  * members of the provided list.
                  */
             expectThumbnailsOrder = function(members) {
+                // eslint-disable-next-line no-var
                 var thumbnails = view.$('.item-member-thumb img');
                 expect(thumbnails.length).toBe(members.length);
                 thumbnails.each(function(index) {
@@ -126,6 +131,7 @@ function($, _, moment, TeamSpecHelpers, TeamCardView, Team, Topic) {
             });
 
             it('displays thumbnails for a nonempty team', function() {
+                // eslint-disable-next-line no-var
                 var users = [
                     {
                         username: 'user_1',
@@ -145,6 +151,7 @@ function($, _, moment, TeamSpecHelpers, TeamCardView, Team, Topic) {
             });
 
             it('displays thumbnails and an ellipsis for a team with greater than 5 members', function() {
+                // eslint-disable-next-line no-var
                 var users = [
                     {
                         username: 'user_1',

@@ -1,7 +1,8 @@
+// eslint-disable-next-line no-var
 var Language = (function() {
     'use strict';
 
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var $settings_language_selector,
         self = null;
     return {
@@ -19,6 +20,7 @@ var Language = (function() {
         listenForLanguagePreferenceChange: function() {
             // eslint-disable-next-line camelcase
             $settings_language_selector.change(function(event) {
+                // eslint-disable-next-line no-var
                 var language = this.value,
                     url = $('.url-endpoint').val(),
                     // eslint-disable-next-line camelcase

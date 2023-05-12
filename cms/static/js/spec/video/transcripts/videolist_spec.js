@@ -14,6 +14,7 @@ define(
         'use strict';
 
         describe('CMS.Views.Metadata.VideoList', function() {
+            // eslint-disable-next-line no-var
             var videoListEntryTemplate = readFixtures(
                     'video/transcripts/metadata-videolist-entry.underscore'
                 ),
@@ -69,7 +70,9 @@ define(
                 waitForEvent,
                 createVideoListView;
 
+            // eslint-disable-next-line no-var
             var createMockAjaxServer = function() {
+                // eslint-disable-next-line no-var
                 var mockServer = AjaxHelpers.server(
                     [
                         200,
@@ -82,6 +85,7 @@ define(
             };
 
             beforeEach(function() {
+                // eslint-disable-next-line no-var
                 var tpl = sandbox({ // eslint-disable-line no-undef
                     class: 'component',
                     // eslint-disable-next-line camelcase
@@ -129,6 +133,7 @@ define(
                     assertValueInView: function() {
                         return {
                             compare: function(actual, expected) {
+                                // eslint-disable-next-line no-var
                                 var actualValue = actual.getValueFromEditor(),
                                     passed = _.isEqual(actualValue, expected);
 
@@ -141,6 +146,7 @@ define(
                     assertCanUpdateView: function() {
                         return {
                             compare: function(actual, expected) {
+                                // eslint-disable-next-line no-var
                                 var actualValue,
                                     passed;
 
@@ -157,6 +163,7 @@ define(
                     assertIsCorrectVideoList: function() {
                         return {
                             compare: function(actual, expected) {
+                                // eslint-disable-next-line no-var
                                 var actualValue = actual.getVideoObjectsList(),
                                     passed = _.isEqual(actualValue, expected);
 
@@ -175,6 +182,7 @@ define(
             });
 
             waitForEvent = function() {
+                // eslint-disable-next-line no-var
                 var triggerCallArgs;
                 // eslint-disable-next-line no-undef
                 return jasmine.waitUntil(function() {
@@ -185,6 +193,7 @@ define(
             };
 
             createVideoListView = function(mockServer) {
+                // eslint-disable-next-line no-var
                 var $container, editor, model, videoListView;
 
                 appendSetFixtures(
@@ -221,9 +230,11 @@ define(
                 return videoListView;
             };
 
+            // eslint-disable-next-line no-var
             var waitsForResponse = function(mockServer) {
                 // eslint-disable-next-line no-undef
                 return jasmine.waitUntil(function() {
+                    // eslint-disable-next-line no-var
                     var requests = mockServer.requests,
                         len = requests.length;
 
@@ -232,6 +243,7 @@ define(
             };
 
             it('Initialize', function(done) {
+                // eslint-disable-next-line no-var
                 var view = createVideoListView(this.mockServer),
                     callArgs;
                 waitsForResponse(this.mockServer)
@@ -247,7 +259,9 @@ define(
             });
 
             describe('Render', function() {
+                // eslint-disable-next-line no-var
                 var assertToHaveBeenRendered = function(expectedVideoList) {
+                        // eslint-disable-next-line no-var
                         var commandCallArgs = Utils.command.calls.mostRecent().args,
                             actualVideoList = commandCallArgs[2].slice(0, expectedVideoList.length);
 
@@ -272,7 +286,7 @@ define(
                 });
 
                 it('is rendered in correct way', function(done) {
-                    // eslint-disable-next-line no-unused-vars
+                    /* eslint-disable-next-line no-unused-vars, no-var */
                     var view = createVideoListView(this.mockServer);
                     waitsForResponse(this.mockServer)
                         .then(function() {
@@ -282,7 +296,9 @@ define(
                 });
 
                 it('is rendered with opened extra videos bar', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer);
+                    // eslint-disable-next-line no-var
                     var videoListLength = [
                             {
                                 mode: 'youtube',
@@ -332,6 +348,7 @@ define(
                 });
 
                 it('is rendered without opened extra videos bar', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer),
                         // eslint-disable-next-line no-shadow
                         videoList = [
@@ -361,6 +378,7 @@ define(
 
             describe('isUniqOtherVideos', function() {
                 it('Unique data - return true', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer),
                         data = videoList.concat([{
                             mode: 'html5',
@@ -370,6 +388,7 @@ define(
 
                     waitsForResponse(this.mockServer)
                         .then(function() {
+                            // eslint-disable-next-line no-var
                             var result = view.isUniqOtherVideos(data);
                             expect(result).toBe(true);
                         })
@@ -377,6 +396,7 @@ define(
                 });
 
                 it('Not Unique data - return false', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer),
                         data = [
                             {
@@ -408,6 +428,7 @@ define(
 
                     waitsForResponse(this.mockServer)
                         .then(function() {
+                            // eslint-disable-next-line no-var
                             var result = view.isUniqOtherVideos(data);
                             expect(result).toBe(false);
                         })
@@ -417,11 +438,13 @@ define(
 
             describe('isUniqVideoTypes', function() {
                 it('Unique data - return true', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer),
                         data = videoList;
 
                     waitsForResponse(this.mockServer)
                         .then(function() {
+                            // eslint-disable-next-line no-var
                             var result = view.isUniqVideoTypes(data);
                             expect(result).toBe(true);
                         })
@@ -429,6 +452,7 @@ define(
                 });
 
                 it('Not Unique data - return false', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer),
                         data = [
                             {
@@ -455,6 +479,7 @@ define(
 
                     waitsForResponse(this.mockServer)
                         .then(function() {
+                            // eslint-disable-next-line no-var
                             var result = view.isUniqVideoTypes(data);
                             expect(result).toBe(false);
                         })
@@ -464,6 +489,7 @@ define(
 
             describe('checkIsUniqVideoTypes', function() {
                 it('Error is shown', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer),
                         data = [
                             {
@@ -490,6 +516,7 @@ define(
 
                     waitsForResponse(this.mockServer)
                         .then(function() {
+                            // eslint-disable-next-line no-var
                             var result = view.checkIsUniqVideoTypes(data);
 
                             expect(MessageManager.prototype.showError).toHaveBeenCalled();
@@ -499,12 +526,14 @@ define(
                 });
 
                 it('All works okay if arguments are not passed', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer);
                     // eslint-disable-next-line no-undef
                     spyOn(view, 'getVideoObjectsList').and.returnValue(videoList);
 
                     waitsForResponse(this.mockServer)
                         .then(function() {
+                            // eslint-disable-next-line no-var
                             var result = view.checkIsUniqVideoTypes();
 
                             expect(view.getVideoObjectsList).toHaveBeenCalled();
@@ -517,12 +546,14 @@ define(
 
             describe('checkValidity', function() {
                 it('Error message is shown', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer);
                     // eslint-disable-next-line no-undef
                     spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
 
                     waitsForResponse(this.mockServer)
                         .then(function() {
+                            // eslint-disable-next-line no-var
                             var data = {mode: 'incorrect'},
                                 result = view.checkValidity(data, true);
 
@@ -534,12 +565,14 @@ define(
                 });
 
                 it('Error message is shown when flag is not passed', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer);
                     // eslint-disable-next-line no-undef
                     spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
 
                     waitsForResponse(this.mockServer)
                         .then(function() {
+                            // eslint-disable-next-line no-var
                             var data = {mode: 'incorrect'},
                                 result = view.checkValidity(data);
 
@@ -550,12 +583,14 @@ define(
                 });
 
                 it('All works okay if correct data is passed', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer);
                     // eslint-disable-next-line no-undef
                     spyOn(view, 'checkIsUniqVideoTypes').and.returnValue(true);
 
                     waitsForResponse(this.mockServer)
                         .then(function() {
+                            // eslint-disable-next-line no-var
                             var data = videoList,
                                 result = view.checkValidity(data);
 
@@ -568,6 +603,7 @@ define(
             });
 
             it('openExtraVideosBar', function(done) {
+                // eslint-disable-next-line no-var
                 var view = createVideoListView(this.mockServer);
                 waitsForResponse(this.mockServer)
                     .then(function() {
@@ -579,6 +615,7 @@ define(
             });
 
             it('closeExtraVideosBar', function(done) {
+                // eslint-disable-next-line no-var
                 var view = createVideoListView(this.mockServer);
                 waitsForResponse(this.mockServer)
                     .then(function() {
@@ -591,6 +628,7 @@ define(
             });
 
             it('toggleExtraVideosBar', function(done) {
+                // eslint-disable-next-line no-var
                 var view = createVideoListView(this.mockServer);
                 waitsForResponse(this.mockServer)
                     .then(function() {
@@ -604,6 +642,7 @@ define(
             });
 
             it('getValueFromEditor', function(done) {
+                // eslint-disable-next-line no-var
                 var view = createVideoListView(this.mockServer);
                 waitsForResponse(this.mockServer)
                     .then(function() {
@@ -613,6 +652,7 @@ define(
             });
 
             it('setValueInEditor', function(done) {
+                // eslint-disable-next-line no-var
                 var view = createVideoListView(this.mockServer);
                 waitsForResponse(this.mockServer)
                     .then(function() {
@@ -622,7 +662,9 @@ define(
             });
 
             it('getVideoObjectsList', function(done) {
+                // eslint-disable-next-line no-var
                 var view = createVideoListView(this.mockServer);
+                // eslint-disable-next-line no-var
                 var value = [
                     {
                         mode: 'youtube',
@@ -656,11 +698,13 @@ define(
 
             describe('getPlaceholders', function() {
                 it('All works okay if empty values are passed', function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer),
                         defaultPlaceholders = view.placeholders;
 
                     waitsForResponse(this.mockServer)
                         .then(function() {
+                            // eslint-disable-next-line no-var
                             var result = view.getPlaceholders([]),
                                 expectedResult = _.values(defaultPlaceholders).reverse();
 
@@ -672,8 +716,10 @@ define(
                 it('On filling less than 3 fields, remaining fields should have '
 + 'placeholders for video types that were not filled yet',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var view = createVideoListView(this.mockServer),
                         defaultPlaceholders = view.placeholders;
+                    // eslint-disable-next-line no-var
                     var dataDict = {
                         youtube: {
                             value: [modelStub.value[0]],
@@ -705,6 +751,7 @@ define(
                     waitsForResponse(this.mockServer)
                         .then(function() {
                             $.each(dataDict, function(index, val) {
+                                // eslint-disable-next-line no-var
                                 var result = view.getPlaceholders(val.value);
 
                                 expect(result).toEqual(val.expectedResult);
@@ -716,14 +763,17 @@ define(
             });
 
             describe('inputHandler', function() {
+                // eslint-disable-next-line no-var
                 var eventObject;
 
+                // eslint-disable-next-line no-var
                 var resetSpies = function(view) {
                     MessageManager.prototype.hideError.calls.reset();
                     view.updateModel.calls.reset();
                     view.closeExtraVideosBar.calls.reset();
                 };
 
+                // eslint-disable-next-line no-var
                 var setUp = function(view) {
                     // eslint-disable-next-line no-undef
                     eventObject = jQuery.Event('input');
@@ -748,6 +798,7 @@ define(
                     resetSpies(view);
                 };
 
+                // eslint-disable-next-line no-var
                 var videoListView = function() {
                     return new VideoList({
                         el: $('.component'),
@@ -765,6 +816,7 @@ define(
                 });
 
                 it('Field has invalid value - nothing should happen', function() {
+                    // eslint-disable-next-line no-var
                     var view = videoListView();
                     setUp(view);
                     $.fn.hasClass.and.returnValue(false);
@@ -779,6 +831,7 @@ define(
                 });
 
                 it('Main field has invalid value - extra Videos Bar is closed', function() {
+                    // eslint-disable-next-line no-var
                     var view = videoListView();
                     setUp(view);
                     $.fn.hasClass.and.returnValue(true);
@@ -793,6 +846,7 @@ define(
                 });
 
                 it('Model is updated if value is valid', function() {
+                    // eslint-disable-next-line no-var
                     var view = videoListView();
                     setUp(view);
                     view.checkValidity.and.returnValue(true);
@@ -807,6 +861,7 @@ define(
                 });
 
                 it('Corner case: Error is hided', function() {
+                    // eslint-disable-next-line no-var
                     var view = videoListView();
                     setUp(view);
                     view.checkValidity.and.returnValue(true);

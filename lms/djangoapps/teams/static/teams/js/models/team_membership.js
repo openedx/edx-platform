@@ -5,6 +5,7 @@
     'use strict';
 
     define(['backbone', 'teams/js/models/team'], function(Backbone, TeamModel) {
+        // eslint-disable-next-line no-var
         var TeamMembership = Backbone.Model.extend({
             defaults: {
                 date_joined: '',

@@ -5,6 +5,7 @@
     define([
         'backbone', 'js/edxnotes/models/tab'
     ], function(Backbone, TabModel) {
+        // eslint-disable-next-line no-var
         var TabsCollection = Backbone.Collection.extend({
             model: TabModel
         });

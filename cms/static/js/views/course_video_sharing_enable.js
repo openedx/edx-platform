@@ -10,6 +10,7 @@ define([
 ], function($, _, Backbone, XBlockViewUtils, TemplateUtils, CourseOutlineModalsFactory, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CourseVideoSharingEnableView = Backbone.View.extend({
         events: {
             'change #video-sharing-configuration-options': 'handleVideoSharingConfigurationChange',
@@ -58,6 +59,7 @@ define([
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var html = this.template(this.model.attributes);
             HtmlUtils.setHtml(this.$el, HtmlUtils.HTML(html));
             return this;

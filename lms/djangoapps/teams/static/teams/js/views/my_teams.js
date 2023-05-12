@@ -3,6 +3,7 @@
 
     define(['underscore', 'backbone', 'gettext', 'teams/js/views/teams', 'edx-ui-toolkit/js/utils/html-utils'],
         function(_, Backbone, gettext, TeamsView, HtmlUtils) {
+            // eslint-disable-next-line no-var
             var MyTeamsView = TeamsView.extend({
 
                 initialize: function(options) {
@@ -17,6 +18,7 @@
                 },
 
                 render: function() {
+                    // eslint-disable-next-line no-var
                     var view = this;
                     if (this.collection.isStale) {
                         this.$el.html('');

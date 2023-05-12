@@ -2,9 +2,11 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty;
 
     function __extends(child, parent) {
+        // eslint-disable-next-line no-var
         for (var key in parent) {
             if (__hasProp.call(parent, key)) {
                 child[key] = parent[key];
@@ -20,7 +22,9 @@
         return child;
     }
 
+    // eslint-disable-next-line no-var
     var __indexOf = [].indexOf || function(item) {
+        // eslint-disable-next-line no-var
         for (var i = 0, l = this.length; i < l; i++) {
             if (i in this && this[i] === item) {
                 return i;
@@ -80,7 +84,7 @@
             };
 
             Content.prototype.addComment = function(comment, options) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var comments_count, model, thread;
                 options = (options) || {};
                 if (!options.silent) {
@@ -100,7 +104,7 @@
             };
 
             Content.prototype.removeComment = function(comment) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var comments_count, thread;
                 thread = this.get('thread');
                 /* eslint-disable-next-line camelcase, radix */
@@ -111,6 +115,7 @@
             };
 
             Content.prototype.resetComments = function(children) {
+                // eslint-disable-next-line no-var
                 var comment, _i, _len, _ref, _results;
                 this.set('children', []);
                 this.set('comments', new Comments());
@@ -126,6 +131,7 @@
             };
 
             Content.prototype.initialize = function() {
+                // eslint-disable-next-line no-var
                 var userId;
                 Content.addContent(this.id, this);
                 userId = this.get('user_id');
@@ -165,6 +171,7 @@
             };
 
             Content.loadContentInfos = function(infos) {
+                // eslint-disable-next-line no-var
                 var id, info;
                 for (id in infos) {
                     if (infos.hasOwnProperty(id)) {
@@ -178,6 +185,7 @@
             };
 
             Content.prototype.pinThread = function() {
+                // eslint-disable-next-line no-var
                 var pinned;
                 pinned = this.get('pinned');
                 this.set('pinned', pinned);
@@ -185,6 +193,7 @@
             };
 
             Content.prototype.unPinThread = function() {
+                // eslint-disable-next-line no-var
                 var pinned;
                 pinned = this.get('pinned');
                 this.set('pinned', pinned);
@@ -192,7 +201,7 @@
             };
 
             Content.prototype.flagAbuse = function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var temp_array;
                 // eslint-disable-next-line camelcase
                 temp_array = this.get('abuse_flaggers');
@@ -208,6 +217,7 @@
             };
 
             Content.prototype.isFlagged = function() {
+                // eslint-disable-next-line no-var
                 var flaggers, user;
                 user = DiscussionUtil.getUser();
                 flaggers = this.get('abuse_flaggers');
@@ -218,6 +228,7 @@
             };
 
             Content.prototype.incrementVote = function(increment) {
+                // eslint-disable-next-line no-var
                 var newVotes;
                 // eslint-disable-next-line no-undef
                 newVotes = _.clone(this.get('votes'));
@@ -328,7 +339,7 @@
             };
 
             Thread.prototype.toJSON = function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var json_attributes;
                 /* eslint-disable-next-line camelcase, no-undef */
                 json_attributes = _.clone(this.attributes);
@@ -358,6 +369,7 @@
             __extends(Comment, _super);
 
             function Comment() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.canBeEndorsed = function() {
                     return Comment.prototype.canBeEndorsed.apply(self, arguments);
@@ -396,6 +408,7 @@
             };
 
             Comment.prototype.getCommentsCount = function() {
+                // eslint-disable-next-line no-var
                 var count;
                 count = 0;
                 this.get('comments').each(function(comment) {
@@ -406,7 +419,7 @@
             };
 
             Comment.prototype.canBeEndorsed = function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var user_id;
                 // eslint-disable-next-line camelcase
                 user_id = window.user.get('id');
@@ -435,6 +448,7 @@
             Comments.prototype.model = Comment;
 
             Comments.prototype.initialize = function() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 return this.bind('add', function(item) {
                     item.collection = self;

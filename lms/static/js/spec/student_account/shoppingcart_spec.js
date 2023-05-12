@@ -4,6 +4,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account
         'use strict';
 
         describe('ShoppingCartInterface', function() {
+            // eslint-disable-next-line no-var
             var COURSE_KEY = 'edX/DemoX/Fall',
                 ADD_COURSE_URL = '/shoppingcart/add/course/edX/DemoX/Fall/',
                 FORWARD_URL = '/shoppingcart/';
@@ -16,6 +17,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account
 
             it('adds a course to the cart', function() {
                 // Spy on Ajax requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
 
                 // Attempt to add a course to the cart
@@ -33,6 +35,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account
 
             it('redirects the user on a server error', function() {
                 // Spy on Ajax requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
 
                 // Attempt to add a course to the cart

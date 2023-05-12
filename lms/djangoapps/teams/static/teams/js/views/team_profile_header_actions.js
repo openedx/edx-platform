@@ -31,6 +31,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var view = this,
                     username = this.context.userInfo.username,
                     message,
@@ -67,6 +68,7 @@
             },
 
             joinTeam: function(event) {
+                // eslint-disable-next-line no-var
                 var view = this;
 
                 event.preventDefault();
@@ -88,7 +90,9 @@
             },
 
             getUserTeamInfo: function(username, courseMaxTeamSize) {
+                // eslint-disable-next-line no-var
                 var deferred = $.Deferred();
+                // eslint-disable-next-line no-var
                 var info = {
                     alreadyInTeamset: false,
                     memberOfCurrentTeam: false,
@@ -99,7 +103,9 @@
 
                 // this.topic.getMaxTeamSize() will return null for a managed team,
                 // but the size is considered to be arbitarily large.
+                // eslint-disable-next-line no-var
                 var isInstructorManagedTopic = TeamUtils.isInstructorManagedTopic(this.topic.attributes.type);
+                // eslint-disable-next-line no-var
                 var teamHasSpace = isInstructorManagedTopic
                         || (this.model.get('membership').length < this.topic.getMaxTeamSize(courseMaxTeamSize));
 
@@ -113,6 +119,7 @@
                     deferred.resolve(info);
                 } else {
                     if (teamHasSpace) {
+                        // eslint-disable-next-line no-var
                         var view = this; // eslint-disable-line vars-on-top
                         $.ajax({
                             type: 'GET',

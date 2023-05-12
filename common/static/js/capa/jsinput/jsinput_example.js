@@ -5,6 +5,7 @@
 
     // state will be populated via initial_state via the `setState` method. Defining dummy values here
     // to make the expected structure clear.
+    // eslint-disable-next-line no-var
     var state = {
             availableChoices: [],
             selectedChoice: ''
@@ -15,6 +16,7 @@
 
     function populateSelect() {
         // Populate the select from `state.availableChoices`.
+        // eslint-disable-next-line no-var
         var i, option;
 
         // Clear out any pre-existing options.
@@ -52,6 +54,7 @@
     // object that will not be used here
     // (see http://mozilla.github.io/jschannel/docs/)
     function setState() {
+        // eslint-disable-next-line no-var
         var stateString = arguments.length === 1 ? arguments[0] : arguments[1];
         state = JSON.parse(stateString);
         populateSelect();

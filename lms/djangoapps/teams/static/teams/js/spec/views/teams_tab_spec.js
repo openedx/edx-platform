@@ -13,16 +13,20 @@ define([
     'use strict';
 
     describe('TeamsTab', function() {
+        // eslint-disable-next-line no-var
         var requests;
 
+        // eslint-disable-next-line no-var
         var expectError = function(teamsTabView, text) {
             expect(teamsTabView.$('.warning').text()).toContain(text);
         };
 
+        // eslint-disable-next-line no-var
         var expectFocus = function(element) {
             expect(element.focus).toHaveBeenCalled();
         };
 
+        // eslint-disable-next-line no-var
         var verifyTeamsRequest = function(options) {
             AjaxHelpers.expectRequestURL(requests, TeamSpecHelpers.testContext.teamsUrl,
                 _.extend(
@@ -39,7 +43,9 @@ define([
                 ));
         };
 
+        // eslint-disable-next-line no-var
         var createTeamsTabView = function(options) {
+            // eslint-disable-next-line no-var
             var teamsTabView = new TeamsTabView(
                 {
                     el: $('.teams-content'),
@@ -68,6 +74,7 @@ define([
 
         describe('Navigation', function() {
             it('does not render breadcrumbs for the top level tabs', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('#my-teams', {trigger: true});
                 expect(teamsTabView.$('.breadcrumbs').length).toBe(0);
@@ -76,12 +83,14 @@ define([
             });
 
             it('does not interfere with anchor links to #main', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('#main', {trigger: true});
                 expect(teamsTabView.$('.wrapper-msg')).toHaveClass('is-hidden');
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent page', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('no_such_page', {trigger: true});
                 expectError(teamsTabView, 'The page "no_such_page" could not be found.');
@@ -89,6 +98,7 @@ define([
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent topic', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('topics/no_such_topic', {trigger: true});
                 AjaxHelpers.expectRequest(requests, 'GET', '/api/team/v0/topics/no_such_topic,course/1', null);
@@ -98,6 +108,7 @@ define([
             });
 
             it('displays and focuses an error message when trying to navigate to a nonexistent team', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView();
                 teamsTabView.router.navigate('teams/' + TeamSpecHelpers.testTopicID + '/no_such_team', {trigger: true});
                 AjaxHelpers.expectRequest(requests, 'GET', '/api/team/v0/teams/no_such_team?expand=user', null);
@@ -107,6 +118,7 @@ define([
             });
 
             it('displays and focuses an error message when it receives a 401 AJAX response', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView().render();
                 teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID, {trigger: true});
                 AjaxHelpers.respondWithError(requests, 401);
@@ -115,6 +127,7 @@ define([
             });
 
             it('displays and focuses an error message when it receives a 500 AJAX response', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView().render();
                 teamsTabView.router.navigate('topics/' + TeamSpecHelpers.testTopicID, {trigger: true});
                 AjaxHelpers.respondWithError(requests, 500);
@@ -127,6 +140,7 @@ define([
             });
 
             it('does not navigate to the topics page when syncing its collection if not on search page', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView(),
                     collection = TeamSpecHelpers.createMockTeams();
                 teamsTabView.createTeamsListView({
@@ -183,6 +197,7 @@ define([
                     }
                 ]
             }, function(url, expectedEvent) {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView({
                     userInfo: TeamSpecHelpers.createMockUserInfo({staff: true})
                 });
@@ -197,6 +212,7 @@ define([
 
         describe('Discussion privileges', function() {
             it('allows privileged access to any team', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView({
                     userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true})
                 });
@@ -207,6 +223,7 @@ define([
             });
 
             it('allows access to a team which an unprivileged user is a member of', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView({
                     userInfo: TeamSpecHelpers.createMockUserInfo({
                         username: TeamSpecHelpers.testUser,
@@ -225,6 +242,7 @@ define([
             });
 
             it('does not allow access if the user is neither privileged nor a team member', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView({
                     userInfo: TeamSpecHelpers.createMockUserInfo({privileged: false, staff: true})
                 });
@@ -235,8 +253,10 @@ define([
         });
 
         describe('Manage Tab', function() {
+            // eslint-disable-next-line no-var
             var manageTabSelector = '.page-content-nav>.nav-item[data-url=manage]';
             it('is not visible to unprivileged users', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView({
                     userInfo: TeamSpecHelpers.createMockUserInfo({privileged: false}),
                     hasManagedTopic: true
@@ -245,6 +265,7 @@ define([
             });
 
             it('is not visible when there are no managed topics', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView({
                     userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true}),
                     hasManagedTopic: false
@@ -253,6 +274,7 @@ define([
             });
 
             it('is visible to privileged users when there is a managed topic', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView({
                     userInfo: TeamSpecHelpers.createMockUserInfo({privileged: true}),
                     hasManagedTopic: true
@@ -262,8 +284,10 @@ define([
         });
 
         describe('Browse Tab', function() {
+            // eslint-disable-next-line no-var
             var browseTabSelector = '.page-content-nav>.nav-item[data-url=browse]';
             it('is not visible if there are no open and no public teamsets', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView({
                     hasOpenTopic: false,
                     hasPublicManagedTopic: false
@@ -272,6 +296,7 @@ define([
             });
 
             it('is visible if there are open teamsets', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView({
                     hasOpenTopic: true,
                     hasPublicManagedTopic: false
@@ -280,6 +305,7 @@ define([
             });
 
             it('is visible if there are public teamsets', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView({
                     hasOpenTopic: false,
                     hasPublicManagedTopic: true
@@ -288,6 +314,7 @@ define([
             });
 
             it('is visible if there are both public and open teamsets', function() {
+                // eslint-disable-next-line no-var
                 var teamsTabView = createTeamsTabView({
                     hasOpenTopic: true,
                     hasPublicManagedTopic: true
@@ -297,8 +324,10 @@ define([
         });
 
         describe('Search', function() {
+            // eslint-disable-next-line no-var
             var teamsTabView;
 
+            // eslint-disable-next-line no-var
             var performSearch = function() {
                 teamsTabView.$('.search-field').val('foo');
                 teamsTabView.$('.action-search').click();
@@ -317,6 +346,7 @@ define([
                 AjaxHelpers.expectNoRequests(requests);
             };
 
+            // eslint-disable-next-line no-var
             var setUpTopicTab = function() {
                 teamsTabView = createTeamsTabView();
                 teamsTabView.browseTopic(TeamSpecHelpers.testTopicID);
@@ -352,6 +382,7 @@ define([
             });
 
             it('updates the description when search string updates', function() {
+                // eslint-disable-next-line no-var
                 var newString = 'bar';
                 setUpTopicTab();
                 performSearch();

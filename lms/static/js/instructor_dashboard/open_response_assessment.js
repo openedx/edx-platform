@@ -3,6 +3,7 @@
 (function(_) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var OpenResponseAssessment = (function() {
         function OpenResponseAssessmentBlock($section) {
             this.$section = $section;
@@ -11,6 +12,7 @@
         }
 
         OpenResponseAssessmentBlock.prototype.onClickTitle = function() {
+            // eslint-disable-next-line no-var
             var block = this.$section.find('.open-response-assessment');
             if (!this.initialized) {
                 this.initialized = true;

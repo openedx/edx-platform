@@ -12,6 +12,7 @@ function createMobileMenu() {
     'use strict';
 
     $('.mobile-nav-item').each(function() {
+        // eslint-disable-next-line no-var
         var mobileNavItem = $(this).clone().addClass('mobile-nav-link');
         mobileNavItem.removeAttr('role');
         mobileNavItem.find('a').attr('role', 'menuitem');
@@ -23,11 +24,15 @@ function createMobileMenu() {
 $(document).ready(function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var $hamburgerMenu;
+    // eslint-disable-next-line no-var
     var $mobileMenu;
     // Toggling visibility for the user dropdown
     $('.global-header .toggle-user-dropdown, .global-header .toggle-user-dropdown span').click(function(e) {
+        // eslint-disable-next-line no-var
         var $dropdownMenu = $('.global-header .nav-item .dropdown-user-menu');
+        // eslint-disable-next-line no-var
         var $userDropdown = $('.global-header .toggle-user-dropdown');
         if ($dropdownMenu.is(':visible')) {
             $dropdownMenu.addClass('hidden');
@@ -44,7 +49,9 @@ $(document).ready(function() {
     // Hide user dropdown on click away
     if ($('.global-header .nav-item .dropdown-user-menu').length) {
         $(window).click(function(e) {
+            // eslint-disable-next-line no-var
             var $dropdownMenu = $('.global-header .nav-item .dropdown-user-menu');
+            // eslint-disable-next-line no-var
             var $userDropdown = $('.global-header .toggle-user-dropdown');
             if ($userDropdown.is(':visible') && !$(e.target).is('.dropdown-item, .toggle-user-dropdown')) {
                 $dropdownMenu.addClass('hidden');
@@ -79,6 +86,7 @@ $(document).ready(function() {
 $('.mobile-menu, .global-header').on('keydown', function(e) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var isNext,
         nextLink,
         loopFirst,

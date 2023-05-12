@@ -4,6 +4,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal', 'edx-ui
 function($, _, gettext, BaseModal, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var UploadDialog = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
             'change input[type=file]': 'selectFile',
@@ -33,6 +34,7 @@ function($, _, gettext, BaseModal, HtmlUtils) {
         },
 
         renderContents: function() {
+            // eslint-disable-next-line no-var
             var isValid = this.model.isValid(),
                 selectedFile = this.model.get('selectedFile'),
                 oldInput = this.$('input[type=file]');
@@ -69,6 +71,7 @@ function($, _, gettext, BaseModal, HtmlUtils) {
         },
 
         selectFile: function(e) {
+            // eslint-disable-next-line no-var
             var selectedFile = e.target.files[0] || null;
             this.model.set({
                 selectedFile: selectedFile
@@ -81,6 +84,7 @@ function($, _, gettext, BaseModal, HtmlUtils) {
         },
 
         upload: function(e) {
+            // eslint-disable-next-line no-var
             var uploadAjaxData = _.extend({}, this.uploadData);
             // don't show the generic error notification; we're in a modal,
             // and we're better off modifying it instead.
@@ -111,6 +115,7 @@ function($, _, gettext, BaseModal, HtmlUtils) {
             if (this.options.onSuccess) {
                 this.options.onSuccess(response, statusText, xhr, form);
             }
+            // eslint-disable-next-line no-var
             var that = this;
             this.removalTimeout = setTimeout(function() {
                 that.hide();

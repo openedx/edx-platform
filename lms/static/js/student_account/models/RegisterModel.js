@@ -25,6 +25,7 @@
                 },
 
                 sync: function(method, model) {
+                    // eslint-disable-next-line no-var
                     var headers = {'X-CSRFToken': $.cookie('csrftoken')},
                         data = {next: model.nextUrl},
                         courseId = $.url('?course_id');

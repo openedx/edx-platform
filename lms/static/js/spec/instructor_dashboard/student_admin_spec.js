@@ -8,6 +8,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
         'use strict';
 
         describe('edx.instructor_dashboard.student_admin.StudentAdmin', function() {
+            // eslint-disable-next-line no-var
             var studentadmin, dashboardApiUrl, uniqStudentIdentifier, alertMsg;
 
             beforeEach(function() {
@@ -29,16 +30,21 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('initiates resetting of entrance exam when button is clicked', function() {
+                // eslint-disable-next-line no-var
                 var successMessage = gettext("Entrance exam attempts is being reset for student '{student_id}'.");
+                // eslint-disable-next-line no-var
                 var fullSuccessMessage = interpolate_text(successMessage, {
                     student_id: uniqStudentIdentifier
                 });
+                // eslint-disable-next-line no-var
                 var url = dashboardApiUrl + '/reset_student_attempts_for_entrance_exam';
 
                 // Spy on AJAX requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
 
                 // Verify that the client contacts the server to start instructor task
+                // eslint-disable-next-line no-var
                 var params = $.param({
                     unique_student_identifier: uniqStudentIdentifier,
                     delete_module: false
@@ -63,15 +69,20 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('shows an error when resetting of entrance exam fails', function() {
+                // eslint-disable-next-line no-var
                 var url = dashboardApiUrl + '/reset_student_attempts_for_entrance_exam';
                 // Spy on AJAX requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 // Verify that the client contacts the server to start instructor task
+                // eslint-disable-next-line no-var
                 var params = $.param({
                     unique_student_identifier: uniqStudentIdentifier,
                     delete_module: false
                 });
+                // eslint-disable-next-line no-var
                 var errorMessage = gettext("Error resetting entrance exam attempts for student '{student_id}'. Make sure student identifier is correct."); //  eslint-disable-line max-len
+                // eslint-disable-next-line no-var
                 var fullErrorMessage = interpolate_text(errorMessage, {
                     student_id: uniqStudentIdentifier
                 });
@@ -88,16 +99,21 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('initiates rescoring of the entrance exam when the button is clicked', function() {
+                // eslint-disable-next-line no-var
                 var successMessage = gettext("Started entrance exam rescore task for student '{student_id}'."
                     + " Click the 'Show Task Status' button to see the status of the task."); //  eslint-disable-line max-len
+                // eslint-disable-next-line no-var
                 var fullSuccessMessage = interpolate_text(successMessage, {
                     student_id: uniqStudentIdentifier
                 });
+                // eslint-disable-next-line no-var
                 var url = dashboardApiUrl + '/rescore_entrance_exam';
 
                 // Spy on AJAX requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 // Verify that the client contacts the server to start instructor task
+                // eslint-disable-next-line no-var
                 var params = $.param({
                     unique_student_identifier: uniqStudentIdentifier,
                     only_if_higher: false
@@ -122,18 +138,23 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('shows an error when entrance exam rescoring fails', function() {
+                // eslint-disable-next-line no-var
                 var url = dashboardApiUrl + '/rescore_entrance_exam';
                 // Spy on AJAX requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 // Verify that the client contacts the server to start instructor task
+                // eslint-disable-next-line no-var
                 var params = $.param({
                     unique_student_identifier: uniqStudentIdentifier,
                     only_if_higher: false
                 });
+                // eslint-disable-next-line no-var
                 var errorMessage = gettext(
                     "Error starting a task to rescore entrance exam for student '{student_id}'."
                     + ' Make sure that entrance exam has problems in it and student identifier is correct.'
                 );
+                // eslint-disable-next-line no-var
                 var fullErrorMessage = interpolate_text(errorMessage, {
                     student_id: uniqStudentIdentifier
                 });
@@ -150,13 +171,17 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('initiates skip entrance exam when button is clicked', function() {
+                // eslint-disable-next-line no-var
                 var successMessage = "This student ('{student_id}') will skip the entrance exam.";
+                // eslint-disable-next-line no-var
                 var fullSuccessMessage = interpolate_text(successMessage, {
                     student_id: uniqStudentIdentifier
                 });
+                // eslint-disable-next-line no-var
                 var url = dashboardApiUrl + '/mark_student_can_skip_entrance_exam';
 
                 // Spy on AJAX requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
 
                 studentadmin.$btn_skip_entrance_exam.click();
@@ -181,8 +206,11 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
 
             it('shows an error when skip entrance exam fails', function() {
                 // Spy on AJAX requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var url = dashboardApiUrl + '/mark_student_can_skip_entrance_exam';
+                // eslint-disable-next-line no-var
                 var errorMessage = "An error occurred. Make sure that the student's username or email address is correct and try again."; //  eslint-disable-line max-len
                 studentadmin.$field_exam_grade.val(uniqStudentIdentifier);
                 studentadmin.$btn_skip_entrance_exam.click();
@@ -198,15 +226,20 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('initiates delete student state for entrance exam when button is clicked', function() {
+                // eslint-disable-next-line no-var
                 var successMessage = gettext("Entrance exam state is being deleted for student '{student_id}'.");
+                // eslint-disable-next-line no-var
                 var fullSuccessMessage = interpolate_text(successMessage, {
                     student_id: uniqStudentIdentifier
                 });
+                // eslint-disable-next-line no-var
                 var url = dashboardApiUrl + '/reset_student_attempts_for_entrance_exam';
 
                 // Spy on AJAX requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 // Verify that the client contacts the server to start instructor task
+                // eslint-disable-next-line no-var
                 var params = $.param({
                     unique_student_identifier: uniqStudentIdentifier,
                     delete_module: true
@@ -230,15 +263,20 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('shows an error when delete student state for entrance exam fails', function() {
+                // eslint-disable-next-line no-var
                 var url = dashboardApiUrl + '/reset_student_attempts_for_entrance_exam';
                 // Spy on AJAX requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var params = $.param({
                     unique_student_identifier: uniqStudentIdentifier,
                     delete_module: true
                 });
+                // eslint-disable-next-line no-var
                 var errorMessage = gettext("Error deleting entrance exam state for student '{student_id}'. "
                     + 'Make sure student identifier is correct.'); //  eslint-disable-line max-len
+                // eslint-disable-next-line no-var
                 var fullErrorMessage = interpolate_text(errorMessage, {
                     student_id: uniqStudentIdentifier
                 });
@@ -254,10 +292,13 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('initiates listing of entrance exam task history when button is clicked', function() {
+                // eslint-disable-next-line no-var
                 var url = dashboardApiUrl + '/list_entrance_exam_instructor_tasks';
 
                 // Spy on AJAX requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var params = $.param({
                     unique_student_identifier: uniqStudentIdentifier
                 });
@@ -292,14 +333,19 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
             });
 
             it('shows an error when listing entrance exam task history fails', function() {
+                // eslint-disable-next-line no-var
                 var url = dashboardApiUrl + '/list_entrance_exam_instructor_tasks';
                 // Spy on AJAX requests
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var params = $.param({
                     unique_student_identifier: uniqStudentIdentifier
                 });
+                // eslint-disable-next-line no-var
                 var errorMessage = gettext("Error getting entrance exam task history for student '{student_id}'. "
                     + 'Make sure student identifier is correct.');
+                // eslint-disable-next-line no-var
                 var fullErrorMessage = interpolate_text(errorMessage, {
                     student_id: uniqStudentIdentifier
                 });

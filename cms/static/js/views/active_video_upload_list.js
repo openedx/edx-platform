@@ -16,6 +16,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
     HtmlUtils, StringUtils, activeVideoUploadListTemplate) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var ActiveVideoUploadListView,
         CONVERSION_FACTOR_GBS_TO_BYTES = 1000 * 1000 * 1000;
     ActiveVideoUploadListView = BaseView.extend({
@@ -101,6 +102,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var preventDefault;
 
             HtmlUtils.setHtml(
@@ -143,7 +145,9 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
         // eslint-disable-next-line consistent-return
         onBeforeUnload: function() {
             // Are there are uploads queued or in progress?
+            // eslint-disable-next-line no-var
             var uploading = this.collection.filter(function(model) {
+                // eslint-disable-next-line no-var
                 var isUploading = model.uploading();
                 if (isUploading) {
                     model.set('uploading', true);
@@ -160,6 +164,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
         },
 
         onUnload: function() {
+            // eslint-disable-next-line no-var
             var statusUpdates = [];
             this.collection.each(function(model) {
                 if (model.get('uploading')) {
@@ -179,6 +184,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
         },
 
         addUpload: function(model) {
+            // eslint-disable-next-line no-var
             var itemView = new ActiveVideoUploadView({model: model});
             this.itemViews.push(itemView);
             this.renderUploadView(itemView);
@@ -210,6 +216,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
         // individual file uploads, using the extra `redirected` field to
         // indicate that the correct upload url has already been retrieved
         fileUploadAdd: function(event, uploadData) {
+            // eslint-disable-next-line no-var
             var view = this,
                 model,
                 errors,
@@ -291,6 +298,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
         },
 
         fileUploadDone: function(event, data) {
+            // eslint-disable-next-line no-var
             var model = this.collection.get(data.cid),
                 self = this;
 
@@ -318,6 +326,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
         },
 
         fileUploadFail: function(event, data) {
+            // eslint-disable-next-line no-var
             var responseText = data.jqXHR.responseText,
                 message = this.defaultFailureMessage,
                 status = 'upload_failed',
@@ -346,6 +355,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
         },
 
         addUploadFailureView: function(fileName, failureMessage) {
+            // eslint-disable-next-line no-var
             var model = new ActiveVideoUpload({
                 fileName: fileName,
                 status: ActiveVideoUpload.STATUS_FAILED,
@@ -371,6 +381,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
         },
 
         validateFile: function(data) {
+            // eslint-disable-next-line no-var
             var self = this,
                 error = null,
                 errors = [],
@@ -416,6 +427,7 @@ function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, Cou
         // uploaded successfully. Also removes the corresponding models
         // from `collection`, keeping both in sync.
         clearSuccessful: function() {
+            // eslint-disable-next-line no-var
             var idx,
                 completedIndexes = [],
                 completedModels = [],

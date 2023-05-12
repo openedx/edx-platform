@@ -15,13 +15,16 @@
              * // returns {"a":"alpha", "b":"beta", "":""}
              */
                 selectorOptionsArrayToHashWithBlank: function(options) {
+                    // eslint-disable-next-line no-var
                     var map = _.object(options);
                     map[''] = '';
                     return map;
                 },
 
                 teamCapacityText: function(memberCount, maxMemberCount) {
+                    // eslint-disable-next-line no-var
                     var formatString;
+                    // eslint-disable-next-line no-var
                     var parameters = {memberCount: memberCount};
                     if (maxMemberCount === null) {
                         formatString = '{memberCount}';
@@ -53,6 +56,7 @@
                 },
 
                 showMessage: function(message, type) {
+                    // eslint-disable-next-line no-var
                     var $messageElement = $('#teams-message');
                     if (_.isUndefined(type)) {
                         type = 'warning'; // eslint-disable-line no-param-reassign
@@ -67,6 +71,7 @@
              */
                 parseAndShowMessage: function(data, genericErrorMessage, type) {
                     try {
+                        // eslint-disable-next-line no-var
                         var errors = JSON.parse(data.responseText); // eslint-disable-line vars-on-top
                         this.showMessage(
                             _.isUndefined(errors.user_message) ? genericErrorMessage : errors.user_message, type
@@ -89,6 +94,7 @@
              */
                 showInfoBanner: function(content, isError) {
                 // clear message
+                    // eslint-disable-next-line no-var
                     var $message = $('#team-management-assign .page-banner .message-content');
                     $message.html('');
 

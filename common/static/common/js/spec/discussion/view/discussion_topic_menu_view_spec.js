@@ -3,6 +3,7 @@
     'use strict';
 
     describe('DiscussionTopicMenuView', function() {
+        // eslint-disable-next-line no-var
         var ExpectedDiscussionId;
         beforeEach(function() {
             this.createTopicView = function(options) {

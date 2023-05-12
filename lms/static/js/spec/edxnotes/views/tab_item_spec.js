@@ -22,6 +22,7 @@ define([
         });
 
         it('can contain an icon', function() {
+            // eslint-disable-next-line no-var
             var firstItem = this.tabsList.$('#first-item'),
                 secondItem = this.tabsList.$('#second-item');
 
@@ -30,6 +31,7 @@ define([
         });
 
         it('can navigate between tabs', function() {
+            // eslint-disable-next-line no-var
             var firstItem = this.tabsList.$('#first-item'),
                 secondItem = this.tabsList.$('#second-item');
 
@@ -45,6 +47,7 @@ define([
         });
 
         it('can close the tab', function() {
+            // eslint-disable-next-line no-var
             var secondItem = this.tabsList.$('#second-item');
 
             expect(this.tabsList.$('.tab')).toHaveLength(2);

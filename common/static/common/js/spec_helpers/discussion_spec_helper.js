@@ -7,6 +7,7 @@
         }
 
         DiscussionSpecHelper.setUpGlobals = function(opts) {
+            // eslint-disable-next-line no-var
             var options = opts || {};
             DiscussionUtil.loadRoles(options.roles || DiscussionSpecHelper.getTestRoleInfo());
             window.$$course_id = options.courseName || 'edX/999/test';
@@ -55,6 +56,7 @@
         };
 
         DiscussionSpecHelper.createTestCourseSettings = function(options) {
+            // eslint-disable-next-line no-var
             var context = _.extend(
                 {
                     category_map: {
@@ -80,6 +82,7 @@
         };
 
         DiscussionSpecHelper.createTestDiscussion = function(options) {
+            // eslint-disable-next-line no-var
             var sortPreference = options.sort_preference,
                 threads = options.threads || [],
                 threadPages = options.thread_pages || 1,
@@ -92,6 +95,7 @@
         };
 
         DiscussionSpecHelper.setUnderscoreFixtures = function() {
+            // eslint-disable-next-line no-var
             var templateFixtures = readFixtures('common/templates/discussion/templates.underscore');
             appendSetFixtures(templateFixtures);
             appendSetFixtures(

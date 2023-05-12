@@ -24,6 +24,7 @@
             },
 
             initialize: function(options) {
+                // eslint-disable-next-line no-var
                 var user = options.user;
                 this.initialUser = user;
                 this.enrollmentSupportUrl = options.enrollmentSupportUrl;
@@ -35,6 +36,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var user = this.enrollments.user;
                 HtmlUtils.setHtml(
                     this.$el,
@@ -86,6 +88,7 @@
              * learner's enrollment.
              */
             changeEnrollment: function(event) {
+                // eslint-disable-next-line no-var
                 var $button = $(event.currentTarget),
                     // eslint-disable-next-line camelcase
                     course_id = $button.data('course_id'),

@@ -3,7 +3,7 @@ $(document).ready(function() {
 
     $('.generate_certs').click(function(e) {
         e.preventDefault();
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var post_url = $('.generate_certs').data('endpoint');
         $('.generate_certs').attr('disabled', true).addClass('is-disabled').attr('aria-disabled', true);
         $.ajax({

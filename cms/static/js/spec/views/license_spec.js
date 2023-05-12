@@ -29,6 +29,7 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
             });
 
             it('switches license type on click', function() {
+                // eslint-disable-next-line no-var
                 var arrBtn = this.view.$('li[data-license=all-rights-reserved] button');
                 expect(this.model.get('type')).toBeNull();
                 arrBtn.click();
@@ -37,6 +38,7 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                 arrBtn = this.view.$('li[data-license=all-rights-reserved] button');
                 expect(arrBtn).toHaveClass('is-selected');
                 // now switch to creative commons
+                // eslint-disable-next-line no-var
                 var ccBtn = this.view.$('li[data-license=creative-commons] button');
                 ccBtn.click();
                 expect(this.model.get('type')).toEqual('creative-commons');
@@ -49,6 +51,7 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
 
             it('sets default license options when switching license types', function() {
                 expect(this.model.get('options')).toEqual({});
+                // eslint-disable-next-line no-var
                 var ccBtn = this.view.$('li[data-license=creative-commons] button');
                 ccBtn.click();
                 expect(this.model.get('options')).toEqual(
@@ -56,6 +59,7 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                         ver: '4.0', BY: true, NC: true, ND: true, SA: false
                     }
                 );
+                // eslint-disable-next-line no-var
                 var arrBtn = this.view.$('li[data-license=all-rights-reserved] button');
                 arrBtn.click();
                 expect(this.model.get('options')).toEqual({});
@@ -97,6 +101,7 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                         ver: '4.0', BY: true, NC: true, ND: true, SA: false
                     }
                 );
+                // eslint-disable-next-line no-var
                 var BY = this.view.$('li[data-option=BY]');
                 expect(BY).toHaveClass('is-disabled');
                 // try to toggle BY option
@@ -117,6 +122,7 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                     }
                 );
                 // SA and ND conflict
+                // eslint-disable-next-line no-var
                 var SA = this.view.$('li[data-option=SA]');
                 // try to turn on SA option
                 SA.click();

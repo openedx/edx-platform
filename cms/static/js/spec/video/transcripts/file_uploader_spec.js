@@ -9,6 +9,7 @@ define(
         'use strict';
 
         describe('Transcripts.FileUploader', function() {
+            // eslint-disable-next-line no-var
             var videoListEntryTemplate = readFixtures(
                     'video/transcripts/metadata-videolist-entry.underscore'
                 ),
@@ -31,7 +32,7 @@ define(
                     ).text(fileUploadTemplate)
                 );
 
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var messenger = jasmine.createSpyObj(
                         'MessageManager',
                         ['render', 'showError', 'hideError']
@@ -84,6 +85,7 @@ define(
                 );
 
                 it('All works okay if all data is okay', function() {
+                    // eslint-disable-next-line no-var
                     var elList = ['$form', '$input', '$progress'],
                         validFileExtensions = ['srt', 'sjson'],
                         // eslint-disable-next-line no-unused-vars
@@ -102,6 +104,7 @@ define(
             });
 
             describe('Upload', function() {
+                // eslint-disable-next-line no-var
                 var videoId = '123-456-789-0';
 
                 beforeEach(function() {
@@ -171,6 +174,7 @@ define(
             });
 
             describe('checkExtValidity', function() {
+                // eslint-disable-next-line no-var
                 var data = {
                     Correct: {
                         name: 'file_name.srt',
@@ -184,6 +188,7 @@ define(
 
                 $.each(data, function(fileType, fileInfo) {
                     it(fileType + ' file type', function() {
+                        // eslint-disable-next-line no-var
                         var result = view.checkExtValidity(fileInfo);
 
                         expect(result).toBe(fileInfo.isValid);
@@ -199,6 +204,7 @@ define(
             });
 
             it('xhrProgressHandler', function() {
+                // eslint-disable-next-line no-var
                 var percent = 26;
 
                 // eslint-disable-next-line no-undef
@@ -211,6 +217,7 @@ define(
 
             describe('xhrCompleteHandler', function() {
                 it('Ajax Success', function() {
+                    // eslint-disable-next-line no-var
                     var xhr = {
                         status: 200,
                         responseText: JSON.stringify({
@@ -229,6 +236,7 @@ define(
                         .toHaveBeenCalledWith('transcripts:basicTabUpdateEdxVideoId', 'test_video_id');
                 });
 
+                // eslint-disable-next-line no-var
                 var assertAjaxError = function(xhr) {
                     view.xhrCompleteHandler(xhr);
 
@@ -238,6 +246,7 @@ define(
                 };
 
                 it('Ajax transport Error', function() {
+                    // eslint-disable-next-line no-var
                     var xhr = {
                         status: 400,
                         responseText: JSON.stringify({})

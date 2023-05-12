@@ -2,7 +2,7 @@
 (function() {
     'use strict';
 
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var $$course_id = '$$course_id';
 
     describe('ResponseCommentView', function() {
@@ -30,6 +30,7 @@
             return this.view.render();
         });
         describe('_delete', function() {
+            // eslint-disable-next-line no-var
             var setAjaxResult;
             beforeEach(function() {
                 this.comment.updateInfo({
@@ -137,6 +138,7 @@
         });
         describe('edit', function() {
             it('triggers the appropriate event and switches to the edit view', function() {
+                // eslint-disable-next-line no-var
                 var editTarget;
                 // eslint-disable-next-line no-undef
                 spyOn(this.view, 'renderEditView');
@@ -154,6 +156,7 @@
             });
             describe('cancelEdit', function() {
                 it('triggers the appropriate event and switches to the show view', function() {
+                    // eslint-disable-next-line no-var
                     var cancelEditTarget;
                     // eslint-disable-next-line no-undef
                     spyOn(this.view, 'renderShowView');
@@ -167,6 +170,7 @@
             });
             describe('update', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-var
                     var self = this;
                     this.updatedBody = 'updated body';
                     this.view.$el.find('.edit-comment-body').html($('<textarea></textarea>'));
@@ -206,6 +210,7 @@
                     return expect(this.view.cancelEdit).toHaveBeenCalled();
                 });
                 it('handles AJAX errors', function() {
+                    // eslint-disable-next-line no-var
                     var originalBody;
                     originalBody = this.comment.get('body');
                     this.ajaxSucceed = false;

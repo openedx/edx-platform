@@ -10,6 +10,7 @@
         ],
         function($, MessageBannerView, BookmarksCollection, BookmarksListView) {
             return function(options) {
+                // eslint-disable-next-line no-var
                 var courseId = options.courseId,
                     bookmarksApiUrl = options.bookmarksApiUrl,
                     bookmarksCollection = new BookmarksCollection([],
@@ -18,6 +19,7 @@
                             url: bookmarksApiUrl
                         }
                     );
+                // eslint-disable-next-line no-var
                 var bookmarksView = new BookmarksListView(
                     {
                         $el: options.$el,

@@ -4,6 +4,7 @@ define(['jquery', 'js/student_account/utils'],
         'use strict';
 
         describe('edxUserCookie', function() {
+            // eslint-disable-next-line no-var
             var user,
                 edxUserInfoCookieName = 'edx-user-info',
                 userInfo = {
@@ -23,6 +24,7 @@ define(['jquery', 'js/student_account/utils'],
         });
 
         describe('userFromEdxUserCookie', function() {
+            // eslint-disable-next-line no-var
             var user;
 
             beforeEach(function() {

@@ -7,6 +7,7 @@
         describe('ViewUtils', function() {
             describe('disabled element while running', function() {
                 it("adds 'is-disabled' class to element while action is running and removes it after", function() {
+                    // eslint-disable-next-line no-var
                     var $link,
                         deferred = new $.Deferred(),
                         promise = deferred.promise();
@@ -20,6 +21,7 @@
                 });
 
                 it('disables elements within withDisabledElement', function() {
+                    // eslint-disable-next-line no-var
                     var $link,
                         eventCallback,
                         event,
@@ -45,6 +47,7 @@
 
             describe('progress notification', function() {
                 it('shows progress notification and removes it upon success', function() {
+                    // eslint-disable-next-line no-var
                     var testMessage = 'Testing...',
                         deferred = new $.Deferred(),
                         promise = deferred.promise(),
@@ -56,6 +59,7 @@
                 });
 
                 it('shows progress notification and leaves it showing upon failure', function() {
+                    // eslint-disable-next-line no-var
                     var testMessage = 'Testing...',
                         deferred = new $.Deferred(),
                         promise = deferred.promise(),
@@ -70,11 +74,13 @@
             describe('course/library fields validation', function() {
                 describe('without unicode support', function() {
                     it('validates presence of field', function() {
+                        // eslint-disable-next-line no-var
                         var error = ViewUtils.validateURLItemEncoding('', false);
                         expect(error).toBeTruthy();
                     });
 
                     it('checks for presence of special characters in the field', function() {
+                        // eslint-disable-next-line no-var
                         var error;
                         // Special characters are not allowed.
                         error = ViewUtils.validateURLItemEncoding('my+field', false);
@@ -92,6 +98,7 @@
                     });
 
                     it('does not allow unicode characters', function() {
+                        // eslint-disable-next-line no-var
                         var error = ViewUtils.validateURLItemEncoding('Field-\u010d', false);
                         expect(error).toBeTruthy();
                     });
@@ -99,16 +106,19 @@
 
                 describe('with unicode support', function() {
                     it('validates presence of field', function() {
+                        // eslint-disable-next-line no-var
                         var error = ViewUtils.validateURLItemEncoding('', true);
                         expect(error).toBeTruthy();
                     });
 
                     it('checks for presence of spaces', function() {
+                        // eslint-disable-next-line no-var
                         var error = ViewUtils.validateURLItemEncoding('My Field', true);
                         expect(error).toBeTruthy();
                     });
 
                     it('allows unicode characters', function() {
+                        // eslint-disable-next-line no-var
                         var error = ViewUtils.validateURLItemEncoding('Field-\u010d', true);
                         expect(error).toBeFalsy();
                     });

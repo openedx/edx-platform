@@ -12,7 +12,7 @@
         function(CertificateInvalidationView, CertificateInvalidationCollection) {
             // eslint-disable-next-line camelcase
             return function(certificate_invalidation_collection_json, certificate_invalidation_url) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var certificate_invalidation_collection = new CertificateInvalidationCollection(
                     JSON.parse(certificate_invalidation_collection_json), {
                         parse: true,
@@ -22,7 +22,7 @@
                     }
                 );
 
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var certificate_invalidation_view = new CertificateInvalidationView({
                     // eslint-disable-next-line camelcase
                     collection: certificate_invalidation_collection

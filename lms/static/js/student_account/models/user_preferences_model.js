@@ -5,6 +5,7 @@
     define([
         'gettext', 'underscore', 'backbone'
     ], function(gettext, _, Backbone) {
+        // eslint-disable-next-line no-var
         var UserPreferencesModel = Backbone.Model.extend({
             idAttribute: 'account_privacy',
             defaults: {

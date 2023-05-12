@@ -10,6 +10,7 @@ define([
     'use strict';
 
     describe('TeamProfileView', function() {
+        // eslint-disable-next-line no-var
         var profileView, createTeamProfileView, createTeamModelData, clickLeaveTeam,
             teamModel,
             leaveTeamLinkSelector = '.leave-team-link',
@@ -123,6 +124,7 @@ define([
         describe('TeamAssignmentsView', function() {
             it('can render itself', function() {
                 // Given a member of a team with team assignments
+                // eslint-disable-next-line no-var
                 var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
                     options = {
                         membership: DEFAULT_MEMBERSHIP
@@ -130,6 +132,7 @@ define([
                     requests = AjaxHelpers.requests(this);
 
                 // When they go to the team profile view
+                // eslint-disable-next-line no-var
                 var view = createTeamProfileView(requests, options);
 
                 // The Assignments section renders with their assignments
@@ -138,6 +141,7 @@ define([
 
             it('displays a message when no assignments are found', function() {
                 // Given a member viewing a team with no assignments
+                // eslint-disable-next-line no-var
                 var mockAssignments = [],
                     options = {
                         assignments: mockAssignments,
@@ -146,6 +150,7 @@ define([
                     requests = AjaxHelpers.requests(this);
 
                 // When they view the team
+                // eslint-disable-next-line no-var
                 var view = createTeamProfileView(requests, options);
 
                 // There should be filler text that says there are no assignments
@@ -155,6 +160,7 @@ define([
 
             it('does not show at all for someone who is not on the team or staff', function() {
                 // Given a user who is not on a team viewing a team with assignments
+                // eslint-disable-next-line no-var
                 var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
                     options = {
                         assignments: mockAssignments
@@ -162,6 +168,7 @@ define([
                     requests = AjaxHelpers.requests(this);
 
                 // When the user goes to the team detail page
+                // eslint-disable-next-line no-var
                 var view = createTeamProfileView(requests, options);
 
                 // Then then assignments view does not appear on the page
@@ -171,6 +178,7 @@ define([
             it('does not show at all when the feature flag is turned off', function() {
                 // Given the team submissions feature is turned off
                 // (teamAsssignmentsUrl isn't surfaced to user)
+                // eslint-disable-next-line no-var
                 var mockAssignments = TeamSpecHelpers.createMockTeamAssignments(),
                     options = {
                         assignments: mockAssignments,
@@ -193,12 +201,14 @@ define([
 
         describe('DiscussionsView', function() {
             it('can render itself', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {});
                 expect(view.$('.forum-nav-thread').length).toEqual(3);
             });
 
             it('shows New Post button when user joins a team', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {});
 
@@ -208,6 +218,7 @@ define([
             });
 
             it('hides New Post button when user left a team', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {membership: DEFAULT_MEMBERSHIP});
 
@@ -216,6 +227,7 @@ define([
             });
 
             it('shows New Post button when user is a staff member or admin', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(
                         requests, {userInfo: TeamSpecHelpers.createMockUserInfo({staff: true})}
@@ -227,7 +239,9 @@ define([
         });
 
         describe('TeamDetailsView', function() {
+            // eslint-disable-next-line no-var
             var assertTeamDetails = function(view, members, memberOfTeam, isManagedTeam) {
+                // eslint-disable-next-line no-var
                 var expectedMemberMsg;
                 expect(view.$('.team-detail-header').text()).toBe('Team Details');
                 expect(view.$('.team-country').text()).toContain('United States');
@@ -248,7 +262,9 @@ define([
 
             describe('Non-Member', function() {
                 it('can render itself', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
+                    // eslint-disable-next-line no-var
                     var view = createTeamProfileView(requests, {
                         country: 'US',
                         language: 'en'
@@ -261,7 +277,9 @@ define([
                 });
 
                 it('cannot see the country & language if empty', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
+                    // eslint-disable-next-line no-var
                     var view = createTeamProfileView(requests, {});
                     expect(view.$('.team-country').length).toBe(0);
                     expect(view.$('.team-language').length).toBe(0);
@@ -270,7 +288,9 @@ define([
 
             describe('Member', function() {
                 it('can render itself', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
+                    // eslint-disable-next-line no-var
                     var view = createTeamProfileView(requests, {
                         country: 'US',
                         language: 'en',
@@ -289,8 +309,10 @@ define([
                 });
 
                 it('can leave team successfully', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
 
+                    // eslint-disable-next-line no-var
                     var view = createTeamProfileView(
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                     );
@@ -300,8 +322,10 @@ define([
                 });
 
                 it('student can not leave instructor managed team', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
 
+                    // eslint-disable-next-line no-var
                     var view = createTeamProfileView(
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}, true
                     );
@@ -310,8 +334,10 @@ define([
                 });
 
                 it("wouldn't do anything if user click on Cancel button on dialog", function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
 
+                    // eslint-disable-next-line no-var
                     var view = createTeamProfileView(
                         requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                     );
@@ -321,9 +347,12 @@ define([
                 });
 
                 it('shows correct error messages', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
 
+                    // eslint-disable-next-line no-var
                     var verifyErrorMessage = function(errorMessage, expectedMessage) {
+                        // eslint-disable-next-line no-var
                         var view = createTeamProfileView(
                             requests, {country: 'US', language: 'en', membership: DEFAULT_MEMBERSHIP}
                         );

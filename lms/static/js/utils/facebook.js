@@ -1,5 +1,6 @@
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable-next-line no-unused-vars, no-var */
 var FaceBook = (function() {
+    // eslint-disable-next-line no-var
     var _args = {};
 
     return {
@@ -14,6 +15,7 @@ var FaceBook = (function() {
                 });
             };
             (function(d, s, id) {
+                // eslint-disable-next-line no-var
                 var js,
                     fjs = d.getElementsByTagName(s)[0];
                 if (d.getElementById(id)) { return; }

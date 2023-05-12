@@ -1,6 +1,7 @@
 describe('TooltipManager', function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var PAGE_X = 100,
         PAGE_Y = 100,
         WIDTH = 100,

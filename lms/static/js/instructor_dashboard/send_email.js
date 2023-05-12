@@ -3,6 +3,7 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var KeywordValidator, PendingInstructorTasks,
         createEmailContentTable, createEmailMessageViews, createTaskListTable,
         plantTimeout, statusAjaxError;
@@ -37,6 +38,7 @@
 
     this.SendEmail = (function() {
         function SendEmail($container) {
+            // eslint-disable-next-line no-var
             var sendemail = this;
             this.$container = $container;
             this.$emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
@@ -56,6 +58,7 @@
             this.$email_content_table_inner = this.$container.find('.content-history-table-inner');
             this.$email_messages_wrapper = this.$container.find('.email-messages-wrapper');
             this.$btn_send.click(function() {
+                // eslint-disable-next-line no-var
                 var body, confirmMessage, displayTarget, fullConfirmMessage, message,
                     sendData, subject, successMessage, target, targets, validation, i, len;
                 subject = sendemail.$subject.val();
@@ -131,6 +134,7 @@
                 }
             });
             this.$btn_task_history_email.click(function() {
+                // eslint-disable-next-line no-var
                 var url = sendemail.$btn_task_history_email.data('endpoint');
                 return $.ajax({
                     type: 'POST',
@@ -156,6 +160,7 @@
                 });
             });
             this.$btn_task_history_email_content.click(function() {
+                // eslint-disable-next-line no-var
                 var url = sendemail.$btn_task_history_email_content.data('endpoint');
                 return $.ajax({
                     type: 'POST',
@@ -184,12 +189,15 @@
                 });
             });
             this.$send_to.change(function() {
+                // eslint-disable-next-line no-var
                 var targets;
+                // eslint-disable-next-line no-var
                 var inputDisable = function() {
                     this.checked = false;
                     this.disabled = true;
                     return true;
                 };
+                // eslint-disable-next-line no-var
                 var inputEnable = function() {
                     this.disabled = false;
                     return true;
@@ -232,6 +240,7 @@
 
     this.Email = (function() {
         function email($section) {
+            // eslint-disable-next-line no-var
             var eml = this;
             this.$section = $section;
             this.$section.data('wrapper', this);

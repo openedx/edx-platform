@@ -2,8 +2,10 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
+            // eslint-disable-next-line no-var
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -25,6 +27,7 @@
             __extends(DiscussionContentView, _super);
 
             function DiscussionContentView() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.setWmdContent = function() {
                     return DiscussionContentView.prototype.setWmdContent.apply(self, arguments);
@@ -50,6 +53,7 @@
 
             DiscussionContentView.prototype.attrRenderer = {
                 ability: function(ability) {
+                    // eslint-disable-next-line no-var
                     var action, selector, _ref, _results;
                     _ref = this.abilityRenderer;
                     _results = [];
@@ -86,12 +90,14 @@
                 },
                 can_openclose: {
                     enable: function() {
+                        // eslint-disable-next-line no-var
                         var self = this;
                         return _.each(['.action-close', '.action-pin'], function(selector) {
                             return self.$(selector).closest('.actions-item').removeClass('is-hidden');
                         });
                     },
                     disable: function() {
+                        // eslint-disable-next-line no-var
                         var self = this;
                         return _.each(['.action-close', '.action-pin'], function(selector) {
                             return self.$(selector).closest('.actions-item').addClass('is-hidden');
@@ -117,6 +123,7 @@
             };
 
             DiscussionContentView.prototype.renderPartialAttrs = function() {
+                // eslint-disable-next-line no-var
                 var attr, value, _ref, _results;
                 _ref = this.model.changedAttributes();
                 _results = [];
@@ -135,6 +142,7 @@
             };
 
             DiscussionContentView.prototype.renderAttrs = function() {
+                // eslint-disable-next-line no-var
                 var attr, value, _ref, _results;
                 _ref = this.model.attributes;
                 _results = [];
@@ -173,6 +181,7 @@
             };
 
             DiscussionContentView.prototype.initialize = function() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.model.bind('change', this.renderPartialAttrs, this);
                 return this.listenTo(this.model, 'change:endorsed', function() {
@@ -189,6 +198,7 @@
             __extends(DiscussionContentShowView, _super);
 
             function DiscussionContentShowView() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.toggleClose = function() {
                     return DiscussionContentShowView.prototype.toggleClose.apply(self, arguments);
@@ -237,6 +247,7 @@
                     ['.action-close', 'toggleClose']
                 ],
                 function(obj, event) {
+                    // eslint-disable-next-line no-var
                     var funcName, selector;
                     selector = event[0];
                     funcName = event[1];
@@ -254,6 +265,7 @@
             );
 
             DiscussionContentShowView.prototype.updateButtonState = function(selector, checked) {
+                // eslint-disable-next-line no-var
                 var $button;
                 $button = this.$(selector);
                 $button.toggleClass('is-checked', checked);
@@ -268,6 +280,7 @@
                         return this.updateButtonState('.action-follow', subscribed);
                     },
                     endorsed: function(endorsed) {
+                        // eslint-disable-next-line no-var
                         var $button, selector;
                         selector = this.model.get('thread').get('thread_type') === 'question'
                             ? '.action-answer'
@@ -278,6 +291,7 @@
                         return $button.toggleClass('is-checked', endorsed);
                     },
                     votes: function(votes) {
+                        // eslint-disable-next-line no-var
                         var button, numVotes, selector, votesText, votesCountMsg;
                         selector = '.action-vote';
                         this.updateButtonState(selector, window.user.voted(this.model));
@@ -300,6 +314,7 @@
                         return this.$('.post-label-pinned').toggleClass('is-hidden', !pinned);
                     },
                     abuse_flaggers: function() {
+                        // eslint-disable-next-line no-var
                         var flagged;
                         flagged = this.model.isFlagged();
                         this.updateButtonState('.action-report', flagged);
@@ -344,6 +359,7 @@
             };
 
             DiscussionContentShowView.prototype.handleSecondaryActionBlur = function(event) {
+                // eslint-disable-next-line no-var
                 var self = this;
                 return setTimeout(function() {
                     if (self.secondaryActionsExpanded && self.$('.actions-dropdown :focus').length === 0) {
@@ -353,6 +369,7 @@
             };
 
             DiscussionContentShowView.prototype.toggleFollow = function(event) {
+                // eslint-disable-next-line no-var
                 var isSubscribing, msg, url;
                 event.preventDefault();
                 isSubscribing = !this.model.get('subscribed');
@@ -372,6 +389,7 @@
             };
 
             DiscussionContentShowView.prototype.toggleEndorse = function(event) {
+                // eslint-disable-next-line no-var
                 var isEndorsing, msg, updates, url,
                     self = this;
                 event.preventDefault();
@@ -414,6 +432,7 @@
 
             // eslint-disable-next-line consistent-return
             DiscussionContentShowView.prototype.toggleVote = function(event) {
+                // eslint-disable-next-line no-var
                 var isVoting, updates, url, user,
                     self = this;
                 event.preventDefault();
@@ -439,6 +458,7 @@
             };
 
             DiscussionContentShowView.prototype.togglePin = function(event) {
+                // eslint-disable-next-line no-var
                 var isPinning, msg, url;
                 event.preventDefault();
                 isPinning = !this.model.get('pinned');
@@ -458,6 +478,7 @@
             };
 
             DiscussionContentShowView.prototype.toggleReport = function(event) {
+                // eslint-disable-next-line no-var
                 var isFlagging, msg, updates, url;
                 event.preventDefault();
                 if (this.model.isFlagged()) {
@@ -481,6 +502,7 @@
             };
 
             DiscussionContentShowView.prototype.toggleClose = function(event) {
+                // eslint-disable-next-line no-var
                 var isClosing, msg, updates;
                 event.preventDefault();
                 isClosing = !this.model.get('closed');
@@ -510,6 +532,7 @@
             };
 
             DiscussionContentShowView.prototype.getEndorserDisplay = function() {
+                // eslint-disable-next-line no-var
                 var endorsement;
                 endorsement = this.model.get('endorsement');
                 if (endorsement && endorsement.username) {

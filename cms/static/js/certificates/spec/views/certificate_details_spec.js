@@ -19,6 +19,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
     Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var SELECTORS = {
         detailsView: '.certificate-details',
         editView: '.certificate-edit',
@@ -42,6 +43,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         inputSignatoryTitle: '.signatory-title-input',
         inputSignatoryOrganization: '.signatory-organization-input'
     };
+    // eslint-disable-next-line no-var
     var verifyAndConfirmPrompt = function(promptSpy, promptText) {
         ViewHelpers.verifyPromptShowing(promptSpy, gettext(promptText));
         ViewHelpers.confirmPrompt(promptSpy);
@@ -49,6 +51,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
     };
 
     describe('Certificate Details Spec:', function() {
+        // eslint-disable-next-line no-var
         var setValuesToInputs = function(view, values) {
             _.each(values, function(value, selector) {
                 if (SELECTORS[selector]) {
@@ -121,31 +124,35 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
 
         describe('The Certificate Details view', function() {
             it('should parse a JSON string collection into a Backbone model collection', function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var course_title = 'Test certificate course title override 2';
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var CERTIFICATE_JSON = '[{"course_title": "' + course_title + '", "signatories":"[]"}]';
                 this.collection.parse(CERTIFICATE_JSON);
+                // eslint-disable-next-line no-var
                 var model = this.collection.at(1);
                 expect(model.get('course_title')).toEqual(course_title);
             });
 
             it('should parse a JSON object collection into a Backbone model collection', function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var course_title = 'Test certificate course title override 2';
+                // eslint-disable-next-line no-var
                 var CERTIFICATE_JSON_OBJECT = [{
                     // eslint-disable-next-line camelcase
                     course_title: course_title,
                     signatories: '[]'
                 }];
                 this.collection.parse(CERTIFICATE_JSON_OBJECT);
+                // eslint-disable-next-line no-var
                 var model = this.collection.at(1);
                 expect(model.get('course_title')).toEqual(course_title);
             });
 
             it('should have empty certificate collection if there is an error parsing certifcate JSON', function() {
+                // eslint-disable-next-line no-var
                 var CERTIFICATE_INVALID_JSON = '[{"course_title": Test certificate course title override, "signatories":"[]"}]'; // eslint-disable-line max-len
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var collection_length = this.collection.length;
                 this.collection.parse(CERTIFICATE_INVALID_JSON);
                 // collection length should remain the same since we have error parsing JSON
@@ -163,6 +170,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
 
             it('should change to "edit" mode when clicking the Edit button and confirming the prompt', function() {
                 expect(this.view.$('.action-edit .edit')).toExist();
+                // eslint-disable-next-line no-var
                 var promptSpy = ViewHelpers.createPromptSpy();
                 this.view.$('.action-edit .edit').click();
                 verifyAndConfirmPrompt(promptSpy, gettext('Edit this certificate?'));
@@ -235,6 +243,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
             });
 
             it('correctly persists changes made during in-line signatory editing', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
 

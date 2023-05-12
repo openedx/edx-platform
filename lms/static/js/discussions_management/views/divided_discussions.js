@@ -4,6 +4,7 @@
     define(['jquery', 'underscore', 'backbone', 'gettext', 'js/models/notification', 'js/views/notification'],
         function($, _, Backbone, gettext) {
             /* global NotificationModel, NotificationView */
+            // eslint-disable-next-line no-var
             var DividedDiscussionConfigurationView = Backbone.View.extend({
 
                 /**
@@ -21,6 +22,7 @@
                 * @returns {Array} - Divided discussions.
                 */
                 getDividedDiscussions: function(selector) {
+                    // eslint-disable-next-line no-var
                     var self = this,
                         dividedDiscussions = [];
 
@@ -37,6 +39,7 @@
                 * @param {object} fieldData - Data to update on the server.
                 */
                 saveForm: function($element, fieldData) {
+                    // eslint-disable-next-line no-var
                     var self = this,
                         discussionSettingsModel = this.discussionSettings,
                         saveOperation = $.Deferred(),
@@ -51,6 +54,7 @@
                     ).done(function() {
                         saveOperation.resolve();
                     }).fail(function(result) {
+                        // eslint-disable-next-line no-var
                         var errorMessage = null,
                             jsonResponse;
                         try {
@@ -75,6 +79,7 @@
                 * @param {string} type - Type of message to show e.g. confirmation or error.
                 */
                 showMessage: function(message, $element, type) {
+                    // eslint-disable-next-line no-var
                     var model = new NotificationModel({type: type || 'confirmation', title: message});
                     this.removeNotification();
                     this.notification = new NotificationView({

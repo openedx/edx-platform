@@ -7,8 +7,10 @@ define([
 function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var studioXBlockWrapperClass = '.studio-xblock-wrapper';
 
+    // eslint-disable-next-line no-var
     var ContainerView = XBlockView.extend({
         // Store the request token of the first xblock on the page (which we know was rendered by Studio when
         // the page was generated). Use that request token to filter out user-defined HTML in any
@@ -18,6 +20,7 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
         new_child_view: 'reorderable_container_child_preview',
 
         xblockReady: function() {
+            // eslint-disable-next-line no-var
             var reorderableClass, reorderableContainer,
                 newParent, oldParent,
                 self = this;
@@ -37,6 +40,7 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
                 },
 
                 stop: function() {
+                    // eslint-disable-next-line no-var
                     var saving, hideSaving, removeFromParent;
 
                     if (_.isUndefined(oldParent)) {
@@ -76,6 +80,7 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
                     // be null if the change is related to the list the element
                     // was originally in (the case of a move within the same container
                     // or the deletion from a container when moving to a new container).
+                    // eslint-disable-next-line no-var
                     var parent = $(event.target).closest(studioXBlockWrapperClass);
                     if (ui.sender) {
                         // Move to a new container (the addition part).
@@ -98,12 +103,14 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
         },
 
         updateChildren: function(targetParent, successCallback) {
+            // eslint-disable-next-line no-var
             var children, childLocators,
                 xblockInfo = this.model;
 
             // Find descendants with class "studio-xblock-wrapper" whose parent === targetParent.
             // This is necessary to filter our grandchildren, great-grandchildren, etc.
             children = targetParent.find(studioXBlockWrapperClass).filter(function() {
+                // eslint-disable-next-line no-var
                 var parent = $(this).parent().closest(studioXBlockWrapperClass);
                 return parent.data('locator') === targetParent.data('locator');
             });
@@ -138,6 +145,7 @@ function($, _, XBlockView, ModuleUtils, gettext, StringUtils, NotificationView) 
         },
 
         refresh: function() {
+            // eslint-disable-next-line no-var
             var sortableInitializedClass = this.makeRequestSpecificSelector('.reorderable-container.ui-sortable');
             this.$(sortableInitializedClass).sortable('refresh');
         },

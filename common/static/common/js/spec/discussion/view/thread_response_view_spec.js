@@ -23,8 +23,10 @@
             return spyOn(ResponseCommentView.prototype, 'render');
         });
         describe('closed and open Threads', function() {
+            // eslint-disable-next-line no-var
             var checkCommentForm;
             checkCommentForm = function(closed) {
+                // eslint-disable-next-line no-var
                 var comment, commentData, thread, view;
                 thread = new Thread({
                     thread_type: 'discussion',

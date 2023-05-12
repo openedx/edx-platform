@@ -37,6 +37,7 @@
             toHaveAttrs: function() {
                 return {
                     compare: function(actual, attrs) {
+                        // eslint-disable-next-line no-var
                         var result = {},
                             element = actual;
 

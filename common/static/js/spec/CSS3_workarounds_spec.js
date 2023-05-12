@@ -1,9 +1,11 @@
 describe('CSS3 workarounds', function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var pointerEventsNone = window.pointerEventsNone;
     describe('pointer-events', function() {
         beforeEach(function() {
+            // eslint-disable-next-line no-var
             var html = "<a href='#' class='is-disabled'>What wondrous life in this I lead</a>";
             setFixtures(html);
         });
@@ -12,6 +14,7 @@ describe('CSS3 workarounds', function() {
             // In case this test suite is being run in a browser where
             // 'pointerEvents' is not supported, mock out document.body.style
             // so that it includes 'pointerEvents'
+            // eslint-disable-next-line no-var
             var mockBodyStyle = document.body.style;
             if (!('pointerEvents' in mockBodyStyle)) {
                 mockBodyStyle.pointerEvents = '';

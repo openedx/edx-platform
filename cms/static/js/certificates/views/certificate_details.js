@@ -17,6 +17,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
     certificateDetailsTemplate) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CertificateDetailsView = BaseView.extend({
         tagName: 'div',
         events: {
@@ -41,6 +42,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
         editCertificate: function(event) {
             // Flip the model into 'editing' mode
             if (event && event.preventDefault) { event.preventDefault(); }
+            // eslint-disable-next-line no-var
             var self = this;
             if (this.model.get('is_active') === true) {
                 ViewUtils.confirmThenRunOperation(
@@ -59,6 +61,7 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
         render: function(showDetails) {
             // Assemble the details view for this model
             // Expand to show all model data, if requested
+            // eslint-disable-next-line no-var
             var attrs = $.extend({}, this.model.attributes, {
                 index: this.model.collection.indexOf(this.model),
                 showDetails: this.showDetails || showDetails || false
@@ -66,9 +69,10 @@ function($, _, str, gettext, BaseView, SignatoryModel, SignatoryDetailsView, Vie
             // xss-lint: disable=javascript-jquery-html
             this.$el.html(_.template(certificateDetailsTemplate)(attrs));
             if (this.showDetails || showDetails) {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.model.get('signatories').each(function(modelSignatory) {
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-var */
                     var signatory_detail_view = new SignatoryDetailsView({model: modelSignatory});
                     // xss-lint: disable=javascript-jquery-append
                     self.$('div.signatory-details-list').append($(signatory_detail_view.render().$el)); // eslint-disable-line camelcase

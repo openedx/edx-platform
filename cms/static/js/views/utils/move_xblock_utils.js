@@ -16,6 +16,7 @@ define([
 function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, StringUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var redirectLink, moveXBlock, undoMoveXBlock, showMovedNotification, hideMovedNotification;
 
     redirectLink = function(link) {
@@ -67,6 +68,7 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
     };
 
     showMovedNotification = function(title, data) {
+        // eslint-disable-next-line no-var
         var movedAlertView;
         // data is provided when we click undo move button.
         if (data) {
@@ -116,6 +118,7 @@ function($, _, Backbone, Feedback, AlertView, XBlockViewUtils, MoveXBlockUtils, 
     };
 
     hideMovedNotification = function() {
+        // eslint-disable-next-line no-var
         var movedAlertView = Feedback.active_alert;
         if (movedAlertView) {
             AlertView.prototype.hide.apply(movedAlertView);

@@ -12,7 +12,9 @@ function(Backbone, $, _, TemplateHelpers, MessageBannerView) {
         });
 
         it('renders message correctly', function() {
+            // eslint-disable-next-line no-var
             var messageSelector = '.message-banner';
+            // eslint-disable-next-line no-var
             var messageView = new MessageBannerView({
                 el: $(messageSelector)
             });

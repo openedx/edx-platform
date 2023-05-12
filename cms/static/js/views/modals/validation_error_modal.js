@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-undef
 define(['jquery', 'underscore', 'gettext', 'js/views/modals/base_modal'],
     function($, _, gettext, BaseModal) {
+        // eslint-disable-next-line no-var
         var ValidationErrorModal = BaseModal.extend({
             events: {
                 'click .action-cancel': 'cancel',

@@ -20,6 +20,7 @@ define([
 ) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var ListItemView = BaseView.extend({
         canDelete: false,
 
@@ -30,6 +31,7 @@ define([
         },
 
         className: function() {
+            // eslint-disable-next-line no-var
             var index = this.model.collection.indexOf(this.model);
 
             return [
@@ -44,6 +46,7 @@ define([
         deleteItem: function(event) {
             if (event && event.preventDefault) { event.preventDefault(); }
             if (!this.canDelete) { return; }
+            // eslint-disable-next-line no-var
             var model = this.model,
                 itemDisplayName = this.itemDisplayName;
             ViewUtils.confirmThenRunOperation(

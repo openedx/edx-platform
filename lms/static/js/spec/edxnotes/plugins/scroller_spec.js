@@ -5,6 +5,7 @@ define([
     'use strict';
 
     describe('EdxNotes Scroll Plugin', function() {
+        // eslint-disable-next-line no-var
         var annotators, highlights;
 
         function checkAnnotatorIsFrozen(annotator) {

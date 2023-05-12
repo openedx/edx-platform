@@ -6,6 +6,7 @@
 
     function VisibilityEditorView(runtime, element) {
         this.getGroupAccess = function() {
+            // eslint-disable-next-line no-var
             var groupAccess = {},
                 partitionId,
                 groupId;
@@ -36,6 +37,7 @@
         };
 
         element.find('.partition-visibility select').change(function(event) {
+            // eslint-disable-next-line no-var
             var partitionId;
 
             // Hide all the partition group options.

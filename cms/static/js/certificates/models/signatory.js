@@ -9,6 +9,7 @@ define([
 function(_, Backbone) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var Signatory = Backbone.RelationalModel.extend({
         idAttribute: 'id',
         defaults: {

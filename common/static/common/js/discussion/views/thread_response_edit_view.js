@@ -2,8 +2,10 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
+            // eslint-disable-next-line no-var
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -44,6 +46,7 @@
             };
 
             ThreadResponseEditView.prototype.render = function() {
+                // eslint-disable-next-line no-var
                 var context = $.extend({mode: this.options.mode, startHeader: this.options.startHeader},
                     this.model.attributes);
                 this.template = edx.HtmlUtils.template($('#thread-response-edit-template').html());

@@ -9,6 +9,7 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/modals/base_mod
 function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockEditorView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var EditXBlockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
             'click .action-save': 'save',
@@ -77,6 +78,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         onDisplayXBlock: function() {
+            // eslint-disable-next-line no-var
             var editorView = this.editorView,
                 title = this.getTitle(),
                 readOnlyView = (this.editOptions && this.editOptions.readOnlyView) || !this.canSave();
@@ -119,6 +121,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         disableSave: function() {
+            // eslint-disable-next-line no-var
             var saveButton = this.getActionButton('save'),
                 cancelButton = this.getActionButton('cancel');
             saveButton.parent().hide();
@@ -127,6 +130,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         getTitle: function() {
+            // eslint-disable-next-line no-var
             var displayName = this.xblockInfo.get('display_name');
             if (!displayName) {
                 if (this.xblockInfo.isVertical()) {
@@ -143,6 +147,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         addDefaultModes: function() {
+            // eslint-disable-next-line no-var
             var defaultModes, i, mode;
             defaultModes = this.editorView.getDefaultModes();
             for (i = 0; i < defaultModes.length; i++) {
@@ -152,6 +157,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         changeMode: function(event) {
+            // eslint-disable-next-line no-var
             var $parent = $(event.target.parentElement),
                 mode = $parent.data('mode');
             event.preventDefault();
@@ -159,6 +165,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         selectMode: function(mode) {
+            // eslint-disable-next-line no-var
             var editorView = this.editorView,
                 buttonSelector;
             editorView.selectMode(mode);
@@ -170,6 +177,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         save: function(event) {
+            // eslint-disable-next-line no-var
             var self = this,
                 editorView = this.editorView,
                 xblockInfo = this.xblockInfo,
@@ -198,6 +206,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         onSave: function() {
+            // eslint-disable-next-line no-var
             var refresh = this.editOptions.refresh;
             this.hide();
             if (refresh) {
@@ -216,6 +225,7 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         addModeButton: function(mode, displayName) {
+            // eslint-disable-next-line no-var
             var buttonPanel = this.$('.editor-modes');
             // xss-lint: disable=javascript-jquery-append
             buttonPanel.append(this.editorModeButtonTemplate({
@@ -225,11 +235,13 @@ function($, _, Backbone, gettext, BaseModal, ViewUtils, XBlockViewUtils, XBlockE
         },
 
         clickTitleButton: function(event) {
+            // eslint-disable-next-line no-var
             var self = this,
                 oldTitle = this.xblockInfo.get('display_name'),
                 titleElt = this.$('.modal-window-title'),
                 $input = $('<input type="text" size="40" />'),
                 changeFunc = function(evt) {
+                    // eslint-disable-next-line no-var
                     var newTitle = $(evt.target).val();
                     if (oldTitle !== newTitle) {
                         self.xblockInfo.set('display_name', newTitle);

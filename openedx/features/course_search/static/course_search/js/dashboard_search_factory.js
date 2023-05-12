@@ -7,12 +7,17 @@
     ],
     function(_, Backbone, SearchRouter, SearchForm, SearchCollection, DashboardSearchResultsView) {
         return function() {
+            // eslint-disable-next-line no-var
             var router = new SearchRouter();
+            // eslint-disable-next-line no-var
             var form = new SearchForm({
                 el: $('#dashboard-search-bar')
             });
+            // eslint-disable-next-line no-var
             var collection = new SearchCollection([]);
+            // eslint-disable-next-line no-var
             var results = new DashboardSearchResultsView({collection: collection});
+            // eslint-disable-next-line no-var
             var dispatcher = _.clone(Backbone.Events);
 
             dispatcher.listenTo(router, 'search', function(query) {

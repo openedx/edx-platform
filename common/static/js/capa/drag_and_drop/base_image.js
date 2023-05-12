@@ -4,6 +4,7 @@
         return BaseImage;
 
         function BaseImage(state) {
+            // eslint-disable-next-line no-var
             var $baseImageElContainer;
 
             $baseImageElContainer = $(HtmlUtils.joinHtml(
@@ -32,6 +33,7 @@
                 state.baseImageLoaded = true;
             });
             state.baseImageEl.error(function() {
+                // eslint-disable-next-line no-var
                 var errorMsg = HtmlUtils.joinHtml(
                     HtmlUtils.HTML('<span style="color: red;">'),
                     HtmlUtils.HTML('ERROR: Image "'), state.config.baseImage, HtmlUtils.HTML('" was not found!'),

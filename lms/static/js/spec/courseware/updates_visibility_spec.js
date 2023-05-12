@@ -12,6 +12,7 @@ define(['jquery', 'logger', 'js/courseware/toggle_element_visibility', 'moment']
             });
 
             it('ensures update will hide on hide button click', function() {
+                // eslint-disable-next-line no-var
                 var $shownUpdate = $('.toggle-visibility-element:not(.hidden)').first(),
                     $updateButton = $shownUpdate.siblings('.toggle-visibility-button');
                 $updateButton.trigger('click');
@@ -20,6 +21,7 @@ define(['jquery', 'logger', 'js/courseware/toggle_element_visibility', 'moment']
             });
 
             it('ensures update will show on show button click', function() {
+                // eslint-disable-next-line no-var
                 var $hiddenUpdate = $('.toggle-visibility-element.hidden').first(),
                     $updateButton = $hiddenUpdate.siblings('.toggle-visibility-button');
                 $updateButton.trigger('click');
@@ -29,6 +31,7 @@ define(['jquery', 'logger', 'js/courseware/toggle_element_visibility', 'moment']
 
             it('ensures old updates will show on button click', function() {
                 // on page load old updates will be hidden
+                // eslint-disable-next-line no-var
                 var $oldUpdates = $('.toggle-visibility-element.old-updates');
                 expect($oldUpdates).toHaveClass('hidden');
 
@@ -38,6 +41,7 @@ define(['jquery', 'logger', 'js/courseware/toggle_element_visibility', 'moment']
             });
 
             it('sends a tracking event on hide and show', function() {
+                // eslint-disable-next-line no-var
                 var $update = $('.toggle-visibility-element:not(.hidden)').first();
                 $update.siblings('.toggle-visibility-button').trigger('click');
                 expect(Logger.log).toHaveBeenCalledWith('edx.course.home.course_update.toggled', {

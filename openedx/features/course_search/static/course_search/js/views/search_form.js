@@ -23,6 +23,7 @@
             },
 
             doSearch: function(term) {
+                // eslint-disable-next-line no-var
                 var trimmedTerm;
                 if (term) {
                     trimmedTerm = term.trim();

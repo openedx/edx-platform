@@ -22,20 +22,24 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var template = this.loadTemplate('certificate-allowlist-editor');
                 this.$el.html(HtmlUtils.HTML(template()).toString());
             },
 
             loadTemplate: function(name) {
+                // eslint-disable-next-line no-var
                 var templateSelector = '#' + name + '-tpl',
                     templateText = $(templateSelector).text();
                 return _.template(templateText);
             },
 
             addException: function() {
+                // eslint-disable-next-line no-var
                 var value = this.$('#certificate-exception').val();
+                // eslint-disable-next-line no-var
                 var notes = this.$('#notes').val();
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var user_email = '',
                     // eslint-disable-next-line camelcase
                     user_name = '',
@@ -53,7 +57,7 @@
                     model = {user_name: user_name};
                 }
 
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var certificate_exception = new CertificateExceptionModel(
                     {
                         // eslint-disable-next-line camelcase
@@ -67,6 +71,7 @@
                         url: this.collection.url
                     }
                 );
+                // eslint-disable-next-line no-var
                 var message = '';
 
                 if (this.collection.findWhere(model)) {
@@ -98,6 +103,7 @@
             },
 
             isEmailAddress: function validateEmail(email) {
+                // eslint-disable-next-line no-var
                 var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
                 return re.test(email);
             },
@@ -122,7 +128,7 @@
             showError: function(caller) {
                 return function(model, response) {
                     try {
-                        // eslint-disable-next-line camelcase
+                        /* eslint-disable-next-line camelcase, no-var */
                         var response_data = JSON.parse(response.responseText);
                         // eslint-disable-next-line camelcase
                         caller.escapeAndShowMessage(response_data.message);

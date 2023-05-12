@@ -8,6 +8,7 @@
         'gettext'
     ],
     function($, _, _s, gettext) {
+        // eslint-disable-next-line no-var
         var utils;
 
         /* Mix non-conflicting functions from underscore.string
@@ -19,6 +20,7 @@
         _.mixin(_s.exports());
 
         utils = (function() {
+            // eslint-disable-next-line no-var
             var _fn = {
                 validate: {
 
@@ -32,6 +34,7 @@
                     },
 
                     field: function(el) {
+                        // eslint-disable-next-line no-var
                         var $el = $(el),
                             required = true,
                             min = true,
@@ -72,12 +75,14 @@
 
                     str: {
                         minlength: function($el) {
+                            // eslint-disable-next-line no-var
                             var min = $el.attr('minlength') || 0;
 
                             return min <= $el.val().length;
                         },
 
                         maxlength: function($el) {
+                            // eslint-disable-next-line no-var
                             var max = $el.attr('maxlength') || false;
 
                             // eslint-disable-next-line no-extra-boolean-cast
@@ -90,6 +95,7 @@
                     },
 
                     isBlank: function($el) {
+                        // eslint-disable-next-line no-var
                         var type = $el.attr('type'),
                             isBlank;
 
@@ -130,6 +136,7 @@
                     },
 
                     getMessage: function($el, tests) {
+                        // eslint-disable-next-line no-var
                         var txt = [],
                             label,
                             context,

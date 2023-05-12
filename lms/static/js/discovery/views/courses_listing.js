@@ -33,9 +33,12 @@
 
             renderItems: function() {
                 /* eslint no-param-reassign: [2, { "props": true }] */
+                // eslint-disable-next-line no-var
                 var latest = this.model.latest();
+                // eslint-disable-next-line no-var
                 var items = latest.map(function(result) {
                     result.userPreferences = this.model.userPreferences;
+                    // eslint-disable-next-line no-var
                     var item = new CourseCardView({model: result});
                     return item.render().el;
                 }, this);
@@ -58,7 +61,9 @@
             },
 
             isNearBottom: function() {
+                // eslint-disable-next-line no-var
                 var scrollBottom = this.$window.scrollTop() + this.$window.height();
+                // eslint-disable-next-line no-var
                 var threshold = this.$document.height() - 200;
                 return scrollBottom >= threshold;
             }

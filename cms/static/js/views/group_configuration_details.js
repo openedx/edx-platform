@@ -10,6 +10,7 @@ define([
 function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var GroupConfigurationDetailsView = BaseView.extend({
         tagName: 'div',
         events: {
@@ -19,6 +20,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
         },
 
         className: function() {
+            // eslint-disable-next-line no-var
             var index = this.model.collection.indexOf(this.model);
 
             return [
@@ -36,6 +38,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var attrs = $.extend({}, this.model.attributes, {
                 groupsCountMessage: this.getGroupsCountTitle(),
                 usageCountMessage: this.getUsageCountTitle(),
@@ -62,6 +65,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
         },
 
         getGroupsCountTitle: function() {
+            // eslint-disable-next-line no-var
             var count = this.model.get('groups').length,
                 /* globals ngettext */
                 message = ngettext(
@@ -77,6 +81,7 @@ function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
         },
 
         getUsageCountTitle: function() {
+            // eslint-disable-next-line no-var
             var count = this.model.get('usage').length;
 
             if (count === 0) {

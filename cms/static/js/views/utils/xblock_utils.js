@@ -7,6 +7,7 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
 function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var addXBlock, duplicateXBlock, deleteXBlock, createUpdateRequestData, updateXBlockField, VisibilityState,
         getXBlockVisibilityClass, getXBlockListTypeClass, updateXBlockFields, getXBlockType, findXBlockInfo,
         moveXBlock;
@@ -47,11 +48,13 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
          * @returns {jQuery promise} A promise representing the addition of the xblock.
          */
     addXBlock = function(target) {
+        // eslint-disable-next-line no-var
         var parentLocator = target.data('parent'),
             category = target.data('category'),
             displayName = target.data('default-name');
         return ViewUtils.runOperationShowingMessage(gettext('Adding'),
             function() {
+                // eslint-disable-next-line no-var
                 var addOperation = $.Deferred();
                 // eslint-disable-next-line no-undef
                 analytics.track('Created a ' + category, {
@@ -65,6 +68,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
                         category: category,
                         display_name: displayName
                     }, function(data) {
+                        // eslint-disable-next-line no-var
                         var locator = data.locator;
                         addOperation.resolve(locator);
                     });
@@ -82,6 +86,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
     duplicateXBlock = function(xblockElement, parentElement) {
         return ViewUtils.runOperationShowingMessage(gettext('Duplicating'),
             function() {
+                // eslint-disable-next-line no-var
                 var duplicationOperation = $.Deferred();
                 $.postJSON(ModuleUtils.getUpdateUrl(), {
                     duplicate_source_locator: xblockElement.data('locator'),
@@ -106,6 +111,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
          * @returns {jQuery promise} A promise representing the moving of the xblock.
          */
     moveXBlock = function(sourceLocator, targetParentLocator, targetIndex) {
+        // eslint-disable-next-line no-var
         var moveOperation = $.Deferred(),
             operationText = targetIndex !== undefined ? gettext('Undo moving') : gettext('Moving');
         return ViewUtils.runOperationShowingMessage(operationText,
@@ -131,6 +137,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
          * @returns {jQuery promise} A promise representing the deletion of the xblock.
          */
     deleteXBlock = function(xblockInfo, xblockType) {
+        // eslint-disable-next-line no-var
         var deletion = $.Deferred(),
             url = ModuleUtils.getUpdateUrl(xblockInfo.id),
             operation = function() {
@@ -189,6 +196,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
     };
 
     createUpdateRequestData = function(fieldName, newValue) {
+        // eslint-disable-next-line no-var
         var metadata = {};
         metadata[fieldName] = newValue;
         return {
@@ -204,6 +212,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
          * @returns {jQuery promise} A promise representing the updating of the field.
          */
     updateXBlockField = function(xblockInfo, fieldName, newValue) {
+        // eslint-disable-next-line no-var
         var requestData = createUpdateRequestData(fieldName, newValue);
         return ViewUtils.runOperationShowingMessage(gettext('Saving'),
             function() {
@@ -250,6 +259,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
     };
 
     getXBlockListTypeClass = function(xblockType) {
+        // eslint-disable-next-line no-var
         var listType = 'list-unknown';
         if (xblockType === 'course') {
             listType = 'list-sections';
@@ -262,6 +272,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
     };
 
     getXBlockType = function(category, parentInfo, translate) {
+        // eslint-disable-next-line no-var
         var xblockType = category;
         if (category === 'chapter') {
             xblockType = translate ? gettext('section') : 'section';
@@ -274,6 +285,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
     };
 
     findXBlockInfo = function(xblockWrapperElement, defaultXBlockInfo) {
+        // eslint-disable-next-line no-var
         var xblockInfo = defaultXBlockInfo,
             xblockElement,
             displayName,

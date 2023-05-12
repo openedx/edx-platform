@@ -13,6 +13,7 @@
              * @param {object} state The object containing the state of the video player.
              * @return {jquery Promise}
              */
+            // eslint-disable-next-line no-var
             var AutoAdvanceControl = function(state) {
                 if (!(this instanceof AutoAdvanceControl)) {
                     return new AutoAdvanceControl(state);
@@ -56,6 +57,7 @@
 
                 /** Initializes the module. */
                 initialize: function() {
+                    // eslint-disable-next-line no-var
                     var state = this.state;
 
                     this.el = $(this.template);
@@ -91,6 +93,7 @@
                 },
 
                 onClick: function(event) {
+                    // eslint-disable-next-line no-var
                     var enabled = !this.state.auto_advance;
                     event.preventDefault();
                     this.setAutoAdvance(enabled);
@@ -112,6 +115,7 @@
                 autoPlay: function() {
                     // Only autoplay the video if it's the first component of the unit.
                     // If a unit has more than one video, no more than one will autoplay.
+                    // eslint-disable-next-line no-var
                     var isFirstComponent = this.state.el.parents('.vert-0').length === 1;
                     if (this.state.auto_advance && isFirstComponent) {
                         this.state.videoCommands.execute('play');

@@ -6,6 +6,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views
     function($, _, gettext, XBlockContainerPage, PagedContainerView) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var PagedXBlockContainerPage = XBlockContainerPage.extend({
 
             events: _.extend({}, XBlockContainerPage.prototype.events, {
@@ -30,6 +31,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views
 
             // eslint-disable-next-line camelcase
             refreshXBlock: function(element, block_added, is_duplicate) {
+                // eslint-disable-next-line no-var
                 var xblockElement = this.findXBlockElement(element),
                     rootLocator = this.xblockView.model.id;
                 if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
@@ -47,7 +49,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/container', 'js/views
 
             // eslint-disable-next-line camelcase
             updatePreviewButton: function(show_previews) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var text = (show_previews) ? gettext('Hide Previews') : gettext('Show Previews'),
                     $button = $('.nav-actions .button-toggle-preview');
 

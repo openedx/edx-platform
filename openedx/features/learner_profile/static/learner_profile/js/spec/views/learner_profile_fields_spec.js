@@ -16,21 +16,31 @@ define(
         'use strict';
 
         describe('edx.user.LearnerProfileFields', function() {
+            // eslint-disable-next-line no-var
             var MOCK_YEAR_OF_BIRTH = 1989;
+            // eslint-disable-next-line no-var
             var MOCK_IMAGE_MAX_BYTES = 64;
+            // eslint-disable-next-line no-var
             var MOCK_IMAGE_MIN_BYTES = 16;
 
+            // eslint-disable-next-line no-var
             var createImageView = function(options) {
+                // eslint-disable-next-line no-var
                 var yearOfBirth = _.isUndefined(options.yearOfBirth) ? MOCK_YEAR_OF_BIRTH : options.yearOfBirth;
+                // eslint-disable-next-line no-var
                 var imageMaxBytes = _.isUndefined(options.imageMaxBytes) ? MOCK_IMAGE_MAX_BYTES : options.imageMaxBytes;
+                // eslint-disable-next-line no-var
                 var imageMinBytes = _.isUndefined(options.imageMinBytes) ? MOCK_IMAGE_MIN_BYTES : options.imageMinBytes;
+                // eslint-disable-next-line no-var
                 var messageView;
 
+                // eslint-disable-next-line no-var
                 var imageData = {
                     image_url_large: '/media/profile-images/default.jpg',
                     has_image: !!options.hasImage
                 };
 
+                // eslint-disable-next-line no-var
                 var accountSettingsModel = new UserAccountModel();
                 accountSettingsModel.set({profile_image: imageData});
                 accountSettingsModel.set({year_of_birth: yearOfBirth});
@@ -54,7 +64,9 @@ define(
                 });
             };
 
+            // eslint-disable-next-line no-var
             var createSocialLinksView = function(ownProfile, socialPlatformLinks) {
+                // eslint-disable-next-line no-var
                 var accountSettingsModel = new UserAccountModel();
                 accountSettingsModel.set({social_platforms: socialPlatformLinks});
 
@@ -65,7 +77,9 @@ define(
                 });
             };
 
+            // eslint-disable-next-line no-var
             var createFakeImageFile = function(size) {
+                // eslint-disable-next-line no-var
                 var fileFakeData = 'i63ljc6giwoskyb9x5sw0169bdcmcxr3cdz8boqv0lik971972cmd6yknvcxr5sw0nvc169bdcmcxsdf';
                 return new Blob(
                     [fileFakeData.substr(0, size)],
@@ -73,6 +87,7 @@ define(
                 );
             };
 
+            // eslint-disable-next-line no-var
             var initializeUploader = function(view) {
                 view.$('.upload-button-input').fileupload({
                     url: Helpers.IMAGE_UPLOAD_API_URL,
@@ -96,24 +111,34 @@ define(
             });
 
             describe('ProfileImageFieldView', function() {
+                // eslint-disable-next-line no-var
                 var verifyImageUploadButtonMessage = function(view, inProgress) {
+                    // eslint-disable-next-line no-var
                     var iconName = inProgress ? 'fa-spinner' : 'fa-camera';
+                    // eslint-disable-next-line no-var
                     var message = inProgress ? view.titleUploading : view.uploadButtonTitle();
                     expect(view.$('.upload-button-icon span').attr('class')).toContain(iconName);
                     expect(view.$('.upload-button-title').text().trim()).toBe(message);
                 };
 
+                // eslint-disable-next-line no-var
                 var verifyImageRemoveButtonMessage = function(view, inProgress) {
+                    // eslint-disable-next-line no-var
                     var iconName = inProgress ? 'fa-spinner' : 'fa-remove';
+                    // eslint-disable-next-line no-var
                     var message = inProgress ? view.titleRemoving : view.removeButtonTitle();
                     expect(view.$('.remove-button-icon span').attr('class')).toContain(iconName);
                     expect(view.$('.remove-button-title').text().trim()).toBe(message);
                 };
 
                 it('can upload profile image', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
+                    // eslint-disable-next-line no-var
                     var imageName = 'profile_image.jpg';
+                    // eslint-disable-next-line no-var
                     var imageView = createImageView({ownProfile: true, hasImage: false});
+                    // eslint-disable-next-line no-var
                     var data;
                     imageView.render();
 
@@ -158,8 +183,11 @@ define(
                 });
 
                 it('can remove profile image', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
+                    // eslint-disable-next-line no-var
                     var imageView = createImageView({ownProfile: true, hasImage: false});
+                    // eslint-disable-next-line no-var
                     var data;
                     imageView.render();
 
@@ -192,6 +220,7 @@ define(
                 });
 
                 it("can't remove default profile image", function() {
+                    // eslint-disable-next-line no-var
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     imageView.render();
 
@@ -208,6 +237,7 @@ define(
                 });
 
                 it("can't upload image having size greater than max size", function() {
+                    // eslint-disable-next-line no-var
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     imageView.render();
 
@@ -222,6 +252,7 @@ define(
                 });
 
                 it("can't upload image having size less than min size", function() {
+                    // eslint-disable-next-line no-var
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     imageView.render();
 
@@ -235,6 +266,7 @@ define(
                 });
 
                 it("can't upload and remove image if parental consent required", function() {
+                    // eslint-disable-next-line no-var
                     var imageView = createImageView({ownProfile: true, hasImage: false, yearOfBirth: ''});
                     imageView.render();
 
@@ -254,6 +286,7 @@ define(
                 });
 
                 it("can't upload and remove image on others profile", function() {
+                    // eslint-disable-next-line no-var
                     var imageView = createImageView({ownProfile: false});
                     imageView.render();
 
@@ -273,6 +306,7 @@ define(
                 });
 
                 it('shows message if we try to navigate away during image upload/remove', function() {
+                    // eslint-disable-next-line no-var
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     // eslint-disable-next-line no-undef
                     spyOn(imageView, 'onBeforeUnload');
@@ -292,7 +326,9 @@ define(
                 });
 
                 it('shows error message for HTTP 500', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
+                    // eslint-disable-next-line no-var
                     var imageView = createImageView({ownProfile: true, hasImage: false});
                     imageView.render();
 
@@ -315,6 +351,7 @@ define(
             });
 
             describe('SocialLinkIconsView', function() {
+                // eslint-disable-next-line no-var
                 var socialPlatformLinks,
                     socialLinkData,
                     socialLinksView,
@@ -340,6 +377,7 @@ define(
                     socialLinksView = createSocialLinksView(true, socialPlatformLinks);
 
                     // Icons should be present and contain links if defined
+                    // eslint-disable-next-line no-var
                     for (var i = 0; i < Object.keys(socialPlatformLinks); i++) { // eslint-disable-line vars-on-top
                         socialPlatform = Object.keys(socialPlatformLinks)[i];
                         socialLinkData = socialPlatformLinks[socialPlatform];
@@ -376,6 +414,7 @@ define(
                     socialLinksView = createSocialLinksView(false, socialPlatformLinks);
 
                     // Icons should not be present if not defined on another user's profile
+                    // eslint-disable-next-line no-var
                     for (var i = 0; i < Object.keys(socialPlatformLinks); i++) { // eslint-disable-line vars-on-top
                         socialPlatform = Object.keys(socialPlatformLinks)[i];
                         socialLinkData = socialPlatformLinks[socialPlatform];

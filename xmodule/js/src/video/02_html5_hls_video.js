@@ -9,6 +9,7 @@
 
     define('video/02_html5_hls_video.js', ['underscore', 'video/02_html5_video.js', 'hls'],
         function(_, HTML5Video, HLS) {
+            // eslint-disable-next-line no-var
             var HLSVideo = {};
 
             HLSVideo.Player = (function() {
@@ -19,6 +20,7 @@
              * @param {Object} config  Contains common config for video player
              */
                 function Player(el, config) {
+                    // eslint-disable-next-line no-var
                     var self = this;
 
                     this.config = config;
@@ -67,6 +69,7 @@
                             self.config.onReadyHLS();
                         });
                         this.hls.on(HLS.Events.LEVEL_SWITCHED, function(event, data) {
+                            // eslint-disable-next-line no-var
                             var level = self.hls.levels[data.level];
                             console.log(
                                 '[HLS Video]: LEVEL_SWITCHED, qualityLevelInfo: ',

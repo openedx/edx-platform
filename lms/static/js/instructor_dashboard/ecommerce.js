@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function(Backbone, $, _, gettext) {
@@ -33,7 +33,7 @@ var edx = edx || {};
     });
 
     $(function() {
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var $registration_code_status_form = $('form#set_regcode_status_form'),
             // eslint-disable-next-line camelcase
             $lookup_button = $('#lookup_regcode', $registration_code_status_form),
@@ -45,9 +45,10 @@ var edx = edx || {};
         $('#coupon_expiration_date').datepicker({
             minDate: 0
         });
-        // eslint-disable-next-line no-unused-vars
+        /* eslint-disable-next-line no-unused-vars, no-var */
         var view = new edx.instructor_dashboard.ecommerce.ExpiryCouponView();
         $('input[name="user-enrollment-report"]').click(function() {
+            // eslint-disable-next-line no-var
             var url = $(this).data('endpoint');
             $.ajax({
                 type: 'POST',
@@ -69,6 +70,7 @@ var edx = edx || {};
             });
         });
         $('input[name="exec-summary-report"]').click(function() {
+            // eslint-disable-next-line no-var
             var url = $(this).data('endpoint');
             $.ajax({
                 type: 'POST',
@@ -95,8 +97,9 @@ var edx = edx || {};
             $registration_code_status_form_error.hide();
             // eslint-disable-next-line camelcase
             $lookup_button.attr('disabled', true);
+            // eslint-disable-next-line no-var
             var url = $(this).data('endpoint');
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var lookup_registration_code = $('#set_regcode_status_form input[name="regcode_code"]').val();
             /* eslint-disable-next-line camelcase, eqeqeq */
             if (lookup_registration_code == '') {
@@ -116,7 +119,7 @@ var edx = edx || {};
                 },
                 url: url,
                 success: function(data) {
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-var */
                     var is_registration_code_valid = data.is_registration_code_valid,
                         // eslint-disable-next-line camelcase
                         is_registration_code_redeemed = data.is_registration_code_redeemed,
@@ -134,8 +137,9 @@ var edx = edx || {};
                         // eslint-disable-next-line camelcase
                         $registration_code_status_form_error.text(gettext(data.message));
                     } else {
-                        /* eslint-disable-next-line camelcase, no-unused-vars */
+                        /* eslint-disable-next-line camelcase, no-unused-vars, no-var */
                         var actions_links = '';
+                        // eslint-disable-next-line no-var
                         var actions = [];
                         /* eslint-disable-next-line camelcase, eqeqeq */
                         if (is_registration_code_valid == true) {
@@ -176,9 +180,9 @@ var edx = edx || {};
                         // eslint-disable-next-line camelcase
                         is_registration_code_valid = is_registration_code_valid ? 'Yes' : 'No';
                         // load the underscore template.
-                        // eslint-disable-next-line camelcase
+                        /* eslint-disable-next-line camelcase, no-var */
                         var template_data = _.template($('#enrollment-code-lookup-links-tpl').text());
-                        // eslint-disable-next-line camelcase
+                        /* eslint-disable-next-line camelcase, no-var */
                         var registration_code_lookup_actions = template_data(
                             {
                                 // eslint-disable-next-line camelcase
@@ -201,6 +205,7 @@ var edx = edx || {};
                 },
                 // eslint-disable-next-line no-unused-vars
                 error: function(jqXHR, textStatus, errorThrown) {
+                    // eslint-disable-next-line no-var
                     var data = $.parseJSON(jqXHR.responseText);
                     // eslint-disable-next-line camelcase
                     $lookup_button.removeAttr('disabled');
@@ -217,10 +222,11 @@ var edx = edx || {};
             $registration_code_status_form_error.attr('style', 'display: none');
             // eslint-disable-next-line camelcase
             $lookup_button.attr('disabled', true);
+            // eslint-disable-next-line no-var
             var url = $(this).data('endpoint');
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var action_type = $(this).data('action-type');
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var registration_code = $(this).data('registration-code');
             $.ajax({
                 type: 'POST',
@@ -248,6 +254,7 @@ var edx = edx || {};
                 },
                 // eslint-disable-next-line no-unused-vars
                 error: function(jqXHR, textStatus, errorThrown) {
+                    // eslint-disable-next-line no-var
                     var data = $.parseJSON(jqXHR.responseText);
                     // eslint-disable-next-line camelcase
                     $registration_code_status_form_error.hide();

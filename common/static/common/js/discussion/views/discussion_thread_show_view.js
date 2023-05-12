@@ -3,8 +3,10 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
+            // eslint-disable-next-line no-var
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -31,6 +33,7 @@
             }
 
             DiscussionThreadShowView.prototype.initialize = function(options) {
+                // eslint-disable-next-line no-var
                 var _ref;
                 DiscussionThreadShowView.__super__.initialize.call(this);
                 this.mode = options.mode || 'inline';
@@ -43,6 +46,7 @@
             };
 
             DiscussionThreadShowView.prototype.renderTemplate = function() {
+                // eslint-disable-next-line no-var
                 var context = $.extend({
                     mode: this.mode,
                     startHeader: this.startHeader,

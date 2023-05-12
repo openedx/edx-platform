@@ -2,6 +2,7 @@
     'use strict';
 
     define(['jquery', 'js/student_account/utils', 'jquery.cookie'], function($, Utils) {
+        // eslint-disable-next-line no-var
         var MultipleEnterpriseInterface = {
 
             urls: {
@@ -21,12 +22,19 @@
              * the selection page is bypassed e.g. when dealing with direct enrolment urls.
              */
             check: function(nextUrl, edxUserInfoCookieName) {
+                // eslint-disable-next-line no-var
                 var view = this;
+                // eslint-disable-next-line no-var
                 var selectionPageUrl = this.urls.multipleEnterpriseUrl + encodeURIComponent(nextUrl);
+                // eslint-disable-next-line no-var
                 var username = Utils.userFromEdxUserCookie(edxUserInfoCookieName).username;
+                // eslint-disable-next-line no-var
                 var next = nextUrl || '/';
+                // eslint-disable-next-line no-var
                 var enterpriseInUrl = this.getEnterpriseFromUrl(nextUrl);
+                // eslint-disable-next-line no-var
                 var userInEnterprise = false;
+                // eslint-disable-next-line no-var
                 var userWithMultipleEnterprises = false;
                 $.ajax({
                     url: this.urls.learners + '?username=' + username,
@@ -73,6 +81,7 @@
             },
 
             getEnterpriseFromUrl: function(url) {
+                // eslint-disable-next-line no-var
                 var regex;
                 // eslint-disable-next-line prefer-regex-literals
                 regex = RegExp('/enterprise/.*/course/.*/enroll');

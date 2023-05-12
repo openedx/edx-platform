@@ -132,6 +132,7 @@
             },
 
             loadForm: function(type) {
+                // eslint-disable-next-line no-var
                 var loadFunc;
                 if (type === 'reset') {
                     loadFunc = _.bind(this.load.login, this);
@@ -143,10 +144,12 @@
 
             load: {
                 login: function(data) {
+                    // eslint-disable-next-line no-var
                     var model = new LoginModel({}, {
                         method: data.method,
                         url: data.submit_url
                     });
+                    // eslint-disable-next-line no-var
                     var isTpaSaml = this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl
                         ? this.thirdPartyAuth.finishAuthUrl.indexOf('tpa-saml') >= 0 : false;
 
@@ -199,6 +202,7 @@
                 },
 
                 register: function(data) {
+                    // eslint-disable-next-line no-var
                     var model = new RegisterModel({}, {
                         method: data.method,
                         url: data.submit_url,
@@ -243,6 +247,7 @@
             },
 
             passwordEmailSent: function() {
+                // eslint-disable-next-line no-var
                 var $loginAnchorElement = $('#login-form');
                 this.element.hide($(this.el).find('#password-reset-anchor'));
                 this.element.show($loginAnchorElement);
@@ -260,6 +265,7 @@
             },
 
             toggleForm: function(e) {
+                // eslint-disable-next-line no-var
                 var type = $(e.currentTarget).data('type'),
                     $form = $('#' + type + '-form'),
                     scrollX = window.scrollX,

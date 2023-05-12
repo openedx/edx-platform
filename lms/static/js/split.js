@@ -30,11 +30,13 @@
  * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
  */
 
+// eslint-disable-next-line no-var
 var _split; // instead of split for a less common name; avoid conflict
 
 // Avoid running twice; that would break the `nativeSplit` reference
 // eslint-disable-next-line no-unused-vars
 _split = _split || (function(undef) {
+    // eslint-disable-next-line no-var
     var nativeSplit = String.prototype.split,
         compliantExecNpcg = /()??/.exec('')[1] === undef, // NPCG: nonparticipating capturing group
         self;
@@ -44,6 +46,7 @@ _split = _split || (function(undef) {
         if (Object.prototype.toString.call(separator) !== '[object RegExp]') {
             return nativeSplit.call(str, separator, limit);
         }
+        // eslint-disable-next-line no-var
         var output = [],
             flags = (separator.ignoreCase ? 'i' : '')
                     + (separator.multiline ? 'm' : '')
@@ -81,6 +84,7 @@ _split = _split || (function(undef) {
                 if (!compliantExecNpcg && match.length > 1) {
                     // eslint-disable-next-line no-loop-func
                     match[0].replace(separator2, function() {
+                        // eslint-disable-next-line no-var
                         for (var i = 1; i < arguments.length - 2; i++) {
                             if (arguments[i] === undef) {
                                 match[i] = undef;

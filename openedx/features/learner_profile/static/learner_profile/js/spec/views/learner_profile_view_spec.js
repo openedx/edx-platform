@@ -26,19 +26,24 @@ define(
         'use strict';
 
         describe('edx.user.LearnerProfileView', function() {
+            // eslint-disable-next-line no-var
             var createLearnerProfileView = function(ownProfile, accountPrivacy, profileIsPublic) {
+                // eslint-disable-next-line no-var
                 var accountSettingsModel = new UserAccountModel();
                 accountSettingsModel.set(Helpers.createAccountSettingsData());
                 accountSettingsModel.set({profile_is_public: profileIsPublic});
                 accountSettingsModel.set({profile_image: Helpers.PROFILE_IMAGE});
 
+                // eslint-disable-next-line no-var
                 var accountPreferencesModel = new AccountPreferencesModel();
                 accountPreferencesModel.set({account_privacy: accountPrivacy});
 
                 accountPreferencesModel.url = Helpers.USER_PREFERENCES_API_URL;
 
+                // eslint-disable-next-line no-var
                 var editable = ownProfile ? 'toggle' : 'never';
 
+                // eslint-disable-next-line no-var
                 var accountPrivacyFieldView = new LearnerProfileFields.AccountPrivacyFieldView({
                     model: accountPreferencesModel,
                     required: true,
@@ -54,10 +59,12 @@ define(
                     accountSettingsPageUrl: '/account/settings/'
                 });
 
+                // eslint-disable-next-line no-var
                 var messageView = new MessageBannerView({
                     el: $('.message-banner')
                 });
 
+                // eslint-disable-next-line no-var
                 var profileImageFieldView = new LearnerProfileFields.ProfileImageFieldView({
                     model: accountSettingsModel,
                     valueAttribute: 'profile_image',
@@ -69,18 +76,21 @@ define(
                     imageRemoveUrl: Helpers.IMAGE_REMOVE_API_URL
                 });
 
+                // eslint-disable-next-line no-var
                 var usernameFieldView = new FieldViews.ReadonlyFieldView({
                     model: accountSettingsModel,
                     valueAttribute: 'username',
                     helpMessage: ''
                 });
 
+                // eslint-disable-next-line no-var
                 var nameFieldView = new FieldViews.ReadonlyFieldView({
                     model: accountSettingsModel,
                     valueAttribute: 'name',
                     helpMessage: ''
                 });
 
+                // eslint-disable-next-line no-var
                 var sectionOneFieldViews = [
                     new LearnerProfileFields.SocialLinkIconsView({
                         model: accountSettingsModel,
@@ -119,6 +129,7 @@ define(
                     })
                 ];
 
+                // eslint-disable-next-line no-var
                 var sectionTwoFieldViews = [
                     new FieldViews.TextareaFieldView({
                         model: accountSettingsModel,
@@ -133,9 +144,11 @@ define(
                     })
                 ];
 
+                // eslint-disable-next-line no-var
                 var badgeCollection = new PagingCollection();
                 badgeCollection.url = Helpers.BADGES_API_URL;
 
+                // eslint-disable-next-line no-var
                 var badgeListContainer = new BadgeListContainer({
                     attributes: {class: 'badge-set-display'},
                     collection: badgeCollection,
@@ -168,6 +181,7 @@ define(
             });
 
             it('shows loading error correctly', function() {
+                // eslint-disable-next-line no-var
                 var learnerProfileView = createLearnerProfileView(false, 'all_users');
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -180,6 +194,7 @@ define(
             });
 
             it('renders all fields as expected for self with full access', function() {
+                // eslint-disable-next-line no-var
                 var learnerProfileView = createLearnerProfileView(true, 'all_users', true);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -192,6 +207,7 @@ define(
             });
 
             it('renders all fields as expected for self with limited access', function() {
+                // eslint-disable-next-line no-var
                 var learnerProfileView = createLearnerProfileView(true, 'private', false);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -204,6 +220,7 @@ define(
             });
 
             it('renders the fields as expected for others with full access', function() {
+                // eslint-disable-next-line no-var
                 var learnerProfileView = createLearnerProfileView(false, 'all_users', true);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -216,6 +233,7 @@ define(
             });
 
             it('renders the fields as expected for others with limited access', function() {
+                // eslint-disable-next-line no-var
                 var learnerProfileView = createLearnerProfileView(false, 'private', false);
 
                 Helpers.expectLoadingIndicatorIsVisible(learnerProfileView, true);
@@ -228,8 +246,10 @@ define(
             });
 
             it("renders an error if the badges can't be fetched", function() {
+                // eslint-disable-next-line no-var
                 var learnerProfileView = createLearnerProfileView(false, 'all_users', true);
                 learnerProfileView.options.accountSettingsModel.set({accomplishments_shared: true});
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
 
                 learnerProfileView.render();

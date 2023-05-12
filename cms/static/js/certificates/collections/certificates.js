@@ -9,6 +9,7 @@ define([
 function(Backbone, gettext, Certificate) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CertificateCollection = Backbone.Collection.extend({
         model: Certificate,
 
@@ -25,6 +26,7 @@ function(Backbone, gettext, Certificate) {
         },
 
         certificateArray: function(certificateInfo) {
+            // eslint-disable-next-line no-var
             var returnArray;
             try {
                 returnArray = JSON.parse(certificateInfo);
@@ -63,6 +65,7 @@ function(Backbone, gettext, Certificate) {
 
         parse: function(certificatesJson) {
             // Transforms the provided JSON into a Certificates collection
+            // eslint-disable-next-line no-var
             var modelArray = this.certificateArray(certificatesJson);
             modelArray.forEach(function(item) {
                 this.push(item);

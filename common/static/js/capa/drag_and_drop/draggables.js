@@ -17,6 +17,7 @@
         }
 
         function makeDraggableCopy(callbackFunc) {
+            // eslint-disable-next-line no-var
             var draggableObj, property;
 
             // Make a full proper copy of the draggable object, with some modifications.
@@ -106,6 +107,7 @@
         }
 
         function processDraggable(state, obj) {
+            // eslint-disable-next-line no-var
             var draggableObj;
 
             draggableObj = {

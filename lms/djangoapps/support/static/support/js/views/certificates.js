@@ -41,6 +41,7 @@
             },
 
             renderResults: function() {
+                // eslint-disable-next-line no-var
                 var context = {
                     certificates: this.certificates
                 };
@@ -49,12 +50,14 @@
             },
 
             renderError: function(error) {
+                // eslint-disable-next-line no-var
                 var errorMsg = error || gettext('An unexpected error occurred.  Please try again.');
                 this.setResults(HtmlUtils.Text(errorMsg));
             },
 
             search: function(event) {
                 // Fetch the certificate collection for the given user
+                // eslint-disable-next-line no-var
                 var url = '/support/certificates?user=' + this.getUserFilter();
 
                 // course id is optional.
@@ -81,6 +84,7 @@
             },
 
             generateCertificate: function(event) {
+                // eslint-disable-next-line no-var
                 var $button = $(event.target);
 
                 // Generate certificates for a particular user and course.
@@ -106,6 +110,7 @@
             },
 
             regenerateCertificate: function(event) {
+                // eslint-disable-next-line no-var
                 var $button = $(event.target);
 
                 // Regenerate certificates for a particular user and course.

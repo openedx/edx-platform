@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-undef
 define(['backbone', 'underscore'], function(Backbone, _) {
+    // eslint-disable-next-line no-var
     var Location = Backbone.Model.extend({
         defaults: {
             tag: '',
@@ -32,6 +33,7 @@ define(['backbone', 'underscore'], function(Backbone, _) {
                 };
             } else if (_.isString(payload)) {
                 this._tagPattern.lastIndex = 0; // odd regex behavior requires this to be reset sometimes
+                // eslint-disable-next-line no-var
                 var foundTag = this._tagPattern.exec(payload);
                 if (foundTag) {
                     this._fieldPattern.lastIndex = this._tagPattern.lastIndex + 1; // skip over the colon

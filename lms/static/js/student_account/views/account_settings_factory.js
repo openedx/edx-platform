@@ -35,6 +35,7 @@
             isSecondaryEmailFeatureEnabled,
             betaLanguage
         ) {
+            // eslint-disable-next-line no-var
             var $accountSettingsElement, userAccountModel, userPreferencesModel, aboutSectionsData,
                 accountsSectionData, ordersSectionData, accountSettingsView, showAccountSettingsPage,
                 showLoadingError, orderNumber, getUserField, userFields, timeZoneDropdownField, countryDropdownField,
@@ -287,6 +288,7 @@
 
             // Add the extended profile fields
             additionalFields = aboutSectionsData[1];
+            // eslint-disable-next-line no-var
             for (var field in extendedProfileFields) { // eslint-disable-line guard-for-in, no-restricted-syntax, vars-on-top, max-len
                 fieldItem = extendedProfileFields[field];
                 if (fieldItem.field_type === 'TextField') {
@@ -322,6 +324,7 @@
                 fields: []
             };
 
+            // eslint-disable-next-line no-var
             for (var socialPlatform in socialPlatforms) { // eslint-disable-line guard-for-in, no-restricted-syntax, vars-on-top, max-len
                 platformData = socialPlatforms[socialPlatform];
                 socialFields.fields.push(

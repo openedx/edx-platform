@@ -23,8 +23,10 @@
         AccountPreferencesModel, FieldsView, LearnerProfileFieldsView, LearnerProfileView, BadgeModel,
         BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
         return function(options) {
+            // eslint-disable-next-line no-var
             var $learnerProfileElement = $('.wrapper-profile');
 
+            // eslint-disable-next-line no-var
             var accountSettingsModel = new AccountSettingsModel(
                 _.extend(
                     options.account_settings_data,
@@ -36,19 +38,24 @@
                 ),
                 {parse: true}
             );
+            // eslint-disable-next-line no-var
             var AccountPreferencesModelWithDefaults = AccountPreferencesModel.extend({
                 defaults: {
                     account_privacy: options.default_visibility
                 }
             });
+            // eslint-disable-next-line no-var
             var accountPreferencesModel = new AccountPreferencesModelWithDefaults(options.preferences_data);
 
+            // eslint-disable-next-line no-var
             var editable = options.own_profile ? 'toggle' : 'never';
 
+            // eslint-disable-next-line no-var
             var messageView = new MessageBannerView({
                 el: $('.message-banner')
             });
 
+            // eslint-disable-next-line no-var
             var accountPrivacyFieldView,
                 profileImageFieldView,
                 usernameFieldView,

@@ -10,6 +10,7 @@
         'text!../../../../common/templates/components/system-feedback.underscore'
     ],
     function($, _, str, Backbone, HtmlUtils, systemFeedbackTemplate) {
+        // eslint-disable-next-line no-var
         var tabbableElements = [
             "a[href]:not([tabindex='-1'])",
             "area[href]:not([tabindex='-1'])",
@@ -21,6 +22,7 @@
             "[tabindex]:not([tabindex='-1'])",
             "[contentEditable=true]:not([tabindex='-1'])"
         ];
+        // eslint-disable-next-line no-var
         var SystemFeedback = Backbone.View.extend({
             options: {
                 title: '',
@@ -83,6 +85,7 @@
             },
 
             inFocus: function(wrapperElementSelector) {
+                // eslint-disable-next-line no-var
                 var wrapper = wrapperElementSelector || '.wrapper',
                     tabbables;
                 this.options.outFocusElement = this.options.outFocusElement || document.activeElement;
@@ -154,6 +157,7 @@
                 // there can be only one active view of a given type at a time: only
                 // one alert, only one notification, only one prompt. Therefore, we'll
                 // use a singleton approach.
+                // eslint-disable-next-line no-var
                 var singleton = SystemFeedback['active_' + this.options.type];
                 if (singleton && singleton !== this) {
                     singleton.stopListening();
@@ -165,6 +169,7 @@
             },
 
             primaryClick: function(event) {
+                // eslint-disable-next-line no-var
                 var actions, primary;
                 actions = this.options.actions;
                 if (!actions) { return; }
@@ -179,6 +184,7 @@
             },
 
             secondaryClick: function(event) {
+                // eslint-disable-next-line no-var
                 var actions, secondaryList, secondary, i;
                 actions = this.options.actions;
                 if (!actions) { return; }

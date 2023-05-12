@@ -32,6 +32,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var template = this.loadTemplate('certificate-allowlist');
                 this.$el.html(HtmlUtils.HTML(template({certificates: this.collection.models})).toString());
                 if (!this.active_certificate || this.collection.isEmpty()) {
@@ -42,14 +43,18 @@
             },
 
             loadTemplate: function(name) {
+                // eslint-disable-next-line no-var
                 var templateSelector = '#' + name + '-tpl',
                     templateText = $(templateSelector).text();
                 return _.template(templateText);
             },
 
             removeException: function(event) {
+                // eslint-disable-next-line no-var
                 var certificate = $(event.target).data();
+                // eslint-disable-next-line no-var
                 var model = this.collection.findWhere(certificate);
+                // eslint-disable-next-line no-var
                 var self = this;
                 if (model) {
                     model.destroy(
@@ -102,6 +107,7 @@
             showError: function(caller_object) {
                 return function(xhr) {
                     try {
+                        // eslint-disable-next-line no-var
                         var response = JSON.parse(xhr.responseText);
                         // eslint-disable-next-line camelcase
                         caller_object.escapeAndShowMessage(response.message);

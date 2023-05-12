@@ -9,6 +9,7 @@ define([
 function(ListItemEditorView, _) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var ContentGroupEditorView = ListItemEditorView.extend({
         tagName: 'div',
         className: 'content-group-edit collection-edit',

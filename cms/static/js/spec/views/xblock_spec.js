@@ -5,6 +5,7 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
     'use strict';
 
     describe('XBlockView', function() {
+        // eslint-disable-next-line no-var
         var model, xblockView, mockXBlockHtml;
 
         beforeEach(function() {
@@ -21,6 +22,7 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
         mockXBlockHtml = readFixtures('mock/mock-xblock.underscore');
 
         it('can render a nested xblock', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             xblockView.render();
             AjaxHelpers.respondWithJson(requests, {
@@ -32,9 +34,11 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
         });
 
         describe('XBlock rendering', function() {
+            // eslint-disable-next-line no-var
             var postXBlockRequest;
 
             postXBlockRequest = function(requests, resources) {
+                // eslint-disable-next-line no-var
                 var promise;
                 $.ajax({
                     url: 'test_url',
@@ -54,11 +58,13 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
             };
 
             it('can render an xblock with no CSS or JavaScript', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 postXBlockRequest(requests, []);
             });
 
             it('can render an xblock with required CSS', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     mockCssText = '// Just a comment',
                     mockCssUrl = 'mock.css',
@@ -73,6 +79,7 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
             });
 
             it('can render an xblock with required JavaScript', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 postXBlockRequest(requests, [
                     ['xblock_spec_hash3', {
@@ -83,6 +90,7 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
             });
 
             it('can render an xblock with required HTML', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     mockHeadTag = '<title>Test Title</title>';
                 postXBlockRequest(requests, [
@@ -92,6 +100,7 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
             });
 
             it('aborts rendering when a dependent script fails to load', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     missingJavaScriptUrl = 'no_such_file.js',
                     promise;
@@ -106,7 +115,7 @@ function($, URI, AjaxHelpers, ViewUtils, XBlockView, XBlockInfo) {
             });
 
             it('Triggers an event to the runtime when a notification-action-button is clicked', function() {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var notifySpy = spyOn(xblockView, 'notifyRuntime').and.callThrough();
 
                 postXBlockRequest(AjaxHelpers.requests(this), []);

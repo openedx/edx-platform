@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-undef
 define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_textbook', 'common/js/components/utils/view_utils'],
     function(BaseView, $, EditTextbookView, ShowTextbookView, ViewUtils) {
+        // eslint-disable-next-line no-var
         var ListTextbooks = BaseView.extend({
             initialize: function() {
                 this.emptyTemplate = this.loadTemplate('no-textbooks');
@@ -10,13 +11,16 @@ define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_
             tagName: 'div',
             className: 'textbooks-list',
             render: function() {
+                // eslint-disable-next-line no-var
                 var textbooks = this.collection;
                 if (textbooks.length === 0) {
                     this.$el.html(this.emptyTemplate()); // xss-lint: disable=javascript-jquery-html
                 } else {
                     this.$el.empty();
+                    // eslint-disable-next-line no-var
                     var that = this;
                     textbooks.each(function(textbook) {
+                        // eslint-disable-next-line no-var
                         var view;
                         if (textbook.get('editing')) {
                             view = new EditTextbookView({model: textbook});
@@ -32,6 +36,7 @@ define(['js/views/baseview', 'jquery', 'js/views/edit_textbook', 'js/views/show_
                 'click .new-button': 'addOne'
             },
             addOne: function(e) {
+                // eslint-disable-next-line no-var
                 var $sectionEl, $inputEl;
                 if (e && e.preventDefault) { e.preventDefault(); }
                 this.collection.add([{editing: true}]); // (render() call triggered here)

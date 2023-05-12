@@ -7,6 +7,7 @@
     'use strict';
 
     describe('DiscussionInlineView', function() {
+        // eslint-disable-next-line no-var
         var createTestView, showDiscussion, setNextAjaxResult,
             TEST_THREAD_TITLE = 'Test thread title';
 
@@ -40,7 +41,9 @@
         });
 
         createTestView = function(test) {
+            // eslint-disable-next-line no-var
             var testView;
+            // eslint-disable-next-line no-var
             var courseSettings = DiscussionSpecHelper.createTestCourseSettings({
                 groups: [
                     {
@@ -76,6 +79,7 @@
         };
 
         showDiscussion = function(test, testView) {
+            // eslint-disable-next-line no-var
             var courseSettings = DiscussionSpecHelper.createTestCourseSettings({
                 groups: [
                     {
@@ -108,6 +112,7 @@
 
         setNextAjaxResult = function(test, result) {
             test.ajaxSpy.and.callFake(function(params) {
+                // eslint-disable-next-line no-var
                 var deferred = $.Deferred();
                 deferred.resolve();
                 params.success(result);
@@ -117,6 +122,7 @@
 
         describe('inline discussion', function() {
             it('is shown by default', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this),
                     showButton = testView.$('.discussion-show');
 
@@ -126,6 +132,7 @@
                 expect(testView.$('.inline-discussion:visible')).not.toHaveClass('is-hidden');
             });
             it('is shown after "Show Discussion" is clicked while discussions are hidden', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this),
                     showButton = testView.$('.discussion-show');
 
@@ -140,6 +147,7 @@
             });
 
             it('is hidden after "Hide Discussion" is clicked', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this),
                     showButton = testView.$('.discussion-show');
 
@@ -155,12 +163,14 @@
 
         describe('new post form', function() {
             it('should not be visible when the discussion is first shown', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this);
                 showDiscussion(this, testView);
                 expect(testView.$('.new-post-article')).toHaveClass('is-hidden');
             });
 
             it('should be shown when the "Add a Post" button is clicked', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this);
                 showDiscussion(this, testView);
                 testView.$('.new-post-btn').click();
@@ -168,6 +178,7 @@
             });
 
             it('should be hidden when the "Cancel" button is clicked', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this);
                 showDiscussion(this, testView);
                 testView.$('.new-post-btn').click();
@@ -176,6 +187,7 @@
             });
 
             it('should be hidden when the "Close" button is clicked', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this);
                 showDiscussion(this, testView);
                 testView.$('.new-post-btn').click();
@@ -184,6 +196,7 @@
             });
 
             it('should return to the thread listing after adding a post', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this);
                 showDiscussion(this, testView);
 
@@ -209,6 +222,7 @@
 
         describe('thread listing', function() {
             it('builds a view that lists the threads', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this);
                 showDiscussion(this, testView);
                 expect(testView.$('.forum-nav-thread-title').text()).toBe(TEST_THREAD_TITLE);
@@ -217,6 +231,7 @@
 
         describe('thread post drill down', function() {
             it('can drill down to a thread', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this);
                 showDiscussion(this, testView);
                 testView.$('.forum-nav-thread-link').click();
@@ -229,6 +244,7 @@
             });
 
             it('can go back to the list of threads', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this);
                 showDiscussion(this, testView);
                 testView.$('.forum-nav-thread-link').click();
@@ -242,7 +258,9 @@
             });
 
             it('marks a thread as read once it is opened', function() {
+                // eslint-disable-next-line no-var
                 var testView = createTestView(this);
+                // eslint-disable-next-line no-var
                 var thread;
                 showDiscussion(this, testView);
                 thread = testView.$('.forum-nav-thread');

@@ -8,10 +8,14 @@ $(document).ready(function() {
     'use strict';
 
     // define variables for code legibility
+    // eslint-disable-next-line no-var
     var $dropdownMenuToggle = $('.user-dropdown');
+    // eslint-disable-next-line no-var
     var $dropdownMenu = $('.user-dropdown-menu');
+    // eslint-disable-next-line no-var
     var menuItems = $dropdownMenu.find('.dropdown-menuitem');
 
+    // eslint-disable-next-line no-var
     var keyCodes = {
         leftArrow: 37,
         upArrow: 38,
@@ -43,16 +47,19 @@ $(document).ready(function() {
 
     function catchKeyPress(object, event) {
         // get currently focused item
-        // eslint-disable-next-line no-undef
+        /* eslint-disable-next-line no-undef, no-var */
         var focusedItem = jQuery(':focus');
 
         // get the number of focusable items
+        // eslint-disable-next-line no-var
         var numberOfMenuItems = menuItems.length;
 
         // get the index of the currently focused item
+        // eslint-disable-next-line no-var
         var focusedItemIndex = menuItems.index(focusedItem);
 
         // var to store next focused item index
+        // eslint-disable-next-line no-var
         var itemToFocusIndex;
 
         // if space key pressed

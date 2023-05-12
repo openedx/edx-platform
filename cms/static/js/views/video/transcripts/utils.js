@@ -3,6 +3,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
     'use strict';
 
     return (function() {
+        // eslint-disable-next-line no-var
         var Storage = {};
 
         /**
@@ -55,8 +56,9 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      *    Undefined:     When model doesn't exist.
      * }
      */
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var _getField = function(collection, field_name) {
+            // eslint-disable-next-line no-var
             var model;
 
             // eslint-disable-next-line camelcase
@@ -88,7 +90,9 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      *                   non-string, video id's length is not equal 11.
      * }
      */
+        // eslint-disable-next-line no-var
         var _youtubeParser = (function() {
+            // eslint-disable-next-line no-var
             var cache = {},
                 // eslint-disable-next-line no-useless-escape
                 regExp = /(?:http|https|)(?:\:\/\/|)(?:www.|)(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/ytscreeningroom\?v=|\/feeds\/api\/videos\/|\/user\S*[^\w\-\s]|\S*[^\w\-\s]))([\w\-]+)/i;
@@ -103,6 +107,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                     return cache[url];
                 }
 
+                // eslint-disable-next-line no-var
                 var match = url.match(regExp);
                 // eslint-disable-next-line no-void
                 cache[url] = (match) ? match[1] : void 0;
@@ -122,7 +127,9 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      *                   non-string.
      * }
      */
+        // eslint-disable-next-line no-var
         var _videoLinkParser = (function() {
+            // eslint-disable-next-line no-var
             var cache = {};
 
             return function(url) {
@@ -135,6 +142,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                     return cache[url];
                 }
 
+                // eslint-disable-next-line no-var
                 var link = document.createElement('a'),
                     match;
 
@@ -180,7 +188,9 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      *    undefined:     when argument is non-string.
      * }
      */
+        // eslint-disable-next-line no-var
         var _linkParser = function(url) {
+            // eslint-disable-next-line no-var
             var youtubeIdLength = 11,
                 result;
 
@@ -220,7 +230,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      * @examples
      * _getYoutubeLink('OEoXaMPEzfM'); => 'http://youtu.be/OEoXaMPEzfM'
      */
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var _getYoutubeLink = function(video_id) {
             // eslint-disable-next-line camelcase
             return 'http://youtu.be/' + video_id;
@@ -245,12 +255,14 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      *       {mode: `html5`, type: `webm`, ...}
      *     ]
      */
-        // eslint-disable-next-line consistent-return
+        /* eslint-disable-next-line consistent-return, no-var */
         var _getVideoList = function(links) {
             if ($.isArray(links)) {
+                // eslint-disable-next-line no-var
                 var arr = [],
                     data;
 
+                // eslint-disable-next-line no-var
                 for (var i = 0, len = links.length; i < len; i += 1) {
                     data = _linkParser(links[i]);
 
@@ -270,8 +282,10 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      * happens.
      * @param {Object} toCollection Collection which will synchronized.
      */
+        // eslint-disable-next-line no-var
         var _syncCollections = function(fromCollection, toCollection) {
             fromCollection.each(function(m) {
+                // eslint-disable-next-line no-var
                 var model = toCollection.findWhere({
                     field_name: m.getFieldName()
                 });
@@ -295,6 +309,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      * attach callbacks to AJAX request events (for example on 'done',
      * 'fail', etc.).
      */
+        // eslint-disable-next-line no-var
         var _command = (function() {
         // We will store the XMLHttpRequest object that $.ajax() function
         // returns, to abort an ongoing AJAX request (if necessary) upon
@@ -302,9 +317,11 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
         //
         // A new AJAX request will be made on each invocation of the
         // _command() function.
+            // eslint-disable-next-line no-var
             var xhr = null;
 
             return function(action, locator, videoList, extraParams) {
+                // eslint-disable-next-line no-var
                 var params, data;
 
                 if (extraParams) {

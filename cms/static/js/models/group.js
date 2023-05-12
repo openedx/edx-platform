@@ -5,6 +5,7 @@ define([
 ], function(Backbone, _, str, gettext) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var Group = Backbone.AssociatedModel.extend({
         defaults: function() {
             return {
@@ -15,6 +16,7 @@ define([
             };
         },
         url: function() {
+            // eslint-disable-next-line no-var
             var parentModel = this.collection.parents[0];
             return parentModel.urlRoot + '/' + encodeURIComponent(parentModel.id) + '/' + encodeURIComponent(this.id);
         },

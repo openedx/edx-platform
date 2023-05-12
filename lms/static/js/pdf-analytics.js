@@ -1,5 +1,6 @@
 // eslint-disable-next-line camelcase
 function sendLog(name, data, event_type) {
+    // eslint-disable-next-line no-var
     var message = data || {};
     // eslint-disable-next-line no-undef
     message.chapter = PDF_URL || '';
@@ -11,15 +12,16 @@ function sendLog(name, data, event_type) {
 // this event is loaded after the others to accurately represent the order of events:
 // click next -> pagechange
 $(function() {
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var first_page = true;
+    // eslint-disable-next-line no-var
     var scroll = {timeStamp: 0, direction: null};
 
     $(window).bind('pagechange', function(event) {
     // log every page render
-        // eslint-disable-next-line no-undef
+        /* eslint-disable-next-line no-undef, no-var */
         var page = PDFViewerApplication.page;
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var old_page = event.originalEvent.previousPageNumber;
         // pagechange is called many times per viewing.
         // eslint-disable-next-line camelcase
@@ -75,9 +77,10 @@ $('#pageNumber').on('change', function() {
     sendLog('page.navigated', {page: $(this).val()});
 });
 
-// eslint-disable-next-line camelcase
+/* eslint-disable-next-line camelcase, no-var */
 var old_amount = 1;
 $(window).bind('scalechange', function(event) {
+    // eslint-disable-next-line no-var
     var amount = event.originalEvent.scale;
     // eslint-disable-next-line camelcase
     if (amount !== old_amount) {
@@ -93,7 +96,7 @@ $('#scaleSelect').on('change', function() {
     sendLog('zoom.menu.changed', {amount: $('#scaleSelect').val(), page: PDFViewerApplication.page});
 });
 
-// eslint-disable-next-line camelcase
+/* eslint-disable-next-line camelcase, no-var */
 var search_event = null;
 $(window).bind('find findhighlightallchange findagain findcasesensitivitychange', function(event) {
     /* eslint-disable-next-line camelcase, eqeqeq */
@@ -102,11 +105,12 @@ $(window).bind('find findhighlightallchange findagain findcasesensitivitychange'
     }
     // eslint-disable-next-line camelcase
     search_event = setTimeout(function() {
+        // eslint-disable-next-line no-var
         var message = event.originalEvent.detail;
         message.status = $('#findMsg').text();
         // eslint-disable-next-line no-undef
         message.page = PDFViewerApplication.page;
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var event_name = 'search';
         // eslint-disable-next-line default-case
         switch (event.type) {

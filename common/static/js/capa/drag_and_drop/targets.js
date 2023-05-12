@@ -21,6 +21,7 @@
         }
 
         function initializeTargetField(draggableObj) {
+            // eslint-disable-next-line no-var
             var iconElOffset;
 
             if (draggableObj.targetField.length === 0) {
@@ -43,6 +44,7 @@
         }
 
         function destroyTargetField(draggableObj) {
+            // eslint-disable-next-line no-var
             var indexOffset, lowestRemovedIndex;
 
             indexOffset = 0;
@@ -73,6 +75,7 @@
         }
 
         function processTarget(state, obj, fromTargetField, draggableObj) {
+            // eslint-disable-next-line no-var
             var $targetEl, borderCss, $numTextEl, targetObj;
 
             borderCss = '';
@@ -183,6 +186,7 @@
         }
 
         function removeDraggable(draggable) {
+            // eslint-disable-next-line no-var
             var c1;
 
             this.draggableList.splice(draggable.onTargetIndex, 1);
@@ -233,6 +237,7 @@
      *     z-index by 1, making sure that the bottom-most draggable ends up on the top.
      */
         function cycleDraggableOrder() {
+            // eslint-disable-next-line no-var
             var c1, lowestZIndex, highestZIndex;
 
             if (this.draggableList.length < 2) {

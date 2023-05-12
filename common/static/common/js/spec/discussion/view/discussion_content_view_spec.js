@@ -47,7 +47,7 @@
         });
 
         it('can be unflagged for abuse', function() {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var temp_array;
             // eslint-disable-next-line camelcase
             temp_array = [];

@@ -19,7 +19,9 @@
         fieldTextTemplate,
         fieldTextAreaTemplate
     ) {
+        // eslint-disable-next-line no-var
         var messageRevertDelay = 6000;
+        // eslint-disable-next-line no-var
         var FieldViews = {};
 
         FieldViews.FieldView = Backbone.View.extend({
@@ -112,6 +114,7 @@
             },
 
             showHelpMessage: function(message) {
+                // eslint-disable-next-line no-var
                 var msg = message;
                 if (_.isUndefined(message) || _.isNull(message)) {
                     msg = this.helpMessage;
@@ -142,6 +145,7 @@
             },
 
             showSuccessMessage: function() {
+                // eslint-disable-next-line no-var
                 var context = Date.now(),
                     successMessage = this.getMessage('success'),
                     view = this;
@@ -170,6 +174,7 @@
             },
 
             showErrorMessage: function(xhr) {
+                // eslint-disable-next-line no-var
                 var errors,
                     validationErrorMessage,
                     message;
@@ -208,7 +213,9 @@
             },
 
             saveAttributes: function(attributes, options) {
+                // eslint-disable-next-line no-var
                 var view = this;
+                // eslint-disable-next-line no-var
                 var defaultOptions = {
                     contentType: 'application/merge-patch+json',
                     patch: true,
@@ -262,6 +269,7 @@
             },
 
             finishEditing: function() {
+                // eslint-disable-next-line no-var
                 var modelValue;
                 if (this.persistChanges === false || this.mode !== 'edit') { return; }
 
@@ -328,6 +336,7 @@
             fieldType: 'date',
 
             timezoneFormattedDate: function() {
+                // eslint-disable-next-line no-var
                 var context;
                 context = {
                     datetime: new Date(this.modelValue()),
@@ -388,9 +397,12 @@
             },
 
             updateValueInField: function() {
+                // eslint-disable-next-line no-var
                 var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? '' : this.modelValue();
 
+                // eslint-disable-next-line no-var
                 var fieldHasFocus = (document.activeElement === this.$('.u-field-value input')[0]);
+                // eslint-disable-next-line no-var
                 var fieldChanged = this.fieldValue() !== value;
                 if (!fieldHasFocus || !fieldChanged) {
                     this.$('.u-field-value input').val(value);
@@ -398,6 +410,7 @@
             },
 
             saveValue: function() {
+                // eslint-disable-next-line no-var
                 var attributes = {};
                 attributes[this.options.valueAttribute] = this.fieldValue();
                 this.saveAttributes(attributes);
@@ -446,6 +459,7 @@
             },
 
             modelValueIsSet: function() {
+                // eslint-disable-next-line no-var
                 var value = this.modelValue();
                 if (_.isUndefined(value) || _.isNull(value) || value === '') {
                     return false;
@@ -455,6 +469,7 @@
             },
 
             optionForValue: function(value) {
+                // eslint-disable-next-line no-var
                 var options = [];
                 if (_.isUndefined(this.options.groupOptions)) {
                     return _.find(this.options.options, function(option) { return option[0] === value; });
@@ -469,6 +484,7 @@
             },
 
             fieldValue: function() {
+                // eslint-disable-next-line no-var
                 var value;
                 if (this.editable === 'never') {
                     value = this.modelValueIsSet() ? this.modelValue() : null;
@@ -479,6 +495,7 @@
             },
 
             displayValue: function(value) {
+                // eslint-disable-next-line no-var
                 var option;
                 if (value) {
                     option = this.optionForValue(value);
@@ -489,8 +506,11 @@
             },
 
             updateValueInField: function() {
+                // eslint-disable-next-line no-var
                 var value; // str
+                // eslint-disable-next-line no-var
                 var fieldHasFocus; // bool
+                // eslint-disable-next-line no-var
                 var fieldChanged; // bool
                 if (this.editable !== 'never') {
                     value = this.modelValue() || '';
@@ -513,6 +533,7 @@
             },
 
             saveValue: function() {
+                // eslint-disable-next-line no-var
                 var attributes = {};
                 attributes[this.options.valueAttribute] = this.fieldValue();
                 $.cookie('old-pref-lang', this.modelValue());
@@ -586,6 +607,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var value = this.modelValue();
                 if (this.mode === 'display') {
                     value = value || this.options.placeholderValue;
@@ -621,8 +643,11 @@
             },
 
             updateCharCount: function() {
+                // eslint-disable-next-line no-var
                 var curCharCount;
+                // eslint-disable-next-line no-var
                 var remainingCharCount;
+                // eslint-disable-next-line no-var
                 var $charCount = $('.u-field-footer .current-char-count');
                 // Update character count for textarea
                 if (this.options.maxCharacters) {
@@ -646,6 +671,7 @@
             },
 
             adjustTextareaHeight: function() {
+                // eslint-disable-next-line no-var
                 var textarea = this.$('textarea');
                 if (this.persistChanges === false) { return; }
                 textarea.css('height', 'auto').css('height', textarea.prop('scrollHeight') + 10);
@@ -657,6 +683,7 @@
             },
 
             modelValue: function() {
+                // eslint-disable-next-line no-var
                 var value = this._super();
                 return value ? $.trim(value) : '';
             },
@@ -670,6 +697,7 @@
             },
 
             saveValue: function() {
+                // eslint-disable-next-line no-var
                 var attributes = {};
                 attributes[this.options.valueAttribute] = this.fieldValue();
                 this.saveAttributes(attributes);

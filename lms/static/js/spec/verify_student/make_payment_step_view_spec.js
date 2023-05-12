@@ -11,12 +11,13 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
     'use strict';
 
     describe('edx.verify_student.MakePaymentStepView', function() {
-        // eslint-disable-next-line no-unused-vars
+        /* eslint-disable-next-line no-unused-vars, no-var */
         var PAYMENT_PARAMS = {
             orderId: 'test-order',
             signature: 'abcd1234'
         };
 
+        // eslint-disable-next-line no-var
         var STEP_DATA = {
             minPrice: '12',
             currency: 'usd',
@@ -25,9 +26,12 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             courseModeSlug: 'verified'
         };
 
+        // eslint-disable-next-line no-var
         var SERVER_ERROR_MSG = 'An error occurred!';
 
+        // eslint-disable-next-line no-var
         var createView = function(stepDataOverrides) {
+            // eslint-disable-next-line no-var
             var view = new MakePaymentStepView({
                 el: $('#current-step-container'),
                 stepData: _.extend(_.clone(STEP_DATA), stepDataOverrides),
@@ -40,7 +44,9 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             return view;
         };
 
+        // eslint-disable-next-line no-var
         var expectPriceSelected = function(price) {
+            // eslint-disable-next-line no-var
             var $sel = $('input[name="contribution"]');
 
             // check that contribution value is same as price given
@@ -48,7 +54,9 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             expect($sel.val()).toEqual(price);
         };
 
+        // eslint-disable-next-line no-var
         var expectPaymentButtonEnabled = function(isEnabled) {
+            // eslint-disable-next-line no-var
             var $el = $('.payment-button'),
                 appearsDisabled = $el.hasClass('is-disabled'),
                 isDisabled = $el.prop('disabled');
@@ -57,14 +65,18 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             expect(!isDisabled).toEqual(isEnabled);
         };
 
+        // eslint-disable-next-line no-var
         var expectPaymentDisabledBecauseInactive = function() {
+            // eslint-disable-next-line no-var
             var $payButton = $('.payment-button');
 
             // Payment button should be hidden
             expect($payButton.length).toEqual(0);
         };
 
+        // eslint-disable-next-line no-var
         var goToPayment = function(requests, kwargs) {
+            // eslint-disable-next-line no-var
             var params = {
                 contribution: kwargs.amount || '',
                 course_id: kwargs.courseId || '',
@@ -89,7 +101,9 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             }
         };
 
+        // eslint-disable-next-line no-var
         var expectPaymentSubmitted = function(view, params) {
+            // eslint-disable-next-line no-var
             var form;
 
             expect(view.submitForm).toHaveBeenCalled();
@@ -100,10 +114,13 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             expect(form.attr('action')).toEqual('http://payment-page-url/');
         };
 
+        // eslint-disable-next-line no-var
         var checkPaymentButtons = function(requests, buttons) {
+            // eslint-disable-next-line no-var
             var $el = $('.payment-button');
             expect($el.length).toEqual(_.size(buttons));
             _.each(buttons, function(expectedText, expectedId) {
+                // eslint-disable-next-line no-var
                 var $buttonEl = $('#' + expectedId),
                     request;
 
@@ -131,6 +148,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         });
 
         it('shows users only minimum price', function() {
+            // eslint-disable-next-line no-var
             var view = createView({}),
                 requests = AjaxHelpers.requests(this);
 
@@ -146,6 +164,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         });
 
         it('view containing verification msg when verification deadline is set and user is active', function() {
+            // eslint-disable-next-line no-var
             var verificationDeadline = '2016-08-14 23:59:00+00:00';
             createView({
                 userEmail: 'test@example.com',
@@ -201,6 +220,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         });
 
         it('by default minimum price is selected if no suggested prices are given', function() {
+            // eslint-disable-next-line no-var
             var view = createView(),
                 requests = AjaxHelpers.requests(this);
 
@@ -232,6 +252,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         });
 
         it('displays an error if the order could not be created', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 view = createView({});
 
@@ -252,6 +273,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         });
 
         it('displays an error if no payment processors are available', function() {
+            // eslint-disable-next-line no-var
             var view = createView({processors: []});
             expect(view.errorModel.get('shown')).toBe(true);
             expect(view.errorModel.get('errorTitle')).toEqual(
@@ -262,6 +284,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
             );
         });
         it('check Initialize method without AB testing ', function() {
+            // eslint-disable-next-line no-var
             var view = createView();
             expect(view.templateName).toEqual('make_payment_step');
             expect(view.btnClass).toEqual('action-primary');

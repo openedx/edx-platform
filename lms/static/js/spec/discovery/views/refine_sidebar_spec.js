@@ -5,6 +5,7 @@ define([
 ], function($, TemplateHelpers, FacetOption, RefineSidebar) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var MEANINGS = {
         org: {
             name: 'Organization',
@@ -60,7 +61,7 @@ define([
         });
 
         it('expands and collapses facet', function() {
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var options = _.range(20).map(function(number) {
                 return {facet: 'org', term: 'test' + number, count: 1};
             });

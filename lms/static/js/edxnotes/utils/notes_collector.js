@@ -2,6 +2,7 @@
     'use strict';
 
     define(['jquery', 'underscore', 'annotator_1.2.9'], function($, _, Annotator) {
+        // eslint-disable-next-line no-var
         var cleanup,
             renderNotes,
             fetchNotesWhenReady,
@@ -34,6 +35,7 @@
          * @param {Number} totalNotesWrappers Total number of edx notes wrappers present
          */
         fetchNotesWhenReady = function(totalNotesWrappers) {
+            // eslint-disable-next-line no-var
             var settings,
                 usageIds,
                 searchEndpoint;
@@ -82,6 +84,7 @@
          * @param {Array} notes Notes data received from server
          */
         renderNotes = function(notes) {
+            // eslint-disable-next-line no-var
             var edxNotes = {};
 
             // AnnotatorJS expects notes to be present in an array named as `rows`

@@ -11,7 +11,9 @@
      * @throws {TypeError, Error}
      * @return {Object}
      */
+            // eslint-disable-next-line no-var
             var inherit = Object.create || (function() {
+                // eslint-disable-next-line no-var
                 var F = function() {};
 
                 return function(o) {
@@ -39,7 +41,7 @@
      * @constructor
      * @return {jquery Promise}
      */
-            // eslint-disable-next-line consistent-return
+            /* eslint-disable-next-line consistent-return, no-var */
             var Component = function() {
                 if ($.isFunction(this.initialize)) {
                     // eslint-disable-next-line prefer-spread
@@ -55,6 +57,7 @@
      * @return {Object}
      */
             Component.extend = function(protoProps, staticProps) {
+                // eslint-disable-next-line no-var
                 var Parent = this,
                     // eslint-disable-next-line consistent-return
                     Child = function() {

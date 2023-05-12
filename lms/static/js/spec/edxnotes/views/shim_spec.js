@@ -5,6 +5,7 @@ define([
     'use strict';
 
     describe('EdxNotes Shim', function() {
+        // eslint-disable-next-line no-var
         var annotators, highlights;
 
         function checkAnnotatorIsFrozen(annotator) {
@@ -20,6 +21,7 @@ define([
         }
 
         function checkClickEventsNotBound(namespace) {
+            // eslint-disable-next-line no-var
             var events = $._data(document, 'events').click;
 
             _.each(events, function(event) {
@@ -147,6 +149,7 @@ define([
         });
 
         it('should hide viewer when close button is clicked', function() {
+            // eslint-disable-next-line no-var
             var close,
                 annotation = {
                     id: '01',
@@ -161,9 +164,11 @@ define([
         });
 
         describe('_setupViewer', function() {
+            // eslint-disable-next-line no-var
             var mockViewer = null;
 
             beforeEach(function() {
+                // eslint-disable-next-line no-var
                 var $element = $('<div />');
                 mockViewer = {
                     fields: [],
@@ -201,6 +206,7 @@ define([
             });
 
             it('should setup the default text field', function() {
+                // eslint-disable-next-line no-var
                 var args = mockViewer.addField.calls.mostRecent().args[0];
 
                 expect(mockViewer.addField.calls.count()).toBe(1);
@@ -208,6 +214,7 @@ define([
             });
 
             it('should set the contents of the field on load', function() {
+                // eslint-disable-next-line no-var
                 var field = document.createElement('div'),
                     annotation = {text: 'text \nwith\r\nline\n\rbreaks \r'};
 
@@ -216,6 +223,7 @@ define([
             });
 
             it('should set the contents of the field to placeholder text when empty', function() {
+                // eslint-disable-next-line no-var
                 var field = document.createElement('div'),
                     annotation = {text: ''};
 
@@ -224,6 +232,7 @@ define([
             });
 
             it('should setup the default text field to publish an event on load', function() {
+                // eslint-disable-next-line no-var
                 var field = document.createElement('div'),
                     annotation = {text: ''},
                     // eslint-disable-next-line no-undef
@@ -253,6 +262,7 @@ define([
 
         describe('TagsPlugin', function() {
             it('should add ARIA label information to the viewer', function() {
+                // eslint-disable-next-line no-var
                 var tagDiv,
                     annotation = {
                         id: '01',
@@ -271,6 +281,7 @@ define([
             });
 
             it('should add screen reader label to the editor', function() {
+                // eslint-disable-next-line no-var
                 var srLabel, editor, inputId;
 
                 // We don't know exactly what the input ID will be (depends on number of annotatable components shown),

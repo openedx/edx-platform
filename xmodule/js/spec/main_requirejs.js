@@ -5,9 +5,11 @@
     // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
     // Note that when the optimizer executes this code, window will not be defined.
     if (window) {
+        // eslint-disable-next-line no-var
         var defineDependency = function(globalName, name, noShim) {
-            // eslint-disable-next-line no-shadow
+            /* eslint-disable-next-line no-shadow, no-var */
             var getGlobalValue = function(name) {
+                    // eslint-disable-next-line no-var
                     var globalNamePath = name.split('.'),
                         result = window,
                         i;

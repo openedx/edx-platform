@@ -10,6 +10,7 @@
     ],
     function($, _, TemplateHelpers, AjaxHelpers, HintedLoginView) {
         describe('edx.student.account.HintedLoginView', function() {
+            // eslint-disable-next-line no-var
             var view = null,
                 // eslint-disable-next-line no-unused-vars
                 requests = null,
@@ -43,6 +44,7 @@
                     ]
                 };
 
+            // eslint-disable-next-line no-var
             var createHintedLoginView = function(hintedProvider) {
                 // Initialize the login view
                 view = new HintedLoginView({

@@ -12,6 +12,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
     PromptView, NotificationView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CourseInfoUpdateView = ValidatingView.extend({
 
         // collection is CourseUpdateCollection
@@ -33,6 +34,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
 
         render: function() {
             // iterate over updates and create views for each using the template
+            // eslint-disable-next-line no-var
             var updateList = this.$el.find('#course-update-list'),
                 self = this;
             $(updateList).empty();
@@ -63,7 +65,9 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
 
             // Hide Update forms that are not for new updates with the editing class
             updateList.children().each(function(index, updateElement) {
+                // eslint-disable-next-line no-var
                 var $updateElement = $(updateElement);
+                // eslint-disable-next-line no-var
                 var updateForm = $updateElement.find('.new-update-form');
                 if ($updateElement.length > 0 && !$updateElement.hasClass('editing')) {
                     $(updateForm).hide();
@@ -87,7 +91,9 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                 }
                 value = $.datepicker.formatDate('MM d, yy', value);
             }
+            // eslint-disable-next-line no-var
             var targetModel = this.collection.get(this.$currentPost.attr('name'));
+            // eslint-disable-next-line no-var
             var prevValue = targetModel.get(attr);
             if (prevValue !== value) {
                 targetModel.set(attr, value);
@@ -96,6 +102,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
         },
 
         handleValidationError: function(model, error) {
+            // eslint-disable-next-line no-var
             var self = this,
                 $validationElement = this.$el.find('#course-update-list li[name="' + model.cid + '"]');
 
@@ -117,6 +124,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
         },
 
         validateModel: function(model) {
+            // eslint-disable-next-line no-var
             var $validationElement = this.$el.find('#course-update-list li[name="' + model.cid + '"]');
             if (model.isValid()) {
                 $validationElement.find('.message-error').remove();
@@ -126,20 +134,24 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
 
         onNew: function(event) {
             // create new obj, insert into collection, and render this one ele overriding the hidden attr
+            // eslint-disable-next-line no-var
             var newModel = new CourseUpdateModel();
             event.preventDefault();
 
             this.collection.add(newModel, {at: 0});
 
+            // eslint-disable-next-line no-var
             var $newForm = $(
                 this.template({
                     updateModel: newModel
                 })
             );
 
+            // eslint-disable-next-line no-var
             var updateEle = this.$el.find('#course-update-list');
             $(updateEle).prepend($newForm);
 
+            // eslint-disable-next-line no-var
             var $textArea = $newForm.find('.new-update-content').first();
             this.$codeMirror = CodeMirror.fromTextArea($textArea.get(0), {
                 mode: 'text/html',
@@ -160,6 +172,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
 
         onSave: function(event) {
             event.preventDefault();
+            // eslint-disable-next-line no-var
             var targetModel = this.eventModel(event);
             targetModel.set({
                 // translate short-form date (for input) into long form date (for display)
@@ -167,10 +180,12 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                 content: this.$codeMirror.getValue()
             });
             // push change to display, hide the editor, submit the change
+            // eslint-disable-next-line no-var
             var saving = new NotificationView.Mini({
                 title: gettext('Saving')
             });
             saving.show();
+            // eslint-disable-next-line no-var
             var ele = this.modelDom(event);
             targetModel.save({}, {
                 success: function() {
@@ -193,6 +208,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
         onCancel: function(event) {
             event.preventDefault();
             // Since we're cancelling, the model should be using it's previous attributes
+            // eslint-disable-next-line no-var
             var targetModel = this.eventModel(event);
             targetModel.set(targetModel.previousAttributes());
             this.validateModel(targetModel);
@@ -204,12 +220,15 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
 
         onEdit: function(event) {
             event.preventDefault();
+            // eslint-disable-next-line no-var
             var self = this;
             this.$currentPost = $(event.target).closest('li');
             this.$currentPost.addClass('editing');
 
             $(this.editor(event)).show();
+            // eslint-disable-next-line no-var
             var $textArea = this.$currentPost.find('.new-update-content').first();
+            // eslint-disable-next-line no-var
             var targetModel = this.eventModel(event);
             // translate long-form date (for viewing) into short-form date (for input)
             if (targetModel.get('date') && targetModel.isValid()) {
@@ -234,8 +253,11 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
         onDelete: function(event) {
             event.preventDefault();
 
+            // eslint-disable-next-line no-var
             var self = this;
+            // eslint-disable-next-line no-var
             var targetModel = this.eventModel(event);
+            // eslint-disable-next-line no-var
             var confirm = new PromptView.Warning({
                 title: gettext('Are you sure you want to delete this update?'),
                 message: gettext('This action cannot be undone.'),
@@ -250,6 +272,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
                                 date: self.dateEntry(event).val()
                             });
                             self.modelDom(event).remove();
+                            // eslint-disable-next-line no-var
                             var deleting = new NotificationView.Mini({
                                 title: gettext('Deleting')
                             });
@@ -280,6 +303,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
         },
 
         closeEditor: function(removePost) {
+            // eslint-disable-next-line no-var
             var content,
                 targetModel = this.collection.get(this.$currentPost.attr('name'));
 
@@ -323,6 +347,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
 
         // eslint-disable-next-line consistent-return
         editor: function(event) {
+            // eslint-disable-next-line no-var
             var li = $(event.currentTarget).closest('li');
             if (li) {
                 return $(li).find('form').first();
@@ -331,6 +356,7 @@ function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, Validat
 
         // eslint-disable-next-line consistent-return
         dateEntry: function(event) {
+            // eslint-disable-next-line no-var
             var li = $(event.currentTarget).closest('li');
             if (li) {
                 return $(li).find('.date').first();

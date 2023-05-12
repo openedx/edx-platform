@@ -18,6 +18,7 @@
     ],
     function(_, $, Backbone, gettext, URI, HtmlUtils, ViewUtils, Discussion, DiscussionUtil,
         DiscussionThreadProfileView, userProfileTemplate, DiscussionThreadListView) {
+        // eslint-disable-next-line no-var
         var DiscussionUserProfileView = Backbone.View.extend({
             events: {
                 'click .all-posts-btn': 'navigateToAllThreads'
@@ -51,6 +52,7 @@
             },
 
             navigateToThread: function(threadId) {
+                // eslint-disable-next-line no-var
                 var thread = this.discussion.get(threadId);
                 this.threadView = new DiscussionThreadView({
                     el: this.$('.forum-content'),

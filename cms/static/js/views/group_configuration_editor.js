@@ -10,6 +10,7 @@ define([
 function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var GroupConfigurationEditorView = ListItemEditorView.extend({
         tagName: 'div',
         events: {
@@ -23,6 +24,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
         },
 
         className: function() {
+            // eslint-disable-next-line no-var
             var index = this.model.collection.indexOf(this.model);
 
             return [
@@ -33,6 +35,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
         },
 
         initialize: function() {
+            // eslint-disable-next-line no-var
             var groups = this.model.get('groups');
 
             ListItemEditorView.prototype.initialize.call(this);
@@ -65,6 +68,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
         },
 
         onAddItem: function(group) {
+            // eslint-disable-next-line no-var
             var view = new ExperimentGroupEditView({model: group});
             this.$('ol.groups').append(view.render().el);
 
@@ -77,6 +81,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
 
         createGroup: function(event) {
             if (event && event.preventDefault) { event.preventDefault(); }
+            // eslint-disable-next-line no-var
             var collection = this.model.get('groups');
             collection.add([{
                 name: collection.getNextDefaultGroupName(),
@@ -106,6 +111,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             this.setDescription();
 
             _.each(this.$('.groups li'), function(li, i) {
+                // eslint-disable-next-line no-var
                 var group = this.model.get('groups').at(i);
 
                 if (group) {

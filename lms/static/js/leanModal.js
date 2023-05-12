@@ -15,12 +15,14 @@
          *   - have rel='leanModal'.
          */
         leanModal: function(options) {
+            // eslint-disable-next-line no-var
             var defaults = {
                 top: 100,
                 overlay: 0.5,
                 closeButton: null,
                 position: 'fixed'
             };
+            // eslint-disable-next-line no-var
             var overlay = '<div id="lean_overlay"></div>';
             if ($('#lean_overlay').length === 0) {
                 edx.HtmlUtils.append(
@@ -43,9 +45,11 @@
             }
 
             return this.each(function() {
+                // eslint-disable-next-line no-var
                 var o = options;
 
                 $(this).click(function(e) {
+                    // eslint-disable-next-line no-var
                     var modalId = $(this).attr('href'),
                         modalClone, modalCloneHtml, notice, $notice;
 
@@ -132,6 +136,7 @@
 
     $(document).ready(function($) { // eslint-disable-line no-shadow
         $('button[rel*=leanModal]').each(function() {
+            // eslint-disable-next-line no-var
             var sep, embed;
 
             $(this).leanModal({

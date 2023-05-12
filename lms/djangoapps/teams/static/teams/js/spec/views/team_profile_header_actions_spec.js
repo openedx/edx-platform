@@ -6,6 +6,7 @@ define([
     'use strict';
 
     describe('TeamProfileHeaderActionsView', function() {
+        // eslint-disable-next-line no-var
         var createTeamsUrl,
             createTeamModelData,
             createMembershipData,
@@ -36,6 +37,7 @@ define([
             isInstructorManagedTopic,
             topicMaxTeamSize
         ) {
+            // eslint-disable-next-line no-var
             var model = new TeamModel(teamModelData, {parse: true}),
                 context = TeamSpecHelpers.createMockContext({
                     courseMaxTeamSize: courseMaxTeamSize,
@@ -86,6 +88,7 @@ define([
             });
 
             verifyErrorMessage = function(requests, errorMessage, expectedMessage, joinTeam) {
+                // eslint-disable-next-line no-var
                 var view = createHeaderActionsView(requests, 1, 'ma', createTeamModelData('teamA', 'teamAlpha', []));
                 if (joinTeam) {
                     // if we want the error to return when user try to join team, respond with no membership
@@ -97,19 +100,28 @@ define([
             };
 
             it('can render itself', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var teamModelData = createTeamModelData('teamA', 'teamAlpha', createMembershipData('ma'));
+                // eslint-disable-next-line no-var
                 var view = createHeaderActionsView(requests, 1, 'ma', teamModelData);
 
                 expect(view.$('.join-team').length).toEqual(1);
             });
 
             it('can join team successfully', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var currentUsername = 'ma1';
+                // eslint-disable-next-line no-var
                 var teamId = 'teamA';
+                // eslint-disable-next-line no-var
                 var teamName = 'teamAlpha';
+                // eslint-disable-next-line no-var
                 var teamModelData = createTeamModelData(teamId, teamName, []);
+                // eslint-disable-next-line no-var
                 var view = createHeaderActionsView(requests, 1, currentUsername, teamModelData);
 
                 // a get request will be sent to get user membership info
@@ -155,8 +167,11 @@ define([
             });
 
             it('shows already member message', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var currentUsername = 'ma1';
+                // eslint-disable-next-line no-var
                 var view = createHeaderActionsView(
                     requests, 1, currentUsername, createTeamModelData('teamA', 'teamAlpha', []));
 
@@ -179,7 +194,9 @@ define([
             });
 
             it('shows team full message', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var view = createHeaderActionsView(
                     requests,
                     1,
@@ -197,9 +214,12 @@ define([
             });
 
             it('correctly resolves teamset-level max_size and course-level max_size', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var currentUsername = 'ma1';
                 // Teamset maxSize = 2, Course maxSize = 1
+                // eslint-disable-next-line no-var
                 var view = createHeaderActionsView(
                     requests,
                     1,
@@ -230,9 +250,12 @@ define([
             });
 
             it('behaves correctly if the teamset max size is set to 0', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var currentUsername = 'ma1';
                 // Teamset = 0, Course = 2
+                // eslint-disable-next-line no-var
                 var view = createHeaderActionsView(
                     requests,
                     2,
@@ -263,8 +286,11 @@ define([
             });
 
             it('shows not join instructor managed team message', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var currentUsername = 'ma1';
+                // eslint-disable-next-line no-var
                 var view = createHeaderActionsView(
                     requests,
                     1,
@@ -295,6 +321,7 @@ define([
             });
 
             it('shows correct error message if user fails to join team', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
 
                 // verify user_message
@@ -323,6 +350,7 @@ define([
             });
 
             it('shows correct error message if initializing the view fails', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
 
                 // verify user_message
@@ -344,6 +372,7 @@ define([
         });
 
         describe('EditButton', function() {
+            // eslint-disable-next-line no-var
             var teamModelData,
                 view,
                 createAndAssertView;
@@ -355,16 +384,19 @@ define([
             };
 
             it('renders when option showEditButton is true', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 createAndAssertView(requests, true);
             });
 
             it('does not render when option showEditButton is false', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 createAndAssertView(requests, false);
             });
 
             it('can navigate to correct url', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     editButton;
                 // eslint-disable-next-line no-undef

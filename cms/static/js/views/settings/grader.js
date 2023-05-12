@@ -6,6 +6,7 @@ define(['js/views/validation',
     'underscore',
     'jquery'],
 function(ValidatingView, gettext, StringUtils, HtmlUtils, _, $) {
+    // eslint-disable-next-line no-var
     var GraderView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGrader
         events: {
@@ -56,6 +57,7 @@ function(ValidatingView, gettext, StringUtils, HtmlUtils, _, $) {
                 if (this.setField(event) != this.oldName && !_.isEmpty(this.oldName)) {
                 // overload the error display logic
                     this._cacheValidationErrors.push(event.currentTarget);
+                    // eslint-disable-next-line no-var
                     var message = StringUtils.interpolate(
                         gettext('For grading to work, you must change all {oldName} subsections to {newName}.'),
                         {

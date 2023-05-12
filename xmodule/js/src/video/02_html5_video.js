@@ -19,6 +19,7 @@
         'video/02_html5_video.js',
         ['underscore'],
         function(_) {
+            // eslint-disable-next-line no-var
             var HTML5Video = {};
 
             HTML5Video.Player = (function() {
@@ -62,6 +63,7 @@
          *     }
          */
                 function Player(el, config) {
+                    // eslint-disable-next-line no-var
                     var errorMessage, lastSource, sourceList;
 
                     // Create HTML markup for individual sources of the HTML5 <video> element.
@@ -180,6 +182,7 @@
                 };
 
                 Player.prototype.setPlaybackRate = function(value) {
+                    // eslint-disable-next-line no-var
                     var newSpeed;
 
                     newSpeed = parseFloat(value);
@@ -201,6 +204,7 @@
                 };
 
                 Player.prototype.showErrorMessage = function(event, css) {
+                    // eslint-disable-next-line no-var
                     var cssSelecter = css || '.video-player .video-error';
                     this.el
                         .find('.video-player div')
@@ -279,6 +283,7 @@
                 };
 
                 Player.prototype.init = function(el, config) {
+                    // eslint-disable-next-line no-var
                     var isTouch = window.onTouchBasedDevice() || '',
                         events = ['loadstart', 'progress', 'suspend', 'abort', 'error',
                             'emptied', 'stalled', 'play', 'pause', 'loadedmetadata',
@@ -312,6 +317,7 @@
                     // Attach a 'click' event on the <video> element. It will cause the
                     // video to pause/play.
                     callback = function() {
+                        // eslint-disable-next-line no-var
                         var PlayerState = HTML5Video.PlayerState;
 
                         if (self.playerState === PlayerState.PLAYING) {

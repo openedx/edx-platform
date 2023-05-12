@@ -41,6 +41,7 @@ class Discussions extends React.Component {
     }
 
     getCountChart(count, percent, label, img = false) {
+        // eslint-disable-next-line no-var
         var percentWidth;
         if (percent === 0) {
             percentWidth = '2px';

@@ -1,4 +1,5 @@
 (function(Backbone) {
+    // eslint-disable-next-line no-var
     var NotificationModel = Backbone.Model.extend({
         defaults: {
             /**

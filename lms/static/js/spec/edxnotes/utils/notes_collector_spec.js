@@ -21,6 +21,7 @@ define([
         });
 
         it('sends single search request to fetch notes for all HTML components', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 token = Helpers.makeToken();
 

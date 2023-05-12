@@ -25,6 +25,7 @@ function($, CertificatesCollection, Certificate, CertificatesPage, CertificatePr
     return function(certificatesJson, certificateUrl, courseOutlineUrl, courseModes, certificateWebViewUrl,
         isActive, certificateActivationHandlerUrl) {
         // Initialize the model collection, passing any necessary options to the constructor
+        // eslint-disable-next-line no-var
         var certificatesCollection = new CertificatesCollection(certificatesJson, {
             parse: true,
             canBeEmpty: true,

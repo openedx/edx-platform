@@ -4,6 +4,7 @@ define(['jquery', 'backbone', 'underscore', 'common/js/components/views/list'],
         'use strict';
 
         describe('ListView', function() {
+            // eslint-disable-next-line no-var
             var Model = Backbone.Model.extend({
                     defaults: {
                         name: 'default name'

@@ -13,18 +13,26 @@ function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpe
     'use strict';
 
     describe('edx.user.BadgeListContainer', function() {
+        // eslint-disable-next-line no-var
         var view;
 
+        // eslint-disable-next-line no-var
         var createView = function(requests, pageNum, badgeListObject) {
+            // eslint-disable-next-line no-var
             var BadgeCollection = PagingCollection.extend({
                 queryParams: {
                     currentPage: 'current_page'
                 }
             });
+            // eslint-disable-next-line no-var
             var badgeCollection = new BadgeCollection();
+            // eslint-disable-next-line no-var
             var models = [];
+            // eslint-disable-next-line no-var
             var badgeListContainer;
+            // eslint-disable-next-line no-var
             var request;
+            // eslint-disable-next-line no-var
             var path;
             badgeCollection.url = '/api/badges/v1/assertions/user/staff/';
             _.each(_.range(badgeListObject.count), function(idx) {
@@ -49,6 +57,7 @@ function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpe
         });
 
         it('displays all badges', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 badges;
             view = createView(requests, 1, {
@@ -65,6 +74,7 @@ function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpe
         });
 
         it('displays placeholder on last page', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 placeholder;
             view = createView(requests, 3, {
@@ -81,6 +91,7 @@ function(Backbone, $, _, URI, AjaxHelpers, PagingCollection, LearnerProfileHelpe
         });
 
         it('does not display placeholder on first page', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 placeholder;
             view = createView(requests, 1, {

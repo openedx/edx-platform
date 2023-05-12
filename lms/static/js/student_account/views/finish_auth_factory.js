@@ -5,6 +5,7 @@
         ['jquery', 'underscore', 'backbone', 'js/student_account/views/FinishAuthView', 'utility'],
         function($, _, Backbone, FinishAuthView) {
             return function() {
+                // eslint-disable-next-line no-var
                 var view = new FinishAuthView({});
                 view.render();
             };

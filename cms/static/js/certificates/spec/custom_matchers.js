@@ -13,7 +13,7 @@ define(['jquery'], function($) { // eslint-disable-line no-unused-vars
                 // Assert the value being tested has key values which match the provided values
                 return {
                     compare: function(actual, values) {
-                        // eslint-disable-next-line no-undef
+                        /* eslint-disable-next-line no-undef, no-var */
                         var passed = _.every(values, function(value, key) {
                             return actual.get(key) === value;
                         });

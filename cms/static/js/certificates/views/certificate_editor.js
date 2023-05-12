@@ -18,7 +18,9 @@ function($, _, Backbone, gettext,
 
     // If signatories limit is required to specific value then we can change it.
     // However, Setting this limit to 100 that will allow PMs to add as many signatories as they want.
+    // eslint-disable-next-line no-var
     var MAX_SIGNATORIES_LIMIT = 100;
+    // eslint-disable-next-line no-var
     var CertificateEditorView = ListItemEditorView.extend({
         tagName: 'div',
         events: {
@@ -34,6 +36,7 @@ function($, _, Backbone, gettext,
 
         className: function() {
             // Determine the CSS class names for this model instance
+            // eslint-disable-next-line no-var
             var index = this.model.collection.indexOf(this.model);
 
             return [
@@ -69,10 +72,11 @@ function($, _, Backbone, gettext,
         render: function() {
             // Assemble the editor view for this model
             ListItemEditorView.prototype.render.call(this);
+            // eslint-disable-next-line no-var
             var self = this;
             // Ensure we have at least one signatory associated with the certificate.
             this.model.get('signatories').each(function(modelSignatory) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var signatory_view = new SignatoryEditorView({
                     model: modelSignatory,
                     isEditingAllCollections: true,
@@ -87,6 +91,7 @@ function($, _, Backbone, gettext,
 
         addSignatory: function() {
             // Append a new signatory to the certificate model's signatories collection
+            // eslint-disable-next-line no-var
             var signatory = new SignatoryModel({certificate: this.getSaveableModel()}); // eslint-disable-line max-len, no-unused-vars
             this.render();
         },

@@ -5,6 +5,7 @@
     define(['gettext', 'underscore',
         'jquery', 'backbone', 'js/edxnotes/utils/template', 'edx-ui-toolkit/js/utils/html-utils'],
     function(gettext, _, $, Backbone, templateUtils, HtmlUtils) {
+        // eslint-disable-next-line no-var
         var TabItemView = Backbone.View.extend({
             tagName: 'li',
             className: 'tab',
@@ -37,6 +38,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var html = this.template(this.model.toJSON());
                 this.$el.html(HtmlUtils.HTML(html).toString());
                 return this;

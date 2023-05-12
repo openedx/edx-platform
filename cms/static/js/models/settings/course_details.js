@@ -5,6 +5,7 @@ define(['backbone', 'underscore', 'gettext', 'js/models/validation_helpers', 'js
 function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CourseDetails = Backbone.Model.extend({
         defaults: {
             org: '',
@@ -45,6 +46,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
         validate: function(newattrs) {
         // Returns either nothing (no return call) so that validate works or an object of {field: errorstring} pairs
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
+            // eslint-disable-next-line no-var
             var errors = {};
             const CERTIFICATES_DISPLAY_BEHAVIOR_OPTIONS = {
                 END: 'end',
@@ -126,6 +128,7 @@ function(Backbone, _, gettext, ValidationHelpers, DateUtils, StringUtils) {
             // TODO check if key points to a real video using google's youtube api
             }
             if (_.has(newattrs, 'entrance_exam_minimum_score_pct')) {
+                // eslint-disable-next-line no-var
                 var range = {
                     min: 1,
                     max: 100

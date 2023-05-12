@@ -10,7 +10,9 @@ define([
 function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var createPageableItem = function(index) {
+        // eslint-disable-next-line no-var
         var id = 'item_' + index;
         return {
             id: id,
@@ -19,6 +21,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
         };
     };
 
+    // eslint-disable-next-line no-var
     var mockFirstPage = {
         results: [
             createPageableItem(1),
@@ -31,6 +34,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
         page: 0,
         start: 0
     };
+    // eslint-disable-next-line no-var
     var mockSecondPage = {
         results: [
             createPageableItem(4)
@@ -41,6 +45,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
         count: 4,
         start: 3
     };
+    // eslint-disable-next-line no-var
     var mockEmptyPage = {
         results: [],
         num_pages: 1,
@@ -50,15 +55,22 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
         start: 0
     };
 
+    // eslint-disable-next-line no-var
     var respondWithMockItems = function(requests) {
+        // eslint-disable-next-line no-var
         var request = AjaxHelpers.currentRequest(requests);
+        // eslint-disable-next-line no-var
         var url = new URI(request.url);
+        // eslint-disable-next-line no-var
         var queryParameters = url.query(true); // Returns an object with each query parameter stored as a value
+        // eslint-disable-next-line no-var
         var page = queryParameters.page;
+        // eslint-disable-next-line no-var
         var response = page === '0' ? mockFirstPage : mockSecondPage;
         AjaxHelpers.respondWithJson(requests, response);
     };
 
+    // eslint-disable-next-line no-var
     var MockPagingView = PagingView.extend({
         renderPageItems: function() {},
         initialize: function() {
@@ -69,6 +81,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
     });
 
     describe('Paging', function() {
+        // eslint-disable-next-line no-var
         var pagingView,
             TestPagingCollection = PagingCollection.extend({
                 state: {
@@ -79,6 +92,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
             });
 
         beforeEach(function() {
+            // eslint-disable-next-line no-var
             var collection = new TestPagingCollection();
             collection.url = '/dummy/';
             pagingView = new MockPagingView({collection: collection});
@@ -87,6 +101,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
         describe('PagingView', function() {
             describe('setPage', function() {
                 it('can set the current page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -97,6 +112,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should not change page after a server error', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -110,6 +126,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
 
             describe('nextPage', function() {
                 it('does not move forward after a server error', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -119,6 +136,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('can move to the next page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -130,6 +148,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('can not move forward from the final page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(2);
                     respondWithMockItems(requests);
@@ -140,6 +159,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
 
             describe('previousPage', function() {
                 it('can move back a page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(2);
                     respondWithMockItems(requests);
@@ -149,6 +169,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('can not move back from the first page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -157,6 +178,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('does not move back after a server error', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(2);
                     respondWithMockItems(requests);
@@ -168,6 +190,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
 
             describe('toggleSortOrder', function() {
                 it('can toggle direction of the current sort', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     expect(pagingView.collection.sortDirection).toBe('desc');
                     pagingView.toggleSortOrder('date-col');
@@ -179,6 +202,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('sets the correct default sort direction for a column', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.toggleSortOrder('name-col');
                     respondWithMockItems(requests);
@@ -194,6 +218,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
             describe('sortableColumnInfo', function() {
                 it('returns the registered info for a column', function() {
                     pagingView.registerSortableColumn('test-col', 'Test Column', 'testField', 'asc');
+                    // eslint-disable-next-line no-var
                     var sortInfo = pagingView.sortableColumnInfo('test-col');
                     expect(sortInfo.displayName).toBe('Test Column');
                     expect(sortInfo.fieldName).toBe('testField');
@@ -209,6 +234,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
         });
 
         describe('PagingHeader', function() {
+            // eslint-disable-next-line no-var
             var pagingHeader;
 
             beforeEach(function() {
@@ -223,6 +249,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('does not move forward if a server error occurs', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -233,6 +260,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('can move to the next page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -242,6 +270,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should be enabled when there is at least one more page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -249,6 +278,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should be disabled on the final page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(2);
                     respondWithMockItems(requests);
@@ -256,6 +286,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should be disabled on an empty page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     AjaxHelpers.respondWithJson(requests, mockEmptyPage);
@@ -271,6 +302,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('does not move back if a server error occurs', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(2);
                     respondWithMockItems(requests);
@@ -280,6 +312,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('can go back a page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(2);
                     respondWithMockItems(requests);
@@ -289,6 +322,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should be disabled on the first page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -296,6 +330,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should be enabled on the second page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(2);
                     respondWithMockItems(requests);
@@ -303,6 +338,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should be disabled for an empty page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     AjaxHelpers.respondWithJson(requests, mockEmptyPage);
@@ -312,6 +348,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
 
             describe('Page metadata section', function() {
                 it('shows the correct metadata for the current page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this),
                         message;
                     pagingView.setPage(1);
@@ -323,6 +360,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('shows the correct metadata when sorted ascending', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this),
                         message;
                     pagingView.setPage(1);
@@ -337,6 +375,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
 
             describe('Item count label', function() {
                 it('should show correct count on first page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -344,6 +383,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should show correct count on second page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(2);
                     respondWithMockItems(requests);
@@ -351,6 +391,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should show correct count for an empty collection', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     AjaxHelpers.respondWithJson(requests, mockEmptyPage);
@@ -360,6 +401,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
 
             describe('Item total label', function() {
                 it('should show correct total on the first page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -367,6 +409,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should show correct total on the second page', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(2);
                     respondWithMockItems(requests);
@@ -374,6 +417,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should show zero total for an empty collection', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     AjaxHelpers.respondWithJson(requests, mockEmptyPage);
@@ -383,6 +427,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
 
             describe('Sort order label', function() {
                 it('should show correct initial sort order', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.setPage(1);
                     respondWithMockItems(requests);
@@ -390,6 +435,7 @@ function($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
                 });
 
                 it('should show updated sort order', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     pagingView.toggleSortOrder('name-col');
                     respondWithMockItems(requests);

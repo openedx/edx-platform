@@ -5,12 +5,14 @@ define(
     function(_, ActiveVideoUpload, BaseView, PromptView, HtmlUtils) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var STATUS_CLASSES = [
             {status: ActiveVideoUpload.STATUS_QUEUED, cls: 'queued'},
             {status: ActiveVideoUpload.STATUS_COMPLETED, cls: 'success'},
             {status: ActiveVideoUpload.STATUS_FAILED, cls: 'error'}
         ];
 
+        // eslint-disable-next-line no-var
         var ActiveVideoUploadView = BaseView.extend({
             tagName: 'li',
             className: 'active-video-upload',
@@ -25,6 +27,7 @@ define(
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var $el = this.$el,
                     status;
                 $el.html(HtmlUtils.HTML(this.template(this.model.attributes)).toString());

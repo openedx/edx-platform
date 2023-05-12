@@ -9,6 +9,7 @@
             'common/js/discussion/views/discussion_thread_view'
         ],
         function(_, Backbone, DiscussionUtil, DiscussionThreadView) {
+            // eslint-disable-next-line no-var
             var DiscussionRouter = Backbone.Router.extend({
                 routes: {
                     '': 'allThreads',
@@ -31,6 +32,7 @@
                 },
 
                 start: function() {
+                    // eslint-disable-next-line no-var
                     var self = this,
                         $newPostButton = $('.new-post-btn');
                     this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
@@ -84,7 +86,7 @@
                 },
 
                 showMain: function() {
-                    // eslint-disable-next-line no-unused-vars
+                    /* eslint-disable-next-line no-unused-vars, no-var */
                     var self = this;
                     if (this.main) {
                         this.main.cleanup();
@@ -109,6 +111,7 @@
                 },
 
                 navigateToThread: function(threadId) {
+                    // eslint-disable-next-line no-var
                     var thread = this.discussion.get(threadId);
                     return this.navigate('' + (thread.get('commentable_id')) + '/threads/' + threadId, {
                         trigger: true
@@ -122,6 +125,7 @@
                 },
 
                 showNewPost: function() {
+                    // eslint-disable-next-line no-var
                     var self = this;
                     return $('.forum-content').fadeOut({
                         duration: 200,

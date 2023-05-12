@@ -11,6 +11,7 @@
         'js/edxnotes/utils/logger',
         'js/edxnotes/collections/notes'
     ], function($, _, Backbone, gettext, HtmlUtils, NotesLogger, NotesCollection) {
+        // eslint-disable-next-line no-var
         var SearchBoxView = Backbone.View.extend({
             events: {
                 submit: 'submitHandler'
@@ -19,6 +20,7 @@
             errorMessage: gettext('An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.'),
 
             emptyFieldMessageHtml: (function() {
+                // eslint-disable-next-line no-var
                 var message = gettext('Please enter a term in the {anchorStart} search field{anchorEnd}.');
                 return HtmlUtils.interpolateHtml(message, {
                     anchorStart: HtmlUtils.HTML('<a href="#search-notes-input">'),
@@ -106,6 +108,7 @@
             },
 
             onSuccess: function(data) {
+                // eslint-disable-next-line no-var
                 var args = this.prepareData(data);
                 if (args) {
                     this.options.search.apply(this, args);
@@ -119,6 +122,7 @@
             },
 
             onError: function(jXHR) {
+                // eslint-disable-next-line no-var
                 var searchQuery = this.getSearchQuery(),
                     message;
 

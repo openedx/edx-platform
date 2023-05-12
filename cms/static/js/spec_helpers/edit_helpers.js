@@ -13,13 +13,14 @@ import XModule from 'xmodule/js/src/xmodule';
 import 'cms/js/main';
 import 'xblock/cms.runtime.v1';
 
-// eslint-disable-next-line import/no-mutable-exports
+/* eslint-disable-next-line import/no-mutable-exports, no-var */
 var installMockXBlock, uninstallMockXBlock, installMockXModule, uninstallMockXModule,
     mockComponentTemplates, installEditTemplates, showEditModal, verifyXBlockRequest;
 
 installMockXBlock = function(mockResult) {
     // eslint-disable-next-line no-unused-vars
     window.MockXBlock = function(runtime, element) {
+        // eslint-disable-next-line no-var
         var block = {
             runtime: runtime
         };
@@ -103,6 +104,7 @@ installEditTemplates = function(append) {
 };
 
 showEditModal = function(requests, xblockElement, model, mockHtml, options) {
+    // eslint-disable-next-line no-var
     var modal = new EditXBlockModal({});
     modal.edit(xblockElement, model, options);
     AjaxHelpers.respondWithJson(requests, {
@@ -113,6 +115,7 @@ showEditModal = function(requests, xblockElement, model, mockHtml, options) {
 };
 
 verifyXBlockRequest = function(requests, expectedJson) {
+    // eslint-disable-next-line no-var
     var request = AjaxHelpers.currentRequest(requests),
         actualJson = JSON.parse(request.requestBody);
     expect(request.url).toEqual('/xblock/');
@@ -120,7 +123,7 @@ verifyXBlockRequest = function(requests, expectedJson) {
     expect(actualJson).toEqual(expectedJson);
 };
 
-// eslint-disable-next-line import/no-mutable-exports
+/* eslint-disable-next-line import/no-mutable-exports, no-var */
 var editHelpers = $.extend(modal_helpers, {
     installMockXBlock: installMockXBlock,
     uninstallMockXBlock: uninstallMockXBlock,

@@ -5,10 +5,13 @@
 
 'use strict';
 
+// eslint-disable-next-line no-var
 var path = require('path');
 
+// eslint-disable-next-line no-var
 var configModule = require(path.join(__dirname, 'common_static/common/js/karma.common.conf.js'));
 
+// eslint-disable-next-line no-var
 var options = {
 
     useRequireJs: false,

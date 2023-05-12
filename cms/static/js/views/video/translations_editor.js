@@ -7,6 +7,7 @@ define(
     function($, _, HtmlUtils, TranscriptUtils, AbstractEditor, ViewUtils, FileUpload, UploadDialog) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var VideoUploadDialog = UploadDialog.extend({
             error: function() {
                 this.model.set({
@@ -17,6 +18,7 @@ define(
             }
         });
 
+        // eslint-disable-next-line no-var
         var Translations = AbstractEditor.extend({
             events: {
                 'click .create-setting': 'addEntry',
@@ -31,6 +33,7 @@ define(
             validFileFormats: ['srt'],
 
             initialize: function() {
+                // eslint-disable-next-line no-var
                 var templateName = _.result(this, 'templateItemName'),
                     tpl = document.getElementById(templateName).text,
                     languageMap = {};
@@ -56,9 +59,10 @@ define(
             },
 
             getDropdown: (function() {
+                // eslint-disable-next-line no-var
                 var dropdown,
                     disableOptions = function(element, values) {
-                        // eslint-disable-next-line no-shadow
+                        /* eslint-disable-next-line no-shadow, no-var */
                         var dropdown = $(element).clone();
 
                         _.each(values, function(value, key) {
@@ -69,6 +73,7 @@ define(
                                 key = null;
                             }
 
+                            // eslint-disable-next-line no-var
                             var option = dropdown[0].options.namedItem(key);
 
                             if (option) {
@@ -88,6 +93,7 @@ define(
                     dropdown.options.add(new Option());
                     // eslint-disable-next-line no-unused-vars
                     _.each(this.model.get('languages'), function(lang, index) {
+                        // eslint-disable-next-line no-var
                         var option = new Option();
 
                         option.setAttribute('name', lang.code);
@@ -101,11 +107,13 @@ define(
             }()),
 
             getValueFromEditor: function() {
+                // eslint-disable-next-line no-var
                 var dict = {},
                     items = this.$el.find('ol').find('.list-settings-item');
 
                 /* eslint-disable-next-line consistent-return, no-unused-vars */
                 _.each(items, function(element, index) {
+                    // eslint-disable-next-line no-var
                     var key = $(element).find('select option:selected').val(),
                         value = $(element).find('.input').val();
 
@@ -126,12 +134,14 @@ define(
 
             // @TODO: Use backbone render patterns.
             setValueInEditor: function(values) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     frag = document.createDocumentFragment(),
                     dropdown = self.getDropdown(values),
                     languageMap = TranscriptUtils.Storage.get('languageMap');
 
                 _.each(values, function(value, newLang) {
+                    // eslint-disable-next-line no-var
                     var $html = $(self.templateItem({
                         newLang: newLang,
                         originalLang: _.findKey(languageMap, function(lang) { return lang === newLang; }) || '',
@@ -157,6 +167,7 @@ define(
             },
 
             removeEntry: function(event) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     $currentListItemEl = $(event.currentTarget).parent(),
                     originalLang = $currentListItemEl.data('original-lang'),
@@ -200,6 +211,7 @@ define(
             },
 
             upload: function(event) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     $target = $(event.currentTarget),
                     $listItem = $target.parents('li.list-settings-item'),
@@ -236,6 +248,7 @@ define(
                     parentElement: $target.closest('.xblock-editor'),
                     uploadData: uploadData,
                     onSuccess: function(response) {
+                        // eslint-disable-next-line no-var
                         var languageMap = TranscriptUtils.Storage.get('languageMap'),
                             newLangObject = {};
 
@@ -263,6 +276,7 @@ define(
             },
 
             onChangeHandler: function(event) {
+                // eslint-disable-next-line no-var
                 var $target = $(event.currentTarget),
                     $listItem = $target.parents('li.list-settings-item'),
                     originalLang = $listItem.data('original-lang'),
@@ -286,6 +300,7 @@ define(
          * Constructs data extracted from each dropdown. This will be used to re-render the whole view.
          */
             getAllLanguageDropdownElementsData: function(isNew, omittedLanguage) {
+                // eslint-disable-next-line no-var
                 var data = {},
                     languageDropdownElements = this.$el.find('select'),
                     languageMap = TranscriptUtils.Storage.get('languageMap');
@@ -295,6 +310,7 @@ define(
                 // {newLang: originalLang};                 original lang changed to a new lang
                 // {selectedLang: ''};                      new lang to be added, no entry in languageMap
                 _.each(languageDropdownElements, function(languageDropdown) {
+                    // eslint-disable-next-line no-var
                     var language = $(languageDropdown).find(':selected').val();
                     data[language] = _.findKey(languageMap, function(lang) { return lang === language; }) || '';
                 });

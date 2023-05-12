@@ -7,6 +7,7 @@ function(
 ) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CourseHighlightsEnableView = Backbone.View.extend({
         events: {
             'click button.status-highlights-enabled-value': 'handleEnableButtonPress',
@@ -25,6 +26,7 @@ function(
         },
 
         highlightsEnableXBlock: function() {
+            // eslint-disable-next-line no-var
             var modal = CourseOutlineModalsFactory.getModal('highlights_enable', this.model, {
                 onSave: this.refresh.bind(this),
                 xblockType: XBlockViewUtils.getXBlockType(
@@ -45,6 +47,7 @@ function(
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var html = this.template(this.model.attributes);
             HtmlUtils.setHtml(this.$el, HtmlUtils.HTML(html));
             return this;

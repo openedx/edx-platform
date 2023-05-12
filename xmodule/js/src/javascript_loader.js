@@ -19,6 +19,7 @@
          *     4) Return to callback function when all scripts loaded
          */
         JavascriptLoader.executeModuleScripts = function(el, callback) {
+            // eslint-disable-next-line no-var
             var callbackCalled, completed, completionHandlerGenerator, loaded, placeholders;
             if (!callback) {
                 callback = null; // eslint-disable-line no-param-reassign
@@ -32,6 +33,7 @@
             }
             // TODO: Verify the execution order of multiple placeholders
             completed = (function() {
+                // eslint-disable-next-line no-var
                 var i, ref, results;
                 results = [];
                 for (i = 1, ref = placeholders.length; ref >= 1 ? i <= ref : i >= ref; ref >= 1 ? ++i : --i) {
@@ -42,6 +44,7 @@
             callbackCalled = false;
             completionHandlerGenerator = function(index) {
                 return function() {
+                    // eslint-disable-next-line no-var
                     var allComplete, flag, i, len;
                     allComplete = true;
                     completed[index] = true;
@@ -64,6 +67,7 @@
             // Keep a map of what sources we're loaded from, and don't do it twice.
             loaded = {};
             return placeholders.each(function(index, placeholder) {
+                // eslint-disable-next-line no-var
                 var s, src;
                 // TODO: Check if the script already exists in DOM. If so, (1) copy it
                 // into memory; (2) delete the DOM script element; (3) reappend it.

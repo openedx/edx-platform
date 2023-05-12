@@ -8,6 +8,7 @@ define([
 ], function(Backbone, _, TeamCollection, TopicCollection, TopicModel) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var createMockPostResponse, createMockDiscussionResponse, createAnnotatedContentInfo, createMockThreadResponse,
         createMockTopicData, createMockTopicCollection, createMockTopic,
         createMockContext,
@@ -30,8 +31,10 @@ define([
             ['fr', 'French']
         ];
 
+    // eslint-disable-next-line no-var
     var createMockTeamData = function(startIndex, stopIndex) {
         return _.map(_.range(startIndex, stopIndex + 1), function(i) {
+            // eslint-disable-next-line no-var
             var id = 'id' + i;
             return {
                 name: 'team ' + i,
@@ -46,6 +49,7 @@ define([
         });
     };
 
+    // eslint-disable-next-line no-var
     var createMockTeamsResponse = function(options) {
         return _.extend(
             {
@@ -59,6 +63,7 @@ define([
         );
     };
 
+    // eslint-disable-next-line no-var
     var createMockTeams = function(responseOptions, options, collectionType) {
         if (_.isUndefined(collectionType)) {
             collectionType = TeamCollection; // eslint-disable-line no-param-reassign
@@ -74,6 +79,7 @@ define([
         );
     };
 
+    // eslint-disable-next-line no-var
     var createMockTeamAssignments = function(assignments, options) {
         if (_.isUndefined(assignments)) {
             assignments = [ // eslint-disable-line no-param-reassign
@@ -86,7 +92,9 @@ define([
         return _.extend(assignments, options);
     };
 
+    // eslint-disable-next-line no-var
     var createMockTeamMembershipsData = function(startIndex, stopIndex) {
+        // eslint-disable-next-line no-var
         var teams = createMockTeamData(startIndex, stopIndex);
         return _.map(_.range(startIndex, stopIndex + 1), function(i) {
             return {
@@ -102,6 +110,7 @@ define([
         });
     };
 
+    // eslint-disable-next-line no-var
     var createMockUserInfo = function(options) {
         return _.extend(
             {
@@ -124,10 +133,14 @@ define([
      * @param {[bool]} showTeamset - should show teamset string? (if not included, do not check
      *     the teamset string at all)
      */
+    // eslint-disable-next-line no-var
     var verifyCards = function(view, teams, showTeamset) {
+        // eslint-disable-next-line no-var
         var teamCards = view.$('.team-card');
         _.each(teams, function(team, index) {
+            // eslint-disable-next-line no-var
             var currentCard = teamCards.eq(index);
+            // eslint-disable-next-line no-var
             var teamsetString = 'teamset-name-' + team.topic_id;
             expect(currentCard.text()).toMatch(team.name);
             expect(currentCard.text()).toMatch(_.object(testLanguages)[team.language]);
@@ -141,6 +154,7 @@ define([
         });
     };
 
+    // eslint-disable-next-line no-var
     var triggerTeamEvent = function(action) {
         teamEvents.trigger('teams:update', {action: action});
     };
@@ -178,6 +192,7 @@ define([
     };
 
     createMockDiscussionResponse = function(threads) {
+        // eslint-disable-next-line no-var
         var responseThreads = threads;
         if (_.isUndefined(threads)) {
             responseThreads = [

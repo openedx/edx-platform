@@ -5,26 +5,32 @@
 (function($, gettext) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var focusableElementsSelector = [
         'a[href], area[href], input:not([disabled]), select:not([disabled]),',
         'textarea:not([disabled]), button:not([disabled]), iframe, object, embed,',
         '*[tabindex], *[contenteditable]'
     ].join(' ');
 
+    // eslint-disable-next-line no-var
     var disableTabIndexingOn = function(containerSelector) {
+        // eslint-disable-next-line no-var
         var $container = $(containerSelector),
             $focusableItems = $container.find('*').filter(focusableElementsSelector).filter(':visible');
         $container.attr('aria-hidden', 'true');
         $focusableItems.attr('tabindex', '-1');
     };
 
+    // eslint-disable-next-line no-var
     var enableTabIndexingOn = function(containerSelector) {
+        // eslint-disable-next-line no-var
         var $container = $(containerSelector),
             $focusableItems = $container.find('*').filter(focusableElementsSelector).filter(':visible');
         $container.attr('aria-hidden', 'false');
         $focusableItems.attr('tabindex', '0');
     };
 
+    // eslint-disable-next-line no-var
     var showModal = function(modalSelector) {
         $(modalSelector).attr('aria-hidden', 'false');
         $(modalSelector).show();
@@ -33,6 +39,7 @@
         $('body').addClass('open-modal');
     };
 
+    // eslint-disable-next-line no-var
     var hideModal = function(modalSelector, tosLinkSelector) {
         $(modalSelector).attr('aria-hidden', 'true');
         $(modalSelector).hide();
@@ -42,8 +49,10 @@
         $(tosLinkSelector).focus();
     };
 
+    // eslint-disable-next-line no-var
     var buildModal = function(modalClass, contentClass, closeButtonClass) {
         // Create the modal container
+        // eslint-disable-next-line no-var
         var modalTitle = gettext('Terms of Service and Honor Code'),
             closeLabel = gettext('Close'),
             titleId = 'modal-header-text',
@@ -76,15 +85,18 @@
         return $modal;
     };
 
+    // eslint-disable-next-line no-var
     var buildIframe = function(link, modalSelector, contentSelector, tosLinkSelector) {
         // Create an iframe with contents from the link and set its height to match the content area
         return $('<iframe>', {
             title: 'Terms of Service and Honor Code',
             src: link.href,
             load: function() {
+                // eslint-disable-next-line no-var
                 var $iframeHead = $(this).contents().find('head'),
                     $iframeBody = $(this).contents().find('body');
                 // Overwrite styles in child page to hide top navigation and footer
+                // eslint-disable-next-line no-var
                 var $style = $('<style>', {type: 'text/css'}),
                     styleContent = [
                         '/* Default honor.html template */',
@@ -128,6 +140,7 @@
     };
 
     $(document).ready(function() {
+        // eslint-disable-next-line no-var
         var tosLinkSelector = '.checkbox-honor_code .supplemental-link a',
             closeButtonClass = 'modal-close-button',
             closeButtonSelector = '.' + closeButtonClass,
@@ -137,6 +150,7 @@
             modalSelector = '.' + modalClass;
 
         $('body').on('click', tosLinkSelector, function(event) {
+            // eslint-disable-next-line no-var
             var link = event.target,
                 $modal,
                 $iframe;

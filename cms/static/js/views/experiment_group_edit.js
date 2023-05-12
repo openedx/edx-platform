@@ -9,6 +9,7 @@ define([
 function(BaseView, _, str, gettext, groupEditTemplate) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var ExperimentGroupEditView = BaseView.extend({
         tagName: 'li',
         events: {
@@ -19,6 +20,7 @@ function(BaseView, _, str, gettext, groupEditTemplate) {
         },
 
         className: function() {
+            // eslint-disable-next-line no-var
             var index = this.model.collection.indexOf(this.model);
             return 'field-group group group-' + index;
         },
@@ -28,6 +30,7 @@ function(BaseView, _, str, gettext, groupEditTemplate) {
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var collection = this.model.collection,
                 index = collection.indexOf(this.model);
 

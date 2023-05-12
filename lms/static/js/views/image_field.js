@@ -7,6 +7,7 @@
         'text!templates/fields/field_image.underscore',
         'backbone-super', 'jquery.fileupload'
     ], function(gettext, $, _, Backbone, HtmlUtils, FieldViews, FieldImageTemplate) {
+        // eslint-disable-next-line no-var
         var ImageFieldView = FieldViews.FieldView.extend({
 
             fieldType: 'image',
@@ -46,6 +47,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var attributes = {
                     id: this.options.valueAttribute,
                     inputName: (this.options.inputName || 'file'),
@@ -129,6 +131,7 @@
             },
 
             clickedRemoveButton: function() {
+                // eslint-disable-next-line no-var
                 var view = this;
                 this.setCurrentStatus('removing');
                 this.setUploadButtonVisibility('none');
@@ -166,6 +169,7 @@
             },
 
             validateImageSize: function(imageBytes) {
+                // eslint-disable-next-line no-var
                 var humanReadableSize;
                 if (imageBytes < this.options.imageMinBytes) {
                     humanReadableSize = this.bytesToHumanReadable(this.options.imageMinBytes);
@@ -215,6 +219,7 @@
 
             // eslint-disable-next-line consistent-return
             onBeforeUnload: function() {
+                // eslint-disable-next-line no-var
                 var status = this.getCurrentStatus();
                 if (status === 'uploading') {
                     return gettext('Upload is in progress. To avoid errors, stay on this page until the process is complete.');
@@ -224,7 +229,9 @@
             },
 
             bytesToHumanReadable: function(size) {
+                // eslint-disable-next-line no-var
                 var units = [gettext('bytes'), gettext('KB'), gettext('MB')];
+                // eslint-disable-next-line no-var
                 var i = 0;
                 while (size >= 1024) {
                     size /= 1024;

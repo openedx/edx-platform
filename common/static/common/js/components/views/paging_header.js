@@ -9,6 +9,7 @@
         'edx-ui-toolkit/js/utils/string-utils',
         'text!common/templates/components/paging-header.underscore'
     ], function(Backbone, _, gettext, HtmlUtils, StringUtils, headerTemplate) {
+        // eslint-disable-next-line no-var
         var PagingHeader = Backbone.View.extend({
             initialize: function(options) {
                 this.srInfo = options.srInfo;
@@ -23,6 +24,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var message,
                     start = (this.collection.getPageNumber() - 1) * this.collection.getPageSize(),
                     end = start + this.collection.size(),
@@ -64,6 +66,7 @@
              * @returns {*} A promise for the collection being updated
              */
             sortCollection: function() {
+                // eslint-disable-next-line no-var
                 var selected = this.$('#paging-header-select option:selected');
                 this.sortOrder = selected.attr('value');
                 this.collection.setSortField(this.sortOrder);

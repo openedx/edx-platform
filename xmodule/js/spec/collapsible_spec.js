@@ -3,7 +3,7 @@
     'use strict';
 
     describe('Collapsible', function() {
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var $el, html, html_custom,
             initialize = function(template) {
                 setFixtures(template);
@@ -61,7 +61,9 @@
         });
 
         describe('toggleFull', function() {
+            // eslint-disable-next-line no-var
             var assertChanges = function(state, anchorsElClass, showText, hideText) {
+                // eslint-disable-next-line no-var
                 var anchors, text;
 
                 if (state == null) {
@@ -94,6 +96,7 @@
             });
 
             it('Default container', function() {
+                // eslint-disable-next-line no-var
                 var event;
 
                 initialize(html);
@@ -113,6 +116,7 @@
             });
 
             it('Custom container', function() {
+                // eslint-disable-next-line no-var
                 var event;
 
                 initialize(html_custom);

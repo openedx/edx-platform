@@ -3,11 +3,13 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var origAjax = $.ajax;
 
+    // eslint-disable-next-line no-var
     var stubbedYT = {
         Player: function() {
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var Player = jasmine.createSpyObj(
                 'YT.Player',
                 [
@@ -111,6 +113,7 @@
 
     // eslint-disable-next-line no-undef
     jasmine.fireEvent = function(el, eventName) {
+        // eslint-disable-next-line no-var
         var event;
 
         if (document.createEvent) {
@@ -135,6 +138,7 @@
 
     // eslint-disable-next-line no-undef
     jasmine.stubRequests = function() {
+        // eslint-disable-next-line no-var
         var spy = $.ajax;
         // eslint-disable-next-line no-undef
         if (!jasmine.isSpy($.ajax)) {
@@ -143,6 +147,7 @@
         }
 
         return spy.and.callFake(function(settings) {
+            // eslint-disable-next-line no-var
             var match = settings.url
                     .match(/googleapis\.com\/.+\/videos\/\?id=(.+)&part=contentDetails/),
                 status, callCallback;
@@ -215,6 +220,7 @@
 
     // eslint-disable-next-line no-undef
     jasmine.initializePlayer = function(fixture, params) {
+        // eslint-disable-next-line no-var
         var state, metadata;
 
         if (_.isString(fixture)) {
@@ -244,6 +250,7 @@
         state = new window.Video('#example');
 
         state.resizer = (function() {
+            // eslint-disable-next-line no-var
             var methods = [
                     'align',
                     'alignByWidthOnly',
@@ -303,13 +310,18 @@
     // automated tests happen in firefox.
     // eslint-disable-next-line no-undef
     jasmine.mockFullscreenAPI = function() {
+        // eslint-disable-next-line no-var
         var fullscreenElement;
+        // eslint-disable-next-line no-var
         var vendorChangeEvent = 'fullscreenEnabled' in document
             ? 'fullscreenchange' : 'mozfullscreenchange';
+        // eslint-disable-next-line no-var
         var vendorRequestFullscreen = 'requestFullscreen' in window.HTMLElement.prototype
             ? 'requestFullscreen' : 'mozRequestFullScreen';
+        // eslint-disable-next-line no-var
         var vendorExitFullscreen = 'exitFullscreen' in document
             ? 'exitFullscreen' : 'mozCancelFullScreen';
+        // eslint-disable-next-line no-var
         var vendorFullscreenElement = 'fullscreenEnabled' in document
             ? 'fullscreenElement' : 'mozFullScreenElement';
 

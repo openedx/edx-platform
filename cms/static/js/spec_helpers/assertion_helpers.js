@@ -6,7 +6,7 @@ define(['jquery', 'common/js/components/views/feedback_notification', 'common/js
     'common/js/spec_helpers/template_helpers'],
 // eslint-disable-next-line no-unused-vars
 function($, NotificationView, Prompt, TemplateHelpers) {
-    // eslint-disable-next-line no-unused-vars
+    /* eslint-disable-next-line no-unused-vars, no-var */
     var installViewTemplates, createFeedbackSpy, verifyFeedbackShowing,
         // eslint-disable-next-line no-unused-vars
         verifyFeedbackHidden, createNotificationSpy, verifyNotificationShowing,
@@ -34,7 +34,7 @@ function($, NotificationView, Prompt, TemplateHelpers) {
 
     // eslint-disable-next-line no-undef
     assertAndDeleteItemError = function(that, url, promptText) {
-        // eslint-disable-next-line no-undef
+        /* eslint-disable-next-line no-undef, no-var */
         var requests = AjaxHelpers.requests(that),
             // eslint-disable-next-line no-undef
             promptSpy = ViewHelpers.createPromptSpy(),
@@ -57,7 +57,7 @@ function($, NotificationView, Prompt, TemplateHelpers) {
 
     // eslint-disable-next-line no-undef
     assertAndDeleteItemWithError = function(that, url, listItemView, promptText) {
-        // eslint-disable-next-line no-undef
+        /* eslint-disable-next-line no-undef, no-var */
         var requests = AjaxHelpers.requests(that),
             // eslint-disable-next-line no-undef
             promptSpy = ViewHelpers.createPromptSpy(),

@@ -6,6 +6,7 @@ import XBlockInfo from 'js/models/xblock_info';
 import XBlockStringFieldEditor from 'js/views/xblock_string_field_editor';
 
 describe('XBlockStringFieldEditorView', function() {
+    // eslint-disable-next-line no-var
     var initialDisplayName, updatedDisplayName, getXBlockInfo, getFieldEditorView;
 
     getXBlockInfo = function(displayName) {
@@ -43,6 +44,7 @@ describe('XBlockStringFieldEditorView', function() {
     });
 
     describe('Editing', function() {
+        // eslint-disable-next-line no-var
         var expectPostedNewDisplayName, expectEditCanceled;
 
         expectPostedNewDisplayName = function(requests, displayName) {
@@ -54,7 +56,7 @@ describe('XBlockStringFieldEditorView', function() {
         };
 
         expectEditCanceled = function(test, fieldEditorView, options) {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var requests, initialRequests, displayNameInput;
             requests = AjaxHelpers.requests(test);
             displayNameInput = EditHelpers.inlineEdit(fieldEditorView.$el, options.newTitle);
@@ -73,6 +75,7 @@ describe('XBlockStringFieldEditorView', function() {
         };
 
         it('can inline edit the display name', function() {
+            // eslint-disable-next-line no-var
             var requests, fieldEditorView;
             requests = AjaxHelpers.requests(this);
             fieldEditorView = getFieldEditorView().render();
@@ -87,7 +90,7 @@ describe('XBlockStringFieldEditorView', function() {
         });
 
         it('does not change the title when a display name update fails', function() {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var requests, fieldEditorView, initialRequests;
             requests = AjaxHelpers.requests(this);
             fieldEditorView = getFieldEditorView().render();
@@ -101,6 +104,7 @@ describe('XBlockStringFieldEditorView', function() {
         });
 
         it('trims whitespace from the display name', function() {
+            // eslint-disable-next-line no-var
             var requests, fieldEditorView;
             requests = AjaxHelpers.requests(this);
             fieldEditorView = getFieldEditorView().render();
@@ -116,28 +120,34 @@ describe('XBlockStringFieldEditorView', function() {
         });
 
         it('does not change the title when input is the empty string', function() {
+            // eslint-disable-next-line no-var
             var fieldEditorView = getFieldEditorView().render();
             expectEditCanceled(this, fieldEditorView, {newTitle: ''});
         });
 
         it('does not change the title when input is whitespace-only', function() {
+            // eslint-disable-next-line no-var
             var fieldEditorView = getFieldEditorView().render();
             expectEditCanceled(this, fieldEditorView, {newTitle: ' '});
         });
 
         it('can cancel an inline edit by pressing escape', function() {
+            // eslint-disable-next-line no-var
             var fieldEditorView = getFieldEditorView().render();
             expectEditCanceled(this, fieldEditorView, {newTitle: updatedDisplayName, pressEscape: true});
         });
 
         it('can cancel an inline edit by clicking cancel', function() {
+            // eslint-disable-next-line no-var
             var fieldEditorView = getFieldEditorView().render();
             expectEditCanceled(this, fieldEditorView, {newTitle: updatedDisplayName, clickCancel: true});
         });
     });
 
     describe('Rendering', function() {
+        // eslint-disable-next-line no-var
         var expectInputMatchesModelDisplayName = function(displayName) {
+            // eslint-disable-next-line no-var
             var fieldEditorView = getFieldEditorView(getXBlockInfo(displayName)).render();
             expect(fieldEditorView.$('.xblock-field-input').val()).toBe(displayName);
         };

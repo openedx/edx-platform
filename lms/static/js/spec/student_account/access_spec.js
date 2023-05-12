@@ -16,7 +16,7 @@
     function($, _, Backbone, TemplateHelpers, AjaxHelpers, AccessView, FormView, EnrollmentInterface,
         ShoppingCartInterface) {
         describe('edx.student.account.AccessView', function() {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var requests = null,
                 view = null,
                 FORM_DESCRIPTION = {
@@ -55,7 +55,9 @@
                 ),
                 THIRD_PARTY_COMPLETE_URL = '/auth/complete/provider/';
 
+            // eslint-disable-next-line no-var
             var ajaxSpyAndInitialize = function(that, mode, nextUrl, finishAuthUrl, createAccountOption) {
+                // eslint-disable-next-line no-var
                 var options = {
                         initial_mode: mode,
                         third_party_auth: {
@@ -90,14 +92,17 @@
                 spyOn(ShoppingCartInterface, 'addCourseToCart').and.callFake(function() {});
             };
 
+            // eslint-disable-next-line no-var
             var assertForms = function(visibleType, hiddenType) {
                 expect($(visibleType)).not.toHaveClass('hidden');
                 expect($(hiddenType)).toHaveClass('hidden');
                 expect($('#password-reset-form')).toHaveClass('hidden');
             };
 
+            // eslint-disable-next-line no-var
             var selectForm = function(type) {
                 // Create a fake change event to control form toggling
+                // eslint-disable-next-line no-var
                 var changeEvent = $.Event('change');
                 changeEvent.currentTarget = $('.form-toggle[data-type="' + type + '"]');
 

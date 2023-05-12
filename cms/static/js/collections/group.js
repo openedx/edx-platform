@@ -5,6 +5,7 @@ define([
 function(_, str, Backbone, gettext, GroupModel) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var GroupCollection = Backbone.Collection.extend({
         model: GroupModel,
         comparator: 'order',
@@ -36,6 +37,7 @@ function(_, str, Backbone, gettext, GroupModel) {
          * Group A, Group B, Group AA, Group ZZZ etc.
          */
         getNextDefaultGroupName: function() {
+            // eslint-disable-next-line no-var
             var index = this.nextOrder(),
                 usedNames = _.pluck(this.toJSON(), 'name'),
                 name = '';
@@ -61,6 +63,7 @@ function(_, str, Backbone, gettext, GroupModel) {
                 default group names. For example: A, B, AA in Group A,
                 Group B, ..., Group AA, etc.
             */
+            // eslint-disable-next-line no-var
             var dict = gettext('ABCDEFGHIJKLMNOPQRSTUVWXYZ').split(''),
                 len = dict.length,
                 divide;
@@ -77,6 +80,7 @@ function(_, str, Backbone, gettext, GroupModel) {
             };
 
             return function getId(number) {
+                // eslint-disable-next-line no-var
                 var accumulatedValues = '',
                     result = divide(number, len),
                     index;

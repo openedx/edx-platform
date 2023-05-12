@@ -23,6 +23,7 @@
         page_re: /\?discussion_page=(\d+)/,
 
         initialize: function(options) {
+            // eslint-disable-next-line no-var
             var match;
             this.$el = options.el;
             this.readOnly = options.readOnly;
@@ -50,6 +51,7 @@
         },
 
         loadDiscussions: function($elem, error) {
+            // eslint-disable-next-line no-var
             var discussionId = this.$el.data('discussion-id'),
                 url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + ('?page=' + this.page)
                     + ('&sort_key=' + this.defaultSortKey) + ('&sort_order=' + this.defaultSortOrder),
@@ -70,6 +72,7 @@
         },
 
         renderDiscussion: function($elem, response, textStatus, discussionId) {
+            // eslint-disable-next-line no-var
             var discussionHtml,
                 user = new DiscussionUser(response.user_info),
                 self = this;
@@ -143,6 +146,7 @@
         },
 
         navigateToThread: function(threadId) {
+            // eslint-disable-next-line no-var
             var thread = this.discussion.get(threadId);
             this.threadView = new DiscussionThreadView({
                 el: this.$('.forum-content'),
@@ -185,6 +189,7 @@
         },
 
         toggleDiscussion: function() {
+            // eslint-disable-next-line no-var
             var self = this;
             if (this.showed) {
                 this.hideDiscussion();
@@ -247,6 +252,7 @@
         },
 
         handleKeydown: function(event) {
+            // eslint-disable-next-line no-var
             var keyCode = event.keyCode;
             if (keyCode === this.escKey) {
                 this.$('section.discussion').find('.cancel').trigger('click');

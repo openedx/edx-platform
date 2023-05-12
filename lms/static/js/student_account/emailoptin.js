@@ -2,6 +2,7 @@
     'use strict';
 
     define(['jquery', 'jquery.cookie'], function($) {
+        // eslint-disable-next-line no-var
         var EmailOptInInterface = {
 
             urls: {

@@ -13,6 +13,7 @@ define(
         'use strict';
 
         describe('Discussion Profile Page Factory', function() {
+            // eslint-disable-next-line no-var
             var testCourseId = 'test_course',
                 initializeDiscussionProfilePageFactory = function(options) {
                     DiscussionProfilePageFactory(_.extend(
@@ -42,6 +43,7 @@ define(
                 expect($('.discussion-user-threads').text()).toContain('Show');
             });
             it('can render itself when roles are undefined', function() {
+                // eslint-disable-next-line no-var
                 var options = {roles: undefined};
                 initializeDiscussionProfilePageFactory(options);
                 expect($('.discussion-user-threads').text()).toContain('Show');

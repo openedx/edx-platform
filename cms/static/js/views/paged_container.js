@@ -2,9 +2,11 @@
 define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/views/container', 'js/utils/module', 'gettext',
     'common/js/components/views/feedback_notification', 'js/views/paging_header', 'common/js/components/views/paging_footer'],
 function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView, PagingHeader, PagingFooter) {
+    // eslint-disable-next-line no-var
     var PagedContainerView = ContainerView.extend({
 
         initialize: function(options) {
+            // eslint-disable-next-line no-var
             var self = this;
             ContainerView.prototype.initialize.call(this);
             this.page_size = this.options.page_size;
@@ -85,6 +87,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
         },
 
         renderPage: function(options) {
+            // eslint-disable-next-line no-var
             var self = this,
                 view = this.view,
                 xblockInfo = this.model,
@@ -97,12 +100,14 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                 data: this.getRenderParameters(options.page_number, options.force_render),
                 headers: {Accept: 'application/json'},
                 success: function(fragment) {
+                    // eslint-disable-next-line no-var
                     var originalDone = options.done;
                     options.done = function() {
                         self.processPaging({requested_page: options.page_number});
                         self.page.updatePreviewButton(self.collection.showChildrenPreviews);
                         self.page.renderAddXBlockComponents();
                         if (options.force_render) {
+                            // eslint-disable-next-line no-var
                             var $target = $('.studio-xblock-wrapper[data-locator="' + options.force_render + '"]');
                             // Scroll us to the element with a little buffer at the top for context.
                             ViewUtils.setScrollOffset($target, ($(window).height() * 0.10));
@@ -143,12 +148,13 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
         setPage: function(page_number, additional_options) {
             // eslint-disable-next-line camelcase
             additional_options = additional_options || {};
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var options = _.extend({page_number: page_number}, additional_options);
             this.render(options);
         },
 
         nextPage: function() {
+            // eslint-disable-next-line no-var
             var collection = this.collection,
                 currentPage = collection.currentPage,
                 lastPage = collection.totalPages - 1;
@@ -158,6 +164,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
         },
 
         previousPage: function() {
+            // eslint-disable-next-line no-var
             var collection = this.collection,
                 currentPage = collection.currentPage;
             if (currentPage > 0) {
@@ -168,6 +175,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
         processPaging: function(options) {
             // We have the Django template sneak us the pagination information,
             // and we load it from a div here.
+            // eslint-disable-next-line no-var
             var $element = this.$el.find('.xblock-container-paging-parameters'),
                 total = $element.data('total'),
                 displayed = $element.data('displayed'),
@@ -212,10 +220,11 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
             // eslint-disable-next-line camelcase
             if (is_duplicate) {
                 // Duplicated blocks can be inserted onto the current page.
+                // eslint-disable-next-line no-var
                 var xblock = xblockView.xblock.element.parents('.studio-xblock-wrapper').first();
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var all_xblocks = xblock.parent().children('.studio-xblock-wrapper');
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var index = all_xblocks.index(xblock);
                 // eslint-disable-next-line camelcase
                 if ((index + 1 <= this.page_size) && (all_xblocks.length > this.page_size)) {
@@ -233,12 +242,12 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
                 return;
             }
             this.collection.totalPages = this.getPageCount(this.collection.totalCount);
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var target_page = this.collection.totalPages - 1;
             // If we're on a new page due to overflow, or this is the first item, set the page.
             /* eslint-disable-next-line camelcase, eqeqeq */
             if (((this.collection.currentPage) != target_page) || this.collection.totalCount == 1) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var force_render = xblockView.model.id;
                 // eslint-disable-next-line camelcase
                 if (is_duplicate) {
@@ -261,9 +270,9 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
             this.notifyRuntime('deleted-child', locator);
             this.collection._size -= 1;
             this.collection.totalCount -= 1;
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var current_page = this.collection.currentPage;
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var total_pages = this.getPageCount(this.collection.totalCount);
             // eslint-disable-next-line camelcase
             this.collection.totalPages = total_pages;
@@ -291,6 +300,7 @@ function($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView,
         },
 
         togglePreviews: function() {
+            // eslint-disable-next-line no-var
             var self = this,
                 xblockUrl = this.model.url();
             return $.ajax({

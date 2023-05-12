@@ -5,6 +5,7 @@
     'use strict';
 
     define(['backbone'], function(Backbone) {
+        // eslint-disable-next-line no-var
         var Topic = Backbone.Model.extend({
             defaults: {
                 name: '',
@@ -20,6 +21,7 @@
             },
 
             isInstructorManaged: function() {
+                // eslint-disable-next-line no-var
                 var topicType = this.get('type');
                 return topicType === 'public_managed' || topicType === 'private_managed';
             },

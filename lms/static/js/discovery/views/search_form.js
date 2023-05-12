@@ -43,6 +43,7 @@
             },
 
             showFoundMessage: function(count) {
+                // eslint-disable-next-line no-var
                 var msg = ngettext(
                     'Viewing %s course',
                     'Viewing %s courses',
@@ -53,7 +54,7 @@
             },
 
             showNotFoundMessage: function(term) {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var msg = interpolate(
                     gettext('We couldn\'t find any results for "%s".'),
                     // eslint-disable-next-line no-undef

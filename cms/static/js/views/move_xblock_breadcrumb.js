@@ -11,6 +11,7 @@ define([
 function($, Backbone, _, gettext, HtmlUtils, StringUtils, MoveXBlockBreadcrumbViewTemplate) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var MoveXBlockBreadcrumb = Backbone.View.extend({
         el: '.breadcrumb-container',
 

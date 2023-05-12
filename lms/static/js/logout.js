@@ -8,6 +8,7 @@
     'use strict';
 
     $(function() {
+        // eslint-disable-next-line no-var
         var $iframeContainer = $('#iframeContainer'),
             $iframes = $iframeContainer.find('iframe'),
             redirectUrl = $iframeContainer.data('redirect-url');

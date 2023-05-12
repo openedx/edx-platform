@@ -12,6 +12,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
     'use strict';
 
     describe('Cohorts View', function() {
+        // eslint-disable-next-line no-var
         var catLoversInitialCount = 123,
             dogLoversInitialCount = 456,
             unknownUserMessage,
@@ -77,6 +78,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
         };
 
         createCohortsView = function(test, options) {
+            // eslint-disable-next-line no-var
             var cohortsJson, cohorts, contentGroups, cohortSettings;
             options = options || {};
             cohortsJson = options.cohorts ? {cohorts: options.cohorts} : createMockCohorts();
@@ -126,6 +128,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
         };
 
         selectContentGroup = function(groupId, userPartitionId) {
+            // eslint-disable-next-line no-var
             var ids = groupId + ':' + userPartitionId;
             cohortsView.$('.radio-yes').prop('checked', true).change();
             cohortsView.$('.input-cohort-group-association').val(ids).change();
@@ -156,6 +159,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
         };
 
         verifyDetailedMessage = function(expectedTitle, expectedMessageType, expectedDetails, expectedAction) {
+            // eslint-disable-next-line no-var
             var numDetails = cohortsView.$('.summary-items').children().length;
             verifyMessage(expectedTitle, expectedMessageType, expectedAction, true);
             expect(numDetails).toBe(expectedDetails.length);
@@ -165,6 +169,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
         };
 
         verifyHeader = function(expectedCohortId, expectedTitle, expectedCount, assignmentType) {
+            // eslint-disable-next-line no-var
             var header = cohortsView.$('.cohort-management-group-header');
             expect(cohortsView.$('.cohort-select').val()).toBe(expectedCohortId.toString());
             expect(cohortsView.$('.cohort-select option:selected').text()).toBe(
@@ -184,14 +189,18 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 )
             );
             assignmentType = assignmentType || MOCK_MANUAL_ASSIGNMENT;
+            // eslint-disable-next-line no-var
             var manualMessage = 'Learners are added to this cohort only when you provide their email addresses '
                     + 'or usernames on this page.';
+            // eslint-disable-next-line no-var
             var randomMessage = 'Learners are added to this cohort automatically.';
+            // eslint-disable-next-line no-var
             var message = (assignmentType === MOCK_MANUAL_ASSIGNMENT) ? manualMessage : randomMessage;
             expect(header.find('.cohort-management-group-setup .setup-value').text().trim().split('\n')[0]).toBe(message);
         };
 
         saveFormAndExpectErrors = function(action, errors) {
+            // eslint-disable-next-line no-var
             var form, expectedTitle;
             if (action === 'add') {
                 expectedTitle = 'The cohort cannot be added';
@@ -254,6 +263,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
         });
 
         it('can upload a CSV of cohort assignments if a cohort exists', function() {
+            // eslint-disable-next-line no-var
             var uploadCsvToggle, fileUploadForm,
                 fileUploadFormCss = '#file-upload-form';
 
@@ -331,8 +341,9 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             });
 
             it('shows an appropriate cohort status message', function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var createCourseCohortSettingsNotificationView = function(is_cohorted) {
+                    // eslint-disable-next-line no-var
                     var notificationView = new CourseCohortSettingsNotificationView({
                         el: $('.cohort-state-message'),
                         // eslint-disable-next-line camelcase
@@ -342,6 +353,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                     return notificationView;
                 };
 
+                // eslint-disable-next-line no-var
                 var notificationView = createCourseCohortSettingsNotificationView(true);
                 expect(notificationView.$('.action-toggle-message').text().trim()).toBe('Cohorts Enabled');
 
@@ -354,6 +366,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 expect(cohortsView.$('.cohorts-state').prop('checked')).toBeFalsy();
                 cohortsView.$('.cohorts-state').prop('checked', true).change();
                 AjaxHelpers.respondWithError(requests, 500);
+                // eslint-disable-next-line no-var
                 var expectedTitle = "We've encountered an error. Refresh your browser and then try again.";
                 expect(cohortsView.$('.message-title').text().trim()).toBe(expectedTitle);
             });
@@ -361,9 +374,10 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
 
         describe('Cohort Group Header', function() {
             it('renders header correctly', function() {
+                // eslint-disable-next-line no-var
                 var cohortName = 'Transformers',
                     newCohortName = 'X Men';
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var expectedRequest = function(assignment_type) {
                     return {
                         name: newCohortName,
@@ -431,10 +445,13 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
         });
 
         describe('Add Cohorts Form', function() {
+            // eslint-disable-next-line no-var
             var defaultCohortName = 'New Cohort';
+            // eslint-disable-next-line no-var
             var assignmentType = 'random';
 
             it('can add a cohort', function() {
+                // eslint-disable-next-line no-var
                 var contentGroupId = 0;
                 createCohortsView(this, {cohorts: []});
                 cohortsView.$('.action-create').click();
@@ -472,6 +489,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             });
 
             it('has default assignment type set to manual', function() {
+                // eslint-disable-next-line no-var
                 var cohortName = 'iCohort';
                 createCohortsView(this, {cohorts: []});
                 cohortsView.$('.action-create').click();
@@ -530,6 +548,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             });
 
             it('shows a message when adding a cohort returns a server error', function() {
+                // eslint-disable-next-line no-var
                 var addModal;
                 createCohortsView(this, {selectCohort: 1});
                 cohortsView.$('.action-create').click();
@@ -599,6 +618,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
         });
 
         describe('Add Students Button', function() {
+            // eslint-disable-next-line no-var
             var getStudentInput, addStudents, respondToAdd;
 
             getStudentInput = function() {
@@ -635,6 +655,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             });
 
             it('can add a single student', function() {
+                // eslint-disable-next-line no-var
                 var catLoversUpdatedCount = catLoversInitialCount + 1;
                 createCohortsView(this, {selectCohort: 1});
                 addStudents('student@sample.com');
@@ -704,6 +725,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             });
 
             it('shows a "view all" button when more than 5 students do not exist', function() {
+                // eslint-disable-next-line no-var
                 var sixUsers = 'unknown1, unknown2, unknown3, unknown4, unknown5, unknown6';
                 createCohortsView(this, {selectCohort: 1});
 
@@ -743,6 +765,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             });
 
             it('shows students moved from one cohort to another', function() {
+                // eslint-disable-next-line no-var
                 var sixUsers = 'moved1@sample.com, moved2@sample.com, moved3@sample.com, alreadypresent@sample.com';
                 createCohortsView(this, {selectCohort: 1});
 
@@ -802,6 +825,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
 
         describe('Cohort Settings', function() {
             describe('Content Group Setting', function() {
+                // eslint-disable-next-line no-var
                 var createCohortsViewWithDeletedContentGroup;
 
                 createCohortsViewWithDeletedContentGroup = function(test) {
@@ -820,6 +844,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 };
 
                 it('shows a select element with an option for each content group', function() {
+                    // eslint-disable-next-line no-var
                     var options;
                     createCohortsView(this, {selectCohort: 1});
                     cohortsView.$('.tab-settings a').click();
@@ -942,6 +967,7 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 });
 
                 it('shows an error message when no content groups are specified', function() {
+                    // eslint-disable-next-line no-var
                     var message;
                     createCohortsView(this, {selectCohort: 1, contentGroups: []});
                     cohortsView.$('.tab-settings a').click();
@@ -956,9 +982,10 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
                 });
 
                 it('can update existing cohort settings', function() {
+                    // eslint-disable-next-line no-var
                     var cohortName = 'Transformers',
                         newCohortName = 'X Men';
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-var */
                     var expectedRequest = function(assignment_type) {
                         return {
                             name: newCohortName,

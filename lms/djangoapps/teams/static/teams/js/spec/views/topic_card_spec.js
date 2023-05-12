@@ -7,6 +7,7 @@ function($, _, TopicCardView, Topic) {
     'use strict';
 
     describe('Topic card view', function() {
+        // eslint-disable-next-line no-var
         var createTopicCardView = function() {
             return new TopicCardView({
                 model: new Topic({
@@ -25,6 +26,7 @@ function($, _, TopicCardView, Topic) {
         });
 
         it('can render itself', function() {
+            // eslint-disable-next-line no-var
             var view = createTopicCardView();
             expect(view.$el).toHaveClass('square-card');
             expect(view.$el.find('.card-title').text()).toContain('Renewable Energy');
@@ -34,6 +36,7 @@ function($, _, TopicCardView, Topic) {
         });
 
         it('navigates when action button is clicked', function() {
+            // eslint-disable-next-line no-var
             var view = createTopicCardView();
             view.$el.find('.action').trigger('click');
             // TODO test actual navigation once implemented

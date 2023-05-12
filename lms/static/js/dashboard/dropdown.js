@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function($) {
@@ -9,6 +9,7 @@ var edx = edx || {};
 
     // Generate the properties object to be passed along with business intelligence events.
     edx.dashboard.dropdown.toggleCourseActionsDropdownMenu = function(event) {
+        // eslint-disable-next-line no-var
         var $target = $(event.currentTarget),
             dashboardIndex = $target.data().dashboardIndex,
             $dropdown = $($target.data('dropdownSelector') || '#actions-dropdown-' + dashboardIndex),
@@ -16,15 +17,18 @@ var edx = edx || {};
             ariaExpandedState = ($dropdownButton.attr('aria-expanded') === 'true'),
             menuItems = $dropdown.find('a');
 
-        // eslint-disable-next-line no-shadow
+        /* eslint-disable-next-line no-shadow, no-var */
         var catchKeyPress = function(object, event) {
             // get currently focused item
+            // eslint-disable-next-line no-var
             var $focusedItem = $(':focus');
 
             // get the index of the currently focused item
+            // eslint-disable-next-line no-var
             var focusedItemIndex = menuItems.index($focusedItem);
 
             // var to store next focused item index
+            // eslint-disable-next-line no-var
             var itemToFocusIndex;
 
             // if space or escape key pressed

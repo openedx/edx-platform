@@ -9,7 +9,7 @@
 
 /* globals Logger, accessible_modal, interpolate */
 
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 // eslint-disable-next-line no-unused-vars
@@ -33,6 +33,7 @@ var edx = edx || {};
      *         - verifyToggleBannerFailedOff
      */
     edx.dashboard.legacy.init = function(urls) {
+        // eslint-disable-next-line no-var
         var $notifications = $('.dashboard-notifications'),
             $upgradeButtonLinks = $('.action-upgrade'),
             $verifyButtonLinks = $('.verification-cta > .cta');
@@ -63,6 +64,7 @@ var edx = edx || {};
             $('.action-linkedin-profile'),
             'edx.bi.user.linkedin_add_to_profile',
             function(element) {
+                // eslint-disable-next-line no-var
                 var $el = $(element);
                 return {
                     category: 'linkedin',
@@ -74,6 +76,7 @@ var edx = edx || {};
 
         // Generate the properties object to be passed along with business intelligence events.
         function generateProperties(element) {
+            // eslint-disable-next-line no-var
             var $el = $(element),
                 properties = {};
 
@@ -91,6 +94,7 @@ var edx = edx || {};
         function setDialogAttributes(isPaidCourse, isCourseVoucherRefundable, certNameLong,
             // eslint-disable-next-line no-unused-vars
             courseNumber, courseName, enrollmentMode, showRefundOption, courseKey) {
+            // eslint-disable-next-line no-var
             var diagAttr = {};
 
             if (isPaidCourse) {
@@ -141,6 +145,7 @@ var edx = edx || {};
             }
         });
         $('.action-unenroll').click(function(event) {
+            // eslint-disable-next-line no-var
             var isPaidCourse = $(event.target).data('course-is-paid-course') === 'True',
                 isCourseVoucherRefundable = $(event.target).data('is-course-voucher-refundable') === 'True',
                 certNameLong = $(event.target).data('course-cert-name-long'),
@@ -151,6 +156,7 @@ var edx = edx || {};
                 courseKey = $(event.target).data('course-id'),
                 dialogMessageAttr;
 
+            // eslint-disable-next-line no-var
             var request = $.ajax({
                 url: courseRefundUrl,
                 method: 'GET',
@@ -283,6 +289,7 @@ var edx = edx || {};
         $('.action-email-settings').each(function(index) {
             $(this).attr('id', 'email-settings-' + index);
             // a bit of a hack, but gets the unique selector for the modal trigger
+            // eslint-disable-next-line no-var
             var trigger = '#' + $(this).attr('id');
             accessibleModal(
                 trigger,
@@ -295,6 +302,7 @@ var edx = edx || {};
         $('.action-unenroll').each(function(index) {
             $(this).attr('id', 'unenroll-' + index);
             // a bit of a hack, but gets the unique selector for the modal trigger
+            // eslint-disable-next-line no-var
             var trigger = '#' + $(this).attr('id');
             accessibleModal(
                 trigger,

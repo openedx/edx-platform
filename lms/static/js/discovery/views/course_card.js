@@ -10,6 +10,7 @@
         'use strict';
 
         function formatDate(date, userLanguage, userTimezone) {
+            // eslint-disable-next-line no-var
             var context;
             context = {
                 datetime: date,
@@ -31,7 +32,9 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var data = _.clone(this.model.attributes);
+                // eslint-disable-next-line no-var
                 var userLanguage = '',
                     userTimezone = '';
                 if (this.model.userPreferences !== undefined) {

@@ -7,6 +7,7 @@ define([
     'use strict';
 
     describe('EdxNotes NotesPage', function() {
+        // eslint-disable-next-line no-var
         var notes = Helpers.getDefaultNotes();
 
         beforeEach(function() {
@@ -18,6 +19,7 @@ define([
         });
 
         it('should be displayed properly', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 tab;
 

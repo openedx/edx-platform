@@ -18,6 +18,7 @@ describe('MoveXBlock', function() {
 
     'use strict';
 
+    // eslint-disable-next-line no-var
     var modal, showModal, renderViews, createXBlockInfo, createCourseOutline, courseOutlineOptions,
         parentChildMap, categoryMap, createChildXBlockInfo, xblockAncestorInfo, courseOutline,
         verifyBreadcrumbViewInfo, verifyListViewInfo, getDisplayedInfo, clickForwardButton,
@@ -144,6 +145,7 @@ describe('MoveXBlock', function() {
      * @returns
      */
     createChildXBlockInfo = function(category, outlineOptions, xblockIndex) {
+        // eslint-disable-next-line no-var
         var childInfo = {
             category: categoryMap[category],
             display_name: category + '_display_name_' + xblockIndex,
@@ -161,6 +163,7 @@ describe('MoveXBlock', function() {
      * @returns {Object}
      */
     createXBlockInfo = function(category, outlineOptions, outline) {
+        // eslint-disable-next-line no-var
         var childInfo = {
                 category: categoryMap[category],
                 display_name: category,
@@ -189,6 +192,7 @@ describe('MoveXBlock', function() {
      * @returns {Object}
      */
     createCourseOutline = function(outlineOptions) {
+        // eslint-disable-next-line no-var
         var courseXBlockInfo = {
             category: 'course',
             display_name: 'Demo Course',
@@ -204,6 +208,7 @@ describe('MoveXBlock', function() {
      * @param {any} ancestorInfo           ancestors info
      */
     renderViews = function(courseOutlineInfo, ancestorInfo) {
+        // eslint-disable-next-line no-var
         var ancestorInfo = ancestorInfo || {ancestors: []}; // eslint-disable-line no-redeclare
         modal.renderViews(courseOutlineInfo, ancestorInfo);
     };
@@ -214,6 +219,7 @@ describe('MoveXBlock', function() {
      * @returns {Object}
      */
     getDisplayedInfo = function() {
+        // eslint-disable-next-line no-var
         var viewEl = modal.moveXBlockListView.$el;
         return {
             categoryText: viewEl.find('.category-text').text().trim(),
@@ -237,6 +243,7 @@ describe('MoveXBlock', function() {
      * @param {Boolean} hasCurrentLocation      do we need to check current location
      */
     verifyListViewInfo = function(category, expectedXBlocksCount, hasCurrentLocation) {
+        // eslint-disable-next-line no-var
         var displayedInfo = getDisplayedInfo();
         expect(displayedInfo.categoryText).toEqual(modal.moveXBlockListView.categoriesText[category] + ':');
         expect(displayedInfo.xblockCount).toEqual(expectedXBlocksCount);
@@ -269,6 +276,7 @@ describe('MoveXBlock', function() {
      * @param {any} xblockIndex     XBlock index
      */
     verifyBreadcrumbViewInfo = function(category, xblockIndex) {
+        // eslint-disable-next-line no-var
         var displayedBreadcrumbs = modal.moveXBlockBreadcrumbView.$el.find('.breadcrumbs .bc-container').map(
                 function() { return $(this).text().trim(); }
             ).get(),
@@ -322,6 +330,7 @@ describe('MoveXBlock', function() {
      * @returns
      */
     verifyXBlockInfo = function(outlineOptions, category, buttonIndex, direction, hasCurrentLocation) {
+        // eslint-disable-next-line no-var
         var expectedXBlocksCount = outlineOptions[category];
 
         verifyListViewInfo(category, expectedXBlocksCount, hasCurrentLocation);
@@ -351,6 +360,7 @@ describe('MoveXBlock', function() {
      * @param {String} hasCurrentLocation   do we need to check current location
      */
     verifyMoveEnabled = function(category, hasCurrentLocation) {
+        // eslint-disable-next-line no-var
         var isMoveEnabled = !modal.$el.find('.modal-actions .action-move').hasClass('is-disabled');
         if (category === 'component' && !hasCurrentLocation) {
             expect(isMoveEnabled).toBeTruthy();
@@ -368,6 +378,7 @@ describe('MoveXBlock', function() {
      * @param {Integer} sourceIndex         source index of the xblock
      */
     verifyNotificationStatus = function(requests, notificationSpy, notificationText, sourceIndex) {
+        // eslint-disable-next-line no-var
         var sourceIndex = sourceIndex || 0; // eslint-disable-line no-redeclare
         ViewHelpers.verifyNotificationShowing(notificationSpy, notificationText);
         AjaxHelpers.respondWithJson(requests, {
@@ -394,6 +405,7 @@ describe('MoveXBlock', function() {
      * @param {Integer} sourceIndex         source index of the xblock
      */
     sendMoveXBlockRequest = function(requests, xblockLocator, targetIndex, sourceIndex) {
+        // eslint-disable-next-line no-var
         var responseData,
             expectedData,
             sourceIndex = sourceIndex || 0; // eslint-disable-line no-redeclare
@@ -499,6 +511,7 @@ describe('MoveXBlock', function() {
     };
 
     it('renders views with correct information', function() {
+        // eslint-disable-next-line no-var
         var outlineOptions = {
                 section: 1, subsection: 1, unit: 1, component: 1
             },
@@ -510,6 +523,7 @@ describe('MoveXBlock', function() {
     });
 
     it('shows correct behavior on breadcrumb navigation', function() {
+        // eslint-disable-next-line no-var
         var outline = createCourseOutline({
             section: 1, subsection: 1, unit: 1, component: 1
         });
@@ -528,6 +542,7 @@ describe('MoveXBlock', function() {
     });
 
     it('shows the correct current location', function() {
+        // eslint-disable-next-line no-var
         var outlineOptions = {
                 section: 2, subsection: 2, unit: 2, component: 2
             },
@@ -540,6 +555,7 @@ describe('MoveXBlock', function() {
     });
 
     it('shows correct message when parent has no children', function() {
+        // eslint-disable-next-line no-var
         var outlinesInfo = [
             {
                 outline: createCourseOutline({}),
@@ -602,6 +618,7 @@ describe('MoveXBlock', function() {
         });
 
         it('is disbabled when navigating to same source xblock', function() {
+            // eslint-disable-next-line no-var
             var outline,
                 libraryContentXBlockInfo = {
                     category: 'library_content',
@@ -623,6 +640,7 @@ describe('MoveXBlock', function() {
         });
 
         it('is disabled when navigating inside source content experiment', function() {
+            // eslint-disable-next-line no-var
             var outline,
                 splitTestXBlockInfo = {
                     category: 'split_test',
@@ -650,6 +668,7 @@ describe('MoveXBlock', function() {
         });
 
         it('is disabled when navigating to any content experiment groups', function() {
+            // eslint-disable-next-line no-var
             var outline,
                 splitTestXBlockInfo = {
                     category: 'split_test',
@@ -672,6 +691,7 @@ describe('MoveXBlock', function() {
         });
 
         it('is enabled when navigating to any parentable component', function() {
+            // eslint-disable-next-line no-var
             var parentableXBlockInfo = {
                 category: 'vertical',
                 display_name: 'Parentable Component',
@@ -703,6 +723,7 @@ describe('MoveXBlock', function() {
         });
 
         it('is disabled when navigating to any non-parentable component', function() {
+            // eslint-disable-next-line no-var
             var nonParentableXBlockInfo = {
                 category: 'html',
                 display_name: 'Non Parentable Component',
@@ -725,6 +746,7 @@ describe('MoveXBlock', function() {
         });
 
         it('move an xblock when move button is clicked', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             moveXBlockWithSuccess(requests);
         });
@@ -736,6 +758,7 @@ describe('MoveXBlock', function() {
         });
 
         it('undo move an xblock when undo move link is clicked', function() {
+            // eslint-disable-next-line no-var
             var sourceIndex = 0,
                 requests = AjaxHelpers.requests(this);
             moveXBlockWithSuccess(requests);
@@ -751,6 +774,7 @@ describe('MoveXBlock', function() {
 
     describe('shows a notification', function() {
         it('mini operation message when moving an xblock', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 notificationSpy = ViewHelpers.createNotificationSpy();
             // navigate to a target parent and click
@@ -763,6 +787,7 @@ describe('MoveXBlock', function() {
         });
 
         it('mini operation message when undo moving an xblock', function() {
+            // eslint-disable-next-line no-var
             var notificationSpy,
                 requests = AjaxHelpers.requests(this);
             moveXBlockWithSuccess(requests);
@@ -772,6 +797,7 @@ describe('MoveXBlock', function() {
         });
 
         it('error message when move request fails', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 notificationSpy = ViewHelpers.createNotificationSpy('Error');
             // select a target item and click
@@ -785,6 +811,7 @@ describe('MoveXBlock', function() {
         });
 
         it('error message when undo move request fails', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 notificationSpy = ViewHelpers.createNotificationSpy('Error');
             moveXBlockWithSuccess(requests);

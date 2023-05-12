@@ -6,6 +6,7 @@ define(['jquery', 'underscore', 'js/views/baseview', 'gettext', 'edx-ui-toolkit/
         /**
          * View for xblock validation messages as displayed in Studio.
          */
+        // eslint-disable-next-line no-var
         var XBlockValidationView = BaseView.extend({
 
             // Takes XBlockValidationModel as a model
@@ -16,6 +17,7 @@ define(['jquery', 'underscore', 'js/views/baseview', 'gettext', 'edx-ui-toolkit/
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var attributes = {
                     validation: this.model,
                     additionalClasses: this.getAdditionalClasses(),

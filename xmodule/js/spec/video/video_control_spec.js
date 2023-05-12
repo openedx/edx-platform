@@ -3,6 +3,7 @@
     'use strict';
 
     describe('VideoControl', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
 
         beforeEach(function() {
@@ -45,6 +46,7 @@
             it(
                 'saved position is 0, timer slider and VCR set to start-time',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -74,6 +76,7 @@
                 'saved position is after start-time, '
                 + 'timer slider and VCR set to saved position',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -107,6 +110,7 @@
                 'saved position is negative, '
                 + 'timer slider and VCR set to start-time',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -140,6 +144,7 @@
                 'saved position is not a number, '
                 + 'timer slider and VCR set to start-time',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -173,6 +178,7 @@
                 'saved position is greater than end-time, '
                 + 'timer slider and VCR set to start-time',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -208,6 +214,7 @@
                 'saved position is 0, timer slider and VCR set to 0:00 '
                 + 'and ending at specified end-time',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -241,6 +248,7 @@
                 'saved position is after start-time, '
                 + 'timer slider and VCR set to saved position',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -274,6 +282,7 @@
             it(
                 'saved position is negative, timer slider and VCR set to 0:00',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -307,6 +316,7 @@
                 'saved position is not a number, '
                 + 'timer slider and VCR set to 0:00',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -341,6 +351,7 @@
                 'saved position is greater than end-time, '
                 + 'timer slider and VCR set to 0:00',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -375,6 +386,7 @@
             it(
                 'saved position is 0, timer slider and VCR set to appropriate start and end times',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -409,6 +421,7 @@
                 'saved position is after start-time, '
                 + 'timer slider and VCR set to saved position',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -443,6 +456,7 @@
                 'saved position is negative, '
                 + 'timer slider and VCR set to start-time',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -477,6 +491,7 @@
                 'saved position is not a number, '
                 + 'timer slider and VCR set to start-time',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -511,6 +526,7 @@
                 'saved position is greater than end-time, '
                 + 'timer slider and VCR set to start-time',
                 function(done) {
+                    // eslint-disable-next-line no-var
                     var duration, sliderEl, expectedValue;
 
                     window.VideoState = {};
@@ -543,6 +559,7 @@
         });
 
         it('show', function() {
+            // eslint-disable-next-line no-var
             var controls;
             // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer();
@@ -561,6 +578,7 @@
         });
 
         it('can focus the first control', function(done) {
+            // eslint-disable-next-line no-var
             var btnPlay;
             // eslint-disable-next-line no-undef
             state = jasmine.initializePlayer({focusFirstControl: true});

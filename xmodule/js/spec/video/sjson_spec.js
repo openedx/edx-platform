@@ -3,10 +3,12 @@
         ['video/00_sjson.js'],
         function(Sjson) {
             describe('Sjson', function() {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var data = jasmine.stubbedCaption,
                     sjson;
+                // eslint-disable-next-line no-var
                 var videoStops = [0, 3120, 6270, 8490, 21620, 24920];
+                // eslint-disable-next-line no-var
                 var OUT_OF_BOUNDS_STOP = 10024920;
 
                 beforeEach(function() {
@@ -43,9 +45,13 @@
                 });
 
                 it('search only searches through a subrange of times if start / end times are specified', function() {
+                    // eslint-disable-next-line no-var
                     var start = videoStops[2] - 100;
+                    // eslint-disable-next-line no-var
                     var end = videoStops[5] - 100;
+                    // eslint-disable-next-line no-var
                     var results = sjson.filter(start, end);
+                    // eslint-disable-next-line no-var
                     var expectedLength = results.captions.length - 1;
 
                     expect(sjson.search(videoStops[0], start, end)).toEqual(0);
@@ -56,8 +62,11 @@
                 });
 
                 it('filters results correctly given a start and end time', function() {
+                    // eslint-disable-next-line no-var
                     var start = videoStops[1] - 100;
+                    // eslint-disable-next-line no-var
                     var end = videoStops[4] - 100;
+                    // eslint-disable-next-line no-var
                     var results = sjson.filter(start, end);
 
                     expect(results.start.length).toEqual(3);

@@ -17,8 +17,10 @@ $(function() {
     </div>');
 
     // This is the editor that pops up as a modal
+    // eslint-disable-next-line no-var
     var editorCircuit = $('#schematic_editor').get(0);
     // This is the circuit that they last clicked. The one being edited.
+    // eslint-disable-next-line no-var
     var editingCircuit = null;
     // Notice we use live, because new circuits can be inserted
     $('.schematic_open').live('click', function() {
@@ -26,10 +28,12 @@ $(function() {
         editingCircuit = $(this).children('input.schematic').get(0);
 
         editingCircuit.schematic.update_value();
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var circuit_so_far = $(editingCircuit).val();
 
+        // eslint-disable-next-line no-var
         var n = editorCircuit.schematic.components.length;
+        // eslint-disable-next-line no-var
         for (var i = 0; i < n; i++) { editorCircuit.schematic.components[n - 1 - i].remove(); }
 
         editorCircuit.schematic.load_schematic(circuit_so_far, '');
@@ -39,10 +43,12 @@ $(function() {
     $('#circuit_save_btn').click(function() {
         // Take the circuit from the editor and put it back into editingCircuit
         editorCircuit.schematic.update_value();
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var saving_circuit = $(editorCircuit).val();
 
+        // eslint-disable-next-line no-var
         var n = editingCircuit.schematic.components.length;
+        // eslint-disable-next-line no-var
         for (var i = 0; i < n; i++) { editingCircuit.schematic.components[n - 1 - i].remove(); }
 
         editingCircuit.schematic.load_schematic(saving_circuit, '');

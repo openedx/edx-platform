@@ -3,6 +3,7 @@
 
     describe('Bulk Email Queueing', function() {
         beforeEach(function() {
+            // eslint-disable-next-line no-var
             var testBody, testSubject;
             testSubject = 'Test Subject';
             testBody = 'Hello, World! This is a test email message!';
@@ -36,6 +37,7 @@
             return this.ajax_params;
         });
         it('cannot send an email with no target', function() {
+            // eslint-disable-next-line no-var
             var target, i, len, ref;
             // eslint-disable-next-line no-undef
             spyOn(window, 'alert');
@@ -86,12 +88,14 @@
             return expect($.ajax).toHaveBeenCalledWith(this.ajax_params);
         });
         it('can send a simple message to a multiple targets', function() {
+            // eslint-disable-next-line no-var
             var target, i, len, ref;
             // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {
                 return params.success();
             });
             this.ajax_params.data.send_to = JSON.stringify((function() {
+                // eslint-disable-next-line no-var
                 var j, len1, ref1, results;
                 ref1 = this.send_email.$send_to;
                 results = [];

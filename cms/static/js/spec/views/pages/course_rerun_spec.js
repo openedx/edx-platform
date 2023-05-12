@@ -4,6 +4,7 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'common/j
     'jquery.simulate'],
 function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory, ViewUtils) {
     describe('Create course rerun page', function() {
+        // eslint-disable-next-line no-var
         var selectors = {
                 org: '.rerun-course-org',
                 number: '.rerun-course-number',
@@ -28,8 +29,10 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
             },
             mockCreateCourseRerunHTML = readFixtures('mock/mock-create-course-rerun.underscore');
 
+        // eslint-disable-next-line no-var
         var CreateCourseUtils = new CreateCourseUtilsFactory(selectors, classes);
 
+        // eslint-disable-next-line no-var
         var fillInFields = function(org, number, run, name) {
             $(selectors.org).val(org);
             $(selectors.number).val(number);
@@ -51,29 +54,35 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
 
         describe('Field validation', function() {
             it('returns a message for an empty string', function() {
+                // eslint-disable-next-line no-var
                 var message = ViewUtils.validateRequiredField('');
                 expect(message).not.toBe('');
             });
 
             it('does not return a message for a non empty string', function() {
+                // eslint-disable-next-line no-var
                 var message = ViewUtils.validateRequiredField('edX');
                 expect(message).toBe('');
             });
         });
 
         describe('Error messages', function() {
+            // eslint-disable-next-line no-var
             var setErrorMessage = function(selector, message) {
+                // eslint-disable-next-line no-var
                 var element = $(selector).parent();
                 CreateCourseUtils.setFieldInErr(element, message);
                 return element;
             };
 
+            // eslint-disable-next-line no-var
             var type = function(input, value) {
                 input.val(value);
                 input.simulate('keyup', {keyCode: $.simulate.keyCode.SPACE});
             };
 
             it('shows an error message', function() {
+                // eslint-disable-next-line no-var
                 var element = setErrorMessage(selectors.org, 'error message');
                 expect(element).toHaveClass(classes.error);
                 expect(element.children(selectors.tipError)).not.toHaveClass(classes.hidden);
@@ -81,6 +90,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
             });
 
             it('hides an error message', function() {
+                // eslint-disable-next-line no-var
                 var element = setErrorMessage(selectors.org, '');
                 expect(element).not.toHaveClass(classes.error);
                 expect(element.children(selectors.tipError)).toHaveClass(classes.hidden);
@@ -109,6 +119,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
             });
 
             it('shows an error message when non URL characters are entered', function() {
+                // eslint-disable-next-line no-var
                 var $input = $(selectors.org);
                 expect($input.parent()).not.toHaveClass(classes.error);
                 type($input, '%');
@@ -116,6 +127,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
             });
 
             it('does not show an error message when tabbing into a field', function() {
+                // eslint-disable-next-line no-var
                 var $input = $(selectors.number);
                 $input.val('');
                 expect($input.parent()).not.toHaveClass(classes.error);
@@ -124,6 +136,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
             });
 
             it('shows an error message when a required field is empty', function() {
+                // eslint-disable-next-line no-var
                 var $input = $(selectors.org);
                 $input.val('');
                 expect($input.parent()).not.toHaveClass(classes.error);
@@ -132,6 +145,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
             });
 
             it('shows an error message when spaces are entered and unicode is allowed', function() {
+                // eslint-disable-next-line no-var
                 var $input = $(selectors.org);
                 $(selectors.allowUnicode).val('True');
                 expect($input.parent()).not.toHaveClass(classes.error);
@@ -149,6 +163,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
 
             describe('Name field', function() {
                 it('does not show an error message when non URL characters are entered', function() {
+                    // eslint-disable-next-line no-var
                     var $input = $(selectors.name);
                     expect($input.parent()).not.toHaveClass(classes.error);
                     type($input, '%');
@@ -158,8 +173,9 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
         });
 
         it('saves course reruns', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var redirectSpy = spyOn(ViewUtils, 'redirect');
             fillInFields('DemoX', 'DM101', '2014', 'Demo course');
             $(selectors.save).click();
@@ -180,6 +196,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
         });
 
         it('displays an error when saving fails', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             fillInFields('DemoX', 'DM101', '2014', 'Demo course');
             $(selectors.save).click();
@@ -193,6 +210,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
         });
 
         it('does not save if there are validation errors', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             fillInFields('DemoX', 'DM101', '', 'Demo course');
             $(selectors.save).click();
@@ -200,7 +218,7 @@ function($, AjaxHelpers, ViewHelpers, CourseRerunUtils, CreateCourseUtilsFactory
         });
 
         it('can be canceled', function() {
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var redirectSpy = spyOn(ViewUtils, 'redirect');
             $(selectors.cancel).click();
             expect(redirectSpy).toHaveBeenCalledWith('/course/');

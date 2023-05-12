@@ -10,6 +10,7 @@ define([
     'use strict';
 
     describe('EdxNotes SearchResultsView', function() {
+        // eslint-disable-next-line no-var
         var notes = [
                 {
                     created: 'December 11, 2014 at 11:12AM',
@@ -80,12 +81,14 @@ define([
         });
 
         it('does not create a tab and content on initialization', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection);
             expect(this.tabsCollection).toHaveLength(0);
             expect(view.$('#search-results-panel')).not.toExist();
         });
 
         it('displays a tab and content on search with proper data and order', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
@@ -96,6 +99,7 @@ define([
         });
 
         it('displays loading indicator when search is running', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
@@ -110,6 +114,7 @@ define([
         });
 
         it('displays no results message', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
@@ -125,6 +130,7 @@ define([
         });
 
         it('does not send an additional request on switching between tabs', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
@@ -146,6 +152,7 @@ define([
         });
 
         it('can clear search results if tab is closed', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
             // eslint-disable-next-line no-undef
@@ -160,6 +167,7 @@ define([
         });
 
         it('can correctly show/hide error messages', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
@@ -183,6 +191,7 @@ define([
         });
 
         it('can correctly update search results', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
                 newNotes = [{
@@ -215,6 +224,7 @@ define([
         });
 
         it('will not render header and footer if there are no notes', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
                 // eslint-disable-next-line no-shadow
@@ -234,6 +244,7 @@ define([
         });
 
         it('can go to a page number', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this),
                 // eslint-disable-next-line no-shadow
@@ -274,6 +285,7 @@ define([
         });
 
         it('can navigate forward and backward', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 page1Notes = Helpers.createNotesData(
                     {
@@ -296,6 +308,7 @@ define([
                 requests[requests.length - 1].url,
                 {page: '2', page_size: '10'}
             );
+            // eslint-disable-next-line no-var
             var page2Notes = Helpers.createNotesData(
                 {
                     numNotesToCreate: 5,
@@ -321,6 +334,7 @@ define([
         });
 
         it('sends correct page size value', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 view = getView(this.tabsCollection, 5);
 

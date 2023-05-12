@@ -7,10 +7,12 @@ function($, AjaxHelpers) {
     'use strict';
 
     describe('Membership.AuthListWidget', function() {
+        // eslint-disable-next-line no-var
         var membership, // eslint-disable-line no-unused-vars
             changeSelectedList;
 
         changeSelectedList = function(listName) {
+            // eslint-disable-next-line no-var
             var i, options;
             options = document.getElementById('member-lists-selector').options;
             for (i = 0; i < options.length; i++) {
@@ -23,6 +25,7 @@ function($, AjaxHelpers) {
         };
 
         beforeEach(function() {
+            // eslint-disable-next-line no-var
             var membershipMain, membershipTpl;
             membershipMain = readFixtures('js/fixtures/instructor_dashboard/membership.html');
             membershipTpl = readFixtures(
@@ -36,6 +39,7 @@ function($, AjaxHelpers) {
         });
 
         it('binds the ajax call and the result will be success for Group Moderator', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 data,
                 url = '/courses/course-v1:edx+ed202+2017_T3/instructor/api/list_forum_members';
@@ -66,7 +70,9 @@ function($, AjaxHelpers) {
         });
 
         it('Error message is shown if user with given identifier does not exist', function() {
+            // eslint-disable-next-line no-var
             var url, params;
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.active .add-field').val('smth');
             $('.active .add').click();
@@ -91,6 +97,7 @@ function($, AjaxHelpers) {
         });
 
         it('When no discussions division scheme is selected error is shown and inputs are disabled', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 data,
                 url = '/courses/course-v1:edx+ed202+2017_T3/instructor/api/list_forum_members';

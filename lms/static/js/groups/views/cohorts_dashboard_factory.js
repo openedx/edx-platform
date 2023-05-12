@@ -6,6 +6,7 @@
         'js/groups/models/content_group'],
     function($, CohortsView, CohortCollection, CourseCohortSettingsModel, ContentGroupModel) {
         return function(contentGroups, studioGroupConfigurationsUrl) {
+            // eslint-disable-next-line no-var
             var contentGroupModels = $.map(contentGroups, function(group) {
                 return new ContentGroupModel({
                     id: group.id,
@@ -14,6 +15,7 @@
                 });
             });
 
+            // eslint-disable-next-line no-var
             var cohorts = new CohortCollection(),
                 courseCohortSettings = new CourseCohortSettingsModel(),
                 $cohortManagementElement = $('.cohort-management');
@@ -21,6 +23,7 @@
             cohorts.url = $cohortManagementElement.data('cohorts_url');
             courseCohortSettings.url = $cohortManagementElement.data('course_cohort_settings_url');
 
+            // eslint-disable-next-line no-var
             var cohortsView = new CohortsView({
                 el: $cohortManagementElement,
                 model: cohorts,

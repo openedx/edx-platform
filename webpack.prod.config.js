@@ -2,13 +2,19 @@
 
 'use strict';
 
+// eslint-disable-next-line no-var
 var Merge = require('webpack-merge');
+// eslint-disable-next-line no-var
 var webpack = require('webpack');
+// eslint-disable-next-line no-var
 var BundleTracker = require('webpack-bundle-tracker');
+// eslint-disable-next-line no-var
 var _ = require('underscore');
 
+// eslint-disable-next-line no-var
 var commonConfig = require('./webpack.common.config.js');
 
+// eslint-disable-next-line no-var
 var optimizedConfig = Merge.smart(commonConfig, {
     web: {
         output: {
@@ -48,6 +54,7 @@ var optimizedConfig = Merge.smart(commonConfig, {
 // gone.
 
 // Step 1: Alter the bundle output names to omit the chunkhash.
+// eslint-disable-next-line no-var
 var requireCompatConfig = Merge.smart(optimizedConfig, {
     web: {
         output: {

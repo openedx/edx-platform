@@ -46,6 +46,7 @@
             // private
 
             hasNextPage: function() {
+                // eslint-disable-next-line no-var
                 var total = this.discovery.get('totalCount');
                 return total - ((this.page + 1) * this.pageSize) > 0;
             },
@@ -61,6 +62,7 @@
             },
 
             buildQuery: function(pageIndex) {
+                // eslint-disable-next-line no-var
                 var data = {
                     search_string: this.searchTerm,
                     page_size: this.pageSize,
@@ -85,7 +87,9 @@
             },
 
             onSync: function(collection, response, options) {
+                // eslint-disable-next-line no-var
                 var total = this.discovery.get('totalCount');
+                // eslint-disable-next-line no-var
                 var originalSearchTerm = this.searchTerm;
                 if (options.data.page_index === 0) {
                     if (total === 0) {
@@ -101,6 +105,7 @@
                     } else {
                         _.each(this.terms, function(term, facet) {
                             if (facet !== 'search_query') {
+                                // eslint-disable-next-line no-var
                                 var option = this.discovery.facetOptions.findWhere({
                                     facet: facet,
                                     term: term
@@ -120,7 +125,9 @@
 
             // lazy load
             cachedDiscovery: function() {
+                // eslint-disable-next-line no-var
                 var deferred = $.Deferred();
+                // eslint-disable-next-line no-var
                 var self = this;
 
                 if (this.cached) {

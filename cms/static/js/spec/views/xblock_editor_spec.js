@@ -8,6 +8,7 @@ import XBlockEditorView from 'js/views/xblock_editor';
 import XBlockInfo from 'js/models/xblock_info';
 
 describe('XBlockEditorView', function() {
+    // eslint-disable-next-line no-var
     var model, editor, testDisplayName, mockSaveResponse;
 
     testDisplayName = 'Test Display Name';
@@ -31,6 +32,7 @@ describe('XBlockEditorView', function() {
     });
 
     describe('Editing an xblock', function() {
+        // eslint-disable-next-line no-var
         var mockXBlockEditorHtml;
 
         beforeEach(function() {
@@ -44,6 +46,7 @@ describe('XBlockEditorView', function() {
         mockXBlockEditorHtml = readFixtures('templates/mock/mock-xblock-editor.underscore');
 
         it('can render itself', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             editor.render();
             AjaxHelpers.respondWithJson(requests, {
@@ -57,6 +60,7 @@ describe('XBlockEditorView', function() {
     });
 
     describe('Editing an xmodule', function() {
+        // eslint-disable-next-line no-var
         var mockXModuleEditorHtml;
 
         mockXModuleEditorHtml = readFixtures('templates/mock/mock-xmodule-editor.underscore');
@@ -70,6 +74,7 @@ describe('XBlockEditorView', function() {
         });
 
         it('can render itself', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             editor.render();
             AjaxHelpers.respondWithJson(requests, {
@@ -82,6 +87,7 @@ describe('XBlockEditorView', function() {
         });
 
         it('saves any custom metadata', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 request, response;
             editor.render();
@@ -99,6 +105,7 @@ describe('XBlockEditorView', function() {
         });
 
         it('can render a module with only settings', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 // eslint-disable-next-line no-shadow
                 mockXModuleEditorHtml;

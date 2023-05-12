@@ -5,6 +5,7 @@
         ['video/01_initialize.js'],
         function(Initialize) {
             describe('Initialize', function() {
+                // eslint-disable-next-line no-var
                 var state = {};
 
                 afterEach(function() {
@@ -12,6 +13,7 @@
                 });
 
                 describe('getCurrentLanguage', function() {
+                    // eslint-disable-next-line no-var
                     var msg;
 
                     beforeEach(function() {
@@ -24,6 +26,7 @@
                     });
 
                     it('returns current language', function() {
+                        // eslint-disable-next-line no-var
                         var expected;
 
                         state.lang = 'de';
@@ -33,6 +36,7 @@
 
                     msg = 'returns `en`, if language isn\'t available for the video';
                     it(msg, function() {
+                        // eslint-disable-next-line no-var
                         var expected;
 
                         state.lang = 'zh';
@@ -43,6 +47,7 @@
                     msg = 'returns any available language, if current and `en` '
                     + 'languages aren\'t available for the video';
                     it(msg, function() {
+                        // eslint-disable-next-line no-var
                         var expected;
 
                         state.lang = 'zh';
@@ -55,6 +60,7 @@
                     });
 
                     it('returns `null`, if transcript unavailable', function() {
+                        // eslint-disable-next-line no-var
                         var expected;
 
                         state.lang = 'zh';
@@ -87,6 +93,7 @@
                     });
 
                     it('returns duration for the 1.0 speed if speed is not 1.0', function() {
+                        // eslint-disable-next-line no-var
                         var expected;
 
                         state.speed = '1.50';
@@ -97,6 +104,7 @@
 
                     describe('Flash mode', function() {
                         it('returns duration for current video', function() {
+                            // eslint-disable-next-line no-var
                             var expected;
 
                             state.isFlashMode.and.returnValue(true);
@@ -106,6 +114,7 @@
                         });
 
                         it('returns duration for the 1.0 speed as a fall-back', function() {
+                            // eslint-disable-next-line no-var
                             var expected;
 
                             state.isFlashMode.and.returnValue(true);
@@ -134,6 +143,7 @@
                     describe('with speed', function() {
                         it('return the video id for given speed', function() {
                             $.each(state.videos, function(speed, videoId) {
+                                // eslint-disable-next-line no-var
                                 var expected = Initialize.prototype.youtubeId.call(
                                     state, speed
                                 );
@@ -145,6 +155,7 @@
 
                     describe('without speed for flash mode', function() {
                         it('return the video id for current speed', function() {
+                            // eslint-disable-next-line no-var
                             var expected;
 
                             state.isFlashMode.and.returnValue(true);
@@ -156,6 +167,7 @@
 
                     describe('without speed for youtube html5 mode', function() {
                         it('return the video id for 1.0x speed', function() {
+                            // eslint-disable-next-line no-var
                             var expected = Initialize.prototype.youtubeId.call(state);
 
                             expect(expected).toEqual('cogebirgzzM');
@@ -164,6 +176,7 @@
 
                     describe('speed is absent in the list of video speeds', function() {
                         it('return the video id for 1.0x speed', function() {
+                            // eslint-disable-next-line no-var
                             var expected = Initialize.prototype.youtubeId.call(state, '0.0');
 
                             expect(expected).toEqual('cogebirgzzM');
@@ -182,6 +195,7 @@
                         });
 
                         it('check mapping', function() {
+                            // eslint-disable-next-line no-var
                             var map = {
                                 0.75: '0.50',
                                 1.25: '1.50'
@@ -234,6 +248,7 @@
                         });
 
                         it('check mapping', function() {
+                            // eslint-disable-next-line no-var
                             var map = {
                                 0.25: '0.75',
                                 '0.50': '0.75'
@@ -255,6 +270,7 @@
                     });
 
                     it('updates player mode', function() {
+                        // eslint-disable-next-line no-var
                         var setPlayerMode = Initialize.prototype.setPlayerMode;
 
                         setPlayerMode.call(state, 'html5');
@@ -264,6 +280,7 @@
                     });
 
                     it('sets default mode if passed is not supported', function() {
+                        // eslint-disable-next-line no-var
                         var setPlayerMode = Initialize.prototype.setPlayerMode;
 
                         setPlayerMode.call(state, '77html77');
@@ -279,6 +296,7 @@
                     });
 
                     it('returns current player mode', function() {
+                        // eslint-disable-next-line no-var
                         var getPlayerMode = Initialize.prototype.getPlayerMode,
                             actual = getPlayerMode.call(state);
 
@@ -288,6 +306,7 @@
 
                 describe('isFlashMode', function() {
                     it('returns `true` if player in `flash` mode', function() {
+                        // eslint-disable-next-line no-var
                         var testState = {
                                 // eslint-disable-next-line no-undef
                                 getPlayerMode: jasmine.createSpy().and.returnValue('flash')
@@ -299,6 +318,7 @@
                     });
 
                     it('returns `false` if player is not in `flash` mode', function() {
+                        // eslint-disable-next-line no-var
                         var testState = {
                                 // eslint-disable-next-line no-undef
                                 getPlayerMode: jasmine.createSpy().and.returnValue('html5')
@@ -312,6 +332,7 @@
 
                 describe('isHtml5Mode', function() {
                     it('returns `true` if player in `html5` mode', function() {
+                        // eslint-disable-next-line no-var
                         var testState = {
                                 // eslint-disable-next-line no-undef
                                 getPlayerMode: jasmine.createSpy().and.returnValue('html5')
@@ -323,6 +344,7 @@
                     });
 
                     it('returns `false` if player is not in `html5` mode', function() {
+                        // eslint-disable-next-line no-var
                         var testState = {
                                 // eslint-disable-next-line no-undef
                                 getPlayerMode: jasmine.createSpy().and.returnValue('flash')

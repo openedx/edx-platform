@@ -28,6 +28,7 @@
         HtmlUtils,
         StringUtils
     ) {
+        // eslint-disable-next-line no-var
         var TeamMembershipView, TeamCountryLanguageView, TeamActivityView, TeamCardView;
 
         TeamMembershipView = Backbone.View.extend({
@@ -42,6 +43,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var view = this;
                 this.getTopic(this.topicId).done(function(topic) {
                     view.renderMessage(topic.getMaxTeamSize(view.courseMaxTeamSize));
@@ -52,6 +54,7 @@
             },
 
             renderMessage: function(maxTeamSize) {
+                // eslint-disable-next-line no-var
                 var allMemberships = _(this.memberships).sortBy(function(member) {
                         return new Date(member.last_activity_at);
                     }).reverse(),
@@ -98,6 +101,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var lastActivity = moment(this.date),
                     currentLanguage = $('html').attr('lang');
                 lastActivity.locale(currentLanguage);

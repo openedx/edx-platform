@@ -18,14 +18,16 @@ $(function() {
     $('#survey-form').on('submit', function() {
         /* validate required fields */
 
+        // eslint-disable-next-line no-var
         var $inputs = $('#survey-form :input');
 
         $('.status.message.submission-error .message-copy').empty();
 
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var cancel_submit = false;
 
         $inputs.each(function() {
+            // eslint-disable-next-line no-var
             var val, fieldLabel;
             /* see if it is a required field and - if so - make sure user presented all information */
             if (typeof $(this).attr('required') !== typeof undefined) {
@@ -73,6 +75,7 @@ $(function() {
 
     // eslint-disable-next-line no-unused-vars
     $('#survey-form').on('ajax:success', function(event, json, xhr) {
+        // eslint-disable-next-line no-var
         var url = json.redirect_url;
         location.href = url;
     });
@@ -92,6 +95,7 @@ $(function() {
 });
 
 function toggleSubmitButton(enable) {
+    // eslint-disable-next-line no-var
     var $submitButton = $('form .form-actions #submit');
 
     if (enable) {

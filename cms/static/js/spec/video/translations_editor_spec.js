@@ -8,6 +8,7 @@ define(
 
         // TODO: fix BLD-1100 Disabled due to intermittent failure on master and in PR builds
         xdescribe('VideoTranslations', function() {
+            // eslint-disable-next-line no-var
             var TranslationsEntryTemplate = readFixtures(
                     'video/metadata-translations-entry.underscore'
                 ),
@@ -40,13 +41,15 @@ define(
                 },
                 self, injector;
 
+            // eslint-disable-next-line no-var
             var setValue = function(view, value) {
                 view.setValueInEditor(value);
                 view.updateModel();
             };
 
+            // eslint-disable-next-line no-var
             var createPromptSpy = function(name) {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var spy = jasmine.createSpyObj(name, ['constructor', 'show', 'hide']);
                 spy.constructor.and.returnValue(spy);
                 spy.show.and.returnValue(spy);
@@ -64,7 +67,9 @@ define(
                     assertValueInView: function() {
                         return {
                             compare: function(actual, expected) {
+                                // eslint-disable-next-line no-var
                                 var value = actual.getValueFromEditor();
+                                // eslint-disable-next-line no-var
                                 var passed = _.isEqual(value, expected);
 
                                 return {
@@ -77,6 +82,7 @@ define(
                     assertCanUpdateView: function() {
                         return {
                             compare: function(actual, expected) {
+                                // eslint-disable-next-line no-var
                                 var view = actual,
                                     value,
                                     passed;
@@ -95,6 +101,7 @@ define(
                     assertClear: function() {
                         return {
                             compare: function(actual, modelValue) {
+                                // eslint-disable-next-line no-var
                                 var view = actual,
                                     model = view.model,
                                     passed;
@@ -112,6 +119,7 @@ define(
                     assertUpdateModel: function() {
                         return {
                             compare: function(actual, originalValue, newValue) {
+                                // eslint-disable-next-line no-var
                                 var view = actual,
                                     model = view.model,
                                     expectOriginal,
@@ -133,6 +141,7 @@ define(
                     verifyKeysUnique: function() {
                         return {
                             compare: function(actual, initial, expected, testData) {
+                                // eslint-disable-next-line no-var
                                 var view = this.actual,
                                     item,
                                     value,
@@ -157,6 +166,7 @@ define(
                     verifyButtons: function() {
                         return {
                             compare: function(actual, upload, download, remove, index) {
+                                // eslint-disable-next-line no-var
                                 var view = this.actual,
                                     items = view.$el.find('.list-settings-item'),
                                     item = index ? items.eq(index) : items.last(),
@@ -200,6 +210,7 @@ define(
                     'js/models/metadata', 'js/views/video/translations_editor'
                 ],
                 function(MetadataModel, Translations) {
+                    // eslint-disable-next-line no-var
                     var model = new MetadataModel($.extend(true, {}, modelStub));
                     self.view = new Translations({model: model});
 
@@ -232,6 +243,7 @@ define(
             });
 
             it('upload works correctly', function() {
+                // eslint-disable-next-line no-var
                 var options;
 
                 setValue(this.view, {

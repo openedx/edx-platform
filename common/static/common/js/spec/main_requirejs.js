@@ -4,6 +4,7 @@
 (function(requirejs) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var testFiles, i, specHelpers;
 
     requirejs.config({

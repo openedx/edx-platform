@@ -5,6 +5,7 @@ import 'xblock/cms.runtime.v1';
 describe('Studio Runtime v1', function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var runtime;
 
     beforeEach(function() {
@@ -13,6 +14,7 @@ describe('Studio Runtime v1', function() {
     });
 
     it('allows events to be listened to', function() {
+        // eslint-disable-next-line no-var
         var canceled = false;
         runtime.listenTo('cancel', function() {
             canceled = true;
@@ -23,6 +25,7 @@ describe('Studio Runtime v1', function() {
     });
 
     it('shows save notifications', function() {
+        // eslint-disable-next-line no-var
         var title = 'Mock saving...',
             notificationSpy = EditHelpers.createNotificationSpy();
         runtime.notify('save', {
@@ -37,6 +40,7 @@ describe('Studio Runtime v1', function() {
     });
 
     it('shows error messages', function() {
+        // eslint-disable-next-line no-var
         var title = 'Mock Error',
             message = 'This is a mock error.',
             notificationSpy = EditHelpers.createNotificationSpy('Error');
@@ -48,6 +52,7 @@ describe('Studio Runtime v1', function() {
     });
 
     describe('Modal Dialogs', function() {
+        // eslint-disable-next-line no-var
         var MockModal, modal, showMockModal;
 
         MockModal = BaseModal.extend({

@@ -3,10 +3,12 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var Extensions;
 
     Extensions = (function() {
         function extensions($section) {
+            // eslint-disable-next-line no-var
             var $gridDisplay,
                 ext = this;
             this.$section = $section;
@@ -21,6 +23,7 @@
             this.$grid_text = $gridDisplay.find('.data-display-text');
             this.$grid_table = $gridDisplay.find('.data-display-table');
             this.$change_due_date.click(function() {
+                // eslint-disable-next-line no-var
                 var sendData;
                 ext.clear_display();
                 ext.$student_input = ext.$section.find("#set-extension input[name='student']");
@@ -48,6 +51,7 @@
                 });
             });
             this.$reset_due_date.click(function() {
+                // eslint-disable-next-line no-var
                 var sendData;
                 ext.clear_display();
                 ext.$student_input = ext.$section.find("#reset-extension input[name='student']");
@@ -73,6 +77,7 @@
                 });
             });
             this.$show_unit_ext.click(function() {
+                // eslint-disable-next-line no-var
                 var sendData, url;
                 ext.clear_display();
                 ext.$grid_table.text('Loading');
@@ -95,6 +100,7 @@
                 });
             });
             this.$show_student_ext.click(function() {
+                // eslint-disable-next-line no-var
                 var sendData, url;
                 ext.clear_display();
                 ext.$grid_table.text('Loading');
@@ -121,6 +127,7 @@
         extensions.prototype.onClickTitle = function() {};
 
         extensions.prototype.fail_with_error = function(id, msg, xhr) {
+            // eslint-disable-next-line no-var
             var $taskError, $taskResponse, data,
                 message = msg;
             $taskError = this.$section.find('#' + id + ' .request-response-error');
@@ -135,6 +142,7 @@
         };
 
         extensions.prototype.display_response = function(id, data) {
+            // eslint-disable-next-line no-var
             var $taskError, $taskResponse;
             $taskError = this.$section.find('#' + id + ' .request-response-error');
             $taskResponse = this.$section.find('#' + id + ' .request-response');
@@ -144,6 +152,7 @@
         };
 
         extensions.prototype.display_grid = function(data) {
+            // eslint-disable-next-line no-var
             var $tablePlaceholder, col, columns, gridData, options;
             this.clear_display();
             this.$grid_text.text(data.title);
@@ -153,6 +162,7 @@
                 forceFitColumns: true
             };
             columns = (function() {
+                // eslint-disable-next-line no-var
                 var i, len, ref, results;
                 ref = data.header;
                 results = [];

@@ -12,6 +12,7 @@ function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
          iframe src urls on a page so that they are rendered as part of the DOM.
          */
 
+    // eslint-disable-next-line no-var
     var BaseView = Backbone.View.extend({
         events: {
             'click .ui-toggle-expansion': 'toggleExpandCollapse'
@@ -45,6 +46,7 @@ function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
             }
             this.options = options;
 
+            // eslint-disable-next-line no-var
             var _this = this;
             // xss-lint: disable=javascript-jquery-insertion
             this.render = _.wrap(this.render, function(render, options) { // eslint-disable-line no-shadow
@@ -70,6 +72,7 @@ function($, _, Backbone, gettext, IframeUtils, TemplateUtils, ViewUtils) {
         },
 
         toggleExpandCollapse: function(event) {
+            // eslint-disable-next-line no-var
             var $target = $(event.target);
             // Don't propagate the event as it is possible that two views will both contain
             // this element, e.g. clicking on the element of a child view container in a parent.

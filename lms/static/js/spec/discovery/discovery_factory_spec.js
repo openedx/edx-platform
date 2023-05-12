@@ -5,6 +5,7 @@ define([
 ], function($, AjaxHelpers, TemplateHelpers, DiscoveryFactory) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var MEANINGS = {
         org: {
             name: 'Organization',
@@ -27,6 +28,7 @@ define([
         }
     };
 
+    // eslint-disable-next-line no-var
     var JSON_RESPONSE = {
         total: 365,
         results: [
@@ -115,6 +117,7 @@ define([
         });
 
         it('does search', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
@@ -125,6 +128,7 @@ define([
         });
 
         it('loads more', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
 
             $('.discovery-input').val('test');
@@ -144,6 +148,7 @@ define([
         });
 
         it('displays not found message', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('asdfasdf');
             $('.discovery-submit').trigger('click');
@@ -154,6 +159,7 @@ define([
         });
 
         it('displays error message', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('asdfasdf');
             $('.discovery-submit').trigger('click');
@@ -164,6 +170,7 @@ define([
         });
 
         it('check filters and bar removed on clear all', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
@@ -176,17 +183,20 @@ define([
         });
 
         it('check filters and bar removed on last filter cleared', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
             expect($('.active-filter').length).toBe(1);
+            // eslint-disable-next-line no-var
             var $filter = $('.active-filter');
             $filter.find('.discovery-button').trigger('click');
             expect($('.active-filter').length).toBe(0);
         });
 
         it('filter results by named facet', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.discovery-input').val('test');
             $('.discovery-submit').trigger('click');

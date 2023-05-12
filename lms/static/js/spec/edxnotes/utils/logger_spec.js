@@ -5,6 +5,7 @@ define([
     'use strict';
 
     describe('Edxnotes NotesLogger', function() {
+        // eslint-disable-next-line no-var
         var getLogger = function(id, mode) {
             return NotesLogger.getLogger(id, mode);
         };
@@ -19,6 +20,7 @@ define([
         });
 
         it('keeps a correct history of logs', function() {
+            // eslint-disable-next-line no-var
             var logger = getLogger('id', 1),
                 logs, log;
 
@@ -43,6 +45,7 @@ define([
         });
 
         it('keeps a correct history of errors', function() {
+            // eslint-disable-next-line no-var
             var logger = getLogger('id', 1),
                 logs, log;
             logger.error('An error type', 'A first error');
@@ -66,6 +69,7 @@ define([
         });
 
         it('can destroy the logger', function() {
+            // eslint-disable-next-line no-var
             var logger = getLogger('id', 1),
                 logs;
 
@@ -79,6 +83,7 @@ define([
         });
 
         it('do not store the history in silent mode', function() {
+            // eslint-disable-next-line no-var
             var logger = getLogger('id', 0),
                 logs;
             logger.log('A log type', 'A first log');
@@ -88,6 +93,7 @@ define([
         });
 
         it('do not show logs in the console in silent mode', function() {
+            // eslint-disable-next-line no-var
             var logger = getLogger('id', 0);
             logger.log('A log type', 'A first log');
             logger.error('An error type', 'A first error');
@@ -96,6 +102,7 @@ define([
         });
 
         it('can use timers', function() {
+            // eslint-disable-next-line no-var
             var logger = getLogger('id', 1),
                 logs, log;
 
@@ -118,6 +125,7 @@ define([
         });
 
         it('can emit an event properly', function() {
+            // eslint-disable-next-line no-var
             var logger = getLogger('id', 0);
             logger.emit('event_name', {id: 'some_id'});
             expect(Logger.log).toHaveBeenCalledWith('event_name', {

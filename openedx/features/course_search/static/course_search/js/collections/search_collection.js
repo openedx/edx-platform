@@ -27,6 +27,7 @@
             },
 
             extractErrorMessage: function(response) {
+                // eslint-disable-next-line no-var
                 var errorMessage;
                 if (response.responseJSON && response.responseJSON.error) {
                     // eslint-disable-next-line no-param-reassign

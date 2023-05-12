@@ -203,7 +203,7 @@ Library.
  *    + (optional) any params
  */
 
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable-next-line no-unused-vars, no-var */
 var Channel = (function() {
     'use strict';
 
@@ -211,7 +211,7 @@ var Channel = (function() {
     // There is one current transaction counter id per page, and it's shared between
     // channel instances.  That means of all messages posted from a single javascript
     // evaluation context, we'll never have two with the same id.
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var s_curTranId = Math.floor(Math.random() * 1000001);
 
     // no two bound channels in the same javascript evaluation context may have the same origin, scope, and window.
@@ -220,23 +220,25 @@ var Channel = (function() {
     // route messages based on origin and scope.  The s_boundChans maps origins to scopes, to message
     // handlers.  Request and Notification messages are routed using this table.
     // Finally, channels are inserted into this table when built, and removed when destroyed.
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var s_boundChans = { };
 
     // add a channel to s_boundChans, throwing if a dup exists
     // eslint-disable-next-line camelcase
     function s_addBoundChan(win, origin, scope, handler) {
         function hasWin(arr) {
+            // eslint-disable-next-line no-var
             for (var i = 0; i < arr.length; i++) { if (arr[i].win === win) { return true; } }
             return false;
         }
 
         // does she exist?
+        // eslint-disable-next-line no-var
         var exists = false;
 
         if (origin === '*') {
             // we must check all other origins, sadly.
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             for (var k in s_boundChans) {
                 /* eslint-disable-next-line no-continue, camelcase */
                 if (!s_boundChans.hasOwnProperty(k)) { continue; }
@@ -274,8 +276,9 @@ var Channel = (function() {
 
     // eslint-disable-next-line camelcase
     function s_removeBoundChan(win, origin, scope) {
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var arr = s_boundChans[origin][scope];
+        // eslint-disable-next-line no-var
         for (var i = 0; i < arr.length; i++) {
             if (arr[i].win === win) {
                 arr.splice(i, 1);
@@ -300,16 +303,17 @@ var Channel = (function() {
     // mapping "transaction ids" to message handlers, allows efficient routing of Callback, Error, and
     // Response messages.  Entries are added to this table when requests are sent, and removed when
     // responses are received.
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var s_transIds = { };
 
     // class singleton onMessage handler
     // this function is registered once and all incoming messages route through here.  This
     // arrangement allows certain efficiencies, message data is only parsed once and dispatch
     // is more efficient, especially for large numbers of simultaneous channels.
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var s_onMessage = function(e) {
         try {
+            // eslint-disable-next-line no-var
             var m = JSON.parse(e.data);
             if (typeof m !== 'object' || m === null) { throw 'malformed'; }
         // eslint-disable-next-line no-shadow
@@ -318,13 +322,16 @@ var Channel = (function() {
             return;
         }
 
+        // eslint-disable-next-line no-var
         var w = e.source;
+        // eslint-disable-next-line no-var
         var o = e.origin;
+        // eslint-disable-next-line no-var
         var s, i, meth;
 
         // eslint-disable-next-line block-scoped-var
         if (typeof m.method === 'string') {
-            // eslint-disable-next-line block-scoped-var
+            /* eslint-disable-next-line block-scoped-var, no-var */
             var ar = m.method.split('::');
             // eslint-disable-next-line eqeqeq
             if (ar.length == 2) {
@@ -350,10 +357,11 @@ var Channel = (function() {
         // if it has a method it's either a notification or a request,
         // route using s_boundChans
         if (typeof meth === 'string') {
+            // eslint-disable-next-line no-var
             var delivered = false;
             // eslint-disable-next-line camelcase
             if (s_boundChans[o] && s_boundChans[o][s]) {
-                /* eslint-disable-next-line block-scoped-var, camelcase */
+                /* eslint-disable-next-line block-scoped-var, camelcase, no-var */
                 for (var j = 0; j < s_boundChans[o][s].length; j++) {
                     /* eslint-disable-next-line block-scoped-var, camelcase */
                     if (s_boundChans[o][s][j].win === w) {
@@ -367,7 +375,7 @@ var Channel = (function() {
 
             // eslint-disable-next-line camelcase
             if (!delivered && s_boundChans['*'] && s_boundChans['*'][s]) {
-                /* eslint-disable-next-line block-scoped-var, camelcase */
+                /* eslint-disable-next-line block-scoped-var, camelcase, no-var */
                 for (var j = 0; j < s_boundChans['*'][s].length; j++) {
                     /* eslint-disable-next-line block-scoped-var, camelcase */
                     if (s_boundChans['*'][s][j].win === w) {
@@ -423,6 +431,7 @@ var Channel = (function() {
      */
     return {
         build: function(cfg) {
+            // eslint-disable-next-line no-var
             var debug = function(m) {
                 if (cfg.debugOutput && window.console && window.console.log) {
                     // try to stringify, if it doesn't work we'll let javascript's built in toString do its magic
@@ -450,8 +459,10 @@ var Channel = (function() {
 
             // let's require that the client specify an origin.  if we just assume '*' we'll be
             // propagating unsafe practices.  that would be lame.
+            // eslint-disable-next-line no-var
             var validOrigin = false;
             if (typeof cfg.origin === 'string') {
+                // eslint-disable-next-line no-var
                 var oMatch;
                 // eslint-disable-next-line brace-style
                 if (cfg.origin === '*') { validOrigin = true; }
@@ -472,25 +483,37 @@ var Channel = (function() {
 
             /* private variables */
             // generate a random and psuedo unique id for this channel
+            // eslint-disable-next-line no-var
             var chanId = (function() {
+                // eslint-disable-next-line no-var
                 var text = '';
+                // eslint-disable-next-line no-var
                 var alpha = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                // eslint-disable-next-line no-var
                 for (var i = 0; i < 5; i++) { text += alpha.charAt(Math.floor(Math.random() * alpha.length)); }
                 return text;
             }());
 
             // registrations: mapping method names to call objects
+            // eslint-disable-next-line no-var
             var regTbl = { };
             // current oustanding sent requests
+            // eslint-disable-next-line no-var
             var outTbl = { };
             // current oustanding received requests
+            // eslint-disable-next-line no-var
             var inTbl = { };
             // are we ready yet?  when false we will block outbound messages.
+            // eslint-disable-next-line no-var
             var ready = false;
+            // eslint-disable-next-line no-var
             var pendingQueue = [];
 
+            // eslint-disable-next-line no-var
             var createTransaction = function(id, origin, callbacks) {
+                // eslint-disable-next-line no-var
                 var shouldDelayReturn = false;
+                // eslint-disable-next-line no-var
                 var completed = false;
 
                 return {
@@ -499,7 +522,9 @@ var Channel = (function() {
                         // verify in table
                         if (!inTbl[id]) { throw 'attempting to invoke a callback of a nonexistent transaction: ' + id; }
                         // verify that the callback name is valid
+                        // eslint-disable-next-line no-var
                         var valid = false;
+                        // eslint-disable-next-line no-var
                         for (var i = 0; i < callbacks.length; i++) { if (cbName === callbacks[i]) { valid = true; break; } }
                         if (!valid) { throw "request supports no such callback '" + cbName + "'"; }
 
@@ -541,10 +566,12 @@ var Channel = (function() {
                 };
             };
 
+            // eslint-disable-next-line no-var
             var setTransactionTimeout = function(transId, timeout, method) {
                 return window.setTimeout(function() {
                     if (outTbl[transId]) {
                         // XXX: what if client code raises an exception here?
+                        // eslint-disable-next-line no-var
                         var msg = 'timeout (' + timeout + "ms) exceeded on method '" + method + "'";
                         (1, outTbl[transId].error)('timeout_error', msg);
                         delete outTbl[transId];
@@ -554,6 +581,7 @@ var Channel = (function() {
                 }, timeout);
             };
 
+            // eslint-disable-next-line no-var
             var onMessage = function(origin, method, m) {
                 // if an observer was specified at allocation time, invoke it
                 if (typeof cfg.gotMessageObserver === 'function') {
@@ -572,23 +600,31 @@ var Channel = (function() {
                 if (m.id && method) {
                     // a request!  do we have a registered handler for this request?
                     if (regTbl[method]) {
+                        // eslint-disable-next-line no-var
                         var trans = createTransaction(m.id, origin, m.callbacks ? m.callbacks : []);
                         inTbl[m.id] = { };
                         try {
                             // callback handling.  we'll magically create functions inside the parameter list for each
                             // callback
                             if (m.callbacks && s_isArray(m.callbacks) && m.callbacks.length > 0) {
+                                // eslint-disable-next-line no-var
                                 for (var i = 0; i < m.callbacks.length; i++) {
+                                    // eslint-disable-next-line no-var
                                     var path = m.callbacks[i];
+                                    // eslint-disable-next-line no-var
                                     var obj = m.params;
+                                    // eslint-disable-next-line no-var
                                     var pathItems = path.split('/');
+                                    // eslint-disable-next-line no-var
                                     for (var j = 0; j < pathItems.length - 1; j++) {
+                                        // eslint-disable-next-line no-var
                                         var cp = pathItems[j];
                                         if (typeof obj[cp] !== 'object') { obj[cp] = { }; }
                                         obj = obj[cp];
                                     }
                                     // eslint-disable-next-line no-loop-func
                                     obj[pathItems[pathItems.length - 1]] = (function() {
+                                        // eslint-disable-next-line no-var
                                         var cbName = path;
                                         return function(params) {
                                             return trans.invoke(cbName, params);
@@ -596,11 +632,14 @@ var Channel = (function() {
                                     }());
                                 }
                             }
+                            // eslint-disable-next-line no-var
                             var resp = regTbl[method](trans, m.params);
                             if (!trans.delayReturn() && !trans.completed()) { trans.complete(resp); }
                         } catch (e) {
                             // automagic handling of exceptions:
+                            // eslint-disable-next-line no-var
                             var error = 'runtime_error';
+                            // eslint-disable-next-line no-var
                             var message = null;
                             // * if it's a string then it gets an error code of 'runtime_error' and string is the message
                             if (typeof e === 'string') {
@@ -674,6 +713,7 @@ var Channel = (function() {
             s_addBoundChan(cfg.window, cfg.origin, ((typeof cfg.scope === 'string') ? cfg.scope : ''), onMessage);
 
             // scope method names based on cfg.scope specified when the Channel was instantiated
+            // eslint-disable-next-line no-var
             var scopeMethod = function(m) {
                 if (typeof cfg.scope === 'string' && cfg.scope.length) { m = [cfg.scope, m].join('::'); }
                 return m;
@@ -681,10 +721,12 @@ var Channel = (function() {
 
             // a small wrapper around postmessage whose primary function is to handle the
             // case that clients start sending messages before the other end is "ready"
+            // eslint-disable-next-line no-var
             var postMessage = function(msg, force) {
                 if (!msg) { throw 'postMessage called with null message'; }
 
                 // delay posting if we're not ready yet.
+                // eslint-disable-next-line no-var
                 var verb = (ready ? 'post  ' : 'queue ');
                 debug(verb + ' message: ' + JSON.stringify(msg));
                 if (!force && !ready) {
@@ -702,6 +744,7 @@ var Channel = (function() {
                 }
             };
 
+            // eslint-disable-next-line no-var
             var onReady = function(trans, type) {
                 debug('ready msg received');
                 if (ready) { throw 'received ready message while in ready state.  help!'; }
@@ -732,6 +775,7 @@ var Channel = (function() {
                 if (typeof cfg.onReady === 'function') { cfg.onReady(obj); }
             };
 
+            // eslint-disable-next-line no-var
             var obj = {
                 // tries to unbind a bound message handler.  returns false if not possible
                 unbind: function(method) {
@@ -756,11 +800,14 @@ var Channel = (function() {
 
                     // now it's time to support the 'callback' feature of jschannel.  We'll traverse the argument
                     // object and pick out all of the functions that were passed as arguments.
+                    // eslint-disable-next-line no-var
                     var callbacks = { };
+                    // eslint-disable-next-line no-var
                     var callbackNames = [];
+                    // eslint-disable-next-line no-var
                     var seen = [];
 
-                    // eslint-disable-next-line no-shadow
+                    /* eslint-disable-next-line no-shadow, no-var */
                     var pruneFunctions = function(path, obj) {
                         if (seen.indexOf(obj) >= 0) {
                             throw 'params cannot be a recursive data structure';
@@ -768,9 +815,11 @@ var Channel = (function() {
                         seen.push(obj);
 
                         if (typeof obj === 'object') {
+                            // eslint-disable-next-line no-var
                             for (var k in obj) {
                                 // eslint-disable-next-line no-continue
                                 if (!obj.hasOwnProperty(k)) { continue; }
+                                // eslint-disable-next-line no-var
                                 var np = path + (path.length ? '/' : '') + k;
                                 if (typeof obj[k] === 'function') {
                                     callbacks[np] = obj[k];
@@ -785,7 +834,7 @@ var Channel = (function() {
                     pruneFunctions('', m.params);
 
                     // build a 'request' message and send it
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-var */
                     var msg = {id: s_curTranId, method: scopeMethod(m.method), params: m.params};
                     if (callbackNames.length) { msg.callbacks = callbackNames; }
 

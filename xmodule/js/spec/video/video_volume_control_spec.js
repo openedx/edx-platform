@@ -2,8 +2,10 @@
     'use strict';
 
     describe('VideoVolumeControl', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD, volumeControl;
 
+        // eslint-disable-next-line no-var
         var KEY = $.ui.keyCode,
 
             keyPressEvent = function(key) {
@@ -65,6 +67,7 @@
             });
 
             it('add ARIA attributes to live region', function() {
+                // eslint-disable-next-line no-var
                 var $liveRegion = $('.video-live-region');
 
                 expect($liveRegion).toHaveAttrs({
@@ -73,6 +76,7 @@
             });
 
             it('add ARIA attributes to volume control', function() {
+                // eslint-disable-next-line no-var
                 var $button = $('.volume .control');
 
                 expect($button).toHaveAttrs({
@@ -81,6 +85,7 @@
             });
 
             it('bind the volume control', function() {
+                // eslint-disable-next-line no-var
                 var $button = $('.volume .control');
 
                 expect($button).toHandle('keydown');
@@ -106,8 +111,10 @@
                     assertLiveRegionState: function() {
                         return {
                             compare: function(actual, volume, expectation) {
+                                // eslint-disable-next-line no-var
                                 var $region = $('.video-live-region');
 
+                                // eslint-disable-next-line no-var
                                 var getExpectedText = function(text) {
                                     return text + ' Volume.';
                                 };
@@ -209,6 +216,7 @@
             });
 
             it('volume is increased correctly', function() {
+                // eslint-disable-next-line no-var
                 var $button = $('.volume .control');
                 volumeControl.volume = 60;
 
@@ -233,6 +241,7 @@
             });
 
             it('volume is decreased correctly', function() {
+                // eslint-disable-next-line no-var
                 var $button = $('.volume .control');
                 volumeControl.volume = 60;
 
@@ -291,6 +300,7 @@
                 volumeControl = state.videoVolumeControl;
             });
 
+            // eslint-disable-next-line no-var
             var assertVolumeIsNotChanged = function(eventObject) {
                 volumeControl.volume = 60;
                 // eslint-disable-next-line no-undef
@@ -328,6 +338,7 @@
             });
 
             it('nothing happens if ALT+ENTER are pushed down', function() {
+                // eslint-disable-next-line no-var
                 var isMuted = volumeControl.getMuteStatus();
                 // eslint-disable-next-line no-undef
                 $('.volume .control').trigger(jQuery.Event('keydown', {

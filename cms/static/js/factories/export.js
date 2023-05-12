@@ -5,14 +5,17 @@ define([
     'use strict';
 
     return function(courselikeHomeUrl, library, statusUrl) {
+        // eslint-disable-next-line no-var
         var $submitBtn = $('.action-export'),
             unloading = false,
             previousExport = Export.storedExport(courselikeHomeUrl);
 
+        // eslint-disable-next-line no-var
         var onComplete = function() {
             $submitBtn.show();
         };
 
+        // eslint-disable-next-line no-var
         var startExport = function(e) {
             e.preventDefault();
             $submitBtn.hide();

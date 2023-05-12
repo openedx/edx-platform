@@ -9,8 +9,10 @@
  */
 // eslint-disable-next-line no-undef
 define(['underscore'], function(_) {
+    // eslint-disable-next-line no-var
     var urlRoot = '/xblock';
 
+    // eslint-disable-next-line no-var
     var getUpdateUrl = function(locator) {
         if (_.isUndefined(locator)) {
             return urlRoot + '/';

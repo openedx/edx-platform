@@ -20,6 +20,7 @@ function($, _, Backbone, gettext,
     signatoryEditorTemplate, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var SignatoryEditorView = Backbone.View.extend({
         tagName: 'div',
         events: {
@@ -33,6 +34,7 @@ function($, _, Backbone, gettext,
 
         className: function() {
             // Determine the CSS class names for this model instance
+            // eslint-disable-next-line no-var
             var index = this.getModelIndex(this.model);
             return [
                 'signatory-edit',
@@ -60,6 +62,7 @@ function($, _, Backbone, gettext,
 
         getTotalSignatoriesOnServer: function() {
             // Retrieve the count of signatories stored server-side
+            // eslint-disable-next-line no-var
             var count = 0;
             this.model.collection.each(function(modelSignatory) {
                 if (!modelSignatory.isNew()) {
@@ -71,6 +74,7 @@ function($, _, Backbone, gettext,
 
         render: function() {
             // Assemble the editor view for this model
+            // eslint-disable-next-line no-var
             var attributes = $.extend({
                 modelIsValid: this.model.isValid(),
                 error: this.model.validationError
@@ -130,9 +134,13 @@ function($, _, Backbone, gettext,
 
         deleteItem: function(event) {
             // Remove the specified model from the collection
+            // eslint-disable-next-line no-var
             var model = this.model;
+            // eslint-disable-next-line no-var
             var self = this;
+            // eslint-disable-next-line no-var
             var titleTextTemplate = _.template(gettext('Delete "<%- signatoryName %>" from the list of signatories?'));
+            // eslint-disable-next-line no-var
             var confirm = new PromptView.Warning({
                 title: titleTextTemplate({signatoryName: model.get('name')}),
                 message: gettext('This action cannot be undone.'),
@@ -140,6 +148,7 @@ function($, _, Backbone, gettext,
                     primary: {
                         text: gettext('Delete'),
                         click: function() {
+                            // eslint-disable-next-line no-var
                             var deleting = new NotificationView.Mini({
                                 title: gettext('Deleting')
                             });
@@ -172,6 +181,7 @@ function($, _, Backbone, gettext,
         },
 
         uploadSignatureImage: function(event) {
+            // eslint-disable-next-line no-var
             var upload, self, modal;
             event.preventDefault();
             upload = new FileUploadModel({
@@ -195,7 +205,9 @@ function($, _, Backbone, gettext,
          * @param string modelAttribute - the attribute of the signatory model e.g. name, title.
         */
         toggleValidationErrorMessage: function(modelAttribute) {
+            // eslint-disable-next-line no-var
             var selector = 'div.add-signatory-' + modelAttribute;
+            // eslint-disable-next-line no-var
             var errorMessage;
             if (!this.model.isValid() && _.has(this.model.validationError, modelAttribute)) {
                 // Show the error message if it is not exist before.

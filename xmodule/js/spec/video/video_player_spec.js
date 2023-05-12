@@ -8,6 +8,7 @@
         ['video/03_video_player.js', 'hls', 'underscore'],
         function(VideoPlayer, HLS, _) {
             describe('VideoPlayer', function() {
+                // eslint-disable-next-line no-var
                 var STATUS = window.STATUS,
                     state,
                     oldOTBD,
@@ -82,6 +83,7 @@
                     });
 
                     it('create Youtube player', function() {
+                        // eslint-disable-next-line no-var
                         var events;
 
                         // eslint-disable-next-line no-undef
@@ -116,6 +118,7 @@
                     });
 
                     it('create Flash player', function() {
+                        // eslint-disable-next-line no-var
                         var player;
 
                         // eslint-disable-next-line no-undef
@@ -168,7 +171,7 @@
                     });
 
                     describe('when not on a touch based device', function() {
-                        /* eslint-disable-next-line no-shadow, no-unused-vars */
+                        /* eslint-disable-next-line no-shadow, no-unused-vars, no-var */
                         var oldOTBD;
 
                         beforeEach(function() {
@@ -213,6 +216,7 @@
                     });
 
                     it('multiple speeds and flash mode, change back to html5 mode', function() {
+                        // eslint-disable-next-line no-var
                         var playbackRates = state.videoPlayer.player.getAvailablePlaybackRates();
 
                         state.currentPlayerMode = 'flash';
@@ -271,6 +275,7 @@
                     });
 
                     describe('when the video is playing', function() {
+                        // eslint-disable-next-line no-var
                         var oldState;
 
                         beforeEach(function() {
@@ -315,7 +320,7 @@
                     });
 
                     describe('when the video is paused', function() {
-                        // eslint-disable-next-line no-unused-vars
+                        /* eslint-disable-next-line no-unused-vars, no-var */
                         var currentUpdateIntrval;
 
                         beforeEach(function() {
@@ -566,6 +571,7 @@
 
                 // Disabled 1/13/14 due to flakiness observed in master
                 xdescribe('update with start & end time', function() {
+                    // eslint-disable-next-line no-var
                     var START_TIME = 1,
                         END_TIME = 2;
 
@@ -592,6 +598,7 @@
                     it(
                         'video is paused on first endTime, start & end time are reset',
                         function(done) {
+                            // eslint-disable-next-line no-var
                             var duration;
 
                             state.videoProgressSlider.notifyThroughHandleEnd.calls.reset();
@@ -626,6 +633,7 @@
                     });
 
                     it('update the video playback time', function(done) {
+                        // eslint-disable-next-line no-var
                         var duration = 0;
 
                         // eslint-disable-next-line no-undef
@@ -659,6 +667,7 @@
                     });
 
                     it('update the playback time on progress slider', function(done) {
+                        // eslint-disable-next-line no-var
                         var duration = 0;
 
                         // eslint-disable-next-line no-undef
@@ -683,6 +692,7 @@
                 xdescribe(
                     'updatePlayTime when start & end times are defined',
                     function() {
+                        // eslint-disable-next-line no-var
                         var START_TIME = 1,
                             END_TIME = 2;
 
@@ -709,6 +719,7 @@
                         it(
                             'when duration becomes available, updatePlayTime() is called',
                             function(done) {
+                                // eslint-disable-next-line no-var
                                 var duration;
 
                                 expect(state.videoPlayer.initialSeekToStartTime).toBeTruthy();
@@ -886,6 +897,7 @@
                     });
 
                     it('set the player volume', function() {
+                        // eslint-disable-next-line no-var
                         var expectedValue = 60,
                             realValue;
 
@@ -918,6 +930,7 @@
 
                         state.videoEl = $('video, iframe');
 
+                        // eslint-disable-next-line no-var
                         var modules = [
                             state.videoControl, state.videoCaption, state.videoProgressSlider,
                             state.videoSpeedControl, state.videoVolumeControl
@@ -929,10 +942,12 @@
                     });
 
                     $.each(['iPad', 'Android'], function(index, device) {
+                        // eslint-disable-next-line no-var
                         var message = 'controls become visible after playing starts '
                     + 'on ' + device;
 
                         it(message, function(done) {
+                            // eslint-disable-next-line no-var
                             var controls;
 
                             window.onTouchBasedDevice.and.returnValue([device]);
@@ -1134,6 +1149,7 @@
                 });
 
                 describe('Overlay Play Button', function() {
+                    // eslint-disable-next-line no-var
                     var playButtonOverlaySelector = '.video-wrapper .btn-play.fa.fa-youtube-play.fa-2x';
                     beforeEach(function() {
                         // eslint-disable-next-line no-undef

@@ -3,6 +3,7 @@
 
     define(['js/api_admin/views/catalog_preview'], function(CatalogPreviewView) {
         return function(options) {
+            // eslint-disable-next-line no-var
             var view = new CatalogPreviewView({
                 el: '.catalog-body',
                 previewUrl: options.previewUrl,

@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function($, _, Backbone, gettext) {
@@ -6,6 +6,7 @@ var edx = edx || {};
 
     edx.ccx = edx.ccx || {};
     edx.ccx.schedule = edx.ccx.schedule || {};
+    // eslint-disable-next-line no-var
     var self;
 
     edx.ccx.schedule.reloadPage = function() {
@@ -55,11 +56,12 @@ var edx = edx || {};
             self.disableFields($('.ccx_start_date_time_fields'));
             // Add unit handlers
             this.chapter_select.on('change', function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var chapter_location = self.chapter_select.val();
                 self.vertical_select.html('').prop('disabled', true);
                 // eslint-disable-next-line camelcase
                 if (chapter_location !== 'none') {
+                    // eslint-disable-next-line no-var
                     var chapter = self.find_unit(self.hidden, chapter_location);
                     self.sequential_select.html('')
                     // xss-lint: disable=javascript-jquery-append, javascript-concat-html
@@ -80,10 +82,11 @@ var edx = edx || {};
             });
 
             this.sequential_select.on('change', function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var sequential_location = self.sequential_select.val();
                 // eslint-disable-next-line camelcase
                 if (sequential_location !== 'all') {
+                    // eslint-disable-next-line no-var
                     var chapter = self.chapter_select.val(),
                         sequential = self.find_unit(self.hidden, chapter, sequential_location);
                     self.vertical_select.html('')
@@ -106,13 +109,14 @@ var edx = edx || {};
             });
 
             this.vertical_select.on('change', function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var vertical_location = self.vertical_select.val();
                 // eslint-disable-next-line camelcase
                 if (vertical_location !== 'all') {
+                    // eslint-disable-next-line no-var
                     var chapter = self.chapter_select.val(),
                         sequential = self.sequential_select.val();
-                    // eslint-disable-next-line no-unused-vars
+                    /* eslint-disable-next-line no-unused-vars, no-var */
                     var vertical = self.find_unit(
                         self.hidden, chapter, sequential, vertical_location);
                     // When a unit (aka vertical) is selected, all date fields are disabled because units
@@ -132,6 +136,7 @@ var edx = edx || {};
             $('#add-unit-button').on('click', function(event) {
                 event.preventDefault();
                 // Default value of time is 00:00.
+                // eslint-disable-next-line no-var
                 var start, chapter, sequential, vertical, units, due;
                 start = self.get_datetime('start');
                 chapter = self.chapter_select.val();
@@ -144,9 +149,11 @@ var edx = edx || {};
                     vertical === 'all' ? null : vertical
                 );
                 due = self.get_datetime('due');
+                // eslint-disable-next-line no-var
                 var errorMessage = self.valid_dates(start, due);
                 if (_.isUndefined(errorMessage)) {
                     units.map(self.show);
+                    // eslint-disable-next-line no-var
                     var unit = units[units.length - 1];
                     if (!_.isUndefined(unit)) {
                         if (!_.isNull(start)) {
@@ -216,6 +223,7 @@ var edx = edx || {};
             });
             // Remove unit handler
             $('table.ccx-schedule button.remove-unit').on('click', function() {
+                // eslint-disable-next-line no-var
                 var row = $(this).closest('tr'),
                     path = row.data('location').split(' '),
                     unit = self.find_unit(self.schedule, path[0], path[1], path[2]);
@@ -260,6 +268,7 @@ var edx = edx || {};
 
         save: function() {
             self.schedule_collection.set(self.schedule);
+            // eslint-disable-next-line no-var
             var $button = $('#dirty-schedule #save-changes');
             $button.prop('disabled', true).text(gettext('Saving'));
             // save_url defined globally in ccx\schedule.html
@@ -303,14 +312,19 @@ var edx = edx || {};
         },
 
         valid_dates: function(start, due) {
+            // eslint-disable-next-line no-var
             var errorMessage;
             // Start date is compulsory and due date is optional.
             if (_.isEmpty(start) && !_.isEmpty(due)) {
                 errorMessage = gettext('Please enter valid start date and time.');
             } else if (!_.isEmpty(start) && !_.isEmpty(due)) {
+                // eslint-disable-next-line no-var
                 var requirejs = window.require || RequireJS.require;
+                // eslint-disable-next-line no-var
                 var moment = requirejs('moment');
+                // eslint-disable-next-line no-var
                 var parsedDueDate = moment(due, 'YYYY-MM-DD HH:mm');
+                // eslint-disable-next-line no-var
                 var parsedStartDate = moment(start, 'YYYY-MM-DD HH:mm');
                 if (parsedDueDate.isBefore(parsedStartDate)) {
                     errorMessage = gettext('Due date cannot be before start date.');
@@ -320,7 +334,9 @@ var edx = edx || {};
         },
 
         get_datetime: function(which) {
+            // eslint-disable-next-line no-var
             var date = $('form#add-unit input[name=' + which + '_date]').val();
+            // eslint-disable-next-line no-var
             var time = $('form#add-unit input[name=' + which + '_time]').val();
             time = _.isEmpty(time) ? '00:00' : time;
             if (date && time) {
@@ -330,6 +346,7 @@ var edx = edx || {};
         },
 
         set_datetime: function(which, value) {
+            // eslint-disable-next-line no-var
             var parts = value ? value.split(' ') : ['', ''],
                 date = parts[0],
                 time = parts[1];
@@ -358,6 +375,7 @@ var edx = edx || {};
         pruned: function(tree, filter) {
             return tree.filter(filter)
                 .map(function(node) {
+                    // eslint-disable-next-line no-var
                     var copy = {};
                     $.extend(copy, node);
                     if (node.children) {
@@ -379,7 +397,9 @@ var edx = edx || {};
 
         toggle_collapse: function(event) {
             event.preventDefault();
+            // eslint-disable-next-line no-var
             var row = $(this).closest('tr');
+            // eslint-disable-next-line no-var
             var children = self.get_children(row);
 
             if (row.is('.expanded')) {
@@ -391,13 +411,16 @@ var edx = edx || {};
                 $(this).attr('aria-expanded', 'true');
                 $(this).find('.fa-caret-right').removeClass('fa-caret-right').addClass('fa-caret-down');
                 row.removeClass('collapsed').addClass('expanded');
+                // eslint-disable-next-line no-var
                 var depth = $(row).data('depth');
+                // eslint-disable-next-line no-var
                 var $childNodes = children.filter('.collapsed');
                 if ($childNodes.length <= 0) {
                     children.show();
                 } else {
                     // this will expand units.
                     $childNodes.each(function() {
+                        // eslint-disable-next-line no-var
                         var depthChild = $(this).data('depth');
                         if (depth === (depthChild - 1)) {
                             $(this).show();
@@ -409,8 +432,10 @@ var edx = edx || {};
 
         expandAll: function() {
             $('table.ccx-schedule > tbody > tr').each(function() {
+                // eslint-disable-next-line no-var
                 var $row = $(this);
                 if (!$row.is('.expanded')) {
+                    // eslint-disable-next-line no-var
                     var children = self.get_children($row);
                     $row.find('.ccx_sr_alert').attr('aria-expanded', 'true');
                     $row.find('.fa-caret-right').removeClass('fa-caret-right').addClass('fa-caret-down');
@@ -425,6 +450,7 @@ var edx = edx || {};
 
         collapseAll: function() {
             $('table.ccx-schedule > tbody > tr').each(function() {
+                // eslint-disable-next-line no-var
                 var $row = $(this);
                 if ($row.is('.expanded')) {
                     $($row).find('.ccx_sr_alert').attr('aria-expanded', 'false');
@@ -437,7 +463,9 @@ var edx = edx || {};
 
         enterNewDate: function(what) {
             return function() {
+                // eslint-disable-next-line no-var
                 var row = $(this).closest('tr');
+                // eslint-disable-next-line no-var
                 var modal = $('#enter-date-modal')
                     .data('what', what)
                     .data('location', row.data('location'));
@@ -462,6 +490,7 @@ var edx = edx || {};
                 modal.find('.close-modal').click(function() {
                     $(document).off('focusin');
                 });
+                // eslint-disable-next-line no-var
                 var path = row.data('location').split(' '),
                     unit = self.find_unit(self.schedule, path[0], path[1], path[2]),
                     parts = unit[what] ? unit[what].split(' ') : ['', ''],
@@ -471,11 +500,11 @@ var edx = edx || {};
                 modal.find('input[name=time]').val(time);
                 modal.find('form').off('submit').on('submit', function(event) {
                     event.preventDefault();
-                    // eslint-disable-next-line no-shadow
+                    /* eslint-disable-next-line no-shadow, no-var */
                     var date = $(this).find('input[name=date]').val(),
                         // eslint-disable-next-line no-shadow
                         time = $(this).find('input[name=time]').val();
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-var */
                     var valid_date = new Date(date);
                     // eslint-disable-next-line camelcase
                     if (isNaN(valid_date.valueOf())) {
@@ -483,7 +512,7 @@ var edx = edx || {};
                         alert('Please enter a valid date');
                         return;
                     }
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-var */
                     var valid_time = /^\d{1,2}:\d{2}?$/;
                     if (!time.match(valid_time)) {
                         // eslint-disable-next-line no-alert
@@ -525,6 +554,7 @@ var edx = edx || {};
         },
 
         find_unit: function(tree, chapter, sequential, vertical) {
+            // eslint-disable-next-line no-var
             var units = self.find_lineage(tree, chapter, sequential, vertical);
             return units[units.length - 1];
         },
@@ -532,12 +562,14 @@ var edx = edx || {};
         find_lineage: function(tree, chapter, sequential, vertical) {
             /* eslint-disable-next-line camelcase, consistent-return */
             function find_in(seq, location) {
+                // eslint-disable-next-line no-var
                 for (var i = 0; i < seq.length; i++) {
                     if (seq[i].location === location) {
                         return seq[i];
                     }
                 }
             }
+            // eslint-disable-next-line no-var
             var units = [],
                 unit = find_in(tree, chapter);
             units[units.length] = unit;
@@ -552,6 +584,7 @@ var edx = edx || {};
             return units;
         },
         get_children: function(row) {
+            // eslint-disable-next-line no-var
             var depth = $(row).data('depth');
             return $(row).nextUntil(
                 $(row).siblings().filter(function() {

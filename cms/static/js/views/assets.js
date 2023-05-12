@@ -20,8 +20,10 @@ define([
 function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, PagingHeader, PagingFooter,
     // eslint-disable-next-line camelcase
     ModalUtils, ViewUtils, NotificationView, asset_library_template) {
+    // eslint-disable-next-line no-var
     var CONVERSION_FACTOR_MBS_TO_BYTES = 1000 * 1000;
 
+    // eslint-disable-next-line no-var
     var AssetsView = BaseView.extend({
         // takes AssetCollection as model
 
@@ -40,6 +42,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
             options = options || {};
 
             BaseView.prototype.initialize.call(this);
+            // eslint-disable-next-line no-var
             var collection = this.collection;
             this.pagingView = this.createPagingView();
             this.listenTo(collection, 'destroy', this.handleDestroy);
@@ -57,6 +60,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
 
         PagingAssetView: PagingView.extend({
             renderPageItems: function() {
+                // eslint-disable-next-line no-var
                 var self = this,
                     assets = this.collection,
                     hasAssets = this.collection.assetType !== '' || assets.length > 0,
@@ -65,6 +69,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
                 if (hasAssets) {
                     assets.each(
                         function(asset) {
+                            // eslint-disable-next-line no-var
                             var view = new AssetView({model: asset});
                             tableBody.append(view.render().el);
                         }
@@ -76,6 +81,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
             },
 
             getTableBody: function() {
+                // eslint-disable-next-line no-var
                 var tableBody = this.tableBody;
                 if (!tableBody) {
                     ViewUtils.hideLoadingIndicator();
@@ -105,6 +111,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
         }),
 
         createPagingView: function() {
+            // eslint-disable-next-line no-var
             var pagingView = new this.PagingAssetView({
                 el: this.$el,
                 collection: this.collection
@@ -157,6 +164,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
         },
 
         onToggleColumn: function(event) {
+            // eslint-disable-next-line no-var
             var columnName = event.target.id;
             this.pagingView.toggleSortOrder(columnName);
         },
@@ -178,6 +186,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
         },
 
         showUploadModal: function(event) {
+            // eslint-disable-next-line no-var
             var self = this;
             event.preventDefault();
             self.resetUploadModal();
@@ -191,6 +200,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
                 autoUpload: true,
                 // eslint-disable-next-line no-shadow
                 progressall: function(event, data) {
+                    // eslint-disable-next-line no-var
                     var percentComplete = parseInt((100 * data.loaded) / data.total, 10);
                     self.showUploadFeedback(event, percentComplete);
                 },
@@ -202,7 +212,9 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
                 },
                 // eslint-disable-next-line no-shadow
                 processfail: function(event, data) {
+                    // eslint-disable-next-line no-var
                     var filename = data.files[data.index].name;
+                    // eslint-disable-next-line no-var
                     var error = gettext('File {filename} exceeds maximum size of {maxFileSizeInMBs} MB')
                         .replace('{filename}', filename)
                         .replace('{maxFileSizeInMBs}', self.maxFileSizeInMBs);
@@ -210,6 +222,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
                     // disable second part of message for any falsy value,
                     // which can be null or an empty string
                     if (self.maxFileSizeRedirectUrl) {
+                        // eslint-disable-next-line no-var
                         var instructions = gettext('Please follow the instructions here to upload a file elsewhere and link to it: {maxFileSizeRedirectUrl}')
                             .replace('{maxFileSizeRedirectUrl}', self.maxFileSizeRedirectUrl);
                         error = error + ' ' + instructions;
@@ -241,6 +254,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
         },
 
         startUpload: function(event) {
+            // eslint-disable-next-line no-var
             var file = event.target.value;
 
             if (!this.largeFileErrorMsg) {
@@ -254,6 +268,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
         resetUploadModal: function() {
             // Reset modal so it no longer displays information about previously
             // completed uploads.
+            // eslint-disable-next-line no-var
             var percentVal = '0%',
                 $progressFill = $('.upload-modal .progress-fill'),
                 $fileName = $('.upload-modal .file-name');
@@ -272,6 +287,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
         },
 
         showUploadFeedback: function(event, percentComplete) {
+            // eslint-disable-next-line no-var
             var percentVal = percentComplete + '%',
                 $progressFill = $('.upload-modal .progress-fill');
 
@@ -284,9 +300,13 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
         },
 
         toggleFilterColumnState: function(menu, selected) {
+            // eslint-disable-next-line no-var
             var $subnav = menu.find('.wrapper-nav-sub');
+            // eslint-disable-next-line no-var
             var $title = menu.find('.title');
+            // eslint-disable-next-line no-var
             var titleText = $title.find('.type-filter');
+            // eslint-disable-next-line no-var
             var assettype = selected ? selected.data('assetfilter') : false;
             if (assettype) {
                 if (assettype === this.allLabel) {
@@ -306,14 +326,19 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
 
         toggleFilterColumn: function(event) {
             event.preventDefault();
+            // eslint-disable-next-line no-var
             var $filterColumn = $(event.currentTarget);
             this._toggleFilterColumn($filterColumn.data('assetfilter'), $filterColumn.text());
         },
 
         _toggleFilterColumn: function(assettype, assettypeLabel) {
+            // eslint-disable-next-line no-var
             var collection = this.collection;
+            // eslint-disable-next-line no-var
             var filterColumn = this.$el.find('.filterable-column');
+            // eslint-disable-next-line no-var
             var resetFilter = filterColumn.find('.reset-filter');
+            // eslint-disable-next-line no-var
             var title = filterColumn.find('.title');
 
             if (assettype === this.allLabel) {
@@ -333,11 +358,13 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
         },
 
         closeFilterPopup: function(element) {
+            // eslint-disable-next-line no-var
             var $menu = element.parents('.nav-dd > .nav-item');
             this.toggleFilterColumnState($menu, element);
         },
 
         displayFinishedUpload: function(resp) {
+            // eslint-disable-next-line no-var
             var asset = resp.asset,
                 $progressFill = $('.upload-modal .progress-fill');
 
@@ -353,6 +380,7 @@ function($, _, gettext, HtmlUtils, BaseView, AssetModel, PagingView, AssetView, 
         },
 
         displayFailedUpload: function(resp) {
+            // eslint-disable-next-line no-var
             var $progressFill = $('.upload-modal .progress-fill');
 
             $('.upload-modal h1').text(gettext('Upload New File'));

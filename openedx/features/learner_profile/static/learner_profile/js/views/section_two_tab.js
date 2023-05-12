@@ -7,6 +7,7 @@
             'edx-ui-toolkit/js/utils/html-utils'
         ],
         function(gettext, $, _, Backbone, sectionTwoTemplate, HtmlUtils) {
+            // eslint-disable-next-line no-var
             var SectionTwoTab = Backbone.View.extend({
                 attributes: {
                     class: 'wrapper-profile-section-two'
@@ -16,7 +17,9 @@
                     this.options = _.extend({}, options);
                 },
                 render: function() {
+                    // eslint-disable-next-line no-var
                     var self = this;
+                    // eslint-disable-next-line no-var
                     var showFullProfile = this.options.showFullProfile();
                     this.$el.html(HtmlUtils.HTML(this.template({ownProfile: self.options.ownProfile, showFullProfile: showFullProfile})).toString()); // eslint-disable-line max-len
                     if (showFullProfile) {

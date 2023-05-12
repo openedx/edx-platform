@@ -13,10 +13,12 @@ define(['jquery.form', 'js/index'], function() {
                 .toggleClass('current');
         });
 
+        // eslint-disable-next-line no-var
         var reloadPage = function() {
             location.reload();
         };
 
+        // eslint-disable-next-line no-var
         var showError = function() {
             $('#request-coursecreator-submit')
                 .toggleClass('has-error')

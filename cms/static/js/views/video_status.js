@@ -6,6 +6,7 @@ define(
     function(BaseView, HtmlUtils, videoStatusTemplate) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var VideoStatusView = BaseView.extend({
             tagName: 'div',
 

@@ -1,6 +1,7 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var TooltipManager = function(element) {
         this.element = $(element);
         // If tooltip container already exist, use it.
@@ -58,6 +59,7 @@
         prepareTooltip: function(element, pageX, pageY) {
             pageX = typeof pageX !== 'undefined' ? pageX : element.offset().left + element.width() / 2;
             pageY = typeof pageY !== 'undefined' ? pageY : element.offset().top + element.height() / 2;
+            // eslint-disable-next-line no-var
             var tooltipText = $(element).attr('data-tooltip');
             this.tooltip
                 .text(tooltipText)
@@ -85,6 +87,7 @@
         },
 
         click: function(event) {
+            // eslint-disable-next-line no-var
             var showOnClick = !!$(event.currentTarget).data('tooltip-show-on-click'); // Default is false
             if (showOnClick) {
                 this.show();

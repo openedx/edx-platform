@@ -7,12 +7,14 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
 function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var disabledCss = 'is-disabled';
 
     /**
          * A view that refreshes the view when certain values in the XBlockInfo have changed
          * after a server sync operation.
          */
+    // eslint-disable-next-line no-var
     var ContainerStateListenerView = BaseView.extend({
 
         // takes XBlockInfo as a model
@@ -34,6 +36,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         render: function() {}
     });
 
+    // eslint-disable-next-line no-var
     var ContainerAccess = ContainerStateListenerView.extend({
         initialize: function() {
             ContainerStateListenerView.prototype.initialize.call(this);
@@ -58,6 +61,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         }
     });
 
+    // eslint-disable-next-line no-var
     var MessageView = ContainerStateListenerView.extend({
         initialize: function() {
             ContainerStateListenerView.prototype.initialize.call(this);
@@ -82,12 +86,14 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
     /**
          * A controller for updating the "View Live" button.
          */
+    // eslint-disable-next-line no-var
     var ViewLiveButtonController = ContainerStateListenerView.extend({
         shouldRefresh: function(model) {
             return ViewUtils.hasChangedAttributes(model, ['published']);
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var viewLiveAction = this.$el.find('.button-view');
             if (this.model.get('published')) {
                 viewLiveAction.removeClass(disabledCss).attr('aria-disabled', false);
@@ -104,6 +110,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
          * 3) Display of who last edited the xblock, and when.
          * 4) Display of publish status (published, published with changes, changes with no published version).
          */
+    // eslint-disable-next-line no-var
     var Publisher = BaseView.extend({
         events: {
             'click .action-publish': 'publish',
@@ -159,6 +166,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         },
 
         publish: function(e) {
+            // eslint-disable-next-line no-var
             var xblockInfo = this.model;
             if (e && e.preventDefault) {
                 e.preventDefault();
@@ -176,6 +184,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         },
 
         discardChanges: function(e) {
+            // eslint-disable-next-line no-var
             var xblockInfo = this.model,
                 renderPage = this.renderPage;
             if (e && e.preventDefault) {
@@ -200,6 +209,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
         },
 
         toggleStaffLock: function(e) {
+            // eslint-disable-next-line no-var
             var xblockInfo = this.model,
                 self = this,
                 enableStaffLock, hasInheritedStaffLock,
@@ -266,6 +276,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, MoveXBlockUtils, H
     /**
          * PublishHistory displays when and by whom the xblock was last published, if it ever was.
          */
+    // eslint-disable-next-line no-var
     var PublishHistory = BaseView.extend({
         // takes XBlockInfo as a model
 

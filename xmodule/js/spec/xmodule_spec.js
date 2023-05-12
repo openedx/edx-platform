@@ -10,6 +10,7 @@
         });
 
         describe('implementation', function() {
+            // eslint-disable-next-line no-var
             var $el,
                 videoModule = {
                     module: 'video_module'
@@ -117,6 +118,7 @@
             });
 
             it('element is of an unknown Module type, console.error() is called if it is defined', function() {
+                // eslint-disable-next-line no-var
                 var oldConsole = window.console;
 
                 if (window.console && window.console.error) {
@@ -140,6 +142,7 @@
             });
 
             it('element is of an unknown Module type, JavaScript throws if console.error() is not defined', function() {
+                // eslint-disable-next-line no-var
                 var oldConsole = window.console,
                     testFunction = function() {
                         // eslint-disable-next-line no-undef
@@ -181,10 +184,12 @@
         });
 
         describe('implementation', function() {
+            // eslint-disable-next-line no-var
             var el, obj, callback, length;
 
             // This is a dummy callback.
             callback = function() {
+                // eslint-disable-next-line no-var
                 var x = 1;
 
                 return x + 1;
@@ -243,7 +248,7 @@
             });
 
             it('Descriptor.update triggers all callbacks with whatever .save() returns', function() {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var callback1 = jasmine.createSpy('callback1'),
                     // eslint-disable-next-line no-undef
                     callback2 = jasmine.createSpy('callback2'),

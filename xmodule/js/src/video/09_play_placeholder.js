@@ -10,6 +10,7 @@
      * @param {Object} i18n The object containing strings with translations.
      * @return {jquery Promise}
      */
+        // eslint-disable-next-line no-var
         var PlayPlaceholder = function(state, i18n) {
             if (!(this instanceof PlayPlaceholder)) {
                 return new PlayPlaceholder(state, i18n);

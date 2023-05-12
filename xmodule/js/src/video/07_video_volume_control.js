@@ -13,6 +13,7 @@
      * @param {Object} i18n The object containing strings with translations.
      * @return {jquery Promise}
      */
+            // eslint-disable-next-line no-var
             var VolumeControl = function(state, i18n) {
                 if (!(this instanceof VolumeControl)) {
                     return new VolumeControl(state, i18n);
@@ -105,6 +106,7 @@
                 /** Initializes the module. */
                 // eslint-disable-next-line consistent-return
                 initialize: function() {
+                    // eslint-disable-next-line no-var
                     var volume;
 
                     if (this.state.isTouch) {
@@ -137,6 +139,7 @@
          * initial configuration.
          */
                 render: function() {
+                    // eslint-disable-next-line no-var
                     var container = this.el.find('.volume-slider'),
                         instructionsId = 'volume-instructions-' + this.state.id;
 
@@ -228,6 +231,7 @@
 
                 /** Increases current volume level using previously defined step. */
                 increaseVolume: function() {
+                    // eslint-disable-next-line no-var
                     var volume = Math.min(this.getVolume() + this.step, this.max);
 
                     this.setVolume(volume, false, false);
@@ -237,6 +241,7 @@
 
                 /** Decreases current volume level using previously defined step. */
                 decreaseVolume: function() {
+                    // eslint-disable-next-line no-var
                     var volume = Math.max(this.getVolume() - this.step, this.min);
 
                     this.setVolume(volume, false, false);
@@ -256,6 +261,7 @@
          * @param {Number} muteStatus Flag to mute/unmute volume.
          */
                 mute: function(muteStatus) {
+                    // eslint-disable-next-line no-var
                     var volume;
 
                     this.updateMuteButtonView(muteStatus);
@@ -283,6 +289,7 @@
          * @param {Boolean} isMuted Flag to use muted or unmuted view.
          */
                 updateMuteButtonView: function(isMuted) {
+                    // eslint-disable-next-line no-var
                     var action = isMuted ? 'addClass' : 'removeClass';
 
                     this.el[action]('is-muted');
@@ -348,6 +355,7 @@
                         return true;
                     }
 
+                    // eslint-disable-next-line no-var
                     var KEY = $.ui.keyCode,
                         keyCode = event.keyCode;
 
@@ -398,6 +406,7 @@
                         return true;
                     }
 
+                    // eslint-disable-next-line no-var
                     var KEY = $.ui.keyCode,
                         keyCode = event.keyCode;
 
@@ -451,6 +460,7 @@
      * @param {Number} max Maximum value for the volume slider.
      * @param {Object} i18n The object containing strings with translations.
      */
+            // eslint-disable-next-line no-var
             var Accessibility = function(button, min, max, i18n) {
                 this.min = min;
                 this.max = max;
@@ -520,6 +530,7 @@
      * @param {Number} min Minimum value for the volume slider.
      * @param {Number} max Maximum value for the volume slider.
      */
+            // eslint-disable-next-line no-var
             var CookieManager = function(min, max) {
                 this.min = min;
                 this.max = max;
@@ -532,6 +543,7 @@
          * @return {Number} Volume level.
          */
                 getVolume: function() {
+                    // eslint-disable-next-line no-var
                     var volume = parseInt($.cookie(this.cookieName), 10);
 
                     // eslint-disable-next-line no-undef

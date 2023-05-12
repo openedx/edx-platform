@@ -23,6 +23,7 @@
                 this.fetchXhr && this.fetchXhr.abort();
                 this.searchTerm = searchTerm || '';
                 this.selectedFacets = facets || {};
+                // eslint-disable-next-line no-var
                 var data = this.preparePostData(0);
                 this.resetState();
                 this.fetchXhr = this.fetch({
@@ -42,6 +43,7 @@
             loadNextPage: function() {
                 // eslint-disable-next-line no-unused-expressions
                 this.fetchXhr && this.fetchXhr.abort();
+                // eslint-disable-next-line no-var
                 var data = this.preparePostData(this.page + 1);
                 this.fetchXhr = this.fetch({
                     data: data,
@@ -62,6 +64,7 @@
             },
 
             preparePostData: function(pageNumber) {
+                // eslint-disable-next-line no-var
                 var data = {
                     search_string: this.searchTerm,
                     page_size: this.pageSize,
@@ -76,6 +79,7 @@
             },
 
             parse: function(response) {
+                // eslint-disable-next-line no-var
                 var results = response.results || [];
                 this.latestModelsCount = results.length;
                 this.totalCount = response.total;

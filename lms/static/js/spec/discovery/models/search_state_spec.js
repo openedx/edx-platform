@@ -4,6 +4,7 @@ define([
 ], function(AjaxHelpers, SearchState) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var JSON_RESPONSE = {
         total: 365,
         results: [
@@ -44,6 +45,7 @@ define([
         });
 
         it('perform search', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             this.search.performSearch('dummy');
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
@@ -55,6 +57,7 @@ define([
         });
 
         it('returns an error', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             this.search.performSearch('');
             AjaxHelpers.respondWithError(requests, 500);
@@ -62,6 +65,7 @@ define([
         });
 
         it('loads next page', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             this.search.performSearch('dummy');
             AjaxHelpers.respondWithJson(requests, JSON_RESPONSE);
@@ -71,6 +75,7 @@ define([
         });
 
         it('shows all results when there are none', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             this.search.performSearch('dummy', {modes: 'SomeOption'});
             // no results

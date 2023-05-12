@@ -8,6 +8,7 @@ define([
 function(Backbone, Signatory) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var SignatoryCollection = Backbone.Collection.extend({
         model: Signatory
     });

@@ -8,6 +8,7 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
     'use strict';
 
     describe('MultipleEnterpriseInterface', function() {
+        // eslint-disable-next-line no-var
         var LEARNER_URL = '/enterprise/api/v1/enterprise-learner/?username=test-learner',
             NEXT_URL = '/dashboard',
             REDIRECT_URL = '/enterprise/select/active/?success_url=%2Fdashboard',
@@ -23,6 +24,7 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
 
         it('gets learner information and checks redirect to enterprise selection page', function() {
             // Spy on Ajax requests
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
 
             // Attempt to fetch a learner
@@ -45,6 +47,7 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
 
         it('checks bypass of enterprise selection page in case of enterprise in URL', function() {
             // Spy on Ajax requests
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             // eslint-disable-next-line no-undef
             spyOn(MultipleEnterpriseInterface, 'getEnterpriseFromUrl').and.returnValue('SomeEnterprise');
@@ -81,6 +84,7 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
 
         it('checks enterprise selection page redirect in case of enterprise activation failure', function() {
             // Spy on Ajax requests
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             // eslint-disable-next-line no-undef
             spyOn(MultipleEnterpriseInterface, 'getEnterpriseFromUrl').and.returnValue('SomeEnterprise');
@@ -118,6 +122,7 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
 
         it('gets learner information and checks that enterprise selection page is bypassed', function() {
             // Spy on Ajax requests
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
 
             // Attempt to fetch a learner
@@ -140,6 +145,7 @@ function(AjaxHelpers, MultipleEnterpriseInterface, Utils) {
 
         it('correctly redirects the user if learner information call fails', function() {
             // Spy on Ajax requests
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
 
             // Attempt to fetch a learner

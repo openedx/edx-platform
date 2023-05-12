@@ -11,6 +11,7 @@ define([
 ], function(ListItemView, ContentGroupEditorView, PartitionGroupDetailsView, gettext) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var PartitionGroupItemView = ListItemView.extend({
         events: {
             'click .delete': 'deleteItem'

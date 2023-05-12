@@ -6,6 +6,7 @@
         'common/js/components/views/paging_header', 'common/js/components/views/paging_footer',
         'edx-ui-toolkit/js/utils/html-utils'],
     function(gettext, _, Backbone, NoteItemView, PagingHeaderView, PagingFooterView, HtmlUtils) {
+        // eslint-disable-next-line no-var
         var TabPanelView = Backbone.View.extend({
             tagName: 'section',
             className: 'tab-panel',
@@ -50,10 +51,12 @@
             },
 
             getNotes: function(collection) {
+                // eslint-disable-next-line no-var
                 var container = document.createDocumentFragment(),
                     scrollToTag = this.options.scrollToTag,
                     view = this.title,
                     notes = _.map(collection, function(model) {
+                        // eslint-disable-next-line no-var
                         var note = new NoteItemView({model: model, scrollToTag: scrollToTag, view: view});
                         container.appendChild(note.render().el);
                         return note;

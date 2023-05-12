@@ -9,9 +9,11 @@ define([
     'use strict';
 
     describe('EnrollmentModal', function() {
+        // eslint-disable-next-line no-var
         var modal;
 
         beforeEach(function() {
+            // eslint-disable-next-line no-var
             var enrollment = new EnrollmentModel(EnrollmentHelpers.mockEnrollmentData);
             enrollment.url = function() {
                 return '/support/enrollment/test-user';
@@ -70,6 +72,7 @@ define([
         });
 
         it('can submit an enrollment change request and hides itself on success', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.enrollment-new-mode').val('verified');
             $('.enrollment-reason').val('Financial Assistance');
@@ -88,6 +91,7 @@ define([
         });
 
         it('shows a message on a server error', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.enrollment-new-mode').val('verified');
             $('.enrollment-reason').val('Financial Assistance');
@@ -98,6 +102,7 @@ define([
         });
 
         it('hides itself on cancel', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             modal.show();
             $('.enrollment-change-cancel').click();

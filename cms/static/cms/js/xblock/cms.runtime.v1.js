@@ -4,8 +4,10 @@ define(['jquery', 'backbone', 'xblock/runtime.v1', 'URI', 'gettext', 'js/utils/m
 function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
+            // eslint-disable-next-line no-var
             var key;
             for (key in parent) {
                 if (__hasProp.call(parent, key)) {
@@ -30,6 +32,7 @@ function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
 
         // eslint-disable-next-line no-use-before-define
         v1.prototype.handlerUrl = function(element, handlerName, suffix, query) {
+            // eslint-disable-next-line no-var
             var uri;
             uri = URI(this.handlerPrefix)
                 .segment($(element).data('usage-id'))
@@ -95,6 +98,7 @@ function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
         };
 
         v1.prototype._handleError = function(data) {
+            // eslint-disable-next-line no-var
             var message, title;
             message = data.message || data.msg;
             if (message) {
@@ -111,6 +115,7 @@ function($, Backbone, XBlock, URI, gettext, ModalUtils, NotificationView) {
         };
 
         v1.prototype._handleSave = function(data) {
+            // eslint-disable-next-line no-var
             var message;
             // Starting to save, so show a notification
             if (data.state === 'start') {

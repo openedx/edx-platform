@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-undef
 define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
+    // eslint-disable-next-line no-var
     var FileUpload = Backbone.Model.extend({
         defaults: {
             title: '',
@@ -25,6 +26,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
         },
         // Return a list of this uploader's valid file types
         fileTypes: function() {
+            // eslint-disable-next-line no-var
             var mimeTypes = _.map(
                     this.attributes.mimeTypes,
                     function(type) {
@@ -41,6 +43,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             return mimeTypes.concat(fileFormats);
         },
         checkTypeValidity: function(file) {
+            // eslint-disable-next-line no-var
             var attrs = this.attributes,
                 getRegExp = function(formats) {
                 // Creates regular expression like: /(?:.+)\.(jpg|png|gif)$/i
@@ -54,6 +57,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
         // Return strings for the valid file types and extensions this
         // uploader accepts, formatted as natural language
         formatValidTypes: function() {
+            // eslint-disable-next-line no-var
             var attrs = this.attributes;
 
             if (attrs.mimeTypes.concat(attrs.fileFormats).length === 1) {
@@ -62,7 +66,9 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                     fileExtensions: '.' + this.fileTypes()[0].toLowerCase()
                 };
             }
+            // eslint-disable-next-line no-var
             var or = gettext('or');
+            // eslint-disable-next-line no-var
             var formatTypes = function(types) {
                 return _.template('<%- initial %> <%- or %> <%- last %>')({
                     initial: _.initial(types).join(', '),

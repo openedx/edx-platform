@@ -9,7 +9,7 @@
      * @param {jquery Element} element
      * @param {Object} options
      */
-        // eslint-disable-next-line consistent-return
+        /* eslint-disable-next-line consistent-return, no-var */
         var VideoPoster = function(element, options) {
             if (!(this instanceof VideoPoster)) {
                 return new VideoPoster(element, options);

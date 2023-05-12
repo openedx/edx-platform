@@ -11,6 +11,7 @@
 
         describe('constructor', function() {
             describe('YT', function() {
+                // eslint-disable-next-line no-var
                 var state;
 
                 beforeEach(function() {
@@ -56,6 +57,7 @@
             });
 
             describe('HTML5', function() {
+                // eslint-disable-next-line no-var
                 var state;
 
                 beforeEach(function() {
@@ -83,7 +85,7 @@
                     });
 
                     it('parse available video speeds', function() {
-                        // eslint-disable-next-line no-undef
+                        /* eslint-disable-next-line no-undef, no-var */
                         var speeds = jasmine.stubbedHtml5Speeds;
 
                         expect(state.speeds).toEqual(speeds);
@@ -107,6 +109,7 @@
         });
 
         describe('YouTube API is not loaded', function() {
+            // eslint-disable-next-line no-var
             var state;
             beforeEach(function() {
                 window.YT = undefined;
@@ -137,7 +140,9 @@
         });
 
         describe('checking start and end times', function() {
+            // eslint-disable-next-line no-var
             var state;
+            // eslint-disable-next-line no-var
             var miniTestSuite = [
                 {
                     itDescription: 'both times are proper',
@@ -195,7 +200,7 @@
 
         // Disabled 11/25/13 due to flakiness in master
         xdescribe('multiple YT on page', function() {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var state1, state2, state3;
 
             beforeEach(function() {
@@ -225,6 +230,7 @@
             it(
                 'check for YT availability is performed only once',
                 function() {
+                    // eslint-disable-next-line no-var
                     var numAjaxCalls = 0;
 
                     // Total ajax calls made.

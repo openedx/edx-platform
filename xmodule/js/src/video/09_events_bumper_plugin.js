@@ -11,6 +11,7 @@
      * @param {Object} options
      * @return {jquery Promise}
      */
+        // eslint-disable-next-line no-var
         var EventsBumperPlugin = function(state, i18n, options) {
             if (!(this instanceof EventsBumperPlugin)) {
                 return new EventsBumperPlugin(state, i18n, options);
@@ -68,6 +69,7 @@
             },
 
             onSkip: function(event, doNotShowAgain) {
+                // eslint-disable-next-line no-var
                 var info = {currentTime: this.getCurrentTime()},
                     eventName = 'edx.video.bumper.' + (doNotShowAgain ? 'dismissed' : 'skipped');
                 this.log(eventName, info);
@@ -90,17 +92,19 @@
             },
 
             getCurrentTime: function() {
+                // eslint-disable-next-line no-var
                 var player = this.state.videoPlayer;
                 return player ? player.currentTime : 0;
             },
 
             getDuration: function() {
+                // eslint-disable-next-line no-var
                 var player = this.state.videoPlayer;
                 return player ? player.duration() : 0;
             },
 
             log: function(eventName, data) {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var logInfo = _.extend({
                     host_component_id: this.state.id,
                     bumper_id: this.state.config.sources[0] || '',

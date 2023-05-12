@@ -9,6 +9,7 @@ define([
 function(gettext, ListView, CertificateItemView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CertificatesListView = ListView.extend({
         tagName: 'div',
         className: 'certificates-list',

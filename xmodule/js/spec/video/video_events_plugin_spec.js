@@ -4,10 +4,12 @@ import '../helper.js';
 (function(undefined) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var describeInfo, state, oldOTBD;
 
     // eslint-disable-next-line no-undef
     describeInfo = new jasmine.DescribeInfo('', function() {
+        // eslint-disable-next-line no-var
         var Logger = window.Logger;
 
         beforeEach(function() {
@@ -206,6 +208,7 @@ import '../helper.js';
         });
 
         it('can destroy itself', function() {
+            // eslint-disable-next-line no-var
             var plugin = state.videoEventsPlugin;
             // eslint-disable-next-line no-undef
             spyOn($.fn, 'off').and.callThrough();

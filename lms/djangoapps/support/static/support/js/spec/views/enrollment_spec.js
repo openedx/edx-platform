@@ -7,6 +7,7 @@ define([
 ], function(_, AjaxHelpers, EnrollmentHelpers, EnrollmentView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var enrollmentView,
         createEnrollmentView = function(options) {
             if (_.isUndefined(options)) {
@@ -32,6 +33,7 @@ define([
         });
 
         it('renders itself when an initial user is provided', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             enrollmentView = createEnrollmentView().render();
             AjaxHelpers.expectRequest(requests, 'GET', '/support/enrollment/test-user', null);
@@ -45,6 +47,7 @@ define([
         });
 
         it('re-renders itself when its collection changes', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             enrollmentView = createEnrollmentView().render();
             // eslint-disable-next-line no-undef
@@ -54,6 +57,7 @@ define([
         });
 
         it('shows a modal dialog to change enrollments', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             enrollmentView = createEnrollmentView().render();
             AjaxHelpers.respondWithJson(requests, [EnrollmentHelpers.mockEnrollmentData]);
@@ -61,6 +65,7 @@ define([
             expect($('.enrollment-modal').length).toBe(1);
         });
         it('renders correct datetime format in UTC', function() {
+            // eslint-disable-next-line no-var
             var $enrollmentResultRow,
                 requests = AjaxHelpers.requests(this);
             enrollmentView = createEnrollmentView().render();

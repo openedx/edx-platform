@@ -5,13 +5,17 @@ import 'jquery.smoothScroll';
 // eslint-disable-next-line no-unused-expressions
 'use strict';
 
-// eslint-disable-next-line import/no-mutable-exports
+/* eslint-disable-next-line import/no-mutable-exports, no-var */
 var toggleSock = function(e) {
     e.preventDefault();
 
+    // eslint-disable-next-line no-var
     var $btnShowSockLabel = $(this).find('.copy-show');
+    // eslint-disable-next-line no-var
     var $btnHideSockLabel = $(this).find('.copy-hide');
+    // eslint-disable-next-line no-var
     var $sock = $('.wrapper-sock');
+    // eslint-disable-next-line no-var
     var $sockContent = $sock.find('.wrapper-inner');
 
     if ($sock.hasClass('is-shown')) {

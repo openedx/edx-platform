@@ -7,9 +7,11 @@
      * Modifies Annotator.Plugin.Store.prototype._onError to show custom error message
      * if sent by server
      */
+        // eslint-disable-next-line no-var
         var originalErrorHandler = Annotator.Plugin.Store.prototype._onError;
         // eslint-disable-next-line consistent-return
         Annotator.Plugin.Store.prototype._onError = function(xhr) {
+            // eslint-disable-next-line no-var
             var serverResponse;
 
             // Try to parse json

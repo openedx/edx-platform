@@ -6,7 +6,9 @@
         'jquery', 'underscore', 'gettext', 'js/edxnotes/views/tab_panel', 'js/edxnotes/views/tab_view',
         'js/edxnotes/views/search_box', 'edx-ui-toolkit/js/utils/html-utils', 'edx-ui-toolkit/js/utils/string-utils'
     ], function($, _, gettext, TabPanelView, TabView, SearchBoxView, HtmlUtils, StringUtils) {
+        // eslint-disable-next-line no-var
         var view = 'Search Results';
+        // eslint-disable-next-line no-var
         var SearchResultsView = TabView.extend({
             PanelConstructor: TabPanelView.extend({
                 id: 'search-results-panel',
@@ -33,6 +35,7 @@
                     ].join(' ');
                 },
                 renderContent: function() {
+                    // eslint-disable-next-line no-var
                     var message = gettext('No results found for "{query_string}". Please try searching again.');
 
                     this.$el.append($('<p />', {
@@ -79,6 +82,7 @@
             },
 
             getSubView: function() {
+                // eslint-disable-next-line no-var
                 var collection = this.getCollection();
                 if (collection) {
                     if (collection.length) {

@@ -2,6 +2,7 @@
     'use strict';
 
     define(['underscore', 'logger'], function(_, Logger) {
+        // eslint-disable-next-line no-var
         var loggers = [],
             NotesLogger, now, destroyLogger;
 
@@ -20,6 +21,7 @@
      * @param  {Object} logger An instance of Logger.
      */
         destroyLogger = function(logger) {
+            // eslint-disable-next-line no-var
             var index = loggers.length,
                 removedLogger;
 
@@ -138,6 +140,7 @@
      * @param  {Number}  timeout   Optional timeout for the ajax request in ms.
      */
         NotesLogger.prototype.emit = function(eventName, data, timeout) {
+            // eslint-disable-next-line no-var
             var args = [eventName, data];
             this.log(eventName, data);
             if (timeout) {
@@ -149,6 +152,7 @@
 
         return {
             getLogger: function(id, mode) {
+                // eslint-disable-next-line no-var
                 var logger = new NotesLogger(id, mode);
                 loggers.push(logger);
                 return logger;

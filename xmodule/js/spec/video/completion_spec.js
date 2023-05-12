@@ -2,6 +2,7 @@
     'use strict';
 
     describe('VideoPlayer completion', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD, completionAjaxCall;
 
         beforeEach(function() {

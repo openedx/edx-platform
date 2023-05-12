@@ -11,6 +11,7 @@
      * @param {Object} options
      * @return {jquery Promise}
      */
+        // eslint-disable-next-line no-var
         var EventsPlugin = function(state, i18n, options) {
             if (!(this instanceof EventsPlugin)) {
                 return new EventsPlugin(state, i18n, options);
@@ -92,6 +93,7 @@
             },
 
             onSkip: function(event, doNotShowAgain) {
+                // eslint-disable-next-line no-var
                 var info = {currentTime: this.getCurrentTime()},
                     eventName = doNotShowAgain ? 'do_not_show_again_video' : 'skip_video';
                 this.log(eventName, info);
@@ -145,17 +147,19 @@
             },
 
             getCurrentTime: function() {
+                // eslint-disable-next-line no-var
                 var player = this.state.videoPlayer;
                 return player ? player.currentTime : 0;
             },
 
             getCurrentLanguage: function() {
+                // eslint-disable-next-line no-var
                 var language = this.state.lang;
                 return language;
             },
 
             log: function(eventName, data) {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var logInfo = _.extend({
                     id: this.state.id,
                     // eslint-disable-next-line no-nested-ternary

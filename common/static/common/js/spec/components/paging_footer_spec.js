@@ -10,6 +10,7 @@ define([
     'use strict';
 
     describe('PagingFooter', function() {
+        // eslint-disable-next-line no-var
         var pagingFooter,
             mockPage = function(currentPage, numPages, collectionLength) {
                 if (_.isUndefined(collectionLength)) {
@@ -31,6 +32,7 @@ define([
 
         beforeEach(function() {
             setFixtures('<div class="paging-footer"></div>');
+            // eslint-disable-next-line no-var
             var collection = new PagingCollection(mockPage(1, 2), {parse: true});
             collection.url = '/test/url/';
 
@@ -70,6 +72,7 @@ define([
 
         describe('Next page button', function() {
             it('does not move forward if a server error occurs', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.$(nextPageCss).click();
                 requests[0].respond(500);
@@ -77,6 +80,7 @@ define([
             });
 
             it('can move to the next page', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.$(nextPageCss).click();
                 AjaxHelpers.respondWithJson(requests, mockPage(2, 2));
@@ -89,6 +93,7 @@ define([
             });
 
             it('should be disabled on the final page', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.$(nextPageCss).click();
                 AjaxHelpers.respondWithJson(requests, mockPage(2, 2));
@@ -98,6 +103,7 @@ define([
 
         describe('Previous page button', function() {
             it('does not move back if a server error occurs', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.collection.reset(mockPage(2, 2), {parse: true});
                 pagingFooter.$(previousPageCss).click();
@@ -106,6 +112,7 @@ define([
             });
 
             it('can go back a page', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.$(nextPageCss).click();
                 AjaxHelpers.respondWithJson(requests, mockPage(2, 2));
@@ -119,6 +126,7 @@ define([
             });
 
             it('should be enabled on the second page', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.$(nextPageCss).click();
                 AjaxHelpers.respondWithJson(requests, mockPage(2, 2));
@@ -132,6 +140,7 @@ define([
             });
 
             it('should show 2 on the second page', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.$(nextPageCss).click();
                 AjaxHelpers.respondWithJson(requests, mockPage(2, 2));
@@ -155,7 +164,7 @@ define([
             });
 
             it('should handle invalid page requests', function() {
-                // eslint-disable-next-line no-unused-vars
+                /* eslint-disable-next-line no-unused-vars, no-var */
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.$(pageNumberInputCss).val('abc');
                 pagingFooter.$(pageNumberInputCss).trigger('change');
@@ -164,6 +173,7 @@ define([
             });
 
             it('should switch pages via the input field', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.$(pageNumberInputCss).val('2');
                 pagingFooter.$(pageNumberInputCss).trigger('change');
@@ -173,6 +183,7 @@ define([
             });
 
             it('should handle AJAX failures when switching pages via the input field', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.$(pageNumberInputCss).val('2');
                 pagingFooter.$(pageNumberInputCss).trigger('change');

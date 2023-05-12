@@ -4,6 +4,7 @@
 // eslint-disable-next-line no-undef
 define(['jquery', 'js/views/baseview'],
     function($, BaseView) {
+        // eslint-disable-next-line no-var
         var BasePage = BaseView.extend({
 
             initialize: function() {
@@ -34,6 +35,7 @@ define(['jquery', 'js/views/baseview'],
              * div with the class 'no-content' will be shown.
              */
             render: function() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.$('.ui-loading').removeClass('is-hidden');
                 this.renderPage().done(function() {

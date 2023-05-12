@@ -3,6 +3,7 @@
     'use strict';
 
     describe('VideoSpeedControl', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
 
         beforeEach(function() {
@@ -27,6 +28,7 @@
                 });
 
                 it('add the video speed control to player', function() {
+                    // eslint-disable-next-line no-var
                     var $secondaryControls = $('.secondary-controls'),
                         li = $secondaryControls.find('.video-speeds li');
 
@@ -61,6 +63,7 @@
             });
 
             describe('when running on non-touch based device', function() {
+                // eslint-disable-next-line no-var
                 var $speedControl, speedEntries, $speedButton, $speedsContainer,
                     KEY = $.ui.keyCode,
 
@@ -124,7 +127,7 @@
 
                 it('UP and DOWN keydown function as expected on speed entries',
                     function() {
-                        // eslint-disable-next-line camelcase
+                        /* eslint-disable-next-line camelcase, no-var */
                         var speed_0_75 = speedEntries.filter(':contains("0.75x")'),
                             // eslint-disable-next-line camelcase
                             speed_1_0 = speedEntries.filter(':contains("1.0x")');

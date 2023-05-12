@@ -8,6 +8,7 @@ define(['js/views/validation',
     'edx-ui-toolkit/js/utils/html-utils'
 ],
 function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
+    // eslint-disable-next-line no-var
     var GradingView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGradingPolicy
         events: {
@@ -27,7 +28,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         },
         initialize: function(options) {
         //  load template for grading view
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var self = this;
             this.template = HtmlUtils.template(
                 $('#course_grade_policy-tpl').text()
@@ -53,10 +54,13 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             this.renderMinimumGradeCredit();
 
             // Create and render the grading type subs
+            // eslint-disable-next-line no-var
             var self = this;
+            // eslint-disable-next-line no-var
             var gradelist = this.$el.find('.course-grading-assignment-list');
             // Undo the double invocation error. At some point, fix the double invocation
             $(gradelist).empty();
+            // eslint-disable-next-line no-var
             var gradeCollection = this.model.get('graders');
             // We need to bind these events here (rather than in
             // initialize), or else we can only press the delete button
@@ -76,7 +80,9 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 },
                 this);
             gradeCollection.each(function(gradeModel) {
+                // eslint-disable-next-line no-var
                 var graderType = gradeModel.get('type');
+                // eslint-disable-next-line no-var
                 var graderTypeAssignmentList = self.courseAssignmentLists[graderType];
                 if (graderTypeAssignmentList === undefined) {
                     graderTypeAssignmentList = [];
@@ -89,7 +95,9 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                         assignmentList: graderTypeAssignmentList
                     })
                 );
+                // eslint-disable-next-line no-var
                 var newEle = gradelist.children().last();
+                // eslint-disable-next-line no-var
                 var newView = new GraderView({
                     el: newEle,
                     model: gradeModel,
@@ -115,10 +123,11 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             minimum_grade_credit: 'course-minimum_grade_credit'
         },
         renderGracePeriod: function() {
+            // eslint-disable-next-line no-var
             var format = function(time) {
                 return time >= 10 ? time.toString() : '0' + time;
             };
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var grace_period = this.model.get('grace_period');
             this.$el.find('#course-grading-graceperiod').val(
                 // eslint-disable-next-line camelcase
@@ -126,7 +135,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
             );
         },
         renderMinimumGradeCredit: function() {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var minimum_grade_credit = this.model.get('minimum_grade_credit');
             this.$el.find('#course-minimum_grade_credit').val(
                 Math.round(parseFloat(minimum_grade_credit) * 100)
@@ -134,12 +143,14 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         },
         setGracePeriod: function(event) {
             this.clearValidationErrors();
+            // eslint-disable-next-line no-var
             var newVal = this.model.parseGracePeriod($(event.currentTarget).val());
             this.model.set('grace_period', newVal, {validate: true});
         },
         setMinimumGradeCredit: function(event) {
             this.clearValidationErrors();
             // get field value in float
+            // eslint-disable-next-line no-var
             var newVal = this.model.parseMinimumGradeCredit($(event.currentTarget).val()) / 100;
             this.model.set('minimum_grade_credit', newVal, {validate: true});
         },
@@ -174,14 +185,19 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         gradeBarWidth: null, // cache of value since it won't change (more certain)
 
         renderCutoffBar: function() {
+            // eslint-disable-next-line no-var
             var gradeBar = this.$el.find('.grade-bar');
             this.gradeBarWidth = gradeBar.width();
+            // eslint-disable-next-line no-var
             var gradelist = gradeBar.children('.grades');
             // HACK fixing a duplicate call issue by undoing previous call effect. Need to figure out why called 2x
             gradelist.empty();
+            // eslint-disable-next-line no-var
             var nextWidth = 100; // first width is 100%
             // Can probably be simplified to one variable now.
+            // eslint-disable-next-line no-var
             var removable = false;
+            // eslint-disable-next-line no-var
             var draggable = false; // first and last are not removable, first is not draggable
             _.each(this.descendingCutoffs, function(cutoff) {
                 HtmlUtils.append(gradelist, this.gradeCutoffTemplate({
@@ -192,6 +208,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 })
                 );
                 if (draggable) {
+                    // eslint-disable-next-line no-var
                     var newBar = gradelist.children().last(); // get the dom object not the unparsed string
                     newBar.resizable({
                         handles: 'e',
@@ -232,17 +249,23 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         startMoveClosure: function() {
         // set min/max widths
+            // eslint-disable-next-line no-var
             var cachethis = this;
+            // eslint-disable-next-line no-var
             var widthPerPoint = cachethis.gradeBarWidth / 100;
             // eslint-disable-next-line no-shadow
             return function(event, ui) {
+                // eslint-disable-next-line no-var
                 var barIndex = ui.element.index();
+                // eslint-disable-next-line no-var
                 var offset = 1;
                 // min and max represent limits not labels
+                // eslint-disable-next-line no-var
                 var min = (barIndex < cachethis.descendingCutoffs.length
                     ? cachethis.descendingCutoffs[barIndex].cutoff + offset
                     : offset);
                 // minus 2 b/c minus 1 is the element we're effecting. It's max is just shy of the next one above it
+                // eslint-disable-next-line no-var
                 var max = (barIndex >= 2 ? cachethis.descendingCutoffs[barIndex - 2].cutoff - offset : 99);
                 ui.element.resizable('option', {minWidth: min * widthPerPoint, maxWidth: max * widthPerPoint});
             };
@@ -250,18 +273,23 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         moveBarClosure: function() {
         // 0th ele doesn't have a bar; so, will never invoke this
+            // eslint-disable-next-line no-var
             var cachethis = this;
             // eslint-disable-next-line no-shadow
             return function(event, ui) {
+                // eslint-disable-next-line no-var
                 var barIndex = ui.element.index();
+                // eslint-disable-next-line no-var
                 var offset = 1;
                 // min and max represent limits not labels (note, can's make smaller than 3 points wide)
+                // eslint-disable-next-line no-var
                 var min = (barIndex < cachethis.descendingCutoffs.length
                     ? cachethis.descendingCutoffs[barIndex].cutoff + offset
                     : offset);
                 // minus 2 b/c minus 1 is the element we're effecting. It's max is just shy of the next one above it
+                // eslint-disable-next-line no-var
                 var max = (barIndex >= 2 ? cachethis.descendingCutoffs[barIndex - 2].cutoff - offset : 100);
-                // eslint-disable-next-line no-mixed-operators
+                /* eslint-disable-next-line no-mixed-operators, no-var */
                 var percentage = Math.min(Math.max(ui.size.width / cachethis.gradeBarWidth * 100, min), max);
                 cachethis.descendingCutoffs[barIndex - 1].cutoff = Math.round(percentage);
                 cachethis.renderGradeRanges();
@@ -270,15 +298,19 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         renderGradeRanges: function() {
         // the labels showing the range e.g., 71-80
+            // eslint-disable-next-line no-var
             var cutoffs = this.descendingCutoffs;
             this.$el.find('.range').each(function(i) {
+                // eslint-disable-next-line no-var
                 var min = (i < cutoffs.length ? cutoffs[i].cutoff : 0);
+                // eslint-disable-next-line no-var
                 var max = (i > 0 ? cutoffs[i - 1].cutoff : 100);
                 $(this).text(min + '-' + max);
             });
         },
 
         stopDragClosure: function() {
+            // eslint-disable-next-line no-var
             var cachethis = this;
             /* eslint-disable-next-line no-shadow, no-unused-vars */
             return function(event, ui) {
@@ -289,6 +321,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         renderGradeLabels: function() {
         // When a grade is removed, keep the remaining grades consistent.
+            // eslint-disable-next-line no-var
             var _this = this;
             if (_this.descendingCutoffs.length === 1 && _this.descendingCutoffs[0].designation === _this.GRADES[0]) {
                 _this.descendingCutoffs[0].designation = 'Pass';
@@ -302,7 +335,9 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         },
         updateDomGradeLabels: function() {
         // Update the DOM elements (Grades)
+            // eslint-disable-next-line no-var
             var _this = this;
+            // eslint-disable-next-line no-var
             var gradeElements = this.$el.find('.grades .letter-grade[contenteditable=true]');
             _.each(gradeElements, function(element, index) {
                 if (index !== 0) { $(element).text(_this.GRADES[index]); }
@@ -322,26 +357,33 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         addNewGrade: function(e) {
             e.preventDefault();
+            // eslint-disable-next-line no-var
             var gradeLength = this.descendingCutoffs.length; // cutoffs doesn't include fail/f so this is only the passing grades
             if (gradeLength > 3) {
             // TODO shouldn't we disable the button
                 return;
             }
+            // eslint-disable-next-line no-var
             var failBarWidth = this.descendingCutoffs[gradeLength - 1].cutoff;
             // going to split the grade above the insertion point in half leaving fail in same place
+            // eslint-disable-next-line no-var
             var nextGradeTop = (gradeLength > 1 ? this.descendingCutoffs[gradeLength - 2].cutoff : 100);
+            // eslint-disable-next-line no-var
             var targetWidth = failBarWidth + ((nextGradeTop - failBarWidth) / 2);
             this.descendingCutoffs.push({designation: this.GRADES[gradeLength], cutoff: failBarWidth});
             this.descendingCutoffs[gradeLength - 1].cutoff = Math.round(targetWidth);
 
+            // eslint-disable-next-line no-var
             var newGradeHtml = this.gradeCutoffTemplate({
                 descriptor: this.GRADES[gradeLength],
                 width: targetWidth,
                 contenteditable: true,
                 removable: true
             });
+            // eslint-disable-next-line no-var
             var gradeDom = this.$el.find('.grades');
             gradeDom.children().last().before(HtmlUtils.ensureHtml(newGradeHtml).toString());
+            // eslint-disable-next-line no-var
             var newEle = gradeDom.children()[gradeLength];
             $(newEle).resizable({
                 handles: 'e',
@@ -365,7 +407,9 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
 
         removeGrade: function(e) {
             e.preventDefault();
+            // eslint-disable-next-line no-var
             var domElement = $(e.currentTarget).closest('li');
+            // eslint-disable-next-line no-var
             var index = domElement.index();
             // copy the boundary up to the next higher grade then remove
             this.descendingCutoffs[index - 1].cutoff = this.descendingCutoffs[index].cutoff;
@@ -379,6 +423,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         },
 
         updateDesignation: function(e) {
+            // eslint-disable-next-line no-var
             var index = $(e.currentTarget).closest('li').index();
             this.descendingCutoffs[index].designation = $(e.currentTarget).html();
             this.saveCutoffs();
@@ -396,8 +441,9 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
         setupCutoffs: function() {
         // Instrument grading scale
         // convert cutoffs to inversely ordered list
+            // eslint-disable-next-line no-var
             var modelCutoffs = this.model.get('grade_cutoffs');
-            // eslint-disable-next-line guard-for-in
+            /* eslint-disable-next-line guard-for-in, no-var */
             for (var cutoff in modelCutoffs) {
                 this.descendingCutoffs.push({designation: cutoff, cutoff: Math.round(modelCutoffs[cutoff] * 100)});
             }
@@ -405,6 +451,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 function(gradeEle) { return -gradeEle.cutoff; });
         },
         revertView: function() {
+            // eslint-disable-next-line no-var
             var self = this;
             this.model.fetch({
                 success: function() {

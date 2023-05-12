@@ -2,8 +2,10 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
+            // eslint-disable-next-line no-var
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -26,6 +28,7 @@
             __extends(ResponseCommentView, _super);
 
             function ResponseCommentView() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.update = function() {
                     return ResponseCommentView.prototype.update.apply(self, arguments);
@@ -100,6 +103,7 @@
             };
 
             ResponseCommentView.prototype._delete = function(event) {
+                // eslint-disable-next-line no-var
                 var $elem, url,
                     self = this;
                 event.preventDefault();
@@ -141,6 +145,7 @@
             };
 
             ResponseCommentView.prototype.update = function(event) {
+                // eslint-disable-next-line no-var
                 var newBody, url,
                     self = this;
                 newBody = this.editView.$('.edit-comment-body textarea').val();

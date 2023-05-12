@@ -1,12 +1,14 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var getModulesList = function(modules) {
         return modules.map(function(moduleName) {
             return {name: moduleName};
         });
     };
 
+    // eslint-disable-next-line no-var
     var jsOptimize = process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE !== undefined
         ? process.env.REQUIRE_BUILD_PROFILE_OPTIMIZE : 'uglify2';
 

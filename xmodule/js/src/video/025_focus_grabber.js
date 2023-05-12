@@ -32,6 +32,7 @@
         [],
         function() {
             return function(state) {
+                // eslint-disable-next-line no-var
                 var dfd = $.Deferred();
 
                 state.focusGrabber = {};
@@ -50,6 +51,7 @@
             // Private functions.
 
             function _makeFunctionsPublic(state) {
+                // eslint-disable-next-line no-var
                 var methodsDict = {
                     // eslint-disable-next-line no-use-before-define
                     disableFocusGrabber: disableFocusGrabber,
@@ -87,6 +89,7 @@
             // Public functions.
 
             function enableFocusGrabber() {
+                // eslint-disable-next-line no-var
                 var tabIndex;
 
                 // When the Focus Grabber is being enabled, there are two different

@@ -17,6 +17,7 @@ import 'jquery.simulate';
 // eslint-disable-next-line camelcase
 function parameterized_suite(label, globalPageOptions) {
     describe(label + ' ContainerPage', function() {
+        // eslint-disable-next-line no-var
         var getContainerPage, renderContainerPage, handleContainerPageRefresh, expectComponents,
             respondWithHtml, model, containerPage, requests, initialDisplayName,
             mockContainerPage = readFixtures('templates/mock/mock-container-page.underscore'),
@@ -33,6 +34,7 @@ function parameterized_suite(label, globalPageOptions) {
             hasMoveModal = globalPageOptions.hasMoveModal;
 
         beforeEach(function() {
+            // eslint-disable-next-line no-var
             var newDisplayName = 'New Display Name';
 
             EditHelpers.installEditTemplates();
@@ -80,7 +82,7 @@ function parameterized_suite(label, globalPageOptions) {
         };
 
         getContainerPage = function(options, componentTemplates) {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var default_options = {
                 model: model,
                 templates: componentTemplates === undefined
@@ -101,6 +103,7 @@ function parameterized_suite(label, globalPageOptions) {
 
         // eslint-disable-next-line no-shadow
         handleContainerPageRefresh = function(requests) {
+            // eslint-disable-next-line no-var
             var request = AjaxHelpers.currentRequest(requests);
             expect(str.startsWith(request.url,
                 '/xblock/locator-container/container_preview')).toBeTruthy();
@@ -112,6 +115,7 @@ function parameterized_suite(label, globalPageOptions) {
 
         expectComponents = function(container, locators) {
             // verify expected components (in expected order) by their locators
+            // eslint-disable-next-line no-var
             var components = $(container).find('.studio-xblock-wrapper');
             expect(components.length).toBe(locators.length);
             // eslint-disable-next-line camelcase
@@ -160,6 +164,7 @@ function parameterized_suite(label, globalPageOptions) {
         });
 
         describe('Editing the container', function() {
+            // eslint-disable-next-line no-var
             var updatedDisplayName = 'Updated Test Container',
                 getDisplayNameWrapper;
 
@@ -172,6 +177,7 @@ function parameterized_suite(label, globalPageOptions) {
             };
 
             it('can edit itself', function() {
+                // eslint-disable-next-line no-var
                 var editButtons, displayNameElement, request;
                 renderContainerPage(this, mockContainerXBlockHtml);
                 displayNameElement = containerPage.$('.page-header-title');
@@ -208,6 +214,7 @@ function parameterized_suite(label, globalPageOptions) {
             });
 
             it('can inline edit the display name', function() {
+                // eslint-disable-next-line no-var
                 var displayNameInput, displayNameWrapper;
                 renderContainerPage(this, mockContainerXBlockHtml);
                 displayNameWrapper = getDisplayNameWrapper();
@@ -228,6 +235,7 @@ function parameterized_suite(label, globalPageOptions) {
             });
 
             it('can show an edit modal for a child xblock', function() {
+                // eslint-disable-next-line no-var
                 var editButtons, request;
                 renderContainerPage(this, mockContainerXBlockHtml);
                 editButtons = containerPage.$('.wrapper-xblock .edit-button');
@@ -245,6 +253,7 @@ function parameterized_suite(label, globalPageOptions) {
             });
 
             it('can show an edit modal for a child xblock with broken JavaScript', function() {
+                // eslint-disable-next-line no-var
                 var editButtons;
                 renderContainerPage(this, mockBadContainerXBlockHtml);
                 editButtons = containerPage.$('.wrapper-xblock .edit-button');
@@ -257,6 +266,7 @@ function parameterized_suite(label, globalPageOptions) {
             });
 
             it('can show a visibility modal for a child xblock if supported for the page', function() {
+                // eslint-disable-next-line no-var
                 var accessButtons, request;
                 renderContainerPage(this, mockContainerXBlockHtml);
                 accessButtons = containerPage.$('.wrapper-xblock .access-button');
@@ -277,6 +287,7 @@ function parameterized_suite(label, globalPageOptions) {
             });
 
             it('can show a move modal for a child xblock', function() {
+                // eslint-disable-next-line no-var
                 var moveButtons;
                 renderContainerPage(this, mockContainerXBlockHtml);
                 moveButtons = containerPage.$('.wrapper-xblock .move-button');
@@ -291,6 +302,7 @@ function parameterized_suite(label, globalPageOptions) {
         });
 
         describe('Editing an xmodule', function() {
+            // eslint-disable-next-line no-var
             var mockXModuleEditor = readFixtures('templates/mock/mock-xmodule-editor.underscore'),
                 newDisplayName = 'New Display Name';
 
@@ -309,6 +321,7 @@ function parameterized_suite(label, globalPageOptions) {
             });
 
             it('can save changes to settings', function() {
+                // eslint-disable-next-line no-var
                 var editButtons, $modal, mockUpdatedXBlockHtml;
                 mockUpdatedXBlockHtml = readFixtures('mock/mock-updated-xblock.underscore');
                 renderContainerPage(this, mockContainerXBlockHtml);
@@ -343,6 +356,7 @@ function parameterized_suite(label, globalPageOptions) {
         });
 
         describe('xblock operations', function() {
+            // eslint-disable-next-line no-var
             var getGroupElement,
                 NUM_COMPONENTS_PER_GROUP = 3,
                 GROUP_TO_TEST = 'A',
@@ -358,6 +372,7 @@ function parameterized_suite(label, globalPageOptions) {
             };
 
             describe('Deleting an xblock', function() {
+                // eslint-disable-next-line no-var
                 var clickDelete, deleteComponent, deleteComponentWithSuccess,
                     promptSpy;
 
@@ -367,6 +382,7 @@ function parameterized_suite(label, globalPageOptions) {
 
                 clickDelete = function(componentIndex, clickNo) {
                     // find all delete buttons for the given group
+                    // eslint-disable-next-line no-var
                     var deleteButtons = getGroupElement().find('.delete-button');
                     expect(deleteButtons.length).toBe(NUM_COMPONENTS_PER_GROUP);
 
@@ -455,6 +471,7 @@ function parameterized_suite(label, globalPageOptions) {
                 });
 
                 it('shows a notification during the delete operation', function() {
+                    // eslint-disable-next-line no-var
                     var notificationSpy = EditHelpers.createNotificationSpy();
                     renderContainerPage(this, mockContainerXBlockHtml);
                     clickDelete(0);
@@ -464,6 +481,7 @@ function parameterized_suite(label, globalPageOptions) {
                 });
 
                 it('does not delete an xblock upon failure', function() {
+                    // eslint-disable-next-line no-var
                     var notificationSpy = EditHelpers.createNotificationSpy();
                     renderContainerPage(this, mockContainerXBlockHtml);
                     clickDelete(0);
@@ -475,11 +493,13 @@ function parameterized_suite(label, globalPageOptions) {
             });
 
             describe('Duplicating an xblock', function() {
+                // eslint-disable-next-line no-var
                 var clickDuplicate, duplicateComponentWithSuccess,
                     refreshXBlockSpies;
 
                 clickDuplicate = function(componentIndex) {
                     // find all duplicate buttons for the given group
+                    // eslint-disable-next-line no-var
                     var duplicateButtons = getGroupElement().find('.duplicate-button');
                     expect(duplicateButtons.length).toBe(NUM_COMPONENTS_PER_GROUP);
 
@@ -533,6 +553,7 @@ function parameterized_suite(label, globalPageOptions) {
                 });
 
                 it('shows a notification when duplicating', function() {
+                    // eslint-disable-next-line no-var
                     var notificationSpy = EditHelpers.createNotificationSpy();
                     renderContainerPage(this, mockContainerXBlockHtml);
                     clickDuplicate(0);
@@ -542,6 +563,7 @@ function parameterized_suite(label, globalPageOptions) {
                 });
 
                 it('does not duplicate an xblock upon failure', function() {
+                    // eslint-disable-next-line no-var
                     var notificationSpy = EditHelpers.createNotificationSpy();
                     renderContainerPage(this, mockContainerXBlockHtml);
                     // eslint-disable-next-line no-undef
@@ -556,6 +578,7 @@ function parameterized_suite(label, globalPageOptions) {
             });
 
             describe('Previews', function() {
+                // eslint-disable-next-line no-var
                 var getButtonIcon, getButtonText;
 
                 // eslint-disable-next-line no-shadow
@@ -576,7 +599,7 @@ function parameterized_suite(label, globalPageOptions) {
                         expect(getButtonText(containerPage)).toBe('');
                     });
 
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-var */
                     var updatePreviewButtonTest = function(show_previews, expected_text) {
                         // eslint-disable-next-line camelcase
                         it('can set preview button to "' + expected_text + '"', function() {
@@ -602,6 +625,7 @@ function parameterized_suite(label, globalPageOptions) {
             });
 
             describe('createNewComponent ', function() {
+                // eslint-disable-next-line no-var
                 var clickNewComponent;
 
                 clickNewComponent = function(index) {
@@ -636,6 +660,7 @@ function parameterized_suite(label, globalPageOptions) {
                     // to add children or allow authors to add children.
                     renderContainerPage(this, mockContainerXBlockHtml);
                     $('.add-xblock-component-button').each(function() {
+                        // eslint-disable-next-line no-var
                         var $htmlAsLink = $($(this).prop('outerHTML').replace(/(<\/?)button/g, '$1a'));
                         $(this).replaceWith($htmlAsLink);
                     });
@@ -648,6 +673,7 @@ function parameterized_suite(label, globalPageOptions) {
                 });
 
                 it('shows a notification while creating', function() {
+                    // eslint-disable-next-line no-var
                     var notificationSpy = EditHelpers.createNotificationSpy();
                     renderContainerPage(this, mockContainerXBlockHtml);
                     clickNewComponent(0);
@@ -666,6 +692,7 @@ function parameterized_suite(label, globalPageOptions) {
                 });
 
                 describe('Template Picker', function() {
+                    // eslint-disable-next-line no-var
                     var showTemplatePicker, verifyCreateHtmlComponent;
 
                     showTemplatePicker = function() {
@@ -673,6 +700,7 @@ function parameterized_suite(label, globalPageOptions) {
                     };
 
                     verifyCreateHtmlComponent = function(test, templateIndex, expectedRequest) {
+                        // eslint-disable-next-line no-var
                         var xblockCount;
                         renderContainerPage(test, mockContainerXBlockHtml);
                         showTemplatePicker();
@@ -707,6 +735,7 @@ function parameterized_suite(label, globalPageOptions) {
                     });
 
                     it('does show the support legend if show_legend is true', function() {
+                        // eslint-disable-next-line no-var
                         var templates = new ComponentTemplates([
                                 {
                                     templates: [
@@ -749,6 +778,7 @@ function parameterized_suite(label, globalPageOptions) {
                     });
 
                     it('does show unsupported level if enabled', function() {
+                        // eslint-disable-next-line no-var
                         var templates = new ComponentTemplates([
                                 {
                                     templates: [
@@ -788,6 +818,7 @@ function parameterized_suite(label, globalPageOptions) {
                     });
 
                     it('does render support level indicators if present in JSON', function() {
+                        // eslint-disable-next-line no-var
                         var templates = new ComponentTemplates([
                                 {
                                     templates: [

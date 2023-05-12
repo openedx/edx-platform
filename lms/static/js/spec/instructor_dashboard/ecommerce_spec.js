@@ -3,6 +3,7 @@ define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce'],
     function(Backbone, $, ExpiryCouponView) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var expiryCouponView;
         describe('edx.instructor_dashboard.ecommerce.ExpiryCouponView', function() {
             beforeEach(function() {
@@ -15,6 +16,7 @@ define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce'],
             });
 
             it('triggers the callback when the checkbox is clicked', function() {
+                // eslint-disable-next-line no-var
                 var target = expiryCouponView.$el.find('input[type="checkbox"]');
                 // eslint-disable-next-line no-undef
                 spyOn(expiryCouponView, 'clicked');
@@ -24,13 +26,14 @@ define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce'],
             });
 
             it('shows the input field when the checkbox is checked', function() {
+                // eslint-disable-next-line no-var
                 var target = expiryCouponView.$el.find('input[type="checkbox"]');
                 target.click();
                 expect(expiryCouponView.$el.find('#coupon_expiration_date').is(':visible')).toBe(true);
             });
 
             it('hides the input field when the checkbox is unchecked', function() {
-                // eslint-disable-next-line no-unused-vars
+                /* eslint-disable-next-line no-unused-vars, no-var */
                 var target = expiryCouponView.$el.find('input[type="checkbox"]');
                 expect(expiryCouponView.$el.find('#coupon_expiration_date')).toHaveAttr('style', 'display: none;');
             });

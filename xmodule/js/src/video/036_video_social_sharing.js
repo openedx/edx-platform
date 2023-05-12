@@ -6,6 +6,7 @@
     define(
         'video/036_video_social_sharing.js', ['underscore'],
         function(_) {
+            // eslint-disable-next-line no-var
             var VideoSocialSharingHandler;
 
             /**
@@ -44,7 +45,9 @@
 
                 // Fire an analytics event on share button click.
                 clickHandler: function(event) {
+                    // eslint-disable-next-line no-var
                     var self = this;
+                    // eslint-disable-next-line no-var
                     var source = $(event.currentTarget).data('source');
                     self.sendAnalyticsEvent(source);
                 },

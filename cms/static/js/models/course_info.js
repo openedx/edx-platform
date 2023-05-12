@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-undef
 define(['backbone'], function(Backbone) {
     // single per course holds the updates and handouts
+    // eslint-disable-next-line no-var
     var CourseInfo = Backbone.Model.extend({
         // This model class is not suited for restful operations and is considered just a server side initialized container
         url: '',

@@ -5,8 +5,10 @@ define(['jquery',
     'common/js/components/utils/view_utils'],
 function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
     describe('Course listing page', function() {
+        // eslint-disable-next-line no-var
         var mockIndexPageHTML = readFixtures('mock/mock-index-page.underscore');
 
+        // eslint-disable-next-line no-var
         var fillInFields = function(org, number, run, name) {
             $('.new-course-org').val(org);
             $('.new-course-number').val(number);
@@ -14,6 +16,7 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
             $('.new-course-name').val(name);
         };
 
+        // eslint-disable-next-line no-var
         var fillInLibraryFields = function(org, number, name) {
             $('.new-library-org').val(org).keyup();
             $('.new-library-number').val(number).keyup();
@@ -32,8 +35,9 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
         });
 
         it('can dismiss notifications', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var reloadSpy = spyOn(ViewUtils, 'reload');
             $('.dismiss-button').click();
             AjaxHelpers.expectJsonRequest(requests, 'DELETE', 'dummy_dismiss_url');
@@ -42,8 +46,9 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
         });
 
         it('saves new courses', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var redirectSpy = spyOn(ViewUtils, 'redirect');
             $('.new-course-button').click();
             AjaxHelpers.expectJsonRequest(requests, 'GET', '/organizations');
@@ -73,6 +78,7 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
         });
 
         it('displays an error when saving fails', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.new-course-button').click();
             AjaxHelpers.expectJsonRequest(requests, 'GET', '/organizations');
@@ -90,8 +96,9 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
         });
 
         it('saves new libraries', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var redirectSpy = spyOn(ViewUtils, 'redirect');
             $('.new-library-button').click();
             fillInLibraryFields('DemoX', 'DM101', 'Demo library');
@@ -108,12 +115,15 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
         });
 
         it('displays an error when a required field is blank', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.new-library-button').click();
+            // eslint-disable-next-line no-var
             var values = ['DemoX', 'DM101', 'Demo library'];
             // Try making each of these three values empty one at a time and ensure the form won't submit:
+            // eslint-disable-next-line no-var
             for (var i = 0; i < values.length; i++) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var values_with_blank = values.slice();
                 // eslint-disable-next-line camelcase
                 values_with_blank[i] = '';
@@ -137,6 +147,7 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
         });
 
         it('displays an error when saving a library fails', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             $('.new-library-button').click();
             fillInLibraryFields('DemoX', 'DM101', 'Demo library');
@@ -151,7 +162,7 @@ function($, AjaxHelpers, ViewHelpers, IndexUtils, ViewUtils) {
         });
 
         it('can switch tabs', function() {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var $courses_tab = $('.courses-tab'),
                 // eslint-disable-next-line camelcase
                 $libraraies_tab = $('.libraries-tab');

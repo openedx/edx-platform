@@ -159,6 +159,7 @@ describe('ModuleEdit', function() {
                 return expect(this.moduleEdit.delegateEvents).toHaveBeenCalled();
             });
             it('loads the editing view via ajax on demand', function() {
+                // eslint-disable-next-line no-var
                 var mockXBlockEditorHtml;
                 expect($.ajax).not.toHaveBeenCalledWith({
                     url: '/xblock/' + this.moduleEdit.model.id + '/studio_view',
@@ -230,10 +231,12 @@ describe('ModuleEdit', function() {
                 return expect(this.moduleEdit.delegateEvents).toHaveBeenCalled();
             });
             it('loads inline css from fragments', function() {
+                // eslint-disable-next-line no-var
                 var args = '<style type="text/css">inline-css</style>';
                 return expect($('head').append).toHaveBeenCalledWith(args);
             });
             it('loads css urls from fragments', function() {
+                // eslint-disable-next-line no-var
                 var args = '<link rel="stylesheet" href="css-url" type="text/css">';
                 return expect($('head').append).toHaveBeenCalledWith(args);
             });
@@ -250,6 +253,7 @@ describe('ModuleEdit', function() {
                 return expect($.fn.append).not.toHaveBeenCalledWith('not-head-html');
             });
             it("doesn't reload resources", function() {
+                // eslint-disable-next-line no-var
                 var count;
                 count = $('head').append.calls.count();
                 $.ajax.calls.mostRecent().args[0].success({
@@ -275,6 +279,7 @@ describe('ModuleEdit', function() {
             });
             it('loads the .xmodule-display inside the module editor', function() {
                 expect(XBlock.initializeBlock).toHaveBeenCalled();
+                // eslint-disable-next-line no-var
                 var sel = '.xblock-student_view';
                 return expect(XBlock.initializeBlock.calls.mostRecent().args[0].get(0)).toBe($(sel).get(0));
             });

@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-undef
 define(['js/models/xblock_info'],
     function(XBlockInfo) {
+        // eslint-disable-next-line no-var
         var CustomSyncXBlockInfo = XBlockInfo.extend({
             sync: function(method, model, options) {
                 options.url = (this.urlRoots[method] || this.urlRoot) + '/' + this.get('id');

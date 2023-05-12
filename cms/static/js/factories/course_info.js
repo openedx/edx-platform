@@ -6,7 +6,7 @@ define([
     'use strict';
 
     return function(updatesUrl, handoutsLocator, baseAssetUrl) {
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var course_updates = new CourseUpdateCollection(),
             // eslint-disable-next-line camelcase
             course_handouts, editor;

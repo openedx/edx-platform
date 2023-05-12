@@ -1,7 +1,7 @@
 /**
  * View for the "face photo" step in the payment/verification flow.
  */
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function($) {
@@ -20,6 +20,7 @@ var edx = edx || {};
         },
 
         postRender: function() {
+            // eslint-disable-next-line no-var
             var webcam = edx.verify_student.getSupportedWebcamView({
                 el: $('#facecam'),
                 model: this.model,

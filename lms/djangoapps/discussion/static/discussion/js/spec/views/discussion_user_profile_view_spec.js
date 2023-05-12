@@ -16,7 +16,9 @@ function(_, $, URI, DiscussionUtil, DiscussionThreadProfileView, Discussion,
     'use strict';
 
     describe('DiscussionUserProfileView', function() {
+        // eslint-disable-next-line no-var
         var createDiscussionUserProfileView = function() {
+            // eslint-disable-next-line no-var
             var discussion = DiscussionSpecHelper.createTestDiscussion({}),
                 courseSettings = DiscussionSpecHelper.createTestCourseSettings();
 
@@ -33,18 +35,21 @@ function(_, $, URI, DiscussionUtil, DiscussionThreadProfileView, Discussion,
 
         describe('thread list in user profile page', function() {
             it('should render', function() {
+                // eslint-disable-next-line no-var
                 var discussionUserProfileView = createDiscussionUserProfileView().render(),
                     threadListView = discussionUserProfileView.discussionThreadListView.render();
                 expect(threadListView.$('.forum-nav-thread-list').length).toBe(1);
             });
 
             it('should ensure discussion thread list view mode is all', function() {
+                // eslint-disable-next-line no-var
                 var discussionUserProfileView = createDiscussionUserProfileView().render(),
                     threadListView = discussionUserProfileView.discussionThreadListView.render();
                 expect(threadListView.mode).toBe('user');
             });
 
             it('should not show the thread list unread unanswered filter', function() {
+                // eslint-disable-next-line no-var
                 var discussionUserProfileView = createDiscussionUserProfileView().render(),
                     threadListView = discussionUserProfileView.discussionThreadListView.render();
                 expect(threadListView.$('.forum-nav-filter-main')).toHaveClass('is-hidden');

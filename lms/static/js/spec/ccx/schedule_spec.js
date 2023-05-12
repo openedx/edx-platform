@@ -2,12 +2,15 @@
 define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
     function(AjaxHelpers) {
         describe('edx.ccx.schedule.ScheduleView', function() {
+            // eslint-disable-next-line no-var
             var view = null;
+            // eslint-disable-next-line no-var
             var data;
 
             beforeEach(function() {
                 loadFixtures('js/fixtures/ccx/schedule.html');
 
+                // eslint-disable-next-line no-var
                 var scheduleFixture = readFixtures('templates/ccx/schedule.underscore');
                 appendSetFixtures(
                     '<script id="schedule_template" type="text/template" >' + scheduleFixture + '</script>'
@@ -63,11 +66,13 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             });
 
             it('finds a unit', function() {
+                // eslint-disable-next-line no-var
                 var unit = view.find_unit(view.schedule, 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b');
                 expect(unit).toEqual(data[0]);
             });
 
             it('hides a unit', function() {
+                // eslint-disable-next-line no-var
                 var unit = view.find_unit(view.schedule, 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b');
                 unit.hidden = false;
                 view.hide(unit);
@@ -75,12 +80,14 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             });
 
             it('shows a unit', function() {
+                // eslint-disable-next-line no-var
                 var unit = view.find_unit(view.schedule, 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b');
                 view.show(unit);
                 expect(unit.hidden).toBe(false);
             });
 
             it('applies function to schedule nodes', function() {
+                // eslint-disable-next-line no-var
                 var unit = view.find_unit(view.schedule, 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b');
                 expect(unit.hidden).toBe(true);
                 view.schedule_apply(view.schedule, view.show);
@@ -99,6 +106,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                 expect(view.sequential_select.children('option').length).toEqual(0);
                 view.chapter_select.change();
                 expect(view.sequential_select.prop('disabled')).toEqual(true);
+                // eslint-disable-next-line no-var
                 var val = 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b';
                 view.chapter_select.val(val);
                 view.chapter_select.change();
@@ -108,6 +116,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             });
 
             it('selects a unit and adds sections to dropdown', function() {
+                // eslint-disable-next-line no-var
                 var val = 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b';
                 view.chapter_select.val(val);
                 view.chapter_select.change();
@@ -123,6 +132,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             });
 
             it('selects a section', function() {
+                // eslint-disable-next-line no-var
                 var val = 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b';
                 view.chapter_select.val(val);
                 view.chapter_select.change();
@@ -136,6 +146,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             });
 
             it('adds a unit', function() {
+                // eslint-disable-next-line no-var
                 var val = 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b';
                 view.chapter_select.val(val);
                 view.chapter_select.change();
@@ -146,6 +157,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                 val = 'i4x://edX/DemoX/vertical/vertical_0270f6de40fc',
                 view.vertical_select.val(val);
                 view.vertical_select.change();
+                // eslint-disable-next-line no-var
                 var unit = view.find_unit(view.schedule, 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b');
                 view.set_datetime('start', '2015-12-12 10:00');
                 view.set_datetime('due', '2015-12-12 10:30');
@@ -155,6 +167,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             });
 
             it('add unit when start date is greater the due date', function() {
+                // eslint-disable-next-line no-var
                 var val = 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b';
                 view.chapter_select.val(val);
                 view.chapter_select.change();
@@ -164,6 +177,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                 val = 'i4x://edX/DemoX/vertical/vertical_0270f6de40fc';
                 view.vertical_select.val(val);
                 view.vertical_select.change();
+                // eslint-disable-next-line no-var
                 var unit = view.find_unit(view.schedule, 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b');
                 // start date is before due date
                 view.set_datetime('start', '2015-11-13 10:45');
@@ -175,6 +189,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             });
 
             it('add unit when start date is missing', function() {
+                // eslint-disable-next-line no-var
                 var val = 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b';
                 view.chapter_select.val(val);
                 view.chapter_select.change();
@@ -184,6 +199,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
                 val = 'i4x://edX/DemoX/vertical/vertical_0270f6de40fc';
                 view.vertical_select.val(val);
                 view.vertical_select.change();
+                // eslint-disable-next-line no-var
                 var unit = view.find_unit(view.schedule, 'i4x://edX/DemoX/chapter/d8a6192ade314473a78242dfeedfbf5b');
                 // start date is missing
                 view.set_datetime('start', null);
@@ -203,6 +219,7 @@ define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/ccx/schedule'],
             it('sets date and time fields from datetime string', function() {
                 $('form#add-unit input[name=start_date]').val('2015-12-12');
                 $('form#add-unit input[name=start_time]').val('10:45');
+                // eslint-disable-next-line no-var
                 var datetime = view.get_datetime('start');
                 expect(datetime).toBe('2015-12-12 10:45');
             });

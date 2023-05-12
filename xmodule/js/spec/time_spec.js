@@ -30,6 +30,7 @@ describe('Time', function() {
 
     describe('formatFull', function() {
         it('gives correct string for times', function() {
+            // eslint-disable-next-line no-var
             var testTimes = [
                 [0, '00:00:00'], [60, '00:01:00'],
                 [488, '00:08:08'], [2452, '00:40:52'],
@@ -39,6 +40,7 @@ describe('Time', function() {
             ];
 
             $.each(testTimes, function(index, times) {
+                // eslint-disable-next-line no-var
                 var timeInt = times[0],
                     timeStr = times[1];
 

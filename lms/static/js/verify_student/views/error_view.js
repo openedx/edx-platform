@@ -1,7 +1,7 @@
 /**
  * Display top-level errors in the payment/verification flow.
  */
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function($, _, Backbone) {
@@ -12,6 +12,7 @@ var edx = edx || {};
     edx.verify_student.ErrorView = Backbone.View.extend({
 
         initialize: function(obj) {
+            // eslint-disable-next-line no-var
             var ErrorModel = Backbone.Model.extend({});
             this.model = obj.model || new ErrorModel({
                 errorTitle: '',
@@ -22,6 +23,7 @@ var edx = edx || {};
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var renderedHtml = edx.HtmlUtils.template($('#error-tpl').html())(
                 {
                     errorTitle: this.model.get('errorTitle'),

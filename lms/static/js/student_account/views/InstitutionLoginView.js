@@ -7,7 +7,7 @@
                 el: '#institution_login-form',
 
                 initialize: function(data) {
-                    // eslint-disable-next-line eqeqeq
+                    /* eslint-disable-next-line eqeqeq, no-var */
                     var tpl = data.mode == 'register' ? '#institution_register-tpl' : '#institution_login-tpl';
                     this.tpl = $(tpl).html();
                     this.providers = data.thirdPartyAuth.secondaryProviders || [];

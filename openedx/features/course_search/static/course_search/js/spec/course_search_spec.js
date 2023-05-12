@@ -72,6 +72,7 @@ define([
             });
 
             it('sends a request without a course ID', function() {
+                // eslint-disable-next-line no-var
                 var collection = new SearchCollection([]);
                 // eslint-disable-next-line no-undef
                 spyOn($, 'ajax');
@@ -80,6 +81,7 @@ define([
             });
 
             it('sends a request with course ID', function() {
+                // eslint-disable-next-line no-var
                 var collection = new SearchCollection([], {courseId: 'edx101'});
                 // eslint-disable-next-line no-undef
                 spyOn($, 'ajax');
@@ -88,7 +90,9 @@ define([
             });
 
             it('sends a request and parses the json result', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var response = {
                     total: 2,
                     access_denied_count: 1,
@@ -113,6 +117,7 @@ define([
             });
 
             it('handles errors', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 this.collection.performSearch('search string');
                 AjaxHelpers.respondWithError(requests, 500);
@@ -121,7 +126,9 @@ define([
             });
 
             it('loads next page', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var response = {total: 35, results: []};
                 this.collection.loadNextPage();
                 AjaxHelpers.respondWithJson(requests, response);
@@ -130,8 +137,11 @@ define([
             });
 
             it('sends correct paging parameters', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var searchString = 'search string';
+                // eslint-disable-next-line no-var
                 var response = {total: 52, results: []};
                 this.collection.performSearch(searchString);
                 AjaxHelpers.respondWithJson(requests, response);
@@ -147,7 +157,9 @@ define([
             });
 
             it('has next page', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var response = {total: 35, access_denied_count: 5, results: []};
                 this.collection.performSearch('search string');
                 AjaxHelpers.respondWithJson(requests, response);
@@ -158,7 +170,9 @@ define([
             });
 
             it('aborts any previous request', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var response = {total: 35, results: []};
 
                 this.collection.performSearch('old search');
@@ -217,6 +231,7 @@ define([
             });
 
             it('triggers a search event', function() {
+                // eslint-disable-next-line no-var
                 var query = 'mercury';
                 this.router.search(query);
                 expect(this.onSearch).toHaveBeenCalledWith(query);
@@ -288,6 +303,7 @@ define([
 
         describe('SearchForm', function() {
             function trimsInputString() {
+                // eslint-disable-next-line no-var
                 var term = '    search string  ';
                 $('.search-field').val(term);
                 $('form').trigger('submit');
@@ -295,6 +311,7 @@ define([
             }
 
             function doesSearch() {
+                // eslint-disable-next-line no-var
                 var term = '  search string  ';
                 $('.search-field').val(term);
                 this.form.doSearch(term);
@@ -306,6 +323,7 @@ define([
             }
 
             function triggersSearchEvent() {
+                // eslint-disable-next-line no-var
                 var term = 'search string';
                 $('.search-field').val(term);
                 $('form').trigger('submit');
@@ -382,6 +400,7 @@ define([
             }
 
             function rendersSearchResults() {
+                // eslint-disable-next-line no-var
                 var searchResults = [{
                     location: ['section', 'subsection', 'unit'],
                     url: '/some/url/to/content',
@@ -422,7 +441,7 @@ define([
             }
 
             function triggersNextPageEvent() {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var onNext = jasmine.createSpy('onNext');
                 this.resultsView.on('next', onNext);
                 this.collection.totalCount = 123;
@@ -447,6 +466,7 @@ define([
             }
 
             function beforeEachHelper(SearchResultsView) {
+                // eslint-disable-next-line no-var
                 var MockCollection = Backbone.Collection.extend({
                     hasNextPage: function() {},
                     latestModelsCount: 0,
@@ -503,6 +523,7 @@ define([
             }
 
             function performsSearch() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 $('.search-field').val('search string');
                 $('.search-button').trigger('click');
@@ -525,6 +546,7 @@ define([
             }
 
             function showsErrorMessage() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 $('.search-field').val('search string');
                 $('.search-button').trigger('click');
@@ -541,6 +563,7 @@ define([
             }
 
             function cancelsSearchRequest() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 // send search request to server
                 $('.search-field').val('search string');
@@ -558,7 +581,9 @@ define([
             }
 
             function loadsNextPage() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
+                // eslint-disable-next-line no-var
                 var response = {
                     total: 1337,
                     access_denied_count: 12,
@@ -572,6 +597,7 @@ define([
                         }
                     }]
                 };
+                // eslint-disable-next-line no-var
                 var body;
                 $('.search-field').val('query');
                 $('.search-button').trigger('click');
@@ -587,6 +613,7 @@ define([
             }
 
             function navigatesToSearch() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 Backbone.history.start();
                 Backbone.history.loadUrl('search/query');
@@ -595,6 +622,7 @@ define([
 
             describe('CourseSearchApp', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-var
                     var courseId = 'a/b/c';
                     loadFixtures('course_search/fixtures/course_content_page.html');
                     CourseSearchFactory({
@@ -646,6 +674,7 @@ define([
                 it('loads next page', loadsNextPage);
                 it('navigates to search', navigatesToSearch);
                 it('returns to course list', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     $('.search-field').val('search string');
                     $('.search-button').trigger('click');
@@ -670,6 +699,7 @@ define([
 
             describe('Course Search Results Page', function() {
                 beforeEach(function() {
+                    // eslint-disable-next-line no-var
                     var courseId = 'a/b/c';
                     loadFixtures('course_search/fixtures/course_search_results_page.html');
                     CourseSearchFactory({

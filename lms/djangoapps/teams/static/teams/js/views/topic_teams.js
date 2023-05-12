@@ -20,6 +20,7 @@
         // 3. create a new team
         // Be careful to start each link with the appropriate start indicator
         // (e.g. {browse_span_start} for #1) and finish it with {span_end}.
+        // eslint-disable-next-line no-var
         var actionMessage = interpolate_text( // eslint-disable-line no-undef
             _.escape(gettext(
                 '{browse_span_start}Browse teams in other '
@@ -35,10 +36,12 @@
             }
         );
 
+        // eslint-disable-next-line no-var
         var canUserCreateTeamErrorMessage = gettext(
             'An error occurred while looking up team membership. Try refreshing the page.'
         );
 
+        // eslint-disable-next-line no-var
         var TopicTeamsView = TeamsView.extend({
             events: {
                 'click a.browse-teams': 'browseTeams',
@@ -54,6 +57,7 @@
             },
 
             checkIfUserCanCreateTeam: function() {
+                // eslint-disable-next-line no-var
                 var deferred = $.Deferred();
                 if (this.context.userInfo.staff || this.context.userInfo.privileged) {
                     deferred.resolve(true);
@@ -103,6 +107,7 @@
             },
 
             searchTeams: function(event) {
+                // eslint-disable-next-line no-var
                 var $searchField = $('.page-header-search .search-field');
                 event.preventDefault();
                 $searchField.focus();
@@ -129,6 +134,7 @@
             },
 
             getTopic: function(topicId) { // eslint-disable-line no-unused-vars
+                // eslint-disable-next-line no-var
                 var deferred = $.Deferred();
                 deferred.resolve(this.model);
                 return deferred.promise();

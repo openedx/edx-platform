@@ -12,6 +12,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
 ) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var expandedLocators, CourseOutlinePage;
 
     CourseOutlinePage = BasePage.extend({
@@ -41,6 +42,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         outlineViewClass: CourseOutlineView,
 
         initialize: function() {
+            // eslint-disable-next-line no-var
             var self = this;
             this.initialState = this.options.initialState;
             BasePage.prototype.initialize.call(this);
@@ -57,7 +59,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         },
 
         setCollapseExpandVisibility: function() {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var has_content = this.hasContent(),
                 $collapseExpandButton = $('.button-toggle-expand-collapse');
             // eslint-disable-next-line camelcase
@@ -69,7 +71,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         },
 
         renderPage: function() {
-            // eslint-disable-next-line no-shadow
+            /* eslint-disable-next-line no-shadow, no-var */
             var setInitialExpandState = function(xblockInfo, expandedLocators) {
                 if (xblockInfo.isCourse() || xblockInfo.isChapter()) {
                     expandedLocators.add(xblockInfo.get('id'));
@@ -152,11 +154,13 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         },
 
         toggleExpandCollapse: function(event) {
+            // eslint-disable-next-line no-var
             var toggleButton = this.$('.button-toggle-expand-collapse'),
                 collapse = toggleButton.hasClass('collapse-all');
             event.preventDefault();
             toggleButton.toggleClass('collapse-all expand-all');
             this.$('.list-sections > li').each(function(index, domElement) {
+                // eslint-disable-next-line no-var
                 var $element = $(domElement);
                 if (collapse) {
                     $element.addClass('is-collapsed');
@@ -176,8 +180,10 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         },
 
         handleReIndexEvent: function(event) {
+            // eslint-disable-next-line no-var
             var self = this;
             event.preventDefault();
+            // eslint-disable-next-line no-var
             var $target = $(event.currentTarget);
             $target.css('cursor', 'wait');
             this.startReIndex($target.attr('href'))
@@ -199,6 +205,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         },
 
         onIndexSuccess: function(data) {
+            // eslint-disable-next-line no-var
             var msg = new AlertView.Announcement({
                 title: gettext('Course Index'),
                 message: data.user_message
@@ -207,6 +214,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         },
 
         onIndexError: function(data) {
+            // eslint-disable-next-line no-var
             var msg = new NoteView.Error({
                 title: gettext('There were errors reindexing course.'),
                 message: data.user_message
@@ -243,6 +251,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
              * Remove the locator from the set if it is present.
              */
         remove: function(locator) {
+            // eslint-disable-next-line no-var
             var index = this.locators.indexOf(locator);
             if (index >= 0) {
                 this.locators.splice(index, 1);

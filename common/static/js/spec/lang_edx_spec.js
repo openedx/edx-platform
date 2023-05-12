@@ -3,7 +3,7 @@
     'use strict';
 
     describe('Language change test for lang-edx.js', function() {
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var $lang_selector,
             deferred;
 
@@ -60,6 +60,7 @@
         it('should call refresh on ajax failure', function() {
             // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function() {
+                // eslint-disable-next-line no-var
                 var d = $.Deferred();
                 d.reject();
                 return d.promise();

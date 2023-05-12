@@ -5,6 +5,7 @@ import * as Time from 'time.js';
     'use strict';
 
     describe('VideoPlayer Save State plugin', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
 
         beforeEach(function() {
@@ -32,6 +33,7 @@ import * as Time from 'time.js';
         });
 
         describe('saveState function', function() {
+            // eslint-disable-next-line no-var
             var videoPlayerCurrentTime, newCurrentTime, speed;
 
             // We make sure that `currentTime` is a float. We need to test
@@ -139,6 +141,7 @@ import * as Time from 'time.js';
 
             function itSpec(value) {
                 state.config.saveStateEnabled = true;
+                // eslint-disable-next-line no-var
                 var asyncVal = value.asyncVal,
                     speedVal = value.speedVal,
                     positionVal = value.positionVal,
@@ -268,6 +271,7 @@ import * as Time from 'time.js';
         });
 
         it('can destroy itself', function() {
+            // eslint-disable-next-line no-var
             var plugin = state.videoSaveStatePlugin;
             // eslint-disable-next-line no-undef
             spyOn($.fn, 'off').and.callThrough();

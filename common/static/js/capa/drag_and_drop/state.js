@@ -4,6 +4,7 @@
         return State;
 
         function State(problemId) {
+            // eslint-disable-next-line no-var
             var state;
 
             state = {
@@ -49,6 +50,7 @@
         }
 
         function makeSalt() {
+            // eslint-disable-next-line no-var
             var text, possible, i;
 
             text = '';

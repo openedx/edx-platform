@@ -9,6 +9,7 @@
      * @return {jquery Promise}
      */
     define('video/09_completion.js', [], function() {
+        // eslint-disable-next-line no-var
         var VideoCompletionHandler = function(state) {
             if (!(this instanceof VideoCompletionHandler)) {
                 return new VideoCompletionHandler(state);
@@ -68,6 +69,7 @@
              *  When destroy is triggered, clean up outstanding resources.
              */
             bindHandlers: function() {
+                // eslint-disable-next-line no-var
                 var self = this;
 
                 /** Event handler to check if the video is complete, and submit
@@ -110,6 +112,7 @@
 
             /** Handler to call when a timeupdate event is triggered */
             handleTimeUpdate: function(currentTime) {
+                // eslint-disable-next-line no-var
                 var duration;
                 if (this.isComplete) {
                     return;
@@ -136,6 +139,7 @@
 
             /** Handler to call when youtube metadata is received */
             checkMetadata: function() {
+                // eslint-disable-next-line no-var
                 var metadata = this.state.metadata[this.state.youtubeId()];
 
                 // https://developers.google.com/youtube/v3/docs/videos#contentDetails.contentRating.ytRating
@@ -151,7 +155,9 @@
 
             /** Submit completion to the LMS */
             markCompletion: function(currentTime) {
+                // eslint-disable-next-line no-var
                 var self = this;
+                // eslint-disable-next-line no-var
                 var errmsg;
                 this.isComplete = true;
                 this.lastSentTime = currentTime;

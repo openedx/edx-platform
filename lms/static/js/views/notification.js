@@ -1,4 +1,5 @@
 (function(Backbone, $, _) {
+    // eslint-disable-next-line no-var
     var NotificationView = Backbone.View.extend({
         events: {
             'click .action-primary': 'triggerCallback'
@@ -24,6 +25,7 @@
 
         triggerCallback: function(event) {
             event.preventDefault();
+            // eslint-disable-next-line no-var
             var actionCallback = this.model.get('actionCallback');
             if (actionCallback) {
                 actionCallback(this);

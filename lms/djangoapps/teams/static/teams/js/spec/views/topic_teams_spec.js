@@ -10,8 +10,10 @@ define([
     'use strict';
 
     describe('Topic Teams View', function() {
+        // eslint-disable-next-line no-var
         var requests, teamsView;
 
+        // eslint-disable-next-line no-var
         var verifyTeamsetTeamsRequest = function(hasTeams) {
             AjaxHelpers.expectRequestURL(
                 requests,
@@ -29,11 +31,15 @@ define([
             AjaxHelpers.expectNoRequests(requests);
         };
 
+        // eslint-disable-next-line no-var
         var createTopicTeamsView = function(_options) {
+            // eslint-disable-next-line no-var
             var options = _options || {};
+            // eslint-disable-next-line no-var
             var onTeamInTeamset = options.onTeamInTeamset || false,
                 isInstructorManagedTopic = options.isInstructorManagedTopic || false;
 
+            // eslint-disable-next-line no-var
             var result, topicTeamsView;
 
             requests = AjaxHelpers.requests(this);
@@ -58,7 +64,9 @@ define([
             return result;
         };
 
+        // eslint-disable-next-line no-var
         var verifyActions = function(showActions) {
+            // eslint-disable-next-line no-var
             var expectedTitle = 'Are you having trouble finding a team to join?',
                 expectedMessage = 'Browse teams in other topics or search teams in this topic. '
                     + 'If you still can\'t find a team to join, create a new team in this topic.',
@@ -81,12 +89,15 @@ define([
         });
 
         it('can render itself', function() {
+            // eslint-disable-next-line no-var
             var testTeamData = TeamSpecHelpers.createMockTeamData(1, 5);
+            // eslint-disable-next-line no-var
             var options = {
                 teams: TeamSpecHelpers.createMockTeams({
                     results: testTeamData
                 })
             };
+            // eslint-disable-next-line no-var
             var footerEl;
 
             teamsView = createTopicTeamsView(options);
@@ -137,6 +148,7 @@ define([
         });
 
         it('shows actions for a privileged user already in a team', function() {
+            // eslint-disable-next-line no-var
             var options = {
                 userInfo: {
                     privileged: true,
@@ -149,6 +161,7 @@ define([
         });
 
         it('shows actions for a staff user already in a team', function() {
+            // eslint-disable-next-line no-var
             var options = {
                 userInfo: {
                     privileged: false,

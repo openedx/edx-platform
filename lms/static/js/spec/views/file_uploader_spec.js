@@ -3,6 +3,7 @@ define(['backbone', 'jquery', 'js/views/file_uploader', 'common/js/spec_helpers/
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/models/notification', 'string_utils'],
 function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, NotificationModel) {
     describe('FileUploaderView', function() {
+        // eslint-disable-next-line no-var
         var verifyTitle, verifyInputLabel, verifyInputTip, verifySubmitButton, verifyExtensions, verifyText,
             verifyFileUploadOption, verifyNotificationMessage, verifySubmitButtonEnabled, mimicUpload,
             respondWithSuccess, respondWithError, fileUploaderView,
@@ -21,6 +22,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
         verifySubmitButton = function(expectedButton) { verifyText('.submit-file-button', expectedButton); };
 
         verifyExtensions = function(expectedExtensions) {
+            // eslint-disable-next-line no-var
             var acceptAttribute = fileUploaderView.$('input.input-file').attr('accept');
             if (expectedExtensions) {
                 expect(acceptAttribute).toBe(expectedExtensions);
@@ -30,6 +32,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
         };
 
         verifySubmitButtonEnabled = function(expectedEnabled) {
+            // eslint-disable-next-line no-var
             var submitButton = fileUploaderView.$('.submit-file-button');
             if (expectedEnabled) {
                 expect(submitButton).not.toHaveClass('is-disabled');
@@ -47,8 +50,10 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
         };
 
         mimicUpload = function(test) {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(test);
 
+            // eslint-disable-next-line no-var
             var param = {files: [{name: 'upload_file.txt'}]};
             fileUploaderView.$('#file-upload-form').fileupload('add', param);
             verifySubmitButtonEnabled(true);
@@ -116,6 +121,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
         });
 
         it('handles errors with default message', function() {
+            // eslint-disable-next-line no-var
             var requests = mimicUpload(this);
             respondWithError(requests);
             verifyNotificationMessage("Your upload of 'upload_file.txt' failed.", 'error');
@@ -126,7 +132,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
                 url: url,
                 // eslint-disable-next-line no-unused-vars
                 errorNotification: function(file, event, data) {
-                    // eslint-disable-next-line no-undef
+                    /* eslint-disable-next-line no-undef, no-var */
                     var message = interpolate_text("Custom error for '{file}'", {file: file});
                     return new NotificationModel({
                         type: 'customized',
@@ -134,18 +140,21 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
                     });
                 }
             }).render();
+            // eslint-disable-next-line no-var
             var requests = mimicUpload(this);
             respondWithError(requests, 'server error');
             verifyNotificationMessage("Custom error for 'upload_file.txt'", 'customized');
         });
 
         it('handles server error message', function() {
+            // eslint-disable-next-line no-var
             var requests = mimicUpload(this);
             respondWithError(requests, 'server error');
             verifyNotificationMessage('server error', 'error');
         });
 
         it('handles success with default message', function() {
+            // eslint-disable-next-line no-var
             var requests = mimicUpload(this);
             respondWithSuccess(requests);
             verifyNotificationMessage("Your upload of 'upload_file.txt' succeeded.", 'confirmation');
@@ -156,7 +165,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
                 url: url,
                 // eslint-disable-next-line no-unused-vars
                 successNotification: function(file, event, data) {
-                    // eslint-disable-next-line no-undef
+                    /* eslint-disable-next-line no-undef, no-var */
                     var message = interpolate_text("Custom success message for '{file}'", {file: file});
                     return new NotificationModel({
                         type: 'customized',
@@ -164,6 +173,7 @@ function(Backbone, $, FileUploaderView, TemplateHelpers, AjaxHelpers, Notificati
                     });
                 }
             }).render();
+            // eslint-disable-next-line no-var
             var requests = mimicUpload(this);
             respondWithSuccess(requests);
             verifyNotificationMessage("Custom success message for 'upload_file.txt'", 'customized');

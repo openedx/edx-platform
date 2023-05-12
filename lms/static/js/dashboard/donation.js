@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function($) {
@@ -23,7 +23,7 @@ var edx = edx || {};
          * @param {string} url - The URL where the form data will be submitted.
          * @param {Object} params - Form data, included as hidden inputs.
          */
-        // eslint-disable-next-line no-shadow
+        /* eslint-disable-next-line no-shadow, no-var */
         var configureForm = function(form, method, url, params) {
             $('input', form).remove();
             form.attr('action', url);
@@ -44,6 +44,7 @@ var edx = edx || {};
         *
         * @param {string} course - The course ID for the donation.
         */
+        // eslint-disable-next-line no-var
         var firePaymentAnalyticsEvent = function(course) {
             // eslint-disable-next-line no-undef
             analytics.track(
@@ -64,6 +65,7 @@ var edx = edx || {};
         *     which resolves with a data object of the form
         *     { payment_url: <string>, payment_params: <Object> }
         */
+        // eslint-disable-next-line no-var
         var addDonationToCart = function(amount, course) {
             return $.ajax({
                 url: '/shoppingcart/donation/',
@@ -75,6 +77,7 @@ var edx = edx || {};
             });
         };
 
+        // eslint-disable-next-line no-var
         var view = {
             /**
             * Initialize the view.
@@ -103,7 +106,7 @@ var edx = edx || {};
             * @returns {DonationView}
             */
             render: function() {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var html = _.template($('#donation-tpl').html())({});
                 this.$el.html(html); // xss-lint: disable=javascript-jquery-html
                 this.$amount = $('input[name="amount"]', this.$el);
@@ -132,6 +135,7 @@ var edx = edx || {};
                 this.$submit.addClass('disabled');
 
                 if (this.validate()) {
+                    // eslint-disable-next-line no-var
                     var amount = this.$amount.val();
                     addDonationToCart(amount, this.course)
                         .done(this.startPayment)
@@ -167,7 +171,9 @@ var edx = edx || {};
             * @returns {boolean} True iff the form is valid.
             */
             validate: function() {
+                // eslint-disable-next-line no-var
                 var amount = this.$amount.val();
+                // eslint-disable-next-line no-var
                 var isValid = this.validateAmount(amount);
 
                 if (isValid) {
@@ -190,6 +196,7 @@ var edx = edx || {};
             * @returns {boolean} True iff the amount is valid.
             */
             validateAmount: function(amount) {
+                // eslint-disable-next-line no-var
                 var amountRegex = /^\d+.\d{2}$|^\d+$/i;
                 if (!amountRegex.test(amount)) {
                     return false;
@@ -235,9 +242,11 @@ var edx = edx || {};
         // that form, and parameterize it based on the
         // "data-course" attribute (the course ID).
         $('.donate-container').each(function() {
+            // eslint-disable-next-line no-var
             var $container = $(this);
+            // eslint-disable-next-line no-var
             var course = $container.data('course');
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var view = new edx.dashboard.donation.DonationView({
                 el: $container,
                 course: course

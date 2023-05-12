@@ -16,6 +16,7 @@ define([
 ], function(BaseView, ViewUtils, _, gettext, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var ListItemEditorView = BaseView.extend({
         initialize: function() {
             this.listenTo(this.model, 'invalid', this.render);
@@ -23,6 +24,7 @@ define([
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var template = this.template(_.extend({
                 error: this.model.validationError || this.getSaveableModel().validationError
             }, this.getTemplateOptions())
@@ -42,7 +44,9 @@ define([
             ViewUtils.runOperationShowingMessage(
                 gettext('Saving'),
                 function() {
+                    // eslint-disable-next-line no-var
                     var dfd = $.Deferred();
+                    // eslint-disable-next-line no-var
                     var actionableModel = this.getSaveableModel();
 
                     actionableModel.save({}, {

@@ -9,6 +9,7 @@ define([
 ], function(BaseView, _, gettext, str, StringUtils, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var PartitionGroupDetailsView = BaseView.extend({
         tagName: 'div',
         events: {
@@ -18,6 +19,7 @@ define([
         },
 
         className: function() {
+            // eslint-disable-next-line no-var
             var index = this.model.collection.indexOf(this.model);
 
             return [
@@ -38,6 +40,7 @@ define([
         },
 
         render: function(showContentGroupUsages) {
+            // eslint-disable-next-line no-var
             var attrs = $.extend({}, this.model.attributes, {
                 usageCountMessage: this.getUsageCountTitle(),
                 courseOutlineUrl: this.model.collection.parents[0].outlineUrl,
@@ -61,6 +64,7 @@ define([
         },
 
         getUsageCountTitle: function() {
+            // eslint-disable-next-line no-var
             var count = this.model.get('usage').length;
 
             if (count === 0) {

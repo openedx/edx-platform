@@ -11,6 +11,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
     'use strict';
 
     describe('edx.verify_student.WebcamPhotoView', function() {
+        // eslint-disable-next-line no-var
         var IMAGE_DATA = 'abcd1234',
             VIDEO_ERROR_TITLE = 'video capture error',
             VIDEO_ERROR_MSG = 'video error msg';
@@ -25,6 +26,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             * cover the HTML5 / Flash webcam integration.  We will need
             * cross-browser manual testing to verify that this works correctly.
             */
+        // eslint-disable-next-line no-var
         var StubBackend = function(name, isSupported, snapshotSuccess) {
             // eslint-disable-next-line no-undef
             if (_.isUndefined(isSupported)) {
@@ -46,6 +48,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             };
         };
 
+        // eslint-disable-next-line no-var
         var createView = function(backendStub) {
             return new WebcamPhotoView({
                 el: $('#current-step-container'),
@@ -57,15 +60,19 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             }).render();
         };
 
+        // eslint-disable-next-line no-var
         var takeSnapshot = function() {
             $('#webcam_capture_button').click();
         };
 
+        // eslint-disable-next-line no-var
         var resetWebcam = function() {
             $('#webcam_reset_button').click();
         };
 
+        // eslint-disable-next-line no-var
         var expectButtonShown = function(obj) {
+            // eslint-disable-next-line no-var
             var $resetButton = $('#webcam_reset_button'),
                 $captureButton = $('#webcam_capture_button');
 
@@ -73,7 +80,9 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
             expect($resetButton.hasClass('is-hidden')).toBe(!obj.reset);
         };
 
+        // eslint-disable-next-line no-var
         var expectSubmitEnabled = function(isEnabled) {
+            // eslint-disable-next-line no-var
             var appearsDisabled = $('#submit_button').hasClass('is-disabled'),
                 isDisabled = $('#submit_button').prop('disabled');
 
@@ -93,6 +102,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
         });
 
         it('takes a snapshot', function() {
+            // eslint-disable-next-line no-var
             var view = createView(new StubBackend('html5'));
 
             // Spy on the backend
@@ -125,6 +135,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
         });
 
         it('resets the camera', function() {
+            // eslint-disable-next-line no-var
             var view = createView(new StubBackend('html5'));
 
             // Spy on the backend
@@ -150,6 +161,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
         });
 
         it('displays an error if the snapshot fails', function() {
+            // eslint-disable-next-line no-var
             var view = createView(new StubBackend('html5', true, false));
 
             // Take a snapshot
@@ -171,6 +183,7 @@ function($, Backbone, TemplateHelpers, AjaxHelpers, WebcamPhotoView, Verificatio
         });
 
         it('displays an error triggered by the backend', function() {
+            // eslint-disable-next-line no-var
             var view = createView(new StubBackend('html5'));
 
             // Simulate an error triggered by the backend

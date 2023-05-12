@@ -5,6 +5,7 @@
 (function(requirejs) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var i, specHelpers, testFiles;
 
     // TODO: how can we share the vast majority of this config that is in common with CMS?

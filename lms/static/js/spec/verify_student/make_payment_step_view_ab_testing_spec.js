@@ -10,6 +10,7 @@ define([
 function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var checkPaymentButtons,
         expectPaymentSubmitted,
         goToPayment,
@@ -20,6 +21,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         SERVER_ERROR_MSG = 'An error occurred!';
 
     describe('edx.verify_student.MakePaymentStepView', function() {
+        // eslint-disable-next-line no-var
         var STEP_DATA = {
             minPrice: '12',
             currency: 'usd',
@@ -30,6 +32,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         };
 
         createView = function(stepDataOverrides) {
+            // eslint-disable-next-line no-var
             var view = new MakePaymentStepView({
                 el: $('#current-step-container'),
                 stepData: _.extend(_.clone(STEP_DATA), stepDataOverrides),
@@ -43,6 +46,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         };
 
         expectPriceSelected = function(price) {
+            // eslint-disable-next-line no-var
             var $sel = $('input[name="contribution"]');
 
             // check that contribution value is same as price given
@@ -51,6 +55,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         };
 
         expectPaymentButtonEnabled = function(isEnabled) {
+            // eslint-disable-next-line no-var
             var $el = $('.payment-button'),
                 appearsDisabled = $el.hasClass('is-disabled'),
                 isDisabled = $el.prop('disabled');
@@ -60,6 +65,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         };
 
         expectPaymentDisabledBecauseInactive = function() {
+            // eslint-disable-next-line no-var
             var $payButton = $('.payment-button');
 
             // Payment button should be hidden
@@ -67,6 +73,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         };
 
         goToPayment = function(requests, kwargs) {
+            // eslint-disable-next-line no-var
             var params = {
                 contribution: kwargs.amount || '',
                 course_id: kwargs.courseId || '',
@@ -94,6 +101,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         };
 
         expectPaymentSubmitted = function(view, params) {
+            // eslint-disable-next-line no-var
             var form;
 
             expect(view.submitForm).toHaveBeenCalled();
@@ -105,9 +113,11 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         };
 
         checkPaymentButtons = function(requests, buttons) {
+            // eslint-disable-next-line no-var
             var $el = $('.payment-button');
             expect($el.length).toEqual(_.size(buttons));
             _.each(buttons, function(expectedText, expectedId) {
+                // eslint-disable-next-line no-var
                 var $buttonEl = $('#' + expectedId),
                     request;
 
@@ -135,12 +145,14 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         });
 
         it('A/B Testing: check Initialize method with AB testing enable ', function() {
+            // eslint-disable-next-line no-var
             var view = createView();
             expect(view.templateName).toEqual('make_payment_step_ab_testing');
             expect(view.btnClass).toEqual('action-primary-blue');
         });
 
         it('shows users only minimum price', function() {
+            // eslint-disable-next-line no-var
             var view = createView(),
                 requests = AjaxHelpers.requests(this);
 
@@ -170,6 +182,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         });
 
         it('A/B Testing: by default minimum price is selected if no suggested prices are given', function() {
+            // eslint-disable-next-line no-var
             var view = createView(),
                 requests = AjaxHelpers.requests(this);
 
@@ -201,6 +214,7 @@ function($, _, Backbone, AjaxHelpers, TemplateHelpers, MakePaymentStepView) {
         });
 
         it('A/B Testing: displays an error if the order could not be created', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 view = createView();
 

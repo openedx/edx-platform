@@ -3,6 +3,7 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var PendingInstructorTasks, createTaskListTable, findAndAssert, statusAjaxError;
 
     statusAjaxError = function() {
@@ -18,6 +19,7 @@
     };
 
     findAndAssert = function($root, selector) {
+        // eslint-disable-next-line no-var
         var item, msg;
         item = $root.find(selector);
         if (item.length !== 1) {
@@ -30,6 +32,7 @@
 
     this.StudentAdmin = (function() {
         function StudentAdmin($section) {
+            // eslint-disable-next-line no-var
             var studentadmin = this;
             this.$section = $section;
             this.$section.data('wrapper', this);
@@ -75,6 +78,7 @@
             this.$enrollment_status_link = findAndAssert(this.$section, 'a.enrollment-status-link');
             this.$enrollment_status = findAndAssert(this.$section, '.student-enrollment-status');
             this.$enrollment_status_link.click(function(e) {
+                // eslint-disable-next-line no-var
                 var errorMessage, fullErrorMessage, uniqStudentIdentifier;
                 e.preventDefault();
                 uniqStudentIdentifier = studentadmin.$field_student_select_enrollment_status.val();
@@ -107,6 +111,7 @@
                 });
             });
             this.$progress_link.click(function(e) {
+                // eslint-disable-next-line no-var
                 var errorMessage, fullErrorMessage, uniqStudentIdentifier;
                 e.preventDefault();
                 uniqStudentIdentifier = studentadmin.$field_student_select_progress.val();
@@ -136,6 +141,7 @@
                 });
             });
             this.$btn_reset_attempts_single.click(function() {
+                // eslint-disable-next-line no-var
                 var errorMessage, fullErrorMessage, fullSuccessMessage,
                     problemToReset, sendData, successMessage, uniqStudentIdentifier;
                 uniqStudentIdentifier = studentadmin.$field_student_select_grade.val();
@@ -177,6 +183,7 @@
                 });
             });
             this.$btn_delete_state_single.click(function() {
+                // eslint-disable-next-line no-var
                 var confirmMessage, errorMessage, fullConfirmMessage,
                     fullErrorMessage, problemToReset, sendData, uniqStudentIdentifier;
                 uniqStudentIdentifier = studentadmin.$field_student_select_grade.val();
@@ -230,6 +237,7 @@
                 return studentadmin.rescore_problem_single(true);
             });
             this.$btn_task_history_single.click(function() {
+                // eslint-disable-next-line no-var
                 var errorMessage, fullErrorMessage, problemToReset, sendData, uniqStudentIdentifier;
                 uniqStudentIdentifier = studentadmin.$field_student_select_grade.val();
                 problemToReset = studentadmin.$field_problem_select_single.val();
@@ -266,6 +274,7 @@
                 });
             });
             this.$btn_reset_entrance_exam_attempts.click(function() {
+                // eslint-disable-next-line no-var
                 var sendData, uniqStudentIdentifier;
                 uniqStudentIdentifier = studentadmin.$field_exam_grade.val();
                 if (!uniqStudentIdentifier) {
@@ -283,6 +292,7 @@
                     url: studentadmin.$btn_reset_entrance_exam_attempts.data('endpoint'),
                     data: sendData,
                     success: studentadmin.clear_errors_then(function() {
+                        // eslint-disable-next-line no-var
                         var fullSuccessMessage, successMessage;
                         successMessage = gettext("Entrance exam attempts is being reset for student '{student_id}'.");
                         fullSuccessMessage = interpolate_text(successMessage, {
@@ -291,6 +301,7 @@
                         return alert(fullSuccessMessage); // eslint-disable-line no-alert
                     }),
                     error: statusAjaxError(function() {
+                        // eslint-disable-next-line no-var
                         var errorMessage, fullErrorMessage;
                         errorMessage = gettext("Error resetting entrance exam attempts for student '{student_id}'. Make sure student identifier is correct."); // eslint-disable-line max-len
                         fullErrorMessage = interpolate_text(errorMessage, {
@@ -307,6 +318,7 @@
                 return studentadmin.rescore_entrance_exam_all(true);
             });
             this.$btn_skip_entrance_exam.click(function() {
+                // eslint-disable-next-line no-var
                 var confirmMessage, fullConfirmMessage, sendData, uniqStudentIdentifier;
                 uniqStudentIdentifier = studentadmin.$field_exam_grade.val();
                 if (!uniqStudentIdentifier) {
@@ -329,6 +341,7 @@
                             return alert(data.message); // eslint-disable-line no-alert
                         }),
                         error: statusAjaxError(function() {
+                            // eslint-disable-next-line no-var
                             var errorMessage;
                             errorMessage = gettext("An error occurred. Make sure that the student's username or email address is correct and try again."); // eslint-disable-line max-len
                             return studentadmin.$request_err_ee.text(errorMessage);
@@ -338,6 +351,7 @@
                 return false;
             });
             this.$btn_delete_entrance_exam_state.click(function() {
+                // eslint-disable-next-line no-var
                 var sendData, uniqStudentIdentifier;
                 uniqStudentIdentifier = studentadmin.$field_exam_grade.val();
                 if (!uniqStudentIdentifier) {
@@ -355,6 +369,7 @@
                     url: studentadmin.$btn_delete_entrance_exam_state.data('endpoint'),
                     data: sendData,
                     success: studentadmin.clear_errors_then(function() {
+                        // eslint-disable-next-line no-var
                         var fullSuccessMessage, successMessage;
                         successMessage = gettext("Entrance exam state is being deleted for student '{student_id}'.");
                         fullSuccessMessage = interpolate_text(successMessage, {
@@ -363,6 +378,7 @@
                         return alert(fullSuccessMessage); // eslint-disable-line no-alert
                     }),
                     error: statusAjaxError(function() {
+                        // eslint-disable-next-line no-var
                         var errorMessage, fullErrorMessage;
                         errorMessage = gettext("Error deleting entrance exam state for student '{student_id}'. Make sure student identifier is correct."); // eslint-disable-line max-len
                         fullErrorMessage = interpolate_text(errorMessage, {
@@ -373,6 +389,7 @@
                 });
             });
             this.$btn_entrance_exam_task_history.click(function() {
+                // eslint-disable-next-line no-var
                 var sendData, uniqStudentIdentifier;
                 uniqStudentIdentifier = studentadmin.$field_exam_grade.val();
                 if (!uniqStudentIdentifier) {
@@ -392,6 +409,7 @@
                         return createTaskListTable(studentadmin.$table_entrance_exam_task_history, data.tasks);
                     }),
                     error: statusAjaxError(function() {
+                        // eslint-disable-next-line no-var
                         var errorMessage, fullErrorMessage;
                         errorMessage = gettext("Error getting entrance exam task history for student '{student_id}'. Make sure student identifier is correct."); // eslint-disable-line max-len
                         fullErrorMessage = interpolate_text(errorMessage, {
@@ -402,6 +420,7 @@
                 });
             });
             this.$btn_reset_attempts_all.click(function() {
+                // eslint-disable-next-line no-var
                 var confirmMessage, errorMessage, fullConfirmMessage,
                     fullErrorMessage, fullSuccessMessage, problemToReset, sendData, successMessage;
                 problemToReset = studentadmin.$field_problem_select_all.val();
@@ -453,6 +472,7 @@
                 return studentadmin.override_problem_score_single();
             });
             this.$btn_task_history_all.click(function() {
+                // eslint-disable-next-line no-var
                 var sendData;
                 sendData = {
                     problem_location_str: studentadmin.$field_problem_select_all.val()
@@ -480,6 +500,7 @@
         }
 
         StudentAdmin.prototype.rescore_problem_single = function(onlyIfHigher) {
+            // eslint-disable-next-line no-var
             var defaultErrorMessage, fullDefaultErrorMessage, fullSuccessMessage,
                 problemToReset, sendData, successMessage, uniqStudentIdentifier,
                 that = this;
@@ -528,6 +549,7 @@
         };
 
         StudentAdmin.prototype.override_problem_score_single = function() {
+            // eslint-disable-next-line no-var
             var defaultErrorMessage, fullDefaultErrorMessage, fullSuccessMessage,
                 problemToReset, score, sendData, successMessage, uniqStudentIdentifier,
                 that = this;
@@ -582,6 +604,7 @@
         };
 
         StudentAdmin.prototype.rescore_entrance_exam_all = function(onlyIfHigher) {
+            // eslint-disable-next-line no-var
             var sendData, uniqStudentIdentifier,
                 that = this;
             uniqStudentIdentifier = this.$field_exam_grade.val();
@@ -600,6 +623,7 @@
                 url: this.$btn_rescore_entrance_exam.data('endpoint'),
                 data: sendData,
                 success: this.clear_errors_then(function() {
+                    // eslint-disable-next-line no-var
                     var fullSuccessMessage, successMessage;
                     successMessage = gettext("Started entrance exam rescore task for student '{student_id}'. Click the 'Show Task Status' button to see the status of the task."); // eslint-disable-line max-len
                     fullSuccessMessage = interpolate_text(successMessage, {
@@ -608,6 +632,7 @@
                     return alert(fullSuccessMessage); // eslint-disable-line no-alert
                 }),
                 error: statusAjaxError(function() {
+                    // eslint-disable-next-line no-var
                     var errorMessage, fullErrorMessage;
                     errorMessage = gettext("Error starting a task to rescore entrance exam for student '{student_id}'. Make sure that entrance exam has problems in it and student identifier is correct."); // eslint-disable-line max-len
                     fullErrorMessage = interpolate_text(errorMessage, {
@@ -619,6 +644,7 @@
         };
 
         StudentAdmin.prototype.rescore_problem_all = function(onlyIfHigher) {
+            // eslint-disable-next-line no-var
             var confirmMessage, defaultErrorMessage, fullConfirmMessage,
                 fullDefaultErrorMessage, fullSuccessMessage, problemToReset,
                 sendData, successMessage,

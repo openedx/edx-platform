@@ -6,7 +6,7 @@
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Same_origin_policy_for_JavaScript
  */
 
-/* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
+/* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars, no-var */
 var JSInput = (function($, undefined) {
     // Initialize js inputs on current page.
     // N.B.: No library assumptions about the iframe can be made (including,
@@ -23,6 +23,7 @@ var JSInput = (function($, undefined) {
     // Take a string and find the nested object that corresponds to it. E.g.:
     //    _deepKey(obj, "an.example") -> obj["an"]["example"]
     function _deepKey(obj, path) {
+        // eslint-disable-next-line no-var
         for (var i = 0, p = path.split('.'), len = p.length; i < len; i++) {
             obj = obj[p[i]];
         }
@@ -37,6 +38,7 @@ var JSInput = (function($, undefined) {
 
         /*                      Private methods                          */
 
+        // eslint-disable-next-line no-var
         var jsinputContainer = $(elem).parent().find('.jsinput'),
             jsinputAttr = function(e) { return $(jsinputContainer).attr(e); },
             iframe = $(elem).find('iframe[name^="iframe_"]').get(0),
@@ -73,7 +75,9 @@ var JSInput = (function($, undefined) {
         /*                       Public methods                     */
 
         // Only one public method that updates the hidden input field.
+        // eslint-disable-next-line no-var
         var update = function(callback) {
+            // eslint-disable-next-line no-var
             var answer, state, store;
 
             if (sop) {
@@ -135,6 +139,7 @@ var JSInput = (function($, undefined) {
         // fails, wait and try again, since the iframe might still be
         // loading.
         if (stateSetter && (storedState || initialState)) {
+            // eslint-disable-next-line no-var
             var stateValue, jsonValue;
 
             if (storedState) {
@@ -189,6 +194,7 @@ var JSInput = (function($, undefined) {
     }
 
     function walkDOM() {
+        // eslint-disable-next-line no-var
         var $jsinputContainers = $('.jsinput');
         // When a JSInput problem loads, its data-processed attribute is false,
         // so the jsconstructor will be called for it.
@@ -197,6 +203,7 @@ var JSInput = (function($, undefined) {
         // rest of the page or when it is submitted, will this constructor be
         // called again.
         $jsinputContainers.each(function(index, value) {
+            // eslint-disable-next-line no-var
             var dataProcessed = ($(value).attr('data-processed') === 'true');
             if (!dataProcessed) {
                 jsinputConstructor(value);

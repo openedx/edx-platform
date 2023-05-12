@@ -7,10 +7,13 @@ define([
     'use strict';
 
     describe('PagingHeader', function() {
+        // eslint-disable-next-line no-var
         var pagingHeader,
             newCollection = function(size, perPage) {
+                // eslint-disable-next-line no-var
                 var pageSize = 5,
                     results = _.map(_.range(size), function(i) { return {foo: i}; });
+                // eslint-disable-next-line no-var
                 var collection = new PagingCollection(
                     {
                         count: results.length,
@@ -26,6 +29,7 @@ define([
                 return collection;
             },
             sortableHeader = function(sortable) {
+                // eslint-disable-next-line no-var
                 var collection = newCollection(5, 4);
                 collection.registerSortableField('foo', 'Display Name');
                 return new PagingHeader({

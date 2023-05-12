@@ -3,8 +3,10 @@
 (function(URI) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
+            // eslint-disable-next-line no-var
             var key;
             for (key in parent) {
                 if (__hasProp.call(parent, key)) {
@@ -31,6 +33,7 @@
         }
 
         v1.prototype.handlerUrl = function(element, handlerName, suffix, query, thirdparty) {
+            // eslint-disable-next-line no-var
             var courseId, handlerAuth, uri, usageId;
             courseId = $(element).data('course-id');
             usageId = $(element).data('usage-id');

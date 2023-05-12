@@ -3,10 +3,12 @@
     'use strict';
 
     describe('Video Context Menu', function() {
+        // eslint-disable-next-line no-var
         var state, openMenu, keyPressEvent, openSubmenuMouse, openSubmenuKeyboard, closeSubmenuMouse,
             closeSubmenuKeyboard, menu, menuItems, menuSubmenuItem, submenu, submenuItems, overlay, $playButton;
 
         openMenu = function() {
+            // eslint-disable-next-line no-var
             var $container = $('.video');
             $container.find('video').trigger('contextmenu');
             menu = $container.children('.contextmenu');
@@ -152,6 +154,7 @@
             });
 
             it('menu can be destroyed successfully', function() {
+                // eslint-disable-next-line no-var
                 var menuitemEvents = ['click', 'keydown', 'contextmenu', 'mouseover'],
                     menuEvents = ['keydown', 'contextmenu', 'mouseleave', 'mouseover'];
 
@@ -239,6 +242,7 @@
             });
 
             it('mouse left/right-clicking behaves as expected on play/pause menu item', function() {
+                // eslint-disable-next-line no-var
                 var menuItem = menuItems.first();
                 // eslint-disable-next-line no-undef
                 spyOn(state.videoPlayer, 'isPlaying');
@@ -269,6 +273,7 @@
             });
 
             it('mouse left/right-clicking behaves as expected on mute/unmute menu item', function() {
+                // eslint-disable-next-line no-var
                 var menuItem = menuItems.eq(1);
                 // Left-click on mute
                 menuItem.click();
@@ -291,6 +296,7 @@
             });
 
             it('mouse left/right-clicking behaves as expected on go to Exit full browser menu item', function() {
+                // eslint-disable-next-line no-var
                 var menuItem = menuItems.eq(2);
                 // Left-click on Fill browser
                 menuItem.click();

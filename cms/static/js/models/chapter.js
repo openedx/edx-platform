@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-undef
 define(['backbone', 'gettext', 'backbone.associations'], function(Backbone, gettext) {
+    // eslint-disable-next-line no-var
     var Chapter = Backbone.AssociatedModel.extend({
         defaults: function() {
             return {

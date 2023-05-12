@@ -6,6 +6,7 @@
 
     this.Sequence = (function() {
         function Sequence(element, runtime) {
+            // eslint-disable-next-line no-var
             var self = this;
 
             this.removeBookmarkIconFromActiveNavItem = function(event) {
@@ -80,6 +81,7 @@
         };
 
         Sequence.prototype.previousNav = function(focused, index) {
+            // eslint-disable-next-line no-var
             var $navItemList,
                 $sequenceList = $(focused).parent().parent();
             if (index === 0) {
@@ -92,6 +94,7 @@
         };
 
         Sequence.prototype.nextNav = function(focused, index, total) {
+            // eslint-disable-next-line no-var
             var $navItemList,
                 $sequenceList = $(focused).parent().parent();
             if (index === total) {
@@ -104,8 +107,10 @@
         };
 
         Sequence.prototype.keydownHandler = function(element) {
+            // eslint-disable-next-line no-var
             var self = this;
             element.keydown(function(event) {
+                // eslint-disable-next-line no-var
                 var key = event.keyCode,
                     $focused = $(event.currentTarget),
                     $sequenceList = $focused.parent().parent(),
@@ -139,6 +144,7 @@
 
         Sequence.prototype.updatePageTitle = function() {
             // update the page title to include the current section
+            // eslint-disable-next-line no-var
             var currentUnitTitle,
                 newPageTitle,
                 positionLink = this.link_for(this.position);
@@ -157,6 +163,7 @@
         };
 
         Sequence.prototype.hookUpContentStateChangeEvent = function() {
+            // eslint-disable-next-line no-var
             var self = this;
 
             return $('.problems-wrapper').bind('contentChanged', function(event, problemId, newContentState, newState) {
@@ -211,6 +218,7 @@
         };
 
         Sequence.prototype.toggleArrows = function() {
+            // eslint-disable-next-line no-var
             var isFirstTab, isLastTab, nextButtonClass, previousButtonClass;
 
             this.$('.sequence-nav-button').unbind('click');
@@ -228,6 +236,7 @@
         };
 
         Sequence.prototype.render = function(newPosition) {
+            // eslint-disable-next-line no-var
             var bookmarked, currentTab, sequenceLinks,
                 self = this;
             if (this.position !== newPosition) {
@@ -258,6 +267,7 @@
 
                 if (this.anyUpdatedProblems(newPosition)) {
                     $.each(this.updatedProblems[newPosition], function(problemId, latestData) {
+                        // eslint-disable-next-line no-var
                         var latestContent, latestResponse;
                         latestContent = latestData[0];
                         latestResponse = latestData[1];
@@ -288,6 +298,7 @@
 
         // eslint-disable-next-line consistent-return
         Sequence.prototype.goto = function(event) {
+            // eslint-disable-next-line no-var
             var alertTemplate, alertText, isBottomNav, newPosition, widgetPlacement;
             event.preventDefault();
 
@@ -346,6 +357,7 @@
 
         // `direction` can be 'previous' or 'next'
         Sequence.prototype._change_sequential = function(direction, event) {
+            // eslint-disable-next-line no-var
             var analyticsEventName, isBottomNav, newPosition, offset, targetUrl, widgetPlacement;
 
             // silently abort if direction is invalid.
@@ -404,6 +416,7 @@
 
         Sequence.prototype.mark_visited = function(position) {
             // Don't overwrite class attribute to avoid changing Progress class
+            // eslint-disable-next-line no-var
             var element = this.link_for(position);
             element.attr({tabindex: '-1', 'aria-selected': 'false', 'aria-expanded': 'false'})
                 .removeClass('inactive')
@@ -413,8 +426,11 @@
         };
 
         Sequence.prototype.update_completion = function(position) {
+            // eslint-disable-next-line no-var
             var element = this.link_for(position);
+            // eslint-disable-next-line no-var
             var usageKey = element[0].attributes['data-id'].value;
+            // eslint-disable-next-line no-var
             var completionIndicators = element.find('.check-circle');
             if (completionIndicators.length) {
                 $.postWithPrefix(this.getCompletionUrl, JSON.stringify({
@@ -431,6 +447,7 @@
 
         Sequence.prototype.mark_active = function(position) {
             // Don't overwrite class attribute to avoid changing Progress class
+            // eslint-disable-next-line no-var
             var element = this.link_for(position);
             element.attr({tabindex: '0', 'aria-selected': 'true', 'aria-expanded': 'true'})
                 .removeClass('inactive')

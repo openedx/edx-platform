@@ -11,6 +11,7 @@
         'js/student_account/views/account_section_view',
         'text!templates/student_account/account_settings.underscore'
     ], function(gettext, $, _, TabbedView, HtmlUtils, AccountSectionView, accountSettingsTemplate) {
+        // eslint-disable-next-line no-var
         var AccountSettingsView = TabbedView.extend({
 
             navLink: '.account-nav-link',
@@ -27,8 +28,10 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var tabName, betaLangMessage, helpTranslateText, helpTranslateLink, betaLangCode, oldLangCode,
                     view = this;
+                // eslint-disable-next-line no-var
                 var accountSettingsTabs = [
                     {
                         name: 'aboutTabSections',
@@ -101,6 +104,7 @@
             },
 
             switchTab: function(e) {
+                // eslint-disable-next-line no-var
                 var $currentTab,
                     $accountNavLink = $('.account-nav-link');
 
@@ -133,6 +137,7 @@
             },
 
             renderSection: function(tabSections, tabName, tabLabel) {
+                // eslint-disable-next-line no-var
                 var accountSectionView = new AccountSectionView({
                     tabName: tabName,
                     tabLabel: tabLabel,

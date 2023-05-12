@@ -2,6 +2,7 @@
 define(['backbone', 'underscore', 'gettext', 'js/models/chapter', 'js/collections/chapter',
     'backbone.associations', 'cms/js/main'],
 function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
+    // eslint-disable-next-line no-var
     var Textbook = Backbone.AssociatedModel.extend({
         defaults: function() {
             return {
@@ -36,6 +37,7 @@ function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
         // eslint-disable-next-line no-undef
         urlRoot: function() { return CMS.URL.TEXTBOOKS; },
         parse: function(response) {
+            // eslint-disable-next-line no-var
             var ret = $.extend(true, {}, response);
             if ('tab_title' in ret && !('name' in ret)) {
                 ret.name = ret.tab_title;
@@ -73,6 +75,7 @@ function(Backbone, _, gettext, ChapterModel, ChapterCollection) {
                 };
             } else {
                 // validate all chapters
+                // eslint-disable-next-line no-var
                 var invalidChapters = [];
                 attrs.chapters.each(function(chapter) {
                     if (!chapter.isValid()) {

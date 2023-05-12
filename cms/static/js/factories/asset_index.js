@@ -5,6 +5,7 @@ define([
     'use strict';
 
     return function(config) {
+        // eslint-disable-next-line no-var
         var assets = new AssetCollection(),
             assetsView;
 

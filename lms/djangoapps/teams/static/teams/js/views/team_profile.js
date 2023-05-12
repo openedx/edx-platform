@@ -18,6 +18,7 @@
     ],
     function(Backbone, _, gettext, HtmlUtils, TeamDiscussionView, ViewUtils, TeamUtils,
         teamTemplate, teamMemberTemplate, teamAssignmentTemplate) {
+        // eslint-disable-next-line no-var
         var TeamProfileView = Backbone.View.extend({
 
             errorMessage: gettext('An error occurred. Try again.'),
@@ -39,6 +40,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var memberships = this.model.get('membership'),
                     discussionTopicID = this.model.get('discussion_topic_id'),
                     isMember = TeamUtils.isUserMemberOfTeam(memberships, this.context.userInfo.username),
@@ -48,8 +50,10 @@
 
                 // Assignments URL isn't provided if team assignments shouldn't be shown
                 // so we can treat it like a toggle
+                // eslint-disable-next-line no-var
                 var showAssignments = !!this.context.teamsAssignmentsUrl;
 
+                // eslint-disable-next-line no-var
                 var showLeaveLink = isMember && (isAdminOrStaff || !isInstructorManagedTopic);
 
                 HtmlUtils.setHtml(
@@ -86,6 +90,7 @@
             },
 
             getTeamAssignments: function() {
+                // eslint-disable-next-line no-var
                 var view = this;
 
                 $.ajax({
@@ -99,6 +104,7 @@
             },
 
             renderTeamAssignments: function(assignments) {
+                // eslint-disable-next-line no-var
                 var view = this;
 
                 if (!assignments || !assignments.length) {
@@ -118,6 +124,7 @@
             },
 
             renderTeamMembers: function() {
+                // eslint-disable-next-line no-var
                 var view = this;
                 _.each(this.model.get('membership'), function(membership) {
                     HtmlUtils.append(
@@ -138,6 +145,7 @@
 
             leaveTeam: function(event) {
                 event.preventDefault();
+                // eslint-disable-next-line no-var
                 var view = this; // eslint-disable-line vars-on-top
                 ViewUtils.confirmThenRunOperation(
                     gettext('Leave this team?'),

@@ -9,6 +9,7 @@ define(['edx-ui-toolkit/js/utils/html-utils',
     'js/views/baseview',
     'jquery.smoothScroll'],
 function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
+    // eslint-disable-next-line no-var
     var ValidatingView = BaseView.extend({
     // Intended as an abstract class which catches validation errors on the model and
     // decorates the fields. Needs wiring per class, but this initialization shows how
@@ -38,8 +39,9 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
         handleValidationError: function(model, error) {
             this.clearValidationErrors();
             // error is object w/ fields and error strings
-            // eslint-disable-next-line guard-for-in
+            /* eslint-disable-next-line guard-for-in, no-var */
             for (var field in error) {
+                // eslint-disable-next-line no-var
                 var ele = this.$el.find('#' + this.fieldToSelectorMap[field]);
                 this._cacheValidationErrors.push(ele);
                 this.getInputElements(ele).addClass('error');
@@ -55,6 +57,7 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
         clearValidationErrors: function() {
         // error is object w/ fields and error strings
             while (this._cacheValidationErrors.length > 0) {
+                // eslint-disable-next-line no-var
                 var ele = this._cacheValidationErrors.pop();
                 this.getInputElements(ele).removeClass('error');
                 $(ele).nextAll('.message-error').remove();
@@ -68,7 +71,9 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
         setField: function(event) {
         // Set model field and return the new value.
             this.clearValidationErrors();
+            // eslint-disable-next-line no-var
             var field = this.selectorToField[event.currentTarget.id];
+            // eslint-disable-next-line no-var
             var newVal = '';
             // eslint-disable-next-line eqeqeq
             if (event.currentTarget.type == 'checkbox') {
@@ -89,6 +94,7 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
         },
 
         getInputElements: function(ele) {
+            // eslint-disable-next-line no-var
             var inputElements = 'input, textarea';
             if ($(ele).is(inputElements)) {
                 return $(ele);
@@ -111,6 +117,7 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
             if (this.saved) {
                 this.saved.hide();
             }
+            // eslint-disable-next-line no-var
             var self = this;
             this.confirmation = new NotificationView.Warning({
                 title: this.save_title,
@@ -146,6 +153,7 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
         },
 
         showSavedBar: function(title, message) {
+            // eslint-disable-next-line no-var
             var defaultTitle = gettext('Your changes have been saved.');
             this.saved = new AlertView.Confirmation({
                 title: title || defaultTitle,
@@ -161,6 +169,7 @@ function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
         },
 
         saveView: function() {
+            // eslint-disable-next-line no-var
             var self = this;
             this.model.save(
                 {},

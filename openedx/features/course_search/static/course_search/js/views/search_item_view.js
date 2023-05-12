@@ -27,6 +27,7 @@
             },
 
             unitIcon: function() {
+                // eslint-disable-next-line no-var
                 var icon = null;
                 switch (this.model.attributes.content_type) {
                 case 'Video':
@@ -46,6 +47,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var data = _.clone(this.model.attributes);
 
                 // Drop the preview text and result type if the search term is found
@@ -70,13 +72,21 @@
             },
 
             logSearchItem: function(event) {
+                // eslint-disable-next-line no-var
                 var self = this;
+                // eslint-disable-next-line no-var
                 var target = this.model.id;
+                // eslint-disable-next-line no-var
                 var link = this.model.get('url');
+                // eslint-disable-next-line no-var
                 var collection = this.model.collection;
+                // eslint-disable-next-line no-var
                 var page = collection.page;
+                // eslint-disable-next-line no-var
                 var pageSize = collection.pageSize;
+                // eslint-disable-next-line no-var
                 var searchTerm = collection.searchTerm;
+                // eslint-disable-next-line no-var
                 var index = collection.indexOf(this.model);
 
                 event.preventDefault();

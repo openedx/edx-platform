@@ -4,6 +4,7 @@ import * as XBlockValidationModel from 'js/models/xblock_validation';
 // eslint-disable-next-line no-unused-expressions
 'use strict';
 export default function XBlockValidationFactory(validationMessages, hasEditingUrl, isRoot, isUnit, validationEle) {
+    // eslint-disable-next-line no-var
     var model, response;
 
     if (hasEditingUrl && !isRoot) {

@@ -23,6 +23,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
     XBlockInfoModel, BaseModal, MoveXBlockListView, MoveXBlockBreadcrumbView, MoveXblockModalTemplate) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var MoveXblockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
             'click .action-move:not(.is-disabled)': 'moveXBlock'
@@ -40,6 +41,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
         }),
 
         initialize: function() {
+            // eslint-disable-next-line no-var
             var self = this;
             BaseModal.prototype.initialize.call(this);
             this.sourceXBlockInfo = this.options.sourceXBlockInfo;
@@ -107,6 +109,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
         },
 
         fetchData: function(url) {
+            // eslint-disable-next-line no-var
             var deferred = $.Deferred();
             $.ajax({
                 url: url,
@@ -133,6 +136,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
         },
 
         updateMoveState: function(isValidMove) {
+            // eslint-disable-next-line no-var
             var $moveButton = this.$el.find('.action-move');
             if (isValidMove) {
                 $moveButton.removeClass('is-disabled');
@@ -142,6 +146,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
         },
 
         isValidCategory: function(targetParentXBlockInfo) {
+            // eslint-disable-next-line no-var
             var basicBlockTypes = ['course', 'chapter', 'sequential', 'vertical'],
                 sourceParentType = this.sourceParentXBlockInfo.get('category'),
                 targetParentType = targetParentXBlockInfo.get('category'),
@@ -164,6 +169,7 @@ function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, Ht
         },
 
         enableMoveOperation: function(targetParentXBlockInfo) {
+            // eslint-disable-next-line no-var
             var isValidMove = false;
 
             // update target parent on navigation

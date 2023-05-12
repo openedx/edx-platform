@@ -3,8 +3,10 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
+            // eslint-disable-next-line no-var
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -27,6 +29,7 @@
             __extends(ResponseCommentShowView, _super);
 
             function ResponseCommentShowView() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.edit = function() {
                     return ResponseCommentShowView.prototype.edit.apply(self, arguments);
@@ -40,8 +43,9 @@
             ResponseCommentShowView.prototype.tagName = 'li';
 
             ResponseCommentShowView.prototype.render = function() {
+                // eslint-disable-next-line no-var
                 var template = edx.HtmlUtils.template($('#response-comment-show-template').html());
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var context = _.extend({
                     cid: this.model.cid,
                     author_display: this.getAuthorDisplay(),
@@ -59,6 +63,7 @@
 
             // eslint-disable-next-line consistent-return
             ResponseCommentShowView.prototype.addReplyLink = function() {
+                // eslint-disable-next-line no-var
                 var html, name;
                 if (this.model.hasOwnProperty('parent')) {
                     name = this.model.parent.get('username') || gettext('anonymous');

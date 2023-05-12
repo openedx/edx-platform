@@ -41,6 +41,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
 
         describe('findDestination', function() {
             it('correctly finds the drop target of a drag', function() {
+                // eslint-disable-next-line no-var
                 var $ele, destination;
                 $ele = $('#unit-1');
                 $ele.offset({
@@ -52,6 +53,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 expect(destination.attachMethod).toBe('before');
             });
             it('can drag and drop across section boundaries, with special handling for single sibling', function() {
+                // eslint-disable-next-line no-var
                 var $ele, $unit0, $unit4, destination;
                 $ele = $('#unit-1');
                 $unit4 = $('#unit-4');
@@ -82,6 +84,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 expect(destination.attachMethod).toBe('before');
             });
             it('can drop before the first element, even if element being dragged is\nslightly before the first element', function() {
+                // eslint-disable-next-line no-var
                 var $ele, destination;
                 $ele = $('#subsection-2');
                 $ele.offset({
@@ -93,6 +96,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 expect(destination.attachMethod).toBe('before');
             });
             it('can drag and drop across section boundaries, with special handling for last element', function() {
+                // eslint-disable-next-line no-var
                 var $ele, destination;
                 $ele = $('#unit-4');
                 $ele.offset({
@@ -111,6 +115,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 expect(destination.attachMethod).toBe('before');
             });
             it('can drop past the last element, even if element being dragged is\nslightly before/taller then the last element', function() {
+                // eslint-disable-next-line no-var
                 var $ele, destination;
                 $ele = $('#subsection-2');
                 $ele.offset({
@@ -122,6 +127,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 expect(destination.attachMethod).toBe('after');
             });
             it('can drag into an empty list', function() {
+                // eslint-disable-next-line no-var
                 var $ele, destination;
                 $ele = $('#unit-1');
                 $ele.offset({
@@ -133,6 +139,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 expect(destination.attachMethod).toBe('prepend');
             });
             it('reports a null destination on a failed drag', function() {
+                // eslint-disable-next-line no-var
                 var $ele, destination;
                 $ele = $('#unit-1');
                 $ele.offset({
@@ -146,6 +153,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 });
             });
             it('can drag into a collapsed list', function() {
+                // eslint-disable-next-line no-var
                 var $ele, destination;
                 $('#subsection-2').addClass('is-collapsed');
                 $ele = $('#unit-2');
@@ -188,6 +196,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 this.redirectSpy = spyOn(window, 'scrollBy').and.callThrough();
             });
             it('adds the correct CSS class to the drop destination', function() {
+                // eslint-disable-next-line no-var
                 var $ele, dragX, dragY;
                 $ele = $('#unit-1');
                 dragY = $ele.offset().top + 10;
@@ -208,6 +217,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 expect($ele).toHaveClass('valid-drop');
             });
             it('does not add CSS class to the drop destination if out of bounds', function() {
+                // eslint-disable-next-line no-var
                 var $ele, dragY;
                 $ele = $('#unit-1');
                 dragY = $ele.offset().top + 10;
@@ -289,7 +299,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 expect($('#subsection-1')).not.toHaveClass('expand-on-drop');
             });
             it('expands a collapsed element when something is dropped in it', function() {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var expandElementSpy = spyOn(ContentDragger, 'expandElement').and.callThrough();
                 expect(expandElementSpy).not.toHaveBeenCalled();
                 expect($('#subsection-2').data('ensureChildrenRendered')).not.toHaveBeenCalled();
@@ -323,6 +333,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 jasmine.stealth.clearSpies();
             });
             it('should send an update on reorder from one parent to another', function() {
+                // eslint-disable-next-line no-var
                 var requests, request, savingOptions;
                 requests = AjaxHelpers.requests(this);
                 ContentDragger.dragState.dropDestination = $('#unit-4');
@@ -355,6 +366,7 @@ function(sinon, ContentDragger, Notification, AjaxHelpers, $, _) {
                 expect($('#subsection-2').data('refresh')).toHaveBeenCalled();
             });
             it('should send an update on reorder within the same parent', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     request;
                 ContentDragger.dragState.dropDestination = $('#unit-2');

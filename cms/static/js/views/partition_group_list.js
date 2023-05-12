@@ -8,6 +8,7 @@ define([
 ], function(_, ListView, PartitionGroupItemView, gettext) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var PartitionGroupListView = ListView.extend({
         initialize: function(options) {
             ListView.prototype.initialize.apply(this, [options]);

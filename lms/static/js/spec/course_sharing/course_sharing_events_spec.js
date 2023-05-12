@@ -6,6 +6,7 @@ define(
         'use strict';
 
         describe('Course sharing click eventing', function() {
+            // eslint-disable-next-line no-var
             var courseKey1 = 'course-v1:edX+DemoX+Demo_Course',
                 courseKey2 = 'course-v1:uog+cs181+2017_LT';
 

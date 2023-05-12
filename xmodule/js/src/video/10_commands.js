@@ -2,6 +2,7 @@
     'use strict';
 
     define('video/10_commands.js', [], function() {
+        // eslint-disable-next-line no-var
         var VideoCommands, Command, playCommand, pauseCommand, togglePlaybackCommand,
             toggleMuteCommand, toggleFullScreenCommand, setSpeedCommand, skipCommand;
         /**
@@ -41,6 +42,7 @@
             },
 
             execute: function(command) {
+                // eslint-disable-next-line no-var
                 var args = [].slice.call(arguments, 1) || [];
 
                 // eslint-disable-next-line no-undef
@@ -53,6 +55,7 @@
             },
 
             getCommands: function() {
+                // eslint-disable-next-line no-var
                 var commands = {},
                     commandsList = [
                         playCommand, pauseCommand, togglePlaybackCommand,

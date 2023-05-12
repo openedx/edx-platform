@@ -12,6 +12,7 @@ define([
     'use strict';
 
     describe('CreateEditTeam', function() {
+        // eslint-disable-next-line no-var
         var editTeamID = 'av',
             DEFAULT_MEMBERSHIP = [
                 {
@@ -58,6 +59,7 @@ define([
                 };
             },
             createEditTeamMembersView = function(membership) {
+                // eslint-disable-next-line no-var
                 var teamModel = new TeamModel(
                     createTeamModelData(membership),
                     {parse: true}
@@ -80,11 +82,13 @@ define([
         });
 
         it('can render a message when there are no members', function() {
+            // eslint-disable-next-line no-var
             var view = createEditTeamMembersView([]);
             verifyNoMembersView(view);
         });
 
         it('can delete a team member and update the view', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 view = createEditTeamMembersView(DEFAULT_MEMBERSHIP);
 
@@ -112,6 +116,7 @@ define([
         });
 
         it('can show an error message if removing the user fails', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 view = createEditTeamMembersView(DEFAULT_MEMBERSHIP);
 
@@ -135,7 +140,9 @@ define([
         });
 
         it('can cancel team membership deletion', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
+            // eslint-disable-next-line no-var
             var view = createEditTeamMembersView(DEFAULT_MEMBERSHIP);
 
             // eslint-disable-next-line no-undef

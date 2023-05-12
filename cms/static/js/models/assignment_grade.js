@@ -1,5 +1,6 @@
 /* eslint-disable-next-line no-undef, no-unused-vars */
 define(['backbone', 'underscore'], function(Backbone, _) {
+    // eslint-disable-next-line no-var
     var AssignmentGrade = Backbone.Model.extend({
         defaults: {
             graderType: null, // the type label (string). May be "notgraded" which implies None.

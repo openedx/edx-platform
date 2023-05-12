@@ -4,6 +4,7 @@ define(
     function(Backbone, gettext) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var statusStrings = {
             // Translators: This is the status of a video upload that is queued
             // waiting for other uploads to complete
@@ -17,6 +18,7 @@ define(
             STATUS_FAILED: gettext('Upload failed')
         };
 
+        // eslint-disable-next-line no-var
         var ActiveVideoUpload = Backbone.Model.extend(
             {
                 defaults: {
@@ -27,6 +29,7 @@ define(
                 },
 
                 uploading: function() {
+                    // eslint-disable-next-line no-var
                     var status = this.get('status');
                     return (this.get('progress') < 1) && ((status === statusStrings.STATUS_UPLOADING));
                 }

@@ -6,6 +6,7 @@
     define(['backbone', 'underscore', 'jquery', 'gettext', 'js/groups/views/cohort_form',
         'edx-ui-toolkit/js/utils/html-utils', 'string_utils', 'js/models/notification', 'js/views/notification'],
     function(Backbone, _, $, gettext, CohortFormView, HtmlUtils) {
+        // eslint-disable-next-line no-var
         var CohortEditorView = Backbone.View.extend({
 
             events: {
@@ -52,6 +53,7 @@
             },
 
             selectTab: function(event) {
+                // eslint-disable-next-line no-var
                 var $tabElement = $(event.currentTarget),
                     tabName = $tabElement.data('tab');
                 event.preventDefault();
@@ -69,7 +71,9 @@
             },
 
             saveSettings: function(event) {
+                // eslint-disable-next-line no-var
                 var cohortFormView = this.cohortFormView;
+                // eslint-disable-next-line no-var
                 var self = this;
                 event.preventDefault();
                 cohortFormView.saveForm()
@@ -91,6 +95,7 @@
 
             addStudents: function(event) {
                 event.preventDefault();
+                // eslint-disable-next-line no-var
                 var self = this,
                     cohorts = this.cohorts,
                     input = this.$('.cohort-management-group-add-students'),
@@ -105,6 +110,7 @@
                     ).done(function(modifiedUsers) {
                         self.refreshCohorts().done(function() {
                             // Find the equivalent cohort in the new collection and select it
+                            // eslint-disable-next-line no-var
                             var cohort = cohorts.get(cohortId);
                             self.setCohort(cohort);
 
@@ -162,6 +168,7 @@
             },
 
             addNotifications: function(modifiedUsers) {
+                // eslint-disable-next-line no-var
                 var oldCohort, title, details, numPresent, numUsersAdded, numPreassigned,
                     numErrors, createErrorDetails, errorActionCallback, errorModel, i,
                     errorLimit = 5;
@@ -179,6 +186,7 @@
                         {numUsersAdded: numUsersAdded}
                     );
 
+                    // eslint-disable-next-line no-var
                     var movedByCohort = {};
                     _.each(modifiedUsers.changed, function(changedInfo) {
                         oldCohort = changedInfo.previous_cohort;
@@ -266,10 +274,13 @@
                 numErrors = modifiedUsers.unknown.length + modifiedUsers.invalid.length + modifiedUsers.not_allowed.length;
                 if (numErrors > 0) {
                     createErrorDetails = function(unknownUsers, invalidEmails, notAllowed, showAllErrors) {
+                        // eslint-disable-next-line no-var
                         var unknownErrorsShown = showAllErrors ? unknownUsers.length
                             : Math.min(errorLimit, unknownUsers.length);
+                        // eslint-disable-next-line no-var
                         var invalidErrorsShown = showAllErrors ? invalidEmails.length
                             : Math.min(errorLimit - unknownUsers.length, invalidEmails.length);
+                        // eslint-disable-next-line no-var
                         var notAllowedErrorsShown = showAllErrors ? notAllowed.length
                             : Math.min(errorLimit - notAllowed.length, notAllowed.length);
                         details = [];

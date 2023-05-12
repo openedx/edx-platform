@@ -12,6 +12,7 @@ define(['jquery', 'js/discovery/views/search_form'], function($, SearchForm) {
         });
 
         it('trims input string', function() {
+            // eslint-disable-next-line no-var
             var term = '  search string  ';
             $('.discovery-input').val(term);
             $('form').trigger('submit');
@@ -19,6 +20,7 @@ define(['jquery', 'js/discovery/views/search_form'], function($, SearchForm) {
         });
 
         it('handles calls to doSearch', function() {
+            // eslint-disable-next-line no-var
             var term = '  search string  ';
             $('.discovery-input').val(term);
             this.form.doSearch(term);

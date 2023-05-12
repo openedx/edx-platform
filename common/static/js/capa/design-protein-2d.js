@@ -1,4 +1,5 @@
 (function() {
+    // eslint-disable-next-line no-var
     var timeout = 1000;
 
     // eslint-disable-next-line no-use-before-define
@@ -27,12 +28,13 @@
     // initialization and has drawn itself
 
     function updateProtexField() {
+        // eslint-disable-next-line no-var
         var problem = $('#protex_container').parents('.problem');
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var input_field = problem.find('input[type=hidden]');
-        /* eslint-disable-next-line camelcase, no-undef */
+        /* eslint-disable-next-line camelcase, no-undef, no-var */
         var protex_answer = protexCheckAnswer();
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var value = {protex_answer: protex_answer};
         // console.log(JSON.stringify(value));
         // eslint-disable-next-line camelcase
@@ -42,23 +44,24 @@
     // eslint-disable-next-line no-undef
     protexIsReady = function() {
         // Load target shape
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var target_shape = $('#target_shape').val();
         // eslint-disable-next-line no-undef
         protexSetTargetShape(target_shape);
 
         // Get answer from protex and store it into the hidden input field
         // when Check button is clicked
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var $fold_button = $('#fold-button');
         // eslint-disable-next-line camelcase
         $fold_button.on('click', function() {
+            // eslint-disable-next-line no-var
             var problem = $('#protex_container').parents('.problem');
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var input_field = problem.find('input[type=hidden]');
-            /* eslint-disable-next-line camelcase, no-undef */
+            /* eslint-disable-next-line camelcase, no-undef, no-var */
             var protex_answer = protexCheckAnswer();
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var value = {protex_answer: protex_answer};
             // console.log(JSON.stringify(value));
             // eslint-disable-next-line camelcase

@@ -16,6 +16,7 @@
      * @return {Object} An instance of NotesPageView.
      */
         return function(params) {
+            // eslint-disable-next-line no-var
             var collection = new NotesCollection(
                 params.notes,
                 {

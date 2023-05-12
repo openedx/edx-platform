@@ -4,6 +4,7 @@ define(['domReady', 'jquery', 'underscore', 'js/utils/cancel_on_escape', 'js/vie
 function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibraryUtilsFactory, ViewUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CreateCourseUtils = new CreateCourseUtilsFactory({
         name: '.new-course-name',
         org: '.new-course-org',
@@ -23,6 +24,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         error: 'error'
     });
 
+    // eslint-disable-next-line no-var
     var CreateLibraryUtils = new CreateLibraryUtilsFactory({
         name: '.new-library-name',
         org: '.new-library-org',
@@ -41,6 +43,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         error: 'error'
     });
 
+    // eslint-disable-next-line no-var
     var saveNewCourse = function(e) {
         e.preventDefault();
 
@@ -48,14 +51,18 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
             return;
         }
 
+        // eslint-disable-next-line no-var
         var $newCourseForm = $(this).closest('#create-course-form');
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var display_name = $newCourseForm.find('.new-course-name').val();
+        // eslint-disable-next-line no-var
         var org = $newCourseForm.find('.new-course-org').val();
+        // eslint-disable-next-line no-var
         var number = $newCourseForm.find('.new-course-number').val();
+        // eslint-disable-next-line no-var
         var run = $newCourseForm.find('.new-course-run').val();
 
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var course_info = {
             org: org,
             number: number,
@@ -67,6 +74,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         // eslint-disable-next-line no-undef
         analytics.track('Created a Course', course_info);
         CreateCourseUtils.create(course_info, function(errorMessage) {
+            // eslint-disable-next-line no-var
             var msg = edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML('<p>'), errorMessage, edx.HtmlUtils.HTML('</p>'));
             $('.create-course .wrap-error').addClass('is-shown');
             edx.HtmlUtils.setHtml($('#course_creation_error'), msg);
@@ -74,7 +82,9 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         });
     };
 
+    // eslint-disable-next-line no-var
     var rtlTextDirection = function() {
+        // eslint-disable-next-line no-var
         var Selectors = {
             new_course_run: '#new-course-run'
         };
@@ -91,6 +101,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         }
     };
 
+    // eslint-disable-next-line no-var
     var makeCancelHandler = function(addType) {
         return function(e) {
             e.preventDefault();
@@ -104,7 +115,9 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         };
     };
 
+    // eslint-disable-next-line no-var
     var addNewCourse = function(e) {
+        // eslint-disable-next-line no-var
         var $newCourse,
             $cancelButton,
             $courseName;
@@ -123,6 +136,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         rtlTextDirection();
     };
 
+    // eslint-disable-next-line no-var
     var saveNewLibrary = function(e) {
         e.preventDefault();
 
@@ -130,13 +144,16 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
             return;
         }
 
+        // eslint-disable-next-line no-var
         var $newLibraryForm = $(this).closest('#create-library-form');
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var display_name = $newLibraryForm.find('.new-library-name').val();
+        // eslint-disable-next-line no-var
         var org = $newLibraryForm.find('.new-library-org').val();
+        // eslint-disable-next-line no-var
         var number = $newLibraryForm.find('.new-library-number').val();
 
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var lib_info = {
             org: org,
             number: number,
@@ -147,6 +164,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         // eslint-disable-next-line no-undef
         analytics.track('Created a Library', lib_info);
         CreateLibraryUtils.create(lib_info, function(errorMessage) {
+            // eslint-disable-next-line no-var
             var msg = edx.HtmlUtils.joinHtml(edx.HtmlUtils.HTML('<p>'), errorMessage, edx.HtmlUtils.HTML('</p>'));
             $('.create-library .wrap-error').addClass('is-shown');
             edx.HtmlUtils.setHtml($('#library_creation_error'), msg);
@@ -154,12 +172,16 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         });
     };
 
+    // eslint-disable-next-line no-var
     var addNewLibrary = function(e) {
         e.preventDefault();
         $('.new-library-button').addClass('is-disabled').attr('aria-disabled', true);
         $('.new-library-save').addClass('is-disabled').attr('aria-disabled', true);
+        // eslint-disable-next-line no-var
         var $newLibrary = $('.wrapper-create-library').addClass('is-shown');
+        // eslint-disable-next-line no-var
         var $cancelButton = $newLibrary.find('.new-library-cancel');
+        // eslint-disable-next-line no-var
         var $libraryName = $('.new-library-name');
         $libraryName.focus().select();
         $('.new-library-save').on('click', saveNewLibrary);
@@ -169,6 +191,7 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         CreateLibraryUtils.configureHandlers();
     };
 
+    // eslint-disable-next-line no-var
     var showTab = function(tab) {
         return function(e) {
             e.preventDefault();
@@ -182,9 +205,13 @@ function(domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibrary
         };
     };
 
+    // eslint-disable-next-line no-var
     var onReady = function() {
+        // eslint-disable-next-line no-var
         var courseTabHref = $('#course-index-tabs .courses-tab a').attr('href');
+        // eslint-disable-next-line no-var
         var libraryTabHref = $('#course-index-tabs .libraries-tab a').attr('href');
+        // eslint-disable-next-line no-var
         var ArchivedTabHref = $('#course-index-tabs .archived-courses-tab a').attr('href');
 
         $('.new-course-button').bind('click', addNewCourse);

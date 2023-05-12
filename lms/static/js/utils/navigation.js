@@ -1,7 +1,8 @@
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {},
 
     Navigation = (function() {
+        // eslint-disable-next-line no-var
         var navigation = {
 
             init: function() {
@@ -17,6 +18,7 @@ var edx = edx || {},
             },
 
             getActiveIndex: function() {
+                // eslint-disable-next-line no-var
                 var index = $('.accordion .button-chapter:has(.active)').index('.accordion .button-chapter'),
                     button = null;
 
@@ -28,6 +30,7 @@ var edx = edx || {},
             },
 
             checkForCurrent: function() {
+                // eslint-disable-next-line no-var
                 var button = navigation.getActiveIndex();
 
                 navigation.closeAccordions();
@@ -41,6 +44,7 @@ var edx = edx || {},
                 $('.accordion').on('click', '.button-chapter', function(event) {
                     event.preventDefault();
 
+                    // eslint-disable-next-line no-var
                     var $button = $(event.currentTarget),
                         section = $button.next('.chapter-content-container');
 
@@ -66,6 +70,7 @@ var edx = edx || {},
             },
 
             closeAccordions: function(button, section) {
+                // eslint-disable-next-line no-var
                 var menu = $(section).find('.chapter-menu'),
                     // eslint-disable-next-line no-unused-vars
                     toggle;
@@ -98,12 +103,14 @@ var edx = edx || {},
             },
 
             setupCurrentAccordionSection: function(button) {
+                // eslint-disable-next-line no-var
                 var section = $(button).next('.chapter-content-container');
 
                 navigation.openAccordion(button, section);
             },
 
             openAccordion: function(button, section) {
+                // eslint-disable-next-line no-var
                 var $sectionEl = $(section),
                     // eslint-disable-next-line no-unused-vars
                     firstLink = $sectionEl.find('.menu-item').first(),

@@ -252,6 +252,7 @@
         }
 
         function attrIsInteger(obj, attr) {
+            // eslint-disable-next-line no-var
             var tempInt;
 
             if (obj.hasOwnProperty(attr) === false) {

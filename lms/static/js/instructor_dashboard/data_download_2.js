@@ -4,7 +4,7 @@
 (function() {
     'use strict';
 
-    // eslint-disable-next-line no-unused-vars
+    /* eslint-disable-next-line no-unused-vars, no-var */
     var DataDownloadV2, PendingInstructorTasks, ReportDownloads, statusAjaxError;
 
     // eslint-disable-next-line no-unused-vars
@@ -22,6 +22,7 @@
 
     DataDownloadV2 = (function() {
         function InstructorDashboardDataDownload($section) {
+            // eslint-disable-next-line no-var
             var dataDownloadObj = this;
             this.$section = $section;
             this.$section.data('wrapper', this);
@@ -77,6 +78,7 @@
              * Show and hide selected tab data
              */
             this.$tabSwitch.click(function(event) {
+                // eslint-disable-next-line no-var
                 var selectedSection = '#' + $(this).attr('data-section');
                 event.preventDefault();
                 $('.data-download-nav .btn-link').removeClass('active-section');
@@ -96,6 +98,7 @@
              * on change of report select update show and hide related descriptions
              */
             this.$report_type_selector.change(function() {
+                // eslint-disable-next-line no-var
                 var selectedOption = dataDownloadObj.$report_type_selector.val();
                 dataDownloadObj.$selection_informations.each(function(index, elem) {
                     if ($(elem).hasClass(selectedOption)) {
@@ -115,7 +118,9 @@
              * On click download button get selected option and pass it to handler function.
              */
             this.downloadReportClickHandler = function() {
+                // eslint-disable-next-line no-var
                 var selectedOption = dataDownloadObj.selectedOption();
+                // eslint-disable-next-line no-var
                 var errorMessage = dataDownloadObj.ERROR_MESSAGES[selectedOption.val()];
 
                 if (selectedOption.data('directdownload')) {
@@ -134,6 +139,7 @@
              * @param errorMessage Error message in case endpoint call fail.
              */
             this.renderDataTable = function(selected, errorMessage) {
+                // eslint-disable-next-line no-var
                 var url = selected.data('endpoint');
                 dataDownloadObj.clear_display();
                 dataDownloadObj.$data_display_table.text(gettext('Loading data...'));
@@ -150,12 +156,15 @@
             };
 
             this.$downloadProblemReport.click(function() {
+                // eslint-disable-next-line no-var
                 var data = {problem_location: dataDownloadObj.$list_problem_responses_csv_input.val()};
                 dataDownloadObj.downloadCSV($(this), false, data);
             });
 
             this.$gradeReportDownload.click(function() {
+                // eslint-disable-next-line no-var
                 var errorMessage = gettext('Error generating grades. Please try again.');
+                // eslint-disable-next-line no-var
                 var data = {verified_learners_only: dataDownloadObj.$learnerStatus.val()};
                 dataDownloadObj.downloadCSV($(this), errorMessage, data);
             });
@@ -164,6 +173,7 @@
              * Call data endpoint and render success/error message on dashboard UI.
              */
             this.downloadCSV = function(selected, errorMessage, postData) {
+                // eslint-disable-next-line no-var
                 var url = selected.data('endpoint');
                 dataDownloadObj.clear_display();
                 return $.ajax({
@@ -201,6 +211,7 @@
              * render data table on dashboard UI with given data.
              */
             this.buildDataTable = function(data) {
+                // eslint-disable-next-line no-var
                 var $tablePlaceholder, columns, feature, gridData, options;
                 dataDownloadObj.clear_display();
                 options = {
@@ -210,6 +221,7 @@
                     rowHeight: 35
                 };
                 columns = (function() {
+                    // eslint-disable-next-line no-var
                     var i, len, ref, results;
                     ref = data.queried_features;
                     results = [];

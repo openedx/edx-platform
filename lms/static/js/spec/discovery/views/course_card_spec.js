@@ -5,6 +5,7 @@ define([
 ], function($, TemplateHelpers, CourseCard, CourseCardView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var JSON_RESPONSE = {
         total: 365,
         results: [
@@ -40,6 +41,7 @@ define([
         });
 
         it('renders', function() {
+            // eslint-disable-next-line no-var
             var data = this.view.model.attributes;
             expect(this.view.$el).toContainHtml(data.content.display_name);
             expect(this.view.$el).toContainElement('a[href="/courses/' + data.course + '/about"]');

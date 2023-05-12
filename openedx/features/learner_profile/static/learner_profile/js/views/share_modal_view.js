@@ -8,6 +8,7 @@
             'edx-ui-toolkit/js/utils/html-utils'
         ],
         function(gettext, $, _, Backbone, Moment, badgeModalTemplate, HtmlUtils) {
+            // eslint-disable-next-line no-var
             var ShareModalView = Backbone.View.extend({
                 attributes: {
                     class: 'badges-overlay'

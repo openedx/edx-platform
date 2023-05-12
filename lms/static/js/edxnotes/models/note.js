@@ -2,6 +2,7 @@
     'use strict';
 
     define(['backbone', 'js/edxnotes/utils/utils', 'underscore.string'], function(Backbone, Utils, str) {
+        // eslint-disable-next-line no-var
         var NoteModel = Backbone.Model.extend({
             defaults: {
                 id: null,
@@ -45,6 +46,7 @@
             },
 
             getQuote: function() {
+                // eslint-disable-next-line no-var
                 var message = this.get('quote');
 
                 if (!this.get('is_expanded') && this.get('show_link')) {

@@ -5,6 +5,7 @@ define([
     'use strict';
 
     return function(courseDetails, gradingUrl, courseAssignmentLists) {
+        // eslint-disable-next-line no-var
         var model, editor;
 
         $('form :input')

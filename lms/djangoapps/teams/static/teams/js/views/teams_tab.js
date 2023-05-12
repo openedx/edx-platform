@@ -33,6 +33,7 @@
         TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, ManageView, TopicTeamsView,
         TeamEditView, TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView,
         teamsTemplate) {
+        // eslint-disable-next-line no-var
         var TeamsHeaderModel = HeaderModel.extend({
             initialize: function() {
                 _.extend(this.defaults, {nav_aria_label: gettext('Topics')});
@@ -40,6 +41,7 @@
             }
         });
 
+        // eslint-disable-next-line no-var
         var ViewWithHeader = Backbone.View.extend({
             initialize: function(options) {
                 this.header = options.header;
@@ -59,8 +61,10 @@
             }
         });
 
+        // eslint-disable-next-line no-var
         var TeamTabView = Backbone.View.extend({
             initialize: function(options) {
+                // eslint-disable-next-line no-var
                 var view = this,
                     router, tabsList;
                 this.context = options.context;
@@ -223,6 +227,7 @@
                  * Render the list of teams for the given topic ID.
                  */
             browseTopic: function(topicID) {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.getTeamsView(topicID).done(function(teamsView) {
                     // eslint-disable-next-line no-multi-assign
@@ -236,6 +241,7 @@
                  * Show the search results for a team.
                  */
             searchTeams: function(topicID) {
+                // eslint-disable-next-line no-var
                 var view = this;
                 if (!this.teamsCollection) {
                     this.router.navigate('topics/' + topicID, {trigger: true});
@@ -259,6 +265,7 @@
                  * Render the create new team form.
                  */
             newTeam: function(topicID) {
+                // eslint-disable-next-line no-var
                 var view = this;
                 this.getTopic(topicID).done(function(topic) {
                     view.mainView = view.createViewWithHeader({
@@ -285,9 +292,11 @@
                  * Render the edit team form.
                  */
             editTeam: function(topicID, teamID) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     editViewWithHeader;
                 $.when(this.getTopic(topicID), this.getTeam(teamID, false)).done(function(topic, team) {
+                    // eslint-disable-next-line no-var
                     var view = new TeamEditView({
                         action: 'edit',
                         teamEvents: self.teamEvents,
@@ -295,6 +304,7 @@
                         topic: topic,
                         model: team
                     });
+                    // eslint-disable-next-line no-var
                     var instructorToolsView = new InstructorToolsView({
                         team: team,
                         teamEvents: self.teamEvents
@@ -322,8 +332,10 @@
                  * The backbone router entry for editing team members, using topic and team IDs.
                  */
             editTeamMembers: function(topicID, teamID) {
+                // eslint-disable-next-line no-var
                 var self = this;
                 $.when(this.getTopic(topicID), this.getTeam(teamID, true)).done(function(topic, team) {
+                    // eslint-disable-next-line no-var
                     var view = new TeamMembersEditView({
                         teamEvents: self.teamEvents,
                         context: self.context,
@@ -352,6 +364,7 @@
             getTeamsView: function(topicID) {
                 // Lazily load the teams-for-topic view in
                 // order to avoid making an extra AJAX call.
+                // eslint-disable-next-line no-var
                 var view = this,
                     deferred = $.Deferred();
                 if (this.teamsView && this.teamsCollection && this.teamsCollection.topic_id === topicID) {
@@ -360,6 +373,7 @@
                 } else {
                     this.getTopic(topicID)
                         .done(function(topic) {
+                            // eslint-disable-next-line no-var
                             var collection = new TeamCollection([], {
                                 teamEvents: view.teamEvents,
                                 course_id: view.context.courseID,
@@ -369,6 +383,7 @@
                             });
                             view.teamsCollection = collection;
                             collection.getPage(1).then(function() {
+                                // eslint-disable-next-line no-var
                                 var teamsView = view.createTeamsListView({
                                     topic: topic,
                                     collection: collection,
@@ -393,6 +408,7 @@
             },
 
             createTeamsListView: function(options) {
+                // eslint-disable-next-line no-var
                 var topic = options.topic,
                     collection = options.collection,
                     teamsView = new TopicTeamsView({
@@ -448,6 +464,7 @@
                  * Browse to the team with the specified team ID belonging to the specified topic.
                  */
             browseTeam: function(topicID, teamID) {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.getBrowseTeamView(topicID, teamID).done(function(browseTeamView) {
                     self.mainView = browseTeamView;
@@ -467,10 +484,12 @@
                  * Return a promise for the team view for the given team ID.
                  */
             getBrowseTeamView: function(topicID, teamID) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     deferred = $.Deferred();
 
                 $.when(this.getTopic(topicID), this.getTeam(teamID, true)).done(function(topic, team) {
+                    // eslint-disable-next-line no-var
                     var view = new TeamProfileView({
                         teamEvents: self.teamEvents,
                         router: self.router,
@@ -480,6 +499,7 @@
                         setFocusToHeaderFunc: self.setFocusToHeader
                     });
 
+                    // eslint-disable-next-line no-var
                     var TeamProfileActionsView = new TeamProfileHeaderActionsView({
                         teamEvents: self.teamEvents,
                         context: self.context,
@@ -551,6 +571,7 @@
             },
 
             createBreadcrumbs: function(topic, team) {
+                // eslint-disable-next-line no-var
                 var breadcrumbs = [{
                     title: gettext('All Topics'),
                     url: '#browse'
@@ -571,6 +592,7 @@
             },
 
             createHeaderModel: function(options) {
+                // eslint-disable-next-line no-var
                 var subject = options.subject,
                     breadcrumbs = options.breadcrumbs,
                     title = options.title || subject.get('name'),
@@ -583,6 +605,7 @@
             },
 
             createViewWithHeader: function(options) {
+                // eslint-disable-next-line no-var
                 var router = this.router;
                 return new ViewWithHeader({
                     header: new HeaderView({
@@ -590,6 +613,7 @@
                         headerActionsView: options.headerActionsView,
                         events: {
                             'click nav.breadcrumbs a.nav-item': function(event) {
+                                // eslint-disable-next-line no-var
                                 var url = $(event.currentTarget).attr('href');
                                 event.preventDefault();
                                 router.navigate(url, {trigger: true});
@@ -611,6 +635,7 @@
             getTopic: function(topicID) {
                 // Try finding topic in the current page of the
                 // topicCollection.  Otherwise call the topic endpoint.
+                // eslint-disable-next-line no-var
                 var topic = this.topicsCollection.findWhere({id: topicID}),
                     self = this,
                     deferred = $.Deferred();
@@ -642,6 +667,7 @@
                  * @returns {promise} a jQuery deferred promise for the team.
                  */
             getTeam: function(teamID, expandUser) {
+                // eslint-disable-next-line no-var
                 var team = this.teamsCollection ? this.teamsCollection.get(teamID) : null,
                     self = this,
                     deferred = $.Deferred(),
@@ -725,6 +751,7 @@
                  * belongs to the team.
                  */
             readOnlyDiscussion: function(team) {
+                // eslint-disable-next-line no-var
                 var userInfo = this.context.userInfo;
                 return !(
                     userInfo.privileged

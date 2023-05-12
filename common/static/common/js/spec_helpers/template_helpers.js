@@ -4,9 +4,11 @@
 // eslint-disable-next-line no-undef
 define(['jquery', 'underscore'],
     function($, _) {
+        // eslint-disable-next-line no-var
         var installTemplate, installTemplates;
 
         installTemplate = function(templateFile, isFirst, templateId) {
+            // eslint-disable-next-line no-var
             var template = readFixtures(templateFile + '.underscore'),
                 templateName = templateFile,
                 slashIndex = _.lastIndexOf(templateName, '/');

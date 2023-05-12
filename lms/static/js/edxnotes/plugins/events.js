@@ -68,6 +68,7 @@
             annotationViewerShown: function(viewer, annotations) {
             // Emits an event only when the annotation already exists on the
             // server. Otherwise, `annotation.id` is `undefined`.
+                // eslint-disable-next-line no-var
                 var data;
                 annotations = _.reject(annotations, this.isNew);
                 data = {
@@ -81,6 +82,7 @@
             },
 
             annotationFullyCreated: function(annotation) {
+                // eslint-disable-next-line no-var
                 var data = this.getDefaultData(annotation);
                 this.log('edx.course.student_notes.added', data);
             },
@@ -96,6 +98,7 @@
             },
 
             annotationUpdated: function(annotation) {
+                // eslint-disable-next-line no-var
                 var data, defaultData;
                 if (!this.isNew(annotation)) {
                     defaultData = this.getDefaultData(annotation);
@@ -109,6 +112,7 @@
             },
 
             annotationDeleted: function(annotation) {
+                // eslint-disable-next-line no-var
                 var data;
                 // Emits an event only when the annotation already exists on the
                 // server.
@@ -119,6 +123,7 @@
             },
 
             getDefaultData: function(annotation) {
+                // eslint-disable-next-line no-var
                 var truncated = [];
                 return _.extend(
                     {
@@ -133,6 +138,7 @@
             },
 
             getText: function(fieldName, text, truncated) {
+                // eslint-disable-next-line no-var
                 var info = {},
                     limit = this.options.stringLimit;
 
@@ -147,6 +153,7 @@
             },
 
             getTextArray: function(fieldName, textArray, truncated) {
+                // eslint-disable-next-line no-var
                 var info = {},
                     limit = this.options.stringLimit,
                     totalLength = 0,

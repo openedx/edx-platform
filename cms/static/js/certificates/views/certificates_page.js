@@ -11,6 +11,7 @@ define([
 function($, _, gettext, BasePage, CertificatesListView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CertificatesPage = BasePage.extend({
 
         initialize: function(options) {

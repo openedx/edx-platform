@@ -13,6 +13,7 @@
      * @param {Object} i18n The object containing strings with translations.
      * @return {jquery Promise}
      */
+            // eslint-disable-next-line no-var
             var SkipControl = function(state, i18n) {
                 if (!(this instanceof SkipControl)) {
                     return new SkipControl(state, i18n);

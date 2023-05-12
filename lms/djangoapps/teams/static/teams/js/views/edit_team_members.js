@@ -47,6 +47,7 @@
             },
 
             renderTeamMembers: function() {
+                // eslint-disable-next-line no-var
                 var self = this,
                     dateJoined, lastActivity;
 
@@ -85,6 +86,7 @@
             },
 
             removeMember: function(event) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     username = $(event.currentTarget).data('username');
                 event.preventDefault();

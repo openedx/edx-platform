@@ -6,15 +6,21 @@ function(TemplateHelpers, AjaxHelpers) {
     'use strict';
 
     describe('edx.dashboard.donation.DonationView', function() {
+        // eslint-disable-next-line no-var
         var PAYMENT_URL = 'https://fake.processor.com/pay/';
+        // eslint-disable-next-line no-var
         var PAYMENT_PARAMS = {
             orderId: 'test-order',
             signature: 'abcd1234'
         };
+        // eslint-disable-next-line no-var
         var AMOUNT = '45.67';
+        // eslint-disable-next-line no-var
         var COURSE_ID = 'edx/DemoX/Demo';
 
+        // eslint-disable-next-line no-var
         var view = null;
+        // eslint-disable-next-line no-var
         var requests = null;
 
         beforeEach(function() {
@@ -68,6 +74,7 @@ function(TemplateHelpers, AjaxHelpers) {
             // We stub out the actual submission of the form to avoid
             // leaving the current page during the test.
             expect(view.submitPaymentForm).toHaveBeenCalled();
+            // eslint-disable-next-line no-var
             var form = view.submitPaymentForm.calls.mostRecent().args[0];
             expect(form.serialize()).toEqual($.param(PAYMENT_PARAMS));
             expect(form.attr('method')).toEqual('post');
@@ -75,6 +82,7 @@ function(TemplateHelpers, AjaxHelpers) {
         });
 
         it('validates the donation amount', function() {
+            // eslint-disable-next-line no-var
             var assertValidAmount = function(amount, isValid) {
                 expect(view.validateAmount(amount)).toBe(isValid);
             };

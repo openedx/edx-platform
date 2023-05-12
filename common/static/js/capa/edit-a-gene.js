@@ -1,4 +1,5 @@
 (function() {
+    // eslint-disable-next-line no-var
     var timeout = 1000;
 
     // eslint-disable-next-line no-use-before-define
@@ -32,19 +33,20 @@
     // Genex does not call the following function
     // eslint-disable-next-line no-undef
     genexGetInputField = function() {
+        // eslint-disable-next-line no-var
         var problem = $('#genex_container').parents('.problem');
         return problem.find('input[type="hidden"][name!="genex_dna_sequence"][name!="genex_problem_number"]');
     };
 
     // eslint-disable-next-line no-undef
     genexIsReady = function() {
-        /* eslint-disable-next-line camelcase, no-undef */
+        /* eslint-disable-next-line camelcase, no-undef, no-var */
         var input_field = genexGetInputField();
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var genex_saved_state = input_field.val();
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var genex_default_dna_sequence;
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var genex_dna_sequence;
 
         // Get the DNA sequence from xml file
@@ -55,7 +57,7 @@
         genexSetDefaultDNASequence(genex_default_dna_sequence);
 
         // Now load problem
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var genex_problem_number = $('#genex_problem_number').val();
         // eslint-disable-next-line no-undef
         genexSetProblemNumber(genex_problem_number);
@@ -85,9 +87,9 @@
 
     // eslint-disable-next-line no-undef
     genexStoreAnswer = function(answer) {
-        /* eslint-disable-next-line camelcase, no-undef */
+        /* eslint-disable-next-line camelcase, no-undef, no-var */
         var input_field = genexGetInputField();
-        // eslint-disable-next-line no-undef
+        /* eslint-disable-next-line no-undef, no-var */
         var value = {genex_dna_sequence: genexGetDNASequence(), genex_answer: answer};
         // eslint-disable-next-line camelcase
         input_field.val(JSON.stringify(value));

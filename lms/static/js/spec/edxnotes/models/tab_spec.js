@@ -17,6 +17,7 @@ define([
         });
 
         it('can inactivate current model', function() {
+            // eslint-disable-next-line no-var
             var model = this.collection.at(0);
             model.activate();
             expect(model.get('is_active')).toBeTruthy();
@@ -25,6 +26,7 @@ define([
         });
 
         it('can see correct activity status via isActive', function() {
+            // eslint-disable-next-line no-var
             var model = this.collection.at(0);
             model.activate();
             expect(model.isActive()).toBeTruthy();

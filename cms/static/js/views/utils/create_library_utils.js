@@ -7,9 +7,12 @@ define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/
         'use strict';
 
         return function(selectors, classes) {
+            // eslint-disable-next-line no-var
             var keyLengthViolationMessage = gettext('The combined length of the organization and library code fields'
               + ' cannot be more than <%- limit %> characters.');
+            // eslint-disable-next-line no-var
             var keyFieldSelectors = [selectors.org, selectors.number];
+            // eslint-disable-next-line no-var
             var nonEmptyCheckFieldSelectors = [selectors.name, selectors.org, selectors.number];
 
             CreateUtilsFactory.call(this, selectors, classes, keyLengthViolationMessage, keyFieldSelectors, nonEmptyCheckFieldSelectors);
@@ -21,9 +24,11 @@ define(['jquery', 'gettext', 'common/js/components/utils/view_utils', 'js/views/
                 ).done(function(data) {
                     ViewUtils.redirect(data.url);
                 }).fail(function(jqXHR, textStatus, errorThrown) {
+                    // eslint-disable-next-line no-var
                     var reason = errorThrown;
                     if (jqXHR.responseText) {
                         try {
+                            // eslint-disable-next-line no-var
                             var detailedReason = $.parseJSON(jqXHR.responseText).ErrMsg;
                             if (detailedReason) {
                                 reason = detailedReason;

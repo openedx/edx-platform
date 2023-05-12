@@ -17,6 +17,7 @@
                 'click .disable-account-btn': 'disableAccount'
             },
             initialize: function(options) {
+                // eslint-disable-next-line no-var
                 var user = options.user;
                 this.initialUser = user;
                 this.userSupportUrl = options.userSupportUrl;
@@ -27,6 +28,7 @@
                 this.user_profile.on('change', _.bind(this.render, this));
             },
             render: function() {
+                // eslint-disable-next-line no-var
                 var user = this.user_profile.user;
                 HtmlUtils.setHtml(this.$el, this.manageUserTpl({
                     user: user,

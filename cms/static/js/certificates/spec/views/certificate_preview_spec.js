@@ -13,6 +13,7 @@ define([
 function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHelpers) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var SELECTORS = {
         course_modes: '#course-modes',
         activate_certificate: '.activate-cert',
@@ -20,6 +21,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
     };
 
     describe('Certificate Web Preview Spec:', function() {
+        // eslint-disable-next-line no-var
         var selectDropDownByText = function(element, value) {
             if (value) {
                 element.val(value);
@@ -87,6 +89,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
             });
 
             it('certificate deactivation works fine', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
                 this.view.$(SELECTORS.activate_certificate).click();
@@ -97,6 +100,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
             });
 
             it('certificate activation works fine', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
                 this.view.is_active = false;

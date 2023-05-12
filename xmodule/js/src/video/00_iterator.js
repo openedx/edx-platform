@@ -11,6 +11,7 @@
      * @constructor
      * @param {array} list Array to be iterated.
      */
+            // eslint-disable-next-line no-var
             var Iterator = function(list) {
                 this.list = list;
                 this.index = 0;

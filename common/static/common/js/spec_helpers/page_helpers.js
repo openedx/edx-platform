@@ -3,6 +3,7 @@ define(['backbone'],
     function(Backbone) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var getLocationHash, preventBackboneChangingUrl;
 
         /**
@@ -29,6 +30,7 @@ define(['backbone'],
          * unexpected navigation state.
          */
         preventBackboneChangingUrl = function() {
+            // eslint-disable-next-line no-var
             var history = {
                 currentFragment: ''
             };

@@ -11,12 +11,14 @@
         'text!learner_profile/templates/badge_placeholder.underscore'
     ],
     function(gettext, $, _, HtmlUtils, ListView, BadgeView, badgePlaceholder) {
+        // eslint-disable-next-line no-var
         var BadgeListView = ListView.extend({
             tagName: 'div',
 
             template: HtmlUtils.template(badgePlaceholder),
 
             renderCollection: function() {
+                // eslint-disable-next-line no-var
                 var self = this,
                     $row;
 
@@ -24,6 +26,7 @@
 
                 // Split into two columns.
                 this.collection.each(function(badge, index) {
+                    // eslint-disable-next-line no-var
                     var $item;
                     if (index % 2 === 0) {
                         $row = $('<div class="row">');

@@ -1,4 +1,5 @@
 (function() {
+    // eslint-disable-next-line no-var
     var CohortManagement;
 
     CohortManagement = (function() {

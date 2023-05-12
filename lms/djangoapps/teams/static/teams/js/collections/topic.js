@@ -3,6 +3,7 @@
 
     define(['underscore', 'gettext', 'teams/js/collections/base', 'teams/js/models/topic'],
         function(_, gettext, BaseCollection, TopicModel) {
+            // eslint-disable-next-line no-var
             var TopicCollection = BaseCollection.extend({
                 model: TopicModel,
 

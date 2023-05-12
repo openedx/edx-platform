@@ -16,6 +16,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
     'use strict';
 
     describe('edx.AccountSettingsFieldViews', function() {
+        // eslint-disable-next-line no-var
         var requests,
             timerCallback, // eslint-disable-line no-unused-vars
             data;
@@ -35,12 +36,14 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
         it('sends request to reset password on clicking link in PasswordFieldView', function() {
             requests = AjaxHelpers.requests(this);
 
+            // eslint-disable-next-line no-var
             var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.PasswordFieldView, {
                 linkHref: '/password_reset',
                 emailAttribute: 'email',
                 valueAttribute: 'password'
             });
 
+            // eslint-disable-next-line no-var
             var view = new AccountSettingsFieldViews.PasswordFieldView(fieldData).render();
             expect(view.$('.u-field-value > button').is(':disabled')).toBe(false);
             view.$('.u-field-value > button').click();
@@ -55,10 +58,14 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
         });
 
         it('update time zone dropdown after country dropdown changes', function() {
+            // eslint-disable-next-line no-var
             var baseSelector = '.u-field-value > select';
+            // eslint-disable-next-line no-var
             var groupsSelector = baseSelector + '> optgroup';
+            // eslint-disable-next-line no-var
             var groupOptionsSelector = groupsSelector + '> option';
 
+            // eslint-disable-next-line no-var
             var timeZoneData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.TimeZoneFieldView, {
                 valueAttribute: 'time_zone',
                 groupOptions: [{
@@ -69,16 +76,21 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
                 persistChanges: true,
                 required: true
             });
+            // eslint-disable-next-line no-var
             var countryData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
                 valueAttribute: 'country',
                 options: [['KY', 'Cayman Islands'], ['CA', 'Canada'], ['GY', 'Guyana']],
                 persistChanges: true
             });
 
+            // eslint-disable-next-line no-var
             var countryChange = {country: 'GY'};
+            // eslint-disable-next-line no-var
             var timeZoneChange = {time_zone: 'Pacific/Kosrae'};
 
+            // eslint-disable-next-line no-var
             var timeZoneView = new AccountSettingsFieldViews.TimeZoneFieldView(timeZoneData).render();
+            // eslint-disable-next-line no-var
             var countryView = new AccountSettingsFieldViews.DropdownFieldView(countryData).render();
 
             requests = AjaxHelpers.requests(this);
@@ -127,13 +139,16 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
         it('sends request to /i18n/setlang/ after changing language in LanguagePreferenceFieldView', function() {
             requests = AjaxHelpers.requests(this);
 
+            // eslint-disable-next-line no-var
             var selector = '.u-field-value > select';
+            // eslint-disable-next-line no-var
             var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
                 valueAttribute: 'language',
                 options: FieldViewsSpecHelpers.SELECT_OPTIONS,
                 persistChanges: true
             });
 
+            // eslint-disable-next-line no-var
             var view = new AccountSettingsFieldViews.LanguagePreferenceFieldView(fieldData).render();
 
             data = {language: FieldViewsSpecHelpers.SELECT_OPTIONS[2][0]};
@@ -181,7 +196,9 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
         it('reads and saves the value correctly for LanguageProficienciesFieldView', function() {
             requests = AjaxHelpers.requests(this);
 
+            // eslint-disable-next-line no-var
             var selector = '.u-field-value > select';
+            // eslint-disable-next-line no-var
             var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.DropdownFieldView, {
                 valueAttribute: 'language_proficiencies',
                 options: FieldViewsSpecHelpers.SELECT_OPTIONS,
@@ -189,6 +206,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
             });
             fieldData.model.set({language_proficiencies: [{code: FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]}]});
 
+            // eslint-disable-next-line no-var
             var view = new AccountSettingsFieldViews.LanguageProficienciesFieldView(fieldData).render();
 
             expect(view.modelValue()).toBe(FieldViewsSpecHelpers.SELECT_OPTIONS[0][0]);
@@ -203,6 +221,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
         it('correctly links and unlinks from AuthFieldView', function() {
             requests = AjaxHelpers.requests(this);
 
+            // eslint-disable-next-line no-var
             var fieldData = FieldViewsSpecHelpers.createFieldData(FieldViews.LinkFieldView, {
                 title: 'Yet another social network',
                 helpMessage: '',
@@ -212,6 +231,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, UserAccountModel, FieldVi
                 connectUrl: 'yetanother.com/auth/connect',
                 disconnectUrl: 'yetanother.com/auth/disconnect'
             });
+            // eslint-disable-next-line no-var
             var view = new AccountSettingsFieldViews.AuthFieldView(fieldData).render();
 
             AccountSettingsFieldViewSpecHelpers.verifyAuthField(view, fieldData, requests);

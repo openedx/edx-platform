@@ -13,6 +13,7 @@ define([
 ], function(domReady, $, _, str, Backbone, gettext, NotificationView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var main, sendJSON;
     main = function() {
         // eslint-disable-next-line no-undef
@@ -36,6 +37,7 @@ define([
             }
         });
         $(document).ajaxError(function(event, jqXHR, ajaxSettings) {
+            // eslint-disable-next-line no-var
             var msg, contentType,
                 message = gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'); // eslint-disable-line max-len
             if (ajaxSettings.notifyOnError === false) {

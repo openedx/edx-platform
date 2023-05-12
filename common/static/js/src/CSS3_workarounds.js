@@ -1,6 +1,7 @@
 // A file for JS workarounds for CSS3 features that are not
 // supported in older browsers
 
+// eslint-disable-next-line no-var
 var pointerEventsNone = function(selector, supportedStyles) {
     // Check to see if the browser supports 'pointer-events' css rule.
     // If it doesn't, use javascript to stop the link from working

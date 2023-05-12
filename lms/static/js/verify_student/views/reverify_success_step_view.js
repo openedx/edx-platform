@@ -3,7 +3,7 @@
  * submitted photos for reverification.
  */
 
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function() {

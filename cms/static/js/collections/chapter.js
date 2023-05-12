@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-undef
 define(['backbone', 'js/models/chapter'], function(Backbone, ChapterModel) {
+    // eslint-disable-next-line no-var
     var ChapterCollection = Backbone.Collection.extend({
         model: ChapterModel,
         comparator: 'order',

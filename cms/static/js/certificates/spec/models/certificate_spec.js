@@ -25,6 +25,7 @@ function(CertificateModel, CertificateCollection) {
             });
 
             it('certificate should be able to reset itself', function() {
+                // eslint-disable-next-line no-var
                 var originalName = 'Original Name',
                     model = new CertificateModel({name: originalName}, this.newModelOptions);
                 model.set({name: 'New Name'});
@@ -33,6 +34,7 @@ function(CertificateModel, CertificateCollection) {
             });
 
             it('certificate should have signatories in its relations', function() {
+                // eslint-disable-next-line no-var
                 var relation = this.model.getRelations()[0];
                 expect(relation.key).toEqual('signatories');
             });
@@ -40,12 +42,14 @@ function(CertificateModel, CertificateCollection) {
 
         describe('Validation', function() {
             it('requires a name', function() {
+                // eslint-disable-next-line no-var
                 var model = new CertificateModel({name: ''}, this.newModelOptions);
 
                 expect(model.isValid()).toBeFalsy();
             });
 
             it('can pass validation', function() {
+                // eslint-disable-next-line no-var
                 var model = new CertificateModel({name: 'foo'}, this.newModelOptions);
 
                 expect(model.isValid()).toBeTruthy();

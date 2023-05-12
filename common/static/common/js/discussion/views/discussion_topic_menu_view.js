@@ -24,6 +24,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var $general,
                     context = _.clone(this.course_settings.attributes);
 
@@ -45,9 +46,11 @@
             },
 
             renderCategoryMap: function(map) {
+                // eslint-disable-next-line no-var
                 var categoryTemplate = edx.HtmlUtils.template($('#new-post-menu-category-template').html()),
                     entryTemplate = edx.HtmlUtils.template($('#new-post-menu-entry-template').html()),
                     mappedCategorySnippets = _.map(map.children, function(child) {
+                        // eslint-disable-next-line no-var
                         var entry,
                             html = '',
                             name = child[0], // child[0] is the category name
@@ -97,6 +100,7 @@
              * @return {String}
              */
             getFullTopicName: function(topicElement) {
+                // eslint-disable-next-line no-var
                 var name;
                 if (topicElement) {
                     name = topicElement.html();

@@ -11,6 +11,7 @@
         'js/edxnotes/plugins/store_error_handler',
         'js/edxnotes/plugins/search_override'
     ], function($, _, Annotator, NotesLogger, NotesCollector) {
+        // eslint-disable-next-line no-var
         var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags'],
             getOptions, setupPlugins, getAnnotator;
 
@@ -26,6 +27,7 @@
      * @return {Object} Options.
      * */
         getOptions = function(element, params) {
+            // eslint-disable-next-line no-var
             var defaultParams = {
                     user: params.user,
                     usage_id: params.usageId,
@@ -65,6 +67,7 @@
         // eslint-disable-next-line no-shadow
         setupPlugins = function(annotator, plugins, options) {
             _.each(plugins, function(plugin) {
+                // eslint-disable-next-line no-var
                 var settings = options[plugin.toLowerCase()];
                 annotator.addPlugin(plugin, settings);
             }, this);
@@ -82,6 +85,7 @@
      * @return {Object} An instance of Annotator.js.
      * */
         getAnnotator = function(element, params) {
+            // eslint-disable-next-line no-var
             var $el = $(element),
                 options = getOptions($el, params),
                 logger = NotesLogger.getLogger(element.id, params.debug),

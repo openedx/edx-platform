@@ -2,7 +2,7 @@
 // generously provided by StackOverflow: http://stackoverflow.com/questions/6238351/fastest-way-to-detect-external-urls
 window.isExternal = function(url) {
     // parse the url into protocol, host, path, query, and fragment. More information can be found here: http://tools.ietf.org/html/rfc3986#appendix-B
-    // eslint-disable-next-line no-useless-escape
+    /* eslint-disable-next-line no-useless-escape, no-var */
     var match = url.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
     // match[1] matches a protocol if one exists in the url
     // if the protocol in the url does not match the protocol in the window's location, this url is considered external
@@ -36,7 +36,7 @@ window.rewriteStaticLinks = function(content, from, to) {
     // escape all regex interpretable chars
     /* eslint-disable-next-line no-undef, no-useless-escape */
     fromRe = from.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    /* eslint-disable-next-line no-undef, no-useless-escape */
+    /* eslint-disable-next-line no-undef, no-useless-escape, no-var */
     var regex = new RegExp('(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9@:%_\+.~#?&//=]*))?' + fromRe, 'g');
     return content.replace(regex, replacer);
 };

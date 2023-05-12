@@ -5,8 +5,10 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
+            // eslint-disable-next-line no-var
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -29,6 +31,7 @@
             __extends(ThreadResponseView, _super);
 
             function ThreadResponseView() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.update = function() {
                     return ThreadResponseView.prototype.update.apply(self, arguments);
@@ -69,7 +72,7 @@
             };
 
             ThreadResponseView.prototype.renderTemplate = function() {
-                // eslint-disable-next-line no-unused-vars
+                /* eslint-disable-next-line no-unused-vars, no-var */
                 var $container, templateData, _ref;
                 // eslint-disable-next-line no-undef
                 this.template = _.template($('#thread-response-template').html());
@@ -125,6 +128,7 @@
             };
 
             ThreadResponseView.prototype.renderComments = function() {
+                // eslint-disable-next-line no-var
                 var collectComments, comments,
                     self = this;
                 comments = new Comments();
@@ -133,6 +137,7 @@
                     return comment.get('created_at');
                 };
                 collectComments = function(comment) {
+                    // eslint-disable-next-line no-var
                     var children;
                     comments.add(comment);
                     children = new Comments(comment.get('children'));
@@ -158,6 +163,7 @@
             };
 
             ThreadResponseView.prototype.renderComment = function(comment) {
+                // eslint-disable-next-line no-var
                 var view,
                     self = this;
                 comment.set('thread', this.model.get('thread'));
@@ -188,6 +194,7 @@
             };
 
             ThreadResponseView.prototype.submitComment = function(event) {
+                // eslint-disable-next-line no-var
                 var body, comment, url, view;
                 event.preventDefault();
                 url = this.model.urlFor('reply');
@@ -229,6 +236,7 @@
             };
 
             ThreadResponseView.prototype._delete = function(event) {
+                // eslint-disable-next-line no-var
                 var $elem, url;
                 event.preventDefault();
                 if (!this.model.can('can_delete')) {
@@ -294,6 +302,7 @@
 
             // eslint-disable-next-line consistent-return
             ThreadResponseView.prototype.createShowView = function() {
+                // eslint-disable-next-line no-var
                 var self = this;
 
                 if (this.editView) {
@@ -333,6 +342,7 @@
             };
 
             ThreadResponseView.prototype.update = function(event) {
+                // eslint-disable-next-line no-var
                 var newBody, url,
                     self = this;
                 newBody = this.editView.$('.edit-post-body textarea').val();

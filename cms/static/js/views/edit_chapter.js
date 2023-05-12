@@ -6,6 +6,7 @@ define(['underscore', 'jquery', 'gettext', 'edx-ui-toolkit/js/utils/html-utils',
 function(_, $, gettext, HtmlUtils, BaseView, FileUploadModel, UploadDialogView, editChapterTemplate) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var EditChapter = BaseView.extend({
         initialize: function() {
             this.template = HtmlUtils.template(editChapterTemplate);
@@ -59,16 +60,20 @@ function(_, $, gettext, HtmlUtils, BaseView, FileUploadModel, UploadDialogView, 
                 name: this.$('input.chapter-name').val(),
                 asset_path: this.$('input.chapter-asset-path').val()
             });
+            // eslint-disable-next-line no-var
             var msg = new FileUploadModel({
                 title: _.template(gettext('Upload a new PDF to “<%- name %>”'))(
                     {name: course.get('name')}),
                 message: gettext('Please select a PDF file to upload.'),
                 mimeTypes: ['application/pdf']
             });
+            // eslint-disable-next-line no-var
             var that = this;
+            // eslint-disable-next-line no-var
             var view = new UploadDialogView({
                 model: msg,
                 onSuccess: function(response) {
+                    // eslint-disable-next-line no-var
                     var options = {};
                     if (!that.model.get('name')) {
                         options.name = response.asset.displayname;

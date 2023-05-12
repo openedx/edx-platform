@@ -15,6 +15,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 ) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CourseOutlineXBlockModal, SettingsXBlockModal, PublishXBlockModal, HighlightsXBlockModal,
         AbstractEditor, BaseDateEditor,
         ReleaseDateEditor, DueDateEditor, SelfPacedDueDateEditor, GradingEditor, PublishEditor, AbstractVisibilityEditor,
@@ -73,6 +74,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         save: function(event) {
+            // eslint-disable-next-line no-var
             var requestData;
 
             event.preventDefault();
@@ -103,6 +105,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
          * @return {Object}
          */
         getRequestData: function() {
+            // eslint-disable-next-line no-var
             var requestData = _.map(this.options.editors, function(editor) {
                 return editor.getRequestData();
             });
@@ -127,7 +130,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         initializeEditors: function() {
+            // eslint-disable-next-line no-var
             var tabsTemplate;
+            // eslint-disable-next-line no-var
             var tabs = this.options.tabs;
             if (tabs && tabs.length > 0) {
                 if (tabs.length > 1) {
@@ -169,6 +174,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
          * @return {Object}
          */
         getRequestData: function() {
+            // eslint-disable-next-line no-var
             var requestData = _.map(this.options.editors, function(editor) {
                 return editor.getRequestData();
             });
@@ -310,11 +316,17 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var xblockInfo = this.model;
+            // eslint-disable-next-line no-var
             var isTimeLimited = xblockInfo.get('is_time_limited');
+            // eslint-disable-next-line no-var
             var isProctoredExam = xblockInfo.get('is_proctored_exam');
+            // eslint-disable-next-line no-var
             var isPracticeExam = xblockInfo.get('is_practice_exam');
+            // eslint-disable-next-line no-var
             var isOnboardingExam = xblockInfo.get('is_onboarding_exam');
+            // eslint-disable-next-line no-var
             var html = this.template($.extend({}, {
                 xblockInfo: xblockInfo,
                 xblockType: this.options.xblockType,
@@ -409,13 +421,17 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         showProjectedDate: function() {
             if (!this.getValue() || !course.get('start')) { return; }
+            // eslint-disable-next-line no-var
             var startDate = new Date(course.get('start'));
             // The value returned by toUTCString() is a string in the form Www, dd Mmm yyyy hh:mm:ss GMT
+            // eslint-disable-next-line no-var
             var startDateList = startDate.toUTCString().split(' ');
             // This text will look like Mmm dd, yyyy (i.e. Jul 26, 2021)
             this.$('#relative_weeks_due_start_date').text(startDateList[2] + ' ' + startDateList[1] + ', ' + startDateList[3]);
+            // eslint-disable-next-line no-var
             var projectedDate = new Date(startDate);
             projectedDate.setDate(projectedDate.getDate() + this.getValue() * 7);
+            // eslint-disable-next-line no-var
             var projectedDateList = projectedDate.toUTCString().split(' ');
             this.$('#relative_weeks_due_projected_due_in').text(projectedDateList[2] + ' ' + projectedDateList[1] + ', ' + projectedDateList[3]);
             this.$('#relative_weeks_due_projected').show();
@@ -447,10 +463,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getRequestData: function() {
             // Grab all the sections, map them to their block_ids, then return as an Array
+            // eslint-disable-next-line no-var
             var sectionIds = $('.outline-section').map(function() { return this.id; }).get();
             // Grab all the subsections, map them to their block_ids, then return as an Array
+            // eslint-disable-next-line no-var
             var subsectionIds = $('.outline-subsection').map(function() { return this.id; }).get();
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var relative_weeks_due = null;
             if (this.getValue() > 0 && $('#grading_type').val() !== 'notgraded') {
                 // eslint-disable-next-line camelcase
@@ -499,6 +517,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getRequestData: function() {
+            // eslint-disable-next-line no-var
             var newReleaseDate = this.getValue();
             if (JSON.stringify(newReleaseDate) === JSON.stringify(this.startingReleaseDate)) {
                 return {};
@@ -550,6 +569,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.selectSpecialExam(true);
         },
         timeLimitFocusout: function(event) {
+            // eslint-disable-next-line no-var
             var selectedTimeLimit;
 
             event.preventDefault();
@@ -606,6 +626,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
         },
         setExamTime: function(value) {
+            // eslint-disable-next-line no-var
             var time = this.convertTimeLimitMinutesToString(value);
             this.$('.field-time-limit input').val(time);
         },
@@ -613,7 +634,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('.field-exam-review-rules textarea').val(value);
         },
         isValidTimeLimit: function(timeLimit) {
-            // eslint-disable-next-line prefer-regex-literals
+            /* eslint-disable-next-line prefer-regex-literals, no-var */
             var pattern = new RegExp('^\\d{1,2}:[0-5][0-9]$');
             return pattern.test(timeLimit) && timeLimit !== '00:00';
         },
@@ -621,25 +642,36 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return this.$('.field-time-limit input').val();
         },
         convertTimeLimitMinutesToString: function(timeLimitMinutes) {
+            // eslint-disable-next-line no-var
             var hoursStr = '' + Math.floor(timeLimitMinutes / 60);
+            // eslint-disable-next-line no-var
             var actualMinutesStr = '' + (timeLimitMinutes % 60);
             hoursStr = '00'.substring(0, 2 - hoursStr.length) + hoursStr;
             actualMinutesStr = '00'.substring(0, 2 - actualMinutesStr.length) + actualMinutesStr;
             return hoursStr + ':' + actualMinutesStr;
         },
         convertTimeLimitToMinutes: function(timeLimit) {
+            // eslint-disable-next-line no-var
             var time = timeLimit.split(':');
+            // eslint-disable-next-line no-var
             var totalTime = (parseInt(time[0], 10) * 60) + parseInt(time[1], 10);
             return totalTime;
         },
         getRequestData: function() {
+            // eslint-disable-next-line no-var
             var isNoSpecialExamChecked = this.$('input.no_special_exam').is(':checked');
+            // eslint-disable-next-line no-var
             var isProctoredExamChecked = this.$('input.proctored_exam').is(':checked');
+            // eslint-disable-next-line no-var
             var isPracticeExamChecked = this.$('input.practice_exam').is(':checked');
+            // eslint-disable-next-line no-var
             var isOnboardingExamChecked = this.$('input.onboarding_exam').is(':checked');
+            // eslint-disable-next-line no-var
             var timeLimit = this.getExamTimeLimit();
+            // eslint-disable-next-line no-var
             var examReviewRules = this.$('.field-exam-review-rules textarea').val();
 
+            // eslint-disable-next-line no-var
             var metadata = {
                 is_practice_exam: isPracticeExamChecked,
                 is_time_limited: !isNoSpecialExamChecked,
@@ -674,6 +706,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             'keyup #prereq_min_score': 'validateScoreAndCompletion'
         },
         afterRender: function() {
+            // eslint-disable-next-line no-var
             var prereq, prereqMinScore, prereqMinCompletion;
 
             AbstractEditor.prototype.afterRender.call(this);
@@ -688,17 +721,22 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('#prereq_min_completion_input').toggle(prereq.length > 0);
         },
         handlePrereqSelect: function() {
+            // eslint-disable-next-line no-var
             var showPrereqInput = this.$('#prereq option:selected').val().length > 0;
             this.$('#prereq_min_score_input').toggle(showPrereqInput);
             this.$('#prereq_min_completion_input').toggle(showPrereqInput);
         },
         isValidPercentage: function(val) {
+            // eslint-disable-next-line no-var
             var intVal = parseInt(val, 10);
             return (typeof val !== 'undefined' && val !== '' && intVal >= 0 && intVal <= 100 && String(intVal) === val);
         },
         validateScoreAndCompletion: function() {
+            // eslint-disable-next-line no-var
             var invalidInput = false;
+            // eslint-disable-next-line no-var
             var minScore = this.$('#prereq_min_score').val().trim();
+            // eslint-disable-next-line no-var
             var minCompletion = this.$('#prereq_min_completion').val().trim();
 
             if (minScore === '' || !this.isValidPercentage(minScore)) {
@@ -720,7 +758,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             }
         },
         getRequestData: function() {
+            // eslint-disable-next-line no-var
             var minScore = this.$('#prereq_min_score').val();
+            // eslint-disable-next-line no-var
             var minCompletion = this.$('#prereq_min_completion').val();
             if (minScore) {
                 minScore = minScore.trim();
@@ -857,6 +897,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         afterRender: function() {
+            // eslint-disable-next-line no-var
             var groupAccess,
                 keys;
             AbstractVisibilityEditor.prototype.afterRender.call(this);
@@ -885,6 +926,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getSelectedCheckboxesByDivId: function(contentGroupId) {
+            // eslint-disable-next-line no-var
             var $checkboxes = $('#' + contentGroupId + '-checkboxes input:checked'),
                 selectedCheckboxValues = [],
                 i;
@@ -908,6 +950,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getGroupAccessData: function() {
+            // eslint-disable-next-line no-var
             var userPartitionId = this.getSelectedEnrollmentTrackId(),
                 groupAccess = {};
             if (userPartitionId !== -1 && !isNaN(userPartitionId)) {
@@ -919,6 +962,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getRequestData: function() {
+            // eslint-disable-next-line no-var
             var metadata = {},
                 groupAccessData = this.getGroupAccessData();
 
@@ -946,6 +990,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         currentValue: function() {
+            // eslint-disable-next-line no-var
             var discussionEnabled = this.model.get('discussion_enabled');
             return discussionEnabled === true || discussionEnabled === 'enabled';
         },
@@ -1033,7 +1078,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         toggleUnlockWarning: function() {
+            // eslint-disable-next-line no-var
             var display;
+            // eslint-disable-next-line no-var
             var warning = this.$('.staff-lock .tip-warning');
             if (warning) {
                 if (this.currentVisibility() !== 'staff_only') {
@@ -1049,6 +1096,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getRequestData: function() {
+            // eslint-disable-next-line no-var
             var metadata;
 
             if (this.hasChanges()) {
@@ -1134,8 +1182,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         className: 'edit-show-highlights',
 
         currentValue: function() {
+            // eslint-disable-next-line no-var
             var highlights = [];
             $('.highlight-input-text').each(function() {
+                // eslint-disable-next-line no-var
                 var value = $(this).val();
                 if (value !== '' && value !== null) {
                     highlights.push(value);
@@ -1225,8 +1275,11 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         getEditModal: function(xblockInfo, options) {
+            // eslint-disable-next-line no-var
             var tabs = [];
+            // eslint-disable-next-line no-var
             var editors = [];
+            // eslint-disable-next-line no-var
             var advancedTab = {
                 name: 'advanced',
                 displayName: gettext('Advanced'),

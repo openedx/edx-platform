@@ -5,6 +5,7 @@
 (function(require, define) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var defineDependency, librarySetup;
 
     // We do not wish to bundle common libraries (that may also be used by non-RequireJS code on the page
@@ -12,7 +13,9 @@
     // Note that when the optimizer executes this code, window will not be defined.
     if (window) {
         defineDependency = function(globalName, name, noShim) {
+            // eslint-disable-next-line no-var
             var getGlobalValue = function() {
+                    // eslint-disable-next-line no-var
                     var globalNamePath = globalName.split('.'),
                         result = window,
                         i;

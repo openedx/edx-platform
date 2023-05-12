@@ -10,6 +10,7 @@
         'teams/js/views/team_utils',
         'text!teams/templates/manage.underscore'
     ], function(Backbone, _, gettext, HtmlUtils, ViewUtils, TeamUtils, manageTemplate) {
+        // eslint-disable-next-line no-var
         var ManageView = Backbone.View.extend({
 
             srInfo: {
@@ -54,6 +55,7 @@
             },
 
             uploadCsv: function() {
+                // eslint-disable-next-line no-var
                 var formData = new FormData();
                 formData.append('csv', this.membershipFile); // xss-lint: disable=javascript-jquery-append
 

@@ -4,6 +4,7 @@ define(['jquery', 'jquery.ui', 'underscore', 'gettext', 'draggabilly',
 function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var contentDragger = {
         droppableClasses: 'drop-target drop-target-prepend drop-target-before drop-target-after',
         validDropClass: 'valid-drop',
@@ -16,27 +17,37 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
              * attachment ('before', 'after', or 'prepend').
              */
         findDestination: function(ele, yChange) {
+            // eslint-disable-next-line no-var
             var eleY = ele.offset().top;
+            // eslint-disable-next-line no-var
             var eleYEnd = eleY + ele.outerHeight();
+            // eslint-disable-next-line no-var
             var $containers = $(ele.data('droppable-class'));
+            // eslint-disable-next-line no-var
             var isSibling = function() {
                 return $(this).data('locator') !== undefined && !$(this).is(ele);
             };
 
+            // eslint-disable-next-line no-var
             for (var i = 0; i < $containers.length; i++) {
+                // eslint-disable-next-line no-var
                 var $container = $($containers[i]);
                 // Exclude the 'new unit' buttons, and make sure we don't
                 // prepend an element to itself
+                // eslint-disable-next-line no-var
                 var siblings = $container.children().filter(isSibling);
                 // If the container is collapsed, check to see if the
                 // element is on top of its parent list -- don't check the
                 // position of the container
+                // eslint-disable-next-line no-var
                 var parentList = $container.parents(ele.data('parent-location-selector')).first();
                 if (parentList.hasClass(this.collapsedClass)) {
+                    // eslint-disable-next-line no-var
                     var parentListTop = parentList.offset().top;
                     // To make it easier to drop subsections into collapsed sections (which have
                     // a lot of visual padding around them), allow a fudge factor around the
                     // parent element.
+                    // eslint-disable-next-line no-var
                     var collapseFudge = 10;
                     if (Math.abs(eleY - parentListTop) < collapseFudge
                             || (eleY > parentListTop
@@ -56,6 +67,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                     // unless both elements are at the same location --
                     // this prevents the user from being unable to expand
                     // a section
+                    // eslint-disable-next-line no-var
                     var containerY = $container.offset().top;
                     if (siblings.length === 0
                             && containerY !== eleY
@@ -68,14 +80,20 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                     }
                     // Otherwise the list is populated, and we should attach before/after a sibling
                     else {
+                        // eslint-disable-next-line no-var
                         for (var j = 0; j < siblings.length; j++) {
+                            // eslint-disable-next-line no-var
                             var $sibling = $(siblings[j]);
+                            // eslint-disable-next-line no-var
                             var siblingY = $sibling.offset().top;
+                            // eslint-disable-next-line no-var
                             var siblingHeight = $sibling.outerHeight();
+                            // eslint-disable-next-line no-var
                             var siblingYEnd = siblingY + siblingHeight;
 
                             // Facilitate dropping into the beginning or end of a list
                             // (coming from opposite direction) via a "fudge factor". Math.min is for Jasmine test.
+                            // eslint-disable-next-line no-var
                             var fudge = Math.min(Math.ceil(siblingHeight / 2), 35);
 
                             // Dragging to top or bottom of a list with only one element is tricky
@@ -154,6 +172,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
         dragState: {},
 
         onDragStart: function(draggable) {
+            // eslint-disable-next-line no-var
             var $ele = $(draggable.element);
             this.dragState = {
                 // Which element will be dropped into/onto on success
@@ -183,7 +202,9 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
 
         onDragMove: function(draggable, event, pointer) {
             // Handle scrolling of the browser.
+            // eslint-disable-next-line no-var
             var scrollAmount = 0;
+            // eslint-disable-next-line no-var
             var dragBuffer = 10;
             if (window.innerHeight - dragBuffer < pointer.clientY) {
                 scrollAmount = dragBuffer;
@@ -195,14 +216,18 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                 return;
             }
 
+            // eslint-disable-next-line no-var
             var yChange = draggable.dragPoint.y - this.dragState.lastY;
             if (yChange !== 0) {
                 this.dragState.direction = yChange;
             }
             this.dragState.lastY = draggable.dragPoint.y;
 
+            // eslint-disable-next-line no-var
             var $ele = $(draggable.element);
+            // eslint-disable-next-line no-var
             var destinationInfo = this.findDestination($ele, this.dragState.direction);
+            // eslint-disable-next-line no-var
             var destinationEle = destinationInfo.ele;
             this.dragState.parentList = destinationInfo.parentList;
 
@@ -224,7 +249,9 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
         },
 
         onDragEnd: function(draggable, event, pointer) {
+            // eslint-disable-next-line no-var
             var $ele = $(draggable.element);
+            // eslint-disable-next-line no-var
             var destination = this.dragState.dropDestination;
 
             // Clear dragging state in preparation for the next event.
@@ -239,6 +266,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
                 if (this.dragState.parentList) {
                     this.expandElement(this.dragState.parentList);
                 }
+                // eslint-disable-next-line no-var
                 var method = this.dragState.attachMethod;
                 destination[method]($ele);
                 this.handleReorder($ele);
@@ -270,6 +298,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
 
         expandElement: function(ele) {
             // Verify all children of the element are rendered.
+            // eslint-disable-next-line no-var
             var ensureChildrenRendered = ele.data('ensureChildrenRendered');
             if (_.isFunction(ensureChildrenRendered)) { ensureChildrenRendered(); }
             // Update classes.
@@ -281,6 +310,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
              * Find all parent-child changes and save them.
              */
         handleReorder: function(element) {
+            // eslint-disable-next-line no-var
             var parentSelector = element.data('parent-location-selector'),
                 childrenSelector = element.data('child-selector'),
                 newParentEle = element.parents(parentSelector).first(),
@@ -290,10 +320,12 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
 
             // eslint-disable-next-line no-shadow
             refreshParent = function(element) {
+                // eslint-disable-next-line no-var
                 var refresh = element.data('refresh');
                 // If drop was into a collapsed parent, the parent will have been
                 // expanded. Views using this class may need to track the
                 // collapse/expand state, so send it with the refresh callback.
+                // eslint-disable-next-line no-var
                 var collapsed = element.hasClass(contentDragger.collapsedClass);
                 if (_.isFunction(refresh)) { refresh(collapsed); }
             };
@@ -330,6 +362,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
              */
         saveItem: function(ele, childrenSelector, success) {
             // Find all current child IDs.
+            // eslint-disable-next-line no-var
             var children = _.map(
                 ele.find(childrenSelector),
                 function(child) {
@@ -361,6 +394,7 @@ function($, ui, _, gettext, Draggabilly, ModuleUtils, NotificationView) {
              *      views of the target and source xblocks.
              */
         makeDraggable: function(element, options) {
+            // eslint-disable-next-line no-var
             var draggable;
             options = _.defaults({
                 type: undefined,

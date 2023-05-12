@@ -6,6 +6,7 @@ define(
         'use strict';
 
         describe('CourseVideoSettingsView', function() {
+            // eslint-disable-next-line no-var
             var $courseVideoSettingsEl,
                 courseVideoSettingsView,
                 renderCourseVideoSettingsView,
@@ -134,6 +135,7 @@ define(
             };
 
             verifyPreferanceErrorState = function($preferanceContainerEl, hasError) {
+                // eslint-disable-next-line no-var
                 var $errorIconHtml = hasError ? '<span class="icon fa fa-info-circle" aria-hidden="true"></span>' : '',
                     requiredText = hasError ? 'Required' : '';
                 expect($preferanceContainerEl.hasClass('error')).toEqual(hasError);
@@ -142,6 +144,7 @@ define(
             };
 
             selectPreference = function(preferenceSelector, preferanceValue) {
+                // eslint-disable-next-line no-var
                 var $preference = $courseVideoSettingsEl.find(preferenceSelector);
                 // Select a vlaue for preference.
                 $preference.val(preferanceValue);
@@ -150,6 +153,7 @@ define(
             };
 
             verifyMessage = function(state, message) {
+                // eslint-disable-next-line no-var
                 var icon = state === 'error' ? 'fa-info-circle' : 'fa-check-circle';
                 expect($courseVideoSettingsEl.find('.course-video-settings-message-wrapper.' + state).html()).toEqual(
                     '<div class="course-video-settings-message">'
@@ -160,6 +164,7 @@ define(
             };
 
             verifyProviderList = function(selectedProvider) {
+                // eslint-disable-next-line no-var
                 var $transcriptProvidersListEl = $courseVideoSettingsEl.find('.transcript-provider-wrapper .transcript-provider-group'); // eslint-disable-line max-len
                 // Check None provider is selected.
                 expect($transcriptProvidersListEl.find('input[type=radio]:checked').val()).toEqual(selectedProvider.value); // eslint-disable-line max-len
@@ -220,6 +225,7 @@ define(
             };
 
             verifyOrganizationCredentialField = function(fieldName, label) {
+                // eslint-disable-next-line no-var
                 var elementSelector = courseVideoSettingsView.selectedProvider + '-' + fieldName;
                 // Verify that correct label is shown.
                 expect(
@@ -258,6 +264,7 @@ define(
             };
 
             resetProvider = function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 // Set no provider selected
                 changeProvider('none');
@@ -274,6 +281,7 @@ define(
             };
 
             submitOrganizationCredentials = function(fieldValues, statusCode, errorMessage) {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 // Click change button to render organization credentials view.
                 $courseVideoSettingsEl.find('.action-change-provider').click();
@@ -364,6 +372,7 @@ define(
             });
 
             it('resets to active preferences when clicked on cancel', function() {
+                // eslint-disable-next-line no-var
                 var selectedProvider = '3PlayMedia';
 
                 renderCourseVideoSettingsView(
@@ -398,6 +407,7 @@ define(
             });
 
             it('shows video source language directly in case of 3Play provider', function() {
+                // eslint-disable-next-line no-var
                 var sourceLanguages,
                     selectedProvider = '3PlayMedia';
 
@@ -418,6 +428,7 @@ define(
             });
 
             it('shows source language when fidelity is selected', function() {
+                // eslint-disable-next-line no-var
                 var sourceLanguages,
                     selectedProvider = 'Cielo24',
                     selectedFidelity = 'PROFESSIONAL';
@@ -452,6 +463,7 @@ define(
             });
 
             it('shows target language when source language is selected', function() {
+                // eslint-disable-next-line no-var
                 var targetLanguages,
                     selectedSourceLanguage = 'en',
                     selectedProvider = 'Cielo24',
@@ -483,6 +495,7 @@ define(
             });
 
             it('shows target language same as selected source language in case of mechanical fidelity', function() {
+                // eslint-disable-next-line no-var
                 var targetLanguages,
                     selectedSourceLanguage = 'en',
                     selectedProvider = 'Cielo24',
@@ -515,6 +528,7 @@ define(
             });
 
             it('saves transcript settings on update settings button click if preferances are selected', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 $courseVideoSettingsEl.find('.action-update-course-video-settings').click();
 
@@ -552,6 +566,7 @@ define(
             });
 
             it('shows error message if server sends error', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 $courseVideoSettingsEl.find('.action-update-course-video-settings').click();
 
@@ -605,6 +620,7 @@ define(
             });
 
             it('shows provider selected view if active provider is present', function() {
+                // eslint-disable-next-line no-var
                 var $selectedProviderContainerEl = $courseVideoSettingsEl.find('.transcript-provider-wrapper .selected-transcript-provider'); // eslint-disable-line max-len
                 expect($selectedProviderContainerEl.find('span').html()).toEqual(courseVideoSettingsView.selectedProvider); // eslint-disable-line max-len
                 expect($selectedProviderContainerEl.find('button.action-change-provider')).toExist();

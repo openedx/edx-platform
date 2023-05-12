@@ -5,6 +5,7 @@
         'video/03_video_player.js',
         ['video/02_html5_video.js', 'video/02_html5_hls_video.js', 'video/00_resizer.js', 'hls', 'underscore', '../time.js'],
         function(HTML5Video, HTML5HLSVideo, Resizer, HLS, _, Time) {
+            // eslint-disable-next-line no-var
             var dfd = $.Deferred(),
                 VideoPlayer = function(state) {
                     state.videoPlayer = {};
@@ -73,6 +74,7 @@
             //     Functions which will be accessible via 'state' object. When called,
             //     these functions will get the 'state' object as a context.
             function _makeFunctionsPublic(state) {
+                // eslint-disable-next-line no-var
                 var debouncedF = _.debounce(
                     // eslint-disable-next-line consistent-return
                     function(params) {
@@ -93,6 +95,7 @@
 
             // Updates players state, once metadata is loaded for html5 player.
             function onLoadMetadataHtml5() {
+                // eslint-disable-next-line no-var
                 var player = this.videoPlayer.player.videoEl,
                     videoWidth = player[0].videoWidth || player.width(),
                     videoHeight = player[0].videoHeight || player.height();
@@ -111,6 +114,7 @@
             //     have to do repeated jQuery element selects.
             // eslint-disable-next-line no-underscore-dangle
             function _initialize(state) {
+                // eslint-disable-next-line no-var
                 var youTubeId,
                     player,
                     userAgent,
@@ -219,7 +223,7 @@
                     });
 
                     state.el.on('initialize', function() {
-                        // eslint-disable-next-line no-shadow, no-multi-assign
+                        /* eslint-disable-next-line no-shadow, no-multi-assign, no-var */
                         var player = state.videoEl = state.el.find('iframe'),
                             videoWidth = player.attr('width') || player.width(),
                             videoHeight = player.attr('height') || player.height();
@@ -239,9 +243,9 @@
             }
 
             function _updateVcrAndRegion(state, isYoutube) {
-                // eslint-disable-next-line no-shadow
+                /* eslint-disable-next-line no-shadow, no-var */
                 var update = function(state) {
-                    // eslint-disable-next-line no-shadow
+                    /* eslint-disable-next-line no-shadow, no-var */
                     var duration = state.videoPlayer.duration(),
                         time;
 
@@ -357,6 +361,7 @@
             // ***************************************************************
 
             function destroy() {
+                // eslint-disable-next-line no-var
                 var player = this.videoPlayer.player;
                 this.el.removeClass([
                     'is-unstarted', 'is-playing', 'is-paused', 'is-buffered',
@@ -432,6 +437,7 @@
             }
 
             function onSpeedChange(newSpeed) {
+                // eslint-disable-next-line no-var
                 var time = this.videoPlayer.currentTime;
 
                 if (this.isFlashMode()) {
@@ -456,6 +462,7 @@
             // It is created on a onPlay event. Cleared on a onPause event.
             // Reinitialized on a onSeek event.
             function onSeek(params) {
+                // eslint-disable-next-line no-var
                 var time = params.time,
                     type = params.type,
                     oldTime = this.videoPlayer.currentTime;
@@ -470,7 +477,7 @@
 
             // eslint-disable-next-line consistent-return
             function seekTo(time) {
-                // eslint-disable-next-line no-shadow
+                /* eslint-disable-next-line no-shadow, no-var */
                 var duration = this.videoPlayer.duration();
 
                 if ((typeof time !== 'number') || (time > duration) || (time < 0)) {
@@ -482,6 +489,7 @@
                 if (this.videoPlayer.isPlaying()) {
                     this.videoPlayer.stopTimer();
                 }
+                // eslint-disable-next-line no-var
                 var isUnplayed = this.videoPlayer.isUnstarted()
                          || this.videoPlayer.isCued();
 
@@ -527,6 +535,7 @@
             }
 
             function onEnded() {
+                // eslint-disable-next-line no-var
                 var time = this.videoPlayer.duration();
 
                 this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
@@ -569,6 +578,7 @@
             }
 
             function onPlaybackQualityChange() {
+                // eslint-disable-next-line no-var
                 var quality;
 
                 quality = this.videoPlayer.player.getPlaybackQuality();
@@ -579,6 +589,7 @@
 
             // eslint-disable-next-line consistent-return
             function onReady() {
+                // eslint-disable-next-line no-var
                 var _this = this,
                     availablePlaybackRates, baseSpeedSubs,
                     // eslint-disable-next-line no-unused-vars
@@ -611,6 +622,7 @@
                 availablePlaybackRates = _.filter(
                     availablePlaybackRates,
                     function(item) {
+                        // eslint-disable-next-line no-var
                         var speed = Number(item);
                         return speed > 0.25 && speed <= 5;
                     }
@@ -660,6 +672,7 @@
                         this.speeds = [];
                         // Recreate it with the supplied frame rates.
                         $.each(availablePlaybackRates, function(index, value) {
+                            // eslint-disable-next-line no-var
                             var key = value.toFixed(2).replace(/\.00$/, '.0');
 
                             _this.videos[key] = baseSpeedSubs;
@@ -680,7 +693,7 @@
                     this.videoPlayer.player.setPlaybackRate(this.speed);
                 }
 
-                // eslint-disable-next-line no-shadow
+                /* eslint-disable-next-line no-shadow, no-var */
                 var duration = this.videoPlayer.duration(),
                     time = this.videoPlayer.figureOutStartingTime(duration);
 
@@ -741,6 +754,7 @@
 
             // eslint-disable-next-line no-shadow
             function figureOutStartEndTime(duration) {
+                // eslint-disable-next-line no-var
                 var videoPlayer = this.videoPlayer;
 
                 videoPlayer.startTime = this.config.startTime;
@@ -763,6 +777,7 @@
 
             // eslint-disable-next-line no-shadow
             function figureOutStartingTime(duration) {
+                // eslint-disable-next-line no-var
                 var savedVideoPosition = this.config.savedVideoPosition,
 
                     // Default starting time is 0. This is the case when
@@ -808,7 +823,7 @@
 
             /* eslint-disable-next-line camelcase, no-unused-vars */
             function updatePlayTime(time, skip_seek) {
-                // eslint-disable-next-line no-unused-vars
+                /* eslint-disable-next-line no-unused-vars, no-var */
                 var videoPlayer = this.videoPlayer,
                     endTime = this.videoPlayer.duration(),
                     // eslint-disable-next-line no-unused-vars
@@ -838,6 +853,7 @@
             }
 
             function isEnded() {
+                // eslint-disable-next-line no-var
                 var playerState = this.videoPlayer.player.getPlayerState(),
                     ENDED = this.videoPlayer.PlayerState.ENDED;
 
@@ -845,24 +861,28 @@
             }
 
             function isPlaying() {
+                // eslint-disable-next-line no-var
                 var playerState = this.videoPlayer.player.getPlayerState();
 
                 return playerState === this.videoPlayer.PlayerState.PLAYING;
             }
 
             function isBuffering() {
+                // eslint-disable-next-line no-var
                 var playerState = this.videoPlayer.player.getPlayerState();
 
                 return playerState === this.videoPlayer.PlayerState.BUFFERING;
             }
 
             function isCued() {
+                // eslint-disable-next-line no-var
                 var playerState = this.videoPlayer.player.getPlayerState();
 
                 return playerState === this.videoPlayer.PlayerState.CUED;
             }
 
             function isUnstarted() {
+                // eslint-disable-next-line no-var
                 var playerState = this.videoPlayer.player.getPlayerState();
 
                 return playerState === this.videoPlayer.PlayerState.UNSTARTED;
@@ -887,6 +907,7 @@
      * This instability is internal to the player API (or browser internals).
      */
             function duration() {
+                // eslint-disable-next-line no-var
                 var dur;
 
                 // Sometimes the YouTube API doesn't finish instantiating all of it's

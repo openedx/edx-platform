@@ -5,6 +5,7 @@
     define([
         'underscore', 'backbone', 'js/edxnotes/views/tab_item'
     ], function(_, Backbone, TabItemView) {
+        // eslint-disable-next-line no-var
         var TabsListView = Backbone.View.extend({
             tagName: 'ul',
             className: 'tabs',
@@ -30,6 +31,7 @@
             },
 
             createTab: function(model) {
+                // eslint-disable-next-line no-var
                 var tab = new TabItemView({
                     model: model
                 });

@@ -9,6 +9,7 @@ define(
         'use strict';
 
         describe('Preview Factory', function() {
+            // eslint-disable-next-line no-var
             var showPreview,
                 previewActionSelect,
                 usernameInput;
@@ -37,6 +38,7 @@ define(
             });
 
             it('can disable course access for a student', function() {
+                // eslint-disable-next-line no-var
                 var select;
                 showPreview({
                     courseId: 'test_course',
@@ -48,6 +50,7 @@ define(
             });
 
             it('can switch to view as a student', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     // eslint-disable-next-line no-undef
                     reloadSpy = spyOn(ViewUtils, 'reload');
@@ -69,6 +72,7 @@ define(
             });
 
             it('can switch to view as a content group', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     // eslint-disable-next-line no-undef
                     reloadSpy = spyOn(ViewUtils, 'reload');
@@ -92,6 +96,7 @@ define(
             });
 
             it('can switch to masquerade as a specific student', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     // eslint-disable-next-line no-undef
                     reloadSpy = spyOn(ViewUtils, 'reload');

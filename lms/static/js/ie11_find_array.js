@@ -6,6 +6,7 @@ if (!Array.prototype.find) {
         value: function(predicate) {
             'use strict';
 
+            // eslint-disable-next-line no-var
             var o, len, thisArg, k, kValue;
 
             // 1. Let O be ? ToObject(this value).

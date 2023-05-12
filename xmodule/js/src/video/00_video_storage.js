@@ -11,6 +11,7 @@
  * @param {string} namespace Namespace that is used to store data.
  * @return {object} VideoStorage API.
  */
+            // eslint-disable-next-line no-var
             var VideoStorage = function(namespace, id) {
                 /**
         * Adds new value to the storage or rewrites existent.
@@ -20,6 +21,7 @@
         * @param {boolean} instanceSpecific Data with this flag will be added
         *     to instance specific storage.
         */
+                // eslint-disable-next-line no-var
                 var setItem = function(name, value, instanceSpecific) {
                     if (name) {
                         if (instanceSpecific) {
@@ -40,6 +42,7 @@
         *     If the given key does not exist in the list
         *     associated with the object then this method must return null.
         */
+                // eslint-disable-next-line no-var
                 var getItem = function(name, instanceSpecific) {
                     if (instanceSpecific) {
                         return window[namespace][id][name];
@@ -55,6 +58,7 @@
         * @param {boolean} instanceSpecific Data with this flag will be added
         *     to instance specific storage.
         */
+                // eslint-disable-next-line no-var
                 var removeItem = function(name, instanceSpecific) {
                     if (instanceSpecific) {
                         delete window[namespace][id][name];
@@ -67,6 +71,7 @@
         * Empties the storage.
         *
         */
+                // eslint-disable-next-line no-var
                 var clear = function() {
                     window[namespace] = {};
                     window[namespace][id] = {};

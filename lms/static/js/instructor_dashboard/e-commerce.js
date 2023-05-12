@@ -3,6 +3,7 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var ECommerce, PendingInstructorTasks, ReportDownloads;
 
     PendingInstructorTasks = function() {
@@ -15,6 +16,7 @@
 
     ECommerce = (function() {
         function eCommerce($section) {
+            // eslint-disable-next-line no-var
             var eCom = this;
             this.$section = $section;
             this.$section.data('wrapper', this);

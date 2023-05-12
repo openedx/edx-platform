@@ -18,6 +18,7 @@ define([
         });
 
         it('has correct order and class names', function() {
+            // eslint-disable-next-line no-var
             var firstItem = this.tabsList.$('#first-item'),
                 secondItem = this.tabsList.$('#second-item');
 
@@ -27,6 +28,7 @@ define([
         });
 
         it('can add a new tab', function() {
+            // eslint-disable-next-line no-var
             var firstItem = this.tabsList.$('#first-item'),
                 thirdItem;
 
@@ -39,6 +41,7 @@ define([
         });
 
         it('can remove tabs', function() {
+            // eslint-disable-next-line no-var
             var secondItem = this.tabsList.$('#second-item');
 
             this.collection.at(0).destroy(); // remove first tab

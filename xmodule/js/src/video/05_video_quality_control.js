@@ -7,6 +7,7 @@
         'video/05_video_quality_control.js',
         ['edx-ui-toolkit/js/utils/html-utils'],
         function(HtmlUtils) {
+            // eslint-disable-next-line no-var
             var template = HtmlUtils.interpolateHtml(
                 HtmlUtils.HTML([
                     '<button class="control quality-control is-hidden" aria-disabled="false" title="',
@@ -29,6 +30,7 @@
 
             // VideoQualityControl() function - what this module "exports".
             return function(state) {
+                // eslint-disable-next-line no-var
                 var dfd = $.Deferred();
 
                 // Changing quality for now only works for YouTube videos.
@@ -59,6 +61,7 @@
             //     Functions which will be accessible via 'state' object. When called, these functions will
             //     get the 'state' object as a context.
             function _makeFunctionsPublic(state) {
+                // eslint-disable-next-line no-var
                 var methodsDict = {
                     // eslint-disable-next-line no-use-before-define
                     destroy: destroy,
@@ -91,7 +94,7 @@
             //     make the created DOM elements available via the 'state' object. Much easier to work this
             //     way - you don't have to do repeated jQuery element selects.
             function _renderElements(state) {
-                // eslint-disable-next-line no-multi-assign
+                /* eslint-disable-next-line no-multi-assign, no-var */
                 var element = state.videoQualityControl.el = $(template.toString());
                 state.videoQualityControl.quality = 'large';
                 HtmlUtils.append(state.el.find('.secondary-controls'), HtmlUtils.HTML(element));
@@ -137,6 +140,7 @@
      * @public
      */
             function fetchAvailableQualities() {
+                // eslint-disable-next-line no-var
                 var qualities = this.videoPlayer.player.getAvailableQualityLevels();
 
                 // eslint-disable-next-line no-undef
@@ -158,6 +162,7 @@
             }
 
             function onQualityChange(value) {
+                // eslint-disable-next-line no-var
                 var controlStateStr;
                 this.videoQualityControl.quality = value;
                 // eslint-disable-next-line no-undef
@@ -179,6 +184,7 @@
             // This function toggles the quality of video only if HD qualities are
             // available.
             function toggleQuality(event) {
+                // eslint-disable-next-line no-var
                 var newQuality,
                     value = this.videoQualityControl.quality,
                     // eslint-disable-next-line no-undef

@@ -4,6 +4,7 @@
     define(['jquery', 'underscore', 'backbone', 'gettext', 'js/discussions_management/views/divided_discussions',
         'edx-ui-toolkit/js/utils/html-utils', 'js/vendor/jquery.qubit'],
     function($, _, Backbone, gettext, DividedDiscussionConfigurationView, HtmlUtils) {
+        // eslint-disable-next-line no-var
         var InlineDiscussionsView = DividedDiscussionConfigurationView.extend({
             events: {
                 'change .check-discussion-category': 'setSaveButton',
@@ -19,6 +20,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var inlineDiscussions = this.model.get('inline_discussions'),
                     alwaysDivideInlineDiscussions = this.discussionSettings.get(
                         'always_divide_inline_discussions'
@@ -44,6 +46,7 @@
                     * @returns {HtmlSnippet} - HTML for inline discussion topics.
                     */
             getInlineDiscussionsHtml: function(inlineDiscussions) {
+                // eslint-disable-next-line no-var
                 var categoryTemplate = HtmlUtils.template($('#cohort-discussions-category-tpl').html()),
                     entryTemplate = HtmlUtils.template($('#cohort-discussions-subcategory-tpl').html()),
                     isCategoryCohorted = false,
@@ -52,6 +55,7 @@
                     subcategories = inlineDiscussions.subcategories;
 
                 return HtmlUtils.joinHtml.apply(this, _.map(children, function(child) {
+                    // eslint-disable-next-line no-var
                     var htmlSnippet = '',
                         name = child[0], // child[0] is the category name
                         type = child[1], // child[1] is the type (i.e. 'entry' or 'subcategory')
@@ -122,6 +126,7 @@
                     * Sends the dividedInlineDiscussions to the server and renders the view.
                     */
             saveInlineDiscussionsForm: function(event) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     dividedInlineDiscussions = self.getDividedDiscussions(
                         '.check-discussion-subcategory-inline:checked'
@@ -143,6 +148,7 @@
                                 self.showMessage(gettext('Your changes have been saved.'),
                                     self.$('.inline-discussion-topics'));
                             }).fail(function() {
+                                // eslint-disable-next-line no-var
                                 var errorMessage = gettext("We've encountered an error. Refresh your browser and then try again."); // eslint-disable-line max-len
                                 self.showMessage(errorMessage, self.$('.inline-discussion-topics'), 'error');
                             });

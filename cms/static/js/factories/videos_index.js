@@ -5,6 +5,7 @@ define([
 ], function($, Backbone, ActiveVideoUploadListView, PreviousVideoUploadListView, ActiveVideoUpload) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var VideosIndexFactory = function(
         $contentWrapper,
         videoImageUploadURL,
@@ -23,6 +24,7 @@ define([
         videoImageSettings,
         transcriptAvailableLanguages
     ) {
+        // eslint-disable-next-line no-var
         var activeView = new ActiveVideoUploadListView({
                 postUrl: videoHandlerUrl,
                 concurrentUploadLimit: concurrentUploadLimit,
@@ -41,9 +43,11 @@ define([
                         dataType: 'json',
                         type: 'GET'
                     }).done(function(responseData) {
+                        // eslint-disable-next-line no-var
                         var updatedCollection = new Backbone.Collection(responseData.videos).filter(function(video) {
                                 // Include videos that are not in the active video upload list,
                                 // or that are marked as Upload Complete
+                                // eslint-disable-next-line no-var
                                 var isActive = activeVideos.where({videoId: video.get('edx_video_id')});
                                 return isActive.length === 0
                                        || isActive[0].get('status') === ActiveVideoUpload.STATUS_COMPLETE;

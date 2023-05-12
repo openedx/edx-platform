@@ -8,6 +8,7 @@ define([
 ], function(ListView, GroupConfigurationItemView, gettext) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var GroupConfigurationsListView = ListView.extend({
         tagName: 'div',
 

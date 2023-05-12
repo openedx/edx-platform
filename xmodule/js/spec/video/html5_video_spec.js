@@ -1,7 +1,9 @@
 /* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(undefined) {
     describe('Video HTML5Video', function() {
+        // eslint-disable-next-line no-var
         var STATUS = window.STATUS;
+        // eslint-disable-next-line no-var
         var state,
             oldOTBD,
             playbackRates = [0.75, 1.0, 1.25, 1.5, 2.0],
@@ -212,7 +214,7 @@
             });
 
             describe('methods', function() {
-                // eslint-disable-next-line no-unused-vars
+                /* eslint-disable-next-line no-unused-vars, no-var */
                 var volume, seek, duration, playbackRate;
 
                 beforeEach(function() {
@@ -239,7 +241,7 @@
                     });
 
                     it('set new incorrect values', function() {
-                        // eslint-disable-next-line no-shadow
+                        /* eslint-disable-next-line no-shadow, no-var */
                         var seek = state.videoPlayer.player.video.currentTime;
                         state.videoPlayer.player.seekTo(-50);
                         expect(state.videoPlayer.player.getCurrentTime()).toBe(seek);
@@ -323,6 +325,7 @@
                     });
 
                     it('set NaN value', function() {
+                        // eslint-disable-next-line no-var
                         var oldPlaybackRate = state.videoPlayer.player.video.playbackRate;
 
                         // When we try setting the playback rate to some
@@ -345,6 +348,7 @@
                     jasmine.waitUntil(function() {
                         return state.videoPlayer.player.getPlayerState() === STATUS.PLAYING;
                     }).then(function() {
+                        // eslint-disable-next-line no-var
                         var logs = state.videoPlayer.player._getLogs();
                         // eslint-disable-next-line no-undef
                         expect(logs).toEqual(jasmine.any(Array));

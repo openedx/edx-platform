@@ -3,6 +3,7 @@ define(['backbone', 'gettext', 'underscore'], function(Backbone, gettext, _) {
     /**
      * Model for xblock validation messages as displayed in Studio.
      */
+    // eslint-disable-next-line no-var
     var XBlockValidationModel = Backbone.Model.extend({
         defaults: {
             summary: {},
@@ -17,7 +18,9 @@ define(['backbone', 'gettext', 'underscore'], function(Backbone, gettext, _) {
 
         parse: function(response) {
             if (!response.empty) {
+                // eslint-disable-next-line no-var
                 var summary = 'summary' in response ? response.summary : {};
+                // eslint-disable-next-line no-var
                 var messages = 'messages' in response ? response.messages : [];
                 if (!summary.text) {
                     if (response.isUnit) {

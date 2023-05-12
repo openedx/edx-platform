@@ -12,10 +12,12 @@
         CohortEditorView, CohortFormView,
         CourseCohortSettingsNotificationView,
         HtmlUtils, BaseDashboardView) {
+        // eslint-disable-next-line no-var
         var hiddenClass = 'hidden',
             disabledClass = 'is-disabled',
             enableCohortsSelector = '.cohorts-state';
 
+        // eslint-disable-next-line no-var
         var CohortsView = BaseDashboardView.extend({
             events: {
                 'change .cohort-select': 'onCohortSelected',
@@ -28,6 +30,7 @@
             },
 
             initialize: function(options) {
+                // eslint-disable-next-line no-var
                 var model = this.model;
                 this.template = HtmlUtils.template($('#cohorts-tpl').text());
                 this.selectorTemplate = HtmlUtils.template($('#cohort-selector-tpl').text());
@@ -61,6 +64,7 @@
             },
 
             renderCourseCohortSettingsNotificationView: function() {
+                // eslint-disable-next-line no-var
                 var cohortStateMessageNotificationView = new CourseCohortSettingsNotificationView({
                     el: $('.cohort-state-message'),
                     cohortEnabled: this.getCohortsEnabled()
@@ -69,6 +73,7 @@
             },
 
             onSync: function(model, response, options) {
+                // eslint-disable-next-line no-var
                 var selectedCohort = this.lastSelectedCohortId && this.model.get(this.lastSelectedCohortId),
                     hasCohorts = this.model.length > 0,
                     cohortNavElement = this.$('.cohort-management-nav'),
@@ -104,6 +109,7 @@
             },
 
             getSelectedCohort: function() {
+                // eslint-disable-next-line no-var
                 var id = this.$('.cohort-select').val();
                 // eslint-disable-next-line radix
                 return id && this.model.get(parseInt(id));
@@ -111,6 +117,7 @@
 
             onCohortSelected: function(event) {
                 event.preventDefault();
+                // eslint-disable-next-line no-var
                 var selectedCohort = this.getSelectedCohort();
                 this.lastSelectedCohortId = selectedCohort.get('id');
                 this.showCohortEditor(selectedCohort);
@@ -122,6 +129,7 @@
             },
 
             saveCohortSettings: function() {
+                // eslint-disable-next-line no-var
                 var self = this,
                     cohortSettings,
                     fieldData = {is_cohorted: this.getCohortsEnabled()};
@@ -166,7 +174,7 @@
             },
 
             showNotification: function(options, beforeElement) {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var model = new NotificationModel(options);
                 this.removeNotification();
                 // eslint-disable-next-line no-undef
@@ -192,6 +200,7 @@
             },
 
             showAddCohortForm: function(event) {
+                // eslint-disable-next-line no-var
                 var newCohort;
                 event.preventDefault();
                 this.removeNotification();
@@ -229,6 +238,7 @@
             },
 
             saveAddCohortForm: function(event) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     newCohort = this.cohortFormView.model;
                 event.preventDefault();
@@ -257,6 +267,7 @@
 
             showSection: function(event) {
                 event.preventDefault();
+                // eslint-disable-next-line no-var
                 var section = $(event.currentTarget).data('section');
                 $(this.getSectionCss(section)).click();
                 $(window).scrollTop(0);
@@ -266,6 +277,7 @@
                 event.preventDefault();
 
                 $(event.currentTarget).addClass(hiddenClass);
+                // eslint-disable-next-line no-var
                 var uploadElement = this.$('.csv-upload').removeClass(hiddenClass);
 
                 if (!this.fileUploaderView) {
@@ -280,7 +292,7 @@
                         url: this.context.uploadCohortsCsvUrl,
                         /* eslint-disable-next-line no-shadow, no-unused-vars */
                         successNotification: function(file, event, data) {
-                            // eslint-disable-next-line no-undef
+                            /* eslint-disable-next-line no-undef, no-var */
                             var message = interpolate_text(gettext(
                                 "Your file '{file}' has been uploaded. Allow a few minutes for processing."
                             ), {file: file});

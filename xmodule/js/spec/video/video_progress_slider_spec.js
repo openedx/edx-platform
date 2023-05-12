@@ -1,6 +1,7 @@
 /* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(undefined) {
     describe('VideoProgressSlider', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
 
         beforeEach(function() {
@@ -45,6 +46,7 @@
                 });
 
                 it('add ARIA attributes to time control', function() {
+                    // eslint-disable-next-line no-var
                     var $timeControl = $('div.slider > .progress-handle');
 
                     expect($timeControl).toHaveAttrs({
@@ -89,6 +91,7 @@
             });
 
             describe('when the slider was already built', function() {
+                // eslint-disable-next-line no-var
                 var spy;
 
                 beforeEach(function() {
@@ -239,6 +242,7 @@
         });
 
         it('getRangeParams', function() {
+            // eslint-disable-next-line no-var
             var testCases = [
                 {
                     startTime: 10,
@@ -261,6 +265,7 @@
             state = jasmine.initializePlayer();
 
             $.each(testCases, function(index, testCase) {
+                // eslint-disable-next-line no-var
                 var step = 100 / testCase.duration,
                     left = testCase.startTime * step,
                     width = testCase.endTime * step - left,
@@ -321,6 +326,7 @@
         });
 
         it('getTimeDescription', function() {
+            // eslint-disable-next-line no-var
             var cases = {
                     0: '0 seconds',
                     1: '1 second',

@@ -19,6 +19,7 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
     signatoryDetailsTemplate, signatoryActionsTemplate, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var SignatoryDetailsView = BaseView.extend({
         tagName: 'div',
         events: {
@@ -30,6 +31,7 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
 
         className: function() {
             // Determine the CSS class names for this model instance
+            // eslint-disable-next-line no-var
             var index = this.model.collection.indexOf(this.model);
             return [
                 'signatory-details',
@@ -63,7 +65,9 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
 
         saveSignatoryData: function(event) {
             // Persist the data for this model
+            // eslint-disable-next-line no-var
             var certificate = this.model.get('certificate');
+            // eslint-disable-next-line no-var
             var self = this;
             if (event && event.preventDefault) { event.preventDefault(); }
             if (!certificate.isValid()) {
@@ -72,7 +76,9 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
             ViewUtils.runOperationShowingMessage(
                 gettext('Saving'),
                 function() {
+                    // eslint-disable-next-line no-var
                     var dfd = $.Deferred();
+                    // eslint-disable-next-line no-var
                     var actionableModel = certificate;
                     actionableModel.save({}, {
                         success: function() {
@@ -94,6 +100,7 @@ function($, _, str, Backbone, gettext, TemplateUtils, ViewUtils, BaseView, Signa
 
         render: function() {
             // Assemble the detail view for this model
+            // eslint-disable-next-line no-var
             var attributes = $.extend({}, this.model.attributes, {
                 signatory_number: this.model.collection.indexOf(this.model) + 1
             });

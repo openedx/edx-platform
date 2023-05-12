@@ -5,6 +5,7 @@ define([
     'use strict';
 
     return function(advancedDict, advancedSettingsUrl, publisherEnabled) {
+        // eslint-disable-next-line no-var
         var advancedModel, editor;
 
         $('form :input')
@@ -22,6 +23,7 @@ define([
         // set the hidden property to true on relevant fields if publisher is enabled
         if (publisherEnabled && advancedModel.attributes) {
             Object.keys(advancedModel.attributes).forEach(function(am) {
+                // eslint-disable-next-line no-var
                 var field = advancedModel.attributes[am];
                 field.hidden = field.hide_on_enabled_publisher;
             });
@@ -34,6 +36,7 @@ define([
         editor.render();
 
         $('#deprecated-settings').click(function() {
+            // eslint-disable-next-line no-var
             var $wrapperDeprecatedSetting = $('.wrapper-deprecated-setting'),
                 $deprecatedSettingsLabel = $('.deprecated-settings-label');
 

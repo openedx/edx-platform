@@ -9,6 +9,7 @@
     ],
     function($, _, TemplateHelpers, InstitutionLoginView) {
         describe('edx.student.account.InstitutionLoginView', function() {
+            // eslint-disable-next-line no-var
             var view = null,
                 PLATFORM_NAME = 'edX',
                 THIRD_PARTY_AUTH = {
@@ -32,6 +33,7 @@
                     ]
                 };
 
+            // eslint-disable-next-line no-var
             var createInstLoginView = function(mode) {
                 // Initialize the login view
                 view = new InstitutionLoginView({
@@ -49,6 +51,7 @@
             });
 
             it('displays a list of providers', function() {
+                // eslint-disable-next-line no-var
                 var $google, $facebook;
 
                 createInstLoginView('login');
@@ -66,6 +69,7 @@
             });
 
             it('displays a list of providers', function() {
+                // eslint-disable-next-line no-var
                 var $google, $facebook;
 
                 createInstLoginView('register');

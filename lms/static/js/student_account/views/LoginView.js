@@ -68,6 +68,7 @@
             },
 
             render: function(html) {
+                // eslint-disable-next-line no-var
                 var fields = html || '';
 
                 HtmlUtils.setHtml(
@@ -98,6 +99,7 @@
             },
 
             postRender: function() {
+                // eslint-disable-next-line no-var
                 var formErrorsTitle;
                 this.$container = $(this.el);
                 this.$form = this.$container.find('form');
@@ -146,6 +148,7 @@
             },
 
             toggleLoginHelp: function(event) {
+                // eslint-disable-next-line no-var
                 var $help;
                 event.preventDefault();
                 $help = $('#login-help');
@@ -164,6 +167,7 @@
             },
 
             resetEmail: function() {
+                // eslint-disable-next-line no-var
                 var email = $('#password-reset-email').val(),
                     successTitle = gettext('Check Your Email'),
                     successMessageHtml = HtmlUtils.interpolateHtml(
@@ -198,6 +202,7 @@
             },
 
             thirdPartyAuth: function(event) {
+                // eslint-disable-next-line no-var
                 var providerUrl = $(event.currentTarget).data('provider-url') || '';
 
                 if (providerUrl) {
@@ -211,7 +216,9 @@
             },
 
             saveError: function(error) {
+                // eslint-disable-next-line no-var
                 var errorCode;
+                // eslint-disable-next-line no-var
                 var msg;
                 if (error.status === 0) {
                     msg = gettext('An error has occurred. Check your Internet connection and try again.');
@@ -270,6 +277,7 @@
             },
 
             renderThirdPartyAuthWarning: function() {
+                // eslint-disable-next-line no-var
                 var message = _.sprintf(
                     gettext('You have successfully signed into %(currentProvider)s, but your %(currentProvider)s'
                             + ' account does not have a linked %(platformName)s account. To link your accounts,'
@@ -285,11 +293,13 @@
             },
 
             clearPasswordResetSuccess: function() {
+                // eslint-disable-next-line no-var
                 var query = '.' + this.passwordResetSuccessJsHook;
                 this.clearFormFeedbackItems(query);
             },
 
             clearAuthWarning: function() {
+                // eslint-disable-next-line no-var
                 var query = '.' + this.authWarningJsHook;
                 this.clearFormFeedbackItems(query);
             }

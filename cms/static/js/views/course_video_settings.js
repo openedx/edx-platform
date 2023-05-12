@@ -20,6 +20,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
     OrganizationCredentialsTemplate, UpdateSettingsFooterTemplate, OrganizationCredentialsFooterTemplate) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CourseVideoSettingsView,
         CIELO24 = 'Cielo24',
         THREE_PLAY_MEDIA = '3PlayMedia',
@@ -43,6 +44,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         initialize: function(options) {
+            // eslint-disable-next-line no-var
             var videoTranscriptSettings = options.videoTranscriptSettings;
             this.activeTranscriptionPlan = options.activeTranscriptPreferences;
             this.transcriptOrganizationCredentials = _.extend({}, options.transcriptOrganizationCredentials);
@@ -61,6 +63,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         registerCloseClickHandler: function() {
+            // eslint-disable-next-line no-var
             var self = this;
 
             // Preventing any parent handlers from being notified of the event. This is to stop from firing the document
@@ -102,6 +105,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         getTurnaroundPlan: function() {
+            // eslint-disable-next-line no-var
             var turnaroundPlan = null;
             if (this.selectedProvider) {
                 turnaroundPlan = this.availableTranscriptionPlans[this.selectedProvider].turnaround;
@@ -110,6 +114,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         getFidelityPlan: function() {
+            // eslint-disable-next-line no-var
             var fidelityPlan = null;
             if (this.selectedProvider === CIELO24) {
                 fidelityPlan = this.availableTranscriptionPlans[this.selectedProvider].fidelity;
@@ -118,6 +123,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         getTargetLanguages: function() {
+            // eslint-disable-next-line no-var
             var availableLanguages,
                 selectedPlan = this.selectedProvider ? this.availableTranscriptionPlans[this.selectedProvider] : null;
             if (selectedPlan) {
@@ -138,6 +144,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         getSourceLanguages: function() {
+            // eslint-disable-next-line no-var
             var sourceLanguages = [];
             if (this.selectedProvider === THREE_PLAY_MEDIA) {
                 sourceLanguages = this.availableTranscriptionPlans[this.selectedProvider].translations;
@@ -148,6 +155,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         fidelitySelected: function(event) {
+            // eslint-disable-next-line no-var
             var $fidelityContainer = this.$el.find('.transcript-fidelity-wrapper');
             this.selectedFidelityPlan = event.target.value;
             // Remove any error if present already.
@@ -163,6 +171,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         videoSourceLanguageSelected: function(event) {
+            // eslint-disable-next-line no-var
             var $videoSourceLanguageContainer = this.$el.find('.video-source-language-wrapper');
             this.selectedVideoSourceLanguage = event.target.value;
             // Remove any error if present already.
@@ -175,6 +184,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         turnaroundSelected: function(event) {
+            // eslint-disable-next-line no-var
             var $turnaroundContainer = this.$el.find('.transcript-turnaround-wrapper');
             this.selectedTurnaroundPlan = event.target.value;
             // Remove any error if present already.
@@ -189,6 +199,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         reRenderView: function() {
+            // eslint-disable-next-line no-var
             var $courseVideoSettingsContentEl = this.$el.find('.course-video-settings-content'),
                 dateModified = this.activeTranscriptionPlan
                     ? moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
@@ -216,6 +227,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         languageSelected: function(event) {
+            // eslint-disable-next-line no-var
             var $parentEl = $(event.target.parentElement).parent(),
                 $languagesEl = this.$el.find('.transcript-languages-wrapper'),
                 selectedLanguage = $parentEl.find('select').val();
@@ -235,6 +247,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         languageRemoved: function(event) {
+            // eslint-disable-next-line no-var
             var selectedLanguage = $(event.target).data('language-code');
             $(event.target.parentElement).parent().remove();
 
@@ -247,6 +260,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         renderProviders: function(state) {
+            // eslint-disable-next-line no-var
             var $transcriptProviderWrapperEl = this.$el.find('.transcript-provider-wrapper');
             if (!state) {
                 state = this.selectedProvider ? 'selected' : 'empty'; // eslint-disable-line no-param-reassign
@@ -294,6 +308,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         renderTurnaround: function() {
+            // eslint-disable-next-line no-var
             var self = this,
                 turnaroundPlan = self.getTurnaroundPlan(),
                 $turnaroundContainer = self.$el.find('.transcript-turnaround-wrapper'),
@@ -308,6 +323,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     HtmlUtils.HTML(new Option(gettext('Select turnaround'), ''))
                 );
                 _.each(turnaroundPlan, function(value, key) {
+                    // eslint-disable-next-line no-var
                     var option = new Option(value, key);
                     if (self.selectedTurnaroundPlan === key) {
                         option.selected = true;
@@ -321,6 +337,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         renderFidelity: function() {
+            // eslint-disable-next-line no-var
             var self = this,
                 fidelityPlan = self.getFidelityPlan(),
                 $fidelityContainer = self.$el.find('.transcript-fidelity-wrapper'),
@@ -336,6 +353,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                     HtmlUtils.HTML(new Option(gettext('Select fidelity'), ''))
                 );
                 _.each(fidelityPlan, function(fidelityObject, key) {
+                    // eslint-disable-next-line no-var
                     var option = new Option(fidelityObject.display_name, key);
                     if (self.selectedFidelityPlan === key) {
                         option.selected = true;
@@ -349,6 +367,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         renderTargetLanguages: function() {
+            // eslint-disable-next-line no-var
             var self = this,
                 // Merge active and selected languages, this handles the case when active languages are present and
                 // user also has selected some languages but not saved, user changes organization credentials,
@@ -380,6 +399,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         renderSourceLanguages: function() {
+            // eslint-disable-next-line no-var
             var self = this,
                 availableLanguages = self.getTargetLanguages(),
                 availableTranslations = self.getSourceLanguages(),
@@ -402,6 +422,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
                 );
 
                 _.each(availableTranslations, function(translatableLanguage, key) {
+                    // eslint-disable-next-line no-var
                     var option = new Option(availableLanguages[key], key);
                     if (self.selectedVideoSourceLanguage === key) {
                         option.selected = true;
@@ -417,6 +438,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         populateLanguageMenu: function() {
+            // eslint-disable-next-line no-var
             var availableLanguages = this.getTargetLanguages(),
                 availableTranslations = this.availableTranscriptionPlans[THREE_PLAY_MEDIA].translations,
                 $languageMenuEl = this.$el.find('.transcript-language-menu'),
@@ -457,6 +479,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         addLanguage: function(language) {
+            // eslint-disable-next-line no-var
             var $languagesContainer = this.$el.find('.languages-container');
             HtmlUtils.append(
                 $languagesContainer,
@@ -482,6 +505,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         updateSuccessResponseStatus: function(data, successMessage) {
+            // eslint-disable-next-line no-var
             var dateModified = data ? moment.utc(data.modified).format('ll') : '';
             successMessage = successMessage ? successMessage : gettext('Settings updated'); // eslint-disable-line no-param-reassign, no-unneeded-ternary, max-len
 
@@ -509,6 +533,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         updateFailResponseStatus: function(data) {
+            // eslint-disable-next-line no-var
             var errorMessage;
             // Enclose inside try-catch so that if we get erroneous data, we could still
             // show some error to user
@@ -519,6 +544,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         renderResponseStatus: function(responseText, type) {
+            // eslint-disable-next-line no-var
             var addClass = type === 'error' ? 'error' : 'success',
                 removeClass = type === 'error' ? 'success' : 'error',
                 iconClass = type === 'error' ? 'fa-info-circle' : 'fa-check-circle',
@@ -539,6 +565,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
 
         clearResponseStatus: function() {
             // Remove parent level state.
+            // eslint-disable-next-line no-var
             var $messageWrapperEl = this.$el.find('.course-video-settings-message-wrapper');
             $messageWrapperEl.empty();
             $messageWrapperEl.removeClass('error');
@@ -555,6 +582,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         addErrorState: function($PreferenceContainer) {
+            // eslint-disable-next-line no-var
             var requiredText = gettext('Required'),
                 infoIconHtml = HtmlUtils.HTML('<span class="icon fa fa-info-circle" aria-hidden="true"></span>');
 
@@ -570,6 +598,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         validateCourseVideoSettings: function() {
+            // eslint-disable-next-line no-var
             var isValid = true,
                 $turnaroundEl = this.$el.find('.transcript-turnaround-wrapper'),
                 $fidelityEl = this.$el.find('.transcript-fidelity-wrapper'),
@@ -613,6 +642,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         validateOrganizationCredentials: function() {
+            // eslint-disable-next-line no-var
             var $OrganizationApiSecretWrapperEl,
                 $OrganizationUsernameWrapperEl,
                 isValid = true,
@@ -652,6 +682,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         saveTranscriptPreferences: function() {
+            // eslint-disable-next-line no-var
             var self = this,
                 responseTranscriptPreferences;
             // First clear response status if present already
@@ -689,6 +720,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         saveOrganizationCredentials: function() {
+            // eslint-disable-next-line no-var
             var self = this,
                 username,
                 apiSecret,
@@ -734,6 +766,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         updateCourseVideoSettings: function() {
+            // eslint-disable-next-line no-var
             var $messageWrapperEl = this.$el.find('.course-video-settings-message-wrapper');
             if (this.validateCourseVideoSettings()) {
                 this.saveTranscriptPreferences();
@@ -750,6 +783,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         renderOrganizationCredentials: function() {
+            // eslint-disable-next-line no-var
             var $courseVideoSettingsContentEl = this.$el.find('.course-video-settings-content');
 
             // Render empty state providers view.
@@ -775,6 +809,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         renderTranscriptPreferences: function() {
+            // eslint-disable-next-line no-var
             var $courseVideoSettingsContentEl = this.$el.find('.course-video-settings-content'),
                 dateModified = this.activeTranscriptionPlan
                     ? moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
@@ -803,6 +838,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var dateModified = this.activeTranscriptionPlan
                 ? moment.utc(this.activeTranscriptionPlan.modified).format('ll') : '';
 
@@ -824,6 +860,7 @@ function($, Backbone, _, gettext, moment, ViewUtils, HtmlUtils, StringUtils, Tra
         },
 
         setFixedCourseVideoSettingsPane: function() {
+            // eslint-disable-next-line no-var
             var $courseVideoSettingsButton = $('.course-video-settings-button'),
                 $courseVideoSettingsContainer = this.$el.find('.course-video-settings-container'),
                 initialPositionTop = $courseVideoSettingsContainer.offset().top,

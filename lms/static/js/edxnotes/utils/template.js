@@ -8,7 +8,9 @@
      * @param name The name of the template.
      * @return The loaded template.
      */
+        // eslint-disable-next-line no-var
         var loadTemplate = function(name) {
+            // eslint-disable-next-line no-var
             var templateSelector = '#' + name + '-tpl',
                 templateText = $(templateSelector).text();
             if (!templateText) {

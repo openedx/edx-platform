@@ -34,6 +34,7 @@
                 });
             });
             describe('AJAX Errors', function() {
+                // eslint-disable-next-line no-var
                 var server;
                 server = null;
                 beforeEach(function() {

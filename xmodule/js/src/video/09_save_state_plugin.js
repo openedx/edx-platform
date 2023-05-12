@@ -11,6 +11,7 @@
      * @param {Object} options
      * @return {jquery Promise}
      */
+        // eslint-disable-next-line no-var
         var SaveStatePlugin = function(state, i18n, options) {
             if (!(this instanceof SaveStatePlugin)) {
                 return new SaveStatePlugin(state, i18n, options);
@@ -50,6 +51,7 @@
             bindHandlers: function() {
                 if (this.options.events.length) {
                     _.each(this.options.events, function(eventName) {
+                        // eslint-disable-next-line no-var
                         var callback;
                         if (_.has(this.events, eventName)) {
                             callback = this.events[eventName];

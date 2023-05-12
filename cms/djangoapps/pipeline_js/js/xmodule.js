@@ -59,6 +59,7 @@ define(
          * @return {jQuery Promise}
          * */
         function requireQueue(modules) {
+            // eslint-disable-next-line no-var
             var deferred = $.Deferred();
             function loadScript(queue) {
                 $script.ready('mathjax', function() {

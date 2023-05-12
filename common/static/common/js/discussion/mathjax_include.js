@@ -1,4 +1,5 @@
 // See common/templates/mathjax_include.html for info on Fast Preview mode.
+// eslint-disable-next-line no-var
 var disableFastPreview = true,
     vendorScript;
 if (typeof MathJax === 'undefined') {
@@ -12,6 +13,7 @@ if (typeof MathJax === 'undefined') {
     vendorScript.onload = function() {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var MathJax = window.MathJax,
             setMathJaxDisplayDivSettings;
         MathJax.Hub.Config({

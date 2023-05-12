@@ -8,9 +8,11 @@
 // eslint-disable-next-line no-shadow-restricted-names
 (function($, ImageInput, undefined) {
     describe('ImageInput', function() {
+        // eslint-disable-next-line no-var
         var state;
 
         beforeEach(function() {
+            // eslint-disable-next-line no-var
             var $el;
 
             loadFixtures('imageinput.html');
@@ -46,6 +48,7 @@
         });
 
         it('coordinates are updated [offsetX is set]', function() {
+            // eslint-disable-next-line no-var
             var event, posX, posY, cssLeft, cssTop;
 
             // Set up of 'click' event.
@@ -78,6 +81,7 @@
         });
 
         it('coordinates are updated [offsetX is NOT set]', function() {
+            // eslint-disable-next-line no-var
             var offset = state.el.offset(),
                 event, posX, posY, cssLeft, cssTop;
 
@@ -122,6 +126,7 @@
     // Create a simple image from a canvas. The canvas is filled by a colored
     // rectangle.
     function createTestImage(id, width, height, fillStyle) {
+        // eslint-disable-next-line no-var
         var canvas, ctx, img;
 
         canvas = document.createElement('canvas');

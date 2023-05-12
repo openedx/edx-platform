@@ -6,6 +6,7 @@
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'js/views/xblock', 'js/views/metadata', 'js/collections/metadata',
     'jquery.inputnumber'],
 function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) {
+    // eslint-disable-next-line no-var
     var XBlockEditorView = XBlockView.extend({
         // takes XBlockInfo as a model
 
@@ -24,6 +25,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
         },
 
         initializeEditors: function() {
+            // eslint-disable-next-line no-var
             var metadataEditor,
                 pluginEl,
                 defaultMode = 'editor';
@@ -61,6 +63,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
         },
 
         createMetadataEditor: function() {
+            // eslint-disable-next-line no-var
             var metadataEditor,
                 metadataData,
                 models = [],
@@ -87,6 +90,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
         },
 
         getDataEditor: function() {
+            // eslint-disable-next-line no-var
             var editor = this.$('.wrapper-comp-editor');
             return editor.length === 1 ? editor : null;
         },
@@ -104,6 +108,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
              * XModules as well as for XBlocks that provide a 'collectFieldData' API.
              */
         getXBlockFieldData: function() {
+            // eslint-disable-next-line no-var
             var xblock = this.xblock,
                 metadataEditor = this.getMetadataEditor(),
                 data = null;
@@ -129,6 +134,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
              * modified in the "Settings" editor, as well as any custom metadata provided by the component.
              */
         getChangedMetadata: function() {
+            // eslint-disable-next-line no-var
             var metadataEditor = this.getMetadataEditor();
             return _.extend(metadataEditor.getModifiedMetadataValues(), this.getCustomMetadata());
         },
@@ -141,6 +147,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
             // Walk through the set of elements which have the 'data-metadata_name' attribute and
             // build up an object to pass back to the server on the subsequent POST.
             // Note that these values will always be sent back on POST, even if they did not actually change.
+            // eslint-disable-next-line no-var
             var metadata, metadataNameElements, i, element, metadataName;
             metadata = {};
             metadataNameElements = this.$('[data-metadata-name]');
@@ -157,6 +164,7 @@ function($, _, gettext, BaseView, XBlockView, MetadataView, MetadataCollection) 
         },
 
         selectMode: function(mode) {
+            // eslint-disable-next-line no-var
             var dataEditor = this.getDataEditor(),
                 metadataEditor = this.getMetadataEditor(),
                 pluginEditor = this.getPluginEditor();

@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+// eslint-disable-next-line no-var
 var path = require('path');
 
 module.exports = {

@@ -1,5 +1,6 @@
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
+// eslint-disable-next-line no-var
 var onCertificatesReady = null;
 
 (function($, gettext, _) {
@@ -14,6 +15,7 @@ var onCertificatesReady = null;
          * enable/disable self-generated certificates for a course.
          */
         $('#enable-certificates-form').on('submit', function(event) {
+            // eslint-disable-next-line no-var
             var isEnabled = $('#certificates-enabled').val() === 'true',
                 confirmMessage = '';
 
@@ -40,6 +42,7 @@ var onCertificatesReady = null;
         /**
          * Start generating certificates for all students.
          */
+        // eslint-disable-next-line no-var
         var $section = $('section#certificates');
         $section.on('click', '#btn-start-generating-certificates', function(event) {
             // eslint-disable-next-line no-alert
@@ -48,11 +51,11 @@ var onCertificatesReady = null;
                 return;
             }
 
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var $btn_generating_certs = $(this),
                 // eslint-disable-next-line camelcase
                 $certificate_generation_status = $('.certificate-generation-status');
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var url = $btn_generating_certs.data('endpoint');
             $.ajax({
                 type: 'POST',
@@ -81,7 +84,7 @@ var onCertificatesReady = null;
                 return;
             }
 
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var $btn_regenerating_certs = $(this),
                 // eslint-disable-next-line camelcase
                 $certificate_regeneration_status = $('.certificate-regeneration-status'),
@@ -105,6 +108,7 @@ var onCertificatesReady = null;
                 },
                 error: function(jqXHR) {
                     try {
+                        // eslint-disable-next-line no-var
                         var response = JSON.parse(jqXHR.responseText);
                         // eslint-disable-next-line camelcase
                         $certificate_regeneration_status.text(gettext(response.message)).addClass('message');
@@ -122,6 +126,7 @@ var onCertificatesReady = null;
     // Call onCertificatesReady on document.ready event
     $(onCertificatesReady);
 
+    // eslint-disable-next-line no-var
     var Certificates = (function() {
         // eslint-disable-next-line no-shadow
         function Certificates($section) {

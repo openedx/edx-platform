@@ -1,6 +1,7 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var Metrics;
 
     Metrics = (function() {

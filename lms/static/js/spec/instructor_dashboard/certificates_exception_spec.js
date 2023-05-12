@@ -13,8 +13,11 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
     'use strict';
 
     describe('edx.certificates.models.certificates_exception.CertificateExceptionModel', function() {
+        // eslint-disable-next-line no-var
         var certificateException = null;
+        // eslint-disable-next-line no-var
         var assertValid = function(fields, isValid, expectedErrors) {
+            // eslint-disable-next-line no-var
             var errors;
             certificateException.set(fields);
             errors = certificateException.validate(certificateException.attributes);
@@ -26,6 +29,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
             }
         };
 
+        // eslint-disable-next-line no-var
         var EXPECTED_ERRORS = {
             user_name_or_email_required: 'Student username/email field is required and can not be empty. '
                 + 'Kindly fill in username/email and then press "Add to Exception List" button.'
@@ -53,8 +57,10 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
     });
 
     describe('edx.certificates.collections.certificate_allowlist.CertificateAllowlist', function() {
+        // eslint-disable-next-line no-var
         var certificateAllowlist = null,
             certificateExceptionUrl = 'test/url/';
+        // eslint-disable-next-line no-var
         var certificatesExceptionsJson = [
             {
                 id: 1,
@@ -124,10 +130,12 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
         });
 
         it('sends empty certificate exceptions list if no model is added', function() {
+            // eslint-disable-next-line no-var
             var successCallback = sinon.spy(),
                 errorCallback = sinon.spy(),
                 requests = AjaxHelpers.requests(this),
                 addStudents = 'all';
+            // eslint-disable-next-line no-var
             var expected = {
                 url: certificateExceptionUrl + addStudents,
                 postData: []
@@ -138,6 +146,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
         });
 
         it('syncs only newly added models with the server', function() {
+            // eslint-disable-next-line no-var
             var successCallback = sinon.spy(),
                 errorCallback = sinon.spy(),
                 requests = AjaxHelpers.requests(this),
@@ -166,9 +175,11 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
     });
 
     describe('edx.certificates.views.certificate_allowlist.CertificateAllowlistView', function() {
+        // eslint-disable-next-line no-var
         var view = null,
             certificateExceptionUrl = 'test/url/';
 
+        // eslint-disable-next-line no-var
         var certificatesExceptionsJson = [
             {
                 id: 1,
@@ -191,6 +202,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
         ];
 
         beforeEach(function() {
+            // eslint-disable-next-line no-var
             var fixture;
             setFixtures();
             fixture = readFixtures('templates/instructor/instructor_dashboard_2/certificate-allowlist.underscore');
@@ -234,6 +246,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
         });
 
         it('verifies view is rendered on add/update to collection', function() {
+            // eslint-disable-next-line no-var
             var user = 'test1',
                 notes = 'test1 notes updates',
                 email = 'update_email@test.com';
@@ -254,6 +267,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
         });
 
         it('verifies collection sync is called when "Generate Exception Certificates" is clicked', function() {
+            // eslint-disable-next-line no-var
             var successCallback = sinon.spy(),
                 errorCallback = sinon.spy();
 
@@ -269,6 +283,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
         });
 
         it('verifies sync is called with "new/all" argument depending upon selected radio button', function() {
+            // eslint-disable-next-line no-var
             var successCallback = sinon.spy(),
                 errorCallback = sinon.spy();
 
@@ -291,9 +306,11 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
     });
 
     describe('edx.certificates.views.certificate_allowlist_editor.CertificateAllowlistEditorView', function() {
+        // eslint-disable-next-line no-var
         var view = null,
             listView = null,
             certificateExceptionUrl = 'test/url/';
+        // eslint-disable-next-line no-var
         var certificatesExceptionsJson = [
             {
                 url: certificateExceptionUrl,
@@ -319,6 +336,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
         ];
 
         beforeEach(function() {
+            // eslint-disable-next-line no-var
             var fixture, fixture2, certificateAllowlist;
             setFixtures();
 
@@ -365,12 +383,14 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
         });
 
         it('verifies success and error messages', function() {
+            // eslint-disable-next-line no-var
             var messageSelector = '.message',
                 successMessage = 'test_user has been successfully added to the exception list. Click Generate'
                         + ' Exception Certificate below to send the certificate.',
                 requests = AjaxHelpers.requests(this),
                 duplicateUser = 'test_user';
 
+            // eslint-disable-next-line no-var
             var errorMessages = {
                 empty_user_name_email: 'Student username/email field is required and can not be empty. '
                     + 'Kindly fill in username/email and then press "Add to Exception List" button.',
@@ -415,6 +435,7 @@ function($, sinon, AjaxHelpers, CertificateExceptionModel, CertificateAllowlistV
         });
 
         it('verifies certificate exception can be deleted by clicking "delete" ', function() {
+            // eslint-disable-next-line no-var
             var username = 'test1',
                 certificateExceptionSelector = "div.allowlisted-students table tr:contains('" + username + "')",
                 deleteBtnSelector = certificateExceptionSelector + ' td .delete-exception',

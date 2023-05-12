@@ -3,6 +3,7 @@ define(['jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'URI', 'j
     'js/collections/asset', 'common/js/spec_helpers/view_helpers'],
 function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
     describe('Assets', function() {
+        // eslint-disable-next-line no-var
         var assetsView, mockEmptyAssetsResponse, mockAssetUploadResponse, mockFileUpload,
             assetLibraryTpl, assetTpl, uploadModalTpl;
 
@@ -20,12 +21,14 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             // eslint-disable-next-line no-undef
             spyOn($.fn, 'fileupload').and.returnValue('');
 
+            // eslint-disable-next-line no-var
             var TestAssetsCollection = AssetCollection.extend({
                 state: {
                     firstPage: 0,
                     pageSize: 2
                 }
             });
+            // eslint-disable-next-line no-var
             var collection = new TestAssetsCollection();
             collection.url = 'assets-url';
             assetsView = new AssetsView({
@@ -36,6 +39,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             assetsView.render();
         });
 
+        // eslint-disable-next-line no-var
         var mockAsset = {
             display_name: 'dummy.jpg',
             url: 'actual_asset_url',
@@ -56,6 +60,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             totalCount: 0
         };
 
+        // eslint-disable-next-line no-var
         var mockExampleAssetsResponse = {
             sort: 'uploadDate',
             end: 2,
@@ -100,6 +105,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             page: 0
         };
 
+        // eslint-disable-next-line no-var
         var mockExampleFilteredAssetsResponse = {
             sort: 'uploadDate',
             end: 1,
@@ -131,23 +137,30 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             files: [{name: 'largefile', size: 0}]
         };
 
+        // eslint-disable-next-line no-var
         var respondWithMockAssets = function(requests) {
+            // eslint-disable-next-line no-var
             var request = AjaxHelpers.currentRequest(requests);
+            // eslint-disable-next-line no-var
             var url = new URI(request.url);
+            // eslint-disable-next-line no-var
             var queryParameters = url.query(true); // Returns an object with each query parameter stored as a value
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var asset_type = queryParameters.asset_type;
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var response = asset_type !== '' ? mockExampleFilteredAssetsResponse : mockExampleAssetsResponse;
             AjaxHelpers.respondWithJson(requests, response);
         };
 
+        // eslint-disable-next-line no-var
         var event = {};
         event.target = {value: 'dummy.jpg'};
 
         describe('AssetsView', function() {
+            // eslint-disable-next-line no-var
             var setup;
             setup = function(responseData) {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 assetsView.pagingView.setPage(1);
                 if (!responseData) {
@@ -193,7 +206,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             });
 
             it('uploads file properly', function() {
-                // eslint-disable-next-line no-unused-vars
+                /* eslint-disable-next-line no-unused-vars, no-var */
                 var requests = setup.call(this);
                 expect(assetsView).toBeDefined();
                 // eslint-disable-next-line no-undef
@@ -261,6 +274,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             it('returns the registered info for a filter column', function() {
                 assetsView.pagingView.registerSortableColumn('test-col', 'Test Column', 'testField', 'asc');
                 assetsView.pagingView.registerFilterableColumn('js-asset-type-col', 'Type', 'asset_type');
+                // eslint-disable-next-line no-var
                 var filterInfo = assetsView.pagingView.filterableColumnInfo('js-asset-type-col');
                 expect(filterInfo.displayName).toBe('Type');
                 expect(filterInfo.fieldName).toBe('asset_type');
@@ -281,15 +295,19 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
 
             it('make sure _toggleFilterColumn filters asset list', function() {
                 expect(assetsView).toBeDefined();
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 // eslint-disable-next-line no-unused-vars
                 $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
+                    // eslint-disable-next-line no-var
                     var $typeColumn = $('#' + columnID);
                     assetsView.pagingView.setPage(1);
                     respondWithMockAssets(requests);
+                    // eslint-disable-next-line no-var
                     var assetsNumber = assetsView.collection.length;
                     assetsView._toggleFilterColumn('Images', 'Images');
                     respondWithMockAssets(requests);
+                    // eslint-disable-next-line no-var
                     var assetsNumberFiltered = assetsView.collection.length;
                     expect(assetsNumberFiltered).toBeLessThan(assetsNumber);
                     expect($typeColumn.find('.title .type-filter')).not.toEqual(assetsView.allLabel);
@@ -301,9 +319,10 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                 setup.call(this, mockExampleAssetsResponse);
                 // eslint-disable-next-line no-unused-vars
                 $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
+                    // eslint-disable-next-line no-var
                     var $typeColumn = $('#' + columnID);
                     expect($typeColumn).toBeVisible();
-                    // eslint-disable-next-line no-unused-vars
+                    /* eslint-disable-next-line no-unused-vars, no-var */
                     var assetsNumber = $('#asset-table-body .type-col').length;
                     assetsView.openFilterColumn($typeColumn);
                     expect($typeColumn.find('.wrapper-nav-sub')).toHaveClass('is-shown');
@@ -316,41 +335,52 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
 
             it('check filtering works with sorting by column on', function() {
                 expect(assetsView).toBeDefined();
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 assetsView.pagingView.registerSortableColumn('name-col', 'Name Column', 'nameField', 'asc');
                 assetsView.pagingView.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
                 assetsView.pagingView.setInitialSortColumn('name-col');
                 assetsView.pagingView.setPage(1);
                 respondWithMockAssets(requests);
+                // eslint-disable-next-line no-var
                 var sortInfo = assetsView.pagingView.sortableColumnInfo('name-col');
                 expect(sortInfo.defaultSortDirection).toBe('asc');
+                // eslint-disable-next-line no-var
                 var $firstFilter = $($('#js-asset-type-col').find('li.nav-item a')[1]);
                 $firstFilter.trigger('click');
                 respondWithMockAssets(requests);
+                // eslint-disable-next-line no-var
                 var assetsNumberFiltered = assetsView.collection.length;
                 expect(assetsNumberFiltered).toBe(1);
             });
 
             it('shows type select menu, selects type, and filters results', function() {
                 expect(assetsView).toBeDefined();
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this);
                 // eslint-disable-next-line no-unused-vars
                 $.each(assetsView.pagingView.filterableColumns, function(columnID, columnData) {
                     assetsView.pagingView.setPage(1);
                     respondWithMockAssets(requests);
+                    // eslint-disable-next-line no-var
                     var $typeColumn = $('#' + columnID);
                     expect($typeColumn).toBeVisible();
+                    // eslint-disable-next-line no-var
                     var assetsNumber = assetsView.collection.length;
                     $typeColumn.trigger('click');
                     expect($typeColumn.find('.wrapper-nav-sub')).toHaveClass('is-shown');
                     expect($typeColumn.find('.title')).toHaveClass('is-selected');
+                    // eslint-disable-next-line no-var
                     var $allFilter = $($typeColumn.find('li.nav-item a')[0]);
+                    // eslint-disable-next-line no-var
                     var $firstFilter = $($typeColumn.find('li.nav-item a')[1]);
+                    // eslint-disable-next-line no-var
                     var $otherFilter = $($typeColumn.find('li.nav-item a[data-assetfilter="OTHER"]')[0]);
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-var */
                     var select_filter_and_check = function($filterEl, result) {
                         $filterEl.trigger('click');
                         respondWithMockAssets(requests);
+                        // eslint-disable-next-line no-var
                         var assetsNumberFiltered = assetsView.collection.length;
                         expect(assetsNumberFiltered).toBe(result);
                     };
@@ -377,6 +407,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
             });
 
             describe('Paging footer', function() {
+                // eslint-disable-next-line no-var
                 var firstPageAssets = {
                         sort: 'uploadDate',
                         end: 1,
@@ -432,6 +463,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                     };
 
                 it('can move forward a page using the next page button', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     assetsView.pagingView.setPage(1);
                     AjaxHelpers.respondWithJson(requests, firstPageAssets);
@@ -445,6 +477,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                 });
 
                 it('can move back a page using the previous page button', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     assetsView.pagingView.setPage(2);
                     AjaxHelpers.respondWithJson(requests, secondPageAssets);
@@ -458,6 +491,7 @@ function($, AjaxHelpers, URI, AssetsView, AssetCollection, ViewHelpers) {
                 });
 
                 it('can set the current page using the page number input', function() {
+                    // eslint-disable-next-line no-var
                     var requests = AjaxHelpers.requests(this);
                     assetsView.pagingView.setPage(1);
                     AjaxHelpers.respondWithJson(requests, firstPageAssets);

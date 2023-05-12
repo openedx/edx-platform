@@ -15,12 +15,14 @@ function(
     $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,
     XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
 ) {
+    // eslint-disable-next-line no-var
     var CourseOutlineView = XBlockOutlineView.extend({
         // takes XBlockOutlineInfo as a model
 
         templateName: 'course-outline',
 
         render: function() {
+            // eslint-disable-next-line no-var
             var renderResult = XBlockOutlineView.prototype.render.call(this);
             this.makeContentDraggable(this.el);
             return renderResult;
@@ -47,7 +49,7 @@ function(
              * @returns {jQuery promise} A promise representing the refresh operation.
              */
         refresh: function(viewState) {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var getViewToRefresh, view, expandedLocators;
 
             // eslint-disable-next-line no-shadow
@@ -69,6 +71,7 @@ function(
              * @param isCollapsed true if the element should be collapsed, else false
              */
         refreshWithCollapsedState: function(isCollapsed) {
+            // eslint-disable-next-line no-var
             var locator = this.model.get('id');
             if (isCollapsed) {
                 this.expandedLocators.remove(locator);
@@ -100,6 +103,7 @@ function(
              * @param {jquery Element}  xblockElement  The xblock element to be duplicated.
              */
         onChildDuplicated: function(locator, xblockType, xblockElement) {
+            // eslint-disable-next-line no-var
             var scrollOffset = ViewUtils.getScrollOffset(xblockElement);
             if (xblockType === 'section') {
                 this.onSectionAdded(locator, xblockElement, scrollOffset);
@@ -113,6 +117,7 @@ function(
         },
 
         onSectionAdded: function(locator, xblockElement, scrollOffset) {
+            // eslint-disable-next-line no-var
             var self = this,
                 initialState = self.createNewItemViewState(locator, scrollOffset),
                 sectionInfo, sectionView;
@@ -138,6 +143,7 @@ function(
         },
 
         onChildDeleted: function(childView) {
+            // eslint-disable-next-line no-var
             var xblockInfo = this.model,
                 children = xblockInfo.get('child_info') && xblockInfo.get('child_info').children;
                 // If deleting a section that isn't the final one, just remove it for efficiency
@@ -160,9 +166,13 @@ function(
         },
 
         editXBlock: function() {
+            // eslint-disable-next-line no-var
             var modal;
+            // eslint-disable-next-line no-var
             var enableProctoredExams = false;
+            // eslint-disable-next-line no-var
             var enableTimedExams = false;
+            // eslint-disable-next-line no-var
             var unitLevelDiscussions = false;
             if (this.model.get('category') === 'sequential') {
                 if (this.parentView.parentView.model.has('enable_proctored_exams')) {
@@ -192,6 +202,7 @@ function(
         },
 
         publishXBlock: function() {
+            // eslint-disable-next-line no-var
             var modal = CourseOutlineModalsFactory.getModal('publish', this.model, {
                 onSave: this.refresh.bind(this),
                 xblockType: XBlockViewUtils.getXBlockType(
@@ -205,6 +216,7 @@ function(
         },
 
         highlightsXBlock: function() {
+            // eslint-disable-next-line no-var
             var modal = CourseOutlineModalsFactory.getModal('highlights', this.model, {
                 onSave: this.refresh.bind(this),
                 xblockType: XBlockViewUtils.getXBlockType(

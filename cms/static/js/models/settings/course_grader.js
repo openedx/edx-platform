@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-undef
 define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
+    // eslint-disable-next-line no-var
     var CourseGrader = Backbone.Model.extend({
         defaults: {
             type: '', // must be unique w/in collection (ie. w/in course)
@@ -23,13 +24,14 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
         },
         // eslint-disable-next-line consistent-return
         validate: function(attrs) {
+            // eslint-disable-next-line no-var
             var errors = {};
             if (_.has(attrs, 'type')) {
                 if (_.isEmpty(attrs.type)) {
                     errors.type = gettext('The assignment type must have a name.');
                 } else {
                 // FIXME somehow this.collection is unbound sometimes. I can't track down when
-                    // eslint-disable-next-line eqeqeq
+                    /* eslint-disable-next-line eqeqeq, no-var */
                     var existing = this.collection && this.collection.some(function(other) { return (other.cid != this.cid) && (other.get('type') == attrs.type); }, this);
                     if (existing) {
                         errors.type = gettext("There's already another assignment type with this name.");
@@ -37,6 +39,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                 }
             }
             if (_.has(attrs, 'weight')) {
+                // eslint-disable-next-line no-var
                 var intWeight = Math.round(attrs.weight); // see if this ensures value saved is int
                 if (!isFinite(intWeight) || /\D+/.test(attrs.weight) || intWeight < 0 || intWeight > 100) {
                     errors.weight = gettext('Please enter an integer between 0 and 100.');
@@ -52,19 +55,23 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
                 }
             }
             if (_.has(attrs, 'min_count')) {
+                // eslint-disable-next-line no-var
                 var intMinCount = Math.round(attrs.min_count);
                 if (!isFinite(intMinCount) || /\D+/.test(attrs.min_count) || intMinCount < 1) {
                     errors.min_count = gettext('Please enter an integer greater than 0.');
                 } else { attrs.min_count = intMinCount; }
             }
             if (_.has(attrs, 'drop_count')) {
+                // eslint-disable-next-line no-var
                 var dropCount = attrs.drop_count;
+                // eslint-disable-next-line no-var
                 var intDropCount = Math.round(dropCount);
                 if (!isFinite(intDropCount) || /\D+/.test(dropCount) || (_.isString(dropCount) && _.isEmpty(dropCount.trim())) || intDropCount < 0) {
                     errors.drop_count = gettext('Please enter non-negative integer.');
                 } else { attrs.drop_count = intDropCount; }
             }
             if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && !_.has(errors, 'min_count') && !_.has(errors, 'drop_count') && attrs.drop_count >= attrs.min_count) {
+                // eslint-disable-next-line no-var
                 var template = _.template(
                     gettext('You must have at least one undroppable <%- types %> assignment.')
                 );

@@ -1,5 +1,7 @@
 $(document).ready(function() {
+    // eslint-disable-next-line no-var
     var $container = $('.requirement-container');
+    // eslint-disable-next-line no-var
     var collapse = $container.data('eligible');
     // eslint-disable-next-line eqeqeq
     if (collapse == 'not_eligible') {
@@ -8,6 +10,7 @@ $(document).ready(function() {
         $('.requirement-detail').text(gettext('More'));
     }
     $('.detail-collapse').on('click', function() {
+        // eslint-disable-next-line no-var
         var $el = $(this);
         $container.toggleClass('is-hidden');
         $el.find('.fa').toggleClass('fa-caret-up fa-caret-down');

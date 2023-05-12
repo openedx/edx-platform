@@ -9,7 +9,7 @@ define(['underscore', 'gettext', 'js/views/manage_users_and_roles'],
         // eslint-disable-next-line camelcase
         return function(containerName, users, tplUserURL, current_user_id, allow_actions) {
             function updateMessages(messages) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var local_messages = _.extend({}, messages);
                 // eslint-disable-next-line camelcase
                 local_messages.alreadyMember.title = gettext('Already a library team member');
@@ -23,12 +23,14 @@ define(['underscore', 'gettext', 'js/views/manage_users_and_roles'],
             // Roles order are important: first role is considered initial role (the role added to user when (s)he's added
             // Last role is considered an admin role (unrestricted access + ability to manage other users' permissions)
             // Changing roles is performed in promote-demote fashion, so moves only to adjacent roles is allowed
+            // eslint-disable-next-line no-var
             var roles = [
                 {key: 'library_user', name: gettext('Library User')},
                 {key: 'staff', name: gettext('Staff')},
                 {key: 'instructor', name: gettext('Admin')}
             ];
 
+            // eslint-disable-next-line no-var
             var options = {
                 el: $('#content'),
                 containerName: containerName,
@@ -42,6 +44,7 @@ define(['underscore', 'gettext', 'js/views/manage_users_and_roles'],
                 allow_actions: allow_actions
             };
 
+            // eslint-disable-next-line no-var
             var view = new ManageUsersAndRoles(options);
             view.render();
         };

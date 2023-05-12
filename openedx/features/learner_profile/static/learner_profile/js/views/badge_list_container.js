@@ -9,6 +9,7 @@
             'text!learner_profile/templates/badge_list.underscore'
         ],
         function(gettext, $, _, PaginatedView, BadgeView, BadgeListView, BadgeListTemplate) {
+            // eslint-disable-next-line no-var
             var BadgeListContainer = PaginatedView.extend({
                 type: 'badge',
 

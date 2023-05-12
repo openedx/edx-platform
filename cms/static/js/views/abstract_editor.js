@@ -1,11 +1,13 @@
 // eslint-disable-next-line no-undef
 define(['js/views/baseview', 'underscore'], function(BaseView, _) {
+    // eslint-disable-next-line no-var
     var AbstractEditor = BaseView.extend({
 
         // Model is MetadataModel
         initialize: function() {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var self = this;
+            // eslint-disable-next-line no-var
             var templateName = _.result(this, 'templateName');
             // Backbone model cid is only unique within the collection.
             this.uniqueId = _.uniqueId(templateName + '_');
@@ -91,6 +93,7 @@ define(['js/views/baseview', 'underscore'], function(BaseView, _) {
          * @returns The loaded template.
          */
         loadTemplate: function(name) {
+            // eslint-disable-next-line no-var
             var templateSelector = '#' + name,
                 templateText = $(templateSelector).text();
             if (!templateText) {

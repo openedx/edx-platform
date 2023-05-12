@@ -12,6 +12,7 @@
     // that are stored in a temporary list.
     window.Video = (function() {
         // Temporary storage place for elements that must be initialized as Video elements.
+        // eslint-disable-next-line no-var
         var tempCallStack = [];
 
         return function(element, processTempCallStack) {
@@ -75,6 +76,7 @@
             VideoCompletionHandler, VideoCommands, VideoContextMenu, VideoSocialSharing
         ) {
             /* RequireJS */
+            // eslint-disable-next-line no-var
             var youtubeXhr = null,
                 oldVideo = window.Video;
             /* End RequireJS */
@@ -83,6 +85,7 @@
             /* End Webpack */
 
             window.Video = function(element) {
+                // eslint-disable-next-line no-var
                 var el = $(element).find('.video'),
                     id = el.attr('id').replace(/video_/, ''),
                     storage = VideoStorage('VideoState', id),
@@ -107,7 +110,9 @@
                         modules: mainVideoModules
                     };
 
+                // eslint-disable-next-line no-var
                 var getBumperState = function(metadata) {
+                    // eslint-disable-next-line no-var
                     var bumperState = $.extend(true, {
                         el: el,
                         id: id,
@@ -123,12 +128,14 @@
                     return bumperState;
                 };
 
+                // eslint-disable-next-line no-var
                 var player = function(innerState) {
                     return function() {
                         _.extend(innerState.metadata, {autoplay: true, focusFirstControl: true});
                         initialize(innerState, element);
                     };
                 };
+                // eslint-disable-next-line no-var
                 var onSequenceChange;
 
                 VideoAccessibleMenu(el, {
@@ -142,7 +149,9 @@
                     VideoPoster(el, {
                         poster: el.data('poster'),
                         onClick: _.once(function() {
+                            // eslint-disable-next-line no-var
                             var mainVideoPlayer = player(state);
+                            // eslint-disable-next-line no-var
                             var bumper, bumperState;
                             if (storage.getItem('isBumperShown')) {
                                 mainVideoPlayer();

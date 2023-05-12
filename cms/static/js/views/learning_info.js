@@ -12,6 +12,7 @@ define([
 function($, _, Backbone, gettext, TemplateUtils, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var LearningInfoView = Backbone.View.extend({
 
         events: {
@@ -33,10 +34,12 @@ function($, _, Backbone, gettext, TemplateUtils, HtmlUtils) {
         render: function() {
             // rendering for this model
             $('li.course-settings-learning-fields').empty();
+            // eslint-disable-next-line no-var
             var self = this;
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var learning_information = this.model.get('learning_info');
             $.each(learning_information, function(index, info) {
+                // eslint-disable-next-line no-var
                 var attributes = {
                     index: index,
                     info: info,
@@ -52,6 +55,7 @@ function($, _, Backbone, gettext, TemplateUtils, HtmlUtils) {
             * Remove course learning fields.
             * */
             event.preventDefault();
+            // eslint-disable-next-line no-var
             var index = event.currentTarget.getAttribute('data-index'),
                 // eslint-disable-next-line camelcase
                 existing_info = _.clone(this.model.get('learning_info'));

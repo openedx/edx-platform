@@ -1,10 +1,12 @@
 // eslint-disable-next-line no-undef
 define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'common/js/components/views/feedback_notification'],
     function(BaseView, _, $, EditChapterView, NotificationView) {
+        // eslint-disable-next-line no-var
         var EditTextbook = BaseView.extend({
             initialize: function() {
                 this.template = this.loadTemplate('edit-textbook');
                 this.listenTo(this.model, 'invalid', this.render);
+                // eslint-disable-next-line no-var
                 var chapters = this.model.get('chapters');
                 this.listenTo(chapters, 'add', this.addOne);
                 this.listenTo(chapters, 'reset', this.addAll);
@@ -26,6 +28,7 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                 'click .action-add-chapter': 'createChapter'
             },
             addOne: function(chapter) {
+                // eslint-disable-next-line no-var
                 var view = new EditChapterView({model: chapter});
                 this.$('ol.chapters').append(view.render().el);
                 return this;
@@ -44,8 +47,10 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
             },
             setValues: function() {
                 this.setName();
+                // eslint-disable-next-line no-var
                 var that = this;
                 _.each(this.$('li'), function(li, i) {
+                    // eslint-disable-next-line no-var
                     var chapter = that.model.get('chapters').at(i);
                     if (!chapter) { return; }
                     chapter.set({
@@ -59,9 +64,11 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                 if (e && e.preventDefault) { e.preventDefault(); }
                 this.setValues();
                 if (!this.model.isValid()) { return; }
+                // eslint-disable-next-line no-var
                 var saving = new NotificationView.Mini({
                     title: gettext('Saving')
                 }).show();
+                // eslint-disable-next-line no-var
                 var that = this;
                 this.model.save({}, {
                     success: function() {
@@ -79,6 +86,7 @@ define(['js/views/baseview', 'underscore', 'jquery', 'js/views/edit_chapter', 'c
                 return this.close();
             },
             close: function() {
+                // eslint-disable-next-line no-var
                 var textbooks = this.model.collection;
                 this.remove();
                 if (this.model.isNew()) {

@@ -7,6 +7,7 @@ define([
     'use strict';
 
     describe('CertificatesView', function() {
+        // eslint-disable-next-line no-var
         var view = null,
 
             REGENERATE_SEARCH_RESULTS = [
@@ -46,9 +47,11 @@ define([
             ],
 
             getSearchResults = function() {
+                // eslint-disable-next-line no-var
                 var results = [];
 
                 $('.certificates-results tr').each(function(rowIndex, rowValue) {
+                    // eslint-disable-next-line no-var
                     var columns = [];
                     $(rowValue).children('td').each(function(colIndex, colValue) {
                         columns[colIndex] = $(colValue).html();
@@ -65,7 +68,7 @@ define([
             // eslint-disable-next-line camelcase
             searchFor = function(user_filter, course_filter, requests, response) {
             // Enter the search term and submit
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var url = '/certificates/search?user=' + user_filter;
                 view.setUserFilter(user_filter);
                 // eslint-disable-next-line camelcase
@@ -82,11 +85,13 @@ define([
             },
 
             regenerateCerts = function(username, courseKey) {
+                // eslint-disable-next-line no-var
                 var sel = '.btn-cert-regenerate[data-course-key="' + courseKey + '"]';
                 $(sel).click();
             },
 
             generateCerts = function(username, courseKey) {
+                // eslint-disable-next-line no-var
                 var sel = '.btn-cert-generate[data-course-key="' + courseKey + '"]';
                 $(sel).click();
             };
@@ -106,6 +111,7 @@ define([
         });
 
         it('searches for certificates and displays results', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 results = [];
 
@@ -143,6 +149,7 @@ define([
         });
 
         it('searches for certificates and displays a message when there are no results', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 results = [];
 
@@ -157,6 +164,7 @@ define([
         });
 
         it('automatically searches for an initial filter if one is provided', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 results = [];
 
@@ -176,6 +184,7 @@ define([
         });
 
         it('regenerates a certificate for a student', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
 
             // Trigger a search
@@ -199,6 +208,7 @@ define([
         });
 
         it('generate a certificate for a student', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
 
             // Trigger a search

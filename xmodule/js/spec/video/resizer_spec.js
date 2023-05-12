@@ -5,6 +5,7 @@
         ['video/00_resizer.js', 'underscore'],
         function(Resizer, _) {
             describe('Resizer', function() {
+                // eslint-disable-next-line no-var
                 var html = [
                         '<div '
                     + 'class="rszr-wrapper" '
@@ -44,7 +45,7 @@
                 );
 
                 it('`alignByWidthOnly` works correctly', function() {
-                    // eslint-disable-next-line no-unused-vars
+                    /* eslint-disable-next-line no-unused-vars, no-var */
                     var resizer = new Resizer(config).alignByWidthOnly(),
                         expectedWidth = $container.width(),
                         realWidth = $element.width();
@@ -53,7 +54,7 @@
                 });
 
                 it('`alignByHeightOnly` works correctly', function() {
-                    // eslint-disable-next-line no-unused-vars
+                    /* eslint-disable-next-line no-unused-vars, no-var */
                     var resizer = new Resizer(config).alignByHeightOnly(),
                         expectedHeight = $container.height(),
                         realHeight = $element.height();
@@ -62,6 +63,7 @@
                 });
 
                 it('`align` works correctly', function() {
+                    // eslint-disable-next-line no-var
                     var resizer = new Resizer(config).align(),
                         expectedHeight = $container.height(),
                         realHeight = $element.height(),
@@ -80,6 +82,7 @@
                 });
 
                 it('`setMode` works correctly', function() {
+                    // eslint-disable-next-line no-var
                     var resizer = new Resizer(config).setMode('height'),
                         expectedHeight = $container.height(),
                         realHeight = $element.height(),
@@ -98,6 +101,7 @@
                 });
 
                 it('`setElement` works correctly', function() {
+                    // eslint-disable-next-line no-var
                     var $newElement,
                         expectedHeight;
 
@@ -114,10 +118,12 @@
                 });
 
                 describe('Callbacks', function() {
+                    // eslint-disable-next-line no-var
                     var resizer,
                         spiesList = [];
 
                     beforeEach(function() {
+                        // eslint-disable-next-line no-var
                         var spiesCount = _.range(3);
 
                         spiesList = $.map(spiesCount, function() {
@@ -177,6 +183,7 @@
                     it(
                         'Error message is shown when wrong argument type is passed',
                         function() {
+                            // eslint-disable-next-line no-var
                             var methods = ['add', 'once'],
                                 errorMessage = '[Video info]: TypeError: Argument is not a function.',
                                 arg = {};
@@ -196,6 +203,7 @@
                 });
 
                 describe('Delta', function() {
+                    // eslint-disable-next-line no-var
                     var resizer;
 
                     beforeEach(function() {
@@ -203,6 +211,7 @@
                     });
 
                     it('adding delta align correctly by height', function() {
+                        // eslint-disable-next-line no-var
                         var delta = 100,
                             expectedHeight = $container.height() + delta,
                             realHeight;
@@ -217,6 +226,7 @@
                     });
 
                     it('adding delta align correctly by width', function() {
+                        // eslint-disable-next-line no-var
                         var delta = 100,
                             expectedWidth = $container.width() + delta,
                             realWidth;
@@ -231,6 +241,7 @@
                     });
 
                     it('substract delta align correctly by height', function() {
+                        // eslint-disable-next-line no-var
                         var delta = 100,
                             expectedHeight = $container.height() - delta,
                             realHeight;
@@ -245,6 +256,7 @@
                     });
 
                     it('substract delta align correctly by width', function() {
+                        // eslint-disable-next-line no-var
                         var delta = 100,
                             expectedWidth = $container.width() - delta,
                             realWidth;
@@ -259,6 +271,7 @@
                     });
 
                     it('reset delta', function() {
+                        // eslint-disable-next-line no-var
                         var delta = 100,
                             expectedWidth = $container.width(),
                             realWidth;

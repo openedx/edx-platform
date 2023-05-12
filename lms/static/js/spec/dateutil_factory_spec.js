@@ -9,20 +9,27 @@ define(['../dateutil_factory.js'], function(DateUtilIterator) {
 
         describe('stringHandler', function() {
             it('returns a complete string', function() {
+                // eslint-disable-next-line no-var
                 var localTimeString = 'RANDOM_STRING';
+                // eslint-disable-next-line no-var
                 var containerString = 'RANDOM_STRING_TWO {random_token}';
+                // eslint-disable-next-line no-var
                 var dateToken = 'random_token';
+                // eslint-disable-next-line no-var
                 var answer = 'RANDOM_STRING_TWO RANDOM_STRING';
                 expect(DateUtilIterator.stringHandler(localTimeString, containerString, dateToken)).toEqual(answer);
             });
         });
 
         describe('transform', function() {
+            // eslint-disable-next-line no-var
             var $form;
 
             it('localizes some times', function() {
                 /* we have to generate a fake span and then test the resultant texts */
+                // eslint-disable-next-line no-var
                 var iterationKey = '.localized-datetime';
+                // eslint-disable-next-line no-var
                 var testLangs = {
                     en: 'Due Oct 14, 2016 08:00 UTC',
                     ru: 'Due 14 окт. 2016 г. 08:00 UTC',

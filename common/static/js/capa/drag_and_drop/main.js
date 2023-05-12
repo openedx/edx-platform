@@ -17,6 +17,7 @@
                 if (!Array.prototype.every) {
                     // eslint-disable-next-line no-extend-native
                     Array.prototype.every = function(fun /* , thisp */) {
+                        // eslint-disable-next-line no-var
                         var thisp, t, len, i;
 
                         if (this == null) {
@@ -48,6 +49,7 @@
 
             // $(value) - get the element of the entire problem
             function processProblem(index, value) {
+                // eslint-disable-next-line no-var
                 var problemId, config, state;
 
                 if ($(value).attr('data-problem-processed') === 'true') {

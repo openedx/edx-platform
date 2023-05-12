@@ -11,6 +11,7 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
     'use strict';
 
     return function(maintenanceViewURL) {
+        // eslint-disable-next-line no-var
         var showError;
         // Reset values
         $('#reset-button').click(function(e) {
@@ -22,6 +23,7 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
         });
 
         showError = function(containerElSelector, error) {
+            // eslint-disable-next-line no-var
             var errorWrapperElSelector, errorHtml;
             errorWrapperElSelector = containerElSelector + ' .wrapper-error';
             errorHtml = HtmlUtils.joinHtml(
@@ -35,6 +37,7 @@ function($, _, gettext, ViewUtils, StringUtils, HtmlUtils) {
         };
 
         $('form#force_publish').submit(function(event) {
+            // eslint-disable-next-line no-var
             var attrs, forcePublishedTemplate, $submitButton, deferred, promise, data;
             event.preventDefault();
 

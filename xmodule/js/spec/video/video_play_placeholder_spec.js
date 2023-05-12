@@ -2,6 +2,7 @@
     'use strict';
 
     describe('VideoPlayPlaceholder', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
 
         beforeEach(function() {
@@ -23,6 +24,7 @@
             window.onTouchBasedDevice = oldOTBD;
         });
 
+        // eslint-disable-next-line no-var
         var cases = [
             {
                 name: 'PC',
@@ -51,6 +53,7 @@
         });
 
         it('works correctly on calling proper methods', function() {
+            // eslint-disable-next-line no-var
             var btnPlay;
 
             // eslint-disable-next-line no-undef
@@ -75,6 +78,7 @@
         });
 
         $.each(cases, function(index, data) {
+            // eslint-disable-next-line no-var
             var message = [
                 (data.isShown) ? 'is' : 'is not',
                 ' shown on',
@@ -82,6 +86,7 @@
             ].join('');
 
             it(message, function() {
+                // eslint-disable-next-line no-var
                 var btnPlay;
 
                 window.onTouchBasedDevice.and.returnValue(data.isTouch);
@@ -102,6 +107,7 @@
                 'is shown on paused video on ' + device
                 + ' in HTML5 player',
                 function() {
+                    // eslint-disable-next-line no-var
                     var btnPlay;
 
                     window.onTouchBasedDevice.and.returnValue([device]);
@@ -118,6 +124,7 @@
                 'is hidden on playing video on ' + device
                 + ' in HTML5 player',
                 function() {
+                    // eslint-disable-next-line no-var
                     var btnPlay;
 
                     window.onTouchBasedDevice.and.returnValue([device]);
@@ -133,6 +140,7 @@
                 'is hidden on paused video on ' + device
                 + ' in YouTube player',
                 function() {
+                    // eslint-disable-next-line no-var
                     var btnPlay;
 
                     window.onTouchBasedDevice.and.returnValue([device]);

@@ -6,7 +6,7 @@
  * to the server.
  *
  */
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function($, Backbone) {
@@ -36,6 +36,7 @@ var edx = edx || {};
         },
 
         sync: function(method, model) {
+            // eslint-disable-next-line no-var
             var headers = {'X-CSRFToken': $.cookie('csrftoken')},
                 data = {};
 

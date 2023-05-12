@@ -1,5 +1,7 @@
 describe('JSInput', function() {
+    // eslint-disable-next-line no-var
     var $jsinputContainers;
+    // eslint-disable-next-line no-var
     var $inputFields;
 
     beforeEach(function() {

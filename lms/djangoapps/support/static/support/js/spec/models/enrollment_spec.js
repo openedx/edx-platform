@@ -7,6 +7,7 @@ define([
     'use strict';
 
     describe('EnrollmentModel', function() {
+        // eslint-disable-next-line no-var
         var enrollment;
 
         beforeEach(function() {
@@ -17,6 +18,7 @@ define([
         });
 
         it('can save an enrollment to the server and updates itself on success', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 // eslint-disable-next-line camelcase
                 manual_enrollment = {
@@ -36,6 +38,7 @@ define([
         });
 
         it('does not update itself on a server error', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             enrollment.updateEnrollment('verified', 'Financial Assistance');
             AjaxHelpers.respondWithError(requests, 500);

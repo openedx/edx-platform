@@ -8,6 +8,7 @@ define([
     'use strict';
 
     describe('EdxNotes ToggleNotesFactory', function() {
+        // eslint-disable-next-line no-var
         var params = {
             endpoint: '/test_endpoint/',
             user: 'user12345',
@@ -47,6 +48,7 @@ define([
         });
 
         it('can toggle notes', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
 
             expect(this.toggleVisibilityButton).not.toHaveClass('is-disabled');
@@ -87,6 +89,7 @@ define([
         });
 
         it('can handle errors', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 $errorContainer = $('.annotator-notice');
 

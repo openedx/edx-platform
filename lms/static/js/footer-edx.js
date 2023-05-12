@@ -1,10 +1,11 @@
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function($) {
     'use strict';
 
     edx.footer = (function() {
+        // eslint-disable-next-line no-var
         var _fn = {
             el: '#footer-edx-v3',
 
@@ -28,6 +29,7 @@ var edx = edx || {};
                 },
 
                 track: function(event) {
+                    // eslint-disable-next-line no-var
                     var $link = $(event.currentTarget);
 
                     // Only tracking external links

@@ -4,6 +4,7 @@
     define(['jquery', 'underscore', 'backbone', 'gettext', 'js/discussions_management/views/divided_discussions',
         'edx-ui-toolkit/js/utils/html-utils'],
     function($, _, Backbone, gettext, DividedDiscussionConfigurationView, HtmlUtils) {
+        // eslint-disable-next-line no-var
         var CourseWideDiscussionsView = DividedDiscussionConfigurationView.extend({
             events: {
                 'change .check-discussion-subcategory-course-wide': 'discussionCategoryStateChanged',
@@ -30,6 +31,7 @@
                      * @returns {HtmlSnippet} - HTML list for course-wide discussion topics.
                      */
             getCourseWideDiscussionsHtml: function(courseWideDiscussions) {
+                // eslint-disable-next-line no-var
                 var subCategoryTemplate = HtmlUtils.template($('#cohort-discussions-subcategory-tpl').html()),
                     entries = courseWideDiscussions.entries,
                     children = courseWideDiscussions.children;
@@ -37,6 +39,7 @@
                 return HtmlUtils.joinHtml.apply(this, _.map(children, function(child) {
                     // child[0] is the category name, child[1] is the type.
                     // For course wide discussions, the type is always 'entry'
+                    // eslint-disable-next-line no-var
                     var name = child[0],
                         entry = entries[name];
                     return subCategoryTemplate({
@@ -60,6 +63,7 @@
                      * Sends the courseWideDividedDiscussions to the server and renders the view.
                      */
             saveCourseWideDiscussionsForm: function(event) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     courseWideDividedDiscussions = self.getDividedDiscussions(
                         '.check-discussion-subcategory-course-wide:checked'
@@ -77,6 +81,7 @@
                                     self.$('.course-wide-discussion-topics')
                                 );
                             }).fail(function() {
+                                // eslint-disable-next-line no-var
                                 var errorMessage = gettext("We've encountered an error. Refresh your browser and then try again."); // eslint-disable-line max-len
                                 self.showMessage(errorMessage, self.$('.course-wide-discussion-topics'), 'error');
                             });

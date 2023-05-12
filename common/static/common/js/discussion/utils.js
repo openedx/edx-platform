@@ -28,6 +28,7 @@
         };
 
         DiscussionUtil.isStaff = function(userId) {
+            // eslint-disable-next-line no-var
             var staff;
             if (_.isUndefined(userId)) {
                 // eslint-disable-next-line no-void
@@ -42,6 +43,7 @@
         };
 
         DiscussionUtil.isTA = function(userId) {
+            // eslint-disable-next-line no-var
             var ta;
             if (_.isUndefined(userId)) {
                 // eslint-disable-next-line no-void
@@ -53,6 +55,7 @@
         };
 
         DiscussionUtil.isGroupTA = function(userId) {
+            // eslint-disable-next-line no-var
             var groupTa,
                 localUserId = userId;
             if (_.isUndefined(userId)) {
@@ -68,6 +71,7 @@
         };
 
         DiscussionUtil.bulkUpdateContentInfo = function(infos) {
+            // eslint-disable-next-line no-var
             var id, info, _results;
             _results = [];
             for (id in infos) {
@@ -187,12 +191,14 @@
         };
 
         DiscussionUtil.showLoadingIndicator = function(element, takeFocus) {
+            // eslint-disable-next-line no-var
             var animElem = edx.HtmlUtils.joinHtml(
                 edx.HtmlUtils.HTML("<div class='loading-animation' tabindex='0'>"),
                 edx.HtmlUtils.HTML("<span class='icon fa fa-spinner' aria-hidden='true'></span><span class='sr'>"),
                 gettext('Loading content'),
                 edx.HtmlUtils.HTML('</span></div>')
             );
+            // eslint-disable-next-line no-var
             var $animElem = $(animElem.toString());
             element.after($animElem);
             this.$_loading = $animElem;
@@ -207,10 +213,12 @@
         };
 
         DiscussionUtil.discussionAlert = function(header, body) {
+            // eslint-disable-next-line no-var
             var $alertDiv, $alertTrigger;
             // Prevents "text" is undefined in underscore.js in tests - looks like some tests use
             // discussions somehow, but never append discussion fixtures or reset them; this causes
             // entire test suite (lms, cms, common) to fail due to unhandled JS exception
+            // eslint-disable-next-line no-var
             var popupTemplate = $('#alert-popup').html() || '';
             if ($('#discussion-alert').length === 0) {
                 $alertDiv = $(
@@ -232,6 +240,7 @@
         };
 
         DiscussionUtil.safeAjax = function(params) {
+            // eslint-disable-next-line no-var
             var $elem, deferred, request,
                 self = this;
             $elem = params.$elem;
@@ -280,6 +289,7 @@
         };
 
         DiscussionUtil.updateWithUndo = function(model, updates, safeAjaxParams, errorMsg, beforeSend) {
+            // eslint-disable-next-line no-var
             var undo,
                 self = this;
             if (errorMsg) {
@@ -298,6 +308,7 @@
         };
 
         DiscussionUtil.bindLocalEvents = function($local, eventsHandler) {
+            // eslint-disable-next-line no-var
             var event, eventSelector, handler, selector, _ref, _results;
             _results = [];
             for (eventSelector in eventsHandler) {
@@ -314,6 +325,7 @@
 
         DiscussionUtil.formErrorHandler = function(errorsField) {
             return function(xhr) {
+                // eslint-disable-next-line no-var
                 var makeErrorElem, response, i, $errorItem;
                 makeErrorElem = function(message, alertId) {
                     return edx.HtmlUtils.joinHtml(
@@ -351,6 +363,7 @@
         };
 
         DiscussionUtil.postMathJaxProcessor = function(htmlSnippet) {
+            // eslint-disable-next-line no-var
             var RE_DISPLAYMATH, RE_INLINEMATH;
             // eslint-disable-next-line no-useless-escape
             RE_INLINEMATH = /^\$([^\$]*)\$/g;
@@ -373,7 +386,7 @@
 
         // eslint-disable-next-line camelcase
         DiscussionUtil.makeWmdEditor = function($content, $local, cls_identifier) {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var appended_id, editor, elem, id, imageUploadUrl, placeholder, _processor;
             // eslint-disable-next-line camelcase
             elem = $local('.' + cls_identifier);
@@ -400,6 +413,7 @@
 
         // eslint-disable-next-line camelcase
         DiscussionUtil.getWmdEditor = function($content, $local, cls_identifier) {
+            // eslint-disable-next-line no-var
             var elem, id;
             // eslint-disable-next-line camelcase
             elem = $local('.' + cls_identifier);
@@ -410,6 +424,7 @@
 
         // eslint-disable-next-line camelcase
         DiscussionUtil.getWmdInput = function($content, $local, cls_identifier) {
+            // eslint-disable-next-line no-var
             var elem, id;
             // eslint-disable-next-line camelcase
             elem = $local('.' + cls_identifier);
@@ -429,7 +444,7 @@
             return this.getWmdEditor($content, $local, cls_identifier).refreshPreview();
         };
 
-        // eslint-disable-next-line no-useless-escape
+        /* eslint-disable-next-line no-useless-escape, no-var */
         var RE_DISPLAYMATH = /^([^\$]*?)\$\$([^\$]*?)\$\$(.*)$/m,
             // eslint-disable-next-line no-useless-escape
             RE_INLINEMATH = /^([^\$]*?)\$([^\$]+?)\$(.*)$/m,
@@ -445,6 +460,7 @@
          * @returns {*}
          */
         DiscussionUtil.processEachMathAndCode = function(htmlSnippet, processor) {
+            // eslint-disable-next-line no-var
             var $div, codeArchive, processedHtmlString, htmlString;
             codeArchive = {};
             processedHtmlString = '';
@@ -524,6 +540,7 @@
          * @returns HtmlSnippet
          */
         DiscussionUtil.markdownWithHighlight = function(unsafeText) {
+            // eslint-disable-next-line no-var
             var converter;
             // eslint-disable-next-line no-useless-escape
             unsafeText = unsafeText.replace(/^\&gt\;/gm, '>');
@@ -534,6 +551,7 @@
             * - converter.makeHtml strips html tags in post body and escapes in code blocks by design.
             *    HTML tags are not supported.  Only markdown is supported.
             */
+            // eslint-disable-next-line no-var
             var htmlSnippet = edx.HtmlUtils.HTML(converter.makeHtml(unsafeText));
             return this.unescapeHighlightTag(this.stripLatexHighlight(htmlSnippet));
         };
@@ -563,7 +581,7 @@
         };
 
         DiscussionUtil.abbreviateHTML = function(htmlSnippet, maxLength) {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var $result, imagesToReplace, truncated_text;
             /* eslint-disable-next-line camelcase, no-undef */
             truncated_text = edx.HtmlUtils.HTML(jQuery.truncate(htmlSnippet.toString(), {
@@ -587,6 +605,7 @@
                 );
             }
             // See TNL-4983 for an explanation of why the linter requires ensureHtml()
+            // eslint-disable-next-line no-var
             var afterMessage = edx.HtmlUtils.interpolateHtml(
                 edx.HtmlUtils.HTML('<em>{text}</em>'), {text: gettext('image omitted')}
             );
@@ -595,6 +614,7 @@
         };
 
         DiscussionUtil.getPaginationParams = function(curPage, numPages, pageUrlFunc) {
+            // eslint-disable-next-line no-var
             var delta, maxPage, minPage, pageInfo;
             delta = 2;
             minPage = Math.max(curPage - delta, 1);
@@ -619,6 +639,7 @@
         };
 
         DiscussionUtil.handleKeypressInToolbar = function(event) {
+            // eslint-disable-next-line no-var
             var $currentButton, $nextButton, $toolbar, $allButtons,
                 keyPressed, nextIndex, currentButtonIndex,
                 validKeyPress, toolbarHasButtons;

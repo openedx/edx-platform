@@ -5,6 +5,7 @@ define([
 ], function($, Backbone, TemplateHelpers, CourseCard, CoursesListing) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var JSON_RESPONSE = {
         total: 365,
         results: [
@@ -36,10 +37,12 @@ define([
             jasmine.clock().install();
             loadFixtures('js/fixtures/discovery.html');
             TemplateHelpers.installTemplate('templates/discovery/course_card');
+            // eslint-disable-next-line no-var
             var collection = new Backbone.Collection(
                 [JSON_RESPONSE.results[0].data],
                 {model: CourseCard}
             );
+            // eslint-disable-next-line no-var
             var mock = {
                 collection: collection,
                 latest: function() { return this.collection.last(20); }

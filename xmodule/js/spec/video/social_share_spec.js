@@ -3,7 +3,7 @@
     'use strict';
 
     describe('VideoSocialSharingHandler', function() {
-        // eslint-disable-next-line no-unused-vars
+        /* eslint-disable-next-line no-unused-vars, no-var */
         var state;
 
         beforeEach(function() {
@@ -27,6 +27,7 @@
             /* eslint-disable-next-line object-curly-spacing, no-undef */
             _.each(testCases, ({ source }) => {
                 it(source, () => {
+                    // eslint-disable-next-line no-var
                     var siteShareButton = $(`.social-share-link[data-source="${source}"]`);
                     expect(siteShareButton.length).toEqual(1);
 

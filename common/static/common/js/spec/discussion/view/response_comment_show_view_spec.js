@@ -39,7 +39,7 @@
                 return expect(this.comment.get('abuse_flaggers')).toEqual(['123', '567']);
             });
             it('can be unflagged for abuse', function() {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var temp_array;
                 // eslint-disable-next-line camelcase
                 temp_array = [];
@@ -62,6 +62,7 @@
                 return DiscussionViewSpecHelper.checkButtonEvents(this.view, '_delete', '.action-delete');
             });
             it('triggers the delete event', function() {
+                // eslint-disable-next-line no-var
                 var triggerTarget;
                 // eslint-disable-next-line no-undef
                 triggerTarget = jasmine.createSpy();
@@ -82,6 +83,7 @@
                 return DiscussionViewSpecHelper.checkButtonEvents(this.view, 'edit', '.action-edit');
             });
             it('triggers comment:edit when the edit button is clicked', function() {
+                // eslint-disable-next-line no-var
                 var triggerTarget;
                 // eslint-disable-next-line no-undef
                 triggerTarget = jasmine.createSpy();
@@ -91,8 +93,10 @@
             });
         });
         describe('labels', function() {
+            // eslint-disable-next-line no-var
             var expectOneElement;
             expectOneElement = function(view, selector, visible) {
+                // eslint-disable-next-line no-var
                 var elements;
                 if (typeof visible === 'undefined' || visible === null) {
                     visible = true;

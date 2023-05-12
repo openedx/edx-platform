@@ -2,11 +2,16 @@
 
 'use strict';
 
+// eslint-disable-next-line no-var
 var Merge = require('webpack-merge');
+// eslint-disable-next-line no-var
 var path = require('path');
+// eslint-disable-next-line no-var
 var webpack = require('webpack');
+// eslint-disable-next-line no-var
 var _ = require('underscore');
 
+// eslint-disable-next-line no-var
 var commonConfig = require('./webpack.common.config.js');
 
 module.exports = _.values(Merge.smart(commonConfig, {

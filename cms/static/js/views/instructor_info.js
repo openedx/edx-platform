@@ -14,6 +14,7 @@ define([
 function($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDialog, HtmlUtils) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var InstructorInfoView = Backbone.View.extend({
 
         events: {
@@ -34,9 +35,11 @@ function($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDial
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var attributes;
             // Assemble the render view for this model.
             $('.course-instructor-details-fields').empty();
+            // eslint-disable-next-line no-var
             var self = this;
             $.each(this.model.get('instructor_info').instructors, function(index, data) {
                 attributes = {
@@ -60,6 +63,7 @@ function($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDial
                  * Remove course Instructor fields.
                  * */
             event.preventDefault();
+            // eslint-disable-next-line no-var
             var index = event.currentTarget.getAttribute('data-index'),
                 instructors = this.model.get('instructor_info').instructors.slice(0);
             instructors.splice(index, 1);
@@ -71,16 +75,20 @@ function($, _, Backbone, gettext, TemplateUtils, FileUploadModel, FileUploadDial
                 * Upload instructor image.
                 * */
             event.preventDefault();
+            // eslint-disable-next-line no-var
             var index = event.currentTarget.getAttribute('data-index'),
                 instructors = this.model.get('instructor_info').instructors.slice(0),
                 instructor = instructors[index];
 
+            // eslint-disable-next-line no-var
             var upload = new FileUploadModel({
                 title: gettext('Upload instructor image.'),
                 message: gettext('Files must be in JPEG or PNG format.'),
                 mimeTypes: ['image/jpeg', 'image/png']
             });
+            // eslint-disable-next-line no-var
             var self = this;
+            // eslint-disable-next-line no-var
             var modal = new FileUploadDialog({
                 model: upload,
                 onSuccess: function(response) {

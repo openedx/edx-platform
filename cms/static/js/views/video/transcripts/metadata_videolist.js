@@ -8,6 +8,7 @@ define(
     function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var VideoList = AbstractEditor.extend({
         // Time that we wait since the last time user typed.
             inputDelay: 300,
@@ -31,6 +32,7 @@ define(
             // Initialize MessageManager that is responsible for
             // status messages and errors.
                 this.options = _.extend({}, options);
+                // eslint-disable-next-line no-var
                 var Messenger = this.options.MessageManager || MessageManager;
 
                 this.messenger = new Messenger({
@@ -65,6 +67,7 @@ define(
             },
 
             updateOnCheckTranscriptSuccess: function(videoList, response) {
+                // eslint-disable-next-line no-var
                 var params = response,
                     len = videoList.length,
                     mode = (len === 1) ? videoList[0].mode : false;
@@ -85,6 +88,7 @@ define(
          * Updates the message with error.
          */
             showServerError: function(response) {
+                // eslint-disable-next-line no-var
                 var errorMessage = gettext('Error: Connection with server failed.');
 
                 if (response.responseJSON !== undefined) {
@@ -133,6 +137,7 @@ define(
          *
          */
             getVideoObjectsList: function() {
+                // eslint-disable-next-line no-var
                 var links = this.getValueFromEditor();
 
                 return Utils.getVideoList(links);
@@ -143,6 +148,7 @@ define(
          * @param {Array} value List of values.
          */
             setValueInEditor: function(value) {
+                // eslint-disable-next-line no-var
                 var list = this.$el.find('.input'),
                     val = value.filter(_.identity),
                     placeholders = this.getPlaceholders(val);
@@ -160,6 +166,7 @@ define(
          * @return {Array} List of placeholders.
          */
             getPlaceholders: function(value) {
+                // eslint-disable-next-line no-var
                 var parseLink = Utils.parseLink,
                     placeholders = _.clone(this.placeholders);
 
@@ -167,6 +174,7 @@ define(
                 return _.map(
                     this.$el.find('.input'),
                     function(element, index) {
+                        // eslint-disable-next-line no-var
                         var linkInfo = parseLink(value[index]),
                             type = (linkInfo) ? linkInfo.type : null,
                             label;
@@ -241,6 +249,7 @@ define(
                     event.preventDefault();
                 }
 
+                // eslint-disable-next-line no-var
                 var $el = $(event.currentTarget),
                     $inputs = this.$el.find('.input'),
                     entry = $el.val(),
@@ -249,6 +258,7 @@ define(
 
                 // Empty value should not be validated
                 if (this.checkValidity(data, isNotEmpty)) {
+                    // eslint-disable-next-line no-var
                     var fieldsValue = this.getValueFromEditor(),
                         modelValue = this.model.getValue();
 
@@ -300,6 +310,7 @@ define(
             isUniqVideoTypes: function(videoList) {
             // Extract a list of "type" property values.
             // => ex: ['webm', 'mp4', 'mp4']
+                // eslint-disable-next-line no-var
                 var arr = _.pluck(videoList, 'type').filter(function(item) {
                         return item !== 'other';
                     }),
@@ -318,6 +329,7 @@ define(
             isUniqOtherVideos: function(videoList) {
             // Returns list of video objects with "type" equal "other" or
             // "youtube".
+                // eslint-disable-next-line no-var
                 var otherLinksList = videoList.filter(function(item) {
                         return item.type === 'other';
                     }),
@@ -338,6 +350,7 @@ define(
          * @return {Boolean}
          */
             checkIsValid: function(validator, list, message) {
+                // eslint-disable-next-line no-var
                 var videoList = list || this.getVideoObjectsList(),
                     isValid = true;
 
@@ -383,6 +396,7 @@ define(
          * @return {Boolean} Boolean value that indicate if value is valid.
          */
             checkValidity: function(data, showErrorModeMessage) {
+                // eslint-disable-next-line no-var
                 var videoList = this.getVideoObjectsList(),
                     isUniqTypes = this.checkIsUniqVideoTypes.bind(this),
                     isUniqOtherVideos = this.checkIsUniqOtherVideos.bind(this);

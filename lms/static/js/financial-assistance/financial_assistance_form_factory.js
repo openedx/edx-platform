@@ -6,6 +6,7 @@
     ],
     function(FinancialAssistanceFormView) {
         return function(options) {
+            // eslint-disable-next-line no-var
             var formView = new FinancialAssistanceFormView({
                 el: '.financial-assistance-wrapper',
                 context: options

@@ -1,20 +1,22 @@
 describe('Tests for accessibility_tools.js', function() {
     describe('Tests for accessible modals', function() {
-        // eslint-disable-next-line no-unused-vars
+        /* eslint-disable-next-line no-unused-vars, no-var */
         var pressTabOnLastElt = function(firstElt, lastElt) {
             firstElt.focus();
         };
 
+        // eslint-disable-next-line no-var
         var pressShiftTabOnFirstElt = function(firstElt, lastElt) {
             lastElt.focus();
         };
 
+        // eslint-disable-next-line no-var
         var pressEsc = function(closeModal) {
             closeModal.click();
         };
 
         beforeEach(function() {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var $focusedElementBeforeModal;
             loadFixtures('js/fixtures/dashboard-fixture.html');
             // eslint-disable-next-line no-undef
@@ -67,6 +69,7 @@ describe('Tests for accessibility_tools.js', function() {
         });
 
         it("pressing ESC calls 'click' on close-modal element", function() {
+            // eslint-disable-next-line no-var
             var clicked = false;
             // eslint-disable-next-line no-unused-vars
             $('#close-modal').click(function(theEvent) {
@@ -99,6 +102,7 @@ describe('Tests for accessibility_tools.js', function() {
     });
 
     describe('Tests for SR region', function() {
+        // eslint-disable-next-line no-var
         var getSRText = function() {
             return $('#reader-feedback').html();
         };
@@ -108,6 +112,7 @@ describe('Tests for accessibility_tools.js', function() {
         });
 
         it('has the sr class and is aria-live', function() {
+            // eslint-disable-next-line no-var
             var $reader = $('#reader-feedback');
             expect($reader.hasClass('sr')).toBe(true);
             expect($reader.attr('aria-live')).toBe('polite');

@@ -8,6 +8,7 @@
         'common/js/components/views/paginated_view',
         'teams/js/views/team_utils'
     ], function(Backbone, gettext, TeamCardView, PaginatedView, TeamUtils) {
+        // eslint-disable-next-line no-var
         var TeamsView = PaginatedView.extend({
             type: 'teams',
 
@@ -19,6 +20,7 @@
             paginationLabel: gettext('Teams Pagination'),
 
             initialize: function(options) {
+                // eslint-disable-next-line no-var
                 var view = this;
                 this.context = options.context;
                 this.itemViewClass = TeamCardView.extend({

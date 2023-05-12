@@ -8,6 +8,7 @@
         'common/js/components/views/tabbed_view',
         'teams/js/utils/team_analytics'
     ], function(TabbedView, TeamAnalytics) {
+        // eslint-disable-next-line no-var
         var TeamsTabbedView = TabbedView.extend({
             /**
              * Overrides TabbedView.prototype.setActiveTab in order to

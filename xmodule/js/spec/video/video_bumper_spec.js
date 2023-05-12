@@ -3,6 +3,7 @@
     'use strict';
 
     describe('VideoBumper', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD, waitForPlaying;
 
         // eslint-disable-next-line no-shadow
@@ -76,7 +77,7 @@
         });
 
         it('can save appropriate states correctly on ended', function() {
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.el.trigger('ended');
@@ -86,7 +87,7 @@
         });
 
         it('can save appropriate states correctly on skip', function() {
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.bumperState.videoBumper.skip();
@@ -97,7 +98,7 @@
         });
 
         it('can save appropriate states correctly on error', function() {
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.el.triggerHandler('error');
@@ -108,7 +109,7 @@
         });
 
         it('can save appropriate states correctly on skip and do not show again', function() {
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var saveState = jasmine.createSpy('saveState');
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.bumperState.videoBumper.skipAndDoNotShowAgain();

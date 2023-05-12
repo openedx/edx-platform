@@ -1,6 +1,7 @@
 /* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(undefined) {
     describe('VideoPlayer Events', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
 
         describe('HTML5', function() {

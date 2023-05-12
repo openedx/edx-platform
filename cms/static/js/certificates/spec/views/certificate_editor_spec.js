@@ -19,7 +19,9 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
     Notification, AjaxHelpers, TemplateHelpers, ViewHelpers, ValidationHelpers, CustomMatchers) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var MAX_SIGNATORIES_LIMIT = 10;
+    // eslint-disable-next-line no-var
     var SELECTORS = {
         detailsView: '.certificate-details',
         editView: '.certificate-edit',
@@ -45,7 +47,9 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         saveCertificateButton: 'button.action-primary'
     };
 
+    // eslint-disable-next-line no-var
     var clickDeleteItem = function(that, promptText, element, url) {
+        // eslint-disable-next-line no-var
         var requests = AjaxHelpers.requests(that),
             promptSpy = ViewHelpers.createPromptSpy(),
             notificationSpy = ViewHelpers.createNotificationSpy();
@@ -63,7 +67,9 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         }
     };
 
+    // eslint-disable-next-line no-var
     var showConfirmPromptAndClickCancel = function(view, element, promptText) {
+        // eslint-disable-next-line no-var
         var promptSpy = ViewHelpers.createPromptSpy();
         view.$(element).click();
         ViewHelpers.verifyPromptShowing(promptSpy, promptText);
@@ -71,7 +77,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
         ViewHelpers.verifyPromptHidden(promptSpy);
     };
 
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var uploadFile = function(file_path, requests) {
         $(SELECTORS.uploadDialogFileInput).change();
         $(SELECTORS.uploadDialogButton).click();
@@ -80,6 +86,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
     };
 
     describe('Certificate editor view', function() {
+        // eslint-disable-next-line no-var
         var setValuesToInputs = function(view, values) {
             _.each(values, function(value, selector) {
                 if (SELECTORS[selector]) {
@@ -88,6 +95,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 }
             });
         };
+        // eslint-disable-next-line no-var
         var basicModalTpl = readFixtures('basic-modal.underscore'),
             modalButtonTpl = readFixtures('modal-button.underscore'),
             uploadDialogTpl = readFixtures('upload-dialog.underscore');
@@ -160,6 +168,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             });
 
             it('should save properly', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
                 this.view.$('.action-add').click();
@@ -177,6 +186,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             });
 
             it('does not hide saving message if failure', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
                 this.view.$(SELECTORS.inputCertificateName).val('New Test Name');
@@ -201,6 +211,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
             });
 
             it('user can only add signatories up to limit', function() {
+                // eslint-disable-next-line no-var
                 for (var i = 1; i < MAX_SIGNATORIES_LIMIT; i++) {
                     this.view.$(SELECTORS.addSignatoryButton).click();
                 }
@@ -216,13 +227,16 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
 
             it('user can add signatories when signatory reached the upper limit But after deleting a signatory',
                 function() {
+                    // eslint-disable-next-line no-var
                     for (var i = 1; i < MAX_SIGNATORIES_LIMIT; i++) {
                         this.view.$(SELECTORS.addSignatoryButton).click();
                     }
                     expect(this.view.$(SELECTORS.addSignatoryButton)).toHaveClass('disableClick');
 
                     // now delete anyone of the signatory, Add signatory should be enabled.
+                    // eslint-disable-next-line no-var
                     var signatory = this.model.get('signatories').at(0);
+                    // eslint-disable-next-line no-var
                     var text = 'Delete "' + signatory.get('name') + '" from the list of signatories?';
                     clickDeleteItem(this, text, SELECTORS.signatoryDeleteButton + ':first');
                     expect(this.view.$(SELECTORS.addSignatoryButton)).not.toHaveClass('disableClick');
@@ -271,15 +285,17 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
 
             it('user can delete those signatories already saved', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var total_signatories = this.model.get('signatories').length;
+                // eslint-disable-next-line no-var
                 var signatory = this.model.get('signatories').at(0);
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var signatory_url = '/certificates/signatory';
                 // eslint-disable-next-line camelcase
                 signatory.url = signatory_url;
                 // eslint-disable-next-line no-undef
                 spyOn(signatory, 'isNew').and.returnValue(false);
+                // eslint-disable-next-line no-var
                 var text = 'Delete "' + signatory.get('name') + '" from the list of signatories?';
                 clickDeleteItem(this, text, SELECTORS.signatoryDeleteButton + ':first', signatory_url);
                 // eslint-disable-next-line camelcase
@@ -288,23 +304,26 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
 
             it('can cancel deletion of signatories', function() {
                 this.view.$(SELECTORS.addSignatoryButton).click();
+                // eslint-disable-next-line no-var
                 var signatory = this.model.get('signatories').at(0);
                 // eslint-disable-next-line no-undef
                 spyOn(signatory, 'isNew').and.returnValue(false);
                 // add one more signatory
                 this.view.$(SELECTORS.addSignatoryButton).click();
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var total_signatories = this.model.get('signatories').length;
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var signatory_url = '/certificates/signatory';
                 // eslint-disable-next-line camelcase
                 signatory.url = signatory_url;
+                // eslint-disable-next-line no-var
                 var text = 'Delete "' + signatory.get('name') + '" from the list of signatories?';
                 showConfirmPromptAndClickCancel(this.view, SELECTORS.signatoryDeleteButton + ':first', text);
                 expect(this.model.get('signatories').length).toEqual(total_signatories);
             });
 
             it('signatories should save properly', function() {
+                // eslint-disable-next-line no-var
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
                 this.view.$('.action-add').click();
@@ -330,7 +349,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 });
 
                 this.view.$(SELECTORS.uploadSignatureButton).click();
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var sinature_image_path = '/c4x/edX/DemoX/asset/Signature-450.png';
                 uploadFile(sinature_image_path, requests);
 
@@ -341,6 +360,7 @@ function(_, Course, CertificateModel, SignatoryModel, CertificatesCollection, Ce
                 });
 
                 // get the first signatory from the signatories collection.
+                // eslint-disable-next-line no-var
                 var signatory = this.model.get('signatories').at(0);
                 expect(signatory).toBeInstanceOf(SignatoryModel);
                 expect(signatory.get('name')).toEqual('New Signatory Name');

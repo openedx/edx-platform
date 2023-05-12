@@ -16,6 +16,7 @@
      *   a<br>
      *   string<br>
      */
+        // eslint-disable-next-line no-var
         var nl2br = function(str) {
             return (str + '').replace(/(\r\n|\n\r|\r|\n)/g, '<br>');
         };

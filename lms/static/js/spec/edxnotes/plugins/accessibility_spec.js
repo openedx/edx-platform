@@ -71,6 +71,7 @@ define([
         });
 
         describe('a11y attributes', function() {
+            // eslint-disable-next-line no-var
             var highlight, annotation, $note;
 
             beforeEach(function() {
@@ -110,7 +111,7 @@ define([
         });
 
         describe('keydown events on highlighted text', function() {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var highlight, annotation, note;
 
             beforeEach(function() {
@@ -147,7 +148,7 @@ define([
             });
 
             it('should focus highlighted text after closing', function() {
-                // eslint-disable-next-line no-shadow
+                /* eslint-disable-next-line no-shadow, no-var */
                 var note;
                 highlight.trigger(keyDownEvent(this.KEY.ENTER));
                 note = this.annotator.element.find('.annotator-edit');
@@ -168,6 +169,7 @@ define([
         });
 
         describe('keydown events on viewer', function() {
+            // eslint-disable-next-line no-var
             var highlight, annotation, listing, note, edit, del, close;
 
             beforeEach(function() {
@@ -225,6 +227,7 @@ define([
             });
 
             it('should hide on ESCAPE keydown', function() {
+                // eslint-disable-next-line no-var
                 var tabControls = [listing, note, edit, del, close];
 
                 _.each(tabControls, function(control) {
@@ -236,6 +239,7 @@ define([
         });
 
         describe('keydown events on editor', function() {
+            // eslint-disable-next-line no-var
             var highlight, annotation, form, annotatorItems, textArea, tags, save, cancel;
 
             beforeEach(function() {
@@ -326,6 +330,7 @@ define([
             });
 
             it('should hide on ESCAPE keydown', function() {
+                // eslint-disable-next-line no-var
                 var tabControls = [textArea, save, cancel];
 
                 _.each(tabControls, function(control) {

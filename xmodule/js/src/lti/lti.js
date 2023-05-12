@@ -10,6 +10,7 @@
      * @param {jQuery} element DOM element with the lti container.
      */
     this.LTI = function(element) {
+        // eslint-disable-next-line no-var
         var dataAttrs = $(element).find('.lti').data(),
             askToSendUsername = (dataAttrs.askToSendUsername === 'True'),
             askToSendEmail = (dataAttrs.askToSendEmail === 'True');

@@ -8,6 +8,7 @@ function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {
     'use strict';
 
     describe('edx.verify_student.ReverifyView', function() {
+        // eslint-disable-next-line no-var
         var TEMPLATES = [
             'webcam_photo',
             'image_input',
@@ -18,6 +19,7 @@ function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {
             'reverify_success_step'
         ];
 
+        // eslint-disable-next-line no-var
         var STEP_INFO = {
             'face-photo-step': {
                 platformName: 'edX'
@@ -34,10 +36,12 @@ function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {
             }
         };
 
+        // eslint-disable-next-line no-var
         var createView = function() {
             return new ReverifyView({stepInfo: STEP_INFO}).render();
         };
 
+        // eslint-disable-next-line no-var
         var expectStepRendered = function(stepName) {
             // Expect that the step container div rendered
             expect($('.' + stepName).length > 0).toBe(true);
@@ -56,6 +60,7 @@ function($, TemplateHelpers, ReviewPhotosStepView, ReverifyView) {
         });
 
         it('renders verification steps', function() {
+            // eslint-disable-next-line no-var
             var view = createView();
 
             // Go through the flow, verifying that each step renders

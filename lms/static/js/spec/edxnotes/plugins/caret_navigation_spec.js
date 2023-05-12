@@ -68,7 +68,9 @@ define([
         });
 
         describe('onKeyUp', function() {
+            // eslint-disable-next-line no-var
             var triggerEvent = function(element, props) {
+                // eslint-disable-next-line no-var
                 var eventProps = $.extend({
                     ctrlKey: true,
                     shiftKey: true,

@@ -1,4 +1,5 @@
 (function() {
+    // eslint-disable-next-line no-var
     var output, Converter;
     if (typeof exports === 'object' && typeof require === 'function') { // we're in a CommonJS (e.g. Node.js) module
         output = exports;
@@ -10,6 +11,7 @@
     }
 
     output.getSanitizingConverter = function() {
+        // eslint-disable-next-line no-var
         var converter = new Converter();
         // eslint-disable-next-line no-use-before-define
         converter.hooks.chain('postConversion', sanitizeHtml);
@@ -24,14 +26,14 @@
     }
 
     // (tags that can be opened/closed) | (tags that stand alone)
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var basic_tag_whitelist = /^(<\/?(b|blockquote|code|del|dd|dl|dt|em|h1|h2|h3|i|kbd|li|ol|p|pre|s|sup|sub|strong|strike|ul)>|<(br|hr)\s?\/?>)$/i;
     // <a href="url..." optional title>|</a>
-    /* eslint-disable-next-line camelcase, no-useless-escape */
+    /* eslint-disable-next-line camelcase, no-useless-escape, no-var */
     var a_white = /^(<a\shref="((https?|ftp):\/\/|\/)[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)]+"(\stitle="[^"<>]+")?\s?>|<\/a>)$/i;
 
     // <img src="url..." optional width  optional height  optional alt  optional title
-    /* eslint-disable-next-line camelcase, no-useless-escape */
+    /* eslint-disable-next-line camelcase, no-useless-escape, no-var */
     var img_white = /^(<img\ssrc="(https?:\/\/|\/)[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)]+"(\swidth="\d{1,3}")?(\sheight="\d{1,3}")?(\salt="[^"<>]*")?(\stitle="[^"<>]*")?\s?\/?>)$/i;
 
     function sanitizeTag(tag) {
@@ -50,24 +52,34 @@
         // eslint-disable-next-line eqeqeq
         if (html == '') { return ''; }
 
+        // eslint-disable-next-line no-var
         var re = /<\/?\w+[^>]*(\s|$|>)/g;
         // convert everything to lower case; this makes
         // our case insensitive comparisons easier
+        // eslint-disable-next-line no-var
         var tags = html.toLowerCase().match(re);
 
         // no HTML tags present? nothing to do; exit now
+        // eslint-disable-next-line no-var
         var tagcount = (tags || []).length;
         // eslint-disable-next-line eqeqeq
         if (tagcount == 0) { return html; }
 
+        // eslint-disable-next-line no-var
         var tagname, tag;
+        // eslint-disable-next-line no-var
         var ignoredtags = '<p><img><br><li><hr>';
+        // eslint-disable-next-line no-var
         var match;
+        // eslint-disable-next-line no-var
         var tagpaired = [];
+        // eslint-disable-next-line no-var
         var tagremove = [];
+        // eslint-disable-next-line no-var
         var needsRemoval = false;
 
         // loop through matched tags in forward order
+        // eslint-disable-next-line no-var
         for (var ctag = 0; ctag < tagcount; ctag++) {
             tagname = tags[ctag].replace(/<\/?(\w+).*/, '$1');
             // skip any already paired tags
@@ -81,6 +93,7 @@
             if (!/^<\//.test(tag)) {
                 // this is an opening tag
                 // search forwards (next tags), look for closing tags
+                // eslint-disable-next-line no-var
                 for (var ntag = ctag + 1; ntag < tagcount; ntag++) {
                     if (!tagpaired[ntag] && tags[ntag] === '</' + tagname + '>') { // xss-lint: disable=javascript-concat-html
                         match = ntag;
@@ -98,11 +111,11 @@
 
         // delete all orphaned tags from the string
 
-        // eslint-disable-next-line block-scoped-var
+        /* eslint-disable-next-line block-scoped-var, no-var */
         var ctag = 0;
         // eslint-disable-next-line no-shadow
         html = html.replace(re, function(match) {
-            // eslint-disable-next-line block-scoped-var
+            /* eslint-disable-next-line block-scoped-var, no-var */
             var res = tagremove[ctag] ? '' : match;
             // eslint-disable-next-line block-scoped-var
             ctag++;

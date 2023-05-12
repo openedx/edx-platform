@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-undef
 define(['js/models/xblock_validation'],
     function(XBlockValidationModel) {
+        // eslint-disable-next-line no-var
         var verifyModel;
 
         // eslint-disable-next-line camelcase

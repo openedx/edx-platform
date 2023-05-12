@@ -52,8 +52,11 @@
             },
 
             renderItems: function() {
+                // eslint-disable-next-line no-var
                 var latest = this.collection.latestModels();
+                // eslint-disable-next-line no-var
                 var items = latest.map(function(result) {
+                    // eslint-disable-next-line no-var
                     var item = new SearchItemView({
                         model: result,
                         template: this.itemTemplate
@@ -65,6 +68,7 @@
             },
 
             totalCountMsg: function() {
+                // eslint-disable-next-line no-var
                 var fmt = ngettext(
                     '{total_results} result found for "{search_term}"',
                     '{total_results} results found for "{search_term}"',

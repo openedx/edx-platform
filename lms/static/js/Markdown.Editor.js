@@ -1,6 +1,7 @@
 // needs Markdown.Converter.js at the moment
 
 (function() {
+    // eslint-disable-next-line no-var
     var util = {},
         position = {},
         ui = {},
@@ -24,6 +25,7 @@
     // -------------------------------------------------------------------
 
     // The text that appears on the dialog box when entering links.
+    // eslint-disable-next-line no-var
     var linkDialogText = gettext('Insert Hyperlink'),
         linkUrlHelpText = gettext("e.g. 'http://google.com'"),
         linkDestinationLabel = gettext('Link Description'),
@@ -32,6 +34,7 @@
         linkDefaultText = 'http://'; // The default text that appears in input
 
     // The text that appears on the dialog box when entering Images.
+    // eslint-disable-next-line no-var
     var imageDialogText = gettext('Insert Image (upload file or type URL)'),
         imageUrlHelpText = gettext("Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')"), // eslint-disable-line max-len
         imageDescriptionLabel = gettext('Image Description'),
@@ -45,6 +48,7 @@
         imageIsDecorativeLabel = gettext('This image is for decorative purposes only and does not require a description.'); // eslint-disable-line max-len
 
     // Text that is shared between both link and image dialog boxes.
+    // eslint-disable-next-line no-var
     var defaultHelpHoverTitle = gettext('Markdown Editing Help'),
         urlLabel = gettext('URL'),
         urlError = gettext('Please provide a valid URL.');
@@ -65,7 +69,7 @@
     Markdown.Editor = function(markdownConverter, idPostfix, help, imageUploadHandler) {
         idPostfix = idPostfix || '';
 
-        /* eslint-disable-next-line no-multi-assign, no-undef */
+        /* eslint-disable-next-line no-multi-assign, no-undef, no-var */
         var hooks = this.hooks = new Markdown.HookCollection();
         hooks.addNoop('onPreviewPush'); // called with no arguments after the preview has been refreshed
         hooks.addNoop('postBlockquoteCreation'); // called with the user's selection *after* the blockquote was created; should return the actual to-be-inserted text
@@ -77,6 +81,7 @@
 
         this.getConverter = function() { return markdownConverter; };
 
+        // eslint-disable-next-line no-var
         var that = this,
             panels;
 
@@ -85,10 +90,11 @@
 
             // eslint-disable-next-line no-use-before-define
             panels = new PanelCollection(idPostfix);
-            // eslint-disable-next-line no-use-before-define
+            /* eslint-disable-next-line no-use-before-define, no-var */
             var commandManager = new CommandManager(hooks);
-            // eslint-disable-next-line no-use-before-define
+            /* eslint-disable-next-line no-use-before-define, no-var */
             var previewManager = new PreviewManager(markdownConverter, panels, function(text, previewSet) { hooks.onPreviewPush(text, previewSet); });
+            // eslint-disable-next-line no-var
             var undoManager, uiManager;
 
             if (!/\?noundo/.test(doc.location.href)) {
@@ -109,7 +115,7 @@
             uiManager = new UIManager(idPostfix, panels, undoManager, previewManager, commandManager, help, imageUploadHandler);
             uiManager.setUndoRedoButtonStates();
 
-            // eslint-disable-next-line no-multi-assign
+            /* eslint-disable-next-line no-multi-assign, no-var */
             var forceRefresh = that.refreshPreview = function() { previewManager.refresh(true); };
 
             forceRefresh();
@@ -123,7 +129,9 @@
     // startRegex: a regular expression to find the start tag
     // endRegex: a regular expresssion to find the end tag
     Chunks.prototype.findTags = function(startRegex, endRegex) {
+        // eslint-disable-next-line no-var
         var chunkObj = this;
+        // eslint-disable-next-line no-var
         var regex;
 
         if (startRegex) {
@@ -168,6 +176,7 @@
     //
     // If remove is true, the whitespace disappears.
     Chunks.prototype.trimWhitespace = function(remove) {
+        // eslint-disable-next-line no-var
         var beforeReplacer, afterReplacer,
             that = this;
         if (remove) {
@@ -193,7 +202,9 @@
         nLinesBefore++;
         nLinesAfter++;
 
+        // eslint-disable-next-line no-var
         var regexText;
+        // eslint-disable-next-line no-var
         var replacementText;
 
         // chrome bug ... documented at: http://meta.stackoverflow.com/questions/63307/blockquote-glitch-in-editor-in-chrome-6-and-7/65985#65985
@@ -246,11 +257,15 @@
     // end of Chunks
 
     function findAnEmptyToolbar(toolbarClassName) {
+        // eslint-disable-next-line no-var
         var toolbars = doc.getElementsByClassName(toolbarClassName);
+        // eslint-disable-next-line no-var
         for (var i = 0; i < toolbars.length; ++i) {
+            // eslint-disable-next-line no-var
             var aToolbar = toolbars[i];
             // eslint-disable-next-line eqeqeq
             if (aToolbar.children.length == 0) {
+                // eslint-disable-next-line no-var
                 var anEmptyToolbar = aToolbar;
                 return anEmptyToolbar;
             }
@@ -344,7 +359,9 @@
             post = '';
         }
 
+        // eslint-disable-next-line no-var
         var pattern = regex.toString();
+        // eslint-disable-next-line no-var
         var flags;
 
         // Replace the flags with empty space and store them.
@@ -364,6 +381,7 @@
     // The assignment in the while loop makes jslint cranky.
     // I'll change it to a better loop later.
     position.getTop = function(elem, isInner) {
+        // eslint-disable-next-line no-var
         var result = elem.offsetTop;
         if (!isInner) {
             // eslint-disable-next-line no-cond-assign
@@ -383,7 +401,9 @@
     };
 
     position.getPageSize = function() {
+        // eslint-disable-next-line no-var
         var scrollWidth, scrollHeight;
+        // eslint-disable-next-line no-var
         var innerWidth, innerHeight;
 
         // It's not very clear which blocks work with which browsers.
@@ -412,7 +432,9 @@
             innerHeight = doc.body.clientHeight;
         }
 
+        // eslint-disable-next-line no-var
         var maxWidth = Math.max(scrollWidth, innerWidth);
+        // eslint-disable-next-line no-var
         var maxHeight = Math.max(scrollHeight, innerHeight);
         return [maxWidth, maxHeight, innerWidth, innerHeight];
     };
@@ -420,15 +442,23 @@
     // Handles pushing and popping TextareaStates for undo/redo commands.
     // I should rename the stack variables to list.
     function UndoManager(callback, panels) {
+        // eslint-disable-next-line no-var
         var undoObj = this;
+        // eslint-disable-next-line no-var
         var undoStack = []; // A stack of undo states
+        // eslint-disable-next-line no-var
         var stackPtr = 0; // The index of the current state
+        // eslint-disable-next-line no-var
         var mode = 'none';
+        // eslint-disable-next-line no-var
         var lastState; // The last state
+        // eslint-disable-next-line no-var
         var timer; // The setTimeout handle for cancelling the timer
+        // eslint-disable-next-line no-var
         var inputStateObj;
 
         // Set the mode for later logic steps.
+        // eslint-disable-next-line no-var
         var setMode = function(newMode, noSave) {
             // eslint-disable-next-line eqeqeq
             if (mode != newMode) {
@@ -448,6 +478,7 @@
             }
         };
 
+        // eslint-disable-next-line no-var
         var refreshState = function(isInitialState) {
             // eslint-disable-next-line no-use-before-define
             inputStateObj = new TextareaState(panels, isInitialState);
@@ -511,9 +542,9 @@
         };
 
         // Push the input area state to the stack.
-        // eslint-disable-next-line consistent-return
+        /* eslint-disable-next-line consistent-return, no-var */
         var saveState = function() {
-            // eslint-disable-next-line no-use-before-define
+            /* eslint-disable-next-line no-use-before-define, no-var */
             var currState = inputStateObj || new TextareaState(panels);
 
             if (!currState) {
@@ -541,12 +572,16 @@
             }
         };
 
+        // eslint-disable-next-line no-var
         var handleCtrlYZ = function(event) {
+            // eslint-disable-next-line no-var
             var handled = false;
 
             if (event.ctrlKey || event.metaKey) {
                 // IE and Opera do not support charCode.
+                // eslint-disable-next-line no-var
                 var keyCode = event.charCode || event.keyCode;
+                // eslint-disable-next-line no-var
                 var keyCodeChar = String.fromCharCode(keyCode);
 
                 // eslint-disable-next-line default-case
@@ -578,8 +613,10 @@
         };
 
         // Set the mode depending on what is going on in the input area.
+        // eslint-disable-next-line no-var
         var handleModeChange = function(event) {
             if (!event.ctrlKey && !event.metaKey) {
+                // eslint-disable-next-line no-var
                 var keyCode = event.keyCode;
 
                 if ((keyCode >= 33 && keyCode <= 40) || (keyCode >= 63232 && keyCode <= 63235)) {
@@ -611,6 +648,7 @@
             }
         };
 
+        // eslint-disable-next-line no-var
         var setEventHandlers = function() {
             util.addEvent(panels.input, 'keypress', function(event) {
                 // keyCode 89: y
@@ -621,6 +659,7 @@
                 }
             });
 
+            // eslint-disable-next-line no-var
             var handlePaste = function() {
                 // eslint-disable-next-line eqeqeq
                 if (uaSniffed.isIE || (inputStateObj && inputStateObj.text != panels.input.value)) {
@@ -643,6 +682,7 @@
             panels.input.ondrop = handlePaste;
         };
 
+        // eslint-disable-next-line no-var
         var init = function() {
             setEventHandlers();
             refreshState(true);
@@ -658,7 +698,9 @@
     // This is used to implement undo/redo by the undo manager.
     function TextareaState(panels, isInitialState) {
         // Aliases
+        // eslint-disable-next-line no-var
         var stateObj = this;
+        // eslint-disable-next-line no-var
         var inputArea = panels.input;
         this.init = function() {
             if (!util.isVisible(inputArea)) {
@@ -694,6 +736,7 @@
                 }
 
                 inputArea.focus();
+                // eslint-disable-next-line no-var
                 var range = inputArea.createTextRange();
                 range.moveStart('character', -inputArea.value.length);
                 range.moveEnd('character', -inputArea.value.length);
@@ -713,12 +756,17 @@
                 // IE loses the selection in the textarea when buttons are
                 // clicked.  On IE we cache the selection. Here, if something is cached,
                 // we take it.
+                // eslint-disable-next-line no-var
                 var range = panels.ieCachedRange || doc.selection.createRange();
 
+                // eslint-disable-next-line no-var
                 var fixedRange = util.fixEolChars(range.text);
+                // eslint-disable-next-line no-var
                 var marker = '\x07';
+                // eslint-disable-next-line no-var
                 var markedRange = marker + fixedRange + marker;
                 range.text = markedRange;
+                // eslint-disable-next-line no-var
                 var inputText = util.fixEolChars(inputArea.value);
 
                 range.moveStart('character', -markedRange.length);
@@ -727,6 +775,7 @@
                 stateObj.start = inputText.indexOf(marker);
                 stateObj.end = inputText.lastIndexOf(marker) - marker.length;
 
+                // eslint-disable-next-line no-var
                 var len = stateObj.text.length - util.fixEolChars(inputArea.value).length;
 
                 if (len) {
@@ -758,6 +807,7 @@
 
         // Gets a collection of HTML chunks from the inptut textarea.
         this.getChunks = function() {
+            // eslint-disable-next-line no-var
             var chunk = new Chunks();
             chunk.before = util.fixEolChars(stateObj.text.substring(0, stateObj.start));
             chunk.startTag = '';
@@ -783,15 +833,21 @@
     }
 
     function PreviewManager(converter, panels, previewPushCallback) {
-        // eslint-disable-next-line no-unused-vars
+        /* eslint-disable-next-line no-unused-vars, no-var */
         var managerObj = this;
+        // eslint-disable-next-line no-var
         var timeout;
+        // eslint-disable-next-line no-var
         var elapsedTime;
+        // eslint-disable-next-line no-var
         var oldInputText;
+        // eslint-disable-next-line no-var
         var maxDelay = 3000;
+        // eslint-disable-next-line no-var
         var startType = 'delayed'; // The other legal value is "manual"
 
         // Adds event listeners to elements
+        // eslint-disable-next-line no-var
         var setupEvents = function(inputElem, listener) {
             util.addEvent(inputElem, 'input', listener);
             inputElem.onpaste = listener;
@@ -801,7 +857,9 @@
             util.addEvent(inputElem, 'keydown', listener);
         };
 
+        // eslint-disable-next-line no-var
         var getDocScrollTop = function() {
+            // eslint-disable-next-line no-var
             var result = 0;
 
             if (window.innerHeight) {
@@ -817,11 +875,13 @@
             return result;
         };
 
+        // eslint-disable-next-line no-var
         var makePreviewHtml = function() {
             // If there is no registered preview panel
             // there is nothing to do.
             if (!panels.preview) { return; }
 
+            // eslint-disable-next-line no-var
             var text = panels.input.value;
             // eslint-disable-next-line eqeqeq
             if (text && text == oldInputText) {
@@ -830,12 +890,14 @@
                 oldInputText = text;
             }
 
+            // eslint-disable-next-line no-var
             var prevTime = new Date().getTime();
 
             text = converter.makeHtml(text);
 
             // Calculate the processing time of the HTML creation.
             // It's used as the delay time in the event listener.
+            // eslint-disable-next-line no-var
             var currTime = new Date().getTime();
             elapsedTime = currTime - prevTime;
 
@@ -844,6 +906,7 @@
         };
 
         // setTimeout is already used.  Used as an event listener.
+        // eslint-disable-next-line no-var
         var applyTimeout = function() {
             if (timeout) {
                 clearTimeout(timeout);
@@ -851,6 +914,7 @@
             }
 
             if (startType !== 'manual') {
+                // eslint-disable-next-line no-var
                 var delay = 0;
 
                 if (startType === 'delayed') {
@@ -864,6 +928,7 @@
             }
         };
 
+        // eslint-disable-next-line no-var
         var getScaleFactor = function(panel) {
             if (panel.scrollHeight <= panel.clientHeight) {
                 return 1;
@@ -871,6 +936,7 @@
             return panel.scrollTop / (panel.scrollHeight - panel.clientHeight);
         };
 
+        // eslint-disable-next-line no-var
         var setPanelScrollTops = function() {
             if (panels.preview) {
                 panels.preview.scrollTop = (panels.preview.scrollHeight - panels.preview.clientHeight) * getScaleFactor(panels.preview);
@@ -890,27 +956,34 @@
             return elapsedTime;
         };
 
+        // eslint-disable-next-line no-var
         var isFirstTimeFilled = true;
 
         // IE doesn't let you use innerHTML if the element is contained somewhere in a table
         // (which is the case for inline editing) -- in that case, detach the element, set the
         // value, and reattach. Yes, that *is* ridiculous.
+        // eslint-disable-next-line no-var
         var ieSafePreviewSet = function(text) {
+            // eslint-disable-next-line no-var
             var preview = panels.preview;
+            // eslint-disable-next-line no-var
             var parent = preview.parentNode;
+            // eslint-disable-next-line no-var
             var sibling = preview.nextSibling;
             parent.removeChild(preview);
             preview.innerHTML = text;
             if (!sibling) { parent.appendChild(preview); } else { parent.insertBefore(preview, sibling); } // xss-lint: disable=javascript-jquery-insert-into-target
         };
 
+        // eslint-disable-next-line no-var
         var nonSuckyBrowserPreviewSet = function(text) {
             panels.preview.innerHTML = text;
         };
 
+        // eslint-disable-next-line no-var
         var previewSetter;
 
-        // eslint-disable-next-line consistent-return
+        /* eslint-disable-next-line consistent-return, no-var */
         var previewSet = function(text) {
             if (previewSetter) { return previewSetter(text); }
 
@@ -923,7 +996,9 @@
             }
         };
 
+        // eslint-disable-next-line no-var
         var pushPreviewHtml = function(text) {
+            // eslint-disable-next-line no-var
             var emptyTop = position.getTop(panels.input) - getDocScrollTop();
 
             if (panels.preview) {
@@ -937,6 +1012,7 @@
                 return;
             }
 
+            // eslint-disable-next-line no-var
             var fullTop = position.getTop(panels.input) - getDocScrollTop();
 
             if (uaSniffed.isIE) {
@@ -948,6 +1024,7 @@
             }
         };
 
+        // eslint-disable-next-line no-var
         var init = function() {
             setupEvents(panels.input, applyTimeout);
             makePreviewHtml();
@@ -965,6 +1042,7 @@
     // Most of this has been moved to CSS but the div creation and
     // browser-specific hacks remain here.
     ui.createBackground = function() {
+        // eslint-disable-next-line no-var
         var background = doc.createElement('div'),
             style = background.style;
 
@@ -981,6 +1059,7 @@
             style.opacity = '0.5';
         }
 
+        // eslint-disable-next-line no-var
         var pageSize = position.getPageSize();
         style.height = pageSize[1] + 'px';
 
@@ -1021,6 +1100,7 @@
         imageUploadHandler) {
         // These variables need to be declared at this level since they are used
         // in multiple functions.
+        // eslint-disable-next-line no-var
         var dialog, // The dialog box.
             urlInput, // The text box where you enter the hyperlink.
             urlErrorMsg,
@@ -1031,7 +1111,9 @@
 
         // Used as a keydown event handler. Esc dismisses the prompt.
         // Key code 27 is ESC.
+        // eslint-disable-next-line no-var
         var checkEscape = function(key) {
+            // eslint-disable-next-line no-var
             var code = (key.charCode || key.keyCode);
             if (code === 27) {
                 // eslint-disable-next-line no-use-before-define
@@ -1039,6 +1121,7 @@
             }
         };
 
+        // eslint-disable-next-line no-var
         var clearFormErrorMessages = function() {
             urlInput.classList.remove('has-error');
             urlErrorMsg.style.display = 'none';
@@ -1049,9 +1132,12 @@
         // Dismisses the hyperlink input box.
         // isCancel is true if we don't care about the input text.
         // isCancel is false if we are going to keep the text.
+        // eslint-disable-next-line no-var
         var close = function(isCancel) {
             util.removeEvent(doc.body, 'keydown', checkEscape);
+            // eslint-disable-next-line no-var
             var url = urlInput.value.trim();
+            // eslint-disable-next-line no-var
             var description = descInput.value.trim();
 
             clearFormErrorMessages();
@@ -1067,6 +1153,7 @@
                 }
             }
 
+            // eslint-disable-next-line no-var
             var isValidUrl = util.isValidUrl(url),
                 isValidDesc = (
                     descInput.checkValidity()
@@ -1077,6 +1164,7 @@
                 dialog.parentNode.removeChild(dialog);
                 callback(url, description);
             } else {
+                // eslint-disable-next-line no-var
                 var errorCount = 0;
                 if (!isValidUrl) {
                     urlInput.classList.add('has-error');
@@ -1108,6 +1196,7 @@
         };
 
         // Create the text input box form/window.
+        // eslint-disable-next-line no-var
         var createDialog = function() {
             // The main dialog box.
             dialog = doc.createElement('div');
@@ -1168,6 +1257,7 @@
             cancelButton.onclick = function() { return close(true); };
 
             if (imageUploadHandler) {
+                // eslint-disable-next-line no-var
                 var startUploadHandler = function() {
                     document.getElementById('file-upload').onchange = function() {
                         imageUploadHandler(this, urlInput);
@@ -1208,11 +1298,13 @@
         setTimeout(function() {
             createDialog();
 
+            // eslint-disable-next-line no-var
             var defTextLen = defaultInputText.length;
             if (urlInput.selectionStart !== undefined) {
                 urlInput.selectionStart = 0;
                 urlInput.selectionEnd = defTextLen;
             } else if (urlInput.createTextRange) {
+                // eslint-disable-next-line no-var
                 var range = urlInput.createTextRange();
                 range.collapse(false);
                 range.moveStart('character', -defTextLen);
@@ -1225,12 +1317,14 @@
     };
 
     function UIManager(postfix, panels, undoManager, previewManager, commandManager, helpOptions, imageUploadHandler) {
+        // eslint-disable-next-line no-var
         var inputBox = panels.input,
             buttons = {}; // buttons.undo, buttons.link, etc. The actual DOM elements.
 
         // eslint-disable-next-line no-use-before-define
         makeSpritedButtonRow();
 
+        // eslint-disable-next-line no-var
         var keyEvent = 'keydown';
         if (uaSniffed.isOpera) {
             keyEvent = 'keypress';
@@ -1239,7 +1333,9 @@
         util.addEvent(inputBox, keyEvent, function(key) {
             // Check to see if we have a button key and, if so execute the callback.
             if ((key.ctrlKey || key.metaKey) && !key.altKey && !key.shiftKey) {
+                // eslint-disable-next-line no-var
                 var keyCode = key.charCode || key.keyCode;
+                // eslint-disable-next-line no-var
                 var keyCodeStr = String.fromCharCode(keyCode).toLowerCase();
 
                 switch (keyCodeStr) {
@@ -1313,9 +1409,11 @@
         // Auto-indent on shift-enter
         util.addEvent(inputBox, 'keyup', function(key) {
             if (key.shiftKey && !key.ctrlKey && !key.metaKey) {
+                // eslint-disable-next-line no-var
                 var keyCode = key.charCode || key.keyCode;
                 // Character 13 is Enter
                 if (keyCode === 13) {
+                    // eslint-disable-next-line no-var
                     var fakeButton = {};
                     // eslint-disable-next-line no-use-before-define
                     fakeButton.textOp = bindCommand('doAutoindent');
@@ -1329,6 +1427,7 @@
         if (uaSniffed.isIE) {
             // eslint-disable-next-line consistent-return
             util.addEvent(inputBox, 'keydown', function(key) {
+                // eslint-disable-next-line no-var
                 var code = key.keyCode;
                 if (code === 27) {
                     return false;
@@ -1345,12 +1444,14 @@
                     undoManager.setCommandMode();
                 }
 
+                // eslint-disable-next-line no-var
                 var state = new TextareaState(panels);
 
                 if (!state) {
                     return;
                 }
 
+                // eslint-disable-next-line no-var
                 var chunks = state.getChunks();
 
                 // Some commands launch a "modal" prompt dialog.  Javascript
@@ -1370,6 +1471,7 @@
                 // Yes this is awkward and I think it sucks, but there's
                 // no real workaround.  Only the image and link code
                 // create dialogs and require the function pointers.
+                // eslint-disable-next-line no-var
                 var fixupInputArea = function() {
                     inputBox.focus();
 
@@ -1381,6 +1483,7 @@
                     previewManager.refresh();
                 };
 
+                // eslint-disable-next-line no-var
                 var noCleanup = button.textOp(chunks, fixupInputArea);
 
                 if (!noCleanup) {
@@ -1394,9 +1497,13 @@
         }
 
         function setupButton(button, isEnabled) {
+            // eslint-disable-next-line no-var
             var normalYShift = '0px';
+            // eslint-disable-next-line no-var
             var disabledYShift = '-20px';
+            // eslint-disable-next-line no-var
             var highlightYShift = '-40px';
+            // eslint-disable-next-line no-var
             var image = button.getElementsByTagName('span')[0];
             if (isEnabled) {
                 image.style.backgroundPosition = button.XShift + ' ' + normalYShift;
@@ -1430,6 +1537,7 @@
                         return false;
                     };
                     util.addEvent(button, 'keydown', function(event) {
+                        // eslint-disable-next-line no-var
                         var keyCode = event.charCode || event.keyCode;
                         // eslint-disable-next-line eqeqeq
                         if (keyCode == 32 || keyCode == 13) {
@@ -1464,27 +1572,33 @@
         }
 
         function makeSpritedButtonRow() {
+            // eslint-disable-next-line no-var
             var buttonBar = panels.buttonBar;
 
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var normalYShift = '0px';
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var disabledYShift = '-20px';
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var highlightYShift = '-40px';
 
+            // eslint-disable-next-line no-var
             var buttonRow = document.createElement('div');
             buttonRow.setAttribute('role', 'toolbar');
             buttonRow.id = 'wmd-button-row' + postfix;
             buttonRow.className = 'wmd-button-row';
             buttonRow = buttonBar.appendChild(buttonRow);
+            // eslint-disable-next-line no-var
             var xPosition = 0;
+            // eslint-disable-next-line no-var
             var makeButton = function(id, title, XShift, textOp, tabIndex) {
+                // eslint-disable-next-line no-var
                 var button = document.createElement('button');
                 button.tabIndex = tabIndex;
                 button.className = 'wmd-button';
                 button.style.left = xPosition + 'px';
                 xPosition += 25;
+                // eslint-disable-next-line no-var
                 var buttonImage = document.createElement('span');
                 button.id = id + postfix;
                 button.appendChild(buttonImage);
@@ -1495,7 +1609,9 @@
                 buttonRow.appendChild(button);
                 return button;
             };
+            // eslint-disable-next-line no-var
             var makeSpacer = function(num) {
+                // eslint-disable-next-line no-var
                 var spacer = document.createElement('span');
                 spacer.setAttribute('role', 'separator');
                 spacer.className = 'wmd-spacer wmd-spacer' + num;
@@ -1528,6 +1644,7 @@
             buttons.undo = makeButton('wmd-undo-button', gettext('Undo (Ctrl+Z)'), '-200px', null, -1);
             buttons.undo.execute = function(manager) { if (manager) { manager.undo(); } };
 
+            // eslint-disable-next-line no-var
             var redoTitle = /win/.test(nav.platform.toLowerCase())
                 ? gettext('Redo (Ctrl+Y)')
                 : gettext('Redo (Ctrl+Shift+Z)'); // mac and other non-Windows platforms
@@ -1536,7 +1653,9 @@
             buttons.redo.execute = function(manager) { if (manager) { manager.redo(); } };
 
             if (helpOptions) {
+                // eslint-disable-next-line no-var
                 var helpButton = document.createElement('span');
+                // eslint-disable-next-line no-var
                 var helpButtonImage = document.createElement('span');
                 helpButton.appendChild(helpButtonImage);
                 helpButton.className = 'wmd-button wmd-help-button';
@@ -1570,6 +1689,7 @@
         this.hooks = pluginHooks;
     }
 
+    // eslint-disable-next-line no-var
     var commandProto = CommandManager.prototype;
 
     // The markdown symbols - 4 spaces = code, > = blockquote, etc.
@@ -1577,12 +1697,14 @@
 
     // Remove markdown symbols from the chunk selection.
     commandProto.unwrap = function(chunk) {
+        // eslint-disable-next-line no-var
         var txt = new re('([^\\n])\\n(?!(\\n|' + this.prefixes + '))', 'g');
         chunk.selection = chunk.selection.replace(txt, '$1 $2');
     };
 
     commandProto.wrap = function(chunk, len) {
         this.unwrap(chunk); // xss-lint: disable=javascript-jquery-insertion
+        // eslint-disable-next-line no-var
         var regex = new re('(.{1,' + len + '})( +|$\\n?)', 'gm'),
             that = this;
 
@@ -1614,9 +1736,12 @@
 
         // Look for stars before and after.  Is the chunk already marked up?
         // note that these regex matches cannot fail
+        // eslint-disable-next-line no-var
         var starsBefore = /(\**$)/.exec(chunk.before)[0];
+        // eslint-disable-next-line no-var
         var starsAfter = /(^\**)/.exec(chunk.after)[0];
 
+        // eslint-disable-next-line no-var
         var prevStars = Math.min(starsBefore.length, starsAfter.length);
 
         // Remove stars if we have to since the button acts as a toggle.
@@ -1629,6 +1754,7 @@
             // some arbitrary stuff around.
             chunk.after = chunk.after.replace(/^([*_]*)/, '');
             chunk.before = chunk.before.replace(/(\s?)$/, '');
+            // eslint-disable-next-line no-var
             var whitespace = re.$1;
             chunk.before = chunk.before + starsAfter + whitespace;
         } else {
@@ -1639,6 +1765,7 @@
             }
 
             // Add the true markup.
+            // eslint-disable-next-line no-var
             var markup = nStars <= 1 ? '*' : '**'; // shouldn't the test be = ?
             chunk.before += markup;
             chunk.after = markup + chunk.after;
@@ -1661,17 +1788,21 @@
     };
 
     commandProto.addLinkDef = function(chunk, linkDef) {
+        // eslint-disable-next-line no-var
         var refNumber = 0; // The current reference number
+        // eslint-disable-next-line no-var
         var defsToAdd = {}; //
         // Start with a clean slate by removing all previous link definitions.
         chunk.before = this.stripLinkDefs(chunk.before, defsToAdd);
         chunk.selection = this.stripLinkDefs(chunk.selection, defsToAdd);
         chunk.after = this.stripLinkDefs(chunk.after, defsToAdd);
 
+        // eslint-disable-next-line no-var
         var defs = '';
-        // eslint-disable-next-line no-useless-escape
+        /* eslint-disable-next-line no-useless-escape, no-var */
         var regex = /(\[)((?:\[[^\]]*\]|[^\[\]])*)(\][ ]?(?:\n[ ]*)?\[)(\d+)(\])/g;
 
+        // eslint-disable-next-line no-var
         var addDefNumber = function(def) {
             refNumber++;
             def = def.replace(/^[ ]{0,3}\[(\d+)\]:/, '  [' + refNumber + ']:');
@@ -1683,6 +1814,7 @@
         //    of regex, inner is always a proper substring of wholeMatch, and
         // b) more than one level of nesting is neither supported by the regex
         //    nor making a lot of sense (the only use case for nesting is a linked image)
+        // eslint-disable-next-line no-var
         var getLink = function(wholeMatch, before, inner, afterInner, id, end) {
             inner = inner.replace(regex, getLink);
             if (defsToAdd[id]) {
@@ -1700,6 +1832,7 @@
             chunk.selection = chunk.selection.replace(regex, getLink);
         }
 
+        // eslint-disable-next-line no-var
         var refOut = refNumber;
 
         chunk.after = chunk.after.replace(regex, getLink);
@@ -1741,6 +1874,7 @@
     commandProto.doLinkOrImage = function(chunk, postProcessing, isImage, imageUploadHandler) {
         chunk.trimWhitespace();
         chunk.findTags(/\s*!?\[/, /\][ ]?(?:\n[ ]*)?(\[.*?\])?/);
+        // eslint-disable-next-line no-var
         var background;
 
         if (chunk.endTag.length > 1 && chunk.startTag.length > 0) {
@@ -1759,9 +1893,11 @@
                 this.addLinkDef(chunk, null);
                 return;
             }
+            // eslint-disable-next-line no-var
             var that = this;
             // The function to be executed when you enter a link and press OK or Cancel.
             // Marks up the link and adds the ref.
+            // eslint-disable-next-line no-var
             var linkEnteredCallback = function(link, description) {
                 background.parentNode.removeChild(background);
 
@@ -1786,8 +1922,10 @@
                     // the first bracket could then not act as the "not a backslash" for the second.
                     chunk.selection = (' ' + chunk.selection).replace(/([^\\](?:\\\\)*)(?=[[\]])/g, '$1\\').substr(1);
 
+                    // eslint-disable-next-line no-var
                     var linkDef = ' [999]: ' + properlyEncoded(link);
 
+                    // eslint-disable-next-line no-var
                     var num = that.addLinkDef(chunk, linkDef);
                     chunk.startTag = isImage ? '![' : '[';
                     chunk.endTag = '][' + num + ']';
@@ -1845,6 +1983,7 @@
     // at the current indent level.
     // eslint-disable-next-line no-unused-vars
     commandProto.doAutoindent = function(chunk, postProcessing) {
+        // eslint-disable-next-line no-var
         var commandMgr = this,
             fakeSelection = false;
 
@@ -1934,13 +2073,18 @@
         // Hence we replaced this by a simple state machine that just goes through the
         // lines and checks for a), b), and c).
 
+        // eslint-disable-next-line no-var
         var match = '',
             leftOver = '',
             line;
         if (chunk.before) {
+            // eslint-disable-next-line no-var
             var lines = chunk.before.replace(/\n$/, '').split('\n');
+            // eslint-disable-next-line no-var
             var inChain = false;
+            // eslint-disable-next-line no-var
             for (var i = 0; i < lines.length; i++) {
+                // eslint-disable-next-line no-var
                 var good = false;
                 line = lines[i];
                 inChain = inChain && line.length > 0; // c) any non-empty line continues the chain
@@ -1982,7 +2126,9 @@
             }
         );
 
+        // eslint-disable-next-line no-var
         var replaceBlanksInTags = function(useBracket) {
+            // eslint-disable-next-line no-var
             var replacement = useBracket ? '> ' : '';
 
             if (chunk.startTag) {
@@ -2031,7 +2177,9 @@
 
     // eslint-disable-next-line no-unused-vars
     commandProto.doCode = function(chunk, postProcessing) {
+        // eslint-disable-next-line no-var
         var hasTextBefore = /\S[ ]*$/.test(chunk.before);
+        // eslint-disable-next-line no-var
         var hasTextAfter = /^[ ]*\S/.test(chunk.after);
 
         // Use 'four space' markdown if the selection is on its own
@@ -2043,7 +2191,9 @@
                     return '';
                 });
 
+            // eslint-disable-next-line no-var
             var nLinesBack = 1;
+            // eslint-disable-next-line no-var
             var nLinesForward = 1;
 
             if (/(\n|^)(\t|[ ]{4,}).*\n$/.test(chunk.before)) {
@@ -2092,19 +2242,25 @@
     commandProto.doList = function(chunk, postProcessing, isNumberedList) {
         // These are identical except at the very beginning and end.
         // Should probably use the regex extension function to make this clearer.
+        // eslint-disable-next-line no-var
         var previousItemsRegex = /(\n|^)(([ ]{0,3}([*+-]|\d+[.])[ \t]+.*)(\n.+|\n{2,}([*+-].*|\d+[.])[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*$/;
+        // eslint-disable-next-line no-var
         var nextItemsRegex = /^\n*(([ ]{0,3}([*+-]|\d+[.])[ \t]+.*)(\n.+|\n{2,}([*+-].*|\d+[.])[ \t]+.*|\n{2,}[ \t]+\S.*)*)\n*/;
 
         // The default bullet is a dash but others are possible.
         // This has nothing to do with the particular HTML bullet,
         // it's just a markdown bullet.
+        // eslint-disable-next-line no-var
         var bullet = '-';
 
         // The number in a numbered list.
+        // eslint-disable-next-line no-var
         var num = 1;
 
         // Get the item prefix - e.g. " 1. " for a numbered list, " - " for a bulleted list.
+        // eslint-disable-next-line no-var
         var getItemPrefix = function() {
+            // eslint-disable-next-line no-var
             var prefix;
             if (isNumberedList) {
                 prefix = ' ' + num + '. ';
@@ -2116,6 +2272,7 @@
         };
 
         // Fixes the prefixes of the other list items.
+        // eslint-disable-next-line no-var
         var getPrefixedItem = function(itemText) {
             // The numbering flag is unset when called by autoindent.
             if (isNumberedList === undefined) {
@@ -2140,6 +2297,7 @@
         }
 
         if (chunk.startTag) {
+            // eslint-disable-next-line no-var
             var hasDigits = /\d+[.]/.test(chunk.startTag);
             chunk.startTag = '';
             chunk.selection = chunk.selection.replace(/\n[ ]{4}/g, '\n');
@@ -2156,6 +2314,7 @@
             }
         }
 
+        // eslint-disable-next-line no-var
         var nLinesUp = 1;
 
         chunk.before = chunk.before.replace(previousItemsRegex,
@@ -2171,8 +2330,10 @@
             chunk.selection = gettext('List item');
         }
 
+        // eslint-disable-next-line no-var
         var prefix = getItemPrefix();
 
+        // eslint-disable-next-line no-var
         var nLinesDown = 1;
 
         chunk.after = chunk.after.replace(nextItemsRegex,
@@ -2184,6 +2345,7 @@
         chunk.trimWhitespace(true);
         chunk.skipLines(nLinesUp, nLinesDown, true);
         chunk.startTag = prefix;
+        // eslint-disable-next-line no-var
         var spaces = prefix.replace(/./g, ' ');
         this.wrap(chunk, SETTINGS.lineLength - spaces.length); // xss-lint: disable=javascript-jquery-insertion
         chunk.selection = chunk.selection.replace(/\n/g, '\n' + spaces);
@@ -2204,6 +2366,7 @@
             return;
         }
 
+        // eslint-disable-next-line no-var
         var headerLevel = 0; // The existing header level of the selected text.
 
         // Remove any existing hash heading markdown and save the header level.
@@ -2232,13 +2395,15 @@
         // We make a level 2 header if there is no current header.
         // If there is a header level, we substract one from the header level.
         // If it's already a level 1 header, it's removed.
-        // eslint-disable-next-line eqeqeq
+        /* eslint-disable-next-line eqeqeq, no-var */
         var headerLevelToCreate = headerLevel == 0 ? 2 : headerLevel - 1;
 
         if (headerLevelToCreate > 0) {
             // The button only creates level 1 and 2 underline headers.
             // Why not have it iterate over hash header levels?  Wouldn't that be easier and cleaner?
+            // eslint-disable-next-line no-var
             var headerChar = headerLevelToCreate >= 2 ? '-' : '=';
+            // eslint-disable-next-line no-var
             var len = chunk.selection.length;
             if (len > SETTINGS.lineLength) {
                 len = SETTINGS.lineLength;

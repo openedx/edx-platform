@@ -1,6 +1,7 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var InstructorDashboardCourseInfo, PendingInstructorTasks;
 
     PendingInstructorTasks = function() {
@@ -9,6 +10,7 @@
 
     InstructorDashboardCourseInfo = (function() {
         function CourseInfo($section) {
+            // eslint-disable-next-line no-var
             var courseInfo = this;
             this.$section = $section;
             this.$section.data('wrapper', this);

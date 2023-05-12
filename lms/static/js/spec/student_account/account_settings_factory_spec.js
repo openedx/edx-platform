@@ -15,7 +15,9 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
     'use strict';
 
     describe('edx.user.AccountSettingsFactory', function() {
+        // eslint-disable-next-line no-var
         var createAccountSettingsPage = function() {
+            // eslint-disable-next-line no-var
             var context = AccountSettingsPage(
                 Helpers.FIELDS_DATA,
                 false,
@@ -33,6 +35,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
             return context.accountSettingsView;
         };
 
+        // eslint-disable-next-line no-var
         var requests;
 
         beforeEach(function() {
@@ -42,10 +45,12 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
         it('shows loading error when UserAccountModel fails to load', function() {
             requests = AjaxHelpers.requests(this);
 
+            // eslint-disable-next-line no-var
             var accountSettingsView = createAccountSettingsPage();
 
             Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
 
+            // eslint-disable-next-line no-var
             var request = requests[0];
             expect(request.method).toBe('GET');
             expect(request.url).toBe(Helpers.USER_ACCOUNTS_API_URL);
@@ -57,10 +62,12 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
         it('shows loading error when UserPreferencesModel fails to load', function() {
             requests = AjaxHelpers.requests(this);
 
+            // eslint-disable-next-line no-var
             var accountSettingsView = createAccountSettingsPage();
 
             Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
 
+            // eslint-disable-next-line no-var
             var request = requests[0];
             expect(request.method).toBe('GET');
             expect(request.url).toBe(Helpers.USER_ACCOUNTS_API_URL);
@@ -84,6 +91,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
         it('renders fields after the models are successfully fetched', function() {
             requests = AjaxHelpers.requests(this);
 
+            // eslint-disable-next-line no-var
             var accountSettingsView = createAccountSettingsPage();
 
             Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
@@ -99,10 +107,12 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
         });
 
         it('expects all fields to behave correctly', function() {
+            // eslint-disable-next-line no-var
             var i, view;
 
             requests = AjaxHelpers.requests(this);
 
+            // eslint-disable-next-line no-var
             var accountSettingsView = createAccountSettingsPage();
 
             AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
@@ -110,10 +120,12 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
             AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
             AjaxHelpers.respondWithJson(requests, {}); // Page viewed analytics event
 
+            // eslint-disable-next-line no-var
             var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
             expect(sectionsData[0].fields.length).toBe(7);
 
+            // eslint-disable-next-line no-var
             var textFields = [sectionsData[0].fields[1], sectionsData[0].fields[2]];
             for (i = 0; i < textFields.length; i++) {
                 view = textFields[i].view;
@@ -130,13 +142,14 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
             }
 
             expect(sectionsData[1].fields.length).toBe(4);
+            // eslint-disable-next-line no-var
             var dropdownFields = [
                 sectionsData[1].fields[0],
                 sectionsData[1].fields[1],
                 sectionsData[1].fields[2]
             ];
             _.each(dropdownFields, function(field) {
-                // eslint-disable-next-line no-shadow
+                /* eslint-disable-next-line no-shadow, no-var */
                 var view = field.view;
                 FieldViewsSpecHelpers.verifyDropDownField(view, {
                     title: view.options.title,
@@ -153,7 +166,9 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
     });
 
     describe('edx.user.AccountSettingsFactory', function() {
+        // eslint-disable-next-line no-var
         var createEnterpriseLearnerAccountSettingsPage = function() {
+            // eslint-disable-next-line no-var
             var context = AccountSettingsPage(
                 Helpers.FIELDS_DATA,
                 false,
@@ -177,11 +192,14 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
             return context.accountSettingsView;
         };
 
+        // eslint-disable-next-line no-var
         var requests;
+        // eslint-disable-next-line no-var
         var accountInfoTab = {
             BASIC_ACCOUNT_INFORMATION: 0,
             ADDITIONAL_INFORMATION: 1
         };
+        // eslint-disable-next-line no-var
         var basicAccountInfoFields = {
             USERNAME: 0,
             FULL_NAME: 1,
@@ -191,6 +209,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
             COUNTRY: 5,
             TIMEZONE: 6
         };
+        // eslint-disable-next-line no-var
         var additionalInfoFields = {
             EDUCATION: 0,
             GENDER: 1,
@@ -203,6 +222,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
         });
 
         it('shows loading error when UserAccountModel fails to load for enterprise learners', function() {
+            // eslint-disable-next-line no-var
             var accountSettingsView, request;
             requests = AjaxHelpers.requests(this);
 
@@ -219,6 +239,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
         });
 
         it('shows loading error when UserPreferencesModel fails to load for enterprise learners', function() {
+            // eslint-disable-next-line no-var
             var accountSettingsView, request;
             requests = AjaxHelpers.requests(this);
 
@@ -247,6 +268,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
         });
 
         it('renders fields after the models are successfully fetched for enterprise learners', function() {
+            // eslint-disable-next-line no-var
             var accountSettingsView;
             requests = AjaxHelpers.requests(this);
 
@@ -265,6 +287,7 @@ function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers, He
         });
 
         it('expects all fields to behave correctly for enterprise learners', function() {
+            // eslint-disable-next-line no-var
             var accountSettingsView, i, view, sectionsData, textFields, dropdownFields;
             requests = AjaxHelpers.requests(this);
 

@@ -15,6 +15,7 @@
         function($, Backbone, Content, Discussion, DiscussionUtil, DiscussionUser, DiscussionCourseSettings,
             DiscussionUserProfileView) {
             return function(options) {
+                // eslint-disable-next-line no-var
                 var threads = options.threads,
                     contentInfo = options.contentInfo,
                     userInfo = options.userInfo,

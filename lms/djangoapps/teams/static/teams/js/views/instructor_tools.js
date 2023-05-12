@@ -47,6 +47,7 @@
             },
 
             handleDelete: function() {
+                // eslint-disable-next-line no-var
                 var self = this,
                     postDelete = function() {
                         self.teamEvents.trigger('teams:update', {

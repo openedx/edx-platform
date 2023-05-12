@@ -1,6 +1,7 @@
 /* eslint-disable-next-line no-shadow-restricted-names, no-unused-vars */
 (function(undefined) {
     describe('VideoQualityControl', function() {
+        // eslint-disable-next-line no-var
         var state, qualityControl, videoPlayer, player;
 
         afterEach(function() {

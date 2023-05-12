@@ -1,12 +1,14 @@
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable-next-line no-unused-vars, no-var */
 var DialogTabControls = (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var focusableChildren,
         numElements,
         currentIndex,
         focusableElementSelectors = 'a, input[type=text], input[type=submit], select, textarea, button',
         setCurrentIndex = function(currentElement) {
+            // eslint-disable-next-line no-var
             var elementIndex = focusableChildren.index(currentElement);
             if (elementIndex >= 0) {
                 currentIndex = elementIndex;
@@ -25,6 +27,7 @@ var DialogTabControls = (function() {
             });
         },
         focusElement = function() {
+            // eslint-disable-next-line no-var
             var focusableElement = focusableChildren[currentIndex];
             if (focusableElement) {
                 focusableElement.focus();
@@ -48,6 +51,7 @@ var DialogTabControls = (function() {
         },
         setKeydownListener = function($element, $closeButton) {
             $element.on('keydown', function(e) {
+                // eslint-disable-next-line no-var
                 var keyCode = e.keyCode || e.which,
                     escapeKeyCode = 27,
                     tabKeyCode = 9;

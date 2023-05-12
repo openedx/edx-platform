@@ -10,8 +10,11 @@ define([
     'use strict';
 
     describe('Team Management Dashboard', function() {
+        // eslint-disable-next-line no-var
         var view;
+        // eslint-disable-next-line no-var
         var uploadFile = new File([], 'empty-test-file.csv');
+        // eslint-disable-next-line no-var
         var mockFileSelectEvent = {target: {files: [uploadFile]}};
 
         beforeEach(function() {
@@ -32,6 +35,7 @@ define([
         });
 
         it('can handle a successful file upload', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             view.setTeamMembershipCsv(mockFileSelectEvent);
             view.uploadCsv();
@@ -41,6 +45,7 @@ define([
         });
 
         it('can handle a failed file upload', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             view.setTeamMembershipCsv(mockFileSelectEvent);
             view.uploadCsv();

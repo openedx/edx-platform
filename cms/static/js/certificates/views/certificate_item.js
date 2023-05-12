@@ -11,6 +11,7 @@ define([
 function(gettext, ListItemView, CertificateDetailsView, CertificateEditorView) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var CertificateItemView = ListItemView.extend({
         events: {
             'click .delete': 'deleteItem'

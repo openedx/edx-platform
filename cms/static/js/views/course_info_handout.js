@@ -11,6 +11,7 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
     'use strict';
 
     // the handouts view is dumb right now; it needs tied to a model and all that jazz
+    // eslint-disable-next-line no-var
     var CourseInfoHandoutsView = BaseView.extend({
     // collection is CourseUpdateCollection
         events: {
@@ -20,6 +21,7 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
         },
 
         initialize: function() {
+            // eslint-disable-next-line no-var
             var self = this;
             this.template = this.loadTemplate('course_info_handouts');
             this.model.fetch({
@@ -44,6 +46,7 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
         },
 
         onEdit: function() {
+            // eslint-disable-next-line no-var
             var self = this;
             this.$editor.val(this.$preview.html());
             this.$form.show();
@@ -55,9 +58,11 @@ function(BaseView, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils, H
         },
 
         onSave: function(event) {
+            // eslint-disable-next-line no-var
             var saving = new NotificationView.Mini({
                 title: gettext('Saving')
             });
+            // eslint-disable-next-line no-var
             var handoutsContent = this.$codeMirror.getValue();
             $('#handout_error').removeClass('is-shown');
             $('.save-button').removeClass('is-disabled').attr('aria-disabled', false);

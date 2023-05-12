@@ -6,6 +6,7 @@
         'jquery', 'underscore', 'backbone', 'gettext',
         'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator', 'js/utils/animation'
     ], function($, _, Backbone, gettext, Annotator, VisibilityDecorator) {
+        // eslint-disable-next-line no-var
         var ToggleVisibilityView = Backbone.View.extend({
             events: {
                 'click .action-toggle-notes': 'toggleHandler'
@@ -35,6 +36,7 @@
             },
 
             receiveMessage: function(event) {
+                // eslint-disable-next-line no-var
                 var data = event.originalEvent.data;
                 if (data === 'tools.toggleNotes') {
                     event.preventDefault();

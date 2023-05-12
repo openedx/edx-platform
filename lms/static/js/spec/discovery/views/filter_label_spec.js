@@ -8,6 +8,7 @@ define([
     describe('discovery.views.FilterLabel', function() {
         beforeEach(function() {
             TemplateHelpers.installTemplate('templates/discovery/filter');
+            // eslint-disable-next-line no-var
             var filter = new Filter({
                 type: 'language',
                 query: 'en',
@@ -18,6 +19,7 @@ define([
         });
 
         it('renders', function() {
+            // eslint-disable-next-line no-var
             var data = this.view.model.attributes;
             expect(this.view.$el.find('button')).toHaveData('value', 'en');
             expect(this.view.$el.find('button')).toHaveData('type', 'language');

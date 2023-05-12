@@ -30,7 +30,7 @@
             },
 
             render: function() {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var formId = _.uniqueId('form-'),
                     threadTypeTemplate = edx.HtmlUtils.template($('#thread-type-template').html()),
                     $threadTypeSelector = $(threadTypeTemplate({form_id: formId}).toString()),
@@ -65,6 +65,7 @@
             },
 
             save: function() {
+                // eslint-disable-next-line no-var
                 var title = this.$('.edit-post-title').val(),
                     threadType = this.$('.input-radio:checked').val(),
                     body = this.$('.edit-post-body textarea').val(),

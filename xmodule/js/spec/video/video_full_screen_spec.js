@@ -2,6 +2,7 @@
     'use strict';
 
     describe('VideoFullScreen', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
 
         beforeEach(function() {
@@ -32,6 +33,7 @@
             });
 
             it('correctly adds ARIA attributes to fullscreen control', function() {
+                // eslint-disable-next-line no-var
                 var $fullScreenControl = $('.add-fullscreen');
 
                 expect($fullScreenControl).toHaveAttrs({
@@ -55,6 +57,7 @@
             });
 
             it('correctly updates ARIA on state change', function() {
+                // eslint-disable-next-line no-var
                 var $fullScreenControl = $('.add-fullscreen');
                 $fullScreenControl.click();
                 expect($fullScreenControl).toHaveAttrs({
@@ -69,6 +72,7 @@
             it('correctly can out of fullscreen by pressing esc', function() {
                 // eslint-disable-next-line no-undef
                 spyOn(state.videoCommands, 'execute');
+                // eslint-disable-next-line no-var
                 var esc = $.Event('keyup');
                 esc.keyCode = 27;
                 state.isFullScreen = true;

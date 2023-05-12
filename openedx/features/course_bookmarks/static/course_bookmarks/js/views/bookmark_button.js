@@ -36,6 +36,7 @@
                 },
 
                 addBookmark: function() {
+                    // eslint-disable-next-line no-var
                     var view = this;
                     $.ajax({
                         data: {usage_id: view.usageId},
@@ -47,6 +48,7 @@
                             view.setBookmarkState(true);
                         },
                         error: function(jqXHR) {
+                            // eslint-disable-next-line no-var
                             var response, userMessage;
                             try {
                                 response = jqXHR.responseText ? JSON.parse(jqXHR.responseText) : '';
@@ -64,7 +66,9 @@
                 },
 
                 removeBookmark: function() {
+                    // eslint-disable-next-line no-var
                     var view = this;
+                    // eslint-disable-next-line no-var
                     var deleteUrl = view.apiUrl + view.bookmarkId + '/';
 
                     $.ajax({
@@ -97,6 +101,7 @@
                 },
 
                 showError: function(errorText) {
+                    // eslint-disable-next-line no-var
                     var errorMsg = errorText || this.errorMessage;
 
                     if (!this.messageView) {

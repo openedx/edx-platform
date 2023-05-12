@@ -8,6 +8,7 @@
         function(Time) {
             // VideoControl() function - what this module "exports".
             return function(state) {
+                // eslint-disable-next-line no-var
                 var dfd = $.Deferred();
 
                 state.videoControl = {};
@@ -32,6 +33,7 @@
             //     Functions which will be accessible via 'state' object. When called, these functions will
             //     get the 'state' object as a context.
             function _makeFunctionsPublic(state) {
+                // eslint-disable-next-line no-var
                 var methodsDict = {
                     // eslint-disable-next-line no-use-before-define
                     destroy: destroy,
@@ -139,6 +141,7 @@
             }
 
             function hideControls() {
+                // eslint-disable-next-line no-var
                 var _this = this;
 
                 this.controlHideTimeout = null;
@@ -162,6 +165,7 @@
             }
 
             function updateVcrVidTime(params) {
+                // eslint-disable-next-line no-var
                 var endTime = (this.config.endTime !== null) ? this.config.endTime : params.duration;
                 // in case endTime is accidentally specified as being greater than the video
                 endTime = Math.min(endTime, params.duration);

@@ -2,6 +2,7 @@
 define(['jquery', 'underscore', 'js/views/modals/base_modal', 'js/spec_helpers/modal_helpers'],
     function($, _, BaseModal, ModelHelpers) {
         describe('BaseModal', function() {
+            // eslint-disable-next-line no-var
             var MockModal, modal, showMockModal;
 
             MockModal = BaseModal.extend({
@@ -36,6 +37,7 @@ define(['jquery', 'underscore', 'js/views/modals/base_modal', 'js/spec_helpers/m
 
                     // eslint-disable-next-line no-undef
                     jasmine.waitUntil(function() {
+                        // eslint-disable-next-line no-var
                         var modalWindow = ModelHelpers.getModalWindow(modal);
                         return ($(modalWindow)[0] === $(modalWindow)[0].ownerDocument.activeElement);
                     }).then(done);
@@ -55,6 +57,7 @@ define(['jquery', 'underscore', 'js/views/modals/base_modal', 'js/spec_helpers/m
             });
 
             describe('Nested Modal', function() {
+                // eslint-disable-next-line no-var
                 var nestedModal, showNestedModal;
 
                 showNestedModal = function() {

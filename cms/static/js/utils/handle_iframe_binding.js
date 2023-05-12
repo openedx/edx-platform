@@ -1,7 +1,8 @@
 // eslint-disable-next-line no-undef
 define(['jquery'], function($) {
+    // eslint-disable-next-line no-var
     var iframeBinding = function(e) {
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var target_element = null;
         if (typeof e === 'undefined') {
             // eslint-disable-next-line camelcase
@@ -19,24 +20,27 @@ define(['jquery'], function($) {
         modifyTagContent(target_element);
     };
 
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var modifyTagContent = function(target_element) {
         // eslint-disable-next-line camelcase
         target_element.each(function() {
             if ($(this).prop('tagName') === 'IFRAME') {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var ifr_source = $(this).attr('src');
 
                 // Modify iframe src only if it is not empty
                 // eslint-disable-next-line camelcase
                 if (ifr_source) {
+                    // eslint-disable-next-line no-var
                     var wmode = 'wmode=transparent';
                     // eslint-disable-next-line camelcase
                     if (ifr_source.indexOf('?') !== -1) {
-                        // eslint-disable-next-line camelcase
+                        /* eslint-disable-next-line camelcase, no-var */
                         var getQString = ifr_source.split('?');
                         if (getQString[1].search('wmode=transparent') === -1) {
+                            // eslint-disable-next-line no-var
                             var oldString = getQString[1];
+                            // eslint-disable-next-line no-var
                             var newString = getQString[0];
                             $(this).attr('src', newString + '?' + wmode + '&' + oldString);
                         }
@@ -63,13 +67,13 @@ define(['jquery'], function($) {
     // tags in html string so both tags will attach to dom and don't create z-index problem for other popups
     // Note: embed tags should be modified before rendering as they are static objects as compared to iframes
     // Note: this method can modify unintended html (invalid tags) while converting to dom object
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var iframeBindingHtml = function(html_string) {
         // eslint-disable-next-line camelcase
         if (html_string) {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var target_element = null;
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var temp_content = document.createElement('div');
             $(temp_content).html(html_string);
             // eslint-disable-next-line camelcase

@@ -9,6 +9,7 @@ define([
 ], function(_, Backbone, gettext, HtmlUtils, StringUtils, pagingHeaderTemplate) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var PagingHeader = Backbone.View.extend({
         events: {
             'click .next-page-link': 'nextPage',
@@ -16,6 +17,7 @@ define([
         },
 
         initialize: function(options) {
+            // eslint-disable-next-line no-var
             var view = options.view,
                 collection = view.collection;
             this.view = view;
@@ -25,6 +27,7 @@ define([
         },
 
         render: function() {
+            // eslint-disable-next-line no-var
             var view = this.view,
                 collection = view.collection,
                 currentPage = collection.getPageNumber(),
@@ -44,6 +47,7 @@ define([
         },
 
         messageHtml: function() {
+            // eslint-disable-next-line no-var
             var message = '',
                 assetType = false;
 
@@ -79,6 +83,7 @@ define([
         },
 
         currentItemRangeLabel: function() {
+            // eslint-disable-next-line no-var
             var view = this.view,
                 collection = view.collection,
                 start = (collection.getPageNumber() - 1) * collection.getPageSize(),
@@ -93,6 +98,7 @@ define([
         },
 
         totalItemsCountLabel: function() {
+            // eslint-disable-next-line no-var
             var totalItemsLabel,
                 htmlMessage = HtmlUtils.HTML('<span class="count-total">{totalItemsLabel}</span>');
 
@@ -107,6 +113,7 @@ define([
         },
 
         sortNameLabel: function() {
+            // eslint-disable-next-line no-var
             var htmlMessage = HtmlUtils.HTML('<span class="sort-order">{sortName}</span>');
 
             return HtmlUtils.interpolateHtml(htmlMessage, {
@@ -115,6 +122,7 @@ define([
         },
 
         filterNameLabel: function() {
+            // eslint-disable-next-line no-var
             var htmlMessage = HtmlUtils.HTML('<span class="filter-column">{filterName}</span>');
 
             return HtmlUtils.interpolateHtml(htmlMessage, {

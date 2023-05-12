@@ -9,8 +9,10 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var indexOfHelper = [].indexOf
         || function(item) {
+            // eslint-disable-next-line no-var
             var i, len;
             for (i = 0, len = this.length; i < len; i++) {
                 if (i in this && this[i] === item) {
@@ -22,6 +24,7 @@
 
     this.Problem = (function() {
         function Problem(element) {
+            // eslint-disable-next-line no-var
             var that = this;
             this.hint_button = function() {
                 return Problem.prototype.hint_button.apply(that, arguments);
@@ -150,6 +153,7 @@
         };
 
         Problem.prototype.bind = function() {
+            // eslint-disable-next-line no-var
             var problemPrefix,
                 that = this;
             if (typeof MathJax !== 'undefined' && MathJax !== null) {
@@ -185,6 +189,7 @@
 
             // Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
             this.$('.clarification').focus(function(ev) {
+                // eslint-disable-next-line no-var
                 var icon;
                 icon = $(ev.target).children('i');
                 return window.globalTooltipManager.openTooltip(icon);
@@ -212,6 +217,7 @@
         };
 
         Problem.prototype.renderProgressState = function() {
+            // eslint-disable-next-line no-var
             var graded, progress, progressTemplate, curScore, totalScore, attemptsUsed;
             curScore = this.el.data('problem-score');
             totalScore = this.el.data('problem-total-possible');
@@ -308,6 +314,7 @@
         };
 
         Problem.prototype.queueing = function(focusCallback) {
+            // eslint-disable-next-line no-var
             var that = this;
             this.queued_items = this.$('.xqueue');
             this.num_queued_items = this.queued_items.length;
@@ -322,8 +329,10 @@
         };
 
         Problem.prototype.poll = function(previousTimeout, focusCallback) {
+            // eslint-disable-next-line no-var
             var that = this;
             return $.postWithPrefix('' + this.url + '/problem_get', function(response) {
+                // eslint-disable-next-line no-var
                 var newTimeout;
                 // If queueing status changed, then render
                 that.new_queued_items = $(response.html).find('.xqueue');
@@ -380,6 +389,7 @@
         };
 
         Problem.prototype.render = function(content, focusCallback) {
+            // eslint-disable-next-line no-var
             var that = this;
             if (content) {
                 edx.HtmlUtils.setHtml(this.el, edx.HtmlUtils.HTML(content));
@@ -405,9 +415,11 @@
         };
 
         Problem.prototype.setupInputTypes = function() {
+            // eslint-disable-next-line no-var
             var that = this;
             this.inputtypeDisplays = {};
             return this.el.find('.capa_inputtype').each(function(index, inputtype) {
+                // eslint-disable-next-line no-var
                 var classes, cls, id, setupMethod, i, len, results;
                 classes = $(inputtype).attr('class').split(' ');
                 id = $(inputtype).attr('id');
@@ -439,6 +451,7 @@
          * and specify the function to be called by the submit button before sending off @answers
          */
         Problem.prototype.submit_save_waitfor = function(callback) {
+            // eslint-disable-next-line no-var
             var flag, inp, i, len, ref,
                 that = this;
             flag = false;
@@ -471,6 +484,7 @@
 
         // Scroll to problem metadata and next focus is problem input
         Problem.prototype.scroll_to_problem_meta = function() {
+            // eslint-disable-next-line no-var
             var questionTitle;
             questionTitle = this.$('.problem-header');
             if (questionTitle.length > 0) {
@@ -482,6 +496,7 @@
         };
 
         Problem.prototype.focus_on_notification = function(type) {
+            // eslint-disable-next-line no-var
             var notification;
             notification = this.$('.notification-' + type);
             if (notification.length > 0) {
@@ -509,6 +524,7 @@
          *       maybe preferable to consolidate all dispatches to use FormData
          */
         Problem.prototype.submit_fd = function() {
+            // eslint-disable-next-line no-var
             var abortSubmission, error, errorHtml, errors, fd, fileNotSelected, fileTooLarge, maxFileSize,
                 requiredFilesNotSubmitted, settings, timeoutId, unallowedFileSubmitted, i, len,
                 that = this;
@@ -536,6 +552,7 @@
 
             errors = [];
             this.inputs.each(function(index, element) {
+                // eslint-disable-next-line no-var
                 var allowedFiles, file, maxSize, requiredFiles, loopI, loopLen, ref;
                 if (element.type === 'file') {
                     requiredFiles = $(element).data('required_files');
@@ -636,6 +653,7 @@
         };
 
         Problem.prototype.submit_internal = function() {
+            // eslint-disable-next-line no-var
             var that = this;
             Logger.log('problem_check', this.answers);
             return $.postWithPrefix('' + this.url + '/problem_check', this.answers, function(response) {
@@ -668,6 +686,7 @@
          * If not, just the text of the status elements are returned.
          */
         Problem.prototype.get_sr_status = function(contents) {
+            // eslint-disable-next-line no-var
             var addedStatus, ariaLabel, element, labeledStatus, parentSection, statusElement, template, i, len;
             statusElement = $(contents).find('.status');
             labeledStatus = [];
@@ -701,6 +720,7 @@
         };
 
         Problem.prototype.reset_internal = function() {
+            // eslint-disable-next-line no-var
             var that = this;
             Logger.log('problem_reset', this.answers);
             return $.postWithPrefix('' + this.url + '/problem_reset', {
@@ -721,16 +741,20 @@
         // need something where responsetypes can define their own behavior when show
         // is called.
         Problem.prototype.show = function() {
+            // eslint-disable-next-line no-var
             var that = this;
             Logger.log('problem_show', {
                 problem: this.id
             });
             return $.postWithPrefix('' + this.url + '/problem_show', function(response) {
+                // eslint-disable-next-line no-var
                 var answers;
                 answers = response.answers;
                 // eslint-disable-next-line consistent-return
                 $.each(answers, function(key, value) {
+                    // eslint-disable-next-line no-var
                     var safeKey = key.replace(':', '\\:'); // fix for courses which use url_names with colons, e.g. problem:question1
+                    // eslint-disable-next-line no-var
                     var answer;
                     if (!$.isArray(value)) {
                         answer = that.$('#answer_' + safeKey + ', #solution_' + safeKey);
@@ -755,6 +779,7 @@
                     }
                 });
                 that.el.find('.capa_inputtype').each(function(index, inputtype) {
+                    // eslint-disable-next-line no-var
                     var classes, cls, display, showMethod, i, len, results;
                     classes = $(inputtype).attr('class').split(' ');
                     results = [];
@@ -808,9 +833,11 @@
         };
 
         Problem.prototype.save_internal = function() {
+            // eslint-disable-next-line no-var
             var that = this;
             Logger.log('problem_save', this.answers);
             return $.postWithPrefix('' + this.url + '/problem_save', this.answers, function(response) {
+                // eslint-disable-next-line no-var
                 var saveMessage;
                 saveMessage = response.msg;
                 if (response.success) {
@@ -830,6 +857,7 @@
         };
 
         Problem.prototype.refreshMath = function(event, element) {
+            // eslint-disable-next-line no-var
             var elid, eqn, jax, mathjaxPreprocessor, preprocessorTag, target;
             if (!element) {
                 element = event.target; // eslint-disable-line no-param-reassign
@@ -884,6 +912,7 @@
          *       to change "Submit" enable status in case of some manipulations with answers
          */
         Problem.prototype.submitAnswersAndSubmitButton = function(bind) {
+            // eslint-disable-next-line no-var
             var answered, atLeastOneTextInputFound, oneTextInputFilled,
                 that = this;
             if (bind === null || bind === undefined) {
@@ -911,6 +940,7 @@
                 answered = false;
             }
             this.el.find('.choicegroup').each(function(i, choicegroupBlock) {
+                // eslint-disable-next-line no-var
                 var checked;
                 checked = false;
                 $(choicegroupBlock).find('input[type=checkbox], input[type=radio]')
@@ -932,6 +962,7 @@
                 }
             });
             this.el.find('select').each(function(i, selectField) {
+                // eslint-disable-next-line no-var
                 var selectedOption = $(selectField).find('option:selected').text()
                     .trim();
                 if (selectedOption === 'Select an option') {
@@ -955,10 +986,12 @@
         Problem.prototype.bindResetCorrectness = function() {
             // Loop through all input types.
             // Bind the reset functions at that scope.
+            // eslint-disable-next-line no-var
             var $inputtypes,
                 that = this;
             $inputtypes = this.el.find('.capa_inputtype').add(this.el.find('.inputtype'));
             return $inputtypes.each(function(index, inputtype) {
+                // eslint-disable-next-line no-var
                 var bindMethod, classes, cls, i, len, results;
                 classes = $(inputtype).attr('class').split(' ');
                 results = [];
@@ -983,6 +1016,7 @@
             // They should set handlers on each <input> to reset the whole.
             formulaequationinput: function(element) {
                 return $(element).find('input').on('input', function() {
+                    // eslint-disable-next-line no-var
                     var $p;
                     $p = $(element).find('span.status');
                     $p.removeClass('correct incorrect submitted');
@@ -990,10 +1024,12 @@
                 });
             },
             choicegroup: function(element) {
+                // eslint-disable-next-line no-var
                 var $element, id;
                 $element = $(element);
                 id = ($element.attr('id').match(/^inputtype_(.*)$/))[1];
                 return $element.find('input').on('change', function() {
+                    // eslint-disable-next-line no-var
                     var $status;
                     $status = $('#status_' + id);
                     if ($status[0]) {
@@ -1010,6 +1046,7 @@
                 });
             },
             'option-input': function(element) {
+                // eslint-disable-next-line no-var
                 var $select, id;
                 $select = $(element).find('select');
                 id = ($select.attr('id').match(/^input_(.*)$/))[1];
@@ -1021,6 +1058,7 @@
             },
             textline: function(element) {
                 return $(element).find('input').on('input', function() {
+                    // eslint-disable-next-line no-var
                     var $p;
                     $p = $(element).find('span.status');
                     $p.removeClass('correct incorrect submitted');
@@ -1035,6 +1073,7 @@
                  Return: function (eqn) -> eqn that preprocesses the user formula input before
                  it is fed into MathJax. Return 'false' if no preprocessor specified
                  */
+                // eslint-disable-next-line no-var
                 var data, preprocessor, preprocessorClass, preprocessorClassName;
                 data = $(element).find('.text-input-dynamath_data');
                 preprocessorClassName = data.data('preprocessor');
@@ -1047,6 +1086,7 @@
                 }
             },
             cminput: function(container) {
+                // eslint-disable-next-line no-var
                 var CodeMirrorEditor, CodeMirrorTextArea, element, id, linenumbers, mode, spaces, tabsize;
                 element = $(container).find('textarea');
                 tabsize = element.data('tabsize');
@@ -1083,6 +1123,7 @@
 
         Problem.prototype.inputtypeShowAnswerMethods = {
             choicegroup: function(element, display, answers, correctStatusHtml) {
+                // eslint-disable-next-line no-var
                 var answer, choice, inputId, i, len, results, $element, $inputLabel, $inputStatus;
                 $element = $(element);
                 inputId = $element.attr('id').replace(/inputtype_/, '');
@@ -1113,6 +1154,7 @@
                 return results;
             },
             choicetextgroup: function(element, display, answers) {
+                // eslint-disable-next-line no-var
                 var answer, choice, inputId, i, len, results, $element;
                 $element = $(element);
                 inputId = $element.attr('id').replace(/inputtype_/, '');
@@ -1132,13 +1174,16 @@
                 //    'rectangle': '(10,10)-(20,30);(12,12)-(40,60)',
                 //    'regions': '[[10,10], [30,30], [10, 30], [30, 10]]'
                 // } }
+                // eslint-disable-next-line no-var
                 var canvas, container, id, types, context, $element;
                 types = {
                     rectangle: function(ctx, coords) {
+                        // eslint-disable-next-line no-var
                         var rects, reg;
                         reg = /^\(([0-9]+),([0-9]+)\)-\(([0-9]+),([0-9]+)\)$/;
                         rects = coords.replace(/\s*/g, '').split(/;/);
                         $.each(rects, function(index, rect) {
+                            // eslint-disable-next-line no-var
                             var abs, height, points, width;
                             abs = Math.abs;
                             points = reg.exec(rect);
@@ -1152,8 +1197,10 @@
                         return ctx.fill();
                     },
                     regions: function(ctx, coords) {
+                        // eslint-disable-next-line no-var
                         var parseCoords;
                         parseCoords = function(coordinates) {
+                            // eslint-disable-next-line no-var
                             var reg;
                             reg = JSON.parse(coordinates);
 
@@ -1222,8 +1269,11 @@
          *
          */
         Problem.prototype.disableAllButtonsWhileRunning = function(operationCallback, isFromCheckOperation) {
+            // eslint-disable-next-line no-var
             var that = this;
+            // eslint-disable-next-line no-var
             var allButtons = [this.resetButton, this.saveButton, this.showButton, this.hintButton, this.submitButton];
+            // eslint-disable-next-line no-var
             var initiallyEnabledButtons = allButtons.filter(function(button) {
                 return !button.attr('disabled');
             });
@@ -1245,6 +1295,7 @@
          *         the submit button.
          */
         Problem.prototype.enableButtons = function(buttons, enable, changeSubmitButtonText) {
+            // eslint-disable-next-line no-var
             var that = this;
             buttons.forEach(function(button) {
                 if (button.hasClass('submit')) {
@@ -1266,6 +1317,7 @@
          *         text of submit button as well.
          */
         Problem.prototype.enableSubmitButton = function(enable, changeText) {
+            // eslint-disable-next-line no-var
             var submitCanBeEnabled;
             if (changeText === null || changeText === undefined) {
                 changeText = true; // eslint-disable-line no-param-reassign
@@ -1297,6 +1349,7 @@
         };
 
         Problem.prototype.enableSubmitButtonAfterTimeout = function() {
+            // eslint-disable-next-line no-var
             var enableSubmitButton,
                 that = this;
             this.has_timed_out = false;
@@ -1313,6 +1366,7 @@
         Problem.prototype.hint_button = function() {
             // Store the index of the currently shown hint as an attribute.
             // Use that to compute the next hint number when the button is clicked.
+            // eslint-disable-next-line no-var
             var hintContainer, hintIndex, nextIndex,
                 that = this;
             hintContainer = this.$('.problem-hint');
@@ -1327,6 +1381,7 @@
                 hint_index: nextIndex,
                 input_id: this.id
             }, function(response) {
+                // eslint-disable-next-line no-var
                 var hintMsgContainer;
                 if (response.success) {
                     hintMsgContainer = that.$('.problem-hint .notification-message');

@@ -19,6 +19,7 @@ define(['backbone'], function(Backbone) {
             // the overall type of the menu. This allows other component types to be added
             // and they will get sorted alphabetically rather than just at the top.
             // e.g. The ORA openassessment xblock is listed as an advanced problem.
+            // eslint-disable-next-line no-var
             var isPrimaryBlankTemplate = function(template) {
                 return !template.boilerplate_name && template.category === response.type;
             };

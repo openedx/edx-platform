@@ -6,6 +6,7 @@
 }((function() {
     return this;
 }()), function(window, jasmine, _) {
+    // eslint-disable-next-line no-var
     var fake, clearSpies, spyOnConstructor,
         unfakes = [];
 
@@ -18,6 +19,7 @@
     };
 
     fake = function(owner, thingToFake, newThing) {
+        // eslint-disable-next-line no-var
         var originalThing;
         originalThing = owner[thingToFake];
         owner[thingToFake] = newThing;
@@ -28,6 +30,7 @@
     };
 
     spyOnConstructor = function(owner, classToFake, methodsToSpy) {
+        // eslint-disable-next-line no-var
         var fakeClass, spies;
 
         fakeClass = (function() {

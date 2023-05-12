@@ -2,10 +2,13 @@
     require(
         ['video/00_async_process.js'],
         function(AsyncProcess) {
+            // eslint-disable-next-line no-var
             var getArrayNthLength = function(n, multiplier) {
+                    // eslint-disable-next-line no-var
                     var result = [],
                         mul = multiplier || 1;
 
+                    // eslint-disable-next-line no-var
                     for (var i = 0; i < n; i++) {
                         result[i] = i * mul;
                     }
@@ -16,6 +19,7 @@
 
             describe('AsyncProcess', function() {
                 it('Array is processed successfully', function(done) {
+                    // eslint-disable-next-line no-var
                     var processedArray,
                         expectedArray = getArrayNthLength(1000, 2),
                         process = function(item) {
@@ -35,6 +39,7 @@
                 });
 
                 it('If non-array is passed, error callback is called', function(done) {
+                    // eslint-disable-next-line no-var
                     var isError,
                         process = function() {};
 
@@ -51,6 +56,7 @@
                 });
 
                 it('If an empty array is passed, returns initial array', function(done) {
+                    // eslint-disable-next-line no-var
                     var processedArray,
                         process = function() {};
 
@@ -67,6 +73,7 @@
                 });
 
                 it('If no process function passed, returns initial array', function(done) {
+                    // eslint-disable-next-line no-var
                     var processedArray;
 
                     AsyncProcess.array(items).done(function(result) {

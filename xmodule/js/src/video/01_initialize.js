@@ -16,6 +16,7 @@
         'video/01_initialize.js',
         ['video/03_video_player.js', 'video/00_i18n.js', 'moment', 'underscore'],
         function(VideoPlayer, i18n, moment, _) {
+            // eslint-disable-next-line no-var
             var moment = moment || window.moment;
             /**
      * @function
@@ -27,6 +28,7 @@
      *     available via this object.
      * @param {DOM element} element Container of the entire Video DOM element.
      */
+            // eslint-disable-next-line no-var
             var Initialize = function(state, element) {
                     // eslint-disable-next-line no-use-before-define
                     _makeFunctionsPublic(state);
@@ -134,6 +136,7 @@
                 // Require JS. At the time when we reach this code, the stand alone
                 // HTML5 player is already loaded, so no further testing in that case
                 // is required.
+                // eslint-disable-next-line no-var
                 var video, onYTApiReady, setupOnYouTubeIframeAPIReady;
 
                 if (state.videoType === 'youtube') {
@@ -234,6 +237,7 @@
             }
 
             function loadYouTubeIFrameAPI(scriptTag) {
+                // eslint-disable-next-line no-var
                 var firstScriptTag = document.getElementsByTagName('script')[0];
                 firstScriptTag.parentNode.insertBefore(scriptTag, firstScriptTag);
             }
@@ -323,9 +327,11 @@
 
             // eslint-disable-next-line no-shadow
             function _initializeModules(state, i18n) {
+                // eslint-disable-next-line no-var
                 var dfd = $.Deferred(),
                     // eslint-disable-next-line consistent-return
                     modulesList = $.map(state.modules, function(module) {
+                        // eslint-disable-next-line no-var
                         var options = state.options[module.moduleName] || {};
                         if (_.isFunction(module)) {
                             return module(state, i18n, options);
@@ -341,7 +347,9 @@
             }
 
             function _getConfiguration(data, storage) {
+                // eslint-disable-next-line no-var
                 var isBoolean = function(value) {
+                        // eslint-disable-next-line no-var
                         var regExp = /^true$/i;
                         return regExp.test(value.toString());
                     },
@@ -359,6 +367,7 @@
                         autoplay: isBoolean,
                         autohideHtml5: isBoolean,
                         autoAdvance: function(value) {
+                            // eslint-disable-next-line no-var
                             var shouldAutoAdvance = storage.getItem('auto_advance');
                             if (_.isUndefined(shouldAutoAdvance)) {
                                 return isBoolean(value) || false;
@@ -517,6 +526,7 @@
             // The function set initial configuration and preparation.
 
             function initialize(element) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     el = this.el,
                     id = this.id,
@@ -582,6 +592,7 @@
 
                     _waitForYoutubeApi(this);
 
+                    // eslint-disable-next-line no-var
                     var scriptTag = document.createElement('script');
 
                     scriptTag.src = this.config.ytApiUrl;
@@ -627,6 +638,7 @@
                 this.videos = {};
 
                 _.each(youtubeStreams.split(/,/), function(video) {
+                    // eslint-disable-next-line no-var
                     var speed;
                     video = video.split(/:/);
                     speed = this.speedToString(video[0]);
@@ -643,6 +655,7 @@
             //     example the length of the video can be determined from the meta
             //     data.
             function fetchMetadata() {
+                // eslint-disable-next-line no-var
                 var self = this,
                     metadataXHRs = [];
 
@@ -652,6 +665,7 @@
                 metadataXHRs = _.map(this.videos, function(url, speed) {
                     return self.getVideoMetadata(url, function(data) {
                         if (data.items.length > 0) {
+                            // eslint-disable-next-line no-var
                             var metaDataItem = data.items[0];
                             self.metadata[metaDataItem.id] = metaDataItem.contentDetails;
                         }
@@ -683,6 +697,7 @@
                 // HTML5 =          [0.75, 1, 1.25, 1.5, 2]
                 // Youtube Flash =  [0.75, 1, 1.25, 1.5]
                 // Youtube HTML5 =  [0.25, 0.5, 1, 1.5, 2]
+                // eslint-disable-next-line no-var
                 var map = {
                     0.25: '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
                     '0.50': '0.75', // Youtube HTML5 -> HTML5 or Youtube Flash
@@ -705,6 +720,7 @@
             }
 
             function getVideoMetadata(url, callback) {
+                // eslint-disable-next-line no-var
                 var youTubeEndpoint;
                 if (!(_.isString(url))) {
                     url = this.videos['1.0'] || '';
@@ -730,6 +746,7 @@
             }
 
             function youtubeId(speed) {
+                // eslint-disable-next-line no-var
                 var currentSpeed = this.isFlashMode() ? this.speed : '1.0';
 
                 return this.videos[speed]
@@ -752,6 +769,7 @@
      *                      Otherwise, `html5` is used by default.
      */
             function setPlayerMode(mode) {
+                // eslint-disable-next-line no-var
                 var supportedModes = ['html5', 'flash'];
 
                 mode = _.contains(supportedModes, mode) ? mode : 'html5';
@@ -796,6 +814,7 @@
             }
 
             function getCurrentLanguage() {
+                // eslint-disable-next-line no-var
                 var keys = _.keys(this.config.transcriptLanguages);
 
                 if (keys.length) {
@@ -825,6 +844,7 @@
      *     state.videoPlayer.pause({'param1': 10});
      */
             function trigger(objChain) {
+                // eslint-disable-next-line no-var
                 var extraParameters = Array.prototype.slice.call(arguments, 1),
                     i, tmpObj, chain;
 

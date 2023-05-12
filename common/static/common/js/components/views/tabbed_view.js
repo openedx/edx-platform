@@ -20,10 +20,12 @@
         tabPanelTemplate,
         HtmlUtils
     ) {
+        // eslint-disable-next-line no-var
         var getTabPanelId = function(id) {
             return 'tabpanel-' + id;
         };
 
+        // eslint-disable-next-line no-var
         var TabPanelView = Backbone.View.extend({
             template: _.template(tabPanelTemplate),
             initialize: function(options) {
@@ -32,6 +34,7 @@
                 this.index = options.index;
             },
             render: function() {
+                // eslint-disable-next-line no-var
                 var tabPanelHtml = this.template({
                     tabId: getTabPanelId(this.url),
                     index: this.index
@@ -42,6 +45,7 @@
             }
         });
 
+        // eslint-disable-next-line no-var
         var TabbedView = Backbone.View.extend({
             events: {
                 'click .tab': 'switchTab',
@@ -83,12 +87,14 @@
                 }, {});
             },
             render: function() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 HtmlUtils.setHtml(
                     this.$el,
                     this.template
                 );
                 _.each(this.tabs, function(tabInfo, index) {
+                    // eslint-disable-next-line no-var
                     var $tabEl = $(_.template(tabTemplate)({
                             index: index,
                             title: tabInfo.title,
@@ -113,6 +119,7 @@
             },
 
             setActiveTab: function(index) {
+                // eslint-disable-next-line no-var
                 var tabMeta = this.getTabMeta(index),
                     tab = tabMeta.tab,
                     view = tab.view,
@@ -159,6 +166,7 @@
             },
 
             previousTab: function(focused, index) {
+                // eslint-disable-next-line no-var
                 var $tab, $panel;
 
                 if (index === 0) {
@@ -176,6 +184,7 @@
             },
 
             nextTab: function(focused, index, total) {
+                // eslint-disable-next-line no-var
                 var $tab, $panel;
 
                 if (index === total) {
@@ -194,6 +203,7 @@
 
             // eslint-disable-next-line consistent-return
             keydownHandler: function(event) {
+                // eslint-disable-next-line no-var
                 var key = event.which,
                     $focused = $(event.currentTarget),
                     index = $($focused).parent().find('.tab').index($focused),
@@ -228,6 +238,7 @@
             * encapsulating the tab object and its element.
             */
             getTabMeta: function(tabNameOrIndex) {
+                // eslint-disable-next-line no-var
                 var tab, $element;
 
                 if (typeof tabNameOrIndex === 'string') {

@@ -7,6 +7,7 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
         // given a pair of inputs (datepicker and timepicker), return a JS Date
         // object that corresponds to the datetime.js that they represent. Assume
         // UTC timezone, NOT the timezone of the user's browser.
+            // eslint-disable-next-line no-var
             var selectedDate = null,
                 selectedTime = null;
             if (datepickerInput.length > 0) {
@@ -31,6 +32,7 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
         function setDate(datepickerInput, timepickerInput, datetime) {
         // given a pair of inputs (datepicker and timepicker) and the date as an
         // ISO-formatted date string.
+            // eslint-disable-next-line no-var
             var parsedDatetime = Date.parse(datetime);
             if (parsedDatetime) {
                 $(datepickerInput).datepicker('setDate', parsedDatetime);
@@ -43,6 +45,7 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
         function renderDate(dateArg) {
         // Render a localized date from an argument that can be passed to
         // the Date constructor (e.g. another Date or an ISO 8601 string)
+            // eslint-disable-next-line no-var
             var dateObj = new Date(dateArg);
             return dateObj.toLocaleString(
                 [],
@@ -59,6 +62,7 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
         }
 
         function convertDateStringsToObjects(obj, dateFields) {
+            // eslint-disable-next-line no-var
             var i;
             for (i = 0; i < dateFields.length; i++) {
                 if (obj[dateFields[i]]) {
@@ -69,12 +73,19 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
         }
 
         function setupDatePicker(fieldName, view, index) {
+            // eslint-disable-next-line no-var
             var cacheModel;
+            // eslint-disable-next-line no-var
             var div;
+            // eslint-disable-next-line no-var
             var datefield;
+            // eslint-disable-next-line no-var
             var timefield;
+            // eslint-disable-next-line no-var
             var cacheview;
+            // eslint-disable-next-line no-var
             var setfield;
+            // eslint-disable-next-line no-var
             var currentDate;
             if (typeof index !== 'undefined' && view.hasOwnProperty('collection')) {
                 cacheModel = view.collection.models[index];
@@ -87,6 +98,7 @@ define(['jquery', 'date', 'js/utils/change_on_enter', 'jquery.ui', 'jquery.timep
             timefield = $(div).find('input.time');
             cacheview = view;
             setfield = function(event) {
+                // eslint-disable-next-line no-var
                 var newVal = getDate(datefield, timefield);
 
                 // Setting to null clears the time as well, as date and time are linked.

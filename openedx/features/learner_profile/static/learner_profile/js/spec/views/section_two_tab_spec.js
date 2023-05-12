@@ -12,14 +12,18 @@ define(
         'use strict';
 
         describe('edx.user.SectionTwoTab', function() {
+            // eslint-disable-next-line no-var
             var createSectionTwoView = function(ownProfile, profileIsPublic) {
+                // eslint-disable-next-line no-var
                 var accountSettingsModel = new UserAccountModel();
                 accountSettingsModel.set(Helpers.createAccountSettingsData());
                 accountSettingsModel.set({profile_is_public: profileIsPublic});
                 accountSettingsModel.set({profile_image: Helpers.PROFILE_IMAGE});
 
+                // eslint-disable-next-line no-var
                 var editable = ownProfile ? 'toggle' : 'never';
 
+                // eslint-disable-next-line no-var
                 var sectionTwoFieldViews = [
                     new FieldViews.TextareaFieldView({
                         model: accountSettingsModel,
@@ -44,13 +48,16 @@ define(
             };
 
             it('full profile displayed for public profile', function() {
+                // eslint-disable-next-line no-var
                 var view = createSectionTwoView(false, true);
                 view.render();
+                // eslint-disable-next-line no-var
                 var bio = view.$el.find('.u-field-bio');
                 expect(bio.length).toBe(1);
             });
 
             it('profile field parts are actually rendered for public profile', function() {
+                // eslint-disable-next-line no-var
                 var view = createSectionTwoView(false, true);
                 _.each(view.options.viewList, function(fieldView) {
                     // eslint-disable-next-line no-undef
@@ -62,11 +69,15 @@ define(
                 });
             });
 
+            // eslint-disable-next-line no-var
             var testPrivateProfile = function(ownProfile, messageString) {
+                // eslint-disable-next-line no-var
                 var view = createSectionTwoView(ownProfile, false);
                 view.render();
+                // eslint-disable-next-line no-var
                 var bio = view.$el.find('.u-field-bio');
                 expect(bio.length).toBe(0);
+                // eslint-disable-next-line no-var
                 var msg = view.$el.find('span.profile-private-message');
                 expect(msg.length).toBe(1);
                 expect(_.count(msg.html(), messageString)).toBeTruthy();
@@ -80,7 +91,9 @@ define(
                 testPrivateProfile(true, 'You are currently sharing a limited profile');
             });
 
+            // eslint-disable-next-line no-var
             var testProfilePrivatePartsDoNotRender = function(ownProfile) {
+                // eslint-disable-next-line no-var
                 var view = createSectionTwoView(ownProfile, false);
                 _.each(view.options.viewList, function(fieldView) {
                     // eslint-disable-next-line no-undef
@@ -101,13 +114,17 @@ define(
             });
 
             it('does not allow fields to be edited when visiting a profile for other people', function() {
+                // eslint-disable-next-line no-var
                 var view = createSectionTwoView(false, true);
+                // eslint-disable-next-line no-var
                 var bio = view.options.viewList[0];
                 expect(bio.editable).toBe('never');
             });
 
             it("allows fields to be edited when visiting one's own profile", function() {
+                // eslint-disable-next-line no-var
                 var view = createSectionTwoView(true, true);
+                // eslint-disable-next-line no-var
                 var bio = view.options.viewList[0];
                 expect(bio.editable).toBe('toggle');
             });

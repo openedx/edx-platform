@@ -4,7 +4,7 @@
     define(['jquery', 'common/js/utils/edx.utils.validate'],
         function($, EdxUtilsValidate) {
             describe('EdxUtilsValidate', function() {
-                // eslint-disable-next-line no-unused-vars
+                /* eslint-disable-next-line no-unused-vars, no-var */
                 var fixture = null,
                     field = null,
                     result = null,
@@ -19,6 +19,7 @@
                     REQUIRED_ERROR_FRAGMENT = 'Please enter your',
                     CUSTOM_MESSAGE = 'custom message';
 
+                // eslint-disable-next-line no-var
                 var createFixture = function(type, name, required, minlength, maxlength, value) {
                     setFixtures('<input id="field" type=' + type + '>');
 
@@ -32,11 +33,13 @@
                     });
                 };
 
+                // eslint-disable-next-line no-var
                 var expectValid = function() {
                     result = EdxUtilsValidate.validate(field);
                     expect(result.isValid).toBe(true);
                 };
 
+                // eslint-disable-next-line no-var
                 var expectInvalid = function(errorFragment) {
                     result = EdxUtilsValidate.validate(field);
                     expect(result.isValid).toBe(false);
@@ -160,6 +163,7 @@
                 });
 
                 it('succeeds if a select is optional, or required and default is selected, but fails if a required select has the default option selected', function() {
+                    // eslint-disable-next-line no-var
                     var select = [
                         '<select id="dropdown" name="country">',
                         '<option value="" data-isdefault="true">Please select a country</option>',

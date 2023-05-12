@@ -10,8 +10,10 @@
         Backbone, TabsCollection, TabsListView, RecentActivityView, CourseStructureView,
         SearchResultsView, TagsView
     ) {
+        // eslint-disable-next-line no-var
         var NotesPageView = Backbone.View.extend({
             initialize: function(options) {
+                // eslint-disable-next-line no-var
                 var scrollToTag, tagsModel;
 
                 this.options = options;

@@ -3,6 +3,7 @@
     'use strict';
 
     describe('NewPostView', function() {
+        // eslint-disable-next-line no-var
         var checkVisibility;
         beforeEach(function() {
             DiscussionSpecHelper.setUpGlobals();
@@ -19,7 +20,7 @@
         });
         // eslint-disable-next-line consistent-return
         checkVisibility = function(view, expectedVisible, expectedDisabled, render) {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var disabled, group_disabled;
             if (render) {
                 view.render();
@@ -120,6 +121,7 @@
                 return checkVisibility(this.view, true, false, false);
             });
             it('allows the user to make a group selection', function() {
+                // eslint-disable-next-line no-var
                 var expectedGroupId,
                     self = this;
                 DiscussionSpecHelper.makeModerator();
@@ -188,6 +190,7 @@
             });
         });
         describe('cancel post resets form ', function() {
+            // eslint-disable-next-line no-var
             var checkPostCancelReset;
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
@@ -225,6 +228,7 @@
             });
             /* eslint-disable-next-line camelcase, consistent-return */
             checkPostCancelReset = function(mode, discussion, course_settings) {
+                // eslint-disable-next-line no-var
                 var eventSpy, view;
                 view = new NewPostView({
                     el: $('#fixture-element'),
@@ -306,6 +310,7 @@
             });
 
             it('should be the first topic if General is not found', function() {
+                // eslint-disable-next-line no-var
                 var eventSpy, view;
                 view = new NewPostView({
                     el: $('#fixture-element'),
@@ -331,6 +336,7 @@
             });
         });
         it('posts to the correct URL', function() {
+            // eslint-disable-next-line no-var
             var topicId, view;
             topicId = 'test_topic';
             // eslint-disable-next-line no-undef

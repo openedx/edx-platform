@@ -3,6 +3,7 @@
     'use strict';
 
     define(['underscore', 'backbone', 'js/edxnotes/utils/logger'], function(_, Backbone, NotesLogger) {
+        // eslint-disable-next-line no-var
         var TabModel = Backbone.Model.extend({
             defaults: {
                 identifier: '',

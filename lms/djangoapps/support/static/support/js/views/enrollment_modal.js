@@ -7,6 +7,7 @@
         'gettext',
         'text!support/templates/enrollment-modal.underscore'
     ], function(Backbone, _, gettext, modalTemplate) {
+        // eslint-disable-next-line no-var
         var EnrollmentModal = Backbone.View.extend({
             events: {
                 'click .enrollment-change-submit': 'submitEnrollmentChange',
@@ -45,7 +46,7 @@
             },
 
             submitEnrollmentChange: function(event) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var new_mode = this.$('.enrollment-new-mode').val(),
                     reason = this.$('.enrollment-reason').val() || this.$('.enrollment-reason-other').val();
                 event.preventDefault();

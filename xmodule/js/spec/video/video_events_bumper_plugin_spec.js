@@ -3,7 +3,9 @@
     'use strict';
 
     describe('VideoPlayer Events Bumper plugin', function() {
+        // eslint-disable-next-line no-var
         var Logger = window.Logger;
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
 
         beforeEach(function() {
@@ -143,6 +145,7 @@
         });
 
         it('can destroy itself', function() {
+            // eslint-disable-next-line no-var
             var plugin = state.bumperState.videoEventsBumperPlugin;
             // eslint-disable-next-line no-undef
             spyOn($.fn, 'off').and.callThrough();

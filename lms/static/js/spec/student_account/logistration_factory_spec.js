@@ -11,6 +11,7 @@
     ],
     function($, _, Backbone, TemplateHelpers, AjaxHelpers, LogistrationFactory) {
         describe('Logistration Factory', function() {
+            // eslint-disable-next-line no-var
             var FORM_DESCRIPTION = {
                 method: 'post',
                 submit_url: '/submit',
@@ -40,7 +41,9 @@
                 ]
             };
 
+            // eslint-disable-next-line no-var
             var initializeLogistrationFactory = function(that, mode, nextUrl, finishAuthUrl) {
+                // eslint-disable-next-line no-var
                 var options = {
                     initial_mode: mode,
                     third_party_auth: {
@@ -60,6 +63,7 @@
                 LogistrationFactory(options);
             };
 
+            // eslint-disable-next-line no-var
             var assertForms = function(visibleForm, hiddenFormsList) {
                 expect($(visibleForm)).not.toHaveClass('hidden');
 
@@ -82,6 +86,7 @@
             });
 
             it('can initially render the login form', function() {
+                // eslint-disable-next-line no-var
                 var hiddenFormsList;
 
                 initializeLogistrationFactory(this, 'login');
@@ -97,6 +102,7 @@
             });
 
             it('can initially render the registration form', function() {
+                // eslint-disable-next-line no-var
                 var hiddenFormsList;
 
                 initializeLogistrationFactory(this, 'register');
@@ -112,6 +118,7 @@
             });
 
             it('can initially render the password reset form', function() {
+                // eslint-disable-next-line no-var
                 var hiddenFormsList;
 
                 initializeLogistrationFactory(this, 'reset');

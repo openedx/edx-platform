@@ -2,6 +2,7 @@
     'use strict';
 
     describe('VideoPlaySkipControl', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
 
         beforeEach(function() {
@@ -53,6 +54,7 @@
         });
 
         it('can destroy itself', function() {
+            // eslint-disable-next-line no-var
             var plugin = state.bumperState.videoPlaySkipControl,
                 el = plugin.el;
             // eslint-disable-next-line no-undef

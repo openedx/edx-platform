@@ -2,38 +2,56 @@
 define(['underscore'], function(_) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var USER_ACCOUNTS_API_URL = '/api/user/v0/accounts/student';
+    // eslint-disable-next-line no-var
     var USER_PREFERENCES_API_URL = '/api/user/v0/preferences/student';
+    // eslint-disable-next-line no-var
     var BADGES_API_URL = '/api/badges/v1/assertions/user/student/';
+    // eslint-disable-next-line no-var
     var IMAGE_UPLOAD_API_URL = '/api/profile_images/v0/staff/upload';
+    // eslint-disable-next-line no-var
     var IMAGE_REMOVE_API_URL = '/api/profile_images/v0/staff/remove';
+    // eslint-disable-next-line no-var
     var FIND_COURSES_URL = '/courses';
+    // eslint-disable-next-line no-var
     var PASSWORD_RESET_SUPPORT_LINK = 'https://support.edx.org/hc/en-us/articles/206212088-What-if-I-did-not-receive-a-password-reset-message-'; // eslint-disable-line max-len
+    // eslint-disable-next-line no-var
     var PLATFORM_NAME = 'edX';
+    // eslint-disable-next-line no-var
     var CONTACT_EMAIL = 'info@example.com';
+    // eslint-disable-next-line no-var
     var ENABLE_COPPA_COMPLIANCE = false;
 
+    // eslint-disable-next-line no-var
     var SYNC_LEARNER_PROFILE_DATA = true;
+    // eslint-disable-next-line no-var
     var ENTERPRISE_NAME = 'Test Enterprise';
+    // eslint-disable-next-line no-var
     var ENTERPRISE_READ_ONLY_ACCOUNT_FIELDS = {
         fields: ['username', 'name', 'email', 'country']
     };
+    // eslint-disable-next-line no-var
     var EDX_SUPPORT_URL = 'https://support.edx.org/';
 
+    // eslint-disable-next-line no-var
     var PROFILE_IMAGE = {
         image_url_large: '/media/profile-images/image.jpg',
         has_image: true
     };
+    // eslint-disable-next-line no-var
     var FIELD_OPTIONS = [
         ['0', 'Option 0'],
         ['1', 'Option 1'],
         ['2', 'Option 2'],
         ['3', 'Option 3']
     ];
+    // eslint-disable-next-line no-var
     var TIME_ZONE_RESPONSE = [{
         time_zone: 'America/Guyana',
         description: 'America/Guyana (ECT, UTC-0500)'
     }];
+    // eslint-disable-next-line no-var
     var FIELDS_DATA = {
         country: {
             options: FIELD_OPTIONS
@@ -63,6 +81,7 @@ define(['underscore'], function(_) {
             options: FIELD_OPTIONS
         }
     };
+    // eslint-disable-next-line no-var
     var AUTH_DATA = {
         providers: [
             {
@@ -83,8 +102,11 @@ define(['underscore'], function(_) {
             }
         ]
     };
+    // eslint-disable-next-line no-var
     var IMAGE_MAX_BYTES = 1024 * 1024;
+    // eslint-disable-next-line no-var
     var IMAGE_MIN_BYTES = 100;
+    // eslint-disable-next-line no-var
     var SOCIAL_PLATFORMS = {
         facebook: {
             display_name: 'Facebook',
@@ -102,6 +124,7 @@ define(['underscore'], function(_) {
             example: 'https://www.linkedin.com/in/username'
         }
     };
+    // eslint-disable-next-line no-var
     var DEFAULT_ACCOUNT_SETTINGS_DATA = {
         username: 'student',
         name: 'Student',
@@ -119,19 +142,23 @@ define(['underscore'], function(_) {
         profile_image: PROFILE_IMAGE,
         accomplishments_shared: false
     };
+    // eslint-disable-next-line no-var
     var DEFAULT_USER_PREFERENCES_DATA = {
         'pref-lang': '2',
         time_zone: 'America/New_York'
     };
 
+    // eslint-disable-next-line no-var
     var createAccountSettingsData = function(options) {
         return _.extend(_.extend({}, DEFAULT_ACCOUNT_SETTINGS_DATA), options);
     };
 
+    // eslint-disable-next-line no-var
     var createUserPreferencesData = function(options) {
         return _.extend(_.extend({}, DEFAULT_USER_PREFERENCES_DATA), options);
     };
 
+    // eslint-disable-next-line no-var
     var expectLoadingIndicatorIsVisible = function(view, visible) {
         if (visible) {
             expect($('.ui-loading-indicator')).not.toHaveClass('is-hidden');
@@ -140,6 +167,7 @@ define(['underscore'], function(_) {
         }
     };
 
+    // eslint-disable-next-line no-var
     var expectLoadingErrorIsVisible = function(view, visible) {
         if (visible) {
             expect(view.$('.ui-loading-error')).not.toHaveClass('is-hidden');
@@ -148,9 +176,12 @@ define(['underscore'], function(_) {
         }
     };
 
+    // eslint-disable-next-line no-var
     var expectElementContainsField = function(element, field) {
+        // eslint-disable-next-line no-var
         var view = field.view;
 
+        // eslint-disable-next-line no-var
         var fieldTitle = $(element).find('.u-field-title').text().trim();
         expect(fieldTitle).toBe(view.options.title);
 
@@ -163,9 +194,12 @@ define(['underscore'], function(_) {
         }
     };
 
+    // eslint-disable-next-line no-var
     var expectSettingsSectionsAndFieldsToBeRendered = function(accountSettingsView, fieldsAreRendered) {
+        // eslint-disable-next-line no-var
         var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
+        // eslint-disable-next-line no-var
         var sectionElements = accountSettingsView.$('#aboutTabSections-tabpanel .section');
         expect(sectionElements.length).toBe(sectionsData.length);
 
@@ -173,6 +207,7 @@ define(['underscore'], function(_) {
             expect($(sectionElement).find('.section-header').text()
                 .trim()).toBe(sectionsData[sectionIndex].title);
 
+            // eslint-disable-next-line no-var
             var sectionFieldElements = $(sectionElement).find('.u-field');
 
             if (fieldsAreRendered === false) {
@@ -187,10 +222,14 @@ define(['underscore'], function(_) {
         });
     };
 
+    // eslint-disable-next-line no-var
     var expectSettingsSectionsAndFieldsToBeRenderedWithMessage = function(accountSettingsView, fieldsAreRendered) {
+        // eslint-disable-next-line no-var
         var sectionFieldElements;
+        // eslint-disable-next-line no-var
         var sectionsData = accountSettingsView.options.tabSections.aboutTabSections;
 
+        // eslint-disable-next-line no-var
         var sectionElements = accountSettingsView.$('#aboutTabSections-tabpanel .section');
         expect(sectionElements.length).toBe(sectionsData.length);
 
@@ -217,6 +256,7 @@ define(['underscore'], function(_) {
         });
     };
 
+    // eslint-disable-next-line no-var
     var expectSettingsSectionsButNotFieldsToBeRendered = function(accountSettingsView) {
         expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView, false);
     };

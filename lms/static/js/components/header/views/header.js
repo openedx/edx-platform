@@ -10,6 +10,7 @@
         'edx-ui-toolkit/js/utils/html-utils'
     ],
     function(Backbone, headerTemplate, HtmlUtils) {
+        // eslint-disable-next-line no-var
         var HeaderView = Backbone.View.extend({
             initialize: function(options) {
                 this.template = HtmlUtils.template(headerTemplate);
@@ -19,6 +20,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var json = this.model.attributes;
                 HtmlUtils.setHtml(
                     this.$el,

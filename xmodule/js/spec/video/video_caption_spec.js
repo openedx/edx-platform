@@ -4,7 +4,9 @@
     'use strict';
 
     describe('VideoCaption', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
+        // eslint-disable-next-line no-var
         var parseIntAttribute = function(element, attrName) {
             return parseInt(element.attr(attrName), 10);
         };
@@ -64,6 +66,7 @@
                 });
 
                 it('add ARIA attributes to transcript control', function() {
+                    // eslint-disable-next-line no-var
                     var $captionControl;
                     // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
@@ -87,6 +90,7 @@
                 });
 
                 it('add ARIA attributes to caption control', function() {
+                    // eslint-disable-next-line no-var
                     var $toggleCaption;
                     // eslint-disable-next-line no-undef
                     state = jasmine.initializePlayer();
@@ -141,6 +145,7 @@
                 });
 
                 it('fetch the transcript in HTML5 mode', function(done) {
+                    // eslint-disable-next-line no-var
                     var transcriptURL = '/transcript/translation/en',
                         transcriptCall;
                     // eslint-disable-next-line no-undef
@@ -239,6 +244,7 @@
             });
 
             it('can destroy itself', function() {
+                // eslint-disable-next-line no-var
                 var plugin;
                 // eslint-disable-next-line no-undef
                 spyOn($, 'ajaxWithPrefix');
@@ -265,6 +271,7 @@
 
             describe('renderCaptions', function() {
                 describe('is rendered', function() {
+                    // eslint-disable-next-line no-var
                     var KEY = $.ui.keyCode,
 
                         keyPressEvent = function(key) {
@@ -314,6 +321,7 @@
 
             describe('renderLanguageMenu', function() {
                 describe('is rendered', function() {
+                    // eslint-disable-next-line no-var
                     var KEY = $.ui.keyCode,
 
                         keyPressEvent = function(key) {
@@ -321,6 +329,7 @@
                         };
 
                     it('if languages more than 1', function() {
+                        // eslint-disable-next-line no-var
                         var transcripts, langCodes, langLabels;
                         // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer();
@@ -332,6 +341,7 @@
                         expect($('.langs-list')).toHandle('click');
 
                         $('.langs-list li').each(function() {
+                            // eslint-disable-next-line no-var
                             var code = $(this).data('lang-code'),
                                 link = $(this).find('.control'),
                                 label = link.text();
@@ -342,6 +352,7 @@
                     });
 
                     it('when clicking on link with new language', function() {
+                        // eslint-disable-next-line no-var
                         var Caption, $link;
                         // eslint-disable-next-line no-undef
                         state = jasmine.initializePlayer();
@@ -371,6 +382,7 @@
                     });
 
                     it('when clicking on link with current language', function() {
+                        // eslint-disable-next-line no-var
                         var Caption, $link;
 
                         // eslint-disable-next-line no-undef
@@ -453,11 +465,12 @@
                 });
 
                 it('render the transcript', function() {
-                    // eslint-disable-next-line no-undef
+                    /* eslint-disable-next-line no-undef, no-var */
                     var captionsData = jasmine.stubbedCaption,
                         $items = $('.subtitles li span[data-index]');
 
                     _.each(captionsData.text, function(text, index) {
+                        // eslint-disable-next-line no-var
                         var item = $items.eq(index);
 
                         expect(parseIntAttribute(item, 'data-index')).toEqual(index);
@@ -475,6 +488,7 @@
                 });
 
                 it('bind all the transcript link', function() {
+                    // eslint-disable-next-line no-var
                     var handlerList = ['captionMouseOverOut', 'captionClick',
                         'captionMouseDown', 'captionFocus', 'captionBlur',
                         'captionKeyDown'
@@ -545,11 +559,12 @@
                     jasmine.waitUntil(function() {
                         return state.videoCaption.rendered;
                     }).then(function() {
-                        // eslint-disable-next-line no-undef
+                        /* eslint-disable-next-line no-undef, no-var */
                         var captionsData = jasmine.stubbedCaption,
                             $items = $('.subtitles li span[data-index]');
 
                         _.each(captionsData.text, function(text, index) {
+                            // eslint-disable-next-line no-var
                             var item = $items.eq(index);
 
                             expect(parseIntAttribute(item, 'data-index')).toEqual(index);
@@ -581,6 +596,7 @@
         });
 
         describe('mouse movement', function() {
+            // eslint-disable-next-line no-var
             var originalClearTimeout;
 
             beforeEach(function(done) {
@@ -702,6 +718,7 @@
         });
 
         describe('fetchCaption', function() {
+            // eslint-disable-next-line no-var
             var Caption, msg;
 
             beforeEach(function() {
@@ -899,6 +916,7 @@
         });
 
         describe('fetchAvailableTranslations', function() {
+            // eslint-disable-next-line no-var
             var Caption, msg;
 
             beforeEach(function() {
@@ -992,6 +1010,7 @@
                 });
 
                 it('render the transcript', function() {
+                    // eslint-disable-next-line no-var
                     var captionsData;
 
                     // eslint-disable-next-line no-undef
@@ -1133,6 +1152,7 @@
 
             describe('set the height of transcript container', function() {
                 it('when transcript button is enabled', function() {
+                    // eslint-disable-next-line no-var
                     var realHeight = parseInt(
                             $('.subtitles').css('maxHeight'), 10
                         ),
@@ -1144,6 +1164,7 @@
                 });
 
                 it('when transcript button is disabled ', function() {
+                    // eslint-disable-next-line no-var
                     var realHeight, videoWrapperHeight, progressSliderHeight,
                         controlHeight, shouldBeHeight;
 
@@ -1167,6 +1188,7 @@
             });
 
             it('set the height of transcript spacing', function() {
+                // eslint-disable-next-line no-var
                 var firstSpacing, lastSpacing;
 
                 firstSpacing = Math.abs(parseInt(
@@ -1254,6 +1276,7 @@
 
                 // eslint-disable-next-line no-undef
                 waitsFor(function() {
+                    // eslint-disable-next-line no-var
                     var duration = state.videoPlayer.duration(),
                         isRendered = state.videoCaption.rendered;
 
@@ -1429,6 +1452,7 @@
                 'when a second transcript gets focus through mouse after '
                 + 'first had focus through TAB key',
                 function() {
+                    // eslint-disable-next-line no-var
                     var $subDataLiIdx0, $subDataLiIdx1;
 
                     beforeEach(function() {

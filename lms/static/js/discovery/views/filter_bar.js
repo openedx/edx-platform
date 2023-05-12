@@ -39,6 +39,7 @@
             },
 
             addFilter: function(filter) {
+                // eslint-disable-next-line no-var
                 var label = new FilterLabel({model: filter});
                 this.$ul.append(label.render().el);
                 this.show();
@@ -56,7 +57,9 @@
             },
 
             clearFilter: function(event) {
+                // eslint-disable-next-line no-var
                 var $target = $(event.currentTarget);
+                // eslint-disable-next-line no-var
                 var filter = this.collection.get($target.data('type'));
                 this.trigger('clearFilter', filter.id);
             },

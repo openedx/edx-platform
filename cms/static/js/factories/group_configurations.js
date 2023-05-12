@@ -9,6 +9,7 @@ define([
         allGroupConfigurationJson,
         groupConfigurationUrl,
         courseOutlineUrl) {
+        // eslint-disable-next-line no-var
         var experimentGroupConfigurations = new GroupConfigurationCollection(
                 experimentGroupConfigurationsJson, {parse: true}
             ),

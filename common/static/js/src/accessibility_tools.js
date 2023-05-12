@@ -34,9 +34,11 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+// eslint-disable-next-line no-var
 var $focusedElementBeforeModal,
     focusableElementsString = 'a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, *[tabindex], *[contenteditable]';
 
+// eslint-disable-next-line no-var
 var reassignTabIndexesAndAriaHidden = function(focusableElementsFilterString, closeButtonId, modalId, mainPageId) {
     // Sets appropriate elements to tab indexable and properly sets aria_hidden on content outside of modal
     // "focusableElementsFilterString" is a string that indicates all elements that should be focusable
@@ -44,6 +46,7 @@ var reassignTabIndexesAndAriaHidden = function(focusableElementsFilterString, cl
     // "modalId" is the selector for the modal being managed
     // "mainPageId" is the selector for the main part of the page
     // Returns a list of focusableItems
+    // eslint-disable-next-line no-var
     var focusableItems;
 
     $(mainPageId).attr('aria-hidden', 'true');
@@ -59,12 +62,14 @@ var reassignTabIndexesAndAriaHidden = function(focusableElementsFilterString, cl
     return focusableItems;
 };
 
+// eslint-disable-next-line no-var
 var trapTabFocus = function(focusableItems, closeButtonId) {
     // Determines last element in modal and traps focus by causing tab
     // to focus on the first modal element (close button)
     // "focusableItems" all elements in the modal that are focusable
     // "closeButtonId" is the selector for the button that closes out the modal.
     // returns the last focusable element in the modal.
+    // eslint-disable-next-line no-var
     var $last;
     if (focusableItems.length !== 0) {
         $last = focusableItems.last();
@@ -74,6 +79,7 @@ var trapTabFocus = function(focusableItems, closeButtonId) {
 
     // tab on last element in modal returns to the first one
     $last.on('keydown', function(e) {
+        // eslint-disable-next-line no-var
         var keyCode = e.keyCode || e.which;
         // 9 is the js keycode for tab
         if (!e.shiftKey && keyCode === 9) {
@@ -85,8 +91,10 @@ var trapTabFocus = function(focusableItems, closeButtonId) {
     return $last;
 };
 
+// eslint-disable-next-line no-var
 var trapShiftTabFocus = function($last, closeButtonId) {
     $(closeButtonId).on('keydown', function(e) {
+        // eslint-disable-next-line no-var
         var keyCode = e.keyCode || e.which;
         // 9 is the js keycode for tab
         if (e.shiftKey && keyCode === 9) {
@@ -96,6 +104,7 @@ var trapShiftTabFocus = function($last, closeButtonId) {
     });
 };
 
+// eslint-disable-next-line no-var
 var bindReturnFocusListener = function($previouslyFocusedElement, closeButtonId, modalId, mainPageId) {
     // Ensures that on modal close, focus is returned to the element
     // that had focus before the modal was opened.
@@ -106,8 +115,10 @@ var bindReturnFocusListener = function($previouslyFocusedElement, closeButtonId,
     });
 };
 
+// eslint-disable-next-line no-var
 var bindEscapeKeyListener = function(modalId, closeButtonId) {
     $(modalId).on('keydown', function(e) {
+        // eslint-disable-next-line no-var
         var keyCode = e.keyCode || e.which;
         // 27 is the javascript keycode for the ESC key
         if (keyCode === 27) {
@@ -117,6 +128,7 @@ var bindEscapeKeyListener = function(modalId, closeButtonId) {
     });
 };
 
+// eslint-disable-next-line no-var
 var trapFocusForAccessibleModal = function(
     $previouslyFocusedElement,
     focusableElementsFilterString,
@@ -126,6 +138,7 @@ var trapFocusForAccessibleModal = function(
     // Re assess the page for which items internal to the modal should be focusable,
     // Should be called after the content of the accessible_modal is changed in order
     // to ensure that the correct elements are accessible.
+    // eslint-disable-next-line no-var
     var focusableItems, $last;
     focusableItems = reassignTabIndexesAndAriaHidden(
         focusableElementsFilterString,
@@ -139,7 +152,7 @@ var trapFocusForAccessibleModal = function(
     bindEscapeKeyListener(modalId, closeButtonId);
 };
 
-/* eslint-disable-next-line camelcase, no-unused-vars */
+/* eslint-disable-next-line camelcase, no-unused-vars, no-var */
 var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
     // Modifies a lean modal to optimize focus management.
     // "trigger" is the selector for the link element that triggers the modal.
@@ -152,6 +165,7 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
     // see http://accessibility.oit.ncsu.edu/blog/2013/09/13/the-incredible-accessible-modal-dialog/
     // for more information on managing modals
     //
+    // eslint-disable-next-line no-var
     var initialFocus;
     $(trigger).click(function() {
         $focusedElementBeforeModal = $(trigger);
@@ -183,6 +197,7 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
 
 // handle things properly for clicks
 $('.nav-skip').click(function() {
+    // eslint-disable-next-line no-var
     var href = $(this).attr('href');
     if (href) {
         $(href).attr('tabIndex', -1).focus();
@@ -190,6 +205,7 @@ $('.nav-skip').click(function() {
 });
 // and for the enter key
 $('.nav-skip').keypress(function(e) {
+    // eslint-disable-next-line no-var
     var href;
     if (e.which === 13) {
         href = $(this).attr('href');
@@ -201,12 +217,14 @@ $('.nav-skip').keypress(function(e) {
 
 // Creates a window level SR object that can be used for giving audible feedback to screen readers.
 $(function() {
+    // eslint-disable-next-line no-var
     var SRAlert;
 
     SRAlert = (function() {
         // eslint-disable-next-line no-shadow
         function SRAlert() {
             // This initialization sometimes gets done twice, so take to only create a single reader-feedback div.
+            // eslint-disable-next-line no-var
             var readerFeedbackID = 'reader-feedback',
                 $readerFeedbackSelector = $('#' + readerFeedbackID);
 
@@ -227,6 +245,7 @@ $(function() {
         };
 
         SRAlert.prototype.readElts = function(elts) {
+            // eslint-disable-next-line no-var
             var texts = [];
             $.each(elts, function(idx, value) {
                 texts.push($(value).html());
@@ -239,6 +258,7 @@ $(function() {
         };
 
         SRAlert.prototype.readTexts = function(texts) {
+            // eslint-disable-next-line no-var
             var htmlFeedback = edx.HtmlUtils.HTML('');
             $.each(texts, function(idx, value) {
                 htmlFeedback = edx.HtmlUtils.interpolateHtml(

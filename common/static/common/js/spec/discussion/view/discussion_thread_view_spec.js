@@ -6,9 +6,11 @@
     'use strict';
 
     describe('DiscussionThreadView', function() {
+        // eslint-disable-next-line no-var
         var assertContentVisible, assertExpandedContentVisible, assertResponseCountAndPaginationCorrect,
             createAjaxResponseJson, createTestResponseJson, postResponse, renderWithContent, renderWithTestResponses;
         beforeEach(function() {
+            // eslint-disable-next-line no-var
             var deferred;
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
@@ -50,10 +52,12 @@
             return jasmine.clock().tick(100);
         };
         renderWithTestResponses = function(view, count, options) {
+            // eslint-disable-next-line no-var
             var index;
             return renderWithContent(view, _.extend({
                 resp_total: count,
                 children: count > 0 ? (function() {
+                    // eslint-disable-next-line no-var
                     var _i, _results;
                     _results = [];
                     // eslint-disable-next-line no-multi-assign
@@ -73,6 +77,7 @@
             };
         };
         assertContentVisible = function(view, selector, visible) {
+            // eslint-disable-next-line no-var
             var content;
             content = view.$el.find(selector);
             expect(content.length).toBeGreaterThan(0);
@@ -119,6 +124,7 @@
             };
         };
         postResponse = function(view, index) {
+            // eslint-disable-next-line no-var
             var responseText, testResponseJson;
             testResponseJson = createTestResponseJson(index);
             responseText = testResponseJson.body;
@@ -136,8 +142,10 @@
             return view.$('.discussion-submit-post').click();
         };
         describe('closed and open Threads', function() {
+            // eslint-disable-next-line no-var
             var checkCommentForm, checkVoteDisplay, createDiscussionThreadView;
             createDiscussionThreadView = function(originallyClosed) {
+                // eslint-disable-next-line no-var
                 var discussion, thread, threadData, view;
                 threadData = DiscussionViewSpecHelper.makeThreadWithProps({
                     closed: originallyClosed
@@ -158,6 +166,7 @@
                 return view;
             };
             checkCommentForm = function(originallyClosed) {
+                // eslint-disable-next-line no-var
                 var view;
                 view = createDiscussionThreadView(originallyClosed);
                 expect(view.$('.comment-form').closest('li').is(':visible')).toBe(!originallyClosed);
@@ -167,6 +176,7 @@
                 return expect(view.$('.discussion-reply-new').is(':visible')).toBe(originallyClosed);
             };
             checkVoteDisplay = function(originallyClosed) {
+                // eslint-disable-next-line no-var
                 var view;
                 view = createDiscussionThreadView(originallyClosed);
                 expect(view.$('.thread-main-wrapper .action-vote').is(':visible')).toBe(!originallyClosed);
@@ -297,6 +307,7 @@
             });
         });
         describe('for question threads', function() {
+            // eslint-disable-next-line no-var
             var generateContent, renderTestCase;
             beforeEach(function() {
                 this.thread.set('thread_type', 'question');

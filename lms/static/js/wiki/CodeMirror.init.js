@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    // eslint-disable-next-line no-undef
+    /* eslint-disable-next-line no-undef, no-var */
     var editor = CodeMirror.fromTextArea(document.getElementById('id_content'), {
         mode: 'edx_markdown',
         matchBrackets: true,
@@ -9,6 +9,7 @@ $(document).ready(function() {
     });
 
     // Store the inital contents so we can compare for unsaved changes
+    // eslint-disable-next-line no-var
     var initialContents = editor.getValue();
 
     // The Wiki associates a label with the text area that has ID "id_content". However, when we swap in

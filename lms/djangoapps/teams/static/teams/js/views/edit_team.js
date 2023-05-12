@@ -98,6 +98,7 @@
             },
 
             set: function(view, selector) {
+                // eslint-disable-next-line no-var
                 var viewEl = view.$el;
                 if (this.$(selector).has(viewEl).length) {
                     view.render().setElement(viewEl);
@@ -108,6 +109,7 @@
 
             createOrUpdateTeam: function(event) {
                 event.preventDefault();
+                // eslint-disable-next-line no-var
                 var view = this, // eslint-disable-line vars-on-top
                     teamLanguage = this.teamLanguageField.fieldValue(),
                     teamCountry = this.teamCountryField.fieldValue(),
@@ -129,6 +131,7 @@
                     saveOptions.contentType = 'application/merge-patch+json';
                 }
 
+                // eslint-disable-next-line no-var
                 var validationResult = this.validateTeamData(data); // eslint-disable-line vars-on-top
                 if (validationResult.status === false) {
                     this.showMessage(validationResult.message, validationResult.srMessage);
@@ -146,7 +149,9 @@
                         );
                     })
                     .fail(function(data) { // eslint-disable-line no-shadow
+                        // eslint-disable-next-line no-var
                         var response = JSON.parse(data.responseText);
+                        // eslint-disable-next-line no-var
                         var message = gettext('An error occurred. Please try again.');
                         if ('user_message' in response) {
                             message = response.user_message;
@@ -156,8 +161,10 @@
             },
 
             validateTeamData: function(data) {
+                // eslint-disable-next-line no-var
                 var status = true,
                     message = gettext('Check the highlighted fields below and try again.');
+                // eslint-disable-next-line no-var
                 var srMessages = [];
 
                 this.teamNameField.unhighlightField();
@@ -209,6 +216,7 @@
             },
 
             cancelAndGoBack: function(event) {
+                // eslint-disable-next-line no-var
                 var url;
                 event.preventDefault();
                 if (this.action === 'create') {

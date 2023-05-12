@@ -13,9 +13,11 @@ import XBlockInfo from 'js/models/xblock_info';
 import XBlockUtils from 'js/views/utils/xblock_utils';
 import Course from 'js/models/course';
 
+// eslint-disable-next-line no-var
 var VisibilityState = XBlockUtils.VisibilityState;
 
 describe('Container Subviews', function() {
+    // eslint-disable-next-line no-var
     var model, containerPage, requests, createContainerPage, renderContainerPage,
         respondWithHtml, fetch,
         disabledCss = 'is-disabled',
@@ -100,6 +102,7 @@ describe('Container Subviews', function() {
     };
 
     describe('ViewLiveButtonController', function() {
+        // eslint-disable-next-line no-var
         var viewPublishedCss = '.button-view',
             // eslint-disable-next-line no-unused-vars
             visibilityNoteCss = '.note-visibility';
@@ -123,6 +126,7 @@ describe('Container Subviews', function() {
     });
 
     describe('Publisher', function() {
+        // eslint-disable-next-line no-var
         var headerCss = '.pub-status',
             bitPublishingCss = 'div.bit-publishing',
             liveClass = 'is-live',
@@ -178,6 +182,7 @@ describe('Container Subviews', function() {
         afterEach(jasmine.stealth.clearSpies);
 
         it('renders correctly with private content', function() {
+            // eslint-disable-next-line no-var
             var verifyPrivateState = function() {
                 expect(containerPage.$(headerCss).text()).toContain('Draft (Never published)');
                 expect(containerPage.$(publishButtonCss)).not.toHaveClass(disabledCss);
@@ -245,6 +250,7 @@ describe('Container Subviews', function() {
         });
 
         it('can publish private content', function() {
+            // eslint-disable-next-line no-var
             var notificationSpy = EditHelpers.createNotificationSpy();
             renderContainerPage(this, mockContainerXBlockHtml);
             expect(containerPage.$(bitPublishingCss)).not.toHaveClass(hasWarningsClass);
@@ -296,6 +302,7 @@ describe('Container Subviews', function() {
         });
 
         it('can discard changes', function() {
+            // eslint-disable-next-line no-var
             var notificationSpy, renderPageSpy, numRequests;
             createContainerPage(this);
             notificationSpy = EditHelpers.createNotificationSpy();
@@ -317,7 +324,7 @@ describe('Container Subviews', function() {
         });
 
         it('does not fetch if discard changes fails', function() {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var renderPageSpy, numRequests;
             createContainerPage(this);
             // eslint-disable-next-line no-undef
@@ -417,10 +424,12 @@ describe('Container Subviews', function() {
         });
 
         describe('Content Visibility', function() {
+            // eslint-disable-next-line no-var
             var requestStaffOnly, verifyStaffOnly, verifyExplicitStaffOnly, verifyImplicitStaffOnly, promptSpy,
                 visibilityTitleCss = '.wrapper-visibility .title';
 
             requestStaffOnly = function(isStaffOnly) {
+                // eslint-disable-next-line no-var
                 var newVisibilityState;
 
                 containerPage.$('.action-staff-lock').click();
@@ -457,6 +466,7 @@ describe('Container Subviews', function() {
             };
 
             verifyStaffOnly = function(isStaffOnly) {
+                // eslint-disable-next-line no-var
                 var visibilityCopy = containerPage.$('.wrapper-visibility .copy').text().trim();
                 if (isStaffOnly) {
                     expect(visibilityCopy).toContain('Staff Only');
@@ -590,6 +600,7 @@ describe('Container Subviews', function() {
     });
 
     describe('PublishHistory', function() {
+        // eslint-disable-next-line no-var
         var lastPublishCss = '.wrapper-last-publish';
 
         it('renders never published when the block is unpublished', function() {
@@ -618,6 +629,7 @@ describe('Container Subviews', function() {
     });
 
     describe('Message Area', function() {
+        // eslint-disable-next-line no-var
         var messageSelector = '.container-message .warning',
             warningMessage = 'Caution: The last published version of this unit is live. '
                 + 'By publishing changes you will change the student experience.';

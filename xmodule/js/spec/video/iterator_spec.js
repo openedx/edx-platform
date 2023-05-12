@@ -5,6 +5,7 @@
         ['video/00_iterator.js'],
         function(Iterator) {
             describe('Iterator', function() {
+                // eslint-disable-next-line no-var
                 var list = ['a', 'b', 'c', 'd', 'e'],
                     iterator;
 

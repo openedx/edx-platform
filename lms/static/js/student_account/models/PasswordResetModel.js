@@ -16,6 +16,7 @@
                 },
 
                 sync: function(method, model) {
+                    // eslint-disable-next-line no-var
                     var headers = {
                         'X-CSRFToken': $.cookie('csrftoken')
                     };

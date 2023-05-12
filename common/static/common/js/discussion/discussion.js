@@ -2,8 +2,10 @@
 (function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
+            // eslint-disable-next-line no-var
             for (var key in parent) {
                 if (__hasProp.call(parent, key)) {
                     child[key] = parent[key];
@@ -32,6 +34,7 @@
             Discussion.prototype.model = Thread;
 
             Discussion.prototype.initialize = function(models, options) {
+                // eslint-disable-next-line no-var
                 var self = this;
                 if (!options) {
                     options = {};
@@ -77,6 +80,7 @@
 
             // eslint-disable-next-line consistent-return
             Discussion.prototype.addThread = function(thread) {
+                // eslint-disable-next-line no-var
                 var model;
                 if (!this.find(thread.id)) {
                     model = new Thread(thread);
@@ -87,6 +91,7 @@
 
             // eslint-disable-next-line camelcase
             Discussion.prototype.retrieveAnotherPage = function(mode, options, sort_options, error) {
+                // eslint-disable-next-line no-var
                 var data, url,
                     self = this;
                 if (!options) {
@@ -137,12 +142,13 @@
                     data: data,
                     dataType: 'json',
                     success: function(response) {
-                        // eslint-disable-next-line camelcase
+                        /* eslint-disable-next-line camelcase, no-var */
                         var models, new_collection, new_threads;
                         models = self.models;
                         // eslint-disable-next-line camelcase
                         new_threads = [
                             (function() {
+                                // eslint-disable-next-line no-var
                                 var _i, _len, _ref, _results;
                                 _ref = response.discussion_data;
                                 _results = [];
@@ -184,7 +190,7 @@
             };
 
             Discussion.prototype.sortByVotes = function(thread1, thread2) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var thread1_count, thread2_count;
                 /* eslint-disable-next-line camelcase, radix */
                 thread1_count = parseInt(thread1.get('votes').up_count);
@@ -194,7 +200,7 @@
             };
 
             Discussion.prototype.sortByComments = function(thread1, thread2) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var thread1_count, thread2_count;
                 /* eslint-disable-next-line camelcase, radix */
                 thread1_count = parseInt(thread1.get('comments_count'));
@@ -229,6 +235,7 @@
             };
 
             Discussion.prototype.pinnedThreadsSortComparatorWithDate = function(thread, ascending) {
+                // eslint-disable-next-line no-var
                 var preferredDate, threadLastActivityAtTime, today;
                 threadLastActivityAtTime = new Date(thread.get('last_activity_at')).getTime();
                 if (thread.get('pinned')) {

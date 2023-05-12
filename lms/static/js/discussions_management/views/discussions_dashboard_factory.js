@@ -7,6 +7,7 @@
             'js/discussions_management/models/course_discussions_settings'],
         function($, DiscussionsView, CourseDiscussionTopicDetailsModel, CourseDiscussionsSettingsModel) {
             return function() {
+                // eslint-disable-next-line no-var
                 var courseDiscussionSettings = new CourseDiscussionsSettingsModel(),
                     discussionTopicsSettings = new CourseDiscussionTopicDetailsModel(),
                     $discussionsManagementElement = $('.discussions-management'),

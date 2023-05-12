@@ -11,6 +11,7 @@
     ],
     function($, _, TemplateHelpers, AjaxHelpers, PasswordResetModel, PasswordResetView) {
         describe('edx.student.account.PasswordResetView', function() {
+            // eslint-disable-next-line no-var
             var model = null,
                 view = null,
                 requests = null,
@@ -30,6 +31,7 @@
                     }]
                 };
 
+            // eslint-disable-next-line no-var
             var createPasswordResetView = function(that) {
                 // Initialize the password reset model
                 model = new PasswordResetModel({}, {
@@ -47,8 +49,10 @@
                 requests = AjaxHelpers.requests(that);
             };
 
+            // eslint-disable-next-line no-var
             var submitEmail = function(validationSuccess) {
                 // Create a fake click event
+                // eslint-disable-next-line no-var
                 var clickEvent = $.Event('click');
 
                 // Simulate manual entry of an email address
@@ -76,6 +80,7 @@
             });
 
             it('allows the user to request a new password', function() {
+                // eslint-disable-next-line no-var
                 var syncSpy, passwordEmailSentSpy;
 
                 createPasswordResetView(this);

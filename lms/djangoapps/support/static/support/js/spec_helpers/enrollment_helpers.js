@@ -2,6 +2,7 @@
 define([], function() {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var testCourse = 'course-v1:TestX+T101+2015';
     return {
         TEST_COURSE: testCourse,

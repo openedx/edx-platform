@@ -12,6 +12,7 @@
      * @param {jquery Element} element
      * @param {Object} options
      */
+            // eslint-disable-next-line no-var
             var VideoTranscriptDownloadHandler = function(element, options) {
                 if (!(this instanceof VideoTranscriptDownloadHandler)) {
                     return new VideoTranscriptDownloadHandler(element, options);
@@ -39,6 +40,7 @@
 
                 // Event handler. We delay link clicks until the file type is set
                 clickHandler: function(event) {
+                    // eslint-disable-next-line no-var
                     var that = this,
                         fileType,
                         data,

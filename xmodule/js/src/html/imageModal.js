@@ -1,26 +1,29 @@
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable-next-line no-unused-vars, no-var */
 var setupFullScreenModal = function() {
     // Setup full screen image modal.
     // Executed from HTMLModule in display.js.
     $('a.modal-content').each(function() {
+        // eslint-disable-next-line no-var
         var smallImageObject = $(this).children();
+        // eslint-disable-next-line no-var
         var largeImageSRC = $(this).attr('href');
 
         // if contents of zoomable link is image and large image link exists: setup modal
         if (smallImageObject.is('img') && largeImageSRC) {
+            // eslint-disable-next-line no-var
             var data = {
                 smallHTML: $(this).html(),
                 largeALT: smallImageObject.attr('alt'),
                 largeSRC: largeImageSRC
             };
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var html = _.template($('#image-modal-tpl').text())(data);
             // xss-lint: disable=javascript-jquery-insertion
             $(this).replaceWith(html);
         }
     });
     $('.wrapper-modal-image .image-wrapper img').each(function() {
-        // eslint-disable-next-line no-undef
+        /* eslint-disable-next-line no-undef, no-var */
         var draggie = new Draggabilly(this, {containment: true});
         draggie.disable();
         $(this).closest('.image-modal').data('draggie', draggie);
@@ -34,6 +37,7 @@ var setupFullScreenModal = function() {
 
     // variable to detect when modal is being "hovered".
     // Done this way as jquery doesn't support the :hover psudo-selector as expected.
+    // eslint-disable-next-line no-var
     var imageModalImageHover = false;
     $('.wrapper-modal-image .image-content img, .wrapper-modal-image .image-content .image-controls').hover(function() {
         imageModalImageHover = true;
@@ -51,6 +55,7 @@ var setupFullScreenModal = function() {
         imageModal.removeClass('image-is-fit-to-screen').removeClass('image-is-zoomed');
         $('.wrapper-modal-image .image-content .image-controls .modal-ui-icon.action-zoom-in').removeClass('is-disabled').attr('aria-disabled', false);
         $('.wrapper-modal-image .image-content .image-controls .modal-ui-icon.action-zoom-out').addClass('is-disabled').attr('aria-disabled', true);
+        // eslint-disable-next-line no-var
         var currentDraggie = imageModal.data('draggie');
         currentDraggie.disable();
         $('body').css('overflow', 'auto');
@@ -72,21 +77,31 @@ var setupFullScreenModal = function() {
     // Make sure it always starts zero position for below calcs to work
     $('.wrapper-modal-image .image-content .image-controls .modal-ui-icon').click(function() {
         if (!$(this).hasClass('is-disabled')) {
+            // eslint-disable-next-line no-var
             var mask = $(this).closest('.image-content');
 
+            // eslint-disable-next-line no-var
             var imageModal = $(this).closest('.image-modal');
+            // eslint-disable-next-line no-var
             var img = imageModal.find('img');
+            // eslint-disable-next-line no-var
             var currentDraggie = imageModal.data('draggie');
 
             if ($(this).hasClass('action-zoom-in')) {
                 imageModal.removeClass('image-is-fit-to-screen').addClass('image-is-zoomed');
 
+                // eslint-disable-next-line no-var
                 var imgWidth = img.width();
+                // eslint-disable-next-line no-var
                 var imgHeight = img.height();
 
+                // eslint-disable-next-line no-var
                 var imgContainerOffsetLeft = imgWidth - mask.width();
+                // eslint-disable-next-line no-var
                 var imgContainerOffsetTop = imgHeight - mask.height();
+                // eslint-disable-next-line no-var
                 var imgContainerWidth = imgWidth + imgContainerOffsetLeft;
+                // eslint-disable-next-line no-var
                 var imgContainerHeight = imgHeight + imgContainerOffsetTop;
 
                 // Set the width and height of the image's container so that the dimensions are equal to the image dimensions + view area dimensions to limit dragging

@@ -25,6 +25,7 @@
          *
          * @returns {jquery Promise}
          */
+        // eslint-disable-next-line no-var
         var VideoCaption = function(state) {
             if (!(this instanceof VideoCaption)) {
                 return new VideoCaption(state);
@@ -80,8 +81,10 @@
             *
             */
             renderElements: function() {
+                // eslint-disable-next-line no-var
                 var languages = this.state.config.transcriptLanguages;
 
+                // eslint-disable-next-line no-var
                 var langHtml = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML(
                         [
@@ -108,6 +111,7 @@
                     }
                 );
 
+                // eslint-disable-next-line no-var
                 var subtitlesHtml = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML(
                         [
@@ -144,6 +148,7 @@
             *
             */
             bindHandlers: function() {
+                // eslint-disable-next-line no-var
                 var state = this.state,
                     events = [
                         'mouseover', 'mouseout', 'mousedown', 'click', 'focus', 'blur',
@@ -203,6 +208,7 @@
             },
 
             handleCaptionToggle: function(event) {
+                // eslint-disable-next-line no-var
                 var KEY = $.ui.keyCode,
                     keyCode = event.keyCode;
 
@@ -216,6 +222,7 @@
             },
 
             handleTranscriptToggle: function(event) {
+                // eslint-disable-next-line no-var
                 var KEY = $.ui.keyCode,
                     keyCode = event.keyCode;
 
@@ -229,6 +236,7 @@
             },
 
             handleKeypressLink: function(event) {
+                // eslint-disable-next-line no-var
                 var KEY = $.ui.keyCode,
                     keyCode = event.keyCode,
                     focused, index, total;
@@ -265,6 +273,7 @@
             },
 
             handleKeypress: function(event) {
+                // eslint-disable-next-line no-var
                 var KEY = $.ui.keyCode,
                     keyCode = event.keyCode;
 
@@ -331,6 +340,7 @@
             },
 
             openLanguageMenu: function(event) {
+                // eslint-disable-next-line no-var
                 var button = this.languageChooserEl,
                     menu = button.parent().find('.menu');
 
@@ -345,6 +355,7 @@
             },
 
             closeLanguageMenu: function(event) {
+                // eslint-disable-next-line no-var
                 var button = this.languageChooserEl;
                 event.preventDefault();
 
@@ -465,8 +476,11 @@
                 // processed in 03_video_player.js, we assume
                 // endTime can be an integer or null,
                 // and startTime is an integer > 0
+                // eslint-disable-next-line no-var
                 var config = this.state.config;
+                // eslint-disable-next-line no-var
                 var startTime = config.startTime * 1000;
+                // eslint-disable-next-line no-var
                 var endTime = (config.endTime !== null) ? config.endTime * 1000 : null;
                 return [startTime, endTime];
             },
@@ -480,10 +494,13 @@
             getBoundedCaptions: function() {
                 // get start and caption. If startTime and endTime
                 // are specified, filter by that range.
+                // eslint-disable-next-line no-var
                 var times = this.getStartEndTimes();
-                // eslint-disable-next-line prefer-spread
+                /* eslint-disable-next-line prefer-spread, no-var */
                 var results = this.sjson.filter.apply(this.sjson, times);
+                // eslint-disable-next-line no-var
                 var start = results.start;
+                // eslint-disable-next-line no-var
                 var captions = results.captions;
 
                 return {
@@ -505,6 +522,7 @@
             *         specified for the Youtube type player.
             */
             fetchCaption: function(fetchWithYoutubeId) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     state = this.state,
                     language = state.getCurrentLanguage(),
@@ -541,6 +559,7 @@
                     notifyOnError: false,
                     data: data,
                     success: function(sjson) {
+                        // eslint-disable-next-line no-var
                         var results, start, captions;
                         self.sjson = new Sjson(sjson);
                         results = self.getBoundedCaptions();
@@ -580,6 +599,7 @@
                         self.loaded = true;
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
+                        // eslint-disable-next-line no-var
                         var canFetchWithYoutubeId;
                         // eslint-disable-next-line no-console
                         console.log('[Video info]: ERROR while fetching captions.');
@@ -622,6 +642,7 @@
             * @returns {jquery Promise}
             */
             fetchAvailableTranslations: function() {
+                // eslint-disable-next-line no-var
                 var self = this,
                     state = this.state;
 
@@ -629,6 +650,7 @@
                     url: state.config.transcriptAvailableTranslationsUrl,
                     notifyOnError: false,
                     success: function(response) {
+                        // eslint-disable-next-line no-var
                         var currentLanguages = state.config.transcriptLanguages,
                             newLanguages = _.pick(currentLanguages, response);
 
@@ -676,6 +698,7 @@
             *
             */
             renderLanguageMenu: function(languages) {
+                // eslint-disable-next-line no-var
                 var self = this,
                     state = this.state,
                     $menu = $('<ol class="langs-list menu">'),
@@ -714,6 +737,7 @@
                 );
 
                 $menu.on('click', '.control-lang', function(e) {
+                    // eslint-disable-next-line no-var
                     var el = $(e.currentTarget).parent(),
                         captionState = self.state,
                         langCode = el.data('lang-code');
@@ -753,7 +777,9 @@
             *
             */
             buildCaptions: function(container, start, captions) {
+                // eslint-disable-next-line no-var
                 var process = function(text, index) {
+                    // eslint-disable-next-line no-var
                     var $spanEl = $('<span>', {
                         role: 'link',
                         'data-index': index,
@@ -782,8 +808,10 @@
             *
             */
             renderCaption: function(start, captions) {
+                // eslint-disable-next-line no-var
                 var self = this;
 
+                // eslint-disable-next-line no-var
                 var onRender = function() {
                     self.addPaddings();
                     // Enables or disables automatic scrolling of the captions when the
@@ -837,6 +865,7 @@
             *
             */
             addPaddings: function() {
+                // eslint-disable-next-line no-var
                 var topSpacer = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML([
                         '<li class="spacing" style="height: {height}px">',
@@ -849,6 +878,7 @@
                     }
                 );
 
+                // eslint-disable-next-line no-var
                 var bottomSpacer = HtmlUtils.interpolateHtml(
                     HtmlUtils.HTML([
                         '<li class="spacing" style="height: {height}px">',
@@ -881,6 +911,7 @@
             *
             */
             captionMouseOverOut: function(event) {
+                // eslint-disable-next-line no-var
                 var $caption = $(event.target),
                     captionIndex = parseInt($caption.attr('data-index'), 10);
 
@@ -900,6 +931,7 @@
             *
             */
             captionMouseDown: function(event) {
+                // eslint-disable-next-line no-var
                 var $caption = $(event.target);
 
                 this.isMouseFocus = true;
@@ -925,6 +957,7 @@
             *
             */
             captionFocus: function(event) {
+                // eslint-disable-next-line no-var
                 var $caption = $(event.target),
                     container = $caption.parent(),
                     captionIndex = parseInt($caption.attr('data-index'), 10);
@@ -959,6 +992,7 @@
             *
             */
             captionBlur: function(event) {
+                // eslint-disable-next-line no-var
                 var $caption = $(event.target),
                     container = $caption.parent(),
                     captionIndex = parseInt($caption.attr('data-index'), 10);
@@ -993,6 +1027,7 @@
             *
             */
             scrollCaption: function() {
+                // eslint-disable-next-line no-var
                 var el = this.subtitlesEl.find('.current:first');
 
                 // Automatic scrolling gets disabled if one of the captions has
@@ -1016,6 +1051,7 @@
             *
             */
             play: function() {
+                // eslint-disable-next-line no-var
                 var captions, startAndCaptions, start;
                 if (this.loaded) {
                     if (!this.rendered) {
@@ -1046,6 +1082,7 @@
             *
             */
             updatePlayTime: function(time) {
+                // eslint-disable-next-line no-var
                 var state = this.state,
                     params, newIndex, times;
 
@@ -1092,6 +1129,7 @@
             *
             */
             seekPlayer: function(event) {
+                // eslint-disable-next-line no-var
                 var state = this.state,
                     time = parseInt($(event.target).data('start'), 10);
 
@@ -1175,6 +1213,7 @@
             },
 
             showClosedCaptions: function() {
+                // eslint-disable-next-line no-var
                 var text = gettext('Hide closed captions');
                 this.state.el.addClass('has-captions');
 
@@ -1200,6 +1239,7 @@
             },
 
             hideClosedCaptions: function() {
+                // eslint-disable-next-line no-var
                 var text = gettext('Turn on closed captioning');
                 this.state.el.removeClass('has-captions');
 
@@ -1234,6 +1274,7 @@
             * the block's showCaptions setting.
             */
             setTranscriptVisibility: function() {
+                // eslint-disable-next-line no-var
                 var hideCaptionsOnRender = !this.state.config.showCaptions;
 
                 if ($.cookie('show_transcript') === 'true') {
@@ -1283,6 +1324,7 @@
             },
 
             listenForDragDrop: function() {
+                // eslint-disable-next-line no-var
                 var captions = this.captionDisplayEl['0'];
 
                 if (typeof Draggabilly === 'function') {
@@ -1301,6 +1343,7 @@
             *     otherwise - show.
             */
             hideCaptions: function(hideCaptions, triggerEvent) {
+                // eslint-disable-next-line no-var
                 var transcriptControlEl = this.transcriptControlEl,
                     state = this.state,
                     text;
@@ -1350,6 +1393,7 @@
             *
             */
             captionHeight: function() {
+                // eslint-disable-next-line no-var
                 var state = this.state;
                 if (state.isFullScreen) {
                     return state.container.height() - state.videoFullScreen.height;
@@ -1363,6 +1407,7 @@
             *
             */
             setSubtitlesHeight: function() {
+                // eslint-disable-next-line no-var
                 var height = 0,
                     state = this.state;
                 // on page load captionHidden = undefined

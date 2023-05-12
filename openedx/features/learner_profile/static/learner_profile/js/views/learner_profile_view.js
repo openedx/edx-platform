@@ -8,9 +8,11 @@
             'learner_profile/js/views/section_two_tab'
         ],
         function(gettext, $, _, Backbone, HtmlUtils, TabbedView, SectionTwoTab) {
+            // eslint-disable-next-line no-var
             var LearnerProfileView = Backbone.View.extend({
 
                 initialize: function(options) {
+                    // eslint-disable-next-line no-var
                     var Router;
                     this.options = _.extend({}, options);
                     _.bindAll(this, 'showFullProfile', 'render', 'renderFields', 'showLoadingError');
@@ -24,6 +26,7 @@
                 },
 
                 showFullProfile: function() {
+                    // eslint-disable-next-line no-var
                     var isAboveMinimumAge = this.options.accountSettingsModel.isAboveMinimumAge();
                     if (this.options.ownProfile) {
                         return isAboveMinimumAge
@@ -41,6 +44,7 @@
                 },
 
                 render: function() {
+                    // eslint-disable-next-line no-var
                     var tabs,
                         $tabbedViewElement,
                         $wrapperProfileBioElement = this.$el.find('.wrapper-profile-bio'),
@@ -116,12 +120,14 @@
                 },
 
                 isCoppaCompliant: function() {
+                    // eslint-disable-next-line no-var
                     var enableCoppaCompliance = this.options.accountSettingsModel.get('enable_coppa_compliance'),
                         isAboveAge = this.options.accountSettingsModel.isAboveMinimumAge();
                     return !enableCoppaCompliance || (enableCoppaCompliance && isAboveAge);
                 },
 
                 renderFields: function() {
+                    // eslint-disable-next-line no-var
                     var view = this,
                         fieldView,
                         imageView,

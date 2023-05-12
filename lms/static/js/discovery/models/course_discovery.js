@@ -22,7 +22,9 @@
             },
 
             parse: function(response) {
+                // eslint-disable-next-line no-var
                 var courses = response.results || [];
+                // eslint-disable-next-line no-var
                 var facets = response.aggs || {};
                 this.courseCards.add(_.pluck(courses, 'data'));
 
@@ -31,6 +33,7 @@
                     latestCount: courses.length
                 });
 
+                // eslint-disable-next-line no-var
                 var options = this.facetOptions;
                 _(facets).each(function(obj, key) {
                     _(obj.terms).each(function(count, term) {

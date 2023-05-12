@@ -11,7 +11,7 @@ import 'xblock/cms.runtime.v1';
 // eslint-disable-next-line no-unused-expressions
 'use strict';
 export default function ContainerFactory(componentTemplates, XBlockInfoJson, action, options) {
-    // eslint-disable-next-line camelcase
+    /* eslint-disable-next-line camelcase, no-var */
     var main_options = {
         el: $('#content'),
         model: new XBlockContainerInfo(XBlockInfoJson, {parse: true}),
@@ -20,6 +20,7 @@ export default function ContainerFactory(componentTemplates, XBlockInfoJson, act
     };
 
     xmoduleLoader.done(function() {
+        // eslint-disable-next-line no-var
         var view = new ContainerPage(_.extend(main_options, options));
         view.render();
     });

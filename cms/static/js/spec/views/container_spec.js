@@ -10,6 +10,7 @@ import 'xblock/cms.runtime.v1';
 
 describe('Container View', () => {
     describe('Supports reordering components', () => {
+        // eslint-disable-next-line no-var
         var model, containerView, mockContainerHTML, init, getComponent,
             getDragHandle, dragComponentVertically, dragComponentAbove,
             verifyRequest, verifyNumReorderCalls, respondToRequest, notificationSpy,
@@ -55,6 +56,7 @@ describe('Container View', () => {
         });
 
         init = function(caller) {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(caller);
             containerView.render();
 
@@ -84,17 +86,20 @@ describe('Container View', () => {
         };
 
         getDragHandle = function(locator) {
+            // eslint-disable-next-line no-var
             var component = getComponent(locator);
             return $(component.find('.drag-handle')[0]);
         };
 
         // eslint-disable-next-line no-unused-vars
         dragComponentVertically = function(locator, dy) {
+            // eslint-disable-next-line no-var
             var handle = getDragHandle(locator);
             handle.simulate('drag', {dy: dy});
         };
 
         dragComponentAbove = function(sourceLocator, targetLocator) {
+            // eslint-disable-next-line no-var
             var targetElement = getComponent(targetLocator),
                 targetTop = targetElement.offset().top + 1,
                 handle = getDragHandle(sourceLocator),
@@ -104,6 +109,7 @@ describe('Container View', () => {
         };
 
         verifyRequest = function(requests, reorderCallIndex, expectedURL, expectedChildren) {
+            // eslint-disable-next-line no-var
             var actualIndex, request, children, i;
             // 0th call is the response to the initial render call to get HTML.
             actualIndex = reorderCallIndex + 1;
@@ -123,6 +129,7 @@ describe('Container View', () => {
         };
 
         respondToRequest = function(requests, reorderCallIndex, status) {
+            // eslint-disable-next-line no-var
             var actualIndex;
             // Number of calls will be 1 more than expected because of the initial render call to get HTML.
             actualIndex = reorderCallIndex + 1;
@@ -133,6 +140,7 @@ describe('Container View', () => {
         };
 
         it('can reorder within a group', () => {
+            // eslint-disable-next-line no-var
             var requests = init(this);
             // Drag the third component in Group A to be the first
             dragComponentAbove(groupAComponent3, groupAComponent1);
@@ -141,6 +149,7 @@ describe('Container View', () => {
         });
 
         it('can drag from one group to another', () => {
+            // eslint-disable-next-line no-var
             var requests = init(this);
             // Drag the first component in Group B to the top of group A.
             dragComponentAbove(groupBComponent1, groupAComponent1);
@@ -155,6 +164,7 @@ describe('Container View', () => {
         });
 
         it('does not remove from old group if addition to new group fails', () => {
+            // eslint-disable-next-line no-var
             var requests = init(this);
             // Drag the first component in Group B to the first group.
             dragComponentAbove(groupBComponent1, groupAComponent1);
@@ -167,6 +177,7 @@ describe('Container View', () => {
         });
 
         it('can swap group A and group B', () => {
+            // eslint-disable-next-line no-var
             var requests = init(this);
             // Drag Group B before group A.
             dragComponentAbove(groupB, groupA);
@@ -176,7 +187,7 @@ describe('Container View', () => {
 
         describe('Shows a saving message', () => {
             it('hides saving message upon success', () => {
-                // eslint-disable-next-line no-unused-vars
+                /* eslint-disable-next-line no-unused-vars, no-var */
                 var requests, savingOptions;
                 requests = init(this);
 
@@ -190,6 +201,7 @@ describe('Container View', () => {
             });
 
             it('does not hide saving message if failure', () => {
+                // eslint-disable-next-line no-var
                 var requests = init(this);
 
                 // Drag the first component in Group B to the first group.

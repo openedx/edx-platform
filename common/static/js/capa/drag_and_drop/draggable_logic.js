@@ -2,6 +2,7 @@
     define(['js/capa/drag_and_drop/update_input', 'js/capa/drag_and_drop/targets'], function(updateInput, Targets) {
         return {
             moveDraggableTo: function(moveType, target, funcCallback) {
+                // eslint-disable-next-line no-var
                 var self, offset;
 
                 if (this.hasLoaded === false) {
@@ -114,6 +115,7 @@
             // the input with the user's answer (X-Y position of the draggable,
             // or the ID of the target where it landed.
             checkLandingElement: function() {
+                // eslint-disable-next-line no-var
                 var positionIE;
 
                 this.mousePressed = false;
@@ -175,6 +177,7 @@
             //
             //     this.iconEl.position()
             checkIfOnTarget: function(positionIE) {
+                // eslint-disable-next-line no-var
                 var c1, target;
 
                 for (c1 = 0; c1 < this.state.targets.length; c1 += 1) {
@@ -241,6 +244,7 @@
             },
 
             toggleTargets: function(isEnabled) {
+                // eslint-disable-next-line no-var
                 var effect = isEnabled ? 'move' : null;
 
                 this.state.baseImageEl.attr('aria-dropeffect', effect);
@@ -250,6 +254,7 @@
             },
 
             snapToTarget: function(target) {
+                // eslint-disable-next-line no-var
                 var offset;
 
                 offset = 0;
@@ -281,6 +286,7 @@
             // ordering of the visibility (z-index) of the other draggables
             // will not change.
             correctZIndexes: function() {
+                // eslint-disable-next-line no-var
                 var c1, highestZIndex;
 
                 highestZIndex = -10000;
@@ -327,6 +333,7 @@
             // move it back to the slider, placing it in the same position
             // that it was dragged out of.
             moveBackToSlider: function() {
+                // eslint-disable-next-line no-var
                 var c1;
 
                 Targets.destroyTargetField(this);

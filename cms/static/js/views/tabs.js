@@ -4,8 +4,10 @@
 (function(analytics, course_location_analytics) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
+            // eslint-disable-next-line no-var
             var key;
             for (key in parent) {
                 if (__hasProp.call(parent, key)) {
@@ -26,6 +28,7 @@
         'common/js/components/views/feedback_notification', 'js/views/module_edit',
         'js/models/module_info', 'js/utils/module'],
     function(_, $, ui, Backbone, PromptView, NotificationView, ModuleEditView, ModuleModel, ModuleUtils) {
+        // eslint-disable-next-line no-var
         var TabsEdit;
         TabsEdit = (function(_super) {
             // eslint-disable-next-line no-use-before-define
@@ -33,6 +36,7 @@
 
             // eslint-disable-next-line no-shadow
             function TabsEdit() {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.deleteTab = function() {
                     return TabsEdit.prototype.deleteTab.apply(self, arguments);
@@ -53,8 +57,10 @@
             }
 
             TabsEdit.prototype.initialize = function(options) {
+                // eslint-disable-next-line no-var
                 var self = this;
                 this.$('.component').each(function(idx, element) {
+                    // eslint-disable-next-line no-var
                     var model;
                     model = new ModuleModel({
                         id: $(element).data('locator')
@@ -82,7 +88,7 @@
             };
 
             TabsEdit.prototype.toggleVisibilityOfTab = function(event) {
-                // eslint-disable-next-line camelcase
+                /* eslint-disable-next-line camelcase, no-var */
                 var checkbox_element, saving, tab_element;
                 // eslint-disable-next-line camelcase
                 checkbox_element = event.target;
@@ -109,6 +115,7 @@
             };
 
             TabsEdit.prototype.tabMoved = function() {
+                // eslint-disable-next-line no-var
                 var saving, tabs;
                 tabs = [];
                 this.$('.course-tab').each(function(idx, element) {
@@ -138,6 +145,7 @@
             };
 
             TabsEdit.prototype.addNewTab = function(event) {
+                // eslint-disable-next-line no-var
                 var editor;
                 event.preventDefault();
                 editor = new ModuleEditView({
@@ -163,6 +171,7 @@
             };
 
             TabsEdit.prototype.deleteTab = function(event) {
+                // eslint-disable-next-line no-var
                 var confirm;
                 confirm = new PromptView.Warning({
                     title: gettext('Delete Page Confirmation'),
@@ -171,6 +180,7 @@
                         primary: {
                             text: gettext('OK'),
                             click: function(view) {
+                                // eslint-disable-next-line no-var
                                 var $component, deleting;
                                 view.hide();
                                 $component = $(event.currentTarget).parents('.component');

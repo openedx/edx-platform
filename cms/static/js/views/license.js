@@ -4,6 +4,7 @@ define([
     'underscore',
     'text!templates/license-selector.underscore'
 ], function(BaseView, _, licenseSelectorTemplate) {
+    // eslint-disable-next-line no-var
     var defaultLicenseInfo = {
         'all-rights-reserved': {
             name: gettext('All Rights Reserved'),
@@ -51,6 +52,7 @@ define([
         }
     };
 
+    // eslint-disable-next-line no-var
     var LicenseView = BaseView.extend({
         events: {
             'click ul.license-types li button': 'onLicenseClick',
@@ -75,6 +77,7 @@ define([
                 // defined license type without options
                 return {};
             }
+            // eslint-disable-next-line no-var
             var defaults = {};
             _.each(this.licenseInfo[licenseType].options, function(value, key) {
                 defaults[key] = value.default;
@@ -94,7 +97,9 @@ define([
         },
 
         onLicenseClick: function(e) {
+            // eslint-disable-next-line no-var
             var $li = $(e.srcElement || e.target).closest('li');
+            // eslint-disable-next-line no-var
             var licenseType = $li.data('license');
 
             // Check that we've selected a different license type than what's currently selected
@@ -111,17 +116,22 @@ define([
         },
 
         onOptionClick: function(e) {
+            // eslint-disable-next-line no-var
             var licenseType = this.model.get('type'),
                 licenseOptions = $.extend({}, this.model.get('options')),
                 $li = $(e.srcElement || e.target).closest('li');
 
+            // eslint-disable-next-line no-var
             var optionKey = $li.data('option');
+            // eslint-disable-next-line no-var
             var licenseInfo = this.licenseInfo[licenseType];
+            // eslint-disable-next-line no-var
             var optionInfo = licenseInfo.options[optionKey];
             if (optionInfo.disabled) {
                 // we're done here
                 return;
             }
+            // eslint-disable-next-line no-var
             var currentOptionValue = licenseOptions[optionKey];
             if (optionInfo.type === 'boolean') {
                 // toggle current value
@@ -130,7 +140,9 @@ define([
             }
             // check for conflicts
             if (currentOptionValue && optionInfo.conflictsWith) {
+                // eslint-disable-next-line no-var
                 var conflicts = optionInfo.conflictsWith;
+                // eslint-disable-next-line no-var
                 for (var i = 0; i < conflicts.length; i++) {
                     // Uncheck all conflicts
                     licenseOptions[conflicts[i]] = false;

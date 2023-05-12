@@ -9,6 +9,7 @@
             return this.autoenrollment;
         });
         it('binds the ajax call and the result will be success', function() {
+            // eslint-disable-next-line no-var
             var submitCallback;
             // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {
@@ -34,6 +35,7 @@
             return expect(submitCallback).toHaveBeenCalled();
         });
         it('binds the ajax call and the result will be error', function() {
+            // eslint-disable-next-line no-var
             var submitCallback;
             // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {
@@ -69,6 +71,7 @@
             return expect(submitCallback).toHaveBeenCalled();
         });
         return it('binds the ajax call and the result will be warnings', function() {
+            // eslint-disable-next-line no-var
             var submitCallback;
             // eslint-disable-next-line no-undef
             spyOn($, 'ajax').and.callFake(function(params) {

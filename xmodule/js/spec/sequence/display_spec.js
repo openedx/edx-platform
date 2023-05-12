@@ -3,6 +3,7 @@
     'use strict';
 
     describe('Sequence', function() {
+        // eslint-disable-next-line no-var
         var local = {},
             keydownHandler,
             keys = {
@@ -12,7 +13,7 @@
             };
 
         beforeEach(function() {
-            // eslint-disable-next-line no-undef
+            /* eslint-disable-next-line no-undef, no-var */
             var runtime = jasmine.createSpyObj('TestRuntime', ['handlerUrl']);
             loadFixtures('sequence.html');
             /* eslint-disable-next-line no-multi-assign, no-undef */
@@ -25,6 +26,7 @@
         });
 
         keydownHandler = function(key) {
+            // eslint-disable-next-line no-var
             var event = document.createEvent('Event');
             event.keyCode = key;
             event.initEvent('keydown', false, false);

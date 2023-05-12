@@ -7,9 +7,12 @@ define(
     function(_, AjaxHelpers) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var TEST_COURSE_ID = 'course-v1:test-course';
 
+        // eslint-disable-next-line no-var
         var createBookmarksData = function(options) {
+            // eslint-disable-next-line no-var
             var data = {
                     count: options.count || 0,
                     num_pages: options.num_pages || 1,
@@ -39,20 +42,27 @@ define(
             return data;
         };
 
+        // eslint-disable-next-line no-var
         var createBookmarkUrl = function(courseId, usageId) {
             return '/courses/' + courseId + '/jump_to/' + usageId;
         };
 
+        // eslint-disable-next-line no-var
         var breadcrumbTrail = function(path, unitDisplayName) {
             return _.pluck(path, 'display_name')
                 .concat([unitDisplayName])
                 .join(' <span class="icon fa fa-caret-right" aria-hidden="true"></span><span class="sr">-</span> ');
         };
 
+        // eslint-disable-next-line no-var
         var verifyBookmarkedData = function(view, expectedData) {
+            // eslint-disable-next-line no-var
             var courseId, usageId;
+            // eslint-disable-next-line no-var
             var bookmarks = view.$('.bookmarks-results-list-item');
+            // eslint-disable-next-line no-var
             var results = expectedData.results;
+            // eslint-disable-next-line no-var
             var i, $bookmark;
 
             expect(bookmarks.length, results.length);
@@ -76,6 +86,7 @@ define(
             }
         };
 
+        // eslint-disable-next-line no-var
         var verifyPaginationInfo = function(requests, view, expectedData, currentPage, headerMessage) {
             AjaxHelpers.respondWithJson(requests, expectedData);
             verifyBookmarkedData(view, expectedData);

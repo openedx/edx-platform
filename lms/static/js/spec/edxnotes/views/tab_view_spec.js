@@ -11,6 +11,7 @@ define([
     'use strict';
 
     describe('EdxNotes TabView', function() {
+        // eslint-disable-next-line no-var
         var TestSubView = Backbone.View.extend({
                 id: 'test-subview-panel',
                 className: 'tab-panel',
@@ -30,6 +31,7 @@ define([
             getView;
 
         getView = function(tabsCollection, options) {
+            // eslint-disable-next-line no-var
             var view;
             // eslint-disable-next-line no-undef
             options = _.defaults(options || {}, {
@@ -57,6 +59,7 @@ define([
         });
 
         it('can create a tab and content on initialization', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection);
             expect(this.tabsCollection).toHaveLength(1);
             expect(view.$('.tab')).toExist();
@@ -64,6 +67,7 @@ define([
         });
 
         it('cannot create a tab on initialization if flag is not set', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection, {
                 createTabOnInitialization: false
             });
@@ -73,6 +77,7 @@ define([
         });
 
         it('can remove the content if tab becomes inactive', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection);
             this.tabsCollection.add({identifier: 'second-tab'});
             view.$('#second-tab').click();
@@ -81,6 +86,7 @@ define([
         });
 
         it('can remove the content if tab is closed', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection);
             // eslint-disable-next-line no-undef
             view.onClose = jasmine.createSpy();
@@ -92,6 +98,7 @@ define([
         });
 
         it('can correctly update the content of active tab', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection);
             TestSubView.prototype.content = '<p>New content</p>';
             view.render();
@@ -100,6 +107,7 @@ define([
         });
 
         it('can show/hide error messages', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection),
                 errorHolder = view.$('.wrapper-msg');
 
@@ -113,6 +121,7 @@ define([
         });
 
         it('should hide error messages before rendering', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.tabsCollection),
                 errorHolder = view.$('.wrapper-msg');
             view.showErrorMessageHtml('<p>error message is here</p>');

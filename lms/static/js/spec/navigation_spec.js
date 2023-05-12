@@ -3,6 +3,7 @@ define(['jquery', 'js/utils/navigation'], function($) {
     'use strict';
 
     describe('Course Navigation Accordion', function() {
+        // eslint-disable-next-line no-var
         var $accordion, chapterMenu;
 
         function keyPressEvent(key) {

@@ -6,6 +6,7 @@ function($, _, AjaxHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, XBloc
     'use strict';
 
     describe('MoveXBlockModal', function() {
+        // eslint-disable-next-line no-var
         var modal,
             showModal,
             DISPLAY_NAME = 'HTML 101',
@@ -57,6 +58,7 @@ function($, _, AjaxHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, XBloc
         });
 
         it('sends request to fetch course outline', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 renderViewsSpy;
             showModal();
@@ -73,6 +75,7 @@ function($, _, AjaxHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, XBloc
         });
 
         it('shows error notification when fetch course outline request fails', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 notificationSpy = ViewHelpers.createNotificationSpy('Error');
             showModal();

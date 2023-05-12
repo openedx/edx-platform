@@ -3,6 +3,7 @@ import XBlockValidationFactory from 'js/factories/xblock_validation';
 import TemplateHelpers from 'common/js/spec_helpers/template_helpers';
 
 describe('XBlockValidationFactory', () => {
+    // eslint-disable-next-line no-var
     var $messageDiv;
 
     beforeEach(function() {
@@ -22,8 +23,10 @@ describe('XBlockValidationFactory', () => {
     });
 
     it('Passes through the root property to the view.', function() {
+        // eslint-disable-next-line no-var
         var noContainerContent = 'no-container-content';
 
+        // eslint-disable-next-line no-var
         var notConfiguredMessages = {
             empty: false,
             summary: {text: 'my summary', type: 'not-configured'},
@@ -40,6 +43,7 @@ describe('XBlockValidationFactory', () => {
     });
 
     describe('Controls display of detailed messages based on url and root property', function() {
+        // eslint-disable-next-line no-var
         var messagesWithSummary, checkDetailedMessages;
 
         beforeEach(function() {

@@ -10,8 +10,10 @@ define([
     'use strict';
 
     describe('edx.verify_student.ImageInputView', function() {
+        // eslint-disable-next-line no-var
         var IMAGE_DATA = 'abcd1234';
 
+        // eslint-disable-next-line no-var
         var createView = function() {
             return new ImageInputView({
                 el: $('#current-step-container'),
@@ -22,12 +24,15 @@ define([
             }).render();
         };
 
+        // eslint-disable-next-line no-var
         var uploadImage = function(view, fileType) {
+            // eslint-disable-next-line no-var
             var deferred = $.Deferred();
 
             // Since image upload is an asynchronous process,
             // we need to wait for the upload to complete
             // before checking the outcome.
+            // eslint-disable-next-line no-var
             var fakeFile,
                 fakeEvent = {target: {files: []}};
 
@@ -59,7 +64,9 @@ define([
             return deferred.promise();
         };
 
+        // eslint-disable-next-line no-var
         var expectPreview = function(view, fileType) {
+            // eslint-disable-next-line no-var
             var previewImage = view.$preview.attr('src');
             if (fileType) {
                 expect(previewImage).toContain('data:image/' + fileType);
@@ -68,7 +75,9 @@ define([
             }
         };
 
+        // eslint-disable-next-line no-var
         var expectSubmitEnabled = function(isEnabled) {
+            // eslint-disable-next-line no-var
             var appearsDisabled = $('#submit_button').hasClass('is-disabled'),
                 isDisabled = $('#submit_button').prop('disabled');
 
@@ -76,7 +85,9 @@ define([
             expect(!isDisabled).toEqual(isEnabled);
         };
 
+        // eslint-disable-next-line no-var
         var expectImageData = function(view, fileType) {
+            // eslint-disable-next-line no-var
             var imageData = view.model.get(view.modelAttribute);
             if (fileType) {
                 expect(imageData).toContain('data:image/' + fileType);
@@ -85,6 +96,7 @@ define([
             }
         };
 
+        // eslint-disable-next-line no-var
         var expectError = function(view) {
             expect(view.errorModel.get('shown')).toBe(true);
         };
@@ -103,6 +115,7 @@ define([
         });
 
         it('uploads a png image', function(done) {
+            // eslint-disable-next-line no-var
             var view = createView();
 
             uploadImage(view, 'png').then(function() {
@@ -113,6 +126,7 @@ define([
         });
 
         it('uploads a jpeg image', function(done) {
+            // eslint-disable-next-line no-var
             var view = createView();
 
             uploadImage(view, 'jpeg').then(function() {
@@ -123,6 +137,7 @@ define([
         });
 
         it('hides the preview when the user cancels the upload', function(done) {
+            // eslint-disable-next-line no-var
             var view = createView();
 
             uploadImage(view, null).then(function() {
@@ -133,6 +148,7 @@ define([
         });
 
         it('shows an error if the file type is not supported', function(done) {
+            // eslint-disable-next-line no-var
             var view = createView();
 
             uploadImage(view, 'txt').then(function() {

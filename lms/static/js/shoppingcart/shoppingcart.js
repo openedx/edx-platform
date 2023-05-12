@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-use-before-define
+/* eslint-disable-next-line no-use-before-define, no-var */
 var edx = edx || {};
 
 (function($) {
@@ -27,6 +27,7 @@ var edx = edx || {};
         *     which checks for cart items are valid or not and returns the boolean
         *     { is_course_enrollment_closed: <boolead> }
         */
+        // eslint-disable-next-line no-var
         var isCourseEnrollmentAllowed = function() {
             return $.ajax({
                 url: '/shoppingcart/verify_cart/',
@@ -34,6 +35,7 @@ var edx = edx || {};
             });
         };
 
+        // eslint-disable-next-line no-var
         var view = {
             /**
             * Initialize the view.
@@ -124,14 +126,16 @@ var edx = edx || {};
             // check if there is code exists in the inout_code field
             // before going to make payment
             // if exists then trigger click event of the apply code button
+            // eslint-disable-next-line no-var
             var code = $('div.code-input input#input_code').val();
             // eslint-disable-next-line eqeqeq
             if (typeof code !== 'undefined' && code != '') {
                 $('div.code-input #submit-code').trigger('click');
                 return false;
             }
+            // eslint-disable-next-line no-var
             var $container = $('.confirm-enrollment.cart-view form');
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var view = new edx.shoppingcart.showcart.CartView({
                 el: $container
             }).submit(event);

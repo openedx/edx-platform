@@ -10,8 +10,10 @@ define([
 
     /** ******** Private properties *************************************** */
 
+    // eslint-disable-next-line no-var
     var COOKIE_NAME = 'lastexport';
 
+    // eslint-disable-next-line no-var
     var STAGE = {
         PREPARING: 0,
         EXPORTING: 1,
@@ -19,6 +21,7 @@ define([
         SUCCESS: 3
     };
 
+    // eslint-disable-next-line no-var
     var STATE = {
         READY: 1,
         IN_PROGRESS: 2,
@@ -26,13 +29,21 @@ define([
         ERROR: 4
     };
 
+    // eslint-disable-next-line no-var
     var courselikeHomeUrl;
+    // eslint-disable-next-line no-var
     var current = {stage: 0, state: STATE.READY, downloadUrl: null};
+    // eslint-disable-next-line no-var
     var deferred = null;
+    // eslint-disable-next-line no-var
     var isLibrary = false;
+    // eslint-disable-next-line no-var
     var statusUrl = null;
+    // eslint-disable-next-line no-var
     var successUnixDate = null;
+    // eslint-disable-next-line no-var
     var timeout = {id: null, delay: 1000};
+    // eslint-disable-next-line no-var
     var $dom = {
         downloadLink: $('#download-exported-button'),
         stages: $('ol.status-progress').children(),
@@ -46,6 +57,7 @@ define([
      * Makes Export feedback status list visible
      *
      */
+    // eslint-disable-next-line no-var
     var displayFeedbackList = function() {
         $dom.wrapper.removeClass('is-hidden');
     };
@@ -56,8 +68,11 @@ define([
      * @param {string} [currStageMsg=''] The message to show on the
      *   current stage (for now only in case of error)
      */
+    // eslint-disable-next-line no-var
     var updateFeedbackList = function(currStageMsg) {
+        // eslint-disable-next-line no-var
         var $checkmark, $curr, $prev, $next;
+        // eslint-disable-next-line no-var
         var date, stageMsg, time;
 
         $checkmark = $dom.successStage.find('.icon');
@@ -159,6 +174,7 @@ define([
      * @param {string} msg Error message to display.
      * @param {int} [stage=current.stage] Stage of export process at which error occurred.
      */
+    // eslint-disable-next-line no-var
     var error = function(msg, stage) {
         current.stage = Math.abs(stage || current.stage); // Could be negative
         current.state = STATE.ERROR;
@@ -174,6 +190,7 @@ define([
      *
      * @param {boolean} [completed=false] If the export has been completed or not
      */
+    // eslint-disable-next-line no-var
     var storeExport = function(completed) {
         $.cookie(COOKIE_NAME, JSON.stringify({
             statusUrl: statusUrl,
@@ -184,6 +201,7 @@ define([
 
     /** ******** Public functions ***************************************** */
 
+    // eslint-disable-next-line no-var
     var CourseExport = {
         /**
          * Fetches the previous stored export
@@ -192,6 +210,7 @@ define([
          * @return {JSON} the data of the previous export
          */
         storedExport: function(contentHomeUrl) {
+            // eslint-disable-next-line no-var
             var storedData = JSON.parse($.cookie(COOKIE_NAME));
             if (storedData) {
                 successUnixDate = storedData.date;
@@ -229,6 +248,7 @@ define([
          * @param {int} [stage=0] Starting stage.
          */
         pollStatus: function(data) {
+            // eslint-disable-next-line no-var
             var editUnitUrl = null,
                 msg = data;
             if (current.state !== STATE.IN_PROGRESS) {
@@ -305,6 +325,7 @@ define([
          * @param {string} errMsg Detailed error message
          */
         showError: function(editUnitUrl, errMsg) {
+            // eslint-disable-next-line no-var
             var action,
                 dialog,
                 msg = '';

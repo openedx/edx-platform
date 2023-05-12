@@ -7,12 +7,15 @@ define([
     'use strict';
 
     describe('GroupConfigurationsPage', function() {
+        // eslint-disable-next-line no-var
         var mockGroupConfigurationsPage = readFixtures(
                 'mock/mock-group-configuration-page.underscore'
             ),
             groupConfigItemClassName = '.group-configurations-list-item';
 
+        // eslint-disable-next-line no-var
         var initializePage = function(disableSpy) {
+            // eslint-disable-next-line no-var
             var view = new GroupConfigurationsPage({
                 el: $('#content'),
                 experimentsEnabled: true,
@@ -31,6 +34,7 @@ define([
             return view;
         };
 
+        // eslint-disable-next-line no-var
         var renderPage = function() {
             return initializePage().render();
         };
@@ -59,6 +63,7 @@ define([
         describe('Initial display', function() {
             // TODO fix this, see TNL-1475
             xit('can render itself', function() {
+                // eslint-disable-next-line no-var
                 var view = initializePage();
                 expect(view.$('.ui-loading')).toBeVisible();
                 view.render();

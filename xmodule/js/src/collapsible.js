@@ -27,7 +27,7 @@
     // [params]
     //     el: container
     function setCollapsibles(el) {
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var linkBottom, linkTop, short_custom;
 
         linkTop = '<a href="#" class="full full-top">See full output</a>';
@@ -44,7 +44,7 @@
         // Set up each one individually.
         // eslint-disable-next-line camelcase
         short_custom.each(function(index, elt) {
-            // eslint-disable-next-line camelcase
+            /* eslint-disable-next-line camelcase, no-var */
             var close_text, open_text;
 
             // eslint-disable-next-line camelcase
@@ -92,7 +92,7 @@
     //         is closed.
     // eslint-disable-next-line camelcase
     function toggleFull(event, open_text, close_text) {
-        // eslint-disable-next-line camelcase
+        /* eslint-disable-next-line camelcase, no-var */
         var $el, new_text, parent;
 
         event.preventDefault();

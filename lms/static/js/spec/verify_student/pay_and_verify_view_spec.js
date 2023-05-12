@@ -4,6 +4,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
         'use strict';
 
         describe('edx.verify_student.PayAndVerifyView', function() {
+            // eslint-disable-next-line no-var
             var TEMPLATES = [
                 'enrollment_confirmation_step',
                 'error',
@@ -16,11 +17,13 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 'image_input'
             ];
 
+            // eslint-disable-next-line no-var
             var INTRO_STEP = {
                 name: 'intro-step',
                 title: 'Intro'
             };
 
+            // eslint-disable-next-line no-var
             var DISPLAY_STEPS_FOR_PAYMENT = [
                 {
                     name: 'make-payment-step',
@@ -28,6 +31,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 }
             ];
 
+            // eslint-disable-next-line no-var
             var DISPLAY_STEPS_FOR_VERIFICATION = [
                 {
                     name: 'face-photo-step',
@@ -47,6 +51,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 }
             ];
 
+            // eslint-disable-next-line no-var
             var createView = function(displaySteps, currentStep) {
                 return new PayAndVerifyView({
                     displaySteps: displaySteps,
@@ -56,6 +61,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 }).render();
             };
 
+            // eslint-disable-next-line no-var
             var expectStepRendered = function(stepName) {
                 // Expect that the step container div rendered
                 expect($('.' + stepName).length > 0).toBe(true);
@@ -75,6 +81,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
 
             it('renders payment and verification steps', function() {
                 // Create the view, starting on the first step
+                // eslint-disable-next-line no-var
                 var view = createView(
                     DISPLAY_STEPS_FOR_PAYMENT.concat(DISPLAY_STEPS_FOR_VERIFICATION),
                     'make-payment-step'
@@ -102,6 +109,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
             });
 
             it('renders intro and verification steps', function() {
+                // eslint-disable-next-line no-var
                 var view = createView(
                     [INTRO_STEP].concat(DISPLAY_STEPS_FOR_VERIFICATION),
                     'intro-step'
@@ -126,6 +134,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
 
             it('jumps to a particular step', function() {
                 // Start on the review photos step
+                // eslint-disable-next-line no-var
                 var view = createView(
                     DISPLAY_STEPS_FOR_VERIFICATION,
                     'review-photos-step'

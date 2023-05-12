@@ -4,6 +4,7 @@
         ['video/00_video_storage.js'],
         function(VideoStorage) {
             describe('VideoStorage', function() {
+                // eslint-disable-next-line no-var
                 var namespace = 'test_storage',
                     id = 'video_id';
 
@@ -13,7 +14,7 @@
 
                 describe('initialize', function() {
                     it('with namespace and id', function() {
-                        // eslint-disable-next-line no-unused-vars
+                        /* eslint-disable-next-line no-unused-vars, no-var */
                         var storage = VideoStorage(namespace, id);
 
                         expect(window[namespace]).toBeDefined();
@@ -23,7 +24,7 @@
                     it('without namespace and id', function() {
                         // eslint-disable-next-line no-undef
                         spyOn(Number.prototype, 'toString').and.returnValue('0.abcdedg');
-                        // eslint-disable-next-line no-unused-vars
+                        /* eslint-disable-next-line no-unused-vars, no-var */
                         var storage = VideoStorage();
 
                         expect(window.VideoStorage).toBeDefined();
@@ -32,6 +33,7 @@
                 });
 
                 describe('methods: ', function() {
+                    // eslint-disable-next-line no-var
                     var data, storage;
 
                     beforeEach(function() {
@@ -47,6 +49,7 @@
                     });
 
                     it('setItem', function() {
+                        // eslint-disable-next-line no-var
                         var expected = $.extend(true, {}, data, {item_4: 'value_4'});
 
                         expected[id].item_3 = 'value_3';
@@ -56,7 +59,7 @@
                     });
 
                     it('getItem', function() {
-                        // eslint-disable-next-line no-shadow
+                        /* eslint-disable-next-line no-shadow, no-var */
                         var data = window[namespace],
                             getItem = storage.getItem;
 
@@ -66,7 +69,7 @@
                     });
 
                     it('removeItem', function() {
-                        // eslint-disable-next-line no-shadow
+                        /* eslint-disable-next-line no-shadow, no-var */
                         var data = window[namespace],
                             removeItem = storage.removeItem;
 
@@ -77,6 +80,7 @@
                     });
 
                     it('clear', function() {
+                        // eslint-disable-next-line no-var
                         var expected = {};
 
                         expected[id] = {};

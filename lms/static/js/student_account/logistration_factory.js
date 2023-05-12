@@ -7,6 +7,7 @@
     ],
     function($, AccessView) {
         return function(options) {
+            // eslint-disable-next-line no-var
             var $logistrationElement = $('#login-and-registration-container');
 
             /* eslint-disable-next-line no-new, no-undef */

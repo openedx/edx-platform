@@ -2,12 +2,16 @@
     'use strict';
 
     function StructuredTagsView(runtime, element) {
+        // eslint-disable-next-line no-var
         var $element = $(element);
+        // eslint-disable-next-line no-var
         var saveTagsInProgress = false;
         // we need studio runtime to get handler capable of saving xblock data
+        // eslint-disable-next-line no-var
         var studioRuntime = new window.StudioRuntime.v1();
 
         $($element).find('.save_tags').click(function(e) {
+            // eslint-disable-next-line no-var
             var dataToPost = {};
             if (!saveTagsInProgress) {
                 saveTagsInProgress = true;

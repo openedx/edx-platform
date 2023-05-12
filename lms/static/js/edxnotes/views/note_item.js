@@ -6,6 +6,7 @@
         'jquery', 'underscore', 'backbone', 'js/edxnotes/utils/template',
         'js/edxnotes/utils/logger', 'edx-ui-toolkit/js/utils/html-utils'
     ], function($, _, Backbone, templateUtils, NotesLogger, HtmlUtils) {
+        // eslint-disable-next-line no-var
         var NoteItemView = Backbone.View.extend({
             tagName: 'article',
             className: 'note',
@@ -26,6 +27,7 @@
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var context = this.getContext();
                 this.$el.html(HtmlUtils.HTML(this.template(context)).toString());
                 return this;
@@ -38,6 +40,7 @@
             },
 
             toggleNote: function() {
+                // eslint-disable-next-line no-var
                 var value = !this.model.get('is_expanded');
                 this.model.set('is_expanded', value);
             },
@@ -48,6 +51,7 @@
             },
 
             unitLinkHandler: function(event) {
+                // eslint-disable-next-line no-var
                 var REQUEST_TIMEOUT = 2000;
                 event.preventDefault();
                 this.logger.emit('edx.course.student_notes.used_unit_link', {

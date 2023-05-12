@@ -33,6 +33,7 @@ define([
         });
 
         it('can return appropriate `quote`', function() {
+            // eslint-disable-next-line no-var
             var model = this.collection.at(0);
 
             // is_expanded = false, show_link = true
@@ -47,6 +48,7 @@ define([
         });
 
         it('can return appropriate `text`', function() {
+            // eslint-disable-next-line no-var
             var model = this.collection.at(0);
             expect(model.get('text')).toBe('text\n with\r\nline\n\rbreaks \r');
         });

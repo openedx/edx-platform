@@ -9,6 +9,7 @@ define([
     'use strict';
 
     describe('EdxNotes CourseStructureView', function() {
+        // eslint-disable-next-line no-var
         var notes = Helpers.getDefaultNotes(),
             getView, getText;
 
@@ -19,6 +20,7 @@ define([
         };
 
         getView = function(collection, tabsCollection, options) {
+            // eslint-disable-next-line no-var
             var view;
 
             options = _.defaults(options || {}, {
@@ -44,6 +46,7 @@ define([
         });
 
         it('displays a tab and content with proper data and order', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.collection, this.tabsCollection),
                 chapters = getText('.course-title'),
                 sections = getText('.course-subtitle'),

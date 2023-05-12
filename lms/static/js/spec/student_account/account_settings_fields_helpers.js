@@ -9,7 +9,9 @@ define(['backbone',
 function(Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViewsSpecHelpers) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var verifyAuthField = function(view, data, requests) {
+        // eslint-disable-next-line no-var
         var selector = '.u-field-value .u-field-link-title-' + view.options.valueAttribute;
 
         // eslint-disable-next-line no-undef

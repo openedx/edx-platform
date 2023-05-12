@@ -9,6 +9,7 @@ define([
     'use strict';
 
     describe('TeamDiscussionView', function() {
+        // eslint-disable-next-line no-var
         var discussionView, createDiscussionView;
 
         beforeEach(function() {
@@ -41,12 +42,14 @@ define([
         };
 
         it('can render itself', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 view = createDiscussionView(requests);
             expect(view.$('.forum-nav-thread-list .forum-nav-thread').length).toEqual(3);
         });
 
         it('cannot see discussion when user is not part of the team and discussion is set to be private', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this),
                 errorMessage = 'Access to this thread is restricted to team members and staff.',
                 view = createDiscussionView(

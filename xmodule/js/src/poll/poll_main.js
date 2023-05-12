@@ -5,6 +5,7 @@
 
             // eslint-disable-next-line camelcase
             showAnswerGraph: function(poll_answers, total) {
+                // eslint-disable-next-line no-var
                 var _this, totalValue;
 
                 totalValue = parseFloat(total);
@@ -15,6 +16,7 @@
                 _this = this;
 
                 $.each(poll_answers, function(index, value) {
+                    // eslint-disable-next-line no-var
                     var numValue, percentValue;
 
                     numValue = parseFloat(value);
@@ -34,6 +36,7 @@
             },
 
             submitAnswer: function(answer, answerObj) {
+                // eslint-disable-next-line no-var
                 var _this;
 
                 // Make sure that the user can answer a question only once.
@@ -77,6 +80,7 @@
             }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
             submitReset: function() {
+                // eslint-disable-next-line no-var
                 var _this;
 
                 _this = this;
@@ -121,6 +125,7 @@
             }, // End-of: 'submitAnswer': function (answer, answerEl) {
 
             postInit: function() {
+                // eslint-disable-next-line no-var
                 var _this;
 
                 // Access this object inside inner functions.
@@ -162,6 +167,7 @@
                 });
 
                 $.each(this.jsonConfig.answers, function(index, value) {
+                    // eslint-disable-next-line no-var
                     var answer;
 
                     answer = {};
@@ -249,6 +255,7 @@
         return PollMain;
 
         function PollMain(el, runtime) {
+            // eslint-disable-next-line no-var
             var _this;
 
             this.runtime = runtime;

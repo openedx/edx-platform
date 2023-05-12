@@ -10,6 +10,7 @@ import 'xmodule/js/src/xmodule'; // Force the XBlockToXModuleShim to load for St
 'use strict';
 export default function EditTabsFactory(courseLocation, explicitUrl) {
     xmoduleLoader.done(function() {
+        // eslint-disable-next-line no-var
         var model = new TabsModel({
                 id: courseLocation,
                 explicit_url: explicitUrl

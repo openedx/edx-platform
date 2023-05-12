@@ -10,6 +10,7 @@
         'edx-ui-toolkit/js/utils/html-utils',
         'text!templates/student_account/account_settings_section.underscore'
     ], function(gettext, $, _, Backbone, HtmlUtils, sectionTemplate) {
+        // eslint-disable-next-line no-var
         var AccountSectionView = Backbone.View.extend({
 
             initialize: function(options) {
@@ -32,6 +33,7 @@
             },
 
             renderFields: function() {
+                // eslint-disable-next-line no-var
                 var view = this;
 
                 _.each(view.$('.' + view.options.tabName + '-section-body'), function(sectionEl, index) {

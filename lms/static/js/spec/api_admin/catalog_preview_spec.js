@@ -8,6 +8,7 @@ define([
     'use strict';
 
     describe('Catalog preview view', function() {
+        // eslint-disable-next-line no-var
         var view,
             previewUrl = 'http://example.com/api-admin/catalogs/preview/',
             catalogApiUrl = 'http://api.example.com/catalog/v1/courses/';
@@ -32,6 +33,7 @@ define([
         });
 
         it('can retrieve a list of catalogs and display them', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             view.$('#id_query').val('*');
             view.$('.preview-query').click();
@@ -47,6 +49,7 @@ define([
         });
 
         it('displays an error when courses cannot be retrieved', function() {
+            // eslint-disable-next-line no-var
             var requests = AjaxHelpers.requests(this);
             view.$('#id_query').val('*');
             view.$('.preview-query').click();

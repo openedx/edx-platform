@@ -5,6 +5,7 @@ define([
     'use strict';
 
     return function(XBlockOutlineInfoJson, initialStateJson) {
+        // eslint-disable-next-line no-var
         var courseXBlock = new XBlockOutlineInfo(XBlockOutlineInfoJson, {parse: true}),
             view = new CourseOutlinePage({
                 el: $('#content'),

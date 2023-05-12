@@ -4,6 +4,7 @@
 (function(requirejs, requireSerial) {
     'use strict';
 
+    // eslint-disable-next-line no-var
     var i, specHelpers, testFiles;
     if (window) {
         // eslint-disable-next-line no-undef

@@ -8,8 +8,11 @@
     'use strict';
 
     define([], function() {
+        // eslint-disable-next-line no-var
         var trackUpsellClick = function(elt, linkName, optionalAttrs) {
+            // eslint-disable-next-line no-var
             var eventAttrs = {linkName: linkName};
+            // eslint-disable-next-line no-var
             var allowedAttrs = ['linkType', 'pageName', 'linkCategory'];
 
             if (!window.analytics || !window.analytics.trackLink) {
@@ -29,6 +32,7 @@
             window.analytics.trackLink(elt, 'edx.bi.ecommerce.upsell_links_clicked', eventAttrs);
         };
 
+        // eslint-disable-next-line no-var
         var TrackECommerceEvents = {trackUpsellClick: trackUpsellClick};
 
         return TrackECommerceEvents;

@@ -3,6 +3,7 @@
 
     this.XBlock.Runtime.v1 = (function() {
         function v1() {
+            // eslint-disable-next-line no-var
             var block = this;
             this.childMap = function() {
                 return v1.prototype.childMap.apply(block, arguments);
@@ -17,6 +18,7 @@
         };
 
         v1.prototype.childMap = function(block, childName) {
+            // eslint-disable-next-line no-var
             var child, idx, len, ref;
             ref = this.children(block);
             for (idx = 0, len = ref.length; idx < len; idx++) {

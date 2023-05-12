@@ -5,6 +5,7 @@ define([
     'use strict';
 
     return function(detailsUrl, showMinGradeWarning, showCertificateAvailableDate, upgradeDeadline, useV2CertDisplaySettings) {
+        // eslint-disable-next-line no-var
         var model;
         // highlighting labels when fields are focused in
         $('form :input')
@@ -29,6 +30,7 @@ define([
         model.fetch({
             // eslint-disable-next-line no-shadow
             success: function(model) {
+                // eslint-disable-next-line no-var
                 var editor = new MainView({
                     el: $('.settings-details'),
                     model: model,

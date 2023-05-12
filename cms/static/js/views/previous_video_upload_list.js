@@ -5,6 +5,7 @@ define(
     function($, _, Backbone, BaseView, HtmlUtils, PreviousVideoUploadView, previousVideoUploadListTemplate) {
         'use strict';
 
+        // eslint-disable-next-line no-var
         var PreviousVideoUploadListView = BaseView.extend({
             tagName: 'section',
             className: 'wrapper-assets',
@@ -28,6 +29,7 @@ define(
             },
 
             render: function() {
+                // eslint-disable-next-line no-var
                 var $el = this.$el,
                     $tabBody;
 

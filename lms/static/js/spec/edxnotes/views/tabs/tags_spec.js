@@ -9,6 +9,7 @@ define([
     'use strict';
 
     describe('EdxNotes TagsView', function() {
+        // eslint-disable-next-line no-var
         var notes = Helpers.getDefaultNotes(),
             getView, getText, getNoteText;
 
@@ -23,6 +24,7 @@ define([
         };
 
         getView = function(collection, tabsCollection, options) {
+            // eslint-disable-next-line no-var
             var view;
 
             options = _.defaults(options || {}, {
@@ -48,6 +50,7 @@ define([
         });
 
         it('displays a tab and content properly ordered by tag', function() {
+            // eslint-disable-next-line no-var
             var view = getView(this.collection, this.tabsCollection),
                 tags = getText('.tags-title'),
                 pumpkinNotes = getNoteText(0),

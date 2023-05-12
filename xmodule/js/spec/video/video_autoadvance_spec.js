@@ -2,6 +2,7 @@
     'use strict';
 
     describe('VideoAutoAdvance', function() {
+        // eslint-disable-next-line no-var
         var state, oldOTBD;
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
@@ -29,10 +30,12 @@
                 appendLoadFixtures('sequence.html');
             });
             it('no auto-advance button is shown', function() {
+                // eslint-disable-next-line no-var
                 var $button = $('.control.auto-advance');
                 expect($button).not.toExist();
             });
             it('when video ends, it will not auto-advance to next unit', function() {
+                // eslint-disable-next-line no-var
                 var $nextButton = $('.sequence-nav-button.button-next').first();
                 expect($nextButton).toExist();
 
@@ -56,16 +59,19 @@
                     appendLoadFixtures('sequence.html');
                 });
                 it('an active auto-advance button is shown', function() {
+                    // eslint-disable-next-line no-var
                     var $button = $('.control.auto-advance');
                     expect($button).toExist();
                     expect($button).toHaveClass('active');
                 });
                 it('when button is clicked, it will deactivate auto-advance', function() {
+                    // eslint-disable-next-line no-var
                     var $button = $('.control.auto-advance');
                     $button.click();
                     expect($button).not.toHaveClass('active');
                 });
                 it('when video ends, it will auto-advance to next unit', function() {
+                    // eslint-disable-next-line no-var
                     var $nextButton = $('.sequence-nav-button.button-next').first();
                     expect($nextButton).toExist();
 
@@ -89,16 +95,19 @@
                     appendLoadFixtures('sequence.html');
                 });
                 it('an inactive auto-advance button is shown', function() {
+                    // eslint-disable-next-line no-var
                     var $button = $('.control.auto-advance');
                     expect($button).toExist();
                     expect($button).not.toHaveClass('active');
                 });
                 it('when the button is clicked, it will activate auto-advance', function() {
+                    // eslint-disable-next-line no-var
                     var $button = $('.control.auto-advance');
                     $button.click();
                     expect($button).toHaveClass('active');
                 });
                 it('when video ends, it will not auto-advance to next unit', function() {
+                    // eslint-disable-next-line no-var
                     var $nextButton = $('.sequence-nav-button.button-next').first();
                     expect($nextButton).toExist();
 

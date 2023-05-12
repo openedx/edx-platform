@@ -11,6 +11,7 @@ mind, or whether to act, and in acting, to live."
         'video/06_video_progress_slider.js',
         [],
         function() {
+            // eslint-disable-next-line no-var
             var template = [
                 '<div class="slider" role="application" title="',
                 gettext('Video position. Press space to toggle playback'),
@@ -19,6 +20,7 @@ mind, or whether to act, and in acting, to live."
 
             // VideoProgressSlider() function - what this module "exports".
             return function(state) {
+                // eslint-disable-next-line no-var
                 var dfd = $.Deferred();
 
                 state.videoProgressSlider = {};
@@ -42,6 +44,7 @@ mind, or whether to act, and in acting, to live."
 
             /* eslint-disable no-use-before-define */
             function _makeFunctionsPublic(state) {
+                // eslint-disable-next-line no-var
                 var methodsDict = {
                     destroy: destroy,
                     buildSlider: buildSlider,
@@ -120,6 +123,7 @@ mind, or whether to act, and in acting, to live."
             // ***************************************************************
 
             function buildSlider() {
+                // eslint-disable-next-line no-var
                 var sliderContents = edx.HtmlUtils.joinHtml(
                     edx.HtmlUtils.HTML('<div class="ui-slider-handle progress-handle"></div>')
                 );
@@ -146,6 +150,7 @@ mind, or whether to act, and in acting, to live."
             // whole slider). Remember that endTime === null means the end-time
             // is set to the end of video by default.
             function updateStartEndTimeRegion(params) {
+                // eslint-disable-next-line no-var
                 var start, end, duration, rangeParams;
 
                 // We must have a duration in order to determine the area of range.
@@ -190,6 +195,7 @@ mind, or whether to act, and in acting, to live."
             }
 
             function getRangeParams(startTime, endTime, duration) {
+                // eslint-disable-next-line no-var
                 var step = 100 / duration,
                     left = startTime * step,
                     width = endTime * step - left;
@@ -201,6 +207,7 @@ mind, or whether to act, and in acting, to live."
             }
 
             function onSlide(event, ui) {
+                // eslint-disable-next-line no-var
                 var time = ui.value,
                     endTime = this.videoPlayer.duration();
 
@@ -235,6 +242,7 @@ mind, or whether to act, and in acting, to live."
             }
 
             function onStop(event, ui) {
+                // eslint-disable-next-line no-var
                 var _this = this;
 
                 this.videoProgressSlider.frozen = true;
@@ -262,10 +270,12 @@ mind, or whether to act, and in acting, to live."
             }
 
             function updatePlayTime(params) {
+                // eslint-disable-next-line no-var
                 var time = Math.floor(params.time);
                 // params.duration could accidentally be construed as a floating
                 // point double. Since we're displaying this number, round down
                 // to nearest second
+                // eslint-disable-next-line no-var
                 var endTime = Math.floor(params.duration);
 
                 if (this.config.endTime !== null) {
@@ -319,10 +329,12 @@ mind, or whether to act, and in acting, to live."
             // Returns a string describing the current time of video in
             // `%d hours %d minutes %d seconds` format.
             function getTimeDescription(time) {
+                // eslint-disable-next-line no-var
                 var seconds = Math.floor(time),
                     minutes = Math.floor(seconds / 60),
                     hours = Math.floor(minutes / 60),
                     i18n = function(value, word) {
+                        // eslint-disable-next-line no-var
                         var msg;
 
                         // eslint-disable-next-line default-case

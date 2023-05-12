@@ -3,6 +3,7 @@
     'use strict';
 
     describe('DiscussionThreadProfileView', function() {
+        // eslint-disable-next-line no-var
         var checkBody, checkPostWithImages, makeThread, makeView, spyConvertMath;
         beforeEach(function() {
             DiscussionSpecHelper.setUpGlobals();
@@ -21,6 +22,7 @@
             this.imageTag = '<img src="https://www.google.com.pk/images/srpr/logo11w.png">';
         });
         makeView = function(thread) {
+            // eslint-disable-next-line no-var
             var view;
             view = new DiscussionThreadProfileView({
                 model: thread
@@ -29,6 +31,7 @@
             return view;
         };
         makeThread = function(threadData) {
+            // eslint-disable-next-line no-var
             var thread;
             thread = new Thread(threadData);
             thread.discussion = new Discussion();
@@ -41,6 +44,7 @@
             });
         };
         checkPostWithImages = function(numberOfImages, truncatedText, threadData, imageTag) {
+            // eslint-disable-next-line no-var
             var expectedHtml, expectedText, i, testText, view, _i, _ref;
             expectedHtml = '<p>';
             threadData.body = '<p>';
@@ -79,6 +83,7 @@
             return expect(view.$el.find('.post-body').html()).toEqual(expectedHtml);
         };
         checkBody = function(truncated, view, threadData) {
+            // eslint-disable-next-line no-var
             var expectedOutput, inputHtmlStripped, outputHtmlStripped;
             view.render();
             if (!truncated) {
@@ -97,26 +102,31 @@
             }
         };
         describe('Body markdown should be correct', function() {
+            // eslint-disable-next-line no-var
             var numImages, truncatedText, _i, _j, _len, _len1, _ref, _ref1;
             it('untruncated text without markdown body', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 this.threadData.body = 'Test body';
                 view = makeView(makeThread(this.threadData));
                 return checkBody(false, view, this.threadData);
             });
             it('truncated text without markdown body', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 this.threadData.body = new Array(100).join('test ');
                 view = makeView(makeThread(this.threadData));
                 return checkBody(true, view, this.threadData);
             });
             it('untruncated text with markdown body', function() {
+                // eslint-disable-next-line no-var
                 var view;
                 this.threadData.body = '<p>' + this.imageTag + '<em>Google top search engine</em></p>';
                 view = makeView(makeThread(this.threadData));
                 return checkBody(false, view, this.threadData);
             });
             it('truncated text with markdown body', function() {
+                // eslint-disable-next-line no-var
                 var testText, view;
                 testText = new Array(100).join('test ');
                 this.threadData.body = '<p>' + this.imageTag + this.imageTag + '<em>' + testText + '</em></p>';
@@ -142,6 +152,7 @@
                 }
             }
             it('check the thread retrieve url', function() {
+                // eslint-disable-next-line no-var
                 var thread;
                 thread = makeThread(this.threadData);
                 return expect(thread.urlFor('retrieve'))

@@ -9,6 +9,7 @@
         'text!templates/fields/message_banner.underscore',
         'edx-ui-toolkit/js/utils/html-utils'
     ], function(gettext, $, _, Backbone, messageBannerTemplate, HtmlUtils) {
+        // eslint-disable-next-line no-var
         var MessageBannerView = Backbone.View.extend({
 
             events: {

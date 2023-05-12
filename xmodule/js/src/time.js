@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-shadow
 function format(time, formatFull) {
+    // eslint-disable-next-line no-var
     var hours, minutes, seconds;
 
     // eslint-disable-next-line no-undef

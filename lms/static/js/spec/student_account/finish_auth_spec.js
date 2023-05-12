@@ -14,12 +14,13 @@
     function($, url, utility, AjaxHelpers, FinishAuthView, EnrollmentInterface, ShoppingCartInterface,
         EmailOptInInterface) {
         describe('FinishAuthView', function() {
-            // eslint-disable-next-line no-unused-vars
+            /* eslint-disable-next-line no-unused-vars, no-var */
             var requests = null,
                 view = null,
                 FORWARD_URL = '/courseware/next',
                 COURSE_KEY = 'course-v1:edX+test+15';
 
+            // eslint-disable-next-line no-var
             var ajaxSpyAndInitialize = function(that) {
                 // Spy on AJAX requests
                 requests = AjaxHelpers.requests(that);
@@ -49,6 +50,7 @@
              * @param {object} params Parameters to set, each of which
              * should be prefixed with '?'
              */
+            // eslint-disable-next-line no-var
             var setFakeQueryParams = function(params) {
                 /* eslint-disable-next-line consistent-return, no-undef */
                 spyOn($, 'url').and.callFake(function(requestedParam) {

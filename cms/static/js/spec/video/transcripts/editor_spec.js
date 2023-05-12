@@ -9,6 +9,7 @@ define(
     // eslint-disable-next-line no-unused-vars
     function($, Backbone, _, Utils, Editor, MetadataView, MetadataModel, MetadataCollection, _str) {
         describe('Transcripts.Editor', function() {
+            // eslint-disable-next-line no-var
             var VideoListEntry = {
                     default_value: ['a thing', 'another thing'],
                     display_name: 'Video URL',
@@ -58,16 +59,18 @@ define(
                 // eslint-disable-next-line no-unused-vars
                 transcripts, $container, waitForEvent, editor;
 
+            // eslint-disable-next-line no-var
             var waitsForDisplayName = function(collection) {
                 // eslint-disable-next-line no-undef
                 return jasmine.waitUntil(function() {
+                    // eslint-disable-next-line no-var
                     var displayNameValue = collection[0].getValue();
                     return displayNameValue !== '' && displayNameValue !== 'video_id';
                 });
             };
 
             beforeEach(function() {
-                // eslint-disable-next-line no-undef
+                /* eslint-disable-next-line no-undef, no-var */
                 var tpl = sandbox({
                     class: 'wrapper-comp-settings basic_metadata_edit',
                     'data-metadata': JSON.stringify(metadataDict.object)
@@ -132,6 +135,7 @@ define(
                 });
 
                 waitForEvent = function(eventName) {
+                    // eslint-disable-next-line no-var
                     var triggerCallArgs;
                     // eslint-disable-next-line no-undef
                     return jasmine.waitUntil(function() {
@@ -147,6 +151,7 @@ define(
                 });
 
                 it('handles transcripts:basicTabFieldChanged', function(done) {
+                    // eslint-disable-next-line no-var
                     var event = 'transcripts:basicTabFieldChanged';
 
                     Backbone.trigger(event);
@@ -167,6 +172,7 @@ define(
                 });
 
                 it('handles xblock:editorModalHidden', function(done) {
+                    // eslint-disable-next-line no-var
                     var event = 'xblock:editorModalHidden';
 
                     Backbone.trigger(event);
@@ -209,6 +215,7 @@ define(
             });
 
             describe('Test synchronization', function() {
+                // eslint-disable-next-line no-var
                 var nameEntry = {
                         default_value: 'default value',
                         display_name: 'Display Name',
@@ -302,10 +309,12 @@ define(
                 describe('Test Advanced to Basic synchronization', function() {
                     it('Correct data', function(done) {
                         transcripts.syncBasicTab(metadataCollection, metadataView);
+                        // eslint-disable-next-line no-var
                         var collection = transcripts.collection.models;
 
                         waitsForDisplayName(collection)
                             .then(function() {
+                                // eslint-disable-next-line no-var
                                 var displayNameValue, videoUrlValue, videoIDValue;
 
                                 displayNameValue = transcripts.collection.findWhere({
@@ -331,6 +340,7 @@ define(
                     });
 
                     it('If metadataCollection is not defined', function() {
+                        // eslint-disable-next-line no-var
                         var videoUrlValue, videoIDValue;
 
                         transcripts.syncBasicTab(null);
@@ -352,6 +362,7 @@ define(
                     });
 
                     it('Youtube Id has length not eqaul 11', function() {
+                        // eslint-disable-next-line no-var
                         var model, videoUrlValue;
 
                         model = metadataCollection.findWhere({
@@ -382,9 +393,11 @@ define(
                     it('Correct data', function(done) {
                         transcripts.syncAdvancedTab(metadataCollection);
 
+                        // eslint-disable-next-line no-var
                         var collection = metadataCollection.models;
                         waitsForDisplayName(collection)
                             .then(function() {
+                                // eslint-disable-next-line no-var
                                 var displayNameValue, subValue, html5SourcesValue, youtubeValue, videoIDValue;
 
                                 displayNameValue = metadataCollection.findWhere({
@@ -419,6 +432,7 @@ define(
                     });
 
                     it('metadataCollection is not defined', function() {
+                        // eslint-disable-next-line no-var
                         var displayNameValue, subValue, html5SourcesValue, youtubeValue, videoIDValue;
 
                         transcripts.syncAdvancedTab(null);
@@ -453,6 +467,7 @@ define(
                     });
 
                     it('Youtube Id is not adjusted', function() {
+                        // eslint-disable-next-line no-var
                         var model, html5SourcesValue, youtubeValue;
 
                         model = transcripts.collection.findWhere({

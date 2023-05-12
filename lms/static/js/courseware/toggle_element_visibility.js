@@ -5,10 +5,12 @@
         function($, Logger, moment) {
             return function() {
                 // define variables for code legibility
+                // eslint-disable-next-line no-var
                 var $toggleActionElements = $('.toggle-visibility-button');
 
+                // eslint-disable-next-line no-var
                 var updateToggleActionText = function(elementIsHidden, actionElement) {
-                    // eslint-disable-next-line camelcase
+                    /* eslint-disable-next-line camelcase, no-var */
                     var show_text = actionElement.data('show'),
                         // eslint-disable-next-line camelcase
                         hide_text = actionElement.data('hide'),
@@ -35,6 +37,7 @@
                 };
 
                 $.each($toggleActionElements, function(i, elem) {
+                    // eslint-disable-next-line no-var
                     var $toggleActionElement = $(elem),
                         toggleTargetElement = $toggleActionElement.siblings('.toggle-visibility-element'),
                         elementIsHidden = toggleTargetElement.is(':visible'),
