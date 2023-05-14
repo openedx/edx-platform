@@ -1882,7 +1882,6 @@
     "The language that team members primarily use to communicate with each other.": "La langue principalement utilis\u00e9e par les membres de l'\u00e9quipe pour communiquer entre eux.",
     "The language used throughout this site. This site is currently available in a limited number of languages. Changing the value of this field will cause the page to refresh.": "La langue employ\u00e9e sur ce site. Ce site est disponible uniquement dans certaines langues. Si vous modifiez ce champ, cela provoquera automatiquement une actualisation de la page.",
     "The maximum number files that can be saved is ": "Le nombre maximum de fichiers pouvant \u00eatre enregistr\u00e9s est",
-    "The maximum number of weeks this subsection can be due in is 18 weeks from the learner enrollment date.": "Le nombre maximum de semaines dans lesquelles cette sous-section peut \u00eatre due est de 18 semaines \u00e0 compter de la date d'inscription de l'apprenant.",
     "The minimum completion percentage must be a whole number between 0 and 100.": "Le pourcentage minimum d'ach\u00e8vement doit \u00eatre un nombre entier entre 0 et 100.",
     "The minimum grade for course credit is not set.": "La note minimale d'obtention d'un cr\u00e9dit pour ce cours n'est pas fix\u00e9e.",
     "The minimum number of weeks this subsection can be due in is 1 week from the learner enrollment date.": "Le nombre minimum de semaines dans lesquelles cette sous-section peut \u00eatre due est de 1 semaine \u00e0 compter de la date d'inscription de l'apprenant.",

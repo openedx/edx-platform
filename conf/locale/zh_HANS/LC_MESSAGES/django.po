@@ -433,6 +433,7 @@ msgid "Discussion"
 msgstr "讨论"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr "问题"
@@ -442,6 +443,10 @@ msgstr "问题"
 #: lms/templates/video.html
 msgid "Video"
 msgstr "视频"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "空白进阶问题"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -9285,10 +9290,6 @@ msgid "Invalid JSON response received from codejail api service."
 msgstr ""
 
 #: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "空白进阶问题"
-
-#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "学生尝试解答这个问题的次数"
 
@@ -10513,6 +10514,17 @@ msgstr ""
 "（允许访问课程概述）和 “public”（允许访问概述和课程内容）。"
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "授课老师"
 
@@ -11472,6 +11484,12 @@ msgstr "为该单元启用上下文讨论"
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
 msgstr "添加对该单元的讨论。"
+
+#: xmodule/video_block/sharing_sites.py
+msgid ""
+"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"\n"
+msgstr ""
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
@@ -13784,6 +13802,14 @@ msgstr "下一页"
 msgid "Paste Component"
 msgstr ""
 
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "追踪记录"
@@ -13901,21 +13927,9 @@ msgstr "下载的文件及字幕"
 msgid "Share on:"
 msgstr ""
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "分享到Twitter"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/video.html
-msgid "Share on Facebook"
-msgstr "分享到Facebook"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-#: lms/templates/video.html
-msgid "Share on LinkedIn"
-msgstr "分享到领英"
+msgid "Share on {site}"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -15015,6 +15029,11 @@ msgid "Post on Facebook"
 msgstr "发布到Facebook"
 
 #: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "分享到Twitter"
+
+#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "推特该项成就。弹出窗口。"
 
@@ -15937,6 +15956,10 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "将证书添加到LinkedIn的个人资料"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Share on LinkedIn"
+msgstr "分享到领英"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr ""
 
@@ -16011,6 +16034,10 @@ msgstr "我正在{facebook_brand}学习网络课程{course_name}，了解一下�
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "分享{course_name}至Facebook"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Facebook"
+msgstr "分享到Facebook"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
