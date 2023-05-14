@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-07 20:35+0000\n"
-"PO-Revision-Date: 2023-05-07 20:35:59.240148\n"
+"POT-Creation-Date: 2023-05-14 20:35+0000\n"
+"PO-Revision-Date: 2023-05-14 20:35:52.019284\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -8483,6 +8483,7 @@ msgstr "Vɐlᴉd"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Certificate Status:"
 msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝ Sʇɐʇns:"
 
@@ -8662,6 +8663,11 @@ msgstr "Ɏønɹ Ᵽɹøƃɹɐɯ Ɉønɹnǝʎ"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Restart my subscription"
+msgstr "Ɍǝsʇɐɹʇ ɯʎ snbsɔɹᴉdʇᴉøn"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Upgrade All Remaining Courses ("
 msgstr "Ʉdƃɹɐdǝ Ⱥll Ɍǝɯɐᴉnᴉnƃ Ȼønɹsǝs ("
 
@@ -8703,16 +8709,25 @@ msgstr ""
 "Ȼøɯdlǝʇǝ ɔønɹsǝs øn ʎønɹ sɔɥǝdnlǝ ʇø ǝnsnɹǝ ʎøn sʇɐnd ønʇ ᴉn ʎønɹ ɟᴉǝld!"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Subscribed"
+msgstr "Snbsɔɹᴉbǝd"
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
 msgstr "{organization}\\'s løƃø"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Needs verified certificate "
 msgstr "Nǝǝds ʌǝɹᴉɟᴉǝd ɔǝɹʇᴉɟᴉɔɐʇǝ "
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade to Verified"
 msgstr "Ʉdƃɹɐdǝ ʇø Vǝɹᴉɟᴉǝd"
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Upgrade with a subscription"
+msgstr "Ʉdƃɹɐdǝ ʍᴉʇɥ ɐ snbsɔɹᴉdʇᴉøn"
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"

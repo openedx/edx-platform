@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-07 20:35+0000\n"
-"PO-Revision-Date: 2023-05-07 20:35:59.234017\n"
+"POT-Creation-Date: 2023-05-14 20:35+0000\n"
+"PO-Revision-Date: 2023-05-14 20:35:51.943642\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -3910,10 +3910,6 @@ msgstr "Łɐnƃnɐƃǝ"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
 msgstr "Łøɔɐʇᴉøn"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "Ƀᴉɹʇɥ Ɏǝɐɹ"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
