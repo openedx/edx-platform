@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-07 20:35+0000\n"
-"PO-Revision-Date: 2023-05-07 20:35:59.234017\n"
+"POT-Creation-Date: 2023-05-14 20:35+0000\n"
+"PO-Revision-Date: 2023-05-14 20:35:51.943642\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -3509,10 +3509,6 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#

@@ -163,6 +163,7 @@ msgid "Discussion"
 msgstr "گفتگو"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr "مساله"
@@ -172,6 +173,10 @@ msgstr "مساله"
 #: lms/templates/video.html
 msgid "Video"
 msgstr "ویدیو"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "مساله پیشرفته خالی"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -9787,10 +9792,6 @@ msgid "Invalid JSON response received from codejail api service."
 msgstr "پاسخ نامعتبر از سوی خدمات codejail api دریافت شد."
 
 #: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "مساله پیشرفته خالی"
-
-#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "تعداد دفعات تلاش یادگیرنده در حل این مساله"
 
@@ -11195,6 +11196,17 @@ msgstr ""
 "آموزشی)."
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "مربی دوره آموزشی"
 
@@ -12283,6 +12295,12 @@ msgstr "گفتگوهای درون‌متنی را برای این واحد فع�
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
 msgstr "افزودن گفتگو برای این بخش."
+
+#: xmodule/video_block/sharing_sites.py
+msgid ""
+"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"\n"
+msgstr ""
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
@@ -14736,6 +14754,14 @@ msgstr "صفحه بعدی"
 msgid "Paste Component"
 msgstr ""
 
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "رهگیری ورود"
@@ -14862,21 +14888,9 @@ msgstr "بارگیری‌ها و زیرنویس‌ها"
 msgid "Share on:"
 msgstr ""
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "اشتراک‌گذاری در تویتر"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/video.html
-msgid "Share on Facebook"
-msgstr "اشتراک‌گذاری در فیسبوک"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-#: lms/templates/video.html
-msgid "Share on LinkedIn"
-msgstr "اشتراک‌گذاری در لینکداین"
+msgid "Share on {site}"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -16204,6 +16218,11 @@ msgid "Post on Facebook"
 msgstr "انتشار در فیس‌بوک"
 
 #: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "اشتراک‌گذاری در تویتر"
+
+#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "این موفقیت را توئیت کنید. پنجرۀ کوچک."
 
@@ -17230,6 +17249,10 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "افزودن گواهی به لینکداین این پرونده کاربری"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Share on LinkedIn"
+msgstr "اشتراک‌گذاری در لینکداین"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr "شما هنوز واجد شرایط دریافت گواهی نیستید."
 
@@ -17307,6 +17330,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "اشتراک‌گذاری {course_name} در فیس‌بوک"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Facebook"
+msgstr "اشتراک‌گذاری در فیسبوک"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"

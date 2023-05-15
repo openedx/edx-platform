@@ -178,7 +178,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-30 20:42+0000\n"
+"POT-Creation-Date: 2023-05-07 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Jesica Greco, 2023\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -10625,6 +10625,14 @@ msgstr "Seleccione cerrar para ocultar los ajustes de vídeo del curso"
 msgid "Course Video Settings"
 msgstr "Ajustes de vídeo del curso"
 
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Video Sharing"
+msgstr ""
+
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Learn more"
+msgstr ""
+
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
 msgstr "Tiempo de procesamiento de la transcripción"
@@ -11234,15 +11242,6 @@ msgid ""
 msgstr ""
 "Si un estudiante empieza en {startDate}, esta subsección será vencida en "
 "{projectedDueIn}."
-
-#: cms/templates/js/self-paced-due-date-editor.underscore
-msgid ""
-"The maximum number of weeks this subsection can be due in is 18 weeks from "
-"the learner enrollment date."
-msgstr ""
-"El número máximo de semanas para esta subsección puede tener fecha de "
-"vencimiento en 18 semanas a partir de la fecha de inscripción del "
-"estudiante."
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
