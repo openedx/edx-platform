@@ -217,7 +217,10 @@
                                 model: userAccountModel,
                                 title: gettext('Education Completed'),
                                 valueAttribute: 'level_of_education',
-                                options: fieldsData.level_of_education.options,
+                                groupOptions: [{
+                                    selectOptions: fieldsData.level_of_education.options,
+                                    nullValueOptionLabel: gettext('(Not Specified)')
+                                }],
                                 persistChanges: true
                             })
                         },
@@ -226,7 +229,10 @@
                                 model: userAccountModel,
                                 title: gettext('Gender'),
                                 valueAttribute: 'gender',
-                                options: fieldsData.gender.options,
+                                groupOptions: [{
+                                    selectOptions: fieldsData.gender.options,
+                                    nullValueOptionLabel: gettext('(Not Specified)')
+                                }],
                                 persistChanges: true
                             })
                         },
@@ -235,7 +241,10 @@
                                 model: userAccountModel,
                                 title: gettext('Year of Birth'),
                                 valueAttribute: 'year_of_birth',
-                                options: fieldsData.year_of_birth.options,
+                                groupOptions: [{
+                                    selectOptions: fieldsData.year_of_birth.options,
+                                    nullValueOptionLabel: gettext('(Not Specified)')
+                                }],
                                 persistChanges: true
                             })
                         },
@@ -244,7 +253,10 @@
                                 model: userAccountModel,
                                 title: gettext('Preferred Language'),
                                 valueAttribute: 'language_proficiencies',
-                                options: fieldsData.preferred_language.options,
+                                groupOptions: [{
+                                    selectOptions: fieldsData.preferred_language.options,
+                                    nullValueOptionLabel: gettext('(Not Specified)')
+                                }],
                                 persistChanges: true
                             })
                         }
