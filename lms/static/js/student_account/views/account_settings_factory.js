@@ -117,7 +117,10 @@
                 required: true,
                 title: gettext('Country or Region of Residence'),
                 valueAttribute: 'country',
-                options: fieldsData.country.options,
+                groupOptions: [{
+                    selectOptions: fieldsData.country.options,
+                    nullValueOptionLabel: gettext('(Not Specified)')
+                }],
                 persistChanges: true,
                 helpMessage: gettext('The country or region where you live.')
             };
@@ -180,7 +183,10 @@
                                     gettext('The language used throughout this site. This site is currently available in a limited number of languages. Changing the value of this field will cause the page to refresh.'),  // eslint-disable-line max-len
                                     {platform_name: platformName}
                                 ),
-                                options: fieldsData.language.options,
+                                groupOptions: [{
+                                    nullValueOptionLabel: gettext('Default (English)'),
+                                    selectOptions: fieldsData.language.options
+                                }],
                                 persistChanges: true,
                                 focusNextID: '#u-field-select-country'
                             })
