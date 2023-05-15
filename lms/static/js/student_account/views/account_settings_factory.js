@@ -117,7 +117,10 @@
                 required: true,
                 title: gettext('Country or Region of Residence'),
                 valueAttribute: 'country',
-                options: fieldsData.country.options,
+                groupOptions: [{
+                    selectOptions: fieldsData.country.options,
+                    nullValueOptionLabel: gettext('(Not Specified)')
+                }],
                 persistChanges: true,
                 helpMessage: gettext('The country or region where you live.')
             };
@@ -180,7 +183,10 @@
                                     gettext('The language used throughout this site. This site is currently available in a limited number of languages. Changing the value of this field will cause the page to refresh.'),  // eslint-disable-line max-len
                                     {platform_name: platformName}
                                 ),
-                                options: fieldsData.language.options,
+                                groupOptions: [{
+                                    nullValueOptionLabel: gettext('Default (English)'),
+                                    selectOptions: fieldsData.language.options
+                                }],
                                 persistChanges: true,
                                 focusNextID: '#u-field-select-country'
                             })
@@ -211,7 +217,10 @@
                                 model: userAccountModel,
                                 title: gettext('Education Completed'),
                                 valueAttribute: 'level_of_education',
-                                options: fieldsData.level_of_education.options,
+                                groupOptions: [{
+                                    selectOptions: fieldsData.level_of_education.options,
+                                    nullValueOptionLabel: gettext('(Not Specified)')
+                                }],
                                 persistChanges: true
                             })
                         },
@@ -220,7 +229,10 @@
                                 model: userAccountModel,
                                 title: gettext('Gender'),
                                 valueAttribute: 'gender',
-                                options: fieldsData.gender.options,
+                                groupOptions: [{
+                                    selectOptions: fieldsData.gender.options,
+                                    nullValueOptionLabel: gettext('(Not Specified)')
+                                }],
                                 persistChanges: true
                             })
                         },
@@ -229,7 +241,10 @@
                                 model: userAccountModel,
                                 title: gettext('Year of Birth'),
                                 valueAttribute: 'year_of_birth',
-                                options: fieldsData.year_of_birth.options,
+                                groupOptions: [{
+                                    selectOptions: fieldsData.year_of_birth.options,
+                                    nullValueOptionLabel: gettext('(Not Specified)')
+                                }],
                                 persistChanges: true
                             })
                         },
@@ -238,7 +253,10 @@
                                 model: userAccountModel,
                                 title: gettext('Preferred Language'),
                                 valueAttribute: 'language_proficiencies',
-                                options: fieldsData.preferred_language.options,
+                                groupOptions: [{
+                                    selectOptions: fieldsData.preferred_language.options,
+                                    nullValueOptionLabel: gettext('(Not Specified)')
+                                }],
                                 persistChanges: true
                             })
                         }

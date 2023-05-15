@@ -167,7 +167,6 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                         <span>{bodyDeletion} </span>
                         <span>{bodyDeletion2}</span>
                       </p>
-                      <p dangerouslySetInnerHTML={{ __html: loseAccessText }} />
                     </div>
                   </div>
                 )}

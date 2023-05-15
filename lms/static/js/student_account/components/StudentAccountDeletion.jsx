@@ -113,16 +113,8 @@ export class StudentAccountDeletion extends React.Component {
               <span>{bodyDeletion2}</span>
         </p>
         <p
-          className="account-settings-header-subtitle"
-          dangerouslySetInnerHTML={{ __html: loseAccessText }}
-        />
-        <p
           className="account-settings-header-subtitle-warning"
           dangerouslySetInnerHTML={{ __html: acctDeletionWarningText }}
-        />
-        <p
-          className="account-settings-header-subtitle"
-          dangerouslySetInnerHTML={{ __html: changeAcctInfoText }}
         />
         <Button
           id="delete-account-btn"
