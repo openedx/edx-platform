@@ -1,10 +1,13 @@
 <span class="badge badge-warning align-self-start"><%- gettext('New') %></span>
-<h4 class="m-0"><%- gettext('Monthly program subscriptions now available') %></h4>
+<h4 class="m-0">
+    <%= HtmlUtils.interpolateHtml(
+        gettext('Monthly program subscriptions {emDash} more flexible, more affordable'),
+        { emDash: HtmlUtils.HTML('&mdash;') }
+    ) %>
+</h4>
 <p class="advertise-message">
     <%- StringUtils.interpolate(
-        gettext(
-            'An easier way to access popular programs with more control over how much you spend. Starting at {minSubscriptionPrice} per month after a {trialLength}-day free trial. Cancel anytime.'
-        ),
+        gettext('Now available for many popular programs, affordable monthly subscription pricing can help you manage your budget more effectively. Subscriptions start at {minSubscriptionPrice}/month USD per program, after a 7-day full access free trial. Cancel at any time.'),
         { minSubscriptionPrice, trialLength }
     ) %>
 </p>
