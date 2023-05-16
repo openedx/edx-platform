@@ -229,11 +229,11 @@ ENABLE_NEW_STUDIO_SCHEDULE_DETAILS_PAGE = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_schedule_details_page', __name__)
 
 
-def use_new_schedule_details_page():
+def use_new_schedule_details_page(course_key):
     """
     Returns a boolean if new studio schedule and details mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_SCHEDULE_DETAILS_PAGE.is_enabled()
+    return ENABLE_NEW_STUDIO_SCHEDULE_DETAILS_PAGE.is_enabled(course_key)
 
 
 # .. toggle_name: new_studio_mfe.use_new_advanced_settings_page
@@ -249,11 +249,11 @@ ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_advanced_settings_page', __name__)
 
 
-def use_new_advanced_settings_page():
+def use_new_advanced_settings_page(course_key):
     """
     Returns a boolean if new studio advanced settings pafe mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE.is_enabled()
+    return ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE.is_enabled(course_key)
 
 
 # .. toggle_name: new_studio_mfe.use_new_grading_page
@@ -269,11 +269,11 @@ ENABLE_NEW_STUDIO_GRADING_PAGE = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_grading_page', __name__)
 
 
-def use_new_grading_page():
+def use_new_grading_page(course_key):
     """
     Returns a boolean if new studio grading mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_GRADING_PAGE.is_enabled()
+    return ENABLE_NEW_STUDIO_GRADING_PAGE.is_enabled(course_key)
 
 
 # .. toggle_name: new_studio_mfe.use_new_updates_page
@@ -289,11 +289,11 @@ ENABLE_NEW_STUDIO_UPDATES_PAGE = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_updates_page', __name__)
 
 
-def use_new_updates_page():
+def use_new_updates_page(course_key):
     """
     Returns a boolean if new studio updates mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_UPDATES_PAGE.is_enabled()
+    return ENABLE_NEW_STUDIO_UPDATES_PAGE.is_enabled(course_key)
 
 
 # .. toggle_name: new_studio_mfe.use_new_import_page
@@ -309,11 +309,11 @@ ENABLE_NEW_STUDIO_IMPORT_PAGE = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_import_page', __name__)
 
 
-def use_new_import_page():
+def use_new_import_page(course_key):
     """
     Returns a boolean if new studio import mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_IMPORT_PAGE.is_enabled()
+    return ENABLE_NEW_STUDIO_IMPORT_PAGE.is_enabled(course_key)
 
 
 # .. toggle_name: new_studio_mfe.use_new_export_page
@@ -329,11 +329,11 @@ ENABLE_NEW_STUDIO_EXPORT_PAGE = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_export_page', __name__)
 
 
-def use_new_export_page():
+def use_new_export_page(course_key):
     """
     Returns a boolean if new studio export mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_EXPORT_PAGE.is_enabled()
+    return ENABLE_NEW_STUDIO_EXPORT_PAGE.is_enabled(course_key)
 
 
 # .. toggle_name: new_studio_mfe.use_new_files_uploads_page
@@ -349,11 +349,11 @@ ENABLE_NEW_STUDIO_FILES_UPLOADS_PAGE = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_files_uploads_page', __name__)
 
 
-def use_new_files_uploads_page():
+def use_new_files_uploads_page(course_key):
     """
     Returns a boolean if new studio files and uploads mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_FILES_UPLOADS_PAGE.is_enabled()
+    return ENABLE_NEW_STUDIO_FILES_UPLOADS_PAGE.is_enabled(course_key)
 
 
 # .. toggle_name: new_studio_mfe.use_new_video_uploads_page
@@ -369,11 +369,11 @@ ENABLE_NEW_STUDIO_VIDEO_UPLOADS_PAGE = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_video_uploads_page', __name__)
 
 
-def use_new_video_uploads_page():
+def use_new_video_uploads_page(course_key):
     """
     Returns a boolean if new studio video uploads mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_VIDEO_UPLOADS_PAGE.is_enabled()
+    return ENABLE_NEW_STUDIO_VIDEO_UPLOADS_PAGE.is_enabled(course_key)
 
 
 # .. toggle_name: new_studio_mfe.use_new_course_outline_page
@@ -389,11 +389,11 @@ ENABLE_NEW_STUDIO_COURSE_OUTLINE_PAGE = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_course_outline_page', __name__)
 
 
-def use_new_course_outline_page():
+def use_new_course_outline_page(course_key):
     """
     Returns a boolean if new studio course outline mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_COURSE_OUTLINE_PAGE.is_enabled()
+    return ENABLE_NEW_STUDIO_COURSE_OUTLINE_PAGE.is_enabled(course_key)
 
 
 # .. toggle_name: new_studio_mfe.use_new_unit_page
@@ -409,8 +409,8 @@ ENABLE_NEW_STUDIO_UNIT_PAGE = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_unit_page', __name__)
 
 
-def use_new_unit_page():
+def use_new_unit_page(course_key):
     """
     Returns a boolean if new studio course outline mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_UNIT_PAGE.is_enabled()
+    return ENABLE_NEW_STUDIO_UNIT_PAGE.is_enabled(course_key)
