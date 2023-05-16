@@ -77,21 +77,21 @@ class Command(BaseCommand):
                             student = Student.objects.filter(gen_user__user__username=username).first()
                             user_states = generated_report_data.get(username)
                             if problem_attributes['problem_type'] == ProblemTypes.JOURNAL and user_states:
-                                defaults = {
-                                    'skill': skill,
-                                    'student': student,
-                                    'journal_type': JournalTypes.STUDENT_POST,
-                                    'is_editable': False
-                                }
-                                if student_module:
-                                    defaults['created'] = student_module.created
-                                    defaults['modified'] = student_module.modified
-
                                 for user_state in user_states:
+                                    defaults = {
+                                        'skill': skill,
+                                        'journal_type': JournalTypes.STUDENT_POST,
+                                        'title': user_state['Question'],
+                                        'description': json.dumps(json.loads(JOURNAL_STYLE.format(user_state['Answer']), strict=False)),
+                                        'is_editable': False
+                                    }
+                                    if student_module:
+                                        defaults['created'] = student_module.created
+                                        defaults['modified'] = student_module.modified
+
                                     obj, created = JournalPost.objects.update_or_create(
                                         uuid=user_state['Answer ID'],
-                                        title=user_state['Question'],
-                                        description=json.dumps(json.loads(JOURNAL_STYLE.format(user_state['Answer']), strict=False)),
+                                        student=student,
                                         defaults=defaults
                                     )
                                     if created:
@@ -99,6 +99,6 @@ class Command(BaseCommand):
                                     else:
                                         print(f"===============Updated Journal Entry===================")
                         except Exception as ex:
-                            self.stdout.write(self.style.ERROR(str(e)))
+                            self.stdout.write(self.style.ERROR(str(ex)))
 
         self.stdout.write(self.style.SUCCESS('DONE!!'))
