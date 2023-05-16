@@ -595,7 +595,7 @@ edx-django-utils==5.4.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions @ git+https://github.com/openedx/edx-drf-extensions.git@7ee99179939ca06c4a5b9d570f73734ea66142bc
+edx-drf-extensions==8.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-completion
