@@ -55,33 +55,20 @@ class ProgramAlertListView extends Backbone.View {
             })
         );
         return alertList.concat(this.trialEndingAlerts.map(
-            ({ title: programName, remainingDays, ...data }) => {
-                const title = 'Subscription trial expires in {remainingDays} day';
-                const message = 'Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}/month.';
-
-                return {
-                    title: StringUtils.interpolate(
-                        ngettext(
-                            title,
-                            title.replace(/\bday\b/, 'days'),
-                            remainingDays
-                        ),
-                        { remainingDays }
-                    ),
-                    message: StringUtils.interpolate(
-                        ngettext(
-                            message,
-                            message.replace(/\bday\b/, 'days'),
-                            remainingDays
-                        ),
-                        {
-                            programName,
-                            remainingDays,
-                            ...data,
-                        }
-                    ),
-                };
-            }
+            ({ title: programName, remainingDays, ...data }) => ({
+                title: StringUtils.interpolate(
+                    ngettext('Subscription trial expires in {remainingDays} day', 'Subscription trial expires in {remainingDays} days', remainingDays),
+                    { remainingDays }
+                ),
+                message: StringUtils.interpolate(
+                    ngettext('Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}/month.', 'Your {programName} trial will expire in {remainingDays} days at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}/month.', remainingDays),
+                    {
+                        programName,
+                        remainingDays,
+                        ...data,
+                    }
+                ),
+            })
         ));
     }
 }

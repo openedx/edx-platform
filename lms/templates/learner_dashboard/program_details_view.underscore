@@ -58,14 +58,14 @@
                 </a>
                 <span class="subscription-info-brief">
                     <%- StringUtils.interpolate(
-                        gettext(
+                        (
                             hasActiveTrial
-                            ? 'Active trial ends {trialEndDate} at {trialEndTime}'
+                            ? gettext('Active trial ends {trialEndDate} at {trialEndTime}')
                             : subscriptionState === 'active'
-                            ? 'Your next billing date is {nextPaymentDate}'
+                            ? gettext('Your next billing date is {nextPaymentDate}')
                             : subscriptionState === 'inactive'
-                            ? 'Unlock verified access to all courses for {subscriptionPrice}/month. Cancel anytime.'
-                            : '{subscriptionPrice}/month subscription after trial ends. Cancel anytime.'
+                            ? gettext('Unlock verified access to all courses for {subscriptionPrice}/month. Cancel anytime.')
+                            : gettext('{subscriptionPrice}/month subscription after trial ends. Cancel anytime.')
                         ),
                         {
                             subscriptionPrice,
