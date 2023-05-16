@@ -496,17 +496,18 @@ WEBPACK_LOADER['DEFAULT']['TIMEOUT'] = 5
 CLOSEST_CLIENT_IP_FROM_HEADERS = []
 
 #################### Event bus backend ########################
-EVENT_BUS_PRODUCER = 'edx_event_bus_kafka.create_producer'
-EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
-EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
+EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
+EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
+EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
 
 ######################## Subscriptions API SETTINGS ########################
 SUBSCRIPTIONS_ROOT_URL = "http://host.docker.internal:18750"
 SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
 
 SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
-SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe"
+SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
+SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

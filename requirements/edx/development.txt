@@ -313,6 +313,7 @@ django==3.2.19
     #   edx-drf-extensions
     #   edx-enterprise
     #   edx-event-bus-kafka
+    #   edx-event-bus-redis
     #   edx-i18n-tools
     #   edx-milestones
     #   edx-name-affirmation
@@ -583,6 +584,7 @@ edx-django-utils==5.4.0
     #   edx-drf-extensions
     #   edx-enterprise
     #   edx-event-bus-kafka
+    #   edx-event-bus-redis
     #   edx-name-affirmation
     #   edx-rest-api-client
     #   edx-toggles
@@ -611,6 +613,8 @@ edx-enterprise==3.62.7
     #   -r requirements/edx/testing.txt
     #   learner-pathway-progress
 edx-event-bus-kafka==4.0.1
+    # via -r requirements/edx/testing.txt
+edx-event-bus-redis==0.1.1
     # via -r requirements/edx/testing.txt
 edx-i18n-tools==0.9.2
     # via
@@ -676,6 +680,7 @@ edx-toggles==5.0.0
     #   -r requirements/edx/testing.txt
     #   edx-completion
     #   edx-event-bus-kafka
+    #   edx-event-bus-redis
     #   edx-name-affirmation
     #   edx-search
     #   edxval
@@ -1033,6 +1038,7 @@ openedx-events==7.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
+    #   edx-event-bus-redis
 openedx-filters==1.2.0
     # via
     #   -r requirements/edx/testing.txt
@@ -1357,7 +1363,9 @@ rapidfuzz==3.0.0
 recommender-xblock==2.0.1
     # via -r requirements/edx/testing.txt
 redis==4.5.5
-    # via -r requirements/edx/testing.txt
+    # via
+    #   -r requirements/edx/testing.txt
+    #   walrus
 regex==2023.5.5
     # via
     #   -r requirements/edx/testing.txt
@@ -1665,6 +1673,10 @@ voluptuous==0.13.1
     #   ora2
 vulture==2.7
     # via -r requirements/edx/development.in
+walrus==0.9.2
+    # via
+    #   -r requirements/edx/testing.txt
+    #   edx-event-bus-redis
 watchdog==3.0.0
     # via -r requirements/edx/testing.txt
 wcwidth==0.2.6
