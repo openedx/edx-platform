@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-07 20:35+0000\n"
-"PO-Revision-Date: 2023-05-07 20:35:59.240148\n"
+"POT-Creation-Date: 2023-05-14 20:35+0000\n"
+"PO-Revision-Date: 2023-05-14 20:35:52.019284\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -9472,6 +9472,7 @@ msgstr "Välïd Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Certificate Status:"
 msgstr "Çértïfïçäté Stätüs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
@@ -9675,6 +9676,11 @@ msgstr "Ýöür Prögräm Jöürnéý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Restart my subscription"
+msgstr "Réstärt mý süßsçrïptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Upgrade All Remaining Courses ("
 msgstr "Ûpgrädé Àll Rémäïnïng Çöürsés ( Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
@@ -9719,16 +9725,25 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Subscribed"
+msgstr "Süßsçrïßéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
 msgstr "{organization}\\'s lögö Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Needs verified certificate "
 msgstr "Nééds vérïfïéd çértïfïçäté  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade to Verified"
 msgstr "Ûpgrädé tö Vérïfïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Upgrade with a subscription"
+msgstr "Ûpgrädé wïth ä süßsçrïptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"

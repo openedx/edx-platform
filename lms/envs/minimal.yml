@@ -20,6 +20,12 @@ MKTG_URL_LINK_MAP: {}
 MKTG_URL_OVERRIDES: {}
 REST_FRAMEWORK: {}
 
+# We need MEDIA_ROOT because otherwise ./lms/djangoapps/certificates/migrations/0003_data__default_modes.py will fail.
+#
+# Using a local tmp location is not a good default for a production system. For production we should use
+# off-machine storage to more easily scale the system.
+MEDIA_ROOT: "/tmp/edx-platform/media/"
+
 # For just the CMS
 LMS_ROOT_URL: "http://localhost"
 LMS_INTERNAL_ROOT_URL: "http://localhost"
