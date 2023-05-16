@@ -348,6 +348,25 @@ def use_new_files_uploads_page():
     return ENABLE_NEW_STUDIO_FILES_UPLOADS_PAGE.is_enabled()
 
 
+# .. toggle_name: new_studio_mfe.use_new_video_uploads_page
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new video uploads page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_VIDEO_UPLOADS_PAGE = WaffleFlag('new_studio_mfe.use_new_video_uploads_page', __name__)
+
+
+def use_new_video_uploads_page():
+    """
+    Returns a boolean if new studio video uploads mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_VIDEO_UPLOADS_PAGE.is_enabled()
+
+
 # .. toggle_name: new_studio_mfe.use_new_course_outline_page
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False

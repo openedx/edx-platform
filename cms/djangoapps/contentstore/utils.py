@@ -40,7 +40,8 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_import_page,
     use_new_schedule_details_page,
     use_new_unit_page,
-    use_new_updates_page
+    use_new_updates_page,
+    use_new_video_uploads_page,
 )
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -327,6 +328,19 @@ def get_files_uploads_url(course_locator) -> str:
         if mfe_base_url:
             files_uploads_url = course_mfe_url
     return files_uploads_url
+
+
+def get_video_uploads_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for files and uploads page view.
+    """
+    video_uploads_url = None
+    if use_new_video_uploads_page():
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/assets/{course_locator}'
+        if mfe_base_url:
+            video_uploads_url = course_mfe_url
+    return video_uploads_url
 
 
 def get_course_outline_url(course_locator) -> str:
