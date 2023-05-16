@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from openedx.features.course_experience.utils import get_course_outline_block_tree
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.user_state_client import DjangoXBlockUserStateClient
+from lms.djangoapps.courseware.models import StudentModule
 
 from openedx.features.genplus_features.genplus.models import Student, JournalPost
 from openedx.features.genplus_features.genplus.constants import JournalTypes
@@ -63,27 +64,41 @@ class Command(BaseCommand):
                     problem_attributes = get_problem_attributes(block.data, block_key)
                     for username in student_list:
                         try:
+                            try:
+                                student_module = StudentModule.objects.get(
+                                    student__username=username,
+                                    course_id=course_id,
+                                    module_state_key=block_key,
+                                )
+                            except StudentModule.DoesNotExist:
+                                student_module = None
+                                print(f"===============Student module not found===================")
+
                             student = Student.objects.filter(gen_user__user__username=username).first()
                             user_states = generated_report_data.get(username)
                             if problem_attributes['problem_type'] == ProblemTypes.JOURNAL and user_states:
-                                defaults = {
-                                    'skill': skill,
-                                    'student': student,
-                                    'journal_type': JournalTypes.STUDENT_POST,
-                                    'is_editable': False
-                                }
                                 for user_state in user_states:
+                                    defaults = {
+                                        'skill': skill,
+                                        'journal_type': JournalTypes.STUDENT_POST,
+                                        'title': user_state['Question'],
+                                        'description': json.dumps(json.loads(JOURNAL_STYLE.format(user_state['Answer']), strict=False)),
+                                        'is_editable': False
+                                    }
+                                    if student_module:
+                                        defaults['created'] = student_module.created
+                                        defaults['modified'] = student_module.modified
+
                                     obj, created = JournalPost.objects.update_or_create(
                                         uuid=user_state['Answer ID'],
-                                        title=user_state['Question'],
-                                        description=json.dumps(json.loads(JOURNAL_STYLE.format(user_state['Answer']), strict=False)),
+                                        student=student,
                                         defaults=defaults
                                     )
                                     if created:
                                         print(f"===============Added Journal Entry===================")
                                     else:
                                         print(f"===============Updated Journal Entry===================")
-                        except:
-                            self.stdout.write(self.style.ERROR('Failed!!'))
+                        except Exception as ex:
+                            self.stdout.write(self.style.ERROR(str(ex)))
 
         self.stdout.write(self.style.SUCCESS('DONE!!'))

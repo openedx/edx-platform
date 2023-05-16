@@ -197,7 +197,7 @@ class JournalViewSet(GenzMixin, FlatMultipleModelMixin, viewsets.ModelViewSet):
     authentication_classes = [SessionAuthenticationCrossDomainCsrf]
     permission_classes = [IsAuthenticated, IsStudentOrTeacher]
     queryset = JournalPost.objects.none()
-    sorting_field = 'created'
+    sorting_field = 'modified'
     pagination_class = JournalListPagination
     sort_descending = True
 
@@ -227,7 +227,7 @@ class JournalViewSet(GenzMixin, FlatMultipleModelMixin, viewsets.ModelViewSet):
 
     def sort_results(self, results):
         # Sorting on the basis of a common field in all the objects.
-        results.sort(key=lambda obj: obj['created'], reverse=True)
+        results.sort(key=lambda obj: obj['modified'], reverse=True)
         return results
 
     def get_querylist(self):
