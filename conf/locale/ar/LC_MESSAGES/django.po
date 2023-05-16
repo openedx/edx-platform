@@ -259,7 +259,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-16 20:42+0000\n"
+"POT-Creation-Date: 2023-05-07 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://app.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -289,6 +289,7 @@ msgid "Discussion"
 msgstr "المناقشة"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr "المسألة"
@@ -298,6 +299,10 @@ msgstr "المسألة"
 #: lms/templates/video.html
 msgid "Video"
 msgstr "فيديو"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "مسألة متقدِّمة فارغة"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -9818,10 +9823,6 @@ msgid "Invalid JSON response received from codejail api service."
 msgstr ""
 
 #: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "مسألة متقدِّمة فارغة"
-
-#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "عدد gfمحاولات التي قام بها الطالب لحلّ هذه المسألة"
 
@@ -11217,6 +11218,17 @@ msgstr ""
 "(السماح بالوصول إلى كل من المخطط ومحتوى المساق)."
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "مدرّس الدورة التدريبية"
 
@@ -12289,6 +12301,12 @@ msgstr ""
 
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+msgid ""
+"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"\n"
 msgstr ""
 
 #: xmodule/video_block/transcripts_utils.py
@@ -14744,6 +14762,14 @@ msgstr "الصفحة التالية"
 msgid "Paste Component"
 msgstr ""
 
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "سجل التتبّع"
@@ -14870,21 +14896,9 @@ msgstr "التنزيلات والنصوص"
 msgid "Share on:"
 msgstr ""
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "شارك على تويتر"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/video.html
-msgid "Share on Facebook"
-msgstr "شارك على فيسبوك"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-#: lms/templates/video.html
-msgid "Share on LinkedIn"
-msgstr "شارك على لينكد إن"
+msgid "Share on {site}"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -16206,6 +16220,11 @@ msgid "Post on Facebook"
 msgstr "انشر على فيسبوك"
 
 #: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "شارك على تويتر"
+
+#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "غرّد هذا الإنجاز. نافذة منبثقة."
 
@@ -17198,6 +17217,10 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "إضافة الشهادة إلى ملفك على لينكد إن"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Share on LinkedIn"
+msgstr "شارك على لينكد إن"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr ""
 
@@ -17272,6 +17295,10 @@ msgstr "أنا آخذ {course_name} عبر الإنترنت مع {facebook_brand
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "شارك {course_name} على فيسبوك"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Facebook"
+msgstr "شارك على فيسبوك"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"

@@ -11,8 +11,8 @@ class ProgramSubscriptionModel extends Backbone.Model {
         const {
             subscriptionData: [data = {}],
             programData: { subscription_prices },
-            urls,
-            userPreferences,
+            urls = {},
+            userPreferences = {},
         } = context;
 
         const priceInUSD = subscription_prices?.find(({ currency }) => currency === 'USD')?.price;
@@ -35,6 +35,8 @@ class ProgramSubscriptionModel extends Backbone.Model {
                 ? trialMoment.isAfter(moment.utc())
                 : false;
 
+        const remainingDays = trialMoment.diff(moment.utc(), 'days');
+
         const [nextPaymentDate] = ProgramSubscriptionModel.formatDate(
             data.next_payment_date,
             userPreferences
@@ -50,6 +52,7 @@ class ProgramSubscriptionModel extends Backbone.Model {
             {
                 hasActiveTrial,
                 nextPaymentDate,
+                remainingDays,
                 subscriptionPrice,
                 subscriptionState,
                 subscriptionUrl,
@@ -66,8 +69,8 @@ class ProgramSubscriptionModel extends Backbone.Model {
             return ['', ''];
         }
 
-        const userTimezone = userPreferences?.time_zone || 'UTC';
-        const userLanguage = userPreferences?.['pref-lang'] || 'en';
+        const userTimezone = userPreferences.time_zone || 'UTC';
+        const userLanguage = userPreferences['pref-lang'] || 'en';
         const context = {
             datetime: date,
             timezone: userTimezone,

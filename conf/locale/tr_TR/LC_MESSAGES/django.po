@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-16 20:42+0000\n"
+"POT-Creation-Date: 2023-05-07 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -162,6 +162,7 @@ msgid "Discussion"
 msgstr "Tartışma"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr "Problem"
@@ -171,6 +172,10 @@ msgstr "Problem"
 #: lms/templates/video.html
 msgid "Video"
 msgstr "Video"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "Boş Gelişmiş Problem"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -3107,6 +3112,10 @@ msgid ""
 "However, you are currently logged in as a '{active_enterprise_name}' user. "
 "Please log in with '{enrollment_enterprise_name}' to access this course."
 msgstr ""
+"Bu derse \"{enrollment_enterprise_name}\" ile kaydoldunuz. Ancak, şu anda "
+"bir '{active_enterprise_name}' kullanıcısı olarak oturum açmış durumdasınız."
+" Bu derse erişmek için lütfen '{enrollment_enterprise_name}' ile giriş "
+"yapın."
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must give Data Sharing Consent for the course"
@@ -4207,6 +4216,9 @@ msgid ""
 "depend on the kind of task being performed. For instanceit may contain the "
 "problem locations for a problem resources task."
 msgstr ""
+"Görev için giriş parametreleri. Bu verilerin formatı ve içeriği, "
+"gerçekleştirilen görevin türüne bağlı olacaktır. Örneğin, problem kaynakları"
+" görevi için problem konumlarını içerebilir."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The username of the user who initiated this task."
@@ -5200,11 +5212,11 @@ msgstr "Bu takım yapılandırmasında zaten bir takıma ait görünüyorsunuz."
 
 #: lms/djangoapps/teams/views.py
 msgid "teamset_id and team_id are mutually exclusive options."
-msgstr ""
+msgstr "teamset_id ve team_id birbirini dışlayan seçeneklerdir."
 
 #: lms/djangoapps/teams/views.py
 msgid "teamset_id requires course_id to also be provided."
-msgstr ""
+msgstr "teamset_id, course_id'nin de sağlanmasını gerektirir."
 
 #: lms/djangoapps/teams/views.py
 msgid "No teamset found in given course with given id"
@@ -5842,6 +5854,8 @@ msgid ""
 "{start_anchor}%(tpa_logout_url)s{middle_anchor}Click here{end_anchor} to "
 "delete your single signed on (SSO) session."
 msgstr ""
+"Single Sign-On (SSO) oturumunuzu silmek için "
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}buraya{end_anchor} tıklayın."
 
 #: lms/templates/logout.html
 msgid "We are signing you in."
@@ -7120,6 +7134,8 @@ msgstr "Bu kaynak için LTI platform açıklayıcı başlığı"
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "If AGS was enabled during launch, this should hold the lineitem ID."
 msgstr ""
+"Başlatma sırasında AGS etkinleştirildiyse, bu, lineitem kimliğini "
+"tutmalıdır."
 
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "We could not find a user with that email address."
@@ -7525,10 +7541,12 @@ msgid ""
 "Discussion context ID in external forum provider. e.g. commentable_id for "
 "cs_comments_service."
 msgstr ""
+"Harici forum sağlayıcısı için tartışma bağlamı kimliği. Örn. commentable_id "
+"için cs_comments_service."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Whether this topic should be shown in-context in the course."
-msgstr ""
+msgstr "Bu konunun derste bağlam içinde gösterilip gösterilmeyeceği."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Ordering of this topic in its learning context"
@@ -9311,6 +9329,9 @@ msgid ""
 " access the courses available to you through {enterprise_name}, "
 "{link_start}visit the {enterprise_name} dashboard{link_end}."
 msgstr ""
+"{bold_start}{enterprise_name}{bold_end} ana paneline erişiminiz var. "
+"{enterprise_name} aracılığıyla size sunulan derslere erişmek için "
+"{link_start}{enterprise_name} ana panelini ziyaret edin{link_end}."
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
@@ -9889,10 +9910,6 @@ msgstr "Codejail API Servisi geçersiz cevap."
 #: xmodule/capa/safe_exec/remote_exec.py
 msgid "Invalid JSON response received from codejail api service."
 msgstr "Codejail api servisinden geçersiz JSON cevabı alındı."
-
-#: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Boş Gelişmiş Problem"
 
 #: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
@@ -11156,6 +11173,12 @@ msgid ""
 "staff/en/latest/course_features/teams/teams_setup.html#enable-and-configure-"
 "teams\">teams configuration documentation</a> for help and examples."
 msgstr ""
+"JSON kullanarak takım kümelerini yapılandırın, takım boyutlarını sınırlayın "
+"ve görünürlük ayarlarını belirleyin. Yardım ve örnekler için <a "
+"target=\"&#95;blank\" href=\"https://edx.readthedocs.io/projects/edx-"
+"partner-course-"
+"staff/en/latest/course_features/teams/teams_setup.html#enable-and-configure-"
+"teams\">teams yapılandırma belgelerine</a> bakın."
 
 #: xmodule/course_block.py
 msgid "Enable Proctored Exams"
@@ -11307,6 +11330,17 @@ msgstr ""
 "öğrenciler için izin verilir), 'public_outline' (ders ana hatlarına erişime "
 "izin verir) ve 'public' (hem anahatlara hem de ders içeriğine erişime izin "
 "verilir). "
+
+#: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
 
 #: xmodule/course_block.py
 msgid "Course Instructor"
@@ -11556,6 +11590,8 @@ msgid ""
 "Enter the number of components to display to each student. Set it to -1 to "
 "display all components."
 msgstr ""
+"Her öğrenciye gösterilecek bileşen sayısını girin. Tüm bileşenleri göstermek"
+" için -1 olarak ayarlayın."
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -12409,6 +12445,12 @@ msgstr "Ünite için bağlam içi tartışmaları etkinleştirin"
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
 msgstr "Üniteye tartışma ekle."
+
+#: xmodule/video_block/sharing_sites.py
+msgid ""
+"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"\n"
+msgstr ""
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
@@ -14872,6 +14914,14 @@ msgstr "Sonraki sayfa"
 msgid "Paste Component"
 msgstr "Bileşeni Yapıştır"
 
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "İzleme geçmişi"
@@ -15000,21 +15050,9 @@ msgstr "İndirmeler ve altyazılar"
 msgid "Share on:"
 msgstr "Şurada paylaş:"
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "Twitter'da paylaş"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/video.html
-msgid "Share on Facebook"
-msgstr "Facebook'ta Paylaş"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-#: lms/templates/video.html
-msgid "Share on LinkedIn"
-msgstr "LinkedIn'de Paylaş"
+msgid "Share on {site}"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -16230,6 +16268,11 @@ msgid "Post on Facebook"
 msgstr "Facebook'ta paylaş"
 
 #: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "Twitter'da paylaş"
+
+#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "Bu Başarı Belgesini Twitle"
 
@@ -17253,6 +17296,10 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "Sertifikanı Linkedln Profiline Ekle"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Share on LinkedIn"
+msgstr "LinkedIn'de Paylaş"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr "Bir sertifika için uygun değilsiniz."
 
@@ -17332,6 +17379,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "{course_name} dersini Facebook'ta paylaş"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Facebook"
+msgstr "Facebook'ta Paylaş"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
