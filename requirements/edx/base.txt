@@ -469,7 +469,7 @@ edx-django-utils==5.4.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions @ git+https://github.com/openedx/edx-drf-extensions.git@umar/replace-jwkest-with-pyjwt
+edx-drf-extensions @ git+https://github.com/openedx/edx-drf-extensions.git@7ee99179939ca06c4a5b9d570f73734ea66142bc
     # via
     #   -r requirements/edx/github.in
     #   edx-completion
@@ -523,7 +523,7 @@ edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.in
 edx-rbac==1.7.0
     # via edx-enterprise
-edx-rest-api-client==5.5.0
+edx-rest-api-client==5.5.1
     # via
     #   -r requirements/edx/base.in
     #   edx-enterprise
@@ -674,7 +674,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==9.4.0
+lti-consumer-xblock==9.5.0
     # via -r requirements/edx/base.in
 lxml==4.9.2
     # via
@@ -771,7 +771,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/base.in
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.in
-openedx-events==7.2.0
+openedx-events==7.3.0
     # via
     #   -r requirements/edx/base.in
     #   edx-event-bus-kafka
@@ -1093,7 +1093,7 @@ sqlparse==0.4.4
     #   openedx-blockstore
 staff-graded-xblock==2.0.1
     # via -r requirements/edx/base.in
-stevedore==5.0.0
+stevedore==5.1.0
     # via
     #   -r requirements/edx/base.in
     #   -r requirements/edx/paver.txt

@@ -376,7 +376,7 @@ django-crum==0.7.9
     #   edx-rbac
     #   edx-toggles
     #   super-csv
-django-debug-toolbar==4.0.0
+django-debug-toolbar==4.1.0
     # via -r requirements/edx/development.in
 django-environ==0.10.0
     # via
@@ -593,7 +593,7 @@ edx-django-utils==5.4.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions @ git+https://github.com/openedx/edx-drf-extensions.git@umar/replace-jwkest-with-pyjwt
+edx-drf-extensions @ git+https://github.com/openedx/edx-drf-extensions.git@7ee99179939ca06c4a5b9d570f73734ea66142bc
     # via
     #   -r requirements/edx/testing.txt
     #   edx-completion
@@ -652,7 +652,7 @@ edx-rbac==1.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-edx-rest-api-client==5.5.0
+edx-rest-api-client==5.5.1
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -800,7 +800,7 @@ idna==3.4
     #   yarl
 imagesize==1.4.1
     # via sphinx
-import-linter==1.8.0
+import-linter==1.9.0
     # via -r requirements/edx/testing.txt
 importlib-metadata==6.6.0
     # via
@@ -910,7 +910,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==9.4.0
+lti-consumer-xblock==9.5.0
     # via -r requirements/edx/testing.txt
 lxml==4.9.2
     # via
@@ -1029,7 +1029,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/testing.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/testing.txt
-openedx-events==7.2.0
+openedx-events==7.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
@@ -1203,7 +1203,7 @@ pylint-django==2.5.3
     # via
     #   -r requirements/edx/testing.txt
     #   edx-lint
-pylint-plugin-utils==0.7
+pylint-plugin-utils==0.8.1
     # via
     #   -r requirements/edx/testing.txt
     #   pylint-celery
@@ -1277,7 +1277,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.12.0
     # via -r requirements/edx/testing.txt
-pytest-xdist[psutil]==3.2.1
+pytest-xdist[psutil]==3.3.0
     # via -r requirements/edx/testing.txt
 python-dateutil==2.8.2
     # via
@@ -1552,7 +1552,7 @@ starlette==0.26.1
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
-stevedore==5.0.0
+stevedore==5.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   code-annotations
