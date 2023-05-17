@@ -845,7 +845,6 @@
     "Explain if other.": "Explique se h\u00e1 outro.",
     "Explanation": "Explica\u00e7\u00e3o",
     "Explicitly Hiding from Students": "Ocultar Explicitamente dos Estudantes",
-    "Explore New Programs": "Explorar Novos Programas",
     "Explore Programs": "Explorar Programas",
     "Explore courses": "Explorar cursos",
     "Explore your course!": "Explore o seu curso!",

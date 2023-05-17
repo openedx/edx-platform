@@ -3864,10 +3864,6 @@ msgstr "Мова"
 msgid "Location"
 msgstr "Місце розташування"
 
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "Рік Народження"
-
 #. Translators: This label appears above a dropdown menu used to select
 #. the user's gender.
 #. Translators: This label appears above a dropdown menu on the registration
