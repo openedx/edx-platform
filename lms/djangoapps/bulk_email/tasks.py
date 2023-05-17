@@ -77,6 +77,7 @@ LIMITED_RETRY_ERRORS = (
 INFINITE_RETRY_ERRORS = (
     SMTPDataError,
     SMTPSenderRefused,
+    ClientError
 )
 
 # Errors that are known to indicate an inability to send any more emails,
@@ -612,11 +613,11 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
     except INFINITE_RETRY_ERRORS as exc:
         # Increment the "retried_nomax" counter, update other counters with progress to date,
         # and set the state to RETRY:
-
-        subtask_status.increment(retried_nomax=1, state=RETRY)
-        return _submit_for_retry(
-            entry_id, email_id, to_list, global_email_context, exc, subtask_status, skip_retry_max=True
-        )
+        if exc.response['Error']['Code'] in ['LimitExceededException'] or isinstance(exc, SMTPDataError) or isinstance(exc, SMTPSenderRefused):
+            subtask_status.increment(retried_nomax=1, state=RETRY)
+            return _submit_for_retry(
+                entry_id, email_id, to_list, global_email_context, exc, subtask_status, skip_retry_max=True
+            )
 
     except LIMITED_RETRY_ERRORS as exc:
         # Errors caught here cause the email to be retried.  The entire task is actually retried
@@ -633,7 +634,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
     except BULK_EMAIL_FAILURE_ERRORS as exc:
         if exc.response['Error']['Code'] in [
             'AccountSendingPausedException', 'MailFromDomainNotVerifiedException', 'LimitExceededException'
-        ]:
+        ] or isinstance(exc, SMTPException):
             num_pending = len(to_list)
             log.exception(
                 f"Task {task_id}: email with id {email_id} caused send_course_email task to fail with 'fatal' exception. "
