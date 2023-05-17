@@ -63,6 +63,9 @@ from lms.djangoapps.instructor_task.subtasks import (
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
+from opaque_keys.edx.keys import CourseKey
+
+from openedx.features.course_experience.url_helpers import get_learning_mfe_home_url
 
 log = logging.getLogger('edx.celery.task')
 
@@ -116,10 +119,8 @@ def _get_course_email_context(course):
     course_title = course.display_name
     course_end_date = get_default_time_display(course.end)
     course_root = reverse('course_root', kwargs={'course_id': course_id})
-    course_url = '{}{}'.format(
-        settings.LMS_ROOT_URL,
-        course_root
-    )
+    course_key = CourseKey.from_string(course_id)
+    course_url = get_learning_mfe_home_url(course_key=course_key, url_fragment='home')
     image_url = f'{settings.LMS_ROOT_URL}{course_image_url(course)}'
     lms_root_url = configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL)
     email_context = {
