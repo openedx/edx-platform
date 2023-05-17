@@ -49,7 +49,8 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
         except ObjectDoesNotExist:
             return False
 
-        is_edly_api_user = request.user.groups.filter(
+        edly_access_user = request.user.edly_multisite_user.get(sub_org__lms_site=request.site)
+        is_edly_api_user = edly_access_user.groups.filter(
             name=settings.EDLY_API_USERS_GROUP
         ).exists()
         if is_edly_api_user and user_belongs_to_edly_sub_organization(request, user):

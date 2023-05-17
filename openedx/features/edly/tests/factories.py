@@ -9,7 +9,7 @@ from factory.django import DjangoModelFactory
 from organizations.tests.factories import OrganizationFactory
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.features.edly.models import EdlyOrganization, EdlySubOrganization, EdlyUserProfile
+from openedx.features.edly.models import EdlyMultiSiteAccess, EdlyOrganization, EdlySubOrganization
 from student.tests.factories import UserFactory
 
 
@@ -62,41 +62,12 @@ class EdlySubOrganizationFactory(DjangoModelFactory):
             self.edx_organizations.add(self.edx_organization)
 
 
-
-class EdlyUserFactory(UserFactory):
+class EdlyMultiSiteAccessFactory(DjangoModelFactory):
     """
-    Factory inherit from "UserFactory" of edx.
-    """
-
-    class Meta(object):
-        model = User
-
-    @factory.post_generation
-    def profile(obj, create, extracted, **kwargs):
-        if create:
-            obj.save()
-            return EdlyUserProfileFactory.create(user=obj, **kwargs)
-        elif kwargs:
-            raise Exception('Cannot build a user edly profile without saving the user')
-        else:
-            return None
-
-
-class EdlyUserProfileFactory(DjangoModelFactory):
-    """
-    Factory class for "EdlyUserProfile" model.
+    Factory class for "EdlyMultiSiteAccess" model.
     """
     class Meta(object):
-        model = EdlyUserProfile
-        django_get_or_create = ('user', )
+        model = EdlyMultiSiteAccess
 
-    user = SubFactory(EdlyUserFactory)
-
-    @factory.post_generation
-    def edly_sub_organizations(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        if extracted:
-            for edly_sub_org in extracted:
-                self.edly_sub_organizations.add(edly_sub_org)
+    user = SubFactory(UserFactory)
+    sub_org = SubFactory(EdlySubOrganizationFactory)

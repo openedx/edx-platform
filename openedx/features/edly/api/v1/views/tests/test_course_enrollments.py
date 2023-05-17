@@ -5,10 +5,10 @@ from django.test import TestCase, RequestFactory, Client
 from django.urls import reverse
 from django.conf import settings
 
-from student.tests.factories import GroupFactory
+from student.tests.factories import GroupFactory, UserFactory
 
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
-from openedx.features.edly.tests.factories import EdlyUserFactory, EdlySubOrganizationFactory
+from openedx.features.edly.tests.factories import EdlySubOrganizationFactory
 
 
 class TestEdlyCourseEnrollmentViewSett(TestCase):
@@ -29,9 +29,8 @@ class TestEdlyCourseEnrollmentViewSett(TestCase):
             )
         self.request = RequestFactory(SERVER_NAME=self.request_site.domain).get('')
         self.request.site = self.request_site
-        self.user = EdlyUserFactory(is_staff=True, is_superuser=True)
+        self.user = UserFactory(is_staff=True, is_superuser=True, edly_multisite_user__sub_org=self.edly_sub_org)
         self.request.user = self.user
-        self.user.edly_profile.edly_sub_organizations.add(self.edly_sub_org)
         self.client = Client(SERVER_NAME=self.request_site.domain)
         self.client.login(username=self.user.username, password='test')
         self.course_enrollments_url = reverse('course_enrollment-list')
@@ -49,7 +48,8 @@ class TestEdlyCourseEnrollmentViewSett(TestCase):
         Verify that returns correct response if user logged in and in edly_api_users_group.
         """
         edly_api_users_group = GroupFactory(name=settings.EDLY_API_USERS_GROUP)
-        self.request.user.groups.add(edly_api_users_group)  # pylint:disable=E1101
+        self.user.edly_multisite_user.get(sub_org=self.edly_sub_org).groups.add(edly_api_users_group)  # pylint:disable=E1101
+        self.client.login(username=self.user.username, password='test')
         response = self.client.get(self.course_enrollments_url)
 
         assert response.status_code == 200

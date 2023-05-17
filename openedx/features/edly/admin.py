@@ -5,9 +5,9 @@ Django Admin pages for Edly.
 from django.contrib import admin
 
 from openedx.features.edly.models import (
+    EdlyMultiSiteAccess,
     EdlyOrganization,
     EdlySubOrganization,
-    EdlyUserProfile,
     StudentCourseProgress,
 )
 
@@ -59,24 +59,6 @@ class EdlyOrganizationAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug', 'enable_all_edly_sub_org_login', 'created', 'modified']
     inlines = [EdlySubOrganizationInlineAdmin]
 
-
-class EdlyUserProfileAdmin(admin.ModelAdmin):
-    """
-    Admin interface for the "EdlyUserProfile" object.
-    """
-    search_fields = ['edly_sub_organizations__name', 'user__username', 'user__email']
-    list_display = ['username', 'email', 'edly_sub_organizations_slugs']
-
-    def username(self, obj):
-        return obj.user.username
-
-    def email(self, obj):
-        return obj.user.email
-
-    def edly_sub_organizations_slugs(self, obj):
-        return ', '.join(obj.edly_sub_organizations.values_list('slug', flat=True))
-
-
 class StudentCourseProgressAdmin(admin.ModelAdmin):
     """
     Admin interface for the "StudentCourseProgress" object.
@@ -85,7 +67,15 @@ class StudentCourseProgressAdmin(admin.ModelAdmin):
     search_fields = ['course_id', 'student__username', 'student__email']
 
 
+class EdlyMultisiteAccessAdmin(admin.ModelAdmin):
+    """
+    Admin interface for the "EdlyMultiSiteAccess" object.
+    """
+    list_display = ["user", "sub_org"]
+    search_fields = ["user__username", "user__email", "sub_org__name"]
+
+
 admin.site.register(StudentCourseProgress, StudentCourseProgressAdmin)
 admin.site.register(EdlyOrganization, EdlyOrganizationAdmin)
 admin.site.register(EdlySubOrganization, EdlySubOrganizationAdmin)
-admin.site.register(EdlyUserProfile, EdlyUserProfileAdmin)
+admin.site.register(EdlyMultiSiteAccess, EdlyMultisiteAccessAdmin)

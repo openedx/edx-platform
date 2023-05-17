@@ -4,7 +4,7 @@ Utility functions for handling cookies.
 from crum import get_current_request
 from django.conf import settings
 
-from openedx.features.edly.models import EdlySubOrganization
+from openedx.features.edly.models import EdlyMultiSiteAccess, EdlySubOrganization
 from openedx.features.edly.utils import encode_edly_user_info_cookie
 from student import auth
 from student.roles import CourseCreatorRole
@@ -72,7 +72,9 @@ def _get_edly_user_info_cookie_string(request):
         edly_sub_organization = request.site.edly_sub_org_for_lms
         user_groups = []
         if getattr(request, 'user', None):
-            user_groups.extend(request.user.groups.all().values_list('name', flat=True))
+            user = request.user
+            edly_access_user = user.edly_multisite_user.get(sub_org=edly_sub_organization)
+            user_groups.extend(edly_access_user.groups.all().values_list('name', flat=True))
 
         edly_user_info_cookie_data = {
             'edly-org': edly_sub_organization.edly_organization.slug,
@@ -85,5 +87,5 @@ def _get_edly_user_info_cookie_string(request):
             'user_groups': user_groups,
         }
         return encode_edly_user_info_cookie(edly_user_info_cookie_data)
-    except EdlySubOrganization.DoesNotExist:
+    except (EdlySubOrganization.DoesNotExist, EdlyMultiSiteAccess.DoesNotExist):
         return ''

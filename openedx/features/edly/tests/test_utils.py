@@ -27,11 +27,10 @@ from openedx.features.edly import cookies as cookies_api
 from openedx.features.edly.tests.factories import (
     EdlyOrganizationFactory,
     EdlySubOrganizationFactory,
-    EdlyUserProfileFactory,
     SiteFactory,
 )
 from openedx.features.edly.utils import (
-    create_user_link_with_edly_sub_organization,
+    create_edly_access_role,
     create_learner_link_with_permission_groups,
     decode_edly_user_info_cookie,
     edly_panel_user_has_edly_org_access,
@@ -86,15 +85,11 @@ class UtilsTests(SharedModuleStoreTestCase):
         Setup initial test data
         """
         super(UtilsTests, self).setUp()
-        self.user = UserFactory.create()
-        self.admin_user = UserFactory.create(is_staff=True)
         self.user_password = 'password'
         self.request = RequestFactory().get('/')
-        self.request.user = self.user
         self.request.session = self._get_stub_session()
         self.request.site = SiteFactory()
 
-        self.edly_user_profile = EdlyUserProfileFactory(user=self.user)
         self.test_edly_user_info_cookie_data = {
             'edly-org': 'edly',
             'edly-sub-org': 'cloud',
@@ -134,7 +129,7 @@ class UtilsTests(SharedModuleStoreTestCase):
         Helper method to set the user password.
         """
         user.set_password(self.user_password)
-        self.user.save()
+        user.save()
 
     def test_encode_edly_user_info_cookie(self):
         """
@@ -163,10 +158,12 @@ class UtilsTests(SharedModuleStoreTestCase):
         """
         Test user have access to a valid site URL which is linked to that user.
         """
-        self._create_edly_sub_organization()
+        edly_sub_org = self._create_edly_sub_organization()
+        user = UserFactory(edly_multisite_user__sub_org=edly_sub_org)
+        self.request.user = user
         response = cookies_api.set_logged_in_edly_cookies(
             self.request, HttpResponse(),
-            self.user,
+            user,
             cookie_settings(self.request)
         )
         self._copy_cookies_to_request(response, self.request)
@@ -178,7 +175,8 @@ class UtilsTests(SharedModuleStoreTestCase):
         """
         Test staff user have access to a valid site URL which is not linked to that user.
         """
-        self.request.user = self.admin_user
+        admin_user = UserFactory.create(is_staff=True)
+        self.request.user = admin_user
         user_has_access = user_has_edly_organization_access(self.request)
         assert user_has_access is True
 
@@ -186,9 +184,8 @@ class UtilsTests(SharedModuleStoreTestCase):
         """
         Test user has no access to a valid site URL but that site in not linked to the user.
         """
-        edly_sub_organization = EdlySubOrganizationFactory(lms_site=SiteFactory())
-        self.edly_user_profile.edly_sub_organizations.add(edly_sub_organization)
-
+        user = UserFactory()
+        self.request.user = user
         user_has_access = user_has_edly_organization_access(self.request)
         assert user_has_access is False
 
@@ -196,20 +193,20 @@ class UtilsTests(SharedModuleStoreTestCase):
         """
         Test user is linked with a valid site.
         """
-        edly_sub_organization = EdlySubOrganizationFactory(lms_site=self.request.site)
-        self.edly_user_profile.edly_sub_organizations.add(edly_sub_organization)
+        edly_sub_org = self._create_edly_sub_organization()
+        user = UserFactory(edly_multisite_user__sub_org=edly_sub_org)
 
-        assert user_belongs_to_edly_sub_organization(self.request, self.user) is True
+        assert user_belongs_to_edly_sub_organization(self.request, user) is True
 
     def test_user_not_linked_with_edly_sub_organization(self):
         """
         Test user is not linked with a valid site.
         """
-        self._create_edly_sub_organization()
+        user = UserFactory()
 
-        assert user_belongs_to_edly_sub_organization(self.request, self.user) is False
+        assert user_belongs_to_edly_sub_organization(self.request, user) is False
 
-    def test_user_can_login_on_requested_edly_organization(self):
+    def test_user_can_login_on_requested_edly_organization_sub_orgs(self):
         """
         Test user can login on the requested URL site if linked with its parent edly-organization.
         """
@@ -218,20 +215,21 @@ class UtilsTests(SharedModuleStoreTestCase):
             lms_site=SiteFactory(),
             edly_organization=edly_sub_organization_linked_to_site.edly_organization,
         )
-        self.edly_user_profile.edly_sub_organizations.add(edly_sub_organization_linked_to_user)
+        user = UserFactory(edly_multisite_user__sub_org=edly_sub_organization_linked_to_user)
 
-        assert user_can_login_on_requested_edly_organization(self.request, self.user) is False
+        assert user_can_login_on_requested_edly_organization(self.request, user) is False
 
         edly_sub_organization_linked_to_site.edly_organization.enable_all_edly_sub_org_login = True
         edly_sub_organization_linked_to_site.edly_organization.save()
 
-        assert user_can_login_on_requested_edly_organization(self.request, self.user) is True
+        assert user_can_login_on_requested_edly_organization(self.request, user) is True
 
     def test_user_cannot_login_on_requested_edly_organization(self):
         """
         Test user cannot login on the requested URL site if not linked with its parent edly-organization.
         """
-        assert user_can_login_on_requested_edly_organization(self.request, self.user) is False
+        user = UserFactory()
+        assert user_can_login_on_requested_edly_organization(self.request, user) is False
 
         edly_sub_organization_linked_to_site = self._create_edly_sub_organization()
 
@@ -239,33 +237,33 @@ class UtilsTests(SharedModuleStoreTestCase):
             lms_site=SiteFactory(),
             edly_organization=EdlyOrganizationFactory(),
         )
-        self.edly_user_profile.edly_sub_organizations.add(edly_sub_organization_linked_to_user)
+        user = UserFactory(edly_multisite_user__sub_org=edly_sub_organization_linked_to_user)
 
-        assert user_can_login_on_requested_edly_organization(self.request, self.user) is False
+        assert user_can_login_on_requested_edly_organization(self.request, user) is False
 
         edly_sub_organization_linked_to_site.edly_organization.enable_all_edly_sub_org_login = True
         edly_sub_organization_linked_to_site.edly_organization.save()
 
-        assert user_can_login_on_requested_edly_organization(self.request, self.user) is False
+        assert user_can_login_on_requested_edly_organization(self.request, user) is False
 
     def test_user_can_login_on_requested_edly_organization_on_login_view(self):
         """
         Test user can login on the requested URL site if linked with its parent edly-organization.
         """
-
-        self._set_user_password(self.user)
-        post_params = {'email': self.user.email, 'password': self.user_password}
-        request = RequestFactory().post('/', post_params)
-        request.site = SiteFactory()
-        request.session = self._get_stub_session()
-
+        site = SiteFactory()
         edly_sub_organization_linked_to_site = self._create_edly_sub_organization()
         edly_sub_organization_linked_to_user = EdlySubOrganizationFactory(
-            lms_site=request.site,
+            lms_site=site,
             edly_organization=edly_sub_organization_linked_to_site.edly_organization,
         )
-        self.edly_user_profile.edly_sub_organizations.add(edly_sub_organization_linked_to_user)  # pylint: disable=E1101
+        user = UserFactory(edly_multisite_user__sub_org=edly_sub_organization_linked_to_user)
+        self._set_user_password(user)
+        post_params = {'email': user.email, 'password': self.user_password}
 
+        request = RequestFactory().post('/', post_params)
+        request.site = site
+        request.session = self._get_stub_session()
+        request.user = user
         response = login_user(request)
         assert response.status_code == 200
 
@@ -273,9 +271,9 @@ class UtilsTests(SharedModuleStoreTestCase):
         """
         Test user cannot login on the requested URL site if not linked with its parent edly-organization.
         """
-
-        self._set_user_password(self.user)
-        post_params = {'email': self.user.email, 'password': self.user_password}
+        user = UserFactory()
+        self._set_user_password(user)
+        post_params = {'email': user.email, 'password': self.user_password}
         request = RequestFactory().post('/', post_params)
         request.site = SiteFactory()
         request.session = self._get_stub_session()
@@ -299,15 +297,14 @@ class UtilsTests(SharedModuleStoreTestCase):
         edly_user_info_cookie = cookies_api._get_edly_user_info_cookie_string(self.request)
         assert edly_sub_organization.get_edx_organizations == get_edx_org_from_cookie(edly_user_info_cookie)
 
-    def test_create_user_link_with_edly_sub_organization(self):
+    def test_create_edly_access_role(self):
         """
-        Test that "create_user_link_with_edly_sub_organization" method create "EdlyUserProfile" link with User.
+        Test that "create_edly_access_role" method create "EdlyMultiSiteAccess" link with User.
         """
-        user = UserFactory()
         edly_sub_organization = self._create_edly_sub_organization()
-        edly_user_profile = create_user_link_with_edly_sub_organization(self.request, user)
-        assert edly_user_profile == user.edly_profile
-        assert edly_sub_organization.slug in user.edly_profile.get_linked_edly_sub_organizations
+        user = UserFactory(edly_multisite_user__sub_org=edly_sub_organization)
+        edly_user_profile = create_edly_access_role(self.request, user)
+        assert edly_sub_organization.slug in edly_user_profile.sub_org.slug
 
     @skip_unless_cms
     @mock.patch('course_creators.admin.render_to_string', mock.Mock(side_effect=mock_render_to_string, autospec=True))
@@ -315,25 +312,27 @@ class UtilsTests(SharedModuleStoreTestCase):
         """
         Test that "update_course_creator_status" method sets/removes a User as Course Creator correctly.
         """
+        admin_user = UserFactory(is_staff=True)
+        user = UserFactory()
         settings.FEATURES['ENABLE_CREATOR_GROUP'] = True
-        update_course_creator_status(self.admin_user, self.user, True)
-        assert self._get_course_creator_status(self.user) == 'granted'
-        assert auth.user_has_role(self.user, CourseCreatorRole())
+        update_course_creator_status(admin_user, user, True)
+        assert self._get_course_creator_status(user) == 'granted'
+        assert auth.user_has_role(user, CourseCreatorRole())
 
-        update_course_creator_status(self.admin_user, self.user, False)
-        assert self._get_course_creator_status(self.user) == 'unrequested'
-        assert not auth.user_has_role(self.user, CourseCreatorRole())
+        update_course_creator_status(admin_user, user, False)
+        assert self._get_course_creator_status(user) == 'unrequested'
+        assert not auth.user_has_role(user, CourseCreatorRole())
 
-        self.admin_user.is_staff = False
-        self.admin_user.save()
+        admin_user.is_staff = False
+        admin_user.save()
         with self.assertRaises(PermissionDenied):
-            update_course_creator_status(self.admin_user, self.user, True)
+            update_course_creator_status(admin_user, user, True)
 
         edly_panel_admin_user_group, __ = Group.objects.get_or_create(name=settings.EDLY_PANEL_ADMIN_USERS_GROUP)
-        self.admin_user.groups.add(edly_panel_admin_user_group)
-        update_course_creator_status(self.admin_user, self.user, False)
-        assert self._get_course_creator_status(self.user) == 'unrequested'
-        assert not auth.user_has_role(self.user, CourseCreatorRole())
+        admin_user.edly_multisite_user.groups.add(edly_panel_admin_user_group)
+        update_course_creator_status(admin_user, user, False)
+        assert self._get_course_creator_status(user) == 'unrequested'
+        assert not auth.user_has_role(user, CourseCreatorRole())
 
     @skip_unless_cms
     @mock.patch('course_creators.admin.render_to_string', mock.Mock(side_effect=mock_render_to_string, autospec=True))
@@ -341,49 +340,54 @@ class UtilsTests(SharedModuleStoreTestCase):
         """
         Test that "set_global_course_creator_status" method sets/removes a User as Global Course Creator correctly.
         """
-        self._create_edly_sub_organization()
-        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), self.user, cookie_settings(self.request))
+        edly_sub_org = self._create_edly_sub_organization()
+        admin_user = UserFactory(is_staff=True, edly_multisite_user__sub_org=edly_sub_org)
+        user = UserFactory(edly_multisite_user__sub_org=edly_sub_org)
+        self.request.user = user
+        response = cookies_api.set_logged_in_edly_cookies(self.request, HttpResponse(), user, cookie_settings(self.request))
         self._copy_cookies_to_request(response, self.request)
         edly_user_info_cookie = self.request.COOKIES.get(settings.EDLY_USER_INFO_COOKIE_NAME)
         edx_orgs = get_edx_org_from_cookie(edly_user_info_cookie)
-        self.request.user = self.admin_user
+        self.request.user = admin_user
         for edx_org in edx_orgs:
-            GlobalCourseCreatorRole(edx_org).add_users(self.user)
+            GlobalCourseCreatorRole(edx_org).add_users(user)
 
-        set_global_course_creator_status(self.request, self.user, True)
-        assert self._get_course_creator_status(self.user) == 'granted'
-
-        for edx_org in edx_orgs:
-            assert auth.user_has_role(self.user, GlobalCourseCreatorRole(edx_org))
-
-        set_global_course_creator_status(self.request, self.user, False)
-        assert self._get_course_creator_status(self.user) == 'unrequested'
+        set_global_course_creator_status(self.request, user, True)
+        assert self._get_course_creator_status(user) == 'granted'
 
         for edx_org in edx_orgs:
-            assert not auth.user_has_role(self.user, GlobalCourseCreatorRole(edx_org))
+            assert auth.user_has_role(user, GlobalCourseCreatorRole(edx_org))
 
-        self.admin_user.is_staff = False
-        self.admin_user.save()
+        set_global_course_creator_status(self.request, user, False)
+        assert self._get_course_creator_status(user) == 'unrequested'
+
+        for edx_org in edx_orgs:
+            assert not auth.user_has_role(user, GlobalCourseCreatorRole(edx_org))
+
+        admin_user.is_staff = False
+        admin_user.save()
         with self.assertRaises(PermissionDenied):
-            set_global_course_creator_status(self.request, self.user, True)
+            set_global_course_creator_status(self.request, user, True)
 
         edly_panel_admin_user_group, __ = Group.objects.get_or_create(name=settings.EDLY_PANEL_ADMIN_USERS_GROUP)
-        self.admin_user.groups.add(edly_panel_admin_user_group)
-        set_global_course_creator_status(self.request, self.user, True)
-        assert self._get_course_creator_status(self.user) == 'granted'
-        assert auth.user_has_role(self.user, CourseCreatorRole())
+        admin_user.edly_multisite_user.groups.add(edly_panel_admin_user_group)
+        set_global_course_creator_status(self.request, user, True)
+        assert self._get_course_creator_status(user) == 'granted'
+        assert auth.user_has_role(user, CourseCreatorRole())
 
     def test_edly_panel_user_has_edly_org_access(self):
         """
         Test if a user is edly panel user or edly panel admin user.
         """
-        self._create_edly_sub_organization()
-        create_user_link_with_edly_sub_organization(self.request, self.request.user)
+        edly_sub_org = self._create_edly_sub_organization()
+        user = UserFactory(edly_multisite_user__sub_org=edly_sub_org)
+        self.request.user = user
+        create_edly_access_role(self.request, self.request.user)
 
         assert not edly_panel_user_has_edly_org_access(self.request)
 
         edly_panel_user_group = GroupFactory(name=settings.EDLY_PANEL_USERS_GROUP)
-        self.request.user.groups.add(edly_panel_user_group)
+        user.edly_multisite_user.get(sub_org=edly_sub_org).groups.add(edly_panel_user_group)
         assert edly_panel_user_has_edly_org_access(self.request)
 
     def test_filter_courses_based_on_org(self):
@@ -397,15 +401,17 @@ class UtilsTests(SharedModuleStoreTestCase):
 
         assert len(modulestore().get_courses()) == 3
 
-        EdlySubOrganizationFactory(
+        edly_sub_org = EdlySubOrganizationFactory(
             edx_organizations=[edx_org_1],
             lms_site=self.request.site,
             studio_site=self.request.site
         )
-        create_user_link_with_edly_sub_organization(self.request, self.request.user)
+        user = UserFactory(edly_multisite_user__sub_org=edly_sub_org)
+        self.request.user = user
+        create_edly_access_role(self.request, self.request.user)
         response = cookies_api.set_logged_in_edly_cookies(
             self.request, HttpResponse(),
-            self.user,
+            user,
             cookie_settings(self.request)
         )
         self._copy_cookies_to_request(response, self.request)
@@ -421,11 +427,12 @@ class UtilsTests(SharedModuleStoreTestCase):
         """
         Test that "create_learner_link_with_permission_groups" method create learner groups permissions.
         """
-        edly_user = UserFactory()
+        edly_sub_org = self._create_edly_sub_organization()
+        edly_access_user = UserFactory(edly_multisite_user__sub_org=edly_sub_org)
         edly_user_group = GroupFactory(name=settings.EDLY_USER_ROLES.get('subscriber', None))
 
-        edly_user = create_learner_link_with_permission_groups(edly_user)
-        assert edly_user.groups.filter(name=edly_user_group).exists()
+        edly_access_user = create_learner_link_with_permission_groups(edly_access_user)
+        assert edly_access_user.groups.filter(name=edly_user_group).exists()
 
     def test_get_current_site_invalid_certificate_context_without_site_configuration(self):
         """

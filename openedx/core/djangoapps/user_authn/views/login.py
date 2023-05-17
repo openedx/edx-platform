@@ -38,7 +38,7 @@ from openedx.core.djangoapps.user_authn.views.password_reset import send_passwor
 from openedx.core.djangoapps.user_authn.config.waffle import ENABLE_LOGIN_USING_THIRDPARTY_AUTH_ONLY
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.edly.utils import (
-    create_user_link_with_edly_sub_organization,
+    create_edly_access_role,
     user_can_login_on_requested_edly_organization
 )
 from openedx.features.edly.validators import is_edly_user_allowed_to_login
@@ -431,7 +431,7 @@ def login_user(request):
 
         if not is_edly_user_allowed_to_login(request, possibly_authenticated_user):
             if user_can_login_on_requested_edly_organization(request, possibly_authenticated_user):
-                create_user_link_with_edly_sub_organization(request, possibly_authenticated_user)
+                create_edly_access_role(request, possibly_authenticated_user)
             else:
                 raise AuthFailedError(_('You are not allowed to login on this site.'))
 

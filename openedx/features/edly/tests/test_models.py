@@ -4,12 +4,11 @@ Tests for Edly django models.
 from django.test import TestCase
 
 from organizations.tests.factories import OrganizationFactory
-from openedx.features.edly.models import EdlyOrganization, EdlySubOrganization, EdlyUserProfile
+from openedx.features.edly.models import EdlyMultiSiteAccess, EdlyOrganization, EdlySubOrganization
 from openedx.features.edly.tests.factories import (
+    EdlyMultiSiteAccessFactory,
     EdlyOrganizationFactory,
     EdlySubOrganizationFactory,
-    EdlyUserFactory,
-    EdlyUserProfileFactory,
     SiteFactory,
 )
 from student.tests.factories import UserFactory
@@ -74,9 +73,7 @@ class EdlySubOrganizationTests(TestCase):
         edly_sub_organization_data = EdlySubOrganization.objects.filter(lms_site=edly_sub_organization.lms_site)
         assert edly_sub_organization_data.count() == 1
 
-        user = UserFactory.create()
-        edly_user_profile = EdlyUserProfileFactory(user=user)
-        edly_user_profile.edly_sub_organizations.add(edly_sub_organization)  # pylint: disable=E1101
+        user = UserFactory.create(edly_multisite_user__sub_org=edly_sub_organization)
         GlobalCourseCreatorRole(edx_org.short_name).add_users(user)
 
         edx_org_2 = OrganizationFactory()
@@ -102,55 +99,54 @@ class EdlySubOrganizationTests(TestCase):
         assert edly_sub_organization_data[0].edly_organization.name == edly_organization.name
 
 
-class EdlyUserProfileTests(TestCase):
+class EdlyMultiSiteAccessTests(TestCase):
     """
-    Tests for "EdlyUserProfile" Model.
+    Tests for "EdlyMultiSiteAccess" Model.
     """
 
     @classmethod
     def setUpClass(cls):
-        super(EdlyUserProfileTests, cls).setUpClass()
-        cls.user = EdlyUserFactory(password='test')
+        super(EdlyMultiSiteAccessTests, cls).setUpClass()
+        cls.user = UserFactory(password='test')
 
     def test_edly_user_profile_post_save_receiver(self):
         """
-        Test "EdlyUserProfile" model object creation.
+        Test "EdlyMultiSiteAccess" model object creation.
         """
-
-        edly_user_profile = EdlyUserProfileFactory(user=self.user)
-        edly_user_profile_data = EdlyUserProfile.objects.filter(user=edly_user_profile.user)
+        edly_sub_org = EdlySubOrganizationFactory()
+        edly_user_profile = EdlyMultiSiteAccessFactory(user=self.user, sub_org=edly_sub_org)
+        edly_user_profile_data = EdlyMultiSiteAccess.objects.filter(user=edly_user_profile.user, sub_org=edly_sub_org)
         assert edly_user_profile_data.count() == 1
 
     def test_multiple_sub_organizations(self):
         """
-        Test "EdlyUserProfile" model multiple edly sub organizations.
+        Test "EdlyMultiSiteAccess" model multiple edly sub organizations.
         """
 
         edly_sub_organizations = [EdlySubOrganizationFactory() for __ in range(3)]
-        edly_user_profile = EdlyUserProfileFactory(user=self.user)
-        edly_user_profile.edly_sub_organizations.add(*edly_sub_organizations)
+        for edly_sub_org in edly_sub_organizations:
+            EdlyMultiSiteAccessFactory(user=self.user, sub_org=edly_sub_org)
 
-        edly_user_profile_data = EdlyUserProfile.objects.filter(user=edly_user_profile.user)
+        edly_user_profile_data = EdlyMultiSiteAccess.objects.filter(user=self.user, sub_org__in=edly_sub_organizations)
 
-        assert edly_user_profile_data.count() == 1
-        assert list(edly_user_profile_data[0].edly_sub_organizations.all()) == edly_sub_organizations
+        assert edly_user_profile_data.count() == 3
 
     def test_edly_user_profile_on_user_creation(self):
         """
-        Test "EdlyUserProfile" object creation on User object creation.
+        Test "EdlyMultiSiteAccess" object creation on User object creation.
         """
-
-        edly_user = EdlyUserFactory(password='test-pass')
-        edly_user_profile = EdlyUserProfile.objects.filter(user=edly_user)
+        edly_sub_org = EdlySubOrganizationFactory()
+        edly_user = UserFactory(password='test-pass', edly_multisite_user__sub_org=edly_sub_org)
+        edly_user_profile = EdlyMultiSiteAccess.objects.filter(user=edly_user, sub_org=edly_sub_org)
         assert edly_user_profile.count() == 1
         assert edly_user_profile[0].user == edly_user
 
     def test_edly_user_profile_is_blocked_attr(self):
         """
-        Test "EdlyUserProfile" attr "is_blocked" bool.
+        Test "EdlyMultiSiteAccess" attr "is_blocked" bool.
         """
 
-        edly_user_profile = EdlyUserProfileFactory()
+        edly_user_profile = EdlyMultiSiteAccessFactory()
         assert not edly_user_profile.is_blocked
 
         edly_user_profile.is_blocked = True

@@ -8,9 +8,8 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteFacto
 from openedx.features.edly.permissions import CanAccessEdxAPI
 from openedx.features.edly.tests.factories import (
     EdlySubOrganizationFactory,
-    EdlyUserFactory,
-    EdlyUserProfileFactory,
 )
+from student.tests.factories import UserFactory
 
 
 class CanAccessEdxAPITests(TestCase):
@@ -20,9 +19,7 @@ class CanAccessEdxAPITests(TestCase):
 
     def setUp(self):
         super(CanAccessEdxAPITests, self).setUp()
-        self.user = EdlyUserFactory()
         self.request = RequestFactory().get('/')
-        self.request.user = self.user
         self.request.site = SiteFactory()
 
     def test_user_can_access_api_on_linked_site(self):
@@ -30,8 +27,8 @@ class CanAccessEdxAPITests(TestCase):
         Verify that user can access API on the site that is linked with edly profile.
         """
         edly_sub_organization = EdlySubOrganizationFactory(lms_site=self.request.site)
-        edly_user_profile = EdlyUserProfileFactory(user=self.user)
-        edly_user_profile.edly_sub_organizations.add(edly_sub_organization)  # pylint: disable=E1101
+        edly_user_profile = UserFactory(edly_multisite_user__sub_org=edly_sub_organization)
+        self.request.user = edly_user_profile
         permission = CanAccessEdxAPI().has_permission(self.request, None)
         assert permission
 
@@ -40,6 +37,8 @@ class CanAccessEdxAPITests(TestCase):
         Verify that user can not access API on the site that is not linked with its edly profile.
         """
         EdlySubOrganizationFactory(lms_site=self.request.site)
+        user = UserFactory()
+        self.request.user = user
         permission = CanAccessEdxAPI().has_permission(self.request, None)
         assert not permission
 
@@ -47,6 +46,9 @@ class CanAccessEdxAPITests(TestCase):
         """
         Verify that staff can access API.
         """
+        edly_sub_organization = EdlySubOrganizationFactory(lms_site=self.request.site)
+        edly_user_profile = UserFactory(edly_multisite_user__sub_org=edly_sub_organization)
+        self.request.user = edly_user_profile
         self.request.user.is_staff = True
         permission = CanAccessEdxAPI().has_permission(self.request, None)
         assert permission

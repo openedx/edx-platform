@@ -44,14 +44,15 @@ class UserSitesViewSet(viewsets.ViewSet):
 
     def list(self, request, *args, **kwargs):
         user = request.user
-        edly_sub_orgs_of_user = user.edly_profile.edly_sub_organizations
+        access_users = user.edly_multisite_user
 
         context = {
             'request': request,
         }
 
         user_sites = []
-        for edly_sub_org_of_user in edly_sub_orgs_of_user.all():
+        for access_user in access_users.all():
+            edly_sub_org_of_user = access_user.sub_org
             context['edly_sub_org_of_user'] = edly_sub_org_of_user
             edx_organizations = edly_sub_org_of_user.get_edx_organizations
 

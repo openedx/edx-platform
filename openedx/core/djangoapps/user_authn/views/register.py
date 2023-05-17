@@ -60,8 +60,8 @@ from openedx.core.djangoapps.waffle_utils import WaffleFlag, WaffleFlagNamespace
 from openedx.features.edly.constants import ACTIVATION_EMAIL
 from openedx.features.edly.validators import get_subscription_limit, handle_subscription_limit
 from openedx.features.edly.utils import (
+    create_edly_access_role,
     create_learner_link_with_permission_groups,
-    create_user_link_with_edly_sub_organization,
     is_config_enabled,
 )
 from student.helpers import (
@@ -216,8 +216,8 @@ def create_account_with_params(request, params):
         django_login(request, new_user)
         request.session.set_expiry(0)
 
-    create_user_link_with_edly_sub_organization(request, user)
-    user = create_learner_link_with_permission_groups(user)
+    edly_access_user = create_edly_access_role(request, user)
+    create_learner_link_with_permission_groups(edly_access_user)
 
     # Sites using multiple languages need to record the language used during registration.
     # If not, compose_and_send_activation_email will be sent in site's default language only.

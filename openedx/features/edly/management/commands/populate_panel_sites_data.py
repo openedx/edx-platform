@@ -16,7 +16,7 @@ from edly_panel_app.api.v1.helpers import _register_user  # pylint: disable=no-n
 from edly_panel_app.models import EdlyUserActivity
 from figures.models import SiteDailyMetrics, SiteMonthlyMetrics
 
-from openedx.features.edly.models import EdlyUserProfile
+from openedx.features.edly.models import EdlyMultiSiteAccess
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from student.helpers import AccountValidationError
@@ -232,15 +232,14 @@ class Command(BaseCommand):
         """
         Add users to edly sub organization and creates user activities.
         """
-        edly_user_profiles = EdlyUserProfile.objects.filter(user__in=users)
-        for user_profile in edly_user_profiles:
+        edly_access_users = EdlyMultiSiteAccess.objects.filter(user__in=users).distinct('user')
+        for user_profile in edly_access_users:
             logger.info('Saving edly user activity')
-            user_profile.edly_sub_organizations.add(*edly_sub_orgs)
-            user_profile.save()
             for edly_sub_org in edly_sub_orgs:
+                edly_access_user = EdlyMultiSiteAccess.objects.get_or_create(user=user_profile, sub_org=edly_sub_org)
                 try:
                     EdlyUserActivity.objects.get_or_create(
-                        user=user_profile.user,
+                        user=edly_access_user.user,
                         activity_date=date,
                         edly_sub_organization=edly_sub_org,
                     )

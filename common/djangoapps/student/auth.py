@@ -7,10 +7,12 @@ to decide whether to check course creator role, and other such functions.
 
 
 from ccx_keys.locator import CCXBlockUsageLocator, CCXLocator
+from crum import get_current_request
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator
 
+from openedx.features.edly.utils import get_edly_sub_org_from_request
 from student.roles import (
     CourseBetaTesterRole,
     CourseCreatorRole,
@@ -172,7 +174,12 @@ def _check_caller_authority(caller, role):
     if not (caller.is_authenticated and caller.is_active):
         raise PermissionDenied
     # superuser
-    if GlobalStaff().has_user(caller) or caller.groups.filter(name=settings.EDLY_PANEL_ADMIN_USERS_GROUP).exists():
+    try:
+        is_edly_admin = caller.edly_multisite_user.get(sub_org=get_edly_sub_org_from_request(get_current_request()))
+    except:
+        is_edly_admin = False
+
+    if GlobalStaff().has_user(caller) or is_edly_admin:
         return
 
     if isinstance(role, (GlobalStaff, CourseCreatorRole)):

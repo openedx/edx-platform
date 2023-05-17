@@ -11,11 +11,11 @@ from openedx.features.edly.constants import (
     NUMBER_OF_REGISTERED_USERS,
 )
 from openedx.features.edly.models import (
+    EdlyMultiSiteAccess,
     EdlySubOrganization,
-    EdlyUserProfile
 )
 from openedx.features.edly.utils import (
-    create_user_link_with_edly_sub_organization,
+    create_edly_access_role,
     user_can_login_on_requested_edly_organization
 )
 
@@ -47,15 +47,12 @@ def is_edly_user_allowed_to_login(request, possibly_authenticated_user):
         return False
 
     try:
-        edly_user_profile = possibly_authenticated_user.edly_profile
-    except EdlyUserProfile.DoesNotExist:
-        logger.warning('User %s has no edly profile for site %s.' % (possibly_authenticated_user.email, request.site))
+        EdlyMultiSiteAccess.objects.get(user=possibly_authenticated_user, sub_org=edly_sub_org)
+    except EdlyMultiSiteAccess.DoesNotExist:
+        logger.warning('User %s has no edly multisite user for site %s.' % (possibly_authenticated_user.email, request.site))
         return False
 
-    if edly_sub_org.slug in edly_user_profile.get_linked_edly_sub_organizations:
-        return True
-
-    return False
+    return True
 
 
 def is_edly_user_allowed_to_login_with_social_auth(request, user):
@@ -72,7 +69,7 @@ def is_edly_user_allowed_to_login_with_social_auth(request, user):
 
     if not is_edly_user_allowed_to_login(request, user):
         if user_can_login_on_requested_edly_organization(request, user):
-            create_user_link_with_edly_sub_organization(request, user)
+            create_edly_access_role(request, user)
         else:
             logger.warning('User %s is not allowed to login for site %s.' % (user.email, request.site))
             return False
@@ -107,7 +104,7 @@ def get_subscription_limit(edly_sub_org, current_plan=None):
     plan_features = settings.PLAN_FEATURES.get(current_plan)
     registration_limit = plan_features.get(NUMBER_OF_REGISTERED_USERS)
 
-    user_records_count = EdlyUserProfile.objects.filter(edly_sub_organizations=edly_sub_org).count()
+    user_records_count = EdlyMultiSiteAccess.objects.filter(sub_org=edly_sub_org).count()
 
     return registration_limit - user_records_count
 

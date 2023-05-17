@@ -31,7 +31,7 @@ from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 from openedx.core.lib.celery.task_utils import emulate_http_request
 from openedx.features.edly.constants import ESSENTIALS
 from openedx.features.edly.context_processor import Colour
-from openedx.features.edly.models import EdlySubOrganization, EdlyUserProfile
+from openedx.features.edly.models import EdlyMultiSiteAccess, EdlySubOrganization
 
 LOGGER = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ def user_has_edly_organization_access(request):
     if request.user.is_superuser or request.user.is_staff:
         return True
 
-    if getattr(request.user, 'edly_profile', None) is None:
+    if getattr(request.user, 'edly_multisite_user', None) is None:
         return False
 
     current_site = request.site
@@ -186,24 +186,25 @@ def get_edly_sub_org_from_request(request):
 
     return edly_sub_org
 
-def create_user_link_with_edly_sub_organization(request, user):
+def create_edly_access_role(request, user):
     """
-    Create edly user profile link with edly sub organization.
+    Create edly user link with edly multi site access.
 
     Arguments:
         request (WSGI Request): Django request object
         user (object): User object.
 
     Returns:
-        object: EdlyUserProfile object.
+        object: EdlyMultiSiteAccess object.
 
     """
     edly_sub_org = get_edly_sub_org_from_request(request)
-    edly_user_profile, __ = EdlyUserProfile.objects.get_or_create(user=user)
-    edly_user_profile.edly_sub_organizations.add(edly_sub_org)
-    edly_user_profile.save()
+    edly_access_user, _ = EdlyMultiSiteAccess.objects.get_or_create(
+        user=user,
+        sub_org=edly_sub_org,
+    )
 
-    return edly_user_profile
+    return edly_access_user
 
 
 def update_course_creator_status(request_user, user, set_creator):
@@ -235,7 +236,10 @@ def set_global_course_creator_status(request, user, set_global_creator):
     from course_creators.models import CourseCreator
 
     request_user = request.user
-    is_edly_panel_admin_user = request_user.groups.filter(name=settings.EDLY_PANEL_ADMIN_USERS_GROUP).exists()
+    edly_sub_org = get_edly_sub_org_from_request(request)
+    is_edly_panel_admin_user = request_user.edly_multisite_user.get(
+        sub_org=edly_sub_org
+    ).groups.filter(name=settings.EDLY_PANEL_ADMIN_USERS_GROUP).exists()
     if not GlobalStaff().has_user(request_user) and not is_edly_panel_admin_user:
         raise PermissionDenied
 
@@ -272,28 +276,19 @@ def user_belongs_to_edly_sub_organization(request, user):
 
     current_site = request.site
     try:
-        edly_sub_org = EdlySubOrganization.objects.get(
-            Q(lms_site=current_site) |
-            Q(studio_site=current_site) |
-            Q(preview_site=current_site)
-        )
-    except EdlySubOrganization.DoesNotExist:
-        return False
-
-    if edly_sub_org.slug in user.edly_profile.get_linked_edly_sub_organizations:
+        user.edly_multisite_user.get(sub_org__lms_site=current_site)
         return True
-
-    return False
+    except EdlyMultiSiteAccess.DoesNotExist:
+        return False
 
 
 def edly_panel_user_has_edly_org_access(request):
     """
     Check if requesting user is an Edly panel user.
     """
-    return EdlyUserProfile.objects.filter(
-        edly_sub_organizations__lms_site=request.site,
-        user=request.user,
-        user__groups__name__in=[
+    return request.user.edly_multisite_user.filter(
+        sub_org__lms_site=request.site,
+        groups__name__in=[
             settings.EDLY_PANEL_ADMIN_USERS_GROUP,
             settings.EDLY_PANEL_USERS_GROUP,
         ]
@@ -334,15 +329,11 @@ def user_can_login_on_requested_edly_organization(request, user, current_site=No
     if not edly_sub_org.edly_organization.enable_all_edly_sub_org_login:
         return False
 
-    current_edly_org_slug_of_user = None
-    edly_sub_org_of_user = user.edly_profile.edly_sub_organizations.first()
-    if edly_sub_org_of_user:
-        current_edly_org_slug_of_user = edly_sub_org_of_user.edly_organization.slug
+    edly_sub_orgs = EdlySubOrganization.objects.filter(
+        edly_organization=edly_sub_org.edly_organization
+    )
 
-    if current_edly_org_slug_of_user == edly_sub_org.edly_organization.slug:
-        return True
-
-    return False
+    return user.edly_multisite_user.filter(sub_org__in=edly_sub_orgs).count() > 0
 
 
 def filter_courses_based_on_org(request, all_courses):
@@ -368,12 +359,12 @@ def filter_courses_based_on_org(request, all_courses):
     return filtered_courses
 
 
-def create_learner_link_with_permission_groups(user):
+def create_learner_link_with_permission_groups(edly_access_user):
     """
     Create Edly Learner Link with Learners Permission Groups.
 
     Arguments:
-        user (object): User object.
+        user (object): Edly Multi Site Access object.
 
     Returns:
         object: User object.
@@ -382,9 +373,9 @@ def create_learner_link_with_permission_groups(user):
     groups = [settings.EDLY_USER_ROLES.get('subscriber', None), settings.EDLY_USER_ROLES.get('panel_restricted', None)]
     groups_info = Group.objects.filter(name__in=groups)
     for new_group in groups_info:
-        user.groups.add(new_group)
+        edly_access_user.groups.add(new_group)
 
-    return user
+    return edly_access_user
 
 
 def get_current_site_invalid_certificate_context(default_html_certificate_configuration):

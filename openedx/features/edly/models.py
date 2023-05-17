@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.validators import RegexValidator
@@ -70,7 +70,7 @@ def update_global_course_creators(sender, instance, **kwargs):  # pylint: disabl
    Update global course creators.
    """
     users = User.objects.filter(
-        edly_profile__edly_sub_organizations=instance.id,
+        edly_multisite_user__sub_org__id=instance.id,
         courseaccessrole__role='global_course_creator'
     )
     edx_orgs = instance.get_edx_organizations
@@ -119,3 +119,22 @@ class StudentCourseProgress(TimeStampedModel):
 
     class Meta(object):
         unique_together = (('course_id', 'student'),)
+
+
+class EdlyMultiSiteAccess(TimeStampedModel):
+    """
+    Edly custom multi site access.
+    """
+
+    user = models.ForeignKey(get_user_model(), db_index=True, on_delete=models.CASCADE, related_name='edly_multisite_user')
+    sub_org = models.ForeignKey(EdlySubOrganization, on_delete=models.CASCADE, related_name='user_site')
+    groups = models.ManyToManyField(Group, verbose_name='groups', blank=True)
+    is_blocked = models.BooleanField(
+        default=False,
+        verbose_name='Blocked',
+        help_text=_('Block/Unblock user from logging in to the platform.')
+    )
+    course_activity_date = models.DateTimeField(blank=True, null=True)
+
+    class Meta(object):
+        unique_together = (('user', 'sub_org'),)

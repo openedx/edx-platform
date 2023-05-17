@@ -26,13 +26,13 @@ class EdlyUserRegistrationTests(TestCase):
 
     def test_edly_profile_creation_with_user_registration(self):
         """
-        Test "EdlyUserProfile" creation on Registration of User.
+        Test "EdlyMultiSiteAccess" creation on Registration of User.
 
         Create an account with params, assert that the response indicates
-        success, and check if "EdlyUserProfile" object exists for the newly created user
+        success, and check if "EdlyMultiSiteAccess" object exists for the newly created user
         """
 
-        EdlySubOrganizationFactory(lms_site=self.site)
+        edly_sub_org = EdlySubOrganizationFactory(lms_site=self.site)
         username = 'test_user'
         params = {
             'email': 'test@example.org',
@@ -46,5 +46,5 @@ class EdlyUserRegistrationTests(TestCase):
         assert response.status_code == 200
 
         edly_user = User.objects.get(username=username)
-        assert hasattr(edly_user, 'edly_profile') == True
-        assert self.site.edly_sub_org_for_lms.slug in edly_user.edly_profile.get_linked_edly_sub_organizations
+        assert hasattr(edly_user, 'edly_multisite_user') == True
+        assert self.site.edly_sub_org_for_lms.slug in edly_user.edly_multisite_user.get(sub_org=edly_sub_org).sub_org.slug

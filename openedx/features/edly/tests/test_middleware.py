@@ -16,8 +16,8 @@ from openedx.core.djangoapps.site_configuration.tests.factories import (
 from openedx.features.edly.cookies import _get_edly_user_info_cookie_string
 from openedx.features.edly.tests.factories import (
     EdlySubOrganizationFactory,
-    EdlyUserFactory
 )
+from student.tests.factories import UserFactory
 
 LOGGER_NAME = 'openedx.features.edly.middleware'
 
@@ -36,10 +36,11 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
     """
 
     def setUp(self):
-        self.user = EdlyUserFactory()
         self.request = RequestFactory().get('/')
-        self.request.user = self.user
         self.request.site = SiteFactory()
+        self.edly_sub_org = EdlySubOrganizationFactory(lms_site=self.request.site)
+        self.user = UserFactory(edly_multisite_user__sub_org=self.edly_sub_org)
+        self.request.user = self.user
         self.site_config = SiteConfigurationFactory(
             site=self.request.site,
             site_values={
@@ -47,20 +48,24 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
                 'DJANGO_SETTINGS_OVERRIDE': {'SITE_NAME': 'testserver.localhost'}
             }
         )
-
-        self.client = Client(SERVER_NAME=self.request.site.domain)
         self.client.login(username=self.user.username, password='test')
+        self.client = Client(SERVER_NAME=self.request.site.domain)
 
     def test_disabled_edly_sub_orgainzation_access(self):
         """
         Test disabled Edly Organization access for a user.
         """
-        EdlySubOrganizationFactory(lms_site=self.request.site, is_active=False)
+        site = SiteFactory()
+        edly_sub_org = EdlySubOrganizationFactory(lms_site=site, is_active=False)
+        user = UserFactory(edly_multisite_user__sub_org=edly_sub_org)
+        self.request.user = user
+        self.request.site = site
         self.client.cookies.load(
             {
                 settings.EDLY_USER_INFO_COOKIE_NAME: _get_edly_user_info_cookie_string(self.request)
             }
         )
+        self.client.login(username=user.username, password='test')
         response = self.client.get('/')
         assert response.status_code != 200
 
@@ -68,7 +73,6 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
         """
         Test logged in user access based on user's linked edly sub organization.
         """
-        EdlySubOrganizationFactory(lms_site=self.request.site)
         self.client.cookies.load(
             {
                 settings.EDLY_USER_INFO_COOKIE_NAME: _get_edly_user_info_cookie_string(self.request)
@@ -85,6 +89,9 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
         Test that logged in user gets redirected to logout page and valid log message if user has no access for
         request site's edly sub organization when FRONTEND_LOGOUT_URL is not set.
         """
+        user = UserFactory()
+        self.request.user = user
+        self.client.login(username=user.username, password='test')
 
         with LogCapture(LOGGER_NAME) as logger:
             response = self.client.get('/', follow=True)
@@ -95,14 +102,14 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
                 target_status_code=200,
                 fetch_redirect_response=True
             )
-            user = auth.get_user(self.client)
-            assert not user.is_authenticated
+            client_user = auth.get_user(self.client)
+            assert not client_user.is_authenticated
 
             logger.check_present(
                 (
                     LOGGER_NAME,
                     'ERROR',
-                    'Edly user %s has no access for site %s.' % (self.user.email, self.request.site)
+                    'Edly user %s has no access for site %s.' % (user.email, self.request.site)
                 )
             )
 
@@ -114,6 +121,9 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
         Test that logged in user gets redirected to logout page and valid log message if user has no access for
         request site's edly sub organization when FRONTEND_LOGOUT_URL is set.
         """
+        user = UserFactory()
+        self.request.user = user
+        self.client.login(username=user.username, password='test')
 
         with LogCapture(LOGGER_NAME) as logger:
             response = self.client.get('/', follow=True)
@@ -128,14 +138,14 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
                 fetch_redirect_response=True
             )
 
-            user = auth.get_user(self.client)
-            assert not user.is_authenticated
+            client_user = auth.get_user(self.client)
+            assert not client_user.is_authenticated
 
             logger.check_present(
                 (
                     LOGGER_NAME,
                     'ERROR',
-                    'Edly user %s has no access for site %s.' % (self.user.email, self.request.site)
+                    'Edly user %s has no access for site %s.' % (user.email, self.request.site)
                 )
             )
 
@@ -143,18 +153,7 @@ class EdlyOrganizationAccessMiddlewareTests(TestCase):
         """
         Test logged in super user has access to all sites.
         """
-        edly_user = EdlyUserFactory(is_superuser=True)
-        client = Client()
-        client.login(username=edly_user.username, password='test')
-
-        response = client.get('/', follow=True)
-        assert response.status_code == 200
-
-    def test_staff_has_all_sites_access(self):
-        """
-        Test logged in staff user has access to all sites.
-        """
-        edly_user = EdlyUserFactory(is_staff=True)
+        edly_user = UserFactory(is_superuser=True)
         client = Client()
         client.login(username=edly_user.username, password='test')
 
@@ -178,11 +177,12 @@ class SettingsOverrideMiddlewareTests(TestCase):
         """
         Create environment for settings override middleware tests.
         """
-        self.user = EdlyUserFactory()
+        self.site = SiteFactory()
+        self.edly_sub_org = EdlySubOrganizationFactory(lms_site=self.site)
+        self.user = UserFactory(edly_multisite_user__sub_org=self.edly_sub_org)
         self.request = RequestFactory().get('/')
         self.request.user = self.user
-        self.request.site = SiteFactory()
-        EdlySubOrganizationFactory(lms_site=self.request.site)
+        self.request.site = self.site
 
         self.client = Client(SERVER_NAME=self.request.site.domain)
         self.client.cookies.load(

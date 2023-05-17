@@ -15,5 +15,7 @@ class CanAccessEdxAPI(BasePermission):
         if api_key is not None and request.META.get("HTTP_X_EDX_API_KEY") == api_key:
             return True
 
-        return request.user.is_staff or \
-            request.site.edly_sub_org_for_lms.slug in request.user.edly_profile.get_linked_edly_sub_organizations
+        edly_access_user = request.user.edly_multisite_user.filter(
+            sub_org__lms_site=request.site
+        )
+        return request.user.is_staff or bool(edly_access_user)
