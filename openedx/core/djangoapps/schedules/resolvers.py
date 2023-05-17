@@ -3,6 +3,7 @@
 import datetime
 import logging
 from itertools import groupby
+from urllib.parse import urljoin
 
 import attr
 from django.conf import settings
@@ -322,7 +323,7 @@ class UpgradeReminderResolver(BinnedSchedulesBaseResolver):
         context = {
             'course_links': course_links,
             'first_course_name': first_schedule.enrollment.course.display_name,
-            'cert_image': static('course_experience/images/verified-cert.png'),
+            'cert_image': urljoin(settings.LMS_ROOT_URL, static('course_experience/images/verified-cert.png')),
             'course_ids': course_id_strs,
         }
         context.update(first_valid_upsell_context)
