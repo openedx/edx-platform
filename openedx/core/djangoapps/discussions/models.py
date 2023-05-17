@@ -50,9 +50,9 @@ class PostingRestriction(models.TextChoices):
     """
     Discussions Restrictions choices
     """
-    Enabled = 'enabled'
-    Disabled = 'disabled'
-    Scheduled = 'scheduled'
+    ENABLED = 'enabled'
+    DISABLED = 'disabled'
+    SCHEDULED = 'scheduled'
 
 
 DEFAULT_CONFIG_ENABLED = True
@@ -424,9 +424,11 @@ class DiscussionsConfiguration(TimeStampedModel):
     )
     posting_restrictions = models.CharField(
         max_length=15,
-        default=PostingRestriction.Scheduled,
+        default=PostingRestriction.SCHEDULED,
         choices=PostingRestriction.choices,
-        help_text=_("If enabled, posting in discussions will be indefinitely disabled.")
+        help_text=_(
+            "The Posting availabilty in discussions whether it will be enabled, scheduled or indefinitely disabled."
+        )
     )
     lti_configuration = models.ForeignKey(
         LtiConfiguration,

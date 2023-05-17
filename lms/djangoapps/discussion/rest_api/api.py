@@ -324,11 +324,21 @@ def get_course(request, course_key):
         """
         return dt.isoformat().replace('+00:00', 'Z')
 
-    def get_posting_status(posting_restrictions, blackout_schedules):
+    def is_posting_allowed(posting_restrictions, blackout_schedules):
+        """
+        Check if posting is allowed based on the given posting restrictions and blackout schedules.
+
+        Args:
+            posting_restrictions (str): Values would be  "disabled", "scheduled" or "enabled".
+            blackout_schedules (List[Dict[str, datetime]]): The list of blackout schedules
+
+        Returns:
+            bool: True if posting is allowed, False otherwise.
+        """
         now = datetime.now(UTC)
-        if posting_restrictions == PostingRestriction.Disabled:
+        if posting_restrictions == PostingRestriction.DISABLED:
             return True
-        elif posting_restrictions == PostingRestriction.Scheduled:
+        elif posting_restrictions == PostingRestriction.SCHEDULED:
             return not any(schedule["start"] <= now <= schedule["end"] for schedule in blackout_schedules)
         else:
             return False
@@ -338,7 +348,7 @@ def get_course(request, course_key):
     course_config = DiscussionsConfiguration.get(course_key)
     EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
     CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
-    is_posting_enabled = get_posting_status(
+    is_posting_enabled = is_posting_allowed(
         course_config.posting_restrictions,
         course.get_discussion_blackout_datetimes()
     )
