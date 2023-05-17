@@ -23,6 +23,7 @@ from django.conf import settings
 from edx_django_utils.cache import RequestCache
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
+from organizations.api import get_course_organization
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -480,11 +481,16 @@ class VideoBlock(
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
         }
+
         if self.is_public_sharing_enabled():
             public_video_url = self.get_public_video_url()
             template_context['public_sharing_enabled'] = True
             template_context['public_video_url'] = public_video_url
-            template_context['sharing_sites_info'] = sharing_sites_info_for_video(public_video_url)
+            organization = get_course_organization(self.course_id)
+            template_context['sharing_sites_info'] = sharing_sites_info_for_video(
+                public_video_url,
+                organization=organization
+            )
 
         return self.runtime.service(self, 'mako').render_template('video.html', template_context)
 
