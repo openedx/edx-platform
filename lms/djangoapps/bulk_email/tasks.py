@@ -83,7 +83,8 @@ INFINITE_RETRY_ERRORS = (
 # and should therefore not be retried.  For example, exceeding a quota for emails.
 # Also, any SMTP errors that are not explicitly enumerated above.
 BULK_EMAIL_FAILURE_ERRORS = (
-    SMTPException,
+    ClientError,
+    SMTPException
 )
 
 
@@ -567,9 +568,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
             except SINGLE_EMAIL_FAILURE_ERRORS as exc:
                 # This will fall through and not retry the message.
-                if exc.response['Error']['Code'] in [
-                    'InvalidParameterValue', 'MessageRejected', 'MailFromDomainNotVerified'
-                ]:
+                if exc.response['Error']['Code'] in ['MessageRejected', 'MailFromDomainNotVerified']:
                     total_recipients_failed += 1
                     log.exception(
                         f"BulkEmail ==> Status: Failed(SINGLE_EMAIL_FAILURE_ERRORS), Task: {parent_task_id}, SubTask: "
@@ -632,15 +631,18 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         )
 
     except BULK_EMAIL_FAILURE_ERRORS as exc:
-        num_pending = len(to_list)
-        log.exception(
-            f"Task {task_id}: email with id {email_id} caused send_course_email task to fail with 'fatal' exception. "
-            f"{num_pending} emails unsent."
-        )
-        # Update counters with progress to date, counting unsent emails as failures,
-        # and set the state to FAILURE:
-        subtask_status.increment(failed=num_pending, state=FAILURE)
-        return subtask_status, exc
+        if exc.response['Error']['Code'] in [
+            'AccountSendingPausedException', 'MailFromDomainNotVerifiedException', 'LimitExceededException'
+        ]:
+            num_pending = len(to_list)
+            log.exception(
+                f"Task {task_id}: email with id {email_id} caused send_course_email task to fail with 'fatal' exception. "
+                f"{num_pending} emails unsent."
+            )
+            # Update counters with progress to date, counting unsent emails as failures,
+            # and set the state to FAILURE:
+            subtask_status.increment(failed=num_pending, state=FAILURE)
+            return subtask_status, exc
 
     except Exception as exc:  # pylint: disable=broad-except
         # Errors caught here cause the email to be retried.  The entire task is actually retried
