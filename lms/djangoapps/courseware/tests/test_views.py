@@ -3500,6 +3500,7 @@ class TestBasePublicVideoXBlockView(TestBasePublicVideoXBlock):
 class TestPublicVideoXBlockView(TestBasePublicVideoXBlock):
     """Test Public Video XBlock View"""
     request = RequestFactory().get('/?utm_source=edx.org&utm_medium=referral&utm_campaign=video')
+    request.user = AnonymousUser()
     base_block = PublicVideoXBlockView(request=request)
     default_utm_params = {'utm_source': 'edx.org', 'utm_medium': 'referral', 'utm_campaign': 'video'}
 
@@ -3630,6 +3631,41 @@ class TestPublicVideoXBlockView(TestBasePublicVideoXBlock):
         else:
             expected_url = reverse('about_course', kwargs={'course_id': str(self.course.id)})
         self.assert_url_with_params(url, expected_url, self.default_utm_params)
+
+    def test_get_public_video_cta_button_urls(self):
+        """
+        Test that get_public_video_cta_button_urls returns correct urls.
+        """
+        catalog_course_info = {'marketing_url': 'some_url'}
+        self.setup_course()
+        learn_more_url, enroll_url, go_to_course_url = \
+            self.base_block.get_public_video_cta_button_urls(self.course, catalog_course_info)
+        assert go_to_course_url == \
+            get_learning_mfe_home_url(course_key=self.course.id, url_fragment='home')
+
+        assert learn_more_url == \
+            self.base_block.get_learn_more_button_url(self.course, catalog_course_info,
+                                                      self.default_utm_params)
+        assert enroll_url == self.base_block.build_url(
+            reverse('register_user'),
+            {
+                'course_id': str(self.course.id),
+                'enrollment_action': 'enroll',
+                'email_opt_in': False,
+            },
+            self.default_utm_params,
+        )
+
+    @ddt.data(True, False)
+    def test_get_is_enrolled_in_course(self, mock_registered_for_course):
+        """
+        Test that is_enrolled_in_course returns correct value.
+        """
+        with patch('lms.djangoapps.courseware.views.views.registered_for_course',
+                   return_value=mock_registered_for_course):
+            self.setup_course()
+            assert views.registered_for_course(self.course, self.user) == mock_registered_for_course
+            assert self.base_block.get_is_enrolled_in_course(self.course) == mock_registered_for_course
 
 
 class TestPublicVideoXBlockEmbedView(TestBasePublicVideoXBlock):
