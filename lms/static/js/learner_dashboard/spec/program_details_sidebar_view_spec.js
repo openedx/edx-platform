@@ -25,7 +25,7 @@ describe('Program Progress View', () => {
         "url": "/certificates/bed3980e67ca40f0b31e309d9dfe9e7e", "type": "course", "title": "Introduction to the Treatment of Urban Sewage"
       }
     ],
-    urls: {"program_listing_url": "/dashboard/programs/", "commerce_api_url": "/api/commerce/v0/baskets/", "track_selection_url": "/course_modes/choose/", "program_record_url": "/foo/bar", "buy_subscription_url": "/subscriptions", "manage_subscription_url": "/orders", "subscriptions_learner_help_center_url": "/learner"},
+    urls: {"program_listing_url": "/dashboard/programs/", "commerce_api_url": "/api/commerce/v0/baskets/", "track_selection_url": "/course_modes/choose/", "program_record_url": "/foo/bar", "buy_subscription_url": "/subscriptions", "orders_and_subscriptions_url": "/orders", "subscriptions_learner_help_center_url": "/learner"},
     userPreferences: {"pref-lang": "en"}
     };
     /* eslint-enable */
