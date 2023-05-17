@@ -701,7 +701,6 @@
     "Explain if other.": "\u5982\u5176\u4ed6\u539f\u56e0\uff0c\u8bf7\u89e3\u91ca\u3002",
     "Explanation": "\u89e3\u91ca",
     "Explicitly Hiding from Students": "\u660e\u786e\u5bf9\u5b66\u751f\u9690\u85cf",
-    "Explore New Programs": "\u63a2\u7d22\u65b0\u8bfe\u7a0b",
     "Explore Programs": "\u641c\u7d22\u8bfe\u7a0b",
     "Explore courses": "\u63a2\u7d22\u8bfe\u7a0b",
     "Explore your course!": "\u63a2\u7d22\u60a8\u7684\u8bfe\u7a0b\uff01",

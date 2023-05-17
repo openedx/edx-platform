@@ -3565,10 +3565,6 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr ""
-
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"

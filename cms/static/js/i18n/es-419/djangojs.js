@@ -900,7 +900,6 @@
     "Explain if other.": "Si otro, explique.",
     "Explanation": "Explicaci\u00f3n",
     "Explicitly Hiding from Students": "Ocultar solo a los estudiantes",
-    "Explore New Programs": "Explorar programas nuevos",
     "Explore Programs": "Explorar programas",
     "Explore courses": "Explorar cursos",
     "Explore your course!": "Explora tus cursos!",

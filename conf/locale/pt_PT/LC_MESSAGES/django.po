@@ -4114,10 +4114,6 @@ msgstr "Idioma"
 msgid "Location"
 msgstr "Local"
 
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "Ano de nascimento"
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
 #. the user's gender.
