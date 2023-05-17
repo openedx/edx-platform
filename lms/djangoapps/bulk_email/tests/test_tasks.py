@@ -266,25 +266,19 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
 
         operation_name = ''
-        parsed_response = {'Error': {'Code': 'InvalidParameterValue', 'Message': 'Error Uploading'}}
+        parsed_response = {'Error': {'Code': 'MessageRejected', 'Message': 'Error Uploading'}}
         self._test_email_address_failures(ClientError(parsed_response, operation_name))
 
     def test_ses_illegal_address(self):
         # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
         operation_name = ''
-        parsed_response = {'Error': {'Code': 'InvalidParameterValue', 'Message': 'Error Uploading'}}
-        self._test_email_address_failures(ClientError(parsed_response, operation_name))
-
-    def test_ses_local_address_character_error(self):
-        # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
-        operation_name = ''
-        parsed_response = {'Error': {'Code': 'InvalidParameterValue', 'Message': 'Error Uploading'}}
+        parsed_response = {'Error': {'Code': 'MailFromDomainNotVerifiedException', 'Message': 'Error Uploading'}}
         self._test_email_address_failures(ClientError(parsed_response, operation_name))
 
     def test_ses_domain_ends_with_dot(self):
         # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
         operation_name = ''
-        parsed_response = {'Error': {'Code': 'InvalidParameterValue', 'Message': 'InvalidParameterValue'}}
+        parsed_response = {'Error': {'Code': 'MailFromDomainNotVerifiedException', 'Message': 'invalid domain'}}
         self._test_email_address_failures(ClientError(parsed_response, operation_name))
 
     def test_bulk_email_skip_with_non_ascii_emails(self):

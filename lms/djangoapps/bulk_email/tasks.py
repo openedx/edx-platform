@@ -569,7 +569,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
             except SINGLE_EMAIL_FAILURE_ERRORS as exc:
                 # This will fall through and not retry the message.
-                if exc.response['Error']['Code'] in ['MessageRejected', 'MailFromDomainNotVerified']:
+                if exc.response['Error']['Code'] in ['MessageRejected', 'MailFromDomainNotVerified', 'MailFromDomainNotVerifiedException', 'FromEmailAddressNotVerifiedException']:   # lint-amnesty, pylint: disable=line-too-long
                     total_recipients_failed += 1
                     log.exception(
                         f"BulkEmail ==> Status: Failed(SINGLE_EMAIL_FAILURE_ERRORS), Task: {parent_task_id}, SubTask: "
@@ -577,6 +577,8 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                         f"UserId: {current_recipient['pk']}"
                     )
                     subtask_status.increment(failed=1)
+                else:
+                    raise exc
 
             else:
                 total_recipients_successful += 1
@@ -613,11 +615,13 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
     except INFINITE_RETRY_ERRORS as exc:
         # Increment the "retried_nomax" counter, update other counters with progress to date,
         # and set the state to RETRY:
-        if exc.response['Error']['Code'] in ['LimitExceededException'] or isinstance(exc, SMTPDataError) or isinstance(exc, SMTPSenderRefused):
+        if isinstance(exc, (SMTPDataError, SMTPSenderRefused)) or exc.response['Error']['Code'] in ['LimitExceededException']:   # lint-amnesty, pylint: disable=line-too-long
             subtask_status.increment(retried_nomax=1, state=RETRY)
             return _submit_for_retry(
                 entry_id, email_id, to_list, global_email_context, exc, subtask_status, skip_retry_max=True
             )
+        else:
+            raise exc
 
     except LIMITED_RETRY_ERRORS as exc:
         # Errors caught here cause the email to be retried.  The entire task is actually retried
@@ -632,18 +636,21 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         )
 
     except BULK_EMAIL_FAILURE_ERRORS as exc:
-        if exc.response['Error']['Code'] in [
+        if isinstance(exc, SMTPException) or exc.response['Error']['Code'] in [
             'AccountSendingPausedException', 'MailFromDomainNotVerifiedException', 'LimitExceededException'
-        ] or isinstance(exc, SMTPException):
+        ]:
             num_pending = len(to_list)
             log.exception(
-                f"Task {task_id}: email with id {email_id} caused send_course_email task to fail with 'fatal' exception. "
+                f"Task {task_id}: email with id {email_id} caused send_course_email "
+                f"task to fail with 'fatal' exception. "
                 f"{num_pending} emails unsent."
             )
             # Update counters with progress to date, counting unsent emails as failures,
             # and set the state to FAILURE:
             subtask_status.increment(failed=num_pending, state=FAILURE)
             return subtask_status, exc
+        else:
+            raise exc
 
     except Exception as exc:  # pylint: disable=broad-except
         # Errors caught here cause the email to be retried.  The entire task is actually retried
