@@ -2,8 +2,6 @@ swagger: '2.0'
 info:
   title: Open edX API
   description: APIs for access to Open edX information
-  contact:
-    email: oscm@edx.org
   version: v1
 basePath: /api
 consumes:
