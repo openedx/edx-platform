@@ -1614,7 +1614,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': DATA_DIR,
+                        'fs_root': lambda settings: settings.DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
@@ -1624,7 +1624,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': DATA_DIR,
+                        'fs_root': lambda settings: settings.DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 }
@@ -1632,6 +1632,7 @@ MODULESTORE = {
         }
     }
 }
+
 
 DATABASES = {
     # edxapp's edxapp-migrate scripts and the edxapp_migrate play
