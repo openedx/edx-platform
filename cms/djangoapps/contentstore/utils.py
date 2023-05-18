@@ -227,13 +227,13 @@ def get_editor_page_base_url(course_locator) -> str:
     return editor_url
 
 
-def get_studio_home_url(course_locator):
+def get_studio_home_url():
     """
     Gets course authoring microfrontend URL for Studio Home view.
     """
     studio_home_url = None
     if use_new_home_page():
-        mfe_base_url = get_course_authoring_url(course_locator)
+        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
         if mfe_base_url:
             studio_home_url = f'{mfe_base_url}/home'
     return studio_home_url
@@ -246,7 +246,7 @@ def get_schedule_details_url(course_locator) -> str:
     schedule_details_url = None
     if use_new_schedule_details_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/settings/details/{course_locator}'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/settings/details'
         if mfe_base_url:
             schedule_details_url = course_mfe_url
     return schedule_details_url
@@ -259,7 +259,7 @@ def get_advanced_settings_url(course_locator) -> str:
     advanced_settings_url = None
     if use_new_advanced_settings_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/settings/advanced/{course_locator}'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/settings/advanced'
         if mfe_base_url:
             advanced_settings_url = course_mfe_url
     return advanced_settings_url
@@ -272,7 +272,7 @@ def get_grading_url(course_locator) -> str:
     grading_url = None
     if use_new_grading_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/settings/grading/{course_locator}'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/settings/grading'
         if mfe_base_url:
             grading_url = course_mfe_url
     return grading_url
@@ -285,7 +285,7 @@ def get_updates_url(course_locator) -> str:
     updates_url = None
     if use_new_updates_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/course_info/{course_locator}'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_info'
         if mfe_base_url:
             updates_url = course_mfe_url
     return updates_url
@@ -298,7 +298,7 @@ def get_import_url(course_locator) -> str:
     import_url = None
     if use_new_import_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/import/{course_locator}'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/import'
         if mfe_base_url:
             import_url = course_mfe_url
     return import_url
@@ -311,7 +311,7 @@ def get_export_url(course_locator) -> str:
     export_url = None
     if use_new_export_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/export/{course_locator}'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/export'
         if mfe_base_url:
             export_url = course_mfe_url
     return export_url
@@ -324,7 +324,7 @@ def get_files_uploads_url(course_locator) -> str:
     files_uploads_url = None
     if use_new_files_uploads_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/assets/{course_locator}'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/assets'
         if mfe_base_url:
             files_uploads_url = course_mfe_url
     return files_uploads_url
@@ -337,7 +337,7 @@ def get_video_uploads_url(course_locator) -> str:
     video_uploads_url = None
     if use_new_video_uploads_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/assets/{course_locator}'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/videos/'
         if mfe_base_url:
             video_uploads_url = course_mfe_url
     return video_uploads_url
