@@ -981,7 +981,7 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):  # lint-amnesty, p
         assert response.status == '201 Created'
         response = json.loads(response.text)
         assert response['language_code'], 'uk'
-        self.assertDictEqual(self.block.transcripts, {})
+        self.assertDictEqual(self.block.transcripts, {'uk': f'{response["edx_video_id"]}-uk.srt'})
         assert edxval_api.get_video_transcript_data(video_id=response['edx_video_id'], language_code='uk')
 
     def test_studio_transcript_post_bad_content(self):
@@ -999,6 +999,8 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):  # lint-amnesty, p
         response = self.block.studio_transcript(request=request, dispatch="translation")
         assert response.status_code == 400
         assert response.json['error'] == 'There is a problem with this transcript file. Try to upload a different file.'
+        # transcripts fields should not be updated
+        self.assertDictEqual(self.block.transcripts, {})
 
 
 @ddt.ddt
