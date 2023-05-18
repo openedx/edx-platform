@@ -36,6 +36,7 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_export_page,
     use_new_files_uploads_page,
     use_new_grading_page,
+    use_new_course_team_page,
     use_new_home_page,
     use_new_import_page,
     use_new_schedule_details_page,
@@ -276,6 +277,19 @@ def get_grading_url(course_locator) -> str:
         if mfe_base_url:
             grading_url = course_mfe_url
     return grading_url
+
+
+def get_course_team_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for course team page view.
+    """
+    course_team_url = None
+    if use_new_course_team_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_team'
+        if mfe_base_url:
+            course_team_url = course_mfe_url
+    return course_team_url
 
 
 def get_updates_url(course_locator) -> str:
