@@ -31,6 +31,8 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_api_data
 
+from edx_rest_api_client.client import USER_AGENT
+
 logger = logging.getLogger(__name__)
 
 missing_details_msg_tpl = 'Failed to get details for program {uuid} from the cache.'
@@ -52,6 +54,7 @@ def get_catalog_api_client(user):
     """
     jwt = create_jwt_for_user(user)
     client = requests.Session()
+    client.headers.update({'User-Agent': USER_AGENT})
     client.auth = SuppliedJwtAuth(jwt)
 
     return client

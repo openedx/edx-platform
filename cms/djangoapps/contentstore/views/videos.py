@@ -29,6 +29,7 @@ from edxval.api import (
     create_video,
     get_3rd_party_transcription_plans,
     get_available_transcript_languages,
+    get_video_transcript_url,
     get_transcript_credentials_state_for_org,
     get_transcript_preferences,
     get_videos_for_course,
@@ -574,6 +575,12 @@ def _get_videos(course, pagination_conf=None):
         video['transcription_status'] = (
             StatusDisplayStrings.get(video['status']) if is_video_encodes_ready else ''
         )
+        video['transcript_urls'] = {}
+        for language_code in video['transcripts']:
+            video['transcript_urls'][language_code] = get_video_transcript_url(
+                video_id=video['edx_video_id'],
+                language_code=language_code,
+            )
         # Convert the video status.
         video['status'] = convert_video_status(video, is_video_encodes_ready)
 
@@ -595,7 +602,7 @@ def _get_index_videos(course, pagination_conf=None):
     attrs = [
         'edx_video_id', 'client_video_id', 'created', 'duration',
         'status', 'courses', 'transcripts', 'transcription_status',
-        'error_description'
+        'transcript_urls', 'error_description'
     ]
 
     def _get_values(video):

@@ -18,13 +18,12 @@ import json
 import logging
 from collections import OrderedDict, defaultdict
 from operator import itemgetter
-from urllib.parse import urljoin
 
 from django.conf import settings
-from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
+from organizations.api import get_course_organization
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -482,16 +481,16 @@ class VideoBlock(
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
         }
+
         if self.is_public_sharing_enabled():
             public_video_url = self.get_public_video_url()
             template_context['public_sharing_enabled'] = True
             template_context['public_video_url'] = public_video_url
-            template_context['sharing_sites_info'] = sharing_sites_info_for_video(public_video_url)
-
-        # Public video previewing / social media sharing
-        if self.is_public_sharing_enabled():
-            template_context['public_sharing_enabled'] = True
-            template_context['public_video_url'] = self.get_public_video_url()
+            organization = get_course_organization(self.course_id)
+            template_context['sharing_sites_info'] = sharing_sites_info_for_video(
+                public_video_url,
+                organization=organization
+            )
 
         return self.runtime.service(self, 'mako').render_template('video.html', template_context)
 
@@ -512,11 +511,6 @@ class VideoBlock(
         """
         Is public sharing enabled for this video?
         """
-
-        # Sharing is DISABLED from studio
-        is_studio = getattr(self.runtime, "is_author_mode", False)
-        if is_studio:
-            return False
 
         # Video share feature must be enabled for sharing settings to take effect
         feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key)
@@ -543,15 +537,7 @@ class VideoBlock(
         """
         Returns the public video url
         """
-        return urljoin(
-            settings.LMS_ROOT_URL,
-            reverse(
-                'render_public_video_xblock',
-                kwargs={
-                    'usage_key_string': str(self.location)
-                }
-            )
-        )
+        return fr'{settings.LMS_ROOT_URL}/videos/{str(self.location)}'
 
     def validate(self):
         """
@@ -674,7 +660,7 @@ class VideoBlock(
         # be shared with leaners. This is not possible with default rendering logic in backbonjs code, that is why
         # we are setting a new type and then do a custom rendering in backbonejs code to render the desired UI.
         editable_fields['public_access']['type'] = 'PublicAccess'
-        editable_fields['public_access']['url'] = fr'{settings.LMS_ROOT_URL}/videos/{str(self.location)}'
+        editable_fields['public_access']['url'] = self.get_public_video_url()
 
         # construct transcripts info and also find if `en` subs exist
         transcripts_info = self.get_transcripts_info()
