@@ -4,7 +4,7 @@ import logging
 import textwrap
 
 from lxml import etree
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
@@ -75,28 +75,28 @@ class AnnotatableBlock(
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/html/display.js'),
-            resource_string(__name__, 'js/src/annotatable/display.js'),
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
+            resource_filename(__name__, 'js/src/html/display.js'),
+            resource_filename(__name__, 'js/src/annotatable/display.js'),
+            resource_filename(__name__, 'js/src/javascript_loader.js'),
+            resource_filename(__name__, 'js/src/collapsible.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     preview_view_css = {
         'scss': [
-            resource_string(__name__, 'css/annotatable/display.scss'),
+            resource_filename(__name__, 'css/annotatable/display.scss'),
         ],
     }
 
     studio_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/raw/edit/xml.js'),
+            resource_filename(__name__, 'js/src/raw/edit/xml.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     studio_view_css = {
         'scss': [
-            resource_string(__name__, 'css/codemirror/codemirror.scss'),
+            resource_filename(__name__, 'css/codemirror/codemirror.scss'),
         ],
     }
     studio_js_module_name = "XMLEditingDescriptor"

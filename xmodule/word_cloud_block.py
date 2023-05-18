@@ -10,7 +10,7 @@ If student have answered - words he entered and cloud.
 import json
 import logging
 
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -114,21 +114,21 @@ class WordCloudBlock(  # pylint: disable=abstract-method
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'assets/word_cloud/src/js/word_cloud.js'),
+            resource_filename(__name__, 'assets/word_cloud/src/js/word_cloud.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     preview_view_css = {
         'scss': [
-            resource_string(__name__, 'css/word_cloud/display.scss'),
+            resource_filename(__name__, 'css/word_cloud/display.scss'),
         ],
     }
 
     studio_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/raw/edit/metadata-only.js'),
+            resource_filename(__name__, 'js/src/raw/edit/metadata-only.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     studio_view_css = {
         'scss': [],
