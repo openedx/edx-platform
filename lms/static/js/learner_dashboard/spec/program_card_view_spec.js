@@ -62,6 +62,7 @@ describe('Program card View', () => {
             not_started: 3,
         },
     ];
+    // eslint-disable-next-line no-undef
     const subscriptionCollection = new Backbone.Collection([{
         resource_id: 'a87e5eac-3c93-45a1-a8e1-4c79ca8401c8',
         subscription_state: 'active',

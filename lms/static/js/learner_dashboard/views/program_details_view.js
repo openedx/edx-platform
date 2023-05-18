@@ -210,16 +210,16 @@ class ProgramDetailsView extends Backbone.View {
         };
         if (this.subscriptionModel.get('subscriptionState') === 'active') {
             if (
-                this.courseData.get('in_progress').length === 0 &&
-                this.courseData.get('not_started').length >= 1
+                this.courseData.get('in_progress').length === 0
+                && this.courseData.get('not_started').length >= 1
             ) {
                 alerts.enrollmentAlerts.push({
                     title: this.programModel.get('title'),
                 });
             }
             if (
-                this.subscriptionModel.get('remainingDays') <= 7 &&
-                this.subscriptionModel.get('hasActiveTrial')
+                this.subscriptionModel.get('remainingDays') <= 7
+                && this.subscriptionModel.get('hasActiveTrial')
             ) {
                 alerts.trialEndingAlerts.push({
                     title: this.programModel.get('title'),
@@ -245,7 +245,7 @@ class ProgramDetailsView extends Backbone.View {
         if (state === 'active') {
             window.analytics.track(
                 'edx.bi.user.subscription.program-detail-page.manage.clicked',
-                this.subscriptionEventParams
+                this.subscriptionEventParams,
             );
         } else {
             const isNewSubscription = state !== 'inactive';
@@ -256,7 +256,7 @@ class ProgramDetailsView extends Backbone.View {
                     is_new_subscription: isNewSubscription,
                     is_trial_eligible: isNewSubscription,
                     ...this.subscriptionEventParams,
-                }
+                },
             );
         }
     }
@@ -265,7 +265,7 @@ class ProgramDetailsView extends Backbone.View {
         if (this.options.isSubscriptionEligible) {
             window.analytics.track(
                 'edx.bi.user.subscription.program-detail-page.viewed',
-                this.subscriptionEventParams
+                this.subscriptionEventParams,
             );
         }
     }

@@ -1,8 +1,13 @@
+/* eslint-disable import/no-extraneous-dependencies, import/no-duplicates,
+ import/order, import/no-self-import, import/no-cycle, import/no-useless-path-segments,
+  import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member */
+// eslint-disable-next-line import/no-extraneous-dependencies
 /* globals setFixtures */
 
 import Backbone from 'backbone';
 
 import ProgressCollection from '../collections/program_progress_collection';
+// eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import ProgramListHeaderView from '../views/program_list_header_view';
 
 describe('Program List Header View', () => {
@@ -52,10 +57,10 @@ describe('Program List Header View', () => {
 
     beforeEach(() => {
         context.subscriptionCollection = new Backbone.Collection(
-            context.programsSubscriptionData
+            context.programsSubscriptionData,
         );
         context.progressCollection = new ProgressCollection(
-            context.userProgress
+            context.userProgress,
         );
         setFixtures('<div class="js-program-list-header"></div>');
         view = new ProgramListHeaderView({
@@ -78,15 +83,15 @@ describe('Program List Header View', () => {
 
     it('should render a program alert', () => {
         expect(
-            view.$('.js-program-list-alerts .alert .alert-heading').html().trim()
+            view.$('.js-program-list-alerts .alert .alert-heading').html().trim(),
         ).toEqual('Enroll in a Test Program course');
         expect(
-            view.$('.js-program-list-alerts .alert .alert-message')
+            view.$('.js-program-list-alerts .alert .alert-message'),
         ).toContainHtml(
-            'According to our records, you are not enrolled in any courses included in your Test Program program subscription. Enroll in a course from the <i>Program Details</i> page.'
+            'According to our records, you are not enrolled in any courses included in your Test Program program subscription. Enroll in a course from the <i>Program Details</i> page.',
         );
         expect(
-            view.$('.js-program-list-alerts .alert .view-button').attr('href')
+            view.$('.js-program-list-alerts .alert .view-button').attr('href'),
         ).toEqual('/dashboard/programs/b90d70d5-f981-4508-bdeb-5b792d930c03/');
     });
 });

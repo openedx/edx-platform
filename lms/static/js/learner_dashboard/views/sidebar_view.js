@@ -48,7 +48,7 @@ class SidebarView extends Backbone.View {
 
     trackSubscriptionUpsellCTA() {
         window.analytics.track(
-            'edx.bi.user.subscription.program-dashboard.upsell.clicked'
+            'edx.bi.user.subscription.program-dashboard.upsell.clicked',
         );
     }
 }
