@@ -72,7 +72,7 @@ class Command(BaseCommand):
                                 )
                             except StudentModule.DoesNotExist:
                                 student_module = None
-                                print(f"===============Student module not found===================")
+                                print(f"===============Student module not found for user {username} and course {course_id} ===================")
 
                             student = Student.objects.filter(gen_user__user__username=username).first()
                             user_states = generated_report_data.get(username)
@@ -97,6 +97,8 @@ class Command(BaseCommand):
                                     if created:
                                         print(f"===============Added Journal Entry===================")
                                     else:
+                                        if student_module:
+                                            JournalPost.objects.filter(uuid=user_state['Answer ID'], student=student).update(modified=student_module.modified)
                                         print(f"===============Updated Journal Entry===================")
                         except Exception as ex:
                             self.stdout.write(self.style.ERROR(str(ex)))

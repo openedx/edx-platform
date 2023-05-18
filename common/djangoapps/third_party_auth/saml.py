@@ -208,10 +208,12 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         """
         details = super().get_user_details(attributes)
         extra_field_definitions = self.conf.get('extra_field_definitions', [])
-        details.update({
-            field['name']: attributes[field['urn']][0] if field['urn'] in attributes else None
-            for field in extra_field_definitions
-        })
+        for field in extra_field_definitions:
+            try:
+                details[field['name']] = attributes[field['urn']][0] if field['urn'] in attributes else None
+            except Exception as ex:
+                log.error(f"An error occurred while processing {field['name']} field in get_user_details: {str(ex)}")
+
         return details
 
     def get_attr(self, attributes, conf_key, default_attribute):
