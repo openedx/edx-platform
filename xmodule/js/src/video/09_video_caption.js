@@ -1,7 +1,7 @@
 (function(define) {
 // VideoCaption module.
-    
-'use strict';
+
+    'use strict';
 
     define('video/09_video_caption.js', [
         'video/00_sjson.js',

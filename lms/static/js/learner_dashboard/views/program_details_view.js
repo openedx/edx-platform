@@ -45,7 +45,7 @@ class ProgramDetailsView extends Backbone.View {
         this.programModel = new Backbone.Model(this.options.programData);
         this.courseData = new Backbone.Model(this.options.courseData);
         this.certificateCollection = new Backbone.Collection(
-            this.options.certificateData
+            this.options.certificateData,
         );
         this.subscriptionModel = new SubscriptionModel({
             context: this.options,
@@ -92,7 +92,7 @@ class ProgramDetailsView extends Backbone.View {
         const totalCount = completedCount + inProgressCount + remainingCount;
         const buyButtonUrl = ProgramDetailsView.getUrl(
             this.options.urls.buy_button_url,
-            this.options.programData
+            this.options.programData,
         );
 
         let data = {

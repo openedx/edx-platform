@@ -147,7 +147,7 @@ define(['js/views/license', 'js/models/license', 'common/js/spec_helpers/templat
                 this.view = new LicenseView({model: this.model, showPreview: true});
                 this.view.render();
                 expect(this.view.$('.license-preview').length).toEqual(1);
-	    // Expect default text to be "All Rights Reserved"
+                // Expect default text to be "All Rights Reserved"
                 expect(this.view.$('.license-preview')).toContainText('All Rights Reserved');
                 this.view.$('li[data-license=creative-commons] button').click();
                 expect(this.view.$('.license-preview').length).toEqual(1);

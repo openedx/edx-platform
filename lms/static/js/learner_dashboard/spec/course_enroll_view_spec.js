@@ -217,7 +217,7 @@ describe('Course Enroll View', () => {
         view.enrollSuccess();
 
         expect(CourseEnrollView.redirect).toHaveBeenCalledWith(
-            view.trackSelectionUrl + courseCardModel.get('course_run_key')
+            view.trackSelectionUrl + courseCardModel.get('course_run_key'),
         );
     });
 

@@ -13,7 +13,7 @@ const mapDispatchToProps = dispatch => ({
     (courseId, excludeBlockTypes) => dispatch(fetchCourseBlocks(courseId, excludeBlockTypes)),
     createProblemResponsesReportTask:
     (problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation) => dispatch(
-        createProblemResponsesReportTask(problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation,),
+        createProblemResponsesReportTask(problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation),
     ),
 });
 
