@@ -101,7 +101,6 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             if (options && options.selectCohort) {
                 cohortsView.$('.cohort-select').val(options.selectCohort.toString()).change();
             }
-
         };
 
         respondToRefresh = function(catCount, dogCount) {
@@ -262,8 +261,8 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollectio
             // But upload form should not be visible until toggle is clicked.
             expect(cohortsView.$(fileUploadFormCss).length).toBe(0);
             uploadCsvToggle = cohortsView.$('.toggle-cohort-management-secondary');
-            expect(uploadCsvToggle.text()).
-                toContain('Assign learners to cohorts by uploading a CSV file');
+            expect(uploadCsvToggle.text())
+                .toContain('Assign learners to cohorts by uploading a CSV file');
             uploadCsvToggle.click();
             // After toggle is clicked, it should be hidden.
             expect(uploadCsvToggle).toHaveClass('hidden');

@@ -15,14 +15,14 @@ function initiateProblemResponsesRequest(endpoint, blockId) {
         method: 'post',
         headers: HEADERS,
         body: formData,
-    },);
+    });
 }
 
 const fetchTaskStatus = (endpoint, taskId) => fetch(`${endpoint}/?task_id=${taskId}`, {
     credentials: 'same-origin',
     method: 'get',
     headers: HEADERS,
-},);
+});
 
 const fetchDownloadsList = (endpoint, reportName) => {
     const formData = new FormData();
@@ -33,7 +33,7 @@ const fetchDownloadsList = (endpoint, reportName) => {
         method: 'POST',
         headers: HEADERS,
         body: formData,
-    },);
+    });
 };
 
 export {

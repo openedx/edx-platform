@@ -61,18 +61,18 @@ describe('Program Progress View', () => {
 
         expect(view.$('.js-subscription-info')[0]).toBeInDOM();
         expect(
-            view.$('.js-subscription-info .divider-heading').text().trim()
+            view.$('.js-subscription-info .divider-heading').text().trim(),
         ).toEqual(heading);
         expect(
-            view.$('.js-subscription-info .subscription-section p:nth-child(1)')
+            view.$('.js-subscription-info .subscription-section p:nth-child(1)'),
         ).toContainHtml(body);
         expect(
-            view.$('.js-subscription-info .subscription-section p:nth-child(2)')
+            view.$('.js-subscription-info .subscription-section p:nth-child(2)'),
         ).toContainText(
-            /Need help\? Check out the.*Learner Help Center.*to troubleshoot issues or contact support/
+            /Need help\? Check out the.*Learner Help Center.*to troubleshoot issues or contact support/,
         );
         expect(
-            view.$('.js-subscription-info .subscription-section p:nth-child(2) .subscription-link').attr('href')
+            view.$('.js-subscription-info .subscription-section p:nth-child(2) .subscription-link').attr('href'),
         ).toEqual('/learner');
     };
 
@@ -235,18 +235,18 @@ describe('Program Progress View', () => {
         testSubscriptionState(
             'pre',
             'Inactive subscription',
-            'If you had a subscription previously, your payment history is still available'
+            'If you had a subscription previously, your payment history is still available',
         );
     });
 
     it('should render active trial subscription info if subscription is active with trial', () => {
         subscriptionData.trial_end = moment().add(3, 'days').utc().format(
-            'YYYY-MM-DDTHH:mm:ss[Z]'
+            'YYYY-MM-DDTHH:mm:ss[Z]',
         );
         testSubscriptionState(
             'active',
             'Trial subscription',
-            'View your receipts or modify your subscription'
+            'View your receipts or modify your subscription',
         );
     });
 
@@ -254,7 +254,7 @@ describe('Program Progress View', () => {
         testSubscriptionState(
             'active',
             'Active subscription',
-            'View your receipts or modify your subscription'
+            'View your receipts or modify your subscription',
         );
     });
 
@@ -262,7 +262,7 @@ describe('Program Progress View', () => {
         testSubscriptionState(
             'inactive',
             'Inactive subscription',
-            'Restart your subscription for $100/month. Your payment history is still available'
+            'Restart your subscription for $100/month. Your payment history is still available',
         );
     });
 });

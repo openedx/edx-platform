@@ -9,4 +9,4 @@ jasmine.getFixtures().fixturesPath = '/base/';
 // Stub out modal dialog alerts, which will prevent
 // us from accessing the test results in the DOM
 window.confirm = function() { return true; };
-window.alert = function() { return; };
+window.alert = function() { };

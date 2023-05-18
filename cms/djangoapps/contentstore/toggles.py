@@ -175,3 +175,242 @@ ENABLE_COPY_PASTE_FEATURE = WaffleFlag(
     __name__,
     CONTENTSTORE_LOG_PREFIX,
 )
+
+
+# .. toggle_name: new_studio_mfe.use_new_home_page
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio home page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-9306
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_HOME_PAGE = WaffleFlag('new_studio_mfe.use_new_home_page', __name__)
+
+
+def use_new_home_page():
+    """
+    Returns a boolean if new studio home page mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_HOME_PAGE.is_enabled()
+
+
+# .. toggle_name: new_studio_mfe.use_new_custom_pages
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio custom pages mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_CUSTOM_PAGES = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_custom_pages', __name__)
+
+
+def use_new_custom_pages():
+    """
+    Returns a boolean if new studio custom pages mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_CUSTOM_PAGES.is_enabled()
+
+
+# .. toggle_name: new_studio_mfe.use_new_schedule_details_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio schedule and details mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_SCHEDULE_DETAILS_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_schedule_details_page', __name__)
+
+
+def use_new_schedule_details_page(course_key):
+    """
+    Returns a boolean if new studio schedule and details mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_SCHEDULE_DETAILS_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: new_studio_mfe.use_new_advanced_settings_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio advanced settings page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_advanced_settings_page', __name__)
+
+
+def use_new_advanced_settings_page(course_key):
+    """
+    Returns a boolean if new studio advanced settings pafe mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: new_studio_mfe.use_new_grading_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio grading page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_GRADING_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_grading_page', __name__)
+
+
+def use_new_grading_page(course_key):
+    """
+    Returns a boolean if new studio grading mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_GRADING_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: new_studio_mfe.use_new_updates_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio updates page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_UPDATES_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_updates_page', __name__)
+
+
+def use_new_updates_page(course_key):
+    """
+    Returns a boolean if new studio updates mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_UPDATES_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: new_studio_mfe.use_new_import_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio import page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_IMPORT_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_import_page', __name__)
+
+
+def use_new_import_page(course_key):
+    """
+    Returns a boolean if new studio import mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_IMPORT_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: new_studio_mfe.use_new_export_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio export page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_EXPORT_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_export_page', __name__)
+
+
+def use_new_export_page(course_key):
+    """
+    Returns a boolean if new studio export mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_EXPORT_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: new_studio_mfe.use_new_files_uploads_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio files and uploads page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_FILES_UPLOADS_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_files_uploads_page', __name__)
+
+
+def use_new_files_uploads_page(course_key):
+    """
+    Returns a boolean if new studio files and uploads mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_FILES_UPLOADS_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: new_studio_mfe.use_new_video_uploads_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new video uploads page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_VIDEO_UPLOADS_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_video_uploads_page', __name__)
+
+
+def use_new_video_uploads_page(course_key):
+    """
+    Returns a boolean if new studio video uploads mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_VIDEO_UPLOADS_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: new_studio_mfe.use_new_course_outline_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio course outline page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_COURSE_OUTLINE_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_course_outline_page', __name__)
+
+
+def use_new_course_outline_page(course_key):
+    """
+    Returns a boolean if new studio course outline mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_COURSE_OUTLINE_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: new_studio_mfe.use_new_unit_page
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use of the new studio course outline page mfe
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-5-15
+# .. toggle_target_removal_date: 2023-8-31
+# .. toggle_tickets: TNL-10619
+# .. toggle_warning:
+ENABLE_NEW_STUDIO_UNIT_PAGE = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_unit_page', __name__)
+
+
+def use_new_unit_page(course_key):
+    """
+    Returns a boolean if new studio course outline mfe is enabled
+    """
+    return ENABLE_NEW_STUDIO_UNIT_PAGE.is_enabled(course_key)

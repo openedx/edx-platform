@@ -889,7 +889,6 @@
     "Explain if other.": "Expliquer si autre.",
     "Explanation": "Explication",
     "Explicitly Hiding from Students": "Cacher explicitement aux \u00e9tudiants",
-    "Explore New Programs": "Explorez les nouveaux programmes",
     "Explore Programs": "Explorez les programmes",
     "Explore your course!": "Explorez votre cours",
     "Failed Proctoring": "Echec de l'Examen Surveill\u00e9",

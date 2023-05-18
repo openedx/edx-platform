@@ -44,7 +44,7 @@ describe('ProblemBrowser Main component', () => {
                     fetchCourseBlocks={jest.fn()}
                     problemResponsesEndpoint={problemResponsesEndpoint}
                     onSelectBlock={jest.fn()}
-                    selectedBlock={'some-selected-block'}
+                    selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
                 />
             </Provider>,
@@ -64,7 +64,7 @@ describe('ProblemBrowser Main component', () => {
                     fetchCourseBlocks={fetchCourseBlocksMock}
                     problemResponsesEndpoint={problemResponsesEndpoint}
                     onSelectBlock={jest.fn()}
-                    selectedBlock={'some-selected-block'}
+                    selectedBlock="some-selected-block"
                     taskStatusEndpoint={taskStatusEndpoint}
                 />
             </Provider>,
@@ -83,7 +83,7 @@ describe('ProblemBrowser Main component', () => {
                 fetchCourseBlocks={jest.fn()}
                 problemResponsesEndpoint={problemResponsesEndpoint}
                 onSelectBlock={jest.fn()}
-                selectedBlock={'some-selected-block'}
+                selectedBlock="some-selected-block"
                 taskStatusEndpoint={taskStatusEndpoint}
             />,
         );

@@ -34,7 +34,7 @@ const BlockType = PropTypes.shape({
 });
 
 export const BlockList = ({
-    blocks, selectedBlock, onSelectBlock, onChangeRoot
+    blocks, selectedBlock, onSelectBlock, onChangeRoot,
 }) => (
     <ul className="block-list">
         {blocks.map(block => (
@@ -48,11 +48,12 @@ export const BlockList = ({
                     label={block.display_name}
                 />
                 {block.children
-        && <Button
-            onClick={() => onChangeRoot(block.id)}
-            label={RightIcon}
-        />
-                }
+        && (
+            <Button
+                onClick={() => onChangeRoot(block.id)}
+                label={RightIcon}
+            />
+        )}
             </li>
         ))}
     </ul>
@@ -71,7 +72,7 @@ BlockList.defaultProps = {
 };
 
 export const BlockBrowser = ({
-    blocks, selectedBlock, onSelectBlock, onChangeRoot, className
+    blocks, selectedBlock, onSelectBlock, onChangeRoot, className,
 }) => !!blocks && (
     <div className={classNames('block-browser', className)}>
         <div className="header">

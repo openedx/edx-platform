@@ -28,7 +28,21 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
-from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_video_editor
+from cms.djangoapps.contentstore.toggles import (
+    use_new_text_editor,
+    use_new_video_editor,
+    use_new_advanced_settings_page,
+    use_new_course_outline_page,
+    use_new_export_page,
+    use_new_files_uploads_page,
+    use_new_grading_page,
+    use_new_home_page,
+    use_new_import_page,
+    use_new_schedule_details_page,
+    use_new_unit_page,
+    use_new_updates_page,
+    use_new_video_uploads_page,
+)
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -211,6 +225,148 @@ def get_editor_page_base_url(course_locator) -> str:
         if mfe_base_url:
             editor_url = course_mfe_url
     return editor_url
+
+
+def get_studio_home_url(course_locator):
+    """
+    Gets course authoring microfrontend URL for Studio Home view.
+    """
+    studio_home_url = None
+    if use_new_home_page():
+        mfe_base_url = get_course_authoring_url(course_locator)
+        if mfe_base_url:
+            studio_home_url = f'{mfe_base_url}/home'
+    return studio_home_url
+
+
+def get_schedule_details_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for schedule and details pages view.
+    """
+    schedule_details_url = None
+    if use_new_schedule_details_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/settings/details/{course_locator}'
+        if mfe_base_url:
+            schedule_details_url = course_mfe_url
+    return schedule_details_url
+
+
+def get_advanced_settings_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for advanced settings page view.
+    """
+    advanced_settings_url = None
+    if use_new_advanced_settings_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/settings/advanced/{course_locator}'
+        if mfe_base_url:
+            advanced_settings_url = course_mfe_url
+    return advanced_settings_url
+
+
+def get_grading_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for grading page view.
+    """
+    grading_url = None
+    if use_new_grading_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/settings/grading/{course_locator}'
+        if mfe_base_url:
+            grading_url = course_mfe_url
+    return grading_url
+
+
+def get_updates_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for updates page view.
+    """
+    updates_url = None
+    if use_new_updates_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course_info/{course_locator}'
+        if mfe_base_url:
+            updates_url = course_mfe_url
+    return updates_url
+
+
+def get_import_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for import page view.
+    """
+    import_url = None
+    if use_new_import_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/import/{course_locator}'
+        if mfe_base_url:
+            import_url = course_mfe_url
+    return import_url
+
+
+def get_export_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for export page view.
+    """
+    export_url = None
+    if use_new_export_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/export/{course_locator}'
+        if mfe_base_url:
+            export_url = course_mfe_url
+    return export_url
+
+
+def get_files_uploads_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for files and uploads page view.
+    """
+    files_uploads_url = None
+    if use_new_files_uploads_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/assets/{course_locator}'
+        if mfe_base_url:
+            files_uploads_url = course_mfe_url
+    return files_uploads_url
+
+
+def get_video_uploads_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for files and uploads page view.
+    """
+    video_uploads_url = None
+    if use_new_video_uploads_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/assets/{course_locator}'
+        if mfe_base_url:
+            video_uploads_url = course_mfe_url
+    return video_uploads_url
+
+
+def get_course_outline_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for course oultine page view.
+    """
+    course_outline_url = None
+    if use_new_course_outline_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
+        if mfe_base_url:
+            course_outline_url = course_mfe_url
+    return course_outline_url
+
+
+def get_unit_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for unit page view.
+    """
+    unit_url = None
+    if use_new_unit_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/container/'
+        if mfe_base_url:
+            unit_url = course_mfe_url
+    return unit_url
 
 
 def course_import_olx_validation_is_enabled():

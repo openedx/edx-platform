@@ -91,9 +91,9 @@ var onCertificatesReady = null;
                         var response = JSON.parse(jqXHR.responseText);
                         $certificate_regeneration_status.text(gettext(response.message)).addClass('message');
                     } catch (error) {
-                        $certificate_regeneration_status.
-                            text(gettext('Error while regenerating certificates. Please try again.')).
-                            addClass('message');
+                        $certificate_regeneration_status
+                            .text(gettext('Error while regenerating certificates. Please try again.'))
+                            .addClass('message');
                     }
                 }
             });

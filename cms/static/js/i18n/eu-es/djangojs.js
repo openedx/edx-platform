@@ -516,7 +516,6 @@
     "Expand Instructions": "Zabaldu argibideak",
     "Explain if other.": "Azaldu, beste bat bada.",
     "Explanation": "Azalpena",
-    "Explore New Programs": "Arakatu programa berriak",
     "Explore Programs": "Arakatu programak",
     "Explore your course!": "Arakatu zure ikastaroa!",
     "February": "Otsaila",
