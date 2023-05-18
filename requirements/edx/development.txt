@@ -1174,7 +1174,6 @@ pygments==2.15.1
 pyjwkest==1.4.2
     # via
     #   -r requirements/edx/testing.txt
-    #   edx-drf-extensions
     #   edx-token-utils
     #   lti-consumer-xblock
 pyjwt[crypto]==2.7.0
