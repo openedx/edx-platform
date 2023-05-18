@@ -592,7 +592,7 @@ edx-enterprise==3.62.7
     #   learner-pathway-progress
 edx-event-bus-kafka==4.0.1
     # via -r requirements/edx/base.txt
-edx-event-bus-redis==0.1.1
+edx-event-bus-redis==0.2.1
     # via -r requirements/edx/base.txt
 edx-i18n-tools==0.9.2
     # via
@@ -635,7 +635,7 @@ edx-rbac==1.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-edx-rest-api-client==5.5.0
+edx-rest-api-client==5.5.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -695,9 +695,9 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==18.7.0
+faker==18.9.0
     # via factory-boy
-fastapi==0.95.1
+fastapi==0.95.2
     # via pact-python
 fastavro==1.7.4
     # via
@@ -765,7 +765,7 @@ idna==3.4
     #   rfc3986
     #   snowflake-connector-python
     #   yarl
-import-linter==1.8.0
+import-linter==1.9.0
     # via -r requirements/edx/testing.in
 importlib-metadata==6.6.0
     # via
@@ -869,7 +869,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==9.4.0
+lti-consumer-xblock==9.5.0
     # via -r requirements/edx/base.txt
 lxml==4.9.2
     # via
@@ -981,7 +981,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.txt
-openedx-events==7.2.0
+openedx-events==7.3.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
@@ -1139,7 +1139,7 @@ pylint-celery==0.3
     # via edx-lint
 pylint-django==2.5.3
     # via edx-lint
-pylint-plugin-utils==0.7
+pylint-plugin-utils==0.8.1
     # via
     #   pylint-celery
     #   pylint-django
@@ -1208,7 +1208,7 @@ pytest-metadata==1.8.0
     #   pytest-json-report
 pytest-randomly==3.12.0
     # via -r requirements/edx/testing.in
-pytest-xdist[psutil]==3.2.1
+pytest-xdist[psutil]==3.3.0
     # via -r requirements/edx/testing.in
 python-dateutil==2.8.2
     # via
@@ -1243,9 +1243,8 @@ python3-openid==3.2.0 ; python_version >= "3"
     #   social-auth-core
 python3-saml==1.15.0
     # via -r requirements/edx/base.txt
-pytz==2022.7.1
+pytz==2023.3
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   babel
     #   celery
@@ -1445,9 +1444,9 @@ sqlparse==0.4.4
     #   openedx-blockstore
 staff-graded-xblock==2.0.1
     # via -r requirements/edx/base.txt
-starlette==0.26.1
+starlette==0.27.0
     # via fastapi
-stevedore==5.0.0
+stevedore==5.1.0
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
