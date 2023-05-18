@@ -897,7 +897,6 @@
     "Explain if other.": "Se altro, immettere una spiegazione. ",
     "Explanation": "Spiegazione",
     "Explicitly Hiding from Students": "Dati nascosti esplicitamente agli studenti",
-    "Explore New Programs": "Esplora nuovi programmi ",
     "Explore Programs": "Esplora programmi ",
     "Explore courses": "Esplora corsi",
     "Explore your course!": "Esplora il tuo corso! ",

@@ -812,7 +812,6 @@
     "Explain if other.": "Di\u011fer ise a\u00e7\u0131kla.",
     "Explanation": "A\u00e7\u0131klama",
     "Explicitly Hiding from Students": "\u00d6\u011frencilerden A\u00e7\u0131k\u00e7a Gizle",
-    "Explore New Programs": "Yeni Programlar\u0131 Ke\u015ffedin",
     "Explore Programs": "Programlar\u0131 Ke\u015ffedin",
     "Explore courses": "Dersleri ke\u015ffet",
     "Explore your course!": "E\u011fitiminizi ke\u015ffedin!",

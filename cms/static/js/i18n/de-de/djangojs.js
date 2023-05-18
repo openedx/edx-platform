@@ -797,7 +797,6 @@
     "Explain if other.": "Erkl\u00e4ren Sie, wenn anders.",
     "Explanation": "Erkl\u00e4rung",
     "Explicitly Hiding from Students": "Gezielt vor Teilnehmern verstecken",
-    "Explore New Programs": "Nach neuen Programmen suchen",
     "Explore Programs": "Nach Programmen suchen",
     "Explore courses": "Kurs\u00fcbersicht",
     "Explore your course!": "Erkunde ihr Kurs!",
