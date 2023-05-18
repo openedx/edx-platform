@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-    Button, InputText, StatusAlert, InputSelect
+    Button, InputText, StatusAlert, InputSelect,
 } from '@edx/paragon';
 
 /*
@@ -112,7 +112,7 @@ const renderEnrollmentsSection = enrollments => (
                                 </div>
                             )}
                         </div>
-                    )
+                    ),
                 )}
             </div>
         ))}
@@ -152,7 +152,7 @@ export const ProgramEnrollmentsInspectorPage = props => (
                     dialog={props.error}
                 />
             )}
-            <div id="input_alert" className={'alert alert-danger'} hidden>
+            <div id="input_alert" className="alert alert-danger" hidden>
                 Search either by edx username or email, or Institution user key, but not both
             </div>
             <div key="edX_accounts">
@@ -228,7 +228,7 @@ ProgramEnrollmentsInspectorPage.propTypes = {
                             is_active: PropTypes.bool,
                             mode: PropTypes.string,
                         }),
-                    })
+                    }),
                 ),
             }),
         ),

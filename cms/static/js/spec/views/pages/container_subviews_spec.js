@@ -343,15 +343,15 @@ describe('Container Subviews', function() {
         it('renders the last published date and user when there are no changes', function() {
             renderContainerPage(this, mockContainerXBlockHtml);
             fetch({published_on: 'Jul 01, 2014 at 12:45 UTC', published_by: 'amako'});
-            expect(containerPage.$(lastDraftCss).text()).
-                toContain('Last published Jul 01, 2014 at 12:45 UTC by amako');
+            expect(containerPage.$(lastDraftCss).text())
+                .toContain('Last published Jul 01, 2014 at 12:45 UTC by amako');
         });
 
         it('renders the last saved date and user when there are changes', function() {
             renderContainerPage(this, mockContainerXBlockHtml);
             fetch({has_changes: true, edited_on: 'Jul 02, 2014 at 14:20 UTC', edited_by: 'joe'});
-            expect(containerPage.$(lastDraftCss).text()).
-                toContain('Draft saved on Jul 02, 2014 at 14:20 UTC by joe');
+            expect(containerPage.$(lastDraftCss).text())
+                .toContain('Draft saved on Jul 02, 2014 at 14:20 UTC by joe');
         });
 
         describe('Release Date', function() {
@@ -596,8 +596,8 @@ describe('Container Subviews', function() {
             fetch({
                 published: true, published_on: 'Jul 01, 2014 at 12:45 UTC', published_by: 'amako'
             });
-            expect(containerPage.$(lastPublishCss).text()).
-                toContain('Last published Jul 01, 2014 at 12:45 UTC by amako');
+            expect(containerPage.$(lastPublishCss).text())
+                .toContain('Last published Jul 01, 2014 at 12:45 UTC by amako');
         });
 
         it('renders correctly when the block is published without publish info', function() {

@@ -75,7 +75,7 @@ function(ValidatingView, _, $, ui, GraderView, StringUtils, HtmlUtils) {
                 this);
             gradeCollection.each(function(gradeModel) {
                 var graderType = gradeModel.get('type');
-                var graderTypeAssignmentList = self.courseAssignmentLists[graderType]
+                var graderTypeAssignmentList = self.courseAssignmentLists[graderType];
                 if (graderTypeAssignmentList === undefined) {
                     graderTypeAssignmentList = [];
                 }

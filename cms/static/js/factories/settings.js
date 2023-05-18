@@ -16,9 +16,9 @@ define([
 
         // Toggle collapsibles when trigger is clicked
         $('.collapsible .collapsible-trigger').click(function() {
-            const contentId = this.id.replace('-trigger', '-content')
-            $(`#${contentId}`).toggleClass('collapsed')
-        })
+            const contentId = this.id.replace('-trigger', '-content');
+            $(`#${contentId}`).toggleClass('collapsed');
+        });
 
         model = new CourseDetailsModel();
         model.urlRoot = detailsUrl;

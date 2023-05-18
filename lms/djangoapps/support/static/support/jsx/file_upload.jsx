@@ -141,8 +141,7 @@ class FileUpload extends React.Component {
                   fileName={this.state.fileInProgress}
                   request={this.state.currentRequest}
               />
-          )
-                    }
+          )}
                 </div>
                 <div className="uploaded-files">
                     {

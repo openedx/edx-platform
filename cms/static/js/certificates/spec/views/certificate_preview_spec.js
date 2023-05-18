@@ -64,16 +64,16 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
 
             it('course mode selection updating the link successfully', function() {
                 selectDropDownByText(this.view.$(SELECTORS.course_modes), 'test1');
-                expect(this.view.$(SELECTORS.preview_certificate).attr('href')).
-                    toEqual('/users/1/courses/orgX/009/2016?preview=test1');
+                expect(this.view.$(SELECTORS.preview_certificate).attr('href'))
+                    .toEqual('/users/1/courses/orgX/009/2016?preview=test1');
 
                 selectDropDownByText(this.view.$(SELECTORS.course_modes), 'test2');
-                expect(this.view.$(SELECTORS.preview_certificate).attr('href')).
-                    toEqual('/users/1/courses/orgX/009/2016?preview=test2');
+                expect(this.view.$(SELECTORS.preview_certificate).attr('href'))
+                    .toEqual('/users/1/courses/orgX/009/2016?preview=test2');
 
                 selectDropDownByText(this.view.$(SELECTORS.course_modes), 'test3');
-                expect(this.view.$(SELECTORS.preview_certificate).attr('href')).
-                    toEqual('/users/1/courses/orgX/009/2016?preview=test3');
+                expect(this.view.$(SELECTORS.preview_certificate).attr('href'))
+                    .toEqual('/users/1/courses/orgX/009/2016?preview=test3');
             });
 
             it('toggle certificate activation event works fine', function() {

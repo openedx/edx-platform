@@ -15,11 +15,11 @@ class AnnouncementSkipLink extends React.Component {
                 this.setState({
                     count: data.count
                 });
-            })
+            });
     }
 
     render() {
-        return (<div>{'Skip to list of ' + this.state.count + ' announcements'}</div>)
+        return (<div>{'Skip to list of ' + this.state.count + ' announcements'}</div>);
     }
 }
 
@@ -29,8 +29,7 @@ class Announcement extends React.Component {
             <div
                 className="announcement"
                 dangerouslySetInnerHTML={{__html: this.props.content}}
-            >
-            </div>
+            />
         );
     }
 }
@@ -66,7 +65,7 @@ class AnnouncementList extends React.Component {
                     end_index: data.end_index,
                     page: page
                 });
-            })
+            });
     }
 
     renderPrevPage() {
@@ -132,4 +131,4 @@ export default class AnnouncementsView {
     }
 }
 
-export {AnnouncementsView, AnnouncementList, AnnouncementSkipLink}
+export {AnnouncementsView, AnnouncementList, AnnouncementSkipLink};

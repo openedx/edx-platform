@@ -21,6 +21,6 @@ export default function EditTabsFactory(courseLocation, explicitUrl) {
             mast: $('.wrapper-mast')
         });
     });
-};
+}
 
-export {EditTabsFactory}
+export {EditTabsFactory};

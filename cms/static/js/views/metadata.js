@@ -313,7 +313,7 @@ define(
             updateUrlFieldVisibility: function() {
                 const urlContainer = this.$el.find('.public-access-block-url-container');
 
-                if(this.getValueFromEditor()) {
+                if (this.getValueFromEditor()) {
                     urlContainer.removeClass('is-hidden');
                 } else {
                     urlContainer.addClass('is-hidden');

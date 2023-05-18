@@ -29,7 +29,7 @@ export default class Main extends React.Component {
             this.props.problemResponsesEndpoint,
             this.props.taskStatusEndpoint,
             this.props.reportDownloadEndpoint,
-            this.props.selectedBlock
+            this.props.selectedBlock,
         );
     }
 

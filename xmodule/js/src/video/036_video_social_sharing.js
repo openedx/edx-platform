@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     // VideoSocialSharingHandler module.
     define(
         'video/036_video_social_sharing.js', ['underscore'],
@@ -37,13 +38,13 @@
                     this.el.on('click', '.btn-link', this.clickHandler);
                     this.baseVideoUrl = this.el.data('url');
                     this.course_id = this.container.data('courseId');
-                    this.block_id = this.container.data('blockId')
+                    this.block_id = this.container.data('blockId');
                 },
 
                 // Fire an analytics event on share button click.
                 clickHandler: function(event) {
                     var self = this;
-                    var source = $(event.currentTarget).data('source')
+                    var source = $(event.currentTarget).data('source');
                     self.sendAnalyticsEvent(source);
                 },
 

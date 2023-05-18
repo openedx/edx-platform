@@ -16,6 +16,6 @@ export default function XBlockValidationFactory(validationMessages, hasEditingUr
     if (!model.get('empty')) {
         new XBlockValidationView({el: validationEle, model: model, root: isRoot}).render();
     }
-};
+}
 
-export {XBlockValidationFactory}
+export {XBlockValidationFactory};

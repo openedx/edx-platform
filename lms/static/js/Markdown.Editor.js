@@ -123,7 +123,7 @@
 
             this.before = this.before.replace(regex,
                 function(match) {
-                    chunkObj.startTag = chunkObj.startTag + match;
+                    chunkObj.startTag += match;
                     return '';
                 });
 
@@ -131,7 +131,7 @@
 
             this.selection = this.selection.replace(regex,
                 function(match) {
-                    chunkObj.startTag = chunkObj.startTag + match;
+                    chunkObj.startTag += match;
                     return '';
                 });
         }
@@ -194,14 +194,14 @@
 
         this.selection = this.selection.replace(/(^\n*)/, '');
 
-        this.startTag = this.startTag + re.$1;
+        this.startTag += re.$1;
 
         this.selection = this.selection.replace(/(\n*$)/, '');
-        this.endTag = this.endTag + re.$1;
+        this.endTag += re.$1;
         this.startTag = this.startTag.replace(/(^\n*)/, '');
-        this.before = this.before + re.$1;
+        this.before += re.$1;
         this.endTag = this.endTag.replace(/(\n*$)/, '');
-        this.after = this.after + re.$1;
+        this.after += re.$1;
 
         if (this.before) {
             regexText = replacementText = '';
@@ -236,7 +236,7 @@
 
     function findAnEmptyToolbar(toolbarClassName) {
         var toolbars = doc.getElementsByClassName(toolbarClassName);
-        for (var i=0; i < toolbars.length; ++i) {
+        for (var i = 0; i < toolbars.length; ++i) {
             var aToolbar = toolbars[i];
             if (aToolbar.children.length == 0) {
                 var anEmptyToolbar = aToolbar;
@@ -524,7 +524,6 @@
                 var keyCodeChar = String.fromCharCode(keyCode);
 
                 switch (keyCodeChar) {
-
                 case 'y':
                     undoObj.redo();
                     handled = true;
@@ -548,7 +547,6 @@
                 if (window.event) {
                     window.event.returnValue = false;
                 }
-                return;
             }
         };
 
@@ -737,7 +735,7 @@
 
         // Sets the TextareaState properties given a chunk of markdown.
         this.setChunks = function(chunk) {
-            chunk.before = chunk.before + chunk.startTag;
+            chunk.before += chunk.startTag;
             chunk.after = chunk.endTag + chunk.after;
 
             this.start = chunk.before.length;
@@ -1572,11 +1570,9 @@
 
             // Add the true markup.
             var markup = nStars <= 1 ? '*' : '**'; // shouldn't the test be = ?
-            chunk.before = chunk.before + markup;
+            chunk.before += markup;
             chunk.after = markup + chunk.after;
         }
-
-        return;
     };
 
     commandProto.stripLinkDefs = function(text, defsToAdd) {
@@ -1663,7 +1659,9 @@
             });
             if (title) {
                 title = title.trim ? title.trim() : title.replace(/^\s*/, '').replace(/\s*$/, '');
-                title = $.trim(title).replace(/"/g, 'quot;').replace(/\(/g, '&#40;').replace(/\)/g, '&#41;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                title = $.trim(title).replace(/"/g, 'quot;').replace(/\(/g, '&#40;').replace(/\)/g, '&#41;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
             }
             return title ? link + ' "' + title + '"' : link;
         });
