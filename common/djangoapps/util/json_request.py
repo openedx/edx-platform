@@ -8,6 +8,8 @@ from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.query import QuerySet
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.utils.decorators import method_decorator
+from django.views import View
 
 
 class EDXJSONEncoder(DjangoJSONEncoder):
@@ -40,7 +42,6 @@ def expect_json(view_function):
     CONTENT_TYPE is application/json, parses the json dict from request.body, and updates
     request.POST with the contents.
     """
-    @wraps(view_function)
     def parse_json_into_request(request, *args, **kwargs):
         # cdodge: fix postback errors in CMS. The POST 'content-type' header can include additional information
         # e.g. 'charset', so we can't do a direct string compare
@@ -54,7 +55,14 @@ def expect_json(view_function):
 
         return view_function(request, *args, **kwargs)
 
-    return parse_json_into_request
+    if isinstance(view_function, type) and issubclass(view_function, View):
+        view_function.dispatch = method_decorator(expect_json)(view_function.dispatch)
+        return view_function
+    else:
+        @wraps(view_function)
+        def wrapper(request, *args, **kwargs):
+            return parse_json_into_request(request, *args, **kwargs)
+        return wrapper
 
 
 class JsonResponse(HttpResponse):
