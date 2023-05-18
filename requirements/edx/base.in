@@ -187,3 +187,4 @@ xblock-poll                         # Xblock for polling users
 xblock-drag-and-drop-v2             # Drag and Drop XBlock
 xblock-google-drive                 # XBlock for google docs and calendar
 openedx-django-require
+openedx-mongodbproxy
