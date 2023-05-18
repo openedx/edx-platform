@@ -25,6 +25,7 @@ cms/envs/private.py
 .redcar/
 codekit-config.json
 .pycharm_helpers/
+.vscode
 /_mac/*
 /IntelliLang.xml
 /conda_packages.xml
@@ -124,7 +125,10 @@ logs
 chromedriver.log
 ghostdriver.log
 
-### Celery artifacts ###
+### Deployment artifacts
+uwsgi.ini
+
+### Celery artifacts
 celerybeat-schedule
 
 ### Unknown artifacts
@@ -140,9 +144,6 @@ autodeploy.properties
 .ws_migrations_complete
 dist
 *.bak
-
-# Visual Studio Code
-.vscode
 
 # Locally generated PII reports
 pii_report
