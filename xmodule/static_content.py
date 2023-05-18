@@ -13,7 +13,7 @@ import os
 import sys
 import textwrap
 from collections import defaultdict
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 
 import django
 from docopt import docopt
@@ -43,27 +43,27 @@ class VideoBlock(HTMLSnippet):  # lint-amnesty, pylint: disable=abstract-method
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/video/10_main.js'),
+            resource_filename(__name__, 'js/src/video/10_main.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
     preview_view_css = {
         'scss': [
-            resource_string(__name__, 'css/video/display.scss'),
-            resource_string(__name__, 'css/video/accessible_menu.scss'),
+            resource_filename(__name__, 'css/video/display.scss'),
+            resource_filename(__name__, 'css/video/accessible_menu.scss'),
         ],
     }
 
     studio_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/tabs/tabs-aggregator.js'),
+            resource_filename(__name__, 'js/src/tabs/tabs-aggregator.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     studio_view_css = {
         'scss': [
-            resource_string(__name__, 'css/tabs/tabs.scss'),
+            resource_filename(__name__, 'css/tabs/tabs.scss'),
         ]
     }
 
@@ -132,7 +132,9 @@ def _write_styles(selector, output_root, classes, css_attribute, suffix):
     for class_ in classes:
         class_css = getattr(class_, css_attribute)()
         for filetype in ('sass', 'scss', 'css'):
-            for idx, fragment in enumerate(class_css.get(filetype, [])):
+            for idx, fragment_path in enumerate(class_css.get(filetype, [])):
+                with open(fragment_path, 'rb') as fragment_file:
+                    fragment = fragment_file.read()
                 css_fragments[idx, filetype, fragment].add(class_.__name__)
     css_imports = defaultdict(set)
     for (idx, filetype, fragment), classes in sorted(css_fragments.items()):  # lint-amnesty, pylint: disable=redefined-argument-from-local
@@ -177,10 +179,14 @@ def _write_js(output_root, classes, js_attribute):
     fragment_owners = defaultdict(list)
     for class_ in classes:
         module_js = getattr(class_, js_attribute)()
+        with open(module_js.get('xmodule_js'), 'rb') as xmodule_js_file:
+            xmodule_js_fragment = xmodule_js_file.read()
         # It will enforce 000 prefix for xmodule.js.
-        fragment_owners[(0, 'js', module_js.get('xmodule_js'))].append(getattr(class_, js_attribute + '_bundle_name')())
+        fragment_owners[(0, 'js', xmodule_js_fragment)].append(getattr(class_, js_attribute + '_bundle_name')())
         for filetype in ('coffee', 'js'):
-            for idx, fragment in enumerate(module_js.get(filetype, [])):
+            for idx, fragment_path in enumerate(module_js.get(filetype, [])):
+                with open(fragment_path, 'rb') as fragment_file:
+                    fragment = fragment_file.read()
                 fragment_owners[(idx + 1, filetype, fragment)].append(getattr(class_, js_attribute + '_bundle_name')())
 
     for (idx, filetype, fragment), owners in sorted(fragment_owners.items()):
