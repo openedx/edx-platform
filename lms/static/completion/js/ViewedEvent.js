@@ -13,7 +13,6 @@ function throttle(fn, wait) {
     return delay;
 }
 
-
 export class ElementViewing {
     /**
    * A wrapper for an HTMLElement that tracks whether the element has been
@@ -95,7 +94,6 @@ export class ElementViewing {
         }
     }
 }
-
 
 export class ViewedEventTracker {
     /**
@@ -179,4 +177,3 @@ export class ViewedEventTracker {
         });
     }
 }
-

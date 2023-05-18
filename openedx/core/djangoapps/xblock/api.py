@@ -7,6 +7,7 @@ the older runtime.
 Note that these views are only for interacting with existing blocks. Other
 Studio APIs cover use cases like adding/deleting/editing blocks.
 """
+# pylint: disable=unused-import
 
 import logging
 import threading
@@ -22,9 +23,20 @@ from xblock.exceptions import NoSuchViewError
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
 from openedx.core.djangoapps.xblock.runtime.blockstore_runtime import BlockstoreXBlockRuntime, xml_for_definition
-from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntimeSystem
+from openedx.core.djangoapps.xblock.runtime.runtime import XBlockRuntimeSystem as _XBlockRuntimeSystem
 from openedx.core.djangolib.blockstore_cache import BundleCache
 from .utils import get_secure_token_for_xblock_handler, get_xblock_id_for_anonymous_user
+
+# Made available as part of this package's public API:
+from openedx.core.djangoapps.xblock.learning_context import LearningContext
+from openedx.core.djangoapps.xblock.runtime.olx_parsing import (
+    BundleFormatException,
+    definition_for_include,
+    parse_xblock_include,
+    XBlockInclude,
+)
+
+# Implementation:
 
 log = logging.getLogger(__name__)
 
@@ -54,7 +66,7 @@ def get_runtime_system():
             runtime_class=BlockstoreXBlockRuntime,
         )
         params.update(get_xblock_app_config().get_runtime_system_params())
-        setattr(get_runtime_system, cache_name, XBlockRuntimeSystem(**params))
+        setattr(get_runtime_system, cache_name, _XBlockRuntimeSystem(**params))
     return getattr(get_runtime_system, cache_name)
 
 

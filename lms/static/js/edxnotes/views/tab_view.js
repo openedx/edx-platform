@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -120,7 +121,6 @@
                 this.getLoadingIndicator().addClass('is-hidden');
                 return this;
             },
-
 
             /**
          * Shows error message.

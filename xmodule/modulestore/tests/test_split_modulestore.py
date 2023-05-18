@@ -514,7 +514,7 @@ class SplitModuleTest(unittest.TestCase):
 
     def findByIdInResult(self, collection, _id):  # pylint: disable=invalid-name
         """
-        Result is a collection of descriptors. Find the one whose block id
+        Result is a collection of blocks. Find the one whose block id
         matches the _id.
         """
         for element in collection:
@@ -576,7 +576,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         assert course.display_name == 'The Ancient Greek Hero', 'wrong display name'
         assert course.advertised_start == 'Fall 2013', 'advertised_start'
         assert len(course.children) == 4, 'children'
-        # check dates and graders--forces loading of descriptor
+        # check dates and graders--forces loading of block
         assert course.edited_by == TEST_ASSISTANT_USER_ID
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
@@ -662,7 +662,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         assert course.advertised_start is None
         assert len(course.children) == 0
         assert course.definition_locator.definition_id != head_course.definition_locator.definition_id
-        # check dates and graders--forces loading of descriptor
+        # check dates and graders--forces loading of block
         assert course.edited_by == TEST_ASSISTANT_USER_ID
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.55})
 
@@ -676,7 +676,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         assert course.display_name == 'The Ancient Greek Hero'
         assert course.advertised_start == 'Fall 2013'
         assert len(course.children) == 4
-        # check dates and graders--forces loading of descriptor
+        # check dates and graders--forces loading of block
         assert course.edited_by == TEST_ASSISTANT_USER_ID
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
 
@@ -928,7 +928,7 @@ class SplitModuleItemTests(SplitModuleTest):
             assert block.display_name == 'The Ancient Greek Hero'
             assert block.advertised_start == 'Fall 2013'
             assert len(block.children) == 4
-            # check dates and graders--forces loading of descriptor
+            # check dates and graders--forces loading of block
             assert block.edited_by == TEST_ASSISTANT_USER_ID
             self.assertDictEqual(
                 block.grade_cutoffs, {"Pass": 0.45},
@@ -1061,7 +1061,7 @@ class SplitModuleItemTests(SplitModuleTest):
 
     def test_get_children(self):
         """
-        Test the existing get_children method on xdescriptors
+        Test the existing get_children method on xblocks
         """
         locator = BlockUsageLocator(
             CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT), 'course', 'head12345'
@@ -1080,7 +1080,7 @@ class SplitModuleItemTests(SplitModuleTest):
 
 def version_agnostic(children):
     """
-    children: list of descriptors
+    children: list of blocks
     Returns the `children` list with each member version-agnostic
     """
     return [child.version_agnostic() for child in children]

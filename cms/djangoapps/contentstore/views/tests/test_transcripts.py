@@ -364,7 +364,7 @@ class TestUploadTranscripts(BaseTranscripts):
     def test_transcript_upload_with_non_existant_edx_video_id(self):
         """
         Test that transcript upload works as expected if `edx_video_id` set on
-        video descriptor is different from `edx_video_id` received in POST request.
+        video block is different from `edx_video_id` received in POST request.
         """
         non_existant_edx_video_id = '1111-2222-3333-4444'
 

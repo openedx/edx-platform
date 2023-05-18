@@ -18,8 +18,8 @@ define(
         window._ = _;
 
         $script(
-            'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js' +
-            '?config=TeX-MML-AM_SVG&delayStartupUntil=configured',
+            'https://cdn.jsdelivr.net/npm/mathjax@2.7.5/MathJax.js'
+            + '?config=TeX-MML-AM_SVG&delayStartupUntil=configured',
             'mathjax',
             function() {
                 window.MathJax.Hub.Config({
@@ -55,7 +55,7 @@ define(
          * The module should be used until we'll use RequireJS for XModules.
          * @param {Array} modules A list of urls.
          * @return {jQuery Promise}
-         **/
+         * */
         function requireQueue(modules) {
             var deferred = $.Deferred();
             function loadScript(queue) {

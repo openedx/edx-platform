@@ -340,7 +340,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase, Milest
         Returns the table of contents for course self.course, for chapter
         self.entrance_exam, and for section self.exam1
         """
-        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(  # pylint: disable=attribute-defined-outside-init
+        self.field_data_cache = FieldDataCache.cache_for_block_descendents(  # pylint: disable=attribute-defined-outside-init
             self.course.id,
             self.request.user,
             self.entrance_exam
@@ -372,7 +372,7 @@ def answer_entrance_exam_problem(course, request, problem, user=None, value=1, m
         user = request.user
 
     grade_dict = {'value': value, 'max_value': max_value, 'user_id': user.id}
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+    field_data_cache = FieldDataCache.cache_for_block_descendents(
         course.id,
         user,
         course,

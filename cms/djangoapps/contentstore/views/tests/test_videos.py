@@ -16,6 +16,7 @@ import ddt
 import pytz
 from django.conf import settings
 from django.test.utils import override_settings
+from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from edxval.api import (
     create_or_update_transcript_preferences,
@@ -1574,7 +1575,6 @@ class VideoUrlsCsvTestCase(
 
 @ddt.ddt
 class GetVideoFeaturesTestCase(
-    VideoStudioAccessTestsMixin,
     CourseTestCase
 ):
     """Test cases for the get_video_features endpoint """
@@ -1582,10 +1582,9 @@ class GetVideoFeaturesTestCase(
         super().setUp()
         self.url = self.get_url_for_course_key()
 
-    def get_url_for_course_key(self, course_id=None):
+    def get_url_for_course_key(self):
         """ Helper to generate a url for a course key """
-        course_id = course_id or str(self.course.id)
-        return reverse_course_url("video_features", course_id)
+        return reverse("video_features")
 
     def test_basic(self):
         """ Test for expected return keys """

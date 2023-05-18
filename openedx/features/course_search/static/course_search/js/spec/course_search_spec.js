@@ -53,7 +53,6 @@ define([
             });
         });
 
-
         describe('SearchCollection', function() {
             beforeEach(function() {
                 this.collection = new SearchCollection();
@@ -198,7 +197,6 @@ define([
             });
         });
 
-
         describe('SearchRouter', function() {
             beforeEach(function() {
                 this.router = new SearchRouter();
@@ -216,7 +214,6 @@ define([
                 expect(this.onSearch).toHaveBeenCalledWith(query);
             });
         });
-
 
         describe('SearchItemView', function() {
             beforeEach(function() {
@@ -278,7 +275,6 @@ define([
                 expect(this.item.redirect).toHaveBeenCalled();
             });
         });
-
 
         describe('SearchForm', function() {
             function trimsInputString() {
@@ -347,7 +343,6 @@ define([
             });
         });
 
-
         describe('SearchResultsView', function() {
             function showsLoadingMessage() {
                 this.resultsView.showLoadingMessage();
@@ -390,9 +385,9 @@ define([
                 expect(this.resultsView.$el.find('ol')[0]).toExist();
                 expect(this.resultsView.$el.find('li').length).toEqual(1);
                 expect(this.resultsView.$el).toContainHtml(
-                    this.collection.totalCount +
-                    ' result found for "' +
-                    this.collection.searchTerm + '"'
+                    this.collection.totalCount
+                    + ' result found for "'
+                    + this.collection.searchTerm + '"'
                 );
                 expect(this.resultsView.$el).toContainHtml('this is a short excerpt');
 
@@ -485,7 +480,6 @@ define([
                 it('shows a spinner when loading more results', showsLoadMoreSpinner);
             });
         });
-
 
         describe('SearchApp', function() {
             function showsLoadingMessage() {
@@ -668,7 +662,7 @@ define([
                         searchHeader: $('.page-header-search')
                     });
                     spyOn(Backbone.history, 'navigate');
-                    this.$contentElement = null;  // The search results page does not show over a content element
+                    this.$contentElement = null; // The search results page does not show over a content element
                     this.contentElementDisplayValue = 'table-cell';
                     this.$searchResults = $('.search-results');
                 });

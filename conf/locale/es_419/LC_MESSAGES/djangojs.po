@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
+# edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -55,7 +55,7 @@
 # Yovany Alexander Álvarez Correa <yalvarez@innovapues.com>, 2018
 # José Luis <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
+# edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -94,7 +94,7 @@
 # Yovany Alexander Álvarez Correa <yalvarez@innovapues.com>, 2018
 # Zimeng Chen, 2021
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (https://www.transifex.com/open-edx/teams/6205/es_419/).
+# edX community translations have been downloaded from Spanish (Latin America) (https://app.transifex.com/open-edx/teams/6205/es_419/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -105,7 +105,7 @@
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
+# edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -145,7 +145,7 @@
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
+# edX community translations have been downloaded from Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -178,10 +178,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-05 20:42+0000\n"
+"POT-Creation-Date: 2023-05-07 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Jesica Greco, 2023\n"
-"Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
+"Language-Team: Spanish (Latin America) (http://app.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "Language: es_419\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3311,6 +3311,48 @@ msgstr ""
 "¿ Está seguro que quiere cancelar la inscripción del curso {courseName} "
 "({courseNumber})? Se reembolsará el dinero que pagó."
 
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "View program"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Enroll in a {programName} course"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"You have an active subscription to the {programName} program but are not "
+"enrolled in any courses. Enroll in a remaining course and enjoy verified "
+"access."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"According to our records, you are not enrolled in any courses included in "
+"your {programName} program subscription. Enroll in a course from the "
+"{i_start}Program Details{i_end} page."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Subscription trial expires in {remainingDays} day"
+msgid_plural "Subscription trial expires in {remainingDays} days"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"Your {programName} trial will expire in {remainingDays} day at "
+"{trialEndTime} on {trialEndDate} and the card on file will be charged "
+"{subscriptionPrice}/month."
+msgid_plural ""
+"Your {programName} trial will expire in {remainingDays} days at "
+"{trialEndTime} on {trialEndDate} and the card on file will be charged "
+"{subscriptionPrice}/month."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
 msgstr "{type} Progreso"
@@ -6333,9 +6375,8 @@ msgid "Please enter non-negative integer."
 msgstr "Por favor ingrese un número entero no negativo."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%- types %> assignments than are assigned."
+msgid "You must have at least one undroppable <%- types %> assignment."
 msgstr ""
-"No se pueden eliminar más asignaciones de <%- types %> de las asignadas."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -6929,11 +6970,19 @@ msgstr "Estructura del curso"
 msgid "Date added"
 msgstr "Fecha de adición"
 
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr ""
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
 msgstr "Editando acceso para: {title}"
+
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
+msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -8828,6 +8877,7 @@ msgstr "Válido"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Certificate Status:"
 msgstr "Estado del Certificado:"
 
@@ -8930,8 +8980,8 @@ msgstr ""
 "en tus temas favoritos."
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New Programs"
-msgstr "Explorar programas nuevos"
+msgid "Explore new programs"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
@@ -8954,6 +9004,11 @@ msgstr "Restante"
 msgid "%(programName)s Home Page."
 msgstr "Página de inicio de %(programName)s."
 
+#: lms/templates/learner_dashboard/program_card.underscore
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Subscribed"
+msgstr ""
+
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Your {program} Certificate"
 msgstr "Tu Certificado {program}"
@@ -8962,6 +9017,44 @@ msgstr "Tu Certificado {program}"
 #, python-format
 msgid "Open the certificate you earned for the %(title)s program."
 msgstr "Abrir el certificado que ganaste en el programa %(title)s."
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Trial subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Active subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Inactive subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"View your receipts or modify your subscription on the {a_start}Orders and "
+"subscriptions{a_end} page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Restart your subscription for {subscriptionPrice}/month. Your payment "
+"history is still available on the {a_start}Orders and subscriptions{a_end} "
+"page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"If you had a subscription previously, your payment history is still "
+"available on the {a_start}Orders and subscriptions{a_end} page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Need help? Check out the {a_start}Learner Help "
+"Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact "
+"support"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Program Record"
@@ -9011,6 +9104,44 @@ msgstr "Tu Trayecto del Programa"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Manage my subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Restart my subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Start {trialLength}-day free trial"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Active trial ends {trialEndDate} at {trialEndTime}"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Your next billing date is {nextPaymentDate}"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid ""
+"Unlock verified access to all courses for {subscriptionPrice}/month. Cancel "
+"anytime."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid ""
+"{subscriptionPrice}/month subscription after trial ends. Cancel anytime."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Upgrade All Remaining Courses ("
 msgstr "Actualizar los cursos restantes ("
 
@@ -9056,13 +9187,50 @@ msgstr ""
 msgid "{organization}\\'s logo"
 msgstr "Logo de la {organization}"
 
+#: lms/templates/learner_dashboard/program_list_header_view.underscore
+msgid "My programs"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "New"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "Monthly program subscriptions {emDash} more flexible, more affordable"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid ""
+"Now available for many popular programs, affordable monthly subscription "
+"pricing can help you manage your budget more effectively. Subscriptions "
+"start at {minSubscriptionPrice}/month USD per program, after a 7-day full "
+"access free trial. Cancel at any time."
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "Explore subscription options"
+msgstr ""
+
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Needs verified certificate "
 msgstr "Necesita certificado verificado"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade to Verified"
 msgstr "Optar por el Certificado Verificado"
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Upgrade with a subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Pay {subscriptionPrice}/month for all courses in this program"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Pay {subscriptionPrice}/month after {trialLength}-day free trial"
+msgstr ""
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -10618,6 +10786,14 @@ msgstr "Seleccione cerrar para ocultar los ajustes de vídeo del curso"
 msgid "Course Video Settings"
 msgstr "Ajustes de vídeo del curso"
 
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Video Sharing"
+msgstr ""
+
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Learn more"
+msgstr ""
+
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
 msgstr "Tiempo de procesamiento de la transcripción"
@@ -10723,6 +10899,30 @@ msgstr ""
 "El número de asignaciones de este tipo que serán descartados. Las "
 "asignaciones con calificaciones más bajas serán las primeras en ser "
 "descartadas."
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
@@ -11203,15 +11403,6 @@ msgid ""
 msgstr ""
 "Si un estudiante empieza en {startDate}, esta subsección será vencida en "
 "{projectedDueIn}."
-
-#: cms/templates/js/self-paced-due-date-editor.underscore
-msgid ""
-"The maximum number of weeks this subsection can be due in is 18 weeks from "
-"the learner enrollment date."
-msgstr ""
-"El número máximo de semanas para esta subsección puede tener fecha de "
-"vencimiento en 18 semanas a partir de la fecha de inscripción del "
-"estudiante."
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""

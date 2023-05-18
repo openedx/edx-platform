@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'underscore', 'annotator_1.2.9'
     ], function(_, Annotator) {
@@ -30,7 +31,7 @@
      *   (user, note ID, old note text, new note text, highlighted content, ID of the component annotated, datetime)
      * - 'edx.course.student_notes.deleted'
      *   (user, note ID, note text, highlighted content, ID of the component annotated, datetime)
-     **/
+     * */
         Annotator.Plugin.Events = function() {
         // Call the Annotator.Plugin constructor this sets up the element and
         // options properties.

@@ -241,13 +241,13 @@ def get_transcripts_from_youtube(youtube_id, settings, i18n, youtube_transcript_
     return {'start': sub_starts, 'end': sub_ends, 'text': sub_texts}
 
 
-def download_youtube_subs(youtube_id, video_descriptor, settings):  # lint-amnesty, pylint: disable=redefined-outer-name
+def download_youtube_subs(youtube_id, video_block, settings):  # lint-amnesty, pylint: disable=redefined-outer-name
     """
     Download transcripts from Youtube.
 
     Args:
         youtube_id: str, actual youtube_id of the video.
-        video_descriptor: video descriptor instance.
+        video_block: video block instance.
 
     We save transcripts for 1.0 speed, as for other speed conversion is done on front-end.
 
@@ -257,7 +257,7 @@ def download_youtube_subs(youtube_id, video_descriptor, settings):  # lint-amnes
     Raises:
         GetTranscriptsFromYouTubeException, if fails.
     """
-    i18n = video_descriptor.runtime.service(video_descriptor, "i18n")
+    i18n = video_block.runtime.service(video_block, "i18n")
     _ = i18n.ugettext
 
     subs = get_transcripts_from_youtube(youtube_id, settings, i18n)
@@ -961,7 +961,7 @@ def get_transcript_from_contentstore(video, language, output_format, transcripts
     Get video transcript from content store.
 
     Arguments:
-        video (Video Descriptor): Video descriptor
+        video (Video block): Video block
         language (unicode): transcript language
         output_format (unicode): transcript output format
         transcripts_info (dict): transcript info for a video
@@ -1089,7 +1089,7 @@ def get_transcript(video, lang=None, output_format=Transcript.SRT, youtube_id=No
     Get video transcript from edx-val or content store.
 
     Arguments:
-        video (Video Descriptor): Video Descriptor
+        video (Video block): Video block
         lang (unicode): transcript language
         output_format (unicode): transcript output format
         youtube_id (unicode): youtube video id

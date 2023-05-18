@@ -1,5 +1,6 @@
 define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'], function(_, URI, AjaxHelpers) {
     'use strict';
+
     var B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
         LONG_TEXT, PRUNED_TEXT, TRUNCATED_TEXT, SHORT_TEXT,
         base64Encode, makeToken, getChapter, getSection, getUnit, getDefaultNotes,

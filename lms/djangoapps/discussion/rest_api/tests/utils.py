@@ -499,7 +499,9 @@ class CommentsServiceMockMixin:
             "type": "discussion",
             "response_count": 0,
             "last_edit": None,
+            "edit_by_label": None,
             "closed_by": None,
+            "closed_by_label": None,
             "close_reason": None,
             "close_reason_code": None,
         }

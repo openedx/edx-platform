@@ -8,6 +8,7 @@ from collections import OrderedDict, namedtuple
 from contextlib import contextmanager
 from datetime import datetime
 from unittest.mock import MagicMock, patch
+from common.djangoapps.student.models.course_enrollment import CourseEnrollment
 
 import ddt
 import pytest
@@ -779,6 +780,7 @@ class GradebookViewTest(GradebookViewTestBase):
                     OrderedDict([
                         ('user_id', self.program_masters_student.id),
                         ('username', self.program_masters_student.username),
+                        ('full_name', self.program_masters_student.profile.name),
                         ('email', self.program_masters_student.email),
                         ('external_user_key', 'program_user_key_0'),
                         ('percent', 0.75),
@@ -827,6 +829,7 @@ class GradebookViewTest(GradebookViewTestBase):
                     OrderedDict([
                         ('user_id', self.program_masters_student.id),
                         ('username', self.program_masters_student.username),
+                        ('full_name', self.program_masters_student.profile.name),
                         ('email', self.program_masters_student.email),
                         ('external_user_key', 'program_user_key_0'),
                         ('percent', 0.75),
@@ -913,6 +916,7 @@ class GradebookViewTest(GradebookViewTestBase):
                     OrderedDict([
                         ('user_id', self.program_masters_student.id),
                         ('username', self.program_masters_student.username),
+                        ('full_name', self.program_masters_student.profile.name),
                         ('email', self.program_masters_student.email),
                         ('external_user_key', 'program_user_key_0'),
                         ('percent', 0.75),
@@ -1461,6 +1465,47 @@ class GradebookViewTest(GradebookViewTestBase):
                 self.program_masters_student.username,
             ]
         )
+
+    def test_full_name__full_course(self):
+        """ Test that masters students have full_name and that no one else in the course does. """
+        self.login_course_staff()
+        with override_waffle_flag(self.waffle_flag, active=True):
+            with self._mock_all_course_grade_reads():
+                response = self.client.get(self.get_url(course_key=self.course.id))
+
+        assert status.HTTP_200_OK == response.status_code
+        response_data = dict(response.data)
+        assert response_data['next'] is None
+
+        usernames = set()
+        masters_students = set()
+        for row in response_data['results']:
+            username = row['username']
+            usernames.add(username)
+            enrollment = CourseEnrollment.objects.get(user__username=username, course_id=self.course.id)
+            if enrollment.mode == CourseMode.MASTERS:
+                masters_students.add(username)
+                assert 'full_name' in row
+                assert row['full_name'] == enrollment.user.profile.name
+            else:
+                assert 'full_name' not in row
+        assert self.program_masters_student.username in masters_students
+        assert self.program_masters_student.username in usernames
+
+    def test_full_name__single_student(self):
+        """ Test that a request for a masters student includes a full name """
+        self.login_course_staff()
+        with override_waffle_flag(self.waffle_flag, active=True):
+            with patch('lms.djangoapps.grades.course_grade_factory.CourseGradeFactory.read') as mock_grade:
+                mock_grade.return_value = self.mock_course_grade(self.student, passed=True, percent=0.85)
+                response = self.client.get(self.get_url(
+                    course_key=self.course.id,
+                    username=self.program_masters_student.username
+                ))
+
+        assert status.HTTP_200_OK == response.status_code
+        response_data = dict(response.data)
+        assert response_data['full_name'] == self.program_masters_student.profile.name
 
 
 @ddt.ddt

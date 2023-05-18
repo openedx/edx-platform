@@ -81,12 +81,12 @@ edx-completion
 edx-django-release-util             # Release utils for the edx release pipeline
 edx-django-sites-extensions
 edx-codejail
-# Need IP address code that was moved to edx-django-utils 5.1.0
-edx-django-utils>=5.1.0             # Utilities for cache, monitoring, and plugins
-edx-drf-extensions
+# edx-django-utils 5.4.0 adds CSP middleware
+edx-django-utils>=5.4.0             # Utilities for cache, monitoring, and plugins
 edx-enterprise
-# edx-event-bus-kafka 2.0.0 adds support for configurable producer API
-edx-event-bus-kafka>=2.0.0          # Kafka implementation of event bus
+# edx-event-bus-kafka 4.0.0 adds support for configurable consumer API
+edx-event-bus-kafka>=4.0.1          # Kafka implementation of event bus
+edx-event-bus-redis
 edx-milestones
 edx-name-affirmation
 edx-opaque-keys

@@ -10,6 +10,7 @@ import time
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.db.models import Q
 import jwt
 from social_django.utils import load_strategy
 
@@ -17,6 +18,12 @@ from common.djangoapps.third_party_auth.models import AppleMigrationUserIdInfo
 from common.djangoapps.third_party_auth.appleid import AppleIdAuth
 
 log = logging.getLogger(__name__)
+
+
+class AccessTokenExpiredException(Exception):
+    """
+    Raised when access token has been expired.
+    """
 
 
 class Command(BaseCommand):
@@ -76,31 +83,63 @@ class Command(BaseCommand):
         access_token = response.json().get('access_token')
         return access_token
 
-    @transaction.atomic
-    def handle(self, *args, **options):
-        migration_url = "https://appleid.apple.com/auth/usermigrationinfo"
-        app_id = "org.edx.mobile"
-
+    def _get_token_and_secret(self):
+        """
+        Get access_token and client_secret
+        """
         client_secret = self._generate_client_secret()
         access_token = self._generate_access_token(client_secret)
-        if not access_token:
-            raise CommandError('Failed to create access token.')
+        return access_token, client_secret
 
+    def _update_token_and_secret(self):
+        self.access_token, self.client_secret = self._get_token_and_secret()  # pylint: disable=W0201
+
+    def _fetch_new_apple_id(self, transfer_id):
+        """
+        Fetch Apple ID for a given transfer ID from Apple API.
+        """
+        migration_url = "https://appleid.apple.com/auth/usermigrationinfo"
+        app_id = "org.edx.mobile"
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
             "Host": "appleid.apple.com",
-            "Authorization": "Bearer " + access_token
+            "Authorization": "Bearer " + self.access_token
         }
         payload = {
             "client_id": app_id,
-            "client_secret": client_secret
+            "client_secret": self.client_secret,
+            "transfer_sub": transfer_id
         }
+        response = requests.post(migration_url, data=payload, headers=headers)
+        if response.status_code == 400:
+            raise AccessTokenExpiredException
 
-        apple_user_ids_info = AppleMigrationUserIdInfo.objects.all()
+        return response.json().get('sub')
+
+    def _exchange_transfer_id_for_new_apple_id(self, transfer_id):
+        """
+        For a Transfer ID obtained from the transferring team,
+        return the correlating Apple ID belonging to the recipient team.
+        """
+        try:
+            new_apple_id = self._fetch_new_apple_id(transfer_id)
+        except AccessTokenExpiredException:
+            log.info('Access token expired. Re-creating access token.')
+            self._update_token_and_secret()
+            new_apple_id = self._fetch_new_apple_id(transfer_id)
+
+        return new_apple_id
+
+    @transaction.atomic
+    def handle(self, *args, **options):
+        self._update_token_and_secret()
+        if not self.access_token:
+            raise CommandError('Failed to create access token.')
+
+        apple_user_ids_info = AppleMigrationUserIdInfo.objects.filter(Q(new_apple_id__isnull=True) | Q(new_apple_id=""),
+                                                                      ~Q(transfer_id=""), transfer_id__isnull=False)
         for apple_user_id_info in apple_user_ids_info:
-            payload['transfer_sub'] = apple_user_id_info.transfer_id
-            response = requests.post(migration_url, data=payload, headers=headers)
-            new_apple_id = response.json().get('sub')
+            new_apple_id = self._exchange_transfer_id_for_new_apple_id(apple_user_id_info.transfer_id)
             if new_apple_id:
                 apple_user_id_info.new_apple_id = new_apple_id
                 apple_user_id_info.save()

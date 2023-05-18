@@ -1,18 +1,19 @@
 (function(require) {
     'use strict';
+
     require(
         ['video/00_resizer.js', 'underscore'],
         function(Resizer, _) {
             describe('Resizer', function() {
                 var html = [
-                        '<div ' +
-                    'class="rszr-wrapper" ' +
-                    'style="width:200px; height: 200px;"' +
-                '>',
-                        '<div ' +
-                        'class="rszr-el" ' +
-                        'style="width:100px; height: 150px;"' +
-                    '>',
+                        '<div '
+                    + 'class="rszr-wrapper" '
+                    + 'style="width:200px; height: 200px;"'
+                + '>',
+                        '<div '
+                        + 'class="rszr-el" '
+                        + 'style="width:100px; height: 150px;"'
+                    + '>',
                         'Content',
                         '</div>',
                         '</div>'
@@ -95,10 +96,10 @@
                     var $newElement,
                         expectedHeight;
 
-                    $container.append('<div ' +
-                'id="Another-el" ' +
-                'style="width:100px; height: 150px;"' +
-            '>');
+                    $container.append('<div '
+                + 'id="Another-el" '
+                + 'style="width:100px; height: 150px;"'
+            + '>');
                     $newElement = $('#Another-el');
                     expectedHeight = $container.height();
 
@@ -120,7 +121,6 @@
 
                         resizer = new Resizer(config);
                     });
-
 
                     it('callbacks are called', function() {
                         $.each(spiesList, function(index, spy) {

@@ -5,6 +5,7 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
     'js/models/xblock_info', 'edx-ui-toolkit/js/utils/string-utils'],
 function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
     'use strict';
+
     var addXBlock, duplicateXBlock, deleteXBlock, createUpdateRequestData, updateXBlockField, VisibilityState,
         getXBlockVisibilityClass, getXBlockListTypeClass, updateXBlockFields, getXBlockType, findXBlockInfo,
         moveXBlock;
@@ -150,7 +151,7 @@ function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         );
 
         if (xblockInfo.get('is_prereq')) {
-            messageBody += ' ' + gettext('Any content that has listed this content as a prerequisite will also have access limitations removed.');   // eslint-disable-line max-len
+            messageBody += ' ' + gettext('Any content that has listed this content as a prerequisite will also have access limitations removed.'); // eslint-disable-line max-len
             ViewUtils.confirmThenRunOperation(
                 StringUtils.interpolate(
                     gettext('Delete this {xblock_type} (and prerequisite)?'),

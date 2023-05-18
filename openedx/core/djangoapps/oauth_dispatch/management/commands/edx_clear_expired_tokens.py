@@ -48,6 +48,7 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
         self._add_boolean_flag(parser, 'refresh-tokens', True)
         self._add_boolean_flag(parser, 'access-tokens', True)
         self._add_boolean_flag(parser, 'grants', True)
+        self._add_boolean_flag(parser, 'revoked-tokens', True)
 
     def clear_table_data(self, query_set, batch_size, model, sleep_time):  # lint-amnesty, pylint: disable=missing-function-docstring
         total_deletions = 0
@@ -64,8 +65,9 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
                 deletions = model.objects.filter(pk__in=batch_id_list).delete()
                 deletion_count = deletions[0]
             total_deletions += deletion_count
+            logger.info(f"Removed {total_deletions} rows from {model.__name__} table")
             sleep(sleep_time)
-        message = f'Cleaned {total_deletions} rows from {model.__name__} table'
+        message = f'Final deletion count: Cleaned {total_deletions} rows from {model.__name__} table'
         logger.info(message)
 
     def get_expiration_time(self, now):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -87,17 +89,27 @@ class Command(BaseCommand):  # lint-amnesty, pylint: disable=missing-class-docst
             excluded_application_ids = []
 
         now = timezone.now()
-        refresh_expire_at = self.get_expiration_time(now)
+        expiry_threshold = self.get_expiration_time(now)
 
         if options['refresh-tokens']:
-            query_set = RefreshToken.objects.filter(access_token__expires__lt=refresh_expire_at).exclude(
+            logger.info("Removing expired RefreshTokens")
+            query_set = RefreshToken.objects.filter(access_token__expires__lt=expiry_threshold).exclude(
                 application_id__in=excluded_application_ids)
             self.clear_table_data(query_set, batch_size, RefreshToken, sleep_time)
 
+        if options['revoked-tokens']:
+            logger.info("Removing revoked RefreshTokens")
+            # remove revoked, as opposed to expired, RefreshTokens
+            revoked = RefreshToken.objects.filter(revoked__lt=expiry_threshold).exclude(
+                application_id__in=excluded_application_ids)
+            self.clear_table_data(revoked, batch_size, RefreshToken, sleep_time)
+
         if options['access-tokens']:
-            query_set = AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=now)
+            logger.info("Removing expired AccessTokens")
+            query_set = AccessToken.objects.filter(refresh_token__isnull=True, expires__lt=expiry_threshold)
             self.clear_table_data(query_set, batch_size, AccessToken, sleep_time)
 
         if options['grants']:
-            query_set = Grant.objects.filter(expires__lt=now)
+            logger.info("Removing expired Grants")
+            query_set = Grant.objects.filter(expires__lt=expiry_threshold)
             self.clear_table_data(query_set, batch_size, Grant, sleep_time)

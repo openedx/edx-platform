@@ -7,8 +7,9 @@
 
 (function() {
     'use strict';
-    var indexOfHelper = [].indexOf ||
-        function(item) {
+
+    var indexOfHelper = [].indexOf
+        || function(item) {
             var i, len;
             for (i = 0, len = this.length; i < len; i++) {
                 if (i in this && this[i] === item) {
@@ -43,7 +44,7 @@
             };
             this.submitAnswersAndSubmitButton = function(bind) {
                 if (bind === null || bind === undefined) {
-                    bind = false;  // eslint-disable-line no-param-reassign
+                    bind = false; // eslint-disable-line no-param-reassign
                 }
                 return Problem.prototype.submitAnswersAndSubmitButton.apply(that, arguments);
             };
@@ -560,12 +561,12 @@
                                 }
                             ));
                         }
-                        fd.append(element.id, file);  // xss-lint: disable=javascript-jquery-append
+                        fd.append(element.id, file); // xss-lint: disable=javascript-jquery-append
                     }
                     if (element.files.length === 0) {
                         fileNotSelected = true;
                         // In case we want to allow submissions with no file
-                        fd.append(element.id, '');  // xss-lint: disable=javascript-jquery-append
+                        fd.append(element.id, ''); // xss-lint: disable=javascript-jquery-append
                     }
                     if (requiredFiles.length !== 0) {
                         requiredFilesNotSubmitted = true;
@@ -576,7 +577,7 @@
                         ));
                     }
                 } else {
-                    fd.append(element.id, element.value);  // xss-lint: disable=javascript-jquery-append
+                    fd.append(element.id, element.value); // xss-lint: disable=javascript-jquery-append
                 }
             });
             if (fileNotSelected) {
@@ -906,8 +907,8 @@
             this.el.find('.choicegroup').each(function(i, choicegroupBlock) {
                 var checked;
                 checked = false;
-                $(choicegroupBlock).find('input[type=checkbox], input[type=radio]').
-                    each(function(j, checkboxOrRadio) {
+                $(choicegroupBlock).find('input[type=checkbox], input[type=radio]')
+                    .each(function(j, checkboxOrRadio) {
                         if ($(checkboxOrRadio).is(':checked')) {
                             checked = true;
                         }

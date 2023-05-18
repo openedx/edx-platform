@@ -58,7 +58,7 @@ class EnterpriseLearnerPortalModal extends React.Component {
 
     handleEsc(e) {
         const { key } = e;
-        if (key === "Escape") {
+        if (key === 'Escape') {
             window.analytics.track('edx.ui.enterprise.lms.dashboard.learner_portal_modal.closed', {
                 enterpriseUUID: this.props.enterpriseCustomerUUID,
                 source: 'Escape',
@@ -117,7 +117,7 @@ class EnterpriseLearnerPortalModal extends React.Component {
                                 gettext('You have access to the {enterpriseName} dashboard'),
                                 {
                                     enterpriseName: this.props.enterpriseCustomerName,
-                                }
+                                },
                             )}
                         </div>
                         <p>
@@ -125,7 +125,7 @@ class EnterpriseLearnerPortalModal extends React.Component {
                                 gettext('To access the courses available to you through {enterpriseName}, visit the {enterpriseName} dashboard.'),
                                 {
                                     enterpriseName: this.props.enterpriseCustomerName,
-                                }
+                                },
                             )}
                         </p>
                         <div className="mt-4 d-flex align-content-center justify-content-end">
@@ -158,4 +158,4 @@ class EnterpriseLearnerPortalModal extends React.Component {
     }
 }
 
-export { EnterpriseLearnerPortalModal }; 
+export { EnterpriseLearnerPortalModal };

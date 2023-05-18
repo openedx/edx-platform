@@ -1,5 +1,6 @@
 describe('escapeSelector', function() {
     'use strict';
+
     var escapeSelector = window.escapeSelector;
 
     it('correctly escapes css', function() {
@@ -29,6 +30,7 @@ describe('escapeSelector', function() {
 
 describe('Formula Equation Preview', function() {
     'use strict';
+
     var formulaEquationPreview = window.formulaEquationPreview;
     beforeEach(function() {
         // Simulate an environment conducive to a FormulaEquationInput
@@ -83,7 +85,7 @@ describe('Formula Equation Preview', function() {
         window.MathJax.Hub.getAllJax = jasmine.createSpy('MathJax.Hub.getAllJax')
             .and.returnValue([this.jax]);
         window.MathJax.Hub.Queue = function(callback) {
-            if (typeof (callback) === 'function') {
+            if (typeof callback === 'function') {
                 callback();
             }
         };
@@ -129,8 +131,10 @@ describe('Formula Equation Preview', function() {
                 'THE_URL',
                 'THE_ID',
                 'preview_formcalc',
-                {formula: 'PREFILLED_VALUE',
-                    request_start: jasmine.any(Number)},
+                {
+                    formula: 'PREFILLED_VALUE',
+                    request_start: jasmine.any(Number)
+                },
                 jasmine.any(Function)
             ]);
         });
@@ -176,8 +180,8 @@ describe('Formula Equation Preview', function() {
             // Either it makes a request or jumps straight into displaying ''.
             jasmine.waitUntil(function() {
                 // (Short circuit if `inputAjax` is indeed called)
-                return window.Problem.inputAjax.calls.count() > 0 ||
-                    window.MathJax.Hub.Queue.calls.count() > 0;
+                return window.Problem.inputAjax.calls.count() > 0
+                    || window.MathJax.Hub.Queue.calls.count() > 0;
             }).then(function() {
                 // Expect the request not to have been called.
                 expect(window.Problem.inputAjax).not.toHaveBeenCalled();
@@ -199,17 +203,17 @@ describe('Formula Equation Preview', function() {
             var iter = 0;
             jasmine.waitUntil(function() {
                 inputAnother(iter++);
-                return Date.now() > end;  // Stop when we get to `end`.
+                return Date.now() > end; // Stop when we get to `end`.
             }).then(function() {
                 jasmine.waitUntil(function() {
-                    return window.Problem.inputAjax.calls.count() > 0 &&
-                        window.Problem.inputAjax.calls.mostRecent().args[3].formula === value;
+                    return window.Problem.inputAjax.calls.count() > 0
+                        && window.Problem.inputAjax.calls.mostRecent().args[3].formula === value;
                 }).then(_.bind(function() {
                     // There should be 2 or 3 calls (depending on leading edge).
                     expect(window.Problem.inputAjax.calls.count()).not.toBeGreaterThan(3);
 
                     // The calls should happen approximately `minDelay` apart.
-                    for (var i = 1; i < this.ajaxTimes.length; i ++) {
+                    for (var i = 1; i < this.ajaxTimes.length; i++) {
                         var diff = this.ajaxTimes[i] - this.ajaxTimes[i - 1];
                         expect(diff).toBeGreaterThan(minDelay - 10);
                     }

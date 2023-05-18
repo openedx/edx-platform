@@ -200,8 +200,8 @@
                     ));
                 } else if (xhr.status === 500) {
                     TeamUtils.showMessage(gettext(
-                        'Your request could not be completed due to a server problem. Reload the page' +
-                            ' and try again. If the issue persists, click the Help tab to report the problem.'
+                        'Your request could not be completed due to a server problem. Reload the page'
+                            + ' and try again. If the issue persists, click the Help tab to report the problem.'
                     ));
                 }
             },
@@ -257,8 +257,8 @@
                         topic: topic,
                         title: gettext('Create a New Team'),
                         description: gettext(
-                            'Create a new team if you can\'t find an existing team to join, ' +
-                                'or if you would like to learn with friends you know.'
+                            'Create a new team if you can\'t find an existing team to join, '
+                                + 'or if you would like to learn with friends you know.'
                         ),
                         breadcrumbs: view.createBreadcrumbs(topic),
                         mainView: new TeamEditView({
@@ -294,8 +294,8 @@
                     editViewWithHeader = self.createViewWithHeader({
                         title: gettext('Edit Team'),
                         description: gettext(
-                            'If you make significant changes, ' +
-                                'make sure you notify members of the team before making these changes.'
+                            'If you make significant changes, '
+                                + 'make sure you notify members of the team before making these changes.'
                         ),
                         breadcrumbs: self.createBreadcrumbs(topic, team),
                         mainView: view,
@@ -326,8 +326,8 @@
                         breadcrumbs: self.createBreadcrumbs(topic, team),
                         title: gettext('Membership'),
                         description: gettext(
-                            'You can remove members from this team, ' +
-                                'especially if they have not participated in the team\'s activity.'
+                            'You can remove members from this team, '
+                                + 'especially if they have not participated in the team\'s activity.'
                         ),
                         topic: topic,
                         team: team
@@ -394,8 +394,8 @@
                         collection: collection,
                         showSortControls: options.showSortControls
                     }),
-                    searchFieldView = this.shouldShowSearch(topic) ?
-                        new SearchFieldView({
+                    searchFieldView = this.shouldShowSearch(topic)
+                        ? new SearchFieldView({
                             type: 'teams',
                             label: gettext('Search teams'),
                             collection: collection
@@ -498,7 +498,6 @@
                 return this.context.userInfo.privileged || this.context.userInfo.staff;
             },
 
-
             /**
                  * Returns whether the "Manage" tab should be shown to the user.
                  */
@@ -528,15 +527,15 @@
             getTeamsTabViewDescription: function() {
                 if (this.context.hasOpenTopic) {
                     return gettext(
-                        'See all teams you belong to and all public ' +
-                            'teams in your course, organized by topic. ' +
-                            'Join an open public team to collaborate with other learners ' +
-                            'who are interested in the same topic as you are.'
+                        'See all teams you belong to and all public '
+                            + 'teams in your course, organized by topic. '
+                            + 'Join an open public team to collaborate with other learners '
+                            + 'who are interested in the same topic as you are.'
                     );
                 } else if (this.context.hasPublicManagedTopic) {
                     return gettext(
-                        'See all teams you belong to and all public ' +
-                            'teams in your course, organized by topic.'
+                        'See all teams you belong to and all public '
+                            + 'teams in your course, organized by topic.'
                     );
                 } else {
                     return gettext('See all teams you belong to.');
@@ -720,8 +719,8 @@
             readOnlyDiscussion: function(team) {
                 var userInfo = this.context.userInfo;
                 return !(
-                    userInfo.privileged ||
-                        _.any(team.attributes.membership, function(membership) {
+                    userInfo.privileged
+                        || _.any(team.attributes.membership, function(membership) {
                             return membership.user.username === userInfo.username;
                         })
                 );

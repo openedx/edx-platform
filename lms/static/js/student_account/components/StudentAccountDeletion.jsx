@@ -133,33 +133,35 @@ export class StudentAccountDeletion extends React.Component {
                     inputRef={(input) => { this.modalTrigger = input; }}
                     onClick={this.loadDeletionModal}
                 />
-                {showError &&
-          <StatusAlert
-              dialog={(
-                  <div className="modal-alert">
-                      <div className="icon-wrapper">
-                          <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
+                {showError
+          && (
+              <StatusAlert
+                  dialog={(
+                      <div className="modal-alert">
+                          <div className="icon-wrapper">
+                              <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
+                          </div>
+                          <div className="alert-content">
+                              {socialAuthConnected && isActive
+                    && <p dangerouslySetInnerHTML={{ __html: socialAuthError }} />}
+                              {!isActive && <p dangerouslySetInnerHTML={{ __html: activationError }} /> }
+                          </div>
                       </div>
-                      <div className="alert-content">
-                          {socialAuthConnected && isActive &&
-                    <p dangerouslySetInnerHTML={{ __html: socialAuthError }} />
-                          }
-                          {!isActive && <p dangerouslySetInnerHTML={{ __html: activationError }} /> }
-                      </div>
-                  </div>
-              )}
-              alertType="danger"
-              dismissible={false}
-              open
-          />
-                }
-                {deletionModalOpen && <StudentAccountDeletionModal
-                    onClose={this.closeDeletionModal}
-                    additionalSiteSpecificDeletionText={this.props.additionalSiteSpecificDeletionText}
-                    mktgRootLink={this.props.mktgRootLink}
-                    platformName={this.props.platformName}
-                    siteName={this.props.siteName}
-                />}
+                  )}
+                  alertType="danger"
+                  dismissible={false}
+                  open
+              />
+          )}
+                {deletionModalOpen && (
+                    <StudentAccountDeletionModal
+                        onClose={this.closeDeletionModal}
+                        additionalSiteSpecificDeletionText={this.props.additionalSiteSpecificDeletionText}
+                        mktgRootLink={this.props.mktgRootLink}
+                        platformName={this.props.platformName}
+                        siteName={this.props.siteName}
+                    />
+                )}
             </div>
         );
     }

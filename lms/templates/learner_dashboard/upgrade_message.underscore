@@ -7,6 +7,6 @@
 <div class="action col-12 md-col-4">
     <a href="<%- upgrade_url %>" class="btn-brand btn cta-primary upgrade-button single-course-run program_dashboard_course_upsell_button">
         <%- gettext('Upgrade to Verified') %>
-    <a>
+    </a>
 </div>
 <% } %>

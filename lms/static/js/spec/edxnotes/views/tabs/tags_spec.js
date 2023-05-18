@@ -6,6 +6,7 @@ define([
     $, _, TemplateHelpers, Helpers, NotesCollection, TabsCollection, TagsView
 ) {
     'use strict';
+
     describe('EdxNotes TagsView', function() {
         var notes = Helpers.getDefaultNotes(),
             getView, getText, getNoteText;

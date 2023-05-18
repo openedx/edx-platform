@@ -1,5 +1,6 @@
 (function(requirejs, require, define) {
     'use strict';
+
     define(
         'video/08_video_speed_control.js', [
             'video/00_iterator.js',
@@ -32,7 +33,7 @@
                 template: [
                     '<div class="speeds menu-container" role="application">',
                     '<p class="sr instructions">',
-                    gettext('Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'),  // eslint-disable-line max-len, indent
+                    gettext('Press UP to enter the speed menu then use the UP and DOWN arrow keys to navigate the different speeds, then press ENTER to change to the selected speed.'), // eslint-disable-line max-len, indent
                     '</p>',
                     '<button class="control speed-button" aria-disabled="false" aria-expanded="false"',
                     'title="',

@@ -94,4 +94,3 @@ var instructorTaskProgress;
 $(document).ready(function() {
     instructorTaskProgress = new InstructorTaskProgress($('#task-progress-wrapper'));
 });
-

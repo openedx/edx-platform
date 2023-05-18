@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-12 20:35+0000\n"
-"PO-Revision-Date: 2023-03-12 20:35:55.895088\n"
+"POT-Creation-Date: 2023-05-17 09:16+0000\n"
+"PO-Revision-Date: 2023-05-17 09:16:40.099706\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -68,6 +68,7 @@ msgid "Discussion"
 msgstr "Đᴉsɔnssᴉøn"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr "Ᵽɹøblǝɯ"
@@ -77,6 +78,10 @@ msgstr "Ᵽɹøblǝɯ"
 #: lms/templates/video.html
 msgid "Video"
 msgstr "Vᴉdǝø"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "Ƀlɐnʞ Ⱥdʌɐnɔǝd Ᵽɹøblǝɯ"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -126,6 +131,13 @@ msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ʍᴉʇɥ ʇɥǝ \"{language_code}\" lɐnƃnɐƃǝ
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
+msgstr "Ɍǝɐdʎ"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -249,6 +261,20 @@ msgstr ""
 "ØⱣŦƗØNȺŁ: Ⱥɟʇǝɹ ʇɥᴉs dɐʇǝ/ʇᴉɯǝ, nsǝɹs ʍᴉll nø lønƃǝɹ bǝ ɐblǝ ʇø ǝnɹøll ᴉn "
 "ʇɥᴉs ɯødǝ. Łǝɐʌǝ ʇɥᴉs blɐnʞ ᴉɟ nsǝɹs ɔɐn ǝnɹøll ᴉn ʇɥᴉs ɯødǝ nnʇᴉl "
 "ǝnɹøllɯǝnʇ ɔløsǝs ɟøɹ ʇɥǝ ɔønɹsǝ."
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr "Łøɔʞ ndƃɹɐdǝ dǝɐdlᴉnǝ dɐʇǝ"
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
+"ØⱣŦƗØNȺŁ: Sǝʇ ʇø Ŧɹnǝ ʇø løɔʞ ᴉn ʇɥǝ ǝxdlᴉɔᴉʇlʎ dǝɟᴉnǝd ndƃɹɐdǝ dǝɐdlᴉnǝ "
+"dɐʇǝ. Sǝʇ ʇø Fɐlsǝ ᴉɟ ʇɥǝɹǝ ᴉs nø ndƃɹɐdǝ dǝɐdlᴉnǝ øɹ ʇø nsǝ ʇɥǝ dǝɟɐnlʇ "
+"ndƃɹɐdǝ dǝɐdlᴉnǝ."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -3885,10 +3911,6 @@ msgstr "Łɐnƃnɐƃǝ"
 msgid "Location"
 msgstr "Łøɔɐʇᴉøn"
 
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "Ƀᴉɹʇɥ Ɏǝɐɹ"
-
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
 #. the user's gender.
@@ -5761,6 +5783,7 @@ msgid "Allow"
 msgstr "Ⱥlløʍ"
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Ɇɹɹøɹ"
@@ -6968,6 +6991,43 @@ msgstr "Wǝ ɔønld nøʇ ɟᴉnd ɐ nsǝɹ ʍᴉʇɥ ʇɥɐʇ ǝɯɐᴉl ɐddɹ
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "This user already has access to this library."
 msgstr "Ŧɥᴉs nsǝɹ ɐlɹǝɐdʎ ɥɐs ɐɔɔǝss ʇø ʇɥᴉs lᴉbɹɐɹʎ."
+
+#: openedx/core/djangoapps/content_staging/data.py
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Łøɐdᴉnƃ"
+
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Expired"
+msgstr "Ɇxdᴉɹǝd"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr "Sʇɐƃǝd Ȼønʇǝnʇ"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+"\n"
+"            Wɥɐʇ ʇʎdǝ øɟ ɔønʇǝnʇ ᴉs sʇɐƃǝd. Ønlʎ ØŁX ɔønʇǝnʇ ᴉs snddøɹʇǝd, ɐnd\n"
+"            ʇɥᴉs ɟᴉǝld ɯnsʇ bǝ ʇɥǝ sɐɯǝ ɐs ʇɥǝ ɹøøʇ ʇɐƃ øɟ ʇɥǝ ØŁX.\n"
+"            ǝ.ƃ. \"ʌᴉdǝø\" ᴉɟ ɐ ʌᴉdǝø ᴉs sʇɐƃǝd, øɹ \"ʌǝɹʇᴉɔɐl\" ɟøɹ ɐ nnᴉʇ.\n"
+"        "
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
+msgstr "Øɹᴉƃᴉnɐl nsɐƃǝ ʞǝʎ/ƗĐ øɟ ʇɥǝ ʇɥᴉnƃ ʇɥɐʇ ᴉs ᴉn ʇɥǝ ɔlᴉdbøɐɹd."
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -8222,6 +8282,14 @@ msgstr "Snɔɔǝss"
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Ⱥɔʇᴉøns"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
+"Ȼøɯɯɐ sǝdɐɹɐʇǝd ɟᴉlǝ ʇɥɐʇ ɥɐʌǝ nsǝɹnɐɯǝ ɐnd nsǝɹ_ǝɯɐᴉl øɟ ʇɥǝ nsǝɹs ʇɥɐʇ "
+"nǝǝds ʇø bǝ ɹǝʇᴉɹǝd"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -9659,10 +9727,6 @@ msgid "Invalid JSON response received from codejail api service."
 msgstr "Ɨnʌɐlᴉd ɈSØN ɹǝsdønsǝ ɹǝɔǝᴉʌǝd ɟɹøɯ ɔødǝɾɐᴉl ɐdᴉ sǝɹʌᴉɔǝ."
 
 #: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Ƀlɐnʞ Ⱥdʌɐnɔǝd Ᵽɹøblǝɯ"
-
-#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Nnɯbǝɹ øɟ ɐʇʇǝɯdʇs ʇɐʞǝn bʎ ʇɥǝ sʇndǝnʇ øn ʇɥᴉs dɹøblǝɯ"
 
@@ -11056,6 +11120,20 @@ msgstr ""
 "'dnblᴉɔ' (ɐlløʍ ɐɔɔǝss ʇø bøʇɥ ønʇlᴉnǝ ɐnd ɔønɹsǝ ɔønʇǝnʇ)."
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr "Vᴉdǝø Sɥɐɹᴉnƃ Ødʇᴉøns"
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+"Sdǝɔᴉɟʎ ʇɥǝ ʌᴉdǝø sɥɐɹᴉnƃ ødʇᴉøns ɟøɹ ʇɥǝ ɔønɹsǝ. Ŧɥᴉs ɔɐn bǝ sǝʇ ʇø ønǝ øɟ "
+"ʇɥɹǝǝ ʌɐlnǝs: 'ɐll-øn', 'ɐll-øɟɟ' ɐnd 'dǝɹ-ʌᴉdǝø'. ʍᴉʇɥ 'dǝɹ-ʌᴉdǝø' ɐs ʇɥǝ "
+"dǝɟɐnlʇ."
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "Ȼønɹsǝ Ɨnsʇɹnɔʇøɹ"
 
@@ -12145,6 +12223,14 @@ msgstr "Ɇnɐblǝ ᴉn-ɔønʇǝxʇ dᴉsɔnssᴉøns ɟøɹ ʇɥǝ Ʉnᴉʇ"
 msgid "Add discussion for the Unit."
 msgstr "Ⱥdd dᴉsɔnssᴉøn ɟøɹ ʇɥǝ Ʉnᴉʇ."
 
+#: xmodule/video_block/sharing_sites.py
+msgid ""
+"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"\n"
+msgstr ""
+"Ħǝɹǝ's ɐ ɟnn ɔlᴉd ɟɹøɯ ɐ ɔlɐss Ɨ'ɯ ʇɐʞᴉnƃ øn @ǝdXønlᴉnǝ.\n"
+"\n"
+
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
@@ -12921,6 +13007,14 @@ msgid "Invalid data ({details})"
 msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr "Ŧɥǝɹǝ ʍɐs ɐ dɹøblǝɯ dɐsʇᴉnƃ ʎønɹ ɔøɯdønǝnʇ."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr "Ɏønɹ ɔlᴉdbøɐɹd ᴉs ǝɯdʇʎ øɹ ᴉnʌɐlᴉd."
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ {source_type} ᴉnʇø {target_parent_type}."
@@ -13015,6 +13109,10 @@ msgstr "Ødǝn Ɍǝsdønsǝ"
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Library Content"
 msgstr "Łᴉbɹɐɹʎ Ȼønʇǝnʇ"
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr "Đɹɐƃ ɐnd Đɹød"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -13276,12 +13374,6 @@ msgstr "Ʉdløɐdᴉnƃ"
 msgid "In Progress"
 msgstr "Ɨn Ᵽɹøƃɹǝss"
 
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "Ɍǝɐdʎ"
-
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Uploaded"
@@ -13542,16 +13634,6 @@ msgstr "Ȼønʇǝnʇ"
 #: wiki/templates/wiki/settings.html
 msgid "Settings"
 msgstr "Sǝʇʇᴉnƃs"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Łøɐdᴉnƃ"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -14595,6 +14677,18 @@ msgstr "Ᵽɹǝʌᴉøns dɐƃǝ"
 msgid "Next page"
 msgstr "Nǝxʇ dɐƃǝ"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr "Ᵽɐsʇǝ Ȼøɯdønǝnʇ"
+
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr "Fɹøɯ:"
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr "Wɥɐʇ's ᴉn ɯʎ ɔlᴉdbøɐɹd?"
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "Ŧɹɐɔʞᴉnƃ Łøƃ"
@@ -14719,14 +14813,16 @@ msgid "Downloads and transcripts"
 msgstr "Đøʍnløɐds ɐnd ʇɹɐnsɔɹᴉdʇs"
 
 #: lms/templates/video.html
+msgid "Share on:"
+msgstr "Sɥɐɹǝ øn:"
+
+#: lms/templates/video.html
+msgid "Share on {site}"
+msgstr "Sɥɐɹǝ øn {site}"
+
+#: lms/templates/video.html
 msgid "Download video file"
 msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -16063,6 +16159,11 @@ msgstr "Ȼlᴉɔʞ ʇɥǝ lᴉnʞ ʇø sǝǝ ɯʎ ɔǝɹʇᴉɟᴉɔɐʇǝ."
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Ᵽøsʇ øn Fɐɔǝbøøʞ"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "Sɥɐɹǝ øn Ŧʍᴉʇʇǝɹ"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
@@ -18114,10 +18215,6 @@ msgstr "Sɔɥøøls"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr "Ɍǝƃᴉsʇǝɹ ɟøɹ ɟɹǝǝ"
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Ɍǝsnɯǝ ʎønɹ lɐsʇ ɔønɹsǝ"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
@@ -21080,10 +21177,10 @@ msgstr "Łøɔɐʇᴉøn ƗĐ"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
 "Ŧø ɔɹǝɐʇǝ ɐ lᴉnʞ ʇø ʇɥᴉs nnᴉʇ ɟɹøɯ ɐn ĦŦMŁ ɔøɯdønǝnʇ ᴉn ʇɥᴉs ɔønɹsǝ, ǝnʇǝɹ "
-"\"/ɾnɯd_ʇø_ᴉd/<location ID>\" ɐs ʇɥǝ ɄɌŁ ʌɐlnǝ."
+"{unit_link} ɐs ʇɥǝ ɄɌŁ ʌɐlnǝ."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -21271,11 +21368,13 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
-"Ŧɥᴉs ɔønɹsǝ ɹnn ᴉs nsᴉnƃ ɐn ndƃɹɐdǝd ʌǝɹsᴉøn øɟ ǝdx dᴉsɔnssᴉøn ɟøɹnɯ. "
-"Đᴉsɔnssᴉøn xbløɔʞs ʍᴉll nø lønƃǝɹ ʍøɹʞ."
+"Ŧɥᴉs ɔønɹsǝ ɹnn ᴉs nsᴉnƃ ɐn ndƃɹɐdǝd ʌǝɹsᴉøn øɟ ǝdx dᴉsɔnssᴉøn ɟøɹnɯ. Ɨn "
+"øɹdǝɹ ʇø dᴉsdlɐʎ ʇɥǝ dᴉsɔnssᴉøns sᴉdǝbɐɹ, dᴉsɔnssᴉøns xɃløɔʞs ʍᴉll nø lønƃǝɹ"
+" bǝ ʌᴉsᴉblǝ ʇø lǝɐɹnǝɹs."
 
 #: cms/templates/course_outline.html
 msgid " Learn more"

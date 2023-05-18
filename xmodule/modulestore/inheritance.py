@@ -272,27 +272,27 @@ class InheritanceMixin(XBlockMixin):
         return self.is_past_due()
 
 
-def compute_inherited_metadata(descriptor):
-    """Given a descriptor, traverse all of its descendants and do metadata
+def compute_inherited_metadata(block):
+    """Given a block, traverse all of its descendants and do metadata
     inheritance.  Should be called on a CourseBlock after importing a
     course.
 
     NOTE: This means that there is no such thing as lazy loading at the
     moment--this accesses all the children."""
-    if descriptor.has_children:
-        parent_metadata = descriptor.xblock_kvs.inherited_settings.copy()
-        # add any of descriptor's explicitly set fields to the inheriting list
+    if block.has_children:
+        parent_metadata = block.xblock_kvs.inherited_settings.copy()
+        # add any of block's explicitly set fields to the inheriting list
         for field in InheritanceMixin.fields.values():  # lint-amnesty, pylint: disable=no-member
-            if field.is_set_on(descriptor):
+            if field.is_set_on(block):
                 # inherited_settings values are json repr
-                parent_metadata[field.name] = field.read_json(descriptor)
+                parent_metadata[field.name] = field.read_json(block)
 
-        for child in descriptor.get_children():
+        for child in block.get_children():
             inherit_metadata(child, parent_metadata)
             compute_inherited_metadata(child)
 
 
-def inherit_metadata(descriptor, inherited_data):
+def inherit_metadata(block, inherited_data):
     """
     Updates this block with metadata inherited from a containing block.
     Only metadata specified in self.inheritable_metadata will
@@ -302,7 +302,7 @@ def inherit_metadata(descriptor, inherited_data):
         they should inherit
     """
     try:
-        descriptor.xblock_kvs.inherited_settings = inherited_data
+        block.xblock_kvs.inherited_settings = inherited_data
     except AttributeError:  # the kvs doesn't have inherited_settings probably b/c it's an error block
         pass
 

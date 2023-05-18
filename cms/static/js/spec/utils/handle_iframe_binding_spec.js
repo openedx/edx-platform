@@ -39,8 +39,8 @@ define(
                 // and embed objects should have "wmode='transparent'" as an attribute
                 expect(iframe_html).toContain('<iframe src="http://www.youtube.com/embed/NHd27UvY-lw?wmode=transparent"');
                 expect(iframe_html).toContainHtml(
-                    '<embed wmode="transparent" type="application/x-shockwave-flash"' +
-              ' src="http://www.youtube.com/embed/NHd27UvY-lw"');
+                    '<embed wmode="transparent" type="application/x-shockwave-flash"'
+              + ' src="http://www.youtube.com/embed/NHd27UvY-lw"');
             });
 
             it('does not modify src url of DOM iframe if it is empty', function() {
