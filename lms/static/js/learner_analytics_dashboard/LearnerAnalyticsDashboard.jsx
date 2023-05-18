@@ -4,9 +4,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
+// eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import CircleChart from './CircleChart';
 import CircleChartLegend from './CircleChartLegend';
 import GradeTable from './GradeTable';
+// eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import DueDates from './DueDates';
 import Discussions from './Discussions';
 

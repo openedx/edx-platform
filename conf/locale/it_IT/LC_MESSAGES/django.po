@@ -127,7 +127,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-16 20:42+0000\n"
+"POT-Creation-Date: 2023-05-07 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2021\n"
 "Language-Team: Italian (Italy) (https://app.transifex.com/open-edx/teams/6205/it_IT/)\n"
@@ -157,6 +157,7 @@ msgid "Discussion"
 msgstr "Discussione"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr "Problema"
@@ -166,6 +167,10 @@ msgstr "Problema"
 #: lms/templates/video.html
 msgid "Video"
 msgstr "Video"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "Problema avanzato vuoto"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -4133,10 +4138,6 @@ msgstr "Lingua"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
 msgstr "Posizione"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "Anno Di Nascita"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
@@ -10122,10 +10123,6 @@ msgid "Invalid JSON response received from codejail api service."
 msgstr "Risposta JSON non valida ricevuta da API codejail."
 
 #: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Problema avanzato vuoto"
-
-#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Numero di tentativi intrapresi dallo studente su questo problema"
 
@@ -11570,6 +11567,17 @@ msgstr ""
 "l'accesso sia al contenuto generale che al contenuto del corso stesso)."
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "istruttore del corso"
 
@@ -12699,6 +12707,12 @@ msgstr "Abilita discussioni contestualizzate per l'Unità"
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
 msgstr "Aggiungi una discussione per l'Unità."
+
+#: xmodule/video_block/sharing_sites.py
+msgid ""
+"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"\n"
+msgstr ""
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
@@ -15215,6 +15229,14 @@ msgstr "Prossima Pagina"
 msgid "Paste Component"
 msgstr ""
 
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "Log di Monitoraggio"
@@ -15344,21 +15366,9 @@ msgstr "Download e trascrizioni"
 msgid "Share on:"
 msgstr ""
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "Condividi su Twitter"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/video.html
-msgid "Share on Facebook"
-msgstr "Condividi su Facebook"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-#: lms/templates/video.html
-msgid "Share on LinkedIn"
-msgstr "Condividi su LinkedIn"
+msgid "Share on {site}"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -16747,6 +16757,11 @@ msgid "Post on Facebook"
 msgstr "Pubblica su Facebook"
 
 #: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "Condividi su Twitter"
+
+#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "Pubblica questo risultato tramite tweet. Finestra a comparsa. "
 
@@ -17785,6 +17800,10 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "Aggiungi il certificato al profilo LinkedIn "
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Share on LinkedIn"
+msgstr "Condividi su LinkedIn"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr "Non sei ancora idoneo per un certificato."
 
@@ -17863,6 +17882,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "Condividi {course_name} su Facebook"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Facebook"
+msgstr "Condividi su Facebook"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"

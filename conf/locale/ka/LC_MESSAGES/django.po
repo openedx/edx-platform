@@ -90,6 +90,7 @@ msgid "Discussion"
 msgstr "დისკუსია"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr ""
@@ -97,6 +98,10 @@ msgstr ""
 #: lms/templates/video.html
 msgid "Video"
 msgstr "ვიდეო"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "ცარიელი დამატებითი პამოცანა"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -3651,10 +3656,6 @@ msgstr "ენა"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
 msgstr "მდებარეობა"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "დაბადების წელი"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
@@ -9087,10 +9088,6 @@ msgid "Invalid JSON response received from codejail api service."
 msgstr ""
 
 #: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "ცარიელი დამატებითი პამოცანა"
-
-#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "ამ ამოცანაზე სტუდენტთა მცდელობების რაოდენობა"
 
@@ -10455,6 +10452,17 @@ msgid ""
 msgstr ""
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "კურსის ინსტრუქტორი"
 
@@ -11511,6 +11519,12 @@ msgstr ""
 
 #: xmodule/vertical_block.py
 msgid "Add discussion for the Unit."
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+msgid ""
+"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"\n"
 msgstr ""
 
 #: xmodule/video_block/transcripts_utils.py
@@ -13925,6 +13939,14 @@ msgstr "მომდევნო გვერდი"
 msgid "Paste Component"
 msgstr ""
 
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "აღრიცხვის ჟურნალი"
@@ -14051,21 +14073,9 @@ msgstr "გადმოწერები და სუბტიტრები"
 msgid "Share on:"
 msgstr ""
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "გააზიარეთ Twitter-ზე"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/video.html
-msgid "Share on Facebook"
-msgstr "Facebook-ზე გაზიარება"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-#: lms/templates/video.html
-msgid "Share on LinkedIn"
-msgstr "გააზიარეთ LinkedIn -ზე"
+msgid "Share on {site}"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -15234,6 +15244,11 @@ msgid "Post on Facebook"
 msgstr "დაპოსტეთ Facebook-ზე"
 
 #: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "გააზიარეთ Twitter-ზე"
+
+#: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
 msgstr "გამოაქვეყნეთ ეს წარმატება. გაიხსნება ამომხტარ ფანჯარაში."
 
@@ -16212,6 +16227,10 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "სერტიფიკატის LinkedIn პროფილზე დამატება"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Share on LinkedIn"
+msgstr "გააზიარეთ LinkedIn -ზე"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr ""
 
@@ -16286,6 +16305,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Facebook"
+msgstr "Facebook-ზე გაზიარება"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
