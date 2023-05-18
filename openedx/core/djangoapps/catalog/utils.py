@@ -448,6 +448,8 @@ def get_course_runs():
 
 
 def get_course_runs_for_course(course_uuid):  # lint-amnesty, pylint: disable=missing-function-docstring
+    if course_uuid is None:
+        raise ValueError('missing course_uuid')
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course runs')
     if user:
         cache_key = f"{catalog_integration.CACHE_KEY}.course.{course_uuid}.course_runs"
@@ -468,6 +470,8 @@ def get_course_runs_for_course(course_uuid):  # lint-amnesty, pylint: disable=mi
 
 
 def get_owners_for_course(course_uuid):  # lint-amnesty, pylint: disable=missing-function-docstring
+    if course_uuid is None:
+        raise ValueError("missing course_uuid")
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Owners')
     if user:
         cache_key = f"{catalog_integration.CACHE_KEY}.course.{course_uuid}.course_runs"
@@ -498,6 +502,8 @@ def get_course_uuid_for_course(course_run_key):
     Returns:
         UUID: Course UUID and None if it was not retrieved.
     """
+    if course_run_key is None:
+        raise ValueError("missing course_run_key")
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course UUID')
     if user:
         api_client = get_catalog_api_client(user)
@@ -611,6 +617,8 @@ def get_course_run_details(course_run_key, fields):
     Returns:
         dict with language, start date, end date, and max_effort details about specified course run
     """
+    if course_run_key is None:
+        raise ValueError("missing course_run_key")
     course_run_details = {}
     user, catalog_integration = check_catalog_integration_and_get_user(
         error_message_field=f'Data for course_run {course_run_key}'
