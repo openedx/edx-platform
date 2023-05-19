@@ -42,6 +42,7 @@ from lms.djangoapps.ccx.utils import (
     assign_staff_role_to_ccx,
     ccx_course,
     ccx_students_enrolling_center,
+    exclude_master_course_staff_users,
     get_ccx_by_ccx_id,
     get_ccx_creation_dict,
     get_ccx_for_coach,
@@ -56,6 +57,7 @@ from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from lms.djangoapps.instructor.views.gradebook_api import get_grade_book_page
 from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import get_course_by_id
 from openedx.core.djangoapps.plugins.plugins_hooks import run_extension_point
 from xmodule.modulestore.django import SignalHandler  # lint-amnesty, pylint: disable=wrong-import-order
@@ -166,10 +168,21 @@ def dashboard(request, course, ccx=None):
         schedule = get_ccx_schedule(course, ccx)
         grading_policy = get_override_for_ccx(
             ccx, course, 'grading_policy', course.grading_policy)
+        enrolled_students = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True)
         context['schedule'] = json.dumps(schedule, indent=4)
         context['save_url'] = reverse(
             'save_ccx', kwargs={'course_id': ccx_locator})
-        context['ccx_members'] = CourseEnrollment.objects.filter(course_id=ccx_locator, is_active=True)
+        context['ccx_members'] = (
+            # TO DO: CCX feature is going to be used only for Licensing (Course Operations business logic)
+            # Additional information can be found at: https://github.com/Pearson-Advance/edx-platform/pull/96
+            enrolled_students
+            if not configuration_helpers.get_value('HIDE_MASTER_COURSE_STAFF_FROM_STUDENT_LIST', False)
+            else exclude_master_course_staff_users(
+                users=enrolled_students,
+                course_key=ccx_locator,
+                model='CourseEnrollment',
+            )
+        )
         # if course licensing is enabled, pending enrollments will be in the context.
         is_course_licensing_enabled = run_extension_point('PCO_ENABLE_COURSE_LICENSING')
         context['pending_ccx_members'] = run_extension_point(
@@ -574,6 +587,15 @@ def ccx_grades_csv(request, course, ccx=None):
             courseenrollment__course_id=ccx_key,
             courseenrollment__is_active=1
         ).order_by('username').select_related("profile")
+
+        # TO DO: CCX feature is going to be used only for Licensing (Course Operations business logic)
+        # Additional information can be found at: https://github.com/Pearson-Advance/edx-platform/pull/96
+        if configuration_helpers.get_value('HIDE_MASTER_COURSE_STAFF_FROM_GRADEBOOK', False):
+            enrolled_students = exclude_master_course_staff_users(
+                users=enrolled_students,
+                course_key=ccx_key,
+            )
+
         grades = CourseGradeFactory().iter(enrolled_students, course)
 
         header = None
