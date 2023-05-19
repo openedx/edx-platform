@@ -205,12 +205,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         block.source_version = edit_info.source_version
         block.definition_locator = DefinitionLocator(block_key.type, definition_id)
 
-        for wrapper in self.modulestore.xblock_field_data_wrappers:
-            block._field_data = wrapper(block, block._field_data)  # pylint: disable=protected-access
-
-        # decache any pending field settings
-        block.save()
-
         # If this is an in-memory block, store it in this system
         if isinstance(block_locator.block_id, LocalId):
             self.local_modules[block_locator] = block
@@ -299,6 +293,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             field_data = inheriting_field_data(kvs)
         else:
             field_data = KvsFieldData(kvs)
+
+        for wrapper in self.modulestore.xblock_field_data_wrappers:
+            field_data = wrapper(block, field_data)
         return field_data
 
     def get_edited_by(self, xblock):
