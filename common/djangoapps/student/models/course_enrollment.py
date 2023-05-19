@@ -590,7 +590,7 @@ class CourseEnrollment(models.Model):
             segment_traits['email'] = self.user.email
 
             if event_name == EVENT_NAME_ENROLLMENT_ACTIVATED:
-                if should_send_enrollment_email():
+                if should_send_enrollment_email() and self.course_id:
                     course_pacing_type = 'self-paced' if self.course_overview.self_paced else 'instructor-paced'
                     send_course_enrollment_email.apply_async((self.user.id, str(self.course_id),
                                                               self.course_overview.display_name,
