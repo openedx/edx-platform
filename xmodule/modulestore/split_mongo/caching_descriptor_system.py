@@ -13,6 +13,7 @@ from xmodule.error_block import ErrorBlock
 from xmodule.errortracker import exc_info_to_str
 from xmodule.library_tools import LibraryToolsService
 from xmodule.mako_block import MakoDescriptorSystem
+from xmodule.modulestore import BlockData
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import InheritanceMixin, inheriting_field_data
@@ -73,6 +74,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         self.default_class = default_class
         self.local_modules = {}
         self._services['library_tools'] = LibraryToolsService(modulestore, user_id=None)
+        # Cache of block field datas, keyed by their ScopeId tuples
+        self.block_field_datas = {}
 
     @lazy
     def _parent_map(self):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -167,76 +170,19 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             # most recent retrieval is most likely the right one for next caller (see comment above fn)
             self.course_entry = CourseEnvelope(course_entry_override.course_key, self.course_entry.structure)
 
-        definition_id = block_data.definition
-
-        # If no usage id is provided, generate an in-memory id
-        if block_key is None:
-            block_key = BlockKey(block_data.block_type, LocalId())
-
-        convert_fields = lambda field: self.modulestore.convert_references_to_keys(
-            course_key, class_, field, self.course_entry.structure['blocks'],
-        )
-
-        if definition_id is not None and not block_data.definition_loaded:
-            definition_loader = DefinitionLazyLoader(
-                self.modulestore,
-                course_key,
-                block_key.type,
-                definition_id,
-                convert_fields,
-            )
-        else:
-            definition_loader = None
-
-        # If no definition id is provide, generate an in-memory id
-        if definition_id is None:
-            definition_id = LocalId()
-
         # Construct the Block Usage Locator:
         block_locator = course_key.make_usage_key(
             block_type=block_key.type,
             block_id=block_key.id,
         )
 
-        converted_fields = convert_fields(block_data.fields)
-        converted_defaults = convert_fields(block_data.defaults)
-        if block_key in self._parent_map:
-            parent_key = self._parent_map[block_key]
-            parent = course_key.make_usage_key(parent_key.type, parent_key.id)
-        else:
-            parent = None
-
-        aside_fields = None
-
-        # for the situation if block_data has no asides attribute
-        # (in case it was taken from memcache)
-        try:
-            if block_data.asides:
-                aside_fields = {block_key.type: {}}
-                for aside in block_data.asides:
-                    aside_fields[block_key.type].update(aside['fields'])
-        except AttributeError:
-            pass
+        definition_id = block_data.definition or LocalId()
 
         try:
-            kvs = SplitMongoKVS(
-                definition_loader,
-                converted_fields,
-                converted_defaults,
-                parent=parent,
-                aside_fields=aside_fields,
-                field_decorator=kwargs.get('field_decorator')
-            )
-
-            if InheritanceMixin in self.modulestore.xblock_mixins:
-                field_data = inheriting_field_data(kvs)
-            else:
-                field_data = KvsFieldData(kvs)
-
             block = self.construct_xblock_from_class(
                 class_,
                 ScopeIds(None, block_key.type, definition_id, block_locator),
-                field_data,
+                field_data=None,
                 for_parent=kwargs.get('for_parent')
             )
         except Exception:  # pylint: disable=broad-except
@@ -270,6 +216,90 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             self.local_modules[block_locator] = block
 
         return block
+
+    def service(self, block, service_name):
+        """
+        Return a service, or None.
+        Services are objects implementing arbitrary other interfaces.
+        """
+        # Implement field data service:
+        if service_name == "field-data":
+            if block.scope_ids not in self.block_field_datas:
+                try:
+                    self.block_field_datas[block.scope_ids] = self._init_field_data_for_block(block)
+                except:
+                    # Don't try again pointlessly every time another field is accessed
+                    self.block_field_datas[block.scope_ids] = None
+                    raise
+            return self.block_field_datas[block.scope_ids]
+        return super().service(block, service_name)
+
+    def _init_field_data_for_block(self, block):
+        """
+        Initialize the field-data service for the given block.
+        """
+        block_key = BlockKey.from_usage_key(block.scope_ids.usage_id)
+        course_key = block.scope_ids.usage_id.context_key
+        try:
+            block_data = self.get_module_data(block_key, course_key)
+            definition_id = block_data.definition
+        except ItemNotFoundError:
+            block_data = BlockData()
+            definition_id = None  # Perhaps this block was newly created.
+        class_ = self.load_block_type(block.scope_ids.block_type)
+        convert_fields = lambda field: self.modulestore.convert_references_to_keys(
+            course_key, class_, field, self.course_entry.structure['blocks'],
+        )
+
+        if definition_id is not None and not block_data.definition_loaded:
+            definition_loader = DefinitionLazyLoader(
+                self.modulestore,
+                course_key,
+                block_key.type,
+                definition_id,
+                convert_fields,
+            )
+        else:
+            definition_loader = None
+
+        # If no definition id is provide, generate an in-memory id
+        if definition_id is None:
+            definition_id = LocalId()
+
+        converted_fields = convert_fields(block_data.fields)
+        converted_defaults = convert_fields(block_data.defaults)
+        if block_key in self._parent_map:
+            parent_key = self._parent_map[block_key]
+            parent = course_key.make_usage_key(parent_key.type, parent_key.id)
+        else:
+            parent = None
+
+        aside_fields = None
+
+        # for the situation if block_data has no asides attribute
+        # (in case it was taken from memcache)
+        try:
+            if block_data.asides:
+                aside_fields = {block_key.type: {}}
+                for aside in block_data.asides:
+                    aside_fields[block_key.type].update(aside['fields'])
+        except AttributeError:
+            pass
+
+        kvs = SplitMongoKVS(
+            definition_loader,
+            converted_fields,
+            converted_defaults,
+            parent=parent,
+            aside_fields=aside_fields,
+            # field_decorator=kwargs.get('field_decorator') # FIXME: Need to get the field_decorator
+        )
+
+        if InheritanceMixin in self.modulestore.xblock_mixins:
+            field_data = inheriting_field_data(kvs)
+        else:
+            field_data = KvsFieldData(kvs)
+        return field_data
 
     def get_edited_by(self, xblock):
         """
