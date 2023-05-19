@@ -163,20 +163,6 @@ class TestAccessTokenView(AccessTokenLoginMixin, mixins.AccessTokenMixin, _Dispa
 
         return body
 
-    def _generate_key_pair(self):
-        """ Generates an asymmetric key pair and returns the JWK of its public keys and keypair. """
-        rsa_key = RSA.generate(2048)
-        rsa_jwk = jwk.RSAKey(kid="key_id", key=rsa_key)
-
-        public_keys = jwk.KEYS()
-        public_keys.append(rsa_jwk)
-        serialized_public_keys_json = public_keys.dump_jwks()
-
-        serialized_keypair = rsa_jwk.serialize(private=True)
-        serialized_keypair_json = json.dumps(serialized_keypair)
-
-        return serialized_public_keys_json, serialized_keypair_json
-
     def _test_jwt_access_token(self, client_attr, token_type=None, headers=None, grant_type=None, asymmetric_jwt=False):
         """
         Test response for JWT token.
