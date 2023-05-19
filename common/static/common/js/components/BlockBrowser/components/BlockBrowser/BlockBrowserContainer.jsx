@@ -4,19 +4,17 @@ import { getActiveBlockTree } from '../../data/selectors/index';
 import { BlockBrowser } from './BlockBrowser';
 
 const mapStateToProps = state => ({
-  blocks: getActiveBlockTree(state),
-  selectedBlock: state.selectedBlock,
+    blocks: getActiveBlockTree(state),
+    selectedBlock: state.selectedBlock,
 });
-
 
 const mapDispatchToProps = dispatch => ({
-  onChangeRoot: blockId => dispatch(changeRoot(blockId)),
+    onChangeRoot: blockId => dispatch(changeRoot(blockId)),
 });
 
-
 const BlockBrowserContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps,
+    mapStateToProps,
+    mapDispatchToProps,
 )(BlockBrowser);
 
 export default BlockBrowserContainer;

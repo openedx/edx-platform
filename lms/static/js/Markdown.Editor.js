@@ -9,13 +9,12 @@
         nav = window.navigator,
         SETTINGS = {lineLength: 72},
 
-    // Used to work around some browser bugs where we can't use feature testing.
+        // Used to work around some browser bugs where we can't use feature testing.
         uaSniffed = {
             isIE: /msie/.test(nav.userAgent.toLowerCase()),
             isIE_5or6: /msie 6/.test(nav.userAgent.toLowerCase()) || /msie 5/.test(nav.userAgent.toLowerCase()),
             isOpera: /opera/.test(nav.userAgent.toLowerCase())
         };
-
 
     // -------------------------------------------------------------------
     //  YOUR CHANGES GO HERE
@@ -34,16 +33,16 @@
 
     // The text that appears on the dialog box when entering Images.
     var imageDialogText = gettext('Insert Image (upload file or type URL)'),
-        imageUrlHelpText = gettext("Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')"),  // eslint-disable-line max-len
+        imageUrlHelpText = gettext("Type in a URL or use the \"Choose File\" button to upload a file from your machine. (e.g. 'http://example.com/img/clouds.jpg')"), // eslint-disable-line max-len
         imageDescriptionLabel = gettext('Image Description'),
         imageDefaultText = 'http://', // The default text that appears in input
-        imageDescError = gettext('Please describe this image or agree that it has no contextual value by checking the checkbox.'),  // eslint-disable-line max-len
-        imageDescriptionHelpText = gettext("e.g. 'Sky with clouds'. The description is helpful for users who cannot see the image."),  // eslint-disable-line max-len
+        imageDescError = gettext('Please describe this image or agree that it has no contextual value by checking the checkbox.'), // eslint-disable-line max-len
+        imageDescriptionHelpText = gettext("e.g. 'Sky with clouds'. The description is helpful for users who cannot see the image."), // eslint-disable-line max-len
         imageDescriptionHelpLink = {
             href: 'http://www.w3.org/TR/html5/embedded-content-0.html#alt',
             text: gettext('How to create useful text alternatives.')
         },
-        imageIsDecorativeLabel = gettext('This image is for decorative purposes only and does not require a description.');  // eslint-disable-line max-len
+        imageIsDecorativeLabel = gettext('This image is for decorative purposes only and does not require a description.'); // eslint-disable-line max-len
 
     // Text that is shared between both link and image dialog boxes.
     var defaultHelpHoverTitle = gettext('Markdown Editing Help'),
@@ -66,9 +65,9 @@
         idPostfix = idPostfix || '';
 
         var hooks = this.hooks = new Markdown.HookCollection();
-        hooks.addNoop('onPreviewPush');       // called with no arguments after the preview has been refreshed
+        hooks.addNoop('onPreviewPush'); // called with no arguments after the preview has been refreshed
         hooks.addNoop('postBlockquoteCreation'); // called with the user's selection *after* the blockquote was created; should return the actual to-be-inserted text
-        hooks.addFalse('insertImageDialog');     /* called with one parameter: a callback to be called with the URL of the image. If the application creates
+        hooks.addFalse('insertImageDialog'); /* called with one parameter: a callback to be called with the URL of the image. If the application creates
                                                   * its own image insertion dialog, this hook should return true, and the callback should be called with the chosen
                                                   * image url (or null if the user cancelled). If this hook returns false, the default dialog will be used.
                                                   */
@@ -90,8 +89,8 @@
             if (!/\?noundo/.test(doc.location.href)) {
                 undoManager = new UndoManager(function() {
                     previewManager.refresh();
-                    if (uiManager) // not available on the first call
-                        { uiManager.setUndoRedoButtonStates(); }
+                    // not available on the first call
+                    if (uiManager) { uiManager.setUndoRedoButtonStates(); }
                 }, panels);
                 this.textOperation = function(f) {
                     undoManager.setCommandMode();
@@ -124,7 +123,7 @@
 
             this.before = this.before.replace(regex,
                 function(match) {
-                    chunkObj.startTag = chunkObj.startTag + match;
+                    chunkObj.startTag += match;
                     return '';
                 });
 
@@ -132,7 +131,7 @@
 
             this.selection = this.selection.replace(regex,
                 function(match) {
-                    chunkObj.startTag = chunkObj.startTag + match;
+                    chunkObj.startTag += match;
                     return '';
                 });
         }
@@ -173,7 +172,6 @@
         this.selection = this.selection.replace(/^(\s*)/, beforeReplacer).replace(/(\s*)$/, afterReplacer);
     };
 
-
     Chunks.prototype.skipLines = function(nLinesBefore, nLinesAfter, findExtraNewlines) {
         if (nLinesBefore === undefined) {
             nLinesBefore = 1;
@@ -196,14 +194,14 @@
 
         this.selection = this.selection.replace(/(^\n*)/, '');
 
-        this.startTag = this.startTag + re.$1;
+        this.startTag += re.$1;
 
         this.selection = this.selection.replace(/(\n*$)/, '');
-        this.endTag = this.endTag + re.$1;
+        this.endTag += re.$1;
         this.startTag = this.startTag.replace(/(^\n*)/, '');
-        this.before = this.before + re.$1;
+        this.before += re.$1;
         this.endTag = this.endTag.replace(/(\n*$)/, '');
-        this.after = this.after + re.$1;
+        this.after += re.$1;
 
         if (this.before) {
             regexText = replacementText = '';
@@ -238,8 +236,7 @@
 
     function findAnEmptyToolbar(toolbarClassName) {
         var toolbars = doc.getElementsByClassName(toolbarClassName);
-        for (var i=0; i < toolbars.length; ++i)
-        {
+        for (var i = 0; i < toolbars.length; ++i) {
             var aToolbar = toolbars[i];
             if (aToolbar.children.length == 0) {
                 var anEmptyToolbar = aToolbar;
@@ -287,7 +284,6 @@
         }
     };
 
-
     // Adds a listener callback to a DOM element which is fired on a specified
     // event.
     util.addEvent = function(elem, event, listener) {
@@ -299,7 +295,6 @@
             elem.addEventListener(event, listener, false);
         }
     };
-
 
     // Removes a listener callback from a DOM element which is fired on a specified
     // event.
@@ -529,7 +524,6 @@
                 var keyCodeChar = String.fromCharCode(keyCode);
 
                 switch (keyCodeChar) {
-
                 case 'y':
                     undoObj.redo();
                     handled = true;
@@ -553,7 +547,6 @@
                 if (window.event) {
                     window.event.returnValue = false;
                 }
-                return;
             }
         };
 
@@ -742,7 +735,7 @@
 
         // Sets the TextareaState properties given a chunk of markdown.
         this.setChunks = function(chunk) {
-            chunk.before = chunk.before + chunk.startTag;
+            chunk.before += chunk.startTag;
             chunk.after = chunk.endTag + chunk.after;
 
             this.start = chunk.before.length;
@@ -777,12 +770,12 @@
             if (window.innerHeight) {
                 result = window.pageYOffset;
             } else
-                if (doc.documentElement && doc.documentElement.scrollTop) {
-                    result = doc.documentElement.scrollTop;
-                } else
-                    if (doc.body) {
-                        result = doc.body.scrollTop;
-                    }
+            if (doc.documentElement && doc.documentElement.scrollTop) {
+                result = doc.documentElement.scrollTop;
+            } else
+            if (doc.body) {
+                result = doc.body.scrollTop;
+            }
 
             return result;
         };
@@ -791,7 +784,6 @@
             // If there is no registered preview panel
             // there is nothing to do.
             if (!panels.preview) { return; }
-
 
             var text = panels.input.value;
             if (text && text == oldInputText) {
@@ -973,23 +965,23 @@
     //      It receives a single argument; either the entered text (if OK was chosen) or null (if Cancel
     //      was chosen).
     ui.prompt = function(title,
-                          urlLabel,
-                          urlHelp,
-                          urlError,
-                          urlDescLabel,
-                          urlDescHelp,
-                          urlDescHelpLink,
-                          urlDescError,
-                          defaultInputText,
-                          callback,
-                          imageIsDecorativeLabel,
-                          imageUploadHandler) {
+        urlLabel,
+        urlHelp,
+        urlError,
+        urlDescLabel,
+        urlDescHelp,
+        urlDescHelpLink,
+        urlDescError,
+        defaultInputText,
+        callback,
+        imageIsDecorativeLabel,
+        imageUploadHandler) {
         // These variables need to be declared at this level since they are used
         // in multiple functions.
-        var dialog,         // The dialog box.
-            urlInput,       // The text box where you enter the hyperlink.
+        var dialog, // The dialog box.
+            urlInput, // The text box where you enter the hyperlink.
             urlErrorMsg,
-            descInput,      // The text box where you enter the description.
+            descInput, // The text box where you enter the description.
             descErrorMsg,
             okButton,
             cancelButton;
@@ -1033,8 +1025,8 @@
 
             var isValidUrl = util.isValidUrl(url),
                 isValidDesc = (
-                    descInput.checkValidity() &&
-                    (descInput.required ? description.length : true)
+                    descInput.checkValidity()
+                    && (descInput.required ? description.length : true)
                 );
 
             if ((isValidUrl && isValidDesc) || isCancel) {
@@ -1076,21 +1068,21 @@
             dialog = doc.createElement('div');
             dialog.innerHTML = _.template(
                 document.getElementById('customwmd-prompt-template').innerHTML)({
-                    title: title,
-                    uploadFieldClass: (imageUploadHandler ? 'file-upload' : ''),
-                    urlLabel: urlLabel,
-                    urlError: urlError,
-                    urlHelp: urlHelp,
-                    urlDescLabel: urlDescLabel,
-                    descError: urlDescError,
-                    urlDescHelp: urlDescHelp,
-                    urlDescHelpLink: urlDescHelpLink,
-                    okText: gettext('OK'),
-                    cancelText: gettext('Cancel'),
-                    chooseFileText: gettext('Choose File'),
-                    imageIsDecorativeLabel: imageIsDecorativeLabel,
-                    imageUploadHandler: imageUploadHandler
-                });
+                title: title,
+                uploadFieldClass: (imageUploadHandler ? 'file-upload' : ''),
+                urlLabel: urlLabel,
+                urlError: urlError,
+                urlHelp: urlHelp,
+                urlDescLabel: urlDescLabel,
+                descError: urlDescError,
+                urlDescHelp: urlDescHelp,
+                urlDescHelpLink: urlDescHelpLink,
+                okText: gettext('OK'),
+                cancelText: gettext('Cancel'),
+                chooseFileText: gettext('Choose File'),
+                imageIsDecorativeLabel: imageIsDecorativeLabel,
+                imageUploadHandler: imageUploadHandler
+            });
             dialog.setAttribute('dir', doc.head.getAttribute('dir'));
             dialog.setAttribute('role', 'dialog');
             dialog.setAttribute('tabindex', '-1');
@@ -1155,6 +1147,7 @@
                 if (event.which === 9 && event.shiftKey && event.target === urlInput) {
                     event.preventDefault();
                     cancelButton.focus();
+                // eslint-disable-next-line brace-style
                 }
                 // On tab forward from the last tabbable item in the prompt
                 else if (event.which === 9 && !event.shiftKey && event.target === cancelButton) {
@@ -1163,7 +1156,6 @@
                 }
             });
         };
-
 
         // Why is this in a zero-length timeout?
         // Is it working around a browser bug?
@@ -1248,7 +1240,6 @@
                     return;
                 }
 
-
                 if (key.preventDefault) {
                     key.preventDefault();
                 }
@@ -1281,7 +1272,6 @@
                 }
             });
         }
-
 
         // Perform the button's action.
         function doClick(button) {
@@ -1468,14 +1458,14 @@
             buttons.hr = makeButton('wmd-hr-button', gettext('Horizontal Rule (Ctrl+R)'), '-180px', bindCommand('doHorizontalRule'), -1);
             makeSpacer(3);
             buttons.undo = makeButton('wmd-undo-button', gettext('Undo (Ctrl+Z)'), '-200px', null, -1);
-            buttons.undo.execute = function(manager) { if (manager) manager.undo(); };
+            buttons.undo.execute = function(manager) { if (manager) { manager.undo(); } };
 
-            var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
-                gettext('Redo (Ctrl+Y)') :
-                gettext('Redo (Ctrl+Shift+Z)'); // mac and other non-Windows platforms
+            var redoTitle = /win/.test(nav.platform.toLowerCase())
+                ? gettext('Redo (Ctrl+Y)')
+                : gettext('Redo (Ctrl+Shift+Z)'); // mac and other non-Windows platforms
 
             buttons.redo = makeButton('wmd-redo-button', redoTitle, '-220px', null, -1);
-            buttons.redo.execute = function(manager) { if (manager) manager.redo(); };
+            buttons.redo.execute = function(manager) { if (manager) { manager.redo(); } };
 
             if (helpOptions) {
                 var helpButton = document.createElement('span');
@@ -1580,11 +1570,9 @@
 
             // Add the true markup.
             var markup = nStars <= 1 ? '*' : '**'; // shouldn't the test be = ?
-            chunk.before = chunk.before + markup;
+            chunk.before += markup;
             chunk.after = markup + chunk.after;
         }
-
-        return;
     };
 
     commandProto.stripLinkDefs = function(text, defsToAdd) {
@@ -1671,7 +1659,9 @@
             });
             if (title) {
                 title = title.trim ? title.trim() : title.replace(/^\s*/, '').replace(/\s*$/, '');
-                title = $.trim(title).replace(/"/g, 'quot;').replace(/\(/g, '&#40;').replace(/\)/g, '&#41;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                title = $.trim(title).replace(/"/g, 'quot;').replace(/\(/g, '&#40;').replace(/\)/g, '&#41;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
             }
             return title ? link + ' "' + title + '"' : link;
         });
@@ -1879,14 +1869,14 @@
                 var good = false;
                 line = lines[i];
                 inChain = inChain && line.length > 0; // c) any non-empty line continues the chain
-                if (/^>/.test(line)) {                // a)
+                if (/^>/.test(line)) { // a)
                     good = true;
-                    if (!inChain && line.length > 1)  // c) any line that starts with ">" and has at least one more character starts the chain
-                        { inChain = true; }
-                } else if (/^[ \t]*$/.test(line)) {   // b)
+                    // c) any line that starts with ">" and has at least one more character starts the chain
+                    if (!inChain && line.length > 1) { inChain = true; }
+                } else if (/^[ \t]*$/.test(line)) { // b)
                     good = true;
                 } else {
-                    good = inChain;                   // c) the line is not empty and does not start with ">", so it matches if and only if we're in the chain
+                    good = inChain; // c) the line is not empty and does not start with ">", so it matches if and only if we're in the chain
                 }
                 if (good) {
                     match += line + '\n';
@@ -1895,7 +1885,7 @@
                     match = '\n';
                 }
             }
-            if (!/(^|\n)>/.test(match)) {             // d)
+            if (!/(^|\n)>/.test(match)) { // d)
                 leftOver += match;
                 match = '';
             }
@@ -1957,10 +1947,10 @@
 
         if (!/\n/.test(chunk.selection)) {
             chunk.selection = chunk.selection.replace(/^(> *)/,
-            function(wholeMatch, blanks) {
-                chunk.startTag += blanks;
-                return '';
-            });
+                function(wholeMatch, blanks) {
+                    chunk.startTag += blanks;
+                    return '';
+                });
         }
     };
 
@@ -1995,7 +1985,8 @@
             } else {
                 if (/^[ ]{0,3}\S/m.test(chunk.selection)) {
                     if (/\n/.test(chunk.selection)) { chunk.selection = chunk.selection.replace(/^/gm, '    '); } else // if it's not multiline, do not select the four added spaces; this is more consistent with the doList behavior
-                        { chunk.before += '    '; }
+                    // eslint-disable-next-line brace-style
+                    { chunk.before += '    '; }
                 } else {
                     chunk.selection = chunk.selection.replace(/^[ ]{4}/gm, '');
                 }
@@ -2132,7 +2123,7 @@
             return;
         }
 
-        var headerLevel = 0;     // The existing header level of the selected text.
+        var headerLevel = 0; // The existing header level of the selected text.
 
         // Remove any existing hash heading markdown and save the header level.
         chunk.findTags(/#+[ ]*/, /[ ]*#+/);

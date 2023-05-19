@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     var InstructorDashboardCourseInfo, PendingInstructorTasks;
 
     PendingInstructorTasks = function() {

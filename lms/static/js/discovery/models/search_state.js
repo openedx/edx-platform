@@ -7,7 +7,6 @@
     ], function(_, Backbone, CourseDiscovery, Filters) {
         'use strict';
 
-
         return Backbone.Model.extend({
 
             page: 0,
@@ -43,7 +42,7 @@
                 }
             },
 
-        // private
+            // private
 
             hasNextPage: function() {
                 var total = this.discovery.get('totalCount');
@@ -116,7 +115,7 @@
                 }
             },
 
-        // lazy load
+            // lazy load
             cachedDiscovery: function() {
                 var deferred = $.Deferred();
                 var self = this;

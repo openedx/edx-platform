@@ -1,6 +1,7 @@
 /* globals DiscussionViewSpecHelper, DiscussionSpecHelper, DiscussionUtil, Thread, ThreadResponseShowView */
 (function() {
     'use strict';
+
     describe('ThreadResponseShowView', function() {
         beforeEach(function() {
             DiscussionSpecHelper.setUpGlobals();

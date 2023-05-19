@@ -1,9 +1,10 @@
 define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
     'use strict';
+
     return (function() {
         var Storage = {};
 
-    /**
+        /**
      * Adds some data to the Storage object. If data with existent `data_id`
      * is added, nothing happens.
      * @function
@@ -16,7 +17,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             return this;
         };
 
-    /**
+        /**
      * Return data from the Storage object by identifier.
      * @function
      * @param {String} data_id Unique identifier of the data.
@@ -26,7 +27,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             return Storage[data_id];
         };
 
-    /**
+        /**
      * Deletes data from the Storage object by identifier.
      * @function
      * @param {String} data_id Unique identifier of the data.
@@ -36,7 +37,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             return (delete Storage[data_id]);
         };
 
-    /**
+        /**
      * Returns model from collection by 'field_name' property.
      * @function
      * @param {Object} collection The model (CMS.Models.Metadata) information
@@ -59,7 +60,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             return model;
         };
 
-    /**
+        /**
      * Parses Youtube link and return video id.
      * @function
      * These are the types of URLs supported:
@@ -83,7 +84,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
 
             return function(url) {
                 if (typeof url !== 'string') {
-                    return void(0);
+                    return void 0;
                 }
 
                 if (cache[url]) {
@@ -91,13 +92,13 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                 }
 
                 var match = url.match(regExp);
-                cache[url] = (match) ? match[1] : void(0);
+                cache[url] = (match) ? match[1] : void 0;
 
                 return cache[url];
             };
         }());
 
-    /**
+        /**
      * Parses links with html5 video sources in mp4 or webm formats.
      * @function
      * @param {String} url Url that should be parsed.
@@ -113,7 +114,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
 
             return function(url) {
                 if (typeof url !== 'string') {
-                    return void(0);
+                    return void 0;
                 }
 
                 if (cache[url]) {
@@ -124,8 +125,8 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                     match;
 
                 link.href = url;
-            // The regular expression try catches file name and file extension.
-            // '[scheme://hostname/pathname/]filename.extension[?query#hash]'
+                // The regular expression try catches file name and file extension.
+                // '[scheme://hostname/pathname/]filename.extension[?query#hash]'
                 match = link.pathname.match(/\/{1}([^\/]+)\.([^\/]+)$/);
                 if (match) {
                     cache[url] = {
@@ -149,7 +150,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             };
         }());
 
-    /**
+        /**
      * Facade function that parses html5 and youtube links.
      * @function
      * @param {String} url Url that should be parsed.
@@ -168,7 +169,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                 result;
 
             if (typeof url !== 'string') {
-                return void(0);
+                return void 0;
             }
 
             if (_youtubeParser(url)) {
@@ -194,7 +195,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             return result;
         };
 
-    /**
+        /**
      * Returns short-hand youtube url.
      * @function
      * @param {String} video_id Youtube Video Id that will be added to the link.
@@ -206,7 +207,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             return 'http://youtu.be/' + video_id;
         };
 
-    /**
+        /**
      * Returns list of objects with information about the passed links.
      * @function
      * @param {Array} links List of links that will be processed.
@@ -242,7 +243,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             }
         };
 
-    /**
+        /**
      * Synchronizes 2 Backbone collections by 'field_name' property.
      * @function
      * @param {Object} fromCollection Collection with which synchronization will
@@ -261,7 +262,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
             });
         };
 
-    /**
+        /**
      * Sends Ajax requests in appropriate format.
      * @function
      * @param {String} action Action that will be invoked on server.
@@ -295,10 +296,10 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                 }
 
                 data = $.extend(
-                {locator: locator},
-                {videos: videoList},
-                params
-            );
+                    {locator: locator},
+                    {videos: videoList},
+                    params
+                );
 
                 xhr = $.ajaxQueue({
                     url: '/transcripts/' + action,

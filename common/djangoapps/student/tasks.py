@@ -26,8 +26,7 @@ from openedx.features.course_experience import ENABLE_COURSE_GOALS
 User = get_user_model()
 log = logging.getLogger(__name__)
 
-MAX_RETRIES = 1
-COUNTDOWN = 60
+MAX_RETRIES = 3
 
 
 @shared_task(bind=True, ignore_result=True)
@@ -79,7 +78,8 @@ def send_course_enrollment_email(
         course_key = CourseKey.from_string(course_id)
         if not course_ended:
             course_date_blocks = get_course_dates_for_email(user, course_key, request=None)
-    except Exception:  # pylint: disable=broad-except
+    except Exception as err:  # pylint: disable=broad-except
+        log.exception(err)
         is_course_date_missing = True
 
     canvas_entry_properties.update(
@@ -89,11 +89,17 @@ def send_course_enrollment_email(
         }
     )
 
+    if course_id is None:
+        raise ValueError('missing course_id')
+
     try:
         course_uuid = get_course_uuid_for_course(course_id)
+        if course_uuid is None:
+            raise ValueError('missing course_uuid')
         owners = get_owners_for_course(course_uuid=course_uuid) or [{}]
         course_run = get_course_run_details(course_id, course_run_fields)
-
+        if course_run is None:
+            raise ValueError('missing course_run')
         marketing_root_url = settings.MKTG_URLS.get("ROOT")
         instructors = get_instructors(course_run, marketing_root_url)
         enrollment_count = int(course_run.get("enrollment_count")) if course_run.get("enrollment_count") else 0
@@ -112,9 +118,9 @@ def send_course_enrollment_email(
                 "partner_image_url": owners[0].get("logo_image_url") or "",
             }
         )
-    except Exception:  # pylint: disable=broad-except
+    except Exception as err:  # pylint: disable=broad-except
         is_course_run_missing = True
-        log.info(f"[Course Enrollment] Course run call failed for user: {user_id} course: {course_id}")
+        log.warning(f"[Course Enrollment] Course run call failed for user: {user_id} course: {course_id} err: {err}")
 
     if is_course_run_missing or is_course_date_missing:
         segment_properties = {
@@ -135,4 +141,5 @@ def send_course_enrollment_email(
             )
     except Exception as exc:  # pylint: disable=broad-except
         log.error(f"[Course Enrollment] Email sending failed with exception: {exc}")
-        raise self.retry(exc=exc, countdown=COUNTDOWN, max_retries=MAX_RETRIES)
+        countdown = 60 * (self.request.retries + 1)
+        raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)

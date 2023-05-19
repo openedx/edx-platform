@@ -156,7 +156,7 @@ well as the trigger location in this same repository.
 
    * - `CourseUnenrollmentStarted <https://github.com/eduNEXT/openedx-filters/blob/main/openedx_filters/learning/filters.py#L98>`_
      - org.openedx.learning.course.unenrollment.started.v1
-     - `2022-06-14 https://github.com/eduNEXT/edx-platform/blob/master/common/djangoapps/student/models.py#L1752>`_
+     - `2022-06-14 <https://github.com/eduNEXT/edx-platform/blob/master/common/djangoapps/student/models.py#L1752>`_
 
    * - `CertificateCreationRequested <https://github.com/openedx/openedx-filters/blob/main/openedx_filters/learning/filters.py#L142>`_
      - org.openedx.learning.certificate.creation.requested.v1

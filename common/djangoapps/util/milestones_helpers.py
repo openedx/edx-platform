@@ -150,35 +150,35 @@ def get_pre_requisite_courses_not_completed(user, enrolled_courses):
     return pre_requisite_courses
 
 
-def get_prerequisite_courses_display(course_descriptor):
+def get_prerequisite_courses_display(course_block):
     """
     It would retrieve pre-requisite courses, make display strings
     and return list of dictionary with course key as 'key' field
     and course display name as `display` field.
     """
     pre_requisite_courses = []
-    if is_prerequisite_courses_enabled() and course_descriptor.pre_requisite_courses:
-        for course_id in course_descriptor.pre_requisite_courses:
+    if is_prerequisite_courses_enabled() and course_block.pre_requisite_courses:
+        for course_id in course_block.pre_requisite_courses:
             course_key = CourseKey.from_string(course_id)
-            required_course_descriptor = modulestore().get_course(course_key)
+            required_course_block = modulestore().get_course(course_key)
             prc = {
                 'key': course_key,
-                'display': get_course_display_string(required_course_descriptor)
+                'display': get_course_display_string(required_course_block)
             }
             pre_requisite_courses.append(prc)
     return pre_requisite_courses
 
 
-def get_course_display_string(descriptor):
+def get_course_display_string(block):
     """
     Returns a string to display for a course or course overview.
 
     Arguments:
-        descriptor (CourseBlock|CourseOverview): a course or course overview.
+        block (CourseBlock|CourseOverview): a course or course overview.
     """
     return ' '.join([
-        descriptor.display_org_with_default,
-        descriptor.display_number_with_default
+        block.display_org_with_default,
+        block.display_number_with_default
     ])
 
 

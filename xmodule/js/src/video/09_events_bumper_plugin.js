@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/09_events_bumper_plugin.js', [], function() {
     /**
      * Events module.
@@ -16,7 +17,7 @@
             }
 
             _.bindAll(this, 'onReady', 'onPlay', 'onEnded', 'onShowLanguageMenu', 'onHideLanguageMenu', 'onSkip',
-            'onShowCaptions', 'onHideCaptions', 'destroy');
+                'onShowCaptions', 'onHideCaptions', 'destroy');
             this.state = state;
             this.options = _.extend({}, options);
             this.state.videoEventsBumperPlugin = this;

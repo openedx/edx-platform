@@ -226,8 +226,8 @@ class ProgressTabView(RetrieveAPIView):
             user_grade = course_grade.percent
             user_has_passing_grade = user_grade >= course.lowest_passing_grade
 
-        descriptor = modulestore().get_course(course_key)
-        grading_policy = descriptor.grading_policy
+        block = modulestore().get_course(course_key)
+        grading_policy = block.grading_policy
         verification_status = IDVerificationService.user_status(student)
         verification_link = None
         if verification_status['status'] is None or verification_status['status'] == 'expired':

@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/09_bumper.js', [], function() {
     /**
      * VideoBumper module.
@@ -15,8 +16,8 @@
             }
 
             _.bindAll(
-            this, 'showMainVideoHandler', 'destroy', 'skipByDuration', 'destroyAndResolve'
-        );
+                this, 'showMainVideoHandler', 'destroy', 'skipByDuration', 'destroyAndResolve'
+            );
             this.dfd = $.Deferred();
             this.element = state.el;
             this.element.addClass('is-bumper');

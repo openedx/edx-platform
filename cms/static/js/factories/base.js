@@ -2,7 +2,7 @@
 // of RequireJS
 define(['js/base', 'cms/js/main', 'js/src/logger', 'datepair', 'accessibility',
     'ieshim', 'tooltip_manager', 'lang_edx', 'js/models/course', 'jquery_extend_patch'],
-    function() {
-        'use strict';
-    }
+function() {
+    'use strict';
+}
 );

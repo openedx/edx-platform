@@ -8,6 +8,12 @@
 // --------
 // Defaults: what displays if the icon font doesn't load.
 // --------
+@import 'vendor/bi-app/bi-app-ltr';
+@import 'bourbon/bourbon';
+@import 'lms/theme/variables';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/breakpoints';
+@import 'lms/theme/variables-v1';
 
 // the html target is necessary for xblocks and xmodules, but works across the board
 
@@ -118,6 +124,11 @@ $cool-dark: rgb(79, 89, 93); // UXPL cool dark
 
         .transcript-option {
           margin: 0;
+
+          a.btn , a.btn-link{
+            font-size: 16px !important;
+            font-weight: unset;
+          }
         }
       }
     }

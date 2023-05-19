@@ -80,7 +80,6 @@
                 });
             },
 
-
             generateCertificate: function(event) {
                 var $button = $(event.target);
 

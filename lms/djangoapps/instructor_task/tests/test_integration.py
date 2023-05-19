@@ -110,15 +110,15 @@ class TestRescoringTask(TestIntegrationTask):
         resp = self.client.post(modx_url, {})
         return resp
 
-    def check_state(self, user, descriptor, expected_score, expected_max_score, expected_attempts=1):
+    def check_state(self, user, block, expected_score, expected_max_score, expected_attempts=1):
         """
         Check that the StudentModule state contains the expected values.
 
-        The student module is found for the test course, given the `username` and problem `descriptor`.
+        The student module is found for the test course, given the `username` and problem `block`.
 
         Values checked include the number of attempts, the score, and the max score for a problem.
         """
-        module = self.get_student_module(user.username, descriptor)
+        module = self.get_student_module(user.username, block)
         assert module.grade == expected_score
         assert module.max_grade == expected_max_score
         state = json.loads(module.state)
@@ -160,11 +160,11 @@ class TestRescoringTask(TestIntegrationTask):
         Common helper to verify the results of rescoring for a single
         student and all students are as expected.
         """
-        # get descriptor:
+        # get block:
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        descriptor = self.module_store.get_item(location)
+        block = self.module_store.get_item(location)
 
         # first store answers for each of the separate users:
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
@@ -176,25 +176,25 @@ class TestRescoringTask(TestIntegrationTask):
         expected_original_scores = (2, 1, 1, 0)
         expected_original_max = 2
         for i, user in enumerate(self.users):
-            self.check_state(user, descriptor, expected_original_scores[i], expected_original_max)
+            self.check_state(user, block, expected_original_scores[i], expected_original_max)
 
         # update the data in the problem definition so the answer changes.
         self.redefine_option_problem(problem_url_name, **problem_edit)
 
         # confirm that simply rendering the problem again does not change the grade
         self.render_problem('u1', problem_url_name)
-        self.check_state(self.user1, descriptor, expected_original_scores[0], expected_original_max)
+        self.check_state(self.user1, block, expected_original_scores[0], expected_original_max)
 
         # rescore the problem for only one student -- only that student's grade should change:
         self.submit_rescore_one_student_answer('instructor', problem_url_name, self.user1, rescore_if_higher)
-        self.check_state(self.user1, descriptor, new_expected_scores[0], new_expected_max)
+        self.check_state(self.user1, block, new_expected_scores[0], new_expected_max)
         for i, user in enumerate(self.users[1:], start=1):  # everyone other than user1
-            self.check_state(user, descriptor, expected_original_scores[i], expected_original_max)
+            self.check_state(user, block, expected_original_scores[i], expected_original_max)
 
         # rescore the problem for all students
         self.submit_rescore_all_student_answers('instructor', problem_url_name, rescore_if_higher)
         for i, user in enumerate(self.users):
-            self.check_state(user, descriptor, new_expected_scores[i], new_expected_max)
+            self.check_state(user, block, new_expected_scores[i], new_expected_max)
 
     RescoreTestData = namedtuple('RescoreTestData', 'edit, new_expected_scores, new_expected_max')
 
@@ -240,31 +240,31 @@ class TestRescoringTask(TestIntegrationTask):
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        descriptor = self.module_store.get_item(location)
+        block = self.module_store.get_item(location)
 
         # first store answers for each of the separate users:
         self.submit_student_answer('u1', problem_url_name, [OPTION_1, OPTION_1])
         self.submit_student_answer('u2', problem_url_name, [OPTION_2, OPTION_2])
 
         # verify each user's grade
-        self.check_state(self.user1, descriptor, 2, 2)  # user 1 has a 2/2
-        self.check_state(self.user2, descriptor, 0, 2)  # user 2 has a 0/2
+        self.check_state(self.user1, block, 2, 2)  # user 1 has a 2/2
+        self.check_state(self.user2, block, 0, 2)  # user 2 has a 0/2
 
         # update the data in the problem definition so the answer changes.
         self.redefine_option_problem(problem_url_name, **problem_edit)
 
         # confirm that simply rendering the problem again does not change the grade
         self.render_problem('u1', problem_url_name)
-        self.check_state(self.user1, descriptor, 2, 2)
-        self.check_state(self.user2, descriptor, 0, 2)
+        self.check_state(self.user1, block, 2, 2)
+        self.check_state(self.user2, block, 0, 2)
 
         # rescore the problem for all students
         self.submit_rescore_all_student_answers('instructor', problem_url_name, True)
 
         # user 1's score would go down, so it remains 2/2. user 2's score was 0/2, which is equivalent to the new score
         # of 0/4, so user 2's score changes to 0/4.
-        self.check_state(self.user1, descriptor, 2, unchanged_max)
-        self.check_state(self.user2, descriptor, 0, new_max)
+        self.check_state(self.user1, block, 2, unchanged_max)
+        self.check_state(self.user2, block, 0, new_max)
 
     def test_rescoring_failure(self):
         """Simulate a failure in rescoring a problem"""
@@ -365,13 +365,13 @@ class TestRescoringTask(TestIntegrationTask):
             """ % ('!=' if redefine else '=='))
         problem_xml = factory.build_xml(script=script, cfn="check_func", expect="42", num_responses=1)
         if redefine:
-            descriptor = self.module_store.get_item(
+            block = self.module_store.get_item(
                 InstructorTaskModuleTestCase.problem_location(problem_url_name)
             )
-            descriptor.data = problem_xml
-            with self.module_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, descriptor.location.course_key):  # lint-amnesty, pylint: disable=line-too-long
-                self.module_store.update_item(descriptor, self.user.id)
-                self.module_store.publish(descriptor.location, self.user.id)
+            block.data = problem_xml
+            with self.module_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, block.location.course_key):  # lint-amnesty, pylint: disable=line-too-long
+                self.module_store.update_item(block, self.user.id)
+                self.module_store.publish(block.location, self.user.id)
         else:
             # Use "per-student" rerandomization so that check-problem can be called more than once.
             # Using "always" means we cannot check a problem twice, but we want to call once to get the
@@ -390,7 +390,7 @@ class TestRescoringTask(TestIntegrationTask):
         problem_url_name = 'H1P1'
         self.define_randomized_custom_response_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        descriptor = self.module_store.get_item(location)
+        block = self.module_store.get_item(location)
         # run with more than one user
         for user in self.users:
             # first render the problem, so that a seed will be created for this user
@@ -399,9 +399,9 @@ class TestRescoringTask(TestIntegrationTask):
             dummy_answer = "1000"
             self.submit_student_answer(user.username, problem_url_name, [dummy_answer, dummy_answer])
             # we should have gotten the problem wrong, since we're way out of range:
-            self.check_state(user, descriptor, 0, 1, expected_attempts=1)
+            self.check_state(user, block, 0, 1, expected_attempts=1)
             # dig the correct answer out of the problem's message
-            module = self.get_student_module(user.username, descriptor)
+            module = self.get_student_module(user.username, block)
             state = json.loads(module.state)
             correct_map = state['correct_map']
             log.info("Correct Map: %s", correct_map)
@@ -409,28 +409,28 @@ class TestRescoringTask(TestIntegrationTask):
             answer = list(correct_map.values())[0]['msg']
             self.submit_student_answer(user.username, problem_url_name, [answer, answer])
             # we should now get the problem right, with a second attempt:
-            self.check_state(user, descriptor, 1, 1, expected_attempts=2)
+            self.check_state(user, block, 1, 1, expected_attempts=2)
 
         # redefine the problem (as stored in Mongo) so that the definition of correct changes
         self.define_randomized_custom_response_problem(problem_url_name, redefine=True)
         # confirm that simply rendering the problem again does not result in a change
         # in the grade (or the attempts):
         self.render_problem('u1', problem_url_name)
-        self.check_state(self.user1, descriptor, 1, 1, expected_attempts=2)
+        self.check_state(self.user1, block, 1, 1, expected_attempts=2)
 
         # rescore the problem for only one student -- only that student's grade should change
         # (and none of the attempts):
         self.submit_rescore_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
         for user in self.users:
             expected_score = 0 if user.username == 'u1' else 1
-            self.check_state(user, descriptor, expected_score, 1, expected_attempts=2)
+            self.check_state(user, block, expected_score, 1, expected_attempts=2)
 
         # rescore the problem for all students
         self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
         # all grades should change to being wrong (with no change in attempts)
         for user in self.users:
-            self.check_state(user, descriptor, 0, 1, expected_attempts=2)
+            self.check_state(user, block, 0, 1, expected_attempts=2)
 
 
 @override_settings(RATELIMIT_ENABLE=False)
@@ -450,9 +450,9 @@ class TestResetAttemptsTask(TestIntegrationTask):
             self.create_student(username)
         self.logout()
 
-    def get_num_attempts(self, username, descriptor):
-        """returns number of attempts stored for `username` on problem `descriptor` for test course"""
-        module = self.get_student_module(username, descriptor)
+    def get_num_attempts(self, username, block):
+        """returns number of attempts stored for `username` on problem `block` for test course"""
+        module = self.get_student_module(username, block)
         state = json.loads(module.state)
         return state['attempts']
 
@@ -463,11 +463,11 @@ class TestResetAttemptsTask(TestIntegrationTask):
 
     def test_reset_attempts_on_problem(self):
         """Run reset-attempts scenario on option problem"""
-        # get descriptor:
+        # get block:
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        descriptor = self.module_store.get_item(location)
+        block = self.module_store.get_item(location)
         num_attempts = 3
         # first store answers for each of the separate users:
         for _ in range(num_attempts):
@@ -475,12 +475,12 @@ class TestResetAttemptsTask(TestIntegrationTask):
                 self.submit_student_answer(username, problem_url_name, [OPTION_1, OPTION_1])
 
         for username in self.userlist:
-            assert self.get_num_attempts(username, descriptor) == num_attempts
+            assert self.get_num_attempts(username, block) == num_attempts
 
         self.reset_problem_attempts('instructor', location)
 
         for username in self.userlist:
-            assert self.get_num_attempts(username, descriptor) == 0
+            assert self.get_num_attempts(username, block) == 0
 
     def test_reset_failure(self):
         """Simulate a failure in resetting attempts on a problem"""
@@ -528,23 +528,23 @@ class TestDeleteProblemTask(TestIntegrationTask):
 
     def test_delete_problem_state(self):
         """Run delete-state scenario on option problem"""
-        # get descriptor:
+        # get block:
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        descriptor = self.module_store.get_item(location)
+        block = self.module_store.get_item(location)
         # first store answers for each of the separate users:
         for username in self.userlist:
             self.submit_student_answer(username, problem_url_name, [OPTION_1, OPTION_1])
         # confirm that state exists:
         for username in self.userlist:
-            assert self.get_student_module(username, descriptor) is not None
+            assert self.get_student_module(username, block) is not None
         # run delete task:
         self.delete_problem_state('instructor', location)
         # confirm that no state can be found:
         for username in self.userlist:
             with pytest.raises(StudentModule.DoesNotExist):
-                self.get_student_module(username, descriptor)
+                self.get_student_module(username, block)
 
     def test_delete_failure(self):
         """Simulate a failure in deleting state of a problem"""

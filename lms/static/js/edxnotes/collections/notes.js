@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'underscore', 'edx-ui-toolkit/js/pagination/paging-collection', 'js/edxnotes/models/note'
     ], function(_, PagingCollection, NoteModel) {
@@ -23,7 +24,7 @@
                 PagingCollection.prototype.constructor.call(this, models, options);
             },
 
-        /**
+            /**
          * Returns course structure from the list of notes.
          * @return {Object}
          */

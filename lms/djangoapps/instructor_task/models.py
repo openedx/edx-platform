@@ -19,7 +19,6 @@ import logging
 import os.path
 from uuid import uuid4
 
-from boto.exception import BotoServerError
 from botocore.exceptions import ClientError
 from django.apps import apps
 from django.conf import settings
@@ -41,7 +40,7 @@ QUEUING = 'QUEUING'
 PROGRESS = 'PROGRESS'
 SCHEDULED = 'SCHEDULED'
 TASK_INPUT_LENGTH = 10000
-DJANGO_STORE_STORAGE_CLASS = 'storages.backends.s3boto.S3BotoStorage'
+DJANGO_STORE_STORAGE_CLASS = 'storages.backends.s3boto3.S3Boto3Storage'
 
 
 class InstructorTask(models.Model):
@@ -332,14 +331,6 @@ class DjangoStorageReportStore(ReportStore):
             # Django's FileSystemStorage fails with an OSError if the course
             # dir does not exist; other storage types return an empty list.
             return []
-        except BotoServerError as ex:
-            logger.error(
-                'Fetching files failed for course: %s, status: %s, reason: %s',
-                course_id,
-                ex.status,
-                ex.reason
-            )
-            return []
         except ClientError as ex:
             logger.error(
                 'Fetching files failed for course: %s, status: %s, reason: %s',
@@ -347,6 +338,7 @@ class DjangoStorageReportStore(ReportStore):
                 ex.response.get('Error'), ex.response.get('Error', {}).get('Message')
             )
             return []
+
         files = [(filename, os.path.join(course_dir, filename)) for filename in filenames]
         files.sort(key=lambda f: self.storage.get_modified_time(f[1]), reverse=True)
         return [

@@ -94,7 +94,6 @@
                         expect(state.videoPlayer.player.video.play).toHaveBeenCalled();
                     });
 
-
                     it('player state was changed', function(done) {
                         jasmine.waitUntil(function() {
                             return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
@@ -153,19 +152,19 @@
 
                 describe('[loadedmetadata]', function() {
                     it(
-                        'player state was changed, start/end was defined, ' +
-                        'onReady called', function(done) {
-                        jasmine.fireEvent(state.videoPlayer.player.video, 'loadedmetadata');
-                        jasmine.waitUntil(function() {
-                            return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
-                        }).then(function() {
-                            expect(state.videoPlayer.player.getPlayerState())
-                                .toBe(STATUS.PAUSED);
-                            expect(state.videoPlayer.player.video.currentTime).toBe(0);
-                            expect(state.videoPlayer.player.config.events.onReady)
-                                .toHaveBeenCalled();
-                        }).always(done);
-                    });
+                        'player state was changed, start/end was defined, '
+                        + 'onReady called', function(done) {
+                            jasmine.fireEvent(state.videoPlayer.player.video, 'loadedmetadata');
+                            jasmine.waitUntil(function() {
+                                return state.videoPlayer.player.getPlayerState() !== STATUS.UNSTARTED;
+                            }).then(function() {
+                                expect(state.videoPlayer.player.getPlayerState())
+                                    .toBe(STATUS.PAUSED);
+                                expect(state.videoPlayer.player.video.currentTime).toBe(0);
+                                expect(state.videoPlayer.player.config.events.onReady)
+                                    .toHaveBeenCalled();
+                            }).always(done);
+                        });
                 });
 
                 describe('[ended]', function() {

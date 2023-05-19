@@ -89,7 +89,14 @@ class CourseMode(models.Model):
     # The system prefers to set this automatically based on default settings. But
     # if the field is set manually we want a way to indicate that so we don't
     # overwrite the manual setting of the field.
-    expiration_datetime_is_explicit = models.BooleanField(default=False)
+    expiration_datetime_is_explicit = models.BooleanField(
+        default=False,
+        verbose_name=_("Lock upgrade deadline date"),
+        help_text=_(
+            "OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline date. "
+            "Set to False if there is no upgrade deadline or to use the default upgrade deadline."
+        )
+    )
 
     # DEPRECATED: the `expiration_date` field has been replaced by `expiration_datetime`
     expiration_date = models.DateField(default=None, null=True, blank=True)

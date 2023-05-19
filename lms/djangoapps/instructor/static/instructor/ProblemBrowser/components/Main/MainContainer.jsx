@@ -4,27 +4,22 @@ import { createProblemResponsesReportTask } from '../../data/actions/problemResp
 import Main from './Main';
 
 const mapStateToProps = state => ({
-  selectedBlock: state.selectedBlock,
+    selectedBlock: state.selectedBlock,
 });
 
-
 const mapDispatchToProps = dispatch => ({
-  onSelectBlock: blockId => dispatch(selectBlock(blockId)),
-  fetchCourseBlocks:
-    (courseId, excludeBlockTypes) =>
-      dispatch(fetchCourseBlocks(courseId, excludeBlockTypes)),
-  createProblemResponsesReportTask:
-    (problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation) =>
-      dispatch(
-        createProblemResponsesReportTask(
-            problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation,
-        ),
-      ),
+    onSelectBlock: blockId => dispatch(selectBlock(blockId)),
+    fetchCourseBlocks:
+    (courseId, excludeBlockTypes) => dispatch(fetchCourseBlocks(courseId, excludeBlockTypes)),
+    createProblemResponsesReportTask:
+    (problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation) => dispatch(
+        createProblemResponsesReportTask(problemResponsesEndpoint, taskStatusEndpoint, reportDownloadEndpoint, problemLocation),
+    ),
 });
 
 const MainContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps,
+    mapStateToProps,
+    mapDispatchToProps,
 )(Main);
 
 export default MainContainer;

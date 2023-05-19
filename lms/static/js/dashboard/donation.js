@@ -176,7 +176,6 @@ var edx = edx || {};
                 return isValid;
             },
 
-
             /**
             * Validate that the given amount is a valid currency string.
             *

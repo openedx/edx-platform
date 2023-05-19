@@ -108,11 +108,11 @@
                 }
             },
 
-    // At this point the mouse was realeased, and we need to check
-    // where the draggable eneded up. Based on several things, we
-    // will either move the draggable back to the slider, or update
-    // the input with the user's answer (X-Y position of the draggable,
-    // or the ID of the target where it landed.
+            // At this point the mouse was realeased, and we need to check
+            // where the draggable eneded up. Based on several things, we
+            // will either move the draggable back to the slider, or update
+            // the input with the user's answer (X-Y position of the draggable,
+            // or the ID of the target where it landed.
             checkLandingElement: function() {
                 var positionIE;
 
@@ -137,11 +137,11 @@
                     }
                 } else {
                     if (
-                (positionIE.left < 0) ||
-                (positionIE.left + this.iconWidth > this.state.baseImageEl.width()) ||
-                (positionIE.top < 0) ||
-                (positionIE.top + this.iconHeight > this.state.baseImageEl.height())
-            ) {
+                        (positionIE.left < 0)
+                || (positionIE.left + this.iconWidth > this.state.baseImageEl.width())
+                || (positionIE.top < 0)
+                || (positionIE.top + this.iconHeight > this.state.baseImageEl.height())
+                    ) {
                         this.moveBackToSlider();
 
                         this.x = -1;
@@ -166,73 +166,74 @@
                 updateInput.update(this.state);
             },
 
-    // Determine if a draggable, after it was relased, ends up on a
-    // target. We do this by iterating over all of the targets, and
-    // for each one we check whether the draggable's center is
-    // within the target's dimensions.
-    //
-    // positionIE is the object as returned by
-    //
-    //     this.iconEl.position()
+            // Determine if a draggable, after it was relased, ends up on a
+            // target. We do this by iterating over all of the targets, and
+            // for each one we check whether the draggable's center is
+            // within the target's dimensions.
+            //
+            // positionIE is the object as returned by
+            //
+            //     this.iconEl.position()
             checkIfOnTarget: function(positionIE) {
                 var c1, target;
 
                 for (c1 = 0; c1 < this.state.targets.length; c1 += 1) {
                     target = this.state.targets[c1];
 
-            // If only one draggable per target is allowed, and
-            // the current target already has a draggable on it
-            // (with an ID different from the one we are checking
-            // against), then go to next target.
+                    // If only one draggable per target is allowed, and
+                    // the current target already has a draggable on it
+                    // (with an ID different from the one we are checking
+                    // against), then go to next target.
                     if (
-                (this.state.config.onePerTarget === true) &&
-                (target.draggableList.length === 1) &&
-                (target.draggableList[0].uniqueId !== this.uniqueId)
-            ) {
+                        (this.state.config.onePerTarget === true)
+                && (target.draggableList.length === 1)
+                && (target.draggableList[0].uniqueId !== this.uniqueId)
+                    ) {
                         continue;
                     }
 
-            // If the target is on a draggable (from target field), we must make sure that
-            // this draggable is not the same as "this" one.
+                    // If the target is on a draggable (from target field), we must make sure that
+                    // this draggable is not the same as "this" one.
                     if ((target.type === 'on_drag') && (target.draggableObj.uniqueId === this.uniqueId)) {
                         continue;
                     }
 
-            // Check if the draggable's center coordinate is within
-            // the target's dimensions. If not, go to next target.
+                    // Check if the draggable's center coordinate is within
+                    // the target's dimensions. If not, go to next target.
                     if (
-                (positionIE.top + this.iconHeight * 0.5 < target.offset.top) ||
-                (positionIE.top + this.iconHeight * 0.5 > target.offset.top + target.h) ||
-                (positionIE.left + this.iconWidth * 0.5 < target.offset.left) ||
-                (positionIE.left + this.iconWidth * 0.5 > target.offset.left + target.w)
-            ) {
+                        (positionIE.top + this.iconHeight * 0.5 < target.offset.top)
+                || (positionIE.top + this.iconHeight * 0.5 > target.offset.top + target.h)
+                || (positionIE.left + this.iconWidth * 0.5 < target.offset.left)
+                || (positionIE.left + this.iconWidth * 0.5 > target.offset.left + target.w)
+                    ) {
                         continue;
                     }
 
-            // If the draggable was moved from one target to
-            // another, then we need to remove it from the
-            // previous target's draggables list, and add it to the
-            // new target's draggables list.
+                    // If the draggable was moved from one target to
+                    // another, then we need to remove it from the
+                    // previous target's draggables list, and add it to the
+                    // new target's draggables list.
                     if ((this.onTarget !== null) && (this.onTarget.uniqueId !== target.uniqueId)) {
                         this.onTarget.removeDraggable(this);
                         target.addDraggable(this);
+                    // eslint-disable-next-line brace-style
                     }
-            // If the draggable was moved from the slider to a
-            // target, remember the target, and add ID to the
-            // target's draggables list.
+                    // If the draggable was moved from the slider to a
+                    // target, remember the target, and add ID to the
+                    // target's draggables list.
                     else if (this.onTarget === null) {
                         target.addDraggable(this);
                     }
 
-            // Reposition the draggable so that it's center
-            // coincides with the center of the target.
+                    // Reposition the draggable so that it's center
+                    // coincides with the center of the target.
                     this.snapToTarget(target);
 
-            // Target was found.
+                    // Target was found.
                     return true;
                 }
 
-        // Target was not found.
+                // Target was not found.
                 return false;
             },
 
@@ -266,16 +267,16 @@
                 }
             },
 
-    // Go through all of the draggables subtract 1 from the z-index
-    // of all whose z-index is higher than the old z-index of the
-    // current element. After, set the z-index of the current
-    // element to 1 + N (where N is the number of draggables - i.e.
-    // the highest z-index possible).
-    //
-    // This will make sure that after releasing a draggable, it
-    // will be on top of all of the other draggables. Also, the
-    // ordering of the visibility (z-index) of the other draggables
-    // will not change.
+            // Go through all of the draggables subtract 1 from the z-index
+            // of all whose z-index is higher than the old z-index of the
+            // current element. After, set the z-index of the current
+            // element to 1 + N (where N is the number of draggables - i.e.
+            // the highest z-index possible).
+            //
+            // This will make sure that after releasing a draggable, it
+            // will be on top of all of the other draggables. Also, the
+            // ordering of the visibility (z-index) of the other draggables
+            // will not change.
             correctZIndexes: function() {
                 var c1, highestZIndex;
 
@@ -285,9 +286,9 @@
                     if (this.onTarget.draggableList.length > 0) {
                         for (c1 = 0; c1 < this.onTarget.draggableList.length; c1 += 1) {
                             if (
-                        (this.onTarget.draggableList[c1].zIndex > highestZIndex) &&
-                        (this.onTarget.draggableList[c1].zIndex !== 1000)
-                    ) {
+                                (this.onTarget.draggableList[c1].zIndex > highestZIndex)
+                        && (this.onTarget.draggableList[c1].zIndex !== 1000)
+                            ) {
                                 highestZIndex = this.onTarget.draggableList[c1].zIndex;
                             }
                         }
@@ -298,9 +299,9 @@
                     for (c1 = 0; c1 < this.state.draggables.length; c1++) {
                         if (this.inContainer === false) {
                             if (
-                        (this.state.draggables[c1].zIndex > highestZIndex) &&
-                        (this.state.draggables[c1].zIndex !== 1000)
-                    ) {
+                                (this.state.draggables[c1].zIndex > highestZIndex)
+                        && (this.state.draggables[c1].zIndex !== 1000)
+                            ) {
                                 highestZIndex = this.state.draggables[c1].zIndex;
                             }
                         }
@@ -319,9 +320,9 @@
                 }
             },
 
-    // If a draggable was released in a wrong positione, we will
-    // move it back to the slider, placing it in the same position
-    // that it was dragged out of.
+            // If a draggable was released in a wrong positione, we will
+            // move it back to the slider, placing it in the same position
+            // that it was dragged out of.
             moveBackToSlider: function() {
                 var c1;
 
@@ -364,9 +365,9 @@
                     height: this.iconHeightSmall,
                     left: 50 - this.iconWidthSmall * 0.5,
 
-            // Before:
-            // 'top': ((this.labelEl !== null) ? (100 - this.iconHeightSmall - 25) * 0.5 : 50 - this.iconHeightSmall * 0.5)
-            // After:
+                    // Before:
+                    // 'top': ((this.labelEl !== null) ? (100 - this.iconHeightSmall - 25) * 0.5 : 50 - this.iconHeightSmall * 0.5)
+                    // After:
                     top: ((this.labelEl !== null) ? 37.5 : 50.0) - 0.5 * this.iconHeightSmall
                 });
                 this.iconEl.appendTo(this.containerEl);
@@ -381,9 +382,9 @@
                         'z-index': this.zIndex,
                         left: 50 - this.labelWidth * 0.5,
 
-                // Before:
-                // 'top': (100 - this.iconHeightSmall - 25) * 0.5 + this.iconHeightSmall + 5
-                // After:
+                        // Before:
+                        // 'top': (100 - this.iconHeightSmall - 25) * 0.5 + this.iconHeightSmall + 5
+                        // After:
                         top: 42.5 + 0.5 * this.iconHeightSmall
                     });
                     this.labelEl.appendTo(this.containerEl);

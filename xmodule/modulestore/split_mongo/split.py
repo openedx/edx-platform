@@ -781,7 +781,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
     def _get_cache(self, course_version_guid):
         """
-        Find the descriptor cache for this course if it exists
+        Find the block cache for this course if it exists
         :param course_version_guid:
         """
         if self.request_cache is None:
@@ -956,7 +956,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     @autoretry_read()
     def get_courses(self, branch, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
-        Returns a list of course descriptors matching any given qualifiers.
+        Returns a list of course blocks matching any given qualifiers.
 
         qualifiers should be a dict of keywords matching the db fields or any
         legal query for mongo to use against the active_versions collection.
@@ -1098,7 +1098,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
     def get_course(self, course_id, depth=0, **kwargs):
         """
-        Gets the course descriptor for the course identified by the locator
+        Gets the course block for the course identified by the locator
         """
         if not isinstance(course_id, CourseLocator) or course_id.deprecated:
             # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
@@ -1423,7 +1423,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         index = self.get_course_index(course_key)
         return index
 
-    # TODO figure out a way to make this info accessible from the course descriptor
+    # TODO figure out a way to make this info accessible from the course block
     def get_course_history_info(self, course_key):
         """
         Because xblocks doesn't give a means to separate the course structure's meta information from
@@ -1490,7 +1490,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
     def create_definition_from_data(self, course_key, new_def_data, category, user_id):
         """
-        Pull the definition fields out of descriptor and save to the db as a new definition
+        Pull the definition fields out of block and save to the db as a new definition
         w/o a predecessor and return the new id.
 
         :param user_id: request.user object
@@ -1529,7 +1529,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     return True
 
         # if this looks in cache rather than fresh fetches, then it will probably not detect
-        # actual change b/c the descriptor and cache probably point to the same objects
+        # actual change b/c the block and cache probably point to the same objects
         old_definition = self.get_definition(course_key, definition_locator.definition_id)
         if old_definition is None:
             raise ItemNotFoundError(definition_locator)
@@ -1579,7 +1579,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     def create_item(self, user_id, course_key, block_type, block_id=None, definition_locator=None, fields=None,  # lint-amnesty, pylint: disable=arguments-differ
                     asides=None, force=False, **kwargs):
         """
-        Add a descriptor to persistence as an element
+        Add a block to persistence as an element
         of the course. Return the resulting post saved version with populated locators.
 
         :param course_key: If it has a version_guid and a course org + course + run + branch, this
@@ -1937,26 +1937,29 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         locator = LibraryLocator(org=org, library=library, branch=kwargs["master_branch"])
         return self._create_courselike(locator, user_id, **kwargs)
 
-    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+    def update_item(self, block, user_id, allow_not_found=False, force=False, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
-        Save the descriptor's fields. it doesn't descend the course dag to save the children.
-        Return the new descriptor (updated location).
+        Save the block's fields. it doesn't descend the course dag to save the children.
+        Return the new block (updated location).
 
         raises ItemNotFoundError if the location does not exist.
 
-        Creates a new course version. If the descriptor's location has a org and course and run, it moves the course head  # lint-amnesty, pylint: disable=line-too-long
-        pointer. If the version_guid of the descriptor points to a non-head version and there's been an intervening
+        Creates a new course version. If the block's location has a org and course and run, it moves the course head  # lint-amnesty, pylint: disable=line-too-long
+        pointer. If the version_guid of the block points to a non-head version and there's been an intervening
         change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
         the course but leaves the head pointer where it is (this change will not be in the course head).
 
         The implementation tries to detect which, if any changes, actually need to be saved and thus won't version
         the definition, structure, nor course if they didn't change.
         """
-        partitioned_fields = self.partition_xblock_fields_by_scope(descriptor)
+        partitioned_fields = self.partition_xblock_fields_by_scope(block)
+        definition_locator = getattr(block, "definition_locator", None)
+        if definition_locator is None and not allow_not_found:
+            raise AttributeError("block is missing expected definition_locator from caching descriptor system")
         return self._update_item_from_fields(
-            user_id, descriptor.location.course_key, BlockKey.from_usage_key(descriptor.location),
-            partitioned_fields, descriptor.definition_locator, allow_not_found, force, **kwargs
-        ) or descriptor
+            user_id, block.location.course_key, BlockKey.from_usage_key(block.location),
+            partitioned_fields, definition_locator, allow_not_found, force, **kwargs
+        ) or block
 
     def _update_item_from_fields(self, user_id, course_key, block_key, partitioned_fields,    # pylint: disable=too-many-statements
                                  definition_locator, allow_not_found, force, asides=None, **kwargs):
@@ -2162,7 +2165,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         partitioned_fields = self.partition_xblock_fields_by_scope(xblock)
         new_def_data = self._serialize_fields(xblock.category, partitioned_fields[Scope.content])
         is_updated = False
-        if xblock.definition_locator is None or isinstance(xblock.definition_locator.definition_id, LocalId):
+        current_definition_locator = getattr(xblock, "definition_locator", xblock.scope_ids.def_id)
+        if current_definition_locator is None or isinstance(current_definition_locator.definition_id, LocalId):
             xblock.definition_locator = self.create_definition_from_data(
                 course_key, new_def_data, xblock.category, user_id
             )
@@ -2519,8 +2523,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         raises ItemNotFoundError if the location does not exist.
         raises ValueError if usage_locator points to the structure root
 
-        Creates a new course version. If the descriptor's location has a org, a course, and a run, it moves the course head  # lint-amnesty, pylint: disable=line-too-long
-        pointer. If the version_guid of the descriptor points to a non-head version and there's been an intervening
+        Creates a new course version. If the block's location has a org, a course, and a run, it moves the course head  # lint-amnesty, pylint: disable=line-too-long
+        pointer. If the version_guid of the block points to a non-head version and there's been an intervening
         change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
         the course but leaves the head pointer where it is (this change will not be in the course head).
         """

@@ -820,7 +820,7 @@ class TestCreditSerializer(LearnerDashboardBaseTest):
         """Mock data following the shape of credit_statuses"""
 
         return {
-            "course_key": enrollment.course.id,
+            "course_key": str(enrollment.course.id),
             "eligible": True,
             "deadline": random_date(),
             "purchased": False,
@@ -835,7 +835,7 @@ class TestCreditSerializer(LearnerDashboardBaseTest):
     def create_test_context(cls, enrollment):
         """Credit data, packaged as it would be for serialization context"""
 
-        return {enrollment.course.id: {**cls.create_test_data(enrollment)}}
+        return {enrollment.course_id: {**cls.create_test_data(enrollment)}}
 
     def test_serialize_credit(self):
         # Given an enrollment and a course with ability to purchase credit
@@ -900,7 +900,17 @@ class TestLearnerEnrollmentsSerializer(LearnerDashboardBaseTest):
             "programs",
             "credit",
         ]
+
+        # Verify we have all the expected keys in our output
         self.assertEqual(output.keys(), set(expected_keys))
+
+        # Entitlements should be the only empty field for an enrollment
+        entitlement = output.pop("entitlement")
+        self.assertDictEqual(entitlement, {})
+
+        # All other keys should have some basic info, unless we broke something
+        for key in output.keys():
+            self.assertNotEqual(output[key], {})
 
     def test_credit_no_credit_option(self):
         # Given an enrollment
@@ -1130,7 +1140,7 @@ class TestEnterpriseDashboardSerializer(TestCase):
 
         output_data = EnterpriseDashboardSerializer(input_data).data
 
-        expected_keys = ["label", "url", "uuid"]
+        expected_keys = ["label", "url", "uuid", "isLearnerPortalEnabled"]
         self.assertEqual(output_data.keys(), set(expected_keys))
 
     def test_happy_path(self):
@@ -1148,6 +1158,7 @@ class TestEnterpriseDashboardSerializer(TestCase):
                 + "/"
                 + input_data["slug"],
                 "uuid": input_data["uuid"],
+                "isLearnerPortalEnabled": input_data["enable_learner_portal"],
             },
         )
 

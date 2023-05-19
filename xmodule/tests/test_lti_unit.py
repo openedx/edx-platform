@@ -65,7 +65,7 @@ class LTIBlockTest(TestCase):
         self.course_id = CourseKey.from_string('org/course/run')
         self.system = get_test_system(self.course_id)
         self.system.publish = Mock()
-        self.system._services['rebind_user'] = Mock()  # pylint: disable=protected-access
+        self.system._runtime_services['rebind_user'] = Mock()  # pylint: disable=protected-access
 
         self.xblock = LTIBlock(
             self.system,
@@ -178,7 +178,7 @@ class LTIBlockTest(TestCase):
         """
         If we have no real user, we should send back failure response.
         """
-        self.system._services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
+        self.system._runtime_services['user'] = StubUserService(user=None)  # pylint: disable=protected-access
         self.xblock.verify_oauth_body_sign = Mock()
         self.xblock.has_score = True
         request = Request(self.environ)

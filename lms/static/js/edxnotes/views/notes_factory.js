@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'jquery', 'underscore', 'annotator_1.2.9',
         'js/edxnotes/utils/logger', 'js/edxnotes/utils/notes_collector',
@@ -12,7 +13,7 @@
         var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags'],
             getOptions, setupPlugins, getAnnotator;
 
-    /**
+        /**
      * Returns options for the annotator.
      * @param {jQuery Element} The container element.
      * @param {String} params.endpoint The endpoint of the store.
@@ -22,7 +23,7 @@
      * @param {String} params.token An authentication token.
      * @param {String} params.tokenUrl The URL to request the token from.
      * @return {Object} Options.
-     **/
+     * */
         getOptions = function(element, params) {
             var defaultParams = {
                     user: params.user,
@@ -54,12 +55,12 @@
             };
         };
 
-    /**
+        /**
      * Setups plugins for the annotator.
      * @param {Object} annotator An instance of the annotator.
      * @param {Array} plugins A list of plugins for the annotator.
      * @param {Object} options An options for the annotator.
-     **/
+     * */
         setupPlugins = function(annotator, plugins, options) {
             _.each(plugins, function(plugin) {
                 var settings = options[plugin.toLowerCase()];
@@ -67,7 +68,7 @@
             }, this);
         };
 
-    /**
+        /**
      * Factory method that returns Annotator.js instantiates.
      * @param {DOM Element} element The container element.
      * @param {String} params.endpoint The endpoint of the store.
@@ -77,7 +78,7 @@
      * @param {String} params.token An authentication token.
      * @param {String} params.tokenUrl The URL to request the token from.
      * @return {Object} An instance of Annotator.js.
-     **/
+     * */
         getAnnotator = function(element, params) {
             var $el = $(element),
                 options = getOptions($el, params),

@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/09_play_skip_control.js', [], function() {
     /**
      * Play/skip control module.
@@ -38,14 +39,14 @@
                 delete this.state.videoPlaySkipControl;
             },
 
-        /** Initializes the module. */
+            /** Initializes the module. */
             initialize: function() {
                 this.el = $(this.template);
                 this.render();
                 this.bindHandlers();
             },
 
-        /**
+            /**
          * Creates any necessary DOM elements, attach them, and set their,
          * initial configuration.
          */
@@ -53,7 +54,7 @@
                 this.state.el.find('.vcr').prepend(this.el);
             },
 
-        /** Bind any necessary function callbacks to DOM events. */
+            /** Bind any necessary function callbacks to DOM events. */
             bindHandlers: function() {
                 this.el.on('click', this.onClick);
                 this.state.el.on({
@@ -73,13 +74,13 @@
 
             play: function() {
                 this.el
-                .removeClass('play')
-                .addClass('skip')
-                .attr('title', gettext('Skip'))
-                .find('.icon')
+                    .removeClass('play')
+                    .addClass('skip')
+                    .attr('title', gettext('Skip'))
+                    .find('.icon')
                     .removeClass('fa-play')
                     .addClass('fa-step-forward');
-            // Disable possibility to pause the video.
+                // Disable possibility to pause the video.
                 this.state.el.find('video').off('click');
             }
         };

@@ -12,7 +12,7 @@ define([
     'edx-ui-toolkit/js/utils/html-utils'
 ],
 function($, _, Backbone, gettext,
-         ListItemEditorView, SignatoryModel, SignatoryEditorView, certificateEditorTemplate, HtmlUtils) {
+    ListItemEditorView, SignatoryModel, SignatoryEditorView, certificateEditorTemplate, HtmlUtils) {
     'use strict';
 
     // If signatories limit is required to specific value then we can change it.
@@ -84,7 +84,7 @@ function($, _, Backbone, gettext,
 
         addSignatory: function() {
             // Append a new signatory to the certificate model's signatories collection
-            var signatory = new SignatoryModel({certificate: this.getSaveableModel()});  // eslint-disable-line max-len, no-unused-vars
+            var signatory = new SignatoryModel({certificate: this.getSaveableModel()}); // eslint-disable-line max-len, no-unused-vars
             this.render();
         },
 

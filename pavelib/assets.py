@@ -170,6 +170,8 @@ def get_theme_sass_dirs(system, theme_dir):
     css_dir = theme_dir / system / "static" / "css"
     certs_sass_dir = theme_dir / system / "static" / "certificates" / "sass"
     certs_css_dir = theme_dir / system / "static" / "certificates" / "css"
+    xmodule_sass_folder = "modules" if system == 'lms' else "descriptors"
+    xmodule_sass_dir = path("common") / "static" / "xmodule" / xmodule_sass_folder / "scss"
 
     dependencies = SASS_LOOKUP_DEPENDENCIES.get(system, [])
     if sass_dir.isdir():
@@ -190,6 +192,16 @@ def get_theme_sass_dirs(system, theme_dir):
         dirs.append({
             "sass_source_dir": sass_dir,
             "css_destination_dir": css_dir,
+            "lookup_paths": dependencies + [
+                sass_dir / "partials",
+                system_sass_dir / "partials",
+                system_sass_dir,
+            ],
+        })
+
+        dirs.append({
+            "sass_source_dir": xmodule_sass_dir,
+            "css_destination_dir": path("common") / "static" / "css" / "xmodule",
             "lookup_paths": dependencies + [
                 sass_dir / "partials",
                 system_sass_dir / "partials",
@@ -223,11 +235,22 @@ def get_system_sass_dirs(system):
     dirs = []
     sass_dir = path(system) / "static" / "sass"
     css_dir = path(system) / "static" / "css"
+    xmodule_sass_folder = "modules" if system == 'lms' else "descriptors"
+    xmodule_sass_dir = path("common") / "static" / "xmodule" / xmodule_sass_folder / "scss"
 
     dependencies = SASS_LOOKUP_DEPENDENCIES.get(system, [])
     dirs.append({
         "sass_source_dir": sass_dir,
         "css_destination_dir": css_dir,
+        "lookup_paths": dependencies + [
+            sass_dir / "partials",
+            sass_dir,
+        ],
+    })
+
+    dirs.append({
+        "sass_source_dir": xmodule_sass_dir,
+        "css_destination_dir": path("common") / "static" / "css" / "xmodule",
         "lookup_paths": dependencies + [
             sass_dir / "partials",
             sass_dir,
@@ -692,30 +715,9 @@ def collect_assets(systems, settings, **kwargs):
     `settings` is the Django settings module to use.
     `**kwargs` include arguments for using a log directory for collectstatic output. Defaults to /dev/null.
     """
-    ignore_patterns = [
-        # Karma test related files...
-        "fixtures",
-        "karma_*.js",
-        "spec",
-        "spec_helpers",
-        "spec-helpers",
-        "xmodule_js",  # symlink for tests
-
-        # Geo-IP data, only accessed in Python
-        "geoip",
-
-        # We compile these out, don't need the source files in staticfiles
-        "sass",
-    ]
-
-    ignore_args = " ".join(
-        f'--ignore "{pattern}"' for pattern in ignore_patterns
-    )
-
     for sys in systems:
         collectstatic_stdout_str = _collect_assets_cmd(sys, **kwargs)
-        sh(django_cmd(sys, settings, "collectstatic {ignore_args} --noinput {logfile_str}".format(
-            ignore_args=ignore_args,
+        sh(django_cmd(sys, settings, "collectstatic --noinput {logfile_str}".format(
             logfile_str=collectstatic_stdout_str
         )))
         print(f"\t\tFinished collecting {sys} assets.")

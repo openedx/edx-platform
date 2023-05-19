@@ -1,5 +1,5 @@
 define(['backbone'], function(Backbone) {
-  /**
+    /**
    * Simple model for an asset.
    */
     var Asset = Backbone.Model.extend({

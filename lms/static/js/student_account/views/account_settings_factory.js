@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'gettext', 'jquery', 'underscore', 'backbone', 'logger',
         'js/student_account/models/user_account_model',
@@ -9,7 +10,7 @@
         'edx-ui-toolkit/js/utils/string-utils',
         'edx-ui-toolkit/js/utils/html-utils'
     ], function(gettext, $, _, Backbone, Logger, UserAccountModel, UserPreferencesModel,
-                 AccountSettingsFieldViews, AccountSettingsView, StringUtils, HtmlUtils) {
+        AccountSettingsFieldViews, AccountSettingsView, StringUtils, HtmlUtils) {
         return function(
             fieldsData,
             disableOrderHistoryTab,
@@ -53,7 +54,7 @@
             if (syncLearnerProfileData && enterpriseName) {
                 aboutSectionMessageType = 'info';
                 aboutSectionMessage = HtmlUtils.interpolateHtml(
-                    gettext('Your profile settings are managed by {enterprise_name}. Contact your administrator or {link_start}edX Support{link_end} for help.'),  // eslint-disable-line max-len
+                    gettext('Your profile settings are managed by {enterprise_name}. Contact your administrator or {link_start}edX Support{link_end} for help.'), // eslint-disable-line max-len
                     {
                         enterprise_name: enterpriseName,
                         link_start: HtmlUtils.HTML(
@@ -73,12 +74,12 @@
                 title: gettext('Email Address (Sign In)'),
                 valueAttribute: 'email',
                 helpMessage: StringUtils.interpolate(
-                    gettext('You receive messages from {platform_name} and course teams at this address.'),  // eslint-disable-line max-len
+                    gettext('You receive messages from {platform_name} and course teams at this address.'), // eslint-disable-line max-len
                     {platform_name: platformName}
                 ),
                 persistChanges: true
             };
-            if (!allowEmailChange || (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('email') !== -1)) {  // eslint-disable-line max-len
+            if (!allowEmailChange || (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('email') !== -1)) { // eslint-disable-line max-len
                 emailFieldView = {
                     view: new AccountSettingsFieldViews.ReadonlyFieldView(emailFieldData)
                 };
@@ -92,7 +93,7 @@
                 model: userAccountModel,
                 title: gettext('Recovery Email Address'),
                 valueAttribute: 'secondary_email',
-                helpMessage: gettext('You may access your account with this address if single-sign on or access to your primary email is not available.'),  // eslint-disable-line max-len
+                helpMessage: gettext('You may access your account with this address if single-sign on or access to your primary email is not available.'), // eslint-disable-line max-len
                 persistChanges: true
             };
 
@@ -100,7 +101,7 @@
                 model: userAccountModel,
                 title: gettext('Full Name'),
                 valueAttribute: 'name',
-                helpMessage: gettext('The name that is used for ID verification and that appears on your certificates.'),  // eslint-disable-line max-len,
+                helpMessage: gettext('The name that is used for ID verification and that appears on your certificates.'), // eslint-disable-line max-len,
                 persistChanges: true
             };
             if (syncLearnerProfileData && enterpriseReadonlyAccountFields.fields.indexOf('name') !== -1) {
@@ -155,7 +156,7 @@
                                 title: gettext('Username'),
                                 valueAttribute: 'username',
                                 helpMessage: StringUtils.interpolate(
-                                    gettext('The name that identifies you on {platform_name}. You cannot change your username.'),  // eslint-disable-line max-len
+                                    gettext('The name that identifies you on {platform_name}. You cannot change your username.'), // eslint-disable-line max-len
                                     {platform_name: platformName}
                                 )
                             })
@@ -172,7 +173,7 @@
                                 passwordResetSupportUrl: passwordResetSupportUrl,
                                 linkTitle: gettext('Reset Your Password'),
                                 linkHref: fieldsData.password.url,
-                                helpMessage: gettext('Check your email account for instructions to reset your password.')  // eslint-disable-line max-len
+                                helpMessage: gettext('Check your email account for instructions to reset your password.') // eslint-disable-line max-len
                             })
                         },
                         {
@@ -183,7 +184,7 @@
                                 required: true,
                                 refreshPageOnSave: true,
                                 helpMessage: StringUtils.interpolate(
-                                    gettext('The language used throughout this site. This site is currently available in a limited number of languages. Changing the value of this field will cause the page to refresh.'),  // eslint-disable-line max-len
+                                    gettext('The language used throughout this site. This site is currently available in a limited number of languages. Changing the value of this field will cause the page to refresh.'), // eslint-disable-line max-len
                                     {platform_name: platformName}
                                 ),
                                 options: fieldsData.language.options,
@@ -252,39 +253,40 @@
                 }
             ];
 
-            if (enableCoppaCompliance){
-              yearOfBirthViewIndex = aboutSectionsData[1]['fields'].findIndex(function (field) {
-	              return field['view']['options']['valueAttribute']=== 'year_of_birth';
+            if (enableCoppaCompliance) {
+                yearOfBirthViewIndex = aboutSectionsData[1].fields.findIndex(function(field) {
+                    return field.view.options.valueAttribute === 'year_of_birth';
                 });
-              aboutSectionsData[1]['fields'].splice(yearOfBirthViewIndex,1)
-}
+                aboutSectionsData[1].fields.splice(yearOfBirthViewIndex, 1);
+            }
 
-			// Secondary email address
+            // Secondary email address
             if (isSecondaryEmailFeatureEnabled) {
                 secondaryEmailFieldView = {
                     view: new AccountSettingsFieldViews.EmailFieldView(secondaryEmailFieldData),
                     successMessage: function() {
-                    return HtmlUtils.joinHtml(
-                        this.indicators.success,
-                        StringUtils.interpolate(
-                            gettext('We\'ve sent a confirmation message to {new_secondary_email_address}. Click the link in the message to update your secondary email address.'),  // eslint-disable-line max-len
-                            {
-                                new_secondary_email_address: this.fieldValue()
-                            }
-                        )
-                    );}
+                        return HtmlUtils.joinHtml(
+                            this.indicators.success,
+                            StringUtils.interpolate(
+                                gettext('We\'ve sent a confirmation message to {new_secondary_email_address}. Click the link in the message to update your secondary email address.'), // eslint-disable-line max-len
+                                {
+                                    new_secondary_email_address: this.fieldValue()
+                                }
+                            )
+                        );
+                    }
                 };
                 emailFieldViewIndex = aboutSectionsData[0].fields.indexOf(emailFieldView);
 
                 // Insert secondary email address after email address field.
                 aboutSectionsData[0].fields.splice(
-                emailFieldViewIndex + 1, 0, secondaryEmailFieldView
-                )
+                    emailFieldViewIndex + 1, 0, secondaryEmailFieldView
+                );
             }
 
             // Add the extended profile fields
             additionalFields = aboutSectionsData[1];
-            for (var field in extendedProfileFields) {  // eslint-disable-line guard-for-in, no-restricted-syntax, vars-on-top, max-len
+            for (var field in extendedProfileFields) { // eslint-disable-line guard-for-in, no-restricted-syntax, vars-on-top, max-len
                 fieldItem = extendedProfileFields[field];
                 if (fieldItem.field_type === 'TextField') {
                     additionalFields.fields.push({
@@ -312,15 +314,14 @@
                 }
             }
 
-
             // Add the social link fields
             socialFields = {
                 title: gettext('Social Media Links'),
-                subtitle: gettext('Optionally, link your personal accounts to the social media icons on your edX profile.'),  // eslint-disable-line max-len
+                subtitle: gettext('Optionally, link your personal accounts to the social media icons on your edX profile.'), // eslint-disable-line max-len
                 fields: []
             };
 
-            for (var socialPlatform in socialPlatforms) {  // eslint-disable-line guard-for-in, no-restricted-syntax, vars-on-top, max-len
+            for (var socialPlatform in socialPlatforms) { // eslint-disable-line guard-for-in, no-restricted-syntax, vars-on-top, max-len
                 platformData = socialPlatforms[socialPlatform];
                 socialFields.fields.push(
                     {
@@ -332,7 +333,7 @@
                             ),
                             valueAttribute: 'social_links',
                             helpMessage: StringUtils.interpolate(
-                                gettext('Enter your {platform_display_name} username or the URL to your {platform_display_name} page. Delete the URL to remove the link.'),  // eslint-disable-line max-len
+                                gettext('Enter your {platform_display_name} username or the URL to your {platform_display_name} page. Delete the URL to remove the link.'), // eslint-disable-line max-len
                                 {platform_display_name: platformData.display_name}
                             ),
                             platform: socialPlatform,
@@ -406,7 +407,7 @@
                 {
                     title: gettext('My Orders'),
                     subtitle: StringUtils.interpolate(
-                        gettext('This page contains information about orders that you have placed with {platform_name}.'),  // eslint-disable-line max-len
+                        gettext('This page contains information about orders that you have placed with {platform_name}.'), // eslint-disable-line max-len
                         {platform_name: platformName}
                     ),
                     fields: _.map(ordersHistoryData, function(order) {

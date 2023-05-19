@@ -1,0 +1,14 @@
+<div class="course-video-sharing">
+  <h2 id="video-sharing-enabled-label" class="status-video-sharing-enabled-label">
+    <%- gettext('Video Sharing') %>
+  </h2>
+  <br>
+  <select id="video-sharing-configuration-options">
+    <% _.each({'per-video': 'Per Video','all-on': 'All Videos','all-off': 'No Videos'}, function (option, key) { %>
+      <option value="<%- key %>" <% if (key === video_sharing_options) { %> selected="true" <% } %>>
+        <%- option %>
+      </option>
+    <% }) %>
+  </select>
+  <a class="status-video-sharing-enabled-info" href="<%- video_sharing_doc_url %>" rel="noopener" target="_blank"><%- gettext('Learn more') %></a>
+</div>

@@ -25,11 +25,11 @@
             });
 
             it('contains the quality control and is initially hidden',
-               function() {
-                   expect(qualityControl.el).toHaveClass(
-                    'quality-control is-hidden'
-                );
-               });
+                function() {
+                    expect(qualityControl.el).toHaveClass(
+                        'quality-control is-hidden'
+                    );
+                });
 
             it('add ARIA attributes to quality control', function() {
                 expect(qualityControl.el).toHaveAttrs({
@@ -63,21 +63,21 @@
             });
 
             it('shows the quality control on play if HD is available',
-               function() {
-                   videoPlayer.onPlay();
+                function() {
+                    videoPlayer.onPlay();
 
-                   expect(qualityControl.el).not.toHaveClass('is-hidden');
-               });
+                    expect(qualityControl.el).not.toHaveClass('is-hidden');
+                });
 
             it('leaves quality control hidden on play if HD is not available',
-               function() {
-                   player.getAvailableQualityLevels.and.returnValue(
-                    ['large', 'medium', 'small']
-                );
+                function() {
+                    player.getAvailableQualityLevels.and.returnValue(
+                        ['large', 'medium', 'small']
+                    );
 
-                   videoPlayer.onPlay();
-                   expect(qualityControl.el).toHaveClass('is-hidden');
-               });
+                    videoPlayer.onPlay();
+                    expect(qualityControl.el).toHaveClass('is-hidden');
+                });
 
             it('switch to HD if it is available', function() {
                 videoPlayer.onPlay();
@@ -95,8 +95,8 @@
             it('quality control is active if HD is available',
                 function() {
                     player.getAvailableQualityLevels.and.returnValue(
-                     ['highres', 'hd1080', 'hd720']
-                 );
+                        ['highres', 'hd1080', 'hd720']
+                    );
 
                     qualityControl.quality = 'highres';
 

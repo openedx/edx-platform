@@ -1,6 +1,7 @@
 /* globals $$course_id, Content, Markdown, MathJax, URI, _ */
 (function() {
     'use strict';
+
     this.DiscussionUtil = (function() {
         function DiscussionUtil() {
         }
@@ -31,8 +32,8 @@
             if (_.isUndefined(userId)) {
                 userId = this.user ? this.user.id : void 0;
             }
-            if(_.isUndefined(this.roleIds)) {
-                this.roleIds = {}
+            if (_.isUndefined(this.roleIds)) {
+                this.roleIds = {};
             }
             staff = _.union(this.roleIds.Moderator, this.roleIds.Administrator);
             return _.include(staff, parseInt(userId));
@@ -76,7 +77,9 @@
         DiscussionUtil.generateDiscussionLink = function(cls, txt, handler) {
             return $('<a>')
                 .addClass('discussion-link').attr('href', '#')
-                .addClass(cls).text(txt).click(function() { return handler(this); });
+                .addClass(cls)
+                .text(txt)
+                .click(function() { return handler(this); });
         };
 
         DiscussionUtil.urlFor = function(name, param, param1, param2) {
@@ -440,8 +443,8 @@
 
         DiscussionUtil.stripHighlight = function(htmlString) {
             return htmlString
-                    .replace(/\&(amp\;)?lt\;highlight\&(amp\;)?gt\;/g, '')
-                    .replace(/\&(amp\;)?lt\;\/highlight\&(amp\;)?gt\;/g, '');
+                .replace(/\&(amp\;)?lt\;highlight\&(amp\;)?gt\;/g, '')
+                .replace(/\&(amp\;)?lt\;\/highlight\&(amp\;)?gt\;/g, '');
         };
 
         DiscussionUtil.stripLatexHighlight = function(htmlSnippet) {
@@ -483,7 +486,6 @@
                 element,
                 this.postMathJaxProcessor(this.markdownWithHighlight(element.text()))
             );
-
         };
 
         DiscussionUtil.typesetMathJax = function(element) {

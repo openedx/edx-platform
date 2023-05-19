@@ -72,9 +72,9 @@ mockComponentTemplates = new ComponentTemplates([
         type: 'html',
         support_legend: {show_legend: false}
     }],
-    {
-        parse: true
-    });
+{
+    parse: true
+});
 
 installEditTemplates = function(append) {
     modal_helpers.installModalTemplates(append);
@@ -138,4 +138,4 @@ export {
     installEditTemplates,
     showEditModal,
     verifyXBlockRequest,
-}
+};

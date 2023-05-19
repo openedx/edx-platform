@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/04_video_full_screen.js', ['edx-ui-toolkit/js/utils/html-utils'], function(HtmlUtils) {
         var template = [
             '<button class="control add-fullscreen" aria-disabled="false" title="',
@@ -11,16 +12,16 @@
             '</button>'
         ].join('');
 
-    // The following properties and functions enable cross-browser use of the
-    // the Fullscreen Web API.
-    //
-    //     function getVendorPrefixed(property)
-    //     function getFullscreenElement()
-    //     function exitFullscreen()
-    //     function requestFullscreen(element, options)
-    //
-    //     For more information about the Fullscreen Web API see MDN:
-    //     https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
+        // The following properties and functions enable cross-browser use of the
+        // the Fullscreen Web API.
+        //
+        //     function getVendorPrefixed(property)
+        //     function getFullscreenElement()
+        //     function exitFullscreen()
+        //     function requestFullscreen(element, options)
+        //
+        //     For more information about the Fullscreen Web API see MDN:
+        //     https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
         var prefixedFullscreenProperties = (function() {
             if ('fullscreenEnabled' in document) {
                 return {
@@ -87,9 +88,9 @@
             return null;
         }
 
-    // ***************************************************************
-    // Private functions start here.
-    // ***************************************************************
+        // ***************************************************************
+        // Private functions start here.
+        // ***************************************************************
 
         function destroy() {
             $(document).off('keyup', this.videoFullScreen.exitHandler);
@@ -107,11 +108,11 @@
             delete this.videoFullScreen;
         }
 
-    // function renderElements(state)
-    //
-    //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
-    //     make the created DOM elements available via the 'state' object. Much easier to work this
-    //     way - you don't have to do repeated jQuery element selects.
+        // function renderElements(state)
+        //
+        //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
+        //     make the created DOM elements available via the 'state' object. Much easier to work this
+        //     way - you don't have to do repeated jQuery element selects.
         function renderElements(state) {
             /* eslint-disable no-param-reassign */
             state.videoFullScreen.fullScreenEl = $(template);
@@ -122,9 +123,9 @@
             /* eslint-enable no-param-reassign */
         }
 
-    // function bindHandlers(state)
-    //
-    //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
+        // function bindHandlers(state)
+        //
+        //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
         function bindHandlers(state) {
             state.videoFullScreen.fullScreenEl.on('click', state.videoFullScreen.toggleHandler);
             state.el.on({
@@ -141,11 +142,11 @@
             return controls.height() + 0.5 * slider.height();
         }
 
-    // ***************************************************************
-    // Public functions start here.
-    // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
-    // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
-    // ***************************************************************
+        // ***************************************************************
+        // Public functions start here.
+        // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
+        // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
+        // ***************************************************************
 
         function handleFullscreenChange() {
             if (getFullscreenElement() !== this.el[0] && this.isFullScreen) {
@@ -161,7 +162,7 @@
             return this.videoFullScreen.height;
         }
 
-    /**
+        /**
      * Event handler to toggle fullscreen mode.
      * @param {jquery Event} event
      */
@@ -182,8 +183,8 @@
             fullScreenClassNameEl.removeClass('video-fullscreen');
             $(window).scrollTop(this.scrollPos);
             this.videoFullScreen.fullScreenEl
-            .attr({title: gettext('Fill browser'), 'aria-label': gettext('Fill browser')})
-            .find('.icon')
+                .attr({title: gettext('Fill browser'), 'aria-label': gettext('Fill browser')})
+                .find('.icon')
                 .removeClass('fa-compress')
                 .addClass('fa-arrows-alt');
 
@@ -205,8 +206,8 @@
             this.videoFullScreen.fullScreenState = this.isFullScreen = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             this.videoFullScreen.fullScreenEl
-            .attr({title: gettext('Exit full browser'), 'aria-label': gettext('Exit full browser')})
-            .find('.icon')
+                .attr({title: gettext('Exit full browser'), 'aria-label': gettext('Exit full browser')})
+                .find('.icon')
                 .removeClass('fa-arrows-alt')
                 .addClass('fa-compress');
 
@@ -232,7 +233,7 @@
             requestFullscreen(this.el[0]);
         }
 
-    /** Toggle fullscreen mode. */
+        /** Toggle fullscreen mode. */
         function toggle() {
             if (this.videoFullScreen.fullScreenState) {
                 this.videoFullScreen.exit();
@@ -241,7 +242,7 @@
             }
         }
 
-    /**
+        /**
      * Event handler to exit from fullscreen mode.
      * @param {jquery Event} event
      */
@@ -252,10 +253,10 @@
             }
         }
 
-    // function makeFunctionsPublic(state)
-    //
-    //     Functions which will be accessible via 'state' object. When called, these functions will
-    //     get the 'state' object as a context.
+        // function makeFunctionsPublic(state)
+        //
+        //     Functions which will be accessible via 'state' object. When called, these functions will
+        //     get the 'state' object as a context.
         function makeFunctionsPublic(state) {
             var methodsDict = {
                 destroy: destroy,

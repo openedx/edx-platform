@@ -14,7 +14,6 @@ import dateutil
 import ddt
 import pytest
 import pytz
-from boto.exception import BotoServerError
 from botocore.exceptions import ClientError
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
@@ -591,6 +590,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
 
 
 @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+@ddt.ddt
 class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test Bulk account creation and enrollment from csv file
@@ -642,32 +642,15 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         )
 
     @patch('lms.djangoapps.instructor.views.api.log.info')
-    def test_account_creation_and_enrollment_with_csv(self, info_log):
+    @ddt.data(
+        b"test_student@example.com,test_student_1,tester1,USA",  # Typical use case.
+        b"\ntest_student@example.com,test_student_1,tester1,USA\n\n",  # Blank lines.
+        b"\xef\xbb\xbftest_student@example.com,test_student_1,tester1,USA",  # Unicode signature (BOM).
+    )
+    def test_account_creation_and_enrollment_with_csv(self, csv_content, info_log):
         """
         Happy path test to create a single new user
         """
-        csv_content = b"test_student@example.com,test_student_1,tester1,USA"
-        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
-        response = self.client.post(self.url, {'students_list': uploaded_file, 'email-students': True})
-        assert response.status_code == 200
-        data = json.loads(response.content.decode('utf-8'))
-        assert len(data['row_errors']) == 0
-        assert len(data['warnings']) == 0
-        assert len(data['general_errors']) == 0
-
-        manual_enrollments = ManualEnrollmentAudit.objects.all()
-        assert manual_enrollments.count() == 1
-        assert manual_enrollments[0].state_transition == UNENROLLED_TO_ENROLLED
-
-        # test the log for email that's send to new created user.
-        info_log.assert_called_with('email sent to new created user at %s', 'test_student@example.com')
-
-    @patch('lms.djangoapps.instructor.views.api.log.info')
-    def test_account_creation_and_enrollment_with_csv_with_blank_lines(self, info_log):
-        """
-        Happy path test to create a single new user
-        """
-        csv_content = b"\ntest_student@example.com,test_student_1,tester1,USA\n\n"
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file, 'email-students': True})
         assert response.status_code == 200
@@ -2747,10 +2730,14 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         """
         Tests the Rate-Limit exceeded is handled and does not raise 500 error.
         """
-        ex_status = 503
-        ex_reason = 'Slow Down'
         url = reverse(endpoint, kwargs={'course_id': str(self.course.id)})
-        with patch('storages.backends.s3boto.S3BotoStorage.listdir', side_effect=BotoServerError(ex_status, ex_reason)):
+        error_response = {'Error': {'Code': 503, 'Message': 'error found'}}
+        operation_name = 'test'
+
+        with patch(
+            'storages.backends.s3boto3.S3Boto3Storage.listdir',
+            side_effect=ClientError(error_response, operation_name)
+        ):
             if endpoint in INSTRUCTOR_GET_ENDPOINTS:
                 response = self.client.get(url)
             else:
@@ -2758,8 +2745,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         mock_error.assert_called_with(
             'Fetching files failed for course: %s, status: %s, reason: %s',
             self.course.id,
-            ex_status,
-            ex_reason,
+            error_response.get('Error'),
+            error_response.get('Error').get('Message')
         )
 
         res_json = json.loads(response.content.decode('utf-8'))
@@ -4382,7 +4369,7 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         """
         # this temporary file will be removed in `self.tearDown()`
         __, file_name = tempfile.mkstemp(suffix=suffix, dir=self.tempdir)
-        with open(file_name, 'w') as file_pointer:
+        with open(file_name, 'w', encoding='utf-8-sig') as file_pointer:
             file_pointer.write(csv_data)
         with open(file_name) as file_pointer:
             url = reverse('add_users_to_cohorts', kwargs={'course_id': str(self.course.id)})

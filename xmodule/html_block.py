@@ -17,7 +17,8 @@ from path import Path as path
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, List, Scope, String
-from common.djangoapps.xblock_django.constants import ATTR_KEY_ANONYMOUS_USER_ID
+
+from common.djangoapps.xblock_django.constants import ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
 from xmodule.contentstore.content import StaticContent
 from xmodule.editing_block import EditingMixin
 from xmodule.edxnotes_utils import edxnotes
@@ -119,7 +120,11 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         """ Returns html required for rendering the block. """
         if self.data:
             data = self.data
-            user_id = self.runtime.service(self, 'user').get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+            user_id = (
+                self.runtime.service(self, 'user')
+                .get_current_user()
+                .opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
+            )
             if user_id:
                 data = data.replace("%%USER_ID%%", user_id)
             data = data.replace("%%COURSE_ID%%", str(self.scope_ids.usage_id.context_key))
@@ -150,7 +155,6 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     preview_view_css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
     uses_xmodule_styles_setup = True
-    requires_per_student_anonymous_id = True
 
     mako_template = "widgets/html-edit.html"
     resources_dir = None

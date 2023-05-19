@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'underscore', 'annotator_1.2.9'
     ], function(_, Annotator) {
@@ -9,17 +10,17 @@
      * an id.
      */
         Annotator.Plugin.Store.prototype.annotationCreated = _.compose(
-        function(jqXhr) {
-            return jqXhr.done(_.bind(function(annotation) {
-                if (annotation && annotation.id) {
-                    this.publish('annotationFullyCreated', annotation);
-                }
-            }, this));
-        },
-        Annotator.Plugin.Store.prototype.annotationCreated
-    );
+            function(jqXhr) {
+                return jqXhr.done(_.bind(function(annotation) {
+                    if (annotation && annotation.id) {
+                        this.publish('annotationFullyCreated', annotation);
+                    }
+                }, this));
+            },
+            Annotator.Plugin.Store.prototype.annotationCreated
+        );
 
-    /**
+        /**
      * Adds the Events Plugin which emits events to capture user intent.
      * Emits the following events:
      * - 'edx.course.student_notes.viewed'
@@ -30,7 +31,7 @@
      *   (user, note ID, old note text, new note text, highlighted content, ID of the component annotated, datetime)
      * - 'edx.course.student_notes.deleted'
      *   (user, note ID, note text, highlighted content, ID of the component annotated, datetime)
-     **/
+     * */
         Annotator.Plugin.Events = function() {
         // Call the Annotator.Plugin constructor this sets up the element and
         // options properties.
@@ -40,27 +41,27 @@
         _.extend(Annotator.Plugin.Events.prototype, new Annotator.Plugin(), {
             pluginInit: function() {
                 _.bindAll(this,
-                'annotationViewerShown', 'annotationFullyCreated', 'annotationEditorShown',
-                'annotationEditorHidden', 'annotationUpdated', 'annotationDeleted'
-            );
+                    'annotationViewerShown', 'annotationFullyCreated', 'annotationEditorShown',
+                    'annotationEditorHidden', 'annotationUpdated', 'annotationDeleted'
+                );
 
                 this.annotator
-                .subscribe('annotationViewerShown', this.annotationViewerShown)
-                .subscribe('annotationFullyCreated', this.annotationFullyCreated)
-                .subscribe('annotationEditorShown', this.annotationEditorShown)
-                .subscribe('annotationEditorHidden', this.annotationEditorHidden)
-                .subscribe('annotationUpdated', this.annotationUpdated)
-                .subscribe('annotationDeleted', this.annotationDeleted);
+                    .subscribe('annotationViewerShown', this.annotationViewerShown)
+                    .subscribe('annotationFullyCreated', this.annotationFullyCreated)
+                    .subscribe('annotationEditorShown', this.annotationEditorShown)
+                    .subscribe('annotationEditorHidden', this.annotationEditorHidden)
+                    .subscribe('annotationUpdated', this.annotationUpdated)
+                    .subscribe('annotationDeleted', this.annotationDeleted);
             },
 
             destroy: function() {
                 this.annotator
-                .unsubscribe('annotationViewerShown', this.annotationViewerShown)
-                .unsubscribe('annotationFullyCreated', this.annotationFullyCreated)
-                .unsubscribe('annotationEditorShown', this.annotationEditorShown)
-                .unsubscribe('annotationEditorHidden', this.annotationEditorHidden)
-                .unsubscribe('annotationUpdated', this.annotationUpdated)
-                .unsubscribe('annotationDeleted', this.annotationDeleted);
+                    .unsubscribe('annotationViewerShown', this.annotationViewerShown)
+                    .unsubscribe('annotationFullyCreated', this.annotationFullyCreated)
+                    .unsubscribe('annotationEditorShown', this.annotationEditorShown)
+                    .unsubscribe('annotationEditorHidden', this.annotationEditorHidden)
+                    .unsubscribe('annotationUpdated', this.annotationUpdated)
+                    .unsubscribe('annotationDeleted', this.annotationDeleted);
             },
 
             annotationViewerShown: function(viewer, annotations) {
@@ -98,18 +99,18 @@
                 if (!this.isNew(annotation)) {
                     defaultData = this.getDefaultData(annotation);
                     data = _.extend(
-                    defaultData,
-                    this.getText('old_note_text', this.oldNoteText, defaultData.truncated),
-                    this.getTextArray('old_tags', this.oldTags, defaultData.truncated)
-                );
+                        defaultData,
+                        this.getText('old_note_text', this.oldNoteText, defaultData.truncated),
+                        this.getTextArray('old_tags', this.oldTags, defaultData.truncated)
+                    );
                     this.log('edx.course.student_notes.edited', data);
                 }
             },
 
             annotationDeleted: function(annotation) {
                 var data;
-            // Emits an event only when the annotation already exists on the
-            // server.
+                // Emits an event only when the annotation already exists on the
+                // server.
                 if (!this.isNew(annotation)) {
                     data = this.getDefaultData(annotation);
                     this.log('edx.course.student_notes.deleted', data);
@@ -124,10 +125,10 @@
                         component_usage_id: annotation.usage_id,
                         truncated: truncated
                     },
-                this.getText('note_text', annotation.text, truncated),
-                this.getText('highlighted_content', annotation.quote, truncated),
-                this.getTextArray('tags', annotation.tags, truncated)
-            );
+                    this.getText('note_text', annotation.text, truncated),
+                    this.getText('highlighted_content', annotation.quote, truncated),
+                    this.getTextArray('tags', annotation.tags, truncated)
+                );
             },
 
             getText: function(fieldName, text, truncated) {
@@ -169,7 +170,7 @@
                 return info;
             },
 
-        /**
+            /**
          * If the model does not yet have an id, it is considered to be new.
          * @return {Boolean}
          */
