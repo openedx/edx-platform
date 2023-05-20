@@ -214,9 +214,6 @@ class HTMLSnippet:
     preview_view_js = {}
     studio_view_js = {}
 
-    preview_view_css = {}
-    studio_view_css = {}
-
     @classmethod
     def get_preview_view_js(cls):
         return cls.preview_view_js
@@ -232,14 +229,6 @@ class HTMLSnippet:
     @classmethod
     def get_studio_view_js_bundle_name(cls):
         return cls.__name__ + 'Studio'
-
-    @classmethod
-    def get_preview_view_css(cls):
-        return cls.preview_view_css
-
-    @classmethod
-    def get_studio_view_css(cls):
-        return cls.studio_view_css
 
     def get_html(self):
         """
