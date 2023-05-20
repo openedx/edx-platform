@@ -62,8 +62,8 @@ class XModuleWebpackLoader(WebpackLoader):
                         },
                         {
                             'name': 'AnnotatableBlockPreview.85745121.css',
-                            'path': 'common/static/css/xmodule/AnnotatableBlockPreview.85745121.css',
-                            'publicPath': '/static/css/xmodule/AnnotatableBlockPreview.85745121.css'
+                            'path': 'xmodule/static/css/AnnotatableBlockPreview.css',
+                            'publicPath': '/static/css/xmodule/AnnotatableBlockPreview.css'
                         }
                     ],
                     ...
@@ -75,7 +75,7 @@ class XModuleWebpackLoader(WebpackLoader):
         """
         assets = super().load_assets()
 
-        css_path = "common/static/css/xmodule"
+        css_path = "xmodule/static/css"
         css_files = listdir(css_path)
 
         for css_file in css_files:
