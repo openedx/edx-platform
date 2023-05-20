@@ -152,7 +152,6 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         ],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
-    preview_view_css = {'scss': [resource_filename(__name__, 'css/html/display.scss')]}
 
     uses_xmodule_styles_setup = True
 
@@ -167,12 +166,6 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
             resource_filename(__name__, 'js/src/html/edit.js')
         ],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [
-            resource_filename(__name__, 'css/editor/edit.scss'),
-            resource_filename(__name__, 'css/html/edit.scss')
-        ]
     }
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
