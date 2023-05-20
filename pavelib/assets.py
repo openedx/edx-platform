@@ -170,8 +170,8 @@ def get_theme_sass_dirs(system, theme_dir):
     css_dir = theme_dir / system / "static" / "css"
     certs_sass_dir = theme_dir / system / "static" / "certificates" / "sass"
     certs_css_dir = theme_dir / system / "static" / "certificates" / "css"
-    xmodule_sass_dir = path("xmodule") / "sass" / system
-    xmodule_lookup_dir = path("xmodule") / "sass" / "include"
+    xmodule_sass_dir = path("xmodule") / "static" / "sass" / system
+    xmodule_lookup_dir = path("xmodule") / "static" / "sass" / "include"
 
     dependencies = SASS_LOOKUP_DEPENDENCIES.get(system, [])
     if sass_dir.isdir():
