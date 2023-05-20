@@ -170,9 +170,8 @@ def get_theme_sass_dirs(system, theme_dir):
     css_dir = theme_dir / system / "static" / "css"
     certs_sass_dir = theme_dir / system / "static" / "certificates" / "sass"
     certs_css_dir = theme_dir / system / "static" / "certificates" / "css"
-    xmodule_sass_folder = "modules" if system == 'lms' else "descriptors"
-    xmodule_sass_dir = path("common") / "static" / "xmodule" / xmodule_sass_folder / "scss"
-    xmodule_lookup_dir = path("xmodule") / "css"
+    xmodule_sass_dir = path("xmodule") / "sass" / system
+    xmodule_lookup_dir = path("xmodule") / "sass" / "include"
 
     dependencies = SASS_LOOKUP_DEPENDENCIES.get(system, [])
     if sass_dir.isdir():
@@ -238,9 +237,8 @@ def get_system_sass_dirs(system):
     dirs = []
     sass_dir = path(system) / "static" / "sass"
     css_dir = path(system) / "static" / "css"
-    xmodule_sass_folder = "modules" if system == 'lms' else "descriptors"
-    xmodule_sass_dir = path("common") / "static" / "xmodule" / xmodule_sass_folder / "scss"
-    xmodule_lookup_dir = path("xmodule") / "css"
+    xmodule_sass_dir = path("xmodule") / "sass" / system
+    xmodule_lookup_dir = path("xmodule") / "sass" / "include"
 
     dependencies = SASS_LOOKUP_DEPENDENCIES.get(system, [])
     dirs.append({
