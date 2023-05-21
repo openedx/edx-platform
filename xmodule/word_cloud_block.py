@@ -112,19 +112,6 @@ class WordCloudBlock(  # pylint: disable=abstract-method
     resources_dir = 'assets/word_cloud'
     template_dir_name = 'word_cloud'
 
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'assets/word_cloud/src/js/word_cloud.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
-    studio_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/raw/edit/metadata-only.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
     studio_js_module_name = "MetadataOnlyEditingDescriptor"
     mako_template = "widgets/metadata-only-edit.html"
 

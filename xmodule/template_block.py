@@ -65,15 +65,6 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
     resources_dir = None
     template_dir_name = 'customtag'
 
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_js = {
-        'js': [resource_filename(__name__, 'js/src/raw/edit/xml.js')],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
     def studio_view(self, _context):
         """
         Return the studio view.

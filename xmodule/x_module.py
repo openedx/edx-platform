@@ -211,25 +211,6 @@ class HTMLSnippet:
     html snippet, along with associated javascript and css
     """
 
-    preview_view_js = {}
-    studio_view_js = {}
-
-    @classmethod
-    def get_preview_view_js(cls):
-        return cls.preview_view_js
-
-    @classmethod
-    def get_preview_view_js_bundle_name(cls):
-        return cls.__name__ + 'Preview'
-
-    @classmethod
-    def get_studio_view_js(cls):
-        return cls.studio_view_js
-
-    @classmethod
-    def get_studio_view_js_bundle_name(cls):
-        return cls.__name__ + 'Studio'
-
     def get_html(self):
         """
         Return the html used to display this snippet

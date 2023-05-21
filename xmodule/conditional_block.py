@@ -146,21 +146,8 @@ class ConditionalBlock(
 
     show_in_read_only_mode = True
 
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/conditional/display.js'),
-            resource_filename(__name__, 'js/src/javascript_loader.js'),
-            resource_filename(__name__, 'js/src/collapsible.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = 'SequenceDescriptor'
-    studio_view_js = {
-        'js': [resource_filename(__name__, 'js/src/sequence/edit.js')],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     # Map
     # key: <tag attribute in xml>

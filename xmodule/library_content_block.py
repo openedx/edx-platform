@@ -95,19 +95,8 @@ class LibraryContentBlock(
 
     resources_dir = 'assets/library_content'
 
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = "VerticalDescriptor"
-    studio_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/vertical/edit.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     show_in_read_only_mode = True
 

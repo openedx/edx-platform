@@ -372,22 +372,9 @@ class LTIBlock(
     resources_dir = None
     uses_xmodule_styles_setup = True
 
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/lti/lti.js')
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
     mako_template = 'widgets/metadata-only-edit.html'
 
     studio_js_module_name = 'MetadataOnlyEditingDescriptor'
-    studio_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/raw/edit/metadata-only.js')
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     def studio_view(self, _context):
         """

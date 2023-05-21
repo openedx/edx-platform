@@ -73,22 +73,6 @@ class AnnotatableBlock(
 
     uses_xmodule_styles_setup = True
 
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/html/display.js'),
-            resource_filename(__name__, 'js/src/annotatable/display.js'),
-            resource_filename(__name__, 'js/src/javascript_loader.js'),
-            resource_filename(__name__, 'js/src/collapsible.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
-    studio_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/raw/edit/xml.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
     studio_js_module_name = "XMLEditingDescriptor"
     mako_template = "widgets/raw-edit.html"
 

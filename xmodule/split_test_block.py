@@ -158,17 +158,8 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
     show_in_read_only_mode = True
 
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
     mako_template = "widgets/metadata-only-edit.html"
     studio_js_module_name = 'SequenceDescriptor'
-    studio_view_js = {
-        'js': [resource_filename(__name__, 'js/src/sequence/edit.js')],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     @cached_property
     def child_block(self):

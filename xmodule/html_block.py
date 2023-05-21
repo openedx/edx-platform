@@ -142,17 +142,6 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
         shim_xmodule_js(fragment, 'HTMLEditingDescriptor')
         return fragment
 
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/html/display.js'),
-            resource_filename(__name__, 'js/src/javascript_loader.js'),
-            resource_filename(__name__, 'js/src/collapsible.js'),
-            resource_filename(__name__, 'js/src/html/imageModal.js'),
-            resource_filename(__name__, 'js/common_static/js/vendor/draggabilly.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
     uses_xmodule_styles_setup = True
 
     mako_template = "widgets/html-edit.html"
@@ -160,13 +149,6 @@ class HtmlBlockMixin(  # lint-amnesty, pylint: disable=abstract-method
     filename_extension = "xml"
     template_dir_name = "html"
     show_in_read_only_mode = True
-
-    studio_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/html/edit.js')
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms

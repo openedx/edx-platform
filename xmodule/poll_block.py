@@ -84,22 +84,6 @@ class PollBlock(
     resources_dir = None
     uses_xmodule_styles_setup = True
 
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/javascript_loader.js'),
-            resource_filename(__name__, 'js/src/poll/poll.js'),
-            resource_filename(__name__, 'js/src/poll/poll_main.js')
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
-    # There is no studio_view() for this XBlock but this is needed to make the
-    # the static_content command happy.
-    studio_view_js = {
-        'js': [],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
-    }
-
     def handle_ajax(self, dispatch, data):  # lint-amnesty, pylint: disable=unused-argument
         """Ajax handler.
 

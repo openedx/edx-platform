@@ -376,47 +376,6 @@ class SassWatcher(PatternMatchingEventHandler):
             traceback.print_exc()
 
 
-class XModuleSassWatcher(SassWatcher):
-    """
-    Watches for sass file changes
-    """
-    ignore_directories = True
-    ignore_patterns = []
-
-    @debounce()
-    def on_any_event(self, event):
-        print('\tCHANGED:', event.src_path)
-        try:
-            process_xmodule_assets()
-        except Exception:  # pylint: disable=broad-except
-            traceback.print_exc()
-
-
-class XModuleAssetsWatcher(PatternMatchingEventHandler):
-    """
-    Watches for css and js file changes
-    """
-    ignore_directories = True
-    patterns = ['*.css', '*.js']
-
-    def register(self, observer):
-        """
-        Register files with observer
-        """
-        observer.schedule(self, 'xmodule/', recursive=True)
-
-    @debounce()
-    def on_any_event(self, event):
-        print('\tCHANGED:', event.src_path)
-        try:
-            process_xmodule_assets()
-        except Exception:  # pylint: disable=broad-except
-            traceback.print_exc()
-
-        # To refresh the hash values of static xmodule content
-        restart_django_servers()
-
-
 @task
 @no_help
 @cmdopts([
@@ -687,19 +646,6 @@ def process_npm_assets():
         copy_vendor_library(library, skip_if_missing=True)
 
 
-@task
-@needs(
-    'pavelib.prereqs.install_python_prereqs',
-)
-@no_help
-def process_xmodule_assets():
-    """
-    Process XModule static assets.
-    """
-    sh('xmodule_assets common/static/xmodule')
-    print("\t\tFinished processing xmodule assets.")
-
-
 def restart_django_servers():
     """
     Restart the django server.
@@ -895,8 +841,6 @@ def watch_assets(options):
     observer = Observer(timeout=wait)
 
     SassWatcher().register(observer, sass_directories)
-    XModuleSassWatcher().register(observer, ['xmodule/'])
-    XModuleAssetsWatcher().register(observer)
 
     print("Starting asset watcher...")
     observer.start()
@@ -969,7 +913,6 @@ def update_assets(args):
     args = parser.parse_args(args)
     collect_log_args = {}
 
-    process_xmodule_assets()
     process_npm_assets()
 
     # Build Webpack

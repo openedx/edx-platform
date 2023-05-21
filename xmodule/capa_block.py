@@ -166,24 +166,6 @@ class ProblemBlock(
 
     uses_xmodule_styles_setup = True
 
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/javascript_loader.js'),
-            resource_filename(__name__, 'js/src/capa/display.js'),
-            resource_filename(__name__, 'js/src/collapsible.js'),
-            resource_filename(__name__, 'js/src/capa/imageinput.js'),
-            resource_filename(__name__, 'js/src/capa/schematic.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
-    }
-
-    studio_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/problem/edit.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
     display_name = String(
         display_name=_("Display Name"),
         help=_("The display name for this component."),

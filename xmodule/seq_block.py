@@ -271,20 +271,6 @@ class SequenceBlock(
     show_in_read_only_mode = True
     uses_xmodule_styles_setup = True
 
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/sequence/display.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
-    }
-
-    # There is no studio_view() for this XBlock but this is needed to make the
-    # the static_content command happy.
-    studio_view_js = {
-        'js': [],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
-    }
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
