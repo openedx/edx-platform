@@ -1,7 +1,7 @@
 """
 Unified course experience settings and helper methods.
 """
-
+from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from edx_toggles.toggles import WaffleFlag
@@ -104,5 +104,19 @@ def course_home_url(course_key):
     Arguments:
         course_key (CourseKey): The course key for which the home url is being requested.
     """
+    if settings.COURSE_HOME_URL_OVERRIDES_FOR_EXTERNAL_COURSES:
+        from openedx.core.djangoapps.catalog.utils import get_course_data
+        course_key_str = '{}+{}'.format(course_key.org, course_key.course)
+        course_data = get_course_data(course_key_str, ['course_type', 'product_source'])
+        if course_data:
+            course_type = course_data.get('course_type')
+            product_source = course_data.get('product_source')
+
+            for override in settings.COURSE_HOME_URL_OVERRIDES_FOR_EXTERNAL_COURSES:
+                override_course_type = override.get('course_type')
+                override_product_source = override.get('product_source')
+                if override_course_type == course_type and override_product_source == product_source:
+                    return override.get('course_home_url')
+
     from .url_helpers import get_learning_mfe_home_url
     return get_learning_mfe_home_url(course_key, url_fragment='home')

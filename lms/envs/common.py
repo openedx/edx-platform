@@ -5300,8 +5300,13 @@ URLS_2U_LOBS = {
     'boot_camps': 'https://www.edx.org/boot-camps',
 }
 
-############ Settings for externally hosted executive education courses ############
-EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
+######### Settings for overriding the course metadata for externally hosted courses #########
+COURSE_HOME_URL_OVERRIDES_FOR_EXTERNAL_COURSES = [{
+    "course_type": "course-type-override",
+    "product_source": "external",
+    "course_home_url": "https://external.com",
+    "uses_additional_metadata": True,
+}]
 
 ############## PLOTLY ##############
 
