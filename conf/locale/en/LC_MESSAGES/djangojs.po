@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-17 09:16+0000\n"
-"PO-Revision-Date: 2023-05-17 09:16:40.131222\n"
+"POT-Creation-Date: 2023-05-22 14:47+0000\n"
+"PO-Revision-Date: 2023-05-22 14:47:11.337765\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -1693,25 +1693,27 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
+msgid "Select military status"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
+msgid "Select level of education"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
+msgid "Select guardian education"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
+msgid "Select current industry"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
+msgid "Select prospective industry"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
 msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx

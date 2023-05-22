@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-17 09:16+0000\n"
-"PO-Revision-Date: 2023-05-17 09:16:40.131222\n"
+"POT-Creation-Date: 2023-05-22 14:47+0000\n"
+"PO-Revision-Date: 2023-05-22 14:47:11.337765\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -2033,34 +2033,30 @@ msgstr ""
 "Nätïönäl Güärd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
-msgstr ""
-"Whät ïs thé hïghést lévél öf édüçätïön thät ýöü hävé äçhïévéd sö fär? Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+msgid "Select military status"
+msgstr "Séléçt mïlïtärý stätüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
-msgstr ""
-"Whät ïs thé hïghést lévél öf édüçätïön thät äný öf ýöür pärénts ör güärdïäns"
-" hävé äçhïévéd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+msgid "Select level of education"
+msgstr "Séléçt lévél öf édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
-msgstr "Séléçt émplöýmént stätüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+msgid "Select guardian education"
+msgstr "Séléçt güärdïän édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
-msgstr ""
-"Whät ïndüstrý dö ýöü çürréntlý wörk ïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
+msgid "Select current industry"
+msgstr "Séléçt çürrént ïndüstrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
+msgid "Select prospective industry"
+msgstr "Séléçt pröspéçtïvé ïndüstrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
 msgstr ""
-"Whät ïndüstrý dö ýöü wänt tö wörk ïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
+"Thänk ýöü! Ýöü’ré hélpïng mäké édX ßéttér för évérýöné. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
