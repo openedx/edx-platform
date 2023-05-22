@@ -34,3 +34,8 @@ tox<4.0.0
 # Pinning Sphinx version unless the compatibility issue gets resolved
 # For details, see issue https://github.com/openedx/edx-sphinx-theme/issues/197
 sphinx<6.0.0
+
+# 2023-05-18: edx-drf-extensions 8.8.0 inadvertently introduced stricter Base64 decoding,
+# and some of our IDAs have malformed configs. This should be a very temporary constraint.
+# See https://github.com/openedx/edx-drf-extensions/issues/346 for details.
+edx-drf-extensions<8.8.0
