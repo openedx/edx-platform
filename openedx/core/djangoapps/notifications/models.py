@@ -1,23 +1,62 @@
 """
 Models for notifications
 """
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth import get_user_model
 from django.db import models
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
+
+User = get_user_model()
+
+NOTIFICATION_CHANNELS = ['web', 'push', 'email']
+
 # When notification preferences are updated, we need to update the CONFIG_VERSION.
 NOTIFICATION_PREFERENCE_CONFIG = {
-    "discussion": {
-        "new_post": {
-            "web": False,
-            "push": False,
-            "email": False,
+    'discussion': {
+        'enabled': False,
+        'notification_types': {
+            'new_post': {
+                'info': '',
+                'web': False,
+                'push': False,
+                'email': False,
+            },
+            'core': {
+                'info': '',
+                'web': False,
+                'push': False,
+                'email': False,
+            },
         },
+        # This is a list of notification channels for notification type that are not editable by the user.
+        # e.g. 'new_post' web notification is not editable by user i.e. 'not_editable': {'new_post': ['web']}
+        'not_editable': {},
     },
 }
 # Update this version when NOTIFICATION_PREFERENCE_CONFIG is updated.
-CONFIG_VERSION = 1
+NOTIFICATION_CONFIG_VERSION = 1
+
+
+def get_notification_preference_config():
+    """
+    Returns the notification preference config.
+    """
+    return NOTIFICATION_PREFERENCE_CONFIG
+
+
+def get_notification_preference_config_version():
+    """
+    Returns the notification preference config version.
+    """
+    return NOTIFICATION_CONFIG_VERSION
+
+
+def get_notification_channels():
+    """
+    Returns the notification channels.
+    """
+    return NOTIFICATION_CHANNELS
 
 
 class NotificationApplication(models.TextChoices):
@@ -51,31 +90,13 @@ class Notification(TimeStampedModel):
     app_name = models.CharField(max_length=64, choices=NotificationApplication.choices, db_index=True)
     notification_type = models.CharField(max_length=64, choices=NotificationType.choices)
     content = models.CharField(max_length=1024)
-    content_context = models.JSONField(default={})
+    content_context = models.JSONField(default=dict)
     content_url = models.URLField(null=True, blank=True)
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.username} - {self.app_name} - {self.notification_type} - {self.content}'
-
-    def get_content(self):
-        return self.content
-
-    def get_content_url(self):
-        return self.content_url
-
-    def get_notification_type(self):
-        return self.notification_type
-
-    def get_app_name(self):
-        return self.app_name
-
-    def get_content_context(self):
-        return self.content_context
-
-    def get_user(self):
-        return self.user
 
 
 class NotificationPreference(TimeStampedModel):
@@ -86,25 +107,10 @@ class NotificationPreference(TimeStampedModel):
     """
     user = models.ForeignKey(User, related_name="notification_preferences", on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
-    notification_preference_config = models.JSONField(default=NOTIFICATION_PREFERENCE_CONFIG)
+    notification_preference_config = models.JSONField(default=get_notification_preference_config)
     # This version indicates the current version of this notification preference.
     config_version = models.IntegerField(blank=True, default=1)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.notification_preference_config}'
-
-    def get_user(self):
-        return self.user
-
-    def get_course_id(self):
-        return self.course_id
-
-    def get_notification_preference_config(self):
-        return self.notification_preference_config
-
-    def get_config_version(self):
-        return self.config_version
-
-    def get_is_active(self):
-        return self.is_active
