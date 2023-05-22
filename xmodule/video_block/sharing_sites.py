@@ -2,10 +2,9 @@
 Defines the sharing sites for different social media platforms
 """
 from collections import namedtuple
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from urllib.parse import urlencode
-
-TWITTER_SHARE_MESSAGE = _("Here's a fun clip from a class I'm taking on @edXonline.\n\n")
 
 SharingSiteConfig = namedtuple(
     'SharingSiteConfig',
@@ -24,7 +23,6 @@ TWITTER = SharingSiteConfig(
     fa_icon_name='fa-twitter-square',
     url_param_name='url',
     base_share_url='https://twitter.com/intent/tweet',
-    additional_site_params={'text': TWITTER_SHARE_MESSAGE}
 )
 
 FACEBOOK = SharingSiteConfig(
@@ -48,7 +46,7 @@ ALL_SHARING_SITES = [
 ]
 
 
-def sharing_sites_info_for_video(video_public_url):
+def sharing_sites_info_for_video(video_public_url, organization=None):
     """
     Returns a list of dicts, each containing the name, fa_icon_name, and sharing_url
     """
@@ -59,14 +57,43 @@ def sharing_sites_info_for_video(video_public_url):
             'fa_icon_name': sharing_site_config.fa_icon_name,
             'sharing_url': sharing_url(
                 video_public_url,
-                sharing_site_config
-            )
+                sharing_site_config,
+                organization=organization
+            ),
         }
         result.append(sharing_site_info)
     return result
 
 
-def sharing_url(video_public_url, sharing_site_config):
+def get_share_text(social_account_handle, organization_name):
+    """
+    Generate the text we will pre-populate when sharing a post to social media.
+
+    NOTE: Most of the time, we will have all info of these, but have provided
+    reasonable fallbacks in case some are missing.
+    """
+    if social_account_handle and organization_name:
+        return _(
+            "Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n\n"
+        ).format(
+            social_account_handle=social_account_handle,
+            organization_name=organization_name,
+        )
+    elif social_account_handle:
+        return _(
+            "Here's a fun clip from a class I'm taking on {social_account_handle}.\n\n"
+        ).format(social_account_handle=social_account_handle)
+    elif organization_name:
+        return _(
+            "Here's a fun clip from a class I'm taking from {organization_name}.\n\n"
+        ).format(organization_name=organization_name)
+    else:
+        return _(
+            "Here's a fun clip from a class I'm taking on {platform_name}.\n\n"
+        ).format(platform_name=settings.PLATFORM_NAME)
+
+
+def sharing_url(video_public_url, sharing_site_config, organization=None):
     """
     Returns the sharing url with the appropriate parameters
     """
@@ -76,5 +103,13 @@ def sharing_url(video_public_url, sharing_site_config):
         'utm_campaign': 'social-share-exp',
         sharing_site_config.url_param_name: video_public_url
     }
-    share_params.update(sharing_site_config.additional_site_params)
+
+    # Special handling for Twitter, pre-populate share text
+    if sharing_site_config.name == "twitter":
+        twitter_handle = settings.PLATFORM_TWITTER_ACCOUNT
+        org_name = organization['name'] if organization else None
+        share_params.update({"text": get_share_text(twitter_handle, org_name)})
+    else:
+        share_params.update(sharing_site_config.additional_site_params)
+
     return sharing_site_config.base_share_url + '?' + urlencode(share_params)

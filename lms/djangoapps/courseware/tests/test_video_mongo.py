@@ -254,22 +254,12 @@ class TestVideoPublicAccess(BaseTestVideoXBlock):
         with patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=enabled):
             yield
 
-    @ddt.data(
-        (True, False),
-        (False, False),
-        (False, True),
-        (True, True),
-    )
-    @ddt.unpack
-    def test_is_public_sharing_enabled(self, is_studio, feature_enabled):
+    @ddt.data(True, False)
+    def test_is_public_sharing_enabled(self, feature_enabled):
         """Test public video url."""
         assert self.block.public_access is True
-        if is_studio:
-            self.block.runtime.is_author_mode = True
-
         with self.mock_feature_toggle(enabled=feature_enabled):
-            assert self.block.is_public_sharing_enabled() == \
-                (not is_studio and feature_enabled)
+            assert self.block.is_public_sharing_enabled() == feature_enabled
 
     def test_is_public_sharing_enabled__not_public(self):
         self.block.public_access = False

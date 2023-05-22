@@ -122,6 +122,24 @@ def use_new_video_editor():
     return ENABLE_NEW_VIDEO_EDITOR_FLAG.is_enabled()
 
 
+# .. toggle_name: new_core_editors.use_video_gallery_flow
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the use the video selection gallery on the flow of the new core video xblock editor
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-04-03
+# .. toggle_target_removal_date: 2023-6-01
+# .. toggle_warning: You need to activate the `new_core_editors.use_new_video_editor` flag to use this new flow.
+ENABLE_VIDEO_GALLERY_FLOW_FLAG = WaffleFlag('new_core_editors.use_video_gallery_flow', __name__)
+
+
+def use_video_gallery_flow():
+    """
+    Returns a boolean = true if the video gallery flow is enabled
+    """
+    return ENABLE_VIDEO_GALLERY_FLOW_FLAG.is_enabled()
+
+
 # .. toggle_name: new_core_editors.use_new_problem_editor
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False

@@ -595,7 +595,7 @@ edx-django-utils==5.4.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions @ git+https://github.com/openedx/edx-drf-extensions.git@7ee99179939ca06c4a5b9d570f73734ea66142bc
+edx-drf-extensions==8.8.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-completion
@@ -607,7 +607,7 @@ edx-drf-extensions @ git+https://github.com/openedx/edx-drf-extensions.git@7ee99
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.62.7
+edx-enterprise==3.63.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -1174,7 +1174,6 @@ pygments==2.15.1
 pyjwkest==1.4.2
     # via
     #   -r requirements/edx/testing.txt
-    #   edx-drf-extensions
     #   edx-token-utils
     #   lti-consumer-xblock
 pyjwt[crypto]==2.7.0

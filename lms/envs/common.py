@@ -2695,7 +2695,8 @@ REQUIRE_JS_PATH_OVERRIDES = {
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json'),
+        'LOADER_CLASS': 'xmodule.util.xmodule_django.XModuleWebpackLoader',
     },
     'WORKERS': {
         'BUNDLE_DIR_NAME': 'bundles/',
@@ -5299,6 +5300,8 @@ URLS_2U_LOBS = {
     'boot_camps': 'https://www.edx.org/boot-camps',
 }
 
+############ Settings for externally hosted executive education courses ############
+EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
 
 ############## PLOTLY ##############
 

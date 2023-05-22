@@ -1863,7 +1863,11 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             'video_embed_url': urljoin(
                 settings.LMS_ROOT_URL,
                 reverse('render_public_video_xblock_embed', kwargs={'usage_key_string': str(video_block.location)})
-            )
+            ),
+            'video_url': urljoin(
+                settings.LMS_ROOT_URL,
+                reverse('render_public_video_xblock', kwargs={'usage_key_string': str(video_block.location)})
+            ),
         }
 
     def get_learn_more_button_url(self, course, catalog_course_data, utm_params):
