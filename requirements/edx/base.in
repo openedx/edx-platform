@@ -130,9 +130,11 @@ nodeenv                             # Utility for managing Node.js environments;
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 olxcleaner
 openedx-calc                        # Library supporting mathematical calculations for Open edX
+openedx-django-require
 # openedx-events 3.1.0 introduces producer API
 openedx-events>=3.1.0               # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
+openedx-mongodbproxy
 optimizely-sdk                      # Optimizely full stack SDK for Python
 ora2>=4.5.0
 outcome-surveys                     # edx-platform plugin to send and track segment events needed for surveys
@@ -187,5 +189,3 @@ xss-utils                           # https://github.com/edx/edx-platform/pull/2
 xblock-poll                         # Xblock for polling users
 xblock-drag-and-drop-v2             # Drag and Drop XBlock
 xblock-google-drive                 # XBlock for google docs and calendar
-openedx-django-require
-openedx-mongodbproxy
