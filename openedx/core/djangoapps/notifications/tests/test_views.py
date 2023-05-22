@@ -3,6 +3,7 @@ Tests for the views in the notifications app.
 """
 import json
 
+import ddt
 from django.dispatch import Signal
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -13,7 +14,8 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
-from openedx.core.djangoapps.notifications.models import Notification, NotificationPreference
+from openedx.core.djangoapps.notifications.models import Notification, NotificationPreference, \
+    get_notification_preference_config
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -129,6 +131,7 @@ class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
 
 
 @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+@ddt.ddt
 class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
     """
     Test for user notification preference API.
@@ -158,27 +161,16 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             created=True
         )
 
-    def _expected_api_response(self, overrides=None):
+    def _expected_api_response(self):
         """
         Helper method to return expected API response.
         """
-        expected_response = {
+        return {
             'id': 1,
             'course_name': 'course-v1:testorg+testcourse+testrun Course',
             'course_id': 'course-v1:testorg+testcourse+testrun',
-            'notification_preference_config': {
-                'discussion': {
-                    'new_post': {
-                        'web': False,
-                        'push': False,
-                        'email': False
-                    }
-                }
-            }
+            'notification_preference_config': get_notification_preference_config(),
         }
-        if overrides:
-            expected_response.update(overrides)
-        return expected_response
 
     def test_get_user_notification_preference_without_login(self):
         """
@@ -196,28 +188,50 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, self._expected_api_response())
 
-    def test_patch_user_notification_preference(self):
+    @ddt.data(
+        ('discussion', None, None, True, status.HTTP_200_OK, 'app_update'),
+        ('discussion', None, None, False, status.HTTP_200_OK, 'app_update'),
+        ('invalid_notification_app', None, None, True, status.HTTP_400_BAD_REQUEST, None),
+
+        ('discussion', 'new_post', 'web', True, status.HTTP_200_OK, 'type_update'),
+        ('discussion', 'new_post', 'web', False, status.HTTP_200_OK, 'type_update'),
+
+        ('discussion', 'core', 'email', True, status.HTTP_200_OK, 'type_update'),
+        ('discussion', 'core', 'email', False, status.HTTP_200_OK, 'type_update'),
+
+        ('discussion', 'invalid_notification_type', 'email', True, status.HTTP_400_BAD_REQUEST, None),
+        ('discussion', 'new_post', 'invalid_notification_channel', False, status.HTTP_400_BAD_REQUEST, None),
+    )
+    @ddt.unpack
+    def test_patch_user_notification_preference(
+        self, notification_app, notification_type, notification_channel, value, expected_status, update_type,
+    ):
         """
         Test update of user notification preference.
         """
         self.client.login(username=self.user.username, password='test')
-        updated_notification_config_data = {
-            "notification_preference_config": {
-                "discussion": {
-                    "new_post": {
-                        "web": True,
-                        "push": False,
-                        "email": False,
-                    },
-                },
-            },
+        payload = {
+            'notification_app': notification_app,
+            'value': value,
         }
-        response = self.client.patch(
-            self.path, json.dumps(updated_notification_config_data), content_type='application/json'
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        expected_data = self._expected_api_response(overrides=updated_notification_config_data)
-        self.assertEqual(response.data, expected_data)
+        if notification_type:
+            payload['notification_type'] = notification_type
+        if notification_channel:
+            payload['notification_channel'] = notification_channel
+
+        response = self.client.patch(self.path, json.dumps(payload), content_type='application/json')
+        self.assertEqual(response.status_code, expected_status)
+
+        if update_type == 'app_update':
+            expected_data = self._expected_api_response()
+            expected_data['notification_preference_config'][notification_app]['enabled'] = value
+            self.assertEqual(response.data, expected_data)
+
+        elif update_type == 'type_update':
+            expected_data = self._expected_api_response()
+            expected_data['notification_preference_config'][notification_app][
+                'notification_types'][notification_type][notification_channel] = value
+            self.assertEqual(response.data, expected_data)
 
 
 class NotificationListAPIViewTest(APITestCase):
