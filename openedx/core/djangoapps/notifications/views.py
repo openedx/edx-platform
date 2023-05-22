@@ -6,7 +6,7 @@ from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from opaque_keys.edx.keys import CourseKey
-from rest_framework import generics, permissions, status, viewsets
+from rest_framework import generics, permissions, status
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
