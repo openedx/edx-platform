@@ -173,7 +173,6 @@ class NotificationListAPIView(generics.ListAPIView):
     - 403: The requester cannot access resource.
     """
 
-    queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -181,14 +180,14 @@ class NotificationListAPIView(generics.ListAPIView):
         """
         Override the get_queryset method to filter the queryset by app name and request.user.
         """
-        queryset = super().get_queryset()
         app_name = self.request.query_params.get('app_name')
         if app_name:
-            queryset = queryset.filter(app_name=app_name, user=self.request.user)
-        return queryset
+            return Notification.objects.filter(user=self.request.user, app_name=app_name)
+        else:
+            return Notification.objects.filter(user=self.request.user)
 
 
-class NotificationCountViewSet(viewsets.ViewSet):
+class NotificationCountView(APIView):
     """
     API view for getting the unseen notifications count for a user.
     """

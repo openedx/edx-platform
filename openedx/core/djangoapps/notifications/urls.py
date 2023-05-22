@@ -8,7 +8,7 @@ from rest_framework import routers
 from .views import (
     CourseEnrollmentListView,
     MarkNotificationsUnseenAPIView,
-    NotificationCountViewSet,
+    NotificationCountView,
     NotificationListAPIView,
     UserNotificationPreferenceView
 )
@@ -24,7 +24,7 @@ urlpatterns = [
         name='notification-preferences'
     ),
     path('', NotificationListAPIView.as_view(), name='notifications-list'),
-    path('count/', NotificationCountViewSet.as_view({'get': 'get'}), name='notifications-count'),
+    path('count/', NotificationCountView.as_view(), name='notifications-count'),
     path(
         'mark-notifications-unseen/<app_name>/',
         MarkNotificationsUnseenAPIView.as_view(),
