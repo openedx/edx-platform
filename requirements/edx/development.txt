@@ -267,7 +267,7 @@ distlib==0.3.6
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==3.2.18
+django==3.2.19
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.txt
