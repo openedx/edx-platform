@@ -5300,6 +5300,8 @@ URLS_2U_LOBS = {
     'boot_camps': 'https://www.edx.org/boot-camps',
 }
 
+############ Settings for externally hosted executive education courses ############
+EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
 
 ############## PLOTLY ##############
 
