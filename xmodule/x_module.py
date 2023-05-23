@@ -10,7 +10,6 @@ from functools import partial
 import yaml
 
 from django.conf import settings
-from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.asides import AsideDefinitionKeyV2, AsideUsageKeyV2
 from opaque_keys.edx.keys import UsageKey
@@ -417,13 +416,12 @@ class XModuleMixin(XModuleFields, XBlock):
         self.save()
         return self._field_data._kvs  # pylint: disable=protected-access
 
-    @lazy
     def _unwrapped_field_data(self):
         """
-        This property hold the value _field_data here before we wrap it in
-        the LmsFieldData or OverrideFieldData classes.
+        This property gets the field-data service before we wrap it in user-specifc wrappers during bind_for_student,
+        e.g. the LmsFieldData or OverrideFieldData classes.
         """
-        return self._field_data
+        return self.runtime.service(self, 'field-data-unbound')
 
     def add_aside(self, aside):
         """
@@ -653,12 +651,13 @@ class XModuleMixin(XModuleFields, XBlock):
 
         if wrappers is None:
             wrappers = []
-
-        wrapped_field_data = self._unwrapped_field_data
-        for wrapper in wrappers:
-            wrapped_field_data = wrapper(wrapped_field_data)
-
-        self._field_data = wrapped_field_data
+        if wrappers:
+            # Put user-specific wrappers around the field-data service for this block.
+            # Note that these are different from modulestore.xblock_field_data_wrappers, which are not user-specific.
+            wrapped_field_data = self.runtime.service(self, 'field-data-unbound')
+            for wrapper in wrappers:
+                wrapped_field_data = wrapper(wrapped_field_data)
+            self._bound_field_data = wrapped_field_data
 
     @property
     def non_editable_metadata_fields(self):

@@ -218,10 +218,15 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         Services are objects implementing arbitrary other interfaces.
         """
         # Implement field data service:
-        if service_name == "field-data":
+        if service_name in ('field-data', 'field-data-unbound'):
+            if hasattr(block, "_bound_field_data") and service_name != "field-data-unbound":
+                # Return the user-specific wrapped field data that gets set onto the block during XModule.bind_for_user
+                # This complexity is due to XModule heritage. If we didn't load the block as one step, then sometimes
+                # "rebind" it to be user-specific as a later step, we could load the field data and overrides at once.
+                return block._bound_field_data  # pylint: disable=protected-access
             if block.scope_ids not in self.block_field_datas:
                 try:
-                    self.block_field_datas[block.scope_ids] = self._init_field_data_for_block(block)
+                    self._init_field_data_for_block(block)
                 except:
                     # Don't try again pointlessly every time another field is accessed
                     self.block_field_datas[block.scope_ids] = None
@@ -295,9 +300,17 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         else:
             field_data = KvsFieldData(kvs)
 
+        # Save the field_data now, because some of the wrappers will try to read fields from the block while they
+        # determine if they want to wrap the field_data or not.
+        self.block_field_datas[block.scope_ids] = field_data
+        # Now add in any wrappers that want to be added:
         for wrapper in self.modulestore.xblock_field_data_wrappers:
-            field_data = wrapper(block, field_data)
-        return field_data
+            self.block_field_datas[block.scope_ids] = wrapper(block, self.block_field_datas[block.scope_ids])
+
+        # Note: user-specific wrappers like LmsFieldData or OverrideFieldData do not get set here. They get set later
+        # during bind_for_student(), which wraps the field-data and sets block._bound_field_data. Calling
+        # runtime.service(block, "field-data") or block._field_data (deprecated) will load block._bound_field_data if
+        # the block has been bound to a user, otherwise it returns the wrapped field data we just created above.
 
     def get_edited_by(self, xblock):
         """
