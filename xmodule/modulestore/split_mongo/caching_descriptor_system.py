@@ -182,8 +182,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             block = self.construct_xblock_from_class(
                 class_,
                 ScopeIds(None, block_key.type, definition_id, block_locator),
-                field_data=None,
                 for_parent=kwargs.get('for_parent')
+                # Passing field_data here is deprecated, so we don't. Get it via block.service(block, "field-data").
+                # https://github.com/openedx/XBlock/blob/e89cbc5/xblock/mixins.py#L200-L207
             )
         except Exception:  # pylint: disable=broad-except
             log.warning("Failed to load descriptor", exc_info=True)
