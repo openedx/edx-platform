@@ -61,7 +61,7 @@ class ProgramAlertListView extends Backbone.View {
                     { remainingDays }
                 ),
                 message: StringUtils.interpolate(
-                    ngettext('Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}/month.', 'Your {programName} trial will expire in {remainingDays} days at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}/month.', remainingDays),
+                    ngettext('Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.', 'Your {programName} trial will expire in {remainingDays} days at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.', remainingDays),
                     {
                         programName,
                         remainingDays,

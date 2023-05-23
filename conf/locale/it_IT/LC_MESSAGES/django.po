@@ -12709,8 +12709,30 @@ msgid "Add discussion for the Unit."
 msgstr "Aggiungi una discussione per l'Unità."
 
 #: xmodule/video_block/sharing_sites.py
+#, python-brace-format
 msgid ""
-"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
 "\n"
 msgstr ""
 

@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-17 09:16+0000\n"
-"PO-Revision-Date: 2023-05-17 09:16:40.099706\n"
+"POT-Creation-Date: 2023-05-22 14:47+0000\n"
+"PO-Revision-Date: 2023-05-22 14:47:11.867932\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -14178,11 +14178,42 @@ msgid "Add discussion for the Unit."
 msgstr "Àdd dïsçüssïön för thé Ûnït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: xmodule/video_block/sharing_sites.py
+#, python-brace-format
 msgid ""
-"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
 "\n"
 msgstr ""
-"Héré's ä fün çlïp fröm ä çläss Ì'm täkïng ön @édXönlïné.\n"
+"Héré's ä fün çlïp fröm ä çläss Ì'm täkïng ön {social_account_handle} fröm {organization_name}.\n"
+"\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+"Héré's ä fün çlïp fröm ä çläss Ì'm täkïng ön {social_account_handle}.\n"
+"\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+"Héré's ä fün çlïp fröm ä çläss Ì'm täkïng fröm {organization_name}.\n"
+"\n"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
+"\n"
+msgstr ""
+"Héré's ä fün çlïp fröm ä çläss Ì'm täkïng ön {platform_name}.\n"
 "\n"
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#\n"
 

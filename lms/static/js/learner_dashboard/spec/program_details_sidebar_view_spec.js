@@ -262,7 +262,7 @@ describe('Program Progress View', () => {
         testSubscriptionState(
             'inactive',
             'Inactive subscription',
-            'Restart your subscription for $100/month. Your payment history is still available',
+            'Restart your subscription for $100/month USD. Your payment history is still available',
         );
     });
 });
