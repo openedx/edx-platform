@@ -48,7 +48,7 @@ class Notification(TimeStampedModel):
     .. no_pii:
     """
     user = models.ForeignKey(User, related_name="notifications", on_delete=models.CASCADE)
-    app_name = models.CharField(max_length=64, choices=NotificationApplication.choices)
+    app_name = models.CharField(max_length=64, choices=NotificationApplication.choices, db_index=True)
     notification_type = models.CharField(max_length=64, choices=NotificationType.choices)
     content = models.CharField(max_length=1024)
     content_context = models.JSONField(default={})
