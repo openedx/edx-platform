@@ -89,8 +89,8 @@
                                 : subscriptionState === 'active'
                                 ? gettext('Your next billing date is {nextPaymentDate}')
                                 : subscriptionState === 'inactive'
-                                ? gettext('Unlock verified access to all courses for {subscriptionPrice}/month. Cancel anytime.')
-                                : gettext('{subscriptionPrice}/month subscription after trial ends. Cancel anytime.')
+                                ? gettext('Unlock verified access to all courses for {subscriptionPrice}. Cancel anytime.')
+                                : gettext('{subscriptionPrice} subscription after trial ends. Cancel anytime.')
                             ),
                             {
                                 subscriptionPrice,
