@@ -993,7 +993,7 @@ class AccountRetirementStatusView(ViewSet):
             state_obj = RetirementState.objects.get(state_name=state)
 
             retirements = UserRetirementStatus.objects.select_related(
-                'user', 'current_state', 'last_state'
+                'user', 'current_state', 'last_state', 'user__profile'
             ).filter(
                 current_state=state_obj, created__lt=end_date, created__gte=start_date
             ).order_by(
