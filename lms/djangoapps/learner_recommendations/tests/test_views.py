@@ -164,7 +164,7 @@ class TestCrossProductRecommendationsView(APITestCase):
         super().setUp()
         self.user = UserFactory()
         self.associated_course_keys = ["edx+HL1", "edx+HL2"]
-        self.amplitude_course_keys = [
+        self.amplitude_keys = [
             "edx+CS0",
             "edx+CS10",
             "edx+CS20",
@@ -176,9 +176,9 @@ class TestCrossProductRecommendationsView(APITestCase):
             "edx+CS80",
             "edx+CS90",
         ]
-        self.amplitude_course_run_keys = [f"course-v1:{course_key}+2023_T2" for course_key in self.amplitude_course_keys]
+        self.amplitude_course_run_keys = [f"course-v1:{course_key}+2023_T2" for course_key in self.amplitude_keys]
         self.enrolled_course_run_keys = self.amplitude_course_run_keys[7:10]
-        self.keys_with_location_restrictions = self.amplitude_course_keys[0:3]
+        self.keys_with_location_restrictions = self.amplitude_keys[0:3]
 
     def _get_url(self, course_key, amplitude_recommendations=False):
         """
@@ -360,7 +360,11 @@ class TestCrossProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     def test_successful_response_with_amplitude_recommendations(
-        self, country_code_from_ip_mock, get_amplitude_course_recommendations_mock, get_course_data_mock, get_user_enrolled_course_keys_mock,
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_mock,
+        get_user_enrolled_course_keys_mock,
     ):
         """
         Verify 2 cross product course recommendations are returned
@@ -369,10 +373,10 @@ class TestCrossProductRecommendationsView(APITestCase):
         """
         country_code_from_ip_mock.return_value = "za"
         get_user_enrolled_course_keys_mock.return_value = []
-        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_course_keys]
+        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
 
         mock_cross_product_course_data = self._get_recommended_courses(self.associated_course_keys)
-        mock_amplitude_course_data = self._get_recommended_courses(self.amplitude_course_keys)
+        mock_amplitude_course_data = self._get_recommended_courses(self.amplitude_keys)
         get_course_data_mock.side_effect = [*mock_amplitude_course_data, *mock_cross_product_course_data]
 
         self.client.login(username=self.user.username, password="test")
@@ -412,7 +416,11 @@ class TestCrossProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     def test_successful_amplitude_course_filtering(
-        self, country_code_from_ip_mock, get_amplitude_course_recommendations_mock, get_course_data_mock, get_user_enrolled_course_keys_mock,
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_mock,
+        get_user_enrolled_course_keys_mock,
     ):
         """
         Verify 2 cross product course recommendations are returned
@@ -421,11 +429,11 @@ class TestCrossProductRecommendationsView(APITestCase):
         """
         country_code_from_ip_mock.return_value = "cn"
         get_user_enrolled_course_keys_mock.return_value = self.enrolled_course_run_keys
-        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_course_keys]
+        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
 
         mock_cross_product_course_data = self._get_recommended_courses(self.associated_course_keys)
         mock_amplitude_course_data = self._get_recommended_courses(
-            self.amplitude_course_keys, num_of_courses_with_restriction=len(self.keys_with_location_restrictions)
+            self.amplitude_keys, num_of_courses_with_restriction=len(self.keys_with_location_restrictions)
         )
         get_course_data_mock.side_effect = [*mock_amplitude_course_data, *mock_cross_product_course_data]
 
@@ -449,7 +457,10 @@ class TestCrossProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     def test_fallback_recommendations_when_enrolled_courses_removed(
-        self, country_code_from_ip_mock, get_amplitude_course_recommendations_mock, get_course_data_mock, get_user_enrolled_course_keys_mock
+        self, country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_mock,
+        get_user_enrolled_course_keys_mock
     ):
         """
         Verify 2 cross product course recommendations are returned
@@ -459,10 +470,10 @@ class TestCrossProductRecommendationsView(APITestCase):
 
         country_code_from_ip_mock.return_value = "za"
         get_user_enrolled_course_keys_mock.return_value = self.amplitude_course_run_keys
-        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_course_keys]
+        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
 
         mock_cross_product_course_data = self._get_recommended_courses(self.associated_course_keys)
-        mock_amplitude_course_data = self._get_recommended_courses(self.amplitude_course_keys)
+        mock_amplitude_course_data = self._get_recommended_courses(self.amplitude_keys)
         get_course_data_mock.side_effect = [*mock_amplitude_course_data, *mock_cross_product_course_data]
 
         self.client.login(username=self.user.username, password="test")
@@ -484,7 +495,11 @@ class TestCrossProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     def test_fallback_recommendations_when_error_querying_amplitude(
-        self, country_code_from_ip_mock, get_amplitude_course_recommendations_mock, get_course_data_mock, get_user_enrolled_course_keys_mock
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_mock,
+        get_user_enrolled_course_keys_mock
     ):
         """
         Verify 2 cross product course recommendations are returned
@@ -517,7 +532,11 @@ class TestCrossProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     def test_response_with_amplitude_and_no_cross_product_courses(
-        self, country_code_from_ip_mock, get_amplitude_course_recommendations_mock, get_course_data_mock, get_user_enrolled_course_keys_mock
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_mock,
+        get_user_enrolled_course_keys_mock
     ):
         """
         Verify that if no cross product courses are returned,
@@ -526,9 +545,9 @@ class TestCrossProductRecommendationsView(APITestCase):
 
         country_code_from_ip_mock.return_value = "za"
         get_user_enrolled_course_keys_mock.return_value = []
-        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_course_keys]
+        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
 
-        mock_amplitude_course_data = self._get_recommended_courses(self.amplitude_course_keys)
+        mock_amplitude_course_data = self._get_recommended_courses(self.amplitude_keys)
         get_course_data_mock.side_effect = [*mock_amplitude_course_data]
 
         self.client.login(username=self.user.username, password="test")

@@ -93,6 +93,8 @@ mock_amplitude_data = [
 
 
 def get_general_recommendations():
+    """Returns 5 general recommendations with the necessary fields"""
+
     courses = []
 
     base_course = {
@@ -122,7 +124,7 @@ def get_general_recommendations():
         },
     }
 
-    for _ in range(4):
+    for _ in range(5):
         courses.append(base_course)
 
     return courses
@@ -135,7 +137,6 @@ mock_amplitude_and_cross_product_course_data = {
 mock_cross_product_course_data = {
     "courses": mock_course_data
 }
-
 
 mock_cross_product_recommendation_keys = {
     "edx+HL0": ["edx+HL1", "edx+HL2"],

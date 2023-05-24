@@ -146,7 +146,7 @@ class CrossProductRecommendationsView(APIView):
         Helper for getting amplitude recommendations
         """
 
-        fallback_recommendations = settings.GENERAL_RECOMMENDATIONS
+        fallback_recommendations = settings.GENERAL_RECOMMENDATIONS[0:4]
 
         try:
             _, _, course_keys = get_amplitude_course_recommendations(
@@ -159,7 +159,9 @@ class CrossProductRecommendationsView(APIView):
         if not course_keys:
             return fallback_recommendations
 
-        filtered_courses = get_filtered_discovery_course_data(course_keys, user_country_code, user, amplitude_course_filters=True)
+        filtered_courses = get_filtered_discovery_course_data(
+            course_keys, user_country_code, user, amplitude_course_filters=True
+        )
 
         return filtered_courses if len(filtered_courses) == 4 else fallback_recommendations
 
@@ -234,7 +236,9 @@ class CrossProductRecommendationsView(APIView):
         and cross product as well as amplitude recommendations for the Learner Dashboard
         """
 
-        should_show_amplitude_recommendations = request.GET.get("include_amplitude_recommendations") and request.user.is_authenticated
+        should_show_amplitude_recommendations = (
+            request.GET.get("include_amplitude_recommendations") and request.user.is_authenticated
+        )
 
         ip_address = get_client_ip(request)[0]
         user_country_code = country_code_from_ip(ip_address).upper()

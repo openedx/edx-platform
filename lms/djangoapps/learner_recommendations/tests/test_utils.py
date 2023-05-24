@@ -310,10 +310,15 @@ class TestGetFilteredDiscoveryCourseData(ModuleStoreTestCase):
             CourseEnrollmentFactory(course_id=course_run_key, user=self.user)
 
         filtered_discovery_data = get_filtered_discovery_course_data(
-            self.recommended_course_keys, user_country_code="US", user=self.user, amplitude_course_filters=True, recommendation_count=10
+            self.recommended_course_keys,
+            user_country_code="US",
+            user=self.user, amplitude_course_filters=True,
+            recommendation_count=10
         )
 
-        total_filtered_courses = total_recommendations - total_inactive_courses - total_restricted_courses - total_enrolled_courses
+        total_filtered_courses = (
+            total_recommendations - total_inactive_courses - total_restricted_courses - total_enrolled_courses
+        )
 
         assert len(filtered_discovery_data) == total_filtered_courses
 
