@@ -16,9 +16,10 @@ from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
+from openedx.core.djangoapps.user_authn.api.tests.test_data import mfe_context_data_keys
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
@@ -343,6 +344,32 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         response = self.client.get(self.url, self.query_params)
         assert response.data == self.get_context()
+
+    def test_mfe_context_api_serialized_response(self):
+        """
+        Test MFE Context API serialized response
+        """
+        response = self.client.get(self.url, self.query_params)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        params = {
+            'next': self.query_params['next']
+        }
+
+        self.assertEqual(
+            response.data,
+            self.get_context(params)
+        )
+
+    def test_mfe_context_api_response_keys(self):
+        """
+        Test MFE Context API response keys
+        """
+        response = self.client.get(self.url, self.query_params)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response_keys = set(response.data.keys())
+        self.assertSetEqual(response_keys, mfe_context_data_keys)
 
 
 @skip_unless_lms
