@@ -9,6 +9,7 @@ from common.djangoapps.student.tests.factories import (
 )
 from lms.djangoapps.learner_recommendations.utils import (
     _has_country_restrictions,
+    get_filtered_discovery_course_data,
     filter_recommended_courses,
     get_amplitude_course_recommendations,
     get_cross_product_recommendations,
@@ -212,6 +213,141 @@ class TestFilterRecommendedCourses(ModuleStoreTestCase):
             expected_recommendations.append(self._mock_get_course_data(course_key))
 
         assert filtered_courses == expected_recommendations
+
+
+class TestGetFilteredDiscoveryCourseData(ModuleStoreTestCase):
+    """Test for get_filtered_discovery_course_data method"""
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.recommended_course_keys = [
+            "MITx+6.00.1x",
+            "IBM+PY0101EN",
+            "HarvardX+CS50P",
+            "UQx+IELTSx",
+            "HarvardX+CS50x",
+            "Harvard+CS50z",
+            "BabsonX+EPS03x",
+            "TUMx+QPLS2x",
+            "NYUx+FCS.NET.1",
+            "MichinX+101x",
+        ]
+        self.course_run_keys = [f"course-v1:{course_key}+2T2023" for course_key in self.recommended_course_keys]
+        self.restricted_course_keys = self.recommended_course_keys[0:2]
+        self.enrolled_course_run_keys = self.course_run_keys[4:6]
+        self.course_keys_with_inactive_course_runs = self.recommended_course_keys[8:10]
+
+    def _mock_get_course_data(self, course_key, fields=None, querystring=None):  # pylint: disable=unused-argument
+        """
+        Returns a course with details based on the status passed
+        """
+        course_data = {
+            "key": course_key,
+            "uuid": "6f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
+            "title": "Title 1",
+            "image": {
+                    "src": "https://www.logo_image_url.com",
+            },
+            "url_slug": "https://www.marketing_url.com",
+            "course_type": "verified-audit",
+            "owners": [
+                {
+                        "key": "org-1",
+                        "name": "org 1",
+                        "logo_image_url": "https://discovery.com/organization/logos/org-1.png",
+                },
+            ],
+            "course_runs": [
+                {
+                    "key": f"course-v1:{course_key}+2T2023",
+                    "marketing_url": "https://www.marketing_url.com",
+                    "availability": "Current",
+                    "uuid": "jh76b2c9-589b-4d1e-88c1-b01a02db3a9c",
+                    "status": "published"
+                }
+            ],
+            "advertised_course_run_uuid": "jh76b2c9-589b-4d1e-88c1-b01a02db3a9c",
+            "location_restriction": None,
+        }
+
+        if course_key in self.restricted_course_keys:
+            course_data.update(
+                {
+                    "location_restriction": {
+                        "restriction_type": "blocklist",
+                        "countries": ["US"],
+                    }
+                }
+            )
+
+        if course_key in self.course_keys_with_inactive_course_runs:
+            course_data.update(
+                {
+                    "course_runs": []
+                }
+            )
+
+        return course_data
+
+    @patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
+    def test_amplitude_course_filters_active(self, mock_get_course_data):
+        """
+        Tests that if amplitude_course_filters is True, that courses that have
+        location restrictions, inactive course runs and courses that the user
+        is already enrolled in is filtered out (to test filtering,
+        the recommendation_count keyword argument will be set to 10 to make sure
+        all courses are 'queried' for, but it will always on return 4 or less courses
+        for amplitude courses
+        """
+        total_recommendations = len(self.recommended_course_keys)
+        total_restricted_courses = len(self.restricted_course_keys)
+        total_enrolled_courses = len(self.enrolled_course_run_keys)
+        total_inactive_courses = len(self.course_keys_with_inactive_course_runs)
+
+        mock_get_course_data.side_effect = self._mock_get_course_data
+        for course_run_key in self.enrolled_course_run_keys:
+            CourseEnrollmentFactory(course_id=course_run_key, user=self.user)
+
+        filtered_discovery_data = get_filtered_discovery_course_data(
+            self.recommended_course_keys, user_country_code="US", user=self.user, amplitude_course_filters=True, recommendation_count=10
+        )
+
+        total_filtered_courses = total_recommendations - total_inactive_courses - total_restricted_courses - total_enrolled_courses
+
+        assert len(filtered_discovery_data) == total_filtered_courses
+
+    @patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
+    def test_amplitude_course_filters_inactive(self, mock_get_course_data):
+        """
+        Tests that if amplitude_course_filters is False, that courses with
+        inactive course runs and location restrictions gets filtered out
+        (Cross Product Recommendations course filters)
+        """
+        total_recommendations = len(self.recommended_course_keys)
+        total_restricted_courses = len(self.restricted_course_keys)
+        total_inactive_courses = len(self.course_keys_with_inactive_course_runs)
+
+        mock_get_course_data.side_effect = self._mock_get_course_data
+
+        filtered_discovery_data = get_filtered_discovery_course_data(
+            self.recommended_course_keys, user_country_code="US", recommendation_count=10
+        )
+
+        total_filtered_courses = total_recommendations - total_inactive_courses - total_restricted_courses
+
+        assert len(filtered_discovery_data) == total_filtered_courses
+
+    def test_no_course_keys_input(self):
+        """
+        Tests that if no course keys were passed, an empty array is returned
+        """
+
+        filtered_discovery_data = get_filtered_discovery_course_data(
+            [], user_country_code="US", recommendation_count=10
+        )
+
+        assert len(filtered_discovery_data) == 0
 
 
 @ddt.ddt

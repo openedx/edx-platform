@@ -39,7 +39,7 @@ class RecommendedCourseSerializer(serializers.Serializer):
         return f"course/{url_slug}"
 
 
-class CrossProductCourseSerializer(serializers.Serializer):
+class ProductRecommendationsSerializer(serializers.Serializer):
     """Serializer for a cross product recommended course"""
     key = serializers.CharField()
     uuid = serializers.UUIDField()
@@ -70,9 +70,25 @@ class AboutPageRecommendationsSerializer(serializers.Serializer):
 
 
 class CrossProductRecommendationsSerializer(serializers.Serializer):
-    """Cross product recommendation courses for course about page"""
+    """
+    Cross product recommendation courses for course about page
+    and amplitude courses for Learner Dashboard
+    """
     courses = serializers.ListField(
-        child=CrossProductCourseSerializer(), allow_empty=True
+        child=ProductRecommendationsSerializer(), allow_empty=True
+    )
+
+
+class CrossProductAndAmplitudeRecommendationsSerializer(serializers.Serializer):
+    """
+    Cross product recommendation courses and
+    Amplitude recommendations for Learner Dashboard
+    """
+    courses = serializers.ListField(
+        child=ProductRecommendationsSerializer(), allow_empty=True
+    )
+    amplitudeCourses = serializers.ListField(
+        child=ProductRecommendationsSerializer(), allow_empty=True
     )
 
 

@@ -204,6 +204,63 @@ def filter_recommended_courses(
     return filtered_recommended_courses
 
 
+def get_filtered_discovery_course_data(
+        course_keys,
+        user_country_code,
+        user=None,
+        recommendation_count=4,
+        amplitude_course_filters=False
+):
+    """
+    Returns course data from discovery with either filters for
+    Amplitude recommendations (used on the Learner Dashboard) or for cross product recommendations
+    """
+    filtered_recommended_courses = []
+    fields = [
+        "key",
+        "uuid",
+        "title",
+        "owners",
+        "image",
+        "url_slug",
+        "course_type",
+        "course_runs",
+        "location_restriction",
+        "advertised_course_run_uuid",
+    ]
+
+    if not course_keys:
+        return []
+
+    if amplitude_course_filters:
+        course_keys_to_filter_out = _get_user_enrolled_course_keys(user)
+
+        for key in course_keys:
+            if len(filtered_recommended_courses) >= recommendation_count:
+                break
+
+            course = get_course_data(key, fields, querystring={'marketable_course_runs_only': 1})
+            if (
+                course
+                and course.get("course_runs", [])
+                and not _is_enrolled_in_course(course.get("course_runs", []), course_keys_to_filter_out)
+                and not _has_country_restrictions(course, user_country_code)
+            ):
+                filtered_recommended_courses.append(course)
+    else:
+        course_data = [get_course_data(key, fields) for key in course_keys]
+
+        for course in course_data:
+            if (
+                course
+                and course.get("course_runs", [])
+                and not _has_country_restrictions(course, user_country_code)
+            ):
+                filtered_recommended_courses.append(course)
+
+    return filtered_recommended_courses
+
+
 def get_cross_product_recommendations(course_key):
     """
     Helper method to get associated course keys based on the key passed
