@@ -90,6 +90,7 @@ class StudentModule(models.Model):
 
     ## The XBlock/XModule type (e.g. "problem")
     module_type = models.CharField(max_length=32, db_index=True)
+    module_type_2 = models.CharField(max_length=32, db_index=True)
 
     # Key used to share state. This is the XBlock usage_id
     module_state_key = UsageKeyField(max_length=255, db_column='module_id')
