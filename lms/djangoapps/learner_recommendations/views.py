@@ -237,7 +237,8 @@ class CrossProductRecommendationsView(APIView):
         """
 
         should_show_amplitude_recommendations = (
-            request.GET.get("include_amplitude_recommendations") and request.user.is_authenticated
+            request.GET.get("include_amplitude_recommendations") == "true"
+            and request.user.is_authenticated
         )
 
         ip_address = get_client_ip(request)[0]
