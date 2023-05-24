@@ -576,7 +576,7 @@ edx-django-release-util==1.2.0
     #   openedx-blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/testing.txt
-edx-django-utils==5.2.0
+edx-django-utils==5.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-config-models
@@ -677,6 +677,7 @@ edx-toggles==5.0.0
     #   edx-completion
     #   edx-event-bus-kafka
     #   edx-name-affirmation
+    #   edx-search
     #   edxval
     #   learner-pathway-progress
     #   ora2
@@ -962,8 +963,6 @@ mistune==2.0.5
     # via sphinx-mdinclude
 mock==5.0.1
     # via -r requirements/edx/testing.txt
-mongodbproxy @ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
-    # via -r requirements/edx/testing.txt
 mongoengine==0.27.0
     # via -r requirements/edx/testing.txt
 monotonic==1.6
@@ -1216,7 +1215,6 @@ pymongo==3.13.0
     #   -r requirements/edx/testing.txt
     #   edx-opaque-keys
     #   event-tracking
-    #   mongodbproxy
     #   mongoengine
 pynacl==1.5.0
     # via

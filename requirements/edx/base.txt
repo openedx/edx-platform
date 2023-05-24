@@ -542,6 +542,7 @@ edx-toggles==5.0.0
     #   edx-completion
     #   edx-event-bus-kafka
     #   edx-name-affirmation
+    #   edx-search
     #   edxval
     #   learner-pathway-progress
     #   ora2
@@ -713,8 +714,6 @@ maxminddb==2.2.0
     # via geoip2
 mock==5.0.1
     # via -r requirements/edx/paver.txt
-mongodbproxy @ git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a
-    # via -r requirements/edx/github.in
 mongoengine==0.27.0
     # via -r requirements/edx/base.in
 monotonic==1.6
@@ -875,7 +874,6 @@ pymongo==3.13.0
     #   -r requirements/edx/paver.txt
     #   edx-opaque-keys
     #   event-tracking
-    #   mongodbproxy
     #   mongoengine
 pynacl==1.5.0
     # via edx-django-utils
