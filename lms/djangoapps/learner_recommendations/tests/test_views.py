@@ -464,8 +464,8 @@ class TestCrossProductRecommendationsView(APITestCase):
     ):
         """
         Verify 2 cross product course recommendations are returned
-        and 4 fallback amplitude recommendations are returned
-        if 4 courses are not left after filtering due to courses being already enrolled in when getting discovery course data back
+        and 4 fallback amplitude recommendations are returned if 4 courses are not left
+        after filtering due to courses being already enrolled in when getting discovery course data back
         """
 
         country_code_from_ip_mock.return_value = "za"
