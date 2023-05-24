@@ -76,7 +76,7 @@ def _do_third_party_auth(request):
 
     try:
         return pipeline.get_authenticated_user(requested_provider, username, third_party_uid)
-    except USER_MODEL.DoesNotExist:
+    except USER_MODEL.DoesNotExist as err:
         AUDIT_LOG.info(
             "Login failed - user with username {username} has no social auth "
             "with backend_name {backend_name}".format(
@@ -98,7 +98,13 @@ def _do_third_party_auth(request):
             )
         )
 
-        raise AuthFailedError(message, error_code='third-party-auth-with-no-linked-account')  # lint-amnesty, pylint: disable=raise-missing-from
+        redirect_url = configuration_helpers.get_value('OC_REDIRECT_ON_TPA_UNLINKED_ACCOUNT', None)
+
+        raise AuthFailedError(
+            message,
+            error_code='third-party-auth-with-no-linked-account',
+            redirect_url=redirect_url
+        ) from err
 
 
 def _get_user_by_email(email):
