@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-17 09:16+0000\n"
-"PO-Revision-Date: 2023-05-17 09:16:40.131222\n"
+"POT-Creation-Date: 2023-05-22 14:47+0000\n"
+"PO-Revision-Date: 2023-05-22 14:47:11.337765\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -1808,28 +1808,28 @@ msgstr ""
 "Nɐʇᴉønɐl Ǥnɐɹd?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
-msgstr "Wɥɐʇ ᴉs ʇɥǝ ɥᴉƃɥǝsʇ lǝʌǝl øɟ ǝdnɔɐʇᴉøn ʇɥɐʇ ʎøn ɥɐʌǝ ɐɔɥᴉǝʌǝd sø ɟɐɹ?"
+msgid "Select military status"
+msgstr "Sǝlǝɔʇ ɯᴉlᴉʇɐɹʎ sʇɐʇns"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
-msgstr ""
-"Wɥɐʇ ᴉs ʇɥǝ ɥᴉƃɥǝsʇ lǝʌǝl øɟ ǝdnɔɐʇᴉøn ʇɥɐʇ ɐnʎ øɟ ʎønɹ dɐɹǝnʇs øɹ ƃnɐɹdᴉɐns"
-" ɥɐʌǝ ɐɔɥᴉǝʌǝd?"
+msgid "Select level of education"
+msgstr "Sǝlǝɔʇ lǝʌǝl øɟ ǝdnɔɐʇᴉøn"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
-msgstr "Sǝlǝɔʇ ǝɯdløʎɯǝnʇ sʇɐʇns"
+msgid "Select guardian education"
+msgstr "Sǝlǝɔʇ ƃnɐɹdᴉɐn ǝdnɔɐʇᴉøn"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
-msgstr "Wɥɐʇ ᴉndnsʇɹʎ dø ʎøn ɔnɹɹǝnʇlʎ ʍøɹʞ ᴉn?"
+msgid "Select current industry"
+msgstr "Sǝlǝɔʇ ɔnɹɹǝnʇ ᴉndnsʇɹʎ"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
-msgstr "Wɥɐʇ ᴉndnsʇɹʎ dø ʎøn ʍɐnʇ ʇø ʍøɹʞ ᴉn?"
+msgid "Select prospective industry"
+msgstr "Sǝlǝɔʇ dɹøsdǝɔʇᴉʌǝ ᴉndnsʇɹʎ"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
+msgstr "Ŧɥɐnʞ ʎøn! Ɏøn’ɹǝ ɥǝldᴉnƃ ɯɐʞǝ ǝdX bǝʇʇǝɹ ɟøɹ ǝʌǝɹʎønǝ."
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"

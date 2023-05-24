@@ -79,7 +79,7 @@ def send_course_enrollment_email(
         if not course_ended:
             course_date_blocks = get_course_dates_for_email(user, course_key, request=None)
     except Exception as err:  # pylint: disable=broad-except
-        log.exception(err)
+        log.exception(f'[Enrollment email] Failed to get course dates with error: {err}')
         is_course_date_missing = True
 
     canvas_entry_properties.update(
@@ -89,17 +89,16 @@ def send_course_enrollment_email(
         }
     )
 
-    if course_id is None:
-        raise ValueError('missing course_id')
-
     try:
         course_uuid = get_course_uuid_for_course(course_id)
         if course_uuid is None:
-            raise ValueError('missing course_uuid')
-        owners = get_owners_for_course(course_uuid=course_uuid) or [{}]
+            raise ValueError('Missing course_uuid')
+
+        owners = get_owners_for_course(course_uuid=course_uuid)
         course_run = get_course_run_details(course_id, course_run_fields)
-        if course_run is None:
-            raise ValueError('missing course_run')
+        if not course_run:
+            raise ValueError('Missing course_run')
+
         marketing_root_url = settings.MKTG_URLS.get("ROOT")
         instructors = get_instructors(course_run, marketing_root_url)
         enrollment_count = int(course_run.get("enrollment_count")) if course_run.get("enrollment_count") else 0
@@ -115,12 +114,12 @@ def send_course_enrollment_email(
                 "course_title": course_run.get("title"),
                 "short_description": course_run.get("short_description"),
                 "pacing_type": course_run.get("pacing_type"),
-                "partner_image_url": owners[0].get("logo_image_url") or "",
+                "partner_image_url": owners[0].get("logo_image_url") if owners else "",
             }
         )
     except Exception as err:  # pylint: disable=broad-except
         is_course_run_missing = True
-        log.warning(f"[Course Enrollment] Course run call failed for user: {user_id} course: {course_id} err: {err}")
+        log.warning(f"[Course Enrollment] Course run call failed for user: {user_id} course: {course_id} error: {err}")
 
     if is_course_run_missing or is_course_date_missing:
         segment_properties = {

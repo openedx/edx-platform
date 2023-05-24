@@ -1929,29 +1929,28 @@ msgstr ""
 "guardia nazionale degli Stati Uniti? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
+msgid "Select military status"
 msgstr ""
-"Qual è il livello di istruzione più elevato che hai raggiunto finora? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
+msgid "Select level of education"
 msgstr ""
-"Qual è il livello di istruzione più elevato raggiunto da uno dei tuoi "
-"genitori o tutori? "
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
-msgstr "Seleziona occupazione"
+msgid "Select guardian education"
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
-msgstr "In quale settore lavori attualmente? "
+msgid "Select current industry"
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
-msgstr "In quale settore vuoi lavorare? "
+msgid "Select prospective industry"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
+msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
