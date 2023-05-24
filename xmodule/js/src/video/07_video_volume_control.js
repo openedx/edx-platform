@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     // VideoVolumeControl module.
     define(
         'video/07_video_volume_control.js', ['edx-ui-toolkit/js/utils/html-utils'],
@@ -66,7 +67,7 @@
                         '</div>',
                         '</div>'].join('')),
                     {
-                        volumeInstructions: gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'),  // eslint-disable-line max-len
+                        volumeInstructions: gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'), // eslint-disable-line max-len
                         adjustVideoVolume: gettext('Adjust video volume'),
                         volumeText: gettext('Volume')
                     }

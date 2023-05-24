@@ -24,7 +24,7 @@
 # Sitdhibong Laokok <sitdhibong@gmail.com>, 2015
 # Theeranuch Sirikojakorn <totallyp3@gmail.com>, 2015
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/).
+# edX community translations have been downloaded from Thai (http://app.transifex.com/open-edx/edx-platform/language/th/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -70,7 +70,7 @@
 # Theeranuch Sirikojakorn <totallyp3@gmail.com>, 2015
 # Sorathan Chaturapruek <tummykung@gmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Thai (http://www.transifex.com/open-edx/edx-platform/language/th/)
+# edX community translations have been downloaded from Thai (http://app.transifex.com/open-edx/edx-platform/language/th/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -116,7 +116,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-02 20:42+0000\n"
+"POT-Creation-Date: 2023-05-17 08:57+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Thai (https://app.transifex.com/open-edx/teams/6205/th/)\n"
@@ -146,6 +146,7 @@ msgid "Discussion"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr ""
@@ -153,6 +154,10 @@ msgstr ""
 #: lms/templates/video.html
 msgid "Video"
 msgstr "วีดีโอ"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -196,6 +201,13 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
+msgstr ""
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -3474,10 +3486,6 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr ""
-
 #: lms/templates/signup_modal.html
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "Gender"
@@ -6252,6 +6260,37 @@ msgstr ""
 msgid "This user already has access to this library."
 msgstr ""
 
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "กำลังโหลด"
+
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -8642,10 +8681,6 @@ msgid "Invalid JSON response received from codejail api service."
 msgstr ""
 
 #: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr ""
-
-#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr ""
 
@@ -9840,6 +9875,17 @@ msgid ""
 msgstr ""
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr ""
 
@@ -10773,6 +10819,34 @@ msgstr ""
 msgid "Add discussion for the Unit."
 msgstr ""
 
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
+"\n"
+msgstr ""
+
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
@@ -11471,6 +11545,14 @@ msgid "Invalid data ({details})"
 msgstr "ข้อมูลไม่ถูกต้อง ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr ""
@@ -11818,12 +11900,6 @@ msgstr "กำลังอัพโหลด"
 msgid "In Progress"
 msgstr "อยู่ในระหว่างดำเนินการ"
 
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "พร้อมแล้ว"
-
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Uploaded"
@@ -12076,16 +12152,6 @@ msgstr "เนื้อหา"
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "การตั้งค่าต่างๆ "
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "กำลังโหลด"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -13086,6 +13152,18 @@ msgstr "เพจหน้าที่แล้ว"
 msgid "Next page"
 msgstr "เพจหน้าถัดไป"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "เข้าสู่ระบบการติดตาม"
@@ -13208,14 +13286,16 @@ msgid "Downloads and transcripts"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
+msgid "Share on:"
 msgstr ""
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "แชร์บน Twitter"
+msgid "Share on {site}"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download video file"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -14259,6 +14339,11 @@ msgstr "คลิกที่ลิ้งค์เพื่อดูประก
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "โพสต์บน Facebook"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "แชร์บน Twitter"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
@@ -18903,7 +18988,7 @@ msgstr "รหัสตำแหน่ง"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
@@ -19086,8 +19171,9 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
 
 #: cms/templates/course_outline.html

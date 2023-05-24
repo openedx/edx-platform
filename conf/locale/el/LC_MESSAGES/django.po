@@ -5,7 +5,7 @@
 #
 # Translators:
 # Alexandra Messini <alexandra_messini@yahoo.com>, 2015
-# Angelos Chraniotis, 2016
+# Angelos Chraniotis, 2016,2023
 # Angelos Sfakianakis <giasas@gmail.com>, 2014
 # Dimitris Agelakis <minoan07@gmail.com>, 2015-2017,2019
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
@@ -22,11 +22,12 @@
 # Anestis, 2014
 # kafroulitsa <zasimak@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/).
+# edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Angelos Chraniotis, 2023
 # Dimitris Agelakis <minoan07@gmail.com>, 2019
 # Giannoulis Thanasis <thanasis@giannoulis.net>, 2015
 # EEYEM, 2015
@@ -40,6 +41,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Angelos Chraniotis, 2023
 # Vassileios-Marios Anastassiou, 2016
 # Chris Nikolo <dr_dreezhellas@yahoo.com>, 2016
 # Dimitris Agelakis <minoan07@gmail.com>, 2015-2016,2018-2019
@@ -54,12 +56,12 @@
 # Nick Gikopoulos, 2014-2017
 # Vassia Kouremenou <Vassiacat@hotmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Greek (http://www.transifex.com/open-edx/edx-platform/language/el/)
+# edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
-# Angelos Chraniotis, 2016
+# Angelos Chraniotis, 2016,2023
 # Dimitris Agelakis <minoan07@gmail.com>, 2015,2019
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015,2017
 # Katerina Ligkovanli <kaligova@gmail.com>, 2016-2017,2019-2020
@@ -91,7 +93,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-02 20:42+0000\n"
+"POT-Creation-Date: 2023-05-17 08:57+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Greek (https://app.transifex.com/open-edx/teams/6205/el/)\n"
@@ -121,6 +123,7 @@ msgid "Discussion"
 msgstr "Συζήτηση"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr ""
@@ -129,6 +132,10 @@ msgstr ""
 #: openedx/core/djangoapps/content_libraries/constants.py
 #: lms/templates/video.html
 msgid "Video"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
@@ -176,6 +183,13 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
+msgstr ""
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
@@ -3633,10 +3647,6 @@ msgstr "Γλώσσα"
 msgid "Location"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr ""
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
 #. the user's gender.
@@ -5363,6 +5373,7 @@ msgid "Allow"
 msgstr ""
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr ""
@@ -6486,6 +6497,37 @@ msgstr ""
 
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "This user already has access to this library."
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Φόρτωση"
+
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
@@ -8977,10 +9019,6 @@ msgid "Invalid JSON response received from codejail api service."
 msgstr ""
 
 #: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr ""
-
-#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr ""
 
@@ -10195,6 +10233,17 @@ msgid ""
 msgstr ""
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr ""
 
@@ -11137,6 +11186,34 @@ msgstr ""
 msgid "Add discussion for the Unit."
 msgstr ""
 
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
+"\n"
+msgstr ""
+
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
@@ -11830,6 +11907,14 @@ msgid "Invalid data ({details})"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr ""
@@ -12168,12 +12253,6 @@ msgstr "Μεταφορτώνεται"
 msgid "In Progress"
 msgstr "Σε εξέλιξη"
 
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr ""
-
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Uploaded"
@@ -12426,16 +12505,6 @@ msgstr ""
 #: wiki/templates/wiki/settings.html
 msgid "Settings"
 msgstr ""
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Φόρτωση"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -13460,6 +13529,18 @@ msgstr ""
 msgid "Next page"
 msgstr ""
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr ""
@@ -13575,13 +13656,15 @@ msgid "Downloads and transcripts"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
+msgid "Share on:"
 msgstr ""
 
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/video.html
-msgid "Share on Twitter"
+msgid "Share on {site}"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download video file"
 msgstr ""
 
 #: lms/templates/video.html
@@ -14626,6 +14709,11 @@ msgstr ""
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Κοινοποιήστε στο Facebook"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr ""
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
@@ -19156,7 +19244,7 @@ msgstr ""
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
@@ -19324,8 +19412,9 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
 
 #: cms/templates/course_outline.html

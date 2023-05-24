@@ -11,19 +11,19 @@ describe('EntitlementUnenrollmentView', () => {
 
     const initView = () => new EntitlementUnenrollmentView(options);
 
-    const modalHtml = '<a id="link1" class="js-entitlement-action-unenroll"                         ' +
-                    '   data-course-name="Test Course 1"                                          ' +
-                    '   data-course-number="test1"                                                ' +
-                    '   data-entitlement-api-endpoint="/test/api/endpoint/1">Unenroll</a>         ' +
-                    '<a id="link2" class="js-entitlement-action-unenroll"                         ' +
-                    '   data-course-name="Test Course 2"                                          ' +
-                    '   data-course-number="test2"                                                ' +
-                    '   data-entitlement-api-endpoint="/test/api/endpoint/2">Unenroll</a>         ' +
-                    '<div class="js-entitlement-unenrollment-modal">                              ' +
-                    '  <span class="js-entitlement-unenrollment-modal-header-text"></span>        ' +
-                    '  <span class="js-entitlement-unenrollment-modal-error-text"></span>         ' +
-                    '  <button class="js-entitlement-unenrollment-modal-submit">Unenroll</button> ' +
-                    '</div>                                                                       ';
+    const modalHtml = '<a id="link1" class="js-entitlement-action-unenroll"                         '
+                    + '   data-course-name="Test Course 1"                                          '
+                    + '   data-course-number="test1"                                                '
+                    + '   data-entitlement-api-endpoint="/test/api/endpoint/1">Unenroll</a>         '
+                    + '<a id="link2" class="js-entitlement-action-unenroll"                         '
+                    + '   data-course-name="Test Course 2"                                          '
+                    + '   data-course-number="test2"                                                '
+                    + '   data-entitlement-api-endpoint="/test/api/endpoint/2">Unenroll</a>         '
+                    + '<div class="js-entitlement-unenrollment-modal">                              '
+                    + '  <span class="js-entitlement-unenrollment-modal-header-text"></span>        '
+                    + '  <span class="js-entitlement-unenrollment-modal-error-text"></span>         '
+                    + '  <button class="js-entitlement-unenrollment-modal-submit">Unenroll</button> '
+                    + '</div>                                                                       ';
 
     beforeEach(() => {
         setFixtures(modalHtml);

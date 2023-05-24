@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/).
+# edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -83,7 +83,7 @@
 # 陈滢冲 <yc.chen@eliteu.cn>, 2018
 # 顾翔 <c0710204@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/).
+# edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -94,9 +94,11 @@
 # BertZou <turingcat@gmail.com>, 2015
 # bnw, 2014
 # 肖寒 <bookman@vip.163.com>, 2013
+# Cecilia Liu, 2023
 # Changyue Wang <peterwang.dut@gmail.com>, 2015
 # shuchuanchen <am15501@163.com>, 2014
 # Dandi Xu <dandi.xu.china@gmail.com>, 2015
+# Diana Huang <dkh@edx.org>, 2023
 # focusheart <focusheart@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2017,2019
 # GoodLuck <1833447072@qq.com>, 2014
@@ -193,7 +195,7 @@
 # 汤和果 <hgtang93@163.com>, 2015
 # 胡超威 <chadennishu@gmail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)
+# edX community translations have been downloaded from Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -228,10 +230,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-19 20:42+0000\n"
+"POT-Creation-Date: 2023-05-07 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: jsgang <jsgang9@gmail.com>, 2015-2017,2020\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
+"Language-Team: Chinese (China) (http://app.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1862,25 +1864,27 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
+msgid "Select military status"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
+msgid "Select level of education"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
+msgid "Select guardian education"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
+msgid "Select current industry"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
+msgid "Select prospective industry"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
 msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
@@ -2999,6 +3003,44 @@ msgid ""
 "Are you sure you want to unenroll from {courseName} ({courseNumber})? You "
 "will be refunded the amount you paid."
 msgstr "确定退选课程 {courseName} ({courseNumber})？您将会收到全额退款。"
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "View program"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Enroll in a {programName} course"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"You have an active subscription to the {programName} program but are not "
+"enrolled in any courses. Enroll in a remaining course and enjoy verified "
+"access."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"According to our records, you are not enrolled in any courses included in "
+"your {programName} program subscription. Enroll in a course from the "
+"{i_start}Program Details{i_end} page."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Subscription trial expires in {remainingDays} day"
+msgid_plural "Subscription trial expires in {remainingDays} days"
+msgstr[0] ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"Your {programName} trial will expire in {remainingDays} day at "
+"{trialEndTime} on {trialEndDate} and the card on file will be charged "
+"{subscriptionPrice}/month."
+msgid_plural ""
+"Your {programName} trial will expire in {remainingDays} days at "
+"{trialEndTime} on {trialEndDate} and the card on file will be charged "
+"{subscriptionPrice}/month."
+msgstr[0] ""
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
@@ -5516,7 +5558,7 @@ msgstr "证书"
 
 #: cms/static/js/certificates/views/certificate_preview.js
 msgid "Deactivating"
-msgstr ""
+msgstr "停用"
 
 #: cms/static/js/certificates/views/certificates_list.js
 msgid "Set up your certificate"
@@ -5530,7 +5572,7 @@ msgstr "您尚未创建任何证书。"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 msgid "Delete \"<%- signatoryName %>\" from the list of signatories?"
-msgstr ""
+msgstr "从签名者列表中删除\"<%- signatoryName %>\" ？"
 
 #: cms/static/js/certificates/views/signatory_editor.js
 #: cms/static/js/views/course_info_update.js
@@ -5661,27 +5703,28 @@ msgstr "文件上传错误"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Organization:"
-msgstr ""
+msgstr "组织机构："
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Number:"
-msgstr ""
+msgstr "课程编号："
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Course Run:"
-msgstr ""
+msgstr "课程长度："
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "(Read-only)"
-msgstr ""
+msgstr "（只读）"
 
 #: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 msgid "Re-run Course"
-msgstr ""
+msgstr "重启课程"
 
+#: cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
-msgstr "查看在线版"
+msgstr "在线查看"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
@@ -5778,13 +5821,13 @@ msgstr "证书生效期必须晚于课程结束日期。"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The certificate display behavior must be one of: {behavior_options}"
-msgstr ""
+msgstr "证书显示行为必须是以下之一：{behavior_options}"
 
 #: cms/static/js/models/settings/course_details.js
 msgid ""
 "The certificates display behavior must be {valid_option} if certificate "
 "available date is set."
-msgstr ""
+msgstr "如果设置了证书可用日期，则证书显示行为必须为 {valid_option}。"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
@@ -5842,7 +5885,7 @@ msgstr "所有章节都必须拥有名称和内容"
 msgid ""
 "Only <%- fileTypes %> files can be uploaded. Please select a file ending in "
 "<%- (fileExtensions) %> to upload."
-msgstr ""
+msgstr "只有<%- fileTypes %>类型的文件能够被上传。 请选择一个结尾为<%- (fileExtensions) %> 的文件上传。"
 
 #: cms/static/js/models/uploads.js
 #: lms/templates/student_account/hinted_login.underscore
@@ -5968,7 +6011,7 @@ msgstr "正在添加"
 
 #: cms/static/js/views/container.js
 msgid "{startTag}{requestToken}{endTag}{selector}"
-msgstr ""
+msgstr "{startTag}{requestToken}{endTag}{selector}"
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
@@ -6025,7 +6068,7 @@ msgstr "{selectedProvider} 证书已保存"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Upload a new PDF to “<%- name %>”"
-msgstr ""
+msgstr "上传一个新的PDF到“<%- name %>”"
 
 #: cms/static/js/views/edit_chapter.js
 msgid "Please select a PDF file to upload."
@@ -6265,7 +6308,7 @@ msgstr "{display_name} 热点"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable Course Highlight Emails"
-msgstr ""
+msgstr "启用课程热点电子邮件"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Enable"
@@ -6307,7 +6350,7 @@ msgstr "组件"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Studio's having trouble parsing the problem component's content"
-msgstr ""
+msgstr "STUDIO在解析问题组件的内容时遇到问题"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move"
@@ -6368,10 +6411,18 @@ msgstr "课程大纲"
 msgid "Date added"
 msgstr "添加日期"
 
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr ""
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
+msgstr "正在编辑对于{title}的访问权限"
+
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -6558,7 +6609,7 @@ msgstr "上传您的视频缩略图。"
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%- name %>”?"
-msgstr ""
+msgstr "删除“<%- name %>”？"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
@@ -6589,13 +6640,13 @@ msgstr "很抱歉，此处出现错误"
 msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than <%- limit %> characters."
-msgstr ""
+msgstr "组织、课程编号和课程运行字段的组合长度不能超过 <%- limit %> 个字符。"
 
 #: cms/static/js/views/utils/create_library_utils.js
 msgid ""
 "The combined length of the organization and library code fields cannot be "
 "more than <%- limit %> characters."
-msgstr ""
+msgstr "组织和图书馆代码字段的组合长度不能超过  <%- limit %>个字符。"
 
 #: cms/static/js/views/utils/move_xblock_utils.js
 msgid "Success! \"{displayName}\" has been moved."
@@ -8149,6 +8200,7 @@ msgstr "有效"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Certificate Status:"
 msgstr "证书状态："
 
@@ -8247,8 +8299,8 @@ msgid ""
 msgstr "浏览最新上线的课程并查看您最喜爱科目的更新情况"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New Programs"
-msgstr "探索新课程"
+msgid "Explore new programs"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
@@ -8269,6 +8321,11 @@ msgstr "剩余"
 msgid "%(programName)s Home Page."
 msgstr "%(programName)s主页"
 
+#: lms/templates/learner_dashboard/program_card.underscore
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Subscribed"
+msgstr ""
+
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Your {program} Certificate"
 msgstr "您的{program}证书"
@@ -8277,6 +8334,44 @@ msgstr "您的{program}证书"
 #, python-format
 msgid "Open the certificate you earned for the %(title)s program."
 msgstr "打开您已获得的%(title)s课程证书。"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Trial subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Active subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Inactive subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"View your receipts or modify your subscription on the {a_start}Orders and "
+"subscriptions{a_end} page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Restart your subscription for {subscriptionPrice}/month. Your payment "
+"history is still available on the {a_start}Orders and subscriptions{a_end} "
+"page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"If you had a subscription previously, your payment history is still "
+"available on the {a_start}Orders and subscriptions{a_end} page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Need help? Check out the {a_start}Learner Help "
+"Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact "
+"support"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Program Record"
@@ -8319,6 +8414,44 @@ msgstr "恭喜！"
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr "您的课程学习之旅"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Manage my subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Restart my subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Start {trialLength}-day free trial"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Active trial ends {trialEndDate} at {trialEndTime}"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Your next billing date is {nextPaymentDate}"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid ""
+"Unlock verified access to all courses for {subscriptionPrice}/month. Cancel "
+"anytime."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid ""
+"{subscriptionPrice}/month subscription after trial ends. Cancel anytime."
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -8365,13 +8498,50 @@ msgstr "按时完成课程学习，比别人先行一步！"
 msgid "{organization}\\'s logo"
 msgstr "{organization}\\'s 的标识"
 
+#: lms/templates/learner_dashboard/program_list_header_view.underscore
+msgid "My programs"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "New"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "Monthly program subscriptions {emDash} more flexible, more affordable"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid ""
+"Now available for many popular programs, affordable monthly subscription "
+"pricing can help you manage your budget more effectively. Subscriptions "
+"start at {minSubscriptionPrice}/month USD per program, after a 7-day full "
+"access free trial. Cancel at any time."
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "Explore subscription options"
+msgstr ""
+
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Needs verified certificate "
 msgstr "需要已认证证书"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade to Verified"
 msgstr "升级到已验证"
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Upgrade with a subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Pay {subscriptionPrice}/month for all courses in this program"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Pay {subscriptionPrice}/month after {trialLength}-day free trial"
+msgstr ""
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -9762,6 +9932,14 @@ msgstr "点击“关闭”以隐藏课程视频设置"
 msgid "Course Video Settings"
 msgstr "课程视频设置"
 
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Video Sharing"
+msgstr ""
+
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Learn more"
+msgstr ""
+
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
 msgstr "字幕转换"
@@ -9854,6 +10032,30 @@ msgid ""
 "The number of assignments of this type that will be dropped. The lowest "
 "scoring assignments are dropped first."
 msgstr "此类型将会被弃用的作业数。最低分的作业会最先被弃用。"
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
@@ -10307,12 +10509,6 @@ msgstr ""
 msgid ""
 "If a learner starts on {startDate}, this subsection will be due on "
 "{projectedDueIn}."
-msgstr ""
-
-#: cms/templates/js/self-paced-due-date-editor.underscore
-msgid ""
-"The maximum number of weeks this subsection can be due in is 18 weeks from "
-"the learner enrollment date."
 msgstr ""
 
 #: cms/templates/js/self-paced-due-date-editor.underscore

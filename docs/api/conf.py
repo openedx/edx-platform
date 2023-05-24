@@ -9,7 +9,7 @@
 
 import os
 
-import edx_theme
+from datetime import datetime
 
 # -- Path setup --------------------------------------------------------------
 
@@ -25,8 +25,8 @@ import edx_theme
 # -- Project information -----------------------------------------------------
 
 project = 'Open edX REST APIs'
-copyright = edx_theme.COPYRIGHT  # lint-amnesty, pylint: disable=redefined-builtin
-author = edx_theme.AUTHOR
+copyright = f'{datetime.now().year}, Axim Collaborative, Inc'  # pylint: disable=redefined-builtin
+author = 'Axim Collaborative, Inc'
 
 # The short X.Y version
 version = ''
@@ -83,19 +83,49 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'edx_theme'
+html_theme = 'sphinx_book_theme'
 
-html_theme_path = [edx_theme.get_html_theme_path()]
+# html_theme_path = []
 
-html_theme_options = {'navigation_depth': 3}
-
-html_favicon = os.path.join(edx_theme.get_html_theme_path(), 'edx_theme', 'static', 'css', 'favicon.ico')
+html_logo = "https://logos.openedx.org/open-edx-logo-color.png"
+html_favicon = "https://logos.openedx.org/open-edx-favicon.ico"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "repository_url": "https://github.com/openedx/edx-platform",
+    "repository_branch": "master",
+    "path_to_docs": "docs/api",
+    "home_page_in_toc": True,
+    "use_repository_button": True,
+    "use_issues_button": True,
+    "use_edit_page_button": True,
+    "navigation_depth": 3,
+    # Please don't change unless you know what you're doing.
+    "extra_footer": """
+        <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
+            <img
+                alt="Creative Commons License"
+                style="border-width:0"
+                src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"/>
+        </a>
+        <br>
+        These works by
+            <a
+                xmlns:cc="https://creativecommons.org/ns#"
+                href="https://openedx.org"
+                property="cc:attributionName"
+                rel="cc:attributionURL"
+            >Axim Collaborative, Inc</a>
+        are licensed under a
+            <a
+                rel="license"
+                href="https://creativecommons.org/licenses/by-sa/4.0/"
+            >Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    """
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

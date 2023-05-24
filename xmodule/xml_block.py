@@ -152,7 +152,7 @@ class XmlMixin:
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         """
-        Return the definition to be passed to the newly created descriptor
+        Return the definition to be passed to the newly created block
         during from_xml
 
         xml_object: An etree Element
@@ -199,7 +199,7 @@ class XmlMixin:
     @classmethod
     def load_definition(cls, xml_object, system, def_id, id_generator):
         """
-        Load a descriptor definition from the specified xml_object.
+        Load a block from the specified xml_object.
         Subclasses should not need to override this except in special
         cases (e.g. html block)
 
@@ -365,7 +365,7 @@ class XmlMixin:
 
         xblock = runtime.construct_xblock_from_class(
             cls,
-            # We're loading a descriptor, so student_id is meaningless
+            # We're loading a block, so student_id is meaningless
             ScopeIds(None, node.tag, def_id, usage_id),
             field_data,
         )
@@ -405,7 +405,7 @@ class XmlMixin:
         return f'{category}/{name}.{cls.filename_extension}'
 
     def export_to_file(self):
-        """If this returns True, write the definition of this descriptor to a separate
+        """If this returns True, write the definition of this block to a separate
         file.
 
         NOTE: Do not override this without a good reason.  It is here

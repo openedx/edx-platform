@@ -133,24 +133,24 @@ function(Backbone, $, AjaxHelpers, TemplateHelpers, DiscussionsView, CourseDiscu
             expect($inlineDiscussionsForm.length).toBe(1);
             expect($courseWideDiscussionsForm.length).toBe(1);
 
-            expect($courseWideDiscussionsForm.text()).
-                toContain('Course-Wide Discussion Topics');
-            expect($courseWideDiscussionsForm.text()).
-                toContain('Select the course-wide discussion topics that you want to divide.');
+            expect($courseWideDiscussionsForm.text())
+                .toContain('Course-Wide Discussion Topics');
+            expect($courseWideDiscussionsForm.text())
+                .toContain('Select the course-wide discussion topics that you want to divide.');
 
             // Should see the inline discussions form and its content
             expect($inlineDiscussionsForm.length).toBe(1);
-            expect($inlineDiscussionsForm.text()).
-                toContain('Content-Specific Discussion Topics');
-            expect($inlineDiscussionsForm.text()).
-                toContain('Specify whether content-specific discussion topics are divided.');
+            expect($inlineDiscussionsForm.text())
+                .toContain('Content-Specific Discussion Topics');
+            expect($inlineDiscussionsForm.text())
+                .toContain('Specify whether content-specific discussion topics are divided.');
         };
 
         beforeEach(function() {
-            setFixtures('<ul class="instructor-nav">' +
-                    '<li class="nav-item"><button type="button" data-section="discussion_management" ' +
-                    'class="active-section">Discussions</button></li></ul><div></div>' +
-                    '<div class="discussions-management"></div>');
+            setFixtures('<ul class="instructor-nav">'
+                    + '<li class="nav-item"><button type="button" data-section="discussion_management" '
+                    + 'class="active-section">Discussions</button></li></ul><div></div>'
+                    + '<div class="discussions-management"></div>');
             TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/discussions');
             TemplateHelpers.installTemplate(
                 'templates/instructor/instructor_dashboard_2/divided-discussions-course-wide'

@@ -1,10 +1,10 @@
 define(['jquery'], function($) {
     var iframeBinding = function(e) {
         var target_element = null;
-        if (typeof(e) === 'undefined') {
+        if (typeof e === 'undefined') {
             target_element = $('iframe, embed');
         } else {
-            if (typeof(e.nodeName) !== 'undefined') {
+            if (typeof e.nodeName !== 'undefined') {
                 target_element = $(e).find('iframe, embed');
             } else {
                 target_element = e.$('iframe, embed');
@@ -28,6 +28,7 @@ define(['jquery'], function($) {
                             var newString = getQString[0];
                             $(this).attr('src', newString + '?' + wmode + '&' + oldString);
                         }
+                    // eslint-disable-next-line brace-style
                     }
                     // The TinyMCE editor is hosted in an iframe, and before the iframe is
                     // removed we execute this code. To avoid throwing an error when setting the

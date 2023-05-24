@@ -6,6 +6,7 @@ define(
     ],
     function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
         'use strict';
+
         var VideoList = AbstractEditor.extend({
         // Time that we wait since the last time user typed.
             inputDelay: 300,
@@ -151,7 +152,6 @@ define(
                         .attr('placeholder', placeholders[index]);
                 });
             },
-
 
             /**
          * Returns the placeholders for the values currently displayed in the

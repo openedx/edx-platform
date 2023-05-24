@@ -1,11 +1,12 @@
 (function(define, undefined) {
     'use strict';
+
     define(['jquery', 'underscore', 'annotator_1.2.9'], function($, _, Annotator) {
     /**
      * The CaretNavigation Plugin which allows notes creation when users use
      * caret navigation to select the text.
      * Use `Ctrl + SPACE` or `Ctrl + ENTER` to open the editor.
-     **/
+     * */
         Annotator.Plugin.CaretNavigation = function() {
         // Call the Annotator.Plugin constructor this sets up the element and
         // options properties.

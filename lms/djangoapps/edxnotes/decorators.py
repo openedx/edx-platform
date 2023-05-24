@@ -29,12 +29,12 @@ def edxnotes(cls):
         if not settings.FEATURES.get("ENABLE_EDXNOTES"):
             return original_get_html(self, *args, **kwargs)
 
-        runtime = getattr(self, 'descriptor', self).runtime
+        runtime = getattr(self, 'block', self).runtime
         if not hasattr(runtime, 'modulestore'):
             return original_get_html(self, *args, **kwargs)
 
         is_studio = getattr(self.runtime, "is_author_mode", False)
-        course = getattr(self, 'descriptor', self).runtime.modulestore.get_course(self.scope_ids.usage_id.context_key)
+        course = getattr(self, 'block', self).runtime.modulestore.get_course(self.scope_ids.usage_id.context_key)
 
         # Must be disabled when:
         # - in Studio

@@ -33,7 +33,10 @@ class StudioEditableBlock(XBlockMixin):
                 'content': rendered_child.content
             })
 
-        fragment.add_content(self.runtime.service(self, 'mako').render_template("studio_render_children_view.html", {  # pylint: disable=no-member
+        # 'lms.' namespace_prefix is required for rendering in studio
+        mako_service = self.runtime.service(self, 'mako')
+        mako_service.namespace_prefix = 'lms.'
+        fragment.add_content(mako_service.render_template("studio_render_children_view.html", {  # pylint: disable=no-member
             'items': contents,
             'xblock_context': context,
             'can_add': can_add,
@@ -48,8 +51,8 @@ class StudioEditableBlock(XBlockMixin):
         return AUTHOR_VIEW if has_author_view(block) else STUDENT_VIEW
 
 
-def has_author_view(descriptor):
+def has_author_view(block):
     """
-    Returns True if the xmodule linked to the descriptor supports "author_view".
+    Returns True if the xmodule linked to the block supports "author_view".
     """
-    return getattr(descriptor, 'has_author_view', False)
+    return getattr(block, 'has_author_view', False)

@@ -57,6 +57,10 @@ describe('Program card View', () => {
             not_started: 3,
         },
     ];
+    const subscriptionCollection = new Backbone.Collection([{
+        resource_id: 'a87e5eac-3c93-45a1-a8e1-4c79ca8401c8',
+        subscription_state: 'active',
+    }]);
     const progressCollection = new ProgressCollection();
     const cardRenders = ($card) => {
         expect($card).toBeDefined();
@@ -74,6 +78,8 @@ describe('Program card View', () => {
             model: programModel,
             context: {
                 progressCollection,
+                subscriptionCollection,
+                isUserB2CSubscriptionsEnabled: true,
             },
         });
     });
@@ -123,7 +129,10 @@ describe('Program card View', () => {
         view.remove();
         view = new ProgramCardView({
             model: programModel,
-            context: {},
+            context: {
+                subscriptionCollection,
+                isUserB2CSubscriptionsEnabled: true,
+            },
         });
         cardRenders(view.$el);
         expect(view.$('.progress').length).toEqual(0);
@@ -136,7 +145,10 @@ describe('Program card View', () => {
         programModel = new ProgramModel(programNoBanner);
         view = new ProgramCardView({
             model: programModel,
-            context: {},
+            context: {
+                subscriptionCollection,
+                isUserB2CSubscriptionsEnabled: true,
+            },
         });
         cardRenders(view.$el);
         expect(view.$el.find('.banner-image').attr('srcset')).toEqual('');
@@ -151,9 +163,16 @@ describe('Program card View', () => {
         programModel = new ProgramModel(programNoBanner);
         view = new ProgramCardView({
             model: programModel,
-            context: {},
+            context: {
+                subscriptionCollection,
+                isUserB2CSubscriptionsEnabled: true,
+            },
         });
         cardRenders(view.$el);
         expect(view.$el.find('.banner-image').attr('srcset')).toEqual('');
+    });
+
+    it('should render the subscription badge if subscription is active', () => {
+        expect(view.$('.subscription-badge .badge').html().trim()).toEqual('Subscribed');
     });
 });

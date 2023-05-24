@@ -12,6 +12,7 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
@@ -2128,8 +2129,7 @@ class TestEditSplitModule(ItemTest):
         group_id_to_child = split_test.group_id_to_child.copy()
         self.assertEqual(2, len(group_id_to_child))
 
-        # Test environment and Studio use different module systems
-        # (CachingDescriptorSystem is used in tests, PreviewModuleSystem in Studio).
+        # CachingDescriptorSystem is used in tests.
         # CachingDescriptorSystem doesn't have user service, that's needed for
         # SplitTestBlock. So, in this line of code we add this service manually.
         split_test.runtime._services['user'] = DjangoXBlockUserService(self.user)  # pylint: disable=protected-access
@@ -2160,10 +2160,10 @@ class TestComponentHandler(TestCase):
         self.modulestore = patcher.start()
         self.addCleanup(patcher.stop)
 
-        # component_handler calls modulestore.get_item to get the descriptor of the requested xBlock.
+        # component_handler calls modulestore.get_item to get the requested xBlock.
         # Here, we mock the return value of modulestore.get_item so it can be used to mock the handler
-        # of the xBlock descriptor.
-        self.descriptor = self.modulestore.return_value.get_item.return_value
+        # of the xBlock.
+        self.block = self.modulestore.return_value.get_item.return_value
 
         self.usage_key = BlockUsageLocator(
             CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name'
@@ -2174,7 +2174,7 @@ class TestComponentHandler(TestCase):
         self.request.user = self.user
 
     def test_invalid_handler(self):
-        self.descriptor.handle.side_effect = NoSuchHandlerError
+        self.block.handle.side_effect = NoSuchHandlerError
 
         with self.assertRaises(Http404):
             component_handler(self.request, self.usage_key_string, 'invalid_handler')
@@ -2186,7 +2186,7 @@ class TestComponentHandler(TestCase):
             self.assertEqual(request.method, method)
             return Response()
 
-        self.descriptor.handle = check_handler
+        self.block.handle = check_handler
 
         # Have to use the right method to create the request to get the HTTP method that we want
         req_factory_method = getattr(self.request_factory, method.lower())
@@ -2199,7 +2199,7 @@ class TestComponentHandler(TestCase):
         def create_response(handler, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
             return Response(status_code=status_code)
 
-        self.descriptor.handle = create_response
+        self.block.handle = create_response
 
         self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                          status_code)
@@ -2220,7 +2220,7 @@ class TestComponentHandler(TestCase):
         self.request.user = UserFactory()
         mock_handler = 'dummy_handler'
 
-        self.descriptor.handle = create_response
+        self.block.handle = create_response
 
         with patch(
             'cms.djangoapps.contentstore.views.component.is_xblock_aside',
@@ -2254,7 +2254,7 @@ class TestComponentHandler(TestCase):
                 else self.usage_key_string
             )
 
-        self.descriptor.handle = create_response
+        self.block.handle = create_response
 
         with patch(
             'cms.djangoapps.contentstore.views.component.is_xblock_aside',
@@ -2770,6 +2770,28 @@ class TestXBlockInfo(ItemTest):
         self.store.update_item(self.course, None)
         course_xblock_info = create_xblock_info(self.course)
         self.assertTrue(course_xblock_info['highlights_enabled_for_messaging'])
+
+    def test_xblock_public_video_sharing_enabled(self):
+        """
+        Public video sharing is included in the xblock info when enable.
+        """
+        self.course.video_sharing_options = 'all-on'
+        with patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=True):
+            self.store.update_item(self.course, None)
+            course_xblock_info = create_xblock_info(self.course)
+            self.assertTrue(course_xblock_info['video_sharing_enabled'])
+            self.assertEqual(course_xblock_info['video_sharing_options'], 'all-on')
+
+    def test_xblock_public_video_sharing_disabled(self):
+        """
+        Public video sharing not is included in the xblock info when disabled.
+        """
+        self.course.video_sharing_options = 'arbitrary'
+        with patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=False):
+            self.store.update_item(self.course, None)
+            course_xblock_info = create_xblock_info(self.course)
+            self.assertNotIn('video_sharing_enabled', course_xblock_info)
+            self.assertNotIn('video_sharing_options', course_xblock_info)
 
     def validate_course_xblock_info(self, xblock_info, has_child_info=True, course_outline=False):
         """

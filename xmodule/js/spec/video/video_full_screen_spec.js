@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     describe('VideoFullScreen', function() {
         var state, oldOTBD;
 

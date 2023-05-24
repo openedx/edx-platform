@@ -3,7 +3,6 @@ define([
 ], function(AjaxHelpers, SearchState) {
     'use strict';
 
-
     var JSON_RESPONSE = {
         total: 365,
         results: [

@@ -2,6 +2,7 @@
 Common utility functions useful throughout the contentstore
 """
 
+from collections import defaultdict
 import logging
 from contextlib import contextmanager
 from datetime import datetime
@@ -20,13 +21,29 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
-from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_video_editor
+from cms.djangoapps.contentstore.toggles import (
+    use_new_text_editor,
+    use_new_video_editor,
+    use_new_advanced_settings_page,
+    use_new_course_outline_page,
+    use_new_export_page,
+    use_new_files_uploads_page,
+    use_new_grading_page,
+    use_new_course_team_page,
+    use_new_home_page,
+    use_new_import_page,
+    use_new_schedule_details_page,
+    use_new_unit_page,
+    use_new_updates_page,
+    use_new_video_uploads_page,
+)
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
@@ -211,6 +228,161 @@ def get_editor_page_base_url(course_locator) -> str:
     return editor_url
 
 
+def get_studio_home_url():
+    """
+    Gets course authoring microfrontend URL for Studio Home view.
+    """
+    studio_home_url = None
+    if use_new_home_page():
+        mfe_base_url = settings.COURSE_AUTHORING_MICROFRONTEND_URL
+        if mfe_base_url:
+            studio_home_url = f'{mfe_base_url}/home'
+    return studio_home_url
+
+
+def get_schedule_details_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for schedule and details pages view.
+    """
+    schedule_details_url = None
+    if use_new_schedule_details_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/settings/details'
+        if mfe_base_url:
+            schedule_details_url = course_mfe_url
+    return schedule_details_url
+
+
+def get_advanced_settings_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for advanced settings page view.
+    """
+    advanced_settings_url = None
+    if use_new_advanced_settings_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/settings/advanced'
+        if mfe_base_url:
+            advanced_settings_url = course_mfe_url
+    return advanced_settings_url
+
+
+def get_grading_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for grading page view.
+    """
+    grading_url = None
+    if use_new_grading_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/settings/grading'
+        if mfe_base_url:
+            grading_url = course_mfe_url
+    return grading_url
+
+
+def get_course_team_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for course team page view.
+    """
+    course_team_url = None
+    if use_new_course_team_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_team'
+        if mfe_base_url:
+            course_team_url = course_mfe_url
+    return course_team_url
+
+
+def get_updates_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for updates page view.
+    """
+    updates_url = None
+    if use_new_updates_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/course_info'
+        if mfe_base_url:
+            updates_url = course_mfe_url
+    return updates_url
+
+
+def get_import_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for import page view.
+    """
+    import_url = None
+    if use_new_import_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/import'
+        if mfe_base_url:
+            import_url = course_mfe_url
+    return import_url
+
+
+def get_export_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for export page view.
+    """
+    export_url = None
+    if use_new_export_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/export'
+        if mfe_base_url:
+            export_url = course_mfe_url
+    return export_url
+
+
+def get_files_uploads_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for files and uploads page view.
+    """
+    files_uploads_url = None
+    if use_new_files_uploads_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/assets'
+        if mfe_base_url:
+            files_uploads_url = course_mfe_url
+    return files_uploads_url
+
+
+def get_video_uploads_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for files and uploads page view.
+    """
+    video_uploads_url = None
+    if use_new_video_uploads_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/videos/'
+        if mfe_base_url:
+            video_uploads_url = course_mfe_url
+    return video_uploads_url
+
+
+def get_course_outline_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for course oultine page view.
+    """
+    course_outline_url = None
+    if use_new_course_outline_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}'
+        if mfe_base_url:
+            course_outline_url = course_mfe_url
+    return course_outline_url
+
+
+def get_unit_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for unit page view.
+    """
+    unit_url = None
+    if use_new_unit_page(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/container/'
+        if mfe_base_url:
+            unit_url = course_mfe_url
+    return unit_url
+
+
 def course_import_olx_validation_is_enabled():
     """
     Check if course olx validation is enabled on course import.
@@ -370,7 +542,7 @@ def get_split_group_display_name(xblock, course):
 
     Arguments:
         xblock (XBlock): The courseware component.
-        course (XBlock): The course descriptor.
+        course (XBlock): The course block.
 
     Returns:
         group name (String): Group name of the matching group xblock.
@@ -397,14 +569,14 @@ def get_user_partition_info(xblock, schemes=None, course=None):
         schemes (iterable of str): If provided, filter partitions to include only
             schemes with the provided names.
 
-        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+        course (XBlock): The course block.  If provided, uses this to look up the user partitions
             instead of loading the course.  This is useful if we're calling this function multiple
             times for the same course want to minimize queries to the modulestore.
 
     Returns: list
 
     Example Usage:
-    >>> get_user_partition_info(block, schemes=["cohort", "verification"])
+    >>> get_user_partition_info(xblock, schemes=["cohort", "verification"])
     [
         {
             "id": 12345,
@@ -507,7 +679,7 @@ def get_visibility_partition_info(xblock, course=None):
     Arguments:
         xblock (XBlock): The component being edited.
 
-        course (XBlock): The course descriptor.  If provided, uses this to look up the user partitions
+        course (XBlock): The course block.  If provided, uses this to look up the user partitions
             instead of loading the course.  This is useful if we're calling this function multiple
             times for the same course want to minimize queries to the modulestore.
 
@@ -567,8 +739,8 @@ def get_xblock_aside_instance(usage_key):
     :param usage_key: Usage key of aside xblock
     """
     try:
-        descriptor = modulestore().get_item(usage_key.usage_key)
-        for aside in descriptor.runtime.get_asides(descriptor):
+        xblock = modulestore().get_item(usage_key.usage_key)
+        for aside in xblock.runtime.get_asides(xblock):
             if aside.scope_ids.block_type == usage_key.aside_type:
                 return aside
     except ItemNotFoundError:
@@ -731,3 +903,35 @@ def translation_language(language):
             translation.activate(previous)
     else:
         yield
+
+
+def get_subsections_by_assignment_type(course_key):
+    """
+    Construct a dictionary mapping each found assignment type in the course
+    to a list of dictionaries with the display name of the subsection and
+    the display name of the section they are in
+    """
+    subsections_by_assignment_type = defaultdict(list)
+
+    with modulestore().bulk_operations(course_key):
+        course = modulestore().get_course(course_key, depth=3)
+        sections = course.get_children()
+        for section in sections:
+            subsections = section.get_children()
+            for subsection in subsections:
+                if subsection.format:
+                    subsections_by_assignment_type[subsection.format].append(
+                        f'{section.display_name} - {subsection.display_name}'
+                    )
+    return subsections_by_assignment_type
+
+
+def update_course_discussions_settings(course_key):
+    """
+    Updates course provider_type when new course is created
+    """
+    provider = DiscussionsConfiguration.get(context_key=course_key).provider_type
+    store = modulestore()
+    course = store.get_course(course_key)
+    course.discussions_settings['provider_type'] = provider
+    store.update_item(course, course.published_by)

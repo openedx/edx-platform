@@ -457,7 +457,7 @@ class ImportManager:
     @abstractmethod
     def get_courselike(self, courselike_key, runtime, dest_id):
         """
-        Given a key, a runtime, and an intended destination key, get the descriptor for the courselike
+        Given a key, a runtime, and an intended destination key, get the block for the courselike
         we'll be importing into.
         """
         raise NotImplementedError
@@ -739,7 +739,7 @@ class LibraryImportManager(ImportManager):
 
     def get_courselike(self, courselike_key, runtime, dest_id):
         """
-        Get the descriptor of the library from the XML import modulestore.
+        Get the block of the library from the XML import modulestore.
         """
         source_library = self.xml_module_store.get_library(courselike_key)
         library, library_data_path = self.import_courselike(
@@ -974,7 +974,7 @@ def _import_course_draft(
         # in the list of children since they would have been
         # filtered out from the non-draft store export.
         if parent_url is not None and index is not None:
-            course_key = descriptor.location.course_key
+            course_key = block.location.course_key
             parent_location = UsageKey.from_string(parent_url).map_into_course(course_key)
 
             # IMPORTANT: Be sure to update the parent in the NEW namespace
@@ -1018,7 +1018,7 @@ def _import_course_draft(
                     # Therefore only process verticals at the unit level, assuming that any other
                     # verticals must be descendants.
                     if 'index_in_children_list' in xml:
-                        descriptor = system.process_xml(xml)
+                        block = system.process_xml(xml)
 
                         # HACK: since we are doing partial imports of drafts
                         # the vertical doesn't have the 'url-name' set in the
@@ -1026,14 +1026,14 @@ def _import_course_draft(
                         # aka sequential), so we have to replace the location.name
                         # with the XML filename that is part of the pack
                         filename, __ = os.path.splitext(filename)
-                        descriptor.location = descriptor.location.replace(name=filename)
+                        block.location = block.location.replace(name=filename)
 
-                        index = index_in_children_list(descriptor)
-                        parent_url = get_parent_url(descriptor, xml)
-                        draft_url = str(descriptor.location)
+                        index = index_in_children_list(block)
+                        parent_url = get_parent_url(block, xml)
+                        draft_url = str(block.location)
 
                         draft = draft_node_constructor(
-                            block=descriptor, url=draft_url, parent_url=parent_url, index=index
+                            block=block, url=draft_url, parent_url=parent_url, index=index
                         )
                         drafts.append(draft)
 
@@ -1047,7 +1047,7 @@ def _import_course_draft(
         try:
             _import_block(draft.module)
         except Exception:  # pylint: disable=broad-except
-            logging.exception(f'Course import {source_course_id}: while importing draft descriptor {draft.module}')
+            logging.exception(f'Course import {source_course_id}: while importing draft block {draft.module}')
 
 
 def allowed_metadata_by_category(category):

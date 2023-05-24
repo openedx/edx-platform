@@ -25,8 +25,8 @@ define(
                         editable: editable,
                         showMessages: false,
                         title: 'About me',
-                        placeholderValue: 'Tell other edX learners a little about yourself: where you live, ' +
-                            "what your interests are, why you're taking courses on edX, or what you hope to learn.",
+                        placeholderValue: 'Tell other edX learners a little about yourself: where you live, '
+                            + "what your interests are, why you're taking courses on edX, or what you hope to learn.",
                         valueAttribute: 'bio',
                         helpMessage: '',
                         messagePosition: 'header'

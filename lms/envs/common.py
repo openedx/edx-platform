@@ -1515,6 +1515,7 @@ GOOGLE_ANALYTICS_ACCOUNT = None
 GOOGLE_SITE_VERIFICATION_ID = ''
 GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
 GOOGLE_ANALYTICS_TRACKING_ID = None
+GOOGLE_ANALYTICS_4_ID = None
 
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
@@ -1639,7 +1640,7 @@ DATABASES = {
         'ATOMIC_REQUESTS': True,
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'NAME': 'edxapp',
         'OPTIONS': {},
         'PASSWORD': 'password',
@@ -1649,7 +1650,7 @@ DATABASES = {
     'read_replica': {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'NAME': 'edxapp',
         'OPTIONS': {},
         'PASSWORD': 'password',
@@ -1659,7 +1660,7 @@ DATABASES = {
     'student_module_history': {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'NAME': 'edxapp_csmh',
         'OPTIONS': {},
         'PASSWORD': 'password',
@@ -1764,7 +1765,6 @@ SITE_NAME = "localhost"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
-
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
@@ -2695,7 +2695,8 @@ REQUIRE_JS_PATH_OVERRIDES = {
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json'),
+        'LOADER_CLASS': 'xmodule.util.xmodule_django.XModuleWebpackLoader',
     },
     'WORKERS': {
         'BUNDLE_DIR_NAME': 'bundles/',
@@ -2954,7 +2955,10 @@ INSTALLED_APPS = [
     'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'django.contrib.staticfiles',
+
+    # Tweaked version of django.contrib.staticfiles
+    'openedx.core.djangoapps.staticfiles.apps.EdxPlatformStaticFilesConfig',
+
     'django_celery_results',
 
     # Common Initialization
@@ -5296,6 +5300,8 @@ URLS_2U_LOBS = {
     'boot_camps': 'https://www.edx.org/boot-camps',
 }
 
+############ Settings for externally hosted executive education courses ############
+EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
 
 ############## PLOTLY ##############
 
@@ -5313,3 +5319,4 @@ SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
 
 SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
 SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
+SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None

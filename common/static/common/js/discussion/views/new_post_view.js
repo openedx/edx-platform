@@ -1,6 +1,7 @@
 /* globals _, Backbone, DiscussionTopicMenuView, DiscussionUtil, Thread */
 (function() {
     'use strict';
+
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {
@@ -221,8 +222,7 @@
                             if (discussionBreadcrumbsModel.get('contents').length) {
                                 discussionBreadcrumbsModel.set('contents', self.topicView.topicText.split('/'));
                             }
-                            self.discussionBoardView.discussionThreadListView.discussionIds =
-                                self.topicView.currentTopicId;
+                            self.discussionBoardView.discussionThreadListView.discussionIds = self.topicView.currentTopicId;
                         }
                         self.$el.addClass('is-hidden');
                         self.resetForm();
@@ -241,7 +241,7 @@
             NewPostView.prototype.cancel = function(event) {
                 event.preventDefault();
                 if (this.formModified()) {
-                    if (!confirm(gettext('Your post will be discarded.'))) {  // eslint-disable-line no-alert
+                    if (!confirm(gettext('Your post will be discarded.'))) { // eslint-disable-line no-alert
                         return;
                     }
                 }

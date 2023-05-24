@@ -652,6 +652,9 @@ OPTIMIZELY_FULLSTACK_SDK_KEY = None
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
 
+######################## HOTJAR ###########################
+HOTJAR_ID = 00000
+
 ############################# TEMPLATE CONFIGURATION #############################
 # Mako templating
 import tempfile
@@ -1436,7 +1439,8 @@ REQUIRE_DEBUG = False
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json'),
+        'LOADER_CLASS': 'xmodule.util.xmodule_django.XModuleWebpackLoader',
     },
     'WORKERS': {
         'BUNDLE_DIR_NAME': 'bundles/',
@@ -1562,8 +1566,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+
+    # Tweaked version of django.contrib.staticfiles
+    'openedx.core.djangoapps.staticfiles.apps.EdxPlatformStaticFilesConfig',
+
     'django_celery_results',
+
     'method_override',
 
     # Common Initialization
@@ -2232,6 +2240,12 @@ PARTNER_SUPPORT_EMAIL = ''
 
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'dev_affiliate_id'
+
+# API access management
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
+API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
+API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
+AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
 
 ############## Settings for Studio Context Sensitive Help ##############
 

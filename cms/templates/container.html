@@ -48,7 +48,8 @@ from openedx.core.djangolib.markup import HTML, Text
             {
                 isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
                 canEdit: true,
-                outlineURL: "${outline_url | n, js_escaped_string}"
+                outlineURL: "${outline_url | n, js_escaped_string}",
+                clipboardData: ${user_clipboard | n, dump_js_escaped_json},
             }
         );
         require(["js/models/xblock_info", "js/views/xblock", "js/views/utils/xblock_utils", "common/js/components/utils/view_utils"], function (XBlockInfo, XBlockView, XBlockUtils, ViewUtils) {
@@ -203,7 +204,9 @@ from openedx.core.djangolib.markup import HTML, Text
                             <h5 class="title">${_("Location ID")}</h5>
                             <p class="unit-id">
                                 <span class="unit-id-value" id="unit-location-id-input">${unit.location.block_id}</span>
-                                <span class="tip"><span class="sr">Tip: </span>${Text(_('To create a link to this unit from an HTML component in this course, enter "/jump_to_id/<location ID>" as the URL value.'))}</span>
+                                <span class="tip"><span class="sr">Tip: </span>${Text(_('To create a link to this unit from an HTML component in this course, enter {unit_link} as the URL value.')).format(
+                                    unit_link="/jump_to_id/{}".format(unit.location.block_id)
+                                )}</span>
                             </p>
                         </div>
                      </div>

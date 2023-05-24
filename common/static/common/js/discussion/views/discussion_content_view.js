@@ -1,6 +1,7 @@
 /* globals _, Backbone, DiscussionContentView, DiscussionUtil */
 (function() {
     'use strict';
+
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {
@@ -262,9 +263,9 @@
                     },
                     endorsed: function(endorsed) {
                         var $button, selector;
-                        selector = this.model.get('thread').get('thread_type') === 'question' ?
-                            '.action-answer' :
-                            '.action-endorse';
+                        selector = this.model.get('thread').get('thread_type') === 'question'
+                            ? '.action-answer'
+                            : '.action-endorse';
                         this.updateButtonState(selector, endorsed);
                         $button = this.$(selector);
                         $button.closest('.actions-item').toggleClass('is-hidden', !this.model.canBeEndorsed());
@@ -380,9 +381,9 @@
                 };
                 if (this.model.get('thread').get('thread_type') === 'question') {
                     if (isEndorsing) {
-                        msg = gettext('This response could not be marked as an answer. Refresh the page and try again.');  // eslint-disable-line max-len
+                        msg = gettext('This response could not be marked as an answer. Refresh the page and try again.'); // eslint-disable-line max-len
                     } else {
-                        msg = gettext('This response could not be unmarked as an answer. Refresh the page and try again.');  // eslint-disable-line max-len
+                        msg = gettext('This response could not be unmarked as an answer. Refresh the page and try again.'); // eslint-disable-line max-len
                     }
                 } else {
                     if (isEndorsing) {
@@ -508,8 +509,8 @@
                     return _.template($('#post-user-display-template').html())({
                         username: endorsement.username,
                         user_url: DiscussionUtil.urlFor('user_profile', endorsement.user_id),
-                        is_community_ta: DiscussionUtil.isTA(endorsement.user_id) ||
-                                         DiscussionUtil.isGroupTA(endorsement.user_id),
+                        is_community_ta: DiscussionUtil.isTA(endorsement.user_id)
+                                         || DiscussionUtil.isGroupTA(endorsement.user_id),
                         is_staff: DiscussionUtil.isStaff(endorsement.user_id)
                     });
                 } else {

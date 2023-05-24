@@ -73,7 +73,7 @@ def answer_problem(course, request, problem, score=1, max_value=1):
 
     user = request.user
     grade_dict = {'value': score, 'max_value': max_value, 'user_id': user.id}
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+    field_data_cache = FieldDataCache.cache_for_block_descendents(
         course.id,
         user,
         course,

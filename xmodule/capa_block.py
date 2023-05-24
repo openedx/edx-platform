@@ -47,7 +47,7 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin
 from common.djangoapps.xblock_django.constants import (
-    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ID,
 )
@@ -165,7 +165,6 @@ class ProblemBlock(
     icon_class = 'problem'
 
     uses_xmodule_styles_setup = True
-    requires_per_student_anonymous_id = True
 
     preview_view_js = {
         'js': [
@@ -822,7 +821,7 @@ class ProblemBlock(
             text = self.data
 
         user_service = self.runtime.service(self, 'user')
-        anonymous_student_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+        anonymous_student_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
         seed = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
 
         sandbox_service = self.runtime.service(self, 'sandbox')

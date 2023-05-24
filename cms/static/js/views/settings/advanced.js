@@ -26,7 +26,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
         },
         render: function() {
         // catch potential outside call before template loaded
-            if (!this.template) return this;
+            if (!this.template) { return this; }
 
             var listEle$ = this.$el.find('.course-advanced-policy-list');
             listEle$.empty();
@@ -61,7 +61,8 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
             var cm = CodeMirror.fromTextArea(textarea, {
                 mode: 'application/json',
                 lineNumbers: false,
-                lineWrapping: false});
+                lineWrapping: false
+            });
             cm.on('change', function(instance, changeobj) {
                 instance.save();
                 // this event's being called even when there's no change :-(
@@ -138,7 +139,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
             this.model.save({}, {
                 success: function() {
                     var title = gettext('Your policy changes have been saved.');
-                    var message = gettext('No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.');  // eslint-disable-line max-len
+                    var message = gettext('No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.'); // eslint-disable-line max-len
                     self.render();
                     self.showSavedBar(title, message);
                     analytics.track('Saved Advanced Settings', {
@@ -149,7 +150,7 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
                 error: function(model, response, options) {
                     var jsonResponse;
 
-                    /* Check that the server came back with a bad request error*/
+                    /* Check that the server came back with a bad request error */
                     if (response.status === 400) {
                         jsonResponse = $.parseJSON(response.responseText);
                         self.showErrorModal(jsonResponse);
@@ -175,9 +176,16 @@ function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUt
         },
         renderTemplate: function(key, model) {
             var newKeyId = _.uniqueId('policy_key_'),
-                newEle = this.template({key: key, display_name: model.display_name, help: model.help,
-                    value: JSON.stringify(model.value, null, 4), deprecated: model.deprecated,
-                    keyUniqueId: newKeyId, valueUniqueId: _.uniqueId('policy_value_'), hidden: model.hidden});
+                newEle = this.template({
+                    key: key,
+                    display_name: model.display_name,
+                    help: model.help,
+                    value: JSON.stringify(model.value, null, 4),
+                    deprecated: model.deprecated,
+                    keyUniqueId: newKeyId,
+                    valueUniqueId: _.uniqueId('policy_value_'),
+                    hidden: model.hidden
+                });
 
             this.fieldToSelectorMap[key] = newKeyId;
             this.selectorToField[newKeyId] = key;

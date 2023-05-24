@@ -382,7 +382,7 @@ class CourseInstantiationTests(ModuleStoreTestCase):
         course = modulestore().get_course(course.id, depth=course_depth)
 
         for _ in range(loops):
-            field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            field_data_cache = FieldDataCache.cache_for_block_descendents(
                 course.id, self.user, course, depth=course_depth
             )
             course_block = get_block_for_descriptor(

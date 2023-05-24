@@ -188,9 +188,9 @@
             if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                 if (reportError !== false) {
                     console.log(
-                        'ERROR: In answer there exists a ' +
-                    'draggable ID "' + draggableId + '". No ' +
-                    'draggable with this ID could be found.'
+                        'ERROR: In answer there exists a '
+                    + 'draggable ID "' + draggableId + '". No '
+                    + 'draggable with this ID could be found.'
                     );
                 }
 
@@ -200,9 +200,9 @@
             if ((target = getById(state, 'targets', targetId)) === null) {
                 if (reportError !== false) {
                     console.log(
-                        'ERROR: In answer there exists a target ' +
-                    'ID "' + targetId + '". No target with this ' +
-                    'ID could be found.'
+                        'ERROR: In answer there exists a target '
+                    + 'ID "' + targetId + '". No target with this '
+                    + 'ID could be found.'
                     );
                 }
 
@@ -226,9 +226,9 @@
 
                         if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                             console.log(
-                                'ERROR: In answer there exists a ' +
-                            'draggable ID "' + draggableId + '". No ' +
-                            'draggable with this ID could be found.'
+                                'ERROR: In answer there exists a '
+                            + 'draggable ID "' + draggableId + '". No '
+                            + 'draggable with this ID could be found.'
                             );
 
                             continue;
@@ -313,20 +313,20 @@
                     if (type === 'draggables') {
                         if ((targetId !== undefined) && (inContainer === false) && (baseDraggableId !== undefined) && (baseTargetId !== undefined)) {
                             if (
-                                (state[type][c1].id === id) &&
-                            (state[type][c1].inContainer === false) &&
-                            (state[type][c1].onTarget.id === targetId) &&
-                            (state[type][c1].onTarget.type === 'on_drag') &&
-                            (state[type][c1].onTarget.draggableObj.id === baseDraggableId) &&
-                            (state[type][c1].onTarget.draggableObj.onTarget.id === baseTargetId)
+                                (state[type][c1].id === id)
+                            && (state[type][c1].inContainer === false)
+                            && (state[type][c1].onTarget.id === targetId)
+                            && (state[type][c1].onTarget.type === 'on_drag')
+                            && (state[type][c1].onTarget.draggableObj.id === baseDraggableId)
+                            && (state[type][c1].onTarget.draggableObj.onTarget.id === baseTargetId)
                             ) {
                                 return state[type][c1];
                             }
                         } else if ((targetId !== undefined) && (inContainer === false)) {
                             if (
-                                (state[type][c1].id === id) &&
-                            (state[type][c1].inContainer === false) &&
-                            (state[type][c1].onTarget.id === targetId)
+                                (state[type][c1].id === id)
+                            && (state[type][c1].inContainer === false)
+                            && (state[type][c1].onTarget.id === targetId)
                             ) {
                                 return state[type][c1];
                             }

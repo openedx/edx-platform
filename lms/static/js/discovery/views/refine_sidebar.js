@@ -28,9 +28,9 @@
             },
 
             termName: function(facetKey, termKey) {
-                return this.meanings[facetKey] &&
-                this.meanings[facetKey].terms &&
-                this.meanings[facetKey].terms[termKey] || termKey;
+                return this.meanings[facetKey]
+                && this.meanings[facetKey].terms
+                && this.meanings[facetKey].terms[termKey] || termKey;
             },
 
             renderOptions: function(options) {

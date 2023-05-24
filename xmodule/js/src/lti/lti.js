@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+
     /**
      * This function will process all the attributes from the DOM element passed, taking all of
      * the configuration attributes. It uses the request-username and request-email

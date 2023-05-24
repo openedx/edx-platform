@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define(['jquery', 'underscore'], function($, _) {
     /**
      * Loads the named template from the page, or logs an error if it fails.

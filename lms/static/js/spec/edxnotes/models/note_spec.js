@@ -2,6 +2,7 @@ define([
     'js/spec/edxnotes/helpers', 'js/edxnotes/collections/notes'
 ], function(Helpers, NotesCollection) {
     'use strict';
+
     describe('EdxNotes NoteModel', function() {
         beforeEach(function() {
             this.collection = new NotesCollection(

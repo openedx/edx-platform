@@ -922,7 +922,7 @@ class ModuleStoreRead(ModuleStoreAssetBase, metaclass=ABCMeta):
     def get_course(self, course_id, depth=0, **kwargs):
         '''
         Look for a specific course by its id (:class:`CourseKey`).
-        Returns the course descriptor, or None if not found.
+        Returns the course block, or None if not found.
         '''
         pass  # lint-amnesty, pylint: disable=unnecessary-pass
 
@@ -1286,8 +1286,8 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         # clone a default 'about' overview block as well
         about_location = self.make_course_key(org, course, run).make_usage_key('about', 'overview')
 
-        about_descriptor = XBlock.load_class('about')
-        overview_template = about_descriptor.get_template('overview.yaml')
+        about_block = XBlock.load_class('about')
+        overview_template = about_block.get_template('overview.yaml')
         self.create_item(
             user_id,
             about_location.course_key,
@@ -1386,10 +1386,3 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         """
         if self.signal_handler:
             self.signal_handler.send("item_deleted", usage_key=usage_key, user_id=user_id)
-
-
-def only_xmodules(identifier, entry_points):
-    """Only use entry_points that are supplied by the xmodule package"""
-    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
-
-    return default_select(identifier, from_xmodule)
