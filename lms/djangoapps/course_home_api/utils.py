@@ -10,7 +10,7 @@ def get_course_or_403(*args, **kwargs):
     When we make requests to the various Learner Home API endpoints, we do not want to return the actual redirects,
     Instead we should return an error code. The redirect info is returned from the course metadata endpoint and the
     URL can be followed by whatever client is calling.
-    
+
     Raises:
      - 404 if course is not found
      - 403 if the requesting user does not have access to the course
