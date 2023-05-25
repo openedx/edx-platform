@@ -151,6 +151,7 @@ class Class(TimeStampedModel):
     students = models.ManyToManyField(Student, blank=True, through="genplus.ClassStudents", related_name='classes')
     program = models.ForeignKey('genplus_learning.Program', on_delete=models.CASCADE, null=True, blank=True,
                                 related_name="classes")
+    last_synced = models.DateTimeField(null=True, blank=True)
     objects = models.Manager()
     visible_objects = ClassManager()
 
@@ -298,6 +299,25 @@ class GenLog(TimeStampedModel):
             gen_log_type=GenLogTypes.RM_UNIFY_PROVISION_UPDATE_USER_DELETE,
             description=f'user with guid {user_guid} removed from the system',
             metadata=details,
+        )
+
+    @classmethod
+    def create_more_than_one_school_log(cls, email, school, class_name):
+        cls.objects.create(
+            gen_log_type=GenLogTypes.STUDENT_PART_OF_MORE_THAN_ONE_SCHOOL,
+            description=f'user with {email} is part of more than one school',
+            metadata={
+                'school': school,
+                'class': class_name
+            },
+        )
+
+    @classmethod
+    def program_enrollment_log(cls, email, details=None):
+        cls.objects.create(
+            gen_log_type=GenLogTypes.PROGRAM_ENROLLMENTS_REMOVE,
+            description=f'Program Enrollment delete for user {email}',
+            metadata=details
         )
 
 

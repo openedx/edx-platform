@@ -11,6 +11,8 @@ from openedx.features.genplus_features.genplus.models import GenUser, Student, S
 from openedx.features.genplus_features.genplus.constants import SchoolTypes, ClassTypes, GenUserRoles
 from .constants import RmUnifyUpdateTypes
 from django.db.models import Q
+from django.utils.timezone import get_current_timezone
+from django.db.utils import IntegrityError
 from django.contrib.auth.models import User
 
 
@@ -108,17 +110,27 @@ class RmUnify(BaseRmUnify):
             for student_data in data['Students']:
                 student_email = student_data.get('UnifyEmailAddress')
                 identity_guid = student_data.get('IdentityGuid')
-                gen_user, created = GenUser.objects.get_or_create(
-                    email=student_email,
-                    role=GenUserRoles.STUDENT,
-                    school=gen_class.school,
-                )
-                # update the identity_guid
-                gen_user.identity_guid = identity_guid
-                gen_user.save()
-                gen_user_ids.append(gen_user.pk)
-                if created:
-                    logger.info('Student with email {} created.'.format(gen_user.email))
+                try:
+                    gen_user, created = GenUser.objects.get_or_create(
+                        email=student_email,
+                        role=GenUserRoles.STUDENT,
+                        school=gen_class.school,
+                    )
+                    # update the identity_guid
+                    gen_user.identity_guid = identity_guid
+                    gen_user.save()
+                    gen_user_ids.append(gen_user.pk)
+                    if created:
+                        logger.info('Student with email {} created.'.format(gen_user.email))
+                except IntegrityError:
+                    logger.error('Error while creating {}.'.format(student_email))
+                    # still adding it to the class (for not removing it in the process)
+                    gen_user = GenUser.objects.get(email=student_email)
+                    gen_user_ids.append(gen_user.pk)
+                    # creating GenLog for more than one school
+                    GenLog.create_more_than_one_school_log(student_email, gen_class.school.name, gen_class.name)
+                    continue
+
             gen_students = Student.objects.filter(gen_user__in=gen_user_ids)
             gen_class.students.add(*gen_students)
             logger.info('_____{} students added to {}_____'.format(str(gen_students.count()), gen_class.name))
@@ -126,6 +138,9 @@ class RmUnify(BaseRmUnify):
             to_be_removed_students = gen_class.students.exclude(gen_user__id__in=gen_user_ids)
             # remove the remaining users from the class
             gen_class.students.remove(*to_be_removed_students)
+            # update the last synced timestamp
+            gen_class.last_synced = datetime.now(tz=get_current_timezone())
+            gen_class.save()
 
 
 class RmUnifyProvisioning(BaseRmUnify):

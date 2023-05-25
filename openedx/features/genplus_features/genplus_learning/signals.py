@@ -122,6 +122,13 @@ def create_activity_on_lesson_completion(sender, instance, created, **kwargs):
 def delete_course_enrollments(sender, instance, **kwargs):
     course_ids = instance.program.all_units_ids
     CourseEnrollment.objects.filter(user=instance.student.gen_user.user, course__in=course_ids).delete()
+    # Create GenLog for Program Enrollment Deletion
+    details = {
+        'program': instance.program.year_group.name,
+        'class': instance.gen_class.name
+    }
+    GenLog.program_enrollment_log(instance.student.gen_user.email,
+                                  details=details)
 
 
 @receiver(pre_delete, sender=Program)

@@ -290,7 +290,8 @@ class ClassAdmin(admin.ModelAdmin):
         'is_visible',
         'program',
         'type',
-        'enrolled_students'
+        'enrolled_students',
+        'last_synced'
     )
     list_filter = ('school', 'is_visible', 'program', 'type')
     search_fields = ('name',)

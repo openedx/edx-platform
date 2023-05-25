@@ -14,7 +14,7 @@ from completion.models import BlockCompletion
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.course_modes.models import CourseMode
-from openedx.features.genplus_features.genplus.models import Class
+from openedx.features.genplus_features.genplus.models import Class, Student
 from openedx.features.genplus_features.genplus.constants import GenUserRoles
 from openedx.features.genplus_features.genplus_learning.models import (
     Program, ProgramEnrollment, UnitCompletion, UnitBlockCompletion
@@ -112,10 +112,10 @@ def unenroll_class_students_from_program(self, class_id, program_id, class_stude
         log.info("Class or program id does not exist")
         return
 
-    removed_class_students = gen_class.students.select_related('gen_user').filter(pk__in=class_student_ids)
+    removed_class_students = Student.objects.filter(pk__in=class_student_ids)
 
     for student in removed_class_students:
-        ProgramEnrollment.objects.filter(program=program,gen_class=gen_class, student=student).delete()
+        ProgramEnrollment.objects.filter(program=program, gen_class=gen_class, student=student).delete()
         if student.active_class.pk == gen_class.pk:
             student.active_class = None
             student.save()
