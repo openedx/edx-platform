@@ -7,23 +7,27 @@ paths actually work.
 """
 
 
-import json  # lint-amnesty, pylint: disable=wrong-import-order
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
+import json  # lint-amnesty, pylint: disable=wrong-import-order
 from itertools import chain, cycle, repeat  # lint-amnesty, pylint: disable=wrong-import-order
-from smtplib import (  # lint-amnesty, pylint: disable=wrong-import-order
-    SMTPAuthenticationError,
-    SMTPConnectError,
-    SMTPDataError,
-    SMTPSenderRefused,
-    SMTPServerDisconnected
-)
+from smtplib import SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPServerDisconnected, SMTPSenderRefused  # lint-amnesty, pylint: disable=wrong-import-order
 from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
 from uuid import uuid4  # lint-amnesty, pylint: disable=wrong-import-order
-
 import pytest
-from botocore.exceptions import ClientError, EndpointConnectionError
+from boto.exception import AWSConnectionError
+from boto.ses.exceptions import (
+    SESAddressBlacklistedError,
+    SESAddressNotVerifiedError,
+    SESDailyQuotaExceededError,
+    SESDomainEndsWithDotError,
+    SESDomainNotConfirmedError,
+    SESIdentityNotVerifiedError,
+    SESIllegalAddressError,
+    SESLocalAddressCharacterError,
+    SESMaxSendingRateExceededError
+)
 from celery.states import FAILURE, SUCCESS
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.management import call_command
 from django.test.utils import override_settings
@@ -264,22 +268,19 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_ses_blacklisted_user(self):
         # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
-
-        operation_name = ''
-        parsed_response = {'Error': {'Code': 'MessageRejected', 'Message': 'Error Uploading'}}
-        self._test_email_address_failures(ClientError(parsed_response, operation_name))
+        self._test_email_address_failures(SESAddressBlacklistedError(554, "Email address is blacklisted"))
 
     def test_ses_illegal_address(self):
         # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
-        operation_name = ''
-        parsed_response = {'Error': {'Code': 'MailFromDomainNotVerifiedException', 'Message': 'Error Uploading'}}
-        self._test_email_address_failures(ClientError(parsed_response, operation_name))
+        self._test_email_address_failures(SESIllegalAddressError(554, "Email address is illegal"))
+
+    def test_ses_local_address_character_error(self):
+        # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
+        self._test_email_address_failures(SESLocalAddressCharacterError(554, "Email address contains a bad character"))
 
     def test_ses_domain_ends_with_dot(self):
         # Test that celery handles permanent SMTPDataErrors by failing and not retrying.
-        operation_name = ''
-        parsed_response = {'Error': {'Code': 'MailFromDomainNotVerifiedException', 'Message': 'invalid domain'}}
-        self._test_email_address_failures(ClientError(parsed_response, operation_name))
+        self._test_email_address_failures(SESDomainEndsWithDotError(554, "Email address ends with a dot"))
 
     def test_bulk_email_skip_with_non_ascii_emails(self):
         """
@@ -366,12 +367,12 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_retry_after_aws_connect_error(self):
         self._test_retry_after_limited_retry_error(
-            EndpointConnectionError(endpoint_url="Could not connect to the endpoint URL:")
+            AWSConnectionError("Unable to provide secure connection through proxy")
         )
 
     def test_max_retry_after_aws_connect_error(self):
         self._test_max_retry_limit_causes_failure(
-            EndpointConnectionError(endpoint_url="Could not connect to the endpoint URL:")
+            AWSConnectionError("Unable to provide secure connection through proxy")
         )
 
     def test_retry_after_general_error(self):
@@ -415,6 +416,11 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
             SMTPSenderRefused(421, "Throttling: Sending rate exceeded", self.instructor.email)
         )
 
+    def test_retry_after_ses_throttling_error(self):
+        self._test_retry_after_unlimited_retry_error(
+            SESMaxSendingRateExceededError(455, "Throttling: Sending rate exceeded")
+        )
+
     def _test_immediate_failure(self, exception):
         """Test that celery can hit a maximum number of retries."""
         # Doesn't really matter how many recipients, since we expect
@@ -437,6 +443,18 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
 
     def test_failure_on_unhandled_smtp(self):
         self._test_immediate_failure(SMTPAuthenticationError(403, "That password doesn't work!"))
+
+    def test_failure_on_ses_quota_exceeded(self):
+        self._test_immediate_failure(SESDailyQuotaExceededError(403, "You're done for the day!"))
+
+    def test_failure_on_ses_address_not_verified(self):
+        self._test_immediate_failure(SESAddressNotVerifiedError(403, "Who *are* you?"))
+
+    def test_failure_on_ses_identity_not_verified(self):
+        self._test_immediate_failure(SESIdentityNotVerifiedError(403, "May I please see an ID!"))
+
+    def test_failure_on_ses_domain_not_confirmed(self):
+        self._test_immediate_failure(SESDomainNotConfirmedError(403, "You're out of bounds!"))
 
     def test_bulk_emails_with_unicode_course_image_name(self):
         # Test bulk email with unicode characters in course image name

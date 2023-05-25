@@ -10,10 +10,21 @@ import re
 import time
 from collections import Counter
 from datetime import datetime
-from smtplib import SMTPConnectError, SMTPDataError, SMTPException, SMTPSenderRefused, SMTPServerDisconnected
+from smtplib import SMTPConnectError, SMTPDataError, SMTPException, SMTPServerDisconnected, SMTPSenderRefused
 from time import sleep
 
-from botocore.exceptions import ClientError, EndpointConnectionError
+from boto.exception import AWSConnectionError
+from boto.ses.exceptions import (
+    SESAddressBlacklistedError,
+    SESAddressNotVerifiedError,
+    SESDailyQuotaExceededError,
+    SESDomainEndsWithDotError,
+    SESDomainNotConfirmedError,
+    SESIdentityNotVerifiedError,
+    SESIllegalAddressError,
+    SESLocalAddressCharacterError,
+    SESMaxSendingRateExceededError
+)
 from celery import current_task, shared_task
 from celery.exceptions import RetryTaskError
 from celery.states import FAILURE, RETRY, SUCCESS
@@ -23,8 +34,8 @@ from django.core.mail import get_connection
 from django.core.mail.message import forbid_multi_line_headers
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext as _
 from django.utils.translation import override as override_language
+from django.utils.translation import gettext as _
 from edx_django_utils.monitoring import set_code_owner_attribute
 from markupsafe import escape
 
@@ -32,12 +43,15 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from lms.djangoapps.branding.api import get_logo_url_for_email
 from lms.djangoapps.bulk_email.api import get_unsubscribed_link
-from lms.djangoapps.bulk_email.messages import ACEEmail, DjangoEmail
-from lms.djangoapps.bulk_email.models import CourseEmail, Optout
+from lms.djangoapps.bulk_email.messages import (
+    DjangoEmail,
+    ACEEmail,
+)
 from lms.djangoapps.bulk_email.toggles import (
     is_bulk_email_edx_ace_enabled,
-    is_email_use_course_id_from_for_bulk_enabled
+    is_email_use_course_id_from_for_bulk_enabled,
 )
+from lms.djangoapps.bulk_email.models import CourseEmail, Optout
 from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
@@ -52,11 +66,13 @@ from openedx.core.lib.courses import course_image_url
 
 log = logging.getLogger('edx.celery.task')
 
-
 # Errors that an individual email is failing to be sent, and should just
 # be treated as a fail.
 SINGLE_EMAIL_FAILURE_ERRORS = (
-    ClientError
+    SESAddressBlacklistedError,  # Recipient's email address has been temporarily blacklisted.
+    SESDomainEndsWithDotError,  # Recipient's email address' domain ends with a period/dot.
+    SESIllegalAddressError,  # Raised when an illegal address is encountered.
+    SESLocalAddressCharacterError,  # An address contained a control or whitespace character.
 )
 
 # Exceptions that, if caught, should cause the task to be re-tried.
@@ -64,7 +80,7 @@ SINGLE_EMAIL_FAILURE_ERRORS = (
 LIMITED_RETRY_ERRORS = (
     SMTPConnectError,
     SMTPServerDisconnected,
-    EndpointConnectionError,
+    AWSConnectionError,
 )
 
 # Errors that indicate that a mailing task should be retried without limit.
@@ -75,17 +91,20 @@ LIMITED_RETRY_ERRORS = (
 # Those not in this range (i.e. in the 5xx range) are treated as hard failures
 # and thus like SINGLE_EMAIL_FAILURE_ERRORS.
 INFINITE_RETRY_ERRORS = (
+    SESMaxSendingRateExceededError,  # Your account's requests/second limit has been exceeded.
     SMTPDataError,
     SMTPSenderRefused,
-    ClientError
 )
 
 # Errors that are known to indicate an inability to send any more emails,
 # and should therefore not be retried.  For example, exceeding a quota for emails.
 # Also, any SMTP errors that are not explicitly enumerated above.
 BULK_EMAIL_FAILURE_ERRORS = (
-    ClientError,
-    SMTPException
+    SESAddressNotVerifiedError,  # Raised when a "Reply-To" address has not been validated in SES yet.
+    SESIdentityNotVerifiedError,  # Raised when an identity has not been verified in SES yet.
+    SESDomainNotConfirmedError,  # Raised when domain ownership is not confirmed for DKIM.
+    SESDailyQuotaExceededError,  # 24-hour allotment of outbound email has been exceeded.
+    SMTPException,
 )
 
 
@@ -569,16 +588,13 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
 
             except SINGLE_EMAIL_FAILURE_ERRORS as exc:
                 # This will fall through and not retry the message.
-                if exc.response['Error']['Code'] in ['MessageRejected', 'MailFromDomainNotVerified', 'MailFromDomainNotVerifiedException', 'FromEmailAddressNotVerifiedException']:   # lint-amnesty, pylint: disable=line-too-long
-                    total_recipients_failed += 1
-                    log.exception(
-                        f"BulkEmail ==> Status: Failed(SINGLE_EMAIL_FAILURE_ERRORS), Task: {parent_task_id}, SubTask: "
-                        f"{task_id}, EmailId: {email_id}, Recipient num: {recipient_num}/{total_recipients}, Recipient "
-                        f"UserId: {current_recipient['pk']}"
-                    )
-                    subtask_status.increment(failed=1)
-                else:
-                    raise exc
+                total_recipients_failed += 1
+                log.exception(
+                    f"BulkEmail ==> Status: Failed(SINGLE_EMAIL_FAILURE_ERRORS), Task: {parent_task_id}, SubTask: "
+                    f"{task_id}, EmailId: {email_id}, Recipient num: {recipient_num}/{total_recipients}, Recipient "
+                    f"UserId: {current_recipient['pk']}"
+                )
+                subtask_status.increment(failed=1)
 
             else:
                 total_recipients_successful += 1
@@ -615,13 +631,10 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
     except INFINITE_RETRY_ERRORS as exc:
         # Increment the "retried_nomax" counter, update other counters with progress to date,
         # and set the state to RETRY:
-        if isinstance(exc, (SMTPDataError, SMTPSenderRefused)) or exc.response['Error']['Code'] in ['LimitExceededException']:   # lint-amnesty, pylint: disable=line-too-long
-            subtask_status.increment(retried_nomax=1, state=RETRY)
-            return _submit_for_retry(
-                entry_id, email_id, to_list, global_email_context, exc, subtask_status, skip_retry_max=True
-            )
-        else:
-            raise exc
+        subtask_status.increment(retried_nomax=1, state=RETRY)
+        return _submit_for_retry(
+            entry_id, email_id, to_list, global_email_context, exc, subtask_status, skip_retry_max=True
+        )
 
     except LIMITED_RETRY_ERRORS as exc:
         # Errors caught here cause the email to be retried.  The entire task is actually retried
@@ -629,28 +642,21 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         # Errors caught are those that indicate a temporary condition that might succeed on retry.
         # Increment the "retried_withmax" counter, update other counters with progress to date,
         # and set the state to RETRY:
-
         subtask_status.increment(retried_withmax=1, state=RETRY)
         return _submit_for_retry(
             entry_id, email_id, to_list, global_email_context, exc, subtask_status, skip_retry_max=False
         )
 
     except BULK_EMAIL_FAILURE_ERRORS as exc:
-        if isinstance(exc, SMTPException) or exc.response['Error']['Code'] in [
-            'AccountSendingPausedException', 'MailFromDomainNotVerifiedException', 'LimitExceededException'
-        ]:
-            num_pending = len(to_list)
-            log.exception(
-                f"Task {task_id}: email with id {email_id} caused send_course_email "
-                f"task to fail with 'fatal' exception. "
-                f"{num_pending} emails unsent."
-            )
-            # Update counters with progress to date, counting unsent emails as failures,
-            # and set the state to FAILURE:
-            subtask_status.increment(failed=num_pending, state=FAILURE)
-            return subtask_status, exc
-        else:
-            raise exc
+        num_pending = len(to_list)
+        log.exception(
+            f"Task {task_id}: email with id {email_id} caused send_course_email task to fail with 'fatal' exception. "
+            f"{num_pending} emails unsent."
+        )
+        # Update counters with progress to date, counting unsent emails as failures,
+        # and set the state to FAILURE:
+        subtask_status.increment(failed=num_pending, state=FAILURE)
+        return subtask_status, exc
 
     except Exception as exc:  # pylint: disable=broad-except
         # Errors caught here cause the email to be retried.  The entire task is actually retried
