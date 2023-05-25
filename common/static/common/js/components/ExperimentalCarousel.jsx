@@ -3,13 +3,15 @@ import Slider from 'react-slick';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-/** Experimental Carousel as part of https://openedx.atlassian.net/browse/LEARNER-3583 **/
+/** Experimental Carousel as part of https://openedx.atlassian.net/browse/LEARNER-3583 * */
 
 function NextArrow(props) {
-    const {currentSlide, slideCount, onClick, displayedSlides} = props;
+    const {
+        currentSlide, slideCount, onClick, displayedSlides
+    } = props;
     const showArrow = slideCount - currentSlide > displayedSlides;
     const opts = {
-        className: classNames('js-carousel-nav', 'carousel-arrow', 'next', 'btn btn-secondary', {'active': showArrow}),
+        className: classNames('js-carousel-nav', 'carousel-arrow', 'next', 'btn btn-secondary', {active: showArrow}),
         onClick
     };
 
@@ -20,8 +22,8 @@ function NextArrow(props) {
     return (
         <button {...opts}>
             <span>Next </span>
-            <span className="icon fa fa-chevron-right" aria-hidden="true"></span>
-            <span className="sr">{ 'Scroll carousel forwards' }</span>
+            <span className="icon fa fa-chevron-right" aria-hidden="true" />
+            <span className="sr">Scroll carousel forwards</span>
         </button>
     );
 }
@@ -30,7 +32,7 @@ function PrevArrow(props) {
     const {currentSlide, onClick} = props;
     const showArrow = currentSlide > 0;
     const opts = {
-        className: classNames('js-carousel-nav', 'carousel-arrow', 'prev', 'btn btn-secondary', {'active': showArrow}),
+        className: classNames('js-carousel-nav', 'carousel-arrow', 'prev', 'btn btn-secondary', {active: showArrow}),
         onClick
     };
 
@@ -39,10 +41,10 @@ function PrevArrow(props) {
     }
 
     return (
-        <button {...opts} >
-            <span className="icon fa fa-chevron-left" aria-hidden="true"></span>
+        <button {...opts}>
+            <span className="icon fa fa-chevron-left" aria-hidden="true" />
             <span> Prev</span>
-            <span className="sr">{ 'Scroll carousel backwards' }</span>
+            <span className="sr">Scroll carousel backwards</span>
         </button>
     );
 }
@@ -63,11 +65,11 @@ export default class ExperimentalCarousel extends React.Component {
     }
 
     afterChange(activeIndex) {
-        this.setState({ activeIndex });
+        this.setState({activeIndex});
     }
 
     componentDidUpdate() {
-        const { activeIndex } = this.state;
+        const {activeIndex} = this.state;
 
         if (!isNaN(activeIndex)) {
             this.carousels[activeIndex].focus();
@@ -85,7 +87,7 @@ export default class ExperimentalCarousel extends React.Component {
                 },
                 tabIndex: tabIndex,
                 className: 'carousel-item'
-            }
+            };
 
             return (
                 <div {...carouselLinkProps}>
@@ -111,7 +113,7 @@ export default class ExperimentalCarousel extends React.Component {
         };
 
         return (
-            <Slider {...carouselSettings} >
+            <Slider {...carouselSettings}>
                 {this.getCarouselContent()}
             </Slider>
         );

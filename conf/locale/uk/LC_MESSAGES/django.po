@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/).
+# edX community translations have been downloaded from Ukrainian (http://app.transifex.com/open-edx/edx-platform/language/uk/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -32,7 +32,7 @@
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # Валентина Пицик <lushalusha007@gmail.com>, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/).
+# edX community translations have been downloaded from Ukrainian (http://app.transifex.com/open-edx/edx-platform/language/uk/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -47,11 +47,12 @@
 # Waheed Ahmed <waheed@edx.org>, 2019
 # Валентина Пицик <lushalusha007@gmail.com>, 2019
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
+# edX community translations have been downloaded from Ukrainian (http://app.transifex.com/open-edx/edx-platform/language/uk/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Alexandra Nabokina <alexandra.nabokina@raccoongang.com>, 2023
 # Alexey Shmalko <rasen.dubi@gmail.com>, 2015
 # b5a5d5cd2b8c637d1ac79fd846147b59_26cb89a <0e9f93b943aec65fc66f0e9c041009ed_739049>, 2018
 # Andrey Kryachko, 2018
@@ -79,7 +80,7 @@
 # Евгений Мовсесов <yevgeniy.movsesov@gmail.com>, 2020
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
+# edX community translations have been downloaded from Ukrainian (http://app.transifex.com/open-edx/edx-platform/language/uk/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -98,7 +99,7 @@
 # Андрей Поляков <polyakov.andrey@gmail.com>, 2016
 # Ксенія Воронова <ksenya.voronova@gmail.com>, 2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Ukrainian (http://www.transifex.com/open-edx/edx-platform/language/uk/)
+# edX community translations have been downloaded from Ukrainian (http://app.transifex.com/open-edx/edx-platform/language/uk/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -111,7 +112,7 @@
 # Валентина Пицик <lushalusha007@gmail.com>, 2019
 # Ксенія Воронова <ksenya.voronova@gmail.com>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)
+# edX community translations have been downloaded from Ukrainian (https://app.transifex.com/open-edx/teams/6205/uk/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -124,10 +125,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-02-19 20:42+0000\n"
+"POT-Creation-Date: 2023-05-17 08:57+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Danylo Shcherbak <danylo.shcherbak@raccoongang.com>, 2020\n"
-"Language-Team: Ukrainian (https://www.transifex.com/open-edx/teams/6205/uk/)\n"
+"Language-Team: Ukrainian (https://app.transifex.com/open-edx/teams/6205/uk/)\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -154,6 +155,7 @@ msgid "Discussion"
 msgstr "Обговорення"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr ""
@@ -161,6 +163,10 @@ msgstr ""
 #: lms/templates/video.html
 msgid "Video"
 msgstr "Відео"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "Звичайне завдання"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -209,6 +215,13 @@ msgstr "Транскрипти з кодом мови \"{language_code}\" вже
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Необхідний файл транскрипту. "
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -329,6 +342,17 @@ msgstr ""
 "ОПЦІОНАЛЬНО: Після цієї дати/часу, користувачи більше не зможуть "
 "зареєструватися в цьому режимі. Залиште це поле порожнім, якщо користувачам "
 "можна зареєструватись у цьому режимі, поки реєстрація на курс не закриється."
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -1655,9 +1679,22 @@ msgstr "Не підтримується"
 msgid "Unlock Account"
 msgstr ""
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a control to allow users to exit out of this modal
+#. interface (a menu or piece of UI that takes the full focus of the screen)
 #: common/templates/admin/student/loginfailures/change_form_template.html
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/includes/cheatsheet.html
+#: lms/templates/wiki/includes/cheatsheet.html lms/templates/ccx/schedule.html
+#: lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: lms/templates/forgot_password_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/invalidate_registration_code_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: lms/templates/modal/_modal-settings-language.html
+#: lms/templates/signup_modal.html
 msgid "Close"
 msgstr "Закрити"
 
@@ -2107,9 +2144,14 @@ msgid ""
 "their respective logos are registered trademarks of edX Inc."
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Open edX' is a trademark, please keep this untranslated.
 #. See http://openedx.org for more information.
-#: lms/djangoapps/branding/api.py
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
+#: lms/djangoapps/branding/api.py cms/templates/widgets/footer.html
+#: themes/red-theme/lms/templates/footer.html
 msgid "Powered by Open edX"
 msgstr "За підтримки Open edX"
 
@@ -2170,9 +2212,15 @@ msgstr "Новини"
 msgid "Terms of Service & Honor Code"
 msgstr "Умови надання послуг і Кодекс честі"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: A 'Privacy Policy' is a legal document/statement describing a
 #. website's use of personal information
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
+#: cms/templates/widgets/footer.html
+#: lms/templates/static_templates/privacy.html
+#: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Privacy Policy"
 msgstr "Політика конфіденційності"
 
@@ -2180,11 +2228,16 @@ msgstr "Політика конфіденційності"
 msgid "Accessibility Policy"
 msgstr "Політика щодо доступності матеріалів"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_authn/api/form_fields.py
 #: openedx/core/djangoapps/user_authn/views/registration_form.py
+#: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
+#: themes/red-theme/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/footer.html
+#: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "Умови надання послуг"
 
@@ -3103,6 +3156,8 @@ msgid "by {date}"
 msgstr "до {date}"
 
 #: lms/djangoapps/courseware/date_summary.py
+#: cms/templates/group_configurations.html
+#: lms/templates/courseware/program_marketing.html
 msgid "Learn More"
 msgstr "Дізнатися більше"
 
@@ -3240,6 +3295,10 @@ msgstr ""
 
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
+#: cms/templates/widgets/header.html
+#: lms/templates/courseware/course_navigation.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Course"
 msgstr "Курс"
 
@@ -3804,10 +3863,6 @@ msgstr "Мова"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
 msgstr "Місце розташування"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "Рік Народження"
 
 #. Translators: This label appears above a dropdown menu used to select
 #. the user's gender.
@@ -4908,6 +4963,7 @@ msgid "Optional language the team uses as ISO 639-1 code."
 msgstr "Код додаткової мови команди за стандартом ISO 639-1."
 
 #: lms/djangoapps/teams/plugins.py
+#: lms/djangoapps/teams/templates/teams/teams.html
 msgid "Teams"
 msgstr "Команди"
 
@@ -5648,6 +5704,7 @@ msgid "Allow"
 msgstr "Дозволити"
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Error"
 msgstr "Помилка"
 
@@ -5921,8 +5978,13 @@ msgstr "Попередній перегляд"
 msgid "Wiki Preview"
 msgstr "Попередній перегляд Вікі"
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this text gives status on if the modal interface (a menu or
+#. piece of UI that takes the full focus of the screen) is open or not
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
-#: lms/templates/wiki/includes/cheatsheet.html
+#: lms/templates/wiki/includes/cheatsheet.html lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_entitlement_unenrollment_modal.html
+#: lms/templates/modal/_modal-settings-language.html
 msgid "window open"
 msgstr "відкрити вікно"
 
@@ -6174,6 +6236,12 @@ msgstr ""
 "бути змінені в інших статтях, що може бути або не бути вдалим варіантом."
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/api_admin/catalogs/search.html
+#: lms/templates/courseware/courses.html
+#: lms/templates/courseware/courseware.html lms/templates/dashboard.html
+#: lms/templates/edxnotes/edxnotes.html lms/templates/index.html
+#: lms/templates/ux/reference/bootstrap/course-skeleton.html
+#: themes/stanford-style/lms/templates/index.html
 #: wiki/plugins/attachments/templates/wiki/plugins/attachments/index.html
 msgid "Search"
 msgstr "Пошук"
@@ -6798,6 +6866,37 @@ msgstr ""
 msgid "This user already has access to this library."
 msgstr ""
 
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Завантаження"
+
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -7383,6 +7482,10 @@ msgid "Experience"
 msgstr "Досвід"
 
 #: openedx/core/djangoapps/schedules/admin.py
+#: cms/templates/maintenance/_force_publish_course.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/support/feature_based_enrollments.html
 msgid "Course ID"
 msgstr "ID курсу"
 
@@ -7991,6 +8094,12 @@ msgstr "Успіх"
 #: openedx/core/djangoapps/user_api/admin.py
 msgid "Actions"
 msgstr "Дії"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -9376,10 +9485,6 @@ msgstr ""
 #: xmodule/capa/safe_exec/remote_exec.py
 msgid "Invalid JSON response received from codejail api service."
 msgstr ""
-
-#: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Звичайне завдання"
 
 #: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
@@ -10780,6 +10885,17 @@ msgstr ""
 "так і до контенту курсу)."
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "Викладач курсу"
 
@@ -11853,6 +11969,34 @@ msgstr ""
 msgid "Add discussion for the Unit."
 msgstr ""
 
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
+"\n"
+msgstr ""
+
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
@@ -12217,7 +12361,8 @@ msgstr ""
 msgid "Thumbnail"
 msgstr ""
 
-#: xmodule/word_cloud_block.py
+#: xmodule/word_cloud_block.py lms/templates/annotatable.html
+#: lms/templates/peer_grading/peer_grading.html
 msgid "Instructions"
 msgstr "Інструкція"
 
@@ -12639,6 +12784,14 @@ msgid "Invalid data ({details})"
 msgstr "Некоректні дані ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "Ви не можете перенести {source_type} у {target_parent_type}."
@@ -12734,6 +12887,10 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Library Content"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
@@ -12994,12 +13151,6 @@ msgstr "Завантаження"
 msgid "In Progress"
 msgstr "Опрацьовується"
 
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "Готово"
-
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Uploaded"
@@ -13258,16 +13409,6 @@ msgstr "Контент"
 msgid "Settings"
 msgstr "Налаштування"
 
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Завантаження"
-
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
 msgid "Course Name"
@@ -13316,11 +13457,15 @@ msgstr "Вимоги"
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/module-error.html
 msgid "Details"
-msgstr ""
+msgstr "Деталі"
 
+#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/wiki/includes/article_menu.html
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "View"
-msgstr "Показати"
+msgstr "Дивитися"
 
 #: cms/templates/maintenance/_announcement_edit.html
 #: lms/templates/problem.html lms/templates/word_cloud.html
@@ -13332,12 +13477,12 @@ msgstr "Зберегти"
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 msgid "Reset"
-msgstr ""
+msgstr "Зкинути"
 
 #: cms/templates/widgets/footer.html lms/templates/footer.html
 #: themes/red-theme/lms/templates/footer.html
 msgid "Legal"
-msgstr ""
+msgstr "Юридична інформація"
 
 #. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'. Please do
 #. not translate any of these trademarks and company names.
@@ -13347,12 +13492,14 @@ msgid ""
 "edX, Open edX, and the edX and Open edX logos are registered trademarks of "
 "{link_start}edX Inc.{link_end}"
 msgstr ""
+"edX, Open edX, the edX та Open edX логотипи є зареєстрованими товарними "
+"знаками {link_start}edX Inc.{link_end}"
 
 #: cms/templates/widgets/header.html lms/templates/header/header.html
 #: lms/templates/navigation/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
 msgid "Choose Language"
-msgstr ""
+msgstr "Обрати мову"
 
 #: cms/templates/widgets/header.html lms/templates/header/user_dropdown.html
 #: lms/templates/user_dropdown.html
@@ -13371,7 +13518,7 @@ msgstr "Допомога"
 #: lms/templates/courseware/static_tab.html
 #: lms/templates/courseware/tab-view.html
 msgid "name"
-msgstr ""
+msgstr "ім'я"
 
 #: cms/templates/widgets/user_dropdown.html
 #: lms/templates/header/user_dropdown.html lms/templates/user_dropdown.html
@@ -13380,7 +13527,7 @@ msgstr "Вийти"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
-msgstr ""
+msgstr "Форма зворотнього зв’язоку"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Email: {email}"
@@ -13388,11 +13535,11 @@ msgstr "Електронна пошта: {email} "
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Full Name: {realname}"
-msgstr ""
+msgstr "Ім'я та прізвище: {realname}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Inquiry Type: {inquiry_type}"
-msgstr ""
+msgstr "Тип запиту: {inquiry_type}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Message: {message}"
@@ -13400,35 +13547,39 @@ msgstr "Повідомлення: {message} "
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Tags: {tags}"
-msgstr ""
+msgstr "Теги: {tags}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Additional Info:"
-msgstr ""
+msgstr "Додаткова інформація"
 
 #: common/templates/emails/contact_us_feedback_email_subject.txt
 msgid "Feedback from user"
-msgstr ""
+msgstr "Відгук користувача"
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid ""
 "The email associated with your {platform_name} account has changed from "
 "{old_email} to {new_email}."
 msgstr ""
+"Електронна адреса, пов’язана з вашим обліковим записом {platform_name}, "
+"змінилася з {old_email} на {new_email}."
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid "No action is needed on your part."
-msgstr ""
+msgstr "Ніяких дій з вашого боку не потрібно."
 
 #: common/templates/emails/sync_learner_profile_data_email_change_body.txt
 msgid ""
 "If this change is not correct, contact {link_start}{platform_name} "
 "Support{link_end} or your administrator."
 msgstr ""
+"Якщо така зміна не є коректною, зв’яжіться з {link_start} {platform_name} "
+"Службою Підтримки {link_end} або з вашим адміністратором."
 
 #: common/templates/emails/sync_learner_profile_data_email_change_subject.txt
 msgid "Your {platform_name} account email has been updated"
-msgstr ""
+msgstr "Електронну адресу вашого облікового запису {platform_name} оновлено"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Add a Post"
@@ -13440,85 +13591,89 @@ msgstr "Форма нової теми"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "Discussion thread list"
-msgstr ""
+msgstr "Список потоків обговорення"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
 msgid "Private Discussion"
-msgstr ""
+msgstr "Приватне обговорення"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_private_fragment.html
 msgid ""
 "This is a private discussion. You do not have permissions to view this "
 "discussion"
-msgstr ""
+msgstr "Це приватне обговорення. У вас немає дозволу на його перегляд"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
 #, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%s обговорення розпочалося"
+msgstr[1] "%s обговорення розпочалося"
+msgstr[2] "%s обговорень розпочалося"
+msgstr[3] "%s обговорень розпочалося"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
 #, python-format
 msgid "%s comment"
 msgid_plural "%s comments"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%s коментар"
+msgstr[1] "%s коментарів"
+msgstr[2] "%s коментарів"
+msgstr[3] "%s коментарів"
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
 msgid "Discussion unavailable"
-msgstr ""
+msgstr "Обговорення недоступне"
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
 msgid ""
 "The discussions are currently undergoing maintenance. We'll have them back "
 "up shortly!"
 msgstr ""
+"В даний час на форумах ведуться технічні роботи. Ми відновимо їх "
+"функціонування найближчим часом!"
 
 #: lms/templates/_gated_content.html lms/templates/seq_block.html
 msgid "Content Locked"
-msgstr ""
+msgstr "Зміст заблоковано"
 
 #: lms/templates/_gated_content.html
 msgid ""
 "You must complete the prerequisites for '{prereq_section_name}' to access "
 "this content."
 msgstr ""
+"Щоб отримати доступ до цього вмісту, потрібно виконати необхідні умови "
+"'{prereq_section_name}' "
 
 #: lms/templates/_gated_content.html
 msgid "Go to Prerequisite Section"
-msgstr ""
+msgstr "Перейдіть до розділу Передумови"
 
 #: lms/templates/annotatable.html
 msgid "Collapse Instructions"
-msgstr ""
+msgstr "Сховати інструкції"
 
 #: lms/templates/annotatable.html
 msgid "Guided Discussion"
-msgstr ""
+msgstr "Керовані Обговорення"
 
 #: lms/templates/annotatable.html
 msgid "Hide Annotations"
-msgstr ""
+msgstr "Сховати Анотації"
 
 #: lms/templates/bookmark_button.html lms/templates/seq_block.html
 msgid "Bookmarked"
-msgstr ""
+msgstr "Додано до закладок"
 
 #: lms/templates/bookmark_button.html
 msgid "Bookmark this page"
-msgstr ""
+msgstr "Додати цю сторінку до закладок"
 
 #: lms/templates/conditional_block.html
 msgid "You do not have access to this dependency block."
-msgstr ""
+msgstr "У вас немає доступу до цього модуля."
 
 #: lms/templates/course.html
 msgid "LEARN MORE"
@@ -13526,11 +13681,11 @@ msgstr "Дізнатися більше"
 
 #: lms/templates/course.html
 msgid "Starts"
-msgstr ""
+msgstr "Розпочинається"
 
 #: lms/templates/course.html
 msgid "Starts: {date}"
-msgstr ""
+msgstr "Починається: {date}"
 
 #: lms/templates/courses_list.html
 msgid "View all Courses"
@@ -13543,15 +13698,15 @@ msgstr "Панель управління"
 
 #: lms/templates/dashboard.html
 msgid "results successfully populated,"
-msgstr ""
+msgstr "результати успішно заповнені,"
 
 #: lms/templates/dashboard.html
 msgid "Click to load all enrolled courses"
-msgstr ""
+msgstr "Натисніть, щоб завантажити всі зареєстровані курси"
 
 #: lms/templates/dashboard.html
 msgid "You are not enrolled in any courses yet."
-msgstr ""
+msgstr "Ви ще не зареєструвались на жодному курсі"
 
 #: lms/templates/dashboard.html
 #: lms/templates/header/navbar-not-authenticated.html
@@ -13563,27 +13718,27 @@ msgstr "Обрати курси"
 #: lms/templates/dashboard.html
 #: lms/templates/registration/account_activation_sidebar_notice.html
 msgid "Activate your account!"
-msgstr ""
+msgstr "Активуйте ваш аккаунт!"
 
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
-msgstr ""
+msgstr "Проблеми з завантаженням курсу"
 
 #: lms/templates/dashboard.html
 msgid "Search Your Courses"
-msgstr ""
+msgstr "Знайти Ваші курси"
 
 #: lms/templates/courseware/courseware.html lms/templates/dashboard.html
 msgid "Clear search"
-msgstr ""
+msgstr "Очистити пошук"
 
 #: lms/templates/dashboard.html
 msgid "Skip to list of announcements"
-msgstr ""
+msgstr "Перейти до списку оголошень"
 
 #: lms/templates/dashboard.html
 msgid "Activate your account so you can log back in"
-msgstr ""
+msgstr "Активуйте свій обліковий запис, щоб увійти знову"
 
 #: lms/templates/dashboard.html
 msgid ""
@@ -13591,10 +13746,13 @@ msgid ""
 "activate your account. Can’t find it? Check your spam folder or "
 "{link_start}resend the email{link_end}."
 msgstr ""
+"Вам було налісдано листа на {strong_start}{email}{strong_end} з посиланням "
+"на активацію аккаунта. Не можете знайти? Перевірте папку Спам або "
+"{link_start}resend the email{link_end}."
 
 #: lms/templates/dashboard.html
 msgid "Continue to {platform_name}"
-msgstr ""
+msgstr "Перейти до {platform_name}"
 
 #: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -13618,50 +13776,53 @@ msgstr "Відписатися від курсу"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
-msgstr ""
+msgstr "Не вдалося змінити адресу електронної пошти"
 
 #: lms/templates/email_change_failed.html
 msgid "We were unable to send a confirmation email to {email}"
-msgstr ""
+msgstr "Ми не змогли надіслати лист-підтвердження на {email}"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 #: lms/templates/invalid_email_key.html
 #: lms/templates/secondary_email_change_failed.html
 msgid "Go back to the {link_start}home page{link_end}."
-msgstr ""
+msgstr "Повернутися на {link_start}головну{link_end}."
 
 #: lms/templates/email_change_successful.html
 msgid "E-mail change successful!"
-msgstr ""
+msgstr "Зміна електронної адреси відбулася успішно!"
 
 #: lms/templates/email_change_successful.html
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
 msgstr ""
+"Ви можете переглянути нову адресу вашої електронної пошти на сторінці "
+"{link_start}вашого облікового запису{link_end}."
 
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
-msgstr ""
+msgstr "Обліковий запис з новою електронною адресою вже існує."
 
 #: lms/templates/enroll_staff.html
 msgid "You should Register before trying to access the Unit"
 msgstr ""
+"Ви повинні зареєструватися, перш ніж отримати доступ до цього розділу."
 
 #: lms/templates/courseware/course_about.html lms/templates/enroll_staff.html
 msgctxt "self"
 msgid "Enroll"
-msgstr ""
+msgstr "Зареєструватися на курс"
 
 #: lms/templates/enroll_staff.html
 msgid "Don't enroll"
-msgstr ""
+msgstr "Не реєструватись"
 
 #: lms/templates/enroll_students.html
 msgid "Student Enrollment Form"
-msgstr ""
+msgstr "Форма для реєстрації студентів"
 
 #: lms/templates/enroll_students.html
 msgid "Course: "
-msgstr ""
+msgstr "Курс:"
 
 #: lms/templates/enroll_students.html
 msgid "Add new students"
@@ -14012,6 +14173,14 @@ msgstr "Електронна адреса"
 msgid "Return To %s"
 msgstr ""
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -14262,6 +14431,18 @@ msgstr "Попередня сторінка"
 msgid "Next page"
 msgstr ""
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr ""
@@ -14370,6 +14551,14 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Downloads and transcripts"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Share on:"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Share on {site}"
 msgstr ""
 
 #: lms/templates/video.html
@@ -17266,10 +17455,6 @@ msgid "Register for free"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr ""
-
-#: lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr "Профіль"
 
@@ -19949,7 +20134,7 @@ msgstr "ID місцезнаходження"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
@@ -20119,8 +20304,9 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
 
 #: cms/templates/course_outline.html

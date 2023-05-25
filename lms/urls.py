@@ -327,14 +327,14 @@ urlpatterns += [
         name=RENDER_XBLOCK_NAME,
     ),
     re_path(
+        fr'^videos/embed/{settings.USAGE_KEY_PATTERN}$',
+        courseware_views.PublicVideoXBlockEmbedView.as_view(),
+        name=RENDER_VIDEO_XBLOCK_EMBED_NAME,
+    ),
+    re_path(
         fr'^videos/{settings.USAGE_KEY_PATTERN}$',
         courseware_views.PublicVideoXBlockView.as_view(),
         name=RENDER_VIDEO_XBLOCK_NAME,
-    ),
-    re_path(
-        fr'^videos/{settings.USAGE_KEY_PATTERN}/embed$',
-        courseware_views.PublicVideoXBlockEmbedView.as_view(),
-        name=RENDER_VIDEO_XBLOCK_EMBED_NAME,
     ),
 
 
@@ -1048,4 +1048,8 @@ urlpatterns += [
 # MFE API urls
 urlpatterns += [
     path('api/mfe_config/v1', include(('lms.djangoapps.mfe_config_api.urls', 'lms.djangoapps.mfe_config_api'), namespace='mfe_config_api'))
+]
+
+urlpatterns += [
+    path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
 ]

@@ -1,3 +1,9 @@
+@import 'bourbon/bourbon';
+@import 'lms/theme/variables';
+@import 'bootstrap/scss/variables';
+@import 'lms/theme/variables-v1';
+@import 'base/mixins';
+
 h2.problem-header {
   display: inline-block;
 }

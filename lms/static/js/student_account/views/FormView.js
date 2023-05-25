@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -64,7 +65,7 @@
                             HtmlUtils: HtmlUtils
                         })
                     )
-                )
+                );
                 this.postRender();
 
                 return this;

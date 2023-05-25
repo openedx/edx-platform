@@ -176,9 +176,9 @@ def _get_entrance_exam(request, course_key):
     except InvalidKeyError:
         return HttpResponse(status=404)
     try:
-        exam_descriptor = modulestore().get_item(exam_key)
+        exam_block = modulestore().get_item(exam_key)
         return HttpResponse(  # lint-amnesty, pylint: disable=http-response-with-content-type-json
-            dump_js_escaped_json({'locator': str(exam_descriptor.location)}),
+            dump_js_escaped_json({'locator': str(exam_block.location)}),
             status=200, content_type='application/json')
     except ItemNotFoundError:
         return HttpResponse(status=404)

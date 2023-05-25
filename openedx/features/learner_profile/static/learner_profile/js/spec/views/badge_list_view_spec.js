@@ -79,4 +79,3 @@ function(Backbone, $, _, PagingCollection, LearnerProfileHelpers, BadgeListView)
     });
 }
 );
-

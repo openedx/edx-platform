@@ -7,6 +7,7 @@ define([
     'teams/js/views/team_profile'
 ], function(_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamModel, TeamProfileView) {
     'use strict';
+
     describe('TeamProfileView', function() {
         var profileView, createTeamProfileView, createTeamModelData, clickLeaveTeam,
             teamModel,
@@ -24,9 +25,9 @@ define([
             ];
 
         beforeEach(function() {
-            setFixtures('<div id="page-prompt"></div>' +
-                '<div class="teams-content"><div class="msg-content"><div class="copy"></div></div></div>' +
-                '<div class="profile-view"></div>');
+            setFixtures('<div id="page-prompt"></div>'
+                + '<div class="teams-content"><div class="msg-content"><div class="copy"></div></div></div>'
+                + '<div class="profile-view"></div>');
             DiscussionSpecHelper.setUnderscoreFixtures();
         });
 
@@ -50,9 +51,9 @@ define([
                 courseID: TeamSpecHelpers.testCourseID,
                 context: options.context || TeamSpecHelpers.testContext,
                 model: teamModel,
-                topic: isInstructorManagedTopic ?
-                    TeamSpecHelpers.createMockTopic({type: 'public_managed'}) :
-                    TeamSpecHelpers.createMockTopic(),
+                topic: isInstructorManagedTopic
+                    ? TeamSpecHelpers.createMockTopic({type: 'public_managed'})
+                    : TeamSpecHelpers.createMockTopic(),
                 setFocusToHeaderFunc: function() {
                     $('.teams-content').focus();
                 }
@@ -62,8 +63,8 @@ define([
                 requests,
                 'GET',
                 interpolate( // eslint-disable-line no-undef
-                    '/courses/%(courseID)s/discussion/forum/%(topicID)s/inline' +
-                    '?page=1&sort_key=activity&sort_order=desc&ajax=1',
+                    '/courses/%(courseID)s/discussion/forum/%(topicID)s/inline'
+                    + '?page=1&sort_key=activity&sort_order=desc&ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         topicID: TeamSpecHelpers.testTeamDiscussionID
@@ -199,7 +200,7 @@ define([
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {});
 
-                teamModel.set('membership', DEFAULT_MEMBERSHIP);  // This should re-render the view.
+                teamModel.set('membership', DEFAULT_MEMBERSHIP); // This should re-render the view.
                 view.render();
                 expect(view.$('.btn-link.new-post-btn.is-hidden').length).toEqual(0);
             });

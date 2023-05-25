@@ -32,6 +32,13 @@
   background: url('#{$static-path}/images/large-text-icon.png') center no-repeat;
 }
 
+.large-drag-and-drop-v2-icon {
+  display: inline-block;
+  width: ($baseline*3);
+  height: ($baseline*3);
+  background: url('#{$static-path}/images/large-drag-and-drop-v2-icon.png') center no-repeat;
+}
+
 .large-problem-icon {
   display: inline-block;
   width: ($baseline*3);

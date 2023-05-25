@@ -120,7 +120,7 @@ var edx = edx || {};
             // before going to make payment
             // if exists then trigger click event of the apply code button
             var code = $('div.code-input input#input_code').val();
-            if (typeof(code) !== 'undefined' && code != '') {
+            if (typeof code !== 'undefined' && code != '') {
                 $('div.code-input #submit-code').trigger('click');
                 return false;
             }

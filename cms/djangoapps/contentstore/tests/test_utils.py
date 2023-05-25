@@ -620,7 +620,7 @@ class GetUserPartitionInfoTest(ModuleStoreTestCase):
         self.assertEqual(partitions[0]["scheme"], "random")
 
     def _set_partitions(self, partitions):
-        """Set the user partitions of the course descriptor. """
+        """Set the user partitions of the course block. """
         self.course.user_partitions = partitions
         self.course = self.store.update_item(self.course, ModuleStoreEnum.UserID.test)
 

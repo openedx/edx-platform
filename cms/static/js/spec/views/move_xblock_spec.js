@@ -15,6 +15,7 @@ import 'mock-ajax';
 describe('MoveXBlock', function() {
 
     'use strict';
+
     var modal, showModal, renderViews, createXBlockInfo, createCourseOutline, courseOutlineOptions,
         parentChildMap, categoryMap, createChildXBlockInfo, xblockAncestorInfo, courseOutline,
         verifyBreadcrumbViewInfo, verifyListViewInfo, getDisplayedInfo, clickForwardButton,
@@ -99,12 +100,12 @@ describe('MoveXBlock', function() {
         appendSetFixtures(mockContainerPage);
 
         window.course = new Course({
-            id: "5",
-            name: "Course Name",
-            url_name: "course_name",
-            org: "course_org",
-            num: "course_num",
-            revision: "course_rev"
+            id: '5',
+            name: 'Course Name',
+            url_name: 'course_name',
+            org: 'course_org',
+            num: 'course_num',
+            revision: 'course_rev'
         });
 
         createContainerPage();
@@ -201,7 +202,7 @@ describe('MoveXBlock', function() {
      * @param {any} ancestorInfo           ancestors info
      */
     renderViews = function(courseOutlineInfo, ancestorInfo) {
-        var ancestorInfo = ancestorInfo || {ancestors: []};  // eslint-disable-line no-redeclare
+        var ancestorInfo = ancestorInfo || {ancestors: []}; // eslint-disable-line no-redeclare
         modal.renderViews(courseOutlineInfo, ancestorInfo);
     };
 
@@ -274,8 +275,8 @@ describe('MoveXBlock', function() {
 
         expect(displayedBreadcrumbs).toEqual(
             _.map(visitedCategories, function(visitedCategory) {
-                return visitedCategory === 'course' ?
-                    'Course Outline' : visitedCategory + '_display_name_' + xblockIndex;
+                return visitedCategory === 'course'
+                    ? 'Course Outline' : visitedCategory + '_display_name_' + xblockIndex;
             })
         );
     };
@@ -286,7 +287,7 @@ describe('MoveXBlock', function() {
      * @param {any} buttonIndex     forward button index
      */
     clickForwardButton = function(buttonIndex) {
-        buttonIndex = buttonIndex || 0;  // eslint-disable-line no-param-reassign
+        buttonIndex = buttonIndex || 0; // eslint-disable-line no-param-reassign
         modal.moveXBlockListView.$el.find('[data-item-index="' + buttonIndex + '"] button').click();
     };
 
@@ -336,7 +337,7 @@ describe('MoveXBlock', function() {
             }
             clickBreadcrumbButton();
         }
-        category = nextCategory(direction, category);  // eslint-disable-line no-param-reassign
+        category = nextCategory(direction, category); // eslint-disable-line no-param-reassign
 
         verifyXBlockInfo(outlineOptions, category, buttonIndex, direction, hasCurrentLocation);
     };
@@ -365,7 +366,7 @@ describe('MoveXBlock', function() {
      * @param {Integer} sourceIndex         source index of the xblock
      */
     verifyNotificationStatus = function(requests, notificationSpy, notificationText, sourceIndex) {
-        var sourceIndex = sourceIndex || 0;  // eslint-disable-line no-redeclare
+        var sourceIndex = sourceIndex || 0; // eslint-disable-line no-redeclare
         ViewHelpers.verifyNotificationShowing(notificationSpy, notificationText);
         AjaxHelpers.respondWithJson(requests, {
             move_source_locator: sourceLocator,
@@ -494,7 +495,9 @@ describe('MoveXBlock', function() {
     };
 
     it('renders views with correct information', function() {
-        var outlineOptions = {section: 1, subsection: 1, unit: 1, component: 1},
+        var outlineOptions = {
+                section: 1, subsection: 1, unit: 1, component: 1
+            },
             outline = createCourseOutline(outlineOptions);
 
         renderViews(outline, xblockAncestorInfo);
@@ -503,7 +506,9 @@ describe('MoveXBlock', function() {
     });
 
     it('shows correct behavior on breadcrumb navigation', function() {
-        var outline = createCourseOutline({section: 1, subsection: 1, unit: 1, component: 1});
+        var outline = createCourseOutline({
+            section: 1, subsection: 1, unit: 1, component: 1
+        });
 
         renderViews(outline);
         _.each(_.range(3), function() {
@@ -519,7 +524,9 @@ describe('MoveXBlock', function() {
     });
 
     it('shows the correct current location', function() {
-        var outlineOptions = {section: 2, subsection: 2, unit: 2, component: 2},
+        var outlineOptions = {
+                section: 2, subsection: 2, unit: 2, component: 2
+            },
             outline = createCourseOutline(outlineOptions);
         renderViews(outline, xblockAncestorInfo);
         verifyXBlockInfo(outlineOptions, 'section', 0, 'forward', true);

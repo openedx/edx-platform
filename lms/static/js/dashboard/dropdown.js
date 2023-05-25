@@ -29,6 +29,7 @@ var edx = edx || {};
             if (event.which === 32 || event.which === 27) {
                 $dropdownButton.click();
                 event.preventDefault();
+            // eslint-disable-next-line brace-style
             }
 
             // if up arrow key pressed or shift+tab
@@ -41,6 +42,7 @@ var edx = edx || {};
                     menuItems.get(itemToFocusIndex).focus();
                 }
                 event.preventDefault();
+            // eslint-disable-next-line brace-style
             }
 
             // if down arrow key pressed or tab key

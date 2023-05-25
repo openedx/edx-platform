@@ -177,13 +177,13 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     }
 
     @cached_property
-    def child_descriptor(self):
+    def child_block(self):
         """
         Return the child block for the partition or None.
         """
-        child_descriptors = self.get_child_descriptors()
-        if len(child_descriptors) >= 1:
-            return child_descriptors[0]
+        child_blocks = self.get_child_blocks()
+        if len(child_blocks) >= 1:
+            return child_blocks[0]
         return None
 
     @cached_property
@@ -191,15 +191,15 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         """
         Return the user bound child block for the partition or None.
         """
-        if self.child_descriptor is not None:
-            return self.runtime.get_block_for_descriptor(self.child_descriptor)
+        if self.child_block is not None:
+            return self.runtime.get_block_for_descriptor(self.child_block)
         else:
             return None
 
-    def get_child_descriptor_by_location(self, location):
+    def get_child_block_by_location(self, location):
         """
         Look through the children and look for one with the given location.
-        Returns the descriptor.
+        Returns the block.
         If none match, return None
         """
         for child in self.get_children():
@@ -227,7 +227,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         """
         return self.child.get_content_titles()
 
-    def get_child_descriptors(self):
+    def get_child_blocks(self):
         """
         For grading--return just the chosen child.
         """
@@ -239,19 +239,19 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         str_group_id = str(group_id)
         if str_group_id in self.group_id_to_child:
             child_location = self.group_id_to_child[str_group_id]
-            child_descriptor = self.get_child_descriptor_by_location(child_location)
+            child_block = self.get_child_block_by_location(child_location)
         else:
             # Oops.  Config error.
             log.debug("configuration error in split test block: invalid group_id %r (not one of %r).  Showing error", str_group_id, list(self.group_id_to_child.keys()))  # lint-amnesty, pylint: disable=line-too-long
 
-        if child_descriptor is None:
-            # Peak confusion is great.  Now that we set child_descriptor,
+        if child_block is None:
+            # Peak confusion is great.  Now that we set child_block,
             # get_children() should return a list with one element--the
             # xmodule for the child
             log.debug("configuration error in split test block: no such child")
             return []
 
-        return [child_descriptor]
+        return [child_block]
 
     def get_group_id(self):
         """
@@ -271,8 +271,8 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         inactive_contents = []
 
         for child_location in self.children:  # pylint: disable=no-member
-            child_descriptor = self.get_child_descriptor_by_location(child_location)
-            child = self.runtime.get_block_for_descriptor(child_descriptor)
+            child_block = self.get_child_block_by_location(child_location)
+            child = self.runtime.get_block_for_descriptor(child_block)
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_fragment_resources(rendered_child)
             group_name, updated_group_id = self.get_data_for_vertical(child)
@@ -346,8 +346,8 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         dependencies are added to the specified fragment.
         """
         html = ""
-        for active_child_descriptor in children:
-            active_child = self.runtime.get_block_for_descriptor(active_child_descriptor)
+        for active_child_block in children:
+            active_child = self.runtime.get_block_for_descriptor(active_child_block)
             rendered_child = active_child.render(StudioEditableBlock.get_preview_view_name(active_child), context)
             if active_child.category == 'vertical':
                 group_name, group_id = self.get_data_for_vertical(active_child)
@@ -378,7 +378,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         conditions for staff.
         """
         if self.child is None:
-            # raise error instead?  In fact, could complain on descriptor load...
+            # raise error instead?  In fact, could complain on block load...
             return Fragment(content="<div>Nothing here.  Move along.</div>")
 
         if self.runtime.user_is_staff:
@@ -409,7 +409,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
             )
             raise
         else:
-            self.runtime.publish('xblock.split_test.child_render', {'child_id': child_id})
+            self.runtime.publish(self, 'xblock.split_test.child_render', {'child_id': child_id})
             return Response()
 
     def get_icon_class(self):
@@ -464,8 +464,8 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
         for child in xml_object:
             try:
-                descriptor = system.process_xml(etree.tostring(child))
-                children.append(descriptor.scope_ids.usage_id)
+                block = system.process_xml(etree.tostring(child))
+                children.append(block.scope_ids.usage_id)
             except Exception:  # lint-amnesty, pylint: disable=broad-except
                 msg = "Unable to load child when parsing split_test block."
                 log.exception(msg)
@@ -486,7 +486,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     def has_dynamic_children(self):
         """
         Grading needs to know that only one of the children is actually "real".  This
-        makes it use block.get_child_descriptors().
+        makes it use block.get_child_blocks().
         """
         return True
 
@@ -561,9 +561,9 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         if not user_partition:
             return [], children
 
-        def get_child_descriptor(location):
+        def get_child_block(location):
             """
-            Returns the child descriptor which matches the specified location, or None if one is not found.
+            Returns the child block which matches the specified location, or None if one is not found.
             """
             for child in children:
                 if child.location == location:
@@ -575,7 +575,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         for group in user_partition.groups:
             group_id = str(group.id)
             child_location = self.group_id_to_child.get(group_id, None)
-            child = get_child_descriptor(child_location)
+            child = get_child_block(child_location)
             if child:
                 active_children.append(child)
 

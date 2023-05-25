@@ -107,6 +107,12 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
         self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
 
+        self.non_staff_client, self.nonstaff = self.create_non_staff_authed_user_client()
+        # "nonstaff" means "non Django staff" here. We assign this user to course staff
+        # role to check that even so they won't have advanced settings access when explicitly
+        # restricted.
+        CourseStaffRole(self.course.id).add_users(self.nonstaff)
+
     @override_settings(FEATURES={'DISABLE_MOBILE_COURSE_AVAILABLE': True})
     def test_mobile_field_available(self):
 
@@ -143,6 +149,51 @@ class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
                 self.assertEqual('allow_anonymous_to_peers' in response, fields_visible)
                 self.assertEqual('discussion_blackouts' in response, fields_visible)
                 self.assertEqual('discussion_topics' in response, fields_visible)
+
+    @ddt.data(False, True)
+    def test_disable_advanced_settings_feature(self, disable_advanced_settings):
+        """
+        If this feature is enabled, only Django Staff/Superuser should be able to access the "Advanced Settings" page.
+        For non-staff users the "Advanced Settings" tab link should not be visible.
+        """
+        advanced_settings_link_html = f"<a href=\"{self.course_setting_url}\">Advanced Settings</a>".encode('utf-8')
+
+        with override_settings(FEATURES={'DISABLE_ADVANCED_SETTINGS': disable_advanced_settings}):
+            for handler in (
+                'import_handler',
+                'export_handler',
+                'course_team_handler',
+                'course_info_handler',
+                'assets_handler',
+                'tabs_handler',
+                'settings_handler',
+                'grading_handler',
+                'textbooks_list_handler',
+            ):
+                # Test that non-staff users don't see the "Advanced Settings" tab link.
+                response = self.non_staff_client.get_html(
+                    get_url(self.course.id, handler)
+                )
+                self.assertEqual(response.status_code, 200)
+                if disable_advanced_settings:
+                    self.assertNotIn(advanced_settings_link_html, response.content)
+                else:
+                    self.assertIn(advanced_settings_link_html, response.content)
+
+                # Test that staff users see the "Advanced Settings" tab link.
+                response = self.client.get_html(
+                    get_url(self.course.id, handler)
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(advanced_settings_link_html, response.content)
+
+            # Test that non-staff users can't access the "Advanced Settings" page.
+            response = self.non_staff_client.get_html(self.course_setting_url)
+            self.assertEqual(response.status_code, 403 if disable_advanced_settings else 200)
+
+            # Test that staff users can access the "Advanced Settings" page.
+            response = self.client.get_html(self.course_setting_url)
+            self.assertEqual(response.status_code, 200)
 
 
 @ddt.ddt
@@ -873,33 +924,33 @@ class CourseGradingTest(CourseTestCase):
     @mock.patch('cms.djangoapps.contentstore.signals.signals.GRADING_POLICY_CHANGED.send')
     def test_update_section_grader_type(self, send_signal, tracker, uuid):
         uuid.return_value = 'mockUUID'
-        # Get the descriptor and the section_grader_type and assert they are the default values
-        descriptor = modulestore().get_item(self.course.location)
+        # Get the block and the section_grader_type and assert they are the default values
+        block = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
-        self.assertEqual(None, descriptor.format)
-        self.assertEqual(False, descriptor.graded)
+        self.assertEqual(None, block.format)
+        self.assertEqual(False, block.graded)
 
         # Change the default grader type to Homework, which should also mark the section as graded
         CourseGradingModel.update_section_grader_type(self.course, 'Homework', self.user)
-        descriptor = modulestore().get_item(self.course.location)
+        block = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
         grading_policy_1 = self._grading_policy_hash_for_course()
 
         self.assertEqual('Homework', section_grader_type['graderType'])
-        self.assertEqual('Homework', descriptor.format)
-        self.assertEqual(True, descriptor.graded)
+        self.assertEqual('Homework', block.format)
+        self.assertEqual(True, block.graded)
 
         # Change the grader type back to notgraded, which should also unmark the section as graded
         CourseGradingModel.update_section_grader_type(self.course, 'notgraded', self.user)
-        descriptor = modulestore().get_item(self.course.location)
+        block = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
         grading_policy_2 = self._grading_policy_hash_for_course()
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
-        self.assertEqual(None, descriptor.format)
-        self.assertEqual(False, descriptor.graded)
+        self.assertEqual(None, block.format)
+        self.assertEqual(False, block.graded)
 
         # one for each call to update_section_grader_type()
         send_signal.assert_has_calls([

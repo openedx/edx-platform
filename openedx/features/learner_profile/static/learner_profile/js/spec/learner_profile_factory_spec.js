@@ -210,7 +210,6 @@ define(
                 LearnerProfileHelpers.expectPage(learnerProfileView, LearnerProfileHelpers.firstPageBadges);
             });
 
-
             it('renders the limited profile for under 13 users', function() {
                 var context = createProfilePage(
                     true,

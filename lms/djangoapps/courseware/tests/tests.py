@@ -63,32 +63,32 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
             self.fail('Could not retrieve any items from course')
 
         # Try to load each item in the course
-        for descriptor in items:
+        for block in items:
 
-            if descriptor.location.category == 'about':
+            if block.location.category == 'about':
                 self._assert_loads('about_course',
                                    {'course_id': str(course_key)},
-                                   descriptor)
+                                   block)
 
-            elif descriptor.location.category == 'static_tab':
+            elif block.location.category == 'static_tab':
                 kwargs = {'course_id': str(course_key),
-                          'tab_slug': descriptor.location.name}
-                self._assert_loads('static_tab', kwargs, descriptor)
+                          'tab_slug': block.location.name}
+                self._assert_loads('static_tab', kwargs, block)
 
-            elif descriptor.location.category == 'course_info':
+            elif block.location.category == 'course_info':
                 self._assert_loads('info', {'course_id': str(course_key)},
-                                   descriptor)
+                                   block)
 
             else:
 
                 kwargs = {'course_id': str(course_key),
-                          'location': str(descriptor.location)}
+                          'location': str(block.location)}
 
-                self._assert_loads('jump_to', kwargs, descriptor,
+                self._assert_loads('jump_to', kwargs, block,
                                    expect_redirect=True,
                                    check_content=True)
 
-    def _assert_loads(self, django_url, kwargs, descriptor,
+    def _assert_loads(self, django_url, kwargs, block,
                       expect_redirect=False,
                       check_content=False):
         """
@@ -103,14 +103,14 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
 
         if response.status_code != 200:
             self.fail('Status %d for page %s' %
-                      (response.status_code, descriptor.location))
+                      (response.status_code, block.location))
 
         if expect_redirect:
             assert response.redirect_chain[0][1] == 302
 
         if check_content:
             self.assertNotContains(response, "this module is temporarily unavailable")
-            assert not isinstance(descriptor, ErrorBlock)
+            assert not isinstance(block, ErrorBlock)
 
 
 class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
@@ -156,7 +156,7 @@ class TestLmsFieldData(TestCase):
         # Verify that if an LmsFieldData is passed into LmsFieldData as the
         # authored_data, that it doesn't produced a nested field data.
         #
-        # This fixes a bug where re-use of the same descriptor for many modules
+        # This fixes a bug where re-use of the same block for many modules
         # would cause more and more nesting, until the recursion depth would be
         # reached on any attribute access
 

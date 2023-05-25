@@ -3,6 +3,7 @@ import Backbone from 'backbone';
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 
 import NewProgramsView from './explore_new_programs_view';
+import SubscriptionUpsellView from './subscription_upsell_view';
 
 import sidebarTpl from '../../../templates/learner_dashboard/sidebar.underscore';
 
@@ -10,6 +11,9 @@ class SidebarView extends Backbone.View {
     constructor(options) {
         const defaults = {
             el: '.sidebar',
+            events: {
+                'click .js-subscription-upsell-cta ': 'trackSubscriptionUpsellCTA',
+            },
         };
         super(Object.assign({}, defaults, options));
     }
@@ -25,9 +29,21 @@ class SidebarView extends Backbone.View {
     }
 
     postRender() {
+        if (this.context.isUserB2CSubscriptionsEnabled) {
+            this.subscriptionUpsellView = new SubscriptionUpsellView({
+                context: this.context,
+            });
+        }
+
         this.newProgramsView = new NewProgramsView({
             context: this.context,
         });
+    }
+
+    trackSubscriptionUpsellCTA() {
+        window.analytics.track(
+            'edx.bi.user.subscription.program-dashboard.upsell.clicked'
+        );
     }
 }
 

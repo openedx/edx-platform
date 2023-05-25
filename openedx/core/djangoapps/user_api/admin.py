@@ -11,7 +11,13 @@ from django.utils.translation import gettext as _
 
 from openedx.core.djangoapps.user_api.accounts.forms import RetirementQueueDeletionForm
 
-from .models import RetirementState, UserRetirementPartnerReportingStatus, UserRetirementRequest, UserRetirementStatus
+from .models import (
+    BulkUserRetirementConfig,
+    RetirementState,
+    UserRetirementPartnerReportingStatus,
+    UserRetirementRequest,
+    UserRetirementStatus
+)
 
 
 @admin.register(RetirementState)
@@ -191,3 +197,11 @@ class UserRetirementPartnerReportingStatusAdmin(admin.ModelAdmin):
         self.message_user(request, "%s successfully reset." % message_bit)
 
     reset_state.short_description = 'Reset is_being_processed to False'
+
+
+@admin.register(BulkUserRetirementConfig)
+class BulkUserRetirementConfigurationAdmin(admin.ModelAdmin):
+    """
+    Admin for BulkUserRetirementConfig model.
+    """
+    list_display = ('id', 'enabled', 'changed_by', 'change_date')

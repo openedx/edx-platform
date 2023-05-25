@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
+# edX community translations have been downloaded from Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -27,7 +27,7 @@
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # ca47f5bf05c27c3888896d9870e257ad_00aad6f <5addf4166015f6e11583e89fe2c53975_164880>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/).
+# edX community translations have been downloaded from Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -48,7 +48,7 @@
 # Muha Aliss <muhaaliss@gmail.com>, 2015
 # Mustafa Tat, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
+# edX community translations have been downloaded from Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -83,7 +83,7 @@
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # ca47f5bf05c27c3888896d9870e257ad_00aad6f <5addf4166015f6e11583e89fe2c53975_164880>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
+# edX community translations have been downloaded from Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -109,7 +109,7 @@
 # ElektrikAkar <volkan.kumtepeli@gmail.com>, 2014
 # Yasar Celep <yasar.celep@hotmail.com>, 2017
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/open-edx/edx-platform/language/tr_TR/)
+# edX community translations have been downloaded from Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -120,7 +120,7 @@
 # Mehmet Kokoç <kokocmehmet@gmail.com>, 2017
 # a56fc07028489bb2b53400de33ba6a83, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)
+# edX community translations have been downloaded from Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -132,10 +132,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-05 20:42+0000\n"
+"POT-Creation-Date: 2023-05-07 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
-"Language-Team: Turkish (Turkey) (https://www.transifex.com/open-edx/teams/6205/tr_TR/)\n"
+"Language-Team: Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -162,6 +162,7 @@ msgid "Discussion"
 msgstr "Tartışma"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr "Problem"
@@ -171,6 +172,10 @@ msgstr "Problem"
 #: lms/templates/video.html
 msgid "Video"
 msgstr "Video"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "Boş Gelişmiş Problem"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -219,6 +224,13 @@ msgstr "\"{language_code}\" dil kodlu bir altyazı zaten mevcut."
 #: xmodule/video_block/video_handlers.py
 msgid "A transcript file is required."
 msgstr "Bir altyazı dosyası gerekiyor."
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
+msgstr "Hazır"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -344,6 +356,20 @@ msgstr ""
 " bu moda kaydolabilecekse boş bırakın."
 
 #: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr "Yükseltme son tarihini kilitle"
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
+"İSTEĞE BAĞLI: Açıkça tanımlanmış yükseltme son tarihini kilitlemek için True"
+" olarak ayarlayın. Yükseltme son tarihi yoksa ya da öntanmlı yükseltme son "
+"tarihini kullanmak için False olarak ayarlayın."
+
+#: common/djangoapps/course_modes/models.py
 msgid ""
 "OPTIONAL: This is the SKU (stock keeping unit) of this mode in the external "
 "ecommerce service.  Leave this blank if the course has not yet been migrated"
@@ -359,8 +385,8 @@ msgid ""
 "the course. Leave this blank if the course has not yet been migrated to the "
 "ecommerce service."
 msgstr ""
-"İSTEĞE BAĞLI: Bu, kursun bu modu için Play Store'da kayıtlı olan Android SKU"
-" (stok tutma birimi) kodudur. Eğer bu eğitim e-ticaret servisine henüz "
+"İSTEĞE BAĞLI: Bu, dersin bu modu için Play Store'da kayıtlı olan Android SKU"
+" (stok tutma birimi) kodudur. Eğer bu ders e-ticaret servisine henüz "
 "geçirilmemişse boş bırakın."
 
 #: common/djangoapps/course_modes/models.py
@@ -3086,6 +3112,10 @@ msgid ""
 "However, you are currently logged in as a '{active_enterprise_name}' user. "
 "Please log in with '{enrollment_enterprise_name}' to access this course."
 msgstr ""
+"Bu derse \"{enrollment_enterprise_name}\" ile kaydoldunuz. Ancak, şu anda "
+"bir '{active_enterprise_name}' kullanıcısı olarak oturum açmış durumdasınız."
+" Bu derse erişmek için lütfen '{enrollment_enterprise_name}' ile giriş "
+"yapın."
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must give Data Sharing Consent for the course"
@@ -3892,7 +3922,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "A list of usage keys for the blocks to include in the report. "
-msgstr ""
+msgstr "Rapora dahil edilecek xblocklar için kullanım anahtarlarının listesi."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -3996,10 +4026,6 @@ msgstr "Dil"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
 msgstr "Yer"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "Doğum Yılı"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
@@ -4186,6 +4212,9 @@ msgid ""
 "depend on the kind of task being performed. For instanceit may contain the "
 "problem locations for a problem resources task."
 msgstr ""
+"Görev için giriş parametreleri. Bu verilerin formatı ve içeriği, "
+"gerçekleştirilen görevin türüne bağlı olacaktır. Örneğin, problem kaynakları"
+" görevi için problem konumlarını içerebilir."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The username of the user who initiated this task."
@@ -5179,11 +5208,11 @@ msgstr "Bu takım yapılandırmasında zaten bir takıma ait görünüyorsunuz."
 
 #: lms/djangoapps/teams/views.py
 msgid "teamset_id and team_id are mutually exclusive options."
-msgstr ""
+msgstr "teamset_id ve team_id birbirini dışlayan seçeneklerdir."
 
 #: lms/djangoapps/teams/views.py
 msgid "teamset_id requires course_id to also be provided."
-msgstr ""
+msgstr "teamset_id, course_id'nin de sağlanmasını gerektirir."
 
 #: lms/djangoapps/teams/views.py
 msgid "No teamset found in given course with given id"
@@ -5821,6 +5850,8 @@ msgid ""
 "{start_anchor}%(tpa_logout_url)s{middle_anchor}Click here{end_anchor} to "
 "delete your single signed on (SSO) session."
 msgstr ""
+"Single Sign-On (SSO) oturumunuzu silmek için "
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}buraya{end_anchor} tıklayın."
 
 #: lms/templates/logout.html
 msgid "We are signing you in."
@@ -5893,6 +5924,7 @@ msgid "Allow"
 msgstr "İzin ver"
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Hata"
@@ -7098,6 +7130,8 @@ msgstr "Bu kaynak için LTI platform açıklayıcı başlığı"
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "If AGS was enabled during launch, this should hold the lineitem ID."
 msgstr ""
+"Başlatma sırasında AGS etkinleştirildiyse, bu, lineitem kimliğini "
+"tutmalıdır."
 
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "We could not find a user with that email address."
@@ -7106,6 +7140,38 @@ msgstr "Bu e-posta adresine sahip bir kullanıcıyı bulamadık."
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "This user already has access to this library."
 msgstr "Bu kullanıcının bu kütüphaneye zaten erişimi var."
+
+#: openedx/core/djangoapps/content_staging/data.py
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "Yükleniyor"
+
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Expired"
+msgstr "Sona Erdi"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
+msgstr ""
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -7471,10 +7537,12 @@ msgid ""
 "Discussion context ID in external forum provider. e.g. commentable_id for "
 "cs_comments_service."
 msgstr ""
+"Harici forum sağlayıcısı için tartışma bağlamı kimliği. Örn. commentable_id "
+"için cs_comments_service."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Whether this topic should be shown in-context in the course."
-msgstr ""
+msgstr "Bu konunun derste bağlam içinde gösterilip gösterilmeyeceği."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Ordering of this topic in its learning context"
@@ -7580,6 +7648,8 @@ msgid ""
 "Comma-separated list of scopes that this application will be allowed to "
 "request."
 msgstr ""
+"Bu uygulamanın istemesine izin verilecek kapsamların virgülle ayrılmış "
+"listesi."
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -8370,6 +8440,12 @@ msgstr "Başarı"
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "Eylemler"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -9249,6 +9325,9 @@ msgid ""
 " access the courses available to you through {enterprise_name}, "
 "{link_start}visit the {enterprise_name} dashboard{link_end}."
 msgstr ""
+"{bold_start}{enterprise_name}{bold_end} ana paneline erişiminiz var. "
+"{enterprise_name} aracılığıyla size sunulan derslere erişmek için "
+"{link_start}{enterprise_name} ana panelini ziyaret edin{link_end}."
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
@@ -9827,10 +9906,6 @@ msgstr "Codejail API Servisi geçersiz cevap."
 #: xmodule/capa/safe_exec/remote_exec.py
 msgid "Invalid JSON response received from codejail api service."
 msgstr "Codejail api servisinden geçersiz JSON cevabı alındı."
-
-#: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Boş Gelişmiş Problem"
 
 #: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
@@ -11094,6 +11169,12 @@ msgid ""
 "staff/en/latest/course_features/teams/teams_setup.html#enable-and-configure-"
 "teams\">teams configuration documentation</a> for help and examples."
 msgstr ""
+"JSON kullanarak takım kümelerini yapılandırın, takım boyutlarını sınırlayın "
+"ve görünürlük ayarlarını belirleyin. Yardım ve örnekler için <a "
+"target=\"&#95;blank\" href=\"https://edx.readthedocs.io/projects/edx-"
+"partner-course-"
+"staff/en/latest/course_features/teams/teams_setup.html#enable-and-configure-"
+"teams\">teams yapılandırma belgelerine</a> bakın."
 
 #: xmodule/course_block.py
 msgid "Enable Proctored Exams"
@@ -11245,6 +11326,20 @@ msgstr ""
 "öğrenciler için izin verilir), 'public_outline' (ders ana hatlarına erişime "
 "izin verir) ve 'public' (hem anahatlara hem de ders içeriğine erişime izin "
 "verilir). "
+
+#: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr "Video Paylaşma Ayarları"
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+"Ders için video paylaşım seçeneklerini belirtin. Bu, üç değerden birine "
+"ayarlanabilir: \"tümü açık\", \"tümü kapalı\" ve \"video başına\". "
+"Varsayılan değer \"video başına\"."
 
 #: xmodule/course_block.py
 msgid "Course Instructor"
@@ -11494,6 +11589,8 @@ msgid ""
 "Enter the number of components to display to each student. Set it to -1 to "
 "display all components."
 msgstr ""
+"Her öğrenciye gösterilecek bileşen sayısını girin. Tüm bileşenleri göstermek"
+" için -1 olarak ayarlayın."
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -12348,6 +12445,34 @@ msgstr "Ünite için bağlam içi tartışmaları etkinleştirin"
 msgid "Add discussion for the Unit."
 msgstr "Üniteye tartışma ekle."
 
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
+"\n"
+msgstr ""
+
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
@@ -12781,6 +12906,7 @@ msgstr "Ders takımı kullanıcısı bulunmuyor"
 msgid ""
 "Number of course outline regenerations successfully requested: {regenerates}"
 msgstr ""
+"Başarıyla talep edilen ders ana hatları yenileme sayısı: {regenerates}"
 
 #: cms/djangoapps/contentstore/admin.py
 msgid "Regenerate selected course outlines"
@@ -13137,6 +13263,14 @@ msgid "Invalid data ({details})"
 msgstr "Geçersiz veri ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr "Bileşeninizi yapıştırırken bir hata gerçekleşti."
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr "Panonuz boş veya geçersiz."
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "{source_type} verisini {target_parent_type} üzerine taşıyamazsınız."
@@ -13235,6 +13369,10 @@ msgid "Library Content"
 msgstr "Kütüphane İçeriği"
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
+msgstr "Sürükle ve Bırak"
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Boş"
 
@@ -13286,6 +13424,8 @@ msgid ""
 "User does not have the permission to create courses in this organization or "
 "course creation is disabled"
 msgstr ""
+"Kullanıcının bu kurumda ders oluşturma izni yok veya ders oluşturma devre "
+"dışı"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -13356,6 +13496,8 @@ msgid ""
 "User does not have the permission to create library in this organization or "
 "course creation is disabled"
 msgstr ""
+"Kullanıcının bu kurumda kütüphane oluşturma izni yok veya ders oluşturma "
+"devre dışı"
 
 #: cms/djangoapps/contentstore/views/library.py
 #, python-brace-format
@@ -13485,12 +13627,6 @@ msgstr "Yüklüyor"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "In Progress"
 msgstr "İşlem Sürüyor"
-
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "Hazır"
 
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
@@ -13642,7 +13778,7 @@ msgstr "Kullanıcıya TÜM kuruluşlarda ders oluşturma izni verin"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Dump courses to CourseGraph (respect cache)"
-msgstr ""
+msgstr "Dersleri CourseGraph'a dökün (önbelleğe dikkat edin)"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Error enqueueing dumps for {} course(s): {}"
@@ -13658,7 +13794,7 @@ msgstr "Tüm {} ders(ler) değişmediği için atlandı."
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Dump courses to CourseGraph (override cache)"
-msgstr ""
+msgstr "Dersleri CourseGraph'a dökün (önbelleği geçersizleştirin)"
 
 #: cms/djangoapps/coursegraph/admin.py
 msgid "Enqueued dumps for {} course(s)."
@@ -13754,16 +13890,6 @@ msgstr "İçerik"
 #: wiki/templates/wiki/settings.html
 msgid "Settings"
 msgstr "Ayarlar"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "Yükleniyor..."
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -14543,6 +14669,14 @@ msgstr "E-posta"
 msgid "Return To %s"
 msgstr "%s Sayfasına Geri Dön"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr "Bu ders hakkında daha fazla bilgi"
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr "Bu derse kaydol"
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -14797,6 +14931,18 @@ msgstr "Önceki sayfa"
 msgid "Next page"
 msgstr "Sonraki sayfa"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr "Bileşeni Yapıştır"
+
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr "Gönderen:"
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr "Panomda ne var?"
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "İzleme geçmişi"
@@ -14920,6 +15066,14 @@ msgstr ""
 #: lms/templates/video.html
 msgid "Downloads and transcripts"
 msgstr "İndirmeler ve altyazılar"
+
+#: lms/templates/video.html
+msgid "Share on:"
+msgstr "Şurada paylaş:"
+
+#: lms/templates/video.html
+msgid "Share on {site}"
+msgstr "{site} sitesinde paylaş"
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -15126,6 +15280,16 @@ msgid ""
 "provide you with instructions for obtaining your API shared secret and "
 "client ID."
 msgstr ""
+"API'lere erişmek için, uygulamanız için bir {platform_name} kullanıcı hesabı"
+" oluşturmanız gerekir (kişisel kullanım için değil). Bu hesap, {request_url}"
+" adresindeki API istek sayfamıza erişmenizi sağlayacaktır. Bu sayfada, "
+"API'ler için önerdiğiniz kullanımların açıklamasını içeren API istek formunu"
+" doldurmanız gerekir. {platform_name} platformuna sağladığınız herhangi bir "
+"hesap ve kayıt bilgisi doğru ve güncel olmalıdır ve herhangi bir değişikliği"
+" derhal bize bildirmeyi kabul edersiniz. {platform_name_capitalized}, API "
+"talep formunuzu inceleyecek ve tamamen {platform_name}'ın takdirine bağlı "
+"olarak onaylandıktan sonra, API shared secret ve müşteri kimliğinizi almanız"
+" için size yönergeleri sağlayacaktır."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Permissible Use"
@@ -15147,6 +15311,19 @@ msgid ""
 "credentials anywhere other than on the {platform_name} website at "
 "{platform_url}."
 msgstr ""
+"API'leri yalnızca API'ler aracılığıyla erişilen içeriği (\"API İçeriği\") "
+"kendi web sitenize, mobil sitenize, uygulamanıza, blogunuza, e-posta dağıtım"
+" listenize veya sosyal medya mülkünüze (\"Uygulamanız\") teslim etmek "
+"amacıyla kullanmayı kabul edersiniz. \") veya erişim talebinizde "
+"tanımladığınız ve {platform_name} tarafından duruma göre onaylanan başka bir"
+" ticari kullanım için. {platform_name_capitalized}, API'leri kullanımınızı "
+"Şartlar'a uygunluk açısından izleyebilir ve {platform_name} tarafından "
+"belirlenen gereksinimleri ve sınırlamaları aşmaya veya aşmaya çalışırsanız "
+"erişiminizi reddedebilir veya entegrasyonunuzu kapatabilir. Uygulamanız veya"
+" API'nin veya API İçeriğinin diğer onaylı kullanımı, son kullanıcılarınızdan"
+" {platform_name} kullanıcı adını, parolasını veya diğer {platform_name} "
+"kullanıcı kimlik bilgilerini {platform_url} adresindeki {platform_name} web "
+"sitesi dışında herhangi bir yerde vermelerini istememelidir."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Prohibited Uses and Activities"
@@ -16169,7 +16346,7 @@ msgstr "Aşağıdaki kuruluşlar tarafından desteklenmiştir"
 
 #: lms/templates/certificates/_accomplishment-rendering.html
 msgid "Awarded to:"
-msgstr ""
+msgstr "Ödüllendirilen:"
 
 #: lms/templates/certificates/_edx-accomplishment-print-help.html
 msgid ""
@@ -17263,7 +17440,7 @@ msgstr "{course_name} dersini Twitter'da paylaş"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course options for"
-msgstr ""
+msgstr "Ders seçenekleri: "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_entitlement_actions.html
@@ -18200,10 +18377,6 @@ msgstr "Okullar"
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Register for free"
 msgstr "Ücretsiz kayıt olun"
-
-#: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr "Son dersinize devam edin"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
@@ -21187,10 +21360,8 @@ msgstr "Konum ID"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
-"Bu ders içindeki bir HTML bileşeninden bu üniteye bağlantı oluşturmak için, "
-"URL değeri olarak \"/jump_to_id/<location ID>\" girin."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -21380,11 +21551,10 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
-"Bu ders, edx tartışma forumunun yükseltilmiş bir sürümünü kullanıyor. "
-"Discussion xblock'ları artık çalışmayacak."
 
 #: cms/templates/course_outline.html
 msgid " Learn more"
@@ -24086,11 +24256,11 @@ msgstr "Erişim Ver"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Copy"
-msgstr ""
+msgstr "Kopyala"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
-msgstr ""
+msgstr "Erişimi Yönet"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."

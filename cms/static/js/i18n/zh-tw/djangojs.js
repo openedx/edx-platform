@@ -271,7 +271,6 @@
     "Everyone who has staff privileges in this course": "\u9019\u9580\u8ab2\u7a0b\u6709\u5de5\u4f5c\u4eba\u54e1\u6b0a\u9650",
     "Expand All": "\u5c55\u958b\u5168\u90e8",
     "Explain if other.": "\u82e5\u6709\u5176\u4ed6\u4e8b\u9805\uff0c\u8acb\u8aaa\u660e\u3002",
-    "Explore New Programs": "\u63a2\u7d22\u65b0\u8a08\u756b",
     "Explore Programs": "\u63a2\u7d22\u8a08\u756b",
     "Explore your course!": "\u700f\u89bd\u60a8\u7684\u8ab2\u7a0b\uff01",
     "File Name": "\u6a94\u6848\u540d\u7a31",

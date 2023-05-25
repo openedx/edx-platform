@@ -140,7 +140,7 @@ class UserCourseStatus(views.APIView):
         the course block. If there is no such visit, the first item deep enough down the course
         tree is used.
         """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             course.id, request.user, course, depth=2)
 
         course_block = get_block_for_descriptor(
@@ -173,14 +173,14 @@ class UserCourseStatus(views.APIView):
         """
         Saves the module id if the found modification_date is less recent than the passed modification date
         """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        field_data_cache = FieldDataCache.cache_for_block_descendents(
             course.id, request.user, course, depth=2)
         try:
-            block_descriptor = modulestore().get_item(module_key)
+            descriptor = modulestore().get_item(module_key)
         except ItemNotFoundError:
             return Response(errors.ERROR_INVALID_MODULE_ID, status=400)
         block = get_block_for_descriptor(
-            request.user, request, block_descriptor, field_data_cache, course.id, course=course
+            request.user, request, descriptor, field_data_cache, course.id, course=course
         )
 
         if modification_date:

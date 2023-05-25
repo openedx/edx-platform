@@ -63,6 +63,7 @@ from openedx.core.release import RELEASE_LINE
     <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
+    <%block name="header_meta"></%block>
     <% favicon_url = branding_api.get_favicon_url() %>
     <link rel="icon" type="image/x-icon" href="${favicon_url}"/>
     <%static:css group='style-vendor'/>
@@ -78,6 +79,17 @@ from openedx.core.release import RELEASE_LINE
     <%include file="widgets/segment-io.html" />
 
     <%block name="header_extras"></%block>
+    <!-- Hotjar Tracking Code for studio -->
+    <script>
+      (function(h,o,t,j,a,r){
+          h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+          h._hjSettings={hjid: Number("${settings.HOTJAR_ID |n, js_escaped_string}"),hjsv:6};
+          a=o.getElementsByTagName('head')[0];
+          r=o.createElement('script');r.async=1;
+          r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+          a.appendChild(r);
+      })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+    </script>
   </head>
 
   <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">

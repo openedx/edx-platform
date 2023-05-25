@@ -9,7 +9,6 @@ will drop every database that starts with "test_" or "acceptance_",
 but ignore other databases.
 */
 
-
 String.prototype.startsWith = function(substring) {
     return (this.indexOf(substring) === 0);
 };

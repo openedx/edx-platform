@@ -21,14 +21,21 @@ class ProgramCardView extends Backbone.View {
         super(Object.assign({}, defaults, options));
     }
 
-    initialize(data) {
+    initialize({ context }) {
         this.tpl = HtmlUtils.template(programCardTpl);
-        this.progressCollection = data.context.progressCollection;
+        this.progressCollection = context.progressCollection;
         if (this.progressCollection) {
             this.progressModel = this.progressCollection.findWhere({
                 uuid: this.model.get('uuid'),
             });
         }
+        this.isSubscribed = (
+            context.isUserB2CSubscriptionsEnabled &&
+            context.subscriptionCollection?.some({
+                resource_id: this.model.get('uuid'),
+                subscription_state: 'active',
+            })
+        ) ?? false;
         this.render();
     }
 
@@ -37,7 +44,10 @@ class ProgramCardView extends Backbone.View {
         const data = $.extend(
             this.model.toJSON(),
             this.getProgramProgress(),
-            { orgList: orgList.join(' ') },
+            {
+                orgList: orgList.join(' '),
+                isSubscribed: this.isSubscribed,
+            },
         );
 
         HtmlUtils.setHtml(this.$el, this.tpl(data));
@@ -45,8 +55,8 @@ class ProgramCardView extends Backbone.View {
     }
 
     postRender() {
-        if (navigator.userAgent.indexOf('MSIE') !== -1 ||
-        navigator.appVersion.indexOf('Trident/') > 0) {
+        if (navigator.userAgent.indexOf('MSIE') !== -1
+        || navigator.appVersion.indexOf('Trident/') > 0) {
             /* Microsoft Internet Explorer detected in. */
             window.setTimeout(() => {
                 this.reLoadBannerImage();
@@ -59,9 +69,9 @@ class ProgramCardView extends Backbone.View {
         const progress = this.progressModel ? this.progressModel.toJSON() : false;
 
         if (progress) {
-            progress.total = progress.completed +
-        progress.in_progress +
-        progress.not_started;
+            progress.total = progress.completed
+        + progress.in_progress
+        + progress.not_started;
 
             progress.percentage = {
                 completed: ProgramCardView.getWidth(progress.completed, progress.total),

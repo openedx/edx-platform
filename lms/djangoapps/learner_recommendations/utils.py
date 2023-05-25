@@ -202,3 +202,26 @@ def filter_recommended_courses(
             filtered_recommended_courses.append(course_data)
 
     return filtered_recommended_courses
+
+
+def get_cross_product_recommendations(course_key):
+    """
+    Helper method to get associated course keys based on the key passed
+    """
+    return settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS.get(course_key)
+
+
+def get_active_course_run(course):
+    """
+    Returns an active course run based on prospectus frontend logic
+    for what defines an active course run
+    """
+    course_runs = course.get("course_runs")
+    advertised_course_run_uuid = course.get("advertised_course_run_uuid")
+
+    if advertised_course_run_uuid:
+        for course_run in course_runs:
+            if course_run.get("uuid") == advertised_course_run_uuid:
+                return course_run
+
+    return None
