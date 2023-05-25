@@ -9,7 +9,7 @@ describe('Program Alert List View', () => {
         trialEndingAlerts: [{
             title: 'Test Program',
             hasActiveTrial: true,
-            nextPaymentDate: 'May 8, 2023',
+            currentPeriodEnd: 'May 8, 2023',
             remainingDays: 2,
             subscriptionPrice: '$100/month USD',
             subscriptionState: 'active',
