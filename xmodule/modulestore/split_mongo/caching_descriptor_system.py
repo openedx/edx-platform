@@ -162,7 +162,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
     # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course id.
     def xblock_from_json(self, class_, course_key, block_key, block_data, course_entry_override=None, **kwargs):
         """
-        Load and return block info.
+        Instantiate an XBlock of the specified class, using the provided data.
         """
         if course_entry_override is None:
             course_entry_override = self.course_entry
@@ -170,12 +170,14 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             # most recent retrieval is most likely the right one for next caller (see comment above fn)
             self.course_entry = CourseEnvelope(course_entry_override.course_key, self.course_entry.structure)
 
-        # Construct the Block Usage Locator:
-        block_locator = course_key.make_usage_key(
-            block_type=block_key.type,
-            block_id=block_key.id,
-        )
+        # If no usage id is provided, generate an in-memory id
+        if block_key is None:
+            block_key = BlockKey(block_data.block_type, LocalId())
 
+        # Construct the Block Usage Locator:
+        block_locator = course_key.make_usage_key(block_type=block_key.type, block_id=block_key.id)
+
+        # If no definition id is provided, generate an in-memory id
         definition_id = block_data.definition or LocalId()
 
         try:
@@ -251,21 +253,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             course_key, class_, field, self.course_entry.structure['blocks'],
         )
 
-        if definition_id is not None and not block_data.definition_loaded:
-            definition_loader = DefinitionLazyLoader(
-                self.modulestore,
-                course_key,
-                block_key.type,
-                definition_id,
-                convert_fields,
-            )
-        else:
-            definition_loader = None
-
-        # If no definition id is provide, generate an in-memory id
-        if definition_id is None:
-            definition_id = LocalId()
-
         converted_fields = convert_fields(block_data.fields)
         converted_defaults = convert_fields(block_data.defaults)
         if block_key in self._parent_map:
@@ -285,6 +272,17 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                     aside_fields[block_key.type].update(aside['fields'])
         except AttributeError:
             pass
+
+        if definition_id is not None and not block_data.definition_loaded:
+            definition_loader = DefinitionLazyLoader(
+                self.modulestore,
+                course_key,
+                block_key.type,
+                definition_id,
+                convert_fields,
+            )
+        else:
+            definition_loader = None
 
         kvs = SplitMongoKVS(
             definition_loader,

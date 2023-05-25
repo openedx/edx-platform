@@ -649,8 +649,6 @@ class XModuleMixin(XModuleFields, XBlock):
                 if field in self._dirty_fields:
                     del self._dirty_fields[field]
 
-        if wrappers is None:
-            wrappers = []
         if wrappers:
             # Put user-specific wrappers around the field-data service for this block.
             # Note that these are different from modulestore.xblock_field_data_wrappers, which are not user-specific.
