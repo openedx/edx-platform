@@ -72,7 +72,6 @@ class AboutPageRecommendationsSerializer(serializers.Serializer):
 class CrossProductRecommendationsSerializer(serializers.Serializer):
     """
     Cross product recommendation courses for course about page
-    and amplitude courses for Learner Dashboard
     """
     courses = serializers.ListField(
         child=ProductRecommendationsSerializer(), allow_empty=True
