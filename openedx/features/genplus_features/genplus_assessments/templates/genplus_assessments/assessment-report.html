@@ -74,7 +74,7 @@
                   <div class="year-info start">
                     <img src="${static.url('genplus_assessments/assets/images/start.png')}" width="32" alt="" />
                     <ul class="star-rating">
-                      % if question.get('total_problem_score') and question.get('score_end_of_year') > 0:
+                      % if question.get('total_problem_score') and question.get('score_start_of_year') > 0:
                         % for i, star in enumerate(range(question.get('total_problem_score', 0))):
                           % if i < question.get('score_start_of_year'):
                             <li><img src="${static.url('genplus_assessments/assets/images/star-fill.png')}" width="25" alt="Favourite" /></li>
