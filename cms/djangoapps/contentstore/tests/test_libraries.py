@@ -15,8 +15,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.x_module import STUDIO_VIEW
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
-from cms.djangoapps.contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
-from cms.djangoapps.contentstore.views.block import _duplicate_block
+from cms.djangoapps.contentstore.utils import reverse_library_url, reverse_url, \
+    reverse_usage_url, duplicate_block
 from cms.djangoapps.contentstore.views.preview import _load_preview_block
 from cms.djangoapps.contentstore.views.tests.test_library import LIBRARY_REST_URL
 from cms.djangoapps.course_creators.views import add_user_with_status_granted
@@ -947,7 +947,7 @@ class TestOverrides(LibraryTestCase):
         if duplicate:
             # Check that this also works when the RCB is duplicated.
             self.lc_block = modulestore().get_item(
-                _duplicate_block(self.course.location, self.lc_block.location, self.user)
+                duplicate_block(self.course.location, self.lc_block.location, self.user)
             )
             self.problem_in_course = modulestore().get_item(self.lc_block.children[0])
         else:
@@ -1006,7 +1006,7 @@ class TestOverrides(LibraryTestCase):
 
         # Duplicate self.lc_block:
         duplicate = store.get_item(
-            _duplicate_block(self.course.location, self.lc_block.location, self.user)
+            duplicate_block(self.course.location, self.lc_block.location, self.user)
         )
         # The duplicate should have identical children to the original:
         self.assertEqual(len(duplicate.children), 1)
