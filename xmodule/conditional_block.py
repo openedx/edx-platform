@@ -9,7 +9,7 @@ import logging
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import ReferenceList, Scope, String
@@ -148,11 +148,11 @@ class ConditionalBlock(
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/conditional/display.js'),
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
+            resource_filename(__name__, 'js/src/conditional/display.js'),
+            resource_filename(__name__, 'js/src/javascript_loader.js'),
+            resource_filename(__name__, 'js/src/collapsible.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     preview_view_css = {
         'scss': [],
@@ -161,8 +161,8 @@ class ConditionalBlock(
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = 'SequenceDescriptor'
     studio_view_js = {
-        'js': [resource_string(__name__, 'js/src/sequence/edit.js')],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'js': [resource_filename(__name__, 'js/src/sequence/edit.js')],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     studio_view_css = {
         'scss': [],
