@@ -405,14 +405,17 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                 % endif
                 </div>
               </div>
-              <div class="action-upgrade-container">
-                <a class="action action-upgrade track_course_dashboard_green_button" href="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}">
-                  <span class="wrapper-copy">
-                    <span class="copy" id="upgrade-to-verified">${_("Upgrade")}</span>
-                      <span class="sr">&nbsp;${_(course_overview.display_name_with_default)}</span>
-                  </span>
-                </a>
-              </div>
+              <form id="add-basket" action="${ecommerce_payment_page}?sku=${course_mode_info['verified_sku']}" method="post">
+                <div class="action-upgrade-container">
+                  <a class="action action-upgrade track_course_dashboard_green_button" href="javascript:{}" 
+                  onclick="document.getElementById('add-basket').submit();">
+                    <span class="wrapper-copy">
+                      <span class="copy" id="upgrade-to-verified">${_("Upgrade")}</span>
+                        <span class="sr">&nbsp;${_(course_overview.display_name_with_default)}</span>
+                    </span>
+                  </a>
+                </div>
+              </form>
             </div>
           </div>
         % endif
