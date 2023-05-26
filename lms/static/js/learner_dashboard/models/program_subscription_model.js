@@ -46,8 +46,8 @@ class ProgramSubscriptionModel extends Backbone.Model {
 
         const remainingDays = trialMoment.diff(moment.utc(), 'days');
 
-        const [nextPaymentDate] = ProgramSubscriptionModel.formatDate(
-            data.next_payment_date,
+        const [currentPeriodEnd] = ProgramSubscriptionModel.formatDate(
+            data.current_period_end,
             userPreferences
         );
         const [trialEndDate, trialEndTime] = ProgramSubscriptionModel.formatDate(
@@ -60,7 +60,7 @@ class ProgramSubscriptionModel extends Backbone.Model {
         super(
             {
                 hasActiveTrial,
-                nextPaymentDate,
+                currentPeriodEnd,
                 remainingDays,
                 subscriptionPrice,
                 subscriptionState,
