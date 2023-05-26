@@ -23,15 +23,12 @@ Provider code
 
   * Its `Access Token View`_ returns JWTs as access tokens when a JWT token_type is requested.
 
-  * It uses an edX custom JwtBuilder_ implementation to create the JWT.
-
-* The JwtBuilder_ uses the pyjwkest_ library for implementation of `JSON Web Signature (JWS)`_ and other crypto to build and sign JWT tokens.
+  * It uses the pyjwt_ library to build and sign JWT tokens.
 
 .. _oauth_dispatch: https://github.com/openedx/edx-platform/tree/master/openedx/core/djangoapps/oauth_dispatch
 .. _validator module: https://github.com/openedx/edx-platform/blob/master/openedx/core/djangoapps/oauth_dispatch/dot_overrides/validators.py
 .. _Access Token View: https://github.com/openedx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/djangoapps/oauth_dispatch/views.py#L89
-.. _JwtBuilder: https://github.com/openedx/edx-platform/blob/d21a09828072504bc97a2e05883c1241e3a35da9/openedx/core/lib/token_utils.py#L15
-.. _pyjwkest: https://github.com/IdentityPython/pyjwkest
+.. _pyjwt: https://github.com/jpadilla/pyjwt
 .. _JSON Web Signature (JWS): https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41
 
 Clients & REST API Clients code

@@ -12,7 +12,7 @@ from uuid import uuid4
 
 from django.utils.functional import cached_property
 from lxml import etree
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
@@ -160,7 +160,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
     preview_view_js = {
         'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     preview_view_css = {
         'scss': [],
@@ -169,8 +169,8 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     mako_template = "widgets/metadata-only-edit.html"
     studio_js_module_name = 'SequenceDescriptor'
     studio_view_js = {
-        'js': [resource_string(__name__, 'js/src/sequence/edit.js')],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'js': [resource_filename(__name__, 'js/src/sequence/edit.js')],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     studio_view_css = {
         'scss': [],
@@ -409,7 +409,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
             )
             raise
         else:
-            self.runtime.publish('xblock.split_test.child_render', {'child_id': child_id})
+            self.runtime.publish(self, 'xblock.split_test.child_render', {'child_id': child_id})
             return Response()
 
     def get_icon_class(self):

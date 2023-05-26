@@ -2241,6 +2241,12 @@ PARTNER_SUPPORT_EMAIL = ''
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'dev_affiliate_id'
 
+# API access management
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
+API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
+API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
+AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
+
 ############## Settings for Studio Context Sensitive Help ##############
 
 HELP_TOKENS_INI_FILE = REPO_ROOT / "cms" / "envs" / "help_tokens.ini"

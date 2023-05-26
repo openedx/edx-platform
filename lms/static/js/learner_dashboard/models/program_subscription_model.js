@@ -2,6 +2,8 @@ import Backbone from 'backbone';
 import moment from 'moment';
 
 import DateUtils from 'edx-ui-toolkit/js/utils/date-utils';
+import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
+
 
 /**
  * Model for Program Subscription Data.
@@ -15,7 +17,7 @@ class ProgramSubscriptionModel extends Backbone.Model {
             userPreferences = {},
         } = context;
 
-        const priceInUSD = subscription_prices?.find(({ currency }) => currency === 'USD')?.price;
+        const priceInUSD = subscription_prices?.find(({ currency }) => currency === 'USD');
         const trialMoment = moment(
             DateUtils.localizeTime(
                 DateUtils.stringToMoment(data.trial_end),
@@ -24,7 +26,14 @@ class ProgramSubscriptionModel extends Backbone.Model {
         );
 
         const subscriptionState = data.subscription_state?.toLowerCase() ?? '';
-        const subscriptionPrice = '$' + parseFloat(priceInUSD);
+        const subscriptionPrice = StringUtils.interpolate(
+            gettext('${price}/month {currency}'),
+            {
+                price: parseFloat(priceInUSD?.price),
+                currency: priceInUSD?.currency,
+            }
+        );
+
         const subscriptionUrl =
             subscriptionState === 'active'
                 ? urls.manage_subscription_url

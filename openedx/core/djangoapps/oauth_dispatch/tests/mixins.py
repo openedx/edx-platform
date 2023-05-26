@@ -41,31 +41,29 @@ class AccessTokenMixin:
                 encoded_secret_key = base64url_encode(secret_key.encode('utf-8'))
                 key_set.append(PyJWK({'k': encoded_secret_key, 'kty': 'oct'}))
 
-
-            for i in range(0, len(key_set)):
+            for i in range(len(key_set)):
                 try:
                     algorithms = None
                     if key_set[i].key_type == 'RSA':
-                        algorithms = ['RS256', 'RS512',]
+                        algorithms = ['RS256', 'RS512']
                     elif key_set[i].key_type == 'oct':
-                        algorithms = ['HS256',]
+                        algorithms = ['HS256']
 
                     data = jwt.decode(
-                            access_token,
-                            key=key_set[i].key,
-                            issuer=issuer,
-                            algorithms=algorithms,
-                            audience=aud,
-                            options={
-                                'verify_exp': verify_expiration,
-                                'verify_aud': True if aud else False,
-                            }
-                        )
+                        access_token,
+                        key=key_set[i].key,
+                        issuer=issuer,
+                        algorithms=algorithms,
+                        audience=aud,
+                        options={
+                            "verify_exp": verify_expiration,
+                            "verify_aud": bool(aud)
+                        },
+                    )
                     return data
                 except Exception:  # pylint: disable=broad-except
                     if i == len(key_set) - 1:
                         raise
-
 
         # Note that if we expect the claims to have expired
         # then we ask the JWT library not to verify expiration

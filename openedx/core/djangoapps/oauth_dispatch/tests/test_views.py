@@ -9,12 +9,10 @@ from unittest.mock import call, patch
 
 import ddt
 import httpretty
-from Cryptodome.PublicKey import RSA
 from django.conf import settings
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_switch
-from jwkest import jwk
 from oauth2_provider import models as dot_models
 
 from common.djangoapps.student.tests.factories import UserFactory
