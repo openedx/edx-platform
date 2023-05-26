@@ -672,6 +672,49 @@ class EntitlementViewSetTest(ModuleStoreTestCase):
         results = response.data
         assert results.get('expired_at')
 
+    def test_entitlements_filter_on_course_uuid_and_expired_at(self):
+        """
+        Verify that courses filtered properly on list of course_uuids.
+        """
+        entitlements = CourseEntitlementFactory.create_batch(5, user=self.user, expired_at=datetime.now())
+        course_uuids_to_filter_on = {
+            str(entitlement.course_uuid)
+            for entitlement in entitlements[0:3]
+        }
+        # Create a 2nd entitlement for one of the ones to filter on
+        active_entitlement = CourseEntitlementFactory.create(
+            user=self.user,
+            course_uuid=str(entitlements[0].course_uuid),
+            expired_at=None,
+        )
+
+        url = reverse('entitlements_api:v1:entitlements-list')
+        url += f'?user={self.user.username}'
+        url += f'&course_uuid={",".join(course_uuids_to_filter_on)}'
+
+        response = self.client.get(
+            url,
+            content_type='application/json',
+        )
+        assert response.status_code == 200
+
+        results = response.data
+        assert results['count'] == 4
+        actual_course_uuids = {entitlement['course_uuid'] for entitlement in results['results']}
+        assert actual_course_uuids == course_uuids_to_filter_on
+        assert len(actual_course_uuids) == 3
+
+        # Now lets confirm we filter out expired entitlements
+        url += '&expired_at__isnull=True'
+        response = self.client.get(
+            url,
+            content_type='application/json',
+        )
+        assert response.status_code == 200
+        results = response.data
+        assert results['count'] == 1
+        assert results['results'][0]['uuid'] == str(active_entitlement.uuid)
+
     def test_delete_and_revoke_entitlement(self):
         course_entitlement = CourseEntitlementFactory.create()
         url = reverse(self.ENTITLEMENTS_DETAILS_PATH, args=[str(course_entitlement.uuid)])
