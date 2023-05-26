@@ -195,6 +195,22 @@ ENABLE_COPY_PASTE_FEATURE = WaffleFlag(
 )
 
 
+# .. toggle_name: contentstore.enable_content_editing_api
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Enables the new (experimental and unsafe!) Content Editing REST API for course authors,
+# .. which provides CRUD capabilities for xblock editing. Use at your own peril - you can easily delete learner data
+# .. when editing running courses. This can be triggered by deleting blocks, editing subsections, problems, assignments, discussions,
+# .. creating new problems or graded sections, and by other things you do.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-05-26
+# .. toggle_tickets: TNL-10208
+ENABLE_CONTENT_EDITING_API = WaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.enable_content_editing_api',
+    __name__,
+)
+
+
 # .. toggle_name: new_studio_mfe.use_new_home_page
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
