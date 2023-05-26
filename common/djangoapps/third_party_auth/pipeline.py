@@ -889,6 +889,27 @@ def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **k
                 changed[provider_field] = current_value
                 setattr(model, field, provider_value)
 
+        # Generate fullname only for IES IDP.
+        # We deliberately left these values hard-coded instead of using Django settings because
+        # it would force us to add custom settings to the edx platform code,
+        # which we try to avoid as we might lose track of that kind of setting.
+        ies_entity_ids = [
+            'https://iam-stage.pearson.com:443/auth/saml-idp-uid',
+            'https://iam.pearson.com:443/auth/saml-idp-uid',
+        ]
+        first_name = details.get('first_name')
+        last_name = details.get('last_name')
+
+        if (
+            first_name and
+            last_name and
+            current_provider.entity_id in ies_entity_ids
+        ):
+            fullname_value = f'{first_name} {last_name}'
+            changed['fullname'] = fullname_value
+
+            setattr(user.profile, 'name', fullname_value)  # pylint: disable=literal-used-as-attribute
+
         if changed:
             logger.info(
                 '[THIRD_PARTY_AUTH] User performed SSO and data was synchronized. '
