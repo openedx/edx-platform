@@ -366,7 +366,7 @@ class XModuleMixin(XModuleFields, XBlock):
     def location(self, value):
         assert isinstance(value, UsageKey)
         self.scope_ids = self.scope_ids._replace(
-            def_id=value,
+            def_id=value,  # FIXME: this seems wrong... a UsageKey is not a definition key.
             usage_id=value,
         )
 

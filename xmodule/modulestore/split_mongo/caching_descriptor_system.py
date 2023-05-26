@@ -2,6 +2,7 @@
 
 import logging
 import sys
+import weakref
 
 from fs.osfs import OSFS
 from lazy import lazy
@@ -75,7 +76,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         self.local_modules = {}
         self._services['library_tools'] = LibraryToolsService(modulestore, user_id=None)
         # Cache of block field datas, keyed by their ScopeId tuples
-        self.block_field_datas = {}
+        self.block_field_datas = weakref.WeakKeyDictionary()
 
     @lazy
     def _parent_map(self):  # lint-amnesty, pylint: disable=missing-function-docstring
@@ -226,14 +227,14 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                 # This complexity is due to XModule heritage. If we didn't load the block as one step, then sometimes
                 # "rebind" it to be user-specific as a later step, we could load the field data and overrides at once.
                 return block._bound_field_data  # pylint: disable=protected-access
-            if block.scope_ids not in self.block_field_datas:
+            if block not in self.block_field_datas:
                 try:
                     self._init_field_data_for_block(block)
                 except:
                     # Don't try again pointlessly every time another field is accessed
-                    self.block_field_datas[block.scope_ids] = None
+                    self.block_field_datas[block] = None
                     raise
-            return self.block_field_datas[block.scope_ids]
+            return self.block_field_datas[block]
         return super().service(block, service_name)
 
     def _init_field_data_for_block(self, block):
@@ -300,10 +301,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
 
         # Save the field_data now, because some of the wrappers will try to read fields from the block while they
         # determine if they want to wrap the field_data or not.
-        self.block_field_datas[block.scope_ids] = field_data
+        self.block_field_datas[block] = field_data
         # Now add in any wrappers that want to be added:
         for wrapper in self.modulestore.xblock_field_data_wrappers:
-            self.block_field_datas[block.scope_ids] = wrapper(block, self.block_field_datas[block.scope_ids])
+            self.block_field_datas[block] = wrapper(block, self.block_field_datas[block])
 
         # Note: user-specific wrappers like LmsFieldData or OverrideFieldData do not get set here. They get set later
         # during bind_for_student(), which wraps the field-data and sets block._bound_field_data. Calling
