@@ -75,7 +75,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         self.default_class = default_class
         self.local_modules = {}
         self._services['library_tools'] = LibraryToolsService(modulestore, user_id=None)
-        # Cache of block field datas, keyed by their ScopeId tuples
+        # Cache of block field datas, keyed by the XBlock instance (since the ScopeId changes!)
         self.block_field_datas = weakref.WeakKeyDictionary()
 
     @lazy
@@ -185,7 +185,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             block = self.construct_xblock_from_class(
                 class_,
                 ScopeIds(None, block_key.type, definition_id, block_locator),
-                for_parent=kwargs.get('for_parent')
+                for_parent=kwargs.get('for_parent'),
+                # Pass this tuple on for use by _init_field_data_for_block() when field data is initialized.
+                cds_init_args=(block_data, definition_id, kwargs.get("field_decorator")),
                 # Passing field_data here is deprecated, so we don't. Get it via block.service(block, "field-data").
                 # https://github.com/openedx/XBlock/blob/e89cbc5/xblock/mixins.py#L200-L207
             )
@@ -244,11 +246,13 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         block_key = BlockKey.from_usage_key(block.scope_ids.usage_id)
         course_key = block.scope_ids.usage_id.context_key
         try:
-            block_data = self.get_module_data(block_key, course_key)
-            definition_id = block_data.definition
-        except ItemNotFoundError:
+            (block_data, definition_id, field_decorator) = block.get_cds_init_args()
+        except KeyError:
+            # This block was not instantiate via xblock_from_json()/modulestore but rather via the "direct" XBlock API
+            # such as using construct_xblock_from_class(). It probably doesn't yet exist in modulestore.
             block_data = BlockData()
-            definition_id = None  # Perhaps this block was newly created.
+            definition_id = LocalId()
+            field_decorator = None
         class_ = self.load_block_type(block.scope_ids.block_type)
         convert_fields = lambda field: self.modulestore.convert_references_to_keys(
             course_key, class_, field, self.course_entry.structure['blocks'],
@@ -274,7 +278,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
         except AttributeError:
             pass
 
-        if definition_id is not None and not block_data.definition_loaded:
+        if not isinstance(definition_id, LocalId) and not block_data.definition_loaded:
             definition_loader = DefinitionLazyLoader(
                 self.modulestore,
                 course_key,
@@ -291,7 +295,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             converted_defaults,
             parent=parent,
             aside_fields=aside_fields,
-            # field_decorator=kwargs.get('field_decorator') # FIXME: Need to get the field_decorator
+            field_decorator=field_decorator,
         )
 
         if InheritanceMixin in self.modulestore.xblock_mixins:

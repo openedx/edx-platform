@@ -313,8 +313,21 @@ class XModuleMixin(XModuleFields, XBlock):
 
     def __init__(self, *args, **kwargs):
         self._asides = []
+        # Initialization data used by CachingDescriptorSystem to defer FieldData initialization
+        self._cds_init_args = kwargs.pop("cds_init_args", None)
 
         super().__init__(*args, **kwargs)
+
+    def get_cds_init_args(self):
+        """ Get initialization data used by CachingDescriptorSystem to defer FieldData initialization """
+        if self._cds_init_args is None:
+            raise KeyError("cds_init_args was not provided for this XBlock")
+        if self._cds_init_args is False:
+            raise RuntimeError("Tried to get CachingDescriptorSystem cds_init_args twice for the same XBlock.")
+        args = self._cds_init_args
+        # Free the memory and set this False to flag any double-access bugs. This only needs to be read once.
+        self._cds_init_args = False
+        return args
 
     @property
     def runtime(self):
