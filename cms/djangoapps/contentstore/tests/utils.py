@@ -8,7 +8,7 @@ import json
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.test.client import Client
-from opaque_keys.edx.keys import AssetKey
+from opaque_keys.edx.keys import AssetKey, CourseKey
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
@@ -19,6 +19,8 @@ from xmodule.tests.test_transcripts_utils import YoutubeVideoHTMLResponse
 
 from cms.djangoapps.contentstore.utils import reverse_url
 from common.djangoapps.student.models import Registration
+from common.djangoapps.student.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
+
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -42,6 +44,7 @@ class AjaxEnabledTestClient(Client):
     """
     Convenience class to make testing easier.
     """
+
     def ajax_post(self, path, data=None, content_type="application/json", **kwargs):
         """
         Convenience method for client post which serializes the data into json and sets the accept type
@@ -210,10 +213,38 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
                 self.assertEqual(value, course2_asset_attrs[key])
 
 
+class CoursesWithStaffMixin():
+    """
+    Mixin to create courses with staff and students,
+    for example to check authorization for course staff.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course_key = CourseKey.from_string('course-v1:edX+ToyX+Toy_Course')
+        self.other_course_key = CourseKey.from_string('course-v1:edX+ToyX_Other_Course+Toy_Course')
+        self.course = self.create_course_from_course_key(self.course_key)
+        self.other_course = self.create_course_from_course_key(self.other_course_key)
+        self.password = 'password'
+        self.student = UserFactory.create(username='student', password=self.password)
+        self.global_staff = GlobalStaffFactory(username='global-staff', password=self.password)
+        self.course_instructor = InstructorFactory(
+            username='instructor',
+            password=self.password,
+            course_key=self.course.id,
+        )
+        self.other_course_instructor = InstructorFactory(
+            username='other-course-instructor',
+            password=self.password,
+            course_key=self.other_course.id,
+        )
+
+
 class HTTPGetResponse:
     """
     Generic object used to return results from a mock patch to an HTTP GET request
     """
+
     def __init__(self, status_code, response_string):
         self.status_code = status_code
         self.text = response_string

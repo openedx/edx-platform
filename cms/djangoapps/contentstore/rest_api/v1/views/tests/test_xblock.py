@@ -12,32 +12,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory, CourseFactory
 from opaque_keys.edx.keys import CourseKey
 
-from common.djangoapps.student.tests.factories import UserFactory, GlobalStaffFactory, InstructorFactory
+from cms.djangoapps.contentstore.tests.utils import CoursesWithStaffMixin
 from cms.djangoapps.contentstore.rest_api.v1.views.xblock import toggles, handle_xblock
+from common.djangoapps.student.tests.factories import UserFactory, GlobalStaffFactory, InstructorFactory
 
 
-class CourseAPITestMixin():
-    """ setup for proctored exam settings tests """
-
-    def setUp(self):
-        super().setUp()
-        self.course_key = CourseKey.from_string('course-v1:edX+ToyX+Toy_Course')
-        self.other_course_key = CourseKey.from_string('course-v1:edX+ToyX_Other_Course+Toy_Course')
-        self.course = self.create_course_from_course_key(self.course_key)
-        self.other_course = self.create_course_from_course_key(self.other_course_key)
-        self.password = 'password'
-        self.student = UserFactory.create(username='student', password=self.password)
-        self.global_staff = GlobalStaffFactory(username='global-staff', password=self.password)
-        self.course_instructor = InstructorFactory(
-            username='instructor',
-            password=self.password,
-            course_key=self.course.id,
-        )
-        self.other_course_instructor = InstructorFactory(
-            username='other-course-instructor',
-            password=self.password,
-            course_key=self.other_course.id,
-        )
+class CourseAPITestcase(CoursesWithStaffMixin):
+    """ setup for studio content API tests """
 
     def tearDown(self):
         super().tearDown()
@@ -71,7 +52,7 @@ class CourseAPITestMixin():
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-class XblockViewPostTest(CourseAPITestMixin, ModuleStoreTestCase, APITestCase):
+class XblockViewPostTest(CourseAPITestcase, ModuleStoreTestCase, APITestCase):
     """
     Test CRUD operations on xblocks
     """

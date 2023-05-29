@@ -1,5 +1,5 @@
 """
-Unit tests for Contentstore views.
+Unit tests for Contentstore Proctored Exam Settings.
 """
 
 import ddt
@@ -12,6 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from cms.djangoapps.contentstore.tests.utils import CoursesWithStaffMixin
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
@@ -21,27 +22,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-a
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-class ProctoringExamSettingsTestMixin():
+class ProctoringExamSettingsTestcase(CoursesWithStaffMixin):
     """ setup for proctored exam settings tests """
-    def setUp(self):
-        super().setUp()
-        self.course_key = CourseKey.from_string('course-v1:edX+ToyX+Toy_Course')
-        self.other_course_key = CourseKey.from_string('course-v1:edX+ToyX_Other_Course+Toy_Course')
-        self.course = self.create_course_from_course_key(self.course_key)
-        self.other_course = self.create_course_from_course_key(self.other_course_key)
-        self.password = 'password'
-        self.student = UserFactory.create(username='student', password=self.password)
-        self.global_staff = GlobalStaffFactory(username='global-staff', password=self.password)
-        self.course_instructor = InstructorFactory(
-            username='instructor',
-            password=self.password,
-            course_key=self.course.id,
-        )
-        self.other_course_instructor = InstructorFactory(
-            username='other-course-instructor',
-            password=self.password,
-            course_key=self.other_course.id,
-        )
 
     def tearDown(self):
         super().tearDown()
@@ -87,7 +69,7 @@ class ProctoringExamSettingsTestMixin():
         }
 
 
-class ProctoringExamSettingsGetTests(ProctoringExamSettingsTestMixin, ModuleStoreTestCase, APITestCase):
+class ProctoringExamSettingsGetTests(ProctoringExamSettingsTestcase, ModuleStoreTestCase, APITestCase):
     """ Tests for proctored exam settings GETs """
     @classmethod
     def get_expected_response_data(cls, course, user):  # pylint: disable=unused-argument
@@ -162,7 +144,7 @@ class ProctoringExamSettingsGetTests(ProctoringExamSettingsTestMixin, ModuleStor
 
 
 @ddt.ddt
-class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleStoreTestCase, APITestCase):
+class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestcase, ModuleStoreTestCase, APITestCase):
     """ Tests for proctored exam settings POST """
 
     @classmethod
