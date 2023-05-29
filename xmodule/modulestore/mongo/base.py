@@ -170,6 +170,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
     A system that has a cache of block json that it will use to load blocks
     from, with a backup of calling to the underlying modulestore for more data
     """
+
+    # This CachingDescriptorSystem runtime sets block._field_data on each block via construct_xblock_from_class(),
+    # rather than the newer approach of providing a "field-data" service via runtime.service(). As a result, during
+    # bind_for_student() we can't just set ._bound_field_data; we must overwrite block._field_data.
+    uses_deprecated_field_data = True
+
     def __repr__(self):
         return "CachingDescriptorSystem{!r}".format((
             self.modulestore,
@@ -177,11 +183,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             [str(key) for key in self.module_data.keys()],
             self.default_class,
         ))
-    
-    # This CachingDescriptorSystem runtime sets block._field_data on each block via construct_xblock_from_class(),
-    # rather than the newer approach of providing a "field-data" service via runtime.service(). As a result, during
-    # bind_for_student() we can't just set ._bound_field_data; we must overwrite block._field_data.
-    uses_deprecated_field_data = True
 
     def __init__(self, modulestore, course_key, module_data, default_class, **kwargs):
         """

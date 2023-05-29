@@ -429,13 +429,6 @@ class XModuleMixin(XModuleFields, XBlock):
         self.save()
         return self._field_data._kvs  # pylint: disable=protected-access
 
-    def _unwrapped_field_data(self):
-        """
-        This property gets the field-data service before we wrap it in user-specifc wrappers during bind_for_student,
-        e.g. the LmsFieldData or OverrideFieldData classes.
-        """
-        return self.runtime.service(self, 'field-data-unbound')
-
     def add_aside(self, aside):
         """
         save connected asides
