@@ -177,6 +177,11 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
             [str(key) for key in self.module_data.keys()],
             self.default_class,
         ))
+    
+    # This CachingDescriptorSystem runtime sets block._field_data on each block via construct_xblock_from_class(),
+    # rather than the newer approach of providing a "field-data" service via runtime.service(). As a result, during
+    # bind_for_student() we can't just set ._bound_field_data; we must overwrite block._field_data.
+    uses_deprecated_field_data = True
 
     def __init__(self, modulestore, course_key, module_data, default_class, **kwargs):
         """
@@ -302,6 +307,18 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):  # li
                     location,
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
+
+    def service(self, block, service_name):
+        """
+        Return a service, or None.
+        Services are objects implementing arbitrary other interfaces.
+        """
+        # A very minimal shim for compatibility with the new API for how we access field data in split mongo:
+        if service_name == 'field-data-unbound':
+            return block._field_data  # pylint: disable=protected-access
+        elif service_name == 'field-data':
+            return block._bound_field_data if hasattr(block, "_bound_field_data") else block._field_data
+        return super().service(block, service_name)
 
     def _convert_reference_to_key(self, ref_string):
         """

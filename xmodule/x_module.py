@@ -669,6 +669,10 @@ class XModuleMixin(XModuleFields, XBlock):
             for wrapper in wrappers:
                 wrapped_field_data = wrapper(wrapped_field_data)
             self._bound_field_data = wrapped_field_data
+            if getattr(self.runtime, "uses_deprecated_field_data", False):
+                # This approach is deprecated but old mongo's CachingDescriptorSystem still requires it.
+                # For Split mongo's CachingDescriptor system, don't set ._field_data this way.
+                self._field_data = wrapped_field_data
 
     @property
     def non_editable_metadata_fields(self):
