@@ -16,5 +16,5 @@ urlpatterns = [
         name="proctored_exam_settings"
     ),
     re_path(fr'^xblock/{settings.COURSE_ID_PATTERN}/{settings.USAGE_KEY_PATTERN}?$',
-            xblock.XblockView.as_view(), name='xblock'),
+            xblock.XblockView.as_view(), name='studio_content'),
 ]

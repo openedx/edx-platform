@@ -9,10 +9,12 @@ from common.djangoapps.util.json_request import expect_json_in_class_view
 
 from ....api import course_author_access_required
 
-from cms.djangoapps.contentstore.xblock_services.xblock_service import handle_xblock
-from cms.djangoapps.contentstore.toggles import use_studio_content_api
+from cms.djangoapps.contentstore.xblock_services import xblock_service
+import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
 log = logging.getLogger(__name__)
+toggles = contentstore_toggles
+handle_xblock = xblock_service.handle_xblock
 
 
 @view_auth_classes()
@@ -31,7 +33,7 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
         and calls other methods to handle specific HTTP methods.
         We use this to raise a 404 if the content api is disabled.
         """
-        if not use_studio_content_api():
+        if not toggles.use_studio_content_api():
             raise Http404
         return super().dispatch(request, *args, **kwargs)
 
