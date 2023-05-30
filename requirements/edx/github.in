@@ -80,6 +80,8 @@
 
 # ... add dependencies here
 
+git+https://github.com/openedx/edx-drf-extensions.git@umar/make-verify-signature-method-generic#egg=edx-drf-extensions==8.9.0
+
 
 ##############################################################################
 # Critical fixes for packages that are not yet available in a PyPI release.

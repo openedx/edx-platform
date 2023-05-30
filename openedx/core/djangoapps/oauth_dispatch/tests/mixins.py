@@ -5,11 +5,13 @@ OAuth Dispatch test mixins
 import pytest
 import jwt
 from django.conf import settings
+from edx_rest_framework_extensions.auth.jwt.decoder import get_signing_jwk_key_set, verify_jwk_signature_using_keyset
 from jwt.api_jwk import PyJWK, PyJWKSet
 from jwt.utils import base64url_encode
 from jwt.exceptions import ExpiredSignatureError
 
 from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
+
 
 
 class AccessTokenMixin:
@@ -33,37 +35,14 @@ class AccessTokenMixin:
             Helper method to decode a JWT with the ability to
             verify the expiration of said token
             """
-            key_set = []
-            if should_be_asymmetric_key:
-                signing_jwk_set = settings.JWT_AUTH.get('JWT_PUBLIC_SIGNING_JWK_SET')
-                key_set.extend(PyJWKSet.from_json(signing_jwk_set).keys)
-            else:
-                encoded_secret_key = base64url_encode(secret_key.encode('utf-8'))
-                key_set.append(PyJWK({'k': encoded_secret_key, 'kty': 'oct'}))
+            key_set = get_signing_jwk_key_set(secret_key, should_be_asymmetric_key)
+            data = verify_jwk_signature_using_keyset(access_token,
+                                                     key_set,
+                                                     iss=issuer,
+                                                     aud=aud,
+                                                     verify_exp=verify_expiration)
 
-            for i in range(len(key_set)):
-                try:
-                    algorithms = None
-                    if key_set[i].key_type == 'RSA':
-                        algorithms = ['RS256', 'RS512']
-                    elif key_set[i].key_type == 'oct':
-                        algorithms = ['HS256']
-
-                    data = jwt.decode(
-                        access_token,
-                        key=key_set[i].key,
-                        issuer=issuer,
-                        algorithms=algorithms,
-                        audience=aud,
-                        options={
-                            "verify_exp": verify_expiration,
-                            "verify_aud": bool(aud)
-                        },
-                    )
-                    return data
-                except Exception:  # pylint: disable=broad-except
-                    if i == len(key_set) - 1:
-                        raise
+            return data
 
         # Note that if we expect the claims to have expired
         # then we ask the JWT library not to verify expiration
