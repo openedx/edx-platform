@@ -292,8 +292,8 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     # by the components in the order listed in COMPONENT_TYPES.
     component_types = COMPONENT_TYPES[:]
 
-    # Libraries do not support discussions and openassessment and other libraries
-    component_not_supported_by_library = ['discussion', 'library', 'openassessment']
+    # Libraries do not support discussions, drag-and-drop, and openassessment and other libraries
+    component_not_supported_by_library = ['discussion', 'library', 'openassessment', 'drag-and-drop-v2']
     if library:
         component_types = [component for component in component_types
                            if component not in set(component_not_supported_by_library)]
