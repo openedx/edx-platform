@@ -9,14 +9,20 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from cms.djangoapps.contentstore.tests.test_utils import AuthorizeStaffTestCase
 
 
+TEST_COURSE_KEY = "course-v1:dede+aba+weagi"
+TEST_LOCATOR = "block-v1:dede+aba+weagi+type@problem+block@ba6327f840da49289fb27a9243913478"
+
+
 class XblockViewTestCase(AuthorizeStaffTestCase):
-    def get_url(self, course_key, block_id=None):
-        kwargs = (
-            {"course_id": course_key}
-            if block_id is None
-            else {"course_id": course_key, "usage_key_string": block_id}
+    # assumes that you want to pass a block id to the url
+    def get_url_params(self, course_key):
+        return {"course_id": course_key, "usage_key_string": TEST_LOCATOR}
+
+    def get_url(self, course_key):
+        return reverse(
+            "cms.djangoapps.contentstore:v1:studio_content",
+            kwargs=self.get_url_params(course_key),
         )
-        return reverse("cms.djangoapps.contentstore:v1:studio_content", kwargs=kwargs)
 
     def send_request():
         raise NotImplementedError("send_request must be implemented by subclasses")
@@ -25,8 +31,8 @@ class XblockViewTestCase(AuthorizeStaffTestCase):
         "cms.djangoapps.contentstore.rest_api.v1.views.xblock.handle_xblock",
         return_value=JsonResponse(
             {
-                "locator": "test-locator",
-                "courseKey": "test-course-key",
+                "locator": TEST_LOCATOR,
+                "courseKey": TEST_COURSE_KEY,
             }
         ),
     )
@@ -42,8 +48,8 @@ class XblockViewTestCase(AuthorizeStaffTestCase):
         course_id=None,
         data=None,
     ):
-        id = self.get_course_id_string(course_id=course_id)
-        url = self.get_url(id)
+        course_id = self.get_course_id_string(course_id=course_id)
+        url = self.get_url(course_id)
         data = self.get_test_data(id)
 
         response = self.send_request(url, data)
@@ -61,10 +67,52 @@ class XblockViewTestCase(AuthorizeStaffTestCase):
         return course_id.html_id()
 
 
+class XblockViewGetTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
+    """
+    Test GET operation on xblocks
+    """
+
+    def get_test_data(self, course_id):
+        return None
+
+    def assert_xblock_handler_called(self, *, mock_handle_xblock, course_id, response):
+        mock_handle_xblock.assert_called_once()
+        passed_args = mock_handle_xblock.call_args[0][0]
+
+        assert passed_args.method == "GET"
+        assert passed_args.path == self.get_url(course_id)
+
+    def send_request(self, url, data):
+        return self.client.get(url)
+
+    def test_api_behind_feature_flag(self):
+        # should return 404 if the feature flag is not enabled
+        url = self.get_url(self.course_key)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_xblock_handler_called_with_correct_arguments(self):
+        self.client.login(
+            username=self.course_instructor.username, password=self.password
+        )
+        response = self.make_request(
+            run_assertions=self.assert_xblock_handler_called,
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["locator"] == TEST_LOCATOR
+        assert data["courseKey"] == TEST_COURSE_KEY
+
+
 class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
     """
-    Test CRUD operations on xblocks
+    Test POST operation on xblocks
     """
+
+    def get_url_params(self, course_key):
+        return {"course_id": course_key}
 
     def get_test_data(self, course_id):
         return {
@@ -73,7 +121,7 @@ class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
             "courseKey": course_id,
         }
 
-    def assert_xblock_handler_called(self, *, mock_handle_xblock, course_id):
+    def assert_xblock_handler_called(self, *, mock_handle_xblock, course_id, response):
         mock_handle_xblock.assert_called_once()
         passed_args = mock_handle_xblock.call_args[0][0]
 
@@ -86,9 +134,7 @@ class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
 
     def test_api_behind_feature_flag(self):
         # should return 404 if the feature flag is not enabled
-        url = reverse(
-            "cms.djangoapps.contentstore:v1:studio_content", args=[self.course_key]
-        )
+        url = self.get_url(self.course_key)
 
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -98,7 +144,9 @@ class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
             username=self.course_instructor.username, password=self.password
         )
         response = self.make_request(
-            assert_xblock_handler_call=True,
             run_assertions=self.assert_xblock_handler_called,
         )
         assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["locator"] == TEST_LOCATOR
+        assert data["courseKey"] == TEST_COURSE_KEY
