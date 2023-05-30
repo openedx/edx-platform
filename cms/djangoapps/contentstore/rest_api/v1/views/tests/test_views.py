@@ -8,56 +8,23 @@ from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
-from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from cms.djangoapps.contentstore.tests.utils import CoursesWithStaffMixin
-from common.djangoapps.student.tests.factories import GlobalStaffFactory
-from common.djangoapps.student.tests.factories import InstructorFactory
-from common.djangoapps.student.tests.factories import UserFactory
+from cms.djangoapps.contentstore.tests.test_utils import AuthorizeStaffTestCase
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-class ProctoringExamSettingsTestcase(CoursesWithStaffMixin):
+class ProctoringExamSettingsTestcase(AuthorizeStaffTestCase):
     """ setup for proctored exam settings tests """
-
-    def tearDown(self):
-        super().tearDown()
-        self.client.logout()
-
-    @classmethod
-    def create_course_from_course_key(cls, course_key):
-        return CourseFactory.create(
-            org=course_key.org,
-            course=course_key.course,
-            run=course_key.run
-        )
-
-    def make_request(self, course_id=None, data=None):
-        raise NotImplementedError
 
     def get_url(self, course_key):
         return reverse(
             'cms.djangoapps.contentstore:v1:proctored_exam_settings',
             kwargs={'course_id': course_key}
         )
-
-    def test_403_if_student(self):
-        self.client.login(username=self.student.username, password=self.password)
-        response = self.make_request()
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_403_if_instructor_in_another_course(self):
-        self.client.login(
-            username=self.other_course_instructor.username,
-            password=self.password
-        )
-        response = self.make_request()
-        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_404_no_course_block(self):
         course_id = 'course-v1:edX+ToyX_Nonexistent_Course+Toy_Course'
@@ -90,16 +57,12 @@ class ProctoringExamSettingsGetTests(ProctoringExamSettingsTestcase, ModuleStore
         url = self.get_url(course_id)
         return self.client.get(url)
 
-    def test_200_global_staff(self):
-        self.client.login(username=self.global_staff.username, password=self.password)
-        response = self.make_request()
-        assert response.status_code == status.HTTP_200_OK
+    def test_global_staff(self):
+        response = super().test_global_staff(status=status.HTTP_200_OK)
         assert response.data == self.get_expected_response_data(self.course, self.global_staff)
 
-    def test_200_course_instructor(self):
-        self.client.login(username=self.course_instructor.username, password=self.password)
-        response = self.make_request()
-        assert response.status_code == status.HTTP_200_OK
+    def test_course_instructor(self):
+        response = super().test_course_instructor(status=status.HTTP_200_OK)
         assert response.data == self.get_expected_response_data(self.course, self.course_instructor)
 
     @override_waffle_flag(EXAMS_IDA, active=False)
@@ -172,6 +135,9 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestcase, ModuleStor
         if data is None:
             data = self.get_request_data()
         return self.client.post(url, data, format='json')
+
+    def test_course_instructor(self):
+        return super().test_course_instructor(status=status.HTTP_403_FORBIDDEN)
 
     @override_settings(
         PROCTORING_BACKENDS={

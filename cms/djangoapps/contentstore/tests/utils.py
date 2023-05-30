@@ -213,33 +213,6 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
                 self.assertEqual(value, course2_asset_attrs[key])
 
 
-class CoursesWithStaffMixin():
-    """
-    Mixin to create courses with staff and students,
-    for example to check authorization for course staff.
-    """
-
-    def setUp(self):
-        super().setUp()
-        self.course_key = CourseKey.from_string('course-v1:edX+ToyX+Toy_Course')
-        self.other_course_key = CourseKey.from_string('course-v1:edX+ToyX_Other_Course+Toy_Course')
-        self.course = self.create_course_from_course_key(self.course_key)
-        self.other_course = self.create_course_from_course_key(self.other_course_key)
-        self.password = 'password'
-        self.student = UserFactory.create(username='student', password=self.password)
-        self.global_staff = GlobalStaffFactory(username='global-staff', password=self.password)
-        self.course_instructor = InstructorFactory(
-            username='instructor',
-            password=self.password,
-            course_key=self.course.id,
-        )
-        self.other_course_instructor = InstructorFactory(
-            username='other-course-instructor',
-            password=self.password,
-            course_key=self.other_course.id,
-        )
-
-
 class HTTPGetResponse:
     """
     Generic object used to return results from a mock patch to an HTTP GET request
