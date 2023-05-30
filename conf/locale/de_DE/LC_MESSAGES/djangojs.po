@@ -1961,28 +1961,28 @@ msgstr ""
 "der Nationalgarde gedient?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
-msgstr "Was ist der höchste Bildungsabschluss, den Sie erreicht haben?"
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
+msgid "Select military status"
 msgstr ""
-"Welches ist der höchste Bildungsabschluss, den ein Elternteil oder "
-"Erziehungsberechtigter von Ihnen erreicht hat?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
-msgstr "Wählen Sie Ihren Beschäftigungsstatus"
+msgid "Select level of education"
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
-msgstr "In welcher Branche arbeiten Sie derzeit?"
+msgid "Select guardian education"
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
-msgstr "In welcher Branchen wollen Sie arbeiten?"
+msgid "Select current industry"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select prospective industry"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
+msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"

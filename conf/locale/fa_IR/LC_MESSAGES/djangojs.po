@@ -1865,26 +1865,28 @@ msgid ""
 msgstr "آیا تا به حال در نیروهای مسلح فعالانه خدمت کرده‌‌اید؟"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
-msgstr "آخرین مدرک تحصیلی شما کدامست؟"
+msgid "Select military status"
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
-msgstr "مدارک تحصیلی والدین یا قیم شما کدامست؟"
+msgid "Select level of education"
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
-msgstr "سمت اداری"
+msgid "Select guardian education"
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
-msgstr "حرفۀ شما چیست؟"
+msgid "Select current industry"
+msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
-msgstr "مایلید وارد کدام حرفه شوید؟"
+msgid "Select prospective industry"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
+msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"

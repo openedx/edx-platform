@@ -8,7 +8,7 @@
 .program-list-wrapper {
   @include make-row();
   padding: ($baseline*2) ($baseline/2);
-  max-width: 82rem;
+  max-width: 79rem;
   margin: 0 auto;
 
   @include media-breakpoint-up(md) {

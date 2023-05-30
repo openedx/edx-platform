@@ -140,6 +140,11 @@ if RELEASE_LINE == "master":
         'course_author': 'https://edx.readthedocs.io/projects/edx-partner-course-staff',
     }
 
+# API access management
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
+API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
+API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
+AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

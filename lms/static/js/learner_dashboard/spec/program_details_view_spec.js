@@ -471,7 +471,7 @@ describe('Program Details View', () => {
         subscriptionData: [
             {
                 trial_end: '1970-01-01T03:25:45Z',
-                next_payment_date: '1970-06-03T07:12:04Z',
+                current_period_end: '1970-06-03T07:12:04Z',
                 price: '100.00',
                 currency: 'USD',
                 subscription_state: 'pre',
@@ -695,7 +695,7 @@ describe('Program Details View', () => {
         testSubscriptionState(
             'pre',
             'Start 7-day free trial',
-            '$100/month subscription after trial ends. Cancel anytime.',
+            '$100/month USD subscription after trial ends. Cancel anytime.',
         );
     });
 
@@ -720,7 +720,7 @@ describe('Program Details View', () => {
         testSubscriptionState(
             'inactive',
             'Restart my subscription',
-            'Unlock verified access to all courses for $100/month. Cancel anytime.',
+            'Unlock verified access to all courses for $100/month USD. Cancel anytime.',
         );
     });
 });

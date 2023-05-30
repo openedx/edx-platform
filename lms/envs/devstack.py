@@ -509,6 +509,12 @@ SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
 SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
 SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
 
+# API access management
+API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
+API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
+API_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/'
+AUTH_DOCUMENTATION_URL = 'https://course-catalog-api-guide.readthedocs.io/en/latest/authentication/index.html'
+
 ################# New settings must go ABOVE this line #################
 ########################################################################
 # See if the developer has any local overrides.
