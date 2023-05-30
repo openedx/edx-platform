@@ -105,6 +105,7 @@ edx-when
 edxval
 event-tracking
 enmerkar-underscore                 # Implements a underscore extractor for django-babel.
+federated-content-connector
 fs
 fs-s3fs==0.1.8
 geoip2                              # Python API for the GeoIP web services and databases
