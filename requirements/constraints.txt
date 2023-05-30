@@ -101,3 +101,11 @@ urllib3<2.0.0
 # Sphinx==5.3.0 requires docutils<0.20
 # Issue to unpin Sphinx to resolve this constraint: https://github.com/openedx/edx-lint/issues/338
 docutils<0.20
+
+# When we unpinned python3-saml and allowed it to upgrade from 1.9.0
+# to 1.15.0 it fixed a devstack issue around ports being dropped, but
+# introduced an issue around duplicate attributes (for some
+# IdPs). It's not clear which version introduces the second problem.
+#
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/32327
+python3-saml<1.10.0
