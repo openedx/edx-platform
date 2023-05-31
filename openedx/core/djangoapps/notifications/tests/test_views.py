@@ -58,6 +58,7 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
             mode='honor'
         )
 
+    @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     def test_course_enrollment_list_view(self):
         """
         Test the CourseEnrollmentListView.
