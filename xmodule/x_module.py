@@ -379,7 +379,7 @@ class XModuleMixin(XModuleFields, XBlock):
     def location(self, value):
         assert isinstance(value, UsageKey)
         self.scope_ids = self.scope_ids._replace(
-            def_id=value,  # FIXME: this seems wrong... a UsageKey is not a definition key.
+            def_id=value,  # Note: assigning a UsageKey as def_id is OK in old mongo / import system but wrong in split
             usage_id=value,
         )
 
