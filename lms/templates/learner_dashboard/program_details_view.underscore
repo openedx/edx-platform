@@ -62,14 +62,14 @@
                             hasActiveTrial
                             ? gettext('Active trial ends {trialEndDate} at {trialEndTime}')
                             : subscriptionState === 'active'
-                            ? gettext('Your next billing date is {nextPaymentDate}')
+                            ? gettext('Your next billing date is {currentPeriodEnd}')
                             : subscriptionState === 'inactive'
-                            ? gettext('Unlock verified access to all courses for {subscriptionPrice}/month. Cancel anytime.')
-                            : gettext('{subscriptionPrice}/month subscription after trial ends. Cancel anytime.')
+                            ? gettext('Unlock verified access to all courses for {subscriptionPrice}. Cancel anytime.')
+                            : gettext('{subscriptionPrice} subscription after trial ends. Cancel anytime.')
                         ),
                         {
                             subscriptionPrice,
-                            nextPaymentDate,
+                            currentPeriodEnd,
                             trialEndDate,
                             trialEndTime,
                         }

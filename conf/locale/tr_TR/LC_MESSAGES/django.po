@@ -11329,7 +11329,7 @@ msgstr ""
 
 #: xmodule/course_block.py
 msgid "Video Sharing Options"
-msgstr ""
+msgstr "Video Paylaşma Ayarları"
 
 #: xmodule/course_block.py
 msgid ""
@@ -11337,6 +11337,9 @@ msgid ""
 "three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
 "default."
 msgstr ""
+"Ders için video paylaşım seçeneklerini belirtin. Bu, üç değerden birine "
+"ayarlanabilir: \"tümü açık\", \"tümü kapalı\" ve \"video başına\". "
+"Varsayılan değer \"video başına\"."
 
 #: xmodule/course_block.py
 msgid "Course Instructor"
@@ -12443,8 +12446,30 @@ msgid "Add discussion for the Unit."
 msgstr "Üniteye tartışma ekle."
 
 #: xmodule/video_block/sharing_sites.py
+#, python-brace-format
 msgid ""
-"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
 "\n"
 msgstr ""
 
@@ -14912,11 +14937,11 @@ msgstr "Bileşeni Yapıştır"
 
 #: lms/templates/studio_render_children_view.html
 msgid "From:"
-msgstr ""
+msgstr "Gönderen:"
 
 #: lms/templates/studio_render_children_view.html
 msgid "What's in my clipboard?"
-msgstr ""
+msgstr "Panomda ne var?"
 
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
@@ -15048,7 +15073,7 @@ msgstr "Şurada paylaş:"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
-msgstr ""
+msgstr "{site} sitesinde paylaş"
 
 #: lms/templates/video.html
 msgid "Download video file"
@@ -15255,6 +15280,16 @@ msgid ""
 "provide you with instructions for obtaining your API shared secret and "
 "client ID."
 msgstr ""
+"API'lere erişmek için, uygulamanız için bir {platform_name} kullanıcı hesabı"
+" oluşturmanız gerekir (kişisel kullanım için değil). Bu hesap, {request_url}"
+" adresindeki API istek sayfamıza erişmenizi sağlayacaktır. Bu sayfada, "
+"API'ler için önerdiğiniz kullanımların açıklamasını içeren API istek formunu"
+" doldurmanız gerekir. {platform_name} platformuna sağladığınız herhangi bir "
+"hesap ve kayıt bilgisi doğru ve güncel olmalıdır ve herhangi bir değişikliği"
+" derhal bize bildirmeyi kabul edersiniz. {platform_name_capitalized}, API "
+"talep formunuzu inceleyecek ve tamamen {platform_name}'ın takdirine bağlı "
+"olarak onaylandıktan sonra, API shared secret ve müşteri kimliğinizi almanız"
+" için size yönergeleri sağlayacaktır."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Permissible Use"
@@ -15276,6 +15311,19 @@ msgid ""
 "credentials anywhere other than on the {platform_name} website at "
 "{platform_url}."
 msgstr ""
+"API'leri yalnızca API'ler aracılığıyla erişilen içeriği (\"API İçeriği\") "
+"kendi web sitenize, mobil sitenize, uygulamanıza, blogunuza, e-posta dağıtım"
+" listenize veya sosyal medya mülkünüze (\"Uygulamanız\") teslim etmek "
+"amacıyla kullanmayı kabul edersiniz. \") veya erişim talebinizde "
+"tanımladığınız ve {platform_name} tarafından duruma göre onaylanan başka bir"
+" ticari kullanım için. {platform_name_capitalized}, API'leri kullanımınızı "
+"Şartlar'a uygunluk açısından izleyebilir ve {platform_name} tarafından "
+"belirlenen gereksinimleri ve sınırlamaları aşmaya veya aşmaya çalışırsanız "
+"erişiminizi reddedebilir veya entegrasyonunuzu kapatabilir. Uygulamanız veya"
+" API'nin veya API İçeriğinin diğer onaylı kullanımı, son kullanıcılarınızdan"
+" {platform_name} kullanıcı adını, parolasını veya diğer {platform_name} "
+"kullanıcı kimlik bilgilerini {platform_url} adresindeki {platform_name} web "
+"sitesi dışında herhangi bir yerde vermelerini istememelidir."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Prohibited Uses and Activities"
