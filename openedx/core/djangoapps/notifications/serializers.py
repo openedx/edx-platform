@@ -9,7 +9,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.notifications.models import (
     get_notification_channels,
     Notification,
-    NotificationPreference,
+    CourseNotificationPreference,
 )
 
 
@@ -34,14 +34,14 @@ class NotificationCourseEnrollmentSerializer(serializers.ModelSerializer):
         fields = ('course',)
 
 
-class UserNotificationPreferenceSerializer(serializers.ModelSerializer):
+class UserCourseNotificationPreferenceSerializer(serializers.ModelSerializer):
     """
     Serializer for user notification preferences.
     """
     course_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        model = NotificationPreference
+        model = CourseNotificationPreference
         fields = ('id', 'course_name', 'course_id', 'notification_preference_config',)
         read_only_fields = ('id', 'course_name', 'course_id',)
         write_only_fields = ('notification_preference_config',)
@@ -136,7 +136,6 @@ class NotificationSerializer(serializers.ModelSerializer):
             'id',
             'app_name',
             'notification_type',
-            'content',
             'content_context',
             'content_url',
             'last_read',
