@@ -1747,12 +1747,12 @@ class TestGetProgramsSubscriptionData(TestCase):
             {'id': uuid.uuid4(), 'resource_id': uuid.uuid4(),
              'resource_type': 'program', 'resource_data': None, 'trial_end': '1970-01-01T00:02:03Z',
              'price': '100.00', 'currency': 'USD', 'sub_type': 'stripe', 'identifier': 'dummy_1',
-             'next_payment_date': '1970-01-01T00:02:03Z', 'status': 'active',
+             'current_period_end': '1970-01-01T00:02:03Z', 'status': 'active',
              'customer': 1, 'subscription_state': 'active'},
             {'id': uuid.uuid4(), 'resource_id': uuid.uuid4(),
              'resource_type': 'program', 'resource_data': None, 'trial_end': '1970-01-01T03:25:12Z',
              'price': '1000.00', 'currency': 'USD', 'sub_type': 'stripe', 'identifier': 'dummy_2',
-             'next_payment_date': '1970-05-23T12:05:21Z', 'status': 'subscription_initiated',
+             'current_period_end': '1970-05-23T12:05:21Z', 'status': 'subscription_initiated',
              'customer': 1, 'subscription_state': 'notStarted'}
         ]
 

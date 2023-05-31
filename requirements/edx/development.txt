@@ -257,6 +257,7 @@ defusedxml==0.7.1
     #   djangorestframework-xml
     #   ora2
     #   python3-openid
+    #   python3-saml
     #   social-auth-core
 deprecated==1.2.13
     # via
@@ -607,7 +608,7 @@ edx-drf-extensions==8.8.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.65.1
+edx-enterprise==3.65.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -926,7 +927,6 @@ lxml==4.9.2
     #   openedx-calc
     #   ora2
     #   pyquery
-    #   python3-saml
     #   xblock
     #   xmlsec
 mailsnake==1.6.4
@@ -1315,8 +1315,10 @@ python3-openid==3.2.0 ; python_version >= "3"
     # via
     #   -r requirements/edx/testing.txt
     #   social-auth-core
-python3-saml==1.15.0
-    # via -r requirements/edx/testing.txt
+python3-saml==1.9.0
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/testing.txt
 pytz==2022.7.1
     # via
     #   -c requirements/edx/../constraints.txt
