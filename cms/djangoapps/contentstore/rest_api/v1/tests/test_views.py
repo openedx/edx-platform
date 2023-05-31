@@ -1,6 +1,7 @@
 """
 Unit tests for Contentstore views.
 """
+import json
 
 import ddt
 from mock import patch
@@ -12,6 +13,7 @@ from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from common.djangoapps.student.tests.factories import GlobalStaffFactory
 from common.djangoapps.student.tests.factories import InstructorFactory
 from common.djangoapps.student.tests.factories import UserFactory
@@ -437,3 +439,54 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
         updated = modulestore().get_item(self.course.location)
         assert updated.enable_proctored_exams is False
         assert updated.proctoring_provider == 'null'
+
+
+@ddt.ddt
+class CourseProctoringErrorsViewTest(CourseTestCase):
+    """
+    Tests for ProctoringErrorsView.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse(
+            'cms.djangoapps.contentstore:v1:proctoring_errors',
+            kwargs={"course_id": self.course.id},
+        )
+        self.non_staff_client, _ = self.create_non_staff_authed_user_client()
+
+    def get_and_check_developer_response(self, response):
+        """
+        Make basic asserting about the presence of an error response, and return the developer response.
+        """
+        content = json.loads(response.content.decode("utf-8"))
+        assert "developer_message" in content
+        return content["developer_message"]
+
+    def test_permissions_unauthenticated(self):
+        """
+        Test that an error is returned in the absence of auth credentials.
+        """
+        self.client.logout()
+        response = self.client.get(self.url)
+        error = self.get_and_check_developer_response(response)
+        assert error == "Authentication credentials were not provided."
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_ADVANCED_SETTINGS': True})
+    def test_permissions_unauthorized(self):
+        """
+        Test that an error is returned if the user is unauthorised.
+        """
+        response = self.non_staff_client.get(self.url)
+        error = self.get_and_check_developer_response(response)
+        assert error == "You do not have permission to perform this action."
+
+    @ddt.data(False, True)
+    def test_disable_advanced_settings_feature(self, disable_advanced_settings):
+        """
+        If this feature is enabled, only Django Staff/Superuser should be able to see the proctoring errors.
+        For non-staff users the proctoring errors should be unavailable.
+        """
+        with override_settings(FEATURES={'DISABLE_ADVANCED_SETTINGS': disable_advanced_settings}):
+            response = self.non_staff_client.get(self.url)
+            self.assertEqual(response.status_code, 403 if disable_advanced_settings else 200)
