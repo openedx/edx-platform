@@ -38,8 +38,6 @@ class CourseEnrollmentListView(generics.ListAPIView):
                     "id": (int) course_id,
                     "display_name": (str) course_display_name
                 },
-                "is_active": (bool) is_enrollment_active,
-                "mode": (str) enrollment_mode
             },
             ...
         ]
