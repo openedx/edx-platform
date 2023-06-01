@@ -1,9 +1,10 @@
 """
 Code for serializing a modulestore XBlock to OLX.
 """
+from __future__ import annotations
 import logging
 import os
-from collections import namedtuple
+from typing import NamedTuple
 
 from lxml import etree
 
@@ -11,14 +12,19 @@ from . import utils
 
 log = logging.getLogger(__name__)
 
-# A static file required by an XBlock
-StaticFile = namedtuple('StaticFile', ['name', 'url', 'data'])
+
+class StaticFile(NamedTuple):
+    """ A static file required by an XBlock """
+    name: str
+    url: str | None
+    data: bytes | None
 
 
 class XBlockSerializer:
     """
     A class that can serialize an XBlock to OLX.
     """
+    static_files: list[StaticFile]
 
     def __init__(self, block):
         """
