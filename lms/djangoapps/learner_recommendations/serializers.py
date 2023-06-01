@@ -56,6 +56,7 @@ class AboutPageProductRecommendationsSerializer(serializers.Serializer):
         url_slug = instance.get("url_slug")
         return f"course/{url_slug}"
 
+
 class LearnerDashboardProductRecommendationsSerializer(serializers.Serializer):
     """Serializer for product recommendations for the Learner Dashboard"""
     title = serializers.CharField()
@@ -69,6 +70,7 @@ class LearnerDashboardProductRecommendationsSerializer(serializers.Serializer):
     def get_prospectusPath(self, instance):
         url_slug = instance.get("url_slug")
         return f"course/{url_slug}"
+
 
 class AboutPageRecommendationsSerializer(serializers.Serializer):
     """Recommended courses for course about page"""

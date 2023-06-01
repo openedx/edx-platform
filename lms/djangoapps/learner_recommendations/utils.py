@@ -150,7 +150,7 @@ def filter_recommended_courses(
     recommendation_count=10,
     user_country_code=None,
     request_course_key=None,
-    fields = [
+    fields=[
         "key",
         "uuid",
         "title",

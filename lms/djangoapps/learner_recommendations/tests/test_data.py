@@ -46,7 +46,7 @@ mock_course_data = [
 ]
 
 mock_cross_product_data = [
-   {
+    {
         "title": "Title 0",
         "image": {
             "src": "https://www.logo_image_url0.com"
@@ -111,7 +111,6 @@ mock_amplitude_data = [
         "courseType": "executive-education"
     }
 ]
-
 
 
 def get_general_recommendations():
