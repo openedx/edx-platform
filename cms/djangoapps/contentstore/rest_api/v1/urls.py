@@ -14,4 +14,9 @@ urlpatterns = [
         views.ProctoredExamSettingsView.as_view(),
         name="proctored_exam_settings"
     ),
+    re_path(
+        fr'^proctoring_errors/{COURSE_ID_PATTERN}$',
+        views.ProctoringErrorsView.as_view(),
+        name="proctoring_errors"
+    ),
 ]

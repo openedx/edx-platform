@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.models import NotificationPreference
 
+from .config.waffle import ENABLE_NOTIFICATIONS
 from .models import Notification
 from .serializers import (
     NotificationCourseEnrollmentSerializer,
@@ -52,6 +53,20 @@ class CourseEnrollmentListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return CourseEnrollment.objects.filter(user=user, is_active=True)
+
+    def list(self, request, *args, **kwargs):
+        """
+        Returns the list of active course enrollments for which ENABLE_NOTIFICATIONS
+        Waffle flag is enabled
+        """
+        enrollment_queryset = self.get_queryset().select_related('course')
+        enrollments = [
+            enrollment
+            for enrollment in enrollment_queryset
+            if ENABLE_NOTIFICATIONS.is_enabled(enrollment.course.id)
+        ]
+        serializer = self.get_serializer(enrollments, many=True)
+        return Response(serializer.data)
 
 
 class UserNotificationPreferenceView(APIView):
