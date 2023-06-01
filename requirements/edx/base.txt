@@ -456,7 +456,7 @@ edx-django-release-util==1.2.0
     #   openedx-blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.in
-edx-django-utils==5.4.0
+edx-django-utils==5.5.0
     # via
     #   -r requirements/edx/base.in
     #   django-config-models
