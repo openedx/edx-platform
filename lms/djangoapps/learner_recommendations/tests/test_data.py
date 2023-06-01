@@ -45,11 +45,42 @@ mock_course_data = [
     }
 ]
 
-mock_amplitude_data = [
-    *mock_course_data,
+mock_cross_product_data = [
+   {
+        "title": "Title 0",
+        "image": {
+            "src": "https://www.logo_image_url0.com"
+        },
+        "prospectusPath": "course/https://www.marketing_url0.com",
+        "owners": [
+            {
+                "key": "org-0",
+                "name": "org 0",
+                "logoImageUrl": "https://discovery.com/organization/logos/org-0.png"
+            }
+        ],
+        "courseType": "executive-education"
+    },
     {
-        "key": "edx+HL2",
-        "uuid": "2f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
+        "title": "Title 1",
+        "image": {
+            "src": "https://www.logo_image_url1.com"
+        },
+        "prospectusPath": "course/https://www.marketing_url1.com",
+        "owners": [
+            {
+                "key": "org-1",
+                "name": "org 1",
+                "logoImageUrl": "https://discovery.com/organization/logos/org-1.png"
+            }
+        ],
+        "courseType": "executive-education"
+    },
+]
+
+mock_amplitude_data = [
+    *mock_cross_product_data,
+    {
         "title": "Title 2",
         "image": {
             "src": "https://www.logo_image_url2.com"
@@ -62,15 +93,9 @@ mock_amplitude_data = [
                 "logoImageUrl": "https://discovery.com/organization/logos/org-2.png"
             }
         ],
-        "activeCourseRun": {
-            "key": "course-v1:Test+2023_T2",
-            "marketingUrl": "https://www.marketing_url2.com"
-        },
         "courseType": "executive-education"
     },
     {
-        "key": "edx+HL3",
-        "uuid": "3f8cb2c9-589b-4d1e-88c1-b01a02db3a9c",
         "title": "Title 3",
         "image": {
             "src": "https://www.logo_image_url3.com"
@@ -83,13 +108,10 @@ mock_amplitude_data = [
                 "logoImageUrl": "https://discovery.com/organization/logos/org-3.png"
             }
         ],
-        "activeCourseRun": {
-            "key": "course-v1:Test+2023_T3",
-            "marketingUrl": "https://www.marketing_url3.com"
-        },
         "courseType": "executive-education"
     }
 ]
+
 
 
 def get_general_recommendations():
@@ -99,19 +121,11 @@ def get_general_recommendations():
 
     base_course = {
         "course_key": "MITx+1.00",
-        "key": "MITx+1.00",
         "title": "Introduction to Computer Science and Programming Using Python",
-        "uuid": "956319ec-8665-4039-8bc6-32c9a9aea5e9",
         "url_slug": "introduction-to-computer-science-and-programming-7",
         "course_type": "credit-verified-audit",
         "logo_image_url": "https://discovery.com/organization/logos/org-1.png",
         "marketing_url": "https://www.marketing_url.com",
-        "course_runs": [
-            {
-                "key": "course-v1:MITx+1.00x+2T2023",
-                "marketing_url": "https://www.marketing_url.com",
-            }
-        ],
         "owners": [
             {
                 "key": "MITx",
@@ -130,7 +144,7 @@ def get_general_recommendations():
     return courses
 
 mock_amplitude_and_cross_product_course_data = {
-    "courses": mock_course_data,
+    "crossProductCourses": mock_cross_product_data,
     "amplitudeCourses": mock_amplitude_data
 }
 

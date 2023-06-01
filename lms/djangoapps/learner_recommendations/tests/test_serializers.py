@@ -95,7 +95,7 @@ class TestCrossProductRecommendationsSerializers(TestCase):
     and CrossProductAndAmplitudeRecommendations Serializer
     """
 
-    def mock_recommended_courses(self, num_of_courses=2):
+    def mock_recommended_courses(self, num_of_courses=2, amplitude_courses=False):
         """Course data mock"""
 
         recommended_courses = []
@@ -134,6 +134,16 @@ class TestCrossProductRecommendationsSerializers(TestCase):
                 },
             )
 
+        if amplitude_courses:
+            keys_to_remove = ["active_course_run", "key", "uuid"]
+            amplitude_courses = []
+
+            for course in recommended_courses:
+                new_course = {key: value for key, value in course.items() if key not in keys_to_remove}
+                amplitude_courses.append(new_course)
+
+            return amplitude_courses
+
         return recommended_courses
 
     def test_successful_cross_product_recommendation_serialization(self):
@@ -152,11 +162,11 @@ class TestCrossProductRecommendationsSerializers(TestCase):
     def test_successful_cross_product_and_amplitude_recommendations_serializer(self):
         """Test that course data serializes correctly for CrossProductAndAmplitudeRecommendationSerializer"""
 
-        courses = self.mock_recommended_courses(num_of_courses=2)
-        amplitude_courses = self.mock_recommended_courses(num_of_courses=4)
+        cross_product_courses = self.mock_recommended_courses(num_of_courses=2)
+        amplitude_courses = self.mock_recommended_courses(num_of_courses=4, amplitude_courses=True)
 
         serialized_data = CrossProductAndAmplitudeRecommendationsSerializer({
-            "courses": courses,
+            "crossProductCourses": cross_product_courses,
             "amplitudeCourses": amplitude_courses,
         }).data
 
@@ -183,14 +193,14 @@ class TestCrossProductRecommendationsSerializers(TestCase):
         """Tests that empty course data for CrossProductRecommendationsSerializer serializes properly"""
 
         serialized_data = CrossProductAndAmplitudeRecommendationsSerializer({
-            "courses": [],
+            "crossProductCourses": [],
             "amplitudeCourses": []
         }).data
 
         self.assertDictEqual(
             serialized_data,
             {
-                "courses": [],
+                "crossProductCourses": [],
                 "amplitudeCourses": []
             },
         )

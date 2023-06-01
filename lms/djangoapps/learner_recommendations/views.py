@@ -19,18 +19,20 @@ from rest_framework.views import APIView
 from common.djangoapps.track import segment
 from common.djangoapps.student.toggles import show_fallback_recommendations
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
+from openedx.core.djangoapps.catalog.utils import get_course_data
 from openedx.features.enterprise_support.utils import is_enterprise_learner
+
 from lms.djangoapps.learner_recommendations.toggles import (
     enable_course_about_page_recommendations,
     enable_dashboard_recommendations,
 )
 from lms.djangoapps.learner_recommendations.utils import (
+    _has_country_restrictions,
     get_amplitude_course_recommendations,
     filter_recommended_courses,
     is_user_enrolled_in_ut_austin_masters_program,
     get_cross_product_recommendations,
     get_active_course_run,
-    get_filtered_discovery_course_data,
 )
 from lms.djangoapps.learner_recommendations.serializers import (
     AboutPageRecommendationsSerializer,
@@ -137,11 +139,85 @@ class CrossProductRecommendationsView(APIView):
     """
 
     def _empty_response(self):
-        """Helper for sending an empty response"""
-
         return Response({"courses": []}, status=200)
 
-    def _amplitude_recommendations(self, user, user_country_code):
+    def get(self, request, course_id):
+        """
+        Returns cross product recommendation courses
+        """
+        course_locator = CourseKey.from_string(course_id)
+        course_key = f'{course_locator.org}+{course_locator.course}'
+
+        associated_course_keys = get_cross_product_recommendations(course_key)
+
+        if not associated_course_keys:
+            return self._empty_response()
+
+        fields = [
+            "key",
+            "uuid",
+            "title",
+            "owners",
+            "image",
+            "url_slug",
+            "course_type",
+            "course_runs",
+            "location_restriction",
+            "advertised_course_run_uuid",
+        ]
+        course_data = [get_course_data(key, fields) for key in associated_course_keys]
+        filtered_courses = [course for course in course_data if course and course.get("course_runs")]
+
+        ip_address = get_client_ip(request)[0]
+        user_country_code = country_code_from_ip(ip_address).upper()
+
+        unrestricted_courses = []
+
+        for course in filtered_courses:
+            if _has_country_restrictions(course, user_country_code):
+                continue
+
+            active_course_run = get_active_course_run(course)
+            if active_course_run:
+                course.update({"active_course_run": active_course_run})
+                unrestricted_courses.append(course)
+
+        if not unrestricted_courses:
+            return self._empty_response()
+
+        return Response(
+            CrossProductRecommendationsSerializer(
+                {
+                    "courses": unrestricted_courses
+                }).data,
+            status=200
+        )
+
+
+class ProductRecommendationsView(APIView):
+    """
+    **Example Request**
+
+    GET api/learner_recommendations/product_recommendations/{course_id}/
+    """
+
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated, NotJwtRestrictedApplication)
+
+    fields = [
+        "title",
+        "owners",
+        "image",
+        "url_slug",
+        "course_type",
+        "course_runs",
+        "location_restriction",
+    ]
+
+    def _get_amplitude_recommendations(self, user, user_country_code):
         """
         Helper for getting amplitude recommendations
         """
@@ -159,11 +235,11 @@ class CrossProductRecommendationsView(APIView):
         if not course_keys:
             return fallback_recommendations
 
-        filtered_courses = get_filtered_discovery_course_data(
-            course_keys, user_country_code, user, amplitude_course_filters=True
+        filtered_courses = filter_recommended_courses(
+            user, course_keys, recommendation_count=4, user_country_code=user_country_code, course_fields=self.fields
         )
 
-        return filtered_courses if len(filtered_courses) == 4 else fallback_recommendations
+        return filtered_courses if len(filtered_courses) > 0 else fallback_recommendations
 
     def _get_cross_product_recommendations(self, course_key, user_country_code):
         """
@@ -173,83 +249,45 @@ class CrossProductRecommendationsView(APIView):
         associated_course_keys = get_cross_product_recommendations(course_key)
 
         if not associated_course_keys:
-            return self._empty_response()
-
-        cross_product_recommendations = get_filtered_discovery_course_data(associated_course_keys, user_country_code)
-        active_cross_product_courses = self._get_active_courses(cross_product_recommendations)
-
-        if not active_cross_product_courses:
-            return self._empty_response()
-
-        return Response(
-            CrossProductRecommendationsSerializer({
-                "courses": active_cross_product_courses
-            }).data,
-            status=200
-        )
-
-    def _get_cross_product_and_amplitude_recommendations(self, course_key, user_country_code, user):
-        """
-        Helper for getting cross product and amplitude recommendations
-        """
-
-        amplitude_recommendations = self._amplitude_recommendations(user, user_country_code)
-        associated_course_keys = get_cross_product_recommendations(course_key)
-
-        cross_product_recommendations = get_filtered_discovery_course_data(associated_course_keys, user_country_code)
-        active_cross_product_courses = self._get_active_courses(cross_product_recommendations)
-        active_amplitude_courses = self._get_active_courses(amplitude_recommendations, amplitude_courses=True)
-
-        return Response(
-            CrossProductAndAmplitudeRecommendationsSerializer(
-                {
-                    "courses": active_cross_product_courses,
-                    "amplitudeCourses": active_amplitude_courses
-                }).data,
-            status=200
-        )
-
-    def _get_active_courses(self, courses, amplitude_courses=False):
-        """Helper for getting/setting the active_course_run property"""
-
-        if not courses:
             return []
 
-        active_courses = []
+        course_data = [get_course_data(key, self.fields) for key in associated_course_keys]
+        filtered_cross_product_courses = []
 
-        if amplitude_courses:
-            for course in courses:
-                course.update({"active_course_run": course.get("course_runs")[0]})
-                active_courses.append(course)
-        else:
-            for course in courses:
-                active_course_run = get_active_course_run(course)
-                if active_course_run:
-                    course.update({"active_course_run": active_course_run})
-                    active_courses.append(course)
+        for course in course_data:
+            if (
+                course
+                and course.get("course_runs", [])
+                and not _has_country_restrictions(course, user_country_code)
+            ):
 
-        return active_courses
+                filtered_cross_product_courses.append(course)
+
+        return filtered_cross_product_courses
 
     def get(self, request, course_id):
         """
         Returns cross product recommendation courses for course about page
-        and cross product as well as amplitude recommendations for the Learner Dashboard
+        and cross product as well as amplitude recommendations
         """
-
-        should_show_amplitude_recommendations = (
-            request.GET.get("include_amplitude_recommendations") == "true"
-            and request.user.is_authenticated
-        )
 
         ip_address = get_client_ip(request)[0]
         user_country_code = country_code_from_ip(ip_address).upper()
         course_locator = CourseKey.from_string(course_id)
         course_key = f'{course_locator.org}+{course_locator.course}'
 
-        if should_show_amplitude_recommendations:
-            return self._get_cross_product_and_amplitude_recommendations(course_key, user_country_code, request.user)
+        amplitude_recommendations = self._get_amplitude_recommendations(request.user, user_country_code)
+        cross_product_recommendations = self._get_cross_product_recommendations(course_key, user_country_code)
 
-        return self._get_cross_product_recommendations(course_key, user_country_code)
+        return Response(
+            CrossProductAndAmplitudeRecommendationsSerializer(
+                {
+                    "crossProductCourses": cross_product_recommendations,
+                    "amplitudeCourses": amplitude_recommendations
+                }
+            ).data,
+            status=200
+        )
 
 
 class DashboardRecommendationsApiView(APIView):
