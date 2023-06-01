@@ -150,18 +150,7 @@ def filter_recommended_courses(
     recommendation_count=10,
     user_country_code=None,
     request_course_key=None,
-    fields=[
-        "key",
-        "uuid",
-        "title",
-        "owners",
-        "image",
-        "url_slug",
-        "course_runs",
-        "location_restriction",
-        "marketing_url",
-        "programs",
-    ],
+    course_fields=None,
 ):
     """
     Returns the filtered course recommendations. The unfiltered course keys
@@ -182,6 +171,18 @@ def filter_recommended_courses(
         filtered_recommended_courses (list): A list of filtered course objects.
     """
     filtered_recommended_courses = []
+    fields = [
+        "key",
+        "uuid",
+        "title",
+        "owners",
+        "image",
+        "url_slug",
+        "course_runs",
+        "location_restriction",
+        "marketing_url",
+        "programs",
+    ] if not course_fields else course_fields
 
     # Filter out enrolled courses .
     course_keys_to_filter_out = _get_user_enrolled_course_keys(user)
