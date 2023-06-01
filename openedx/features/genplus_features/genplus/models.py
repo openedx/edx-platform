@@ -80,7 +80,7 @@ class GenUser(models.Model):
 
     email = models.EmailField(unique=True)
     identity_guid = models.CharField(null=True, max_length=1024)
-    user = models.OneToOneField(USER_MODEL, on_delete=models.CASCADE, null=True, related_name='gen_user')
+    user = models.OneToOneField(USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='gen_user')
     role = models.CharField(blank=True, null=True, max_length=32, choices=ROLE_CHOICES)
     school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True)
     year_of_entry = models.CharField(max_length=32, null=True, blank=True)
@@ -308,7 +308,8 @@ class GenLog(TimeStampedModel):
             description=f'user with {email} is part of more than one school',
             metadata={
                 'school': school,
-                'class': class_name
+                'class': class_name,
+                'email': email
             },
         )
 

@@ -3,8 +3,8 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.db.models.signals import post_save, pre_save
-from .models import GenUser, Student, Teacher, Class, JournalPost, Activity
-from .constants import JournalTypes, ActivityTypes
+from .models import GenUser, Student, Teacher, Class, JournalPost, Activity, GenLog
+from .constants import JournalTypes, ActivityTypes, GenLogTypes
 
 USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -18,6 +18,26 @@ def create_user_profile(sender, instance, created, **kwargs):
             Student.objects.create(gen_user=instance)
         elif instance.is_teacher:
             Teacher.objects.create(gen_user=instance)
+    if not created:
+        # create a gen log if school is updated for gen user
+        if instance.school != instance.pre_save_instance.school:
+            GenLog.objects.create(
+                gen_log_type=GenLogTypes.SCHOOL_UPDATED,
+                description=f'school updated for {instance.email}',
+                metadata={
+                    'old_school': instance.pre_save_instance.school.name,
+                    'new_school': instance.school.name,
+                    'email': instance.email
+                }
+            )
+
+
+@receiver(pre_save, sender=GenUser)
+def add_pre_save_instance(sender, instance, **kwargs):
+    try:
+        instance.pre_save_instance = GenUser.objects.get(pk=instance.pk)
+    except GenUser.DoesNotExist:
+        instance.pre_save_instance = instance
 
 
 # capturing activity of student during onboard character selection

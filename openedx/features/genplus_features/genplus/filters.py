@@ -34,5 +34,5 @@ class DifferentActiveClassFilter(SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value() == "yes":
             student_ids = Student.objects.filter(active_class__in=F('classes')).values_list('id', flat=True)
-            return queryset.exclude(id__in=student_ids, active_class__isnull=True)
+            return queryset.exclude(id__in=student_ids)
         return queryset.all()

@@ -127,6 +127,10 @@ class RmUnify(BaseRmUnify):
                     # still adding it to the class (for not removing it in the process)
                     gen_user = GenUser.objects.get(email=student_email)
                     gen_user_ids.append(gen_user.pk)
+                    # updating the school if user is not longer the member of old school
+                    if not self.student_exists_in_rm_unify_old_school(gen_user):
+                        gen_user.school = gen_class.school
+                        gen_user.save()
                     # creating GenLog for more than one school
                     GenLog.create_more_than_one_school_log(student_email, gen_class.school.name, gen_class.name)
                     continue
@@ -141,6 +145,15 @@ class RmUnify(BaseRmUnify):
             # update the last synced timestamp
             gen_class.last_synced = datetime.now(tz=get_current_timezone())
             gen_class.save()
+
+    def student_exists_in_rm_unify_old_school(self, gen_user):
+        try:
+            resource_url = f'{gen_user.school.guid}/student/{gen_user.identity_guid}'
+            url = self.generate_url(self.ORGANISATION, resource_url)
+            return self.fetch(url)
+        except Exception as e:
+            logger.exception(str(e))
+            return True
 
 
 class RmUnifyProvisioning(BaseRmUnify):
