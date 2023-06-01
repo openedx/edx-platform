@@ -1888,27 +1888,29 @@ msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select military status"
-msgstr ""
+msgstr "Askerlik durumu seçin"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select level of education"
-msgstr ""
+msgstr "Eğitim seviyesi seçin"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select guardian education"
-msgstr ""
+msgstr "Velinizin eğitim seviyesini seçin"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select current industry"
-msgstr ""
+msgstr "Bir sektör seçin"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select prospective industry"
-msgstr ""
+msgstr "Hedef sektörü seçin"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Thank you! You’re helping make edX better for everyone."
 msgstr ""
+"Teşekkürler! edX'i herkes için daha iyi bir hale getirmemize yardım "
+"ediyorsunuz."
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -3104,6 +3106,10 @@ msgstr "Başladı {start}"
 msgid "Ends {end}"
 msgstr "Bitti {end}"
 
+#: lms/static/js/learner_dashboard/models/program_subscription_model.js
+msgid "${price}/month {currency}"
+msgstr "${price}/ay {currency}"
+
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
 msgstr "Derse erişmek için oturum seçmelisiniz."
@@ -3193,11 +3199,11 @@ msgstr[1] "Abonelik deneme süresi {remainingDays} gün içinde sona eriyor"
 msgid ""
 "Your {programName} trial will expire in {remainingDays} day at "
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
-"{subscriptionPrice}/month."
+"{subscriptionPrice}."
 msgid_plural ""
 "Your {programName} trial will expire in {remainingDays} days at "
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
-"{subscriptionPrice}/month."
+"{subscriptionPrice}."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -8822,9 +8828,8 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
-"Restart your subscription for {subscriptionPrice}/month. Your payment "
-"history is still available on the {a_start}Orders and subscriptions{a_end} "
-"page"
+"Restart your subscription for {subscriptionPrice}. Your payment history is "
+"still available on the {a_start}Orders and subscriptions{a_end} page"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
@@ -8907,20 +8912,19 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid "Your next billing date is {nextPaymentDate}"
+msgid "Your next billing date is {currentPeriodEnd}"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid ""
-"Unlock verified access to all courses for {subscriptionPrice}/month. Cancel "
+"Unlock verified access to all courses for {subscriptionPrice}. Cancel "
 "anytime."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"{subscriptionPrice}/month subscription after trial ends. Cancel anytime."
+msgid "{subscriptionPrice} subscription after trial ends. Cancel anytime."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
@@ -9006,11 +9010,11 @@ msgid "Upgrade with a subscription"
 msgstr ""
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
-msgid "Pay {subscriptionPrice}/month for all courses in this program"
+msgid "Pay {subscriptionPrice} for all courses in this program"
 msgstr ""
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
-msgid "Pay {subscriptionPrice}/month after {trialLength}-day free trial"
+msgid "Pay {subscriptionPrice} after {trialLength}-day free trial"
 msgstr ""
 
 #: lms/templates/student_account/account.underscore
