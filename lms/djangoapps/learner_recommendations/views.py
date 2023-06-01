@@ -236,7 +236,7 @@ class ProductRecommendationsView(APIView):
             return fallback_recommendations
 
         filtered_courses = filter_recommended_courses(
-            user, course_keys, recommendation_count=4, user_country_code=user_country_code, course_fields=self.fields
+            user, course_keys, recommendation_count=4, user_country_code=user_country_code, fields=self.fields
         )
 
         return filtered_courses if len(filtered_courses) > 0 else fallback_recommendations

@@ -369,7 +369,7 @@ class TestProductRecommendationsView(APITestCase):
             kwargs={'course_id': f'course-v1:{course_key}+Test_Course'}
         )
 
-    def _get_product_recommendations(self, course_keys, keys_with_restriction=[]):
+    def _get_product_recommendations(self, course_keys, keys_with_restriction=None):
         """
         Returns course data based on the number of course keys passed in
         with a location restriction object if a list of keys for location restriction courses is passed in
@@ -401,7 +401,7 @@ class TestProductRecommendationsView(APITestCase):
                     }
                 ],
             }
-            if key in keys_with_restriction:
+            if keys_with_restriction and key in keys_with_restriction:
                 course.update({
                     "location_restriction": {
                         "restriction_type": "blocklist",
