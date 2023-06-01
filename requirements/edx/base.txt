@@ -244,6 +244,7 @@ django==3.2.19
     #   openedx-filters
     #   ora2
     #   outcome-surveys
+    #   skill-tagging
     #   super-csv
     #   xss-utils
 django-appconf==1.0.5
@@ -319,6 +320,7 @@ django-model-utils==4.3.1
     #   learner-pathway-progress
     #   ora2
     #   outcome-surveys
+    #   skill-tagging
     #   super-csv
 django-mptt==0.14.0
     # via
@@ -779,10 +781,12 @@ openedx-events==8.0.0
     #   -r requirements/edx/base.in
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
+    #   skill-tagging
 openedx-filters==1.3.0
     # via
     #   -r requirements/edx/base.in
     #   lti-consumer-xblock
+    #   skill-tagging
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.in
 optimizely-sdk==4.1.1
@@ -1069,6 +1073,8 @@ six==1.16.0
     #   pyjwkest
     #   python-dateutil
     #   python-memcached
+skill-tagging==0.1.0
+    # via -r requirements/edx/base.in
 slumber==0.7.1
     # via
     #   edx-bulk-grades
