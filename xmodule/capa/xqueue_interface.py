@@ -1,6 +1,7 @@
 """
 LMS Interface to external queueing system (xqueue)
 """
+from typing import Callable, TYPE_CHECKING
 
 import hashlib
 import json
@@ -8,6 +9,11 @@ import logging
 
 import requests
 import six
+from django.conf import settings
+from django.urls import reverse
+
+if TYPE_CHECKING:
+    from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'
@@ -155,21 +161,19 @@ class XQueueService:
     XBlock service providing an interface to the XQueue service.
 
     Args:
-        construct_callback(callable): function which constructs a fully-qualified callback URL to make xqueue requests.
-        default_queuename(string): course-specific queue name.
-        waittime(int): number of seconds to wait between xqueue requests
-        url(string): base URL for the XQueue service.
-        django_auth(dict): username and password for the XQueue service.
-        basic_auth(array or None): basic authentication credentials, if needed.
+        user_id: The user ID.
+        block: The XBlock.
     """
-    def __init__(self, construct_callback, default_queuename, waittime, url, django_auth, basic_auth=None):
 
+    def __init__(self, user_id: int, block: 'XBlock'):
+        basic_auth = settings.XQUEUE_INTERFACE.get('basic_auth')
         requests_auth = requests.auth.HTTPBasicAuth(*basic_auth) if basic_auth else None
-        self._interface = XQueueInterface(url, django_auth, requests_auth)
+        self._interface = XQueueInterface(
+            settings.XQUEUE_INTERFACE['url'], settings.XQUEUE_INTERFACE['django_auth'], requests_auth
+        )
 
-        self._construct_callback = construct_callback
-        self._default_queuename = default_queuename.replace(' ', '_')
-        self._waittime = waittime
+        self._user_id = user_id
+        self._block = block
 
     @property
     def interface(self):
@@ -179,22 +183,39 @@ class XQueueService:
         return self._interface
 
     @property
-    def construct_callback(self):
+    def construct_callback(self) -> Callable[[str], str]:
         """
         Returns the function to construct the XQueue callback.
         """
-        return self._construct_callback
+        return self._make_xqueue_callback
 
     @property
-    def default_queuename(self):
+    def default_queuename(self) -> str:
         """
         Returns the default queue name for the current course.
         """
-        return self._default_queuename
+        course_id = self._block.scope_ids.usage_id.context_key
+        return f'{course_id.org}-{course_id.course}'.replace(' ', '_')
 
     @property
-    def waittime(self):
+    def waittime(self) -> int:
         """
         Returns the number of seconds to wait in between calls to XQueue.
         """
-        return self._waittime
+        return settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
+
+    def _make_xqueue_callback(self, dispatch: str = 'score_update') -> str:
+        """
+        Return a fully qualified callback URL for external queueing system.
+        """
+        relative_xqueue_callback_url = reverse(
+            'xqueue_callback',
+            kwargs=dict(
+                course_id=str(self._block.scope_ids.usage_id.context_key),
+                userid=str(self._user_id),
+                mod_id=str(self._block.scope_ids.usage_id),
+                dispatch=dispatch,
+            ),
+        )
+        xqueue_callback_url_prefix = settings.XQUEUE_INTERFACE.get('callback_url', settings.LMS_ROOT_URL)
+        return xqueue_callback_url_prefix + relative_xqueue_callback_url

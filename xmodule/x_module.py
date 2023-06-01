@@ -1240,31 +1240,6 @@ class ModuleSystemShim:
         self._deprecated_render_template = render_template
 
     @property
-    def xqueue(self):
-        """
-        Returns a dict containing the XQueueInterface object, as well as parameters for the specific StudentModule:
-        * interface: XQueueInterface object
-        * construct_callback: function to construct the fully-qualified LMS callback URL.
-        * default_queuename: default queue name for the course in XQueue
-        * waittime: number of seconds to wait in between calls to XQueue
-
-        Deprecated in favor of the xqueue service.
-        """
-        warnings.warn(
-            'runtime.xqueue is deprecated. Please use the xqueue service instead.',
-            DeprecationWarning, stacklevel=3,
-        )
-        xqueue_service = self._runtime_services.get('xqueue') or self._services.get('xqueue')
-        if xqueue_service:
-            return {
-                'interface': xqueue_service.interface,
-                'construct_callback': xqueue_service.construct_callback,
-                'default_queuename': xqueue_service.default_queuename,
-                'waittime': xqueue_service.waittime,
-            }
-        return None
-
-    @property
     def can_execute_unsafe_code(self):
         """
         Returns a function which returns a boolean, indicating whether or not to allow the execution of unsafe,

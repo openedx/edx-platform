@@ -439,36 +439,6 @@ def prepare_runtime_for_user(
         KvsFieldData:  student_data bound to, primarily, the user and block
     """
 
-    def make_xqueue_callback(dispatch='score_update'):
-        """
-        Returns fully qualified callback URL for external queueing system
-        """
-        relative_xqueue_callback_url = reverse(
-            'xqueue_callback',
-            kwargs=dict(
-                course_id=str(course_id),
-                userid=str(user.id),
-                mod_id=str(block.location),
-                dispatch=dispatch
-            ),
-        )
-        xqueue_callback_url_prefix = settings.XQUEUE_INTERFACE.get('callback_url', settings.LMS_ROOT_URL)
-        return xqueue_callback_url_prefix + relative_xqueue_callback_url
-
-    # Default queuename is course-specific and is derived from the course that
-    #   contains the current block.
-    # TODO: Queuename should be derived from 'course_settings.json' of each course
-    xqueue_default_queuename = block.location.org + '-' + block.location.course
-
-    xqueue_service = XQueueService(
-        construct_callback=make_xqueue_callback,
-        default_queuename=xqueue_default_queuename,
-        url=settings.XQUEUE_INTERFACE['url'],
-        django_auth=settings.XQUEUE_INTERFACE['django_auth'],
-        basic_auth=settings.XQUEUE_INTERFACE.get('basic_auth'),
-        waittime=settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS,
-    )
-
     def inner_get_block(block):
         """
         Delegate to get_block_for_descriptor_internal() with all values except `block` set.
@@ -579,7 +549,7 @@ def prepare_runtime_for_user(
         'content_type_gating': ContentTypeGatingService(),
         'cache': CacheService(cache),
         'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
-        'xqueue': xqueue_service,
+        'xqueue': partial(XQueueService, user.id),
         'replace_urls': replace_url_service,
         # Rebind module service to deal with noauth modules getting attached to users.
         'rebind_user': RebindUserService(
