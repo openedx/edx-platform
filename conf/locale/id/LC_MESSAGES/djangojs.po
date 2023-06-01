@@ -84,7 +84,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-07 20:42+0000\n"
+"POT-Creation-Date: 2023-05-23 13:03+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Faizar Septiawan <faizarsangster@gmail.com>, 2023\n"
 "Language-Team: Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/)\n"
@@ -2974,6 +2974,10 @@ msgstr "Telah dimulai {start}"
 msgid "Ends {end}"
 msgstr "Berakhir {end}"
 
+#: lms/static/js/learner_dashboard/models/program_subscription_model.js
+msgid "${price}/month {currency}"
+msgstr ""
+
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
 msgstr "Anda harus memilih sesi untuk mengakses kursus."
@@ -3058,11 +3062,11 @@ msgstr[0] ""
 msgid ""
 "Your {programName} trial will expire in {remainingDays} day at "
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
-"{subscriptionPrice}/month."
+"{subscriptionPrice}."
 msgid_plural ""
 "Your {programName} trial will expire in {remainingDays} days at "
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
-"{subscriptionPrice}/month."
+"{subscriptionPrice}."
 msgstr[0] ""
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
@@ -8493,9 +8497,8 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
-"Restart your subscription for {subscriptionPrice}/month. Your payment "
-"history is still available on the {a_start}Orders and subscriptions{a_end} "
-"page"
+"Restart your subscription for {subscriptionPrice}. Your payment history is "
+"still available on the {a_start}Orders and subscriptions{a_end} page"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
@@ -8579,20 +8582,19 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid "Your next billing date is {nextPaymentDate}"
+msgid "Your next billing date is {currentPeriodEnd}"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid ""
-"Unlock verified access to all courses for {subscriptionPrice}/month. Cancel "
+"Unlock verified access to all courses for {subscriptionPrice}. Cancel "
 "anytime."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"{subscriptionPrice}/month subscription after trial ends. Cancel anytime."
+msgid "{subscriptionPrice} subscription after trial ends. Cancel anytime."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
@@ -8680,11 +8682,11 @@ msgid "Upgrade with a subscription"
 msgstr ""
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
-msgid "Pay {subscriptionPrice}/month for all courses in this program"
+msgid "Pay {subscriptionPrice} for all courses in this program"
 msgstr ""
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
-msgid "Pay {subscriptionPrice}/month after {trialLength}-day free trial"
+msgid "Pay {subscriptionPrice} after {trialLength}-day free trial"
 msgstr ""
 
 #: lms/templates/student_account/account.underscore
