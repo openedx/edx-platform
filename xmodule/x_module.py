@@ -43,6 +43,8 @@ from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,
     ATTR_KEY_REQUEST_COUNTRY_CODE,
     ATTR_KEY_USER_ID,
+    ATTR_KEY_USER_IS_BETA_TESTER,
+    ATTR_KEY_USER_IS_GLOBAL_STAFF,
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ROLE,
 )
@@ -1189,6 +1191,36 @@ class ModuleSystemShim:
         user_service = self._runtime_services.get('user') or self._services.get('user')
         if user_service:
             return partial(user_service.get_current_user().opt_attrs.get, ATTR_KEY_USER_ROLE)
+
+    @property
+    def user_is_beta_tester(self):
+        """
+        Returns whether the current user is enrolled in the course as a beta tester.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.user_is_beta_tester is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=2,
+        )
+        user_service = self._runtime_services.get('user') or self._services.get('user')
+        if user_service:
+            return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_BETA_TESTER)
+
+    @property
+    def user_is_admin(self):
+        """
+        Returns whether the current user has global staff permissions.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.user_is_admin is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=2,
+        )
+        user_service = self._runtime_services.get('user') or self._services.get('user')
+        if user_service:
+            return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_GLOBAL_STAFF)
 
     @property
     def render_template(self):
