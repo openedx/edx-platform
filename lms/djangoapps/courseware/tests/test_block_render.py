@@ -41,7 +41,6 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData  # lint-amnesty, pyli
 from xblock.test.tools import TestRuntime  # lint-amnesty, pylint: disable=wrong-import-order
 
 from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
-from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_block import ProblemBlock
 from xmodule.contentstore.django import contentstore
 from xmodule.html_block import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
@@ -121,7 +120,6 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 @XBlock.needs('content_type_gating')
 @XBlock.needs('cache')
 @XBlock.needs('sandbox')
-@XBlock.needs('xqueue')
 @XBlock.needs('replace_urls')
 @XBlock.needs('rebind_user')
 @XBlock.needs('completion')
@@ -2333,7 +2331,6 @@ class LMSXBlockServiceBindingTest(LMSXBlockServiceMixin):
         'content_type_gating',
         'cache',
         'sandbox',
-        'xqueue',
         'replace_urls',
         'rebind_user',
         'completion',
@@ -2864,47 +2861,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     def test_render_template(self):
         rendered = self.block.runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
         assert rendered == '<div id="hi" ns="main">Testing the MakoService</div>\n'
-
-    def test_xqueue(self):
-        xqueue = self.block.runtime.xqueue
-        assert isinstance(xqueue['interface'], XQueueInterface)
-        assert xqueue['interface'].url == 'http://sandbox-xqueue.edx.org'
-        assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
-        assert xqueue['waittime'] == 5
-        callback_url = f'http://localhost:8000/courses/{self.course.id}/xqueue/232/{self.block.location}'
-        assert xqueue['construct_callback']() == f'{callback_url}/score_update'
-        assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'
-
-    @override_settings(
-        XQUEUE_INTERFACE={
-            'callback_url': 'http://alt.url',
-            'url': 'http://xqueue.url',
-            'django_auth': {
-                'username': 'user',
-                'password': 'password',
-            },
-            'basic_auth': ('basic', 'auth'),
-        },
-        XQUEUE_WAITTIME_BETWEEN_REQUESTS=15,
-    )
-    def test_xqueue_settings(self):
-        _ = render.prepare_runtime_for_user(
-            self.user,
-            self.student_data,
-            self.block,
-            self.course.id,
-            self.track_function,
-            self.request_token,
-            course=self.course,
-        )
-        xqueue = self.block.runtime.xqueue
-        assert isinstance(xqueue['interface'], XQueueInterface)
-        assert xqueue['interface'].url == 'http://xqueue.url'
-        assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
-        assert xqueue['waittime'] == 15
-        callback_url = f'http://alt.url/courses/{self.course.id}/xqueue/232/{self.block.location}'
-        assert xqueue['construct_callback']() == f'{callback_url}/score_update'
-        assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'
 
     @override_settings(COURSES_WITH_UNSAFE_CODE=[r'course-v1:edX\+LmsModuleShimTest\+2021_Fall'])
     def test_can_execute_unsafe_code_when_allowed(self):
