@@ -91,7 +91,7 @@ class LogoutView(TemplateView):
         # NOTE: This step skips rendering logout.html, which is used to log the user out from the
         # different IDAs. To ensure the user is logged out of all the IDAs be sure to redirect
         # back to <LMS>/logout after logging out of the TPA.
-        if settings.TPA_AUTOMATIC_LOGOUT_ENABLED:
+        if getattr(settings, 'TPA_AUTOMATIC_LOGOUT_ENABLED', False):
             if self.tpa_logout_url:
                 return redirect(self.tpa_logout_url)
 

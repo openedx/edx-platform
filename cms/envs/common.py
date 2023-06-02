@@ -2261,20 +2261,6 @@ SOFTWARE_SECURE_REQUEST_RETRY_DELAY = 60 * 60
 # Maximum of 6 retries before giving up.
 SOFTWARE_SECURE_RETRY_MAX_ATTEMPTS = 6
 
-
-# .. toggle_name: TPA_AUTOMATIC_LOGOUT_ENABLED
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Redirect the user to the TPA logout URL if this flag is enabled, the
-#   TPA logout URL is configured, and the user logs in through TPA
-# .. toggle_use_cases: open_edx
-# .. toggle_warning: Enabling this toggle skips rendering logout.html, which is used to log the user out
-#   from the different IDAs. To ensure the user is logged out of all the IDAs be sure to redirect
-#   back to <LMS>/logout after logging out of the TPA.
-# .. toggle_creation_date: 2023-05-07
-# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/32193
-TPA_AUTOMATIC_LOGOUT_ENABLED = False
-
 ############## DJANGO-USER-TASKS ##############
 
 # How long until database records about the outcome of a task and its artifacts get deleted?
