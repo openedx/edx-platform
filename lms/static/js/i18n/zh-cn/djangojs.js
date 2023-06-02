@@ -1357,6 +1357,7 @@
     "Select all": "\u5168\u9009",
     "Select fidelity": "\u9009\u62e9\u4fdd\u771f\u5ea6",
     "Select language": "\u9009\u62e9\u8bed\u8a00",
+    "Select military status": "\u9009\u62e9\u519b\u7c4d",
     "Select one or more groups:": "\u9009\u62e9\u4e00\u6216\u8005\u591a\u4e2a\u7fa4\u7ec4",
     "Select the course-wide discussion topics that you want to divide.": "\u9009\u62e9\u60a8\u60f3\u8981\u533a\u5206\u7684\u8bfe\u7a0b\u8303\u56f4\u5185\u7684\u8ba8\u8bba\u4e3b\u9898\u3002",
     "Select the time zone for displaying course dates. If you do not specify a time zone, course dates, including assignment deadlines, will be displayed in your browser's local time zone.": "\u8bf7\u9009\u62e9\u7528\u4e8e\u663e\u793a\u8bfe\u7a0b\u65e5\u671f\u7684\u65f6\u533a\u3002\u5982\u679c\u60a8\u4e0d\u8bbe\u7f6e\u65f6\u533a\uff0c\u90a3\u4e48\u5982\u4f5c\u4e1a\u622a\u6b62\u65e5\u671f\u7b49\u8bfe\u7a0b\u65e5\u671f\u4fe1\u606f\u5c06\u6839\u636e\u60a8\u6d4f\u89c8\u5668\u7684\u672c\u5730\u65f6\u533a\u663e\u793a\u3002",

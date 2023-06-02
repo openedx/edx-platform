@@ -7765,6 +7765,12 @@ msgstr ""
 "asociadas serán deshabilitadas."
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr "La configuración de información LTI para este contexto/proveedor."
 
@@ -13596,6 +13602,16 @@ msgstr "Grupo eliminado"
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Duplicado de {0}"
+
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Duplicado de '{0}'"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "La imagen debe tener nombre, tipo de contenido y tamaño."
@@ -13727,16 +13743,6 @@ msgstr ""
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr "Debes proveer  target_index ({target_index}) como un entero."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Duplicado de {0}"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Duplicado de '{0}'"
 
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
