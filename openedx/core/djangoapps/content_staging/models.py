@@ -67,6 +67,21 @@ class StagedContent(models.Model):
         return f'Staged {self.block_type} block "{self.display_name}" ({self.status})'
 
 
+class StagedContentFile(models.Model):
+    """
+    A data file ("Static Asset") associated with some StagedContent.
+
+    These usually come from a course's Files & Uploads page, but can also come
+    from per-xblock file storage (e.g. video transcripts or images used in
+    v2 content libraries).
+    """
+    for_content = models.ForeignKey(StagedContent, on_delete=models.CASCADE, related_name="files")
+    filename = models.CharField(max_length=255, blank=False)
+    # Everything below is optional:
+    data_file = models.FileField(upload_to="staged-content-temp/", blank=True)
+    md5_hash = models.CharField(max_length=32, blank=True)
+
+
 class UserClipboard(models.Model):
     """
     Each user has a clipboard that can hold one item at a time, where an item

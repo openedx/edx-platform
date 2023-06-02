@@ -1,8 +1,11 @@
 """
 REST API views for content staging
 """
+from __future__ import annotations
+import hashlib
 import logging
 
+from django.core.files.base import ContentFile
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -19,11 +22,14 @@ from common.djangoapps.student.auth import has_studio_read_access
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.xblock_serializer.api import serialize_xblock_to_olx
 from xmodule import block_metadata_utils
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from .data import CLIPBOARD_PURPOSE, StagedContentStatus
-from .models import StagedContent, UserClipboard
+from .data import CLIPBOARD_PURPOSE, StagedContentFileData, StagedContentStatus
+from .filters import StagingStaticAssetFilter
+from .models import StagedContent, StagedContentFile, UserClipboard
 from .serializers import UserClipboardSerializer, PostToClipboardSerializer
 from .tasks import delete_expired_clipboards
 
@@ -149,6 +155,51 @@ class ClipboardEndpoint(APIView):
             serializer = UserClipboardSerializer(clipboard, context={"request": request})
             # Log an event so we can analyze how this feature is used:
             log.info(f"Copied {usage_key.block_type} component \"{usage_key}\" to their clipboard.")
+
+        # Try to copy the static files. If this fails, we still consider the overall copy attempt to have succeeded,
+        # because intra-course pasting will still work fine, and in any case users can manually resolve the file issue.
+        try:
+            files_to_save: list[StagedContentFileData] = []
+            for f in block_data.static_files:
+                source_asset_key = (
+                    StaticContent.get_asset_key_from_path(course_key, f.url)
+                    if (f.url and f.url.startswith('/')) else None
+                )
+                # Compute the MD5 hash and get the content:
+                content: bytes | None = f.data
+                if content:
+                    md5_hash = hashlib.md5(f.data).hexdigest()
+                elif source_asset_key:
+                    sc = contentstore().find(source_asset_key)
+                    md5_hash = sc.content_digest
+                    content = sc.data
+                else:
+                    md5_hash = ""  # Unknown
+
+                # Load the data:
+
+                entry = StagedContentFileData(
+                    filename=f.name,
+                    data=content,
+                    source_asset_key=source_asset_key,
+                    md5_hash=md5_hash,
+                )
+                files_to_save.append(entry)
+
+            # run filters on files_to_save.
+            # e.g. remove large files, add python_lib.zip which may not otherwise be detected
+            files_to_save = StagingStaticAssetFilter.run_filter(staged_content=staged_content, file_datas=files_to_save)
+
+            for f in files_to_save:
+                StagedContentFile.objects.create(
+                    for_content=staged_content,
+                    filename=f.filename,
+                    data_file=ContentFile(content=f.data, name=f.filename) if f.data else None,
+                    md5_hash=f.md5_hash or "",
+                )
+        except Exception as err:  # pylint: disable=broad-except
+            log.exception(f"Unable to copy static files to clipboard for component {usage_key}")
+
         # Enqueue a (potentially slow) task to delete the old staged content
         try:
             delete_expired_clipboards.delay(expired_ids)
