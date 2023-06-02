@@ -53,7 +53,6 @@ from xmodule.util.sandboxing import SandboxService
 from xmodule.services import EventPublishingService, RebindUserService, SettingsService, TeamsConfigurationService
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
-from xmodule.capa.xqueue_interface import XQueueService  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
 from lms.djangoapps.courseware.masquerade import (
@@ -445,8 +444,6 @@ def prepare_runtime_for_user(
 
         Because it does an access check, it may return None.
         """
-        # TODO: fix this so that make_xqueue_callback uses the block passed into
-        # inner_get_block, not the parent's callback.  Add it as an argument....
         return get_block_for_descriptor_internal(
             user=user,
             block=block,
@@ -549,7 +546,6 @@ def prepare_runtime_for_user(
         'content_type_gating': ContentTypeGatingService(),
         'cache': CacheService(cache),
         'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
-        'xqueue': partial(XQueueService, user.id),
         'replace_urls': replace_url_service,
         # Rebind module service to deal with noauth modules getting attached to users.
         'rebind_user': RebindUserService(

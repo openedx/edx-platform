@@ -13,7 +13,7 @@ from django.conf import settings
 from django.urls import reverse
 
 if TYPE_CHECKING:
-    from xblock.core import XBlock
+    from xmodule.capa_block import ProblemBlock
 
 log = logging.getLogger(__name__)
 dateformat = '%Y%m%d%H%M%S'
@@ -161,18 +161,16 @@ class XQueueService:
     XBlock service providing an interface to the XQueue service.
 
     Args:
-        user_id: The user ID.
-        block: The XBlock.
+        block: The `ProblemBlock` instance.
     """
 
-    def __init__(self, user_id: int, block: 'XBlock'):
+    def __init__(self, block: 'ProblemBlock'):
         basic_auth = settings.XQUEUE_INTERFACE.get('basic_auth')
         requests_auth = requests.auth.HTTPBasicAuth(*basic_auth) if basic_auth else None
         self._interface = XQueueInterface(
             settings.XQUEUE_INTERFACE['url'], settings.XQUEUE_INTERFACE['django_auth'], requests_auth
         )
 
-        self._user_id = user_id
         self._block = block
 
     @property
@@ -212,7 +210,7 @@ class XQueueService:
             'xqueue_callback',
             kwargs=dict(
                 course_id=str(self._block.scope_ids.usage_id.context_key),
-                userid=str(self._user_id),
+                userid=str(self._block.scope_ids.user_id),
                 mod_id=str(self._block.scope_ids.usage_id),
                 dispatch=dispatch,
             ),
