@@ -70,12 +70,20 @@ def register_exams(course_key):
             timed_exam.is_practice_exam,
             timed_exam.is_onboarding_exam
         )
+
         exams_list.append({
             'course_id': str(course_key),
             'content_id': str(timed_exam.location),
             'exam_name': timed_exam.display_name,
             'time_limit_mins': timed_exam.default_time_limit_minutes,
-            'due_date': timed_exam.due.isoformat() if timed_exam.due and not course.self_paced else None,
+            # If the subsection has no due date, then infer a due date from the course end date. This behavior is a
+            # departure from the legacy register_exams function used by the edx-proctoring plugin because
+            # edx-proctoring makes a direct call to edx-when API when computing an exam's due date.
+            # By sending the course end date when registering exams, we can avoid calling to the platform from the
+            # exam service. Also note that we no longer consider the pacing type of the course - this applies to both
+            # self-paced and indstructor-paced courses. Therefore, this effectively opts out exams powered by edx-exams
+            # from personalized learner schedules/relative dates.
+            'due_date': timed_exam.due.isoformat() if timed_exam.due else course.end.isoformat(),
             'exam_type': exam_type,
             'is_active': True,
             'hide_after_due': timed_exam.hide_after_due,

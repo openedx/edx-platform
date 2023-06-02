@@ -27,10 +27,13 @@ from lms.djangoapps.course_goals.api import (
     get_course_goal,
 )
 from lms.djangoapps.course_goals.models import CourseGoal
-from lms.djangoapps.course_home_api.outline.serializers import OutlineTabSerializer
+from lms.djangoapps.course_home_api.outline.serializers import (
+    OutlineTabSerializer,
+)
+from lms.djangoapps.course_home_api.utils import get_course_or_403
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
-from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section, get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_info_section
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import is_masquerading, setup_masquerade
 from lms.djangoapps.courseware.views.views import get_cert_data
@@ -76,7 +79,9 @@ class OutlineTabView(RetrieveAPIView):
 
     **Response Values**
 
-        Body consists of the following fields:
+        Body consists of two possible shapes.
+
+        For a good 200 response, the response will include:
 
         access_expiration: An object detailing when access to this course will expire
             expiration_date: (str) When the access expires, in ISO 8601 notation
@@ -143,9 +148,19 @@ class OutlineTabView(RetrieveAPIView):
         welcome_message_html: (str) Raw HTML for the course updates banner
         user_has_passing_grade: (bool) Whether the user currently is passing the course
 
+        If the learner does not have access to the course for a specific reason and should be redirected this
+        view will return a 403 and the following data:
+
+        url: (str) The URL to which the user should be redirected
+        error_code: (str) A system identifier for the reason the user is being redirected
+        developer_message: (str) A message explaining why the user is being redirected,
+                                 intended for developer debugging.
+        user_message: (str) A message explaining why the user is being redirected, intended to be shown to the user.
+
     **Returns**
 
-        * 200 on success with above fields.
+        * 200 on success.
+        * 403 if the user does not currently have access to the course and should be redirected.
         * 404 if the course is not available or cannot be seen.
 
     """
@@ -167,7 +182,7 @@ class OutlineTabView(RetrieveAPIView):
         monitoring_utils.set_custom_attribute('user_id', request.user.id)
         monitoring_utils.set_custom_attribute('is_staff', request.user.is_staff)
 
-        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
+        course = get_course_or_403(request.user, 'load', course_key, check_if_enrolled=False)
 
         masquerade_object, request.user = setup_masquerade(
             request,
@@ -365,7 +380,7 @@ def dismiss_welcome_message(request):  # pylint: disable=missing-function-docstr
 
     try:
         course_key = CourseKey.from_string(course_id)
-        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        course = get_course_or_403(request.user, 'load', course_key, check_if_enrolled=True)
         dismiss_current_update_for_user(request, course)
         return Response({'message': _('Welcome message successfully dismissed.')})
     except Exception:
