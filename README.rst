@@ -109,7 +109,6 @@ Issue Tracker
 We use Github Issues for our issue tracker. You can search
 `previously reported issues`_.  If you need to report a bug, or want to discuss
 a new feature before you implement it, please `create a new issue`_.
-please make a free account on our JIRA and `create a new issue`_.
 
 .. _previously reported issues: https://github.com/openedx/edx-platform/issues
 .. _create a new issue: https://github.com/openedx/edx-platform/issues/new/choose
