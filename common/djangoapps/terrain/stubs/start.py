@@ -13,11 +13,13 @@ from .ecommerce import StubEcommerceService
 from .edxnotes import StubEdxNotesService
 from .lti import StubLtiService
 from .video_source import VideoSourceHttpService
+from .xqueue import StubXQueueService
 from .youtube import StubYouTubeService
 
 USAGE = "USAGE: python -m stubs.start SERVICE_NAME PORT_NUM [CONFIG_KEY=CONFIG_VAL, ...]"
 
 SERVICES = {
+    'xqueue': StubXQueueService,
     'youtube': StubYouTubeService,
     'comments': StubCommentsService,
     'lti': StubLtiService,
