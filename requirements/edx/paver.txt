@@ -4,6 +4,10 @@
 #
 #    make upgrade
 #
+--index-url http://edx.devstack.devpi:3141/root/pypi/+simple/
+--extra-index-url https://pypi.python.org/simple
+--trusted-host edx.devstack.devpi
+
 certifi==2023.5.7
     # via requests
 charset-normalizer==2.0.12
@@ -18,7 +22,7 @@ lazy==1.5
     # via -r requirements/edx/paver.in
 libsass==0.10.0
     # via -r requirements/edx/paver.in
-markupsafe==2.1.2
+markupsafe==2.1.3
     # via -r requirements/edx/paver.in
 mock==5.0.2
     # via -r requirements/edx/paver.in

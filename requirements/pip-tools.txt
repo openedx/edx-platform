@@ -4,6 +4,10 @@
 #
 #    make upgrade
 #
+--index-url http://edx.devstack.devpi:3141/root/pypi/+simple/
+--extra-index-url https://pypi.python.org/simple
+--trusted-host edx.devstack.devpi
+
 build==0.10.0
     # via pip-tools
 click==8.1.3
