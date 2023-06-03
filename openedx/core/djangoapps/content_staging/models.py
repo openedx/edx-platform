@@ -79,6 +79,10 @@ class StagedContentFile(models.Model):
     filename = models.CharField(max_length=255, blank=False)
     # Everything below is optional:
     data_file = models.FileField(upload_to="staged-content-temp/", blank=True)
+    # If this asset came from Files & Uploads in a course, this is an AssetKey
+    # as a string. If this asset came from an XBlock's filesystem, this is the
+    # UsageKey of the XBlock.
+    source_key_str = models.CharField(max_length=255, blank=True)
     md5_hash = models.CharField(max_length=32, blank=True)
 
 

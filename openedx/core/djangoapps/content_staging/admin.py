@@ -10,7 +10,7 @@ from .models import StagedContent, StagedContentFile, UserClipboard
 class StagedContentFileInline(admin.TabularInline):
     """ Inline admin UI for StagedContentFile """
     model = StagedContentFile
-    readonly_fields = ('filename', 'md5_hash', 'data_file')
+    readonly_fields = ('filename', 'md5_hash', 'source_key_str', 'data_file')
 
 
 @admin.register(StagedContent)

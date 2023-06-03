@@ -161,7 +161,7 @@ class ClipboardEndpoint(APIView):
         try:
             files_to_save: list[StagedContentFileData] = []
             for f in block_data.static_files:
-                source_asset_key = (
+                source_key = (
                     StaticContent.get_asset_key_from_path(course_key, f.url)
                     if (f.url and f.url.startswith('/')) else None
                 )
@@ -169,8 +169,10 @@ class ClipboardEndpoint(APIView):
                 content: bytes | None = f.data
                 if content:
                     md5_hash = hashlib.md5(f.data).hexdigest()
-                elif source_asset_key:
-                    sc = contentstore().find(source_asset_key)
+                    # This asset came from the XBlock's filesystem, e.g. a video block's transcript file
+                    source_key = usage_key
+                elif source_key:
+                    sc = contentstore().find(source_key)
                     md5_hash = sc.content_digest
                     content = sc.data
                 else:
@@ -181,7 +183,7 @@ class ClipboardEndpoint(APIView):
                 entry = StagedContentFileData(
                     filename=f.name,
                     data=content,
-                    source_asset_key=source_asset_key,
+                    source_key=source_key,
                     md5_hash=md5_hash,
                 )
                 files_to_save.append(entry)
@@ -195,6 +197,7 @@ class ClipboardEndpoint(APIView):
                     for_content=staged_content,
                     filename=f.filename,
                     data_file=ContentFile(content=f.data, name=f.filename) if f.data else None,
+                    source_key_str=str(source_key) if source_key else "",
                     md5_hash=f.md5_hash or "",
                 )
         except Exception as err:  # pylint: disable=broad-except

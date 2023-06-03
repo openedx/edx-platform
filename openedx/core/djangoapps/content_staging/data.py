@@ -50,7 +50,12 @@ class StagedContentFileData:
     filename: str = field(validator=validators.instance_of(str))
     # Everything below is optional:
     data: bytes | None = field(validator=validators.optional(validators.instance_of(bytes)))
-    source_asset_key: AssetKey | None = field(validator=validators.optional(validators.instance_of(AssetKey)))
+    # If this asset came from Files & Uploads in a course, this is an AssetKey
+    # as a string. If this asset came from an XBlock's filesystem, this is the
+    # UsageKey of the XBlock.
+    source_key: AssetKey | UsageKey | None = field(
+        validator=validators.optional(validators.instance_of((AssetKey, UsageKey)))
+    )
     md5_hash: str | None = field(validator=validators.optional(validators.instance_of(str)))
 
 

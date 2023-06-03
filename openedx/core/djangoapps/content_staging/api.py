@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from django.http import HttpRequest
 
-from .data import StagedContentData, StagedContentStatus, UserClipboardData
+from .data import StagedContentData, StagedContentFileData, StagedContentStatus, UserClipboardData
 from .models import UserClipboard as _UserClipboard, StagedContent as _StagedContent
 from .serializers import UserClipboardSerializer as _UserClipboardSerializer
 
