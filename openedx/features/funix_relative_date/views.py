@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.dates.serializers import DatesTabSerializer
-from lms.djangoapps.course_home_api.toggles import course_home_legacy_is_active
+
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
