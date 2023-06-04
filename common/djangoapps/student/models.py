@@ -2762,6 +2762,8 @@ def get_user_by_username_or_email(username_or_email):
             raise User.DoesNotExist
     return user
 
+def get_user_by_id(user_id):
+    return User.objects.get(id=user_id)
 
 def get_user(email):
     user = User.objects.get(email=email)

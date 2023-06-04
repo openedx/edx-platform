@@ -38,8 +38,10 @@ from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import Blockst
 from openedx.core.djangoapps.xblock.runtime.ephemeral_field_data import EphemeralKeyValueStore
 from openedx.core.djangoapps.xblock.runtime.mixin import LmsBlockMixin
 from openedx.core.djangoapps.xblock.utils import get_xblock_id_for_anonymous_user
-from openedx.core.lib.cache_utils import CacheService
-from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url, request_token
+from openedx.core.lib.xblock_utils import wrap_fragment, xblock_local_resource_url
+from common.djangoapps.static_replace import process_static_urls
+from xmodule.errortracker import make_error_tracker  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.django import ModuleI18nService  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .id_managers import OpaqueKeyReader
 from .shims import RuntimeShim, XBlockShim
@@ -195,6 +197,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
             block_key=block.scope_ids.usage_id,
             completion=event['completion'],
         )
+        FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
 
     def applicable_aside_types(self, block):
         """ Disable XBlock asides in this runtime """
