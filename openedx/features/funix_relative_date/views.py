@@ -38,8 +38,7 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 		course_key_string = kwargs.get('course_key_string')
 		course_key = CourseKey.from_string(course_key_string)
 
-		if course_home_legacy_is_active(course_key):
-			raise Http404
+
 
 		# Enable NR tracing for this view based on course
 		monitoring_utils.set_custom_attribute('course_id', course_key_string)
