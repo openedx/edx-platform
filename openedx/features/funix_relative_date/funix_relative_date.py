@@ -22,7 +22,7 @@ class FunixRelativeDateLibary():
 		date_blocks = FunixRelativeDateDAO.get_all_block_by_id(user_id=user.id, course_id=course.id)
 		date_blocks = list(date_blocks)
 		date_blocks.sort(key=lambda x: x.index)
-
+		print('---------------date_block:', date_blocks)
 		# Add start date
 		start_date = date_blocks.pop(0)
 		output = [
