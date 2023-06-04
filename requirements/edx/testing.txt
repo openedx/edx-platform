@@ -74,10 +74,11 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
-backports-zoneinfo==0.2.1
+backports-zoneinfo[tzdata]==0.2.1
     # via
     #   -r requirements/edx/base.txt
     #   icalendar
+    #   kombu
 beautifulsoup4==4.12.2
     # via
     #   -r requirements/edx/base.txt
@@ -700,9 +701,9 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==18.9.0
+faker==18.10.1
     # via factory-boy
-fastapi==0.95.2
+fastapi==0.96.0
     # via pact-python
 fastavro==1.7.4
     # via
@@ -840,11 +841,11 @@ jsonschema==4.17.3
     # via
     #   -r requirements/edx/base.txt
     #   optimizely-sdk
-jwcrypto==1.4.2
+jwcrypto==1.5.0
     # via
     #   -r requirements/edx/base.txt
     #   pylti1p3
-kombu==5.2.4
+kombu==5.3.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -907,7 +908,7 @@ markey==0.8
     # via
     #   -r requirements/edx/base.txt
     #   enmerkar-underscore
-markupsafe==2.1.2
+markupsafe==2.1.3
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
@@ -975,7 +976,7 @@ openedx-blockstore==1.3.1
     # via -r requirements/edx/base.txt
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
-openedx-django-pyfs==3.2.1
+openedx-django-pyfs==3.3.0
     # via
     #   -r requirements/edx/base.txt
     #   xblock
@@ -983,7 +984,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.txt
-openedx-events==8.0.0
+openedx-events==8.0.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
@@ -998,7 +999,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==5.0.1
+ora2==5.0.2
     # via -r requirements/edx/base.txt
 oscrypto==1.3.0
     # via
@@ -1285,7 +1286,7 @@ pyyaml==6.0
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/base.txt
-rapidfuzz==3.0.0
+rapidfuzz==3.1.0
     # via
     #   -r requirements/edx/base.txt
     #   levenshtein
@@ -1295,7 +1296,7 @@ redis==4.5.5
     # via
     #   -r requirements/edx/base.txt
     #   walrus
-regex==2023.5.5
+regex==2023.6.3
     # via
     #   -r requirements/edx/base.txt
     #   nltk
@@ -1330,7 +1331,7 @@ requests-oauthlib==1.3.1
     #   social-auth-core
 rfc3986[idna2008]==1.5.0
     # via httpx
-ruamel-yaml==0.17.28
+ruamel-yaml==0.17.31
     # via
     #   -r requirements/edx/base.txt
     #   drf-yasg
@@ -1507,7 +1508,7 @@ tqdm==4.65.0
     # via
     #   -r requirements/edx/base.txt
     #   nltk
-typing-extensions==4.6.2
+typing-extensions==4.6.3
     # via
     #   -r requirements/edx/base.txt
     #   asgiref
@@ -1515,11 +1516,16 @@ typing-extensions==4.6.2
     #   django-countries
     #   grimp
     #   import-linter
+    #   kombu
     #   pydantic
     #   pylint
     #   pylti1p3
     #   snowflake-connector-python
     #   starlette
+tzdata==2023.3
+    # via
+    #   -r requirements/edx/base.txt
+    #   backports-zoneinfo
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.txt
