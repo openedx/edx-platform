@@ -39,7 +39,7 @@ class FunixRelativeDateDAO():
 
     @classmethod
     def get_enroll_by_id(self, user_id, course_id):
-        return FunixRelativeDate.objects.get(user_id=user_id, course_id=course_id, type="start")
+        return FunixRelativeDate.objects.filter(user_id=user_id, course_id=course_id, type="start")[0]
 
     @classmethod
     def get_all_enroll_by_course(self, course_id):
