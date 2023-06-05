@@ -1,41 +1,54 @@
 define(['jquery',
     'underscore',
     'moment',
+    'teams/js/spec_helpers/team_spec_helpers',
     'teams/js/views/team_card',
     'teams/js/models/team',
     'teams/js/models/topic'],
-    function($, _, moment, TeamCardView, Team, Topic) {
+    function($, _, moment, TeamSpecHelpers, TeamCardView, Team, Topic) {
         'use strict';
 
         describe('TeamCardView', function() {
             var createTeamCardView, view;
+            var teamName = 'Test Team',
+                teamID = 'test-team',
+                courseID = TeamSpecHelpers.testCourseID,
+                teamsetID = TeamSpecHelpers.testTopicID,
+                teamsetName = 'Team Set',
+                description = 'A team for testing';
+
             createTeamCardView = function(topicOptions) {
                 var model = new Team({
-                        id: 'test-team',
-                        name: 'Test Team',
+                        id: teamID,
+                        name: teamName,
+                        course_id: courseID,
+                        topic_id: teamsetID,
+                        description: description,
                         is_active: true,
-                        course_id: 'test/course/id',
-                        topic_id: 'test-topic',
-                        description: 'A team for testing',
                         last_activity_at: '2015-08-21T18:53:01.145Z',
                         country: 'us',
                         language: 'en',
                         membership: []
                     }),
-                    topic = new Topic(_.extend({id: 'test-topic'}, topicOptions)),
+                    topic = new Topic(_.extend({
+                        id: teamsetID,
+                        name: teamsetName,
+                    }, topicOptions)),
                     TeamCardClass = TeamCardView.extend({
                         courseMaxTeamSize: '100',
                         srInfo: {
                             id: 'test-sr-id',
                             text: 'Screenreader text'
                         },
+                        showTeamset: true,
                         countries: {us: 'United States of America'},
                         languages: {en: 'English'},
                         // eslint-disable-next-line no-unused-vars
                         getTopic: function(topicId) { return $.Deferred().resolve(topic); }
                     });
                 return new TeamCardClass({
-                    model: model
+                    model: model,
+                    showTopic: true,
                 });
             };
 
@@ -47,8 +60,9 @@ define(['jquery',
 
             it('can render itself', function() {
                 expect(view.$el).toHaveClass('list-card');
-                expect(view.$el.find('.card-title').text()).toContain('Test Team');
-                expect(view.$el.find('.card-description').text()).toContain('A team for testing');
+                expect(view.$el.find('.card-title').text()).toContain(teamName);
+                expect(view.$el.find('.card-description').text()).toContain(description);
+                expect(view.$el.find('.card-type').text()).toContain(teamsetName);
                 expect(view.$el.find('.team-activity abbr').attr('title')).toContain('August 21st 2015');
                 expect(view.$el.find('.team-activity').text()).toContain('Last activity');
                 expect(view.$el.find('.card-meta').text()).toContain('0 / 100 Members');
@@ -56,8 +70,14 @@ define(['jquery',
                 expect(view.$el.find('.team-language').text()).toContain('English');
             });
 
+            it('does not show teamset name is showTeamset is false', function() {
+                view.showTeamset = false;
+                view.render();
+                expect(view.$el.find('.card-type').length).toEqual(0);
+            });
+
             it('navigates to the associated team page when its action button is clicked', function() {
-                expect(view.$('.action').attr('href')).toEqual('#teams/test-topic/test-team');
+                expect(view.$('.action').attr('href')).toEqual('#teams/' + teamsetID + '/' + teamID);
             });
 
             describe('Profile Image Thumbnails', function() {

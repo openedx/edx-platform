@@ -4,21 +4,21 @@ import hashlib
 import ddt
 import factory
 import pytz
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User
 from django.core.cache import cache
 from django.db.models import signals
 from django.db.models.functions import Lower
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import (
+from common.djangoapps.student.models import (
     ALLOWEDTOENROLL_TO_ENROLLED,
     AccountRecovery,
     CourseEnrollment,
@@ -27,7 +27,7 @@ from student.models import (
     PendingEmailChange,
     PendingNameChange
 )
-from student.tests.factories import AccountRecoveryFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import AccountRecoveryFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -403,3 +403,119 @@ class TestAccountRecovery(TestCase):
 
         # Assert that there is no longer an AccountRecovery record for this user
         assert len(AccountRecovery.objects.filter(user_id=user.id)) == 0
+
+
+@ddt.ddt
+class TestUserPostSaveCallback(SharedModuleStoreTestCase):
+    """
+    Tests for the user post save callback.
+    These tests are to ensure that user activation auto-enrolls invited users into courses without
+    changing any existing course mode states.
+    """
+    def setUp(self):
+        super(TestUserPostSaveCallback, self).setUp()
+        self.course = CourseFactory.create()
+
+    @ddt.data(*(set(CourseMode.ALL_MODES) - set(CourseMode.AUDIT_MODES)))
+    def test_paid_user_not_downgraded_on_activation(self, mode):
+        """
+        Make sure that students who are already enrolled + have paid do not get downgraded to audit mode
+        when their account is activated.
+        """
+        # fixture
+        student = self._set_up_invited_student(
+            course=self.course,
+            active=False,
+            course_mode=mode
+        )
+
+        # trigger the post_save callback
+        student.is_active = True
+        student.save()
+
+        # reload values from the database + make sure they are in the expected state
+        actual_course_enrollment = CourseEnrollment.objects.get(user=student, course_id=self.course.id)
+        actual_student = User.objects.get(email=student.email)
+        actual_cea = CourseEnrollmentAllowed.objects.get(email=student.email)
+
+        self.assertEqual(actual_course_enrollment.mode, mode)
+        self.assertEqual(actual_student.is_active, True)
+        self.assertEqual(actual_cea.user, student)
+
+    def test_not_enrolled_student_is_enrolled(self):
+        """
+        Make sure that invited students who are not enrolled become enrolled when their account is activated.
+        They should be enrolled in the course in audit mode.
+        """
+        # fixture
+        student = self._set_up_invited_student(
+            course=self.course,
+            active=False,
+            enrolled=False
+        )
+
+        # trigger the post_save callback
+        student.is_active = True
+        student.save()
+
+        # reload values from the database + make sure they are in the expected state
+        actual_course_enrollment = CourseEnrollment.objects.get(user=student, course_id=self.course.id)
+        actual_student = User.objects.get(email=student.email)
+        actual_cea = CourseEnrollmentAllowed.objects.get(email=student.email)
+
+        self.assertEqual(actual_course_enrollment.mode, u"audit")
+        self.assertEqual(actual_student.is_active, True)
+        self.assertEqual(actual_cea.user, student)
+
+    def test_verified_student_not_downgraded_when_changing_email(self):
+        """
+        Make sure that verified students do not get downgrade if they are active + changing their email.
+        """
+        # fixture
+        student = self._set_up_invited_student(
+            course=self.course,
+            active=True,
+            course_mode=u'verified'
+        )
+        old_email = student.email
+
+        # trigger the post_save callback
+        student.email = "foobar" + old_email
+        student.save()
+
+        # reload values from the database + make sure they are in the expected state
+        actual_course_enrollment = CourseEnrollment.objects.get(user=student, course_id=self.course.id)
+        actual_student = User.objects.get(email=student.email)
+
+        self.assertEqual(actual_course_enrollment.mode, u"verified")
+        self.assertEqual(actual_student.is_active, True)
+
+    def _set_up_invited_student(self, course, active=False, enrolled=True, course_mode=''):
+        """
+        Helper function to create a user in the right state, invite them into the course, and update their
+        course mode if needed.
+        """
+        email = 'robot@robot.org'
+        user = UserFactory(
+            username='somestudent',
+            first_name='Student',
+            last_name='Person',
+            email=email,
+            is_active=active
+        )
+
+        # invite the user to the course
+        cea = CourseEnrollmentAllowed(email=email, course_id=course.id, auto_enroll=True)
+        cea.save()
+
+        if enrolled:
+            CourseEnrollment.enroll(user, course.id)
+
+            if course_mode:
+                course_enrollment = CourseEnrollment.objects.get(
+                    user=user, course_id=self.course.id
+                )
+                course_enrollment.mode = course_mode
+                course_enrollment.save()
+
+        return user

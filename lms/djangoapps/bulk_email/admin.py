@@ -6,8 +6,8 @@ Django admin page for bulk email models
 from config_models.admin import ConfigurationModelAdmin
 from django.contrib import admin
 
-from bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
-from bulk_email.models import BulkEmailFlag, CourseAuthorization, CourseEmail, CourseEmailTemplate, Optout
+from lms.djangoapps.bulk_email.forms import CourseAuthorizationAdminForm, CourseEmailTemplateForm
+from lms.djangoapps.bulk_email.models import BulkEmailFlag, CourseAuthorization, CourseEmail, CourseEmailTemplate, Optout
 
 
 class CourseEmailAdmin(admin.ModelAdmin):

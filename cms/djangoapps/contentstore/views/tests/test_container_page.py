@@ -13,12 +13,13 @@ from django.utils import http
 from mock import Mock, patch
 from pytz import UTC
 
-import contentstore.views.component as views
-from contentstore.tests.test_libraries import LibraryTestCase
-from contentstore.views.tests.utils import StudioPageTestCase
+import cms.djangoapps.contentstore.views.component as views
+from cms.djangoapps.contentstore.tests.test_libraries import LibraryTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from .utils import StudioPageTestCase
 
 
 class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
@@ -205,7 +206,10 @@ class ContainerPageTestCase(StudioPageTestCase, LibraryTestCase):
         empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
         self.validate_preview_html(empty_child_container, self.reorderable_child_view, can_add=False)
 
-    @patch('contentstore.views.component.render_to_response', Mock(return_value=Mock(status_code=200, content='')))
+    @patch(
+        'cms.djangoapps.contentstore.views.component.render_to_response',
+        Mock(return_value=Mock(status_code=200, content=''))
+    )
     def test_container_page_with_valid_and_invalid_usage_key_string(self):
         """
         Check that invalid 'usage_key_string' raises Http404.

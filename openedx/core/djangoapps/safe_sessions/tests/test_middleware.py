@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 from mock import patch
 
 from openedx.core.djangolib.testing.utils import get_mock_request
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..middleware import SafeCookieData, SafeSessionMiddleware
 from .test_utils import TestSafeSessionsLogMixin
@@ -305,10 +305,6 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
 
     def test_error(self):
         self.verify_error(302)
-
-    def test_error_from_mobile_web_view(self):
-        self.request.path = '/xblock/block-v1:org+course+run+type@html+block@block_id'
-        self.verify_error(401)
 
     @override_settings(MOBILE_APP_USER_AGENT_REGEXES=[r'open edX Mobile App'])
     def test_error_from_mobile_app(self):

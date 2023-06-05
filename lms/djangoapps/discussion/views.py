@@ -18,6 +18,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import get_language_bidi
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from edx_django_utils.monitoring import function_trace
@@ -30,7 +31,7 @@ import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.courses import get_course_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
-from lms.djangoapps.discussion.config.waffle import is_forum_daily_digest_enabled, use_bootstrap_flag_enabled
+from lms.djangoapps.discussion.config.settings import is_forum_daily_digest_enabled
 from lms.djangoapps.discussion.django_comment_client.base.views import track_thread_viewed_event
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY
 from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
@@ -56,8 +57,8 @@ from openedx.core.djangoapps.django_comment_common.utils import (
 )
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
-from student.models import CourseEnrollment
-from util.json_request import JsonResponse, expect_json
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.discussions")
@@ -253,6 +254,7 @@ def inline_discussion(request, course_key, discussion_id):
     })
 
 
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @login_required
 @use_bulk_ops
 def forum_form_discussion(request, course_key):
@@ -423,7 +425,6 @@ def _create_base_discussion_view_context(request, course_key):
     user_info = cc_user.to_dict()
     course = get_course_with_access(user, 'load', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, user)
-    uses_bootstrap = use_bootstrap_flag_enabled()
     return {
         'csrf': csrf(request)['csrf_token'],
         'course': course,
@@ -440,8 +441,7 @@ def _create_base_discussion_view_context(request, course_key):
         ),
         'course_settings': course_settings,
         'disable_courseware_js': True,
-        'uses_bootstrap': uses_bootstrap,
-        'uses_pattern_library': not uses_bootstrap,
+        'uses_bootstrap': True,
     }
 
 
@@ -697,6 +697,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
     """
     Component implementation of the discussion board.
     """
+
     def render_to_fragment(
         self,
         request,
@@ -760,7 +761,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             log.warning('Forum is in maintenance mode')
             html = render_to_string('discussion/maintenance_fragment.html', {
                 'disable_courseware_js': True,
-                'uses_pattern_library': True,
+                'uses_bootstrap': True,
             })
             fragment = Fragment(html)
             self.add_fragment_resource_urls(fragment)
@@ -774,7 +775,7 @@ class DiscussionBoardFragmentView(EdxFragmentView):
             )
             html = render_to_string('discussion/discussion_private_fragment.html', {
                 'disable_courseware_js': True,
-                'uses_pattern_library': True,
+                'uses_bootstrap': True,
             })
             fragment = Fragment(html)
             self.add_fragment_resource_urls(fragment)
@@ -809,15 +810,11 @@ class DiscussionBoardFragmentView(EdxFragmentView):
         the files are loaded individually, but in production just the single bundle is loaded.
         """
         is_right_to_left = get_language_bidi()
-        if use_bootstrap_flag_enabled():
-            css_file = BOOTSTRAP_DISCUSSION_CSS_PATH
-            if is_right_to_left:
-                css_file = css_file.replace('.css', '-rtl.css')
-            return [css_file]
-        elif is_right_to_left:
-            return self.get_css_dependencies('style-discussion-main-rtl')
-        else:
-            return self.get_css_dependencies('style-discussion-main')
+
+        css_file = BOOTSTRAP_DISCUSSION_CSS_PATH
+        if is_right_to_left:
+            css_file = css_file.replace('.css', '-rtl.css')
+        return [css_file]
 
 
 @expect_json

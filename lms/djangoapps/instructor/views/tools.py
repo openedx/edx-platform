@@ -17,7 +17,8 @@ from pytz import UTC
 from six import string_types, text_type
 from six.moves import zip
 
-from student.models import get_user_by_username_or_email, CourseEnrollment
+from openedx.core.djangoapps.schedules.models import Schedule
+from common.djangoapps.student.models import get_user_by_username_or_email, CourseEnrollment
 
 
 class DashboardError(Exception):
@@ -127,13 +128,19 @@ def get_units_with_due_date(course):
     """
     units = []
 
+    # Pass in a schedule here so that we get back any relative dates in the course, but actual value
+    # doesn't matter, since we don't care about the dates themselves, just whether they exist.
+    # Thus we don't save or care about this temporary schedule object.
+    schedule = Schedule(start_date=course.start)
+    course_dates = api.get_dates_for_course(course.id, schedule=schedule)
+
     def visit(node):
         """
         Visit a node.  Checks to see if node has a due date and appends to
         `units` if it does.  Otherwise recurses into children to search for
         nodes with due dates.
         """
-        if getattr(node, 'due', None):
+        if (node.location, 'due') in course_dates:
             units.append(node)
         else:
             for child in node.get_children():
@@ -166,15 +173,35 @@ def set_due_date_extension(course, unit, student, due_date, actor=None, reason='
     if not mode:
         raise DashboardError(_("Could not find student enrollment in the course."))
 
-    if due_date:
-        try:
-            api.set_date_for_block(course.id, unit.location, 'due', due_date, user=student, reason=reason, actor=actor)
-        except api.MissingDateError:
-            raise DashboardError(_(u"Unit {0} has no due date to extend.").format(unit.location))
-        except api.InvalidDateError:
-            raise DashboardError(_("An extended due date must be later than the original due date."))
-    else:
-        api.set_date_for_block(course.id, unit.location, 'due', None, user=student, reason=reason, actor=actor)
+    # We normally set dates at the subsection level. But technically dates can be anywhere down the tree (and
+    # usually are in self paced courses, where the subsection date gets propagated down).
+    # So find all children that we need to set the date on, then set those dates.
+    course_dates = api.get_dates_for_course(course.id, user=student)
+    blocks_to_set = {unit}  # always include the requested unit, even if it doesn't appear to have a due date now
+
+    def visit(node):
+        """
+        Visit a node.  Checks to see if node has a due date and appends to
+        `blocks_to_set` if it does.  And recurses into children to search for
+        nodes with due dates.
+        """
+        if (node.location, 'due') in course_dates:
+            blocks_to_set.add(node)
+        for child in node.get_children():
+            visit(child)
+    visit(unit)
+
+    for block in blocks_to_set:
+        if due_date:
+            try:
+                api.set_date_for_block(course.id, block.location, 'due', due_date, user=student, reason=reason,
+                                       actor=actor)
+            except api.MissingDateError:
+                raise DashboardError(_(u"Unit {0} has no due date to extend.").format(unit.location))
+            except api.InvalidDateError:
+                raise DashboardError(_("An extended due date must be later than the original due date."))
+        else:
+            api.set_date_for_block(course.id, block.location, 'due', None, user=student, reason=reason, actor=actor)
 
 
 def dump_module_extensions(course, unit):

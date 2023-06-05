@@ -1,11 +1,13 @@
 """
 Serializers for use in the support app.
 """
+import json
+
 from django.urls import reverse
 
 from rest_framework import serializers
 
-from student.models import CourseEnrollment, ManualEnrollmentAudit
+from common.djangoapps.student.models import CourseEnrollment, ManualEnrollmentAudit
 from lms.djangoapps.program_enrollments.models import (
     ProgramEnrollment,
     ProgramCourseEnrollment,
@@ -86,3 +88,19 @@ def serialize_user_info(user, user_social_auths=None):
                 'uid': user_social_auth.uid,
             })
     return user_info
+
+
+def serialize_sso_records(user_social_auths):
+    """
+    Serialize user social auth model object
+    """
+    sso_records = []
+    for user_social_auth in user_social_auths:
+        sso_records.append({
+            'provider': user_social_auth.provider,
+            'uid': user_social_auth.uid,
+            'created': user_social_auth.created,
+            'modified': user_social_auth.modified,
+            'extraData': json.dumps(user_social_auth.extra_data),
+        })
+    return sso_records

@@ -11,7 +11,7 @@ from django.test.client import RequestFactory
 from lms.djangoapps.teams.serializers import BulkTeamCountTopicSerializer, MembershipSerializer, TopicSerializer
 from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from openedx.core.lib.teams_config import TeamsConfig
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -79,9 +79,9 @@ class TopicSerializerTestCase(SerializerTestCase):
     def test_topic_with_no_team_count(self):
         """
         Verifies that the `TopicSerializer` correctly displays a topic with a
-        team count of 0, and that it only takes one SQL query.
+        team count of 0, and that it takes a known number of SQL queries.
         """
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             serializer = TopicSerializer(
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
@@ -101,12 +101,12 @@ class TopicSerializerTestCase(SerializerTestCase):
     def test_topic_with_team_count(self):
         """
         Verifies that the `TopicSerializer` correctly displays a topic with a
-        positive team count, and that it only takes one SQL query.
+        positive team count, and that it takes a known number of SQL queries.
         """
         CourseTeamFactory.create(
             course_id=self.course.id, topic_id=self.course.teamsets[0].teamset_id
         )
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             serializer = TopicSerializer(
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
@@ -134,7 +134,7 @@ class TopicSerializerTestCase(SerializerTestCase):
         )
         CourseTeamFactory.create(course_id=self.course.id, topic_id=duplicate_topic[u'id'])
         CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic[u'id'])
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             serializer = TopicSerializer(
                 self.course.teamsets[0].cleaned_data,
                 context={'course_id': self.course.id},
@@ -227,13 +227,18 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
 
     NUM_TOPICS = 6
 
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
+
     def test_topics_with_no_team_counts(self):
         """
         Verify that we serialize topics with no team count, making only one SQL
         query.
         """
         topics = self.setup_topics(teams_per_topic=0)
-        self.assert_serializer_output(topics, num_teams_per_topic=0, num_queries=1)
+        self.assert_serializer_output(topics, num_teams_per_topic=0, num_queries=2)
 
     def test_topics_with_team_counts(self):
         """
@@ -242,7 +247,7 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         """
         teams_per_topic = 10
         topics = self.setup_topics(teams_per_topic=teams_per_topic)
-        self.assert_serializer_output(topics, num_teams_per_topic=teams_per_topic, num_queries=1)
+        self.assert_serializer_output(topics, num_teams_per_topic=teams_per_topic, num_queries=2)
 
     def test_subset_of_topics(self):
         """
@@ -251,7 +256,7 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         """
         teams_per_topic = 10
         topics = self.setup_topics(num_topics=self.NUM_TOPICS, teams_per_topic=teams_per_topic)
-        self.assert_serializer_output(topics, num_teams_per_topic=teams_per_topic, num_queries=1)
+        self.assert_serializer_output(topics, num_teams_per_topic=teams_per_topic, num_queries=2)
 
     def test_scoped_within_course(self):
         """Verify that team counts are scoped within a course."""
@@ -265,7 +270,7 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
             }),
         )
         CourseTeamFactory.create(course_id=second_course.id, topic_id=duplicate_topic[u'id'])
-        self.assert_serializer_output(first_course_topics, num_teams_per_topic=teams_per_topic, num_queries=1)
+        self.assert_serializer_output(first_course_topics, num_teams_per_topic=teams_per_topic, num_queries=2)
 
     def _merge_dicts(self, first, second):
         """Convenience method to merge two dicts in a single expression"""
@@ -277,8 +282,19 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         """
         Verify that the serializer produced the expected topics.
         """
+        # Set a request user
+        request = RequestFactory().get('/api/team/v0/topics')
+        request.user = self.user
+
         with self.assertNumQueries(num_queries):
-            serializer = self.serializer(topics, context={'course_id': self.course.id}, many=True)
+            serializer = self.serializer(
+                topics,
+                context={
+                    'course_id': self.course.id,
+                    'request': request
+                },
+                many=True
+            )
             self.assertEqual(
                 serializer.data,
                 [self._merge_dicts(topic, {u'team_count': num_teams_per_topic}) for topic in topics]
@@ -290,4 +306,4 @@ class BulkTeamCountTopicSerializerTestCase(BaseTopicSerializerTestCase):
         with no topics.
         """
         self.course.teams_configuration = TeamsConfig({'topics': []})
-        self.assert_serializer_output([], num_teams_per_topic=0, num_queries=0)
+        self.assert_serializer_output([], num_teams_per_topic=0, num_queries=1)

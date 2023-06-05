@@ -19,19 +19,19 @@ from six import text_type
 from six.moves import range
 
 from common.test.utils import XssTestMixin
-from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.course_modes.models import CourseMode
+from edx_toggles.toggles.testutils import override_waffle_flag
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StaffFactory, StudentModuleFactory, UserFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK, waffle_flags
+from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from shoppingcart.models import CourseRegCodeItem, Order, PaidCourseRegistration
-from student.models import CourseEnrollment
-from student.roles import CourseFinanceAdminRole
-from student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseFinanceAdminRole
+from common.djangoapps.student.tests.factories import AdminFactory, CourseAccessRoleFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
@@ -137,31 +137,39 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertTrue(has_instructor_tab(org_researcher, self.course))
 
     @ddt.data(
-        ('staff', False),
-        ('instructor', False),
-        ('data_researcher', True),
-        ('global_staff', True),
+        ('staff', False, False),
+        ('instructor', False, False),
+        ('data_researcher', True, False),
+        ('global_staff', True, False),
+        ('staff', False, True),
+        ('instructor', False, True),
+        ('data_researcher', True, True),
+        ('global_staff', True, True),
     )
     @ddt.unpack
-    def test_data_download(self, access_role, can_access):
+    def test_data_download(self, access_role, can_access, waffle_status):
         """
         Verify that the Data Download tab only shows up for certain roles
         """
-        download_section = '<li class="nav-item"><button type="button" class="btn-link data_download" '\
-                           'data-section="data_download">Data Download</button></li>'
-        user = UserFactory.create(is_staff=access_role == 'global_staff')
-        CourseAccessRoleFactory(
-            course_id=self.course.id,
-            user=user,
-            role=access_role,
-            org=self.course.id.org
-        )
-        self.client.login(username=user.username, password="test")
-        response = self.client.get(self.url)
-        if can_access:
-            self.assertContains(response, download_section)
-        else:
-            self.assertNotContains(response, download_section)
+        with override_waffle_flag(DATA_DOWNLOAD_V2, waffle_status):
+            download_section = '<li class="nav-item"><button type="button" class="btn-link data_download" ' \
+                               'data-section="data_download">Data Download</button></li>'
+            if waffle_status:
+                download_section = '<li class="nav-item"><button type="button" class="btn-link data_download_2" '\
+                                   'data-section="data_download_2">Data Download</button></li>'
+            user = UserFactory.create(is_staff=access_role == 'global_staff')
+            CourseAccessRoleFactory(
+                course_id=self.course.id,
+                user=user,
+                role=access_role,
+                org=self.course.id.org
+            )
+            self.client.login(username=user.username, password="test")
+            response = self.client.get(self.url)
+            if can_access:
+                self.assertContains(response, download_section)
+            else:
+                self.assertNotContains(response, download_section)
 
     @override_settings(ANALYTICS_DASHBOARD_URL='http://example.com')
     @override_settings(ANALYTICS_DASHBOARD_NAME='Example')
@@ -322,13 +330,36 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
     )
     def test_staff_can_see_writable_gradebook(self):
         """
-        Test that, when the writable gradebook featue is enabled, a staff member can see it.
+        Test that, when the writable gradebook feature is enabled and
+        deployed in another domain, a staff member can see it.
         """
         waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
         with override_waffle_flag(waffle_flag, active=True):
             response = self.client.get(self.url)
 
         expected_gradebook_url = 'http://gradebook.local.edx.org/{}'.format(self.course.id)
+        self.assertContains(response, expected_gradebook_url)
+        self.assertContains(response, 'View Gradebook')
+
+    GRADEBOOK_LEARNER_COUNT_MESSAGE = (
+        'Note: This feature is available only to courses with a small number ' +
+        'of enrolled learners.'
+    )
+
+    @patch(
+        'lms.djangoapps.instructor.views.instructor_dashboard.settings.WRITABLE_GRADEBOOK_URL',
+        settings.LMS_ROOT_URL + '/gradebook'
+    )
+    def test_staff_can_see_writable_gradebook_as_subdirectory(self):
+        """
+        Test that, when the writable gradebook feature is enabled and
+        deployed in a subdirectory, a staff member can see it.
+        """
+        waffle_flag = waffle_flags()[WRITABLE_GRADEBOOK]
+        with override_waffle_flag(waffle_flag, active=True):
+            response = self.client.get(self.url)
+
+        expected_gradebook_url = '{}/{}'.format(settings.WRITABLE_GRADEBOOK_URL, self.course.id)
         self.assertContains(response, expected_gradebook_url)
         self.assertContains(response, 'View Gradebook')
 
@@ -369,31 +400,12 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         )
         self.assertContains(response, 'View Gradebook')
 
-    def test_default_currency_in_the_html_response(self):
-        """
-        Test that checks the default currency_symbol ($) in the response
-        """
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
-        response = self.client.get(self.url)
-        self.assertContains(response, '${amount}'.format(amount=total_amount))
-
     def test_course_name_xss(self):
         """Test that the instructor dashboard correctly escapes course names
         with script tags.
         """
         response = self.client.get(self.url)
         self.assert_no_xss(response, '<script>alert("XSS")</script>')
-
-    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
-    def test_override_currency_settings_in_the_html_response(self):
-        """
-        Test that checks the default currency_symbol ($) in the response
-        """
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
-        response = self.client.get(self.url)
-        self.assertContains(response, '{currency}{amount}'.format(currency='Rs', amount=total_amount))
 
     @patch.dict(settings.FEATURES, {'DISPLAY_ANALYTICS_ENROLLMENTS': False})
     @override_settings(ANALYTICS_DASHBOARD_URL='')
@@ -480,34 +492,6 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         # link to dashboard shown
         expected_message = self.get_dashboard_analytics_message()
         self.assertIn(expected_message, response.content.decode(response.charset))
-
-    def add_course_to_user_cart(self, cart, course_key):
-        """
-        adding course to user cart
-        """
-        reg_item = PaidCourseRegistration.add_to_order(cart, course_key)
-        return reg_item
-
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
-    def test_total_credit_cart_sales_amount(self):
-        """
-        Test to check the total amount for all the credit card purchases.
-        """
-        student = UserFactory.create()
-        self.client.login(username=student.username, password="test")
-        student_cart = Order.get_cart_for_user(student)
-        item = self.add_course_to_user_cart(student_cart, self.course.id)
-        resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': 4})
-        self.assertEqual(resp.status_code, 200)
-        student_cart.purchase()
-
-        self.client.login(username=self.instructor.username, password="test")
-        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
-        single_purchase_total = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
-        bulk_purchase_total = CourseRegCodeItem.get_total_amount_of_purchased_item(self.course.id)
-        total_amount = single_purchase_total + bulk_purchase_total
-        response = self.client.get(self.url)
-        self.assertContains(response, '{currency}{amount}'.format(currency='$', amount=total_amount))
 
     @ddt.data(
         (True, True, True),

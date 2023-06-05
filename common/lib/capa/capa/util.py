@@ -221,3 +221,34 @@ def remove_markup(html):
     u'Rock &amp; Roll'
     """
     return HTML(bleach.clean(html, tags=[], strip=True))
+
+
+def get_course_id_from_capa_module(capa_module):
+    """
+    Extract a stringified course run key from a CAPA module (aka ProblemBlock).
+
+    This is a bit of a hack. Its intended use is to allow us to pass the course id
+    (if available) to `safe_exec`, enabling course-run-specific resource limits
+    in the safe execution environment (codejail).
+
+    Arguments:
+        capa_module (ProblemBlock|None)
+
+    Returns: str|None
+        The stringified course run key of the module.
+        If not available, fall back to None.
+    """
+    if not capa_module:
+        return None
+    try:
+        return str(capa_module.scope_ids.usage_id.course_key)
+    except (AttributeError, TypeError):
+        # AttributeError:
+        #     If the capa module lacks scope ids or has unexpected scope ids, we
+        #     would rather fall back to `None` than let an AttributeError be raised
+        #     here.
+        # TypeError:
+        #     Old Mongo usage keys lack a 'run' specifier, and may
+        #     raise a type error when we try to serialize them into a course
+        #     run key. This is tolerable because such course runs are deprecated.
+        return None

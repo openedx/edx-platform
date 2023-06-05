@@ -4,7 +4,7 @@ LMS Configuration Settings
 The lms.envs module contains project-wide settings, defined in python modules
 using the standard `Django Settings`_ mechanism.
 
-.. _Django Settings: https://docs.djangoproject.com/en/1.11/topics/settings/
+.. _Django Settings: https://docs.djangoproject.com/en/2.2/topics/settings/
 
 Different python modules are used for different setting configuration options.
 To prevent duplication of settings, modules import values from other modules,
@@ -87,7 +87,7 @@ when nested within each other::
         },
         {
             'NAME': 'mako',
-            'BACKEND': 'edxmako.backend.Mako',
+            'BACKEND': 'common.djangoapps.edxmako.backend.Mako',
             'APP_DIRS': False,
             'DIRS': _make_mako_template_dirs,
         },

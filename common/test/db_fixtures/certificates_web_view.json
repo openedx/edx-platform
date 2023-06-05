@@ -106,9 +106,7 @@
       "change_date": "2050-06-15 11:02:13.007790+00:00",
       "changed_by": 99,
       "enabled": true,
-      "dashboard_tracking_code": "edx-course-v1&TESTCOURSE",
-      "company_identifier": "7nTFLiuDkkQkdELSpruCwD4F6jzqtTFsx3PfJUIT2qHqXRLG1",
-      "trk_partner_name": "edx"
+      "company_identifier": 1337
     }
   },
   {

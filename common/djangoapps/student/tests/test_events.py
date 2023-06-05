@@ -9,9 +9,9 @@ from django.db.utils import IntegrityError
 from django.test import TestCase
 from django_countries.fields import Country
 
-from student.models import CourseEnrollmentAllowed
-from student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
-from student.tests.tests import UserSettingsEventTestMixin
+from common.djangoapps.student.models import CourseEnrollmentAllowed
+from common.djangoapps.student.tests.factories import CourseEnrollmentAllowedFactory, UserFactory
+from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
 
 
 class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
@@ -75,7 +75,7 @@ class TestUserProfileEvents(UserSettingsEventTestMixin, TestCase):
         self.profile.save()
         self.assert_no_events_were_emitted()
 
-    @mock.patch('student.models.UserProfile.save', side_effect=IntegrityError)
+    @mock.patch('common.djangoapps.student.models.UserProfile.save', side_effect=IntegrityError)
     def test_no_event_if_save_failed(self, _save_mock):
         """
         Verify no event is triggered if the save does not complete. Note that the pre_save

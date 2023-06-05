@@ -15,8 +15,8 @@ from django_countries import countries
 from pytz import common_timezones, common_timezones_set, country_timezones
 
 from openedx.core.lib.time_zone_utils import get_display_time_zone
-from student.models import User, UserProfile
-from track import segment
+from common.djangoapps.student.models import User, UserProfile
+from common.djangoapps.track import segment
 
 from ..errors import (
     CountryCodeError,
@@ -32,6 +32,31 @@ from ..models import UserOrgTag, UserPreference
 from ..serializers import RawUserPreferenceSerializer
 
 log = logging.getLogger(__name__)
+
+
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
+def has_user_preference(requesting_user, preference_key, username=None):
+    """
+    Returns True if the user has preference with the specified key.
+
+    Args:
+        requesting_user (User): The user requesting the user preference check. Only the user with username
+            `username` or users with "is_staff" privileges can access the preferences.
+        preference_key (str): The key for the user preference.
+        username (str): Optional username for which to look up the preferences. If not specified,
+            `requesting_user.username` is assumed.
+
+    Returns:
+         (bool): Returns True if the user has preference with the specified key and False otherwise.
+
+    Raises:
+         UserNotFound: no user with username `username` exists (or `requesting_user.username` if
+            `username` is not specified)
+         UserNotAuthorized: the requesting_user does not have access to the user preference.
+         UserAPIInternalError: the operation failed due to an unexpected error.
+    """
+    existing_user = _get_authorized_user(requesting_user, username, allow_staff=True)
+    return UserPreference.has_value(existing_user, preference_key)
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])

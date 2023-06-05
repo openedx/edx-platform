@@ -28,6 +28,7 @@ class RenderForm extends React.Component {
     this.userInformation = this.props.context.user;
     const course = this.userInformation ? this.userInformation.course_id : '';
     this.courseDiscussionURL = '/courses/{course_id}/discussion/forum';
+    this.submitButton = null;
     this.state = {
       currentRequest: null,
       errorList: initialFormErrors,
@@ -44,7 +45,7 @@ class RenderForm extends React.Component {
       message: gettext('Enter some details for your support request.'),
       request: gettext('Something went wrong. Please try again later.'),
     };
-    this.submitForm = this.submitForm.bind(this);
+    this.handleClick = this.handleClick.bind(this);
     this.reDirectUser = this.reDirectUser.bind(this);
     this.formOnChangeCallback = this.formOnChangeCallback.bind(this);
   }
@@ -107,12 +108,15 @@ class RenderForm extends React.Component {
     window.location.href = this.courseDiscussionURL.replace('{course_id}', formData.course);
   }
 
-  submitForm(event) {
+  handleClick(event) {
     event.preventDefault();
+    this.submitButton = event.currentTarget;
+    this.submitButton.setAttribute("disabled", true);
     const formData = this.getFormDataFromState();
     this.clearErrorState();
     this.validateFormData(formData);
     if (this.formHasErrors()) {
+      this.submitButton.removeAttribute("disabled");
       return this.scrollToTop();
     }
     this.createZendeskTicket(formData);
@@ -131,25 +135,25 @@ class RenderForm extends React.Component {
           value: formData.course,
         }],
         tags: this.props.context.tags,
-        requester: {
-          email: this.userInformation.email,
-          name: this.userInformation.username,
-        },
       };
     request.open('POST', url, true);
     request.setRequestHeader('Content-type', 'application/json;charset=UTF-8');
     request.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
     request.send(JSON.stringify(data));
     request.onreadystatechange = function success() {
-      if (request.readyState === 4 && request.status === 201) {
-        this.setState({
-          success: true,
-        });
+      if (request.readyState === 4) {
+        this.submitButton.removeAttribute("disabled");
+        if (request.status === 201) {
+            this.setState({
+                success: true,
+            });
+        }
       }
     }.bind(this);
 
     request.onerror = function error() {
       this.updateErrorInState('request', this.formValidationErrors.request);
+      this.submitButton.removeAttribute("disabled");
       this.scrollToTop();
     }.bind(this);
   }
@@ -185,7 +189,7 @@ class RenderForm extends React.Component {
       userElement = (<LoggedInUser
         userInformation={this.userInformation}
         onChangeCallback={this.formOnChangeCallback}
-        submitForm={this.submitForm}
+        handleClick={this.handleClick}
         showWarning={this.showWarningMessage()}
         showDiscussionButton={this.showDiscussionButton()}
         reDirectUser={this.reDirectUser}

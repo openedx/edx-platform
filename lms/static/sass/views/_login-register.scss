@@ -98,6 +98,16 @@
   }
 }
 
+#login-help, #reset-help {
+    padding-left: 8px;
+}
+ul.fa-ul{
+    margin: 0 0 0 0;
+    i {
+        margin-right: 5px;
+    }
+}
+
 .login-register {
   $grid-columns: 12;
 
@@ -373,8 +383,8 @@
       @extend %t-copy-sub2;
 
       display: block;
-      margin-bottom: ($baseline/2);
-      margin-top: ($baseline/4);
+      margin-bottom: 5px;
+      margin-top: 5px;
       border: none;
       padding: 0;
       background: transparent;
@@ -390,6 +400,11 @@
       &:hover,
       &:focus {
         text-decoration: underline;
+      }
+      > i {
+        border: none;
+        padding: 0;
+        margin: 0 2px 0 0;
       }
     }
 
@@ -600,6 +615,34 @@
       &:focus {
         background-color: $facebook-focus-blue;
         border: 1px solid $facebook-focus-blue;
+        color: $white;
+      }
+    }
+
+    &.button-oa2-apple-id {
+      color: white;
+      border-color: $apple-black;
+      background-color: $apple-black;
+
+      span {
+        vertical-align: middle;
+        @include font-size(16);
+      }
+
+      .icon {
+        background: transparent;
+
+        .icon-image {
+          max-height: 2.2em;
+          max-width: 2.5em;
+          margin-top: 0px;
+        }
+      }
+
+      &:hover,
+      &:focus {
+        background-color: $apple-focus-black;
+        border: 1px solid $apple-focus-black;
         color: $white;
       }
     }

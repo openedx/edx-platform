@@ -27,8 +27,8 @@ from lms.djangoapps.ccx.utils import add_master_course_staff_to_ccx, assign_staf
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.api import authentication, permissions
-from student.models import CourseEnrollment
-from student.roles import CourseCcxCoachRole
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseCcxCoachRole
 from xmodule.modulestore.django import SignalHandler
 
 from .paginators import CCXAPIPagination

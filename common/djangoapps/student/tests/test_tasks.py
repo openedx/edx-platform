@@ -11,9 +11,9 @@ from six.moves import range
 from edx_ace.errors import ChannelError, RecoverableChannelDeliveryError
 from lms.djangoapps.courseware.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
-from student.models import Registration
-from student.tasks import send_activation_email
-from student.views.management import compose_activation_email, compose_and_send_activation_email
+from common.djangoapps.student.models import Registration
+from common.djangoapps.student.tasks import send_activation_email
+from common.djangoapps.student.views.management import compose_activation_email, compose_and_send_activation_email
 
 
 class SendActivationEmailTestCase(TestCase):
@@ -41,8 +41,8 @@ class SendActivationEmailTestCase(TestCase):
         self.assertEqual(self.msg.context['routed_profile_name'], '')
 
     @mock.patch('time.sleep', mock.Mock(return_value=None))
-    @mock.patch('student.tasks.log')
-    @mock.patch('student.tasks.ace.send', mock.Mock(side_effect=RecoverableChannelDeliveryError(None, None)))
+    @mock.patch('common.djangoapps.student.tasks.log')
+    @mock.patch('common.djangoapps.student.tasks.ace.send', mock.Mock(side_effect=RecoverableChannelDeliveryError(None, None)))
     def test_RetrySendUntilFail(self, mock_log):
         """
         Tests retries when the activation email doesn't send
@@ -71,8 +71,8 @@ class SendActivationEmailTestCase(TestCase):
         )
         self.assertEqual(mock_log.error.call_count, 1)
 
-    @mock.patch('student.tasks.log')
-    @mock.patch('student.tasks.ace.send', mock.Mock(side_effect=ChannelError))
+    @mock.patch('common.djangoapps.student.tasks.log')
+    @mock.patch('common.djangoapps.student.tasks.ace.send', mock.Mock(side_effect=ChannelError))
     def test_UnrecoverableSendError(self, mock_log):
         """
         Tests that a major failure of the send is logged

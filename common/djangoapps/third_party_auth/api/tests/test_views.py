@@ -17,13 +17,13 @@ from rest_framework.test import APITestCase
 from six.moves import range
 from social_django.models import UserSocialAuth
 
-from student.tests.factories import UserFactory
-from third_party_auth.api.permissions import (
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.third_party_auth.api.permissions import (
     JwtHasScope,
     JwtHasTpaProviderFilterForRequestedProvider,
     JwtRestrictedApplication
 )
-from third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
+from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin
 
 VALID_API_KEY = "i am a key"
 IDP_SLUG_TESTSHIB = 'testshib'

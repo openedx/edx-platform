@@ -73,6 +73,21 @@ $grid-breakpoints-lg: 992px !default;
   }
 }
 
+// Flexible grid
+$gw-column: 80px !default;
+$gw-gutter: 20px !default;
+$fg-column: $gw-column !default;
+$fg-gutter: $gw-gutter !default;
+$fg-max-columns: 12 !default;
+$fg-max-width: 1400px !default;
+$fg-min-width: 810px !default;
+
+@function flex-grid($columns, $container-columns: $fg-max-columns) {
+  $width: $columns * $fg-column + ($columns - 1) * $fg-gutter;
+  $container-width: $container-columns * $fg-column + ($container-columns - 1) * $fg-gutter;
+  @return percentage($width / $container-width);
+}
+
 // ----------------------------
 // #FONTS
 // ----------------------------
@@ -142,6 +157,9 @@ $state-warning-border: darken($state-warning-bg, 5%) !default;
 $state-danger-text: $black !default;
 $state-danger-bg: #f2dede !default;
 $state-danger-border: darken($state-danger-bg, 5%) !default;
+
+$palette-error-accent: #cb0712;
+$palette-error-back: #feeced;
 
 // logo colors
 $micromasters-color: #005585 !default;

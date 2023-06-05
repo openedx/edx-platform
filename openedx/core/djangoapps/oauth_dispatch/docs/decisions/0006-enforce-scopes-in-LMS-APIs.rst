@@ -4,7 +4,7 @@
 Status
 ------
 
-Proposed
+Accepted
 
 Context
 -------

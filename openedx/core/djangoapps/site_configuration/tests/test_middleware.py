@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 

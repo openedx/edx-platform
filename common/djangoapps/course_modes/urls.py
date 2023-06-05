@@ -4,7 +4,7 @@
 from django.conf import settings
 from django.conf.urls import url
 
-from course_modes import views
+from common.djangoapps.course_modes import views
 
 urlpatterns = [
     url(r'^choose/{}/$'.format(settings.COURSE_ID_PATTERN), views.ChooseModeView.as_view(), name='course_modes_choose'),

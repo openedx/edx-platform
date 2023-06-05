@@ -5,7 +5,7 @@ URLs for EdxNotes.
 
 from django.conf.urls import url
 
-from edxnotes import views
+from . import views
 
 # Additionally, we include login URLs for the browseable API.
 urlpatterns = [

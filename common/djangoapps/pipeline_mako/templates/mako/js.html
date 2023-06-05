@@ -1,5 +1,6 @@
+<%page expression_filter="h"/>
 <script \
-% if async:
+% if context.get('async', default=None):
 async \
 % endif
 % if defer:

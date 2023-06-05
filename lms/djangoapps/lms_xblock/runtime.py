@@ -10,12 +10,13 @@ from django.conf import settings
 from django.urls import reverse
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
 
-from badges.service import BadgingService
-from badges.utils import badges_enabled
+from lms.djangoapps.badges.service import BadgingService
+from lms.djangoapps.badges.utils import badges_enabled
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.teams.services import TeamsService
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
+from openedx.core.lib.xblock_services.call_to_action import CallToActionService
 from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resource_url
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import ModuleI18nService, modulestore
@@ -152,7 +153,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             services['completion'] = CompletionService(user=user, context_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
-        services['library_tools'] = LibraryToolsService(store)
+        services['library_tools'] = LibraryToolsService(store, user_id=user.id if user else None)
         services['partitions'] = PartitionService(
             course_id=kwargs.get('course_id'),
             cache=request_cache_dict
@@ -164,6 +165,7 @@ class LmsModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         self.request_token = kwargs.pop('request_token', None)
         services['teams'] = TeamsService()
         services['teams_configuration'] = TeamsConfigurationService()
+        services['call_to_action'] = CallToActionService()
         super(LmsModuleSystem, self).__init__(**kwargs)
 
     def handler_url(self, *args, **kwargs):

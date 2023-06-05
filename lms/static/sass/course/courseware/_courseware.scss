@@ -523,6 +523,37 @@ html.video-fullscreen {
       }
     }
 
+    .vert-due-date {
+      color: #686b73;
+      display: flex;
+      font-size: 16px;
+
+      .localized-datetime {
+        max-width: 80%;
+      }
+
+      .pill {
+        font-size: 12px;
+        max-height: 20px;
+        padding: 2px 8px;
+        border-radius: 5px;
+        margin-left: 8px;
+        font-style: italic;
+        font-weight: bold;
+        vertical-align: top;
+
+        &.completed {
+          background-color: #f3f3f4;
+          color: #2d323e;
+        }
+
+        &.past-due {
+          background-color: #d1d2d4;
+          color: black;
+        }
+      }
+    }
+
     .vert-mod {
       padding: 0;
       margin: 0;

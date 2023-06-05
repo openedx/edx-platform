@@ -8,9 +8,9 @@ from django.conf import settings
 from django.test import TestCase, override_settings
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
-from ..tasks.v1 import tasks
+from openedx.core.djangoapps.credentials.tasks.v1 import tasks
 
 TASKS_MODULE = 'openedx.core.djangoapps.credentials.tasks.v1.tasks'
 

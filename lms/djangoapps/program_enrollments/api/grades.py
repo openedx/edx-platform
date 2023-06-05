@@ -11,7 +11,7 @@ import logging
 from six import text_type
 
 from lms.djangoapps.grades.api import CourseGradeFactory, clear_prefetched_course_grades, prefetch_course_grades
-from util.query import read_replica_or_default
+from common.djangoapps.util.query import read_replica_or_default
 
 from .reading import fetch_program_course_enrollments
 

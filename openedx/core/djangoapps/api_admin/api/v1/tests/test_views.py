@@ -11,7 +11,7 @@ from django.test import TestCase
 
 from openedx.core.djangoapps.api_admin.tests import factories
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @skip_unless_lms

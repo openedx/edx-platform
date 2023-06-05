@@ -3,16 +3,9 @@
 End-to-end tests for the LMS that utilize the course home page and course outline.
 """
 
-
-from datetime import datetime, timedelta
-
-import six
-
-from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from openedx.core.lib.tests import attr
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from ...pages.lms.bookmarks import BookmarksPage
 from ...pages.lms.course_home import CourseHomePage
 from ...pages.lms.courseware import CoursewarePage
 from ..helpers import UniqueCourseTest, auto_auth, load_data_str

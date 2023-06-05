@@ -58,7 +58,7 @@ def update_masters_access_course(sender, instance, **kwargs):  # pylint: disable
     masters_id = getattr(settings, 'COURSE_ENROLLMENT_MODES', {}).get('masters', {}).get('id', None)
     verified_id = getattr(settings, 'COURSE_ENROLLMENT_MODES', {}).get('verified', {}).get('id', None)
     if not (masters_id and verified_id):
-        log.error("Missing settings.COURSE_ENROLLMENT_MODES -> verified:%s masters:%s", verified, masters)
+        log.error("Missing settings.COURSE_ENROLLMENT_MODES -> verified:%s masters:%s", verified_id, masters_id)
         return
 
     course_id = instance.course_id

@@ -9,7 +9,7 @@ Enrollments.
 from django.core.management.base import BaseCommand
 
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role_on_enrollment
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 
 class Command(BaseCommand):

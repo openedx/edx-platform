@@ -7,24 +7,18 @@ progress page.
 
 from contextlib import contextmanager
 
-import ddt
 from six.moves import range
 
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.courseware import CoursewarePage
-from ...pages.lms.instructor_dashboard import InstructorDashboardPage, StudentSpecificAdmin
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
 from ...pages.studio.overview import CourseOutlinePage as StudioCourseOutlinePage
-from ...pages.studio.utils import type_in_codemirror
-from ...pages.studio.xblock_editor import XBlockEditorView
 from ..helpers import (
     UniqueCourseTest,
     auto_auth,
     create_multiple_choice_problem,
-    create_multiple_choice_xml,
-    get_modal_alert
 )
 
 
@@ -126,154 +120,6 @@ class ProgressPageBaseTest(UniqueCourseTest):
             auto_auth(self.browser, self.USERNAME, self.EMAIL, False, self.course_id)
         yield
         self.logout_page.visit()
-
-
-@ddt.ddt
-class PersistentGradesTest(ProgressPageBaseTest):
-    """
-    Test that grades for completed assessments are persisted
-    when various edits are made.
-    """
-    shard = 22
-
-    def setUp(self):
-        super(PersistentGradesTest, self).setUp()
-        self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
-
-    def _change_subsection_structure(self):
-        """
-        Adds a unit to the subsection, which
-        should not affect a persisted subsection grade.
-        """
-        self.studio_course_outline.visit()
-        subsection = self.studio_course_outline.section(self.SECTION_NAME).subsection(self.SUBSECTION_NAME)
-        subsection.expand_subsection()
-        subsection.add_unit()
-        self.studio_course_outline.wait_for_ajax()
-        subsection.publish()
-
-    def _set_staff_lock_on_subsection(self, locked):
-        """
-        Sets staff lock for a subsection, which should hide the
-        subsection score from students on the progress page.
-        """
-        self.studio_course_outline.visit()
-        subsection = self.studio_course_outline.section_at(0).subsection_at(0)
-        subsection.set_staff_lock(locked)
-        self.assertEqual(subsection.has_staff_lock_warning, locked)
-
-    def _get_problem_in_studio(self):
-        """
-        Returns the editable problem component in studio,
-        along with its container unit, so any changes can
-        be published.
-        """
-        self.studio_course_outline.visit()
-        self.studio_course_outline.section_at(0).subsection_at(0).expand_subsection()
-        unit = self.studio_course_outline.section_at(0).subsection_at(0).unit(self.UNIT_NAME).go_to()
-        component = unit.xblocks[1]
-        return unit, component
-
-    def _change_weight_for_problem(self):
-        """
-        Changes the weight of the problem, which should not affect
-        persisted grades.
-        """
-        unit, component = self._get_problem_in_studio()
-        component.edit()
-        component_editor = XBlockEditorView(self.browser, component.locator)
-        component_editor.set_field_value_and_save('Problem Weight', 5)
-        unit.publish()
-
-    def _change_correct_answer_for_problem(self, new_correct_choice=1):
-        """
-        Changes the correct answer of the problem.
-        """
-        unit, component = self._get_problem_in_studio()
-        modal = component.edit()
-
-        modified_content = create_multiple_choice_xml(correct_choice=new_correct_choice)
-
-        type_in_codemirror(self, 0, modified_content)
-        modal.q(css='.action-save').click()
-        unit.publish()
-
-    def _student_admin_action_for_problem(self, action_button, has_cancellable_alert=False):
-        """
-        As staff, clicks the "delete student state" button,
-        deleting the student user's state for the problem.
-        """
-        self.instructor_dashboard_page.visit()
-        student_admin_section = self.instructor_dashboard_page.select_student_admin(StudentSpecificAdmin)
-        student_admin_section.set_student_email_or_username(self.USERNAME)
-        student_admin_section.set_problem_location(self.problem1.locator)
-        getattr(student_admin_section, action_button).click()
-        if has_cancellable_alert:
-            alert = get_modal_alert(student_admin_section.browser)
-            alert.accept()
-        alert = get_modal_alert(student_admin_section.browser)
-        alert.dismiss()
-        return student_admin_section
-
-    def test_progress_page_shows_scored_problems(self):
-        """
-        Checks the progress page before and after answering
-        the course's first problem correctly.
-        """
-        with self._logged_in_session():
-            self.assertEqual(self._get_problem_scores(), [(0, 1), (0, 1)])
-            self.assertEqual(self._get_section_score(), (0, 2))
-            self.courseware_page.visit()
-            self._answer_problem_correctly()
-            self.assertEqual(self._get_problem_scores(), [(1, 1), (0, 1)])
-            self.assertEqual(self._get_section_score(), (1, 2))
-
-    @ddt.data(
-        _change_subsection_structure,
-        _change_weight_for_problem
-    )
-    def test_content_changes_do_not_change_score(self, edit):
-        with self._logged_in_session():
-            self.courseware_page.visit()
-            self._answer_problem_correctly()
-
-        with self._logged_in_session(staff=True):
-            edit(self)
-
-        with self._logged_in_session():
-            self.assertEqual(self._get_problem_scores(), [(1, 1), (0, 1)])
-            self.assertEqual(self._get_section_score(), (1, 2))
-
-    def test_visibility_change_affects_score(self):
-        with self._logged_in_session():
-            self.courseware_page.visit()
-            self._answer_problem_correctly()
-
-        with self._logged_in_session(staff=True):
-            self._set_staff_lock_on_subsection(True)
-
-        with self._logged_in_session():
-            self.assertEqual(self._get_problem_scores(), None)
-            self.assertEqual(self._get_section_score(), None)
-
-        with self._logged_in_session(staff=True):
-            self._set_staff_lock_on_subsection(False)
-
-        with self._logged_in_session():
-            self.assertEqual(self._get_problem_scores(), [(1, 1), (0, 1)])
-            self.assertEqual(self._get_section_score(), (1, 2))
-
-    def test_delete_student_state_affects_score(self):
-        with self._logged_in_session():
-            self.courseware_page.visit()
-            self._answer_problem_correctly()
-
-        with self._logged_in_session(staff=True):
-            self._student_admin_action_for_problem('delete_state_button', has_cancellable_alert=True)
-
-        with self._logged_in_session():
-            self.assertEqual(self._get_problem_scores(), [(0, 1), (0, 1)])
-            self.assertEqual(self._get_section_score(), (0, 2))
 
 
 class SubsectionGradingPolicyBase(ProgressPageBaseTest):

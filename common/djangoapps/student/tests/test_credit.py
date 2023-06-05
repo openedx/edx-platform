@@ -15,8 +15,8 @@ from mock import patch
 
 from openedx.core.djangoapps.credit import api as credit_api
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditEligibility, CreditProvider
-from student.models import CourseEnrollmentAttribute
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollmentAttribute
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -235,7 +235,7 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
         self._make_eligible()
 
         # The user should have the option to purchase credit
-        with patch('student.views.dashboard.get_credit_provider_attribute_values') as mock_method:
+        with patch('common.djangoapps.student.views.dashboard.get_credit_provider_attribute_values') as mock_method:
             mock_method.return_value = providers_list
             response = self._load_dashboard()
 

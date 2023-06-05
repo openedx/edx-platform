@@ -10,8 +10,8 @@ from django.core.files.base import ContentFile
 from factory import DjangoModelFactory
 from factory.django import ImageField
 
-from badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration, CourseEventBadgesConfiguration
-from student.tests.factories import UserFactory
+from lms.djangoapps.badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration, CourseEventBadgesConfiguration
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 def generate_dummy_image(_unused):

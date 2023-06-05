@@ -21,7 +21,7 @@ from openedx.core.djangoapps.enrollments.errors import (
 )
 from openedx.core.djangoapps.enrollments.serializers import CourseEnrollmentSerializer, CourseSerializer
 from openedx.core.lib.exceptions import CourseNotFoundError
-from student.models import (
+from common.djangoapps.student.models import (
     AlreadyEnrolledError,
     CourseEnrollment,
     CourseEnrollmentAttribute,
@@ -29,7 +29,7 @@ from student.models import (
     EnrollmentClosedError,
     NonExistentCourseError
 )
-from student.roles import RoleCache
+from common.djangoapps.student.roles import RoleCache
 
 log = logging.getLogger(__name__)
 
@@ -143,7 +143,7 @@ def create_course_enrollment(username, course_id, mode, is_active):
         user = User.objects.get(username=username)
     except User.DoesNotExist:
         msg = u"Not user with username '{username}' found.".format(username=username)
-        log.warn(msg)
+        log.warning(msg)
         raise UserNotFoundError(msg)
 
     try:
@@ -181,7 +181,7 @@ def update_course_enrollment(username, course_id, mode=None, is_active=None):
         user = User.objects.get(username=username)
     except User.DoesNotExist:
         msg = u"Not user with username '{username}' found.".format(username=username)
-        log.warn(msg)
+        log.warning(msg)
         raise UserNotFoundError(msg)
 
     try:
@@ -272,7 +272,7 @@ def _get_user(username):
         return User.objects.get(username=username)
     except User.DoesNotExist:
         msg = u"Not user with username '{username}' found.".format(username=username)
-        log.warn(msg)
+        log.warning(msg)
         raise UserNotFoundError(msg)
 
 
@@ -295,17 +295,17 @@ def _invalid_attribute(attributes):
     for attribute in attributes:
         if "namespace" not in attribute:
             msg = u"'namespace' not in enrollment attribute"
-            log.warn(msg)
+            log.warning(msg)
             invalid_attributes.append("namespace")
             raise InvalidEnrollmentAttribute(msg)
         if "name" not in attribute:
             msg = u"'name' not in enrollment attribute"
-            log.warn(msg)
+            log.warning(msg)
             invalid_attributes.append("name")
             raise InvalidEnrollmentAttribute(msg)
         if "value" not in attribute:
             msg = u"'value' not in enrollment attribute"
-            log.warn(msg)
+            log.warning(msg)
             invalid_attributes.append("value")
             raise InvalidEnrollmentAttribute(msg)
 
@@ -354,3 +354,10 @@ def get_user_roles(username):
         user._roles = RoleCache(user)
     role_cache = user._roles
     return role_cache._roles
+
+
+def serialize_enrollments(enrollments):
+    """
+    Take CourseEnrollment objects and return them in a serialized list.
+    """
+    return CourseEnrollmentSerializer(enrollments, many=True).data

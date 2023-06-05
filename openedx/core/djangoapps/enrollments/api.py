@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core.cache import cache
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.enrollments import errors
 
 log = logging.getLogger(__name__)
@@ -266,7 +266,7 @@ def update_enrollment(
     enrollment = _data_api().update_course_enrollment(username, course_id, mode=mode, is_active=is_active)
     if enrollment is None:
         msg = u"Course Enrollment not found for user {user} in course {course}".format(user=username, course=course_id)
-        log.warn(msg)
+        log.warning(msg)
         raise errors.EnrollmentNotFoundError(msg)
     else:
         if enrollment_attributes is not None:
@@ -455,7 +455,7 @@ def validate_course_mode(course_id, mode, is_active=None, include_expired=False)
             course_id=course_id,
             available=", ".join(available_modes)
         )
-        log.warn(msg)
+        log.warning(msg)
         raise errors.CourseModeNotFoundError(msg, course_enrollment_info)
 
 
@@ -475,6 +475,23 @@ def get_user_roles(username):
     :return: All roles for all courses that this user has.
     """
     return _data_api().get_user_roles(username)
+
+
+def serialize_enrollments(enrollments):
+    """
+    Takes a list of CourseEnrollment objects and serializes them.
+
+    Serialized result will be compatible will the results from `get_enrollments`. If
+    the `get_enrollments` function changes to return non-serialized data, this will
+    need to change as well.
+
+    Args:
+        enrollments: list of CourseEnrollment objects to be serialized
+
+    Returns:
+        A list of enrollments
+    """
+    return _data_api().serialize_enrollments(enrollments)
 
 
 def _data_api():

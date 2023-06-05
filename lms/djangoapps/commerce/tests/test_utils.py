@@ -14,20 +14,20 @@ from opaque_keys.edx.locator import CourseLocator
 from six.moves.urllib.parse import urlencode
 from waffle.testutils import override_switch
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement, refund_seat
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.log_utils import audit_log
-from student.models import CourseEnrollment
-from student.tests.factories import TEST_PASSWORD, UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
 if settings.ROOT_URLCONF == 'lms.urls':
-    from entitlements.tests.factories import CourseEntitlementFactory
+    from common.djangoapps.entitlements.tests.factories import CourseEntitlementFactory
 
 
 def update_commerce_config(enabled=False, checkout_page='/test_basket/add/'):

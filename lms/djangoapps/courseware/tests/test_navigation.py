@@ -12,11 +12,11 @@ from mock import patch
 from six import text_type
 from six.moves import range
 
+from edx_toggles.toggles.testutils import override_waffle_flag
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from openedx.features.course_experience import COURSE_OUTLINE_PAGE_FLAG
-from student.tests.factories import UserFactory
+from openedx.features.course_experience import DISABLE_COURSE_OUTLINE_PAGE_FLAG
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -99,7 +99,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         return
 
     # TODO: LEARNER-71: Do we need to adjust or remove this test?
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_chrome_settings(self):
         '''
         Test settings for disabling and modifying navigation chrome in the courseware:
@@ -228,7 +228,7 @@ class TestNavigation(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertRedirects(resp, section_url)
 
     # TODO: LEARNER-71: Do we need to adjust or remove this test?
-    @override_waffle_flag(COURSE_OUTLINE_PAGE_FLAG, active=False)
+    @override_waffle_flag(DISABLE_COURSE_OUTLINE_PAGE_FLAG, active=True)
     def test_incomplete_course(self):
         email = self.staff_user.email
         password = "test"

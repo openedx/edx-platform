@@ -18,10 +18,10 @@ from six.moves import range
 from web_fragments.fragment import Fragment
 from xblock.field_data import DictFieldData
 
-from course_api.blocks.tests.helpers import deserialize_usage_key
+from lms.djangoapps.course_api.blocks.tests.helpers import deserialize_usage_key
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor_internal
 from lms.djangoapps.courseware.tests.helpers import XModuleRenderingTestBase
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xblock_discussion import DiscussionXBlock, loader
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

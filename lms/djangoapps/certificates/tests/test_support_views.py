@@ -20,9 +20,9 @@ from lms.djangoapps.certificates.models import CertificateInvalidation, Certific
 from lms.djangoapps.certificates.tests.factories import CertificateInvalidationFactory
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.models import CourseEnrollment
-from student.roles import GlobalStaff, SupportStaffRole
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -314,7 +314,7 @@ class CertificateRegenerateTests(CertificateSupportTestCase):
         self.cert.save()
 
         with mock_passing_grade(percent=0.75):
-            with patch('course_modes.models.CourseMode.mode_for_course') as mock_mode_for_course:
+            with patch('common.djangoapps.course_modes.models.CourseMode.mode_for_course') as mock_mode_for_course:
                 mock_mode_for_course.return_value = 'honor'
                 api.regenerate_user_certificates(self.student, self.course.id,
                                                  course=self.course)

@@ -45,9 +45,10 @@ define([
                     }),
                     topicOptions = typeof topicMaxTeamSize !== 'undefined' ?
                         {max_team_size: topicMaxTeamSize} : {},
-                    topic = isInstructorManagedTopic ?
-                        TeamSpecHelpers.createMockInstructorManagedTopic(topicOptions) :
-                        TeamSpecHelpers.createMockTopic(topicOptions);
+                    topic;
+
+                topicOptions.type = isInstructorManagedTopic ? 'public_managed' : 'open';
+                topic = TeamSpecHelpers.createMockTopic(topicOptions);
 
                 return new TeamProfileHeaderActionsView(
                     {

@@ -10,9 +10,9 @@ import six
 from django.conf import settings
 from django.urls import reverse
 
-from contentstore.management.commands.utils import get_course_versions
+from cms.djangoapps.contentstore.management.commands.utils import get_course_versions
 from openedx.features.announcements.models import Announcement
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

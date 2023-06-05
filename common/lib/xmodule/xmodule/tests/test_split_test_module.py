@@ -11,7 +11,12 @@ from mock import Mock, patch
 
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, Group, UserPartition
 from xmodule.partitions.tests.test_partitions import MockPartitionService, MockUserPartitionScheme, PartitionTestCase
-from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
+from xmodule.split_test_module import (
+    SplitTestDescriptor,
+    SplitTestFields,
+    get_split_user_partitions,
+    user_partition_values,
+)
 from xmodule.tests import get_test_system
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
@@ -276,12 +281,12 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         """
         Tests that the available partitions are populated correctly when editable_metadata_fields are called
         """
-        self.assertEqual([], SplitTestDescriptor.user_partition_id.values)
+        self.assertEqual([], user_partition_values.values)
 
         # user_partitions is empty, only the "Not Selected" item will appear.
         self.split_test_module.user_partition_id = SplitTestFields.no_partition_selected['value']
         self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
-        partitions = SplitTestDescriptor.user_partition_id.values
+        partitions = user_partition_values.values
         self.assertEqual(1, len(partitions))
         self.assertEqual(SplitTestFields.no_partition_selected['value'], partitions[0]['value'])
 
@@ -298,7 +303,7 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
             )
         ]
         self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
-        partitions = SplitTestDescriptor.user_partition_id.values
+        partitions = user_partition_values.values
         self.assertEqual(2, len(partitions))
         self.assertEqual(SplitTestFields.no_partition_selected['value'], partitions[0]['value'])
         self.assertEqual(0, partitions[1]['value'])
@@ -307,7 +312,7 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         # Try again with a selected partition and verify that there is no option for "No Selection"
         self.split_test_module.user_partition_id = 0
         self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
-        partitions = SplitTestDescriptor.user_partition_id.values
+        partitions = user_partition_values.values
         self.assertEqual(1, len(partitions))
         self.assertEqual(0, partitions[0]['value'])
         self.assertEqual("first_partition", partitions[0]['display_name'])
@@ -315,7 +320,7 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         # Finally try again with an invalid selected partition and verify that "No Selection" is an option
         self.split_test_module.user_partition_id = 999
         self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
-        partitions = SplitTestDescriptor.user_partition_id.values
+        partitions = user_partition_values.values
         self.assertEqual(2, len(partitions))
         self.assertEqual(SplitTestFields.no_partition_selected['value'], partitions[0]['value'])
         self.assertEqual(0, partitions[1]['value'])

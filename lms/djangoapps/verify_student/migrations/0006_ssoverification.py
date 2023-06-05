@@ -26,7 +26,19 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(blank=True, max_length=255)),
                 ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('updated_at', models.DateTimeField(auto_now=True, db_index=True)),
-                ('identity_provider_type', models.CharField(choices=[(u'third_party_auth.models.OAuth2ProviderConfig', u'OAuth2 Provider'), (u'third_party_auth.models.SAMLProviderConfig', u'SAML Provider'), (u'third_party_auth.models.LTIProviderConfig', u'LTI Provider')], default=u'third_party_auth.models.SAMLProviderConfig', help_text=u'Specifies which type of Identity Provider this verification originated from.', max_length=100)),
+                (
+                    'identity_provider_type',
+                    models.CharField(
+                        choices=[
+                            (u'common.djangoapps.third_party_auth.models.OAuth2ProviderConfig', u'OAuth2 Provider'),
+                            (u'common.djangoapps.third_party_auth.models.SAMLProviderConfig', u'SAML Provider'),
+                            (u'common.djangoapps.third_party_auth.models.LTIProviderConfig', u'LTI Provider'),
+                        ],
+                        default=u'common.djangoapps.third_party_auth.models.SAMLProviderConfig',
+                        help_text=u'Specifies which type of Identity Provider this verification originated from.',
+                        max_length=100,
+                    ),
+                ),
                 ('identity_provider_slug', models.SlugField(default=u'default', help_text=u'The slug uniquely identifying the Identity Provider this verification originated from.', max_length=30)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],

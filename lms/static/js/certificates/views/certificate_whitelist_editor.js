@@ -8,9 +8,10 @@
         'underscore',
         'gettext',
         'backbone',
-        'js/certificates/models/certificate_exception'
+        'js/certificates/models/certificate_exception',
+        'edx-ui-toolkit/js/utils/html-utils'
     ],
-        function($, _, gettext, Backbone, CertificateExceptionModel) {
+        function($, _, gettext, Backbone, CertificateExceptionModel, HtmlUtils) {
             return Backbone.View.extend({
                 el: '#certificate-white-list-editor',
                 message_div: '.message',
@@ -21,7 +22,7 @@
 
                 render: function() {
                     var template = this.loadTemplate('certificate-white-list-editor');
-                    this.$el.html(template());
+                    this.$el.html(HtmlUtils.HTML(template()).toString());
                 },
 
                 loadTemplate: function(name) {
@@ -59,12 +60,12 @@
                     var message = '';
 
                     if (this.collection.findWhere(model)) {
-                        message = gettext('<%= user %> already in exception list.');
+                        message = gettext('<%- user %> already in exception list.');
                         this.escapeAndShowMessage(
                             _.template(message)({user: (user_name || user_email)})
                         );
                     } else if (certificate_exception.isValid()) {
-                        message = gettext('<%= user %> has been successfully added to the exception list. Click Generate Exception Certificate below to send the certificate.');  // eslint-disable-line max-len
+                        message = gettext('<%- user %> has been successfully added to the exception list. Click Generate Exception Certificate below to send the certificate.');  // eslint-disable-line max-len
                         certificate_exception.save(
                             null,
                             {
@@ -88,7 +89,8 @@
 
                 escapeAndShowMessage: function(message) {
                     $(this.message_div + '>p').remove();
-                    this.$(this.message_div).removeClass('hidden').append('<p>' + _.escape(message) + '</p>');
+                    // eslint-disable-next-line max-len
+                    this.$(this.message_div).removeClass('hidden').append(HtmlUtils.joinHtml(HtmlUtils.HTML('<p>'), message, HtmlUtils.HTML('</p>')).toString());
                 },
 
                 showSuccess: function(caller, add_model, message) {

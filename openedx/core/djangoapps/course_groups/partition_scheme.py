@@ -61,7 +61,7 @@ class CohortPartitionScheme(object):
             # if we have a match but the partition doesn't match the requested
             # one it means the mapping is invalid.  the previous state of the
             # partition configuration may have been modified.
-            log.warn(
+            log.warning(
                 u"partition mismatch in CohortPartitionScheme: %r",
                 {
                     "requested_partition_id": user_partition.id,
@@ -79,7 +79,7 @@ class CohortPartitionScheme(object):
             # if we have a match but the group doesn't exist in the partition,
             # it means the mapping is invalid.  the previous state of the
             # partition configuration may have been modified.
-            log.warn(
+            log.warning(
                 u"group not found in CohortPartitionScheme: %r",
                 {
                     "requested_partition_id": user_partition.id,

@@ -14,7 +14,7 @@ import logging
 
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
 from openedx.core.djangoapps.django_comment_common.models import Role
-from student.roles import (
+from common.djangoapps.student.roles import (
     CourseBetaTesterRole, CourseCcxCoachRole, CourseDataResearcherRole,
     CourseInstructorRole, CourseStaffRole
 )

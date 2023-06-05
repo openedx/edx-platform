@@ -16,14 +16,14 @@ from django.utils.translation.trans_real import get_supported_language_variant
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-import branding.api as branding_api
+import lms.djangoapps.branding.api as branding_api
 import lms.djangoapps.courseware.views.views as courseware_views
-import student.views
-from edxmako.shortcuts import marketing_link, render_to_response
+from common.djangoapps.student import views as student_views
+from common.djangoapps.edxmako.shortcuts import marketing_link, render_to_response
 from openedx.core.djangoapps.lang_pref.api import released_languages
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from util.cache import cache_if_anonymous
-from util.json_request import JsonResponse
+from common.djangoapps.util.cache import cache_if_anonymous
+from common.djangoapps.util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ def index(request):
     """
     if request.user.is_authenticated:
         # Only redirect to dashboard if user has
-        # courses in his/her dashboard. Otherwise UX is a bit cryptic.
+        # courses in their dashboard. Otherwise UX is a bit cryptic.
         # In this case, we want to have the user stay on a course catalog
         # page to make it easier to browse for courses (and register)
         if configuration_helpers.get_value(
@@ -68,7 +68,7 @@ def index(request):
     #  marketing and edge are enabled
 
     try:
-        return student.views.index(request, user=request.user)
+        return student_views.index(request, user=request.user)
     except NoReverseMatch:
         log.error(
             'https is not a registered namespace Request from {}'.format(domain),
@@ -215,7 +215,7 @@ def footer(request):
                 # ...
             ],
             "openedx_link": {
-                "url": "http://open.edx.org",
+                "url": "https://open.edx.org",
                 "title": "Powered by Open edX",
                 "image": "http://example.com/openedx.png"
             },

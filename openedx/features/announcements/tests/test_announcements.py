@@ -12,7 +12,7 @@ from django.test import TestCase
 from django.test.client import Client
 from django.urls import reverse
 
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.tests.factories import AdminFactory
 
 from openedx.features.announcements.models import Announcement
 

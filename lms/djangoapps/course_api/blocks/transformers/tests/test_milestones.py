@@ -8,12 +8,12 @@ import six
 from milestones.tests.utils import MilestonesTestCaseMixin
 from mock import Mock, patch
 
-from gating import api as lms_gating_api
+from lms.djangoapps.gating import api as lms_gating_api
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
 from openedx.core.lib.gating import api as gating_api
-from student.tests.factories import CourseEnrollmentFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory
 
 from ..milestones import MilestonesAndSpecialExamsTransformer
 

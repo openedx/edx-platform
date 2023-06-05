@@ -21,10 +21,10 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from badges.events.course_complete import get_completion_badge
-from badges.utils import badges_enabled
-from edxmako.shortcuts import render_to_response
-from edxmako.template import Template
+from lms.djangoapps.badges.events.course_complete import get_completion_badge
+from lms.djangoapps.badges.utils import badges_enabled
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.template import Template
 from lms.djangoapps.certificates.api import (
     emit_certificate_event,
     get_active_web_certificate,
@@ -51,10 +51,10 @@ from openedx.features.edly.utils import (
     get_current_site_invalid_certificate_context,
     get_logo_from_current_site_configurations
 )
-from student.models import LinkedInAddToProfileConfiguration
-from util import organizations_helpers as organization_api
-from util.date_utils import strftime_localized
-from util.views import handle_500
+from common.djangoapps.student.models import LinkedInAddToProfileConfiguration
+from common.djangoapps.util import organizations_helpers as organization_api
+from common.djangoapps.util.date_utils import strftime_localized
+from common.djangoapps.util.views import handle_500
 
 log = logging.getLogger(__name__)
 _ = translation.ugettext
@@ -348,6 +348,7 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
                 modified_date = datetime.now().date()
             user_certificate = GeneratedCertificate(
                 mode=preview_mode,
+                verify_uuid=six.text_type(uuid4().hex),
                 modified_date=modified_date,
                 created_date=datetime.now().date(),
             )
@@ -399,7 +400,7 @@ def _track_certificate_events(request, context, course, user, user_certificate):
                 }
             )
         else:
-            log.warn(
+            log.warning(
                 u"Could not find badge for %s on course %s.",
                 user.id,
                 course_key,

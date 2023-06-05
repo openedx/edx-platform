@@ -6,22 +6,14 @@ Index view for the support app.
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from edxmako.shortcuts import render_to_response
-from support.decorators import require_support_permission
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from lms.djangoapps.support.decorators import require_support_permission
 
 SUPPORT_INDEX_URLS = [
     {
         "url": reverse_lazy("support:certificates"),
         "name": _("Certificates"),
         "description": _("View and regenerate certificates."),
-    },
-
-    # DEPRECATION WARNING: We can remove this end-point
-    # once shoppingcart has been replaced by the E-Commerce service.
-    {
-        "url": reverse_lazy("support:refund"),
-        "name": _("Manual Refund"),
-        "description": _("Track refunds issued directly through CyberSource."),
     },
     {
         "url": reverse_lazy("support:enrollment"),

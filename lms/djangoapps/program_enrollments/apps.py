@@ -5,8 +5,9 @@ ProgramEnrollments Application Configuration
 
 
 from django.apps import AppConfig
+from edx_django_utils.plugins import PluginURLs
 
-from openedx.core.djangoapps.plugins.constants import PluginURLs, ProjectType
+from openedx.core.djangoapps.plugins.constants import ProjectType
 
 
 class ProgramEnrollmentsConfig(AppConfig):
@@ -29,5 +30,5 @@ class ProgramEnrollmentsConfig(AppConfig):
         """
         Connect handlers to signals.
         """
-        from . import signals  # pylint: disable=unused-import
-        from . import tasks    # pylint: disable=unused-import
+        from lms.djangoapps.program_enrollments import signals  # pylint: disable=unused-import
+        from lms.djangoapps.program_enrollments import tasks    # pylint: disable=unused-import

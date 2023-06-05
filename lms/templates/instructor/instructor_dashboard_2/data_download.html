@@ -58,22 +58,20 @@ from openedx.core.djangolib.markup import HTML, Text
       </p>
     %endif
 
-    <p>
-      <div class="problems">
+    <div class="mb-15 problems">
         ${static.renderReact(
           component="ProblemBrowser",
-          id="react-block-listing",
+          id="react-problem-report",
           props={
             "courseId": course.id,
-            "excludeBlockTypes": ['html', 'video', 'discussion']
+            "excludeBlockTypes": ['html', 'video', 'discussion'],
+            "problemResponsesEndpoint": section_data['get_problem_responses_url'],
+            "taskStatusEndpoint": "/instructor_task_status",
+            "reportDownloadEndpoint": section_data['list_report_downloads_url'],
+            "ShowBtnUi": "true",
           }
         )}
-      </div>
-    </p>
-
-    <p>
-      <input type="button" name="list-problem-responses-csv" value="${_("Download a CSV of problem responses")}" data-endpoint="${ section_data['get_problem_responses_url'] }" data-csv="true">
-    </p>
+    </div>
 
     <div class="issued_certificates">
       <p>${_("Click to list certificates that are issued for this course:")}</p>
@@ -98,6 +96,11 @@ from openedx.core.djangolib.markup import HTML, Text
       <input type="button" name="problem-grade-report" class="async-report-btn" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['problem_grade_report_url'] }"/>
       <input type="button" name="export-ora2-data" class="async-report-btn" value="${_("Generate ORA Data Report")}" data-endpoint="${ section_data['export_ora2_data_url'] }"/>
     </p>
+
+    <p>${_("Click to generate a ZIP file that contains all submission texts and attachments.")}</p>
+
+    <p><input type="button" name="export-ora2-data" class="async-report-btn" value="${_("Generate Submission Files Archive")}" data-endpoint="${ section_data['export_ora2_submission_files_url'] }"/></p>
+
   %endif
 
     <div class="request-response msg msg-confirm copy" id="report-request-response"></div>

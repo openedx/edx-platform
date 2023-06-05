@@ -19,7 +19,7 @@ class PaverXSSCommitLintTest(PaverTestCase):
     """
 
     def setUp(self):
-        super(PaverXSSCommitLintTest, self).setUp()
+        super().setUp()
         self.reset_task_messages()
 
     @patch.object(pavelib.quality, '_write_metric')

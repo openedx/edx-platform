@@ -23,6 +23,7 @@ from rest_framework.views import APIView
 from six import text_type, iteritems
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.user_api.accounts import BIO_MAX_LENGTH
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.permissions import IsUserInUrl
 
@@ -154,11 +155,16 @@ def add_serializer_errors(serializer, data, field_errors):
         errors = serializer.errors
         for key, error in iteritems(errors):
             error = clean_errors(error)
+            if key == 'bio':
+                user_message = _(u"The about me field must be at most {} characters long.".format(BIO_MAX_LENGTH))
+            else:
+                user_message = _(u"This value is invalid.")
+
             field_errors[key] = {
                 'developer_message': u"Value '{field_value}' is not valid for field '{field_name}': {error}".format(
                     field_value=data.get(key, ''), field_name=key, error=error
                 ),
-                'user_message': _(u"This value is invalid."),
+                'user_message': user_message,
             }
     return field_errors
 

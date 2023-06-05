@@ -4,10 +4,11 @@ Tests for block_structure/cache.py
 
 
 import ddt
+from edx_toggles.toggles.testutils import override_waffle_switch
 
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 
-from ..config import STORAGE_BACKING_FOR_CACHE, waffle
+from ..config import STORAGE_BACKING_FOR_CACHE, waffle_switch
 from ..config.models import BlockStructureConfiguration
 from ..exceptions import BlockStructureNotFound
 from ..store import BlockStructureStore
@@ -47,13 +48,13 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
 
     @ddt.data(True, False)
     def test_get_none(self, with_storage_backing):
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with override_waffle_switch(waffle_switch(STORAGE_BACKING_FOR_CACHE), active=with_storage_backing):
             with self.assertRaises(BlockStructureNotFound):
                 self.store.get(self.block_structure.root_block_usage_key)
 
     @ddt.data(True, False)
     def test_add_and_get(self, with_storage_backing):
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with override_waffle_switch(waffle_switch(STORAGE_BACKING_FOR_CACHE), active=with_storage_backing):
             self.store.add(self.block_structure)
             stored_value = self.store.get(self.block_structure.root_block_usage_key)
             self.assertIsNotNone(stored_value)
@@ -61,7 +62,7 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
 
     @ddt.data(True, False)
     def test_delete(self, with_storage_backing):
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=with_storage_backing):
+        with override_waffle_switch(waffle_switch(STORAGE_BACKING_FOR_CACHE), active=with_storage_backing):
             self.store.add(self.block_structure)
             self.store.delete(self.block_structure.root_block_usage_key)
             with self.assertRaises(BlockStructureNotFound):
@@ -74,7 +75,7 @@ class TestBlockStructureStore(UsageKeyFactoryMixin, ChildrenMapTestMixin, CacheI
             self.store.get(self.block_structure.root_block_usage_key)
 
     def test_uncached_with_storage(self):
-        with waffle().override(STORAGE_BACKING_FOR_CACHE, active=True):
+        with override_waffle_switch(waffle_switch(STORAGE_BACKING_FOR_CACHE), active=True):
             self.store.add(self.block_structure)
             self.mock_cache.map.clear()
             stored_value = self.store.get(self.block_structure.root_block_usage_key)

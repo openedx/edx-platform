@@ -6,8 +6,8 @@ Unit tests for credit eligibility UI in Studio.
 import mock
 import six
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from openedx.core.djangoapps.credit.api import get_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.credit.signals import on_course_publish

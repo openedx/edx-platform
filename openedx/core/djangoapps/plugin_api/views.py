@@ -8,10 +8,10 @@ import logging
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from web_fragments.views import FragmentView
 
-from edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
+from common.djangoapps.edxmako.shortcuts import is_any_marketing_link_set, is_marketing_link_set, marketing_link
 
 log = logging.getLogger('plugin_api')
 
@@ -84,7 +84,7 @@ class EdxFragmentView(FragmentView):
         Creates the base context for rendering a fragment as a standalone page.
         """
         return {
-            'uses_pattern_library': True,
+            'uses_bootstrap': True,
             'disable_accordion': True,
             'allow_iframing': True,
             'disable_header': True,
@@ -132,11 +132,10 @@ class EdxFragmentView(FragmentView):
             'fragment': fragment,
             'page_title': self.standalone_page_title(request, fragment, **kwargs),
         })
-        if context.get('uses_pattern_library', False):
-            template = 'fragments/standalone-page-v2.html'
-        elif context.get('uses_bootstrap', False):
-            template = 'fragments/standalone-page-bootstrap.html'
-        else:
-            template = 'fragments/standalone-page-v1.html'
+        template_name = 'fragments/standalone-page-bootstrap.html'
 
-        return render_to_response(template, context)
+        return render(
+            request=request,
+            template_name=template_name,
+            context=context
+        )

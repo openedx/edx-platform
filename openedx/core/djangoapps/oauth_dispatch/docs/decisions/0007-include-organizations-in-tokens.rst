@@ -4,7 +4,7 @@
 Status
 ------
 
-Proposed
+Accepted
 
 Context
 -------
@@ -42,9 +42,9 @@ Here are a few organizational relationships that exist in the edX system:
     do so either via
 
     a. bulk APIs using the *Client Credentials grant type* (e.g., to
-       synchronize their own data in a background process) or 
+       synchronize their own data in a background process) or
 
-    b. a user-specific API on behalf of a logged-in user via the 
+    b. a user-specific API on behalf of a logged-in user via the
        *Authorization grant type* and *edX as the identity provider*
        (e.g., to display user-specific data on their own portal).
 
@@ -100,7 +100,7 @@ organization information to the granting end-user.
 
     "content_org:Microsoft"
 
-* For a token created on behalf of a user (*not* created via a 
+* For a token created on behalf of a user (*not* created via a
   *Client Credentials grant type*), the token
   is further restricted specifically for the granting user.  And so, a
   "user" filter with the value "me" would be added for this grant type.
@@ -137,7 +137,7 @@ Token Examples
 Client Credentials (server-to-server) grant type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When a trusted application makes server-to-server calls, the application's 
+When a trusted application makes server-to-server calls, the application's
 service user info is included in the JWT and the *filters* field
 includes the organization identifier and type associated with the application.
 
@@ -166,7 +166,7 @@ filter “me” in the *filters* field.
     "version": "1.0",
     "preferred_username": "ajay_mehta",
     ...
-  } 
+  }
 
 Consequences
 ------------
@@ -191,7 +191,7 @@ Consequences
   make sure there are no security issues introduced where old endpoints
   that are not aware of the new filter do not enforce it.  Possible
   ways of doing so are:
- 
+
   * Endpoints that are highly security sensitive should reject any
     token that includes an unrecognized filter.
 
@@ -206,7 +206,7 @@ Consequences
   they don't recognize. For example:
 
     "grades:read:content_org"
-  
+
   Additionally, this alternative would allow tokens to specify different filters
   for different scopes.
 

@@ -9,7 +9,7 @@ from django.conf import settings
 from django.db import migrations, models
 from opaque_keys.edx.django.models import CourseKeyField
 
-from badges.models import validate_badge_image
+from lms.djangoapps.badges.models import validate_badge_image
 from lms.djangoapps.certificates import models as cert_models
 
 

@@ -2,7 +2,7 @@
 
 
 from openedx.features.calendar_sync.models import UserCalendarSyncConfig
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

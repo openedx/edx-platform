@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { Button, StatusAlert } from '@edx/paragon';
 import StringUtils from 'edx-ui-toolkit/js/utils/string-utils';
 
-function LoggedInUser({ userInformation, onChangeCallback, submitForm, showWarning, showDiscussionButton, reDirectUser, errorList }) {
+function LoggedInUser({ userInformation, onChangeCallback, handleClick, showWarning, showDiscussionButton, reDirectUser, errorList }) {
   let courseElement;
   let detailElement;
   let discussionElement = '';
@@ -107,7 +107,8 @@ function LoggedInUser({ userInformation, onChangeCallback, submitForm, showWarni
           <div className="col-sm-12">
             <Button
               className={['btn', 'btn-primary', 'btn-submit']}
-              type="submit"
+              type="button"
+              onClick={handleClick}
               label={gettext('Create Support Ticket')}
             />
           </div>
@@ -116,7 +117,7 @@ function LoggedInUser({ userInformation, onChangeCallback, submitForm, showWarni
     );
   }
 
-  return (<form id="contact-us-form" onSubmit={submitForm} onChange={onChangeCallback}>
+  return (<form id="contact-us-form" onChange={onChangeCallback}>
     <div className="row">
       <hr className="col-sm-12" />
     </div>
@@ -162,7 +163,7 @@ function LoggedInUser({ userInformation, onChangeCallback, submitForm, showWarni
     /* /> */
 
 LoggedInUser.propTypes = {
-  submitForm: PropTypes.func.isRequired,
+  handleClick: PropTypes.func.isRequired,
   onChangeCallback: PropTypes.func.isRequired,
   reDirectUser: PropTypes.func.isRequired,
   userInformation: PropTypes.shape({

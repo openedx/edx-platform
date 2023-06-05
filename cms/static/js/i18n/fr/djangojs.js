@@ -4,7 +4,7 @@
 
   var django = globals.django || (globals.django = {});
 
-  
+
   django.pluralidx = function(n) {
     var v=(n > 1);
     if (typeof(v) == 'boolean') {
@@ -13,12 +13,12 @@
       return v;
     }
   };
-  
+
 
   /* gettext library */
 
   django.catalog = django.catalog || {};
-  
+
   var newcatalog = {
     "\n\nThis email is to let you know that the status of your proctoring session review for %(exam_name)s in\n<a href=\"%(course_url)s\">%(course_name)s </a> is %(status)s. If you have any questions about proctoring,\ncontact %(platform)s support at %(contact_email)s.\n\n": "\n\nCet email pour vous informer que le statut de votre examen  %(exam_name)s du cours\n<a href=\"%(course_url)s\">%(course_name)s </a> est %(status)s. Si vous avez des questions \u00e0 propos des revues,\ncontacter le support %(platform)s sur %(contact_email)s.\n\n",
     "\n            Do not close this window before you finish your exam. if you close this window, your proctoring session ends, and you will not successfully complete the proctored exam.\n          ": "\n            Ne fermez pas cette fen\u00eatre avant d'avoir termin\u00e9 votre examen. Si vous fermez cette fen\u00eatre, votre session d'examen surveill\u00e9 sera termin\u00e9.\n          ",
@@ -173,7 +173,6 @@
     "<%= user %> already in exception list.": "<%= user %> est d\u00e9j\u00e0 dans la liste d'exceptions.",
     "<%= user %> has been successfully added to the exception list. Click Generate Exception Certificate below to send the certificate.": "<%= user %> a \u00e9t\u00e9 ajout\u00e9 avec succ\u00e8s \u00e0 la liste des exceptions. Cliquez sur g\u00e9n\u00e9rer une attestation d'exception ci-dessous pour envoyer l'attestation.",
     "A Password is required": "Un Mot de passe est requis.",
-    "A driver's license, passport, or government-issued ID with your name and photo.": "Un permis de conduire, un passeport ou toute pi\u00e8ce d'identit\u00e9 avec votre nom et photo.",
     "A driver's license, passport, or other government-issued ID with your name and photo": "Un permis de conduire, un passeport ou toute pi\u00e8ce d'identit\u00e9 avec votre nom et photo.",
     "A highlight to look forward to this week.": "Un fait marquant qui vous attend cette semaine.",
     "A list of courses you have just enrolled in as a verified student": "Une liste de cours o\u00f9 vous venez de vous inscrire en tant qu'\u00e9tudiant v\u00e9rifi\u00e9",
@@ -435,7 +434,6 @@
     "Check Your Email": "V\u00e9rifiez votre email",
     "Check the highlighted fields below and try again.": "V\u00e9rifiez les champs en surbrillance ci-dessous et r\u00e9essayez.",
     "Check this box to receive an email digest once a day notifying you about new, unread activity from posts you are following.": "Cocher cette case pour recevoir une fois par jour un e-mail r\u00e9capitulatif des nouveaut\u00e9s dans les fils de discussion que vous suivez.",
-    "Check your email": "V\u00e9rifiez votre email",
     "Check your email account for instructions to reset your password.": "V\u00e9rifiez votre boite email pour les instructions de r\u00e9initialisation de mot de passe.",
     "Check your email for an activation message.": "V\u00e9rifiez dans vos emails que vous avez re\u00e7u le message d'activation",
     "Checkout": "Payer",
@@ -812,7 +810,6 @@
     "Feedback available for selection.": "Feedback disponible pour la s\u00e9lection.",
     "File": "Fichier",
     "File Name": "Nom du fichier",
-    "File type is not allowed.": "Type de fichier non support\u00e9",
     "File types can not be empty.": "Les types de fichier ne peuvent \u00eatre vides.",
     "File upload succeeded": "Chargement du fichier r\u00e9ussi",
     "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB": "Le fichier nomm\u00e9 {filename} d\u00e9passe le poids maximum autoris\u00e9 : {maxFileSizeInMBs} Mo",
@@ -2136,7 +2133,6 @@
     "You can pay now even if you don't have the following items available, but you will need to have these by {date} to qualify to earn a Verified Certificate.": "Vous pouvez payer maintenant m\u00eame s'il vous manque les \u00e9lements suivants, mais vous en aurez besoin avant le {date} afin d'obtenir un certificat v\u00e9rifi\u00e9.",
     "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate.": "Vous pouvez payer m\u00eame si vous ne disposez pas encore des \u00e9l\u00e9ments suivants, mais vous en aurez besoin afin d'avoir le droit d'obtenir un certificat v\u00e9rifi\u00e9.",
     "You can remove members from this team, especially if they have not participated in the team's activity.": "Vous pouvez retirer des membres de cette \u00e9quipe, en particulier s'ils n'ont pas particip\u00e9 \u00e0 l'activit\u00e9 de l'\u00e9quipe.",
-    "You can upload files with these file types: ": "Vous pouvez envoyer des fichiers ayant les types suivants :",
     "You can use your {accountName} account to sign in to your {platformName} account.": "Vous pouvez utiliser votre compte {accountName} afin de vous connecter \u00e0 votre compte {platformName}.",
     "You can view your information or unlink from {enterprise_name} anytime in your Account Settings.": "Vous pouvez voir votre information ou vous d\u00e9connectez de {enterprise_name}\u00a0\u00e0 tout moment dans vos Param\u00e8tres de compte.",
     "You cannot view the course as a student or beta tester before the course release date.": "Vous ne pouvez pas voir le cours en tant qu'\u00e9tudiant ou en tant que b\u00eata testeur avant la date de publication du cours.",
@@ -2462,7 +2458,7 @@
   for (var key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
-  
+
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
@@ -2575,4 +2571,3 @@
   }
 
 }(this));
-

@@ -63,7 +63,7 @@ define(['backbone', 'underscore', 'gettext'], function(Backbone, _, gettext) {
             }
             if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && !_.has(errors, 'min_count') && !_.has(errors, 'drop_count') && attrs.drop_count > attrs.min_count) {
                 var template = _.template(
-                gettext('Cannot drop more <%= types %> assignments than are assigned.')
+                gettext('Cannot drop more <%- types %> assignments than are assigned.')
             );
                 errors.drop_count = template({types: attrs.type});
             }

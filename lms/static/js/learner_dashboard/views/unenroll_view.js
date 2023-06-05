@@ -38,6 +38,7 @@ class UnenrollView extends Backbone.View {
 
   switchToSlideTwo() {
     let reason = this.$(".reasons_survey input[name='reason']:checked").attr('val');
+    const courserunKey = $('#unenroll_course_id').val() + $('#unenroll_course_number').val();
     if (reason === 'Other') {
       reason = this.$('.other_text').val();
     }
@@ -46,6 +47,7 @@ class UnenrollView extends Backbone.View {
         category: 'user-engagement',
         label: reason,
         displayName: 'v1',
+        courserunKey,
       });
     }
     this.$('.slide1').addClass('hidden');
@@ -91,7 +93,6 @@ class UnenrollView extends Backbone.View {
 
   initialize(options) {
     const view = this;
-
     this.urls = options.urls;
     this.isEdx = options.isEdx;
 

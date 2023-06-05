@@ -1,6 +1,6 @@
 <div class="wrapper-modal wrapper-modal-image">
   <section class="image-link">
-    <%= smallHTML%>
+    <%= smallHTML%> <% // xss-lint: disable=underscore-not-escaped %>
     <a href="#" class="modal-ui-icon action-fullscreen" role="button">
       <span class="label">
         <span class="icon fa fa-arrows-alt fa-large" aria-hidden="true"></span> <%- gettext("Fullscreen") %>
@@ -11,7 +11,7 @@
   <section class="image-modal">
     <section class="image-content">
       <div class="image-wrapper">
-        <img alt="<%= largeALT %>, <%- gettext('Large') %>" src="<%= largeSRC %>" />
+        <img alt="<%- largeALT %>, <%- gettext('Large') %>" src="<%- largeSRC %>" />
       </div>
 
       <a href="#" class="modal-ui-icon action-close" role="button">

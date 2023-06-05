@@ -16,7 +16,7 @@ from lxml.etree import ParserError, XMLSyntaxError
 from requests.auth import HTTPBasicAuth
 
 from capa.xqueue_interface import XQueueInterface, make_hashkey, make_xheader
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.models import CertificateStatuses as status
 from lms.djangoapps.certificates.models import (
     CertificateWhitelist,
@@ -26,7 +26,7 @@ from lms.djangoapps.certificates.models import (
 )
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
-from student.models import CourseEnrollment, UserProfile
+from common.djangoapps.student.models import CourseEnrollment, UserProfile
 from xmodule.modulestore.django import modulestore
 
 LOGGER = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ class XQueueCertInterface(object):
 
        del_cert:   Delete an existing certificate
                    For a user that already has a certificate
-                   this will delete his cert.
+                   this will delete their cert.
 
     """
 

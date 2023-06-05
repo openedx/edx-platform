@@ -11,7 +11,7 @@ from factory.django import DjangoModelFactory
 from opaque_keys.edx.locator import CourseLocator
 
 from lms.djangoapps.instructor_task.models import InstructorTask
-from student.tests.factories import UserFactory as StudentUserFactory
+from common.djangoapps.student.tests.factories import UserFactory as StudentUserFactory
 
 
 class InstructorTaskFactory(DjangoModelFactory):

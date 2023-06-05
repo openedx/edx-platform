@@ -9,7 +9,7 @@ from xblock.reference.user_service import UserService, XBlockUser
 
 from openedx.core.djangoapps.external_user_ids.models import ExternalId
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
-from student.models import anonymous_id_for_user, get_user_by_username_or_email
+from common.djangoapps.student.models import anonymous_id_for_user, get_user_by_username_or_email
 
 ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
 ATTR_KEY_USER_ID = 'edx-platform.user_id'

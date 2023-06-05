@@ -22,8 +22,8 @@ from mock import Mock, patch
 from opaque_keys.edx.keys import CourseKey
 from six.moves import range
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.models import DynamicUpgradeDeadlineConfiguration
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from openedx.core.djangoapps.schedules import resolvers, tasks
@@ -33,8 +33,8 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfi
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.djangolib.testing.utils import FilteredQueryCountMixin
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 
 SITE_QUERY = 1  # django_site
 SITE_CONFIG_QUERY = 1  # site_configuration_siteconfiguration
@@ -196,8 +196,8 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
 
     @ddt.data(1, 10, 100)
     @patch.object(tasks, 'ace')
-    @patch.object(resolvers, 'set_custom_metric')
-    def test_schedule_bin(self, schedule_count, mock_metric, mock_ace):
+    @patch.object(resolvers, 'set_custom_attribute')
+    def test_schedule_bin(self, schedule_count, mock_attribute, mock_ace):
         with patch.object(self.task, 'async_send_task') as mock_schedule_send:
             current_day, offset, target_day, upgrade_deadline = self._get_dates()
             schedules = [
@@ -226,7 +226,7 @@ class ScheduleSendEmailTestMixin(FilteredQueryCountMixin):
                         site_id=self.site_config.site.id, target_day_str=target_day_str, day_offset=offset, bin_num=b,
                     ))
 
-                num_schedules = mock_metric.call_args[0][1]
+                num_schedules = mock_attribute.call_args[0][1]
                 if b in bins_in_use:
                     self.assertGreater(num_schedules, 0)
                 else:

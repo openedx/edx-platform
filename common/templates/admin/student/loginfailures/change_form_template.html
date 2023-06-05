@@ -4,13 +4,13 @@
 <div class="submit-row">
     {% if original.lockout_until %}
     <input type="submit"
-           value="{% trans "Unlock Account" %}"
+           value="{% trans "Unlock Account" as tmsg %}{{tmsg|force_escape}}"
            name="_unlock"
            class="deletelink">
     {% endif %}
     <a href="{% url opts|admin_urlname:'changelist' %}"
        class="closelink">
-        {% trans 'Close' %}
+        {% trans 'Close' as tmsg %}{{tmsg|force_escape}}
     </a>
 </div>
 {% endblock %}
@@ -19,14 +19,14 @@
     {% if original.lockout_until %}
     <p class="deletelink-box">
         <input type="submit"
-               value="{% trans "Unlock Account" %}"
+               value="{% trans "Unlock Account" as tmsg %}{{tmsg|force_escape}}"
                name="_unlock"
                class="deletelink">
     </p>
     {% endif %}
     <a href="{% url opts|admin_urlname:'changelist' %}"
        class="closelink">
-        {% trans 'Close' %}
+        {% trans 'Close' as tmsg %}{{tmsg|force_escape}}
     </a>
 </div>
 {% endblock %}

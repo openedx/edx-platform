@@ -4,7 +4,7 @@ waffle switches for the Certificates app.
 """
 
 
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
+from edx_toggles.toggles import WaffleSwitchNamespace
 
 # Namespace
 WAFFLE_NAMESPACE = u'certificates'

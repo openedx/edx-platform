@@ -8,22 +8,27 @@ import unittest
 import six.moves.urllib.error
 import six.moves.urllib.parse
 import six.moves.urllib.request
+from datetime import timedelta
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
+from django.utils.timezone import now
 from django.test.utils import override_settings
 from django.urls import reverse
+from lms.djangoapps.course_blocks.transformers.tests.helpers import ModuleStoreTestCase
 from mock import patch
 from rest_framework.test import APITestCase
 
-from experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
-from experiments.models import ExperimentData, ExperimentKeyValue
-from experiments.serializers import ExperimentDataSerializer
-from student.tests.factories import UserFactory
+from lms.djangoapps.experiments.factories import ExperimentDataFactory, ExperimentKeyValueFactory
+from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
+from lms.djangoapps.experiments.serializers import ExperimentDataSerializer
+from common.djangoapps.student.tests.factories import UserFactory
+
+from xmodule.modulestore.tests.factories import CourseFactory
 
 CROSS_DOMAIN_REFERER = 'https://ecommerce.edx.org'
 
 
-class ExperimentDataViewSetTests(APITestCase):
+class ExperimentDataViewSetTests(APITestCase, ModuleStoreTestCase):
 
     def assert_data_created_for_user(self, user, method='post', status=201):
         url = reverse('api_experiments:v0:data-list')
@@ -288,3 +293,55 @@ class ExperimentKeyValueViewSetTests(APITestCase):
 
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
+
+
+class ExperimentUserMetaDataViewTests(APITestCase, ModuleStoreTestCase):
+    """ Internal user_metadata view/API for use in Optimizely experiments """
+
+    def test_UserMetaDataView_get_success_same_user(self):
+        """ Request succeeds when logged-in user makes request for self """
+        lookup_user = UserFactory()
+        lookup_course = CourseFactory.create(start=now() - timedelta(days=30))
+        call_args = [lookup_user.username, lookup_course.id]
+        self.client.login(username=lookup_user.username, password=UserFactory._DEFAULT_PASSWORD)
+
+        response = self.client.get(reverse('api_experiments:user_metadata', args=call_args))
+        self.assertEqual(response.status_code, 200)
+
+    def test_UserMetaDataView_get_success_staff_user(self):
+        """ Request succeeds when logged-in staff user makes request for different user """
+        lookup_user = UserFactory()
+        lookup_course = CourseFactory.create(start=now() - timedelta(days=30))
+        call_args = [lookup_user.username, lookup_course.id]
+        staff_user = UserFactory(is_staff=True)
+
+        self.client.login(username=staff_user.username, password=UserFactory._DEFAULT_PASSWORD)
+
+        response = self.client.get(reverse('api_experiments:user_metadata', args=call_args))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['course_id'])
+        self.assertTrue(response.json()['user_id'])
+        self.assertEqual(response.json()['username'], lookup_user.username)
+        self.assertEqual(response.json()['email'], lookup_user.email)
+
+    def test_UserMetaDataView_get_different_user(self):
+        """ Request fails when not logged in for requested user or staff  """
+        lookup_user = UserFactory()
+        lookup_course = CourseFactory.create(start=now() - timedelta(days=30))
+        call_args = [lookup_user.username, lookup_course.id]
+
+        response = self.client.get(reverse('api_experiments:user_metadata', args=call_args))
+        self.assertEqual(response.status_code, 401)
+
+    def test_UserMetaDataView_get_missing_course(self):
+        """ Request fails when not course not found  """
+        lookup_user = UserFactory()
+        lookup_course = CourseFactory.create(start=now() - timedelta(days=30))
+        call_args = [lookup_user.username, lookup_course.id]
+        self.client.login(username=lookup_user.username, password=UserFactory._DEFAULT_PASSWORD)
+        bogus_course_name = str(lookup_course.id) + '_FOOBAR'
+
+        call_args_with_bogus_course = [lookup_user.username, bogus_course_name]
+        response = self.client.get(reverse('api_experiments:user_metadata', args=call_args_with_bogus_course))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()['message'], 'Provided course is not found')

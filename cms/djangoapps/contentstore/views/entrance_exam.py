@@ -16,14 +16,16 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from contentstore.views.helpers import create_xblock, remove_entrance_exam_graders
-from contentstore.views.item import delete_item
-from models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
-from student.auth import has_course_author_access
-from util import milestones_helpers
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.util import milestones_helpers
+from openedx.core import toggles as core_toggles
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+
+from .helpers import create_xblock, remove_entrance_exam_graders
+from .item import delete_item
 
 __all__ = ['entrance_exam', ]
 
@@ -41,23 +43,21 @@ def _get_default_entrance_exam_minimum_pct():
     return entrance_exam_minimum_score_pct
 
 
-def check_feature_enabled(feature_name):
+def check_entrance_exams_enabled(view_func):
     """
-    Ensure the specified feature is turned on.  Return an HTTP 400 code if not.
+    Ensure the entrance exams feature is turned on. Return an HTTP 400 code if not.
     """
-    def _check_feature_enabled(view_func):
-        def _decorator(request, *args, **kwargs):
-            # Deny access if the entrance exam feature is disabled
-            if not settings.FEATURES.get(feature_name, False):
-                return HttpResponseBadRequest()
-            return view_func(request, *args, **kwargs)
-        return wraps(view_func)(_decorator)
-    return _check_feature_enabled
+    def _decorator(request, *args, **kwargs):
+        # Deny access if the entrance exam feature is disabled
+        if not core_toggles.ENTRANCE_EXAMS.is_enabled():
+            return HttpResponseBadRequest()
+        return view_func(request, *args, **kwargs)
+    return wraps(view_func)(_decorator)
 
 
 @login_required
 @ensure_csrf_cookie
-@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
+@check_entrance_exams_enabled
 def entrance_exam(request, course_key_string):
     """
     The restful handler for entrance exams.
@@ -104,7 +104,7 @@ def entrance_exam(request, course_key_string):
         return HttpResponse(status=405)
 
 
-@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
+@check_entrance_exams_enabled
 def create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct):
     """
     api method to create an entrance exam.
@@ -185,7 +185,7 @@ def _get_entrance_exam(request, course_key):
         return HttpResponse(status=404)
 
 
-@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
+@check_entrance_exams_enabled
 def update_entrance_exam(request, course_key, exam_data):
     """
     Operation to update course fields pertaining to entrance exams
@@ -199,7 +199,7 @@ def update_entrance_exam(request, course_key, exam_data):
         CourseMetadata.update_from_dict(metadata, course, request.user)
 
 
-@check_feature_enabled(feature_name='ENTRANCE_EXAMS')
+@check_entrance_exams_enabled
 def delete_entrance_exam(request, course_key):
     """
     api method to delete an entrance exam

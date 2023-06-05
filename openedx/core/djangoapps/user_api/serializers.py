@@ -7,7 +7,12 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 from rest_framework import serializers
 
-from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
+from lms.djangoapps.verify_student.models import (
+    IDVerificationAttempt,
+    ManualVerification,
+    SoftwareSecurePhotoVerification,
+    SSOVerification
+)
 
 from .models import UserPreference
 
@@ -130,3 +135,27 @@ class ManualVerificationSerializer(IDVerificationSerializer):
     class Meta(object):
         fields = ('status', 'expiration_datetime', 'is_verified')
         model = ManualVerification
+
+
+class IDVerificationDetailsSerializer(serializers.Serializer):
+    type = serializers.SerializerMethodField()
+    status = serializers.CharField()
+    expiration_datetime = serializers.DateTimeField()
+    message = serializers.SerializerMethodField()
+    updated_at = serializers.DateTimeField()
+
+    def get_type(self, obj):
+        if isinstance(obj, SoftwareSecurePhotoVerification):
+            return 'Software Secure'
+        elif isinstance(obj, ManualVerification):
+            return 'Manual'
+        else:
+            return 'SSO'
+
+    def get_message(self, obj):
+        if isinstance(obj, SoftwareSecurePhotoVerification):
+            return obj.error_msg
+        elif isinstance(obj, ManualVerification):
+            return obj.reason
+        else:
+            return ''

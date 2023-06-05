@@ -21,18 +21,18 @@ from django.utils.translation import get_language
 from markupsafe import escape
 from mock import Mock, patch
 
-from bulk_email.models import BulkEmailFlag, Optout
-from bulk_email.tasks import _get_course_email_context, _get_source_address
-from course_modes.models import CourseMode
+from ..models import BulkEmailFlag, Optout
+from lms.djangoapps.bulk_email.tasks import _get_course_email_context, _get_source_address
+from common.djangoapps.course_modes.models import CourseMode
 
 from lms.djangoapps.courseware.tests.factories import InstructorFactory, StaffFactory
 from lms.djangoapps.instructor_task.subtasks import update_subtask_status
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from openedx.core.djangoapps.enrollments.api import update_enrollment
-from student.models import CourseEnrollment
-from student.roles import CourseStaffRole
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -166,7 +166,7 @@ class SendEmailWithMockedUgettextMixin(object):
                 text=text,
             )
 
-        with patch('bulk_email.tasks._', side_effect=mock_ugettext):
+        with patch('lms.djangoapps.bulk_email.tasks._', side_effect=mock_ugettext):
             self.client.post(self.send_mail_url, test_email)
 
         return mail.outbox[0]
@@ -229,7 +229,7 @@ class LocalizedFromAddressCourseLangTestCase(SendEmailWithMockedUgettextMixin, E
         self.assertRegex(message.from_email, 'AR .* Course Staff')
 
 
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase):
     """
     Tests email sending with mocked html_to_text.
@@ -249,7 +249,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         # We should get back a HttpResponseForbidden (status code 403)
         self.assertContains(response, "Email is not enabled for this course.", status_code=403)
 
-    @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+    @patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
     def test_send_to_self(self):
         """
         Make sure email send to myself goes to myself.
@@ -566,7 +566,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         self.assertEqual(len(from_email), 61)
 
     @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3)
-    @patch('bulk_email.tasks.update_subtask_status')
+    @patch('lms.djangoapps.bulk_email.tasks.update_subtask_status')
     def test_chunked_queries_send_numerous_emails(self, email_mock):
         """
         Test sending a large number of emails, to test the chunked querying

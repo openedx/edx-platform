@@ -43,8 +43,8 @@ from openedx.core.djangoapps.catalog.utils import (
 )
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, PaginatedAPIView
-from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
-from util.query import read_replica_or_default
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
+from common.djangoapps.util.query import read_replica_or_default
 
 from .constants import ENABLE_ENROLLMENT_RESET_FLAG, MAX_ENROLLMENT_RECORDS
 from .serializers import (
@@ -709,15 +709,17 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
 
         if request_user.is_staff:
             programs = get_programs_by_type(request.site, requested_program_type)
-        elif self.is_course_staff(request_user):
-            programs = self.get_programs_user_is_course_staff_for(request_user, requested_program_type)
         else:
-            program_enrollments = fetch_program_enrollments_by_student(
-                user=request.user,
-                program_enrollment_statuses=ProgramEnrollmentStatuses.__ACTIVE__,
-            )
-            uuids = [enrollment.program_uuid for enrollment in program_enrollments]
-            programs = get_programs(uuids=uuids) or []
+            program_dict = {}
+            # Check if the user is a course staff of any course which is a part of a program.
+            for staff_program in self.get_programs_user_is_course_staff_for(request_user, requested_program_type):
+                program_dict.setdefault(staff_program['uuid'], staff_program)
+
+            # Now get the program enrollments for user purely as a learner add to the list
+            for learner_program in self._get_enrolled_programs_from_model(request_user):
+                program_dict.setdefault(learner_program['uuid'], learner_program)
+
+            programs = list(program_dict.values())
 
         programs_in_which_user_has_access = [
             {'uuid': program['uuid'], 'slug': program['marketing_slug']}
@@ -726,12 +728,16 @@ class UserProgramReadOnlyAccessView(DeveloperErrorViewMixin, PaginatedAPIView):
 
         return Response(programs_in_which_user_has_access, status.HTTP_200_OK)
 
-    def is_course_staff(self, user):
+    def _get_enrolled_programs_from_model(self, user):
         """
-        Returns true if the user is a course_staff member of any course within a program
+        Return the Program Enrollments linked to the learner within the data model.
         """
-        staff_course_keys = self.get_course_keys_user_is_staff_for(user)
-        return len(staff_course_keys)
+        program_enrollments = fetch_program_enrollments_by_student(
+            user=user,
+            program_enrollment_statuses=ProgramEnrollmentStatuses.__ACTIVE__,
+        )
+        uuids = [enrollment.program_uuid for enrollment in program_enrollments]
+        return get_programs(uuids=uuids) or []
 
     def get_course_keys_user_is_staff_for(self, user):
         """

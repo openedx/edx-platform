@@ -223,9 +223,9 @@ class ProviderConfig(ConfigurationModel):
         abstract = True
 
     def clean(self):
-        """ Ensure that either `icon_class` or `icon_image` is set """
+        """ Ensure that at most `icon_class` or `icon_image` is set """
         super(ProviderConfig, self).clean()
-        if bool(self.icon_class) == bool(self.icon_image):
+        if bool(self.icon_class) and bool(self.icon_image):
             raise ValidationError('Either an icon class or an icon image must be given (but not both)')
 
     @property
@@ -367,7 +367,7 @@ class OAuth2ProviderConfig(ProviderConfig):
             u'For increased security, you can avoid storing this in your database by leaving '
             ' this field blank and setting '
             'SOCIAL_AUTH_OAUTH_SECRETS = {"(backend name)": "secret", ...} '
-            'in your instance\'s Django settings (or lms.auth.json)'
+            'in your instance\'s Django settings (or lms.yml)'
         )
     )
     other_settings = models.TextField(blank=True, help_text=u"Optional JSON object with advanced settings, if any.")
@@ -431,7 +431,7 @@ class SAMLConfiguration(ConfigurationModel):
             'Paste the contents of saml.key here. '
             'For increased security, you can avoid storing this in your database by leaving '
             'this field blank and setting it via the SOCIAL_AUTH_SAML_SP_PRIVATE_KEY setting '
-            'in your instance\'s Django settings (or lms.auth.json).'
+            'in your instance\'s Django settings (or lms.yml).'
         ),
         blank=True,
     )
@@ -440,7 +440,7 @@ class SAMLConfiguration(ConfigurationModel):
             u'Public key certificate. '
             'For increased security, you can avoid storing this in your database by leaving '
             'this field blank and setting it via the SOCIAL_AUTH_SAML_SP_PUBLIC_CERT setting '
-            'in your instance\'s Django settings (or lms.auth.json).'
+            'in your instance\'s Django settings (or lms.yml).'
         ),
         blank=True,
     )
@@ -455,6 +455,14 @@ class SAMLConfiguration(ConfigurationModel):
         help_text=(
             u"JSON object defining advanced settings that are passed on to python-saml. "
             "Valid keys that can be set here include: SECURITY_CONFIG and SP_EXTRA"
+        ),
+    )
+    is_public = models.BooleanField(
+        default=False,
+        verbose_name=u"Allow customers to see and use this SAML configuration",
+        help_text=(
+            u"When checked, customers will be able to choose this SAML Configuration "
+            "in the admin portal."
         ),
     )
 
@@ -618,6 +626,43 @@ class SAMLProviderConfig(ProviderConfig):
             "This is helpful for testing/setup but should always be disabled before users start using this provider."
         ),
     )
+    country = models.CharField(
+        max_length=128,
+        help_text=(
+            u'URN of SAML attribute containing the user`s country.',
+        ),
+        blank=True,
+    )
+    skip_hinted_login_dialog = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is enabled, users that visit a \"TPA hinted\" URL for this provider "
+            "(e.g. a URL ending with `?tpa_hint=[provider_name]`) will be forwarded directly to "
+            "the login URL of the provider instead of being first prompted with a login dialog."
+        ),
+    )
+    skip_registration_form = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is enabled, users will not be asked to confirm their details "
+            "(name, email, etc.) during the registration process. Only select this option "
+            "for trusted providers that are known to provide accurate user information."
+        ),
+    )
+    skip_email_verification = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is selected, users will not be required to confirm their "
+            "email, and their account will be activated immediately upon registration."
+        ),
+    )
+    send_to_registration_first = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is selected, users will be directed to the registration page "
+            "immediately after authenticating with the third party instead of the login page."
+        ),
+    )
     other_settings = models.TextField(
         verbose_name=u"Advanced settings", blank=True,
         help_text=(
@@ -692,7 +737,7 @@ class SAMLProviderConfig(ProviderConfig):
             conf = {}
         attrs = (
             'attr_user_permanent_id', 'attr_full_name', 'attr_first_name',
-            'attr_last_name', 'attr_username', 'attr_email', 'entity_id')
+            'attr_last_name', 'attr_username', 'attr_email', 'entity_id', 'country')
         attr_defaults = {
             'attr_full_name': 'default_full_name',
             'attr_first_name': 'default_first_name',
@@ -834,7 +879,7 @@ class LTIProviderConfig(ProviderConfig):
             'For increased security, you can avoid storing this in '
             'your database by leaving this field blank and setting '
             'SOCIAL_AUTH_LTI_CONSUMER_SECRETS = {"consumer key": "secret", ...} '
-            'in your instance\'s Django setttigs (or lms.auth.json)'
+            'in your instance\'s Django setttigs (or lms.yml)'
         ),
         blank=True,
     )

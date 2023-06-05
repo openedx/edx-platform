@@ -133,7 +133,7 @@ class Command(BaseCommand):
         Generates course blocks for the given course_keys per the given options.
         """
         if options.get('with_storage'):
-            waffle().override_for_request(STORAGE_BACKING_FOR_CACHE)
+            waffle().set_request_cache_with_short_name(STORAGE_BACKING_FOR_CACHE, True)
 
         for course_key in course_keys:
             try:

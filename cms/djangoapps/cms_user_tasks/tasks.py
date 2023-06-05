@@ -10,7 +10,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.core import mail
 
-from edxmako.shortcuts import render_to_string
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 LOGGER = get_task_logger(__name__)

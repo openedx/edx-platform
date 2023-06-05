@@ -15,14 +15,14 @@ from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.test import APIRequestFactory, APITestCase, force_authenticate
 
-from bulk_enroll.serializers import BulkEnrollmentSerializer
-from bulk_enroll.views import BulkEnrollView
+from lms.djangoapps.bulk_enroll.serializers import BulkEnrollmentSerializer
+from lms.djangoapps.bulk_enroll.views import BulkEnrollView
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
 from openedx.core.djangoapps.site_configuration.helpers import get_value as get_site_value
-from student.models import ENROLLED_TO_UNENROLLED, UNENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import ENROLLED_TO_UNENROLLED, UNENROLLED_TO_ENROLLED, CourseEnrollment, ManualEnrollmentAudit
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

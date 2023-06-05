@@ -12,7 +12,7 @@ from django.template.loader import get_template
 from pytz import utc
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseAccessRole
+from common.djangoapps.student.models import CourseAccessRole
 
 logger = logging.getLogger(__name__)
 

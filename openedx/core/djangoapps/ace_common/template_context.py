@@ -5,7 +5,7 @@ Context dictionary for templates that use the ace_common base template.
 from django.conf import settings
 from django.urls import NoReverseMatch, reverse
 
-from edxmako.shortcuts import marketing_link
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_config_value_from_site_or_settings
 from openedx.features.edly.context_processor import get_theme_colors
@@ -31,6 +31,7 @@ def get_base_template_context(site):
     """
     # When on LMS and a dashboard is available, use that as the dashboard url.
     # Otherwise, use the home url instead.
+    default_logo_url = getattr(settings, 'DEFAULT_EMAIL_LOGO_URL')
     try:
         dashboard_url = reverse('dashboard')
     except NoReverseMatch:
@@ -59,6 +60,7 @@ def get_base_template_context(site):
         'contact_mailing_address': contact_mailing_address,
         'social_media_urls': get_config_value_from_site_or_settings('SOCIAL_MEDIA_FOOTER_URLS', site=site),
         'mobile_store_urls': get_config_value_from_site_or_settings('MOBILE_STORE_URLS', site=site),
+        'logo_url': getattr(settings, 'LOGO_URL_PNG', default_logo_url),
 
         # Context processor values for dynamic theming
         'edly_colors_config': get_theme_colors(),

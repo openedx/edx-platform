@@ -7,7 +7,7 @@ import functools
 from logging import getLogger
 
 from .exceptions import TransformerDataIncompatible, TransformerException
-from .transformer import FilteringTransformerMixin
+from .transformer import FilteringTransformerMixin, combine_filters
 from .transformer_registry import TransformerRegistry
 
 logger = getLogger(__name__)  # pylint: disable=C0103
@@ -131,19 +131,8 @@ class BlockStructureTransformers(object):
         for transformer in self._transformers['supports_filter']:
             filters.extend(transformer.transform_block_filters(self.usage_info, block_structure))
 
-        combined_filters = functools.reduce(
-            self._filter_chain,
-            filters,
-            block_structure.create_universal_filter()
-        )
+        combined_filters = combine_filters(block_structure, filters)
         block_structure.filter_topological_traversal(combined_filters)
-
-    def _filter_chain(self, accumulated, additional):
-        """
-        Given two functions that take a block_key and return a boolean, yield
-        a function that takes a block key, and 'ands' the functions together
-        """
-        return lambda block_key: accumulated(block_key) and additional(block_key)
 
     def _transform_without_filters(self, block_structure):
         """

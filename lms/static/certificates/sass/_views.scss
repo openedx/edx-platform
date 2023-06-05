@@ -24,16 +24,18 @@
   }
 
   .content-main {
-    margin-bottom: spacing-vertical(base);
+    margin-bottom: map-get($spacing-vertical, base);
 
-    @media (min-width: $bp-screen-md) {
-      @include span(9, after);
+    @include media-breakpoint-up(md) {
+      @include make-col(9);
+      @include margin-left(0);
     }
   }
 
   .content-secondary {
-    @media (min-width: $bp-screen-md) {
-      @include span(3, before);
+    @include media-breakpoint-up(md) {
+      @include make-col(3);
+      @include margin-right(0);
     }
   }
 }

@@ -8,7 +8,7 @@ from tempfile import mkdtemp
 
 import six
 
-from contentstore.management.commands.export_all_courses import export_courses_to_output_path
+from cms.djangoapps.contentstore.management.commands.export_all_courses import export_courses_to_output_path
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

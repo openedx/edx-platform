@@ -1,6 +1,9 @@
 """
 Celery needs to be loaded when the cms modules are so that task
 registration and discovery can work correctly.
+
+Import sorting is intentionally disabled in this module.
+isort:skip_file
 """
 
 
@@ -15,6 +18,7 @@ registration and discovery can work correctly.
 import kombu.utils
 kombu.utils.entrypoints = lambda namespace: iter([])
 
-# This will make sure the app is always imported when
-# Django starts so that shared_task will use this app.
+# This will make sure the app is always imported when Django starts so
+# that shared_task will use this app, and also ensures that the celery
+# singleton is always configured for the CMS.
 from .celery import APP as CELERY_APP

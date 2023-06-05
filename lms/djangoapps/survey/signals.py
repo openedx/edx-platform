@@ -6,7 +6,7 @@ Signal handlers for the survey app
 from django.dispatch.dispatcher import receiver
 
 from openedx.core.djangoapps.user_api.accounts.signals import USER_RETIRE_LMS_MISC
-from survey.models import SurveyAnswer
+from lms.djangoapps.survey.models import SurveyAnswer
 
 
 @receiver(USER_RETIRE_LMS_MISC)

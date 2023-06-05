@@ -10,29 +10,22 @@ import ddt
 import mock
 import six
 from django.core.management import call_command
+from edx_toggles.toggles.testutils import override_waffle_switch
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from openedx.core.djangolib.testing.utils import skip_unless_lms
-
-from openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j import (
-    ModuleStoreSerializer
-)
-from openedx.core.djangoapps.coursegraph.management.commands.tests.utils import (
-    MockGraph,
-    MockNodeSelector,
-)
-from openedx.core.djangoapps.coursegraph.tasks import (
-    serialize_item,
-    serialize_course,
-    coerce_types,
-    should_dump_course,
-    strip_branch_and_version,
-)
-from openedx.core.djangoapps.content.block_structure.signals import (
-    update_block_structure_on_course_publish
-)
 import openedx.core.djangoapps.content.block_structure.config as block_structure_config
+from openedx.core.djangoapps.content.block_structure.signals import update_block_structure_on_course_publish
+from openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j import ModuleStoreSerializer
+from openedx.core.djangoapps.coursegraph.management.commands.tests.utils import MockGraph, MockNodeSelector
+from openedx.core.djangoapps.coursegraph.tasks import (
+    coerce_types,
+    serialize_course,
+    serialize_item,
+    should_dump_course,
+    strip_branch_and_version
+)
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
@@ -414,9 +407,10 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)
 
         self.assertCourseDump(
             mock_graph,
@@ -441,9 +435,10 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph(transaction_errors=True)
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)
 
         self.assertCourseDump(
             mock_graph,
@@ -472,17 +467,18 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
         # run once to warm the cache
         self.mss.dump_courses_to_neo4j(
-            mock_credentials, override_cache=override_cache
+            credentials, override_cache=override_cache
         )
 
         # when run the second time, only dump courses if the cache override
         # is enabled
         submitted, __ = self.mss.dump_courses_to_neo4j(
-            mock_credentials, override_cache=override_cache
+            credentials, override_cache=override_cache
         )
         self.assertEqual(len(submitted), expected_number_courses)
 
@@ -496,18 +492,21 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph = MockGraph()
         mock_graph_constructor.return_value = mock_graph
         mock_selector_class.return_value = MockNodeSelector(mock_graph)
-        mock_credentials = mock.Mock()
+        # mocking is thorwing error in kombu serialzier and its not require here any more.
+        credentials = {}
 
         # run once to warm the cache
-        submitted, skipped = self.mss.dump_courses_to_neo4j(mock_credentials)
+        submitted, skipped = self.mss.dump_courses_to_neo4j(credentials)
         self.assertEqual(len(submitted), len(self.course_strings))
 
         # simulate one of the courses being published
-        with block_structure_config.waffle().override(block_structure_config.STORAGE_BACKING_FOR_CACHE):
+        with override_waffle_switch(
+            block_structure_config.waffle_switch(block_structure_config.STORAGE_BACKING_FOR_CACHE), True
+        ):
             update_block_structure_on_course_publish(None, self.course.id)
 
         # make sure only the published course was dumped
-        submitted, __ = self.mss.dump_courses_to_neo4j(mock_credentials)
+        submitted, __ = self.mss.dump_courses_to_neo4j(credentials)
         self.assertEqual(len(submitted), 1)
         self.assertEqual(submitted[0], six.text_type(self.course.id))
 

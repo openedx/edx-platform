@@ -12,8 +12,8 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 
-from badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration
-from badges.utils import requires_badges_enabled, site_prefix
+from lms.djangoapps.badges.models import BadgeAssertion, BadgeClass, CourseCompleteImageConfiguration
+from lms.djangoapps.badges.utils import requires_badges_enabled, site_prefix
 from xmodule.modulestore.django import modulestore
 
 
@@ -85,7 +85,7 @@ def get_completion_badge(course_id, user):
     Given a course key and a user, find the user's enrollment mode
     and get the Course Completion badge.
     """
-    from student.models import CourseEnrollment
+    from common.djangoapps.student.models import CourseEnrollment
     badge_classes = CourseEnrollment.objects.filter(
         user=user, course_id=course_id
     ).order_by('-is_active')

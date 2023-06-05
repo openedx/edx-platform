@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from six import text_type
 
-from discussion.views import get_divided_discussions
+from lms.djangoapps.discussion.views import get_divided_discussions
 from lms.djangoapps.instructor.access import update_forum_role
 from lms.djangoapps.discussion.django_comment_client.utils import available_division_schemes
 from lms.djangoapps.discussion.rest_api.api import (
@@ -60,7 +60,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)

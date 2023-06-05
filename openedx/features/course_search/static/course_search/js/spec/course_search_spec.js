@@ -252,18 +252,18 @@ define([
                 expect(this.item.$el).toHaveAttr('role', 'region');
                 expect(this.item.$el).toHaveAttr('aria-label', 'search result');
                 expect(this.item.$el).toContainElement('a[href="' + this.model.get('url') + '"]');
-                expect(this.item.$el.find('.result-type')).toContainHtml(this.model.get('content_type'));
+                expect(this.item.$el.find('.result-type i')).toHaveClass('fa-' + this.item.unitIcon());
                 expect(this.item.$el.find('.result-excerpt')).toContainHtml(this.model.get('excerpt'));
-                expect(this.item.$el.find('.result-location')).toContainHtml('section ▸ subsection ▸ unit');
+                expect(this.item.$el.find('.result-link')).toContainHtml('section / subsection / unit');
             });
 
             it('rendersSequentialItem', function() {
                 expect(this.seqItem.$el).toHaveAttr('role', 'region');
                 expect(this.seqItem.$el).toHaveAttr('aria-label', 'search result');
                 expect(this.seqItem.$el).toContainElement('a[href="' + this.seqModel.get('url') + '"]');
-                expect(this.seqItem.$el.find('.result-type')).toBeEmpty();
+                expect(this.seqItem.$el.find('.result-type i')).toHaveClass('fa-' + this.seqItem.unitIcon());
                 expect(this.seqItem.$el.find('.result-excerpt')).toBeEmpty();
-                expect(this.seqItem.$el.find('.result-location')).toContainHtml('section ▸ subsection');
+                expect(this.seqItem.$el.find('.result-link')).toContainHtml('section / subsection');
             });
 
             it('logsSearchItemViewEvent', function() {
@@ -389,13 +389,16 @@ define([
                 this.resultsView.render();
                 expect(this.resultsView.$el.find('ol')[0]).toExist();
                 expect(this.resultsView.$el.find('li').length).toEqual(1);
-                expect(this.resultsView.$el).toContainHtml('Search Results');
+                expect(this.resultsView.$el).toContainHtml(
+                    this.collection.totalCount +
+                    ' result found for "' +
+                    this.collection.searchTerm + '"'
+                );
                 expect(this.resultsView.$el).toContainHtml('this is a short excerpt');
 
                 this.collection.set(searchResults);
                 this.collection.totalCount = 2;
                 this.resultsView.renderNext();
-                expect(this.resultsView.$el.find('.search-count')).toContainHtml('2');
                 expect(this.resultsView.$el.find('li').length).toEqual(2);
             }
 
@@ -446,6 +449,7 @@ define([
                 });
 
                 this.collection = new MockCollection();
+                this.collection.searchTerm = 'demo';
                 this.resultsView = new SearchResultsView({collection: this.collection});
             }
 

@@ -13,12 +13,12 @@ from lazy.lazy import lazy
 from mock import Mock, call, patch
 
 from edx_django_utils.cache import TieredCache
-from badges.backends.badgr import BadgrBackend
-from badges.models import BadgeAssertion
-from badges.tests.factories import BadgeClassFactory
+from lms.djangoapps.badges.backends.badgr import BadgrBackend
+from lms.djangoapps.badges.models import BadgeAssertion
+from lms.djangoapps.badges.tests.factories import BadgeClassFactory
 from openedx.core.lib.tests.assertions.events import assert_event_matches
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from track.tests import FROZEN_TIME, EventTrackingTestCase
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.track.tests import EventTrackingTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

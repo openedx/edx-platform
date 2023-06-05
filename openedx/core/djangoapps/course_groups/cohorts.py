@@ -21,7 +21,7 @@ from eventtracking import tracker
 
 from lms.djangoapps.courseware import courses
 from openedx.core.lib.cache_utils import request_cached
-from student.models import get_user_by_username_or_email
+from common.djangoapps.student.models import get_user_by_username_or_email
 
 from .models import (
     CohortMembership,

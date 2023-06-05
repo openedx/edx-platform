@@ -7,11 +7,10 @@ from celery import task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 
-from entitlements.models import CourseEntitlement
+from common.djangoapps.entitlements.models import CourseEntitlement
 
 LOGGER = get_task_logger(__name__)
-# Under cms the following setting is not defined, leading to errors during tests.
-ROUTING_KEY = getattr(settings, 'ENTITLEMENTS_EXPIRATION_ROUTING_KEY', None)
+
 # Maximum number of retries before giving up on awarding credentials.
 # For reference, 11 retries with exponential backoff yields a maximum waiting
 # time of 2047 seconds (about 30 minutes). Setting this to None could yield
@@ -19,7 +18,11 @@ ROUTING_KEY = getattr(settings, 'ENTITLEMENTS_EXPIRATION_ROUTING_KEY', None)
 MAX_RETRIES = 11
 
 
-@task(bind=True, ignore_result=True, routing_key=ROUTING_KEY)
+@task(
+    bind=True,
+    ignore_result=True,
+    name='entitlements.expire_old_entitlements',
+)
 def expire_old_entitlements(self, start, end, logid='...'):
     """
     This task is designed to be called to process a bundle of entitlements

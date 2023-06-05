@@ -9,42 +9,42 @@ import os
 import shutil
 import tarfile
 from datetime import datetime
-from math import ceil
 from tempfile import NamedTemporaryFile, mkdtemp
 
-from celery import group
+from ccx_keys.locator import CCXLocator
 from celery.task import task
 from celery.utils.log import get_task_logger
-from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import SuspiciousOperation
 from django.core.files import File
-from django.core.files.base import ContentFile
 from django.test import RequestFactory
 from django.utils.text import get_valid_filename
 from django.utils.translation import ugettext as _
+from edx_django_utils.monitoring import set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from organizations.models import OrganizationCourse
 from path import Path as path
 from pytz import UTC
 from six import iteritems, text_type
-from six.moves import range
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.tasks import UserTask
 
-from contentstore.courseware_index import CoursewareSearchIndexer, LibrarySearchIndexer, SearchIndexingError
-from contentstore.storage import course_import_export_storage
-from contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
-from contentstore.video_utils import scrape_youtube_thumbnail
-from course_action_state.models import CourseRerunState
-from models.settings.course_metadata import CourseMetadata
+from cms.djangoapps.contentstore.courseware_index import (
+    CoursewareSearchIndexer,
+    LibrarySearchIndexer,
+    SearchIndexingError
+)
+from cms.djangoapps.contentstore.storage import course_import_export_storage
+from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
+from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from common.djangoapps.course_action_state.models import CourseRerunState
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
 from openedx.core.lib.extract_tar import safetar_extractall
-from student.auth import has_course_author_access
-from util.organizations_helpers import add_organization_course, get_organization_by_short_name
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.util.organizations_helpers import add_organization_course, get_organization_by_short_name
 from xmodule.contentstore.django import contentstore
 from xmodule.course_module import CourseFields
 from xmodule.exceptions import SerializationError
@@ -53,12 +53,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
 from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
-from xmodule.video_module.transcripts_utils import (
-    Transcript,
-    TranscriptsGenerationException,
-    clean_video_id,
-    get_transcript_from_contentstore
-)
 
 User = get_user_model()
 
@@ -89,7 +83,8 @@ def clone_instance(instance, field_values):
     return instance
 
 
-@task()
+@task
+@set_code_owner_attribute
 def rerun_course(source_course_key_string, destination_course_key_string, user_id, fields=None):
     """
     Reruns a course in a new celery task.
@@ -175,11 +170,23 @@ def _parse_time(time_isoformat):
     ).replace(tzinfo=UTC)
 
 
-@task(routing_key=settings.UPDATE_SEARCH_INDEX_JOB_QUEUE)
+@task
+@set_code_owner_attribute
 def update_search_index(course_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
         course_key = CourseKey.from_string(course_id)
+
+        # We skip search indexing for CCX courses because there is currently
+        # some issue around Modulestore caching that makes it prohibitively
+        # expensive (sometimes hours-long for really complex courses).
+        if isinstance(course_key, CCXLocator):
+            LOGGER.warning(
+                u'Search indexing skipped for CCX Course %s (this is currently too slow to run in production)',
+                course_id
+            )
+            return
+
         CoursewareSearchIndexer.index(modulestore(), course_key, triggered_at=(_parse_time(triggered_time_isoformat)))
 
     except SearchIndexingError as exc:
@@ -188,7 +195,8 @@ def update_search_index(course_id, triggered_time_isoformat):
         LOGGER.debug(u'Search indexing successful for complete course %s', course_id)
 
 
-@task()
+@task
+@set_code_owner_attribute
 def update_library_index(library_id, triggered_time_isoformat):
     """ Updates course search index. """
     try:
@@ -437,7 +445,7 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
             if courselike_module.entrance_exam_enabled:
                 fake_request = RequestFactory().get(u'/')
                 fake_request.user = user
-                from contentstore.views.entrance_exam import remove_entrance_exam_milestone_reference
+                from .views.entrance_exam import remove_entrance_exam_milestone_reference
                 # TODO: Is this really ok?  Seems dangerous for a live course
                 remove_entrance_exam_milestone_reference(fake_request, courselike_key)
                 LOGGER.info(
@@ -537,6 +545,6 @@ def import_olx(self, user_id, course_key_string, archive_path, archive_name, lan
 
                 metadata = {u'entrance_exam_id': text_type(entrance_exam_chapter.location)}
                 CourseMetadata.update_from_dict(metadata, course, user)
-                from contentstore.views.entrance_exam import add_entrance_exam_milestone
+                from .views.entrance_exam import add_entrance_exam_milestone
                 add_entrance_exam_milestone(course.id, entrance_exam_chapter)
                 LOGGER.info(u'Course %s Entrance exam imported', course.id)

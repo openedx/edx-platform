@@ -146,9 +146,8 @@ var edx = edx || {};
                 .attr('aria-disabled', !isEnabled);
         },
 
-        // This function invokes the create_order endpoint.  It will either create an order in
-        // the lms' shoppingcart or a basket in Otto, depending on which backend the request course
-        // mode is configured to use.  In either case, the checkout process will be triggered,
+        // This function invokes the create_order endpoint.  It will create an order in
+        // a basket in Otto.  The checkout process will be triggered,
         // and the expected response will consist of an appropriate payment processor endpoint for
         // redirection, along with parameters to be passed along in the request.
         createOrder: function(event) {

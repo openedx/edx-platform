@@ -69,14 +69,14 @@ from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 from simple_history.models import HistoricalRecords
 
-from badges.events.course_complete import course_badge_check
-from badges.events.course_meta import completion_check, course_group_check
-from course_modes.models import CourseMode
+from lms.djangoapps.badges.events.course_complete import course_badge_check
+from lms.djangoapps.badges.events.course_meta import completion_check, course_group_check
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.instructor_task.models import InstructorTask
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.signals.signals import COURSE_CERT_AWARDED, COURSE_CERT_CHANGED, COURSE_CERT_REVOKED
 from openedx.core.djangoapps.xmodule_django.models import NoneToEmptyManager
-from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
+from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
 
 LOGGER = logging.getLogger(__name__)
 
@@ -248,7 +248,7 @@ class GeneratedCertificate(models.Model):
     """
     # Import here instead of top of file since this module gets imported before
     # the course_modes app is loaded, resulting in a Django deprecation warning.
-    from course_modes.models import CourseMode
+    from common.djangoapps.course_modes.models import CourseMode
 
     # Only returns eligible certificates. This should be used in
     # preference to the default `objects` manager in most cases.
@@ -263,9 +263,17 @@ class GeneratedCertificate(models.Model):
     # results. Django requires us to explicitly declare this.
     objects = models.Manager()
 
-    MODES = Choices(u'verified', u'honor', u'audit', u'professional', u'no-id-professional', u'masters')
+    MODES = Choices(
+        'verified',
+        'honor',
+        'audit',
+        'professional',
+        'no-id-professional',
+        'masters',
+        'executive-education'
+    )
 
-    VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE, CourseMode.MASTERS]
+    VERIFIED_CERTS_MODES = [CourseMode.VERIFIED, CourseMode.CREDIT_MODE, CourseMode.MASTERS, CourseMode.EXECUTIVE_EDUCATION]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course_id = CourseKeyField(max_length=255, blank=True, default=None)
@@ -611,7 +619,7 @@ def certificate_status(generated_certificate):
     """
     # Import here instead of top of file since this module gets imported before
     # the course_modes app is loaded, resulting in a Django deprecation warning.
-    from course_modes.models import CourseMode
+    from common.djangoapps.course_modes.models import CourseMode
 
     if generated_certificate:
         cert_status = {
@@ -642,7 +650,7 @@ def certificate_info_for_user(user, course_id, grade, user_is_whitelisted, user_
     """
     Returns the certificate info for a user for grade report.
     """
-    from student.models import CourseEnrollment
+    from common.djangoapps.student.models import CourseEnrollment
 
     certificate_is_delivered = 'N'
     certificate_type = 'N/A'
@@ -696,7 +704,7 @@ class ExampleCertificateSet(TimeStampedModel):
         """
         # Import here instead of top of file since this module gets imported before
         # the course_modes app is loaded, resulting in a Django deprecation warning.
-        from course_modes.models import CourseMode
+        from common.djangoapps.course_modes.models import CourseMode
         cert_set = cls.objects.create(course_key=course_key)
 
         ExampleCertificate.objects.bulk_create([

@@ -17,11 +17,8 @@ from openedx.core.djangolib.markup import HTML, Text
     <article class="content-primary" role="main">
       <p>
       ${_('The page that you were looking for was not found.')}
-      ${Text(_('Go back to the {homepage} or let us know about any pages that may have been moved at {email}.')).format(
+      ${Text(_('Go back to the {homepage}.')).format(
         homepage=HTML('<a href="/">homepage</a>'),
-        email=HTML('<a href="mailto:{address}">{address}</a>').format(
-          address=Text(settings.TECH_SUPPORT_EMAIL)
-        )
       )}
       </p>
     </article>

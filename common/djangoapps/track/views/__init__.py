@@ -1,25 +1,14 @@
 
 
-import datetime
 import json
-
-import pytz
 import six
-from django.contrib.auth.decorators import login_required
+
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.views.decorators.csrf import ensure_csrf_cookie
 from eventtracking import tracker as eventtracker
 from ipware.ip import get_ip
 
-from edxmako.shortcuts import render_to_response
-from track import contexts, shim, tracker
-
-
-def log_event(event):
-    """Capture a event by sending it to the register trackers"""
-    tracker.send(event)
+from common.djangoapps.track import contexts, shim, tracker
 
 
 def _get_request_header(request, header_name, default=''):
@@ -46,6 +35,18 @@ def _get_request_value(request, value_name, default=''):
         elif request.method == 'POST':
             return request.POST.get(value_name, default)
     return default
+
+
+def _get_course_context(page):
+    """Return the course context from the provided page.
+
+    If the context has no/empty course_id, return empty context
+    """
+    course_context = contexts.course_context_from_url(page)
+    if course_context.get('course_id', '') == '':
+        course_context = {}
+
+    return course_context
 
 
 def _add_user_id_for_username(data):
@@ -111,27 +112,16 @@ def server_track(request, event_type, event, page=None):
     except:
         username = "anonymous"
 
-    # define output:
-    event = {
-        "username": username,
-        "ip": _get_request_ip(request),
-        "referer": _get_request_header(request, 'HTTP_REFERER'),
-        "accept_language": _get_request_header(request, 'HTTP_ACCEPT_LANGUAGE'),
-        "event_source": "server",
-        "event_type": event_type,
-        "event": event,
-        "agent": _get_request_header(request, 'HTTP_USER_AGENT').encode().decode('latin1'),
-        "page": page,
-        "time": datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
-        "host": _get_request_header(request, 'SERVER_NAME'),
-        "context": eventtracker.get_tracker().resolve_context(),
-    }
+    context_override = _get_course_context(page)
+    context_override.update({
+        'username': username,
+        'event_source': 'server',
+        'page': page
+    })
 
-    # Some duplicated fields are passed into event-tracking via the context by track.middleware.
-    # Remove them from the event here since they are captured elsewhere.
-    shim.remove_shim_context(event)
-
-    log_event(event)
+    event_tracker = eventtracker.get_tracker()
+    with event_tracker.context('edx.course.server', context_override):
+        eventtracker.emit(name=event_type, data=event)
 
 
 def task_track(request_info, task_info, event_type, event, page=None):
@@ -156,22 +146,17 @@ def task_track(request_info, task_info, event_type, event, page=None):
 
     # supplement event information with additional information
     # about the task in which it is running.
-    full_event = dict(event, **task_info)
+    data = dict(event, **task_info)
 
-    # Get values from the task-level
-    # information, or just add placeholder values.
-    with eventtracker.get_tracker().context('edx.course.task', contexts.course_context_from_url(page)):
-        event = {
-            "username": request_info.get('username', 'unknown'),
-            "ip": request_info.get('ip', 'unknown'),
-            "event_source": "task",
-            "event_type": event_type,
-            "event": full_event,
-            "agent": request_info.get('agent', 'unknown'),
-            "page": page,
-            "time": datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
-            "host": request_info.get('host', 'unknown'),
-            "context": eventtracker.get_tracker().resolve_context(),
-        }
+    context_override = contexts.course_context_from_url(page)
+    context_override.update({
+        'username': request_info.get('username', 'unknown'),
+        'ip': request_info.get('ip', 'unknown'),
+        'agent': request_info.get('agent', 'unknown'),
+        'host': request_info.get('host', 'unknown'),
+        'event_source': 'task',
+        'page': page,
+    })
 
-    log_event(event)
+    with eventtracker.get_tracker().context('edx.course.task', context_override):
+        eventtracker.emit(name=event_type, data=data)

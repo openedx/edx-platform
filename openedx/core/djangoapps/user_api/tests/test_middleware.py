@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import Mock, patch
 
-from student.tests.factories import AnonymousUserFactory, UserFactory
+from common.djangoapps.student.tests.factories import AnonymousUserFactory, UserFactory
 
 from ..middleware import UserTagsEventContextMiddleware
 from ..tests.factories import UserCourseTagFactory

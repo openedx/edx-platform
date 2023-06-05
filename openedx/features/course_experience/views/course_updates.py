@@ -20,8 +20,6 @@ from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
 
-from .. import USE_BOOTSTRAP_FLAG
-
 STATUS_VISIBLE = 'visible'
 STATUS_DELETED = 'deleted'
 
@@ -66,12 +64,6 @@ class CourseUpdatesView(CourseTabView):
         """
         return super(CourseUpdatesView, self).get(request, course_id, 'courseware', **kwargs)
 
-    def uses_bootstrap(self, request, course, tab):
-        """
-        Returns true if the USE_BOOTSTRAP Waffle flag is enabled.
-        """
-        return USE_BOOTSTRAP_FLAG.is_enabled(course.id)
-
     def render_to_fragment(self, request, course=None, tab=None, **kwargs):
         course_id = six.text_type(course.id)
         updates_fragment_view = CourseUpdatesFragmentView()
@@ -82,6 +74,7 @@ class CourseUpdatesFragmentView(EdxFragmentView):
     """
     A fragment to render the updates page for a course.
     """
+
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """
         Renders the course's home page as a fragment.
@@ -104,7 +97,6 @@ class CourseUpdatesFragmentView(EdxFragmentView):
             'updates': ordered_updates,
             'plain_html_updates': plain_html_updates,
             'disable_courseware_js': True,
-            'uses_pattern_library': True,
         }
         html = render_to_string('course_experience/course-updates-fragment.html', context)
         return Fragment(html)

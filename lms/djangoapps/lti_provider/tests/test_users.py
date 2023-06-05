@@ -12,9 +12,9 @@ from django.test.client import RequestFactory
 from mock import MagicMock, PropertyMock, patch
 from six.moves import range
 
-import lti_provider.users as users
-from lti_provider.models import LtiConsumer, LtiUser
-from student.tests.factories import UserFactory
+from .. import users
+from ..models import LtiConsumer, LtiUser
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class UserManagementHelperTest(TestCase):
@@ -45,9 +45,9 @@ class UserManagementHelperTest(TestCase):
         with self.assertRaises(PermissionDenied):
             users.switch_user(self.request, self.lti_user, self.lti_consumer)
 
-    @patch('lti_provider.users.login')
+    @patch('lms.djangoapps.lti_provider.users.login')
     def test_authenticate_called(self, _login_mock):
-        with patch('lti_provider.users.authenticate', return_value=self.new_user) as authenticate:
+        with patch('lms.djangoapps.lti_provider.users.authenticate', return_value=self.new_user) as authenticate:
             users.switch_user(self.request, self.lti_user, self.lti_consumer)
             authenticate.assert_called_with(
                 username=self.new_user.username,
@@ -55,9 +55,9 @@ class UserManagementHelperTest(TestCase):
                 lti_consumer=self.lti_consumer
             )
 
-    @patch('lti_provider.users.login')
+    @patch('lms.djangoapps.lti_provider.users.login')
     def test_login_called(self, login_mock):
-        with patch('lti_provider.users.authenticate', return_value=self.new_user):
+        with patch('lms.djangoapps.lti_provider.users.authenticate', return_value=self.new_user):
             users.switch_user(self.request, self.lti_user, self.lti_consumer)
             login_mock.assert_called_with(self.request, self.new_user)
 
@@ -73,8 +73,8 @@ class UserManagementHelperTest(TestCase):
                 )
 
 
-@patch('lti_provider.users.switch_user', autospec=True)
-@patch('lti_provider.users.create_lti_user', autospec=True)
+@patch('lms.djangoapps.lti_provider.users.switch_user', autospec=True)
+@patch('lms.djangoapps.lti_provider.users.create_lti_user', autospec=True)
 class AuthenticateLtiUserTest(TestCase):
     """
     Tests for the authenticate_lti_user function in users.py
@@ -111,7 +111,7 @@ class AuthenticateLtiUserTest(TestCase):
     def test_authentication_with_new_user(self, _create_user, switch_user):
         lti_user = MagicMock()
         lti_user.edx_user_id = self.edx_user_id
-        with patch('lti_provider.users.create_lti_user', return_value=lti_user) as create_user:
+        with patch('lms.djangoapps.lti_provider.users.create_lti_user', return_value=lti_user) as create_user:
             users.authenticate_lti_user(self.request, self.lti_user_id, self.lti_consumer)
             create_user.assert_called_with(self.lti_user_id, self.lti_consumer)
             switch_user.assert_called_with(self.request, lti_user, self.lti_consumer)
@@ -161,7 +161,7 @@ class CreateLtiUserTest(TestCase):
         self.assertEqual(User.objects.count(), 1)
 
     @patch('uuid.uuid4', return_value='random_uuid')
-    @patch('lti_provider.users.generate_random_edx_username', return_value='edx_id')
+    @patch('lms.djangoapps.lti_provider.users.generate_random_edx_username', return_value='edx_id')
     def test_create_lti_user_creates_correct_user(self, uuid_mock, _username_mock):
         users.create_lti_user('lti_user_id', self.lti_consumer)
         self.assertEqual(User.objects.count(), 1)
@@ -169,7 +169,7 @@ class CreateLtiUserTest(TestCase):
         self.assertEqual(user.email, 'edx_id@lti.example.com')
         uuid_mock.assert_called_with()
 
-    @patch('lti_provider.users.generate_random_edx_username', side_effect=['edx_id', 'new_edx_id'])
+    @patch('lms.djangoapps.lti_provider.users.generate_random_edx_username', side_effect=['edx_id', 'new_edx_id'])
     def test_unique_username_created(self, username_mock):
         User(username='edx_id').save()
         users.create_lti_user('lti_user_id', self.lti_consumer)

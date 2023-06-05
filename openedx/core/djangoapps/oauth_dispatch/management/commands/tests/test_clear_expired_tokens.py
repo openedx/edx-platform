@@ -18,7 +18,7 @@ from oauth2_provider.models import AccessToken, RefreshToken
 from testfixtures import LogCapture
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 LOGGER_NAME = 'openedx.core.djangoapps.oauth_dispatch.management.commands.edx_clear_expired_tokens'
 

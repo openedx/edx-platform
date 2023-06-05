@@ -5,7 +5,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from ... import tasks
+from lms.djangoapps.program_enrollments import tasks
 
 logger = logging.getLogger(__name__)
 

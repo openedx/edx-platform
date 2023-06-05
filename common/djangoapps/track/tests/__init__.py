@@ -13,7 +13,7 @@ from pytz import UTC
 FROZEN_TIME = datetime(2013, 10, 3, 8, 24, 55, tzinfo=UTC)
 IN_MEMORY_BACKEND_CONFIG = {
     'mem': {
-        'ENGINE': 'track.tests.InMemoryBackend'
+        'ENGINE': 'common.djangoapps.track.tests.InMemoryBackend'
     }
 }
 

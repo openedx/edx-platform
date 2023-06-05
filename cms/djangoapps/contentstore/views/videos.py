@@ -3,21 +3,22 @@ Views related to the video upload feature
 """
 
 
+import codecs
 import csv
+import io
 import json
 import logging
 from contextlib import closing
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-import rfc6266_parser
 import six
 from boto import s3
 from boto.sts import STSConnection
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import FileResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_noop
@@ -39,21 +40,26 @@ from edxval.api import (
 )
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
+from rest_framework import status as rest_status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-from contentstore.models import VideoUploadConfig
-from contentstore.utils import reverse_course_url
-from contentstore.video_utils import validate_video_image
-from edxmako.shortcuts import render_to_response
+from edx_toggles.toggles import WaffleFlagNamespace, WaffleSwitchNamespace
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
     DEPRECATE_YOUTUBE,
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
     waffle_flags
 )
-from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag, WaffleFlagNamespace, WaffleSwitchNamespace
-from util.json_request import JsonResponse, expect_json
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
+from openedx.core.lib.api.view_utils import view_auth_classes
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.video_module.transcripts_utils import Transcript
 
+from ..models import VideoUploadConfig
+from ..utils import reverse_course_url
+from ..video_utils import validate_video_image
 from .course import get_course_and_check_access
 
 __all__ = [
@@ -61,6 +67,7 @@ __all__ = [
     'video_encodings_download',
     'video_images_handler',
     'transcript_preferences_handler',
+    'generate_video_upload_link_handler',
 ]
 
 LOGGER = logging.getLogger(__name__)
@@ -78,7 +85,7 @@ WAFFLE_STUDIO_FLAG_NAMESPACE = WaffleFlagNamespace(name=u'studio')
 ENABLE_VIDEO_UPLOAD_PAGINATION = CourseWaffleFlag(
     waffle_namespace=WAFFLE_STUDIO_FLAG_NAMESPACE,
     flag_name=u'enable_video_upload_pagination',
-    flag_undefined_default=False
+    module_name=__name__,
 )
 # Default expiration, in seconds, of one-time URLs used for uploading videos.
 KEY_EXPIRATION_IN_SECONDS = 86400
@@ -94,38 +101,6 @@ VIDEO_UPLOAD_MAX_FILE_SIZE_GB = 5
 MAX_UPLOAD_HOURS = 24
 
 VIDEOS_PER_PAGE = 100
-
-
-class AssumeRole(object):
-    """ Singleton class to establish connection to aws using mfa and assume role """
-    __instance = None
-
-    @staticmethod
-    def get_instance():
-        """ Static access method. """
-        if not AssumeRole.__instance:
-            AssumeRole()
-
-        return AssumeRole.__instance
-
-    def __init__(self):
-        """ Virtually private constructor. """
-        if AssumeRole.__instance:
-            raise Exception("This is a singleton class!")
-
-        sts = STSConnection(
-            settings.AWS_ACCESS_KEY_ID,
-            settings.AWS_SECRET_ACCESS_KEY
-        )
-        self.credentials = sts.assume_role(
-            role_arn=settings.ROLE_ARN,
-            role_session_name='vem',
-            duration_seconds=3600,
-            mfa_serial_number=settings.MFA_SERIAL_NUMBER,
-            mfa_token=settings.MFA_TOKEN
-        ).credentials.to_dict()
-
-        AssumeRole.__instance = self
 
 
 class TranscriptProvider(object):
@@ -245,7 +220,24 @@ def videos_handler(request, course_key_string, edx_video_id=None):
         elif _is_pagination_context_update_request(request):
             return _update_pagination_context(request)
 
-        return videos_post(course, request)
+        data, status = videos_post(course, request)
+        return JsonResponse(data, status=status)
+
+
+@api_view(['POST'])
+@view_auth_classes()
+@expect_json
+def generate_video_upload_link_handler(request, course_key_string):
+    """
+    API for creating a video upload.  Returns an edx_video_id and a presigned URL that can be used
+    to upload the video to AWS S3.
+    """
+    course = _get_and_validate_course(course_key_string, request.user)
+    if not course:
+        return Response(data='Course Not Found', status=rest_status.HTTP_400_BAD_REQUEST)
+
+    data, status = videos_post(course, request)
+    return Response(data, status=status)
 
 
 @expect_json
@@ -460,17 +452,12 @@ def video_encodings_download(request, course_key_string):
             for key, value in ret.items()
         }
 
-    response = HttpResponse(content_type="text/csv")
-    # Translators: This is the suggested filename when downloading the URL
-    # listing for videos uploaded through Studio
-    filename = _("{course}_video_urls").format(course=course.id.course)
-    # See https://tools.ietf.org/html/rfc6266#appendix-D
-    response["Content-Disposition"] = rfc6266_parser.build_header(
-        filename + ".csv",
-        filename_compat="video_urls.csv"
-    )
+    # Write csv to bytes-like object. We need a separate writer and buffer as the csv
+    # writer writes str and the FileResponse expects a bytes files.
+    buffer = io.BytesIO()
+    buffer_writer = codecs.getwriter("utf-8")(buffer)
     writer = csv.DictWriter(
-        response,
+        buffer_writer,
         [
             col_name.encode("utf-8") if six.PY2 else col_name
             for col_name
@@ -481,7 +468,12 @@ def video_encodings_download(request, course_key_string):
     writer.writeheader()
     for video in videos:
         writer.writerow(make_csv_dict(video))
-    return response
+    buffer.seek(0)
+
+    # Translators: This is the suggested filename when downloading the URL
+    # listing for videos uploaded through Studio
+    filename = _("{course}_video_urls").format(course=course.id.course) + ".csv"
+    return FileResponse(buffer, as_attachment=True, filename=filename, content_type="text/csv")
 
 
 def _get_and_validate_course(course_key_string, user):
@@ -744,7 +736,7 @@ def videos_post(course, request):
         error = "Request 'files' entry contain unsupported content_type"
 
     if error:
-        return JsonResponse({'error': error}, status=400)
+        return {'error': error}, 400
 
     bucket = storage_service_bucket()
     req_files = data['files']
@@ -757,7 +749,7 @@ def videos_post(course, request):
             file_name.encode('ascii')
         except UnicodeEncodeError:
             error_msg = u'The file name for %s must contain only ASCII characters.' % file_name
-            return JsonResponse({'error': error_msg}, status=400)
+            return {'error': error_msg}, 400
 
         edx_video_id = six.text_type(uuid4())
         key = storage_service_key(bucket, file_name=edx_video_id)
@@ -801,19 +793,19 @@ def videos_post(course, request):
 
         resp_files.append({'file_name': file_name, 'upload_url': upload_url, 'edx_video_id': edx_video_id})
 
-    return JsonResponse({'files': resp_files}, status=200)
+    return {'files': resp_files}, 200
 
 
 def storage_service_bucket():
     """
-    Returns an S3 bucket for video uploads.
+    Returns an S3 bucket for video upload.
     """
     if waffle_flags()[ENABLE_DEVSTACK_VIDEO_UPLOADS].is_enabled():
-        credentials = AssumeRole.get_instance().credentials
         params = {
-            'aws_access_key_id': credentials['access_key'],
-            'aws_secret_access_key': credentials['secret_key'],
-            'security_token': credentials['session_token']
+            'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
+            'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY,
+            'security_token': settings.AWS_SECURITY_TOKEN
+
         }
     else:
         params = {
@@ -822,11 +814,12 @@ def storage_service_bucket():
         }
 
     conn = s3.connection.S3Connection(**params)
+
     # We don't need to validate our bucket, it requires a very permissive IAM permission
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
     # meaning it would need ListObjects on the whole bucket, not just the path used in each
     # environment (since we share a single bucket for multiple deployments in some configurations)
-    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE["BUCKET"], validate=False)
+    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'], validate=False)
 
 
 def storage_service_key(bucket, file_name):

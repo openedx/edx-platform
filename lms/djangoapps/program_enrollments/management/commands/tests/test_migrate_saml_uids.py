@@ -11,7 +11,7 @@ from social_django.models import UserSocialAuth
 
 from lms.djangoapps.program_enrollments.management.commands import migrate_saml_uids
 from lms.djangoapps.program_enrollments.management.commands.tests.utils import UserSocialAuthFactory
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 _COMMAND_PATH = 'lms.djangoapps.program_enrollments.management.commands.migrate_saml_uids'
 

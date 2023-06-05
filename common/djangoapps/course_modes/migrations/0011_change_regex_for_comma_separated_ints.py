@@ -18,11 +18,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='coursemode',
             name='suggested_prices',
-            field=models.CharField(blank=True, default=u'', max_length=255, validators=[django.core.validators.RegexValidator(re.compile('^\d+(?:\,\d+)*\Z'), code='invalid', message='Enter only digits separated by commas.')]),
+            field=models.CharField(blank=True, default=u'', max_length=255, validators=[django.core.validators.RegexValidator(re.compile('^\d+(?:{escaped_comma}\d+)*\Z'.format(escaped_comma=re.escape(','))), code='invalid', message='Enter only digits separated by commas.')]),
         ),
         migrations.AlterField(
             model_name='coursemodesarchive',
             name='suggested_prices',
-            field=models.CharField(blank=True, default=u'', max_length=255, validators=[django.core.validators.RegexValidator(re.compile('^\d+(?:\,\d+)*\Z'), code='invalid', message='Enter only digits separated by commas.')]),
+            field=models.CharField(blank=True, default=u'', max_length=255, validators=[django.core.validators.RegexValidator(re.compile('^\d+(?:{escaped_comma}\d+)*\Z'.format(escaped_comma=re.escape(','))), code='invalid', message='Enter only digits separated by commas.')]),
         ),
     ]

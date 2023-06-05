@@ -5,7 +5,7 @@ URLs for bulk_email app
 from django.conf.urls import url
 from django.conf import settings
 
-from bulk_email import views
+from . import views
 
 urlpatterns = [
     url(

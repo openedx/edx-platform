@@ -9,7 +9,7 @@ from django.test import TestCase
 from django.urls import reverse
 from oauth2_provider.models import Application
 
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..adapters import DOTAdapter
 from . import mixins

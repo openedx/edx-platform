@@ -391,6 +391,10 @@ class VideoStudentViewHandlers(object):
         runtime uses a similar REST API that's not an XBlock handler.
         """
         from lms.djangoapps.courseware.views.views import load_metadata_from_youtube
+        if not self.youtube_id_1_0:
+            # TODO: more informational response to explain that yt_video_metadata not supported for non-youtube videos.
+            return Response('{}', status=400)
+
         metadata, status_code = load_metadata_from_youtube(video_id=self.youtube_id_1_0, request=request)
         response = Response(json.dumps(metadata), status=status_code)
         response.content_type = 'application/json'

@@ -61,5 +61,5 @@ class GradesService(object):
         return api.undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, feature=feature)
 
     def should_override_grade_on_rejected_exam(self, course_key_or_id):
-        """Convienence function to return the state of the CourseWaffleFlag REJECTED_EXAM_OVERRIDES_GRADE"""
+        """Convenience function to return the state of the CourseWaffleFlag REJECTED_EXAM_OVERRIDES_GRADE"""
         return api.should_override_grade_on_rejected_exam(course_key_or_id)

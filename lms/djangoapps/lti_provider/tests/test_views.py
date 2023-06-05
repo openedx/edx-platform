@@ -11,8 +11,8 @@ from mock import MagicMock, patch
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 
 from lms.djangoapps.courseware.testutils import RenderXBlockTestMixin
-from lti_provider import models, views
-from student.tests.factories import UserFactory
+from lms.djangoapps.lti_provider import models, views
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 LTI_DEFAULT_PARAMS = {
@@ -71,7 +71,7 @@ class LtiTestMixin(object):
         super(LtiTestMixin, self).setUp()
         # Always accept the OAuth signature
         self.mock_verify = MagicMock(return_value=True)
-        patcher = patch('lti_provider.signature_validator.SignatureValidator.verify', self.mock_verify)
+        patcher = patch('lms.djangoapps.lti_provider.signature_validator.SignatureValidator.verify', self.mock_verify)
         patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -87,8 +87,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
     """
     Tests for the lti_launch view
     """
-    @patch('lti_provider.views.render_courseware')
-    @patch('lti_provider.views.authenticate_lti_user')
+    @patch('lms.djangoapps.lti_provider.views.render_courseware')
+    @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user')
     def test_valid_launch(self, _authenticate, render):
         """
         Verifies that the LTI launch succeeds when passed a valid request.
@@ -97,9 +97,9 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         views.lti_launch(request, six.text_type(COURSE_KEY), six.text_type(USAGE_KEY))
         render.assert_called_with(request, USAGE_KEY)
 
-    @patch('lti_provider.views.render_courseware')
-    @patch('lti_provider.views.store_outcome_parameters')
-    @patch('lti_provider.views.authenticate_lti_user')
+    @patch('lms.djangoapps.lti_provider.views.render_courseware')
+    @patch('lms.djangoapps.lti_provider.views.store_outcome_parameters')
+    @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user')
     def test_valid_launch_with_optional_params(self, _authenticate, store_params, _render):
         """
         Verifies that the LTI launch succeeds when passed a valid request.
@@ -112,9 +112,9 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
             self.consumer
         )
 
-    @patch('lti_provider.views.render_courseware')
-    @patch('lti_provider.views.store_outcome_parameters')
-    @patch('lti_provider.views.authenticate_lti_user')
+    @patch('lms.djangoapps.lti_provider.views.render_courseware')
+    @patch('lms.djangoapps.lti_provider.views.store_outcome_parameters')
+    @patch('lms.djangoapps.lti_provider.views.authenticate_lti_user')
     def test_outcome_service_registered(self, _authenticate, store_params, _render):
         """
         Verifies that the LTI launch succeeds when passed a valid request.
@@ -168,7 +168,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.status_code, 403)
 
-    @patch('lti_provider.views.render_courseware')
+    @patch('lms.djangoapps.lti_provider.views.render_courseware')
     def test_lti_consumer_record_supplemented_with_guid(self, _render):
         self.mock_verify.return_value = False
 
@@ -187,7 +187,6 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    SUCCESS_ENROLLED_STAFF_MONGO_COUNT = 9
 
     def get_response(self, usage_key, url_encoded_params=None):
         """

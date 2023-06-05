@@ -11,7 +11,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from django.contrib.auth import get_user_model
 
-logger = logging.getLogger('student.management.commands.bulk_update_email')
+logger = logging.getLogger('common.djangoapps.student.management.commands.bulk_update_email')
 
 
 class Command(BaseCommand):

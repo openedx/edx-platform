@@ -1,5 +1,5 @@
 (function(requirejs, require, define) {
-    define([], function() {
+    define(['edx-ui-toolkit/js/utils/html-utils'], function(HtmlUtils) {
         return {
             initializeBaseTargets: initializeBaseTargets,
             initializeTargetField: initializeTargetField,
@@ -76,17 +76,19 @@
             }
 
             $targetEl = $(
-            '<div ' +
-                'style=" ' +
-                    'display: block; ' +
-                    'position: absolute; ' +
-                    'width: ' + obj.w + 'px; ' +
-                    'height: ' + obj.h + 'px; ' +
-                    'top: ' + obj.y + 'px; ' +
-                    'left: ' + obj.x + 'px; ' +
-                    borderCss +
-                '" ' +
-            'aria-dropeffect=""></div>'
+                HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<div style="display: block; position: absolute; width: '),
+                    obj.w,
+                    HtmlUtils.HTML('px; height: '),
+                    obj.h,
+                    HtmlUtils.HTML('px; top: '),
+                    obj.y,
+                    HtmlUtils.HTML('px; left: '),
+                    obj.x,
+                    HtmlUtils.HTML('px; '),
+                    borderCss,
+                    HtmlUtils.HTML('"aria-dropeffect=""></div>')
+                ).toString()
         );
             if (fromTargetField === true) {
                 $targetEl.appendTo(draggableObj.iconEl);
@@ -100,23 +102,17 @@
 
             if (state.config.onePerTarget === false) {
                 $numTextEl = $(
-                '<div ' +
-                    'style=" ' +
-                        'display: block; ' +
-                        'position: absolute; ' +
-                        'width: 24px; ' +
-                        'height: 24px; ' +
-                        'top: ' + obj.y + 'px; ' +
-                        'left: ' + (obj.x + obj.w - 24) + 'px; ' +
-                        'border: 1px solid black; ' +
-                        'text-align: center; ' +
-                        'z-index: 500; ' +
-                        'background-color: white; ' +
-                        'font-size: 0.95em; ' +
-                        'color: #009fe2; ' +
-                    '" ' +
-                '>0</div>'
-            );
+                    HtmlUtils.joinHtml(
+                        HtmlUtils.HTML('<div style=" display: block; position: absolute;'),
+                        HtmlUtils.HTML('width: 24px; height: 24px; top: '),
+                        obj.y,
+                        HtmlUtils.HTML('px; left: '),
+                        obj.x,
+                        obj.w - 24,
+                        HtmlUtils.HTML('px; border: 1px solid black; text-align: center; z-index: 500;'),
+                        HtmlUtils.HTML('background-color: white; font-size: 0.95em; color: #009fe2; ">0</div>')
+                    ).toString()
+                );
             } else {
                 $numTextEl = null;
             }
@@ -263,7 +259,7 @@
 
         function updateNumTextEl() {
             if (this.numTextEl !== null) {
-                this.numTextEl.html(this.draggableList.length);
+                this.numTextEl.text(this.draggableList.length);
             }
         }
     }); // End-of: define([], function () {

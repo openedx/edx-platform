@@ -2,7 +2,7 @@
 Constants used throughout the program_enrollments app and exposed to other
 in-process apps through api.py.
 """
-from student.roles import CourseStaffRole
+from common.djangoapps.student.roles import CourseStaffRole
 
 
 class ProgramEnrollmentStatuses(object):

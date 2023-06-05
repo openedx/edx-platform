@@ -9,7 +9,7 @@ from django.test import TestCase
 from oauth2_provider.models import get_application_model
 
 from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..create_dot_application import Command
 

@@ -4,7 +4,7 @@
 import mock
 from django.contrib.admin.sites import AdminSite
 from django.test import TestCase
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.external_user_ids.models import (
     ExternalId,

@@ -1,10 +1,10 @@
 """utils for feature-based enrollments"""
 
 
-from student.models import FBEEnrollmentExclusion
+from common.djangoapps.student.models import FBEEnrollmentExclusion
 
 
-def is_in_holdback(user, enrollment):
+def is_in_holdback(enrollment):
     """
     Return true if given user is in holdback expermiment
     """

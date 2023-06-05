@@ -1515,6 +1515,15 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-class-docs
         incorrect_responses = ["", "3.01", "-1.01"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
+    def test_grade_percent_tolerance_with_spaces(self):
+        """
+        Tests that system does not throw an error when tolerance data contains spaces before or after.
+        """
+        problem = self.build_problem(answer=4, tolerance="10% ")
+        correct_responses = ["4.0", "4.00", "4.39", "3.61"]
+        incorrect_responses = ["", "4.41", "3.59", "0"]
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+
     def test_floats(self):
         """
         Default tolerance for all responsetypes is 1e-3%.

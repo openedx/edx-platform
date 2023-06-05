@@ -404,26 +404,18 @@ class TestJavaScriptLinter(TestLinter):
         self._validate_data_rules(data, results)
 
     @data(
-        {'template': 'StringUtils.interpolate()', 'rule': None},
-        {'template': 'HtmlUtils.interpolateHtml()', 'rule': None},
-        {'template': 'interpolate(anything)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_interpolate},
-    )
-    def test_javascript_interpolate(self, data):
-        """
-        Test check_javascript_file_is_safe with interpolate()
-        """
-        linter = _build_javascript_linter()
-        results = FileResults('')
-
-        linter.check_javascript_file_is_safe(data['template'], results)
-
-        self._validate_data_rules(data, results)
-
-    @data(
         {'template': '_.escape(message)', 'rule': None},
-        {'template': 'anything.escape(message)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_escape},
+        {'template': 'anything.escape(message)', 'rule': None},
+        {'template': 'anythingescape(message)', 'rule': None},
+        {'template': '$escape(message)', 'rule': None},
+        {'template': '_escape(message)', 'rule': None},
+        {'template': 'escape(message)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_escape},
+        {'template': '(escape(message))', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_escape},
+        {'template': '  escape(message))', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_escape},
+        {'template': 'window.escape(message)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_escape},
+        {'template': '(window.escape(message)', 'rule': JAVASCRIPT_LINTER_RULESET.javascript_escape},
     )
-    def test_javascript_interpolate(self, data):
+    def test_javascript_escape(self, data):
         """
         Test check_javascript_file_is_safe with interpolate()
         """

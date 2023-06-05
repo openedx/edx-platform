@@ -13,7 +13,7 @@ class XBlockConfig(AppConfig):
     """
     Default configuration for the "xblock_config" Django application.
     """
-    name = u'xblock_config'
+    name = u'cms.djangoapps.xblock_config'
     verbose_name = u'XBlock Configuration'
 
     def ready(self):

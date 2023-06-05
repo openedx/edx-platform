@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import AssetKey, CourseKey
 from fs.memoryfs import MemoryFS
 from fs.wrapfs import WrapFS
 
-from static_replace import replace_static_urls
+from common.djangoapps.static_replace import replace_static_urls
 from xmodule.contentstore.content import StaticContent
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.modulestore.django import modulestore as store

@@ -18,7 +18,7 @@ class JsTestSuite(TestSuite):
     A class for running JavaScript tests.
     """
     def __init__(self, *args, **kwargs):
-        super(JsTestSuite, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.run_under_coverage = kwargs.get('with_coverage', True)
         self.mode = kwargs.get('mode', 'run')
         self.report_dir = Env.JS_REPORT_DIR
@@ -28,7 +28,7 @@ class JsTestSuite(TestSuite):
         self.subsuites = self._default_subsuites if suite == 'all' else [JsTestSubSuite(*args, **kwargs)]
 
     def __enter__(self):
-        super(JsTestSuite, self).__enter__()
+        super().__enter__()
         if tasks.environment.dry_run:
             tasks.environment.info("make report_dir")
         else:
@@ -55,7 +55,7 @@ class JsTestSubSuite(TestSuite):
     common-requirejs and xmodule
     """
     def __init__(self, *args, **kwargs):
-        super(JsTestSubSuite, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.test_id = args[0]
         self.run_under_coverage = kwargs.get('with_coverage', True)
         self.mode = kwargs.get('mode', 'run')

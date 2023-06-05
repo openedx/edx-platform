@@ -8,8 +8,8 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import patch
 
-from lti_provider.models import LtiConsumer
-from lti_provider.signature_validator import SignatureValidator
+from lms.djangoapps.lti_provider.models import LtiConsumer
+from lms.djangoapps.lti_provider.signature_validator import SignatureValidator
 
 
 def get_lti_consumer():

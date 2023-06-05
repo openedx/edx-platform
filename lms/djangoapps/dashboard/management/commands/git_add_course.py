@@ -8,8 +8,7 @@ import logging
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
 
-import dashboard.git_import
-from dashboard.git_import import GitImportError
+from lms.djangoapps.dashboard import git_import
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
 
@@ -50,6 +49,6 @@ class Command(BaseCommand):
             branch = options['repository_branch']
 
         try:
-            dashboard.git_import.add_repo(options['repository_url'], rdir_arg, branch)
-        except GitImportError as ex:
+            git_import.add_repo(options['repository_url'], rdir_arg, branch)
+        except git_import.GitImportError as ex:
             raise CommandError(str(ex))

@@ -2,53 +2,45 @@
 Tests for Video Pipeline api utils.
 """
 
-import ddt
 import json
-from mock import Mock, patch
 
+import ddt
 from django.test.testcases import TestCase
+from mock import Mock, patch
 from slumber.exceptions import HttpClientError
-
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
-from openedx.core.djangoapps.video_pipeline.tests.mixins import VideoPipelineIntegrationMixin
+from openedx.core.djangoapps.video_pipeline.tests.mixins import VideoPipelineMixin
 
 
 @ddt.ddt
-class TestAPIUtils(VideoPipelineIntegrationMixin, TestCase):
+class TestAPIUtils(VideoPipelineMixin, TestCase):
     """
     Tests for API Utils.
     """
     def setUp(self):
-        self.pipeline_integration = self.create_video_pipeline_integration()
-        self.user = UserFactory(username=self.pipeline_integration.service_username)
-        self.oauth_client = self.create_video_pipeline_oauth_client(user=self.user)
+        """
+        Setup VEM oauth client.
+        """
+        self.add_vem_client()
 
-    def test_update_transcription_service_credentials_with_integration_disabled(self):
+    def add_vem_client(self):
         """
-        Test updating the credentials when service integration is disabled.
+        Creates a VEM oauth client
         """
-        self.pipeline_integration.enabled = False
-        self.pipeline_integration.save()
-        __, is_updated = update_3rd_party_transcription_service_credentials()
-        self.assertFalse(is_updated)
+        self.vem_pipeline_integration = self.create_vem_pipeline_integration()
+        self.vem_user = UserFactory(username=self.vem_pipeline_integration.service_username)
+        self.vem_oauth_client = self.create_video_pipeline_oauth_client(user=self.vem_user)
 
-    def test_update_transcription_service_credentials_with_unknown_user(self):
+    def test_update_transcription_service_credentials_with_vem_disabled(self):
         """
-        Test updating the credentials when expected service user is not registered.
+        Test updating the credentials when VEM integration is disabled.
         """
-        self.pipeline_integration.service_username = 'non_existent_user'
-        self.pipeline_integration.save()
-        __, is_updated = update_3rd_party_transcription_service_credentials()
-        self.assertFalse(is_updated)
+        # Disabling VEM
+        self.vem_pipeline_integration.enabled = False
+        self.vem_pipeline_integration.save()
 
-    def test_update_transcription_service_credentials_with_unknown_oauth_client(self):
-        """
-        Test updating the credentials when expected oauth cleint is not present.
-        """
-        self.pipeline_integration.client_name = 'non_existent_client'
-        self.pipeline_integration.save()
         __, is_updated = update_3rd_party_transcription_service_credentials()
         self.assertFalse(is_updated)
 
@@ -63,33 +55,35 @@ class TestAPIUtils(VideoPipelineIntegrationMixin, TestCase):
         }
     )
     @patch('openedx.core.djangoapps.video_pipeline.api.log')
-    @patch('openedx.core.djangoapps.video_pipeline.utils.EdxRestApiClient')
+    @patch('openedx.core.djangoapps.video_pipeline.utils.OAuthAPIClient')
     def test_update_transcription_service_credentials(self, credentials_payload, mock_client, mock_logger):
         """
         Tests that the update transcription service credentials api util works as expected.
         """
-        # Mock the post request
-        mock_credentials_endpoint = mock_client.return_value.transcript_credentials
+        mock_client.request.return_value.ok = True
+
         # Try updating the transcription service credentials
         error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
 
-        mock_credentials_endpoint.post.assert_called_with(credentials_payload)
         # Making sure log.exception is not called.
         self.assertDictEqual(error_response, {})
         self.assertFalse(mock_logger.exception.called)
         self.assertTrue(is_updated)
 
+        mock_logger.info.assert_any_call('Sending transcript credentials to VEM for org: {} and provider: {}'.format(
+            credentials_payload.get('org'), credentials_payload.get('provider')
+        ))
+
     @patch('openedx.core.djangoapps.video_pipeline.api.log')
-    @patch('openedx.core.djangoapps.video_pipeline.utils.EdxRestApiClient')
+    @patch('openedx.core.djangoapps.video_pipeline.utils.OAuthAPIClient')
     def test_update_transcription_service_credentials_exceptions(self, mock_client, mock_logger):
         """
         Tests that the update transcription service credentials logs the exception occurring
         during communication with edx-video-pipeline.
         """
         error_content = '{"error_type": "1"}'
-        # Mock the post request
-        mock_credentials_endpoint = mock_client.return_value.transcript_credentials
-        mock_credentials_endpoint.post = Mock(side_effect=HttpClientError(content=error_content))
+        mock_client.return_value.request = Mock(side_effect=HttpClientError(content=error_content))
+
         # try updating the transcription service credentials
         credentials_payload = {
             'org': 'mit',
@@ -98,13 +92,13 @@ class TestAPIUtils(VideoPipelineIntegrationMixin, TestCase):
         }
         error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
 
-        mock_credentials_endpoint.post.assert_called_with(credentials_payload)
         # Assert the results.
         self.assertFalse(is_updated)
         self.assertDictEqual(error_response, json.loads(error_content))
         mock_logger.exception.assert_called_with(
-            u'[video-pipeline-service] Unable to update transcript credentials -- org=%s -- provider=%s -- response=%s.',
-            credentials_payload['org'],
-            credentials_payload['provider'],
-            error_content
+            'Unable to update transcript credentials -- org={}, provider={}, response={}'.format(
+                credentials_payload['org'],
+                credentials_payload['provider'],
+                error_content
+            )
         )

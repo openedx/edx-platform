@@ -4,15 +4,17 @@ Test models, managers, and validators.
 
 
 import six
-from completion import models, waffle
+from completion import models
 from completion.test_utils import CompletionWaffleTestMixin, submit_completions_for_testing
+from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from edx_toggles.toggles.testutils import override_waffle_switch
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from six.moves import range, zip
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 SELECT = 1
 UPDATE = 1
@@ -165,7 +167,7 @@ class SubmitBatchCompletionTestCase(CompletionWaffleTestMixin, TestCase):
         self.assertEqual(models.BlockCompletion.objects.last().completion, 1.0)
 
     def test_submit_batch_completion_without_waffle(self):
-        with waffle.waffle().override(waffle.ENABLE_COMPLETION_TRACKING, False):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, False):
             with self.assertRaises(RuntimeError):
                 blocks = [(self.block_key, 1.0)]
                 models.BlockCompletion.objects.submit_batch_completion(self.user, blocks)

@@ -14,12 +14,10 @@ If you will be modifying edx-platform code, the `Open edX Developer Stack`_ is
 a Docker-based development environment.
 
 If you want to run your own Open edX server and have the technical skills to do
-so, `Open edX Ubuntu 16.04 64-bit Installation`_ has instructions to install
-it on an existing Ubuntu 16.04 server.
+so, `Open edX Installation Options`_ explains your options.
 
 .. _Open edX Developer Stack: https://github.com/edx/devstack
-.. _Open edX Ubuntu 16.04 64-bit Installation: https://openedx.atlassian.net/wiki/display/OpenOPS/Native+Open+edX+Ubuntu+16.04+64+bit+Installation
-
+.. _Open edX Installation Options:  https://openedx.atlassian.net/wiki/spaces/OpenOPS/pages/60227779/Open+edX+Installation+Options
 
 License
 -------

@@ -18,14 +18,14 @@ class PythonTestSuite(TestSuite):
     A subclass of TestSuite with extra setup for python tests
     """
     def __init__(self, *args, **kwargs):
-        super(PythonTestSuite, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.opts = kwargs
         self.disable_migrations = kwargs.get('disable_migrations', True)
         self.fasttest = kwargs.get('fasttest', False)
         self.subsuites = kwargs.get('subsuites', self._default_subsuites)
 
     def __enter__(self):
-        super(PythonTestSuite, self).__enter__()
+        super().__enter__()
 
         if self.disable_migrations:
             os.environ['DISABLE_MIGRATIONS'] = '1'

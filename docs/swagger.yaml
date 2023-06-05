@@ -641,12 +641,13 @@ paths:
     post:
       operationId: completion_v1_completion-batch_create
       summary: Inserts a batch of completions.
-      description: "REST Endpoint Format:\n{\n  \"username\": \"username\",\n  \"\
-        course_key\": \"course-key\",\n  \"blocks\": {\n    \"block_key1\": 0.0,\n\
-        \    \"block_key2\": 1.0,\n    \"block_key3\": 1.0,\n  }\n}\n\n**Returns**\n\
+      description: "REST Endpoint Format:\n```\n{\n  \"username\": \"username\",\n\
+        \  \"course_key\": \"course-key\",\n  \"blocks\": {\n    \"block_key1\": 0.0,\n\
+        \    \"block_key2\": 1.0,\n    \"block_key3\": 1.0,\n  }\n}\n```\n\n**Returns**\n\
         \nA Response object, with an appropriate status code.\n\nIf successful, status\
-        \ code is 200.\n{\n   \"detail\" : _(\"ok\")\n}\n\nOtherwise, a 400 or 404\
-        \ may be returned, and the \"detail\" content will explain the error."
+        \ code is 200.\n```\n{\n   \"detail\" : _(\"ok\")\n}\n```\n\nOtherwise, a\
+        \ 400 or 404 may be returned, and the \"detail\" content will explain the\
+        \ error."
       parameters: []
       responses:
         '201':
@@ -677,6 +678,49 @@ paths:
         in: path
         required: true
         type: string
+  ? /course_experience/v1/course_deadlines_info/(P{course_key_string}[/+]+{var}[/+]+api/course_experience/v1/course_deadlines_info/(P{course_key_string}[/+]+(/|+)[/+]+{var}[/]+)
+  : get:
+      operationId: course_experience_v1_course_deadlines_info_+]+api_course_experience_v1_course_deadlines_info_+]+(_|+)[_]+)_read
+      summary: '**Use Cases**'
+      description: "Request course deadline info for mobile\n\n**Example Requests**\n\
+        \n    GET api/course_experience/v1/course_deadlines_info/{course_key}\n\n\
+        **Response Values**\n\n    Body consists of the following fields:\n\n    dates_banner_info:\
+        \ (obj)\n        missed_deadlines: (bool) Whether the user has missed any\
+        \ graded content deadlines for the given course.\n        missed_gated_content:\
+        \ (bool) Whether the user has missed any gated content for the given course.\n\
+        \        content_type_gating_enabled: (bool) Whether content type gating is\
+        \ enabled for this enrollment.\n        verified_upgrade_link: (str) The URL\
+        \ to ecommerce IDA for purchasing the verified upgrade.\n\n**Returns**\n\n\
+        \    * 200 on success with above fields.\n    * 401 if the user is not authenticated.\n\
+        \    * 404 if the course is not available or cannot be seen."
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CourseDeadlinesMobile'
+      tags:
+        - course_experience
+    parameters:
+      - name: course_key_string
+        in: path
+        required: true
+        type: string
+      - name: var
+        in: path
+        required: true
+        type: string
+  /course_experience/v1/reset_course_deadlines:
+    post:
+      operationId: course_experience_v1_reset_course_deadlines_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - course_experience
+    parameters: []
   /course_goals/v0/course_goals/:
     get:
       operationId: course_goals_v0_course_goals_list
@@ -829,6 +873,244 @@ paths:
         description: A unique integer value identifying this course goal.
         required: true
         type: integer
+  ? /course_home/v1/course_metadata/(P{course_key_string}[/+]+{var}[/+]+api/course_home/v1/course_metadata/(P{course_key_string}[/+]+(/|+)[/+]+{var}[/]+)
+  : get:
+      operationId: course_home_v1_course_metadata_+]+api_course_home_v1_course_metadata_+]+(_|+)[_]+)_read
+      summary: '**Use Cases**'
+      description: "Request Course metadata details for the Course Home MFE that every\
+        \ page needs.\n\n**Example Requests**\n\n    GET api/course_home/v1/course_metadata/{course_key}\n\
+        \n**Response Values**\n\n    Body consists of the following fields:\n\n  \
+        \  course_id: (str) The Course's id (Course Run key)\n    is_enrolled: (bool)\
+        \ Indicates if the user is enrolled in the course\n    is_self_paced: (bool)\
+        \ Indicates if the course is self paced\n    is_staff: (bool) Indicates if\
+        \ the user is staff\n    original_user_is_staff: (bool) Indicates if the original\
+        \ user has staff access\n        Used for when masquerading to distinguish\
+        \ between the original requesting user\n        and the user being masqueraded\
+        \ as.\n    number: (str) The Course's number\n    org: (str) The Course's\
+        \ organization\n    tabs: List of Course Tabs to display. They are serialized\
+        \ as:\n        tab_id: (str) The tab's id\n        title: (str) The title\
+        \ of the tab to display\n        url: (str) The url to view the tab\n    title:\
+        \ (str) The Course's display title\n\n**Returns**\n\n    * 200 on success\
+        \ with above fields.\n    * 404 if the course is not available or cannot be\
+        \ seen."
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/CourseHomeMetadata'
+      tags:
+        - course_home
+    parameters:
+      - name: course_key_string
+        in: path
+        required: true
+        type: string
+      - name: var
+        in: path
+        required: true
+        type: string
+  ? /course_home/v1/dates/(P{course_key_string}[/+]+{var}[/+]+api/course_home/v1/dates/(P{course_key_string}[/+]+(/|+)[/+]+{var}[/]+)
+  : get:
+      operationId: course_home_v1_dates_+]+api_course_home_v1_dates_+]+(_|+)[_]+)_read
+      summary: '**Use Cases**'
+      description: "Request details for the Dates Tab\n\n**Example Requests**\n\n\
+        \    GET api/course_home/v1/dates/{course_key}\n\n**Response Values**\n\n\
+        \    Body consists of the following fields:\n\n    course_date_blocks: List\
+        \ of serialized DateSummary objects. Each serialization has the following\
+        \ fields:\n        complete: (bool) Meant to only be used by assignments.\
+        \ Indicates completeness for an\n            assignment.\n        date: (datetime)\
+        \ The date time corresponding for the event\n        date_type: (str) The\
+        \ type of date (ex. course-start-date, assignment-due-date, etc.)\n      \
+        \  description: (str) The description for the date event\n        learner_has_access:\
+        \ (bool) Indicates if the learner has access to the date event\n        link:\
+        \ (str) An absolute link to content related to the date event\n          \
+        \  (ex. verified link or link to assignment)\n        title: (str) The title\
+        \ of the date event\n    dates_banner_info: (obj)\n        content_type_gating_enabled:\
+        \ (bool) Whether content type gating is enabled for this enrollment.\n   \
+        \     missed_deadlines: (bool) Indicates whether the user missed any graded\
+        \ content deadlines\n        missed_gated_content: (bool) Indicates whether\
+        \ the user missed gated content\n        verified_upgrade_link: (str) The\
+        \ link for upgrading to the Verified track in a course\n    has_ended: (bool)\
+        \ Indicates whether course has ended\n    learner_is_full_access: (bool) Indicates\
+        \ if the user is verified in the course\n    user_timezone: (str) The user's\
+        \ preferred timezone\n\n**Returns**\n\n    * 200 on success with above fields.\n\
+        \    * 401 if the user is not authenticated.\n    * 404 if the course is not\
+        \ available or cannot be seen."
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/DatesTab'
+      tags:
+        - course_home
+    parameters:
+      - name: course_key_string
+        in: path
+        required: true
+        type: string
+      - name: var
+        in: path
+        required: true
+        type: string
+  /course_home/v1/dismiss_welcome_message:
+    post:
+      operationId: course_home_v1_dismiss_welcome_message_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - course_home
+    parameters: []
+  ? /course_home/v1/outline/(P{course_key_string}[/+]+{var}[/+]+api/course_home/v1/outline/(P{course_key_string}[/+]+(/|+)[/+]+{var}[/]+)
+  : get:
+      operationId: course_home_v1_outline_+]+api_course_home_v1_outline_+]+(_|+)[_]+)_read
+      summary: '**Use Cases**'
+      description: "Request details for the Outline Tab\n\n**Example Requests**\n\n\
+        \    GET api/course_home/v1/outline/{course_key}\n\n**Response Values**\n\n\
+        \    Body consists of the following fields:\n\n    course_blocks:\n      \
+        \  blocks: List of serialized Course Block objects. Each serialization has\
+        \ the following fields:\n            id: (str) The usage ID of the block.\n\
+        \            type: (str) The type of block. Possible values the names of any\n\
+        \                XBlock type in the system, including custom blocks. Examples\
+        \ are\n                course, chapter, sequential, vertical, html, problem,\
+        \ video, and\n                discussion.\n            display_name: (str)\
+        \ The display name of the block.\n            lms_web_url: (str) The URL to\
+        \ the navigational container of the\n                xBlock on the web LMS.\n\
+        \            children: (list) If the block has child blocks, a list of IDs\
+        \ of\n                the child blocks.\n            resume_block: (bool)\
+        \ Whether the block is the resume block\n    course_goals:\n        goal_options:\
+        \ (list) A list of goals where each goal is represented as a tuple (goal_key,\
+        \ goal_string)\n        selected_goal:\n            key: (str) The unique\
+        \ id given to the user's selected goal.\n            text: (str) The display\
+        \ text for the user's selected goal.\n    course_tools: List of serialized\
+        \ Course Tool objects. Each serialization has the following fields:\n    \
+        \    analytics_id: (str) The unique id given to the tool.\n        title:\
+        \ (str) The display title of the tool.\n        url: (str) The link to access\
+        \ the tool.\n    dates_banner_info: (obj)\n        content_type_gating_enabled:\
+        \ (bool) Whether content type gating is enabled for this enrollment.\n   \
+        \     missed_deadlines: (bool) Whether the user has missed any graded content\
+        \ deadlines for the given course.\n        missed_gated_content: (bool) Whether\
+        \ the user has missed any gated content for the given course.\n        verified_upgrade_link:\
+        \ (str) The URL to ecommerce IDA for purchasing the verified upgrade.\n  \
+        \  dates_widget:\n        course_date_blocks: List of serialized Course Dates\
+        \ objects. Each serialization has the following fields:\n            complete:\
+        \ (bool) Meant to only be used by assignments. Indicates completeness for\
+        \ an\n            assignment.\n            date: (datetime) The date time\
+        \ corresponding for the event\n            date_type: (str) The type of date\
+        \ (ex. course-start-date, assignment-due-date, etc.)\n            description:\
+        \ (str) The description for the date event\n            learner_has_access:\
+        \ (bool) Indicates if the learner has access to the date event\n         \
+        \   link: (str) An absolute link to content related to the date event\n  \
+        \              (ex. verified link or link to assignment)\n            title:\
+        \ (str) The title of the date event\n        dates_tab_link: (str) The URL\
+        \ to the Dates Tab\n        user_timezone: (str) The timezone of the given\
+        \ user\n    enroll_alert:\n        can_enroll: (bool) Whether the user can\
+        \ enroll in the given course\n        extra_text: (str)\n    handouts_html:\
+        \ (str) Raw HTML for the handouts section of the course info\n    has_ended:\
+        \ (bool) Indicates whether course has ended\n    resume_course:\n        has_visited_course:\
+        \ (bool) Whether the user has ever visited the course\n        url: (str)\
+        \ The display name of the course block to resume\n    welcome_message_html:\
+        \ (str) Raw HTML for the course updates banner\n\n**Returns**\n\n    * 200\
+        \ on success with above fields.\n    * 403 if the user is not authenticated.\n\
+        \    * 404 if the course is not available or cannot be seen."
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/OutlineTab'
+      tags:
+        - course_home
+    parameters:
+      - name: course_key_string
+        in: path
+        required: true
+        type: string
+      - name: var
+        in: path
+        required: true
+        type: string
+  ? /course_home/v1/progress/(P{course_key_string}[/+]+{var}[/+]+api/course_home/v1/progress/(P{course_key_string}[/+]+(/|+)[/+]+{var}[/]+)
+  : get:
+      operationId: course_home_v1_progress_+]+api_course_home_v1_progress_+]+(_|+)[_]+)_read
+      summary: '**Use Cases**'
+      description: "Request details for the Progress Tab\n\n**Example Requests**\n\
+        \n    GET api/course_home/v1/progress/{course_key}\n\n**Response Values**\n\
+        \n    Body consists of the following fields:\n\n    certificate_data: Object\
+        \ containing information about the user's certificate status\n        cert_web_view_url:\
+        \ (str) the url to view the certificate\n        download_url: (str) the url\
+        \ to download the certificate\n        is_downloadable: (bool) true if the\
+        \ status is downloadable and the download url is not None\n        is_requestable:\
+        \ (bool) true if status is requesting and request_cert_url is not None\n \
+        \       msg: (str) message for the certificate status\n        title: (str)\
+        \ title of the certificate status\n    credit_course_requirements: An object\
+        \ containing the following fields\n        dashboard_url: (str) the url to\
+        \ the user's dashboard\n        eligibility_status: (str) the user's eligibility\
+        \ to receive a course credit\n        requirements: object containing the\
+        \ following fields\n            display_name: (str) the name of the requirement\
+        \ that should be displayed\n            namespace: (str) the type that the\
+        \ requirement is\n            min_grade: (float) the percentage formatted\
+        \ minimum grade needed for this requirement\n            status: (str) the\
+        \ status of the requirement\n            status_date: (str) the date the status\
+        \ was set\n    credit_support_url: (str) the url to the support docs for purchasing\
+        \ a credit\n    courseware_summary: List of serialized Chapters. each Chapter\
+        \ has the following fields:\n        display_name: (str) a str of what the\
+        \ name of the Chapter is for displaying on the site\n        subsections:\
+        \ List of serialized Subsections, each has the following fields:\n       \
+        \     display_name: (str) a str of what the name of the Subsection is for\
+        \ displaying on the site\n            due: (str) a DateTime string for when\
+        \ the Subsection is due\n            format: (str) the format, if any, of\
+        \ the Subsection (Homework, Exam, etc)\n            graded: (bool) whether\
+        \ or not the Subsection is graded\n            graded_total: an object containing\
+        \ the following fields\n                earned: (float) the amount of points\
+        \ the user earned\n                possible: (float) the amount of points\
+        \ the user could have earned\n            percent_graded: (float) the percentage\
+        \ of the points the user received for the subsection\n            show_correctness:\
+        \ (str) a str representing whether to show the problem/practice scores based\
+        \ on due date\n            show_grades: (bool) a bool for whether to show\
+        \ grades based on the access the user has\n            url: (str) the absolute\
+        \ path url to the Subsection\n    enrollment_mode: (str) a str representing\
+        \ the enrollment the user has ('audit', 'verified', ...)\n    studio_url:\
+        \ (str) a str of the link to the grading in studio for the course\n    user_timezone:\
+        \ (str) The user's preferred timezone\n    verification_data: an object containing\n\
+        \        link: (str) the link to either start or retry verification\n    \
+        \    status: (str) the status of the verification\n        status_date: (str)\
+        \ the date time string of when the verification status was set\n\n\n\n**Returns**\n\
+        \n    * 200 on success with above fields.\n    * 302 if the user is not enrolled.\n\
+        \    * 403 if the user is not authenticated.\n    * 404 if the course is not\
+        \ available or cannot be seen."
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/ProgressTab'
+      tags:
+        - course_home
+    parameters:
+      - name: course_key_string
+        in: path
+        required: true
+        type: string
+      - name: var
+        in: path
+        required: true
+        type: string
+  /course_home/v1/save_course_goal:
+    post:
+      operationId: course_home_v1_save_course_goal_create
+      description: ''
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - course_home
+    parameters: []
   /course_modes/v1/courses/{course_id}/:
     get:
       operationId: course_modes_v1_courses_read
@@ -1072,18 +1354,21 @@ paths:
         \ the\n      username for the user whose course blocks are requested.\n\n\
         \    * username: (string) Required, unless ``all_blocks`` is specified.\n\
         \      Specify the username for the user whose course blocks are requested.\n\
-        \      Only users with course staff permissions can specify other users'\n\
-        \      usernames. If a username is specified, results include blocks that\n\
-        \      are visible to that user, including those based on group or cohort\n\
-        \      membership or randomized content assigned to that user.\n\n      Example:\
-        \ username=anjali\n\n    * student_view_data: (list) Indicates for which block\
-        \ types to return\n      student_view_data.\n\n      Example: student_view_data=video\n\
-        \n    * block_counts: (list) Indicates for which block types to return the\n\
-        \      aggregate count of the blocks.\n\n      Example: block_counts=video,problem\n\
-        \n    * requested_fields: (list) Indicates which additional fields to return\n\
-        \      for each block.  For a list of available fields see under `Response\n\
-        \      Values -> blocks`, below.\n\n      The following fields are always\
-        \ returned: id, type, display_name\n\n      Example: requested_fields=graded,format,student_view_multi_device\n\
+        \      A blank/empty username can be used to request the blocks accessible\n\
+        \      to anonymous users (for public courses). Only users with course staff\n\
+        \      permissions can specify other users' usernames. If a username is\n\
+        \      specified, results include blocks that are visible to that user,\n\
+        \      including those based on group or cohort membership or randomized\n\
+        \      content assigned to that user.\n\n      Example: username=anjali\n\
+        \               username=''\n               username\n\n    * student_view_data:\
+        \ (list) Indicates for which block types to return\n      student_view_data.\n\
+        \n      Example: student_view_data=video\n\n    * block_counts: (list) Indicates\
+        \ for which block types to return the\n      aggregate count of the blocks.\n\
+        \n      Example: block_counts=video,problem\n\n    * requested_fields: (list)\
+        \ Indicates which additional fields to return\n      for each block.  For\
+        \ a list of available fields see under `Response\n      Values -> blocks`,\
+        \ below.\n\n      The following fields are always returned: id, type, display_name\n\
+        \n      Example: requested_fields=graded,format,student_view_multi_device\n\
         \n    * depth: (integer or all) Indicates how deep to traverse into the blocks\n\
         \      hierarchy.  A value of all means the entire hierarchy.\n\n      Default\
         \ is 0\n\n      Example: depth=all\n\n    * nav_depth: (integer)\n\n     \
@@ -1146,6 +1431,9 @@ paths:
         \        in the \"requested_fields\" parameter.\n\n      * show_correctness:\
         \ Whether to show scores/correctness to learners for the current sequence\
         \ or problem.\n        Returned only if \"show_correctness\" is included in\
+        \ the \"requested_fields\" parameter.\n\n      * Additional XBlock fields\
+        \ can be included in the response if they are\n        configured via the\
+        \ COURSE_BLOCKS_API_EXTRA_FIELDS Django setting and\n        requested via\
         \ the \"requested_fields\" parameter."
       parameters:
         - name: page
@@ -1424,18 +1712,21 @@ paths:
         \ the\n      username for the user whose course blocks are requested.\n\n\
         \    * username: (string) Required, unless ``all_blocks`` is specified.\n\
         \      Specify the username for the user whose course blocks are requested.\n\
-        \      Only users with course staff permissions can specify other users'\n\
-        \      usernames. If a username is specified, results include blocks that\n\
-        \      are visible to that user, including those based on group or cohort\n\
-        \      membership or randomized content assigned to that user.\n\n      Example:\
-        \ username=anjali\n\n    * student_view_data: (list) Indicates for which block\
-        \ types to return\n      student_view_data.\n\n      Example: student_view_data=video\n\
-        \n    * block_counts: (list) Indicates for which block types to return the\n\
-        \      aggregate count of the blocks.\n\n      Example: block_counts=video,problem\n\
-        \n    * requested_fields: (list) Indicates which additional fields to return\n\
-        \      for each block.  For a list of available fields see under `Response\n\
-        \      Values -> blocks`, below.\n\n      The following fields are always\
-        \ returned: id, type, display_name\n\n      Example: requested_fields=graded,format,student_view_multi_device\n\
+        \      A blank/empty username can be used to request the blocks accessible\n\
+        \      to anonymous users (for public courses). Only users with course staff\n\
+        \      permissions can specify other users' usernames. If a username is\n\
+        \      specified, results include blocks that are visible to that user,\n\
+        \      including those based on group or cohort membership or randomized\n\
+        \      content assigned to that user.\n\n      Example: username=anjali\n\
+        \               username=''\n               username\n\n    * student_view_data:\
+        \ (list) Indicates for which block types to return\n      student_view_data.\n\
+        \n      Example: student_view_data=video\n\n    * block_counts: (list) Indicates\
+        \ for which block types to return the\n      aggregate count of the blocks.\n\
+        \n      Example: block_counts=video,problem\n\n    * requested_fields: (list)\
+        \ Indicates which additional fields to return\n      for each block.  For\
+        \ a list of available fields see under `Response\n      Values -> blocks`,\
+        \ below.\n\n      The following fields are always returned: id, type, display_name\n\
+        \n      Example: requested_fields=graded,format,student_view_multi_device\n\
         \n    * depth: (integer or all) Indicates how deep to traverse into the blocks\n\
         \      hierarchy.  A value of all means the entire hierarchy.\n\n      Default\
         \ is 0\n\n      Example: depth=all\n\n    * nav_depth: (integer)\n\n     \
@@ -1498,6 +1789,9 @@ paths:
         \        in the \"requested_fields\" parameter.\n\n      * show_correctness:\
         \ Whether to show scores/correctness to learners for the current sequence\
         \ or problem.\n        Returned only if \"show_correctness\" is included in\
+        \ the \"requested_fields\" parameter.\n\n      * Additional XBlock fields\
+        \ can be included in the response if they are\n        configured via the\
+        \ COURSE_BLOCKS_API_EXTRA_FIELDS Django setting and\n        requested via\
         \ the \"requested_fields\" parameter."
       parameters:
         - name: page
@@ -1517,6 +1811,25 @@ paths:
         - courses
     parameters:
       - name: usage_key_string
+        in: path
+        required: true
+        type: string
+      - name: var
+        in: path
+        required: true
+        type: string
+  ? /courseware/celebration/(P{course_key_string}[/+]+{var}[/+]+api/courseware/celebration/(P{course_key_string}[/+]+(/|+)[/+]+{var}[/]+)
+  : post:
+      operationId: courseware_celebration_+]+api_courseware_celebration_+]+(_|+)[_]+)_create
+      description: Handle a POST request.
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - courseware
+    parameters:
+      - name: course_key_string
         in: path
         required: true
         type: string
@@ -1551,15 +1864,43 @@ paths:
         \ Enrollment status of authenticated user\n        * mode: `audit`, `verified`,\
         \ etc\n        * is_active: boolean\n    * can_load_course: Whether the user\
         \ can view the course (AccessResponse object)\n    * is_staff: Whether the\
-        \ user has staff access to the course\n\n**Parameters:**\n\n    requested_fields\
-        \ (optional) comma separated list:\n        If set, then only those fields\
-        \ will be returned.\n    username (optional) username to masquerade as (if\
-        \ requesting user is staff)\n\n**Returns**\n\n    * 200 on success with above\
-        \ fields.\n    * 400 if an invalid parameter was sent or the username was\
-        \ not provided\n      for an authenticated request.\n    * 403 if a user who\
-        \ does not have permission to masquerade as\n      another user specifies\
-        \ a username other than their own.\n    * 404 if the course is not available\
-        \ or cannot be seen."
+        \ effective user has staff access to the course\n    * original_user_is_staff:\
+        \ Whether the original user has staff access to the course\n    * user_has_passing_grade:\
+        \ Whether or not the effective user's grade is equal to or above the courses\
+        \ minimum\n        passing grade\n    * course_exit_page_is_active: Flag for\
+        \ the learning mfe on whether or not the course exit page should display\n\
+        \    * certificate_data: data regarding the effective user's certificate for\
+        \ the given course\n    * verify_identity_url: URL for a learner to verify\
+        \ their identity. Only returned for learners enrolled in a\n        verified\
+        \ mode. Will update to reverify URL if necessary.\n    * linkedin_add_to_profile_url:\
+        \ URL to add the effective user's certificate to a LinkedIn Profile.\n\n**Parameters:**\n\
+        \n    requested_fields (optional) comma separated list:\n        If set, then\
+        \ only those fields will be returned.\n    username (optional) username to\
+        \ masquerade as (if requesting user is staff)\n\n**Returns**\n\n    * 200\
+        \ on success with above fields.\n    * 400 if an invalid parameter was sent\
+        \ or the username was not provided\n      for an authenticated request.\n\
+        \    * 403 if a user who does not have permission to masquerade as\n     \
+        \ another user specifies a username other than their own.\n    * 404 if the\
+        \ course is not available or cannot be seen."
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - courseware
+    parameters:
+      - name: course_key_string
+        in: path
+        required: true
+        type: string
+      - name: var
+        in: path
+        required: true
+        type: string
+  ? /courseware/resume/(P{course_key_string}[/+]+{var}[/+]+api/courseware/resume/(P{course_key_string}[/+]+(/|+)[/+]+{var}[/]+)
+  : get:
+      operationId: courseware_resume_+]+api_courseware_resume_+]+(_|+)[_]+)_list
+      description: Return response to a GET request.
       parameters: []
       responses:
         '200':
@@ -1755,6 +2096,29 @@ paths:
         in: path
         required: true
         type: string
+  /demographics/v1/demographics/status/:
+    get:
+      operationId: demographics_v1_demographics_status_list
+      summary: GET /api/user/v1/accounts/demographics/status
+      description: This is a Web API to determine the status of demographics related
+        features
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - demographics
+    patch:
+      operationId: demographics_v1_demographics_status_partial_update
+      summary: PATCH /api/user/v1/accounts/demographics/status
+      description: This is a Web API to update fields that are dependent on user interaction.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - demographics
+    parameters: []
   /discounts/course/(P{course_key_string}[/+]+{var}[/+]+api/discounts/course/(P{course_key_string}[/+]+(/|+)[/+]+{var}[/]+):
     get:
       operationId: discounts_course_+]+api_discounts_course_+]+(_|+)[_]+)_list
@@ -2527,7 +2891,7 @@ paths:
         \ named by the 'user' GET\nparameter. If the username does not match that\
         \ of the currently logged in user, only\ncourses for which the currently logged\
         \ in user has the Staff or Admin role are listed.\nAs a result, a course team\
-        \ member can find out which of his or her own courses a particular\nlearner\
+        \ member can find out which of their own courses a particular\nlearner\
         \ is enrolled in.\n\nOnly the Staff or Admin role (granted on the Django administrative\
         \ console as the staff\nor instructor permission) in individual courses gives\
         \ the requesting user access to\nenrollment data. Permissions granted at the\
@@ -2731,7 +3095,7 @@ paths:
         - entitlements
     post:
       operationId: entitlements_v1_entitlements_create
-      description: ''
+      description: ViewSet for the Entitlements API.
       parameters:
         - name: data
           in: body
@@ -2761,7 +3125,7 @@ paths:
         - entitlements
     put:
       operationId: entitlements_v1_entitlements_update
-      description: ''
+      description: ViewSet for the Entitlements API.
       parameters:
         - name: data
           in: body
@@ -2777,7 +3141,7 @@ paths:
         - entitlements
     patch:
       operationId: entitlements_v1_entitlements_partial_update
-      description: ''
+      description: ViewSet for the Entitlements API.
       parameters:
         - name: data
           in: body
@@ -2793,7 +3157,7 @@ paths:
         - entitlements
     delete:
       operationId: entitlements_v1_entitlements_delete
-      description: ''
+      description: ViewSet for the Entitlements API.
       parameters: []
       responses:
         '204':
@@ -3263,6 +3627,22 @@ paths:
         in: path
         required: true
         type: string
+  /learning_sequences/v1/course_outline/{course_key_str}:
+    get:
+      operationId: learning_sequences_v1_course_outline_read
+      summary: The CourseOutline, customized for a given user.
+      description: Currently restricted to global staff.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - learning_sequences
+    parameters:
+      - name: course_key_str
+        in: path
+        required: true
+        type: string
   /mobile/{api_version}/course_info/{course_id}/handouts:
     get:
       operationId: mobile_course_info_handouts_list
@@ -3483,69 +3863,6 @@ paths:
         in: path
         required: true
         type: string
-  /notifier/v1/users/:
-    get:
-      operationId: notifier_v1_users_list
-      description: "An endpoint that the notifier can use to retrieve users who have\
-        \ enabled\ndaily forum digests, including all information that the notifier\
-        \ needs about\nsuch users."
-      parameters:
-        - name: page
-          in: query
-          description: A page number within the paginated result set.
-          required: false
-          type: integer
-        - name: page_size
-          in: query
-          description: Number of results to return per page.
-          required: false
-          type: integer
-      responses:
-        '200':
-          description: ''
-          schema:
-            required:
-              - count
-              - results
-            type: object
-            properties:
-              count:
-                type: integer
-              next:
-                type: string
-                format: uri
-                x-nullable: true
-              previous:
-                type: string
-                format: uri
-                x-nullable: true
-              results:
-                type: array
-                items:
-                  $ref: '#/definitions/NotifierUser'
-      tags:
-        - notifier
-    parameters: []
-  /notifier/v1/users/{id}/:
-    get:
-      operationId: notifier_v1_users_read
-      description: "An endpoint that the notifier can use to retrieve users who have\
-        \ enabled\ndaily forum digests, including all information that the notifier\
-        \ needs about\nsuch users."
-      parameters: []
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/NotifierUser'
-      tags:
-        - notifier
-    parameters:
-      - name: id
-        in: path
-        description: A unique integer value identifying this user.
-        required: true
-        type: integer
   /organizations/v0/organizations/:
     get:
       operationId: organizations_v0_organizations_list
@@ -4105,6 +4422,31 @@ paths:
         in: path
         required: true
         type: string
+  /team/v0/teams/{team_id}/assignments:
+    get:
+      operationId: team_v0_teams_assignments_list
+      description: GET v0/teams/{team_id_pattern}/assignments
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+        - name: page_size
+          in: query
+          description: Number of results to return per page.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+      tags:
+        - team
+    parameters:
+      - name: team_id
+        in: path
+        required: true
+        type: string
   /team/v0/topics/:
     get:
       operationId: team_v0_topics_list
@@ -4270,6 +4612,17 @@ paths:
         in: path
         required: true
         type: string
+  /toggles/v0/state/:
+    get:
+      operationId: toggles_v0_state_list
+      description: An endpoint for displaying the state of toggles in edx-platform.
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - toggles
+    parameters: []
   /user/v1/accounts:
     get:
       operationId: user_v1_accounts_list
@@ -4552,6 +4905,26 @@ paths:
         in: path
         required: true
         type: string
+  /user/v1/accounts/{username}/verifications/:
+    get:
+      operationId: user_v1_accounts_verifications_list
+      description: IDVerificationStatusDeetails endpoint to retrieve more details
+        about ID Verification status
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/IDVerificationDetails'
+      tags:
+        - user
+    parameters:
+      - name: username
+        in: path
+        required: true
+        type: string
   /user/v1/me:
     get:
       operationId: user_v1_get
@@ -4731,9 +5104,10 @@ paths:
     put:
       operationId: val_v0_videos_missing-hls_update
       summary: Update a single profile for a given video.
-      description: "Example request data:\n    {\n        'edx_video_id': '1234'\n\
-        \        'profile': 'hls',\n        'encode_data': {\n            'url': 'foo.com/qwe.m3u8'\n\
-        \            'file_size': 34\n            'bitrate': 12\n        }\n    }"
+      description: "Example request data:\n    ```\n    {\n        'edx_video_id':\
+        \ '1234'\n        'profile': 'hls',\n        'encode_data': {\n          \
+        \  'url': 'foo.com/qwe.m3u8'\n            'file_size': 34\n            'bitrate':\
+        \ 12\n        }\n    }\n    ```"
       parameters: []
       responses:
         '200':
@@ -4752,63 +5126,6 @@ paths:
       tags:
         - val
     parameters: []
-  /val/v0/videos/transcript-credentials/{provider}/{org}:
-    get:
-      operationId: val_v0_videos_transcript-credentials_read
-      summary: Retrieves the transcript credentials for a given organization and provider.
-      description: "**Example requests**:\n\n    GET api/val/v0/videos/transcript-credentials/{provider}/{org}\n\
-        \n**GET Parameters**:\n\n    The following parameters are required to get\
-        \ the credentials:\n\n        * provider(str): transcript provider, which\
-        \ is either 3PlayMedia or Cielo24.\n\n        * org(str): organization whose\
-        \ credentials are to be fetch.\n\n**Response Values**\n\n    For a successful\
-        \ request, the following values are returned along with 200 status:\n\n  \
-        \      * api_key(str): provider key\n\n        * api_secret_key(str): provider\
-        \ api secret key(only for 3PlayMedia)\n\n        * provider(str): transcript\
-        \ provider\n\n        * org(str): organization whose credentials are fetched.\n\
-        \n    For the error, 400 response code is returned with:\n\n        * message(str):\
-        \ error message"
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - val
-    parameters:
-      - name: org
-        in: path
-        description: This value must match the value of organization in studio/edx-platform.
-        required: true
-        type: string
-      - name: provider
-        in: path
-        required: true
-        type: string
-  /val/v0/videos/transcript-preferences/{course_id}:
-    get:
-      operationId: val_v0_videos_transcript-preferences_read
-      summary: Retrieves the transcript preferences for a given course.
-      description: "**Example requests**\n\n    GET api/val/v0/videos/transcript-preferences/{course_id}\n\
-        \n**Parameters**\n\n    * course_id(str): course whose preferences are to\
-        \ be fetched\n\n**Response Values**\n\n    * course_id(str): course id whose\
-        \ preferences are fetched\n\n    * provider(str): transcript provider name\n\
-        \n    * cielo24_fidelity(str/None): Cielo24 fidelity choice\n\n    * cielo24_turnaround(str/None):\
-        \ Cielo24 turnaround time choice\n\n    * three_play_turnaround(str/None):\
-        \ 3playMedia turnaround\n\n    * preferred_languages(list): list of languages(str\
-        \ values)\n\n    * video_source_language(str): video language\n\n    * modified(datetime):\
-        \ last modified date"
-      parameters: []
-      responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/TranscriptPreference'
-      tags:
-        - val
-    parameters:
-      - name: course_id
-        in: path
-        required: true
-        type: string
   /val/v0/videos/video-images/update/:
     post:
       operationId: val_v0_videos_video-images_update_create
@@ -5145,6 +5462,17 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/commerce.CourseMode'
+  CourseDeadlinesMobile:
+    type: object
+    properties:
+      dates_banner_info:
+        title: Dates banner info
+        type: string
+        readOnly: true
+      has_ended:
+        title: Has ended
+        type: string
+        readOnly: true
   CourseGoal:
     required:
       - user
@@ -5168,6 +5496,493 @@ definitions:
           - complete
           - explore
           - unsure
+  CourseTab:
+    required:
+      - tab_id
+    type: object
+    properties:
+      tab_id:
+        title: Tab id
+        type: string
+        minLength: 1
+      title:
+        title: Title
+        type: string
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        readOnly: true
+  CourseHomeMetadata:
+    required:
+      - course_id
+      - is_enrolled
+      - is_self_paced
+      - is_staff
+      - number
+      - org
+      - original_user_is_staff
+      - tabs
+      - title
+    type: object
+    properties:
+      course_id:
+        title: Course id
+        type: string
+        minLength: 1
+      is_enrolled:
+        title: Is enrolled
+        type: boolean
+      is_self_paced:
+        title: Is self paced
+        type: boolean
+      is_staff:
+        title: Is staff
+        type: boolean
+      number:
+        title: Number
+        type: string
+        minLength: 1
+      org:
+        title: Org
+        type: string
+        minLength: 1
+      original_user_is_staff:
+        title: Original user is staff
+        type: boolean
+      tabs:
+        type: array
+        items:
+          $ref: '#/definitions/CourseTab'
+      title:
+        title: Title
+        type: string
+        minLength: 1
+  DateSummary:
+    required:
+      - complete
+      - date
+      - date_type
+      - description
+      - link_text
+      - title
+      - extra_info
+    type: object
+    properties:
+      assignment_type:
+        title: Assignment type
+        type: string
+        minLength: 1
+      complete:
+        title: Complete
+        type: boolean
+      date:
+        title: Date
+        type: string
+        format: date-time
+      date_type:
+        title: Date type
+        type: string
+        minLength: 1
+      description:
+        title: Description
+        type: string
+        minLength: 1
+      learner_has_access:
+        title: Learner has access
+        type: string
+        readOnly: true
+      link:
+        title: Link
+        type: string
+        readOnly: true
+      link_text:
+        title: Link text
+        type: string
+        minLength: 1
+      title:
+        title: Title
+        type: string
+        minLength: 1
+      extra_info:
+        title: Extra info
+        type: string
+        minLength: 1
+  DatesTab:
+    required:
+      - course_date_blocks
+      - has_ended
+      - learner_is_full_access
+      - user_timezone
+    type: object
+    properties:
+      dates_banner_info:
+        title: Dates banner info
+        type: string
+        readOnly: true
+      course_date_blocks:
+        type: array
+        items:
+          $ref: '#/definitions/DateSummary'
+      has_ended:
+        title: Has ended
+        type: boolean
+      learner_is_full_access:
+        title: Learner is full access
+        type: boolean
+      user_timezone:
+        title: User timezone
+        type: string
+        minLength: 1
+  CourseBlock:
+    title: Course blocks
+    type: object
+    properties:
+      blocks:
+        title: Blocks
+        type: string
+        readOnly: true
+  CourseGoals:
+    title: Course goals
+    required:
+      - goal_options
+      - selected_goal
+    type: object
+    properties:
+      goal_options:
+        type: array
+        items:
+          type: string
+      selected_goal:
+        title: Selected goal
+        type: object
+        additionalProperties:
+          type: string
+  CourseTool:
+    required:
+      - analytics_id
+      - title
+    type: object
+    properties:
+      analytics_id:
+        title: Analytics id
+        type: string
+        minLength: 1
+      title:
+        title: Title
+        type: string
+        minLength: 1
+      url:
+        title: Url
+        type: string
+        readOnly: true
+  DatesWidget:
+    title: Dates widget
+    required:
+      - course_date_blocks
+      - dates_tab_link
+      - user_timezone
+    type: object
+    properties:
+      course_date_blocks:
+        type: array
+        items:
+          $ref: '#/definitions/DateSummary'
+      dates_tab_link:
+        title: Dates tab link
+        type: string
+        minLength: 1
+      user_timezone:
+        title: User timezone
+        type: string
+        minLength: 1
+  EnrollAlert:
+    title: Enroll alert
+    required:
+      - can_enroll
+      - extra_text
+    type: object
+    properties:
+      can_enroll:
+        title: Can enroll
+        type: boolean
+      extra_text:
+        title: Extra text
+        type: string
+        minLength: 1
+  ResumeCourse:
+    title: Resume course
+    required:
+      - has_visited_course
+      - url
+    type: object
+    properties:
+      has_visited_course:
+        title: Has visited course
+        type: boolean
+      url:
+        title: Url
+        type: string
+        format: uri
+        minLength: 1
+  OutlineTab:
+    required:
+      - course_blocks
+      - course_expired_html
+      - course_goals
+      - course_tools
+      - dates_widget
+      - enroll_alert
+      - handouts_html
+      - has_ended
+      - offer_html
+      - resume_course
+      - welcome_message_html
+    type: object
+    properties:
+      dates_banner_info:
+        title: Dates banner info
+        type: string
+        readOnly: true
+      course_blocks:
+        $ref: '#/definitions/CourseBlock'
+      course_expired_html:
+        title: Course expired html
+        type: string
+        minLength: 1
+      course_goals:
+        $ref: '#/definitions/CourseGoals'
+      course_tools:
+        type: array
+        items:
+          $ref: '#/definitions/CourseTool'
+      dates_widget:
+        $ref: '#/definitions/DatesWidget'
+      enroll_alert:
+        $ref: '#/definitions/EnrollAlert'
+      handouts_html:
+        title: Handouts html
+        type: string
+        minLength: 1
+      has_ended:
+        title: Has ended
+        type: boolean
+      offer_html:
+        title: Offer html
+        type: string
+        minLength: 1
+      resume_course:
+        $ref: '#/definitions/ResumeCourse'
+      welcome_message_html:
+        title: Welcome message html
+        type: string
+        minLength: 1
+  CertificateData:
+    title: Certificate data
+    required:
+      - cert_status
+      - cert_web_view_url
+      - download_url
+      - msg
+      - title
+    type: object
+    properties:
+      cert_status:
+        title: Cert status
+        type: string
+        minLength: 1
+      cert_web_view_url:
+        title: Cert web view url
+        type: string
+        minLength: 1
+      download_url:
+        title: Download url
+        type: string
+        minLength: 1
+      msg:
+        title: Msg
+        type: string
+        minLength: 1
+      title:
+        title: Title
+        type: string
+        minLength: 1
+  CreditRequirement:
+    required:
+      - display_name
+      - status
+      - status_date
+    type: object
+    properties:
+      display_name:
+        title: Display name
+        type: string
+        minLength: 1
+      min_grade:
+        title: Min grade
+        type: string
+        readOnly: true
+      status:
+        title: Status
+        type: string
+        minLength: 1
+      status_date:
+        title: Status date
+        type: string
+        format: date-time
+  CreditCourseRequirements:
+    title: Credit course requirements
+    required:
+      - eligibility_status
+      - requirements
+    type: object
+    properties:
+      dashboard_url:
+        title: Dashboard url
+        type: string
+        readOnly: true
+      eligibility_status:
+        title: Eligibility status
+        type: string
+        minLength: 1
+      requirements:
+        type: array
+        items:
+          $ref: '#/definitions/CreditRequirement'
+  GradedTotal:
+    title: Graded total
+    required:
+      - earned
+      - possible
+    type: object
+    properties:
+      earned:
+        title: Earned
+        type: number
+      possible:
+        title: Possible
+        type: number
+  Subsection:
+    required:
+      - display_name
+      - due
+      - format
+      - graded
+      - graded_total
+      - percent_graded
+      - show_correctness
+    type: object
+    properties:
+      display_name:
+        title: Display name
+        type: string
+        minLength: 1
+      due:
+        title: Due
+        type: string
+        format: date-time
+      format:
+        title: Format
+        type: string
+        minLength: 1
+      graded:
+        title: Graded
+        type: boolean
+      graded_total:
+        $ref: '#/definitions/GradedTotal'
+      percent_graded:
+        title: Percent graded
+        type: number
+      problem_scores:
+        title: Problem scores
+        type: string
+        readOnly: true
+      show_correctness:
+        title: Show correctness
+        type: string
+        minLength: 1
+      show_grades:
+        title: Show grades
+        type: string
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        readOnly: true
+  Chapter:
+    required:
+      - display_name
+      - subsections
+    type: object
+    properties:
+      display_name:
+        title: Display name
+        type: string
+        minLength: 1
+      subsections:
+        type: array
+        items:
+          $ref: '#/definitions/Subsection'
+  VerificationData:
+    title: Verification data
+    required:
+      - link
+      - status
+      - status_date
+    type: object
+    properties:
+      link:
+        title: Link
+        type: string
+        format: uri
+        minLength: 1
+      status:
+        title: Status
+        type: string
+        minLength: 1
+      status_date:
+        title: Status date
+        type: string
+        format: date-time
+  ProgressTab:
+    required:
+      - certificate_data
+      - credit_course_requirements
+      - credit_support_url
+      - courseware_summary
+      - enrollment_mode
+      - studio_url
+      - user_timezone
+      - verification_data
+    type: object
+    properties:
+      certificate_data:
+        $ref: '#/definitions/CertificateData'
+      credit_course_requirements:
+        $ref: '#/definitions/CreditCourseRequirements'
+      credit_support_url:
+        title: Credit support url
+        type: string
+        format: uri
+        minLength: 1
+      courseware_summary:
+        type: array
+        items:
+          $ref: '#/definitions/Chapter'
+      enrollment_mode:
+        title: Enrollment mode
+        type: string
+        minLength: 1
+      studio_url:
+        title: Studio url
+        type: string
+        minLength: 1
+      user_timezone:
+        title: User timezone
+        type: string
+        minLength: 1
+      verification_data:
+        $ref: '#/definitions/VerificationData'
   course_modes.CourseMode:
     required:
       - course_id
@@ -5792,31 +6607,6 @@ definitions:
         title: Certificate
         type: string
         readOnly: true
-  NotifierUser:
-    type: object
-    properties:
-      id:
-        title: ID
-        type: integer
-        readOnly: true
-      email:
-        title: Email address
-        type: string
-        format: email
-        readOnly: true
-        minLength: 1
-      name:
-        title: Name
-        type: string
-        readOnly: true
-      preferences:
-        title: Preferences
-        type: string
-        readOnly: true
-      course_info:
-        title: Course info
-        type: string
-        readOnly: true
   Organization:
     required:
       - name
@@ -6005,6 +6795,33 @@ definitions:
         title: Remote id
         type: string
         readOnly: true
+  IDVerificationDetails:
+    required:
+      - status
+      - expiration_datetime
+      - updated_at
+    type: object
+    properties:
+      type:
+        title: Type
+        type: string
+        readOnly: true
+      status:
+        title: Status
+        type: string
+        minLength: 1
+      expiration_datetime:
+        title: Expiration datetime
+        type: string
+        format: date-time
+      message:
+        title: Message
+        type: string
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
   EncodedVideo:
     required:
       - url
@@ -6086,62 +6903,3 @@ definitions:
         title: Error Description
         type: string
         x-nullable: true
-  TranscriptPreference:
-    required:
-      - course_id
-      - provider
-    type: object
-    properties:
-      course_id:
-        title: Course ID
-        type: string
-        maxLength: 255
-        minLength: 1
-      provider:
-        title: Provider
-        type: string
-        enum:
-          - Custom
-          - 3PlayMedia
-          - Cielo24
-      cielo24_fidelity:
-        title: Cielo24 Fidelity
-        type: string
-        enum:
-          - MECHANICAL
-          - PREMIUM
-          - PROFESSIONAL
-        x-nullable: true
-      cielo24_turnaround:
-        title: Cielo24 Turnaround
-        type: string
-        enum:
-          - STANDARD
-          - PRIORITY
-        x-nullable: true
-      three_play_turnaround:
-        title: 3PlayMedia Turnaround
-        type: string
-        enum:
-          - extended
-          - standard
-          - expedited
-          - rush
-          - same_day
-          - two_hour
-        x-nullable: true
-      preferred_languages:
-        title: Preferred languages
-        type: string
-        readOnly: true
-      video_source_language:
-        title: Video Source Language
-        description: This specifies the speech language of a Video.
-        type: string
-        maxLength: 50
-        x-nullable: true
-      modified:
-        title: Modified
-        type: string
-        format: date-time
-        readOnly: true

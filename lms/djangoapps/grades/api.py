@@ -27,7 +27,7 @@ from lms.djangoapps.grades.subsection_grade_factory import SubsectionGradeFactor
 from lms.djangoapps.grades.tasks import compute_all_grades_for_course as task_compute_all_grades_for_course
 from lms.djangoapps.grades.util_services import GradesUtilService
 from lms.djangoapps.utils import _get_key
-from track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
+from common.djangoapps.track.event_transaction_utils import create_new_event_transaction_id, set_event_transaction_type
 
 
 def graded_subsections_for_course_id(course_id):
@@ -134,7 +134,7 @@ def undo_override_subsection_grade(user_id, course_key_or_id, usage_key_or_id, f
 
 
 def should_override_grade_on_rejected_exam(course_key_or_id):
-    """Convienence function to return the state of the CourseWaffleFlag REJECTED_EXAM_OVERRIDES_GRADE"""
+    """Convenience function to return the state of the CourseWaffleFlag REJECTED_EXAM_OVERRIDES_GRADE"""
     from .config.waffle import waffle_flags, REJECTED_EXAM_OVERRIDES_GRADE
     course_key = _get_key(course_key_or_id, CourseKey)
     return waffle_flags()[REJECTED_EXAM_OVERRIDES_GRADE].is_enabled(course_key)

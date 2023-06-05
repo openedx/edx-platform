@@ -11,7 +11,8 @@
                 tpl: '#password_reset-tpl',
 
                 events: {
-                    'click .js-reset': 'submitForm'
+                    'click .js-reset': 'submitForm',
+                    'click .reset-help': 'toggleResetHelp'
                 },
 
                 formType: 'password-reset',
@@ -25,6 +26,13 @@
                     this.element.show($(this.el));
                     this.element.show($(this.el).parent());
                     this.listenTo(this.model, 'sync', this.saveSuccess);
+                },
+
+                toggleResetHelp: function(event) {
+                    var $help;
+                    event.preventDefault();
+                    $help = $('#reset-help');
+                    this.toggleHelp(event, $help);
                 },
 
                 saveSuccess: function() {

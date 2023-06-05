@@ -41,7 +41,7 @@ def qualityTestCleanup() {
 }
 
 pipeline {
-    agent { label "juniper-worker" }
+    agent { label "koa-worker" }
     options {
         sendSplunkConsoleLog()
         timestamps()
@@ -75,7 +75,7 @@ pipeline {
             parallel {
                 stage("commonlib pylint") {
                     // "pylint common" requires 5.5 GB of RAM, so use js-worker (8 GB) instead of jenkins-worker (4 GB)
-                    agent { label "juniper-js-worker" }
+                    agent { label "koa-js-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 1
@@ -94,7 +94,7 @@ pipeline {
                     }
                 }
                 stage("lms pylint") {
-                    agent { label "juniper-worker" }
+                    agent { label "koa-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 2
@@ -113,7 +113,7 @@ pipeline {
                     }
                 }
                 stage("cms/openedx/pavelib pylint") {
-                    agent { label "juniper-worker" }
+                    agent { label "koa-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 3
@@ -132,7 +132,7 @@ pipeline {
                     }
                 }
                 stage("Other quality checks") {
-                    agent { label "juniper-worker" }
+                    agent { label "koa-worker" }
                     environment {
                         TEST_SUITE = "quality"
                         SHARD = 4
@@ -198,7 +198,7 @@ pipeline {
                     // Publish Quality report
                     publishHTML([allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true,
                         reportDir: 'reports/metrics/',
-                        reportFiles: 'pylint/*view*/,pep8/*view*/,python_complexity/*view*/,xsscommitlint/*view*/,xsslint/*view*/,eslint/*view*/,pii/*view*/',
+                        reportFiles: 'pylint/*view*/,pep8/*view*/,xsscommitlint/*view*/,xsslint/*view*/,eslint/*view*/,pii/*view*/',
                         reportName: 'Quality Report', reportTitles: ''])
                 } finally {
                     if (env.ghprbPullId != null) {

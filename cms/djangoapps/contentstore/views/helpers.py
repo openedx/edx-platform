@@ -2,7 +2,6 @@
 Helper methods for Studio views.
 """
 
-
 from uuid import uuid4
 
 import six
@@ -12,13 +11,13 @@ from django.utils.translation import ugettext as _
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 
-from contentstore.utils import reverse_course_url, reverse_library_url, reverse_usage_url
-from edxmako.shortcuts import render_to_string
-from models.settings.course_grading import CourseGradingModel
-from util.milestones_helpers import is_entrance_exams_enabled
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
+from openedx.core.toggles import ENTRANCE_EXAMS
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import StaticTab
-from xmodule.x_module import DEPRECATION_VSCOMPAT_EVENT
+
+from ..utils import reverse_course_url, reverse_library_url, reverse_usage_url
 
 __all__ = ['event']
 
@@ -213,7 +212,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
 
         # Entrance Exams: Chapter module positioning
         child_position = None
-        if is_entrance_exams_enabled():
+        if ENTRANCE_EXAMS.is_enabled():
             if category == 'chapter' and is_entrance_exam:
                 fields['is_entrance_exam'] = is_entrance_exam
                 fields['in_entrance_exam'] = True  # Inherited metadata, all children will have it
@@ -237,7 +236,7 @@ def create_xblock(parent_locator, user, category, display_name, boilerplate=None
         )
 
         # Entrance Exams: Grader assignment
-        if is_entrance_exams_enabled():
+        if ENTRANCE_EXAMS.is_enabled():
             course_key = usage_key.course_key
             course = store.get_course(course_key)
             if hasattr(course, 'entrance_exam_enabled') and course.entrance_exam_enabled:

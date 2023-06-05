@@ -17,7 +17,7 @@ from django.db import connection
 from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.commerce.tests import TEST_API_URL
 from openedx.core.djangoapps.credit import api
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_attribute_values, make_providers_strings
@@ -39,19 +39,20 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirementStatus
 )
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
-from util.date_utils import from_timestamp
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.util.date_utils import from_timestamp
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 TEST_CREDIT_PROVIDER_SECRET_KEY = "931433d583c84ca7ba41784bad3232e6"
+TEST_CREDIT_PROVIDER_SECRET_KEY_TWO = "abcf433d583c8baebae1784bad3232e6"
 TEST_ECOMMERCE_WORKER = 'test_worker'
 
 
 @override_settings(CREDIT_PROVIDER_SECRET_KEYS={
     "hogwarts": TEST_CREDIT_PROVIDER_SECRET_KEY,
-    "ASU": TEST_CREDIT_PROVIDER_SECRET_KEY,
+    "ASU": [TEST_CREDIT_PROVIDER_SECRET_KEY_TWO, TEST_CREDIT_PROVIDER_SECRET_KEY],
     "MIT": TEST_CREDIT_PROVIDER_SECRET_KEY
 })
 class CreditApiTestBase(ModuleStoreTestCase):

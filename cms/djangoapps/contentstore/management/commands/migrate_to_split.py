@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from contentstore.management.commands.utils import user_from_str
+from cms.djangoapps.contentstore.management.commands.utils import user_from_str
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.split_migrator import SplitMigrator

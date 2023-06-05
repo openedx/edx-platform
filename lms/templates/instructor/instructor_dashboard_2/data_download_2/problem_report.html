@@ -1,0 +1,48 @@
+<%page args="section_data" expression_filter="h"/>
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<section id="problem" class="idash-section tab-data" aria-labelledby="header-problem">
+    <h6 class="mb-20 font-size-100" id="header-problem">
+        ${_("Select a problem to generate a CSV \
+        file that lists all student answers to the problem. You also select a section or chapter to include \
+        results of all problems in that section or chapter.")}
+    </h6>
+    <div class="mb-15 problems">
+        ${static.renderReact(
+          component="ProblemBrowser",
+          id="react-problem-report",
+          props={
+            "courseId": course.id,
+            "excludeBlockTypes": ['html', 'video', 'discussion'],
+            "problemResponsesEndpoint": section_data['get_problem_responses_url'],
+            "taskStatusEndpoint": "/instructor_task_status",
+            "reportDownloadEndpoint": section_data['list_report_downloads_url'],
+            "showBtnUi": "false"
+          }
+        )}
+    </div>
+<!--    <button data-endpoint="${ section_data['get_problem_responses_url'] }" id="download-problem-report"-->
+<!--            class="btn-brand mb-20" type="button" value="download report">Download-->
+<!--        report-->
+<!--    </button>-->
+    <input data-endpoint="${ section_data['get_problem_responses_url'] }"
+           type="button"
+           value="Download Report"
+           id="download-problem-report"
+           class="download-report mb-20 hidden"
+           style="margin-left: 0">
+
+    <% max_entries = settings.FEATURES.get('MAX_PROBLEM_RESPONSES_COUNT') %>
+    %if max_entries is not None:
+    <p class="mb-15">
+        <strong>${_("NOTE")}: </strong>
+        ${_("The generated report is limited to {max_entries} responses. If you expect more than {max_entries} "
+        "responses, try generating the report on a chapter-by-chapter, or problem-by-problem basis, or contact "
+        "your site administrator to increase the limit.").format(max_entries=max_entries)}
+    </p>
+    %endif
+</section>

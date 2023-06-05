@@ -11,8 +11,8 @@ from django.urls import reverse
 from mock import patch
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.models import Registration
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import Registration
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -70,11 +70,22 @@ class TestActivateAccount(TestCase):
         self.assertTrue(self.user.is_active)
         self.assertFalse(mock_segment_identify.called)
 
+    @patch('common.djangoapps.student.models.USER_ACCOUNT_ACTIVATED')
+    def test_activation_signal(self, mock_signal):
+        """
+        Verify that USER_ACCOUNT_ACTIVATED is emitted upon account email activation.
+        """
+        assert not self.user.is_active, 'Ensure that the user starts inactive'
+        assert not mock_signal.send_robust.call_count, 'Ensure no signal is fired before activation'
+        self.registration.activate()  # Until you explicitly activate it
+        assert self.user.is_active, 'Sanity check for .activate()'
+        mock_signal.send_robust.assert_called_once_with(Registration, user=self.user)  # Ensure the signal is emitted
+
     def test_account_activation_message(self):
         """
         Verify that account correct activation message is displayed.
 
-        If logged in user has not activated his/her account, make sure that an
+        If logged in user has not activated their account, make sure that an
         account activation message is displayed on dashboard sidebar.
         """
         # Log in with test user.

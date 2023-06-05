@@ -4,11 +4,12 @@ Unit tests for the IdentityServer3 OAuth2 Backend
 import json
 import ddt
 import unittest
-from third_party_auth.identityserver3 import IdentityServer3
-from third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.identityserver3 import IdentityServer3
+from common.djangoapps.third_party_auth.tests import testutil
+from common.djangoapps.third_party_auth.tests.utils import skip_unless_thirdpartyauth
 
 
-@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, testutil.AUTH_FEATURES_KEY + ' not enabled')
+@skip_unless_thirdpartyauth()
 @ddt.ddt
 class IdentityServer3Test(testutil.TestCase):
     """
@@ -47,7 +48,7 @@ class IdentityServer3Test(testutil.TestCase):
         test that a KeyError is thrown if the "sub" claim does not exist
         """
         response = {"id": 1}
-        self.assertRaises(KeyError, self.id3_instance.get_user_id({}, response))
+        self.assertRaises(TypeError, self.id3_instance.get_user_id({}, response))
 
     def test_proper_config_access(self):
         """

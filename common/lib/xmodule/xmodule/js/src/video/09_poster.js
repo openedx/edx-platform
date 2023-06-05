@@ -23,8 +23,8 @@
         VideoPoster.moduleName = 'Poster';
         VideoPoster.prototype = {
             template: _.template([
-                '<div class="video-pre-roll is-<%= type %> poster" ',
-                'style="background-image: url(<%= url %>)">',
+                '<div class="video-pre-roll is-<%- type %> poster" ',
+                'style="background-image: url(<%- url %>)">',
                 '<button class="btn-play btn-pre-roll">',
                 '<img src="/static/images/play.png" alt="">',
                 '<span class="sr">', gettext('Play video'), '</span>',

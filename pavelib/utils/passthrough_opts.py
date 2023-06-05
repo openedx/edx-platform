@@ -59,9 +59,9 @@ class PassthroughOptionParser(OptionParser):
 
             if len(rargs) < nargs:
                 if nargs == 1:
-                    self.error(u"%s option requires an argument" % opt)
+                    self.error("%s option requires an argument" % opt)
                 else:
-                    self.error(u"%s option requires %d arguments"
+                    self.error("%s option requires %d arguments"
                                % (opt, nargs))
             elif nargs == 1:
                 value = rargs.pop(0)
@@ -70,7 +70,7 @@ class PassthroughOptionParser(OptionParser):
                 del rargs[0:nargs]
 
         elif had_explicit_value:
-            self.error(u"%s option does not take a value" % opt)
+            self.error("%s option does not take a value" % opt)
 
         else:
             value = None
@@ -104,9 +104,9 @@ class PassthroughOptionParser(OptionParser):
                 nargs = option.nargs
                 if len(rargs) < nargs:
                     if nargs == 1:
-                        self.error(u"%s option requires an argument" % opt)
+                        self.error("%s option requires an argument" % opt)
                     else:
-                        self.error(u"%s option requires %d arguments"
+                        self.error("%s option requires %d arguments"
                                    % (opt, nargs))
 
                 elif nargs == 1:
@@ -136,11 +136,11 @@ class PassthroughTask(paver.tasks.Task):
     @property
     def parser(self):
         with patch.object(paver.tasks.optparse, 'OptionParser', PassthroughOptionParser):
-            return super(PassthroughTask, self).parser
+            return super().parser
 
     def __call__(self, *args, **kwargs):
         paver.tasks.environment.passthrough_options = self._parser.passthrough_options  # pylint: disable=no-member
         try:
-            return super(PassthroughTask, self).__call__(*args, **kwargs)
+            return super().__call__(*args, **kwargs)
         finally:
             del paver.tasks.environment.passthrough_options

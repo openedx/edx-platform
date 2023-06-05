@@ -11,8 +11,8 @@ from django.utils.translation import ugettext as _
 from edx_django_utils.cache import RequestCache
 from web_fragments.fragment import Fragment
 
-from course_modes.models import format_course_price, get_course_prices
-from experiments.models import ExperimentData
+from common.djangoapps.course_modes.models import format_course_price, get_course_prices
+from lms.djangoapps.experiments.models import ExperimentData
 from lms.djangoapps.courseware.utils import verified_upgrade_deadline_link
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangolib.markup import HTML, Text
@@ -87,7 +87,7 @@ def format_strikeout_price(user, course, base_price=None, check_for_discount=Tru
             )).format(
                 original_price=original_price,
                 formatted_discount_price=formatted_discount_price,
-                s_sr=HTML("<span class='sr'>"),
+                s_sr=HTML("<span class='sr-only'>"),
                 s_op=HTML("<span class='price original'>"),
                 e_p=HTML("</span>"),
                 e_sr=HTML("</span>"),
@@ -123,7 +123,7 @@ def generate_offer_html(user, course):
                               u'{a_open}Upgrade Now{a_close}{div_close}')
 
             message_html = HTML(offer_message).format(
-                a_open=HTML(u'<a href="{upgrade_link}">').format(
+                a_open=HTML(u'<a id="welcome" href="{upgrade_link}">').format(
                     upgrade_link=verified_upgrade_deadline_link(user=user, course=course)
                 ),
                 a_close=HTML('</a>'),
@@ -133,11 +133,11 @@ def generate_offer_html(user, course):
                 br=HTML('<br>'),
                 banner_open=HTML(
                     '<div class="first-purchase-offer-banner" role="note">'
-                    '<span class="first-purchase-offer-banner-bold">'
+                    '<span class="first-purchase-offer-banner-bold"><b>'
                 ),
                 discount_expiration_date=discount_expiration_date.strftime(u'%B %d'),
                 percentage=discount_percentage(course),
-                span_close=HTML('</span>'),
+                span_close=HTML('</b></span>'),
                 div_close=HTML('</div>'),
                 strikeout_price=HTML(format_strikeout_price(user, course, check_for_discount=False)[0])
             )

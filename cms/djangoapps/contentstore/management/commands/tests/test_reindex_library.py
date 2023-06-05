@@ -7,8 +7,8 @@ import six
 from django.core.management import CommandError, call_command
 from opaque_keys import InvalidKeyError
 
-from contentstore.courseware_index import SearchIndexingError
-from contentstore.management.commands.reindex_library import Command as ReindexCommand
+from cms.djangoapps.contentstore.courseware_index import SearchIndexingError
+from cms.djangoapps.contentstore.management.commands.reindex_library import Command as ReindexCommand
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -36,9 +36,11 @@ class TestReindexLibrary(ModuleStoreTestCase):
             org="test", course="course2", display_name="run1", default_store=ModuleStoreEnum.Type.split
         )
 
-    REINDEX_PATH_LOCATION = 'contentstore.management.commands.reindex_library.LibrarySearchIndexer.do_library_reindex'
-    MODULESTORE_PATCH_LOCATION = 'contentstore.management.commands.reindex_library.modulestore'
-    YESNO_PATCH_LOCATION = 'contentstore.management.commands.reindex_library.query_yes_no'
+    REINDEX_PATH_LOCATION = (
+        'cms.djangoapps.contentstore.management.commands.reindex_library.LibrarySearchIndexer.do_library_reindex'
+    )
+    MODULESTORE_PATCH_LOCATION = 'cms.djangoapps.contentstore.management.commands.reindex_library.modulestore'
+    YESNO_PATCH_LOCATION = 'cms.djangoapps.contentstore.management.commands.reindex_library.query_yes_no'
 
     def _get_lib_key(self, library):
         """ Get's library key as it is passed to indexer """

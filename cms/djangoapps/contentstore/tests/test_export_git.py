@@ -12,8 +12,8 @@ from uuid import uuid4
 from django.conf import settings
 from django.test.utils import override_settings
 
-import contentstore.git_export_utils as git_export_utils
-from contentstore.utils import reverse_course_url
+import cms.djangoapps.contentstore.git_export_utils as git_export_utils
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from xmodule.modulestore.django import modulestore
 
 from .utils import CourseTestCase

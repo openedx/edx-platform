@@ -6,14 +6,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from django.shortcuts import redirect, render_to_response
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 
-from badges.utils import badges_enabled
-from edxmako.shortcuts import marketing_link
+from lms.djangoapps.badges.utils import badges_enabled
+from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.credentials.utils import get_credentials_records_url
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -23,7 +23,7 @@ from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.features.learner_profile.toggles import should_redirect_to_profile_microfrontend
 from openedx.features.learner_profile.views.learner_achievements import LearnerAchievementsFragmentView
-from student.models import User
+from common.djangoapps.student.models import User
 
 
 @login_required
@@ -51,9 +51,10 @@ def learner_profile(request, username):
 
     try:
         context = learner_profile_context(request, username, request.user.is_staff)
-        return render_to_response(
-            'learner_profile/learner_profile.html',
-            context
+        return render(
+            request=request,
+            template_name='learner_profile/learner_profile.html',
+            context=context
         )
     except (UserNotAuthorized, UserNotFound, ObjectDoesNotExist):
         raise Http404

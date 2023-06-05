@@ -10,6 +10,7 @@ import json
 from unittest import skipUnless
 
 from django.conf import settings
+from django.db import connections
 from django.test import TestCase
 from mock import patch
 
@@ -21,7 +22,7 @@ from lms.djangoapps.courseware.tests.factories import StudentModuleFactory, cour
 class TestStudentModuleHistoryBackends(TestCase):
     """ Tests of data in CSMH and CSMHE """
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     def setUp(self):
         super(TestStudentModuleHistoryBackends, self).setUp()

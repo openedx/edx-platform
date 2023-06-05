@@ -20,14 +20,15 @@ from search.tests.tests import TEST_INDEX_NAME
 from search.tests.utils import SearcherMixin
 from waffle.testutils import override_switch
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from opaque_keys.edx.locator import LibraryLocator
 from openedx.core.lib.api.view_utils import LazySequence
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.course_duration_limits.models import CourseDurationLimitConfig
-from student.auth import add_users
-from student.roles import CourseInstructorRole, CourseStaffRole
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.auth import add_users
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -395,7 +396,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
         self.setup_user(self.audit_user)
 
         # These query counts were found empirically
-        query_counts = [62, 45, 45, 45, 45, 45, 45, 45, 45, 45, 15]
+        query_counts = [54, 46, 46, 46, 46, 46, 46, 46, 46, 46, 16]
         ordered_course_ids = sorted([str(cid) for cid in (course_ids + [c.id for c in self.courses])])
 
         self.clear_caches()
@@ -459,9 +460,15 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
         add_users(self.global_admin, CourseStaffRole(self.course.id), course_staff_user)
 
         # Create a second course, along with an instructor user for it.
-        alternate_course = self.create_course(org='test')
+        alternate_course1 = self.create_course(org='test1')
         course_instructor_user = self.create_user(username='course_instructor', is_staff=False)
-        add_users(self.global_admin, CourseInstructorRole(alternate_course.id), course_instructor_user)
+        add_users(self.global_admin, CourseInstructorRole(alternate_course1.id), course_instructor_user)
+
+        # Create a third course, along with an user that has both staff and instructor for it.
+        alternate_course2 = self.create_course(org='test2')
+        course_instructor_staff_user = self.create_user(username='course_instructor_staff', is_staff=False)
+        add_users(self.global_admin, CourseInstructorRole(alternate_course2.id), course_instructor_staff_user)
+        add_users(self.global_admin, CourseStaffRole(alternate_course2.id), course_instructor_staff_user)
 
         # Requesting the courses for which the course staff user is staff should return *only* the single course.
         self.setup_user(self.staff_user)
@@ -485,7 +492,7 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'instructor'
         })
         self.assertEqual(len(filtered_response.data['results']), 1)
-        self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course.org))
+        self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course1.org))
 
         # The course instructor user has the inferred course staff role on one course.
         self.setup_user(course_instructor_user)
@@ -494,7 +501,38 @@ class CourseIdListViewTestCase(CourseApiTestViewMixin, ModuleStoreTestCase):
             'role': 'staff'
         })
         self.assertEqual(len(filtered_response.data['results']), 1)
-        self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course.org))
+        self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course1.org))
+
+        # The user with both instructor AND staff on a course has the inferred course staff role on that one course.
+        self.setup_user(course_instructor_staff_user)
+        filtered_response = self.verify_response(params={
+            'username': course_instructor_staff_user.username,
+            'role': 'staff'
+        })
+        self.assertEqual(len(filtered_response.data['results']), 1)
+        self.assertTrue(filtered_response.data['results'][0].startswith(alternate_course2.org))
+
+    def test_no_libraries(self):
+        """
+        Verify that only Course IDs are returned, not anything else like libraries.
+        """
+        # Make this user a course staff user for a course, AND a library.
+        course_staff_user = self.create_user(username='course_staff', is_staff=False)
+        add_users(self.global_admin, CourseStaffRole(self.course.id), course_staff_user)
+        add_users(
+            self.global_admin,
+            CourseStaffRole(LibraryLocator.from_string('library-v1:library_org+library_name')),
+            course_staff_user,
+        )
+
+        # Requesting the courses should return *only* courses and not libraries.
+        self.setup_user(self.staff_user)
+        filtered_response = self.verify_response(params={
+            'username': course_staff_user.username,
+            'role': 'staff'
+        })
+        self.assertEqual(len(filtered_response.data['results']), 1)
+        self.assertTrue(filtered_response.data['results'][0].startswith(self.course.org))
 
 
 class LazyPageNumberPaginationTestCase(TestCase):

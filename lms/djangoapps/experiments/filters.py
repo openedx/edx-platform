@@ -5,7 +5,7 @@ Experimentation filters
 
 import django_filters
 
-from experiments.models import ExperimentData, ExperimentKeyValue
+from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
 
 
 class ExperimentDataFilter(django_filters.FilterSet):

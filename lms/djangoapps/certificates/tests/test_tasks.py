@@ -10,7 +10,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.certificates.tasks import generate_certificate
 from lms.djangoapps.verify_student.models import IDVerificationAttempt
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt

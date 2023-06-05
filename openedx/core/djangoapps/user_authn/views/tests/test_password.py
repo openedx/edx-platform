@@ -5,17 +5,21 @@ Tests for user authorization password-related functionality.
 import json
 import logging
 import re
+from datetime import datetime, timedelta
 
 import ddt
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import mail
+from django.core.cache import cache
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from freezegun import freeze_time
 from mock import Mock, patch
 from oauth2_provider.models import AccessToken as dot_access_token
 from oauth2_provider.models import RefreshToken as dot_refresh_token
+from pytz import UTC
 from testfixtures import LogCapture
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
@@ -110,6 +114,7 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
         result = self.client.login(username=self.USERNAME, password=self.OLD_PASSWORD)
         self.assertTrue(result)
         mail.outbox = []
+        cache.clear()
 
     def test_password_change(self):
         # Request a password change while logged in, simulating
@@ -262,11 +267,16 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
             # Send the view an email address not tied to any user
             response = self._change_password(email=self.NEW_EMAIL)
             self.assertEqual(response.status_code, 200)
-            logger.check((LOGGER_NAME, 'INFO', 'Invalid password reset attempt'))
+
+            expected_logs = (
+                (LOGGER_NAME, 'INFO', 'Password reset initiated for user {}.'.format(self.NEW_EMAIL)),
+                (LOGGER_NAME, 'INFO', 'Invalid password reset attempt')
+            )
+            logger.check(*expected_logs)
 
     def test_password_change_rate_limited(self):
         """
-        Tests that consecutive password reset requests are rate limited.
+        Tests that password reset requests are rate limited as expected.
         """
         # Log out the user created during test setup, to prevent the view from
         # selecting the logged-in user's email address over the email provided
@@ -276,11 +286,11 @@ class TestPasswordChange(CreateAccountMixin, CacheIsolationTestCase):
             response = self._change_password(email=self.NEW_EMAIL)
             self.assertEqual(response.status_code, status)
 
-        with patch(
-            'util.request_rate_limiter.PasswordResetEmailRateLimiter.is_rate_limit_exceeded',
-            return_value=False
-        ):
-            response = self._change_password(email=self.NEW_EMAIL)
+        # now reset the time to 1 min from now in future and change the email and
+        # verify that it will allow another request from same IP
+        reset_time = datetime.now(UTC) + timedelta(seconds=61)
+        with freeze_time(reset_time):
+            response = self._change_password(email=self.OLD_EMAIL)
             self.assertEqual(response.status_code, 200)
 
     @ddt.data(

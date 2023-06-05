@@ -11,8 +11,8 @@ from opaque_keys.edx.locator import CourseLocator
 from rest_framework.exceptions import PermissionDenied
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
-from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

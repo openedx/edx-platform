@@ -6,8 +6,8 @@
 
     /* RequireJS */
     define(['jquery', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
-        'common/js/components/views/feedback_prompt'],
-        function($, _, gettext, NotificationView, PromptView) {
+        'common/js/components/views/feedback_prompt', 'edx-ui-toolkit/js/utils/html-utils'],
+        function($, _, gettext, NotificationView, PromptView, HtmlUtils) {
     /* End RequireJS */
     /* Webpack
     define(['jquery', 'underscore', 'gettext', 'common/js/components/views/feedback_notification',
@@ -247,10 +247,17 @@
             };
 
             checkTotalKeyLengthViolations = function(selectors, classes, keyFieldSelectors, messageTpl) {
+                var tempHtml;
                 if (!validateTotalKeyLength(keyFieldSelectors)) {
                     $(selectors.errorWrapper).addClass(classes.shown).removeClass(classes.hiding);
-                    $(selectors.errorMessage).html(
-                        '<p>' + _.template(messageTpl)({limit: MAX_SUM_KEY_LENGTH}) + '</p>'
+                    tempHtml = HtmlUtils.joinHtml(
+                            HtmlUtils.HTML('<p>'),
+                            HtmlUtils.template(messageTpl)({limit: MAX_SUM_KEY_LENGTH}),
+                            HtmlUtils.HTML('</p>')
+                    );
+                    HtmlUtils.setHtml(
+                        $(selectors.errorMessage),
+                        tempHtml
                     );
                     $(selectors.save).addClass(classes.disabled);
                 } else {

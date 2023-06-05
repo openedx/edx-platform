@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseNotFound
 
-from rss_proxy.models import WhitelistedRssUrl
+from lms.djangoapps.rss_proxy.models import WhitelistedRssUrl
 
 CACHE_KEY_RSS = "rss_proxy.{url}"
 

@@ -108,7 +108,7 @@ def update_local_bokchoy_db_from_s3(options):
         reset_test_db(BOKCHOY_DB_FILES, update_cache_files=False, use_existing_db=True)
 
     else:
-        msg = u"{} {} {}".format(
+        msg = "{} {} {}".format(
             "Did not find updated bokchoy db files at S3.",
             "Loading the bokchoy db files from disk",
             "and running migrations."
@@ -121,7 +121,7 @@ def update_local_bokchoy_db_from_s3(options):
         if not is_fingerprint_in_bucket(fingerprint, CACHE_BUCKET_NAME):
             upload_db_cache_to_s3(fingerprint, BOKCHOY_DB_FILES, CACHE_BUCKET_NAME)
         else:
-            msg = u"{} {}. {}".format(
+            msg = "{} {}. {}".format(
                 "Found a matching fingerprint in bucket ",
                 CACHE_BUCKET_NAME,
                 "Not pushing to s3"

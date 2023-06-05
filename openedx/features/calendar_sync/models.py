@@ -19,6 +19,7 @@ class UserCalendarSyncConfig(models.Model):
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)
     enabled = models.BooleanField(default=False)
+    ics_sequence = models.IntegerField(default=0)
 
     history = HistoricalRecords()
 

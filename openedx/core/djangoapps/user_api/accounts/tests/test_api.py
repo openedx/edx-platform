@@ -19,15 +19,15 @@ from django.urls import reverse
 from mock import Mock, patch
 from six import iteritems
 from social_django.models import UserSocialAuth
-from student.models import (
+from common.djangoapps.student.models import (
     AccountRecovery,
     PendingEmailChange,
     PendingSecondaryEmailChange,
     UserProfile
 )
-from student.tests.factories import UserFactory
-from student.tests.tests import UserSettingsEventTestMixin
-from student.views.management import activate_secondary_email
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.tests import UserSettingsEventTestMixin
+from common.djangoapps.student.views.management import activate_secondary_email
 
 from openedx.core.djangoapps.ace_common.tests.mixins import EmailTemplateTagMixin
 from openedx.core.djangoapps.user_api.accounts import PRIVATE_VISIBILITY
@@ -80,7 +80,7 @@ class CreateAccountMixin(object):
 
 @skip_unless_lms
 @ddt.ddt
-@patch('student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
+@patch('common.djangoapps.student.views.management.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
 class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAccountMixin, RetirementTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
@@ -366,7 +366,7 @@ class TestAccountApi(UserSettingsEventTestMixin, EmailTemplateTagMixin, CreateAc
         self.assertIn("Full Name cannot contain the following characters: < >", field_errors["name"]["user_message"])
 
     @patch('django.core.mail.EmailMultiAlternatives.send')
-    @patch('student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    @patch('common.djangoapps.student.views.management.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_update_sending_email_fails(self, send_mail):
         """Test what happens if all validation checks pass, but sending the email for email change fails."""
         send_mail.side_effect = [Exception, None]

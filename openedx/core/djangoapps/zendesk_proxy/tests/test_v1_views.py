@@ -11,6 +11,7 @@ from mock import MagicMock, patch
 import six
 from six.moves import range
 
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.zendesk_proxy.v1.views import ZendeskProxyThrottle
 from openedx.core.lib.api.test_utils import ApiTestCase
 
@@ -25,10 +26,12 @@ class ZendeskProxyTestCase(ApiTestCase):
 
     def setUp(self):
         self.url = reverse('zendesk_proxy_v1')
+        self.user = UserFactory(username='test', password='test123')
+        self.client.login(username='test', password='test123')
         self.request_data = {
             'requester': {
-                'email': 'JohnQStudent@example.com',
-                'name': 'John Q. Student'
+                'email': self.user.email,
+                'name': self.user.username
             },
             'subject': 'Python Unit Test Help Request',
             'comment': {
@@ -73,8 +76,8 @@ class ZendeskProxyTestCase(ApiTestCase):
                         },
                         'custom_fields': [{'id': '001', 'value': 'demo-course'}],
                         'requester': {
-                            'email': 'JohnQStudent@example.com',
-                            'name': 'John Q. Student',
+                            'email': self.user.email,
+                            'name': self.user.username
                         },
                         'subject': 'Python Unit Test Help Request',
                         'tags': ['python_unit_test'],
@@ -82,7 +85,7 @@ class ZendeskProxyTestCase(ApiTestCase):
                 }
             )
 
-    @ddt.data('requester', 'tags')
+    @ddt.data('subject', 'tags')
     def test_bad_request(self, key_to_delete):
         test_data = deepcopy(self.request_data)
         _ = test_data.pop(key_to_delete)

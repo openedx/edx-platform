@@ -12,6 +12,8 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from edx_toggles.toggles.testutils import override_waffle_switch
 from mock import Mock, PropertyMock, patch
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
@@ -30,23 +32,15 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData
 from xblock.test.tools import TestRuntime
 from xblock.validation import ValidationMessage
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.views.component import component_handler, get_component_templates
-from contentstore.views.item import (
-    ALWAYS,
-    VisibilityState,
-    _get_module_info,
-    _get_source_index,
-    _xblock_type_and_display_name,
-    add_container_page_publishing_info,
-    create_xblock_info,
-    highlights_setting
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
+from cms.djangoapps.contentstore.views import item as item_module
+from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.xblock_django.models import (
+    XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
 )
-from lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
-from student.tests.factories import UserFactory
-from xblock_django.models import XBlockConfiguration, XBlockStudioConfiguration, XBlockStudioConfigurationFlag
-from xblock_django.user_service import DjangoXBlockUserService
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.capa_module import ProblemBlock
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.modulestore import ModuleStoreEnum
@@ -62,6 +56,18 @@ from xmodule.partitions.partitions import (
 )
 from xmodule.partitions.tests.test_partitions import MockPartitionService
 from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
+
+from ..component import component_handler, get_component_templates
+from ..item import (
+    ALWAYS,
+    VisibilityState,
+    _get_module_info,
+    _get_source_index,
+    _xblock_type_and_display_name,
+    add_container_page_publishing_info,
+    create_xblock_info,
+    highlights_setting
+)
 
 
 class AsideTest(XBlockAside):
@@ -330,7 +336,7 @@ class GetItemTest(ItemTest):
         """
         Tests that valid paging is passed along to underlying block
         """
-        with patch('contentstore.views.item.get_preview_fragment') as patched_get_preview_fragment:
+        with patch('cms.djangoapps.contentstore.views.item.get_preview_fragment') as patched_get_preview_fragment:
             retval = Mock()
             type(retval).content = PropertyMock(return_value="Some content")
             type(retval).resources = PropertyMock(return_value=[])
@@ -1233,7 +1239,7 @@ class TestMoveItem(ItemTest):
         validation = html.validate()
         self.assertEqual(len(validation.messages), 0)
 
-    @patch('contentstore.views.item.log')
+    @patch('cms.djangoapps.contentstore.views.item.log')
     def test_move_logging(self, mock_logger):
         """
         Test logging when an item is successfully moved.
@@ -2145,7 +2151,7 @@ class TestComponentHandler(TestCase):
 
         self.request_factory = RequestFactory()
 
-        patcher = patch('contentstore.views.component.modulestore')
+        patcher = patch('cms.djangoapps.contentstore.views.component.modulestore')
         self.modulestore = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -2217,12 +2223,12 @@ class TestComponentHandler(TestCase):
         self.descriptor.handle = create_response
 
         with patch(
-            'contentstore.views.component.is_xblock_aside',
+            'cms.djangoapps.contentstore.views.component.is_xblock_aside',
             return_value=is_xblock_aside
         ), patch(
-            'contentstore.views.component.get_aside_from_xblock'
+            'cms.djangoapps.contentstore.views.component.get_aside_from_xblock'
         ) as mocked_get_aside_from_xblock, patch(
-            "contentstore.views.component.webob_to_django_response"
+            "cms.djangoapps.contentstore.views.component.webob_to_django_response"
         ) as mocked_webob_to_django_response:
             component_handler(
                 self.request,
@@ -2473,7 +2479,6 @@ class TestXBlockInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
     """
-
     def setUp(self):
         super(TestXBlockInfo, self).setUp()
         user_id = self.user.id
@@ -2664,7 +2669,7 @@ class TestXBlockInfo(ItemTest):
         self.course.highlights_enabled_for_messaging = True
         self.store.update_item(self.course, None)
         chapter = self.store.get_item(self.chapter.location)
-        with highlights_setting.override():
+        with override_waffle_switch(highlights_setting, active=True):
             chapter_xblock_info = create_xblock_info(chapter)
             course_xblock_info = create_xblock_info(self.course)
             self.assertTrue(chapter_xblock_info['highlights_enabled'])
@@ -2783,15 +2788,37 @@ class TestXBlockInfo(ItemTest):
         else:
             self.assertIsNone(xblock_info.get('child_info', None))
 
-    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
-    @patch('contentstore.views.item.does_backend_support_onboarding')
-    @patch('contentstore.views.item.get_exam_configuration_dashboard_url')
-    def test_proctored_exam_xblock_info(self, get_exam_configuration_dashboard_url_patch,
-                                        does_backend_support_onboarding_patch):
+
+@patch.dict('django.conf.settings.FEATURES', {'ENABLE_SPECIAL_EXAMS': True})
+class TestSpecialExamXBlockInfo(ItemTest):
+    """
+    Unit tests for XBlock outline handling, specific to special exam XBlocks.
+    """
+    patch_get_exam_configuration_dashboard_url = patch.object(
+        item_module, 'get_exam_configuration_dashboard_url', return_value='test_url'
+    )
+    patch_does_backend_support_onboarding = patch.object(
+        item_module, 'does_backend_support_onboarding', return_value=True
+    )
+    patch_get_exam_by_content_id_success = patch.object(
+        item_module, 'get_exam_by_content_id'
+    )
+    patch_get_exam_by_content_id_not_found = patch.object(
+        item_module, 'get_exam_by_content_id', side_effect=ProctoredExamNotFoundException
+    )
+
+    def setUp(self):
+        super().setUp()
+        user_id = self.user.id
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location, category='chapter', display_name="Week 1", user_id=user_id,
+            highlights=['highlight'],
+        )
         self.course.enable_proctored_exams = True
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
+    def test_proctoring_is_enabled_for_course(self):
         course = modulestore().get_item(self.course.location)
         xblock_info = create_xblock_info(
             course,
@@ -2799,31 +2826,97 @@ class TestXBlockInfo(ItemTest):
             include_children_predicate=ALWAYS,
         )
         # exam proctoring should be enabled and time limited.
-        self.assertEqual(xblock_info['enable_proctored_exams'], True)
+        assert xblock_info['enable_proctored_exams']
 
+    @patch_get_exam_configuration_dashboard_url
+    @patch_does_backend_support_onboarding
+    @patch_get_exam_by_content_id_success
+    def test_special_exam_xblock_info(
+            self,
+            mock_get_exam_by_content_id,
+            _mock_does_backend_support_onboarding,
+            mock_get_exam_configuration_dashboard_url,
+    ):
         sequential = ItemFactory.create(
-            parent_location=self.chapter.location, category='sequential',
-            display_name="Test Lesson 1", user_id=self.user.id,
-            is_proctored_exam=True, is_time_limited=True,
-            default_time_limit_minutes=100, is_onboarding_exam=False
+            parent_location=self.chapter.location,
+            category='sequential',
+            display_name="Test Lesson 1",
+            user_id=self.user.id,
+            is_proctored_exam=True,
+            is_time_limited=True,
+            default_time_limit_minutes=100,
+            is_onboarding_exam=False,
         )
         sequential = modulestore().get_item(sequential.location)
-
-        get_exam_configuration_dashboard_url_patch.return_value = 'test_url'
-        does_backend_support_onboarding_patch.return_value = True
         xblock_info = create_xblock_info(
             sequential,
             include_child_info=True,
             include_children_predicate=ALWAYS,
         )
         # exam proctoring should be enabled and time limited.
-        self.assertEqual(xblock_info['is_proctored_exam'], True)
-        self.assertEqual(xblock_info['is_time_limited'], True)
-        self.assertEqual(xblock_info['default_time_limit_minutes'], 100)
-        self.assertEqual(xblock_info['proctoring_exam_configuration_link'], 'test_url')
-        self.assertEqual(xblock_info['supports_onboarding'], True)
-        self.assertEqual(xblock_info['is_onboarding_exam'], False)
-        get_exam_configuration_dashboard_url_patch.assert_called_with(self.course.id, xblock_info['id'])
+        assert xblock_info['is_proctored_exam'] is True
+        assert xblock_info['was_ever_special_exam'] is True
+        assert xblock_info['is_time_limited'] is True
+        assert xblock_info['default_time_limit_minutes'] == 100
+        assert xblock_info['proctoring_exam_configuration_link'] == 'test_url'
+        assert xblock_info['supports_onboarding'] is True
+        assert xblock_info['is_onboarding_exam'] is False
+        mock_get_exam_configuration_dashboard_url.assert_called_with(self.course.id, xblock_info['id'])
+        assert mock_get_exam_by_content_id.call_count == 0
+
+    @patch_get_exam_configuration_dashboard_url
+    @patch_does_backend_support_onboarding
+    @patch_get_exam_by_content_id_success
+    def test_xblock_was_ever_special_exam(
+            self,
+            mock_get_exam_by_content_id,
+            _mock_does_backend_support_onboarding_patch,
+            _mock_get_exam_configuration_dashboard_url,
+    ):
+        sequential = ItemFactory.create(
+            parent_location=self.chapter.location,
+            category='sequential',
+            display_name="Test Lesson 1",
+            user_id=self.user.id,
+            is_proctored_exam=False,
+            is_time_limited=False,
+            is_onboarding_exam=False,
+        )
+        sequential = modulestore().get_item(sequential.location)
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        assert xblock_info['was_ever_special_exam'] is True
+        assert mock_get_exam_by_content_id.call_count == 1
+
+    @patch_get_exam_configuration_dashboard_url
+    @patch_does_backend_support_onboarding
+    @patch_get_exam_by_content_id_not_found
+    def test_xblock_was_never_proctored_exam(
+            self,
+            mock_get_exam_by_content_id,
+            _mock_does_backend_support_onboarding_patch,
+            _mock_get_exam_configuration_dashboard_url,
+    ):
+        sequential = ItemFactory.create(
+            parent_location=self.chapter.location,
+            category='sequential',
+            display_name="Test Lesson 1",
+            user_id=self.user.id,
+            is_proctored_exam=False,
+            is_time_limited=False,
+            is_onboarding_exam=False,
+        )
+        sequential = modulestore().get_item(sequential.location)
+        xblock_info = create_xblock_info(
+            sequential,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        assert xblock_info['was_ever_special_exam'] is False
+        assert mock_get_exam_by_content_id.call_count == 1
 
 
 class TestLibraryXBlockInfo(ModuleStoreTestCase):
@@ -3026,6 +3119,18 @@ class TestXBlockPublishingInfo(ItemTest):
         empty_chapter = self._create_child(self.course, 'chapter', "Empty Chapter")
         xblock_info = self._get_xblock_info(empty_chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.unscheduled)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_chapter_self_paced_default_start_date(self, store_type):
+        course = CourseFactory.create(default_store=store_type)
+        course.self_paced = True
+        self.store.update_item(course, self.user.id)
+        chapter = self._create_child(course, 'chapter', "Test Chapter")
+        sequential = self._create_child(chapter, 'sequential', "Test Sequential")
+        self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._set_release_date(chapter.location, DEFAULT_START_DATE)
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.live)
 
     def test_empty_sequential(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")

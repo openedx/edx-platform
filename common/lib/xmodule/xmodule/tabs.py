@@ -11,7 +11,7 @@ from django.core.files.storage import get_storage_class
 from six import text_type
 from xblock.fields import List
 
-from openedx.core.lib.plugins import PluginError
+from edx_django_utils.plugins import PluginError
 
 log = logging.getLogger("edx.courseware")
 
@@ -110,13 +110,6 @@ class CourseTab(six.with_metaclass(ABCMeta, object)):
             user (User): an optional user interacting with the course (defaults to None)
         """
         raise NotImplementedError()
-
-    @property
-    def uses_bootstrap(self):
-        """
-        Returns true if this tab is rendered with Bootstrap.
-        """
-        return False
 
     def get(self, key, default=None):
         """

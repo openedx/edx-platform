@@ -22,10 +22,10 @@ profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
         <div class="nav align-items-center">
             <a class="menu-title mr-2" href="${reverse('dashboard')}">
                 <span class="sr-only">${_("Dashboard for:")}</span>
-                <img class="user-image-frame" src="${profile_image_url}" alt="${username}">
+                <img data-hj-suppress class="user-image-frame" src="${profile_image_url}" alt="${username}">
             </a>
             <div class="dropdown">
-                <a class="dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${username}</a>
+                <a data-hj-suppress class="dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${username}</a>
                 <ul role="menu" class="dropdown-menu dropdown-menu-right" id="${_("Usermenu")}" aria-labelledby="dropdownMenuLink" tabindex="-1">
                     <li role="presentation"><a role="menuitem" class="dropdown-item" href="${reverse('dashboard')}">${_("Dashboard")}</a></li>
                     <li role="presentation"><a role="menuitem" class="dropdown-item" href="${reverse('account_settings')}">${_("Account")}</a></li>
@@ -39,34 +39,13 @@ profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
         <li role="presentation" class="nav-item nav-item-open-collapsed-only"><a role="menuitem" href="${reverse('account_settings')}">${_("Account")}</a></li>
         <li role="presentation" class="nav-item nav-item-open-collapsed-only"><a role="menuitem" href="${reverse('logout')}">${_("Sign Out")}</a></li>
     </ul>
-% elif uses_pattern_library:
-    <div class="wrapper-user-menu dropdown-menu-container logged-in js-header-user-menu">
-        <a href="${reverse('dashboard')}" class="menu-title">
-            <span class="sr-only">${_("Dashboard for:")}</span>
-            <img class="menu-image" src="${profile_image_url}" alt="${username}">
-            ${username}
-        </a>
-        <div role="group" aria-label="User menu" class="user-menu">
-            <button type="button" class="menu-button button-more has-dropdown js-dropdown-button" aria-expanded="false" aria-controls="${_("Usermenu")}">
-                  <span class="icon fa fa-caret-down" aria-hidden="true"></span>
-                  <span class="sr-only">${_("Usermenu dropdown")}</span>
-            </button>
-            <ul class="dropdown-menu list-divided is-hidden" id="${_("Usermenu")}" tabindex="-1">
-                <%block name="navigation_dropdown_menu_links" >
-                    <li class="dropdown-item item has-block-link"><a href="${reverse('dashboard')}" role="menuitem" class="action dropdown-menuitem">${_("Dashboard")}</a></li>
-                    <li class="dropdown-item item has-block-link"><a href="${reverse('account_settings')}" role="menuitem" class="action dropdown-menuitem">${_("Account")}</a></li>
-                </%block>
-                <li class="dropdown-item item has-block-link"><a href="${reverse('logout')}" role="menuitem" class="action dropdown-menuitem">${_("Sign Out")}</a></li>
-            </ul>
-        </div>
-    </div>
 % else:
     <ol class="user">
         <li class="primary">
             <a href="${reverse('dashboard')}" class="user-link">
                 <span class="sr">${_("Dashboard for:")}</span>
                 <img class="user-image-frame" src="${profile_image_url}" alt="">
-                <div class="label-username">${username}</div>
+                <div data-hj-suppress class="label-username">${username}</div>
             </a>
         </li>
         <li class="primary">

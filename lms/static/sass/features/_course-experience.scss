@@ -181,9 +181,9 @@
   h1,
   h2,
   h3 {
-    font-size: font-size(large);
     font-weight: $font-bold;
     color: $black;
+    margin-bottom: $baseline;
   }
 
   img {
@@ -197,8 +197,9 @@
     @include float(right);
 
     .btn-link {
-      color: palette(grayscale, base);
+      color: $gray-800;
       border-color: transparent;
+      cursor: pointer;
     }
   }
 
@@ -319,10 +320,6 @@
 
 // Course outline for visual progress waffle switch
 .course-outline {
-  .dates-banner-wrapper {
-    display: none;
-  }
-
   .block-tree {
     margin: 0;
     padding: 0;
@@ -412,6 +409,16 @@
       }
     }
   }
+
+  .fa-chevron-right {
+    transform: rotateY(0deg) #{"/*rtl: rotateY(180deg)*/"};
+    font-size: inherit;
+
+    &.fa-rotate-90 {
+      transform: rotate(90deg) #{"/*rtl: rotate(90deg)*/"};
+      font-size: inherit;
+    }
+  }
 }
 
 #expand-collapse-outline-all-button {
@@ -490,6 +497,14 @@
   }
 }
 
+.dates-tab-link {
+  padding: 16px 0 0 24px;
+
+  a {
+    font-weight: bold;
+  }
+}
+
 // Course Updates Page
 .course-updates {
   .all-updates {
@@ -501,7 +516,7 @@
       border-bottom: 1px solid $border-color;
 
       .date {
-        font-size: font-size(small);
+        font-size: 0.875rem;
         font-weight: $font-light;
         float: none;
         padding-bottom: ($baseline/4);
@@ -516,6 +531,27 @@
         max-width: 100%;
       }
     }
+
+    .well {
+      box-shadow: inset 0 1px 2px 1px $shadow;
+      padding: 1.25rem;
+      background: $gray-100;
+    }
+  }
+}
+
+// Course Breadcrumbs
+.has-breadcrumbs .breadcrumbs {
+  font-size: 0.875rem;
+
+  .nav-item {
+    @include margin-left($baseline/4);
+  }
+
+  .fa-angle-right {
+    transform: rotateY(0deg) #{"/*rtl: rotateY(180deg)*/"};
+
+    @include margin-left($baseline/4);
   }
 }
 

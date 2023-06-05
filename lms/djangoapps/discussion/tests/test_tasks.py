@@ -25,7 +25,7 @@ from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.django_comment_common.signals import comment_created
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory
 from openedx.core.lib.celery.task_utils import emulate_http_request
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 NOW = datetime.utcnow()
@@ -78,7 +78,7 @@ class TaskTestCase(ModuleStoreTestCase):
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with mock.patch('student.models.cc.User.save'):
+        with mock.patch('common.djangoapps.student.models.cc.User.save'):
             cls.thread_author = UserFactory(
                 username='thread_author',
                 password='password',

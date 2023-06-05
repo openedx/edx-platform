@@ -169,7 +169,7 @@ describe('Course Card View', () => {
       );
   });
 
-  it('should show a message if an there is an upcoming course run', () => {
+  it('should show a message if there is an upcoming course run', () => {
     course.course_runs[0].is_enrollment_open = false;
 
     setupView(course, false);

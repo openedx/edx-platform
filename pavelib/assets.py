@@ -11,7 +11,6 @@ from datetime import datetime
 from functools import wraps
 from threading import Timer
 
-import six
 from paver import tasks
 from paver.easy import call_task, cmdopts, consume_args, needs, no_help, path, sh, task
 from watchdog.events import PatternMatchingEventHandler
@@ -44,7 +43,6 @@ COMMON_LOOKUP_PATHS = [
     path("common/static/sass"),
     path('node_modules/@edx'),
     path('node_modules'),
-    path('node_modules/edx-pattern-library/node_modules'),
 ]
 
 # A list of NPM installed libraries that should be copied into the common
@@ -89,7 +87,7 @@ SASS_LOOKUP_DEPENDENCIES = {
 COLLECTSTATIC_LOG_DIR_ARG = 'collect_log_dir'
 
 # Webpack command
-WEBPACK_COMMAND = u'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'
+WEBPACK_COMMAND = 'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'
 
 
 def get_sass_directories(system, theme_dir=None):
@@ -110,7 +108,7 @@ def get_sass_directories(system, theme_dir=None):
     :param theme_dir: absolute path of theme for which to compile sass files.
     """
     if system not in SYSTEMS:
-        raise ValueError(u"'system' must be one of ({allowed_values})".format(
+        raise ValueError("'system' must be one of ({allowed_values})".format(
             allowed_values=', '.join(list(SYSTEMS.keys())))
         )
     system = SYSTEMS[system]
@@ -169,6 +167,8 @@ def get_theme_sass_dirs(system, theme_dir):
     system_sass_dir = path(system) / "static" / "sass"
     sass_dir = theme_dir / system / "static" / "sass"
     css_dir = theme_dir / system / "static" / "css"
+    certs_sass_dir = theme_dir / system / "static" / "certificates" / "sass"
+    certs_css_dir = theme_dir / system / "static" / "certificates" / "css"
 
     dependencies = SASS_LOOKUP_DEPENDENCIES.get(system, [])
     if sass_dir.isdir():
@@ -195,6 +195,17 @@ def get_theme_sass_dirs(system, theme_dir):
                 system_sass_dir,
             ],
         })
+
+        # now compile theme sass files for certificate
+        if system == 'lms':
+            dirs.append({
+                "sass_source_dir": certs_sass_dir,
+                "css_destination_dir": certs_css_dir,
+                "lookup_paths": [
+                    sass_dir / "partials",
+                    sass_dir
+                ],
+            })
 
     return dirs
 
@@ -455,7 +466,7 @@ def compile_sass(options):
 
     for system in systems:
         for theme in themes:
-            print(u"Started compiling '{system}' Sass for '{theme}'.".format(system=system, theme=theme or 'system'))
+            print("Started compiling '{system}' Sass for '{theme}'.".format(system=system, theme=theme or 'system'))
 
             # Compile sass files
             is_successful = _compile_sass(
@@ -467,18 +478,18 @@ def compile_sass(options):
             )
 
             if is_successful:
-                print(u"Finished compiling '{system}' Sass for '{theme}'.".format(
+                print("Finished compiling '{system}' Sass for '{theme}'.".format(
                     system=system, theme=theme or 'system'
                 ))
 
-            compilation_results['success' if is_successful else 'failure'].append(u'{system} sass for {theme}.'.format(
+            compilation_results['success' if is_successful else 'failure'].append('{system} sass for {theme}.'.format(
                 system=system, theme=theme or 'system',
             ))
 
     print("\t\tFinished compiling Sass:")
     if not dry_run:
         for sass_dir, css_dir, duration in timing_info:
-            print(u">> {} -> {} in {}s".format(sass_dir, css_dir, duration))
+            print(">> {} -> {} in {}s".format(sass_dir, css_dir, duration))
 
     if compilation_results['success']:
         print("\033[92m\nSuccessful compilations:\n--- " + "\n--- ".join(compilation_results['success']) + "\n\033[00m")
@@ -524,7 +535,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
         lookup_paths = dirs['lookup_paths']
 
         if not sass_source_dir.isdir():
-            print(u"\033[91m Sass dir '{dir}' does not exists, skipping sass compilation for '{theme}' \033[00m".format(
+            print("\033[91m Sass dir '{dir}' does not exists, skipping sass compilation for '{theme}' \033[00m".format(
                 dir=sass_dirs, theme=theme or system,
             ))
             # theme doesn't override sass directory, so skip it
@@ -532,14 +543,14 @@ def _compile_sass(system, theme, debug, force, timing_info):
 
         if force:
             if dry_run:
-                tasks.environment.info(u"rm -rf {css_dir}/*.css".format(
+                tasks.environment.info("rm -rf {css_dir}/*.css".format(
                     css_dir=css_dir,
                 ))
             else:
-                sh(u"rm -rf {css_dir}/*.css".format(css_dir=css_dir))
+                sh("rm -rf {css_dir}/*.css".format(css_dir=css_dir))
 
         if dry_run:
-            tasks.environment.info(u"libsass {sass_dir}".format(
+            tasks.environment.info("libsass {sass_dir}".format(
                 sass_dir=sass_source_dir,
             ))
         else:
@@ -556,7 +567,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
             if should_generate_rtl_css_file(sass_file):
                 source_css_file = sass_file.replace(sass_source_dir, css_dir).replace('.scss', '.css')
                 target_css_file = source_css_file.replace('.css', '-rtl.css')
-                sh(u"rtlcss {source_file} {target_file}".format(
+                sh("rtlcss {source_file} {target_file}".format(
                     source_file=source_css_file,
                     target_file=target_css_file,
                 ))
@@ -606,19 +617,19 @@ def process_npm_assets():
         else:
             vendor_dir = NPM_JS_VENDOR_DIRECTORY
         if os.path.exists(library_path):
-            sh(u'/bin/cp -rf {library_path} {vendor_dir}'.format(
+            sh('/bin/cp -rf {library_path} {vendor_dir}'.format(
                 library_path=library_path,
                 vendor_dir=vendor_dir,
             ))
         elif not skip_if_missing:
-            raise Exception(u'Missing vendor file {library_path}'.format(library_path=library_path))
+            raise Exception('Missing vendor file {library_path}'.format(library_path=library_path))
 
     def copy_vendor_library_dir(library_dir, skip_if_missing=False):
         """
         Copies all vendor libraries in directory to the shared vendor directory.
         """
         library_dir_path = 'node_modules/{library_dir}'.format(library_dir=library_dir)
-        print(u'Copying vendor library dir: {}'.format(library_dir_path))
+        print('Copying vendor library dir: {}'.format(library_dir_path))
         if os.path.exists(library_dir_path):
             for dirpath, _, filenames in os.walk(library_dir_path):
                 for filename in filenames:
@@ -697,16 +708,16 @@ def collect_assets(systems, settings, **kwargs):
     ]
 
     ignore_args = " ".join(
-        u'--ignore "{}"'.format(pattern) for pattern in ignore_patterns
+        '--ignore "{}"'.format(pattern) for pattern in ignore_patterns
     )
 
     for sys in systems:
         collectstatic_stdout_str = _collect_assets_cmd(sys, **kwargs)
-        sh(django_cmd(sys, settings, u"collectstatic {ignore_args} --noinput {logfile_str}".format(
+        sh(django_cmd(sys, settings, "collectstatic {ignore_args} --noinput {logfile_str}".format(
             ignore_args=ignore_args,
             logfile_str=collectstatic_stdout_str
         )))
-        print(u"\t\tFinished collecting {} assets.".format(sys))
+        print("\t\tFinished collecting {} assets.".format(sys))
 
 
 def _collect_assets_cmd(system, **kwargs):
@@ -719,7 +730,7 @@ def _collect_assets_cmd(system, **kwargs):
         if kwargs[COLLECTSTATIC_LOG_DIR_ARG] is None:
             collectstatic_stdout_str = ""
         else:
-            collectstatic_stdout_str = u"> {output_dir}/{sys}-collectstatic.log".format(
+            collectstatic_stdout_str = "> {output_dir}/{sys}-collectstatic.log".format(
                 output_dir=kwargs[COLLECTSTATIC_LOG_DIR_ARG],
                 sys=system
             )
@@ -745,7 +756,7 @@ def execute_compile_sass(args):
             django_cmd(
                 sys,
                 args.settings,
-                u"compile_sass {system} {options}".format(
+                "compile_sass {system} {options}".format(
                     system='cms' if sys == 'studio' else sys,
                     options=options,
                 ),
@@ -764,17 +775,17 @@ def webpack(options):
     Run a Webpack build.
     """
     settings = getattr(options, 'settings', Env.DEVSTACK_SETTINGS)
-    static_root_lms = Env.get_django_setting("STATIC_ROOT", "lms", settings=settings)
-    static_root_cms = Env.get_django_setting("STATIC_ROOT", "cms", settings=settings)
-    config_path = Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
-    environment = u'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms}'.format(
+    result = Env.get_django_settings(['STATIC_ROOT', 'WEBPACK_CONFIG_PATH'], "lms", settings=settings)
+    static_root_lms, config_path = result
+    static_root_cms, = Env.get_django_settings(["STATIC_ROOT"], "cms", settings=settings)
+    environment = 'NODE_ENV={node_env} STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms}'.format(
         node_env="development" if config_path == 'webpack.dev.config.js' else "production",
         static_root_lms=static_root_lms,
         static_root_cms=static_root_cms
     )
     sh(
         cmd(
-            u'{environment} $(npm bin)/webpack --config={config_path}'.format(
+            '{environment} $(npm bin)/webpack --config={config_path}'.format(
                 environment=environment,
                 config_path=config_path
             )
@@ -789,13 +800,17 @@ def execute_webpack_watch(settings=None):
     # We only want Webpack to re-run on changes to its own entry points,
     # not all JS files, so we use its own watcher instead of subclassing
     # from Watchdog like the other watchers do.
+
+    result = Env.get_django_settings(["STATIC_ROOT", "WEBPACK_CONFIG_PATH"], "lms", settings=settings)
+    static_root_lms, config_path = result
+    static_root_cms, = Env.get_django_settings(["STATIC_ROOT"], "cms", settings=settings)
     run_background_process(
-        u'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'.format(
-            options=u'--watch --config={config_path}'.format(
-                config_path=Env.get_django_setting("WEBPACK_CONFIG_PATH", "lms", settings=settings)
+        'STATIC_ROOT_LMS={static_root_lms} STATIC_ROOT_CMS={static_root_cms} $(npm bin)/webpack {options}'.format(
+            options='--watch --config={config_path}'.format(
+                config_path=config_path
             ),
-            static_root_lms=Env.get_django_setting("STATIC_ROOT", "lms", settings=settings),
-            static_root_cms=Env.get_django_setting("STATIC_ROOT", "cms", settings=settings),
+            static_root_lms=static_root_lms,
+            static_root_cms=static_root_cms,
         )
     )
 
@@ -824,7 +839,7 @@ def listfy(data):
         data: data structure to be converted.
     """
 
-    if isinstance(data, six.string_types):
+    if isinstance(data, str):
         data = data.split(',')
     elif not isinstance(data, list):
         data = [data]
@@ -854,7 +869,7 @@ def watch_assets(options):
     themes = get_parsed_option(options, 'themes')
     theme_dirs = get_parsed_option(options, 'theme_dirs', [])
 
-    default_wait = [six.text_type(DEFAULT_OBSERVER_TIMEOUT)]
+    default_wait = [str(DEFAULT_OBSERVER_TIMEOUT)]
     wait = float(get_parsed_option(options, 'wait', default_wait)[0])
 
     if not theme_dirs and themes:

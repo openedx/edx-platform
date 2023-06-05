@@ -3,12 +3,11 @@ Unittests for creating a course in an chosen modulestore
 """
 
 
-from six import StringIO
-
 import ddt
 import six
 from django.core.management import CommandError, call_command
 from django.test import TestCase
+from six import StringIO
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

@@ -1,5 +1,5 @@
 {% extends "main_django.html" %}
-{% load i18n staticfiles %}
+{% load i18n static %}
 {% load django_markup %}
 
 {% block title %}{% trans "Signed Out" as tmsg %}{{ tmsg | force_escape }} | {{ block.super }}{% endblock %}

@@ -94,6 +94,38 @@
                     });
                 });
 
+                it('adds "closed" class to the main element if transcript setting is off', function() {
+                    // No cookie, showCaptions setting is off: hide transcripts panel.
+                    $.cookie.and.returnValue(null);
+                    state = jasmine.initializePlayer('video_all.html', {showCaptions: false});
+                    expect(state.el).toHaveClass('closed');
+
+                    // No cookie, showCaptions setting is on: show transcripts panel.
+                    $.cookie.and.returnValue(null);
+                    state = jasmine.initializePlayer('video_all.html', {showCaptions: true});
+                    expect(state.el).not.toHaveClass('closed');
+
+                    // Cookie preference is on, showCaptions setting is off: hide transcripts panel.
+                    $.cookie.and.returnValue('true');
+                    state = jasmine.initializePlayer('video_all.html', {showCaptions: false});
+                    expect(state.el).toHaveClass('closed');
+
+                    // Cookie preference is on, showCaptions setting is on: show transcripts panel.
+                    $.cookie.and.returnValue('true');
+                    state = jasmine.initializePlayer('video_all.html', {showCaptions: true});
+                    expect(state.el).not.toHaveClass('closed');
+
+                    // Cookie preference is off, showCaptions setting is off: hide transcripts panel.
+                    $.cookie.and.returnValue('false');
+                    state = jasmine.initializePlayer('video_all.html', {showCaptions: false});
+                    expect(state.el).toHaveClass('closed');
+
+                    // Cookie preference is off, showCaptions setting is on: hide transcripts panel.
+                    $.cookie.and.returnValue('false');
+                    state = jasmine.initializePlayer('video_all.html', {showCaptions: true});
+                    expect(state.el).toHaveClass('closed');
+                });
+
                 it('fetch the transcript in HTML5 mode', function(done) {
                     var transcriptURL = '/transcript/translation/en',
                         transcriptCall;
@@ -623,19 +655,19 @@
                     'loaded yet';
             it(msg, function() {
                 Caption.loaded = false;
-                state.hideCaptions = false;
+                Caption.hideCaptionsOnLoad = false;
                 Caption.fetchCaption();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.hideCaptions).toHaveBeenCalledWith(false, false);
+                expect(Caption.hideCaptions).toHaveBeenCalledWith(false);
 
                 Caption.loaded = false;
                 Caption.hideCaptions.calls.reset();
-                state.hideCaptions = true;
+                Caption.hideCaptionsOnLoad = true;
                 Caption.fetchCaption();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.hideCaptions).toHaveBeenCalledWith(true, false);
+                expect(Caption.hideCaptions).toHaveBeenCalledWith(true);
             });
 
             it('on success: on touch devices', function() {
@@ -714,8 +746,7 @@
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
                 expect(Caption.fetchAvailableTranslations).not.toHaveBeenCalled();
-                expect(Caption.hideCaptions.calls.mostRecent().args)
-                    .toEqual([true, false]);
+                expect(Caption.hideCaptions.calls.mostRecent().args[0]).toEqual(true);
             });
 
             msg = 'on error: for Html5 player an attempt to fetch transcript ' +
@@ -735,8 +766,7 @@
                 expect(Caption.fetchAvailableTranslations).not.toHaveBeenCalled();
                 expect($.ajaxWithPrefix.calls.mostRecent().args[0].data)
                     .toEqual({videoId: 'Z5KLxerq05Y'});
-                expect(Caption.hideCaptions.calls.mostRecent().args)
-                    .toEqual([true, false]);
+                expect(Caption.hideCaptions.calls.mostRecent().args[0]).toEqual(true);
                 expect(Caption.fetchCaption.calls.mostRecent().args[0]).toEqual(true);
                 expect(Caption.fetchCaption.calls.count()).toEqual(2);
             });
@@ -846,8 +876,8 @@
                 Caption.fetchAvailableTranslations();
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
-                expect(Caption.hideCaptions).toHaveBeenCalledWith(true, false);
-                expect(Caption.subtitlesEl).toBeHidden();
+                expect(Caption.hideCaptions).toHaveBeenCalledWith(true);
+                expect(Caption.languageChooserEl).toBeHidden();
             });
         });
 
@@ -1151,7 +1181,7 @@
                 });
         });
 
-        describe('toggle', function() {
+        describe('toggleTranscript', function() {
             beforeEach(function() {
                 state = jasmine.initializePlayer();
                 $('.subtitles li span[data-index=1]').addClass('current');
@@ -1160,7 +1190,7 @@
             describe('when the transcript is visible', function() {
                 beforeEach(function() {
                     state.el.removeClass('closed');
-                    state.videoCaption.toggle(jQuery.Event('click'));
+                    state.videoCaption.toggleTranscript(jQuery.Event('click'));
                 });
 
                 it('hide the transcript', function() {
@@ -1171,7 +1201,7 @@
             describe('when the transcript is hidden', function() {
                 beforeEach(function() {
                     state.el.addClass('closed');
-                    state.videoCaption.toggle(jQuery.Event('click'));
+                    state.videoCaption.toggleTranscript(jQuery.Event('click'));
                     jasmine.clock().install();
                 });
 

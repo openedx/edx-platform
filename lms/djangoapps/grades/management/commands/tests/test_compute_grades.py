@@ -14,7 +14,7 @@ from mock import ANY, patch
 
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from lms.djangoapps.grades.management.commands import compute_grades
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -92,19 +92,19 @@ class TestComputeGrades(SharedModuleStoreTestCase):
         # Order doesn't matter, but can't use a set because dicts aren't hashable
         expected = [
             ({
-                'routing_key': 'key',
+                'queue': 'key',
                 'kwargs': _kwargs(self.course_keys[0], 0)
             },),
             ({
-                'routing_key': 'key',
+                'queue': 'key',
                 'kwargs': _kwargs(self.course_keys[0], 2)
             },),
             ({
-                'routing_key': 'key',
+                'queue': 'key',
                 'kwargs': _kwargs(self.course_keys[3], 0)
             },),
             ({
-                'routing_key': 'key',
+                'queue': 'key',
                 'kwargs': _kwargs(self.course_keys[3], 2)
             },),
         ]

@@ -213,11 +213,11 @@ describe('ModuleEdit', function() {
                 return expect(this.moduleEdit.delegateEvents).toHaveBeenCalled();
             });
             it('loads inline css from fragments', function() {
-                var args = "<style type='text/css'>inline-css</style>";
+                var args = '<style type="text/css">inline-css</style>';
                 return expect($('head').append).toHaveBeenCalledWith(args);
             });
             it('loads css urls from fragments', function() {
-                var args = "<link rel='stylesheet' href='css-url' type='text/css'>";
+                var args = '<link rel="stylesheet" href="css-url" type="text/css">';
                 return expect($('head').append).toHaveBeenCalledWith(args);
             });
             it('loads inline js from fragments', function() {

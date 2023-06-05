@@ -9,33 +9,29 @@ BULK_EMAIL_DEFAULT_FROM_EMAIL: no-reply@example.com
 CACHES:
   celery:
     BACKEND: django.core.cache.backends.memcached.MemcachedCache
-    KEY_FUNCTION: util.memcache.safe_key
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: integration_celery
     LOCATION: ['edx.devstack.memcached:11211']
   default:
     BACKEND: django.core.cache.backends.memcached.MemcachedCache
-    KEY_FUNCTION: util.memcache.safe_key
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: sandbox_default
     LOCATION: ['edx.devstack.memcached:11211']
   general:
     BACKEND: django.core.cache.backends.memcached.MemcachedCache
-    KEY_FUNCTION: util.memcache.safe_key
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: sandbox_general
     LOCATION: ['edx.devstack.memcached:11211']
   mongo_metadata_inheritance:
     BACKEND: django.core.cache.backends.memcached.MemcachedCache
-    KEY_FUNCTION: util.memcache.safe_key
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: integration_mongo_metadata_inheritance
     LOCATION: ['edx.devstack.memcached:11211']
   staticfiles:
     BACKEND: django.core.cache.backends.memcached.MemcachedCache
-    KEY_FUNCTION: util.memcache.safe_key
+    KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
     KEY_PREFIX: integration_static_files
     LOCATION: ['edx.devstack.memcached:11211']
-CC_PROCESSOR:
-  CyberSource2: {ACCESS_KEY: abcd123, PROFILE_ID: edx, PURCHASE_ENDPOINT: /shoppingcart/payment_fake,
-    SECRET_KEY: abcd123}
-CC_PROCESSOR_NAME: CyberSource2
 CELERY_BROKER_HOSTNAME: localhost
 CELERY_BROKER_PASSWORD: celery
 CELERY_BROKER_TRANSPORT: amqp
@@ -59,9 +55,9 @@ CONTENTSTORE:
     host: [edx.devstack.mongo]
     port: 27017
 DATABASES:
-  default: {ENGINE: django.db.backends.mysql, HOST: edx.devstack.mysql, NAME: edxtest,
+  default: {ENGINE: django.db.backends.mysql, HOST: edx.devstack.mysql57, NAME: edxtest,
     PASSWORD: '', PORT: '3306', USER: root}
-  student_module_history: {ENGINE: django.db.backends.mysql, HOST: edx.devstack.mysql,
+  student_module_history: {ENGINE: django.db.backends.mysql, HOST: edx.devstack.mysql57,
     NAME: student_module_history_test, PASSWORD: '', PORT: '3306', USER: root}
 DEFAULT_FEEDBACK_EMAIL: feedback@example.com
 DEFAULT_FROM_EMAIL: registration@example.com
@@ -85,7 +81,7 @@ FEATURES: {ALLOW_AUTOMATED_SIGNUPS: true, AUTOMATIC_AUTH_FOR_TESTING: true,
   AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING: true, CERTIFICATES_HTML_VIEW: true,
   CERTIFICATES_INSTRUCTOR_GENERATION: true, CUSTOM_COURSES_EDX: true,
   ENABLE_COURSE_DISCOVERY: true, ENABLE_DISCUSSION_SERVICE: true, ENABLE_GRADE_DOWNLOADS: true,
-  ENABLE_PAYMENT_FAKE: true, ENABLE_SPECIAL_EXAMS: true, ENABLE_THIRD_PARTY_AUTH: true,
+  ENABLE_SPECIAL_EXAMS: true, ENABLE_THIRD_PARTY_AUTH: true,
   ENABLE_VERIFIED_CERTIFICATES: true, EXPOSE_CACHE_PROGRAMS_ENDPOINT: true, MODE_CREATION_FOR_TESTING: true,
   PREVIEW_LMS_BASE: 'preview.localhost:8003', RESTRICT_AUTOMATIC_AUTH: false, SHOW_HEADER_LANGUAGE_SELECTOR: true}
 GITHUB_REPO_ROOT: '** OVERRIDDEN **'
@@ -126,7 +122,7 @@ MODULESTORE:
           fs_root: '** OVERRIDDEN **'
           host: [edx.devstack.mongo]
           port: 27017
-          render_template: edxmako.shortcuts.render_to_string
+          render_template: common.djangoapps.edxmako.shortcuts.render_to_string
       - ENGINE: xmodule.modulestore.xml.XMLModuleStore
         NAME: xml
         OPTIONS: {data_dir: '** OVERRIDDEN **', default_class: xmodule.hidden_module.HiddenDescriptor}
@@ -135,7 +131,7 @@ REGISTRATION_EXTENSION_FORM: openedx.core.djangoapps.user_api.tests.test_helpers
 REGISTRATION_EXTRA_FIELDS: {city: hidden, country: required, gender: optional, goals: optional,
   honor_code: required, level_of_education: optional, mailing_address: optional, terms_of_service: hidden,
   year_of_birth: optional}
-SECRET_KEY: ''
+SECRET_KEY: 'bokchoy_docker_secret_key'
 SERVER_EMAIL: devops@example.com
 SESSION_COOKIE_DOMAIN: null
 SITE_NAME: localhost:8003
@@ -147,12 +143,12 @@ SUPPORT_SITE_LINK: https://support.example.com
 SYSLOG_SERVER: ''
 TECH_SUPPORT_EMAIL: technical@example.com
 THIRD_PARTY_AUTH_BACKENDS: [social_core.backends.google.GoogleOAuth2, social_core.backends.linkedin.LinkedinOAuth2,
-  social_core.backends.facebook.FacebookOAuth2, third_party_auth.dummy.DummyBackend,
-  third_party_auth.saml.SAMLAuthBackend]
+  social_core.backends.facebook.FacebookOAuth2, common.djangoapps.third_party_auth.dummy.DummyBackend,
+  common.djangoapps.third_party_auth.saml.SAMLAuthBackend]
 TIME_ZONE: America/New_York
 TRACKING_BACKENDS:
   mongo:
-    ENGINE: track.backends.mongodb.MongoBackend
+    ENGINE: common.djangoapps.track.backends.mongodb.MongoBackend
     OPTIONS:
       collection: events
       database: test

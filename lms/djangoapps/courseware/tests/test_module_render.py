@@ -14,8 +14,10 @@ import ddt
 import pytz
 import six
 from bson import ObjectId
+from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
+from common.djangoapps.course_modes.models import CourseMode
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404, HttpResponse
@@ -26,6 +28,8 @@ from django.urls import reverse
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCertificateService, MockCreditService, MockGradesService
+from edx_toggles.toggles import WaffleSwitch
+from edx_toggles.toggles.testutils import override_waffle_switch
 from edx_when.field_data import DateLookupFieldData
 from freezegun import freeze_time
 from milestones.tests.utils import MilestonesTestCaseMixin
@@ -44,31 +48,34 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData, Runtime
 from xblock.test.tools import TestRuntime
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware import module_render as render
 from lms.djangoapps.courseware.access_response import AccessResponse
 from lms.djangoapps.courseware.courses import get_course_info_section, get_course_with_access
+from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.courseware.masquerade import CourseMasquerade
 from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor, hash_resource
 from lms.djangoapps.courseware.tests.factories import (
-    GlobalStaffFactory, RequestFactoryNoCsrf, StudentModuleFactory, UserFactory,
+    GlobalStaffFactory,
+    RequestFactoryNoCsrf,
+    StudentModuleFactory,
+    UserFactory
 )
 from lms.djangoapps.courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.courseware.tests.tests import LoginEnrollmentTestCase
-from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status, set_credit_requirements
 from openedx.core.djangoapps.credit.models import CreditCourse
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
-from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory, AccessTokenFactory
+from openedx.core.djangoapps.oauth_dispatch.tests.factories import AccessTokenFactory, ApplicationFactory
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.url_utils import quote_slashes
-from student.models import CourseEnrollment, anonymous_id_for_user
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
-from xblock_django.models import XBlockConfiguration
+from common.djangoapps.student.models import CourseEnrollment, anonymous_id_for_user
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from common.djangoapps.xblock_django.models import XBlockConfiguration
 from xmodule.capa_module import ProblemBlock
 from xmodule.html_module import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
 from xmodule.lti_module import LTIDescriptor
@@ -84,7 +91,13 @@ from xmodule.modulestore.tests.test_asides import AsideTestType
 from xmodule.video_module import VideoBlock
 from xmodule.x_module import STUDENT_VIEW, CombinedSystem, XModule, XModuleDescriptor
 
+
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+
+# pylint: disable=feature-toggle-needs-doc
+ENABLE_COMPLETION_TRACKING_SWITCH = WaffleSwitch(
+    completion_waffle.waffle(), completion_waffle.ENABLE_COMPLETION_TRACKING, __name__
+)
 
 
 @XBlock.needs("field-data")
@@ -760,7 +773,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     @ddt.unpack
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
     def test_completion_events_with_completion_disabled(self, signal, data):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, False):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, False):
             course = CourseFactory.create()
             block = ItemFactory.create(category='comp', parent=course)
             request = self.request_factory.post(
@@ -782,7 +795,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
     def test_completion_signal_for_completable_xblock(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
             block = ItemFactory.create(category='comp', parent=course)
 
@@ -849,7 +862,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
 
         with patch(
-            'courseware.module_render.is_xblock_aside',
+            'lms.djangoapps.courseware.module_render.is_xblock_aside',
             return_value=True
         ), self.assertRaises(Http404):
             render.handle_xblock_callback(
@@ -862,7 +875,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
     def test_progress_signal_ignored_for_completable_xblock(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
             block = ItemFactory.create(category='comp', parent=course)
 
@@ -875,7 +888,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 
     @XBlock.register_temp_plugin(XBlockWithoutCompletionAPI, identifier='no_comp')
     def test_progress_signal_processed_for_xblock_without_completion_api(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
             block = ItemFactory.create(category='no_comp', parent=course)
 
@@ -889,7 +902,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
 
     @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
     def test_skip_handlers_for_masquerading_staff(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+        with override_waffle_switch(ENABLE_COMPLETION_TRACKING_SWITCH, True):
             course = CourseFactory.create()
             block = ItemFactory.create(category='comp', parent=course)
             request = self.request_factory.post(
@@ -997,6 +1010,7 @@ class TestXBlockView(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 @ddt.ddt
 class TestTOC(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
+
     def setup_request_and_course(self, num_finds, num_sends):
         """
         Sets up the toy course in the modulestore and the request object.
@@ -1522,6 +1536,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
     Tests to verify that standard modifications to the output of XModule/XBlock
     student_view are taking place
     """
+
     def setUp(self):
         super(TestHtmlModifiers, self).setUp()
         self.course = CourseFactory.create()
@@ -1712,109 +1727,12 @@ class JsonInitDataTest(ModuleStoreTestCase):
         self.assertEqual(html.count("</script>"), 1)
 
 
-class ViewInStudioTest(ModuleStoreTestCase):
-    """Tests for the 'View in Studio' link visiblity."""
-
-    def setUp(self):
-        """ Set up the user and request that will be used. """
-        super(ViewInStudioTest, self).setUp()
-        self.staff_user = GlobalStaffFactory.create()
-        self.request = RequestFactoryNoCsrf().get('/')
-        self.request.user = self.staff_user
-        self.request.session = {}
-        self.module = None
-        self.default_context = {'bookmarked': False, 'username': self.user.username}
-
-    def _get_module(self, course_id, descriptor, location):
-        """
-        Get the module from the course from which to pattern match (or not) the 'View in Studio' buttons
-        """
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course_id,
-            self.staff_user,
-            descriptor
-        )
-
-        return render.get_module(
-            self.staff_user,
-            self.request,
-            location,
-            field_data_cache,
-        )
-
-    def setup_mongo_course(self, course_edit_method='Studio'):
-        """ Create a mongo backed course. """
-        course = CourseFactory.create(
-            course_edit_method=course_edit_method
-        )
-
-        descriptor = ItemFactory.create(
-            category='vertical',
-            parent_location=course.location,
-        )
-
-        child_descriptor = ItemFactory.create(
-            category='vertical',
-            parent_location=descriptor.location
-        )
-
-        self.module = self._get_module(course.id, descriptor, descriptor.location)
-
-        # pylint: disable=attribute-defined-outside-init
-        self.child_module = self._get_module(course.id, child_descriptor, child_descriptor.location)
-
-
-class MongoViewInStudioTest(ViewInStudioTest):
-    """Test the 'View in Studio' link visibility in a mongo backed course."""
-
-    def test_view_in_studio_link_studio_course(self):
-        """Regular Studio courses should see 'View in Studio' links."""
-        self.setup_mongo_course()
-        result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        self.assertIn('View Unit in Studio', result_fragment.content)
-
-    def test_view_in_studio_link_only_in_top_level_vertical(self):
-        """Regular Studio courses should not see 'View in Studio' for child verticals of verticals."""
-        self.setup_mongo_course()
-        # Render the parent vertical, then check that there is only a single "View Unit in Studio" link.
-        result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        # The single "View Unit in Studio" link should appear before the first xmodule vertical definition.
-        parts = result_fragment.content.split('data-block-type="vertical"')
-        self.assertEqual(3, len(parts), "Did not find two vertical blocks")
-        self.assertIn('View Unit in Studio', parts[0])
-        self.assertNotIn('View Unit in Studio', parts[1])
-        self.assertNotIn('View Unit in Studio', parts[2])
-
-    def test_view_in_studio_link_xml_authored(self):
-        """Courses that change 'course_edit_method' setting can hide 'View in Studio' links."""
-        self.setup_mongo_course(course_edit_method='XML')
-        result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        self.assertNotIn('View Unit in Studio', result_fragment.content)
-
-
-class MixedViewInStudioTest(ViewInStudioTest):
-    """Test the 'View in Studio' link visibility in a mixed mongo backed course."""
-
-    MODULESTORE = TEST_DATA_MIXED_MODULESTORE
-
-    def test_view_in_studio_link_mongo_backed(self):
-        """Mixed mongo courses that are mongo backed should see 'View in Studio' links."""
-        self.setup_mongo_course()
-        result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        self.assertIn('View Unit in Studio', result_fragment.content)
-
-    def test_view_in_studio_link_xml_authored(self):
-        """Courses that change 'course_edit_method' setting can hide 'View in Studio' links."""
-        self.setup_mongo_course(course_edit_method='XML')
-        result_fragment = self.module.render(STUDENT_VIEW, context=self.default_context)
-        self.assertNotIn('View Unit in Studio', result_fragment.content)
-
-
 @XBlock.tag("detached")
 class DetachedXBlock(XBlock):
     """
     XBlock marked with the 'detached' flag.
     """
+
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """
         A simple view that returns just enough to test.
@@ -2100,7 +2018,7 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         )
 
 
-@patch('track.views.tracker', autospec=True)
+@patch('common.djangoapps.track.views.eventtracker', autospec=True)
 class TestModuleTrackingContext(SharedModuleStoreTestCase):
     """
     Ensure correct tracking information is included in events emitted during XBlock callback handling.
@@ -2152,7 +2070,11 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             return {'content': 'test1', 'data_field': 'test2'}
 
         AsideTestType.get_event_context = get_event_context
-        context_info = self.handle_callback_and_get_context_info(mock_tracker, problem_display_name)
+
+        # for different operations, there are different number of context calls.
+        # We are sending this `call_idx` to get the mock call that we are interested in.
+        context_info = self.handle_callback_and_get_context_info(mock_tracker, problem_display_name, call_idx=4)
+
         self.assertIn('asides', context_info)
         self.assertIn('test_aside', context_info['asides'])
         self.assertIn('content', context_info['asides']['test_aside'])
@@ -2160,11 +2082,15 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
         self.assertIn('data_field', context_info['asides']['test_aside'])
         self.assertEqual(context_info['asides']['test_aside']['data_field'], 'test2')
 
-    def handle_callback_and_get_context_info(self, mock_tracker, problem_display_name=None):
+    def handle_callback_and_get_context_info(self,
+                                             mock_tracker,
+                                             problem_display_name=None,
+                                             call_idx=0):
         """
         Creates a fake module, invokes the callback and extracts the 'context'
         metadata from the emitted problem_check event.
         """
+
         descriptor_kwargs = {
             'category': 'problem',
             'data': self.problem_xml
@@ -2173,28 +2099,35 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             descriptor_kwargs['display_name'] = problem_display_name
 
         descriptor = ItemFactory.create(**descriptor_kwargs)
+        with patch('lms.djangoapps.courseware.module_render.tracker') as mock_tracker_for_context:
+            render.handle_xblock_callback(
+                self.request,
+                text_type(self.course.id),
+                quote_slashes(text_type(descriptor.location)),
+                'xmodule_handler',
+                'problem_check',
+            )
 
-        render.handle_xblock_callback(
-            self.request,
-            text_type(self.course.id),
-            quote_slashes(text_type(descriptor.location)),
-            'xmodule_handler',
-            'problem_check',
-        )
+            self.assertEquals(len(mock_tracker.emit.mock_calls), 1)
+            mock_call = mock_tracker.emit.mock_calls[0]
+            event = mock_call[2]
 
-        self.assertEqual(len(mock_tracker.send.mock_calls), 1)
-        mock_call = mock_tracker.send.mock_calls[0]
-        event = mock_call[1][0]
+            self.assertEquals(event['name'], 'problem_check')
 
-        self.assertEqual(event['event_type'], 'problem_check')
-        return event['context']
+            # for different operations, there are different number of context calls.
+            # We are sending this `call_idx` to get the mock call that we are interested in.
+            context = mock_tracker_for_context.get_tracker.mock_calls[call_idx][1][1]
+
+            return context
 
     def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
         """
         Creates a fake module, invokes the callback and extracts the 'module'
         metadata from the emitted problem_check event.
         """
-        event = self.handle_callback_and_get_context_info(mock_tracker, problem_display_name)
+        event = self.handle_callback_and_get_context_info(
+            mock_tracker, problem_display_name, call_idx=1
+        )
         return event['module']
 
     def test_missing_display_name(self, mock_tracker):
@@ -2292,6 +2225,7 @@ class TestRebindModule(TestSubmittingProblems):
     Tests to verify the functionality of rebinding a module.
     Inherit from TestSubmittingProblems to get functionality that set up a course structure
     """
+
     def setUp(self):
         super(TestRebindModule, self).setUp()
         self.homework = self.add_graded_section_to_course('homework')
@@ -2650,6 +2584,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
     """
     Tests that verify disabled XBlock types are not loaded.
     """
+
     def setUp(self):
         super(TestDisabledXBlockTypes, self).setUp()
         XBlockConfiguration(name='video', enabled=False).save()

@@ -153,7 +153,7 @@
                     delete_module: false
                 };
                 successMessage = gettext("Success! Problem attempts reset for problem '<%- problem_id %>' and student '<%- student_id %>'.");  // eslint-disable-line max-len
-                errorMessage = gettext("Error resetting problem attempts for problem '<%= problem_id %>' and student '<%- student_id %>'. Make sure that the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
+                errorMessage = gettext("Error resetting problem attempts for problem '<%- problem_id %>' and student '<%- student_id %>'. Make sure that the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
                 fullSuccessMessage = _.template(successMessage)({
                     problem_id: problemToReset,
                     student_id: uniqStudentIdentifier

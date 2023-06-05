@@ -10,7 +10,7 @@ from factory.fuzzy import FuzzyText
 from oauth2_provider.models import AccessToken, Application, RefreshToken
 
 from openedx.core.djangoapps.oauth_dispatch.models import ApplicationAccess
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class ApplicationFactory(DjangoModelFactory):

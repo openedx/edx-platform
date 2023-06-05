@@ -1,6 +1,6 @@
 <form>
   <div role="group" aria-labelledby="verification-checkpoint-title">
-    <h3 id="verification-checkpoint-title" class="modal-section-title"><%= gettext('Verification Checkpoint') %></h3>
+    <h3 id="verification-checkpoint-title" class="modal-section-title"><%- gettext('Verification Checkpoint') %></h3>
     <div class="modal-section-content verification-access">
       <div class="list-fields list-input">
         <div class="field field-checkbox checkbox-cosmetic">
@@ -20,7 +20,7 @@
           </label>
 
           <label class="sr" for="verification-partition-select">
-            <%= gettext('Verification checkpoint to be completed') %>
+            <%- gettext('Verification checkpoint to be completed') %>
           </label>
 
           <select id="verification-partition-select">
@@ -35,7 +35,7 @@
           </select>
 
           <div id="verification-help-text" class="note">
-            <%= gettext("Learners who require verification must pass the selected checkpoint to see the content in this unit. Learners who do not require verification see this content by default.") %>
+            <%- gettext("Learners who require verification must pass the selected checkpoint to see the content in this unit. Learners who do not require verification see this content by default.") %>
           </div>
         </div>
       </div>

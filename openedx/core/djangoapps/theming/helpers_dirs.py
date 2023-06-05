@@ -10,7 +10,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from path import Path
 
 
-def get_theme_base_dirs_from_settings(theme_dirs=None):
+def get_theme_base_dirs_from_settings(theme_base_dirs=None):
     """
     Return base directories that contains all the themes.
 
@@ -18,41 +18,54 @@ def get_theme_base_dirs_from_settings(theme_dirs=None):
         >> get_theme_base_dirs_from_settings('/edx/app/ecommerce/ecommerce/themes')
         ['/edx/app/ecommerce/ecommerce/themes']
 
+    Args:
+        themes_base_dirs (list of str): Paths to themes base directories.
+
     Returns:
          (List of Paths): Base theme directory paths
     """
-    theme_base_dirs = []
-    if theme_dirs:
-        theme_base_dirs.extend([Path(theme_dir) for theme_dir in theme_dirs])
-    return theme_base_dirs
+    theme_base_dirs_paths = []
+    if theme_base_dirs:
+        theme_base_dirs_paths.extend([Path(theme_base_dir) for theme_base_dir in theme_base_dirs])
+    return theme_base_dirs_paths
 
 
-def get_themes_unchecked(themes_dirs, project_root=None):
+def get_themes_unchecked(themes_base_dirs, project_root=None):
     """
     Returns a list of all themes known to the system.
 
     Args:
-        themes_dirs (list): Paths to themes base directory
+        themes_base_dirs (list of str / list of Path): Paths to themes base directories.
         project_root (str): (optional) Path to project root
     Returns:
-        List of themes known to the system.
+        (list of Theme): List of themes known to the system.
     """
-    themes_base_dirs = [Path(themes_dir) for themes_dir in themes_dirs]
+    # Convert base dirs to Path objects
+    themes_base_dirs = [Path(themes_base_dir) for themes_base_dir in themes_base_dirs]
     # pick only directories and discard files in themes directory
     themes = []
-    for themes_dir in themes_base_dirs:
-        themes.extend([Theme(name, name, themes_dir, project_root) for name in get_theme_dirs(themes_dir)])
+    for themes_base_dir in themes_base_dirs:
+        themes.extend([Theme(name, name, themes_base_dir, project_root) for name in get_theme_dirs(themes_base_dir)])
 
     return themes
 
 
-def get_theme_dirs(themes_dir=None):
+def get_theme_dirs(themes_base_dir=None):
     """
-    Returns theme dirs in given dirs
+    Get all the theme dirs directly under a given base dir.
+
     Args:
-        themes_dir (Path): base dir that contains themes.
+        themes_base_dir (Path): base dir that contains themes.
+    Returns:
+        List of theme dir names (relative to the base dir) or empty list if the base themes dir does not exist or there
+        are no containing theme dirs.
     """
-    return [_dir for _dir in os.listdir(themes_dir) if is_theme_dir(themes_dir / _dir)]
+    try:
+        themes_base_dir_listing = os.listdir(themes_base_dir)
+    except FileNotFoundError:
+        themes_base_dir_listing = []
+
+    return [_dir for _dir in themes_base_dir_listing if is_theme_dir(themes_base_dir / _dir)]
 
 
 def is_theme_dir(_dir):

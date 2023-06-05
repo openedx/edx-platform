@@ -15,16 +15,16 @@ from django.utils.translation import override as override_language
 from django.utils.translation import ugettext as _
 from pytz import UTC
 from six import text_type  # pylint: disable=ungrouped-imports
-from student import views as student_views
-from student.models import (
+from common.djangoapps.student import views as student_views
+from common.djangoapps.student.models import (
     AccountRecovery,
     User,
     UserProfile,
     email_exists_or_retired,
     username_exists_or_retired
 )
-from util.model_utils import emit_setting_changed_event
-from util.password_policy_validators import validate_password
+from common.djangoapps.util.model_utils import emit_setting_changed_event
+from common.djangoapps.util.password_policy_validators import validate_password
 
 from openedx.core.djangoapps.user_api import accounts, errors, helpers
 from openedx.core.djangoapps.user_api.errors import (

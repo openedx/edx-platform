@@ -8,7 +8,7 @@ from celery.states import FAILURE
 from mock import MagicMock, Mock, patch
 from six.moves import range
 
-from bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
+from lms.djangoapps.bulk_email.models import SEND_TO_LEARNERS, SEND_TO_MYSELF, SEND_TO_STAFF, CourseEmail
 from common.test.utils import normalize_repr
 from lms.djangoapps.courseware.tests.factories import UserFactory
 from lms.djangoapps.certificates.models import CertificateGenerationHistory, CertificateStatuses
@@ -26,9 +26,8 @@ from lms.djangoapps.instructor_task.api import (
     submit_course_survey_report,
     submit_delete_entrance_exam_state_for_student,
     submit_delete_problem_state_for_all_students,
-    submit_detailed_enrollment_features_csv,
-    submit_executive_summary_report,
     submit_export_ora2_data,
+    submit_export_ora2_submission_files,
     submit_override_score,
     submit_rescore_entrance_exam_for_student,
     submit_rescore_problem_for_all_students,
@@ -38,7 +37,7 @@ from lms.djangoapps.instructor_task.api import (
 )
 from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError, QueueConnectionError
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
-from lms.djangoapps.instructor_task.tasks import export_ora2_data
+from lms.djangoapps.instructor_task.tasks import export_ora2_data, export_ora2_submission_files
 from lms.djangoapps.instructor_task.tests.test_base import (
     TEST_COURSE_KEY,
     InstructorTaskCourseTestCase,
@@ -190,7 +189,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
             task_function(self.create_task_request(self.instructor), location, **params)
 
 
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""
 
@@ -240,7 +239,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         api_call = lambda: submit_calculate_problem_responses_csv(
             self.create_task_request(self.instructor),
             self.course.id,
-            problem_location=''
+            problem_locations='',
         )
         self._test_resubmission(api_call)
 
@@ -249,17 +248,6 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             self.create_task_request(self.instructor),
             self.course.id,
             features=[]
-        )
-        self._test_resubmission(api_call)
-
-    def test_submit_enrollment_report_features_csv(self):
-        api_call = lambda: submit_detailed_enrollment_features_csv(self.create_task_request(self.instructor),
-                                                                   self.course.id)
-        self._test_resubmission(api_call)
-
-    def test_submit_executive_summary_report(self):
-        api_call = lambda: submit_executive_summary_report(
-            self.create_task_request(self.instructor), self.course.id
         )
         self._test_resubmission(api_call)
 
@@ -294,6 +282,22 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
 
             mock_submit_task.assert_called_once_with(
                 request, 'export_ora2_data', export_ora2_data, self.course.id, {}, '')
+
+    def test_submit_export_ora2_submission_files(self):
+        request = self.create_task_request(self.instructor)
+
+        with patch('lms.djangoapps.instructor_task.api.submit_task') as mock_submit_task:
+            mock_submit_task.return_value = MagicMock()
+            submit_export_ora2_submission_files(request, self.course.id)
+
+            mock_submit_task.assert_called_once_with(
+                request,
+                'export_ora2_submission_files',
+                export_ora2_submission_files,
+                self.course.id,
+                {},
+                ''
+            )
 
     def test_submit_generate_certs_students(self):
         """

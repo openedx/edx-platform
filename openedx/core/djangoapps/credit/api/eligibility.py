@@ -9,7 +9,7 @@ import logging
 import six
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credit.email_utils import send_credit_notifications
 from openedx.core.djangoapps.credit.exceptions import InvalidCreditCourse, InvalidCreditRequirements
 from openedx.core.djangoapps.credit.models import (
@@ -19,7 +19,7 @@ from openedx.core.djangoapps.credit.models import (
     CreditRequirement,
     CreditRequirementStatus
 )
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 # TODO: Cleanup this mess! ECOM-2908
 
@@ -260,7 +260,7 @@ def set_credit_requirement_status(user, course_key, req_namespace, req_name, sta
                 u'Could not update credit requirement in course "%s" '
                 u'with namespace "%s" and name "%s" '
                 u'because the requirement does not exist. '
-                u'The user "%s" should have had his/her status updated to "%s".'
+                u'The user "%s" should have had their status updated to "%s".'
             ),
             six.text_type(course_key), req_namespace, req_name, user.username, status
         )

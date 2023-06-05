@@ -7,8 +7,8 @@ import six
 from mock import Mock, patch
 
 from lms.lib.courseware_search.lms_filter_generator import LmsSearchFilterGenerator
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

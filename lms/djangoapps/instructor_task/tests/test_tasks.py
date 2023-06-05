@@ -17,7 +17,7 @@ from mock import MagicMock, Mock, patch
 from opaque_keys.edx.keys import i4xEncoder
 from six.moves import range
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.models import StudentModule
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.instructor_task.exceptions import UpdateProblemModuleStateError
@@ -25,6 +25,7 @@ from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.tasks import (
     delete_problem_state,
     export_ora2_data,
+    export_ora2_submission_files,
     generate_certificates,
     override_problem_score,
     rescore_problem,
@@ -678,6 +679,36 @@ class TestOra2ResponsesInstructorTask(TestInstructorTasks):
         with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
             export_ora2_data(task_entry.id, task_xmodule_args)
             action_name = ugettext_noop('generated')
+
+            assert mock_main_task.call_count == 1
+            args = mock_main_task.call_args[0]
+            assert args[0] == task_entry.id
+            assert callable(args[1])
+            assert args[2] == action_name
+
+
+class TestOra2ExportSubmissionFilesInstructorTask(TestInstructorTasks):
+    """Tests instructor task that exports ora2 submission files archive."""
+
+    def test_ora2_missing_current_task(self):
+        self._test_missing_current_task(export_ora2_submission_files)
+
+    def test_ora2_with_failure(self):
+        self._test_run_with_failure(export_ora2_submission_files, 'We expected this to fail')
+
+    def test_ora2_with_long_error_msg(self):
+        self._test_run_with_long_error_msg(export_ora2_submission_files)
+
+    def test_ora2_with_short_error_msg(self):
+        self._test_run_with_short_error_msg(export_ora2_submission_files)
+
+    def test_ora2_runs_task(self):
+        task_entry = self._create_input_entry()
+        task_xmodule_args = self._get_xmodule_instance_args()
+
+        with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
+            export_ora2_submission_files(task_entry.id, task_xmodule_args)
+            action_name = ugettext_noop('compressed')
 
             assert mock_main_task.call_count == 1
             args = mock_main_task.call_args[0]

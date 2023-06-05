@@ -72,6 +72,7 @@ module.exports = Merge.smart({
             // Studio
             Import: './cms/static/js/features/import/factories/import.js',
             CourseOrLibraryListing: './cms/static/js/features_jsx/studio/CourseOrLibraryListing.jsx',
+            LibrarySourcedBlockPicker: './common/lib/xmodule/xmodule/assets/library_source_block/LibrarySourcedBlockPicker.jsx',  // eslint-disable-line max-len
             'js/factories/textbooks': './cms/static/js/factories/textbooks.js',
             'js/factories/container': './cms/static/js/factories/container.js',
             'js/factories/context_course': './cms/static/js/factories/context_course.js',
@@ -93,6 +94,9 @@ module.exports = Merge.smart({
             StudentAccountDeletionInitializer: './lms/static/js/student_account/StudentAccountDeletionInitializer.js',
             EdlyStudentAccountDeletionInitializer: './themes/st-lutherx/lms/static/js/student_account/StudentAccountDeletionInitializer.js',
             ProblemBrowser: './lms/djangoapps/instructor/static/instructor/ProblemBrowser/index.jsx',
+            DemographicsCollectionBanner: './lms/static/js/demographics_collection/DemographicsCollectionBanner.jsx',
+            DemographicsCollectionModal: './lms/static/js/demographics_collection/DemographicsCollectionModal.jsx',
+            AxiosJwtTokenService: './lms/static/js/jwt_auth/AxiosJwtTokenService.js',
 
             // Learner Dashboard
             EntitlementFactory: './lms/static/js/learner_dashboard/course_entitlement_factory.js',
@@ -344,6 +348,18 @@ module.exports = Merge.smart({
                 {
                     test: /logger/,
                     loader: 'imports-loader?this=>window'
+                },
+                {
+                    test: /\.css$/,
+                    use: [
+                        'style-loader',
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                modules: true
+                            }
+                        }
+                    ]
                 }
             ]
         },

@@ -22,12 +22,12 @@ from integrated_channels.sap_success_factors.models import SapSuccessFactorsLear
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
-from entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
+from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup, UnregisteredLearnerCohortAssignments
 from openedx.core.djangoapps.profile_images.images import create_profile_images
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
-from student.models import CourseEnrollment, CourseEnrollmentAllowed, PendingEmailChange, UserProfile
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentAllowed, PendingEmailChange, UserProfile
 
 from ...models import UserOrgTag
 

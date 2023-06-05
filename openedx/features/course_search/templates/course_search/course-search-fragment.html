@@ -36,17 +36,19 @@ from openedx.features.course_experience import course_home_page_title
         </div>
         <div class="page-header-secondary">
             <div class="page-header-search">
-                <form class="search-form" role="search">
-                    <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
+                <form class="search-form input-group" role="search">
                     <input
-                            class="field-input input-text search-field"
+                            class="field-input input-text search-field form-control"
                             type="search"
                             name="query"
                             id="search"
                             value="${query}"
                             placeholder="${_('Search the course')}"
                     />
-                    <button class="btn btn-small search-button" type="submit">${_('Search')}</button>
+                    <label class="field-label sr-only" for="search" id="search-hint">${_('Search the course')}</label>
+                    <div class="input-group-append input-group-btn">
+                        <button class="btn btn-outline-primary search-button" type="submit">${_('Search')}</button>
+                    </div>
                 </form>
             </div>
         </div>

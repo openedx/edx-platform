@@ -58,13 +58,6 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
 
   </div>
   <div class="secondary">
-    % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
-      <div class="mobile-nav-item hidden-mobile nav-item">
-        <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
-          <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
-        </a>
-      </div>
-    % endif
     <div class="mobile-nav-item hidden-mobile nav-item">
       % if online_help_token == "instructor":
         <a class="help-link" href="${get_online_help_info(online_help_token)['doc_url']}" rel="noopener" target="_blank">${_("Help")}</a>

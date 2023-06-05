@@ -16,17 +16,17 @@ from edx_ace.recipient import Recipient
 from mock import Mock, patch
 from six import text_type
 
-from bulk_email.models import BulkEmailFlag
-from bulk_email.policies import CourseEmailOptout
-from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from lms.djangoapps.bulk_email.models import BulkEmailFlag
+from lms.djangoapps.bulk_email.policies import CourseEmailOptout
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from lms.djangoapps.bulk_email.api import get_unsubscribed_link
 
 
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestOptoutCourseEmails(ModuleStoreTestCase):
     """
     Test that optouts are referenced in sending course email.
@@ -144,7 +144,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.assertIn(self.instructor.email, sent_addresses)
 
 
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestACEOptoutCourseEmails(ModuleStoreTestCase):
     """
     Test that optouts are referenced in sending course email.

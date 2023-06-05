@@ -22,8 +22,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from six import text_type
 
-import contentstore.git_export_utils as git_export_utils
-from contentstore.git_export_utils import GitExportError
+import cms.djangoapps.contentstore.git_export_utils as git_export_utils
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +51,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(options['course_loc'])
         except InvalidKeyError:
-            raise CommandError(text_type(GitExportError.BAD_COURSE))
+            raise CommandError(text_type(git_export_utils.GitExportError.BAD_COURSE))
 
         try:
             git_export_utils.export_to_git(

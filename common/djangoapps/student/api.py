@@ -7,10 +7,10 @@ Python APIs exposed by the student app to other in-process apps.
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
-from student.models_api import create_manual_enrollment_audit as _create_manual_enrollment_audit
-from student.models_api import get_course_access_role
-from student.models_api import get_course_enrollment as _get_course_enrollment
-from student.models_api import (
+from common.djangoapps.student.models_api import create_manual_enrollment_audit as _create_manual_enrollment_audit
+from common.djangoapps.student.models_api import get_course_access_role
+from common.djangoapps.student.models_api import get_course_enrollment as _get_course_enrollment
+from common.djangoapps.student.models_api import (
     ENROLLED_TO_ENROLLED as _ENROLLED_TO_ENROLLED,
     ENROLLED_TO_UNENROLLED as _ENROLLED_TO_UNENROLLED,
     UNENROLLED_TO_ENROLLED as _UNENROLLED_TO_ENROLLED,
@@ -20,7 +20,7 @@ from student.models_api import (
     ALLOWEDTOENROLL_TO_UNENROLLED as _ALLOWEDTOENROLL_TO_UNENROLLED,
     DEFAULT_TRANSITION_STATE as _DEFAULT_TRANSITION_STATE,
 )
-from student.roles import REGISTERED_ACCESS_ROLES as _REGISTERED_ACCESS_ROLES
+from common.djangoapps.student.roles import REGISTERED_ACCESS_ROLES as _REGISTERED_ACCESS_ROLES
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 

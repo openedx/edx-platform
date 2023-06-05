@@ -16,6 +16,7 @@ import ddt
 import six
 from celery.states import FAILURE, SUCCESS
 from django.contrib.auth.models import User
+from django.test.utils import override_settings
 from django.urls import reverse
 from mock import patch
 from six import text_type
@@ -70,6 +71,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
 
 
 @ddt.ddt
+@override_settings(RATELIMIT_ENABLE=False)
 class TestRescoringTask(TestIntegrationTask):
     """
     Integration-style tests for rescoring problems in a background task.
@@ -432,6 +434,7 @@ class TestRescoringTask(TestIntegrationTask):
             self.check_state(user, descriptor, 0, 1, expected_attempts=2)
 
 
+@override_settings(RATELIMIT_ENABLE=False)
 class TestResetAttemptsTask(TestIntegrationTask):
     """
     Integration-style tests for resetting problem attempts in a background task.

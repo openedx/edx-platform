@@ -24,6 +24,20 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
     feature to take effect.
 
     .. no_pii:
+
+    .. toggle_name: PersistentGradesEnabledFlag.enabled
+    .. toggle_implementation: ConfigurationModel
+    .. toggle_default: False
+    .. toggle_description: When enabled, grades are persisted. This means that PersistentCourseGrade objects are
+       created for student grades. In order for this to take effect, CoursePersistentGradesFlag objects must also be
+       created individually for each course. Alternatively, the PersistentGradesEnabledFlag.enabled_for_all_courses
+       waffle flag or the PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS feature flag can be set to True to enable this
+       feature for all courses.
+    .. toggle_use_cases: temporary
+    .. toggle_creation_date: 2016-08-26
+    .. toggle_target_removal_date: None
+    .. toggle_warnings: None
+    .. toggle_tickets: https://github.com/edx/edx-platform/pull/13329
     """
     # this field overrides course-specific settings to enable the feature for all courses
     enabled_for_all_courses = BooleanField(default=False)

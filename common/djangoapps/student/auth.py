@@ -13,7 +13,7 @@ from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator
 
 from openedx.features.edly.utils import get_edly_sub_org_from_request
-from student.roles import (
+from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseCreatorRole,
     CourseInstructorRole,

@@ -15,13 +15,16 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest
 from django.test import TestCase
 from mock import Mock, patch
+from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import CourseLocator
 from pytz import UTC
 from six import text_type
 
-import util.file
-from util.file import (
+from ccx_keys.locator import CCXLocator
+
+import common.djangoapps.util.file
+from common.djangoapps.util.file import (
     FileValidationException,
     UniversalNewlineIterator,
     course_and_time_based_filename_generator,
@@ -35,13 +38,62 @@ class FilenamePrefixGeneratorTestCase(TestCase):
     """
     Tests for course_filename_prefix_generator
     """
-    @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
+    @ddt.data(
+        CourseLocator(org='foo', course='bar', run='baz'),
+        CourseKey.from_string('foo/bar/baz'),
+        CCXLocator.from_course_locator(CourseLocator(org='foo', course='bar', run='baz'), '1'),
+    )
     def test_locators(self, course_key):
-        self.assertEqual(course_filename_prefix_generator(course_key), u'foo_bar_baz')
+        """
+        Test filename prefix genaration from multiple course key formats.
+
+        Test that the filename prefix is generated from a CCX course locator or a course key. If the
+        filename is generated for a CCX course but the related 'ENABLE_COURSE_FILENAME_CCX_SUFFIX'
+        feature is not turned on, the generated filename shouldn't contain the CCX course ID.
+        """
+        assert course_filename_prefix_generator(course_key) == 'foo_bar_baz'
+
+    @ddt.data(
+        [CourseLocator(org='foo', course='bar', run='baz'), 'foo_bar_baz'],
+        [CourseKey.from_string('foo/bar/baz'), 'foo_bar_baz'],
+        [CCXLocator.from_course_locator(CourseLocator(org='foo', course='bar', run='baz'), '1'), 'foo_bar_baz_ccx_1'],
+    )
+    @ddt.unpack
+    @override_settings(FEATURES={'ENABLE_COURSE_FILENAME_CCX_SUFFIX': True})
+    def test_include_ccx_id(self, course_key, expected_filename):
+        """
+        Test filename prefix genaration from multiple course key formats.
+
+        Test that the filename prefix is generated from a CCX course locator or a course key. If the
+        filename is generated for a CCX course but the related 'ENABLE_COURSE_FILENAME_CCX_SUFFIX'
+        feature is not turned on, the generated filename shouldn't contain the CCX course ID.
+        """
+        assert course_filename_prefix_generator(course_key) == expected_filename
 
     @ddt.data(CourseLocator(org='foo', course='bar', run='baz'), CourseKey.from_string('foo/bar/baz'))
     def test_custom_separator(self, course_key):
-        self.assertEqual(course_filename_prefix_generator(course_key, separator='-'), u'foo-bar-baz')
+        """
+        Test filename prefix is generated with a custom separator.
+
+        The filename should be build up from the course locator separated by a custom separator.
+        """
+        assert course_filename_prefix_generator(course_key, separator='-') == 'foo-bar-baz'
+
+    @ddt.data(
+        [CourseLocator(org='foo', course='bar', run='baz'), 'foo-bar-baz'],
+        [CourseKey.from_string('foo/bar/baz'), 'foo-bar-baz'],
+        [CCXLocator.from_course_locator(CourseLocator(org='foo', course='bar', run='baz'), '1'), 'foo-bar-baz-ccx-1'],
+    )
+    @ddt.unpack
+    @override_settings(FEATURES={'ENABLE_COURSE_FILENAME_CCX_SUFFIX': True})
+    def test_custom_separator_including_ccx_id(self, course_key, expected_filename):
+        """
+        Test filename prefix is generated with a custom separator.
+
+        The filename should be build up from the course locator separated by a custom separator
+        including the CCX ID if the related 'ENABLE_COURSE_FILENAME_CCX_SUFFIX' is turned on.
+        """
+        assert course_filename_prefix_generator(course_key, separator='-') == expected_filename
 
 
 @ddt.ddt
@@ -54,7 +106,7 @@ class FilenameGeneratorTestCase(TestCase):
     def setUp(self):
         super(FilenameGeneratorTestCase, self).setUp()
         datetime_patcher = patch.object(
-            util.file, 'datetime',
+            common.djangoapps.util.file, 'datetime',
             Mock(wraps=datetime)
         )
         mocked_datetime = datetime_patcher.start()

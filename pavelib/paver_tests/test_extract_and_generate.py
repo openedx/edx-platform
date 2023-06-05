@@ -15,7 +15,6 @@ from unittest import TestCase
 from i18n import config, dummy, extract, generate
 from polib import pofile
 from pytz import UTC
-from six.moves import range
 
 
 class TestGenerate(TestCase):
@@ -26,7 +25,7 @@ class TestGenerate(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestGenerate, cls).setUpClass()
+        super().setUpClass()
 
         sys.stderr.write(
             "\nThis test tests that i18n extraction (`paver i18n_extract`) works properly. "
@@ -50,10 +49,10 @@ class TestGenerate(TestCase):
         sys.stderr.flush()
         returncode = subprocess.call(cmd, shell=True)
         assert returncode == 0
-        super(TestGenerate, cls).tearDownClass()
+        super().tearDownClass()
 
     def setUp(self):
-        super(TestGenerate, self).setUp()
+        super().setUp()
 
         self.configuration = config.Configuration()
 
@@ -87,11 +86,11 @@ class TestGenerate(TestCase):
                 mofile = filename + '.mo'
                 path = os.path.join(self.configuration.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
-                self.assertTrue(exists, msg=u'Missing file in locale %s: %s' % (locale, mofile))
+                self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
                 self.assertGreaterEqual(
                     datetime.fromtimestamp(os.path.getmtime(path), UTC),
                     self.start_time,
-                    msg=u'File not recently modified: %s' % path
+                    msg='File not recently modified: %s' % path
                 )
             # Segmenting means that the merge headers don't work they way they
             # used to, so don't make this check for now. I'm not sure if we'll
@@ -116,7 +115,7 @@ class TestGenerate(TestCase):
         self.assertEqual(
             len(match),
             3,
-            msg=u"Found %s (should be 3) merge comments in the header for %s" % (len(match), path)
+            msg="Found %s (should be 3) merge comments in the header for %s" % (len(match), path)
         )
 
 

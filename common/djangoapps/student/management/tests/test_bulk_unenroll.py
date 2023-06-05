@@ -7,13 +7,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from testfixtures import LogCapture
 
-from course_modes.tests.factories import CourseModeFactory
-from student.models import BulkUnenrollConfiguration, CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import BulkUnenrollConfiguration, CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-LOGGER_NAME = 'student.management.commands.bulk_unenroll'
+LOGGER_NAME = 'common.djangoapps.student.management.commands.bulk_unenroll'
 
 
 class BulkUnenrollTests(SharedModuleStoreTestCase):
@@ -58,7 +58,7 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
             csv = self._write_test_csv(csv, lines=["amy,test_course\n"])
 
             with LogCapture(LOGGER_NAME) as log:
-                call_command("bulk_unenroll", "--csv_path={}".format(csv.name))
+                call_command("bulk_unenroll", "--csv_path={}".format(csv.name), "--commit")
                 expected_message = 'Invalid course id {}, skipping un-enrollement.'.\
                     format('test_course')
 
@@ -76,9 +76,25 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
         with NamedTemporaryFile() as csv:
             csv = self._write_test_csv(csv, lines=lines)
 
-            call_command("bulk_unenroll", "--csv_path={}".format(csv.name))
+            call_command("bulk_unenroll", "--csv_path={}".format(csv.name), "--commit")
             for enrollment in CourseEnrollment.objects.all():
                 self.assertEqual(enrollment.is_active, False)
+
+    def test_bulk_un_enroll_without_commit(self):
+        """
+        Verify the ability to dry-run the command.
+        """
+        lines = [
+            enrollment.user.username + "," +
+            str(enrollment.course.id) + "\n"
+            for enrollment in self.enrollments
+        ]
+        with NamedTemporaryFile() as csv:
+            csv = self._write_test_csv(csv, lines=lines)
+
+            call_command("bulk_unenroll", "--csv_path={}".format(csv.name))
+            for enrollment in CourseEnrollment.objects.all():
+                self.assertEqual(enrollment.is_active, True)
 
     def test_bulk_unenroll_from_config_model(self):
         """Verify users are unenrolled using the command."""
@@ -90,7 +106,7 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
         csv_file = SimpleUploadedFile(name='test.csv', content=lines.encode('utf-8'), content_type='text/csv')
         BulkUnenrollConfiguration.objects.create(enabled=True, csv_file=csv_file)
 
-        call_command("bulk_unenroll")
+        call_command("bulk_unenroll", "--commit")
         for enrollment in CourseEnrollment.objects.all():
             self.assertEqual(enrollment.is_active, False)
 
@@ -101,14 +117,20 @@ class BulkUnenrollTests(SharedModuleStoreTestCase):
         csv_file = SimpleUploadedFile(name='test.csv', content=lines.encode('utf-8'), content_type='text/csv')
         BulkUnenrollConfiguration.objects.create(enabled=True, csv_file=csv_file)
 
+        course_id = self.enrollments[0].course.id
         with LogCapture(LOGGER_NAME) as log:
-            call_command("bulk_unenroll")
+            call_command("bulk_unenroll", "--commit")
             log.check(
+                (
+                    LOGGER_NAME,
+                    'INFO',
+                    'Processing [{}] with [1] enrollments.'.format(course_id),
+                ),
                 (
                     LOGGER_NAME,
                     'INFO',
                     'User [{}] have been successfully unenrolled from the course: {}'.format(
                         self.enrollments[0].username, self.enrollments[0].course.id
                     )
-                )
+                ),
             )

@@ -12,7 +12,7 @@ from organizations.tests.factories import OrganizationFactory
 from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.program_enrollments.signals import _listen_for_lms_retire, logger
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from openedx.core.djangoapps.catalog.cache import PROGRAM_CACHE_KEY_TPL
@@ -22,10 +22,10 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import fake_completed_retirement
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.models import CourseEnrollmentException
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from third_party_auth.models import SAMLProviderConfig
-from third_party_auth.tests.factories import SAMLProviderConfigFactory
+from common.djangoapps.student.models import CourseEnrollmentException
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -34,14 +34,14 @@ class ProgramEnrollmentRetireSignalTests(ModuleStoreTestCase):
     Test the _listen_for_lms_retire signal
     """
 
-    def create_enrollment_and_history(self, user=None):
+    def create_enrollment_and_history(self, user=None, external_user_key='defaultExternalKey'):
         """
         Create ProgramEnrollment and several History entries
         """
         if user:
-            enrollment = ProgramEnrollmentFactory(user=user)
+            enrollment = ProgramEnrollmentFactory(user=user, external_user_key=external_user_key)
         else:
-            enrollment = ProgramEnrollmentFactory()
+            enrollment = ProgramEnrollmentFactory(external_user_key=external_user_key)
         for status in ['pending', 'suspended', 'canceled', 'enrolled']:
             enrollment.status = status
             enrollment.save()
@@ -52,9 +52,11 @@ class ProgramEnrollmentRetireSignalTests(ModuleStoreTestCase):
         Assert that for the enrollment and all histories, external key is None
         """
         enrollment.refresh_from_db()
-        self.assertIsNone(enrollment.external_user_key)
+        self.assertIsNotNone(enrollment.external_user_key)
+        self.assertTrue(enrollment.external_user_key.startswith('retired_external_key'))
         for history_record in enrollment.historical_records.all():
-            self.assertIsNone(history_record.external_user_key)
+            self.assertIsNotNone(history_record.external_user_key)
+            self.assertTrue(history_record.external_user_key.startswith('retired_external_key'))
 
     def test_retire_enrollment(self):
         """
@@ -368,7 +370,7 @@ class SocialAuthEnrollmentCompletionSignalTest(CacheIsolationTestCase):
         program_enrollment = self._create_waiting_program_enrollment()
         self._create_waiting_course_enrollments(program_enrollment)
 
-        with mock.patch('student.models.CourseEnrollment.enroll') as enrollMock:
+        with mock.patch('common.djangoapps.student.models.CourseEnrollment.enroll') as enrollMock:
             enrollMock.side_effect = CourseEnrollmentException('something has gone wrong')
             with pytest.raises(CourseEnrollmentException):
                 UserSocialAuth.objects.create(

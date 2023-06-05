@@ -3,6 +3,7 @@ API Client methods for working with Blockstore bundles and drafts
 """
 
 import base64
+from urllib.parse import urlencode
 from uuid import UUID
 
 import dateutil.parser
@@ -144,6 +145,21 @@ def delete_collection(collection_uuid):
     api_request('delete', api_url('collections', str(collection_uuid)))
 
 
+def get_bundles(uuids=None, text_search=None):
+    """
+    Get the details of all bundles
+    """
+    query_params = {}
+    if uuids:
+        query_params['uuid'] = ','.join(map(str, uuids))
+    if text_search:
+        query_params['text_search'] = text_search
+    version_url = api_url('bundles') + '?' + urlencode(query_params)
+    response = api_request('get', version_url)
+    # build bundle from response, convert map object to list and return
+    return [_bundle_from_response(item) for item in response]
+
+
 def get_bundle(bundle_uuid):
     """
     Retrieve metadata about the specified bundle
@@ -248,14 +264,23 @@ def delete_draft(draft_uuid):
     api_request('delete', api_url('drafts', str(draft_uuid)))
 
 
+def get_bundle_version(bundle_uuid, version_number):
+    """
+    Get the details of the specified bundle version
+    """
+    if version_number == 0:
+        return None
+    version_url = api_url('bundle_versions', str(bundle_uuid) + ',' + str(version_number))
+    return api_request('get', version_url)
+
+
 def get_bundle_version_files(bundle_uuid, version_number):
     """
     Get a list of the files in the specified bundle version
     """
     if version_number == 0:
         return []
-    version_url = api_url('bundle_versions', str(bundle_uuid) + ',' + str(version_number))
-    version_info = api_request('get', version_url)
+    version_info = get_bundle_version(bundle_uuid, version_number)
     return [BundleFile(path=path, **file_metadata) for path, file_metadata in version_info["snapshot"]["files"].items()]
 
 
@@ -265,8 +290,7 @@ def get_bundle_version_links(bundle_uuid, version_number):
     """
     if version_number == 0:
         return {}
-    version_url = api_url('bundle_versions', str(bundle_uuid) + ',' + str(version_number))
-    version_info = api_request('get', version_url)
+    version_info = get_bundle_version(bundle_uuid, version_number)
     return {
         name: LinkDetails(
             name=name,

@@ -1,15 +1,14 @@
 """
 Script to process pytest warnings output by pytest-json-report plugin and output it as a html
 """
-from __future__ import absolute_import
-from __future__ import print_function
+
+import argparse
+import io
+import itertools
 import json
 import os
-import io
 import re
-import argparse
 from collections import Counter
-import pandas as pd
 
 from write_to_html import (
     HtmlOutlineWriter,
@@ -36,11 +35,11 @@ def seperate_warnings_by_location(warnings_data):
 
     # first create regex for each n file location
     warnings_locations = {
-        ".*/python\d\.\d/site-packages/.*\.py": "python",  # noqa pylint: disable=W1401
-        ".*/edx-platform/lms/.*\.py": "lms",  # noqa pylint: disable=W1401
-        ".*/edx-platform/openedx/.*\.py": "openedx",  # noqa pylint: disable=W1401
-        ".*/edx-platform/cms/.*\.py": "cms",  # noqa pylint: disable=W1401
-        ".*/edx-platform/common/.*\.py": "common",  # noqa pylint: disable=W1401
+        r".*/python\d\.\d/site-packages/.*\.py": "python",  # noqa pylint: disable=W1401
+        r".*/edx-platform/lms/.*\.py": "lms",  # noqa pylint: disable=W1401
+        r".*/edx-platform/openedx/.*\.py": "openedx",  # noqa pylint: disable=W1401
+        r".*/edx-platform/cms/.*\.py": "cms",  # noqa pylint: disable=W1401
+        r".*/edx-platform/common/.*\.py": "common",  # noqa pylint: disable=W1401
     }
 
     # separate into locations flow:
@@ -93,7 +92,7 @@ def read_warning_data(dir_path):
     # TODO(jinder): currently this is hard-coded in, maybe create a constants file with info
     # THINK(jinder): but creating file for one constant seems overkill
     warnings_file_name_regex = (
-        "pytest_warnings_?\d*\.json"  # noqa pylint: disable=W1401
+        r"pytest_warnings_?\d*\.json"  # noqa pylint: disable=W1401
     )
 
     # iterate through files_in_dir and see if they match our know file name pattern
@@ -156,16 +155,29 @@ def process_warnings_json(dir_path):
     return compressed_warnings_data
 
 
-def group_and_sort_by_sumof(dataframe, group, sort_by):
-    groups_by = dataframe.groupby(group)
-    temp_list_to_sort = [(key, value, value[sort_by].sum()) for key, value in groups_by]
+def group_and_sort_by_sumof(data, group, sort_by):
+    """
+    Group and sort data.
+
+    Return
+        List of tuples. Each tuple has:
+        - Group key
+        - Iterable of warnings that belongs to that group
+        - Count of warnings that belong to that group
+    """
+    sorted_data = sorted(data, key=lambda x: x[columns.index(group)])
+    groups_by = itertools.groupby(sorted_data, lambda x: x[columns_index_dict[group]])
+    temp_list_to_sort = []
+    for key, generator in groups_by:
+        value = list(generator)
+        temp_list_to_sort.append((key, value, sum([item[columns_index_dict[sort_by]] for item in value])))
     # sort by count
     return sorted(temp_list_to_sort, key=lambda x: -x[2])
 
 
-def write_html_report(warnings_dataframe, html_path):
+def write_html_report(warnings_data, html_path):
     """
-    converts from panda dataframe to our html
+    converts from list of lists data to our html
     """
     html_path = os.path.expanduser(html_path)
     if "/" in html_path:
@@ -175,7 +187,7 @@ def write_html_report(warnings_dataframe, html_path):
     with io.open(html_path, "w") as fout:
         html_writer = HtmlOutlineWriter(fout)
         category_sorted_by_count = group_and_sort_by_sumof(
-            warnings_dataframe, "category", "num"
+            warnings_data, "category", "num"
         )
         for category, group_in_category, category_count in category_sorted_by_count:
             # xss-lint: disable=python-wrap-html
@@ -211,20 +223,20 @@ def write_html_report(warnings_dataframe, html_path):
                     )
                     html_writer.start_section(html, klass=u"warning_text")
                     # warnings_object[location][warning_text] is a list
-                    for _, warning in message_group.iterrows():
+                    for warning in message_group:
                         # xss-lint: disable=python-wrap-html
                         html = u'<span class="count">{warning_file_path}</span> '.format(
-                            warning_file_path=warning["filename"]
+                            warning_file_path=warning[columns_index_dict["filename"]]
                         )
                         html_writer.start_section(html, klass=u"warning")
                         # xss-lint: disable=python-wrap-html
                         html = u'<p class="lineno">lineno: {lineno}</p> '.format(
-                            lineno=warning["lineno"]
+                            lineno=warning[columns_index_dict["lineno"]]
                         )
                         html_writer.write(html)
                         # xss-lint: disable=python-wrap-html
                         html = u'<p class="num">num_occur: {num}</p> '.format(
-                            num=warning["num"]
+                            num=warning[columns_index_dict["num"]]
                         )
                         html_writer.write(html)
 
@@ -242,5 +254,4 @@ if __name__ == "__main__":
     parser.add_argument("--html-path", default="test_html.html")
     args = parser.parse_args()
     data_output = process_warnings_json(args.dir_path)
-    data_dataframe = pd.DataFrame(data=data_output, columns=columns)
-    write_html_report(data_dataframe, args.html_path)
+    write_html_report(data_output, args.html_path)

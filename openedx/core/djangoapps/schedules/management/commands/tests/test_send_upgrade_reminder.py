@@ -15,7 +15,7 @@ from mock import patch
 from opaque_keys.edx.locator import CourseLocator
 from six.moves import range
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.schedules import resolvers, tasks
 from openedx.core.djangoapps.schedules.management.commands import send_upgrade_reminder as reminder
 from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base import (
@@ -24,7 +24,7 @@ from openedx.core.djangoapps.schedules.management.commands.tests.send_email_base
 )
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 LOG = logging.getLogger(__name__)
 

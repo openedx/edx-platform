@@ -8,8 +8,8 @@ from mock import MagicMock
 
 from lms.djangoapps.course_blocks.api import get_course_block_access_transformers, get_course_blocks
 from openedx.core.djangoapps.content.block_structure.transformers import BlockStructureTransformers
-from student.roles import CourseStaffRole
-from student.tests.factories import UserFactory
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory

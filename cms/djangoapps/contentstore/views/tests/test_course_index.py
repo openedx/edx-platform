@@ -15,30 +15,24 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
-from edx_django_utils.monitoring.middleware import _DEFAULT_NAMESPACE as DJANGO_UTILS_NAMESPACE
 from opaque_keys.edx.locator import CourseLocator
 from search.api import perform_search
 
-from contentstore.config.waffle import WAFFLE_NAMESPACE as STUDIO_WAFFLE_NAMESPACE
-from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
-from contentstore.views.course import WAFFLE_NAMESPACE as COURSE_WAFFLE_NAMESPACE
-from contentstore.views.course import (
-    _deprecated_blocks_info,
-    course_outline_initial_state,
-    reindex_course_and_check_access
-)
-from contentstore.views.item import VisibilityState, create_xblock_info
-from course_action_state.managers import CourseRerunUIStateManager
-from course_action_state.models import CourseRerunState
-from openedx.core.djangoapps.waffle_utils import WaffleSwitchNamespace
-from student.auth import has_course_author_access
-from student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
-from student.tests.factories import UserFactory
+from cms.djangoapps.contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import add_instructor, reverse_course_url, reverse_usage_url
+from common.djangoapps.course_action_state.managers import CourseRerunUIStateManager
+from common.djangoapps.course_action_state.models import CourseRerunState
+from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
+from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.student.roles import CourseStaffRole, GlobalStaff, LibraryUserRole
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory, check_mongo_calls
+
+from ..course import _deprecated_blocks_info, course_outline_initial_state, reindex_course_and_check_access
+from ..item import VisibilityState, create_xblock_info
 
 
 class TestCourseIndex(CourseTestCase):
@@ -365,17 +359,11 @@ class TestCourseIndexArchived(CourseTestCase):
         for course in (self.course, self.active_course, self.archived_course):
             CourseStaffRole(course.id).add_users(self.staff)
 
-        # Make sure we've cached data which could change the query counts
-        # depending on test execution order
-        WaffleSwitchNamespace(name=COURSE_WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
-        WaffleSwitchNamespace(name=STUDIO_WAFFLE_NAMESPACE).is_enabled(u'enable_policy_page')
-        WaffleSwitchNamespace(name=DJANGO_UTILS_NAMESPACE).is_enabled(u'enable_memory_middleware')
-
     def check_index_page_with_query_count(self, separate_archived_courses, org, mongo_queries, sql_queries):
         """
         Checks the index page, and ensures the number of database queries is as expected.
         """
-        with self.assertNumQueries(sql_queries):
+        with self.assertNumQueries(sql_queries, table_blacklist=WAFFLE_TABLES):
             with check_mongo_calls(mongo_queries):
                 self.check_index_page(separate_archived_courses=separate_archived_courses, org=org)
 
@@ -398,13 +386,13 @@ class TestCourseIndexArchived(CourseTestCase):
 
     @ddt.data(
         # Staff user has course staff access
-        (True, 'staff', None, 3, 19),
-        (False, 'staff', None, 3, 19),
+        (True, 'staff', None, 3, 18),
+        (False, 'staff', None, 3, 18),
         # Base user has global staff access
-        (True, 'user', ORG, 3, 19),
-        (False, 'user', ORG, 3, 19),
-        (True, 'user', None, 3, 19),
-        (False, 'user', None, 3, 19),
+        (True, 'user', ORG, 3, 18),
+        (False, 'user', ORG, 3, 18),
+        (True, 'user', None, 3, 18),
+        (False, 'user', None, 3, 18),
     )
     @ddt.unpack
     def test_separate_archived_courses(self, separate_archived_courses, username, org, mongo_queries, sql_queries):

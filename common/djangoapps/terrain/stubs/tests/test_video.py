@@ -8,7 +8,7 @@ import unittest
 import requests
 from django.conf import settings
 
-from terrain.stubs.video_source import VideoSourceHttpService
+from common.djangoapps.terrain.stubs.video_source import VideoSourceHttpService
 
 HLS_MANIFEST_TEXT = """
 #EXTM3U

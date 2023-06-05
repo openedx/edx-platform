@@ -22,14 +22,14 @@ from opaque_keys.edx.django.models import CourseKeyField
 from openedx.core.djangolib.model_mixins import DeletableByUserValue
 from openedx.core.lib.cache_utils import request_cached
 # pylint: disable=unused-import
-from student.models import (
+from common.djangoapps.student.models import (
     PendingEmailChange,
     Registration,
     UserProfile,
     get_retired_email_by_email,
     get_retired_username_by_username
 )
-from util.model_utils import emit_setting_changed_event, get_changed_fields_dict
+from common.djangoapps.util.model_utils import emit_setting_changed_event, get_changed_fields_dict
 
 
 class RetirementStateError(Exception):
@@ -82,6 +82,24 @@ class UserPreference(models.Model):
             return user_preference.value
         except cls.DoesNotExist:
             return default
+
+    @classmethod
+    def has_value(cls, user, preference_key):
+        """Checks if the user has preference value for a given key.
+
+        Note:
+            This method provides no authorization of access to the user preference.
+            Consider using user_api.preferences.api.has_user_preference instead if
+            this is part of a REST API request.
+
+        Arguments:
+            user (User): The user whose preference should be checked.
+            preference_key (str): The key for the user preference.
+
+        Returns:
+            (bool): True if user preference for the given key is set and False otherwise.
+        """
+        return cls.objects.filter(user=user, key=preference_key).exists()
 
 
 @receiver(pre_save, sender=UserPreference)

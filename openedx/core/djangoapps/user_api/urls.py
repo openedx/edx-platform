@@ -18,7 +18,7 @@ from .accounts.views import (
     UsernameReplacementView
 )
 from .preferences.views import PreferencesDetailView, PreferencesView
-from .verification_api.views import IDVerificationStatusView
+from .verification_api.views import IDVerificationStatusView, IDVerificationStatusDetailsView
 
 ME = AccountViewSet.as_view({
     'get': 'get',
@@ -105,6 +105,11 @@ urlpatterns = [
         r'^v1/accounts/{}/verification_status/$'.format(settings.USERNAME_PATTERN),
         IDVerificationStatusView.as_view(),
         name='verification_status'
+    ),
+    url(
+        r'^v1/accounts/{}/verifications/$'.format(settings.USERNAME_PATTERN),
+        IDVerificationStatusDetailsView.as_view(),
+        name='verification_details'
     ),
     url(
         r'^v1/accounts/{}/retirement_status/$'.format(settings.USERNAME_PATTERN),

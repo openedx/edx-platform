@@ -32,7 +32,8 @@
                     totalCount: this.collection.totalCount,
                     totalCountMsg: this.totalCountMsg(),
                     pageSize: this.collection.pageSize,
-                    hasMoreResults: this.collection.hasNextPage()
+                    hasMoreResults: this.collection.hasNextPage(),
+                    searchTerm: this.collection.searchTerm
                 }));
                 this.renderItems();
                 this.$el.find(this.spinner).hide();
@@ -64,9 +65,14 @@
             },
 
             totalCountMsg: function() {
-                var fmt = ngettext('{total_results} result', '{total_results} results', this.collection.totalCount);
+                var fmt = ngettext(
+                    '{total_results} result found for "{search_term}"',
+                    '{total_results} results found for "{search_term}"',
+                    this.collection.totalCount
+                );
                 return StringUtils.interpolate(fmt, {
-                    total_results: this.collection.totalCount
+                    total_results: this.collection.totalCount,
+                    search_term: this.collection.searchTerm
                 });
             },
 

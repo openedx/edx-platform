@@ -10,7 +10,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from contentstore.views.course import _accessible_courses_iter, get_course_and_check_access
+from cms.djangoapps.contentstore.views.course import _accessible_courses_iter, get_course_and_check_access
 
 from ..serializers.course_runs import (
     CourseRunCreateSerializer,

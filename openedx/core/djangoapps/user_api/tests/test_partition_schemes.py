@@ -11,7 +11,7 @@ from mock import patch
 from six.moves import range
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme, UserPartitionError
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.partitions.tests.test_partitions import PartitionTestCase
 

@@ -8,7 +8,7 @@ from django.template import Engine, engines, TemplateDoesNotExist
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
 from django.template.loaders.filesystem import Loader as FilesystemLoader
 
-from edxmako.template import Template
+from common.djangoapps.edxmako.template import Template
 from openedx.core.lib.tempdir import mkdtemp_clean
 
 log = logging.getLogger(__name__)

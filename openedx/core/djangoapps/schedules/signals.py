@@ -11,7 +11,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from edx_ace.utils import date
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.courseware.models import (
     CourseDynamicUpgradeDeadlineConfiguration,
     DynamicUpgradeDeadlineConfiguration,
@@ -22,9 +22,9 @@ from openedx.core.djangoapps.schedules.content_highlights import course_has_high
 from openedx.core.djangoapps.schedules.models import ScheduleExperience
 from openedx.core.djangoapps.schedules.utils import reset_self_paced_schedule
 from openedx.core.djangoapps.theming.helpers import get_current_site
-from student.models import CourseEnrollment
-from student.signals import ENROLLMENT_TRACK_UPDATED
-from track import segment
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
+from common.djangoapps.track import segment
 
 from .config import CREATE_SCHEDULE_WAFFLE_FLAG
 from .models import Schedule, ScheduleConfig

@@ -1,7 +1,8 @@
 (function(define, undefined) {
     'use strict';
-    define(['gettext', 'underscore', 'jquery', 'backbone', 'js/edxnotes/utils/template'],
-function(gettext, _, $, Backbone, templateUtils) {
+    define(['gettext', 'underscore',
+        'jquery', 'backbone', 'js/edxnotes/utils/template', 'edx-ui-toolkit/js/utils/html-utils'],
+function(gettext, _, $, Backbone, templateUtils, HtmlUtils) {
     var TabItemView = Backbone.View.extend({
         tagName: 'li',
         className: 'tab',
@@ -34,7 +35,7 @@ function(gettext, _, $, Backbone, templateUtils) {
 
         render: function() {
             var html = this.template(this.model.toJSON());
-            this.$el.html(html);
+            this.$el.html(HtmlUtils.HTML(html).toString());
             return this;
         },
 

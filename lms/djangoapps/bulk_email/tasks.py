@@ -40,8 +40,8 @@ from django.utils.translation import ugettext as _
 from markupsafe import escape
 from six import text_type
 
-from bulk_email.models import CourseEmail, Optout
-from bulk_email.api import get_unsubscribed_link
+from lms.djangoapps.bulk_email.models import CourseEmail, Optout
+from lms.djangoapps.bulk_email.api import get_unsubscribed_link
 from lms.djangoapps.courseware.courses import get_course
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
@@ -52,8 +52,8 @@ from lms.djangoapps.instructor_task.subtasks import (
 )
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.courses import course_image_url
-from util.date_utils import get_default_time_display
-from util.string_utils import _has_non_ascii_characters
+from common.djangoapps.util.date_utils import get_default_time_display
+from common.djangoapps.util.string_utils import _has_non_ascii_characters
 
 log = logging.getLogger('edx.celery.task')
 
@@ -196,8 +196,6 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
 
     total_recipients = combined_set.count()
 
-    routing_key = settings.BULK_EMAIL_ROUTING_KEY
-
     # Weird things happen if we allow empty querysets as input to emailing subtasks
     # The task appears to hang at "0 out of 0 completed" and never finishes.
     if total_recipients == 0:
@@ -217,7 +215,6 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
                 initial_subtask_status.to_dict(),
             ),
             task_id=subtask_id,
-            routing_key=routing_key,
         )
         return new_subtask
 

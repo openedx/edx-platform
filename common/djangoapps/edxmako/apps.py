@@ -12,7 +12,7 @@ class EdxMakoConfig(AppConfig):
     """
     Configuration class for the edxmako Django application.
     """
-    name = 'edxmako'
+    name = 'common.djangoapps.edxmako'
     verbose_name = "edX Mako Templating"
 
     def ready(self):

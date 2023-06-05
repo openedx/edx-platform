@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
-from edx_django_utils.monitoring import set_custom_metric
+from edx_django_utils.monitoring import set_custom_attribute
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_condition import C
@@ -16,7 +16,7 @@ from rest_framework import permissions
 from edx_rest_framework_extensions.permissions import IsStaff, IsUserInUrl
 from openedx.core.lib.log_utils import audit_log
 from openedx.features.edly.utils import user_belongs_to_edly_sub_organization
-from student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):
@@ -40,7 +40,7 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
             audit_log("ApiKeyHeaderPermission used",
                       path=request.path,
                       ip=request.META.get("REMOTE_ADDR"))
-            set_custom_metric('deprecated_api_key_header', True)
+            set_custom_attribute('deprecated_api_key_header', True)
             return True
 
         username = request.data.get('user', request.user.username)

@@ -11,7 +11,7 @@ from mock import patch
 from pytz import UTC
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from six import text_type
 
 from ..image_helpers import get_profile_image_urls_for_user

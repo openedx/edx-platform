@@ -33,8 +33,9 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('courseware', '0010_auto_20190709_1559'),
-        ('coursewarehistoryextended', '0002_force_studentmodule_index'),
     ]
+    if settings.FEATURES["ENABLE_CSMH_EXTENDED"]:
+        dependencies.append(('coursewarehistoryextended', '0002_force_studentmodule_index'))
 
     operations = [
         CsmBigInt(

@@ -15,14 +15,14 @@ from mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.certificates.apis.v0.views import CertificatesDetailView, CertificatesListView
 from lms.djangoapps.certificates.models import CertificateStatuses
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from openedx.core.djangoapps.user_authn.tests.utils import JWT_AUTH_TYPES, AuthAndScopesTestMixin, AuthType
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -228,6 +228,46 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(resp.data), 1)
+
+    def test_owner_can_access_its_certs(self):
+        """
+        Tests the owner of the certs can access the certificate list api
+        """
+        self.student.profile.year_of_birth = 1977
+        self.student.profile.save()
+        UserPreferenceFactory.build(
+            user=self.student,
+            key='visibility.course_certificates',
+            value='private',
+        ).save()
+
+        resp = self.get_response(AuthType.session, requesting_user=self.student)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # verifies that other than owner cert list api is not accessible
+        resp = self.get_response(AuthType.session, requesting_user=self.other_student)
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_public_profile_certs_is_accessible(self):
+        """
+        Tests the public profile certs can be accessed by all users
+        """
+        self.student.profile.year_of_birth = 1977
+        self.student.profile.save()
+        UserPreferenceFactory.build(
+            user=self.student,
+            key='visibility.course_certificates',
+            value='all_users',
+        ).save()
+
+        resp = self.get_response(AuthType.session, requesting_user=self.student)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        resp = self.get_response(AuthType.session, requesting_user=self.other_student)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        resp = self.get_response(AuthType.session, requesting_user=self.global_staff)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     @ddt.data(*list(AuthType))
     def test_another_user_with_certs_shared_custom(self, auth_type):

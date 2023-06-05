@@ -7,8 +7,8 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 from six.moves.urllib.parse import quote_plus, unquote
 
-from edxmako.shortcuts import render_to_response
-from support.decorators import require_support_permission
+from common.djangoapps.edxmako.shortcuts import render_to_response
+from lms.djangoapps.support.decorators import require_support_permission
 
 
 class CertificatesSupportView(View):
@@ -20,8 +20,8 @@ class CertificatesSupportView(View):
     such as:
 
     * The user's name was spelled incorrectly.
-    * The user later earned a higher grade and wants it on his/her certificate and dashboard.
-    * The user accidentally received an honor code certificate because his/her
+    * The user later earned a higher grade and wants it on their certificate and dashboard.
+    * The user accidentally received an honor code certificate because their
         verification expired before certs were generated.
 
     Most of the heavy lifting is performed client-side through API

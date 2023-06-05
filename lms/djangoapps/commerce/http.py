@@ -3,7 +3,7 @@
 
 from rest_framework.status import HTTP_200_OK, HTTP_500_INTERNAL_SERVER_ERROR
 
-from util.json_request import JsonResponse
+from common.djangoapps.util.json_request import JsonResponse
 
 
 class DetailResponse(JsonResponse):

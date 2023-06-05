@@ -21,7 +21,7 @@ class ChangeEnterpriseUserUsernameCommandTests(TestCase):
     """
     command = 'change_enterprise_user_username'
 
-    @mock.patch('student.management.commands.change_enterprise_user_username.LOGGER')
+    @mock.patch('common.djangoapps.student.management.commands.change_enterprise_user_username.LOGGER')
     def test_user_not_enterprise(self, logger_mock):
         """
         Test that the command does not update a user's username if it is not linked to an Enterprise.
@@ -37,7 +37,7 @@ class ChangeEnterpriseUserUsernameCommandTests(TestCase):
         logger_mock.info.assert_called_with('User {} must be an Enterprise User.'.format(user.id))
         post_save_handler.assert_not_called()
 
-    @mock.patch('student.management.commands.change_enterprise_user_username.LOGGER')
+    @mock.patch('common.djangoapps.student.management.commands.change_enterprise_user_username.LOGGER')
     def test_username_updated_successfully(self, logger_mock):
         """
         Test that the command updates the user's username when the user is linked to an Enterprise.

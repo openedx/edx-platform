@@ -59,11 +59,6 @@ urlpatterns = [
         name='openedx.course_experience.latest_update_fragment_view',
     ),
     url(
-        r'course_sock_fragment$',
-        CourseSockFragmentView.as_view(),
-        name='openedx.course_experience.course_sock_fragment_view',
-    ),
-    url(
         r'^dismiss_welcome_message$',
         dismiss_welcome_message,
         name='openedx.course_experience.dismiss_welcome_message',

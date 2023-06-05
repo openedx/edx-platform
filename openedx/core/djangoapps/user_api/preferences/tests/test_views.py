@@ -14,7 +14,7 @@ from mock import patch
 from rest_framework.test import APIClient
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import TEST_PASSWORD, UserFactory
+from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
 
 from ...accounts.tests.test_views import UserAPITestCase
 from ..api import set_user_preference

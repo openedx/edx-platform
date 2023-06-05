@@ -6,7 +6,7 @@ import datetime
 import json
 import logging
 
-from track.backends.logger import LoggerBackend
+from common.djangoapps.track.backends.logger import LoggerBackend
 
 
 def test_logger_backend(caplog):
@@ -15,7 +15,7 @@ def test_logger_backend(caplog):
     by the logger. The events are serialized to JSON.
     """
     caplog.set_level(logging.INFO)
-    logger_name = 'track.backends.logger.test'
+    logger_name = 'common.djangoapps.track.backends.logger.test'
     backend = LoggerBackend(name=logger_name)
     event = {
         'test': True,

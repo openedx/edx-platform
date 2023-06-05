@@ -12,7 +12,7 @@ from django.test import TestCase
 from django.urls import clear_url_caches, resolve
 from mock import patch
 
-from util.db import OuterAtomic
+from common.djangoapps.util.db import OuterAtomic
 
 if six.PY3:
     from importlib import reload

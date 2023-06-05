@@ -5,17 +5,21 @@ from tempfile import NamedTemporaryFile
 
 import six
 from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from testfixtures import LogCapture
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-LOGGER_NAME = 'student.management.commands.bulk_change_enrollment_csv'
+from common.djangoapps.student.models import BulkChangeEnrollmentConfiguration
+
+LOGGER_NAME = 'common.djangoapps.student.management.commands.bulk_change_enrollment_csv'
 
 
 class BulkChangeEnrollmentCSVTests(SharedModuleStoreTestCase):
@@ -120,3 +124,26 @@ class BulkChangeEnrollmentCSVTests(SharedModuleStoreTestCase):
             new_enrollment = CourseEnrollment.get_enrollment(user=enrollment.user, course_key=enrollment.course)
             self.assertEqual(new_enrollment.is_active, True)
             self.assertEqual(new_enrollment.mode, CourseMode.VERIFIED)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_bulk_enrollment_from_config_model(self):
+        """ Test all users are enrolled using the config model."""
+        lines = "course_id,user,mode\n"
+        for enrollment in self.enrollments:
+            lines += str(enrollment.course.id) + "," + str(enrollment.user.username) + ",verified\n"
+
+        csv_file = SimpleUploadedFile(name='test.csv', content=lines.encode('utf-8'), content_type='text/csv')
+        BulkChangeEnrollmentConfiguration.objects.create(enabled=True, csv_file=csv_file)
+        call_command("bulk_change_enrollment_csv", "--file_from_database")
+
+        for enrollment in self.enrollments:
+            new_enrollment = CourseEnrollment.get_enrollment(user=enrollment.user, course_key=enrollment.course)
+            self.assertEqual(new_enrollment.is_active, True)
+            self.assertEqual(new_enrollment.mode, CourseMode.VERIFIED)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_command_error_for_config_model(self):
+        """ Test command error raised if file_from_database is required and the config model is not enabled"""
+
+        with self.assertRaises(CommandError):
+            call_command("bulk_change_enrollment_csv", "--file_from_database")

@@ -2,18 +2,17 @@
 Unit tests for Edx Proctoring feature flag in new instructor dashboard.
 """
 
-
 import ddt
 from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
-from edx_proctoring.api import create_exam
-from edx_proctoring.backends.tests.test_backend import TestBackendProvider
 from mock import patch
 from six import text_type
 
-from student.roles import CourseInstructorRole, CourseStaffRole
-from student.tests.factories import AdminFactory
+from edx_proctoring.api import create_exam
+from edx_proctoring.backends.tests.test_backend import TestBackendProvider
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -51,6 +50,16 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.course = CourseFactory.create(enable_proctored_exams=enable_proctored_exams,
                                            enable_timed_exams=enable_timed_exams)
         self.setup_course_url(self.course)
+
+    def setup_course_with_proctoring_backend(self, proctoring_provider, escalation_email):
+        """
+        Create course based on proctoring provider and escalation email values
+        """
+        course = CourseFactory.create(enable_proctored_exams=True,
+                                      enable_timed_exams=True,
+                                      proctoring_provider=proctoring_provider,
+                                      proctoring_escalation_email=escalation_email)
+        self.setup_course_url(course)
 
     @ddt.data(
         (True, False),
@@ -127,6 +136,47 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
         self._assert_proctoring_tab_available(False)
 
+    @patch.dict(settings.PROCTORING_BACKENDS,
+                {
+                    'DEFAULT': 'test_proctoring_provider',
+                    'test_proctoring_provider': {},
+                    'proctortrack': {}
+                },
+                )
+    @ddt.data(
+        ('test_proctoring_provider', None),
+        ('test_proctoring_provider', 'foo@bar.com')
+    )
+    @ddt.unpack
+    def test_non_proctortrack_provider(self, proctoring_provider, escalation_email):
+        """
+        Escalation email will not be visible if proctortrack is not the proctoring provider, with or without
+        escalation email provided.
+        """
+        self.setup_course_with_proctoring_backend(proctoring_provider, escalation_email)
+
+        self.instructor.is_staff = True
+        self.instructor.save()
+        self._assert_escalation_email_available(False)
+
+    @patch.dict(settings.PROCTORING_BACKENDS,
+                {
+                    'DEFAULT': 'test_proctoring_provider',
+                    'test_proctoring_provider': {},
+                    'proctortrack': {}
+                },
+                )
+    def test_proctortrack_provider_with_email(self):
+        """
+        Escalation email will be visible if proctortrack is the proctoring provider, and there
+        is an escalation email provided.
+        """
+        self.setup_course_with_proctoring_backend('proctortrack', 'foo@bar.com')
+
+        self.instructor.is_staff = True
+        self.instructor.save()
+        self._assert_escalation_email_available(True)
+
     def test_review_dashboard(self):
         """
         The exam review dashboard will appear for backends that support the feature
@@ -157,3 +207,11 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         response = self.client.get(self.url)
         func(self.proctoring_link, response.content.decode('utf-8'))
         func('proctoring-wrapper', response.content.decode('utf-8'))
+
+    def _assert_escalation_email_available(self, available):
+        """
+        Asserts that escalation email is/is not available for logged in user
+        """
+        func = self.assertIn if available else self.assertNotIn
+        response = self.client.get(self.url)
+        func('escalation-email-container', response.content.decode('utf-8'))

@@ -21,16 +21,13 @@ from edxval.api import (
 )
 from opaque_keys.edx.keys import CourseKey
 
-from contentstore.views.videos import TranscriptProvider
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
-from openedx.core.djangoapps.video_pipeline.config.waffle import (
-    SAVE_CREDENTIALS_IN_VAL,
-    waffle_flags
-)
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
-from student.auth import has_studio_write_access
-from util.json_request import JsonResponse, expect_json
+from common.djangoapps.student.auth import has_studio_write_access
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.video_module.transcripts_utils import Transcript, TranscriptsGenerationException
+
+from .videos import TranscriptProvider
 
 __all__ = [
     'transcript_credentials_handler',
@@ -112,14 +109,9 @@ def transcript_credentials_handler(request, course_key_string):
     if error_message:
         response = JsonResponse({'error': error_message}, status=400)
     else:
-        # Send the validated credentials to edx-video-pipeline.
+        # Send the validated credentials to edx-video-pipeline and video-encode-manager
         credentials_payload = dict(validated_credentials, org=course_key.org, provider=provider)
-        if waffle_flags()[SAVE_CREDENTIALS_IN_VAL].is_enabled(course_key):
-            from edxval.api import create_or_update_transcript_credentials
-            response = create_or_update_transcript_credentials(**credentials_payload)
-            error_response, is_updated = response, not response.get('error_type')
-        else:
-            error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
+        error_response, is_updated = update_3rd_party_transcription_service_credentials(**credentials_payload)
         # Send appropriate response based on whether credentials were updated or not.
         if is_updated:
             # Cache credentials state in edx-val.

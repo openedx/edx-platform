@@ -43,7 +43,7 @@ class TestPaverDbUtils(TestCase):
         extracted_file = os.path.join(output_dir, 'test.txt')
         assert os.path.isfile(extracted_file)
 
-        with open(extracted_file, 'r') as test_file:
+        with open(extracted_file) as test_file:
             data = test_file.read()
         assert data == 'Test file content'
 
@@ -65,7 +65,7 @@ class TestPaverDatabaseTasks(PaverTestCase):
     """
 
     def setUp(self):
-        super(TestPaverDatabaseTasks, self).setUp()
+        super().setUp()
         # This value is the actual sha1 fingerprint calculated for the dummy
         # files used in these tests
         self.expected_fingerprint = 'ccaa8d8dcc7d030cd6a6768db81f90d0ef976c3d'
@@ -94,8 +94,8 @@ class TestPaverDatabaseTasks(PaverTestCase):
             # Make sure that the local cache files are used - NOT downloaded from s3
             self.assertFalse(_mock_get_file.called)
         calls = [
-            call(u'{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call(u'{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
+            call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
+            call('{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
         ]
         _mock_sh.assert_has_calls(calls)
 
@@ -137,8 +137,8 @@ class TestPaverDatabaseTasks(PaverTestCase):
                 )
 
         calls = [
-            call(u'{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call(u'{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
+            call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
+            call('{}/scripts/reset-test-db.sh --use-existing-db'.format(Env.REPO_ROOT))
         ]
         _mock_sh.assert_has_calls(calls)
 
@@ -165,8 +165,8 @@ class TestPaverDatabaseTasks(PaverTestCase):
 
         database.update_local_bokchoy_db_from_s3()  # pylint: disable=no-value-for-parameter
         calls = [
-            call(u'{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
-            call(u'{}/scripts/reset-test-db.sh --rebuild_cache --use-existing-db'.format(Env.REPO_ROOT))
+            call('{}/scripts/reset-test-db.sh --calculate_migrations'.format(Env.REPO_ROOT)),
+            call('{}/scripts/reset-test-db.sh --rebuild_cache --use-existing-db'.format(Env.REPO_ROOT))
         ]
         _mock_sh.assert_has_calls(calls)
 

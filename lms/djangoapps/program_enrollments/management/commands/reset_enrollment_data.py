@@ -14,7 +14,7 @@ from django.db import transaction
 from six.moves import input
 
 from lms.djangoapps.program_enrollments.models import ProgramEnrollment
-from student.models import CourseEnrollment
+from common.djangoapps.student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 

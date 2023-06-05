@@ -65,7 +65,7 @@ class RandomUserPartitionScheme(object):
                 group = user_partition.get_group(int(group_id))
             except NoSuchUserPartitionGroupError:
                 # jsa: we can turn off warnings here if this is an expected case.
-                log.warn(
+                log.warning(
                     u"group not found in RandomUserPartitionScheme: %r",
                     {
                         "requested_partition_id": user_partition.id,

@@ -84,7 +84,8 @@ class InheritanceMixin(XBlockMixin):
             # specific words for the acceptable values.
             'Specify when the Show Answer button appears for each problem. '
             'Valid values are "always", "answered", "attempted", "closed", '
-            '"finished", "past_due", "correct_or_past_due", and "never".'
+            '"finished", "past_due", "correct_or_past_due", "after_all_attempts", '
+            '"after_all_attempts_or_correct", "attempted_no_past_due", and "never".'
         ),
         scope=Scope.settings,
         default="finished",

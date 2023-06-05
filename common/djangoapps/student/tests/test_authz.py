@@ -10,9 +10,9 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 
-from student.auth import add_users, has_studio_read_access, has_studio_write_access, remove_users, user_has_role
-from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole
-from student.tests.factories import AdminFactory
+from common.djangoapps.student.auth import add_users, has_studio_read_access, has_studio_write_access, remove_users, user_has_role
+from common.djangoapps.student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory
 
 
 class CreatorGroupTest(TestCase):

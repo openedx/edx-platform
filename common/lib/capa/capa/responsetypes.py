@@ -57,6 +57,7 @@ from .util import (
     convert_files_to_filenames,
     default_tolerance,
     find_with_default,
+    get_course_id_from_capa_module,
     get_inner_html_from_xpath,
     is_list_of_files
 )
@@ -487,6 +488,9 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
                     globals_dict,
                     python_path=self.context['python_path'],
                     extra_files=self.context['extra_files'],
+                    limit_overrides_context=get_course_id_from_capa_module(
+                        self.capa_module
+                    ),
                     slug=self.id,
                     random_seed=self.context['seed'],
                     unsafely=self.capa_system.can_execute_unsafe_code(),
@@ -1551,7 +1555,7 @@ class NumericalResponse(LoncapaResponse):
                 id=xml.get('id')
             )
             if tolerance_xml:  # If it isn't an empty list...
-                self.tolerance = contextualize_text(tolerance_xml[0], context)
+                self.tolerance = contextualize_text(tolerance_xml[0].strip(), context)
 
     def get_staff_ans(self, answer):
         """
@@ -3057,7 +3061,7 @@ class FormulaResponse(LoncapaResponse):
             id=xml.get('id')
         )
         if tolerance_xml:  # If it isn't an empty list...
-            self.tolerance = contextualize_text(tolerance_xml[0], context)
+            self.tolerance = contextualize_text(tolerance_xml[0].strip(), context)
 
         types = xml.get('type')
         if types is None:

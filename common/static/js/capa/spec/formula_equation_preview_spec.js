@@ -1,3 +1,32 @@
+describe('escapeSelector', function() {
+    'use strict';
+    var escapeSelector = window.escapeSelector;
+
+    it('correctly escapes css', function() {
+        // tests borrowed from
+        // https://github.com/jquery/jquery/blob/3edfa1bcdc50bca41ac58b2642b12f3feee03a3b/test/unit/selector.js#L2030
+        expect(escapeSelector('-')).toEqual('\\-');
+        expect(escapeSelector('-a')).toEqual('-a');
+        expect(escapeSelector('--')).toEqual('--');
+        expect(escapeSelector('--a')).toEqual('--a');
+        expect(escapeSelector('\uFFFD')).toEqual('\uFFFD');
+        expect(escapeSelector('\uFFFDb')).toEqual('\uFFFDb');
+        expect(escapeSelector('a\uFFFDb')).toEqual('a\uFFFDb');
+        expect(escapeSelector('1a')).toEqual('\\31 a');
+        expect(escapeSelector('a\0b')).toEqual('a\uFFFDb');
+        expect(escapeSelector('a3b')).toEqual('a3b');
+        expect(escapeSelector('-4a')).toEqual('-\\34 a');
+        expect(escapeSelector('\x01\x02\x1E\x1F')).toEqual('\\1 \\2 \\1e \\1f ');
+
+        // This is the important one; xblocks and course ids often contain invalid characters, so if these aren't
+        // escaped when embedding/searching xblock IDs using css selectors, bad things happen.
+        expect(escapeSelector('course-v1:edX+DemoX+Demo_Course')).toEqual('course-v1\\:edX\\+DemoX\\+Demo_Course');
+        expect(escapeSelector('block-v1:edX+DemoX+Demo_Course+type@sequential+block')).toEqual(
+          'block-v1\\:edX\\+DemoX\\+Demo_Course\\+type\\@sequential\\+block'
+        );
+    });
+});
+
 describe('Formula Equation Preview', function() {
     'use strict';
     var formulaEquationPreview = window.formulaEquationPreview;

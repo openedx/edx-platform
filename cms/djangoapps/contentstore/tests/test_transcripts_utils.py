@@ -17,8 +17,8 @@ from django.utils import translation
 from mock import Mock, patch
 from six import text_type
 
-from contentstore.tests.utils import mock_requests_get
-from student.tests.factories import UserFactory
+from cms.djangoapps.contentstore.tests.utils import mock_requests_get
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError

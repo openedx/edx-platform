@@ -12,7 +12,7 @@ from ccx_keys.locator import CCXLocator
 from six.moves import range, zip_longest
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

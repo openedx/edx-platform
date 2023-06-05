@@ -9,12 +9,13 @@ import ddt
 import six
 from mock import patch
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_usage_url
-from contentstore.views.item import VisibilityState
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_usage_url
 from openedx.core.lib.gating.api import GATING_NAMESPACE_QUALIFIER
 from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import ItemFactory
+
+from ..item import VisibilityState
 
 
 @ddt.ddt
@@ -57,7 +58,7 @@ class TestSubsectionGating(CourseTestCase):
         )
         self.seq2_url = reverse_usage_url('xblock_handler', self.seq2.location)
 
-    @patch('contentstore.views.item.gating_api.add_prerequisite')
+    @patch('cms.djangoapps.contentstore.views.item.gating_api.add_prerequisite')
     def test_add_prerequisite(self, mock_add_prereq):
         """
         Test adding a subsection as a prerequisite
@@ -69,7 +70,7 @@ class TestSubsectionGating(CourseTestCase):
         )
         mock_add_prereq.assert_called_with(self.course.id, self.seq1.location)
 
-    @patch('contentstore.views.item.gating_api.remove_prerequisite')
+    @patch('cms.djangoapps.contentstore.views.item.gating_api.remove_prerequisite')
     def test_remove_prerequisite(self, mock_remove_prereq):
         """
         Test removing a subsection as a prerequisite
@@ -81,7 +82,7 @@ class TestSubsectionGating(CourseTestCase):
         )
         mock_remove_prereq.assert_called_with(self.seq1.location)
 
-    @patch('contentstore.views.item.gating_api.set_required_content')
+    @patch('cms.djangoapps.contentstore.views.item.gating_api.set_required_content')
     def test_add_gate(self, mock_set_required_content):
         """
         Test adding a gated subsection
@@ -100,7 +101,7 @@ class TestSubsectionGating(CourseTestCase):
             '100'
         )
 
-    @patch('contentstore.views.item.gating_api.set_required_content')
+    @patch('cms.djangoapps.contentstore.views.item.gating_api.set_required_content')
     def test_remove_gate(self, mock_set_required_content):
         """
         Test removing a gated subsection
@@ -118,9 +119,9 @@ class TestSubsectionGating(CourseTestCase):
             ''
         )
 
-    @patch('contentstore.views.item.gating_api.get_prerequisites')
-    @patch('contentstore.views.item.gating_api.get_required_content')
-    @patch('contentstore.views.item.gating_api.is_prerequisite')
+    @patch('cms.djangoapps.contentstore.views.item.gating_api.get_prerequisites')
+    @patch('cms.djangoapps.contentstore.views.item.gating_api.get_required_content')
+    @patch('cms.djangoapps.contentstore.views.item.gating_api.is_prerequisite')
     @ddt.data(
         (90, None),
         (None, 90),
@@ -147,8 +148,8 @@ class TestSubsectionGating(CourseTestCase):
         self.assertEqual(resp['prereq_min_completion'], min_completion)
         self.assertEqual(resp['visibility_state'], VisibilityState.gated)
 
-    @patch('contentstore.signals.handlers.gating_api.set_required_content')
-    @patch('contentstore.signals.handlers.gating_api.remove_prerequisite')
+    @patch('cms.djangoapps.contentstore.signals.handlers.gating_api.set_required_content')
+    @patch('cms.djangoapps.contentstore.signals.handlers.gating_api.remove_prerequisite')
     def test_delete_item_signal_handler_called(self, mock_remove_prereq, mock_set_required):
         seq3 = ItemFactory.create(
             parent_location=self.chapter.location,

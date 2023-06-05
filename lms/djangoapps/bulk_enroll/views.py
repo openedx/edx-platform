@@ -13,14 +13,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from six.moves import zip_longest
 
-from bulk_enroll.serializers import BulkEnrollmentSerializer
+from lms.djangoapps.bulk_enroll.serializers import BulkEnrollmentSerializer
 from lms.djangoapps.instructor.views.api import students_update_enrollment
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, get_cohort_by_name
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.enrollments.views import EnrollmentUserThrottle
 from openedx.core.lib.api.authentication import BearerAuthentication
 from openedx.core.lib.api.permissions import IsStaff
-from util.disable_rate_limit import can_disable_rate_limit
+from common.djangoapps.util.disable_rate_limit import can_disable_rate_limit
 
 
 @can_disable_rate_limit

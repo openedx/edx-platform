@@ -15,7 +15,7 @@ from rest_framework.test import APITestCase
 from lms.djangoapps.grades.rest_api.v1.tests.mixins import GradeViewTestMixin
 from lms.djangoapps.grades.rest_api.v1.views import CourseGradesView
 from openedx.core.djangoapps.user_authn.tests.utils import AuthAndScopesTestMixin
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 @ddt.ddt

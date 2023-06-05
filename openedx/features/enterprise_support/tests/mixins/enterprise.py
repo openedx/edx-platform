@@ -142,6 +142,66 @@ class EnterpriseServiceMockMixin(object):
             required=False,
         )
 
+    def get_mock_enterprise_learner_results(
+            self,
+            entitlement_id=1,
+            learner_id=1,
+            enterprise_customer_uuid='cf246b88-d5f6-4908-a522-fc307e0b0c59',
+            enable_audit_enrollment=False,
+    ):
+        """
+        Helper function to format enterprise learner API response.
+        """
+        mock_results = [
+            {
+                'id': learner_id,
+                'enterprise_customer': {
+                    'uuid': enterprise_customer_uuid,
+                    'name': 'TestShib',
+                    'active': True,
+                    'site': {
+                        'domain': 'example.com',
+                        'name': 'example.com'
+                    },
+                    'enable_data_sharing_consent': True,
+                    'enforce_data_sharing_consent': 'at_login',
+                    'enable_audit_enrollment': enable_audit_enrollment,
+                    'branding_configuration': {
+                        'enterprise_customer': enterprise_customer_uuid,
+                        'logo': 'https://open.edx.org/sites/all/themes/edx_open/logo.png'
+                    },
+                    'enterprise_customer_entitlements': [
+                        {
+                            'enterprise_customer': enterprise_customer_uuid,
+                            'entitlement_id': entitlement_id
+                        }
+                    ],
+                    'replace_sensitive_sso_username': True,
+                },
+                'user_id': 5,
+                'user': {
+                    'username': 'verified',
+                    'first_name': '',
+                    'last_name': '',
+                    'email': 'verified@example.com',
+                    'is_staff': True,
+                    'is_active': True,
+                    'date_joined': '2016-09-01T19:18:26.026495Z'
+                },
+                'data_sharing_consent': [
+                    {
+                        "username": "verified",
+                        "enterprise_customer_uuid": enterprise_customer_uuid,
+                        "exists": True,
+                        "course_id": "course-v1:edX DemoX Demo_Course",
+                        "consent_provided": True,
+                        "consent_required": False
+                    }
+                ]
+            }
+        ]
+        return mock_results
+
     def mock_enterprise_learner_api(
             self,
             entitlement_id=1,
@@ -152,58 +212,14 @@ class EnterpriseServiceMockMixin(object):
         """
         Helper function to register enterprise learner API endpoint.
         """
+        results = self.get_mock_enterprise_learner_results(
+            entitlement_id, learner_id, enterprise_customer_uuid, enable_audit_enrollment
+        )
         enterprise_learner_api_response = {
             'count': 1,
             'num_pages': 1,
             'current_page': 1,
-            'results': [
-                {
-                    'id': learner_id,
-                    'enterprise_customer': {
-                        'uuid': enterprise_customer_uuid,
-                        'name': 'TestShib',
-                        'active': True,
-                        'site': {
-                            'domain': 'example.com',
-                            'name': 'example.com'
-                        },
-                        'enable_data_sharing_consent': True,
-                        'enforce_data_sharing_consent': 'at_login',
-                        'enable_audit_enrollment': enable_audit_enrollment,
-                        'branding_configuration': {
-                            'enterprise_customer': enterprise_customer_uuid,
-                            'logo': 'https://open.edx.org/sites/all/themes/edx_open/logo.png'
-                        },
-                        'enterprise_customer_entitlements': [
-                            {
-                                'enterprise_customer': enterprise_customer_uuid,
-                                'entitlement_id': entitlement_id
-                            }
-                        ],
-                        'replace_sensitive_sso_username': True,
-                    },
-                    'user_id': 5,
-                    'user': {
-                        'username': 'verified',
-                        'first_name': '',
-                        'last_name': '',
-                        'email': 'verified@example.com',
-                        'is_staff': True,
-                        'is_active': True,
-                        'date_joined': '2016-09-01T19:18:26.026495Z'
-                    },
-                    'data_sharing_consent': [
-                        {
-                            "username": "verified",
-                            "enterprise_customer_uuid": enterprise_customer_uuid,
-                            "exists": True,
-                            "course_id": "course-v1:edX DemoX Demo_Course",
-                            "consent_provided": True,
-                            "consent_required": False
-                        }
-                    ]
-                }
-            ],
+            'results': results,
             'next': None,
             'start': 0,
             'previous': None

@@ -9,7 +9,7 @@ import unittest
 import mock
 from django.http import HttpResponse, HttpResponseBadRequest
 
-from util.json_request import JsonResponse, JsonResponseBadRequest
+from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest
 
 
 class JsonResponseTestCase(unittest.TestCase):

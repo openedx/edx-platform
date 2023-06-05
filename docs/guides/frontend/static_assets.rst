@@ -74,8 +74,8 @@ mechanism:
 
 ``openedx.core.djangoapps.theming.finders.ThemeFilesFinder``
   Custom finder that overrides any static asset with a version from the themes
-  directory (``COMPREHENSIVE_THEME_DIRS`` defined in ``lms.envs.json`` and
-  ``cms.envs.json``).
+  directory (``COMPREHENSIVE_THEME_DIRS`` defined in ``lms.yml`` and
+  ``studio.yml``).
 
 ``openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder``
   Custom finder that accesses and extracts assets from pip-installed XBlocks via

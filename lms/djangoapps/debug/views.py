@@ -10,14 +10,21 @@ from django.utils.html import escape
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from codejail.safe_exec import safe_exec
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangolib.markup import HTML
 
 
 @login_required
 @ensure_csrf_cookie
 def run_python(request):
-    """A page to allow testing the Python sandbox on a production server."""
+    """
+    A page to allow testing the Python sandbox on a production server.
+
+    Runs in the override context "debug_run_python", so resource limits with come first from:
+        CODE_JAIL['limit_overrides']['debug_run_python']
+    and then from:
+        CODE_JAIL['limits']
+    """
     if not request.user.is_staff:
         raise Http404
     c = {}
@@ -27,7 +34,12 @@ def run_python(request):
         py_code = c['code'] = request.POST.get('code')
         g = {}
         try:
-            safe_exec(py_code, g)
+            safe_exec(
+                code=py_code,
+                globals_dict=g,
+                slug="debug_run_python",
+                limit_overrides_context="debug_run_python",
+            )
         except Exception:   # pylint: disable=broad-except
             c['results'] = traceback.format_exc()
         else:

@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='../../static_content.html'/>
-<%page args="tabName"/>
+<%page args="tabName" expression_filter="h"/>
 
 <%
 import json
@@ -25,7 +25,7 @@ import json
     </script>
 % endfor
 
-<div class="wrapper-comp-settings basic_metadata_edit" data-metadata='${json.dumps(transcripts_basic_tab_metadata) | h}'></div>
+<div class="wrapper-comp-settings basic_metadata_edit" data-metadata='${json.dumps(transcripts_basic_tab_metadata)}'></div>
 
 <script type="text/javascript">
     require(
@@ -37,13 +37,13 @@ import json
 
         function(doc, $, Editor) {
             var transcripts = new Editor({
-                    el: $('#editor-tab-${html_id}').find('.basic_metadata_edit')
+                    el: $('#editor-tab-${html_id|n, decode.utf8}').find('.basic_metadata_edit')
                 }),
                 storage = TabsEditingDescriptor.getStorage();
 
             TabsEditingDescriptor.Model.addModelUpdate(
-                '${html_id}',
-                '${tabName}',
+                '${html_id|n, decode.utf8}',
+                '${tabName|n, decode.utf8}',
                 function () {
                     // Advanced, Save
                     metadataEditor = storage.MetadataEditor;
@@ -55,8 +55,8 @@ import json
             );
 
             TabsEditingDescriptor.Model.addOnSwitch(
-                '${html_id}',
-                '${tabName}',
+                '${html_id|n, decode.utf8}',
+                '${tabName|n, decode.utf8}',
                 function () {
                     // Basic
                     metadataEditor = storage.MetadataEditor;

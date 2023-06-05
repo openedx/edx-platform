@@ -20,7 +20,7 @@ from six import text_type
 from lms.djangoapps.courseware.courses import get_problems_in_section
 from lms.djangoapps.courseware.module_render import get_xqueue_callback_url_prefix
 from lms.djangoapps.instructor_task.models import PROGRESS, InstructorTask
-from util.db import outer_atomic
+from common.djangoapps.util.db import outer_atomic
 from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
@@ -110,7 +110,6 @@ def generate_already_running_error_message(task_type):
         'profile_info_csv': _('enrolled learner profile'),
         'may_enroll_info_csv': _('enrollment'),
         'detailed_enrollment_report': _('detailed enrollment'),
-        'exec_summary_report': _('executive summary'),
         'course_survey_report': _('survey'),
         'proctored_exam_results_report': _('proctored exam results'),
         'export_ora2_data': _('ORA data'),

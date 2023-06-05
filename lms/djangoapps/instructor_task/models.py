@@ -280,9 +280,14 @@ class DjangoStorageReportStore(ReportStore):
         """
         path = self.path_to(course_id, filename)
         # See https://github.com/boto/boto/issues/2868
-        # Boto doesn't play nice with unicod in python3
+        # Boto doesn't play nice with unicode in python3
         if not six.PY2:
-            buff = ContentFile(buff.read().encode('utf-8'))
+            buff_contents = buff.read()
+
+            if not isinstance(buff_contents, bytes):
+                buff_contents = buff_contents.encode('utf-8')
+
+            buff = ContentFile(buff_contents)
 
         self.storage.save(path, buff)
 

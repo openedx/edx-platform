@@ -6,6 +6,7 @@ Tests for js_utils.py
 
 import json
 import re
+import html
 from unittest import TestCase
 
 import six
@@ -184,9 +185,8 @@ class TestJSUtils(TestCase):
                 should be parseable into a near equivalent to test_dict.
 
         """
-        html_parser = six.moves.html_parser.HTMLParser()
 
-        expected_json = html_parser.unescape(expected_json_for_html_string)
+        expected_json = html.unescape(expected_json_for_html_string)
         parsed_expected_dict = json.loads(expected_json)
         # tuples become arrays in json, so it is parsed to a list that is
         # switched back to a tuple before comparing

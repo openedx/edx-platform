@@ -159,6 +159,35 @@ def delete_bookmark(user, usage_key):
     _track_event('edx.bookmark.removed', bookmark)
 
 
+def delete_bookmarks(usage_key):
+    """
+    Delete all bookmarks for usage_key.
+
+    Arguments:
+        usage_key (UsageKey): The usage_key of the bookmarks.
+    """
+    units_keys = []
+
+    if usage_key.block_type == 'vertical':
+        units_keys.append(usage_key)
+    else:
+        # NOTE: Get all children for deleted block
+        descriptor = modulestore().get_item(usage_key)
+        for child in descriptor.get_children():
+            if usage_key.block_type == 'chapter':
+                units_keys += [unit.location for unit in child.get_children()]
+            else:
+                units_keys.append(child.location)
+
+    bookmarks = Bookmark.objects.filter(usage_key__in=units_keys)
+
+    # Emit removed bookmard event
+    for bookmark in bookmarks:
+        _track_event('edx.bookmark.removed', bookmark)
+
+    bookmarks.delete()
+
+
 def _track_event(event_name, bookmark):
     """
     Emit events for a bookmark.

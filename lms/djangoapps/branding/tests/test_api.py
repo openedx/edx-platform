@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from branding.api import _footer_business_links, get_footer, get_home_url, get_logo_url
+from ..api import _footer_business_links, get_footer, get_home_url, get_logo_url
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 
 test_config_disabled_contact_us = {   # pylint: disable=invalid-name
@@ -31,7 +31,7 @@ class TestHeader(TestCase):
         # load, which can cause other tests to fail.  To ensure that this change
         # doesn't affect other tests, we patch the `url()` method directly instead.
         cdn_url = "http://cdn.example.com/static/image.png"
-        with mock.patch('branding.api.staticfiles_storage.url', return_value=cdn_url):
+        with mock.patch('lms.djangoapps.branding.api.staticfiles_storage.url', return_value=cdn_url):
             logo_url = get_logo_url()
 
         self.assertEqual(logo_url, cdn_url)
@@ -103,7 +103,7 @@ class TestFooter(TestCase):
                 {'url': 'https://edx.org/about-us', 'name': 'about', 'title': 'About'},
                 {'url': business_url, 'name': 'enterprise', 'title': '\xe9dX for Business'},
                 {'url': 'https://edx.org/affiliate-program', 'name': 'affiliates', 'title': 'Affiliates'},
-                {'url': 'http://open.edx.org', 'name': 'openedx', 'title': 'Open edX'},
+                {'url': 'https://open.edx.org', 'name': 'openedx', 'title': 'Open edX'},
                 {'url': 'https://edx.org/careers', 'name': 'careers', 'title': 'Careers'},
                 {'url': 'https://edx.org/news-announcements', 'name': 'news', 'title': 'News'},
 
@@ -156,8 +156,8 @@ class TestFooter(TestCase):
             'mobile_links': [],
             'logo_image': 'https://edx.org/static/images/logo.png',
             'openedx_link': {
-                'url': 'http://open.edx.org',
-                'image': 'https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png',
+                'url': 'https://open.edx.org',
+                'image': 'https://files.edx.org/openedx-logos/open-edx-logo-tag.png',
                 'title': 'Powered by Open edX'
             },
             'edx_org_link': {

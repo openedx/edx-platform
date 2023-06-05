@@ -4,6 +4,8 @@ Views for user API
 
 
 import six
+from completion.utilities import get_key_to_last_completed_block
+from completion.exceptions import UnavailableCompletionData
 from django.contrib.auth.signals import user_logged_in
 from django.shortcuts import redirect
 from django.utils import dateparse
@@ -22,9 +24,9 @@ from lms.djangoapps.courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.courseware.views.index import save_positions_recursively_up
 from lms.djangoapps.courseware.access_utils import ACCESS_GRANTED
-from mobile_api.utils import API_V05
+from lms.djangoapps.mobile_api.utils import API_V05, API_V1
 from openedx.features.course_duration_limits.access import check_course_expired
-from student.models import CourseEnrollment, User
+from common.djangoapps.student.models import CourseEnrollment, User
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
@@ -83,6 +85,8 @@ class UserCourseStatus(views.APIView):
         Get or update the ID of the module that the specified user last
         visited in the specified course.
 
+        Get ID of the last completed block in case of version v1
+
     **Example Requests**
 
         GET /api/mobile/{version}/users/{username}/course_status_info/{course_id}
@@ -110,6 +114,11 @@ class UserCourseStatus(views.APIView):
           visited in the course.
         * last_visited_module_path: The ID of the modules in the path from the
           last visited module to the course module.
+
+        For version v1 GET request response includes the following values.
+
+        * last_visited_block_id: ID of the last completed block.
+
     """
 
     http_method_names = ["get", "patch"]
@@ -183,8 +192,19 @@ class UserCourseStatus(views.APIView):
         """
         Get the ID of the module that the specified user last visited in the specified course.
         """
+        user_course_status = self._get_course_info(request, course)
 
-        return self._get_course_info(request, course)
+        api_version = self.kwargs.get("api_version")
+        if api_version == API_V1:
+            # Get ID of the block that the specified user last visited in the specified course.
+            try:
+                block_id = str(get_key_to_last_completed_block(request.user, course.id))
+            except UnavailableCompletionData:
+                block_id = ""
+
+            user_course_status.data["last_visited_block_id"] = block_id
+
+        return user_course_status
 
     @mobile_course_access(depth=2)
     def patch(self, request, course, *args, **kwargs):

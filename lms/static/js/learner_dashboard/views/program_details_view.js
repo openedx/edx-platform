@@ -11,6 +11,7 @@ import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
 
 import pageTpl from '../../../templates/learner_dashboard/program_details_view.underscore';
+import trackECommerceEvents from '../../commerce/track_ecommerce_events';
 
 class ProgramDetailsView extends Backbone.View {
   constructor(options) {
@@ -43,6 +44,13 @@ class ProgramDetailsView extends Backbone.View {
     );
 
     this.render();
+
+    const $courseUpsellButton = $('#program_dashboard_course_upsell_all_button');
+    trackECommerceEvents.trackUpsellClick($courseUpsellButton, 'program_dashboard_program', {
+      linkType: 'button',
+      pageName: 'program_dashboard',
+      linkCategory: 'green_upgrade',
+    });
   }
 
   static getUrl(base, programData) {

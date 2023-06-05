@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "comma-dangle": "off",
+    "object-curly-spacing": "off",
+    "no-underscore-dangle": "off"
+  }
+}

@@ -9,7 +9,6 @@ from django.db.models.functions import Greatest
 from django.db import transaction
 
 from openedx.core.djangoapps.schedules.models import Schedule
-from student.models import CourseEnrollment
 
 LOG = logging.getLogger(__name__)
 

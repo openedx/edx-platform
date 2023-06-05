@@ -10,7 +10,7 @@ class LtiProviderConfig(AppConfig):
     """
     Configuration class for the lti_provider Django application.
     """
-    name = 'lti_provider'
+    name = 'lms.djangoapps.lti_provider'
     verbose_name = "LTI Provider"
 
     def ready(self):

@@ -8,7 +8,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from lms.djangoapps.courseware.courses import get_course_with_access
 from openedx.core.djangoapps.verified_track_content.models import VerifiedTrackCohortedCourse
-from util.json_request import JsonResponse, expect_json
+from common.djangoapps.util.json_request import JsonResponse, expect_json
 
 
 @expect_json

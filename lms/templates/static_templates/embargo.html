@@ -15,13 +15,13 @@ from openedx.core.djangolib.markup import HTML, Text
         </h1>
       % endif
         <p>
-            <%block name="pagecontent">${page_content or Text(_("Our system indicates that you are trying to access this {platform_name} "
-                    "course from a country or region currently subject to U.S. economic and trade sanctions."
-                    "Unfortunately, because {platform_name} is required to comply with export controls,"
-                    "we cannot allow you to access this course at this time."
-                    )).format(
+        <%block name="pagecontent">${page_content or Text(_("Our system indicates that you are trying to access this {platform_name} "
+                "course from a country or region currently subject to U.S. economic and trade sanctions. "
+                "Unfortunately, because {platform_name} is required to comply with export controls, "
+                "we cannot allow you to access this course at this time."
+                )).format(
                     platform_name=Text(settings.PLATFORM_NAME),
-                    )}}
+                )}
         </%block>
         </p>
     </section>

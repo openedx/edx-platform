@@ -32,6 +32,8 @@ from sympy.physics.quantum.state import Ket
 from sympy.printing.latex import LatexPrinter
 from sympy.printing.str import StrPrinter
 
+from openedx.core.djangolib.markup import HTML
+
 log = logging.getLogger(__name__)
 
 log.warning("Dark code. Needs review before enabling in prod.")
@@ -84,14 +86,14 @@ def to_latex(expr):
     # sometimes get 'script(N)__B' or more complicated terms
     expr_s = re.sub(
         r'script([a-zA-Z0-9]+)',
-        '\\mathcal{\\1}',
+        r'\\mathcal{\\1}',
         expr_s
     )
 
     #return '<math>%s{}{}</math>' % (xs[1:-1])
     if expr_s[0] == '$':
-        return '[mathjax]%s[/mathjax]<br>' % (expr_s[1:-1])	 # for sympy v6  # xss-lint: disable=python-interpolate-html
-    return '[mathjax]%s[/mathjax]<br>' % (expr_s)		# for sympy v7  # xss-lint: disable=python-interpolate-html
+        return HTML('[mathjax]{expression}[/mathjax]<br>').format(expression=expr_s[1:-1])	 # for sympy v6
+    return HTML('[mathjax]{expression}[/mathjax]<br>').format(expression=expr_s)		# for sympy v7
 
 
 def my_evalf(expr, chop=False):

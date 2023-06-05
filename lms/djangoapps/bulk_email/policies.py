@@ -5,7 +5,7 @@ from edx_ace.channel import ChannelType
 from edx_ace.policy import Policy, PolicyResult
 from opaque_keys.edx.keys import CourseKey
 
-from bulk_email.models import Optout
+from lms.djangoapps.bulk_email.models import Optout
 
 
 class CourseEmailOptout(Policy):

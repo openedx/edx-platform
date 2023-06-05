@@ -14,9 +14,9 @@ from django.utils.timezone import now
 from mock import patch
 from pytz import UTC
 
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification, VerificationDeadline
-from student.helpers import (
+from common.djangoapps.student.helpers import (
     VERIFY_STATUS_APPROVED,
     VERIFY_STATUS_MISSED_DEADLINE,
     VERIFY_STATUS_NEED_TO_REVERIFY,
@@ -24,8 +24,8 @@ from student.helpers import (
     VERIFY_STATUS_RESUBMITTED,
     VERIFY_STATUS_SUBMITTED
 )
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -44,7 +44,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         None: None,
     }
 
-    URLCONF_MODULES = ['verify_student.urls']
+    URLCONF_MODULES = ['lms.djangoapps.verify_student.urls']
 
     def setUp(self):
         # Invoke UrlResetMixin
@@ -136,7 +136,11 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     @patch("lms.djangoapps.verify_student.services.is_verification_expiring_soon")
     def test_verify_resubmit_button_on_dashboard(self, mock_expiry):
         mock_expiry.return_value = True
-        SoftwareSecurePhotoVerification.objects.create(user=self.user, status='approved', expiry_date=now())
+        SoftwareSecurePhotoVerification.objects.create(
+            user=self.user,
+            status='approved',
+            expiration_date=now() + timedelta(days=1)
+        )
         response = self.client.get(self.dashboard_url)
         self.assertContains(response, "Resubmit Verification")
 
@@ -162,7 +166,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.mark_ready()
         attempt.submit()
         attempt.approve()
-        attempt.created_at = self.DATES[self.PAST] - timedelta(days=900)
+        attempt.expiration_date = self.DATES[self.PAST] - timedelta(days=900)
         attempt.save()
 
         # The student didn't have an approved verification at the deadline,
@@ -178,7 +182,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.mark_ready()
         attempt.submit()
         attempt.approve()
-        attempt.created_at = self.DATES[self.PAST] - timedelta(days=900)
+        attempt.expiration_date = self.DATES[self.PAST] - timedelta(days=900)
         attempt.save()
 
         # The student didn't have an approved verification at the deadline,
@@ -249,7 +253,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         attempt.mark_ready()
         attempt.submit()
 
-        # Expect that learner has submitted photos for reverfication and his/her
+        # Expect that learner has submitted photos for reverfication and their
         # previous verification is set to expired soon.
         self._assert_course_verification_status(VERIFY_STATUS_RESUBMITTED)
 

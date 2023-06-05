@@ -10,16 +10,16 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import sentinel
 
-from track.tests import EventTrackingTestCase
-from track.views import segmentio
+from common.djangoapps.track.tests import EventTrackingTestCase
+from common.djangoapps.track.views import segmentio
 
 SEGMENTIO_TEST_SECRET = 'anything'
 SEGMENTIO_TEST_ENDPOINT = '/segmentio/test/event'
 SEGMENTIO_TEST_USER_ID = 10
 
 _MOBILE_SHIM_PROCESSOR = [
-    {'ENGINE': 'track.shim.LegacyFieldMappingProcessor'},
-    {'ENGINE': 'track.shim.PrefixedEventProcessor'},
+    {'ENGINE': 'common.djangoapps.track.shim.LegacyFieldMappingProcessor'},
+    {'ENGINE': 'common.djangoapps.track.shim.PrefixedEventProcessor'},
 ]
 
 
@@ -56,6 +56,14 @@ class SegmentIOTrackingTestCaseBase(EventTrackingTestCase):
         """Post a fake Segment event to the view that processes it"""
         request = self.create_request(
             data=self.create_segmentio_event_json(**kwargs),
+            content_type='application/json'
+        )
+        segmentio.track_segmentio_event(request)
+
+    def post_modified_segmentio_event(self, event):
+        """Post an externally-defined fake Segment event to the view that processes it"""
+        request = self.create_request(
+            data=json.dumps(event),
             content_type='application/json'
         )
         segmentio.track_segmentio_event(request)

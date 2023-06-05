@@ -12,6 +12,7 @@ from enum import Enum
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, User
+from django.db import connections
 from django.test import TestCase
 from django.test.utils import override_settings
 from mock import patch
@@ -21,8 +22,8 @@ from lms.djangoapps.courseware.tests.factories import StaffFactory
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
 from openedx.core.djangolib.testing.utils import CacheIsolationMixin, CacheIsolationTestCase, FilteredQueryCountMixin
 from openedx.core.lib.tempdir import mkdtemp_clean
-from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, clear_existing_modulestores, modulestore
@@ -97,7 +98,7 @@ def draft_mongo_store_config(data_dir):
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': data_dir,
-        'render_template': 'edxmako.shortcuts.render_to_string'
+        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string'
     }
 
     store = {
@@ -124,7 +125,7 @@ def split_mongo_store_config(data_dir):
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': data_dir,
-        'render_template': 'edxmako.shortcuts.render_to_string',
+        'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
     }
 
     store = {
@@ -371,7 +372,7 @@ class SharedModuleStoreTestCase(
     How to use::
 
         from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-        from student.tests.factories import CourseEnrollmentFactory, UserFactory
+        from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
         class MyModuleStoreTestCase(SharedModuleStoreTestCase):
             @classmethod
@@ -397,7 +398,7 @@ class SharedModuleStoreTestCase(
     for Django ORM models that will get cleaned up properly.
     """
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     @classmethod
     @contextmanager
@@ -486,7 +487,7 @@ class ModuleStoreTestCase(
     CREATE_USER = True
 
     # Tell Django to clean out all databases, not just default
-    multi_db = True
+    databases = {alias for alias in connections}
 
     @classmethod
     def setUpClass(cls):

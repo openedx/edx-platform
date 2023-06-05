@@ -10,7 +10,7 @@ import random
 import six
 from pytz import UTC
 
-from util.date_utils import get_default_time_display
+from common.djangoapps.util.date_utils import get_default_time_display
 
 
 class FakeInfo(object):

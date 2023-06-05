@@ -78,6 +78,7 @@
                     this.hideAuthWarnings = options.hide_auth_warnings || false;
                     this.pipelineUserDetails = options.third_party_auth.pipeline_user_details;
                     this.enterpriseName = options.enterprise_name || '';
+                    this.enterpriseSlugLoginURL = options.enterprise_slug_login_url || '';
                     this.isAccountRecoveryFeatureEnabled = options.is_account_recovery_feature_enabled || false;
                     this.isMultipleUserEnterprisesFeatureEnabled =
                         options.is_multiple_user_enterprises_feature_enabled || false;
@@ -160,7 +161,8 @@
                             createAccountOption: this.createAccountOption,
                             hideAuthWarnings: this.hideAuthWarnings,
                             pipelineUserDetails: this.pipelineUserDetails,
-                            enterpriseName: this.enterpriseName
+                            enterpriseName: this.enterpriseName,
+                            enterpriseSlugLoginURL: this.enterpriseSlugLoginURL
                         });
 
                     // Listen for 'password-help' event to toggle sub-views
@@ -262,6 +264,12 @@
 
                 // Load the form. Institution login is always refreshed since it changes based on the previous form.
                     if (!this.form.isLoaded($form) || type == 'institution_login') {
+
+                        // We need a special case for loading reset form as there is mismatch of form id
+                        // value ie 'password-reset' vs load function name ie 'reset'
+                        if (type === 'password-reset') {
+                            type = 'reset';
+                        }
                         this.loadForm(type);
                     }
                     this.activeForm = type;

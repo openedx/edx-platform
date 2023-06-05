@@ -3,7 +3,7 @@ Course API Authorization functions
 """
 
 
-from student.roles import GlobalStaff
+from common.djangoapps.student.roles import GlobalStaff
 
 
 def can_view_courses_for_username(requesting_user, target_username):

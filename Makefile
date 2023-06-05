@@ -21,7 +21,7 @@ clean: ## archive and delete most git-ignored files
 
 SWAGGER = docs/swagger.yaml
 
-docs: api-docs guides ## build all the developer documentation for this repository
+docs: api-docs guides technical-docs ## build all the developer documentation for this repository
 
 swagger: ## generate the swagger.yaml file
 	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=edx_api_doc_tools.ApiSchemaGenerator -o $(SWAGGER)
@@ -32,6 +32,9 @@ api-docs-sphinx: swagger	## generate the sphinx source files for api-docs
 
 api-docs: api-docs-sphinx	## build the REST api docs
 	cd docs/api; make html
+
+technical-docs:  ## build the technical docs
+	$(MAKE) -C docs/technical html
 
 guides:	## build the developer guide docs
 	cd docs/guides; make clean html
@@ -50,7 +53,7 @@ pull_translations: ## pull translations from Transifex
 	i18n_tool generate
 	git clean -fdX conf/locale/rtl
 	git clean -fdX conf/locale/eo
-	i18n_tool validate
+	i18n_tool validate --verbose
 	paver i18n_compilejs
 
 
@@ -60,8 +63,10 @@ detect_changed_source_translations: ## check if translation files are up-to-date
 pull: ## update the Docker image used by "make shell"
 	docker pull edxops/edxapp:latest
 
-requirements: ## install development environment requirements
+pre-requirements: ## install Python requirements for running pip-tools
 	pip install -qr requirements/edx/pip-tools.txt
+
+requirements: pre-requirements ## install development environment requirements
 	pip-sync -q requirements/edx/development.txt requirements/edx/private.*
 
 shell: ## launch a bash shell in a Docker container with all edx-platform dependencies installed
@@ -75,6 +80,7 @@ shell: ## launch a bash shell in a Docker container with all edx-platform depend
 REQ_FILES = \
 	requirements/edx/pip-tools \
 	requirements/edx/coverage \
+	requirements/edx/doc \
 	requirements/edx/paver \
 	requirements/edx-sandbox/shared \
 	requirements/edx-sandbox/py35 \
@@ -83,15 +89,14 @@ REQ_FILES = \
 	requirements/edx/development \
 	scripts/xblock/requirements
 
-upgrade: export CUSTOM_COMPILE_COMMAND=make upgrade
-upgrade: ## update the pip requirements files to use the latest releases satisfying our constraints
-	pip install -qr requirements/edx/pip-tools.txt
+compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
+compile-requirements: ## Re-compile *.in requirements to *.txt
 	@ export REBUILD='--rebuild'; \
 	for f in $(REQ_FILES); do \
 		echo ; \
 		echo "== $$f ===============================" ; \
-		echo "pip-compile -v --no-emit-trusted-host --no-index $$REBUILD --upgrade -o $$f.txt $$f.in"; \
-		pip-compile -v --no-emit-trusted-host --no-index $$REBUILD --upgrade -o $$f.txt $$f.in || exit 1; \
+		echo "pip-compile -v --no-emit-trusted-host --no-index $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in"; \
+		pip-compile -v --no-emit-trusted-host --no-index $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
 		export REBUILD=''; \
 	done
 	# Post process all of the files generated above to work around open pip-tools issues
@@ -100,3 +105,29 @@ upgrade: ## update the pip requirements files to use the latest releases satisfy
 	grep -e "^django==" requirements/edx/base.txt > requirements/edx/django.txt
 	sed '/^[dD]jango==/d' requirements/edx/testing.txt > requirements/edx/testing.tmp
 	mv requirements/edx/testing.tmp requirements/edx/testing.txt
+
+upgrade: pre-requirements ## update the pip requirements files to use the latest releases satisfying our constraints
+	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
+
+# These make targets currently only build LMS images.
+docker_build:
+	docker build . -f Dockerfile --target lms -t openedx/edx-platform
+	docker build . -f Dockerfile --target lms-newrelic -t openedx/edx-platform:latest-newrelic
+	docker build . -f Dockerfile --target lms-devstack -t openedx/edx-platform:latest-devstack
+
+docker_tag: docker_build
+	docker tag openedx/edx-platform openedx/edx-platform:${GITHUB_SHA}
+	docker tag openedx/edx-platform:latest-newrelic openedx/edx-platform:${GITHUB_SHA}-newrelic
+	docker tag openedx/edx-platform:latest-devstack openedx/edx-platform:${GITHUB_SHA}-devstack
+
+docker_auth:
+	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
+
+docker_push: docker_tag docker_auth ## push to docker hub
+	docker push 'openedx/edx-platform:latest'
+	docker push "openedx/edx-platform:${GITHUB_SHA}"
+	docker push 'openedx/edx-platform:latest-newrelic'
+	docker push "openedx/edx-platform:${GITHUB_SHA}-newrelic"
+	docker push 'openedx/edx-platform:latest-devstack'
+	docker push "openedx/edx-platform:${GITHUB_SHA}-devstack"
+

@@ -20,8 +20,8 @@ from mock import ANY, Mock, call, patch
 from six import text_type
 from six.moves import range
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion import views
 from lms.djangoapps.discussion.django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
@@ -56,9 +56,9 @@ from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from student.roles import CourseStaffRole, UserBasedRole
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import EventTestMixin, UrlResetMixin
+from common.djangoapps.student.roles import CourseStaffRole, UserBasedRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.util.testing import EventTestMixin, UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
@@ -89,7 +89,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             password = 'test'
@@ -108,8 +108,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         config.enabled = True
         config.save()
 
-    @patch('student.models.cc.User.from_django_user')
-    @patch('student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.cc.User.active_threads')
     def test_user_profile_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -125,8 +125,8 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    @patch('student.models.cc.User.from_django_user')
-    @patch('student.models.cc.User.subscribed_threads')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.cc.User.subscribed_threads')
     def test_user_followed_threads_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app
@@ -447,6 +447,25 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
             )
 
 
+class AllowPlusOrMinusOneInt(int):
+    """
+    A workaround for the fact that assertNumQueries doesn't let you
+    specify a range or any tolerance. An 'int' that is 'equal to' its value,
+    but also its value +/- 1
+    """
+
+    def __init__(self, value):
+        super().__init__()
+        self.value = value
+        self.values = (value, value - 1, value + 1)
+
+    def __eq__(self, other):
+        return other in self.values
+
+    def __repr__(self):
+        return "({} +/- 1)".format(self.value)
+
+
 @ddt.ddt
 @patch('requests.request', autospec=True)
 class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
@@ -463,18 +482,18 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # course is outside the context manager that is verifying the number of queries,
         # and with split mongo, that method ends up querying disabled_xblocks (which is then
         # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 23, 7),
-        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 23, 7),
+        (ModuleStoreEnum.Type.mongo, False, 1, 5, 2, 21, 7),
+        (ModuleStoreEnum.Type.mongo, False, 50, 5, 2, 21, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 23, 7),
-        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 23, 7),
+        (ModuleStoreEnum.Type.split, False, 1, 3, 3, 21, 8),
+        (ModuleStoreEnum.Type.split, False, 50, 3, 3, 21, 8),
 
         # Enabling Enterprise integration should have no effect on the number of mongo queries made.
-        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 23, 7),
-        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 23, 7),
+        (ModuleStoreEnum.Type.mongo, True, 1, 5, 2, 21, 7),
+        (ModuleStoreEnum.Type.mongo, True, 50, 5, 2, 21, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 23, 7),
-        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 23, 7),
+        (ModuleStoreEnum.Type.split, True, 1, 3, 3, 21, 8),
+        (ModuleStoreEnum.Type.split, True, 50, 3, 3, 21, 8),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -525,7 +544,10 @@ class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # Test uncached first, then cached now that the cache is warm.
         cached_calls = [
             [num_uncached_mongo_calls, num_uncached_sql_queries],
-            [num_cached_mongo_calls, num_cached_sql_queries],
+            # Sometimes there will be one more or fewer sql call than expected, because the call to
+            # CourseMode.modes_for_course sometimes does / doesn't get cached and does / doesn't hit the DB.
+            # EDUCATOR-5167
+            [num_cached_mongo_calls, AllowPlusOrMinusOneInt(num_cached_sql_queries)],
         ]
         for expected_mongo_calls, expected_sql_queries in cached_calls:
             with self.assertNumQueries(expected_sql_queries, table_blacklist=QUERY_COUNT_TABLE_BLACKLIST):
@@ -1632,7 +1654,7 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         self.assertTrue(self.client.login(username=username, password=password))
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user')
     def test_forum_discussion_xss_prevent(self, malicious_code, mock_user, mock_req):
         """
         Test that XSS attack is prevented
@@ -1648,8 +1670,8 @@ class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTe
         self.assertNotContains(resp, malicious_code)
 
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
-    @patch('student.models.cc.User.from_django_user')
-    @patch('student.models.cc.User.active_threads')
+    @patch('common.djangoapps.student.models.cc.User.from_django_user')
+    @patch('common.djangoapps.student.models.cc.User.active_threads')
     def test_forum_user_profile_xss_prevent(self, malicious_code, mock_threads, mock_from_django_user, mock_request):
         """
         Test that XSS attack is prevented

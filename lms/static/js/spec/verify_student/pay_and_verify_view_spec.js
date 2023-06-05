@@ -10,7 +10,6 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 'id_photo_step',
                 'intro_step',
                 'make_payment_step',
-                'payment_confirmation_step',
                 'review_photos_step',
                 'webcam_photo',
                 'image_input'
@@ -25,10 +24,6 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
                 {
                     name: 'make-payment-step',
                     title: 'Make Payment'
-                },
-                {
-                    name: 'payment-confirmation-step',
-                    title: 'Payment Confirmation'
                 }
             ];
 
@@ -87,9 +82,6 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
 
                 // Iterate through the steps, ensuring that each is rendered
                 view.nextStep();
-                expectStepRendered('payment-confirmation-step');
-
-                view.nextStep();
                 expectStepRendered('face-photo-step');
 
                 view.nextStep();
@@ -127,21 +119,6 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
 
                 view.nextStep();
                 expectStepRendered('enrollment-confirmation-step');
-            });
-
-            it('starts from a later step', function() {
-                // Start from the payment confirmation step
-                var view = createView(
-                    DISPLAY_STEPS_FOR_PAYMENT.concat(DISPLAY_STEPS_FOR_VERIFICATION),
-                    'payment-confirmation-step'
-                );
-
-                // Verify that we start on the right step
-                expectStepRendered('payment-confirmation-step');
-
-                // Try moving to the next step
-                view.nextStep();
-                expectStepRendered('face-photo-step');
             });
 
             it('jumps to a particular step', function() {

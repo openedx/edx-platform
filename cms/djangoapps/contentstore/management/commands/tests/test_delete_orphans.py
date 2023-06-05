@@ -5,7 +5,7 @@ import ddt
 import six
 from django.core.management import CommandError, call_command
 
-from contentstore.tests.test_orphan import TestOrphanBase
+from cms.djangoapps.contentstore.tests.test_orphan import TestOrphanBase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory
 

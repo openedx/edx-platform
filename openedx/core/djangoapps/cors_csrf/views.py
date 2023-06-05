@@ -8,7 +8,7 @@ from django.conf import settings
 from django.http import HttpResponseNotFound
 from django.views.decorators.cache import cache_page
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 
 from .models import XDomainProxyConfiguration
 

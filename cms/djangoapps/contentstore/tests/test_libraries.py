@@ -10,15 +10,15 @@ from mock import Mock, patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
 from six.moves import range
 
-from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
-from contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
-from contentstore.views.item import _duplicate_item
-from contentstore.views.preview import _load_preview_module
-from contentstore.views.tests.test_library import LIBRARY_REST_URL
-from course_creators.views import add_user_with_status_granted
-from student import auth
-from student.auth import has_studio_read_access, has_studio_write_access
-from student.roles import (
+from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
+from cms.djangoapps.contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
+from cms.djangoapps.contentstore.views.item import _duplicate_item
+from cms.djangoapps.contentstore.views.preview import _load_preview_module
+from cms.djangoapps.contentstore.views.tests.test_library import LIBRARY_REST_URL
+from cms.djangoapps.course_creators.views import add_user_with_status_granted
+from common.djangoapps.student import auth
+from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     LibraryUserRole,
@@ -26,8 +26,8 @@ from student.roles import (
     OrgLibraryUserRole,
     OrgStaffRole
 )
-from student.tests.factories import UserFactory
-from xblock_django.user_service import DjangoXBlockUserService
+from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -477,6 +477,22 @@ class TestLibraries(LibraryTestCase):
         self.assertEqual(resp.status_code, 200)
         with self.assertRaises(ValueError):
             self._refresh_children(lc_block, status_code_expected=400)
+
+    def test_library_filters(self):
+        """
+        Test the filters in the list libraries API
+        """
+        self._create_library(library="test-lib1", display_name="Foo", org='org')
+        self._create_library(library="test-lib2", display_name="Library-Title-2", org='org-test1')
+        self._create_library(library="l3", display_name="Library-Title-3", org='org-test1')
+        self._create_library(library="l4", display_name="Library-Title-4", org='org-test2')
+
+        self.assertEqual(len(self.client.get_json(LIBRARY_REST_URL).json()), 5)  # 1 more from self.setUp()
+        self.assertEqual(len(self.client.get_json('{}?org=org-test1'.format(LIBRARY_REST_URL)).json()), 2)
+        self.assertEqual(len(self.client.get_json('{}?text_search=test-lib'.format(LIBRARY_REST_URL)).json()), 2)
+        self.assertEqual(len(self.client.get_json('{}?text_search=library-title'.format(LIBRARY_REST_URL)).json()), 3)
+        self.assertEqual(len(self.client.get_json('{}?text_search=library-'.format(LIBRARY_REST_URL)).json()), 3)
+        self.assertEqual(len(self.client.get_json('{}?text_search=org-test'.format(LIBRARY_REST_URL)).json()), 3)
 
 
 @ddt.ddt

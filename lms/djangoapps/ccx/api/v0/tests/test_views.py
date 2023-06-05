@@ -30,9 +30,9 @@ from lms.djangoapps.ccx.utils import ccx_course as ccx_course_cm
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.instructor.access import allow_access, list_with_level
 from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
-from student.models import CourseEnrollment
-from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
-from student.tests.factories import AdminFactory, UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.tests.factories import AdminFactory, UserFactory
 
 USER_PASSWORD = 'test'
 

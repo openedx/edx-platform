@@ -27,8 +27,8 @@ from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params,
 from lms.djangoapps.instructor.views.api import _split_input_list
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment, CourseEnrollmentException
-from student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.models import CourseEnrollment, CourseEnrollmentException
+from common.djangoapps.student.roles import CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
 
 log = logging.getLogger("edx.ccx")
 
@@ -293,7 +293,7 @@ def ccx_course(ccx_locator):
 
 def assign_staff_role_to_ccx(ccx_locator, user, master_course_id):
     """
-    Check if user has ccx_coach role on master course then assign him staff role on ccx only
+    Check if user has ccx_coach role on master course then assign them staff role on ccx only
     if role is not already assigned. Because of this coach can open dashboard from master course
     as well as ccx.
     :param ccx_locator: CCX key

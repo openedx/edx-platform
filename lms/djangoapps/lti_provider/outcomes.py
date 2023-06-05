@@ -13,7 +13,7 @@ from lxml import etree
 from lxml.builder import ElementMaker
 from requests.exceptions import RequestException
 
-from lti_provider.models import GradedAssignment, OutcomeService
+from lms.djangoapps.lti_provider.models import GradedAssignment, OutcomeService
 
 log = logging.getLogger("edx.lti_provider")
 

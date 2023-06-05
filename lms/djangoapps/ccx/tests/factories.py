@@ -7,7 +7,7 @@ from factory import Sequence, SubFactory
 from factory.django import DjangoModelFactory
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 # pylint: disable=missing-class-docstring

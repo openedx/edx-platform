@@ -11,9 +11,9 @@ from django.test import TestCase
 from edx_django_utils.cache import RequestCache
 from opaque_keys.edx.keys import CourseKey
 
-from course_modes.models import CourseMode
+from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 
 from ..constants import ProgramCourseEnrollmentRoles
 from ..models import ProgramEnrollment
@@ -100,11 +100,19 @@ class ProgramEnrollmentModelTests(TestCase):
         self.enrollment.refresh_from_db()
 
         # Ensure those values are retired
-        self.assertEqual(self.enrollment.external_user_key, None)
+        self.assertTrue(
+            self.enrollment.external_user_key.startswith(
+                'retired_external_key'
+            )
+        )
 
         self.assertTrue(self.enrollment.historical_records.all())
         for record in self.enrollment.historical_records.all():
-            self.assertEqual(record.external_user_key, None)
+            self.assertTrue(
+                record.external_user_key.startswith(
+                    'retired_external_key'
+                )
+            )
 
 
 @ddt.ddt

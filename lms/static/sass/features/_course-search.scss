@@ -2,6 +2,9 @@
 
 .search-results {
   flex-grow: 1;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
 
   .search-result-list {
     list-style: none;
@@ -13,8 +16,9 @@
   .search-results-title {
     display: inline-block;
     color: black;
-    font-size: 1.5rem;
+    font-size: 0.875rem;
     line-height: 1.5;
+    font-weight: 600;
   }
 
   .search-count {
@@ -27,21 +31,23 @@
   .search-results-item {
     position: relative;
     border-top: 1px solid $border-color;
-    padding: $baseline ($baseline/2);
+    border-left: 1px solid $border-color;
+    border-right: 1px solid $border-color;
+    padding: $baseline;
     list-style-type: none;
     cursor: pointer;
+
+    display: flex;
+    flex-direction: row;
 
     &:last-child {
       border-bottom: 1px solid $border-color;
     }
-
-    &:hover {
-      background: theme-color("lightest");
-    }
   }
 
   .result-excerpt {
-    display: inline-block;
+    display: block;
+    font-size: 0.875rem;
   }
 
   .result-location {
@@ -52,18 +58,14 @@
   }
 
   .result-link {
-    @include float(right);
-    @include padding-left($baseline/4);
-
     line-height: 1.6em;
+    display: block;
   }
 
   .result-type {
-    @include right($baseline/2);
-
-    position: absolute;
     color: theme-color("dark");
-    font-size: 14px;
+    font-size: 1rem;
+    margin-right: $baseline;
     bottom: $baseline;
   }
 

@@ -13,7 +13,7 @@ from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.edx_api_utils import get_edx_api_data
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 UTILITY_MODULE = 'openedx.core.lib.edx_api_utils'
 TEST_API_URL = 'http://www-internal.example.com/api'

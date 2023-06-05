@@ -28,7 +28,7 @@ class TimedDecoratorTests(TestCase):
     Tests of the pavelib.utils.timer:timed decorator.
     """
     def setUp(self):
-        super(TimedDecoratorTests, self).setUp()
+        super().setUp()
 
         patch_dumps = patch.object(timer.json, 'dump', autospec=True)
         self.mock_dump = patch_dumps.start()

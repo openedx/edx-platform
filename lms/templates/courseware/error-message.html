@@ -5,8 +5,5 @@
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
 %>
-<%
-    tech_support_email=HTML('<a href=\"mailto:{tech_support_email}\">{tech_support_email}</a>').format(tech_support_email=static.get_tech_support_email_address())
-%>
-<p>${Text(_("We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible."))}</p>
 
+<p>${Text(_("We're sorry, this module is temporarily unavailable. Our staff is working to fix it as soon as possible."))}</p>

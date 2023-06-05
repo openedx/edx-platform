@@ -58,58 +58,6 @@ div.info-wrapper {
     width: 100%;
     display: block;
 
-    div.dates-banner {
-      // This banner uses the Pattern Library's defined variables
-      @include border-left(0);
-
-      border: 1px solid $border-color;
-      width: 100%;
-      display: table;
-
-      .notification-color-border {
-        width: 6px; //Value defined by UX team
-        min-height: 100%;
-        margin: 0;
-        display: table-cell;
-        background: $notification-highlight-border-color;
-      }
-
-      .notification-content {
-        display: inline-flex;
-        align-items: center;
-        align-content: flex-start;
-        flex-flow: row wrap;
-        background: $notification-background;
-        width: 100%;
-        padding: $baseline/2 0;
-        margin-bottom: 0;
-        justify-content: space-between;
-
-        .upgrade-icon {
-          margin: 0;
-          padding: $baseline/2 $baseline;
-          flex-flow: row nowrap;
-          align-items: center;
-          // flex: grow, shrink, base
-          // The 7 was the value that allowed the icon image to grow to the UX
-          // desired size.
-          flex: 7 1 50px;
-          // The following dimensions were added so that the
-          // icon will adjust as the notification is adjusted
-          // but will not be smaller or larger than UX requirements.
-          min-height: 50px;
-          min-width: 80px;
-          max-height: 90px;
-          max-width: 130px;
-
-          img {
-            min-height: 50px;
-            min-width: 80px;
-          }
-        }
-      }
-    }
-
     > p {
       margin-bottom: lh();
     }

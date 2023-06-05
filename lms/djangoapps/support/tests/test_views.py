@@ -22,17 +22,17 @@ from pytz import UTC
 from social_django.models import UserSocialAuth
 
 from common.test.utils import disable_signal
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
 from lms.djangoapps.support.serializers import ProgramEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
 from lms.djangoapps.verify_student.services import IDVerificationService
 from lms.djangoapps.verify_student.tests.factories import SSOVerificationFactory
-from student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
-from student.roles import GlobalStaff, SupportStaffRole
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from third_party_auth.tests.factories import SAMLProviderConfigFactory
+from common.djangoapps.student.models import ENROLLED_TO_ENROLLED, CourseEnrollment, CourseEnrollmentAttribute, ManualEnrollmentAudit
+from common.djangoapps.student.roles import GlobalStaff, SupportStaffRole
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.third_party_auth.tests.factories import SAMLProviderConfigFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -108,7 +108,8 @@ class SupportViewManageUserTests(SupportViewTestCase):
         )
         url = reverse('support:manage_user_detail') + test_user.username
         response = self.client.post(url, data={
-            'username_or_email': test_user.username
+            'username_or_email': test_user.username,
+            'comment': 'Test comment'
         })
         data = json.loads(response.content.decode('utf-8'))
         self.assertEqual(data['success_msg'], 'User Disabled Successfully')
@@ -128,7 +129,6 @@ class SupportViewAccessTests(SupportViewTestCase):
         in itertools.product((
             'support:index',
             'support:certificates',
-            'support:refund',
             'support:enrollment',
             'support:enrollment_list',
             'support:manage_user',
@@ -156,7 +156,6 @@ class SupportViewAccessTests(SupportViewTestCase):
     @ddt.data(
         "support:index",
         "support:certificates",
-        "support:refund",
         "support:enrollment",
         "support:enrollment_list",
         "support:manage_user",
@@ -185,7 +184,6 @@ class SupportViewIndexTests(SupportViewTestCase):
 
     EXPECTED_URL_NAMES = [
         "support:certificates",
-        "support:refund",
         "support:link_program_enrollments",
     ]
 
@@ -394,7 +392,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
 
     def _assert_generated_modes(self, response):
         """Dry method to generate course modes dict and test with response data."""
-        modes = CourseMode.modes_for_course(self.course.id, include_expired=True, exclude_credit=False)
+        modes = CourseMode.modes_for_course(self.course.id, include_expired=True, only_selectable=False)
         modes_data = []
         for mode in modes:
             expiry = mode.expiration_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') if mode.expiration_datetime else None
@@ -433,7 +431,7 @@ class SupportViewEnrollmentsTests(SharedModuleStoreTestCase, SupportViewTestCase
             kwargs={'username_or_email': getattr(self.student, search_string_type)}
         )
 
-        with patch('support.views.enrollments.get_credit_provider_attribute_values') as mock_method:
+        with patch('lms.djangoapps.support.views.enrollments.get_credit_provider_attribute_values') as mock_method:
             credit_provider = (
                 [u'Arizona State University'], 'You are now eligible for credit from Arizona State University'
             )
@@ -472,7 +470,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
     Tests for the link_program_enrollments support view.
     """
     patch_render = patch(
-        'support.views.program_enrollments.render_to_response',
+        'lms.djangoapps.support.views.program_enrollments.render_to_response',
         return_value=HttpResponse(),
         autospec=True,
     )
@@ -540,7 +538,7 @@ class SupportViewLinkProgramEnrollmentsTests(SupportViewTestCase):
         '0001,learner-01,apple,orange\n0002,learner-02,purple',             # extra fields
         '\t0001        ,    \t  learner-01    \n   0002 , learner-02    ',  # whitespace
     )
-    @patch('support.views.program_enrollments.link_program_enrollments')
+    @patch('lms.djangoapps.support.views.program_enrollments.link_program_enrollments')
     def test_text(self, text, mocked_link):
         self.client.post(self.url, data={
             'program_uuid': self.program_uuid,
@@ -641,7 +639,7 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
     View tests for Program Enrollments Inspector
     """
     patch_render = patch(
-        'support.views.program_enrollments.render_to_response',
+        'lms.djangoapps.support.views.program_enrollments.render_to_response',
         return_value=HttpResponse(),
         autospec=True,
     )
@@ -962,3 +960,47 @@ class ProgramEnrollmentsInspectorViewTests(SupportViewTestCase):
         )
         render_call_dict = mocked_render.call_args[0][1]
         assert expected_error == render_call_dict['error']
+
+
+class SsoRecordsTests(SupportViewTestCase):
+
+    def setUp(self):
+        """Make the user support staff"""
+        super(SsoRecordsTests, self).setUp()
+        SupportStaffRole().add_users(self.user)
+        self.student = UserFactory.create(username='student', email='test@example.com', password='test')
+        self.url = reverse("support:sso_records", kwargs={'username_or_email': self.student.username})
+        self.org_key_list = ['test_org']
+        for org_key in self.org_key_list:
+            lms_org = OrganizationFactory(
+                short_name=org_key
+            )
+            SAMLProviderConfigFactory(
+                organization=lms_org,
+                slug=org_key,
+                enabled=True,
+            )
+
+    def test_empty_response(self):
+        response = self.client.get(self.url)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data), 0)
+
+    def test_user_does_not_exist(self):
+        response = self.client.get(reverse("support:sso_records", kwargs={'username_or_email': 'wrong_username'}))
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data), 0)
+
+    def test_response(self):
+        user_social_auth = UserSocialAuth.objects.create(
+            user=self.student,
+            uid=self.student.email,
+            provider='tpa-saml'
+        )
+        response = self.client.get(self.url)
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data), 1)
+        self.assertContains(response, '"uid": "test@example.com"')

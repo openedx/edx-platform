@@ -11,16 +11,12 @@ from django.urls import reverse
 from edxval import api
 from mock import ANY, Mock, patch
 
-from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
-from contentstore.views.transcript_settings import TranscriptionProviderErrorType, validate_transcript_credentials
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from cms.djangoapps.contentstore.utils import reverse_course_url
 from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
-from openedx.core.djangoapps.video_pipeline.config.waffle import (
-    SAVE_CREDENTIALS_IN_VAL,
-    waffle_flags
-)
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from student.roles import CourseStaffRole
+from common.djangoapps.student.roles import CourseStaffRole
+
+from ..transcript_settings import TranscriptionProviderErrorType, validate_transcript_credentials
 
 
 @ddt.ddt
@@ -97,63 +93,13 @@ class TranscriptCredentialsTest(CourseTestCase):
         )
     )
     @ddt.unpack
-    @patch('contentstore.views.transcript_settings.update_3rd_party_transcription_service_credentials')
+    @patch('cms.djangoapps.contentstore.views.transcript_settings.update_3rd_party_transcription_service_credentials')
     def test_transcript_credentials_handler(self, request_payload, update_credentials_response, expected_status_code,
                                             expected_response, mock_update_credentials):
         """
         Tests that transcript credentials handler works as expected.
         """
         mock_update_credentials.return_value = update_credentials_response
-        transcript_credentials_url = self.get_url_for_course_key(self.course.id)
-        response = self.client.post(
-            transcript_credentials_url,
-            data=json.dumps(request_payload),
-            content_type='application/json'
-        )
-        self.assertEqual(response.status_code, expected_status_code)
-        self.assertEqual(response.content.decode('utf-8'), expected_response)
-
-    @override_waffle_flag(waffle_flags()[SAVE_CREDENTIALS_IN_VAL], True)
-    @ddt.data(
-        (
-            {
-                'provider': '3PlayMedia',
-                'api_key': '11111',
-                'api_secret_key': '44444'
-            },
-            {'error_type': TranscriptionProviderErrorType.INVALID_CREDENTIALS},
-            400,
-            '{\n  "error": "The information you entered is incorrect."\n}'
-        ),
-        (
-            {
-                'provider': 'Cielo24',
-                'api_key': '12345',
-                'username': 'test_user'
-            },
-            {'error_type': None},
-            200,
-            ''
-        ),
-        (
-            {
-                'provider': '3PlayMedia',
-                'api_key': '12345',
-                'api_secret_key': '44444'
-            },
-            {'error_type': None},
-            200,
-            ''
-        )
-    )
-    @ddt.unpack
-    @patch('edxval.api.create_or_update_transcript_credentials')
-    def test_val_transcript_credentials_handler(self, request_payload, update_credentials_response,
-                                                expected_status_code, expected_response, api_patch):
-        """
-        Test that credentials handler works fine with VAL api endpoint.
-        """
-        api_patch.return_value = update_credentials_response
         transcript_credentials_url = self.get_url_for_course_key(self.course.id)
         response = self.client.post(
             transcript_credentials_url,
@@ -264,7 +210,7 @@ class TranscriptDownloadTest(CourseTestCase):
         response = self.client.post(self.view_url, content_type='application/json')
         self.assertEqual(response.status_code, 405)
 
-    @patch('contentstore.views.transcript_settings.get_video_transcript_data')
+    @patch('cms.djangoapps.contentstore.views.transcript_settings.get_video_transcript_data')
     def test_transcript_download_handler(self, mock_get_video_transcript_data):
         """
         Tests that transcript download handler works as expected.
@@ -356,8 +302,11 @@ class TranscriptUploadTest(CourseTestCase):
         response = self.client.get(self.view_url, content_type='application/json')
         self.assertEqual(response.status_code, 405)
 
-    @patch('contentstore.views.transcript_settings.create_or_update_video_transcript')
-    @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
+    @patch('cms.djangoapps.contentstore.views.transcript_settings.create_or_update_video_transcript')
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
     def test_transcript_upload_handler(self, mock_create_or_update_video_transcript):
         """
         Tests that transcript upload handler works as expected.
@@ -419,7 +368,10 @@ class TranscriptUploadTest(CourseTestCase):
         )
     )
     @ddt.unpack
-    @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
     def test_transcript_upload_handler_missing_attrs(self, request_payload, expected_error_message):
         """
         Tests the transcript upload handler when the required attributes are missing.
@@ -429,7 +381,10 @@ class TranscriptUploadTest(CourseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content.decode('utf-8'))['error'], expected_error_message)
 
-    @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en', 'es']))
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en', 'es'])
+    )
     def test_transcript_upload_handler_existing_transcript(self):
         """
         Tests that upload handler do not update transcript's language if a transcript
@@ -448,7 +403,10 @@ class TranscriptUploadTest(CourseTestCase):
             u'A transcript with the "es" language code already exists.'
         )
 
-    @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
     def test_transcript_upload_handler_with_image(self):
         """
         Tests the transcript upload handler with an image file.
@@ -472,7 +430,10 @@ class TranscriptUploadTest(CourseTestCase):
                 u'There is a problem with this transcript file. Try to upload a different file.'
             )
 
-    @patch('contentstore.views.transcript_settings.get_available_transcript_languages', Mock(return_value=['en']))
+    @patch(
+        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        Mock(return_value=['en']),
+    )
     def test_transcript_upload_handler_with_invalid_transcript(self):
         """
         Tests the transcript upload handler with an invalid transcript file.

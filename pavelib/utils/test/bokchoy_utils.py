@@ -41,16 +41,16 @@ def start_servers(options):
         print(cmd, logfile)
         run_background_process(cmd, out_log=logfile, err_log=logfile, cwd=cwd)
 
-    for service, info in six.iteritems(Env.BOK_CHOY_SERVERS):
+    for service, info in Env.BOK_CHOY_SERVERS.items():
         address = "0.0.0.0:{}".format(info['port'])
-        cmd = (u"DEFAULT_STORE={default_store} ").format(default_store=options.default_store)
+        cmd = ("DEFAULT_STORE={default_store} ").format(default_store=options.default_store)
         if coveragerc:
-            cmd += (u"coverage run --rcfile={coveragerc} -m ").format(coveragerc=coveragerc)
+            cmd += ("coverage run --rcfile={coveragerc} -m ").format(coveragerc=coveragerc)
         else:
             cmd += "python -m "
         cmd += (
-            u"manage {service} --settings {settings} runserver "
-            u"{address} --traceback --noreload".format(
+            "manage {service} --settings {settings} runserver "
+            "{address} --traceback --noreload".format(
                 service=service,
                 settings=Env.SETTINGS,
                 address=address,
@@ -58,9 +58,9 @@ def start_servers(options):
         )
         start_server(cmd, info['log'])
 
-    for service, info in six.iteritems(Env.BOK_CHOY_STUBS):
+    for service, info in Env.BOK_CHOY_STUBS.items():
         cmd = (
-            u"python -m stubs.start {service} {port} "
+            "python -m stubs.start {service} {port} "
             "{config}".format(
                 service=service,
                 port=info['port'],
@@ -75,7 +75,7 @@ def wait_for_server(server, port):
     Wait for a server to respond with status 200
     """
     print(
-        u"Checking server {server} on port {port}".format(
+        "Checking server {server} on port {port}".format(
             server=server,
             port=port,
         )
@@ -110,12 +110,12 @@ def wait_for_test_servers():
     Wait until we get a successful response from the servers or time out
     """
 
-    for service, info in six.iteritems(Env.BOK_CHOY_SERVERS):
+    for service, info in Env.BOK_CHOY_SERVERS.items():
         ready = wait_for_server(info['host'], info['port'])
         if not ready:
             msg = colorize(
                 "red",
-                u"Could not contact {} test server".format(service)
+                "Could not contact {} test server".format(service)
             )
             print(msg)
             sys.exit(1)
@@ -127,7 +127,7 @@ def is_mongo_running():
     """
     # The mongo command will connect to the service,
     # failing with a non-zero exit code if it cannot connect.
-    output = os.popen(u'mongo --host {} --eval "print(\'running\')"'.format(Env.MONGO_HOST)).read()
+    output = os.popen('mongo --host {} --eval "print(\'running\')"'.format(Env.MONGO_HOST)).read()
     return output and "running" in output
 
 
@@ -159,7 +159,7 @@ def clear_mongo():
     Clears mongo database.
     """
     sh(
-        u"mongo --host {} {} --eval 'db.dropDatabase()' > /dev/null".format(
+        "mongo --host {} {} --eval 'db.dropDatabase()' > /dev/null".format(
             Env.MONGO_HOST,
             Env.BOK_CHOY_MONGO_DATABASE,
         )

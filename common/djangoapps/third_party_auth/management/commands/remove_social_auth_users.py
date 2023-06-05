@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from six.moves import input
 
-from third_party_auth.models import SAMLProviderConfig
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 
 log = logging.getLogger(__name__)
 

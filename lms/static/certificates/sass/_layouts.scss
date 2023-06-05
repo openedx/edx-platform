@@ -10,10 +10,10 @@
 // #BASE
 // ------------------------------
 %layout-wrapper {
-  margin-bottom: spacing-vertical(base);
+  margin-bottom: map-get($spacing-vertical, base);
   padding: 0 5%;
 
-  @media (min-width: $bp-screen-md) {
+  @include media-breakpoint-up(md) {
     padding: 0 2.5%;
   }
 }
@@ -26,8 +26,8 @@
 .wrapper-header {
   @extend %layout-wrapper;
 
-  padding-top: spacing-vertical(small);
-  padding-bottom: spacing-vertical(small);
+  padding-top: map-get($spacing-vertical, small);
+  padding-bottom: map-get($spacing-vertical, small);
 }
 
 .header-app {
@@ -36,7 +36,7 @@
   .logo {
     display: block;
 
-    @include size(rem(100) auto);
+    @include size(rem(100), auto);
 
     margin: 0 auto;
   }
@@ -49,7 +49,7 @@
 
 .header-app-title {
   @include text-align(center);
-  @include span(12);
+  @include make-col(12);
 
   margin: 0;
 }
@@ -58,8 +58,8 @@
 .wrapper-banner {
   @extend %layout-wrapper;
 
-  padding-top: spacing-vertical(small);
-  padding-bottom: spacing-vertical(small);
+  padding-top: map-get($spacing-vertical, small);
+  padding-bottom: map-get($spacing-vertical, small);
 
   .banner {
     @extend %layout;
@@ -68,13 +68,13 @@
 
 // message to user-centric banner
 .wrapper-banner-user {
-  margin-top: -(spacing-vertical(base)); // abut the global header, plz
+  margin-top: -(map-get($spacing-vertical, base)); // abut the global header, plz
 }
 
 .banner-user {
   @include text-align(center);
 
-  @media (min-width: $bp-screen-lg) {
+  @include media-breakpoint-up(lg) {
     @include text-align(left);
   }
 
@@ -82,16 +82,17 @@
     @include grid-container();
 
     .message-copy {
-      margin-bottom: spacing-vertical(small);
+      margin-bottom: map-get($spacing-vertical, small);
+      margin-top: 0;
     }
 
     .message-actions {
-      @include span(12);
+      @include make-col(12);
 
       .action {
         display: block;
         width: 100%;
-        margin: 0 auto spacing-vertical(small) auto;
+        margin: 0 auto map-get($spacing-vertical, small) auto;
 
         &:last-child {
           margin-bottom: 0;
@@ -99,8 +100,8 @@
 
         // CASE: icon display only
         &.icon-only {
-          @media (min-width: $bp-screen-md) {
-            padding: spacing-vertical(x-small) spacing-horizontal(base);
+          @include media-breakpoint-up(md) {
+            padding: map-get($spacing-vertical, x-small) map-get($spacing-horizontal, base);
 
             .icon {
               @include margin-right(0);
@@ -108,13 +109,13 @@
           }
         }
 
-        @media (min-width: $bp-screen-md) {
+        @include media-breakpoint-up(md) {
           display: inline-block;
           vertical-align: middle;
           min-width: 130px;
           width: auto;
           margin-bottom: 0;
-          margin-right: spacing-horizontal(mid-small);
+          margin-right: map-get($spacing-horizontal, mid-small);
 
           &:last-child {
             margin-right: 0;
@@ -135,36 +136,47 @@
 }
 
 .footer-app-copyright {
-  @media (min-width: $bp-screen-md) {
-    @include span(6, after);
+  @extend %copy-micro;
+
+  @include media-breakpoint-up(md) {
+    @include make-col(6);
+    @include margin-left(0);
 
     margin-bottom: 0;
   }
 }
 
 .footer-app-nav {
-  @media (min-width: $bp-screen-md) {
-    @include span(6, before);
+  @include media-breakpoint-up(md) {
+    @include make-col(6);
+    @include margin-right(0);
   }
 
   .list {
     .nav-item {
-      display: block;
-      margin-bottom: spacing-vertical(x-small);
+      @extend %copy-meta;
 
-      @media (min-width: $bp-screen-md) {
+      display: block;
+      font-weight: 600;
+      margin-bottom: map-get($spacing-vertical, x-small);
+
+      @include media-breakpoint-up(md) {
         display: inline-block;
         vertical-align: middle;
 
-        @include margin-right(spacing-horizontal(base));
+        @include margin-right(map-get($spacing-horizontal, base));
 
         margin-bottom: 0;
       }
     }
+
+    .action {
+      @extend %link;
+    }
   }
 
   .list-legal {
-    @media (min-width: $bp-screen-md) {
+    @include media-breakpoint-up(md) {
       @include text-align(right);
     }
   }
@@ -177,7 +189,7 @@
   .wrapper-introduction {
     @extend %layout-wrapper;
 
-    margin-bottom: spacing-vertical(large);
+    margin-bottom: map-get($spacing-vertical, large);
 
     .introduction {
       @extend %layout;
@@ -187,57 +199,59 @@
   .wrapper-accomplishment-rendering {
     @extend %layout-wrapper;
 
-    margin-bottom: spacing-vertical(small);
+    margin-bottom: map-get($spacing-vertical, small);
   }
 
   .accomplishment-rendering {
     @extend %layout;
 
     position: relative;
-    top: -(spacing-vertical(base));
+    top: -(map-get($spacing-vertical, base));
 
     .accomplishment-course,
     .accomplishment-recipient,
     .accomplishment-type {
-      @include span(12);
+      @include make-col(12);
     }
 
     .accomplishment-summary,
     .accomplishment-statement-detail {
-      @include span(12);
+      @include make-col(12);
     }
   }
 
   .accomplishment-orgs {
-    @include grid-row;
+    @include make-container();
 
     .wrapper-orgs {
       @include text-align(center);
+
+      margin: 0;
+      padding: 0;
     }
 
     .wrapper-organization {
-      @include span(6);
-      @include margin-right(spacing-horizontal(base));
+      @include make-col(6);
 
       display: inline-block;
       vertical-align: middle;
       height: rem(100);
-      margin-bottom: spacing-vertical(small);
+      width: calc(50% - 1rem);
 
       &:last-child {
         @include margin-right(0);
       }
 
-      @media (min-width: $bp-screen-md) {
-        @include span(3);
+      @include media-breakpoint-up(md) {
+        @include make-col(3);
       }
 
-      @media (min-width: $bp-screen-lg) {
-        @include span(2);
+      @include media-breakpoint-up(lg) {
+        @include make-col(2);
       }
 
-      @media (min-width: $bp-screen-xl) {
-        @include span(2);
+      @include media-breakpoint-up(xl) {
+        @include make-col(2);
       }
     }
 
@@ -255,6 +269,10 @@
       @include left(50%);
 
       transform: translate(-50%, -50%);
+
+      @include rtl {
+        transform: translate(50%, -50%);
+      }
     }
   }
 
@@ -266,26 +284,27 @@
     .signatory {
       display: inline-block;
       vertical-align: middle;
+      width: calc(100% - 1rem);
 
-      @include span(12);
+      @include make-col(12);
 
-      @media (min-width: $bp-screen-md) {
-        @include span(4);
+      @include media-breakpoint-up(md) {
+        @include make-col(4);
       }
 
-      @media (min-width: $bp-screen-lg) {
-        @include span(3);
+      @include media-breakpoint-up(lg) {
+        @include make-col(3);
       }
 
-      @media (min-width: $bp-screen-xl) {
-        @include span(3);
+      @include media-breakpoint-up(xl) {
+        @include make-col(3);
       }
 
       .signatory-signature {
         display: block;
         max-width: 100%;
         max-height: rem(100);
-        padding: spacing-vertical(small) spacing-horizontal(small);
+        padding: map-get($spacing-vertical, small) map-get($spacing-horizontal, small);
       }
     }
   }
@@ -297,29 +316,33 @@
       @extend %layout;
 
       .accomplishment-metadata-title {
-        @include span(12);
+        @include make-col(12);
       }
     }
 
     .wrapper-metadata {
       @extend %layout;
 
+      @include make-container();
+
+      padding: 0;
+
       .metadata {
         @extend %divider-2;
 
-        @include span(12);
+        @include make-col(12);
 
-        margin-bottom: spacing-vertical(small);
-        border-bottom-color: palette(grayscale, x-back);
-        padding-bottom: spacing-vertical(small);
+        margin-bottom: map-get($spacing-vertical, small);
+        border-bottom-color: $gray-x-back;
+        padding-bottom: map-get($spacing-vertical, small);
 
         &:last-child {
           border-bottom: none;
           padding-bottom: 0;
         }
 
-        @media (min-width: $bp-screen-md) {
-          @include span(4);
+        @include media-breakpoint-up(md) {
+          @include make-col(4);
 
           border-bottom: none;
           padding-bottom: 0;
@@ -336,15 +359,15 @@
     }
 
     .accomplishment-brief {
-      margin-bottom: spacing-vertical(small);
+      margin-bottom: map-get($spacing-vertical, small);
 
-      @media (min-width: $bp-screen-md) {
-        @include span(6);
+      @include media-breakpoint-up(md) {
+        @include make-col(6);
       }
 
       .accomplishment-type-symbol {
         @include size(rem(50));
-        @include margin-right(spacing-horizontal(base));
+        @include margin-right(map-get($spacing-horizontal, base));
       }
     }
   }
@@ -357,16 +380,39 @@
     }
 
     .about-item {
-      margin-bottom: spacing-vertical(base);
+      margin-bottom: map-get($spacing-vertical, base);
 
       &:last-child {
         margin-bottom: 0;
       }
 
-      @media (min-width: $bp-screen-md) {
-        @include span(6);
+      @include media-breakpoint-up(md) {
+        @include make-col(6);
 
         margin-bottom: 0;
+      }
+
+      a {
+        @extend %link;
+      }
+
+      .about-edx-title,
+      .about-title {
+        font-weight: 400;
+        margin-top: 0;
+
+        @include margin(0, rem(8), rem(10), rem(8));
+      }
+
+      .about-copy,
+      .about-edx-copy {
+        @extend %copy-meta;
+
+        margin: 0 rem(8);
+
+        p {
+          margin-top: 0;
+        }
       }
     }
   }

@@ -22,5 +22,9 @@ CATALOG_COURSE_PROGRAMS_CACHE_KEY_TPL = 'catalog-course-programs-{course_uuid}'
 # that live in the same environment).
 PROGRAMS_BY_TYPE_CACHE_KEY_TPL = 'programs-by-type-{site_id}-{program_type}'
 
+# Site-aware cache key template used to locate an item containing
+# a list of all program UUIDs with a certain program slug
+PROGRAMS_BY_TYPE_SLUG_CACHE_KEY_TPL = 'programs-by-type-slug-{site_id}-{program_slug}'
+
 # Template used to create cache keys for organization to program uuids.
 PROGRAMS_BY_ORGANIZATION_CACHE_KEY_TPL = 'organization-programs-{org_key}'

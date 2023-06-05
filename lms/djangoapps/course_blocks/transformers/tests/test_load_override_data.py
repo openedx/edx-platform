@@ -11,7 +11,7 @@ import pytz
 from lms.djangoapps.course_blocks.transformers.load_override_data import REQUESTED_FIELDS, OverrideDataTransformer
 from lms.djangoapps.courseware.student_field_overrides import get_override_for_user, override_field_for_user
 from openedx.core.djangoapps.content.block_structure.factory import BlockStructureFactory
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory

@@ -4,9 +4,10 @@
 <%!
 import logging
 import six
+from six.moves.urllib.parse import quote
 
 from cms.djangoapps.contentstore.config.waffle_utils import should_show_checklists_quality
-from util.date_utils import get_default_time_display
+from common.djangoapps.util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
@@ -114,6 +115,47 @@ from django.urls import reverse
         </div>
       </div>
     %endif
+  
+  %if proctoring_errors:
+    <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
+      <div class="alert announcement has-actions">
+        <span class="feedback-symbol fa fa-warning" aria-hidden="true"></span>
+
+        <div class="exam-settings-alert copy">
+          <h2 class="title title-3">${_("This course has proctored exam settings that are incomplete or invalid.")}</h2>
+          <p>
+            % if course_authoring_microfrontend_url:
+              <% url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='') %>
+              ${Text(_("To update these settings go to the {link_start}Proctored Exam Settings page{link_end}.")).format(
+                link_start=HTML('<a href="{course_authoring_microfrontend_url}/proctored-exam-settings/{url_encoded_course_id}">').format(
+                  course_authoring_microfrontend_url=course_authoring_microfrontend_url,
+                  url_encoded_course_id=url_encoded_course_id,
+                ),
+                link_end=HTML("</a>")
+              )}
+            % else:
+              ${Text(_("To update these settings go to the {link_start}Advanced Settings page{link_end}.")).format(
+                link_start=HTML('<a href="{advance_settings_url}">').format(advance_settings_url=advance_settings_url),
+                link_end=HTML("</a>")
+              )}
+            % endif
+          </p>
+          <div class="errors-list">
+            <nav class="nav-related" aria-label="${_('Proctoring Settings Errors')}">
+              <ul>
+                % for error in proctoring_errors:
+                  <li class="nav-item">
+                    <h3 class="title title-4">${error.get('model', {}).get('display_name')}</h3>
+                    <p>${error.get('message')}</p>
+                  </li>
+                % endfor
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  %endif
 
 </%block>
 

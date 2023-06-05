@@ -14,7 +14,7 @@ from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, Cours
 from openedx.core.djangoapps.credentials.signals import is_course_run_in_a_program, send_grade_if_interesting
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfigurationFactory, SiteFactory
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory as XModuleCourseFactory
 

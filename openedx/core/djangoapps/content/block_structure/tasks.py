@@ -60,7 +60,7 @@ def _update_course_in_cache(self, **kwargs):
     Updates the course blocks (mongo -> BlockStructure) for the specified course.
     """
     if kwargs.get('with_storage'):
-        waffle().override_for_request(STORAGE_BACKING_FOR_CACHE)
+        waffle().set_request_cache_with_short_name(STORAGE_BACKING_FOR_CACHE, True)
     _call_and_retry_if_needed(self, api.update_course_in_cache, **kwargs)
 
 
@@ -89,7 +89,7 @@ def _get_course_in_cache(self, **kwargs):
     Gets the course blocks for the specified course, updating the cache if needed.
     """
     if kwargs.get('with_storage'):
-        waffle().override_for_request(STORAGE_BACKING_FOR_CACHE)
+        waffle().set_request_cache_with_short_name(STORAGE_BACKING_FOR_CACHE, True)
     _call_and_retry_if_needed(self, api.get_course_in_cache, **kwargs)
 
 

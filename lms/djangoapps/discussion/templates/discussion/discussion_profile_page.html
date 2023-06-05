@@ -48,7 +48,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
             <div>
                 <h2 class="discussion-profile-title">${_("Discussion")}</h2>
                 <%def name="span(num)"><span class="discussion-count">${num}</span></%def>
-                <span class="user-name"><a href="${learner_profile_page_url}">${django_user.username}</a></span>
+                <span data-hj-suppress class="user-name"><a href="${learner_profile_page_url}">${django_user.username}</a></span>
                 <span class="discussion-profile-info">
                     <span class="user-roles">${", ".join(_(role_name) for role_name in django_user_roles)}</span>
                 </span>

@@ -4,7 +4,7 @@
 from django.test import TestCase
 
 from openedx.features.calendar_sync import get_calendar_event_id
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 TEST_PASSWORD = 'test'
 

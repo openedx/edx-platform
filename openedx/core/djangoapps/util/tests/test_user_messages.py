@@ -9,7 +9,7 @@ from django.test import RequestFactory, TestCase
 
 from common.test.utils import normalize_repr
 from openedx.core.djangolib.markup import HTML, Text
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 from ..user_messages import PageLevelMessages, UserMessageType
 

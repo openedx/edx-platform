@@ -3,8 +3,8 @@
         "pk": 1,
         "model": "waffle.flag",
         "fields": {
-            "name": "course_experience.course_outline_page",
-            "everyone": false
+            "name": "course_experience.disable_course_outline_page",
+            "everyone": true
         }
     },
     {

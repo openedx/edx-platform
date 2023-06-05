@@ -11,7 +11,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

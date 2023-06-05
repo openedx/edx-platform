@@ -64,3 +64,15 @@ from openedx.core.djangolib.markup import HTML
 
 <%include file="_underscore_templates.html" />
 <%include file="_thread_list_template.html" />
+
+<%static:require_module_async module_name="js/commerce/track_ecommerce_events" class_name="TrackECommerceEvents">
+
+  var fbeLink = $("#FBE_banner");
+
+  TrackECommerceEvents.trackUpsellClick(fbeLink, 'discussion_audit_access_expires', {
+      pageName: "discussion_tab",
+      linkType: "link",
+      linkCategory: "FBE_banner"
+  });
+
+</%static:require_module_async>

@@ -10,7 +10,7 @@ from django.http import Http404
 from django.test.client import RequestFactory
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
-from student.tests.factories import UserFactory, AdminFactory
+from common.djangoapps.student.tests.factories import UserFactory, AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 

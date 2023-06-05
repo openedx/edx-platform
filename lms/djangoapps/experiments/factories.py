@@ -6,8 +6,8 @@ Experimentation factories
 import factory
 import factory.fuzzy
 
-from experiments.models import ExperimentData, ExperimentKeyValue
-from student.tests.factories import UserFactory
+from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class ExperimentDataFactory(factory.DjangoModelFactory):

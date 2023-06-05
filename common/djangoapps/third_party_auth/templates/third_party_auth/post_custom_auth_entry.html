@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{% trans "Please wait" %}</title>
+    <title>{% trans "Please wait" as tmsg %}{{tmsg|force_escape}}</title>
     <style type="text/css">
     #djDebug {display:none;}
     </style>

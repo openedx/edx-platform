@@ -72,13 +72,6 @@ var edx = edx || {};
                 verificationGoodUntil: $el.data('verification-good-until'),
                 isABTesting: $el.data('is-ab-testing')
             },
-            'payment-confirmation-step': {
-                courseKey: $el.data('course-key'),
-                courseName: $el.data('course-name'),
-                coursewareUrl: $el.data('courseware-url'),
-                platformName: $el.data('platform-name'),
-                requirements: $el.data('requirements')
-            },
             'face-photo-step': {
                 platformName: $el.data('platform-name'),
                 captureSoundPath: $el.data('capture-sound')

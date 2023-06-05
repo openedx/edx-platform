@@ -19,8 +19,8 @@ from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 from six.moves import range
 
-from bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
-from bulk_email.tasks import perform_delegate_email_batches, send_course_email
+from lms.djangoapps.bulk_email.models import SEND_TO_MYSELF, BulkEmailFlag, CourseEmail
+from lms.djangoapps.bulk_email.tasks import perform_delegate_email_batches, send_course_email
 from lms.djangoapps.instructor_task.exceptions import DuplicateTaskException
 from lms.djangoapps.instructor_task.models import InstructorTask
 from lms.djangoapps.instructor_task.subtasks import (
@@ -30,7 +30,7 @@ from lms.djangoapps.instructor_task.subtasks import (
     initialize_subtask_info,
     update_subtask_status
 )
-from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -41,7 +41,7 @@ class EmailTestException(Exception):
 
 
 @ddt.ddt
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
+@patch('lms.djangoapps.bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class TestEmailErrors(ModuleStoreTestCase):
     """
     Test that errors from sending email are handled properly.
@@ -75,8 +75,8 @@ class TestEmailErrors(ModuleStoreTestCase):
         super(TestEmailErrors, cls).tearDownClass()
         BulkEmailFlag.objects.all().delete()
 
-    @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.send_course_email.retry')
+    @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
+    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry')
     def test_data_err_retry(self, retry, get_conn):
         """
         Test that celery handles transient SMTPDataErrors by retrying.
@@ -97,9 +97,9 @@ class TestEmailErrors(ModuleStoreTestCase):
         exc = kwargs['exc']
         self.assertIsInstance(exc, SMTPDataError)
 
-    @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.update_subtask_status')
-    @patch('bulk_email.tasks.send_course_email.retry')
+    @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
+    @patch('lms.djangoapps.bulk_email.tasks.update_subtask_status')
+    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry')
     def test_data_err_fail(self, retry, result, get_conn):
         """
         Test that celery handles permanent SMTPDataErrors by failing and not retrying.
@@ -130,8 +130,8 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertEqual(subtask_status.failed, expected_fails)
         self.assertEqual(subtask_status.succeeded, settings.BULK_EMAIL_EMAILS_PER_TASK - expected_fails)
 
-    @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.send_course_email.retry')
+    @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
+    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry')
     def test_disconn_err_retry(self, retry, get_conn):
         """
         Test that celery handles SMTPServerDisconnected by retrying.
@@ -151,8 +151,8 @@ class TestEmailErrors(ModuleStoreTestCase):
         exc = kwargs['exc']
         self.assertIsInstance(exc, SMTPServerDisconnected)
 
-    @patch('bulk_email.tasks.get_connection', autospec=True)
-    @patch('bulk_email.tasks.send_course_email.retry')
+    @patch('lms.djangoapps.bulk_email.tasks.get_connection', autospec=True)
+    @patch('lms.djangoapps.bulk_email.tasks.send_course_email.retry')
     def test_conn_err_retry(self, retry, get_conn):
         """
         Test that celery handles SMTPConnectError by retrying.
@@ -173,8 +173,8 @@ class TestEmailErrors(ModuleStoreTestCase):
         exc = kwargs['exc']
         self.assertIsInstance(exc, SMTPConnectError)
 
-    @patch('bulk_email.tasks.SubtaskStatus.increment')
-    @patch('bulk_email.tasks.log')
+    @patch('lms.djangoapps.bulk_email.tasks.SubtaskStatus.increment')
+    @patch('lms.djangoapps.bulk_email.tasks.log')
     def test_nonexistent_email(self, mock_log, result):
         """
         Tests retries when the email doesn't exist
@@ -368,5 +368,5 @@ class TestEmailErrors(ModuleStoreTestCase):
         with self.assertRaises(CourseEmail.DoesNotExist):
             # we skip the call that updates subtask status, since we've not set up the InstructorTask
             # for the subtask, and it's not important to the test.
-            with patch('bulk_email.tasks.update_subtask_status'):
+            with patch('lms.djangoapps.bulk_email.tasks.update_subtask_status'):
                 send_course_email(entry_id, bogus_email_id, to_list, global_email_context, subtask_status.to_dict())

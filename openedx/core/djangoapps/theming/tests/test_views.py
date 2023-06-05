@@ -10,7 +10,7 @@ from django.test import TestCase
 
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
 from openedx.core.djangoapps.theming.middleware import CurrentSiteThemeMiddleware
-from student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import UserFactory
 
 THEMING_ADMIN_URL = '/theming/admin'
 TEST_THEME_NAME = 'test-theme'

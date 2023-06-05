@@ -4,7 +4,6 @@ Unittests for migrating a course to split mongo
 
 
 import six
-
 from django.core.management import CommandError, call_command
 from django.test import TestCase
 

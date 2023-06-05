@@ -12,6 +12,7 @@ from functools import wraps
 
 import six
 from django import forms
+from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
@@ -206,7 +207,8 @@ class FormDescription(object):
             "restrictions": {},
             "errorMessages": {},
             "supplementalLink": supplementalLink,
-            "supplementalText": supplementalText
+            "supplementalText": supplementalText,
+            "loginIssueSupportLink": settings.LOGIN_ISSUE_SUPPORT_LINK,
         }
 
         field_override = self._field_overrides.get(name, {})

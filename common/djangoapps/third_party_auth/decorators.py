@@ -10,8 +10,8 @@ from django.shortcuts import redirect
 from django.utils.decorators import available_attrs
 from six.moves.urllib.parse import urlencode, urlparse
 
-from third_party_auth.models import LTIProviderConfig
-from third_party_auth.provider import Registry
+from common.djangoapps.third_party_auth.models import LTIProviderConfig
+from common.djangoapps.third_party_auth.provider import Registry
 
 
 def xframe_allow_whitelisted(view_func):

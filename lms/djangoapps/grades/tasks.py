@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
-from edx_django_utils.monitoring import set_custom_metric, set_custom_metrics_for_course_key
+from edx_django_utils.monitoring import set_custom_attribute, set_custom_attributes_for_course_key, set_code_owner_attribute
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
@@ -21,9 +21,9 @@ from lms.djangoapps.courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.models import ComputeGradesSetting
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from student.models import CourseEnrollment
-from track.event_transaction_utils import set_event_transaction_id, set_event_transaction_type
-from util.date_utils import from_timestamp
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.track.event_transaction_utils import set_event_transaction_id, set_event_transaction_type
+from common.djangoapps.util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
 
 from .config.waffle import DISABLE_REGRADE_ON_POLICY_CHANGE, waffle
@@ -48,7 +48,8 @@ RETRY_DELAY_SECONDS = 40
 SUBSECTION_GRADE_TIMEOUT_SECONDS = 300
 
 
-@task(base=LoggedPersistOnFailureTask, routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY)
+@task(base=LoggedPersistOnFailureTask)
+@set_code_owner_attribute
 def compute_all_grades_for_course(**kwargs):
     """
     Compute grades for all students in the specified course.
@@ -69,7 +70,7 @@ def compute_all_grades_for_course(**kwargs):
                 'batch_size': batch_size,
             })
             compute_grades_for_course_v2.apply_async(
-                kwargs=kwargs, routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY
+                kwargs=kwargs, queue=settings.POLICY_CHANGE_GRADES_ROUTING_KEY
             )
 
 
@@ -131,7 +132,6 @@ def compute_grades_for_course(course_key, offset, batch_size, **kwargs):  # pyli
     time_limit=SUBSECTION_GRADE_TIMEOUT_SECONDS,
     max_retries=2,
     default_retry_delay=RETRY_DELAY_SECONDS,
-    routing_key=settings.POLICY_CHANGE_GRADES_ROUTING_KEY
 )
 def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint: disable=unused-argument
     """
@@ -171,8 +171,7 @@ def recalculate_course_and_subsection_grades_for_user(self, **kwargs):  # pylint
     base=LoggedPersistOnFailureTask,
     time_limit=SUBSECTION_GRADE_TIMEOUT_SECONDS,
     max_retries=2,
-    default_retry_delay=RETRY_DELAY_SECONDS,
-    routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY
+    default_retry_delay=RETRY_DELAY_SECONDS
 )
 def recalculate_subsection_grade_v3(self, **kwargs):
     """
@@ -213,8 +212,8 @@ def _recalculate_subsection_grade(self, **kwargs):
 
         scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
 
-        set_custom_metrics_for_course_key(course_key)
-        set_custom_metric('usage_id', six.text_type(scored_block_usage_key))
+        set_custom_attributes_for_course_key(course_key)
+        set_custom_attribute('usage_id', six.text_type(scored_block_usage_key))
 
         # The request cache is not maintained on celery workers,
         # where this code runs. So we take the values from the

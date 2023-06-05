@@ -6,17 +6,21 @@ This module contains signals related to enterprise.
 import logging
 
 import six
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from enterprise.models import EnterpriseCourseEnrollment, EnterpriseCustomer, EnterpriseCustomerUser
 from integrated_channels.integrated_channel.tasks import transmit_single_learner_data
+from slumber.exceptions import HttpClientError
 
-from email_marketing.tasks import update_user
+from lms.djangoapps.email_marketing.tasks import update_user
+from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_NOW_PASSED
 from openedx.features.enterprise_support.api import enterprise_enabled
 from openedx.features.enterprise_support.tasks import clear_enterprise_customer_data_consent_share_cache
 from openedx.features.enterprise_support.utils import clear_data_consent_share_cache, is_enterprise_learner
+from common.djangoapps.student.signals import UNENROLL_DONE
 
 log = logging.getLogger(__name__)
 
@@ -80,3 +84,36 @@ def handle_enterprise_learner_passing_grade(sender, user, course_id, **kwargs): 
         }
 
         transmit_single_learner_data.apply_async(kwargs=kwargs)
+
+
+@receiver(UNENROLL_DONE)
+def refund_order_voucher(sender, course_enrollment, skip_refund=False, **kwargs):  # pylint: disable=unused-argument
+    """
+        Call the /api/v2/enterprise/coupons/create_refunded_voucher/ API to create new voucher and assign it to user.
+    """
+
+    if skip_refund:
+        return
+    if not course_enrollment.refundable():
+        return
+    if not EnterpriseCourseEnrollment.objects.filter(
+        enterprise_customer_user__user_id=course_enrollment.user_id,
+        course_id=str(course_enrollment.course.id)
+    ).exists():
+        return
+
+    service_user = User.objects.get(username=settings.ECOMMERCE_SERVICE_WORKER_USERNAME)
+    client = ecommerce_api_client(service_user)
+    order_number = course_enrollment.get_order_attribute_value('order_number')
+    if order_number:
+        error_message = u"Encountered {} from ecommerce while creating refund voucher. Order={}, enrollment={}, user={}"
+        try:
+            client.enterprise.coupons.create_refunded_voucher.post({"order": order_number})
+        except HttpClientError as ex:
+            log.info(
+                error_message.format(type(ex).__name__, order_number, course_enrollment, course_enrollment.user)
+            )
+        except Exception as ex:  # pylint: disable=broad-except
+            log.exception(
+                error_message.format(type(ex).__name__, order_number, course_enrollment, course_enrollment.user)
+            )

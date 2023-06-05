@@ -15,7 +15,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 import geoip2.database
-from student.auth import has_course_author_access
+from common.djangoapps.student.auth import has_course_author_access
 
 from .models import CountryAccessRule, RestrictedCourse
 

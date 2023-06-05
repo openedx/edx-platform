@@ -2,9 +2,8 @@
 Tests for experimentation feature flags
 """
 
-import pytz
-
 import ddt
+import pytz
 from crum import set_current_request
 from dateutil import parser
 from django.test.client import RequestFactory
@@ -12,12 +11,14 @@ from edx_django_utils.cache import RequestCache
 from mock import patch
 from opaque_keys.edx.keys import CourseKey
 
-from experiments.factories import ExperimentKeyValueFactory
-from experiments.flags import ExperimentWaffleFlag
+from edx_toggles.toggles.testutils import override_waffle_flag
+from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
+from lms.djangoapps.experiments.factories import ExperimentKeyValueFactory
+from lms.djangoapps.experiments.flags import ExperimentWaffleFlag
 from openedx.core.djangoapps.site_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-from openedx.core.djangoapps.waffle_utils.testutils import override_waffle_flag
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from openedx.core.djangoapps.waffle_utils.models import WaffleFlagCourseOverrideModel
+from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 
@@ -36,17 +37,17 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
         self.addCleanup(set_current_request, None)
         set_current_request(self.request)
 
-        self.flag = ExperimentWaffleFlag('experiments', 'test', num_buckets=2, experiment_id=0)
+        self.flag = ExperimentWaffleFlag('experiments', 'test', __name__, num_buckets=2, experiment_id=0)
         self.key = CourseKey.from_string('a/b/c')
 
-        bucket_patch = patch('experiments.flags.stable_bucketing_hash_group', return_value=1)
+        bucket_patch = patch('lms.djangoapps.experiments.flags.stable_bucketing_hash_group', return_value=1)
         self.addCleanup(bucket_patch.stop)
         bucket_patch.start()
 
         self.addCleanup(RequestCache.clear_all_namespaces)
 
     def get_bucket(self, track=False, active=True):
-        # Does not use ExperimentWaffleFlag.override, since that shortcuts get_bucket and we want to test internals
+        # Does not use override_experiment_waffle_flag, since that shortcuts get_bucket and we want to test internals
         with override_waffle_flag(self.flag, active):
             with override_waffle_flag(self.flag.bucket_flags[1], True):
                 return self.flag.get_bucket(course_key=self.key, track=track)
@@ -103,13 +104,13 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
     )
     @ddt.unpack
     def test_forcing_bucket(self, active, expected_bucket):
-        bucket_flag = CourseWaffleFlag('experiments', 'test.0')
-        with bucket_flag.override(active=active):
+        bucket_flag = CourseWaffleFlag('experiments', 'test.0', __name__)
+        with override_waffle_flag(bucket_flag, active=active):
             self.assertEqual(self.get_bucket(), expected_bucket)
 
     def test_tracking(self):
         # Run twice, with same request
-        with patch('experiments.flags.segment') as segment_mock:
+        with patch('lms.djangoapps.experiments.flags.segment') as segment_mock:
             self.assertEqual(self.get_bucket(track=True), 1)
             RequestCache.clear_all_namespaces()  # we want to force get_bucket to check session, not early exit
             self.assertEqual(self.get_bucket(track=True), 1)
@@ -135,12 +136,10 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
         self.assertEqual(self.get_bucket(active=False), 1)  # still returns 1!
 
     def test_is_enabled(self):
-        with patch('experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=1):
-            self.assertEqual(self.flag.is_enabled_without_course_context(), True)
+        with patch('lms.djangoapps.experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=1):
             self.assertEqual(self.flag.is_enabled(self.key), True)
             self.assertEqual(self.flag.is_enabled(), True)
-        with patch('experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=0):
-            self.assertEqual(self.flag.is_enabled_without_course_context(), False)
+        with patch('lms.djangoapps.experiments.flags.ExperimentWaffleFlag.get_bucket', return_value=0):
             self.assertEqual(self.flag.is_enabled(self.key), False)
             self.assertEqual(self.flag.is_enabled(), False)
 
@@ -153,6 +152,106 @@ class ExperimentWaffleFlagTests(SharedModuleStoreTestCase):
     @ddt.unpack
     # Test the override method
     def test_override_method(self, active, bucket_override, expected_bucket):
-        with self.flag.override(active=active, bucket=bucket_override):
+        with override_experiment_waffle_flag(self.flag, active=active, bucket=bucket_override):
             self.assertEqual(self.flag.get_bucket(), expected_bucket)
             self.assertEqual(self.flag.is_experiment_on(), active)
+
+
+class ExperimentWaffleFlagCourseAwarenessTest(SharedModuleStoreTestCase):
+    """
+    Tests for how course context awareness/unawareness interacts with the
+    ExperimentWaffleFlag class.
+    """
+    course_aware_flag = ExperimentWaffleFlag(
+        'exp', 'aware', __name__, num_buckets=20, use_course_aware_bucketing=True,
+    )
+    course_aware_subflag = CourseWaffleFlag('exp', 'aware.1', __name__)
+
+    course_unaware_flag = ExperimentWaffleFlag(
+        'exp', 'unaware', __name__, num_buckets=20, use_course_aware_bucketing=False,
+    )
+    course_unaware_subflag = CourseWaffleFlag('exp', 'unaware.1', __name__)
+
+    course_key_1 = CourseKey.from_string("x/y/1")
+    course_key_2 = CourseKey.from_string("x/y/22")
+    course_key_3 = CourseKey.from_string("x/y/333")
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        # Force all users into Bucket 1 for course at `course_key_1`.
+        WaffleFlagCourseOverrideModel.objects.create(
+            waffle_flag="exp.aware.1", course_id=cls.course_key_1, enabled=True
+        )
+        WaffleFlagCourseOverrideModel.objects.create(
+            waffle_flag="exp.unaware.1", course_id=cls.course_key_1, enabled=True
+        )
+        cls.user = UserFactory()
+
+    def setUp(self):
+        super().setUp()
+        self.request = RequestFactory().request()
+        self.request.session = {}
+        self.request.site = SiteFactory()
+        self.request.user = self.user
+        self.addCleanup(set_current_request, None)
+        set_current_request(self.request)
+        self.addCleanup(RequestCache.clear_all_namespaces)
+
+        # Enable all experiment waffle flags.
+        experiment_waffle_flag_patcher = patch.object(
+            ExperimentWaffleFlag, 'is_experiment_on', return_value=True
+        )
+        experiment_waffle_flag_patcher.start()
+        self.addCleanup(experiment_waffle_flag_patcher.stop)
+
+        # Use our custom fake `stable_bucketing_hash_group` implementation.
+        stable_bucket_patcher = patch(
+            'lms.djangoapps.experiments.flags.stable_bucketing_hash_group', self._mock_stable_bucket
+        )
+        stable_bucket_patcher.start()
+        self.addCleanup(stable_bucket_patcher.stop)
+
+    @staticmethod
+    def _mock_stable_bucket(group_name, *_args, **_kwargs):
+        """
+        A fake version of `stable_bucketing_hash_group` that just returns
+        the length of `group_name`.
+        """
+        return len(group_name)
+
+    def test_course_aware_bucketing(self):
+        """
+        Test behavior of an experiment flag configured wtih course-aware bucket hashing.
+        """
+
+        # Expect queries for Course 1 to be forced into Bucket 1
+        # due to `course_aware_subflag`.
+        assert self.course_aware_flag.get_bucket(self.course_key_1) == 1
+
+        # Because we are using course-aware bucket hashing, different
+        # courses may default to different buckets.
+        # In the case of Courses 2 and 3 here, we expect two different buckets.
+        assert self.course_aware_flag.get_bucket(self.course_key_2) == 16
+        assert self.course_aware_flag.get_bucket(self.course_key_3) == 17
+
+        # We can still query a course-aware flag outside of course context,
+        # which has its own default bucket.
+        assert self.course_aware_flag.get_bucket() == 9
+
+    def test_course_unaware_bucketing(self):
+        """
+        Test behavior of an experiment flag configured wtih course-unaware bucket hashing.
+        """
+
+        # Expect queries for Course 1 to be forced into Bucket 1
+        # due to `course_unaware_subflag`.
+        # This should happen in spite of the fact that *default* bucketing
+        # is unaware of courses.
+        assert self.course_unaware_flag.get_bucket(self.course_key_1) == 1
+
+        # Expect queries for Course 2, queries for Course 3, and queries outside
+        # the context of the course to all be hashed into the same default bucket.
+        assert self.course_unaware_flag.get_bucket(self.course_key_2) == 11
+        assert self.course_unaware_flag.get_bucket(self.course_key_3) == 11
+        assert self.course_unaware_flag.get_bucket() == 11

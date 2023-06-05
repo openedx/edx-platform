@@ -12,7 +12,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 from social_django.models import UserSocialAuth
 
-from edxmako.shortcuts import render_to_response
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from lms.djangoapps.program_enrollments.api import (
     fetch_program_enrollments_by_student,
     get_users_by_external_keys_and_org_key,
@@ -29,7 +29,7 @@ from lms.djangoapps.support.serializers import (
     serialize_user_info
 )
 from lms.djangoapps.verify_student.services import IDVerificationService
-from third_party_auth.models import SAMLProviderConfig
+from common.djangoapps.third_party_auth.models import SAMLProviderConfig
 
 TEMPLATE_PATH = 'support/link_program_enrollments.html'
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S'

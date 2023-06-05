@@ -56,7 +56,7 @@ class ContentTypeGatingFieldOverride(FieldOverrideProvider):
             if parent is not None:
                 merged_group_access = parent.merged_group_access
                 if merged_group_access and CONTENT_GATING_PARTITION_ID in merged_group_access:
-                    return original_group_access
+                    return default
 
         original_group_access.setdefault(
             CONTENT_GATING_PARTITION_ID,
@@ -67,5 +67,5 @@ class ContentTypeGatingFieldOverride(FieldOverrideProvider):
 
     @classmethod
     def enabled_for(cls, course):
-        """This simple override provider is always enabled"""
+        """Check our stackable config for this specific course"""
         return ContentTypeGatingConfig.enabled_for_course(course_key=course.scope_ids.usage_id.course_key)

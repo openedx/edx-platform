@@ -6,15 +6,22 @@ Experimentation views
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
+from django.http import Http404
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
+from lms.djangoapps.courseware import courses
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import permissions, viewsets
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from common.djangoapps.util.json_request import JsonResponse
 
-from experiments import filters, serializers
-from experiments.models import ExperimentData, ExperimentKeyValue
-from experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly
+from lms.djangoapps.experiments import filters, serializers
+from lms.djangoapps.experiments.models import ExperimentData, ExperimentKeyValue
+from lms.djangoapps.experiments.permissions import IsStaffOrOwner, IsStaffOrReadOnly, IsStaffOrReadOnlyForSelf
+from lms.djangoapps.experiments.utils import get_experiment_user_metadata_context
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
+from common.djangoapps.student.models import get_user_by_username_or_email
 
 User = get_user_model()  # pylint: disable=invalid-name
 
@@ -84,3 +91,27 @@ class ExperimentKeyValueViewSet(viewsets.ModelViewSet):
     permission_classes = (IsStaffOrReadOnly,)
     queryset = ExperimentKeyValue.objects.all()
     serializer_class = serializers.ExperimentKeyValueSerializer
+
+
+class UserMetaDataView(APIView):
+    authentication_classes = (JwtAuthentication, ExperimentCrossDomainSessionAuth,)
+    permission_classes = (IsStaffOrReadOnlyForSelf,)
+
+    def get(self, request, course_id=None, username=None):
+        """ Return user-metadata for the given course and user """
+        try:
+            user = get_user_by_username_or_email(username)
+        except User.DoesNotExist:
+            # Note: this will only be seen by staff, for administrative de-bugging purposes
+            message = "Provided user is not found"
+            return JsonResponse({'message': message}, status=404)
+
+        try:
+            course = courses.get_course_by_id(CourseKey.from_string(course_id))
+        except Http404:
+            message = "Provided course is not found"
+            return JsonResponse({'message': message}, status=404)
+
+        context = get_experiment_user_metadata_context(course, user)
+        user_metadata = context.get('user_metadata')
+        return JsonResponse(user_metadata)

@@ -17,30 +17,30 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
     Test the Paver JavaScript testing tasks.
     """
 
-    EXPECTED_DELETE_JAVASCRIPT_REPORT_COMMAND = u'find {platform_root}/reports/javascript -type f -delete'
-    EXPECTED_INSTALL_NPM_ASSETS_COMMAND = u'install npm_assets'
+    EXPECTED_DELETE_JAVASCRIPT_REPORT_COMMAND = 'find {platform_root}/reports/javascript -type f -delete'
+    EXPECTED_INSTALL_NPM_ASSETS_COMMAND = 'install npm_assets'
     EXPECTED_KARMA_OPTIONS = (
-        u"{config_file} "
-        u"--single-run={single_run} "
-        u"--capture-timeout=60000 "
-        u"--junitreportpath="
-        u"{platform_root}/reports/javascript/javascript_xunit-{suite}.xml "
-        u"--browsers={browser}"
+        "{config_file} "
+        "--single-run={single_run} "
+        "--capture-timeout=60000 "
+        "--junitreportpath="
+        "{platform_root}/reports/javascript/javascript_xunit-{suite}.xml "
+        "--browsers={browser}"
     )
     EXPECTED_COVERAGE_OPTIONS = (
-        u' --coverage --coveragereportpath={platform_root}/reports/javascript/coverage-{suite}.xml'
+        ' --coverage --coveragereportpath={platform_root}/reports/javascript/coverage-{suite}.xml'
     )
 
     EXPECTED_COMMANDS = [
-        u"make report_dir",
-        u'git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads',
-        u"find . -name '.git' -prune -o -name '*.pyc' -exec rm {} \\;",
-        u'rm -rf test_root/log/auto_screenshots/*',
-        u"rm -rf /tmp/mako_[cl]ms",
+        "make report_dir",
+        'git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads',
+        "find . -name '.git' -prune -o -name '*.pyc' -exec rm {} \\;",
+        'rm -rf test_root/log/auto_screenshots/*',
+        "rm -rf /tmp/mako_[cl]ms",
     ]
 
     def setUp(self):
-        super(TestPaverJavaScriptTestTasks, self).setUp()
+        super().setUp()
 
         # Mock the paver @needs decorator
         self._mock_paver_needs = patch.object(pavelib.js_test.test_js, 'needs').start()
@@ -119,7 +119,7 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
         expected_messages.append(self.EXPECTED_INSTALL_NPM_ASSETS_COMMAND)
 
         command_template = (
-            u'nodejs --max_old_space_size=4096 node_modules/.bin/karma start {options}'
+            'nodejs --max_old_space_size=4096 node_modules/.bin/karma start {options}'
         )
 
         for suite in suites:
@@ -141,9 +141,9 @@ class TestPaverJavaScriptTestTasks(PaverTestCase):
                         suite=suite
                     )
                 if port:
-                    expected_test_tool_command += u" --port={port}".format(port=port)
+                    expected_test_tool_command += " --port={port}".format(port=port)
             else:
-                expected_test_tool_command = u'jest'
+                expected_test_tool_command = 'jest'
 
             expected_messages.append(expected_test_tool_command)
 

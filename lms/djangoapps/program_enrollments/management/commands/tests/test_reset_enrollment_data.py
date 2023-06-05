@@ -15,8 +15,8 @@ from six import StringIO
 from lms.djangoapps.program_enrollments.management.commands import reset_enrollment_data
 from lms.djangoapps.program_enrollments.models import ProgramCourseEnrollment, ProgramEnrollment
 from lms.djangoapps.program_enrollments.tests.factories import ProgramCourseEnrollmentFactory, ProgramEnrollmentFactory
-from student.models import CourseEnrollment
-from student.tests.factories import UserFactory
+from common.djangoapps.student.models import CourseEnrollment
+from common.djangoapps.student.tests.factories import UserFactory
 
 
 class TestResetEnrollmentData(TestCase):

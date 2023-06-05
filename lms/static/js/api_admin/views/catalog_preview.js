@@ -6,8 +6,9 @@
         'underscore',
         'gettext',
         'text!../../../templates/api_admin/catalog-results.underscore',
-        'text!../../../templates/api_admin/catalog-error.underscore'
-    ], function(Backbone, _, gettext, catalogResultsTpl, catalogErrorTpl) {
+        'text!../../../templates/api_admin/catalog-error.underscore',
+        'edx-ui-toolkit/js/utils/html-utils'
+    ], function(Backbone, _, gettext, catalogResultsTpl, catalogErrorTpl, HtmlUtils) {
         return Backbone.View.extend({
 
             events: {
@@ -20,9 +21,8 @@
             },
 
             render: function() {
-                this.$('#id_query').after(
-                    '<button class="preview-query">' + gettext('Preview this query') + '</button>'
-                );
+                // eslint-disable-next-line
+                this.$('#id_query').after(HtmlUtils.joinHtml(HtmlUtils.HTML('<button class="preview-query">'), gettext('Preview this query'), HtmlUtils.HTML('</button>')).toString());
                 return this;
             },
 
@@ -44,7 +44,10 @@
                     method: 'GET',
                     success: _.bind(this.renderCourses, this),
                     error: _.bind(function() {
-                        this.$('.preview-results').html(_.template(catalogErrorTpl)({}));
+                        HtmlUtils.setHtml(
+                            this.$('.preview-results'),
+                            HtmlUtils.template(catalogErrorTpl)({})
+                        );
                     }, this)
                 });
             },
@@ -54,10 +57,13 @@
              * courses API.
              */
             renderCourses: function(data) {
-                this.$('.preview-results').html(_.template(catalogResultsTpl)({
-                    courses: data.results,
-                    catalogApiUrl: this.catalogApiUrl
-                }));
+                HtmlUtils.setHtml(
+                    this.$('.preview-results'),
+                    HtmlUtils.template(catalogResultsTpl)({
+                        courses: data.results,
+                        catalogApiUrl: this.catalogApiUrl
+                    })
+                );
             }
         });
     });

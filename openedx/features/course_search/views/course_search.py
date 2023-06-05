@@ -18,7 +18,7 @@ from lms.djangoapps.courseware.courses import get_course_overview_with_access
 from lms.djangoapps.courseware.views.views import CourseTabView
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.features.course_experience import default_course_url_name
-from util.views import ensure_valid_course_key
+from common.djangoapps.util.views import ensure_valid_course_key
 
 
 class CourseSearchView(CourseTabView):
@@ -45,6 +45,7 @@ class CourseSearchFragmentView(EdxFragmentView):
     """
     A fragment to render the home page for a course.
     """
+
     def render_to_fragment(self, request, course_id=None, **kwargs):
         """
         Renders the course's home page as a fragment.
@@ -62,7 +63,7 @@ class CourseSearchFragmentView(EdxFragmentView):
             'course_url': course_url,
             'query': request.GET.get('query', ''),
             'disable_courseware_js': True,
-            'uses_pattern_library': True,
+            'uses_bootstrap': True,
         }
         html = render_to_string('course_search/course-search-fragment.html', context)
         return Fragment(html)

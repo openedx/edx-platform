@@ -71,6 +71,7 @@ import six
 import social_django
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth import logout
 from django.core.mail.message import EmailMessage
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
@@ -81,17 +82,17 @@ from social_core.pipeline import partial
 from social_core.pipeline.social_auth import associate_by_email
 from social_core.utils import module_member, slugify
 
-import third_party_auth
-from edxmako.shortcuts import render_to_string
+from common.djangoapps import third_party_auth
+from common.djangoapps.edxmako.shortcuts import render_to_string
 from lms.djangoapps.verify_student.models import SSOVerification
 from lms.djangoapps.verify_student.utils import earliest_allowed_verification_date
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api import accounts
 from openedx.core.djangoapps.user_authn import cookies as user_authn_cookies
 from openedx.features.edly.validators import is_edly_user_allowed_to_login_with_social_auth
-from third_party_auth.utils import user_exists
-from track import segment
-from util.json_request import JsonResponse
+from common.djangoapps.third_party_auth.utils import user_exists
+from common.djangoapps.track import segment
+from common.djangoapps.util.json_request import JsonResponse
 
 from . import provider
 
@@ -672,10 +673,11 @@ def set_logged_in_cookies(backend=None, user=None, strategy=None, auth_entry=Non
 
     """
     if not is_api(auth_entry) and user is not None and user.is_authenticated:
+        request = strategy.request if strategy else None
         if not user.has_usable_password():
             msg = "Your account is disabled"
+            logout(request)
             return JsonResponse(msg, status=403)
-        request = strategy.request if strategy else None
         # n.b. for new users, user.is_active may be False at this point; set the cookie anyways.
         if request is not None:
             # Check that the cookie isn't already set.

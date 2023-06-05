@@ -5,6 +5,7 @@ Transformers.
 
 
 from abc import abstractmethod
+import functools
 
 
 class BlockStructureTransformer(object):
@@ -177,7 +178,8 @@ class FilteringTransformerMixin(BlockStructureTransformer):
         transform_block_filters calls will be combined and used in a single
         tree traversal.
         """
-        block_structure.filter_topological_traversal(self.transform_block_filters(usage_info, block_structure))
+        filters = self.transform_block_filters(usage_info, block_structure)
+        block_structure.filter_topological_traversal(combine_filters(block_structure, filters))
 
     @abstractmethod
     def transform_block_filters(self, usage_info, block_structure):
@@ -209,3 +211,19 @@ class FilteringTransformerMixin(BlockStructureTransformer):
                 transformer, that is to be transformed in place.
         """
         raise NotImplementedError
+
+
+def combine_filters(block_structure, filters):
+    return functools.reduce(
+        _filter_chain,
+        filters,
+        block_structure.create_universal_filter()
+    )
+
+
+def _filter_chain(accumulated, additional):
+    """
+    Given two functions that take a block_key and return a boolean, yield
+    a function that takes a block key, and 'ands' the functions together
+    """
+    return lambda block_key: accumulated(block_key) and additional(block_key)

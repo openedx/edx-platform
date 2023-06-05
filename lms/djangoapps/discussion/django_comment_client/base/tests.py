@@ -21,8 +21,8 @@ from six import text_type
 from six.moves import range
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
+from common.djangoapps.course_modes.models import CourseMode
+from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from lms.djangoapps.discussion.django_comment_client.base import views
 from lms.djangoapps.discussion.django_comment_client.tests.group_id import (
     CohortedTopicGroupIdTestMixin,
@@ -48,12 +48,12 @@ from openedx.core.djangoapps.django_comment_common.utils import (
 )
 from openedx.core.djangoapps.waffle_utils.testutils import WAFFLE_TABLES
 from openedx.core.lib.teams_config import TeamsConfig
-from student.roles import CourseStaffRole, UserBasedRole
-from student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
-from track.middleware import TrackMiddleware
-from track.views import segmentio
-from track.views.tests.base import SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
-from util.testing import UrlResetMixin
+from common.djangoapps.student.roles import CourseStaffRole, UserBasedRole
+from common.djangoapps.student.tests.factories import CourseAccessRoleFactory, CourseEnrollmentFactory, UserFactory
+from common.djangoapps.track.middleware import TrackMiddleware
+from common.djangoapps.track.views import segmentio
+from common.djangoapps.track.views.tests.base import SEGMENTIO_TEST_USER_ID, SegmentIOTrackingTestCaseBase
+from common.djangoapps.util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -239,7 +239,7 @@ class ViewsTestCaseMixin(object):
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             self.password = 'test'
@@ -405,8 +405,8 @@ class ViewsQueryCountTestCase(
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 40),
-        (ModuleStoreEnum.Type.split, 3, 13, 40),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 39),
+        (ModuleStoreEnum.Type.split, 3, 13, 39),
     )
     @ddt.unpack
     @count_queries
@@ -414,8 +414,8 @@ class ViewsQueryCountTestCase(
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 3, 36),
-        (ModuleStoreEnum.Type.split, 3, 10, 36),
+        (ModuleStoreEnum.Type.mongo, 3, 3, 35),
+        (ModuleStoreEnum.Type.split, 3, 10, 35),
     )
     @ddt.unpack
     @count_queries
@@ -462,7 +462,7 @@ class ViewsTestCase(
 
         # Patch the comment client user save method so it does not try
         # to create a new cc user when creating a django user
-        with patch('student.models.cc.User.save'):
+        with patch('common.djangoapps.student.models.cc.User.save'):
             uname = 'student'
             email = 'student@edx.org'
             self.password = 'test'
@@ -1517,7 +1517,7 @@ class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleSto
         self.client.login(username=user.username, password=self.password)
 
     @ddt.data(
-        # student_in_team will be able to update his own post, regardless of team membership
+        # student_in_team will be able to update their own post, regardless of team membership
         ('student_in_team', 'student_in_team', 'team_commentable_id', 200, CourseDiscussionSettings.NONE),
         ('student_in_team', 'student_in_team', 'course_commentable_id', 200, CourseDiscussionSettings.NONE),
         # students can only update their own posts
@@ -2050,7 +2050,7 @@ class ForumThreadViewedEventTransformerTestCase(ForumsEnableMixin, UrlResetMixin
     DUMMY_CATEGORY_ID = 'i4x-edx-dummy-commentable-id'
     DUMMY_THREAD_ID = 'dummy_thread_id'
 
-    @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @mock.patch.dict("common.djangoapps.student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(ForumThreadViewedEventTransformerTestCase, self).setUp()
         self.courses_by_store = {

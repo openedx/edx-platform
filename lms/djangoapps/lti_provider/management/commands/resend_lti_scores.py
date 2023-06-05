@@ -9,8 +9,8 @@ import six
 from django.core.management import BaseCommand
 from opaque_keys.edx.keys import CourseKey
 
-from lti_provider import tasks
-from lti_provider.models import GradedAssignment
+from lms.djangoapps.lti_provider import tasks
+from lms.djangoapps.lti_provider.models import GradedAssignment
 
 
 class Command(BaseCommand):
