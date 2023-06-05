@@ -19,12 +19,12 @@ class XblockViewTestCase(AuthorizeStaffTestCase):
         raise NotImplementedError("get_test_data must be implemented by subclasses")
 
     def get_url_params(self):
-        return {"course_id": AuthorizeStaffTestCase.get_course_key_string(), "usage_key_string": TEST_LOCATOR}
+        return {"course_id": self.get_course_key_string(), "usage_key_string": TEST_LOCATOR}
 
-    def get_url(self, course_key):
+    def get_url(self):
         return reverse(
             "cms.djangoapps.contentstore:v1:studio_content",
-            kwargs=self.get_url_params(course_key),
+            kwargs=self.get_url_params(),
         )
 
     def send_request():
@@ -51,8 +51,7 @@ class XblockViewTestCase(AuthorizeStaffTestCase):
         course_id=None,
         data=None,
     ):
-        course_id = self.get_course_key_string()
-        url = self.get_url(course_id)
+        url = self.get_url()
         data = self.get_test_data(id)
 
         response = self.send_request(url, data)
@@ -74,19 +73,19 @@ class XblockViewGetTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
     def get_test_data(self, course_id):
         return None
 
-    def assert_xblock_handler_called(self, *, mock_handle_xblock, course_id, response):
+    def assert_xblock_handler_called(self, *, mock_handle_xblock, response):
         mock_handle_xblock.assert_called_once()
         passed_args = mock_handle_xblock.call_args[0][0]
 
         assert passed_args.method == "GET"
-        assert passed_args.path == self.get_url(course_id)
+        assert passed_args.path == self.get_url()
 
     def send_request(self, url, data):
         return self.client.get(url)
 
     def test_api_behind_feature_flag(self):
         # should return 404 if the feature flag is not enabled
-        url = self.get_url(self.course_key)
+        url = self.get_url()
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -102,7 +101,7 @@ class XblockViewGetTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["locator"] == TEST_LOCATOR
-        assert data["courseKey"] == 'abc'
+        assert data["courseKey"] == self.get_course_key_string()
 
 
 class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
@@ -110,42 +109,39 @@ class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
     Test POST operation on xblocks
     """
 
-    def get_url_params(self, course_key):
-        return {"course_id": course_key}
+    def get_url_params(self):
+        return {"course_id": self.get_course_key_string()}
 
-    def get_url(self, course_key):
+    def get_url(self):
         return reverse(
             "cms.djangoapps.contentstore:v1:studio_content",
-            kwargs=self.get_url_params(course_key),
+            kwargs=self.get_url_params(),
         )
 
     def get_test_data(self, course_id):
+        id = self.get_course_key_string()
         return {
-            "parent_locator": course_id,
+            "parent_locator": id,
             "category": "html",
-            "courseKey": course_id,
+            "courseKey": id,
         }
 
     def assert_xblock_handler_called(self, *, mock_handle_xblock, response):
         mock_handle_xblock.assert_called_once()
         passed_args = mock_handle_xblock.call_args[0][0]
 
-        import pdb
-        pdb.set_trace()
         course_id = self.get_course_key_string()
 
         assert passed_args.data.get("courseKey") == course_id
         assert passed_args.method == "POST"
-        assert passed_args.path == self.get_url(course_id)
+        assert passed_args.path == self.get_url()
 
     def send_request(self, url, data):
-        import pdb
-        pdb.set_trace()
         return self.client.post(url, data=data)
 
     def test_api_behind_feature_flag(self):
         # should return 404 if the feature flag is not enabled
-        url = self.get_url(self.course_key)
+        url = self.get_url()
 
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -159,7 +155,5 @@ class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
         )
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
-        import pdb
-        pdb.set_trace()
         assert data["locator"] == TEST_LOCATOR
         assert data["courseKey"] == self.get_course_key_string()
