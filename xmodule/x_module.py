@@ -1293,51 +1293,6 @@ class ModuleSystemShim:
         return self._runtime_services.get('cache') or self._services.get('cache') or DoNothingCache()
 
     @property
-    def replace_urls(self):
-        """
-        Returns a function to replace static urls with course specific urls.
-
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'runtime.replace_urls is deprecated. Please use the replace_urls service instead.',
-            DeprecationWarning, stacklevel=2,
-        )
-        replace_urls_service = self._runtime_services.get('replace_urls') or self._services.get('replace_urls')
-        if replace_urls_service:
-            return partial(replace_urls_service.replace_urls, static_replace_only=True)
-
-    @property
-    def replace_course_urls(self):
-        """
-        Returns a function to replace static urls with course specific urls.
-
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'runtime.replace_course_urls is deprecated. Please use the replace_urls service instead.',
-            DeprecationWarning, stacklevel=2,
-        )
-        replace_urls_service = self._runtime_services.get('replace_urls') or self._services.get('replace_urls')
-        if replace_urls_service:
-            return partial(replace_urls_service.replace_urls)
-
-    @property
-    def replace_jump_to_id_urls(self):
-        """
-        Returns a function to replace static urls with course specific urls.
-
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'runtime.replace_jump_to_id_urls is deprecated. Please use the replace_urls service instead.',
-            DeprecationWarning, stacklevel=2,
-        )
-        replace_urls_service = self._runtime_services.get('replace_urls') or self._services.get('replace_urls')
-        if replace_urls_service:
-            return partial(replace_urls_service.replace_urls)
-
-    @property
     def filestore(self):
         """
         A filestore ojbect. Defaults to an instance of OSFS based at settings.DATA_DIR.

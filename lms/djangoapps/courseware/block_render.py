@@ -482,11 +482,20 @@ def prepare_runtime_for_user(
             request_token=request_token,
         ))
 
-    replace_url_service = ReplaceURLService(
-        data_directory=getattr(block, 'data_dir', None),
-        course_id=course_id,
-        static_asset_path=static_asset_path or block.static_asset_path,
-        jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''})
+    # HACK: The following test fails when we do not access this attribute.
+    #  lms/djangoapps/courseware/tests/test_views.py::TestRenderXBlock::test_success_enrolled_staff
+    #  This happens because accessing `field_data` caches the XBlock's parents through the inheritance mixin.
+    #  If we do this operation before assigning `inner_get_block` to the `get_block_for_descriptor` attribute, these
+    #  parents will be initialized without binding the user data (that's how the `get_block` works in `x_module.py`).
+    #  If we retrieve the parents after this operation (e.g., in the `enclosing_sequence_for_gating_checks` function),
+    #  they will have their runtimes initialized, which can lead to an altered behavior of the XBlock-specific
+    #  parts of other runtimes. We will keep this workaround until we remove all XBlock-specific code from here.
+    block.static_asset_path  # pylint: disable=pointless-statement
+
+    replace_url_service = partial(
+        ReplaceURLService,
+        static_asset_path=static_asset_path,
+        jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''}),
     )
 
     # Rewrite static urls with course-specific absolute urls
