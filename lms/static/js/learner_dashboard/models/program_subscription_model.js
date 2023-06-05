@@ -18,11 +18,9 @@ class ProgramSubscriptionModel extends Backbone.Model {
         } = context;
 
         const priceInUSD = subscription_prices?.find(({ currency }) => currency === 'USD');
-        const trialMoment = moment(
-            DateUtils.localizeTime(
-                DateUtils.stringToMoment(data.trial_end),
-                'UTC'
-            )
+        const trialMoment = DateUtils.localizeTime(
+            DateUtils.stringToMoment(data.trial_end),
+            'UTC'
         );
 
         const subscriptionState = data.subscription_state?.toLowerCase() ?? '';
@@ -44,7 +42,10 @@ class ProgramSubscriptionModel extends Backbone.Model {
                 ? trialMoment.isAfter(moment.utc())
                 : false;
 
-        const remainingDays = trialMoment.diff(moment.utc(), 'days');
+        const remainingDays = ProgramSubscriptionModel.getRemainingDays(
+            data.trial_end,
+            userPreferences
+        );
 
         const [currentPeriodEnd] = ProgramSubscriptionModel.formatDate(
             data.current_period_end,
@@ -91,9 +92,28 @@ class ProgramSubscriptionModel extends Backbone.Model {
         const localTime = DateUtils.localizeTime(
             DateUtils.stringToMoment(date),
             userTimezone
-        ).format('HH:mm');
+        ).format('HH:mm (z)');
 
         return [localDate, localTime];
+    }
+
+    static getRemainingDays(trialEndDate, userPreferences) {
+        if (!trialEndDate) {
+            return 0;
+        }
+
+        const userTimezone = userPreferences.time_zone || 'UTC';
+        const trialEndTime = DateUtils.localizeTime(
+            DateUtils.stringToMoment(trialEndDate),
+            userTimezone
+        ).startOf('day');
+        const currentTime = DateUtils.localizeTime(
+            moment.utc(),
+            userTimezone
+        ).startOf('day');
+
+        return trialEndTime.diff(currentTime, 'days');
+
     }
 }
 
