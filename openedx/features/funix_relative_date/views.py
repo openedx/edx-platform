@@ -18,6 +18,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
 from lms.djangoapps.courseware.courses import  get_course_with_access
+from openedx.features.funix_relative_date.serializers import FUNiXDatesTabSerializer
 from openedx.features.funix_relative_date.funix_relative_date import FunixRelativeDateLibary
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
