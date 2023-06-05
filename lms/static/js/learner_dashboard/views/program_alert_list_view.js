@@ -57,11 +57,15 @@ class ProgramAlertListView extends Backbone.View {
         return alertList.concat(this.trialEndingAlerts.map(
             ({ title: programName, remainingDays, ...data }) => ({
                 title: StringUtils.interpolate(
-                    ngettext('Subscription trial expires in {remainingDays} day', 'Subscription trial expires in {remainingDays} days', remainingDays),
+                    remainingDays < 1
+                        ? gettext('Subscription trial expires in less than 24 hours')
+                        : ngettext('Subscription trial expires in {remainingDays} day', 'Subscription trial expires in {remainingDays} days', remainingDays),
                     { remainingDays }
                 ),
                 message: StringUtils.interpolate(
-                    ngettext('Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.', 'Your {programName} trial will expire in {remainingDays} days at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.', remainingDays),
+                    remainingDays < 1
+                        ? gettext('Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.')
+                        : ngettext('Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.', 'Your {programName} trial will expire in {remainingDays} days at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.', remainingDays),
                     {
                         programName,
                         remainingDays,
