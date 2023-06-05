@@ -213,7 +213,7 @@ class Command(BaseCommand):
         Application.objects.filter(name='credentials-sso').update(
             redirect_uris='http://edx.devstack.lms:18150/complete/edx-oauth2/')
 
-        CatalogIntegration.objects.get_or_create(internal_api_url='https://edx.devstack.lms:1381/api', enabled=True)
+        CatalogIntegration.objects.get_or_create(internal_api_url='https://edx.devstack.lms:18381/api', enabled=True)
 
         CredentialsApiConfig.objects.get_or_create(
             internal_service_url='http://edx.devstack.lms:18150/',
