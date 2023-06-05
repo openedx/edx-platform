@@ -267,8 +267,7 @@ class ProductRecommendationsView(APIView):
 
     def get(self, request, course_id):
         """
-        Returns cross product recommendation courses for course about page
-        and cross product as well as amplitude recommendations
+        Returns cross product and amplitude recommendation courses
         """
 
         ip_address = get_client_ip(request)[0]
