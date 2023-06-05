@@ -26,7 +26,7 @@ class NotificationCourseEnrollmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CourseEnrollment
-        fields = ('course', 'is_active', 'mode')
+        fields = ('course',)
 
 
 class UserNotificationPreferenceSerializer(serializers.ModelSerializer):
@@ -70,4 +70,5 @@ class NotificationSerializer(serializers.ModelSerializer):
             'content_url',
             'last_read',
             'last_seen',
+            'created',
         )
