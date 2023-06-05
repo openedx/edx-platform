@@ -986,6 +986,11 @@ class ProblemBlock(
         # then we disable the "submit" button
         # Also, disable the "submit" button if we're waiting
         # for the user to reset a randomized problem
+
+        # if Past Due => Can submit
+        if self.is_past_due():
+            return True
+
         if self.closed() or submitted_without_reset:
             return False
         else:

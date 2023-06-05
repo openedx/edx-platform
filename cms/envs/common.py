@@ -288,7 +288,7 @@ FEATURES = {
     'LICENSING': False,
 
     # Enable the courseware search functionality
-    'ENABLE_COURSEWARE_INDEX': False,
+    'ENABLE_COURSEWARE_INDEX': True,
 
     # Enable content libraries (modulestore) search functionality
     'ENABLE_LIBRARY_INDEX': False,
@@ -1739,6 +1739,7 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
     'openedx.features.funix_relative_date',
+    'openedx.features.funix_goal',
     'lms.djangoapps.experiments',
 
     'openedx.core.djangoapps.external_user_ids',

@@ -581,8 +581,8 @@ FEATURES = {
     # .. toggle_creation_date: 2015-01-29
     # .. toggle_warning: In order to get this working, your courses data should be indexed in Elasticsearch. You will
     #   see the search widget on the courseware page only if the DISABLE_COURSE_OUTLINE_PAGE_FLAG is set.
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6506
-    'ENABLE_COURSEWARE_SEARCH': False,
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
+    'ENABLE_COURSEWARE_SEARCH': True,
 
     # .. toggle_name: FEATURES['ENABLE_COURSEWARE_SEARCH_FOR_COURSE_STAFF']
     # .. toggle_implementation: DjangoSetting
@@ -605,8 +605,8 @@ FEATURES = {
     #   courseware data.
     # .. toggle_use_cases: open_edx
     # .. toggle_creation_date: 2015-01-29
-    # .. toggle_warning: In order to get this working, your courses data should be indexed in Elasticsearch.
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/6506
+    # .. toggle_warnings: In order to get this working, your courses data should be indexed in Elasticsearch.
+    # .. toggle_tickets: https://github.com/edx/edx-platform/pull/6506
     'ENABLE_DASHBOARD_SEARCH': False,
 
     # log all information from cybersource callbacks
@@ -3195,6 +3195,7 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
     'openedx.features.funix_relative_date',
+    'openedx.features.funix_goal',
     'openedx.features.name_affirmation_api.apps.NameAffirmationApiConfig',
 
     'lms.djangoapps.experiments',

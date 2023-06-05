@@ -13,7 +13,7 @@ from rest_framework.response import Response
 
 from common.djangoapps.student.models import CourseEnrollment
 
-from lms.djangoapps.course_home_api.dates.serializers import DatesTabSerializer
+
 
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
@@ -23,6 +23,7 @@ from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
+from openedx.features.funix_goal.models import LearnGoal
 
 
 class FunixRelativeDatesTabView(RetrieveAPIView):
@@ -32,7 +33,7 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 		SessionAuthenticationAllowInactiveUser,
 	)
 	permission_classes = (IsAuthenticated,)
-	serializer_class = DatesTabSerializer
+	serializer_class = FUNiXDatesTabSerializer
 
 	def get(self, request, *args, **kwargs):
 		course_key_string = kwargs.get('course_key_string')
@@ -69,11 +70,16 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 		user_timezone_locale = user_timezone_locale_prefs(request)
 		user_timezone = user_timezone_locale['user_timezone']
 
+		# Get goal
+		goal = LearnGoal.get_goal(course_id=course_key_string, user_id=str(request.user.id))
+
 		data = {
 			'has_ended': course.has_ended(),
 			'course_date_blocks': [block for block in blocks if not isinstance(block, TodaysDate)],
 			'learner_is_full_access': learner_is_full_access,
 			'user_timezone': user_timezone,
+			'goal_hours_per_day': goal.hours_per_day,
+			'goal_weekdays': [getattr(goal, f'weekday_{i}') for i in range(7)]
 		}
 		context = self.get_serializer_context()
 		context['learner_is_full_access'] = learner_is_full_access
