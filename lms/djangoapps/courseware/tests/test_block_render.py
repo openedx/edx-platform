@@ -58,7 +58,6 @@ from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty,
 from xmodule.services import RebindUserServiceError
 from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW, DescriptorSystem  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps import static_replace
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
 from common.djangoapps.student.tests.factories import (
     BetaTesterFactory,
@@ -2895,22 +2894,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     def test_cache(self):
         assert hasattr(self.block.runtime.cache, 'get')
         assert hasattr(self.block.runtime.cache, 'set')
-
-    def test_replace_urls(self):
-        html = '<a href="/static/id">'
-        assert self.block.runtime.replace_urls(html) == \
-            static_replace.replace_static_urls(html, course_id=self.course.id)
-
-    def test_replace_course_urls(self):
-        html = '<a href="/course/id">'
-        assert self.block.runtime.replace_course_urls(html) == \
-            static_replace.replace_course_urls(html, course_key=self.course.id)
-
-    def test_replace_jump_to_id_urls(self):
-        html = '<a href="/jump_to_id/id">'
-        jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': str(self.course.id), 'module_id': ''})
-        assert self.block.runtime.replace_jump_to_id_urls(html) == \
-            static_replace.replace_jump_to_id_urls(html, self.course.id, jump_to_id_base_url)
 
     @XBlock.register_temp_plugin(PureXBlock, 'pure')
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
