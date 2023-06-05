@@ -29,7 +29,7 @@ describe('Program List Header View', () => {
                 id: 'eeb25640-9741-4c11-963c-8a27337f217c',
                 resource_id: 'b90d70d5-f981-4508-bdeb-5b792d930c03',
                 trial_end: '2022-04-20T05:59:42Z',
-                next_payment_date: '2023-05-08T05:59:42Z',
+                current_period_end: '2023-05-08T05:59:42Z',
                 subscription_state: 'active',
             },
         ],

@@ -60,16 +60,16 @@
                     <%- StringUtils.interpolate(
                         (
                             hasActiveTrial
-                            ? gettext('Active trial ends {trialEndDate} at {trialEndTime}')
+                            ? gettext('Trial ends {trialEndDate} at {trialEndTime}')
                             : subscriptionState === 'active'
-                            ? gettext('Your next billing date is {nextPaymentDate}')
+                            ? gettext('Your next billing date is {currentPeriodEnd}')
                             : subscriptionState === 'inactive'
-                            ? gettext('Unlock verified access to all courses for {subscriptionPrice}. Cancel anytime.')
+                            ? gettext('{subscriptionPrice} subscription. Cancel anytime.')
                             : gettext('{subscriptionPrice} subscription after trial ends. Cancel anytime.')
                         ),
                         {
                             subscriptionPrice,
-                            nextPaymentDate,
+                            currentPeriodEnd,
                             trialEndDate,
                             trialEndTime,
                         }

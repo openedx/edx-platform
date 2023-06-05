@@ -48,7 +48,7 @@ from xmodule.partitions.tests.test_partitions import MockPartitionService
 from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url, duplicate_block, update_from_source
 from cms.djangoapps.contentstore.views import block as item_module
 from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from common.djangoapps.xblock_django.models import (
@@ -786,6 +786,30 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
 
         # Now send a custom display name for the duplicate.
         verify_name(self.seq_usage_key, self.chapter_usage_key, "customized name", display_name="customized name")
+
+    def test_shallow_duplicate(self):
+        """
+        Test that duplicate_block(..., shallow=True) can duplicate a block but ignores its children.
+        """
+        source_course = CourseFactory()
+        user = UserFactory.create()
+        source_chapter = BlockFactory(parent=source_course, category='chapter', display_name='Source Chapter')
+        BlockFactory(parent=source_chapter, category='html', display_name='Child')
+        # Refresh.
+        source_chapter = self.store.get_item(source_chapter.location)
+        self.assertEqual(len(source_chapter.get_children()), 1)
+        destination_course = CourseFactory()
+        destination_location = duplicate_block(
+            parent_usage_key=destination_course.location,
+            duplicate_source_usage_key=source_chapter.location,
+            user=user,
+            display_name=source_chapter.display_name,
+            shallow=True,
+        )
+        # Refresh here, too, just to be sure.
+        destination_chapter = self.store.get_item(destination_location)
+        self.assertEqual(len(destination_chapter.get_children()), 0)
+        self.assertEqual(destination_chapter.display_name, 'Source Chapter')
 
 
 @ddt.ddt
@@ -3495,3 +3519,111 @@ class TestXBlockPublishingInfo(ItemTest):
         # Check that in self paced course content has live state now
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.live)
+
+
+@patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+       lambda self, block: ['test_aside'])
+class TestUpdateFromSource(ModuleStoreTestCase):
+    """
+    Test update_from_source.
+    """
+
+    def setUp(self):
+        """
+        Set up the runtime for tests.
+        """
+        super().setUp()
+        key_store = DictKeyValueStore()
+        field_data = KvsFieldData(key_store)
+        self.runtime = TestRuntime(services={'field-data': field_data})
+
+    def create_source_block(self, course):
+        """
+        Create a chapter with all the fixings.
+        """
+        source_block = BlockFactory(
+            parent=course,
+            category='course_info',
+            display_name='Source Block',
+            metadata={'due': datetime(2010, 11, 22, 4, 0, tzinfo=UTC)},
+        )
+
+        def_id = self.runtime.id_generator.create_definition('html')
+        usage_id = self.runtime.id_generator.create_usage(def_id)
+
+        aside = AsideTest(scope_ids=ScopeIds('user', 'html', def_id, usage_id), runtime=self.runtime)
+        aside.field11 = 'html_new_value1'
+
+        # The data attribute is handled in a special manner and should be updated.
+        source_block.data = '<div>test</div>'
+        # This field is set on the content scope (definition_data), which should be updated.
+        source_block.items = ['test', 'beep']
+
+        self.store.update_item(source_block, self.user.id, asides=[aside])
+
+        # quick sanity checks
+        source_block = self.store.get_item(source_block.location)
+        self.assertEqual(source_block.due, datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
+        self.assertEqual(source_block.display_name, 'Source Block')
+        self.assertEqual(source_block.runtime.get_asides(source_block)[0].field11, 'html_new_value1')
+        self.assertEqual(source_block.data, '<div>test</div>')
+        self.assertEqual(source_block.items, ['test', 'beep'])
+
+        return source_block
+
+    def check_updated(self, source_block, destination_key):
+        """
+        Check that the destination block has been updated to match our source block.
+        """
+        revised = self.store.get_item(destination_key)
+        self.assertEqual(source_block.display_name, revised.display_name)
+        self.assertEqual(source_block.due, revised.due)
+        self.assertEqual(revised.data, source_block.data)
+        self.assertEqual(revised.items, source_block.items)
+
+        self.assertEqual(
+            revised.runtime.get_asides(revised)[0].field11,
+            source_block.runtime.get_asides(source_block)[0].field11,
+        )
+
+    @XBlockAside.register_temp_plugin(AsideTest, 'test_aside')
+    def test_update_from_source(self):
+        """
+        Test that update_from_source updates the destination block.
+        """
+        course = CourseFactory()
+        user = UserFactory.create()
+
+        source_block = self.create_source_block(course)
+
+        destination_block = BlockFactory(parent=course, category='course_info', display_name='Destination Problem')
+        update_from_source(source_block=source_block, destination_block=destination_block, user_id=user.id)
+        self.check_updated(source_block, destination_block.location)
+
+    @XBlockAside.register_temp_plugin(AsideTest, 'test_aside')
+    def test_update_clobbers(self):
+        """
+        Verify that our update replaces all settings on the block.
+        """
+        course = CourseFactory()
+        user = UserFactory.create()
+
+        source_block = self.create_source_block(course)
+
+        destination_block = BlockFactory(
+            parent=course,
+            category='course_info',
+            display_name='Destination Chapter',
+            metadata={'due': datetime(2025, 10, 21, 6, 5, tzinfo=UTC)},
+        )
+
+        def_id = self.runtime.id_generator.create_definition('html')
+        usage_id = self.runtime.id_generator.create_usage(def_id)
+        aside = AsideTest(scope_ids=ScopeIds('user', 'html', def_id, usage_id), runtime=self.runtime)
+        aside.field11 = 'Other stuff'
+        destination_block.data = '<div>other stuff</div>'
+        destination_block.items = ['other stuff', 'boop']
+        self.store.update_item(destination_block, user.id, asides=[aside])
+
+        update_from_source(source_block=source_block, destination_block=destination_block, user_id=user.id)
+        self.check_updated(source_block, destination_block.location)

@@ -179,7 +179,7 @@
                     <a href="${course_team_url}">${_("Course Team")}</a>
                   </li>
                   % endif
-                  % if not course_team_mfe_enabled:
+                  % if course_team_mfe_enabled:
                   <li class="nav-item nav-course-settings-team">
                     <a href="${get_course_team_url(course_key)}">${_("Course Team")}</a>
                   </li>
