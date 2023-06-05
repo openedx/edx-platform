@@ -794,16 +794,25 @@ class AuthorizeStaffTestCase():
     """
     Test that only staff roles can access an API endpoint.
     """
+    @classmethod
+    def get_course_key_string(cls):
+        return 'course-v1:edX+ToyX+Toy_Course'
+
+    @classmethod
+    def get_other_course_key_string(cls):
+        return 'course-v1:edX+ToyX_Other_Course+Toy_Course'
 
     def setUp(self):
         super().setUp()
-        self.course_key = CourseKey.from_string('course-v1:edX+ToyX+Toy_Course')
-        self.other_course_key = CourseKey.from_string('course-v1:edX+ToyX_Other_Course+Toy_Course')
-        self.course = self.create_course_from_course_key(self.course_key)
-        self.other_course = self.create_course_from_course_key(self.other_course_key)
+        self.course_key = self.get_course_key_string()
+        self.other_course_key = self.get_other_course_key_string()
+        self.course = self.create_course_from_course_key(CourseKey.from_string(self.course_key))
+        self.other_course = self.create_course_from_course_key(CourseKey.from_string(self.other_course_key))
         self.password = 'password'
         self.student = UserFactory.create(username='student', password=self.password)
-        self.global_staff = GlobalStaffFactory(username='global-staff', password=self.password)
+        self.global_staff = GlobalStaffFactory(
+            username='global-staff', password=self.password
+        )
         self.course_instructor = InstructorFactory(
             username='instructor',
             password=self.password,

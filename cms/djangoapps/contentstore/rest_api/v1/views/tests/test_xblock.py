@@ -9,14 +9,17 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from cms.djangoapps.contentstore.tests.test_utils import AuthorizeStaffTestCase
 
 
-TEST_COURSE_KEY = "course-v1:dede+aba+weagi"
 TEST_LOCATOR = "block-v1:dede+aba+weagi+type@problem+block@ba6327f840da49289fb27a9243913478"
 
 
 class XblockViewTestCase(AuthorizeStaffTestCase):
     # assumes that you want to pass a block id to the url
-    def get_url_params(self, course_key):
-        return {"course_id": course_key, "usage_key_string": TEST_LOCATOR}
+
+    def get_test_data():
+        raise NotImplementedError("get_test_data must be implemented by subclasses")
+
+    def get_url_params(self):
+        return {"course_id": AuthorizeStaffTestCase.get_course_key_string(), "usage_key_string": TEST_LOCATOR}
 
     def get_url(self, course_key):
         return reverse(
@@ -32,7 +35,7 @@ class XblockViewTestCase(AuthorizeStaffTestCase):
         return_value=JsonResponse(
             {
                 "locator": TEST_LOCATOR,
-                "courseKey": TEST_COURSE_KEY,
+                "courseKey": AuthorizeStaffTestCase.get_course_key_string(),
             }
         ),
     )
@@ -48,7 +51,7 @@ class XblockViewTestCase(AuthorizeStaffTestCase):
         course_id=None,
         data=None,
     ):
-        course_id = self.get_course_id_string(course_id=course_id)
+        course_id = self.get_course_key_string()
         url = self.get_url(course_id)
         data = self.get_test_data(id)
 
@@ -57,14 +60,10 @@ class XblockViewTestCase(AuthorizeStaffTestCase):
         # run optional callback method with additional assertions
         if run_assertions:
             run_assertions(
-                response=response, course_id=id, mock_handle_xblock=mock_handle_xblock
+                response=response, mock_handle_xblock=mock_handle_xblock
             )
 
         return response
-
-    def get_course_id_string(self, course_id=None):
-        course_id = course_id if course_id else self.course.id
-        return course_id.html_id()
 
 
 class XblockViewGetTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
@@ -103,7 +102,7 @@ class XblockViewGetTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["locator"] == TEST_LOCATOR
-        assert data["courseKey"] == TEST_COURSE_KEY
+        assert data["courseKey"] == 'abc'
 
 
 class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
@@ -114,6 +113,12 @@ class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
     def get_url_params(self, course_key):
         return {"course_id": course_key}
 
+    def get_url(self, course_key):
+        return reverse(
+            "cms.djangoapps.contentstore:v1:studio_content",
+            kwargs=self.get_url_params(course_key),
+        )
+
     def get_test_data(self, course_id):
         return {
             "parent_locator": course_id,
@@ -121,15 +126,21 @@ class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
             "courseKey": course_id,
         }
 
-    def assert_xblock_handler_called(self, *, mock_handle_xblock, course_id, response):
+    def assert_xblock_handler_called(self, *, mock_handle_xblock, response):
         mock_handle_xblock.assert_called_once()
         passed_args = mock_handle_xblock.call_args[0][0]
+
+        import pdb
+        pdb.set_trace()
+        course_id = self.get_course_key_string()
 
         assert passed_args.data.get("courseKey") == course_id
         assert passed_args.method == "POST"
         assert passed_args.path == self.get_url(course_id)
 
     def send_request(self, url, data):
+        import pdb
+        pdb.set_trace()
         return self.client.post(url, data=data)
 
     def test_api_behind_feature_flag(self):
@@ -148,5 +159,7 @@ class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
         )
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
+        import pdb
+        pdb.set_trace()
         assert data["locator"] == TEST_LOCATOR
-        assert data["courseKey"] == TEST_COURSE_KEY
+        assert data["courseKey"] == self.get_course_key_string()
