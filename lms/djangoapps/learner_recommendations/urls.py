@@ -16,7 +16,10 @@ urlpatterns = [
     re_path(fr'^cross_product/{settings.COURSE_ID_PATTERN}/$',
             views.CrossProductRecommendationsView.as_view(),
             name='cross_product_recommendations'),
+    re_path(fr'^product_recommendations/{settings.COURSE_ID_PATTERN}/$',
+            views.ProductRecommendationsView.as_view(),
+            name='product_recommendations'),
     re_path(r"^courses/$",
             views.DashboardRecommendationsApiView.as_view(),
-            name="courses")
+            name="courses"),
 ]
