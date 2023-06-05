@@ -8,7 +8,7 @@ from common.djangoapps.student.models import get_user_by_username_or_email, get_
 from openedx.features.funix_relative_date.models import FunixRelativeDate, FunixRelativeDateDAO
 from opaque_keys.edx.keys import CourseKey
 from lms.djangoapps.courseware.date_summary import FunixCourseStartDate, TodaysDate
-from openedx.features.funix_goal.models import LearnGoal
+from openedx.features.funix_goal import models
 
 class FunixRelativeDateLibary():
 	TIME_PER_DAY = 2.5 * 60
@@ -84,7 +84,7 @@ class FunixRelativeDateLibary():
 		FunixRelativeDateDAO.delete_all_date(user_id=user.id, course_id=course_id)
 
 		# Get goal
-		goal = LearnGoal.get_goal(course_id=course_id, user_id=str(user.id))
+		goal = models.LearnGoal.get_goal(course_id=course_id, user_id=str(user.id))
 		index = 0
 		completed_assignments = [asm for asm in assignment_blocks if asm.complete]
 		uncompleted_assignments = [asm for asm in assignment_blocks if not asm.complete]
