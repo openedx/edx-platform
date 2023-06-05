@@ -106,7 +106,7 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.exceptions import NotFoundError, ProcessingError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from openedx.features.funix_relative_date.funix_relative_date import FunixRelativeDateLibary
+from openedx.features.funix_relative_date import funix_relative_date
 
 
 log = logging.getLogger(__name__)
@@ -576,7 +576,7 @@ def get_module_system_for_user(
                 block_key=block.scope_ids.usage_id,
                 completion=event['completion'],
             )
-            FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
+            funix_relative_date.FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
 
     def handle_grade_event(block, event):
         """
@@ -621,7 +621,7 @@ def get_module_system_for_user(
                     block_key=block.scope_ids.usage_id,
                     completion=1.0,
                 )
-                FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
+                funix_relative_date.FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
 
     # Rebind module service to deal with noauth modules getting attached to users
     rebind_user_service = RebindUserService(
