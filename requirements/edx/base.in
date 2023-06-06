@@ -147,8 +147,6 @@ py2neo                              # Driver for converting Python modulestore s
 pycountry
 pycryptodomex
 pygments                            # Used to support colors in paver command output
-pyjwkest
-# TODO Replace PyJWT usage with pyjwkest
 # PyJWT 1.6.3 contains PyJWTError, which is required by Apple auth in social-auth-core
 PyJWT>=1.6.3
 pylti1p3                            # Required by content_libraries core library to suport LTI 1.3 launches
