@@ -54,7 +54,6 @@ from enterprise.constants import (
     ENTERPRISE_CATALOG_ADMIN_ROLE,
     ENTERPRISE_DASHBOARD_ADMIN_ROLE,
     ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
-    ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
     ENTERPRISE_OPERATOR_ROLE
 )
@@ -1140,32 +1139,32 @@ CACHES = {
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'TIMEOUT': 300,
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
     },
     'staticfiles': {
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'staticfiles_general',
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
     },
     'default': {
         'VERSION': '1',
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'default',
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
     },
     'configuration': {
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'configuration',
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
     },
     'general': {
         'KEY_FUNCTION': 'common.djangoapps.util.memcache.safe_key',
         'LOCATION': ['localhost:11211'],
         'KEY_PREFIX': 'general',
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
     },
 }
 
@@ -4634,7 +4633,6 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
         ENTERPRISE_CATALOG_ADMIN_ROLE,
         ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
-        ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ],
 }
 

@@ -10,7 +10,7 @@ import ddt
 from django.conf import settings
 from django.http import HttpRequest
 from django.test.client import Client
-from django.utils.translation import LANGUAGE_SESSION_KEY
+# from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from openedx.core.djangoapps.dark_lang.middleware import DarkLangMiddleware
 from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
@@ -50,7 +50,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
             enabled=True
         ).save()
 
-    def process_middleware_request(self, language_session_key=UNSET, accept=UNSET):
+    def process_middleware_request(self, ABC=UNSET, accept=UNSET):
         """
         Build a request and then process it using the ``DarkLangMiddleware``.
 
@@ -59,7 +59,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
             accept (str): The accept header to set in request.META['HTTP_ACCEPT_LANGUAGE']
         """
         session = {}
-        set_if_set(session, LANGUAGE_SESSION_KEY, language_session_key)
+        set_if_set(session, 'LANGUAGE_SESSION_KEY', 'language_session_key')
 
         meta = {}
         set_if_set(meta, 'HTTP_ACCEPT_LANGUAGE', accept)
@@ -239,7 +239,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         """
         Assert that the LANGUAGE_SESSION_KEY set in session is equal to value
         """
-        assert value == session.get(LANGUAGE_SESSION_KEY, UNSET)
+        assert value == session.get('LANGUAGE_SESSION_KEY', UNSET)
 
     def _post_set_preview_lang(self, preview_language):
         """
@@ -258,7 +258,7 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         Set the session language in the Client
         """
         session = self.client.session
-        session[LANGUAGE_SESSION_KEY] = session_language
+        session['LANGUAGE_SESSION_KEY'] = session_language
         session.save()
 
     def test_preview_lang_with_released_language(self):

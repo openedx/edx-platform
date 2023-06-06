@@ -24,7 +24,7 @@ class CourseEntitlementSerializer(serializers.ModelSerializer):
         Returns a serialized set of all support interactions with the course entitlement
         """
         qset = CourseEntitlementSupportDetail.objects.filter(entitlement=model).order_by('-created')
-        return CourseEntitlementSupportDetailSerializer(qset, many=True).data
+        return CourseEntitlementSupportDetailSerializer(qset).data
 
     class Meta:
         model = CourseEntitlement
@@ -50,7 +50,7 @@ class CourseEntitlementSupportDetailSerializer(serializers.ModelSerializer):
         slug_field='username',
         default=serializers.CurrentUserDefault()
     )
-    unenrolled_run = CourseKeyField('unenrolled_run.id')
+    # unenrolled_run = CourseKeyField('unenrolled_run.id')
 
     class Meta:
         model = CourseEntitlementSupportDetail

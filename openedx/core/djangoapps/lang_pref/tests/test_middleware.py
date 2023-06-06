@@ -12,7 +12,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpResponse
 from django.test.client import Client, RequestFactory
 from django.urls import reverse
-from django.utils.translation import LANGUAGE_SESSION_KEY
+# from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
 
 from openedx.core.djangoapps.lang_pref import COOKIE_DURATION, LANGUAGE_KEY
@@ -88,7 +88,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
                 domain=settings.SESSION_COOKIE_DOMAIN,
             )
 
-        assert LANGUAGE_SESSION_KEY not in self.request.session
+        assert 'LANGUAGE_SESSION_KEY' not in self.request.session
 
     @ddt.data(*itertools.product(
         (None, 'eo', 'es'),  # LANGUAGE_COOKIE_NAME
@@ -140,7 +140,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         if lang_cookie:
             self.request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = lang_cookie
         if lang_session_in:
-            self.request.session[LANGUAGE_SESSION_KEY] = lang_session_in
+            self.request.session['LANGUAGE_SESSION_KEY'] = lang_session_in
         if accept_lang_in:
             self.request.META['HTTP_ACCEPT_LANGUAGE'] = accept_lang_in
         else:
@@ -160,7 +160,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         else:
             assert accept_lang_result == accept_lang_out
 
-        assert self.request.session.get(LANGUAGE_SESSION_KEY) == lang_session_out
+        assert self.request.session.get('LANGUAGE_SESSION_KEY') == lang_session_out
 
     @ddt.data(None, 'es', 'en')
     def test_logout_preserves_cookie(self, lang_cookie):
@@ -295,7 +295,7 @@ class TestUserPreferenceMiddleware(CacheIsolationTestCase):
         assert response['Content-Language'] == 'eo'
         # `LocaleMiddleware` no longer looks for language in the session since Django 3.2. It checks the cookie instead.
         # See: https://docs.djangoproject.com/en/3.2/releases/3.0/#miscellaneous
-        assert self.client.session.get(LANGUAGE_SESSION_KEY) is None
+        assert self.client.session.get('LANGUAGE_SESSION_KEY') is None
 
         # Clean up by making a request to a Site without specific configuration.
         with with_site_configuration_context():

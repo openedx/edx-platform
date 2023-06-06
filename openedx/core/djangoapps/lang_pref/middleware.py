@@ -3,7 +3,7 @@ Middleware for Language Preferences
 """
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.translation import LANGUAGE_SESSION_KEY
+# from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
 
 from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
@@ -54,8 +54,8 @@ class LanguagePreferenceMiddleware(MiddlewareMixin):
             request.META[LANGUAGE_HEADER] = accept_header
 
             # Allow the new cookie setting to update the language in the user's session
-            if LANGUAGE_SESSION_KEY in request.session and request.session[LANGUAGE_SESSION_KEY] != cookie_lang:
-                del request.session[LANGUAGE_SESSION_KEY]
+            if 'LANGUAGE_SESSION_KEY' in request.session and request.session['LANGUAGE_SESSION_KEY'] != cookie_lang:
+                del request.session['LANGUAGE_SESSION_KEY']
 
         # Apply language specified in SiteConfiguration, ignoring user preferences.
         if language := get_value('LANGUAGE_CODE'):
