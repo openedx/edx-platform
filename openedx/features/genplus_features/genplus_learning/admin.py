@@ -44,13 +44,14 @@ class ProgramAdmin(admin.ModelAdmin):
     search_fields = ('year_group__name',)
     list_display = (
         'year_group',
+        'slug',
         'start_date',
         'end_date',
         'status',
     )
     readonly_fields = ('slug', 'uuid',)
-    
-    
+
+
 @admin.register(ClassLesson)
 class ClassLessonAdmin(admin.ModelAdmin):
     list_display = ('class_unit', 'course_key', 'usage_key')

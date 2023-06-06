@@ -296,7 +296,7 @@ class ClassAdmin(admin.ModelAdmin):
     list_filter = ('school', 'is_visible', 'program', 'type')
     search_fields = ('name',)
     filter_horizontal = ('students',)
-    actions = ['mark_visible', 'sync_students']
+    actions = ['mark_visible', 'mark_invisible', 'sync_students']
 
     def sync_students(modeladmin, request, queryset):
         class_ids = queryset.values_list('id', flat=True)
@@ -355,8 +355,8 @@ class ClassAdmin(admin.ModelAdmin):
         actions = super(ClassAdmin, self).get_actions(request)
         for value in Program.objects.all():
             func = func_maker(value)
-            name = 'attach_{}'.format(value.year_group.name.strip())
-            actions['attach_{}'.format(value.year_group.name.strip())] = (func, name,
+            name = 'attach_{}'.format(value.slug.strip())
+            actions['attach_{}'.format(value.slug.strip())] = (func, name,
                                                                           'attach to Program: {}'.format(
                                                                               value.year_group.name))
 
@@ -438,15 +438,16 @@ class StudentAdmin(admin.ModelAdmin):
                 except ProgramEnrollment.DoesNotExist:
                     continue
             if unit_data:
-                program_data[program.year_group.name] = unit_data
+                program_data[program.slug] = unit_data
             else:
-                program_data[program.year_group.name] = "Not enrolled yet"
+                program_data[program.slug] = "Not enrolled yet"
+
         return str(program_data)
 
 @admin.register(GenLog)
 class GenLog(admin.ModelAdmin):
     list_filter = ('gen_log_type', )
-    search_fields = ('metadata',)
+    search_fields = ('metadata', 'description')
     list_display = ('description', 'gen_log_type', 'metadata', 'created')
 
 

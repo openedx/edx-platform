@@ -79,7 +79,7 @@ class Program(TimeStampedModel):
         return cls.objects.filter(status=ProgramStatuses.ACTIVE)
 
     def __str__(self):
-        return self.year_group.name
+        return self.slug
 
 
 class Unit(models.Model):
