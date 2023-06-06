@@ -124,9 +124,9 @@ class Command(BaseCommand):
         log.info('Generating new JWT signing keypair for key id %s.', key_id)
         rsa_key = RSA.generate(key_size)
         algo = get_default_algorithms()['RS512']
-        pem = rsa_key.export_key('PEM').decode()
-        rsa_jwk = json.loads(algo.to_jwk(algo.prepare_key(pem)))
-        public_rsa_jwk = json.loads(algo.to_jwk(algo.prepare_key(pem).public_key()))
+        key_data = algo.prepare_key(rsa_key.export_key('PEM').decode())
+        rsa_jwk = json.loads(algo.to_jwk(key_data))
+        public_rsa_jwk = json.loads(algo.to_jwk(key_data.public_key()))
 
         rsa_jwk['kid'] = key_id
         public_rsa_jwk['kid'] = key_id
