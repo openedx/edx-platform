@@ -15,7 +15,7 @@ TEST_LOCATOR = "block-v1:dede+aba+weagi+type@problem+block@ba6327f840da49289fb27
 class XblockViewTestCase(AuthorizeStaffTestCase):
     # assumes that you want to pass a block id to the url
 
-    def get_test_data():
+    def get_test_data(self):
         raise NotImplementedError("get_test_data must be implemented by subclasses")
 
     def get_url_params(self):
@@ -27,7 +27,7 @@ class XblockViewTestCase(AuthorizeStaffTestCase):
             kwargs=self.get_url_params(),
         )
 
-    def send_request():
+    def send_request(self):
         raise NotImplementedError("send_request must be implemented by subclasses")
 
     @patch(
@@ -52,7 +52,7 @@ class XblockViewTestCase(AuthorizeStaffTestCase):
         data=None,
     ):
         url = self.get_url()
-        data = self.get_test_data(id)
+        data = self.get_test_data()
 
         response = self.send_request(url, data)
 
@@ -70,7 +70,7 @@ class XblockViewGetTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
     Test GET operation on xblocks
     """
 
-    def get_test_data(self, course_id):
+    def get_test_data(self):
         return None
 
     def assert_xblock_handler_called(self, *, mock_handle_xblock, response):
@@ -106,7 +106,7 @@ class XblockViewGetTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
 
 class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
     """
-    Test POST operation on xblocks
+    Test POST operation on xblocks - Create a new xblock for a parent xblock
     """
 
     def get_url_params(self):
@@ -118,7 +118,7 @@ class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
             kwargs=self.get_url_params(),
         )
 
-    def get_test_data(self, course_id):
+    def get_test_data(self):
         id = self.get_course_key_string()
         return {
             "parent_locator": id,
@@ -137,13 +137,66 @@ class XblockViewPostTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert passed_args.path == self.get_url()
 
     def send_request(self, url, data):
-        return self.client.post(url, data=data)
+        return self.client.post(url, data=data, format="json")
 
     def test_api_behind_feature_flag(self):
         # should return 404 if the feature flag is not enabled
         url = self.get_url()
 
         response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_xblock_handler_called_with_correct_arguments(self):
+        self.client.login(
+            username=self.course_instructor.username, password=self.password
+        )
+        response = self.make_request(
+            run_assertions=self.assert_xblock_handler_called,
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["locator"] == TEST_LOCATOR
+        assert data["courseKey"] == self.get_course_key_string()
+
+
+class XblockViewPutTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
+    """
+    Test PUT operation on xblocks - update an xblock
+    """
+
+    def get_test_data(self):
+        id = self.get_course_key_string()
+        return {
+            "category": "html",
+            "courseKey": id,
+            "data": "<p>Updated block!</p>",
+            "has_changes": True,
+            "id": TEST_LOCATOR,
+            "metadata": {
+                "display_name": "Text"
+            }
+        }
+
+    def assert_xblock_handler_called(self, *, mock_handle_xblock, response):
+        mock_handle_xblock.assert_called_once()
+        passed_args = mock_handle_xblock.call_args[0][0]
+
+        course_id = self.get_course_key_string()
+
+        assert passed_args.data.get("courseKey") == course_id
+        assert passed_args.data.get("data") == "<p>Updated block!</p>"
+        assert passed_args.data.get("id") == TEST_LOCATOR
+        assert passed_args.method == "PUT"
+        assert passed_args.path == self.get_url()
+
+    def send_request(self, url, data):
+        return self.client.put(url, data=data, format="json")
+
+    def test_api_behind_feature_flag(self):
+        # should return 404 if the feature flag is not enabled
+        url = self.get_url()
+
+        response = self.client.put(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_xblock_handler_called_with_correct_arguments(self):
