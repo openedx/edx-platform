@@ -358,7 +358,7 @@ class ClassAdmin(admin.ModelAdmin):
             name = 'attach_{}'.format(value.slug.strip())
             actions['attach_{}'.format(value.slug.strip())] = (func, name,
                                                                           'attach to Program: {}'.format(
-                                                                              value.year_group.name))
+                                                                              value.slug))
 
         return actions
 
