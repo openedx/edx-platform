@@ -19,8 +19,16 @@ from common.djangoapps.third_party_auth.appleid import AppleIdAuth
 
 log = logging.getLogger(__name__)
 
+INVALID_GRANT_ERROR = "invalid_grant"
+
 
 class AccessTokenExpiredException(Exception):
+    """
+    Raised when access token has been expired.
+    """
+
+
+class BadRequestException(Exception):
     """
     Raised when access token has been expired.
     """
@@ -32,7 +40,7 @@ class Command(BaseCommand):
     the user in new migrated team.
 
     Usage:
-        manage.py generate_and_store_apple_transfer_ids
+        manage.py generate_and_store_new_apple_ids
     """
 
     def _generate_client_secret(self):
@@ -112,7 +120,11 @@ class Command(BaseCommand):
         }
         response = requests.post(migration_url, data=payload, headers=headers)
         if response.status_code == 400:
-            raise AccessTokenExpiredException
+            error = response.json().get('error')
+            log.info("Error while fetching apple_id for transfer_id %s. Error: %s", transfer_id, error)
+            if error == INVALID_GRANT_ERROR:
+                raise AccessTokenExpiredException
+            raise BadRequestException
 
         return response.json().get('sub')
 
@@ -120,6 +132,9 @@ class Command(BaseCommand):
         """
         For a Transfer ID obtained from the transferring team,
         return the correlating Apple ID belonging to the recipient team.
+        Update access token if expired.
+        Skip the current transfer_id in case of a malformed request
+        error and log info.
         """
         try:
             new_apple_id = self._fetch_new_apple_id(transfer_id)
@@ -127,10 +142,12 @@ class Command(BaseCommand):
             log.info('Access token expired. Re-creating access token.')
             self._update_token_and_secret()
             new_apple_id = self._fetch_new_apple_id(transfer_id)
+        except BadRequestException:
+            log.info('Bad request for transfer_id %s.', transfer_id)
+            new_apple_id = ''
 
         return new_apple_id
 
-    @transaction.atomic
     def handle(self, *args, **options):
         self._update_token_and_secret()
         if not self.access_token:
@@ -139,12 +156,14 @@ class Command(BaseCommand):
         apple_user_ids_info = AppleMigrationUserIdInfo.objects.filter(Q(new_apple_id__isnull=True) | Q(new_apple_id=""),
                                                                       ~Q(transfer_id=""), transfer_id__isnull=False)
         for apple_user_id_info in apple_user_ids_info:
-            new_apple_id = self._exchange_transfer_id_for_new_apple_id(apple_user_id_info.transfer_id)
+            transfer_id = apple_user_id_info.transfer_id
+            old_apple_id = apple_user_id_info.old_apple_id
+            log.info("Begin processing old_apple_id %s, transfer_id %s", old_apple_id, transfer_id)
+            new_apple_id = self._exchange_transfer_id_for_new_apple_id(transfer_id)
             if new_apple_id:
-                apple_user_id_info.new_apple_id = new_apple_id
-                apple_user_id_info.save()
-                log.info('Updated new Apple ID for uid %s',
-                         apple_user_id_info.old_apple_id)
+                with transaction.atomic():
+                    apple_user_id_info.new_apple_id = new_apple_id
+                    apple_user_id_info.save()
+                    log.info('Updated new Apple ID for uid %s', old_apple_id)
             else:
-                log.info('Unable to fetch new Apple ID for uid %s',
-                         apple_user_id_info.old_apple_id)
+                log.info('Unable to fetch new Apple ID for uid %s', old_apple_id)
