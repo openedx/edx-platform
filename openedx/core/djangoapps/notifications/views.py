@@ -12,13 +12,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.djangoapps.student.models import CourseEnrollment
-from openedx.core.djangoapps.notifications.models import NotificationPreference
+from openedx.core.djangoapps.notifications.models import (
+    CourseNotificationPreference,
+    get_course_notification_preference_config_version
+)
 
+from .config.waffle import ENABLE_NOTIFICATIONS
 from .models import Notification
 from .serializers import (
     NotificationCourseEnrollmentSerializer,
     NotificationSerializer,
-    UserNotificationPreferenceSerializer
+    UserCourseNotificationPreferenceSerializer,
+    UserNotificationPreferenceUpdateSerializer
 )
 
 User = get_user_model()
@@ -37,8 +42,6 @@ class CourseEnrollmentListView(generics.ListAPIView):
                     "id": (int) course_id,
                     "display_name": (str) course_display_name
                 },
-                "is_active": (bool) is_enrollment_active,
-                "mode": (str) enrollment_mode
             },
             ...
         ]
@@ -52,6 +55,20 @@ class CourseEnrollmentListView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return CourseEnrollment.objects.filter(user=user, is_active=True)
+
+    def list(self, request, *args, **kwargs):
+        """
+        Returns the list of active course enrollments for which ENABLE_NOTIFICATIONS
+        Waffle flag is enabled
+        """
+        enrollment_queryset = self.get_queryset().select_related('course')
+        enrollments = [
+            enrollment
+            for enrollment in enrollment_queryset
+            if ENABLE_NOTIFICATIONS.is_enabled(enrollment.course.id)
+        ]
+        serializer = self.get_serializer(enrollments, many=True)
+        return Response(serializer.data)
 
 
 class UserNotificationPreferenceView(APIView):
@@ -70,12 +87,23 @@ class UserNotificationPreferenceView(APIView):
         'course_id': 'course-v1:testorg+testcourse+testrun',
         'notification_preference_config': {
             'discussion': {
-                'new_post': {
+                'enabled': False,
+                'core': {
+                    'info': '',
                     'web': False,
                     'push': False,
                     'email': False,
-                }
-            }
+                },
+                'notification_types': {
+                    'new_post': {
+                        'info': '',
+                        'web': False,
+                        'push': False,
+                        'email': False,
+                    },
+                },
+                'not_editable': {},
+            },
         }
     }
     """
@@ -96,22 +124,33 @@ class UserNotificationPreferenceView(APIView):
                 'course_id': 'course-v1:testorg+testcourse+testrun',
                 'notification_preference_config': {
                     'discussion': {
-                        'new_post': {
+                        'enabled': False,
+                        'core': {
+                            'info': '',
                             'web': False,
                             'push': False,
                             'email': False,
-                        }
-                    }
+                        },
+                        'notification_types': {
+                            'new_post': {
+                                'info': '',
+                                'web': False,
+                                'push': False,
+                                'email': False,
+                            },
+                        },
+                        'not_editable': {},
+                    },
                 }
             }
          """
         course_id = CourseKey.from_string(course_key_string)
-        user_notification_preference, _ = NotificationPreference.objects.get_or_create(
+        user_notification_preference, _ = CourseNotificationPreference.objects.get_or_create(
             user=request.user,
             course_id=course_id,
             is_active=True,
         )
-        serializer = UserNotificationPreferenceSerializer(user_notification_preference)
+        serializer = UserCourseNotificationPreferenceSerializer(user_notification_preference)
         return Response(serializer.data)
 
     def patch(self, request, course_key_string):
@@ -129,16 +168,24 @@ class UserNotificationPreferenceView(APIView):
             400: Validation error
         """
         course_id = CourseKey.from_string(course_key_string)
-        user_notification_preference = NotificationPreference.objects.get(
+        user_course_notification_preference = CourseNotificationPreference.objects.get(
             user=request.user,
             course_id=course_id,
             is_active=True,
         )
-        serializer = UserNotificationPreferenceSerializer(user_notification_preference, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if user_course_notification_preference.config_version != get_course_notification_preference_config_version():
+            return Response(
+                {'error': 'The notification preference config version is not up to date.'},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        preference_update_serializer = UserNotificationPreferenceUpdateSerializer(
+            user_course_notification_preference, data=request.data, partial=True
+        )
+        preference_update_serializer.is_valid(raise_exception=True)
+        updated_notification_preferences = preference_update_serializer.save()
+        serializer = UserCourseNotificationPreferenceSerializer(updated_notification_preferences)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class NotificationListAPIView(generics.ListAPIView):

@@ -62,6 +62,7 @@ from openedx.core.djangolib.markup import HTML
   <%static:css group='style-course'/>
     
   <%include file="widgets/segment-io.html" />
+  ${HTML(fragment.head_html())}
 
   <meta name="path_prefix" content="${EDX_ROOT_URL}">
   <% google_site_verification_id = configuration_helpers.get_value('GOOGLE_SITE_VERIFICATION_ID', settings.GOOGLE_SITE_VERIFICATION_ID) %>

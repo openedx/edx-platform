@@ -127,7 +127,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-07 20:42+0000\n"
+"POT-Creation-Date: 2023-05-28 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ilaria Botti <ilabotti@gmail.com>, 2021\n"
 "Language-Team: Italian (Italy) (https://app.transifex.com/open-edx/teams/6205/it_IT/)\n"
@@ -7646,6 +7646,12 @@ msgstr ""
 "apprendimento associato verranno disabilitate."
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr "I dati di configurazione LTI per questo contesto/provider."
 
@@ -13458,6 +13464,16 @@ msgstr "Gruppo eliminato"
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Duplicato di {0}"
+
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Duplicato di '{0}'"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr ""
@@ -13592,16 +13608,6 @@ msgstr ""
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr "target_index ({target_index}) deve essere un numero intero."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Duplicato di {0}"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Duplicato di '{0}'"
 
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of

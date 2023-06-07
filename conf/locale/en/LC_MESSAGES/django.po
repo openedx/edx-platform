@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-22 14:47+0000\n"
-"PO-Revision-Date: 2023-05-22 14:47:11.867932\n"
+"POT-Creation-Date: 2023-06-04 20:36+0000\n"
+"PO-Revision-Date: 2023-06-04 20:36:01.279673\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -6661,6 +6661,12 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr ""
 
@@ -11623,6 +11629,16 @@ msgstr ""
 msgid "{previous_groups}, {current_group}"
 msgstr ""
 
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr ""
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr ""
@@ -11737,16 +11753,6 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
 msgstr ""
 
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
@@ -13032,6 +13038,10 @@ msgstr ""
 
 #: lms/templates/public_video.html
 msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Go to course"
 msgstr ""
 
 #: lms/templates/public_video.html
@@ -21397,7 +21407,7 @@ msgid "Set Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

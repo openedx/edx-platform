@@ -43,6 +43,7 @@
     " records are not in the correct format and have not been added to the exception list": " \u0279\u01dd\u0254\u00f8\u0279ds \u0250\u0279\u01dd n\u00f8\u0287 \u1d09n \u0287\u0265\u01dd \u0254\u00f8\u0279\u0279\u01dd\u0254\u0287 \u025f\u00f8\u0279\u026f\u0250\u0287 \u0250nd \u0265\u0250\u028c\u01dd n\u00f8\u0287 b\u01dd\u01ddn \u0250dd\u01ddd \u0287\u00f8 \u0287\u0265\u01dd \u01ddx\u0254\u01ddd\u0287\u1d09\u00f8n l\u1d09s\u0287",
     " to learn": " \u0287\u00f8 l\u01dd\u0250\u0279n",
     "${listPrice}": "${listPrice}",
+    "${price}/month {currency}": "${price}/\u026f\u00f8n\u0287\u0265 {currency}",
     "%(cohort_name)s (%(user_count)s)": "%(cohort_name)s (%(user_count)s)",
     "%(comments_count)s %(span_sr_open)scomments %(span_close)s": "%(comments_count)s %(span_sr_open)s\u0254\u00f8\u026f\u026f\u01ddn\u0287s %(span_close)s",
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)s\u0254\u00f8\u026f\u026f\u01ddn\u0287s (%(unread_comments_count)s nn\u0279\u01dd\u0250d \u0254\u00f8\u026f\u026f\u01ddn\u0287s)%(span_close)s",
@@ -1183,8 +1184,8 @@
     "Pasting": "\u2c63\u0250s\u0287\u1d09n\u0183",
     "Path to Signature Image": "\u2c63\u0250\u0287\u0265 \u0287\u00f8 S\u1d09\u0183n\u0250\u0287n\u0279\u01dd \u0197\u026f\u0250\u0183\u01dd",
     "Pause": "\u2c63\u0250ns\u01dd",
-    "Pay {subscriptionPrice}/month after {trialLength}-day free trial": "\u2c63\u0250\u028e {subscriptionPrice}/\u026f\u00f8n\u0287\u0265 \u0250\u025f\u0287\u01dd\u0279 {trialLength}-d\u0250\u028e \u025f\u0279\u01dd\u01dd \u0287\u0279\u1d09\u0250l",
-    "Pay {subscriptionPrice}/month for all courses in this program": "\u2c63\u0250\u028e {subscriptionPrice}/\u026f\u00f8n\u0287\u0265 \u025f\u00f8\u0279 \u0250ll \u0254\u00f8n\u0279s\u01dds \u1d09n \u0287\u0265\u1d09s d\u0279\u00f8\u0183\u0279\u0250\u026f",
+    "Pay {subscriptionPrice} after {trialLength}-day free trial": "\u2c63\u0250\u028e {subscriptionPrice} \u0250\u025f\u0287\u01dd\u0279 {trialLength}-d\u0250\u028e \u025f\u0279\u01dd\u01dd \u0287\u0279\u1d09\u0250l",
+    "Pay {subscriptionPrice} for all courses in this program": "\u2c63\u0250\u028e {subscriptionPrice} \u025f\u00f8\u0279 \u0250ll \u0254\u00f8n\u0279s\u01dds \u1d09n \u0287\u0265\u1d09s d\u0279\u00f8\u0183\u0279\u0250\u026f",
     "Photo": "\u2c63\u0265\u00f8\u0287\u00f8",
     "Photo Captured successfully.": "\u2c63\u0265\u00f8\u0287\u00f8 \u023b\u0250d\u0287n\u0279\u01ddd sn\u0254\u0254\u01ddss\u025fnll\u028e.",
     "Photo ID": "\u2c63\u0265\u00f8\u0287\u00f8 \u0197\u0110",
@@ -1356,7 +1357,7 @@
     "Reset attempts for all students on problem '<%- problem_id %>'?": "\u024c\u01dds\u01dd\u0287 \u0250\u0287\u0287\u01dd\u026fd\u0287s \u025f\u00f8\u0279 \u0250ll s\u0287nd\u01ddn\u0287s \u00f8n d\u0279\u00f8bl\u01dd\u026f '<%- problem_id %>'?",
     "Responses could not be loaded. Refresh the page and try again.": "\u024c\u01ddsd\u00f8ns\u01dds \u0254\u00f8nld n\u00f8\u0287 b\u01dd l\u00f8\u0250d\u01ddd. \u024c\u01dd\u025f\u0279\u01dds\u0265 \u0287\u0265\u01dd d\u0250\u0183\u01dd \u0250nd \u0287\u0279\u028e \u0250\u0183\u0250\u1d09n.",
     "Restart my subscription": "\u024c\u01dds\u0287\u0250\u0279\u0287 \u026f\u028e snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n",
-    "Restart your subscription for {subscriptionPrice}/month. Your payment history is still available on the {a_start}Orders and subscriptions{a_end} page": "\u024c\u01dds\u0287\u0250\u0279\u0287 \u028e\u00f8n\u0279 snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n \u025f\u00f8\u0279 {subscriptionPrice}/\u026f\u00f8n\u0287\u0265. \u024e\u00f8n\u0279 d\u0250\u028e\u026f\u01ddn\u0287 \u0265\u1d09s\u0287\u00f8\u0279\u028e \u1d09s s\u0287\u1d09ll \u0250\u028c\u0250\u1d09l\u0250bl\u01dd \u00f8n \u0287\u0265\u01dd {a_start}\u00d8\u0279d\u01dd\u0279s \u0250nd snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8ns{a_end} d\u0250\u0183\u01dd",
+    "Restart your subscription for {subscriptionPrice}. Your payment history is still available on the {a_start}Orders and subscriptions{a_end} page": "\u024c\u01dds\u0287\u0250\u0279\u0287 \u028e\u00f8n\u0279 snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n \u025f\u00f8\u0279 {subscriptionPrice}. \u024e\u00f8n\u0279 d\u0250\u028e\u026f\u01ddn\u0287 \u0265\u1d09s\u0287\u00f8\u0279\u028e \u1d09s s\u0287\u1d09ll \u0250\u028c\u0250\u1d09l\u0250bl\u01dd \u00f8n \u0287\u0265\u01dd {a_start}\u00d8\u0279d\u01dd\u0279s \u0250nd snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8ns{a_end} d\u0250\u0183\u01dd",
     "Restore enrollment code": "\u024c\u01dds\u0287\u00f8\u0279\u01dd \u01ddn\u0279\u00f8ll\u026f\u01ddn\u0287 \u0254\u00f8d\u01dd",
     "Restore last draft": "\u024c\u01dds\u0287\u00f8\u0279\u01dd l\u0250s\u0287 d\u0279\u0250\u025f\u0287",
     "Restrict access to:": "\u024c\u01dds\u0287\u0279\u1d09\u0254\u0287 \u0250\u0254\u0254\u01ddss \u0287\u00f8:",
@@ -1861,7 +1862,7 @@
     "Unlink This Account": "\u0244nl\u1d09n\u029e \u0166\u0265\u1d09s \u023a\u0254\u0254\u00f8nn\u0287",
     "Unlink your {accountName} account": "\u0244nl\u1d09n\u029e \u028e\u00f8n\u0279 {accountName} \u0250\u0254\u0254\u00f8nn\u0287",
     "Unlinking": "\u0244nl\u1d09n\u029e\u1d09n\u0183",
-    "Unlock verified access to all courses for {subscriptionPrice}/month. Cancel anytime.": "\u0244nl\u00f8\u0254\u029e \u028c\u01dd\u0279\u1d09\u025f\u1d09\u01ddd \u0250\u0254\u0254\u01ddss \u0287\u00f8 \u0250ll \u0254\u00f8n\u0279s\u01dds \u025f\u00f8\u0279 {subscriptionPrice}/\u026f\u00f8n\u0287\u0265. \u023b\u0250n\u0254\u01ddl \u0250n\u028e\u0287\u1d09\u026f\u01dd.",
+    "Unlock verified access to all courses for {subscriptionPrice}. Cancel anytime.": "\u0244nl\u00f8\u0254\u029e \u028c\u01dd\u0279\u1d09\u025f\u1d09\u01ddd \u0250\u0254\u0254\u01ddss \u0287\u00f8 \u0250ll \u0254\u00f8n\u0279s\u01dds \u025f\u00f8\u0279 {subscriptionPrice}. \u023b\u0250n\u0254\u01ddl \u0250n\u028e\u0287\u1d09\u026f\u01dd.",
     "Unmark as Answer": "\u0244n\u026f\u0250\u0279\u029e \u0250s \u023ans\u028d\u01dd\u0279",
     "Unmute": "\u0244n\u026fn\u0287\u01dd",
     "Unpin": "\u0244nd\u1d09n",
@@ -2149,7 +2150,7 @@
     "Your message cannot be blank.": "\u024e\u00f8n\u0279 \u026f\u01ddss\u0250\u0183\u01dd \u0254\u0250nn\u00f8\u0287 b\u01dd bl\u0250n\u029e.",
     "Your message must have a subject.": "\u024e\u00f8n\u0279 \u026f\u01ddss\u0250\u0183\u01dd \u026fns\u0287 \u0265\u0250\u028c\u01dd \u0250 snb\u027e\u01dd\u0254\u0287.",
     "Your message must have at least one target.": "\u024e\u00f8n\u0279 \u026f\u01ddss\u0250\u0183\u01dd \u026fns\u0287 \u0265\u0250\u028c\u01dd \u0250\u0287 l\u01dd\u0250s\u0287 \u00f8n\u01dd \u0287\u0250\u0279\u0183\u01dd\u0287.",
-    "Your next billing date is {nextPaymentDate}": "\u024e\u00f8n\u0279 n\u01ddx\u0287 b\u1d09ll\u1d09n\u0183 d\u0250\u0287\u01dd \u1d09s {nextPaymentDate}",
+    "Your next billing date is {currentPeriodEnd}": "\u024e\u00f8n\u0279 n\u01ddx\u0287 b\u1d09ll\u1d09n\u0183 d\u0250\u0287\u01dd \u1d09s {currentPeriodEnd}",
     "Your policy changes have been saved.": "\u024e\u00f8n\u0279 d\u00f8l\u1d09\u0254\u028e \u0254\u0265\u0250n\u0183\u01dds \u0265\u0250\u028c\u01dd b\u01dd\u01ddn s\u0250\u028c\u01ddd.",
     "Your post will be discarded.": "\u024e\u00f8n\u0279 d\u00f8s\u0287 \u028d\u1d09ll b\u01dd d\u1d09s\u0254\u0250\u0279d\u01ddd.",
     "Your profile settings are managed by {enterprise_name}. Contact your administrator or {link_start}edX Support{link_end} for help.": "\u024e\u00f8n\u0279 d\u0279\u00f8\u025f\u1d09l\u01dd s\u01dd\u0287\u0287\u1d09n\u0183s \u0250\u0279\u01dd \u026f\u0250n\u0250\u0183\u01ddd b\u028e {enterprise_name}. \u023b\u00f8n\u0287\u0250\u0254\u0287 \u028e\u00f8n\u0279 \u0250d\u026f\u1d09n\u1d09s\u0287\u0279\u0250\u0287\u00f8\u0279 \u00f8\u0279 {link_start}\u01dddX Sndd\u00f8\u0279\u0287{link_end} \u025f\u00f8\u0279 \u0265\u01ddld.",
@@ -2167,9 +2168,9 @@
     "Your upload of '{file}' succeeded.": "\u024e\u00f8n\u0279 ndl\u00f8\u0250d \u00f8\u025f '{file}' sn\u0254\u0254\u01dd\u01ddd\u01ddd.",
     "Your verification status is good until {verificationGoodUntil}.": "\u024e\u00f8n\u0279 \u028c\u01dd\u0279\u1d09\u025f\u1d09\u0254\u0250\u0287\u1d09\u00f8n s\u0287\u0250\u0287ns \u1d09s \u0183\u00f8\u00f8d nn\u0287\u1d09l {verificationGoodUntil}.",
     "Your video uploads are not complete.": "\u024e\u00f8n\u0279 \u028c\u1d09d\u01dd\u00f8 ndl\u00f8\u0250ds \u0250\u0279\u01dd n\u00f8\u0287 \u0254\u00f8\u026fdl\u01dd\u0287\u01dd.",
-    "Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}/month.": [
-      "\u024e\u00f8n\u0279 {programName} \u0287\u0279\u1d09\u0250l \u028d\u1d09ll \u01ddxd\u1d09\u0279\u01dd \u1d09n {remainingDays} d\u0250\u028e \u0250\u0287 {trialEndTime} \u00f8n {trialEndDate} \u0250nd \u0287\u0265\u01dd \u0254\u0250\u0279d \u00f8n \u025f\u1d09l\u01dd \u028d\u1d09ll b\u01dd \u0254\u0265\u0250\u0279\u0183\u01ddd {subscriptionPrice}/\u026f\u00f8n\u0287\u0265.",
-      "\u024e\u00f8n\u0279 {programName} \u0287\u0279\u1d09\u0250l \u028d\u1d09ll \u01ddxd\u1d09\u0279\u01dd \u1d09n {remainingDays} d\u0250\u028es \u0250\u0287 {trialEndTime} \u00f8n {trialEndDate} \u0250nd \u0287\u0265\u01dd \u0254\u0250\u0279d \u00f8n \u025f\u1d09l\u01dd \u028d\u1d09ll b\u01dd \u0254\u0265\u0250\u0279\u0183\u01ddd {subscriptionPrice}/\u026f\u00f8n\u0287\u0265."
+    "Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.": [
+      "\u024e\u00f8n\u0279 {programName} \u0287\u0279\u1d09\u0250l \u028d\u1d09ll \u01ddxd\u1d09\u0279\u01dd \u1d09n {remainingDays} d\u0250\u028e \u0250\u0287 {trialEndTime} \u00f8n {trialEndDate} \u0250nd \u0287\u0265\u01dd \u0254\u0250\u0279d \u00f8n \u025f\u1d09l\u01dd \u028d\u1d09ll b\u01dd \u0254\u0265\u0250\u0279\u0183\u01ddd {subscriptionPrice}.",
+      "\u024e\u00f8n\u0279 {programName} \u0287\u0279\u1d09\u0250l \u028d\u1d09ll \u01ddxd\u1d09\u0279\u01dd \u1d09n {remainingDays} d\u0250\u028es \u0250\u0287 {trialEndTime} \u00f8n {trialEndDate} \u0250nd \u0287\u0265\u01dd \u0254\u0250\u0279d \u00f8n \u025f\u1d09l\u01dd \u028d\u1d09ll b\u01dd \u0254\u0265\u0250\u0279\u0183\u01ddd {subscriptionPrice}."
     ],
     "Your {program} Certificate": "\u024e\u00f8n\u0279 {program} \u023b\u01dd\u0279\u0287\u1d09\u025f\u1d09\u0254\u0250\u0287\u01dd",
     "Yourself": "\u024e\u00f8n\u0279s\u01ddl\u025f",
@@ -2355,7 +2356,7 @@
     "{startTag}{requestToken}{endTag}{selector}": "{startTag}{requestToken}{endTag}{selector}",
     "{start_strong}{total}{end_strong} words submitted in total.": "{start_strong}{total}{end_strong} \u028d\u00f8\u0279ds snb\u026f\u1d09\u0287\u0287\u01ddd \u1d09n \u0287\u00f8\u0287\u0250l.",
     "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on {platformName}.{strongEnd}": "{strongStart}W\u0250\u0279n\u1d09n\u0183: \u023a\u0254\u0254\u00f8nn\u0287 d\u01ddl\u01dd\u0287\u1d09\u00f8n \u1d09s d\u01dd\u0279\u026f\u0250n\u01ddn\u0287.{strongEnd} \u2c63l\u01dd\u0250s\u01dd \u0279\u01dd\u0250d \u0287\u0265\u01dd \u0250b\u00f8\u028c\u01dd \u0254\u0250\u0279\u01dd\u025fnll\u028e b\u01dd\u025f\u00f8\u0279\u01dd d\u0279\u00f8\u0254\u01dd\u01ddd\u1d09n\u0183. \u0166\u0265\u1d09s \u1d09s \u0250n \u1d09\u0279\u0279\u01dd\u028c\u01dd\u0279s\u1d09bl\u01dd \u0250\u0254\u0287\u1d09\u00f8n, \u0250nd {strongStart}\u028e\u00f8n \u028d\u1d09ll n\u00f8 l\u00f8n\u0183\u01dd\u0279 b\u01dd \u0250bl\u01dd \u0287\u00f8 ns\u01dd \u0287\u0265\u01dd s\u0250\u026f\u01dd \u01dd\u026f\u0250\u1d09l \u00f8n {platformName}.{strongEnd}",
-    "{subscriptionPrice}/month subscription after trial ends. Cancel anytime.": "{subscriptionPrice}/\u026f\u00f8n\u0287\u0265 snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n \u0250\u025f\u0287\u01dd\u0279 \u0287\u0279\u1d09\u0250l \u01ddnds. \u023b\u0250n\u0254\u01ddl \u0250n\u028e\u0287\u1d09\u026f\u01dd.",
+    "{subscriptionPrice} subscription after trial ends. Cancel anytime.": "{subscriptionPrice} snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n \u0250\u025f\u0287\u01dd\u0279 \u0287\u0279\u1d09\u0250l \u01ddnds. \u023b\u0250n\u0254\u01ddl \u0250n\u028e\u0287\u1d09\u026f\u01dd.",
     "{team_count} Team": [
       "{team_count} \u0166\u01dd\u0250\u026f",
       "{team_count} \u0166\u01dd\u0250\u026fs"

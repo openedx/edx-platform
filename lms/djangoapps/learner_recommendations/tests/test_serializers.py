@@ -6,9 +6,13 @@ from django.test import TestCase
 
 from lms.djangoapps.learner_recommendations.serializers import (
     DashboardRecommendationsSerializer,
-    CrossProductRecommendationsSerializer
+    CrossProductRecommendationsSerializer,
+    CrossProductAndAmplitudeRecommendationsSerializer
 )
-from lms.djangoapps.learner_recommendations.tests.test_data import mock_course_data
+from lms.djangoapps.learner_recommendations.tests.test_data import (
+    mock_amplitude_and_cross_product_course_data,
+    mock_cross_product_course_data
+)
 
 
 class TestDashboardRecommendationsSerializer(TestCase):
@@ -85,10 +89,13 @@ class TestDashboardRecommendationsSerializer(TestCase):
         )
 
 
-class TestCrossProductRecommendationsSerializer(TestCase):
-    """Tests for the Cross Product Recommendations Serializer"""
+class TestCrossProductRecommendationsSerializers(TestCase):
+    """
+    Tests for the CrossProductRecommendationsSerializer
+    and CrossProductAndAmplitudeRecommendations Serializer
+    """
 
-    def mock_recommended_courses(self, num_of_courses):
+    def mock_recommended_courses(self, num_of_courses=2, amplitude_courses=False):
         """Course data mock"""
 
         recommended_courses = []
@@ -127,28 +134,73 @@ class TestCrossProductRecommendationsSerializer(TestCase):
                 },
             )
 
+        if amplitude_courses:
+            keys_to_remove = ["active_course_run", "key", "uuid"]
+            amplitude_courses = []
+
+            for course in recommended_courses:
+                new_course = {key: value for key, value in course.items() if key not in keys_to_remove}
+                amplitude_courses.append(new_course)
+
+            return amplitude_courses
+
         return recommended_courses
 
-    def test_successful_serialization(self):
+    def test_successful_cross_product_recommendation_serialization(self):
+        """Test that course data serializes correctly for CrossProductRecommendationSerializer"""
         courses = self.mock_recommended_courses(num_of_courses=2)
 
         serialized_data = CrossProductRecommendationsSerializer({
-            "courses": courses
+            "courses": courses,
         }).data
 
         self.assertDictEqual(
             serialized_data,
-            mock_course_data
+            mock_cross_product_course_data
         )
 
-    def test_no_course_data_serialization(self):
+    def test_successful_cross_product_and_amplitude_recommendations_serializer(self):
+        """Test that course data serializes correctly for CrossProductAndAmplitudeRecommendationSerializer"""
+
+        cross_product_courses = self.mock_recommended_courses(num_of_courses=2)
+        amplitude_courses = self.mock_recommended_courses(num_of_courses=4, amplitude_courses=True)
+
+        serialized_data = CrossProductAndAmplitudeRecommendationsSerializer({
+            "crossProductCourses": cross_product_courses,
+            "amplitudeCourses": amplitude_courses,
+        }).data
+
+        self.assertDictEqual(
+            serialized_data,
+            mock_amplitude_and_cross_product_course_data
+        )
+
+    def test_no_cross_product_course_serialization(self):
+        """Tests that empty course data for CrossProductRecommendationsSerializer serializes properly"""
+
         serialized_data = CrossProductRecommendationsSerializer({
-            "courses": []
+            "courses": [],
         }).data
 
         self.assertDictEqual(
             serialized_data,
             {
-                "courses": []
+                "courses": [],
+            },
+        )
+
+    def test_no_amplitude_and_cross_product_and_course_serialization(self):
+        """Tests that empty course data for CrossProductRecommendationsSerializer serializes properly"""
+
+        serialized_data = CrossProductAndAmplitudeRecommendationsSerializer({
+            "crossProductCourses": [],
+            "amplitudeCourses": []
+        }).data
+
+        self.assertDictEqual(
+            serialized_data,
+            {
+                "crossProductCourses": [],
+                "amplitudeCourses": []
             },
         )
