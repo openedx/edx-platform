@@ -127,8 +127,7 @@ class Command(BaseCommand):
             log.info("Error while fetching transfer_id for uid %s. Error: %s", apple_id, error)
             if error == INVALID_GRANT_ERROR:
                 raise AccessTokenExpiredException
-            else:
-                raise BadRequestException
+            raise BadRequestException
 
         return response.json().get('transfer_sub')
 
