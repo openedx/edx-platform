@@ -1,8 +1,6 @@
 """
 Unit tests for Contentstore views.
 """
-import json
-
 import ddt
 from mock import patch
 from django.conf import settings
@@ -21,6 +19,8 @@ from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
+
+from ..mixins import PermissionAccessMixin
 
 
 class ProctoringExamSettingsTestMixin():
@@ -442,7 +442,7 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestMixin, ModuleSto
 
 
 @ddt.ddt
-class CourseProctoringErrorsViewTest(CourseTestCase):
+class CourseProctoringErrorsViewTest(CourseTestCase, PermissionAccessMixin):
     """
     Tests for ProctoringErrorsView.
     """
@@ -454,32 +454,6 @@ class CourseProctoringErrorsViewTest(CourseTestCase):
             kwargs={"course_id": self.course.id},
         )
         self.non_staff_client, _ = self.create_non_staff_authed_user_client()
-
-    def get_and_check_developer_response(self, response):
-        """
-        Make basic asserting about the presence of an error response, and return the developer response.
-        """
-        content = json.loads(response.content.decode("utf-8"))
-        assert "developer_message" in content
-        return content["developer_message"]
-
-    def test_permissions_unauthenticated(self):
-        """
-        Test that an error is returned in the absence of auth credentials.
-        """
-        self.client.logout()
-        response = self.client.get(self.url)
-        error = self.get_and_check_developer_response(response)
-        assert error == "Authentication credentials were not provided."
-
-    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_ADVANCED_SETTINGS': True})
-    def test_permissions_unauthorized(self):
-        """
-        Test that an error is returned if the user is unauthorised.
-        """
-        response = self.non_staff_client.get(self.url)
-        error = self.get_and_check_developer_response(response)
-        assert error == "You do not have permission to perform this action."
 
     @ddt.data(False, True)
     def test_disable_advanced_settings_feature(self, disable_advanced_settings):
