@@ -703,7 +703,7 @@ describe('Program Details View', () => {
         testSubscriptionState(
             'active',
             'Manage my subscription',
-            'Active trial ends',
+            'Trial ends',
             true,
         );
     });
@@ -720,7 +720,7 @@ describe('Program Details View', () => {
         testSubscriptionState(
             'inactive',
             'Restart my subscription',
-            'Unlock verified access to all courses for $100/month USD. Cancel anytime.',
+            '$100/month USD subscription. Cancel anytime.',
         );
     });
 });
