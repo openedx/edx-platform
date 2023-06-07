@@ -9,12 +9,38 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_FAILED,
     COURSE_GRADE_NOW_PASSED
 )
+from openedx_filters import PipelineStep
+from openedx_filters.exceptions import OpenEdxFilterException
+from openedx_filters.tooling import OpenEdxPublicFilter
 from .course_data import CourseData
 from .course_grade import CourseGrade, ZeroCourseGrade
 from .models import PersistentCourseGrade
 from .models_api import prefetch_grade_overrides_and_visible_blocks
 
 log = getLogger(__name__)
+
+
+class CourseGradeUpdateStarted(OpenEdxPublicFilter):
+    """
+    Custom class used to create enrollment filters and its custom methods.
+    """
+
+    filter_type = "org.openedx.learning.course.grade.update.started.v1"
+
+    @classmethod
+    def run_filter(cls, course_grade):
+
+        data = super().run_pipeline(course_grade=course_grade)
+        return data.get("course_grade")
+
+
+class NeverPassCourse(PipelineStep):
+
+    def run_filter(self, course_grade):
+        course_grade.passed = False
+        return {
+            "course_grade": course_grade,
+        }
 
 
 class CourseGradeFactory:
@@ -165,6 +191,7 @@ class CourseGradeFactory:
             force_update_subsections=force_update_subsections
         )
         course_grade = course_grade.update()
+        course_grade = CourseGradeUpdateStarted.run_filter(course_grade)
 
         should_persist = course_grade.attempted
         if should_persist:
