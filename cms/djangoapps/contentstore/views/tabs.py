@@ -19,6 +19,17 @@ from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException, StaticT
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import has_course_author_access
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from .helpers import (
+    create_xblock,
+    get_parent_xblock,
+    import_staged_content_from_user_clipboard,
+    is_unit,
+    usage_key_with_run,
+    xblock_primary_child_category,
+    xblock_studio_url,
+    xblock_type_display_name
+)
+from ..toggles import use_new_custom_pages
 from ..utils import get_lms_link_for_item, get_pages_and_resources_url
 
 __all__ = ["tabs_handler", "update_tabs_handler"]
@@ -49,10 +60,20 @@ def tabs_handler(request, course_key_string):
         raise PermissionDenied()
 
     course_item = modulestore().get_course(course_key)
+    tabs_to_render = list(get_course_tabs(course_item, request.user))
 
     if "application/json" in request.META.get("HTTP_ACCEPT", "application/json"):
         if request.method == "GET":  # lint-amnesty, pylint: disable=no-else-raise
-            raise NotImplementedError("coming soon")
+            if use_new_custom_pages:
+                json_tabs = []
+                for tab in tabs_to_render:
+                    static_tab_loc = course_item.id.make_usage_key("static_tab", tab.url_slug)
+                    static_tab = StaticTab.to_json(tab)
+                    static_tab["id"] = str(static_tab_loc)
+                    json_tabs.append(static_tab)
+                return JsonResponse(json_tabs, status=200)
+            else:
+                raise NotImplementedError("coming soon")
         else:
             try:
                 update_tabs_handler(course_item, request.json, request.user)
@@ -63,9 +84,6 @@ def tabs_handler(request, course_key_string):
     elif request.method == "GET":  # assume html
         # get all tabs from the tabs list: static tabs (a.k.a. user-created tabs) and built-in tabs
         # present in the same order they are displayed in LMS
-
-        tabs_to_render = list(get_course_tabs(course_item, request.user))
-
         return render_to_response(
             "edit-tabs.html",
             {
