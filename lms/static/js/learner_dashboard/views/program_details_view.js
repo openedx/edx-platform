@@ -38,10 +38,6 @@ class ProgramDetailsView extends Backbone.View {
         } else {
             this.tpl = HtmlUtils.template(pageTpl);
         }
-        this.options.isSubscriptionEligible = (
-            this.options.isUserB2CSubscriptionsEnabled
-            && this.options.programData.subscription_eligible
-        );
         this.programModel = new Backbone.Model(this.options.programData);
         this.courseData = new Backbone.Model(this.options.courseData);
         this.certificateCollection = new Backbone.Collection(
@@ -66,6 +62,7 @@ class ProgramDetailsView extends Backbone.View {
             label: this.options.programData.title,
             program_uuid: this.options.programData.uuid,
         };
+        this.options.isSubscriptionEligible = this.getIsSubscriptionEligible();
 
         this.render();
 
@@ -188,6 +185,30 @@ class ProgramDetailsView extends Backbone.View {
                 hasIframe = true;
             }
         }).bind(this);
+    }
+
+    getIsSubscriptionEligible() {
+        const courseCollections = [
+            this.completedCourseCollection,
+            this.inProgressCourseCollection,
+        ];
+        const isSomeCoursePurchasable = courseCollections.some((collection) => (
+            collection.some((course) => (
+                course.get('upgrade_url') &&
+                !(course.get('expired') === true)
+            ))
+        ));
+        const programPurchasedWithoutSubscription = (
+            this.subscriptionModel.get('subscriptionState') !== 'active'
+            && !isSomeCoursePurchasable
+            && this.remainingCourseCollection.length === 0
+        );
+
+        return (
+            this.options.isUserB2CSubscriptionsEnabled
+            && this.options.programData.subscription_eligible
+            && !programPurchasedWithoutSubscription
+        );
     }
 
     getAlerts() {
