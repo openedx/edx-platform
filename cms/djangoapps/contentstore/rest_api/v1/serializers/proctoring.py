@@ -1,5 +1,5 @@
 """
-API Serializers for Contentstore
+API Serializers for proctoring
 """
 
 from rest_framework import serializers
