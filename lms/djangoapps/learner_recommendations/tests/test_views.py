@@ -360,13 +360,18 @@ class TestProductRecommendationsView(APITestCase):
         self.amplitude_location_restriction_keys = self.amplitude_keys[0:3]
         self.cross_product_location_restriction_keys = self.associated_course_keys[0]
 
-    def _get_url(self, course_key):
+    def _get_url(self, course_key=None):
         """
-        Returns the url with a sepcific course id
+        Returns the product recommendations url with or without the course key
         """
+        if course_key:
+            return reverse_lazy(
+                "learner_recommendations:product_recommendations",
+                kwargs={'course_id': f'course-v1:{course_key}+Test_Course'}
+            )
+
         return reverse_lazy(
-            "learner_recommendations:product_recommendations",
-            kwargs={'course_id': f'course-v1:{course_key}+Test_Course'}
+            "learner_recommendations:product_recommendations_amplitude_only"
         )
 
     def _get_product_recommendations(self, course_keys, keys_with_restriction=None):
@@ -637,6 +642,37 @@ class TestProductRecommendationsView(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(cross_product_course_data), 0)
+        self.assertEqual(len(amplitude_course_data), 4)
+
+    @mock.patch("lms.djangoapps.learner_recommendations.utils._get_user_enrolled_course_keys")
+    @mock.patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_amplitude_only_url_response(
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_mock,
+        get_user_enrolled_course_keys_mock
+    ):
+        """
+        Verify that if no course key was provided in the url,
+        only 1 field for amplitude courses are sent back
+        """
+
+        country_code_from_ip_mock.return_value = "za"
+        get_user_enrolled_course_keys_mock.return_value = self.enrolled_course_run_keys
+        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
+
+        mock_amplitude_course_data = self._get_product_recommendations(self.amplitude_keys)
+        get_course_data_mock.side_effect = mock_amplitude_course_data
+
+        response = self.client.get(self._get_url())
+        response_content = json.loads(response.content)
+        amplitude_course_data = response_content["amplitudeCourses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response_content), 1)
         self.assertEqual(len(amplitude_course_data), 4)
 
 

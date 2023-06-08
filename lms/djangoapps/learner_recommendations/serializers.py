@@ -93,6 +93,13 @@ class CrossProductRecommendationsSerializer(serializers.Serializer):
     )
 
 
+class AmplitudeRecommendationsSerializer(serializers.Serializer):
+    """Serializer for Amplitude recommendations for Learner Dashboard"""
+    amplitudeCourses = serializers.ListField(
+        child=LearnerDashboardProductRecommendationsSerializer(), allow_empty=True
+    )
+
+
 class CrossProductAndAmplitudeRecommendationsSerializer(serializers.Serializer):
     """
     Cross product recommendation courses and
