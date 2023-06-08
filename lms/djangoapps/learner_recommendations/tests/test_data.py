@@ -142,6 +142,7 @@ def get_general_recommendations():
 
     return courses
 
+
 mock_amplitude_and_cross_product_course_data = {
     "crossProductCourses": mock_cross_product_data,
     "amplitudeCourses": mock_amplitude_data
@@ -149,6 +150,10 @@ mock_amplitude_and_cross_product_course_data = {
 
 mock_cross_product_course_data = {
     "courses": mock_course_data
+}
+
+mock_amplitude_course_data = {
+    "amplitudeCourses": mock_amplitude_data
 }
 
 mock_cross_product_recommendation_keys = {
