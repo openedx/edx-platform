@@ -199,6 +199,7 @@ class ProductRecommendationsView(APIView):
     """
     **Example Request**
 
+    GET api/learner_recommendations/product_recommendations/
     GET api/learner_recommendations/product_recommendations/{course_id}/
     """
 
@@ -267,6 +268,10 @@ class ProductRecommendationsView(APIView):
         return filtered_cross_product_courses
 
     def _cross_product_recommendations_response(self, course_key, user, user_country_code):
+        """
+        Helper for collecting and forming a response for
+        cross product and Amplitude recommendations
+        """
         amplitude_recommendations = self._get_amplitude_recommendations(user, user_country_code)
         cross_product_recommendations = self._get_cross_product_recommendations(course_key, user_country_code)
 
@@ -281,6 +286,9 @@ class ProductRecommendationsView(APIView):
         )
 
     def _amplitude_recommendations_response(self, user, user_country_code):
+        """
+        Helper for collecting and forming a response for Amplitude recommendations only
+        """
         amplitude_recommendations = self._get_amplitude_recommendations(user, user_country_code)
 
         return Response(
