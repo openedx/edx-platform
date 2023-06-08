@@ -266,7 +266,7 @@ class ProductRecommendationsView(APIView):
 
         return filtered_cross_product_courses
 
-    def _course_id_present_response(self, course_key, user, user_country_code):
+    def _cross_product_recommendations_response(self, course_key, user, user_country_code):
         amplitude_recommendations = self._get_amplitude_recommendations(user, user_country_code)
         cross_product_recommendations = self._get_cross_product_recommendations(course_key, user_country_code)
 
@@ -280,7 +280,7 @@ class ProductRecommendationsView(APIView):
             status=200
         )
 
-    def _course_id_absent_response(self, user, user_country_code):
+    def _amplitude_recommendations_response(self, user, user_country_code):
         amplitude_recommendations = self._get_amplitude_recommendations(user, user_country_code)
 
         return Response(
@@ -302,9 +302,9 @@ class ProductRecommendationsView(APIView):
         if course_id:
             course_locator = CourseKey.from_string(course_id)
             course_key = f'{course_locator.org}+{course_locator.course}'
-            return self._course_id_present_response(course_key, request.user, user_country_code)
+            return self._cross_product_recommendations_response(course_key, request.user, user_country_code)
 
-        return self._course_id_absent_response(request.user, user_country_code)
+        return self._amplitude_recommendations_response(request.user, user_country_code)
 
 
 class DashboardRecommendationsApiView(APIView):
