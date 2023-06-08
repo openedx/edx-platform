@@ -150,8 +150,9 @@ def _write_styles(selector, output_root, classes, css_attribute, suffix):
         ))
         module_styles_lines.extend(f'  @import "{name}";' for name in fragment_names)
         module_styles_lines.append('}')
+        file_hash = hashlib.md5("".join(fragment_names).encode('ascii')).hexdigest()
 
-        contents[f"{class_.__name__}{suffix}.scss"] = '\n'.join(module_styles_lines)
+        contents[f"{class_.__name__}{suffix}.{file_hash}.scss"] = '\n'.join(module_styles_lines)
 
     _write_files(output_root, contents)
 
