@@ -88,10 +88,11 @@ class CourseTabListView(DeveloperErrorViewMixin, APIView):
         if use_new_custom_pages(course_key):
             json_tabs = []
             for tab in serializedCourseTabs:
-                url_slug = tab.get('settings').get('url_slug')
-                static_tab_loc = course_block.id.make_usage_key("static_tab", url_slug)
-                tab["id"] = str(static_tab_loc)
-                json_tabs.append(tab)
+                if tab.get('type') == 'static_tab':
+                    url_slug = tab.get('settings').get('url_slug')
+                    static_tab_loc = course_block.id.make_usage_key("static_tab", url_slug)
+                    tab["id"] = str(static_tab_loc)
+                    json_tabs.append(tab)
             return Response(json_tabs)
         return Response(serializedCourseTabs)
 

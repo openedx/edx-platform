@@ -63,6 +63,7 @@ def tabs_handler(request, course_key_string):
     elif request.method == "GET":  # assume html
         # get all tabs from the tabs list: static tabs (a.k.a. user-created tabs) and built-in tabs
         # present in the same order they are displayed in LMS
+        
         tabs_to_render = list(get_course_tabs(course_item, request.user))
 
         return render_to_response(
