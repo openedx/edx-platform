@@ -151,3 +151,12 @@ class CourseNotificationPreference(TimeStampedModel):
             except Exception as e:
                 log.error(f'Unable to update notification preference for {user.username} to new config. {e}')
         return preferences
+
+    def get_app_config(self, app_name) -> dict:
+        return self.notification_preference_config.get(app_name, {})
+
+    def get_notification_type_config(self, app_name, notification_type) -> dict:
+        return self.get_app_config(app_name).get(notification_type, {})
+
+    def get_web_config(self, app_name, notification_type) -> bool:
+        return self.get_notification_type_config(app_name, notification_type).get('web', False)

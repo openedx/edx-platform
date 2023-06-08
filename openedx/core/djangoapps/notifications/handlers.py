@@ -5,9 +5,9 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.db.models.signals import post_save
 from django.dispatch import receiver
 from openedx_events.learning.signals import COURSE_UNENROLLMENT_COMPLETED
+from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED, USER_NOTIFICATION
 
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.models import CourseNotificationPreference
@@ -16,7 +16,7 @@ from openedx.core.djangoapps.notifications.models import CourseNotificationPrefe
 log = logging.getLogger(__name__)
 
 
-@receiver(post_save, sender='student.CourseEnrollment')
+@receiver(COURSE_ENROLLMENT_CREATED, sender='student.CourseEnrollment')
 def course_enrollment_post_save(sender, instance, created, **kwargs):
     """
     Watches for post_save signal for creates on the CourseEnrollment table.
@@ -42,3 +42,14 @@ def on_user_course_unenrollment(enrollment, **kwargs):
         preference.delete()
     except ObjectDoesNotExist:
         log.info(f'Notification Preference doesnot exist for {enrollment.user.pii.username} in {course_key}')
+
+
+@receiver(USER_NOTIFICATION)
+def generate_user_notifications(**kwargs):
+    """
+    Watches for USER_NOTIFICATION signal and calls  send_web_notifications task
+    """
+    from .tasks import send_notifications
+    notification_data = kwargs.get('notification_data', {}).__dict__
+
+    send_notifications.delay(**notification_data)

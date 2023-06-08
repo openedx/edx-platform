@@ -16,6 +16,9 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_COMMUNITY_TA,
 )
+from openedx_events.learning.signals import USER_NOTIFICATION
+from openedx_events.learning.data import UserNotificationData
+from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 
 
 class AttributeDict(dict):
@@ -351,3 +354,50 @@ def get_archived_topics(filtered_topic_ids: List[str], topics: List[Dict[str, st
             if topic['id'] == topic_id and topic['usage_key'] is not None:
                 archived_topics.append(topic)
     return archived_topics
+
+
+def send_response_notifications(thread, course, creator, parent_id=None):
+    """
+    Send notifications to users who are subscribed to the thread.
+    """
+    def send_notification(user_ids, notification_type, extra_context=None):
+        """
+        Send notification to users
+        """
+        if not user_ids:
+            return
+
+        if extra_context is None:
+            extra_context = {}
+
+        notification_data = UserNotificationData(
+            user_ids=user_ids,
+            context={
+                "course_id": str(course.id),
+                "replier_name": creator.username,
+                "post_title": thread.title,
+                **extra_context,
+            },
+            notification_type=notification_type,
+            content_url=thread.url_with_id(params={'id': thread.id}),
+            app_name="discussion",
+        )
+        USER_NOTIFICATION.send_event(notification_data=notification_data)
+
+    if not parent_id:
+        # Send notification on main thread/post i.e. there is a response to the main thread
+        if creator.id != thread.user_id:
+            send_notification([thread.user_id], "new_response")
+        return
+
+    parent_response = Comment(id=parent_id).retrieve()
+    # send notification to parent thread creator i.e. comment on the response
+    if creator.id != int(thread.user_id):
+        context = {
+            "author_name": parent_response.username,
+        }
+        send_notification([thread.user_id], "new_comment", extra_context=context)
+
+    # send notification to parent response creator i.e. comment on the response
+    if creator.id != int(parent_response['user_id']):
+        send_notification([parent_response.user_id], "new_comment_on_response")
