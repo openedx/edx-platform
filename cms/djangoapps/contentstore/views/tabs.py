@@ -64,16 +64,7 @@ def tabs_handler(request, course_key_string):
 
     if "application/json" in request.META.get("HTTP_ACCEPT", "application/json"):
         if request.method == "GET":  # lint-amnesty, pylint: disable=no-else-raise
-            if use_new_custom_pages:
-                json_tabs = []
-                for tab in tabs_to_render:
-                    static_tab_loc = course_item.id.make_usage_key("static_tab", tab.url_slug)
-                    static_tab = StaticTab.to_json(tab)
-                    static_tab["id"] = str(static_tab_loc)
-                    json_tabs.append(static_tab)
-                return JsonResponse(json_tabs, status=200)
-            else:
-                raise NotImplementedError("coming soon")
+            raise NotImplementedError("coming soon")
         else:
             try:
                 update_tabs_handler(course_item, request.json, request.user)
