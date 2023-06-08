@@ -85,7 +85,7 @@ class CourseTabListView(DeveloperErrorViewMixin, APIView):
         course_block = modulestore().get_course(course_key)
         tabs_to_render = get_course_tabs(course_block, request.user)
         serializedCourseTabs = CourseTabSerializer(tabs_to_render, many=True).data
-        if use_new_custom_pages:
+        if use_new_custom_pages(course_key):
             json_tabs = []
             for tab in serializedCourseTabs:
                 url_slug = tab.get('settings').get('url_slug')
