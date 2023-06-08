@@ -106,12 +106,12 @@ For more information about these options, see the `Getting Help`_ page.
 Issue Tracker
 *************
 
-We use JIRA for our issue tracker, not GitHub issues. You can search
-`previously reported issues`_.  If you need to report a problem,
-please make a free account on our JIRA and `create a new issue`_.
+We use Github Issues for our issue tracker. You can search
+`previously reported issues`_.  If you need to report a bug, or want to discuss
+a new feature before you implement it, please `create a new issue`_.
 
-.. _previously reported issues: https://openedx.atlassian.net/projects/CRI/issues
-.. _create a new issue: https://openedx.atlassian.net/secure/CreateIssue.jspa?issuetype=1&pid=11900
+.. _previously reported issues: https://github.com/openedx/edx-platform/issues
+.. _create a new issue: https://github.com/openedx/edx-platform/issues/new/choose
 
 
 How to Contribute

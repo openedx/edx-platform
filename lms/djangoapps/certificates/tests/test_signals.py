@@ -513,5 +513,5 @@ class CertificateEventBusTests(ModuleStoreTestCase):
         data = mock_producer.return_value.send.call_args.kwargs
         assert data['signal'].event_type == CERTIFICATE_CREATED.event_type
         assert data['event_data']['certificate'] == expected_certificate_data
-        assert data['topic'] == 'certificates'
+        assert data['topic'] == 'learning-certificate-lifecycle'
         assert data['event_key_field'] == 'certificate.course.course_key'

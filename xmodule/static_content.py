@@ -123,44 +123,35 @@ def _ensure_dir(directory):
 def _write_styles(selector, output_root, classes, css_attribute, suffix):
     """
     Write the css fragments from all XModules in `classes`
-    into `output_root` as individual files, hashed by the contents to remove
-    duplicates
+    into `output_root` as individual files
     """
     contents = {}
 
-    css_fragments = defaultdict(set)
     for class_ in classes:
         class_css = getattr(class_, css_attribute)()
-        for filetype in ('sass', 'scss', 'css'):
-            for idx, fragment_path in enumerate(class_css.get(filetype, [])):
-                with open(fragment_path, 'rb') as fragment_file:
-                    fragment = fragment_file.read()
-                css_fragments[idx, filetype, fragment].add(class_.__name__)
-    css_imports = defaultdict(set)
-    for (idx, filetype, fragment), classes in sorted(css_fragments.items()):  # lint-amnesty, pylint: disable=redefined-argument-from-local
-        fragment_name = "{idx:0=3d}-{hash}.{type}".format(
-            idx=idx,
-            hash=hashlib.md5(fragment).hexdigest(),
-            type=filetype)
-        # Prepend _ so that sass just includes the files into a single file
-        filename = '_' + fragment_name
-        contents[filename] = fragment
+        fragment_paths = class_css.get('scss', [])
+        if not fragment_paths:
+            continue
+        fragment_names = []
+        for fragment_path in fragment_paths:
+            with open(fragment_path, 'rb') as fragment_file:
+                fragment = fragment_file.read()
+            fragment_name = "{hash}.{type}".format(
+                hash=hashlib.md5(fragment).hexdigest(),
+                type='scss')
+            # Prepend _ so that sass just includes the files into a single file
+            filename = '_' + fragment_name
+            contents[filename] = fragment
+            fragment_names.append(fragment_name)
 
-        for class_ in classes:
-            css_imports[class_].add(fragment_name)
-
-    for class_, fragment_names in sorted(css_imports.items()):
         module_styles_lines = []
-
-        fragment_names = sorted(fragment_names)
-        module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
+        module_styles_lines.append("""{selector}.xmodule_{class_.__name__} {{""".format(
             class_=class_, selector=selector
         ))
         module_styles_lines.extend(f'  @import "{name}";' for name in fragment_names)
         module_styles_lines.append('}')
-        file_hash = hashlib.md5("".join(fragment_names).encode('ascii')).hexdigest()
 
-        contents[f"{class_}{suffix}.{file_hash}.scss"] = '\n'.join(module_styles_lines)
+        contents[f"{class_.__name__}{suffix}.scss"] = '\n'.join(module_styles_lines)
 
     _write_files(output_root, contents)
 

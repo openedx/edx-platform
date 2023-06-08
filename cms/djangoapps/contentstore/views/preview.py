@@ -305,8 +305,10 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             selected_groups_label = _('Access restricted to: {list_of_groups}').format(list_of_groups=selected_groups_label)  # lint-amnesty, pylint: disable=line-too-long
         course = modulestore().get_course(xblock.location.course_key)
         can_edit = context.get('can_edit', True)
+        # Is this a course or a library?
+        is_course = xblock.scope_ids.usage_id.context_key.is_course
         # Copy-paste is a new feature; while we are beta-testing it, only beta users with the Waffle flag enabled see it
-        enable_copy_paste = can_edit and ENABLE_COPY_PASTE_FEATURE.is_enabled()
+        enable_copy_paste = can_edit and is_course and ENABLE_COPY_PASTE_FEATURE.is_enabled()
         template_context = {
             'xblock_context': context,
             'xblock': xblock,
@@ -316,10 +318,10 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'is_reorderable': is_reorderable,
             'can_edit': can_edit,
             'enable_copy_paste': enable_copy_paste,
-            'can_edit_visibility': context.get('can_edit_visibility', xblock.scope_ids.usage_id.context_key.is_course),
+            'can_edit_visibility': context.get('can_edit_visibility', is_course),
             'selected_groups_label': selected_groups_label,
             'can_add': context.get('can_add', True),
-            'can_move': context.get('can_move', xblock.scope_ids.usage_id.context_key.is_course),
+            'can_move': context.get('can_move', is_course),
             'language': getattr(course, 'language', None)
         }
 
