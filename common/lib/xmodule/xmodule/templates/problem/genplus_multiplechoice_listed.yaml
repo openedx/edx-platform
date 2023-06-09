@@ -1,24 +1,23 @@
 ---
 metadata:
-    display_name: Gen+ Multiple Choices (Listed)
+    display_name: 2023 MCQ
     markdown: !!null
 data: |
     <div class="choices-xblock choices-listed theme-dark">
       <problem class="multiple_choice">
         <!-- <div class="asn-icon top-left">
           <img src="/static/images/asset-logo-pink.svg" alt="Logo Left" />
-          <img src="/static/images/asset+block@read-alt.png" width="50" alt="Icon Read" />
+          <img src="/static/images/read-alt.png" width="50" alt="Icon Read" />
         </div> -->
         <!-- <div class="asn-icon with-text top-right">
-          <img src="/static/images/asset+block@read-alt.png" width="50" alt="Icon Read" />
-          <img src="/static/images/asset-logo-pink.svg" alt="Logo Left" />
+          <img src="/static/images/read-alt.png" width="50" alt="Icon Read" />
           <span class="text-help">Select up to three answers.</span>
         </div> -->
         <div class="choices-xblock-wapper">
           <div class="choices-form">
             <choiceresponse>
               <strong class="question-text">
-                <span>What did your meta-skills profile show as your top skill strenth(s)?</span>
+                <span>What did your meta-skills profile show as your top skill strength(s)?</span>
               </strong>
               <checkboxgroup>
                 <choice class="choice_0" correct="true">Leadership</choice>
