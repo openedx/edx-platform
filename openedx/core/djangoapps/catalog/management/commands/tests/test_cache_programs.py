@@ -141,6 +141,18 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             content_type='application/json',
         )
 
+    def mock_domain(self):
+        """ Mock the data for domain argument passed to cache_programs command. """
+        return "testsite1.com"
+
+    def test_handle_domain(self):
+        """
+        Verify that the command argument is working corrects.
+        """
+        domain = self.mock_domain()
+        if domain:
+            self.site_domain = domain
+
     def test_handle_programs(self):
         """
         Verify that the command requests and caches program UUIDs and details.
