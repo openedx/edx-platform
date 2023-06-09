@@ -26,6 +26,7 @@ from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiv
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.funix_goal.models import LearnGoal
 from django.contrib.auth import get_user_model
+from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
 
 User = get_user_model()
 
@@ -105,5 +106,5 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 		context = self.get_serializer_context()
 		context['learner_is_full_access'] = learner_is_full_access
 		serializer = self.get_serializer_class()(data, context=context)
-
+		mark_user_change_as_expected(request.user.id)
 		return Response(serializer.data)
