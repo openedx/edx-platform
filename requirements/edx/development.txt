@@ -81,7 +81,7 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   analytics-python
-backports-zoneinfo[tzdata]==0.2.1
+backports-zoneinfo==0.2.1
     # via
     #   -r requirements/edx/testing.txt
     #   celery
@@ -242,7 +242,7 @@ cssselect==1.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   pyquery
-cssutils==2.7.0
+cssutils==2.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   pynliner
@@ -728,7 +728,7 @@ faker==18.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.96.0
+fastapi==0.95.2
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -1027,7 +1027,6 @@ openedx-calc==3.0.1
     # via -r requirements/edx/testing.txt
 openedx-django-pyfs==3.2.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   xblock
 openedx-django-require==2.0.0
@@ -1165,7 +1164,7 @@ pycryptodomex==3.18.0
     #   lti-consumer-xblock
     #   pyjwkest
     #   snowflake-connector-python
-pydantic==1.10.9
+pydantic==1.10.8
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
@@ -1362,7 +1361,7 @@ pyyaml==6.0
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/testing.txt
-rapidfuzz==3.1.1
+rapidfuzz==3.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   levenshtein
