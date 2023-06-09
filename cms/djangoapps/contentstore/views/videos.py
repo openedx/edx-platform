@@ -29,6 +29,7 @@ from edxval.api import (
     create_video,
     get_3rd_party_transcription_plans,
     get_available_transcript_languages,
+    get_video_transcript_url,
     get_transcript_credentials_state_for_org,
     get_transcript_preferences,
     get_videos_for_course,
@@ -45,7 +46,6 @@ from rest_framework.response import Response
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.json_request import JsonResponse, expect_json
-from common.djangoapps.util.views import ensure_valid_course_key
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
@@ -278,19 +278,14 @@ def video_images_upload_enabled(request):
     return JsonResponse({'allowThumbnailUpload': True})
 
 
-@ensure_valid_course_key
 @login_required
 @require_GET
-def get_video_features(request, course_key_string):
+def get_video_features(request):
     """ Return a dict with info about which video features are enabled """
-    course_key = CourseKey.from_string(course_key_string)
-    course = get_course_and_check_access(course_key, request.user)
-    if not course:
-        return HttpResponseNotFound()
 
     features = {
         'allowThumbnailUpload': VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled(),
-        'videoSharingEnabled': PUBLIC_VIDEO_SHARE.is_enabled(course_key),
+        'videoSharingEnabled': PUBLIC_VIDEO_SHARE.is_enabled(),
     }
     return JsonResponse(features)
 
@@ -580,6 +575,12 @@ def _get_videos(course, pagination_conf=None):
         video['transcription_status'] = (
             StatusDisplayStrings.get(video['status']) if is_video_encodes_ready else ''
         )
+        video['transcript_urls'] = {}
+        for language_code in video['transcripts']:
+            video['transcript_urls'][language_code] = get_video_transcript_url(
+                video_id=video['edx_video_id'],
+                language_code=language_code,
+            )
         # Convert the video status.
         video['status'] = convert_video_status(video, is_video_encodes_ready)
 
@@ -601,7 +602,7 @@ def _get_index_videos(course, pagination_conf=None):
     attrs = [
         'edx_video_id', 'client_video_id', 'created', 'duration',
         'status', 'courses', 'transcripts', 'transcription_status',
-        'error_description'
+        'transcript_urls', 'error_description'
     ]
 
     def _get_values(video):

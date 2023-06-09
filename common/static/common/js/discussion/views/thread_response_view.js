@@ -4,6 +4,7 @@
 */
 (function() {
     'use strict';
+
     var __hasProp = {}.hasOwnProperty,
         __extends = function(child, parent) {
             for (var key in parent) {
@@ -73,7 +74,7 @@
                     $container = $('.discussion-module');
                 }
                 templateData = _.extend(this.model.toJSON(), {
-                    wmdId: typeof(this.model.id) !== 'undefined' ? this.model.id : (new Date()).getTime(),
+                    wmdId: typeof this.model.id !== 'undefined' ? this.model.id : (new Date()).getTime(),
                     create_sub_comment: $container.data('user-create-subcomment'),
                     readOnly: this.readOnly
                 });

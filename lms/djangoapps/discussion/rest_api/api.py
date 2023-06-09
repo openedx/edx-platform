@@ -40,7 +40,12 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from lms.djangoapps.discussion.views import is_privileged_user
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.models import (
+    DiscussionsConfiguration,
+    DiscussionTopicLink,
+    Provider,
+    PostingRestriction
+)
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
@@ -166,7 +171,7 @@ class DiscussionEntity(Enum):
 
 def _get_course(course_key: CourseKey, user: User, check_tab: bool = True) -> CourseBlock:
     """
-    Get the course descriptor, raising CourseNotFoundError if the course is not found or
+    Get the course block, raising CourseNotFoundError if the course is not found or
     the user cannot access forums for the course, and DiscussionDisabledError if the
     discussion tab is disabled for the course.
 
@@ -319,14 +324,38 @@ def get_course(request, course_key):
         """
         return dt.isoformat().replace('+00:00', 'Z')
 
+    def is_posting_allowed(posting_restrictions, blackout_schedules):
+        """
+        Check if posting is allowed based on the given posting restrictions and blackout schedules.
+
+        Args:
+            posting_restrictions (str): Values would be  "disabled", "scheduled" or "enabled".
+            blackout_schedules (List[Dict[str, datetime]]): The list of blackout schedules
+
+        Returns:
+            bool: True if posting is allowed, False otherwise.
+        """
+        now = datetime.now(UTC)
+        if posting_restrictions == PostingRestriction.DISABLED:
+            return True
+        elif posting_restrictions == PostingRestriction.SCHEDULED:
+            return not any(schedule["start"] <= now <= schedule["end"] for schedule in blackout_schedules)
+        else:
+            return False
+
     course = _get_course(course_key, request.user)
     user_roles = get_user_role_names(request.user, course_key)
     course_config = DiscussionsConfiguration.get(course_key)
     EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
     CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
+    is_posting_enabled = is_posting_allowed(
+        course_config.posting_restrictions,
+        course.get_discussion_blackout_datetimes()
+    )
 
     return {
         "id": str(course_key),
+        "is_posting_enabled": is_posting_enabled,
         "blackouts": [
             {
                 "start": _format_datetime(blackout["start"]),

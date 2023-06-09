@@ -184,8 +184,8 @@ var edx = edx || {};
             $('table.ccx-schedule .date button').each(function() {
                 if ($(this).text().trim() === gettext('Click to change')) {
                     // xss-lint: disable=javascript-jquery-html, javascript-concat-html
-                    $(this).html('Set date <span class="sr"> ' +
-          gettext('Click to change') + '</span>'); // xss-lint: disable=javascript-concat-html
+                    $(this).html('Set date <span class="sr"> '
+          + gettext('Click to change') + '</span>'); // xss-lint: disable=javascript-concat-html
                 }
             });
 
@@ -431,15 +431,15 @@ var edx = edx || {};
                     .data('what', what)
                     .data('location', row.data('location'));
                 modal.find('h2').text(
-                    what === 'due' ? gettext('Enter Due Date and Time') :
-                        gettext('Enter Start Date and Time')
+                    what === 'due' ? gettext('Enter Due Date and Time')
+                        : gettext('Enter Start Date and Time')
                 );
                 modal.focus();
                 $(document).on('focusin', function(event) {
                     try {
-                        if (!_.isUndefined(event.target.closest('.modal').id) &&
-              event.target.closest('.modal').id !== 'enter-date-modal' &&
-              event.target.id !== 'enter-date-modal') {
+                        if (!_.isUndefined(event.target.closest('.modal').id)
+              && event.target.closest('.modal').id !== 'enter-date-modal'
+              && event.target.id !== 'enter-date-modal') {
                             event.preventDefault();
                             modal.find('.close-modal').focus();
                         }

@@ -69,9 +69,10 @@ class MFEContextView(APIView):
 
             optional_fields = RegistrationFieldsContext('optional').get_fields()
             if optional_fields:
+                extended_profile_fields = configuration_helpers.get_value('extended_profile_fields')
                 context['optional_fields'].update({
                     'fields': optional_fields,
-                    'extended_profile': configuration_helpers.get_value('extended_profile_fields', []),
+                    'extended_profile': extended_profile_fields if extended_profile_fields else []
                 })
 
         return Response(

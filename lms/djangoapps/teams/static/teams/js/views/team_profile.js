@@ -3,6 +3,7 @@
  */
 (function(define) {
     'use strict';
+
     define([
         'backbone',
         'underscore',
@@ -140,8 +141,8 @@
                 var view = this; // eslint-disable-line vars-on-top
                 ViewUtils.confirmThenRunOperation(
                     gettext('Leave this team?'),
-                    gettext("If you leave, you can no longer post in this team's discussions." +
-                            'Your place will be available to another learner.'),
+                    gettext("If you leave, you can no longer post in this team's discussions."
+                            + 'Your place will be available to another learner.'),
                     gettext('Confirm'),
                     function() {
                         $.ajax({

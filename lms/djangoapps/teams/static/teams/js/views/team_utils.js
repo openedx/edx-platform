@@ -1,6 +1,7 @@
-/*  Team utility methods*/
+/*  Team utility methods */
 (function(define) {
     'use strict';
+
     define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/string-utils'],
         function($, _, StringUtils) {
             return {

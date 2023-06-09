@@ -30,7 +30,7 @@
 # AzizAhmed <dr.zezo@gmail.com>, 2014
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016-2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
-# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021-2022
+# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2021-2023
 # Glib Glugovskiy <glugov1998@gmail.com>, 2021
 # Hamza Madni, 2022
 # HasnaG <hasnaa.elghandor@yahoo.com>, 2014
@@ -140,6 +140,7 @@
 # Deimer Morales, 2023
 # e2f_ar r3 <e2f_ar_r3@outlook.com>, 2017
 # e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
+# Ghassan Maslamani <ghassan.maslamani@gmail.com>, 2023
 # Hamza Madni, 2022
 # Hani <hani0a@hotmail.com>, 2014
 # Hani <hani0a@hotmail.com>, 2014
@@ -222,7 +223,7 @@
 # soliman osman <solimanosman@windowslive.com>, 2015
 # طاهر <charaf.le.prince@gmail.com>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
+# edX community translations have been downloaded from Arabic (http://app.transifex.com/open-edx/edx-platform/language/ar/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -246,7 +247,7 @@
 # SalmaGhazal <salma-ghazal1@hotmail.com>, 2014
 # SalmaGhazal <salma-ghazal1@hotmail.com>, 2014
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)
+# edX community translations have been downloaded from Arabic (https://app.transifex.com/open-edx/teams/6205/ar/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -258,10 +259,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-26 20:42+0000\n"
+"POT-Creation-Date: 2023-05-28 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
-"Language-Team: Arabic (https://www.transifex.com/open-edx/teams/6205/ar/)\n"
+"Language-Team: Arabic (https://app.transifex.com/open-edx/teams/6205/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -288,6 +289,7 @@ msgid "Discussion"
 msgstr "المناقشة"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr "المسألة"
@@ -297,6 +299,10 @@ msgstr "المسألة"
 #: lms/templates/video.html
 msgid "Video"
 msgstr "فيديو"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "مسألة متقدِّمة فارغة"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -348,7 +354,7 @@ msgstr "ملف النص مطلوب."
 #. Translators: This is the status for a video that the servers have
 #. successfully processed
 #: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Ready"
 msgstr ""
 
@@ -4085,10 +4091,6 @@ msgstr "اللغة"
 msgid "Location"
 msgstr "الموقع"
 
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "سنة الميلاد"
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
 #. the user's gender.
@@ -4300,7 +4302,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The requested course does not exist."
-msgstr ""
+msgstr "المساق المطلوب غير موجود."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "URL from which report can be downloaded."
@@ -5937,7 +5939,7 @@ msgid "Allow"
 msgstr "موافق"
 
 #: lms/templates/oauth2_provider/authorize.html
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "حدث خطأ"
@@ -7128,10 +7130,6 @@ msgstr "لم نستطع العثور على مستخدم بذلك البريد �
 msgid "This user already has access to this library."
 msgstr "يمتلك هذا المستخدم حق الوصول للمكتبة"
 
-#: openedx/core/djangoapps/content_staging/models.py
-msgid "Staged Content"
-msgstr ""
-
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -7142,8 +7140,12 @@ msgstr ""
 msgid "Loading"
 msgstr "جاري التحميل"
 
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
 msgstr ""
 
 #: openedx/core/djangoapps/content_staging/models.py
@@ -7445,6 +7447,12 @@ msgid ""
 "be disabled."
 msgstr ""
 "إذا تم تعطيله، فسيتم تعطيل المناقشات في سياق / برنامج التعلم ذي الصلة."
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
@@ -9817,10 +9825,6 @@ msgid "Invalid JSON response received from codejail api service."
 msgstr ""
 
 #: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "مسألة متقدِّمة فارغة"
-
-#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "عدد gfمحاولات التي قام بها الطالب لحلّ هذه المسألة"
 
@@ -11216,6 +11220,17 @@ msgstr ""
 "(السماح بالوصول إلى كل من المخطط ومحتوى المساق)."
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "مدرّس الدورة التدريبية"
 
@@ -12290,6 +12305,34 @@ msgstr ""
 msgid "Add discussion for the Unit."
 msgstr ""
 
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
+"\n"
+msgstr ""
+
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
@@ -12984,6 +13027,16 @@ msgstr "مجموعة محذوفة"
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}، {current_group}"
 
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "نسخة مطابقة لـ {0}"
+
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "نسخة مطابقة لـ ’{0}‘"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "يجب أن يكون للصورة اسم ونوع المحتوى ومعلومات الحجم."
@@ -13066,6 +13119,14 @@ msgid "Invalid data ({details})"
 msgstr "بيانات غير صالحة ({details}) "
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "لا يمكنك نقل {source_type} إلى {target_parent_type}."
@@ -13101,16 +13162,6 @@ msgstr "لا يمكنك نقل {source_usage_key} في فهرس غير صالح 
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr "يجب إدخال target_index ({target_index}) كعدد صحيح."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "نسخة مطابقة لـ {0}"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "نسخة مطابقة لـ ’{0}‘"
 
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
@@ -14731,6 +14782,18 @@ msgstr "الصفحة السابقة"
 msgid "Next page"
 msgstr "الصفحة التالية"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "سجل التتبّع"
@@ -14854,24 +14917,16 @@ msgid "Downloads and transcripts"
 msgstr "التنزيلات والنصوص"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "تنزيل ملف الفيديو "
-
-#: lms/templates/video.html
 msgid "Share on:"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Twitter"
+msgid "Share on {site}"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Facebook"
-msgstr ""
-
-#: lms/templates/video.html
-msgid "Linkedin"
-msgstr ""
+msgid "Download video file"
+msgstr "تنزيل ملف الفيديو "
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -17322,7 +17377,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Upgrade"
-msgstr ""
+msgstr "ترقية"
 
 #: lms/templates/dashboard/_dashboard_course_resume.html
 msgid "Resume Course"
@@ -17928,7 +17983,7 @@ msgstr "رقم طلبيتك هو : {order_number}"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Hello {full_name},"
-msgstr ""
+msgstr "مرحبًا {full_name}،"
 
 #: lms/templates/emails/passed_verification_email.txt
 msgid "Your {platform_name} ID verification photos have been approved."
@@ -21095,10 +21150,8 @@ msgstr "رمز الموقع"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
-"لإنشاء رابط إلى هذه الوحدة من عنصر HTML في هذا المساق، أدخل "
-"\"/jump_to_id/<location ID>\" كقيمة الرابط."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -24180,11 +24233,11 @@ msgstr "إنشاء جديد"
 
 #: cms/templates/maintenance/_announcement_index.html
 msgid "previous"
-msgstr ""
+msgstr "السابق"
 
 #: cms/templates/maintenance/_announcement_index.html
 msgid "next"
-msgstr ""
+msgstr "التالي"
 
 #: cms/templates/maintenance/_force_publish_course.html
 msgid "Required data to force publish course."

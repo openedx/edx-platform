@@ -70,7 +70,7 @@ def get_buy_subscription_url(program_uuid, skus):
     Returns the URL to the Subscription Purchase page for the given program UUID and course Skus.
     """
     formatted_skus = urlencode({'sku': skus}, doseq=True)
-    url = f'{settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL}/{program_uuid}/?{formatted_skus}'
+    url = f'{settings.SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL}{program_uuid}/?{formatted_skus}'
     return url
 
 
@@ -95,7 +95,8 @@ def get_program_urls(program_data):
         'buy_button_url': ecommerce_service.get_checkout_page_url(*skus),
         'program_record_url': program_record_url,
         'buy_subscription_url': get_buy_subscription_url(program_uuid, skus),
-        'manage_subscription_url': settings.ORDER_HISTORY_MICROFRONTEND_URL,
+        'manage_subscription_url': settings.SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL,
+        'orders_and_subscriptions_url': settings.ORDER_HISTORY_MICROFRONTEND_URL,
         'subscriptions_learner_help_center_url': settings.SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL
     }
     return urls
@@ -984,9 +985,9 @@ class ProgramMarketingDataExtender(ProgramDataExtender):
         """
         module_store = modulestore()
         course_run_key = CourseKey.from_string(course_run['key'])
-        course_descriptor = module_store.get_course(course_run_key)
-        if course_descriptor:
-            course_instructors = getattr(course_descriptor, 'instructor_info', {})
+        course_block = module_store.get_course(course_run_key)
+        if course_block:
+            course_instructors = getattr(course_block, 'instructor_info', {})
 
             # Deduplicate program instructors using instructor name
             curr_instructors_names = [instructor.get('name', '').strip() for instructor in self.instructors]
@@ -1078,7 +1079,7 @@ def get_programs_subscription_data(user, program_uuid=None):
 
     try:
         if program_uuid:
-            response = client.get(api_path, params={'resource_id': program_uuid, 'most_active_and_recent': True})
+            response = client.get(api_path, params={'resource_id': program_uuid, 'most_active_and_recent': 'true'})
             response.raise_for_status()
             subscription_data = response.json().get('results', [])
         else:

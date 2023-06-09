@@ -19,7 +19,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_str
 from django.utils.functional import cached_property
 from lxml import etree
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -47,7 +47,7 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin
 from common.djangoapps.xblock_django.constants import (
-    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ID,
 )
@@ -165,36 +165,35 @@ class ProblemBlock(
     icon_class = 'problem'
 
     uses_xmodule_styles_setup = True
-    requires_per_student_anonymous_id = True
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/capa/display.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
-            resource_string(__name__, 'js/src/capa/imageinput.js'),
-            resource_string(__name__, 'js/src/capa/schematic.js'),
+            resource_filename(__name__, 'js/src/javascript_loader.js'),
+            resource_filename(__name__, 'js/src/capa/display.js'),
+            resource_filename(__name__, 'js/src/collapsible.js'),
+            resource_filename(__name__, 'js/src/capa/imageinput.js'),
+            resource_filename(__name__, 'js/src/capa/schematic.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
 
     preview_view_css = {
         'scss': [
-            resource_string(__name__, 'css/capa/display.scss'),
+            resource_filename(__name__, 'css/capa/display.scss'),
         ],
     }
 
     studio_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/problem/edit.js'),
+            resource_filename(__name__, 'js/src/problem/edit.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     studio_view_css = {
         'scss': [
-            resource_string(__name__, 'css/editor/edit.scss'),
-            resource_string(__name__, 'css/problem/edit.scss'),
+            resource_filename(__name__, 'css/editor/edit.scss'),
+            resource_filename(__name__, 'css/problem/edit.scss'),
         ]
     }
 
@@ -822,7 +821,7 @@ class ProblemBlock(
             text = self.data
 
         user_service = self.runtime.service(self, 'user')
-        anonymous_student_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+        anonymous_student_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
         seed = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
 
         sandbox_service = self.runtime.service(self, 'sandbox')

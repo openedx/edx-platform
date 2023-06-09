@@ -149,8 +149,8 @@ class RenderForm extends React.Component {
                     },
                     {
                         id: this.props.context.customFields.referrer,
-                        value: document.referrer ? document.referrer : "Direct Contact Us Page Request",
-                    }
+                        value: document.referrer ? document.referrer : 'Direct Contact Us Page Request',
+                    },
                 ],
                 tags: this.props.context.tags,
             };
@@ -175,6 +175,7 @@ class RenderForm extends React.Component {
             this.scrollToTop();
         }.bind(this);
     }
+
     validateFormData(formData) {
         const { course, subject, message } = formData;
 
@@ -239,13 +240,13 @@ class RenderForm extends React.Component {
         if (event.keyCode === enterKeyCode) {
             window.location.href = suggestions[activeSuggestion].html_url;
         } else if (event.keyCode === upArrowKeyCode) {
-            (activeSuggestion === 0) ?
-                this.setState({ activeSuggestion: suggestions.length - 1 }) :
-                this.setState({ activeSuggestion: activeSuggestion - 1 });
+            (activeSuggestion === 0)
+                ? this.setState({ activeSuggestion: suggestions.length - 1 })
+                : this.setState({ activeSuggestion: activeSuggestion - 1 });
         } else if (event.keyCode === downArrowKeyCode) {
-            (activeSuggestion + 1 === suggestions.length) ?
-                this.setState({ activeSuggestion: 0 }) :
-                this.setState({ activeSuggestion: activeSuggestion + 1 });
+            (activeSuggestion + 1 === suggestions.length)
+                ? this.setState({ activeSuggestion: 0 })
+                : this.setState({ activeSuggestion: activeSuggestion + 1 });
         }
     }
 
@@ -273,21 +274,25 @@ class RenderForm extends React.Component {
         let userElement,
             suggestionsListComponent = null;
         if (this.userInformation) {
-            userElement = (<LoggedInUser
-                userInformation={this.userInformation}
-                onChangeCallback={this.formOnChangeCallback}
-                handleClick={this.handleClick}
-                showWarning={this.showWarningMessage()}
-                showDiscussionButton={this.showDiscussionButton()}
-                reDirectUser={this.reDirectUser}
-                errorList={this.getFormErrorsFromState()}
-            />);
+            userElement = (
+                <LoggedInUser
+                    userInformation={this.userInformation}
+                    onChangeCallback={this.formOnChangeCallback}
+                    handleClick={this.handleClick}
+                    showWarning={this.showWarningMessage()}
+                    showDiscussionButton={this.showDiscussionButton()}
+                    reDirectUser={this.reDirectUser}
+                    errorList={this.getFormErrorsFromState()}
+                />
+            );
         } else {
-            userElement = (<LoggedOutUser
-                platformName={this.props.context.platformName}
-                loginQuery={this.props.context.loginQuery}
-                supportEmail={this.props.context.supportEmail}
-            />);
+            userElement = (
+                <LoggedOutUser
+                    platformName={this.props.context.platformName}
+                    loginQuery={this.props.context.loginQuery}
+                    supportEmail={this.props.context.supportEmail}
+                />
+            );
         }
         if (suggestions !== null && suggestions.length) {
             suggestionsListComponent = (
@@ -348,7 +353,7 @@ class RenderForm extends React.Component {
                             type="button"
                             onClick={() => this.handleSearchButton(document.getElementById('query').value)}
                         >
-              Search
+                            Search
                         </button>
                     </div>
                 </div>

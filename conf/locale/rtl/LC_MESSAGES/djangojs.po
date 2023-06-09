@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-20 20:44+0000\n"
-"PO-Revision-Date: 2023-04-20 20:44:15.413132\n"
+"POT-Creation-Date: 2023-06-04 20:35+0000\n"
+"PO-Revision-Date: 2023-06-04 20:36:01.165758\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -1808,28 +1808,28 @@ msgstr ""
 "Nɐʇᴉønɐl Ǥnɐɹd?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
-msgstr "Wɥɐʇ ᴉs ʇɥǝ ɥᴉƃɥǝsʇ lǝʌǝl øɟ ǝdnɔɐʇᴉøn ʇɥɐʇ ʎøn ɥɐʌǝ ɐɔɥᴉǝʌǝd sø ɟɐɹ?"
+msgid "Select military status"
+msgstr "Sǝlǝɔʇ ɯᴉlᴉʇɐɹʎ sʇɐʇns"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
-msgstr ""
-"Wɥɐʇ ᴉs ʇɥǝ ɥᴉƃɥǝsʇ lǝʌǝl øɟ ǝdnɔɐʇᴉøn ʇɥɐʇ ɐnʎ øɟ ʎønɹ dɐɹǝnʇs øɹ ƃnɐɹdᴉɐns"
-" ɥɐʌǝ ɐɔɥᴉǝʌǝd?"
+msgid "Select level of education"
+msgstr "Sǝlǝɔʇ lǝʌǝl øɟ ǝdnɔɐʇᴉøn"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
-msgstr "Sǝlǝɔʇ ǝɯdløʎɯǝnʇ sʇɐʇns"
+msgid "Select guardian education"
+msgstr "Sǝlǝɔʇ ƃnɐɹdᴉɐn ǝdnɔɐʇᴉøn"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
-msgstr "Wɥɐʇ ᴉndnsʇɹʎ dø ʎøn ɔnɹɹǝnʇlʎ ʍøɹʞ ᴉn?"
+msgid "Select current industry"
+msgstr "Sǝlǝɔʇ ɔnɹɹǝnʇ ᴉndnsʇɹʎ"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
-msgstr "Wɥɐʇ ᴉndnsʇɹʎ dø ʎøn ʍɐnʇ ʇø ʍøɹʞ ᴉn?"
+msgid "Select prospective industry"
+msgstr "Sǝlǝɔʇ dɹøsdǝɔʇᴉʌǝ ᴉndnsʇɹʎ"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
+msgstr "Ŧɥɐnʞ ʎøn! Ɏøn’ɹǝ ɥǝldᴉnƃ ɯɐʞǝ ǝdX bǝʇʇǝɹ ɟøɹ ǝʌǝɹʎønǝ."
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -2999,6 +2999,10 @@ msgstr "Sʇɐɹʇǝd {start}"
 msgid "Ends {end}"
 msgstr "Ɇnds {end}"
 
+#: lms/static/js/learner_dashboard/models/program_subscription_model.js
+msgid "${price}/month {currency}"
+msgstr "${price}/ɯønʇɥ {currency}"
+
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
 msgstr "Ɏøn ɯnsʇ sǝlǝɔʇ ɐ sǝssᴉøn ʇø ɐɔɔǝss ʇɥǝ ɔønɹsǝ."
@@ -3050,6 +3054,58 @@ msgid ""
 msgstr ""
 "Ⱥɹǝ ʎøn snɹǝ ʎøn ʍɐnʇ ʇø nnǝnɹøll ɟɹøɯ {courseName} ({courseNumber})? Ɏøn "
 "ʍᴉll bǝ ɹǝɟnndǝd ʇɥǝ ɐɯønnʇ ʎøn dɐᴉd."
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "View program"
+msgstr "Vᴉǝʍ dɹøƃɹɐɯ"
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Enroll in a {programName} course"
+msgstr "Ɇnɹøll ᴉn ɐ {programName} ɔønɹsǝ"
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"You have an active subscription to the {programName} program but are not "
+"enrolled in any courses. Enroll in a remaining course and enjoy verified "
+"access."
+msgstr ""
+"Ɏøn ɥɐʌǝ ɐn ɐɔʇᴉʌǝ snbsɔɹᴉdʇᴉøn ʇø ʇɥǝ {programName} dɹøƃɹɐɯ bnʇ ɐɹǝ nøʇ "
+"ǝnɹøllǝd ᴉn ɐnʎ ɔønɹsǝs. Ɇnɹøll ᴉn ɐ ɹǝɯɐᴉnᴉnƃ ɔønɹsǝ ɐnd ǝnɾøʎ ʌǝɹᴉɟᴉǝd "
+"ɐɔɔǝss."
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"According to our records, you are not enrolled in any courses included in "
+"your {programName} program subscription. Enroll in a course from the "
+"{i_start}Program Details{i_end} page."
+msgstr ""
+"Ⱥɔɔøɹdᴉnƃ ʇø ønɹ ɹǝɔøɹds, ʎøn ɐɹǝ nøʇ ǝnɹøllǝd ᴉn ɐnʎ ɔønɹsǝs ᴉnɔlndǝd ᴉn "
+"ʎønɹ {programName} dɹøƃɹɐɯ snbsɔɹᴉdʇᴉøn. Ɇnɹøll ᴉn ɐ ɔønɹsǝ ɟɹøɯ ʇɥǝ "
+"{i_start}Ᵽɹøƃɹɐɯ Đǝʇɐᴉls{i_end} dɐƃǝ."
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Subscription trial expires in {remainingDays} day"
+msgid_plural "Subscription trial expires in {remainingDays} days"
+msgstr[0] "Snbsɔɹᴉdʇᴉøn ʇɹᴉɐl ǝxdᴉɹǝs ᴉn {remainingDays} dɐʎ"
+msgstr[1] "Snbsɔɹᴉdʇᴉøn ʇɹᴉɐl ǝxdᴉɹǝs ᴉn {remainingDays} dɐʎs"
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"Your {programName} trial will expire in {remainingDays} day at "
+"{trialEndTime} on {trialEndDate} and the card on file will be charged "
+"{subscriptionPrice}."
+msgid_plural ""
+"Your {programName} trial will expire in {remainingDays} days at "
+"{trialEndTime} on {trialEndDate} and the card on file will be charged "
+"{subscriptionPrice}."
+msgstr[0] ""
+"Ɏønɹ {programName} ʇɹᴉɐl ʍᴉll ǝxdᴉɹǝ ᴉn {remainingDays} dɐʎ ɐʇ "
+"{trialEndTime} øn {trialEndDate} ɐnd ʇɥǝ ɔɐɹd øn ɟᴉlǝ ʍᴉll bǝ ɔɥɐɹƃǝd "
+"{subscriptionPrice}."
+msgstr[1] ""
+"Ɏønɹ {programName} ʇɹᴉɐl ʍᴉll ǝxdᴉɹǝ ᴉn {remainingDays} dɐʎs ɐʇ "
+"{trialEndTime} øn {trialEndDate} ɐnd ʇɥǝ ɔɐɹd øn ɟᴉlǝ ʍᴉll bǝ ɔɥɐɹƃǝd "
+"{subscriptionPrice}."
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
@@ -6607,6 +6663,10 @@ msgstr "Ȼønɹsǝ Ønʇlᴉnǝ"
 msgid "Date added"
 msgstr "Đɐʇǝ ɐddǝd"
 
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr "Ᵽɐsʇᴉnƃ"
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
@@ -8479,6 +8539,7 @@ msgstr "Vɐlᴉd"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Certificate Status:"
 msgstr "Ȼǝɹʇᴉɟᴉɔɐʇǝ Sʇɐʇns:"
 
@@ -8579,8 +8640,8 @@ msgstr ""
 "snbɾǝɔʇs"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New Programs"
-msgstr "Ɇxdløɹǝ Nǝʍ Ᵽɹøƃɹɐɯs"
+msgid "Explore new programs"
+msgstr "Ɇxdløɹǝ nǝʍ dɹøƃɹɐɯs"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
@@ -8602,6 +8663,11 @@ msgstr "Ɍǝɯɐᴉnᴉnƃ"
 msgid "%(programName)s Home Page."
 msgstr "%(programName)s Ħøɯǝ Ᵽɐƃǝ."
 
+#: lms/templates/learner_dashboard/program_card.underscore
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Subscribed"
+msgstr "Snbsɔɹᴉbǝd"
+
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Your {program} Certificate"
 msgstr "Ɏønɹ {program} Ȼǝɹʇᴉɟᴉɔɐʇǝ"
@@ -8610,6 +8676,52 @@ msgstr "Ɏønɹ {program} Ȼǝɹʇᴉɟᴉɔɐʇǝ"
 #, python-format
 msgid "Open the certificate you earned for the %(title)s program."
 msgstr "Ødǝn ʇɥǝ ɔǝɹʇᴉɟᴉɔɐʇǝ ʎøn ǝɐɹnǝd ɟøɹ ʇɥǝ %(title)s dɹøƃɹɐɯ."
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Trial subscription"
+msgstr "Ŧɹᴉɐl snbsɔɹᴉdʇᴉøn"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Active subscription"
+msgstr "Ⱥɔʇᴉʌǝ snbsɔɹᴉdʇᴉøn"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Inactive subscription"
+msgstr "Ɨnɐɔʇᴉʌǝ snbsɔɹᴉdʇᴉøn"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"View your receipts or modify your subscription on the {a_start}Orders and "
+"subscriptions{a_end} page"
+msgstr ""
+"Vᴉǝʍ ʎønɹ ɹǝɔǝᴉdʇs øɹ ɯødᴉɟʎ ʎønɹ snbsɔɹᴉdʇᴉøn øn ʇɥǝ {a_start}Øɹdǝɹs ɐnd "
+"snbsɔɹᴉdʇᴉøns{a_end} dɐƃǝ"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Restart your subscription for {subscriptionPrice}. Your payment history is "
+"still available on the {a_start}Orders and subscriptions{a_end} page"
+msgstr ""
+"Ɍǝsʇɐɹʇ ʎønɹ snbsɔɹᴉdʇᴉøn ɟøɹ {subscriptionPrice}. Ɏønɹ dɐʎɯǝnʇ ɥᴉsʇøɹʎ ᴉs "
+"sʇᴉll ɐʌɐᴉlɐblǝ øn ʇɥǝ {a_start}Øɹdǝɹs ɐnd snbsɔɹᴉdʇᴉøns{a_end} dɐƃǝ"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"If you had a subscription previously, your payment history is still "
+"available on the {a_start}Orders and subscriptions{a_end} page"
+msgstr ""
+"Ɨɟ ʎøn ɥɐd ɐ snbsɔɹᴉdʇᴉøn dɹǝʌᴉønslʎ, ʎønɹ dɐʎɯǝnʇ ɥᴉsʇøɹʎ ᴉs sʇᴉll "
+"ɐʌɐᴉlɐblǝ øn ʇɥǝ {a_start}Øɹdǝɹs ɐnd snbsɔɹᴉdʇᴉøns{a_end} dɐƃǝ"
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Need help? Check out the {a_start}Learner Help "
+"Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact "
+"support"
+msgstr ""
+"Nǝǝd ɥǝld? Ȼɥǝɔʞ ønʇ ʇɥǝ {a_start}Łǝɐɹnǝɹ Ħǝld "
+"Ȼǝnʇǝɹ{span_start}{icon}{span_end}{a_end} ʇø ʇɹønblǝsɥøøʇ ᴉssnǝs øɹ ɔønʇɐɔʇ "
+"snddøɹʇ"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Program Record"
@@ -8658,6 +8770,45 @@ msgstr "Ɏønɹ Ᵽɹøƃɹɐɯ Ɉønɹnǝʎ"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Manage my subscription"
+msgstr "Mɐnɐƃǝ ɯʎ snbsɔɹᴉdʇᴉøn"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Restart my subscription"
+msgstr "Ɍǝsʇɐɹʇ ɯʎ snbsɔɹᴉdʇᴉøn"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Start {trialLength}-day free trial"
+msgstr "Sʇɐɹʇ {trialLength}-dɐʎ ɟɹǝǝ ʇɹᴉɐl"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Active trial ends {trialEndDate} at {trialEndTime}"
+msgstr "Ⱥɔʇᴉʌǝ ʇɹᴉɐl ǝnds {trialEndDate} ɐʇ {trialEndTime}"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Your next billing date is {currentPeriodEnd}"
+msgstr "Ɏønɹ nǝxʇ bᴉllᴉnƃ dɐʇǝ ᴉs {currentPeriodEnd}"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid ""
+"Unlock verified access to all courses for {subscriptionPrice}. Cancel "
+"anytime."
+msgstr ""
+"Ʉnløɔʞ ʌǝɹᴉɟᴉǝd ɐɔɔǝss ʇø ɐll ɔønɹsǝs ɟøɹ {subscriptionPrice}. Ȼɐnɔǝl "
+"ɐnʎʇᴉɯǝ."
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "{subscriptionPrice} subscription after trial ends. Cancel anytime."
+msgstr "{subscriptionPrice} snbsɔɹᴉdʇᴉøn ɐɟʇǝɹ ʇɹᴉɐl ǝnds. Ȼɐnɔǝl ɐnʎʇᴉɯǝ."
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Upgrade All Remaining Courses ("
 msgstr "Ʉdƃɹɐdǝ Ⱥll Ɍǝɯɐᴉnᴉnƃ Ȼønɹsǝs ("
 
@@ -8702,13 +8853,54 @@ msgstr ""
 msgid "{organization}\\'s logo"
 msgstr "{organization}\\'s løƃø"
 
+#: lms/templates/learner_dashboard/program_list_header_view.underscore
+msgid "My programs"
+msgstr "Mʎ dɹøƃɹɐɯs"
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "New"
+msgstr "Nǝʍ"
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "Monthly program subscriptions {emDash} more flexible, more affordable"
+msgstr "Mønʇɥlʎ dɹøƃɹɐɯ snbsɔɹᴉdʇᴉøns {emDash} ɯøɹǝ ɟlǝxᴉblǝ, ɯøɹǝ ɐɟɟøɹdɐblǝ"
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid ""
+"Now available for many popular programs, affordable monthly subscription "
+"pricing can help you manage your budget more effectively. Subscriptions "
+"start at {minSubscriptionPrice}/month USD per program, after a 7-day full "
+"access free trial. Cancel at any time."
+msgstr ""
+"Nøʍ ɐʌɐᴉlɐblǝ ɟøɹ ɯɐnʎ dødnlɐɹ dɹøƃɹɐɯs, ɐɟɟøɹdɐblǝ ɯønʇɥlʎ snbsɔɹᴉdʇᴉøn "
+"dɹᴉɔᴉnƃ ɔɐn ɥǝld ʎøn ɯɐnɐƃǝ ʎønɹ bndƃǝʇ ɯøɹǝ ǝɟɟǝɔʇᴉʌǝlʎ. Snbsɔɹᴉdʇᴉøns "
+"sʇɐɹʇ ɐʇ {minSubscriptionPrice}/ɯønʇɥ ɄSĐ dǝɹ dɹøƃɹɐɯ, ɐɟʇǝɹ ɐ 7-dɐʎ ɟnll "
+"ɐɔɔǝss ɟɹǝǝ ʇɹᴉɐl. Ȼɐnɔǝl ɐʇ ɐnʎ ʇᴉɯǝ."
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "Explore subscription options"
+msgstr "Ɇxdløɹǝ snbsɔɹᴉdʇᴉøn ødʇᴉøns"
+
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Needs verified certificate "
 msgstr "Nǝǝds ʌǝɹᴉɟᴉǝd ɔǝɹʇᴉɟᴉɔɐʇǝ "
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade to Verified"
 msgstr "Ʉdƃɹɐdǝ ʇø Vǝɹᴉɟᴉǝd"
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Upgrade with a subscription"
+msgstr "Ʉdƃɹɐdǝ ʍᴉʇɥ ɐ snbsɔɹᴉdʇᴉøn"
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Pay {subscriptionPrice} for all courses in this program"
+msgstr "Ᵽɐʎ {subscriptionPrice} ɟøɹ ɐll ɔønɹsǝs ᴉn ʇɥᴉs dɹøƃɹɐɯ"
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Pay {subscriptionPrice} after {trialLength}-day free trial"
+msgstr "Ᵽɐʎ {subscriptionPrice} ɐɟʇǝɹ {trialLength}-dɐʎ ɟɹǝǝ ʇɹᴉɐl"
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -10228,6 +10420,14 @@ msgstr "Ᵽɹǝss ɔløsǝ ʇø ɥᴉdǝ ɔønɹsǝ ʌᴉdǝø sǝʇʇᴉnƃs"
 msgid "Course Video Settings"
 msgstr "Ȼønɹsǝ Vᴉdǝø Sǝʇʇᴉnƃs"
 
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Video Sharing"
+msgstr "Vᴉdǝø Sɥɐɹᴉnƃ"
+
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Learn more"
+msgstr "Łǝɐɹn ɯøɹǝ"
+
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
 msgstr "Ŧɹɐnsɔɹᴉdʇ Ŧnɹnɐɹønnd"
@@ -10832,14 +11032,6 @@ msgid ""
 msgstr ""
 "Ɨɟ ɐ lǝɐɹnǝɹ sʇɐɹʇs øn {startDate}, ʇɥᴉs snbsǝɔʇᴉøn ʍᴉll bǝ dnǝ øn "
 "{projectedDueIn}."
-
-#: cms/templates/js/self-paced-due-date-editor.underscore
-msgid ""
-"The maximum number of weeks this subsection can be due in is 18 weeks from "
-"the learner enrollment date."
-msgstr ""
-"Ŧɥǝ ɯɐxᴉɯnɯ nnɯbǝɹ øɟ ʍǝǝʞs ʇɥᴉs snbsǝɔʇᴉøn ɔɐn bǝ dnǝ ᴉn ᴉs 18 ʍǝǝʞs ɟɹøɯ "
-"ʇɥǝ lǝɐɹnǝɹ ǝnɹøllɯǝnʇ dɐʇǝ."
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""

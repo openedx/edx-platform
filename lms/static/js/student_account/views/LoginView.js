@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -166,9 +167,9 @@
                 var email = $('#password-reset-email').val(),
                     successTitle = gettext('Check Your Email'),
                     successMessageHtml = HtmlUtils.interpolateHtml(
-                        gettext('{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email address is associated with your {platform_name} account, we will send a message with password recovery instructions to this email address.{paragraphEnd}' + // eslint-disable-line max-len
-                        '{paragraphStart}If you do not receive a password reset message after 1 minute, verify that you entered the correct email address, or check your spam folder.{paragraphEnd}' + // eslint-disable-line max-len
-                        '{paragraphStart}If you need further assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}'), { // eslint-disable-line max-len
+                        gettext('{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email address is associated with your {platform_name} account, we will send a message with password recovery instructions to this email address.{paragraphEnd}' // eslint-disable-line max-len
+                        + '{paragraphStart}If you do not receive a password reset message after 1 minute, verify that you entered the correct email address, or check your spam folder.{paragraphEnd}' // eslint-disable-line max-len
+                        + '{paragraphStart}If you need further assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}'), { // eslint-disable-line max-len
                             boldStart: HtmlUtils.HTML('<b data-hj-suppress>'),
                             boldEnd: HtmlUtils.HTML('</b>'),
                             paragraphStart: HtmlUtils.HTML('<p>'),
@@ -218,10 +219,10 @@
                     msg = gettext('An error has occurred. Try refreshing the page, or check your Internet connection.'); // eslint-disable-line max-len
                 } else if (error.responseJSON !== undefined && error.responseJSON.error_code === 'inactive-user') {
                     msg = HtmlUtils.interpolateHtml(
-                        gettext('In order to sign in, you need to activate your account.{line_break}{line_break}' +
-                            'We just sent an activation link to {strong_start} {email} {strong_end}. If ' +
-                            ' you do not receive an email, check your spam folders or ' +
-                            ' {anchorStart}contact {platform_name} Support{anchorEnd}.'),
+                        gettext('In order to sign in, you need to activate your account.{line_break}{line_break}'
+                            + 'We just sent an activation link to {strong_start} {email} {strong_end}. If '
+                            + ' you do not receive an email, check your spam folders or '
+                            + ' {anchorStart}contact {platform_name} Support{anchorEnd}.'),
                         {
                             email: error.responseJSON.email,
                             platform_name: this.platform_name,
@@ -270,9 +271,9 @@
 
             renderThirdPartyAuthWarning: function() {
                 var message = _.sprintf(
-                    gettext('You have successfully signed into %(currentProvider)s, but your %(currentProvider)s' +
-                            ' account does not have a linked %(platformName)s account. To link your accounts,' +
-                            ' sign in now using your %(platformName)s password.'),
+                    gettext('You have successfully signed into %(currentProvider)s, but your %(currentProvider)s'
+                            + ' account does not have a linked %(platformName)s account. To link your accounts,'
+                            + ' sign in now using your %(platformName)s password.'),
                     {currentProvider: this.currentProvider, platformName: this.platformName}
                 );
 

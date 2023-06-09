@@ -7,16 +7,19 @@ import PropTypes from 'prop-types';
 class ShowErrors extends React.Component {
     render() {
         return (
-            this.props.hasErrors && <div className="col-sm-12">
-                <div className="alert alert-danger" role="alert">
-                    <strong>{gettext('Please fix the following errors:')}</strong>
-                    <ul>
-                        { Object.keys(this.props.errorList).map(key =>
-                            this.props.errorList[key] && <li key={key}>{this.props.errorList[key]}</li>,
-                        )}
-                    </ul>
+            this.props.hasErrors && (
+                <div className="col-sm-12">
+                    <div className="alert alert-danger" role="alert">
+                        <strong>{gettext('Please fix the following errors:')}</strong>
+                        <ul>
+                            {
+                                Object.keys(this.props.errorList).map(key => this.props.errorList[key]
+                                && <li key={key}>{this.props.errorList[key]}</li>)
+                            }
+                        </ul>
+                    </div>
                 </div>
-            </div>);
+            ));
     }
 }
 

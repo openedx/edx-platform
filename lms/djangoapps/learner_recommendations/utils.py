@@ -150,6 +150,7 @@ def filter_recommended_courses(
     recommendation_count=10,
     user_country_code=None,
     request_course_key=None,
+    course_fields=None,
 ):
     """
     Returns the filtered course recommendations. The unfiltered course keys
@@ -164,6 +165,7 @@ def filter_recommended_courses(
         recommendation_count: the maximum count of recommendations to be returned
         user_country_code: if provided, will apply location restrictions to recommendations
         request_course_key: if provided, will filter out that course from recommendations (used for course about page)
+        fields: if provided, collects those fields on each course being queried, otherwise collects default fields
 
     Returns:
         filtered_recommended_courses (list): A list of filtered course objects.
@@ -180,7 +182,7 @@ def filter_recommended_courses(
         "location_restriction",
         "marketing_url",
         "programs",
-    ]
+    ] if not course_fields else course_fields
 
     # Filter out enrolled courses .
     course_keys_to_filter_out = _get_user_enrolled_course_keys(user)
@@ -209,3 +211,19 @@ def get_cross_product_recommendations(course_key):
     Helper method to get associated course keys based on the key passed
     """
     return settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS.get(course_key)
+
+
+def get_active_course_run(course):
+    """
+    Returns an active course run based on prospectus frontend logic
+    for what defines an active course run
+    """
+    course_runs = course.get("course_runs")
+    advertised_course_run_uuid = course.get("advertised_course_run_uuid")
+
+    if advertised_course_run_uuid:
+        for course_run in course_runs:
+            if course_run.get("uuid") == advertised_course_run_uuid:
+                return course_run
+
+    return None

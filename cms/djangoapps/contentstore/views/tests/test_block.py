@@ -12,6 +12,7 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
@@ -47,7 +48,7 @@ from xmodule.partitions.tests.test_partitions import MockPartitionService
 from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
-from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
+from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url, duplicate_block, update_from_source
 from cms.djangoapps.contentstore.views import block as item_module
 from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from common.djangoapps.xblock_django.models import (
@@ -785,6 +786,30 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
 
         # Now send a custom display name for the duplicate.
         verify_name(self.seq_usage_key, self.chapter_usage_key, "customized name", display_name="customized name")
+
+    def test_shallow_duplicate(self):
+        """
+        Test that duplicate_block(..., shallow=True) can duplicate a block but ignores its children.
+        """
+        source_course = CourseFactory()
+        user = UserFactory.create()
+        source_chapter = BlockFactory(parent=source_course, category='chapter', display_name='Source Chapter')
+        BlockFactory(parent=source_chapter, category='html', display_name='Child')
+        # Refresh.
+        source_chapter = self.store.get_item(source_chapter.location)
+        self.assertEqual(len(source_chapter.get_children()), 1)
+        destination_course = CourseFactory()
+        destination_location = duplicate_block(
+            parent_usage_key=destination_course.location,
+            duplicate_source_usage_key=source_chapter.location,
+            user=user,
+            display_name=source_chapter.display_name,
+            shallow=True,
+        )
+        # Refresh here, too, just to be sure.
+        destination_chapter = self.store.get_item(destination_location)
+        self.assertEqual(len(destination_chapter.get_children()), 0)
+        self.assertEqual(destination_chapter.display_name, 'Source Chapter')
 
 
 @ddt.ddt
@@ -2159,10 +2184,10 @@ class TestComponentHandler(TestCase):
         self.modulestore = patcher.start()
         self.addCleanup(patcher.stop)
 
-        # component_handler calls modulestore.get_item to get the descriptor of the requested xBlock.
+        # component_handler calls modulestore.get_item to get the requested xBlock.
         # Here, we mock the return value of modulestore.get_item so it can be used to mock the handler
-        # of the xBlock descriptor.
-        self.descriptor = self.modulestore.return_value.get_item.return_value
+        # of the xBlock.
+        self.block = self.modulestore.return_value.get_item.return_value
 
         self.usage_key = BlockUsageLocator(
             CourseLocator('dummy_org', 'dummy_course', 'dummy_run'), 'dummy_category', 'dummy_name'
@@ -2173,7 +2198,7 @@ class TestComponentHandler(TestCase):
         self.request.user = self.user
 
     def test_invalid_handler(self):
-        self.descriptor.handle.side_effect = NoSuchHandlerError
+        self.block.handle.side_effect = NoSuchHandlerError
 
         with self.assertRaises(Http404):
             component_handler(self.request, self.usage_key_string, 'invalid_handler')
@@ -2185,7 +2210,7 @@ class TestComponentHandler(TestCase):
             self.assertEqual(request.method, method)
             return Response()
 
-        self.descriptor.handle = check_handler
+        self.block.handle = check_handler
 
         # Have to use the right method to create the request to get the HTTP method that we want
         req_factory_method = getattr(self.request_factory, method.lower())
@@ -2198,7 +2223,7 @@ class TestComponentHandler(TestCase):
         def create_response(handler, request, suffix):  # lint-amnesty, pylint: disable=unused-argument
             return Response(status_code=status_code)
 
-        self.descriptor.handle = create_response
+        self.block.handle = create_response
 
         self.assertEqual(component_handler(self.request, self.usage_key_string, 'dummy_handler').status_code,
                          status_code)
@@ -2219,7 +2244,7 @@ class TestComponentHandler(TestCase):
         self.request.user = UserFactory()
         mock_handler = 'dummy_handler'
 
-        self.descriptor.handle = create_response
+        self.block.handle = create_response
 
         with patch(
             'cms.djangoapps.contentstore.views.component.is_xblock_aside',
@@ -2253,7 +2278,7 @@ class TestComponentHandler(TestCase):
                 else self.usage_key_string
             )
 
-        self.descriptor.handle = create_response
+        self.block.handle = create_response
 
         with patch(
             'cms.djangoapps.contentstore.views.component.is_xblock_aside',
@@ -2769,6 +2794,28 @@ class TestXBlockInfo(ItemTest):
         self.store.update_item(self.course, None)
         course_xblock_info = create_xblock_info(self.course)
         self.assertTrue(course_xblock_info['highlights_enabled_for_messaging'])
+
+    def test_xblock_public_video_sharing_enabled(self):
+        """
+        Public video sharing is included in the xblock info when enable.
+        """
+        self.course.video_sharing_options = 'all-on'
+        with patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=True):
+            self.store.update_item(self.course, None)
+            course_xblock_info = create_xblock_info(self.course)
+            self.assertTrue(course_xblock_info['video_sharing_enabled'])
+            self.assertEqual(course_xblock_info['video_sharing_options'], 'all-on')
+
+    def test_xblock_public_video_sharing_disabled(self):
+        """
+        Public video sharing not is included in the xblock info when disabled.
+        """
+        self.course.video_sharing_options = 'arbitrary'
+        with patch.object(PUBLIC_VIDEO_SHARE, 'is_enabled', return_value=False):
+            self.store.update_item(self.course, None)
+            course_xblock_info = create_xblock_info(self.course)
+            self.assertNotIn('video_sharing_enabled', course_xblock_info)
+            self.assertNotIn('video_sharing_options', course_xblock_info)
 
     def validate_course_xblock_info(self, xblock_info, has_child_info=True, course_outline=False):
         """
@@ -3472,3 +3519,111 @@ class TestXBlockPublishingInfo(ItemTest):
         # Check that in self paced course content has live state now
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.live)
+
+
+@patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+       lambda self, block: ['test_aside'])
+class TestUpdateFromSource(ModuleStoreTestCase):
+    """
+    Test update_from_source.
+    """
+
+    def setUp(self):
+        """
+        Set up the runtime for tests.
+        """
+        super().setUp()
+        key_store = DictKeyValueStore()
+        field_data = KvsFieldData(key_store)
+        self.runtime = TestRuntime(services={'field-data': field_data})
+
+    def create_source_block(self, course):
+        """
+        Create a chapter with all the fixings.
+        """
+        source_block = BlockFactory(
+            parent=course,
+            category='course_info',
+            display_name='Source Block',
+            metadata={'due': datetime(2010, 11, 22, 4, 0, tzinfo=UTC)},
+        )
+
+        def_id = self.runtime.id_generator.create_definition('html')
+        usage_id = self.runtime.id_generator.create_usage(def_id)
+
+        aside = AsideTest(scope_ids=ScopeIds('user', 'html', def_id, usage_id), runtime=self.runtime)
+        aside.field11 = 'html_new_value1'
+
+        # The data attribute is handled in a special manner and should be updated.
+        source_block.data = '<div>test</div>'
+        # This field is set on the content scope (definition_data), which should be updated.
+        source_block.items = ['test', 'beep']
+
+        self.store.update_item(source_block, self.user.id, asides=[aside])
+
+        # quick sanity checks
+        source_block = self.store.get_item(source_block.location)
+        self.assertEqual(source_block.due, datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
+        self.assertEqual(source_block.display_name, 'Source Block')
+        self.assertEqual(source_block.runtime.get_asides(source_block)[0].field11, 'html_new_value1')
+        self.assertEqual(source_block.data, '<div>test</div>')
+        self.assertEqual(source_block.items, ['test', 'beep'])
+
+        return source_block
+
+    def check_updated(self, source_block, destination_key):
+        """
+        Check that the destination block has been updated to match our source block.
+        """
+        revised = self.store.get_item(destination_key)
+        self.assertEqual(source_block.display_name, revised.display_name)
+        self.assertEqual(source_block.due, revised.due)
+        self.assertEqual(revised.data, source_block.data)
+        self.assertEqual(revised.items, source_block.items)
+
+        self.assertEqual(
+            revised.runtime.get_asides(revised)[0].field11,
+            source_block.runtime.get_asides(source_block)[0].field11,
+        )
+
+    @XBlockAside.register_temp_plugin(AsideTest, 'test_aside')
+    def test_update_from_source(self):
+        """
+        Test that update_from_source updates the destination block.
+        """
+        course = CourseFactory()
+        user = UserFactory.create()
+
+        source_block = self.create_source_block(course)
+
+        destination_block = BlockFactory(parent=course, category='course_info', display_name='Destination Problem')
+        update_from_source(source_block=source_block, destination_block=destination_block, user_id=user.id)
+        self.check_updated(source_block, destination_block.location)
+
+    @XBlockAside.register_temp_plugin(AsideTest, 'test_aside')
+    def test_update_clobbers(self):
+        """
+        Verify that our update replaces all settings on the block.
+        """
+        course = CourseFactory()
+        user = UserFactory.create()
+
+        source_block = self.create_source_block(course)
+
+        destination_block = BlockFactory(
+            parent=course,
+            category='course_info',
+            display_name='Destination Chapter',
+            metadata={'due': datetime(2025, 10, 21, 6, 5, tzinfo=UTC)},
+        )
+
+        def_id = self.runtime.id_generator.create_definition('html')
+        usage_id = self.runtime.id_generator.create_usage(def_id)
+        aside = AsideTest(scope_ids=ScopeIds('user', 'html', def_id, usage_id), runtime=self.runtime)
+        aside.field11 = 'Other stuff'
+        destination_block.data = '<div>other stuff</div>'
+        destination_block.items = ['other stuff', 'boop']
+        self.store.update_item(destination_block, user.id, asides=[aside])
+
+        update_from_source(source_block=source_block, destination_block=destination_block, user_id=user.id)
+        self.check_updated(source_block, destination_block.location)

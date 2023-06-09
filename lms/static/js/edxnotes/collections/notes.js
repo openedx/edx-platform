@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'underscore', 'edx-ui-toolkit/js/pagination/paging-collection', 'js/edxnotes/models/note'
     ], function(_, PagingCollection, NoteModel) {

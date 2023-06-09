@@ -394,7 +394,6 @@
     "Exception Granted": "Excepci\u00f3 concedida",
     "Expand All": "Expandeix-ho tot",
     "Explain if other.": "Expliqueu-ho si hi ha altres.",
-    "Explore New Programs": "Exploreu nous programes",
     "Explore Programs": "Explore programes",
     "Explore your course!": "Exploreu el vostre curs!",
     "Failed Proctoring": "Supervisat susp\u00e8s",

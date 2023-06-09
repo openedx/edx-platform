@@ -297,7 +297,7 @@ def get_block(user, request, usage_key, field_data_cache, position=None, log_if_
                                 XModule javascript to be bound correctly
       - depth                 : number of levels of descendents to cache when loading this module.
                                 None means cache all descendents
-      - static_asset_path     : static asset path to use (overrides descriptor's value); needed
+      - static_asset_path     : static asset path to use (overrides block's value); needed
                                 by get_course_info_section, because info section modules
                                 do not have a course as the parent module, and thus do not
                                 inherit this lms key value.
@@ -310,8 +310,8 @@ def get_block(user, request, usage_key, field_data_cache, position=None, log_if_
     if possible.  If not possible, return None.
     """
     try:
-        descriptor = modulestore().get_item(usage_key, depth=depth)
-        return get_block_for_descriptor(user, request, descriptor, field_data_cache, usage_key.course_key,
+        block = modulestore().get_item(usage_key, depth=depth)
+        return get_block_for_descriptor(user, request, block, field_data_cache, usage_key.course_key,
                                         position=position,
                                         wrap_xblock_display=wrap_xblock_display,
                                         grade_bucket_type=grade_bucket_type,
@@ -365,7 +365,7 @@ def display_access_messages(user, block, view, frag, context):  # pylint: disabl
 
 
 # pylint: disable=too-many-statements
-def get_block_for_descriptor(user, request, descriptor, field_data_cache, course_key,
+def get_block_for_descriptor(user, request, block, field_data_cache, course_key,
                              position=None, wrap_xblock_display=True, grade_bucket_type=None,
                              static_asset_path='', disable_staff_debug_info=False,
                              course=None, will_recheck_access=False):
@@ -387,7 +387,7 @@ def get_block_for_descriptor(user, request, descriptor, field_data_cache, course
 
     return get_block_for_descriptor_internal(
         user=user,
-        descriptor=descriptor,
+        block=block,
         student_data=student_data,
         course_id=course_key,
         track_function=track_function,
@@ -469,17 +469,17 @@ def prepare_runtime_for_user(
         waittime=settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS,
     )
 
-    def inner_get_block(descriptor):
+    def inner_get_block(block):
         """
-        Delegate to get_block_for_descriptor_internal() with all values except `descriptor` set.
+        Delegate to get_block_for_descriptor_internal() with all values except `block` set.
 
         Because it does an access check, it may return None.
         """
-        # TODO: fix this so that make_xqueue_callback uses the descriptor passed into
+        # TODO: fix this so that make_xqueue_callback uses the block passed into
         # inner_get_block, not the parent's callback.  Add it as an argument....
         return get_block_for_descriptor_internal(
             user=user,
-            descriptor=descriptor,
+            block=block,
             student_data=student_data,
             course_id=course_id,
             track_function=track_function,
@@ -493,23 +493,14 @@ def prepare_runtime_for_user(
             will_recheck_access=will_recheck_access,
         )
 
-    # These modules store data using the anonymous_student_id as a key.
-    # To prevent loss of data, we will continue to provide old modules with
-    # the per-student anonymized id (as we have in the past),
-    # while giving selected modules a per-course anonymized id.
-    # As we have the time to manually test more modules, we can add to the list
-    # of modules that get the per-course anonymized id.
-    if getattr(block, 'requires_per_student_anonymous_id', False):
-        anonymous_student_id = anonymous_id_for_user(user, None)
-    else:
-        anonymous_student_id = anonymous_id_for_user(user, course_id)
-
     user_is_staff = bool(has_access(user, 'staff', block.location, course_id))
     user_service = DjangoXBlockUserService(
         user,
         user_is_staff=user_is_staff,
         user_role=get_user_role(user, course_id),
-        anonymous_user_id=anonymous_student_id,
+        anonymous_user_id=anonymous_id_for_user(user, course_id),
+        # See the docstring of `DjangoXBlockUserService`.
+        deprecated_anonymous_user_id=anonymous_id_for_user(user, None),
         request_country_code=user_location,
     )
 
@@ -648,7 +639,7 @@ def prepare_runtime_for_user(
 
 # TODO: Find all the places that this method is called and figure out how to
 # get a loaded course passed into it
-def get_block_for_descriptor_internal(user, descriptor, student_data, course_id, track_function, request_token,
+def get_block_for_descriptor_internal(user, block, student_data, course_id, track_function, request_token,
                                       position=None, wrap_xblock_display=True, grade_bucket_type=None,
                                       static_asset_path='', user_location=None, disable_staff_debug_info=False,
                                       course=None, will_recheck_access=False):
@@ -664,7 +655,7 @@ def get_block_for_descriptor_internal(user, descriptor, student_data, course_id,
     student_data = prepare_runtime_for_user(
         user=user,
         student_data=student_data,  # These have implicit user bindings, the rest of args are considered not to
-        block=descriptor,
+        block=block,
         course_id=course_id,
         track_function=track_function,
         position=position,
@@ -678,7 +669,7 @@ def get_block_for_descriptor_internal(user, descriptor, student_data, course_id,
         will_recheck_access=will_recheck_access,
     )
 
-    descriptor.bind_for_student(
+    block.bind_for_student(
         user.id,
         [
             partial(DateLookupFieldData, course_id=course_id, user=user),
@@ -687,16 +678,16 @@ def get_block_for_descriptor_internal(user, descriptor, student_data, course_id,
         ],
     )
 
-    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)
+    block.scope_ids = block.scope_ids._replace(user_id=user.id)
 
     # Do not check access when it's a noauth request.
-    # Not that the access check needs to happen after the descriptor is bound
+    # Not that the access check needs to happen after the block is bound
     # for the student, since there may be field override data for the student
     # that affects xblock visibility.
     user_needs_access_check = getattr(user, 'known', True) and not isinstance(user, SystemUser)
     if user_needs_access_check:
-        access = has_access(user, 'load', descriptor, course_id)
-        # A descriptor should only be returned if either the user has access, or the user doesn't have access, but
+        access = has_access(user, 'load', block, course_id)
+        # A block should only be returned if either the user has access, or the user doesn't have access, but
         # the failed access has a message for the user and the caller of this function specifies it will check access
         # again. This allows blocks to show specific error message or upsells when access is denied.
         caller_will_handle_access_error = (
@@ -705,10 +696,10 @@ def get_block_for_descriptor_internal(user, descriptor, student_data, course_id,
             and (access.user_message or access.user_fragment)
         )
         if access or caller_will_handle_access_error:
-            descriptor.has_access_error = bool(caller_will_handle_access_error)
-            return descriptor
+            block.has_access_error = bool(caller_will_handle_access_error)
+            return block
         return None
-    return descriptor
+    return block
 
 
 def load_single_xblock(request, user_id, course_id, usage_key_string, course=None, will_recheck_access=False):
@@ -719,7 +710,7 @@ def load_single_xblock(request, user_id, course_id, usage_key_string, course=Non
     course_key = CourseKey.from_string(course_id)
     usage_key = usage_key.map_into_course(course_key)
     user = User.objects.get(id=user_id)
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+    field_data_cache = FieldDataCache.cache_for_block_descendents(
         course_key,
         user,
         modulestore().get_item(usage_key),
@@ -873,15 +864,15 @@ def _get_usage_key_for_course(course_key, usage_id) -> UsageKey:
         raise Http404("Invalid location") from exc
 
 
-def _get_descriptor_by_usage_key(usage_key):
+def _get_block_by_usage_key(usage_key):
     """
-    Gets a descriptor instance based on a mapped-to-course usage_key
+    Gets a block instance based on a mapped-to-course usage_key
 
     Returns (instance, tracking_context)
     """
     try:
-        descriptor = modulestore().get_item(usage_key)
-        descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
+        block = modulestore().get_item(usage_key)
+        block_orig_usage_key, block_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError as exc:
         log.warning(
             "Invalid location for course id %s: %s",
@@ -893,17 +884,17 @@ def _get_descriptor_by_usage_key(usage_key):
     tracking_context = {
         'module': {
             # xss-lint: disable=python-deprecated-display-name
-            'display_name': descriptor.display_name_with_default_escaped,
-            'usage_key': str(descriptor.location),
+            'display_name': block.display_name_with_default_escaped,
+            'usage_key': str(block.location),
         }
     }
 
     # For blocks that are inherited from a content library, we add some additional metadata:
-    if descriptor_orig_usage_key is not None:
-        tracking_context['module']['original_usage_key'] = str(descriptor_orig_usage_key)
-        tracking_context['module']['original_usage_version'] = str(descriptor_orig_version)
+    if block_orig_usage_key is not None:
+        tracking_context['module']['original_usage_key'] = str(block_orig_usage_key)
+        tracking_context['module']['original_usage_version'] = str(block_orig_version)
 
-    return descriptor, tracking_context
+    return block, tracking_context
 
 
 def get_block_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None,
@@ -915,19 +906,19 @@ def get_block_by_usage_id(request, course_id, usage_id, disable_staff_debug_info
     """
     course_key = CourseKey.from_string(course_id)
     usage_key = _get_usage_key_for_course(course_key, usage_id)
-    descriptor, tracking_context = _get_descriptor_by_usage_key(usage_key)
+    block, tracking_context = _get_block_by_usage_key(usage_key)
 
-    _, user = setup_masquerade(request, course_key, has_access(request.user, 'staff', descriptor, course_key))
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+    _, user = setup_masquerade(request, course_key, has_access(request.user, 'staff', block, course_key))
+    field_data_cache = FieldDataCache.cache_for_block_descendents(
         course_key,
         user,
-        descriptor,
+        block,
         read_only=CrawlersConfig.is_crawler(request),
     )
     instance = get_block_for_descriptor(
         user,
         request,
-        descriptor,
+        block,
         field_data_cache,
         usage_key.course_key,
         disable_staff_debug_info=disable_staff_debug_info,
@@ -978,13 +969,13 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
             block_usage_key = usage_key
 
         # Peek at the handler method to see if it actually wants to check access itself. (The handler may not want
-        # inaccessible blocks stripped from the tree.) This ends up doing two modulestore lookups for the descriptor,
+        # inaccessible blocks stripped from the tree.) This ends up doing two modulestore lookups for the block,
         # but the blocks should be available in the request cache the second time.
         # At the time of writing, this is only used by one handler. If this usage grows, we may want to re-evaluate
         # how we do this to something more elegant. If you are the author of a third party block that decides it wants
         # to set this too, please let us know so we can consider making this easier / better-documented.
-        descriptor, _ = _get_descriptor_by_usage_key(block_usage_key)
-        handler_method = getattr(descriptor, handler, False)
+        block, _ = _get_block_by_usage_key(block_usage_key)
+        handler_method = getattr(block, handler, False)
         will_recheck_access = handler_method and getattr(handler_method, 'will_recheck_access', False)
 
         instance, tracking_context = get_block_by_usage_id(

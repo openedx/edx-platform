@@ -6,6 +6,7 @@ define([
     $, TemplateHelpers, AjaxHelpers, NotesCollection, TabsCollection, RecentActivityView, Helpers
 ) {
     'use strict';
+
     describe('EdxNotes RecentActivityView', function() {
         var notes = {
                 count: 3,

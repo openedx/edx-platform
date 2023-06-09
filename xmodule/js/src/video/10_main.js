@@ -64,14 +64,15 @@
             'video/09_poster.js',
             'video/09_completion.js',
             'video/10_commands.js',
-            'video/095_video_context_menu.js'
+            'video/095_video_context_menu.js',
+            'video/036_video_social_sharing.js'
         ],
         function(
             VideoStorage, initialize, FocusGrabber, VideoAccessibleMenu, VideoControl, VideoFullScreen,
             VideoQualityControl, VideoProgressSlider, VideoVolumeControl, VideoSpeedControl, VideoAutoAdvanceControl,
             VideoCaption, VideoPlayPlaceholder, VideoPlayPauseControl, VideoPlaySkipControl, VideoSkipControl,
             VideoBumper, VideoSaveStatePlugin, VideoEventsPlugin, VideoEventsBumperPlugin, VideoPoster,
-            VideoCompletionHandler, VideoCommands, VideoContextMenu
+            VideoCompletionHandler, VideoCommands, VideoContextMenu, VideoSocialSharing
         ) {
             /* RequireJS */
             var youtubeXhr = null,
@@ -134,6 +135,8 @@
                     storage: storage,
                     saveStateUrl: state.metadata.saveStateUrl
                 });
+
+                VideoSocialSharing(el);
 
                 if (bumperMetadata) {
                     VideoPoster(el, {

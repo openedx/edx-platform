@@ -812,7 +812,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase, CacheIsolationTestCase)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_course_display_name_not_override_with_course_title(self):
-        # if certificate in descriptor has not course_title then course name should not be overridden with this title.
+        # if certificate in block has not course_title then course name should not be overridden with this title.
         test_certificates = [
             {
                 'id': 0,

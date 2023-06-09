@@ -53,7 +53,12 @@ class ContextDataSerializer(serializers.Serializer):
     autoSubmitRegForm = serializers.BooleanField(default=False)
     syncLearnerProfileData = serializers.BooleanField(default=False)
     countryCode = serializers.CharField(allow_null=True)
-    pipelineUserDetails = PipelineUserDetailsSerializer(source='pipeline_user_details', allow_null=True)
+    pipelineUserDetails = serializers.SerializerMethodField()
+
+    def get_pipelineUserDetails(self, obj):
+        if obj.get('pipeline_user_details'):
+            return PipelineUserDetailsSerializer(obj.get('pipeline_user_details')).data
+        return {}
 
 
 class MFEContextSerializer(serializers.Serializer):

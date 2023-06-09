@@ -19,7 +19,6 @@ var JSInput = (function($, undefined) {
 
     /*                      Utils                               */
 
-
     // Take a string and find the nested object that corresponds to it. E.g.:
     //    _deepKey(obj, "an.example") -> obj["an"]["example"]
     function _deepKey(obj, path) {
@@ -29,9 +28,7 @@ var JSInput = (function($, undefined) {
         return obj;
     }
 
-
     /*      END     Utils                                   */
-
 
     function jsinputConstructor(elem) {
         // Define an class that will be instantiated for each jsinput element
@@ -144,7 +141,7 @@ var JSInput = (function($, undefined) {
                     jsonValue = storedState;
                 }
 
-                if (typeof(jsonValue) === 'object') {
+                if (typeof jsonValue === 'object') {
                     stateValue = jsonValue.state;
                 } else {
                     stateValue = jsonValue;

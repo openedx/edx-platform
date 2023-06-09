@@ -46,3 +46,7 @@ openedx/features/discounts/
 # Ping tCRIL On-call if someone uses the QuickStart
 # https://docs.openedx.org/en/latest/developers/quickstarts/first_openedx_pr.html
 lms/templates/dashboard.html               @openedx/tcril-oncall
+
+# Ensure minimal.yml stays minimal, this could be a team in the future
+# but it's just me for now, others can sign up if they care as well.
+lms/envs/minimal.yml                                            @feanil

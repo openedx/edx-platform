@@ -85,20 +85,20 @@ class BaseTestXmodule(ModuleStoreTestCase):
             'category': self.CATEGORY
         })
 
-        self.item_descriptor = BlockFactory.create(**kwargs)
+        self.block = BlockFactory.create(**kwargs)
 
         self.runtime = self.new_descriptor_runtime()
 
         field_data = {}
         field_data.update(self.MODEL_DATA)
         student_data = DictFieldData(field_data)
-        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)  # lint-amnesty, pylint: disable=protected-access
+        self.block._field_data = LmsFieldData(self.block._field_data, student_data)  # lint-amnesty, pylint: disable=protected-access
 
         if runtime_kwargs is None:
             runtime_kwargs = {}
-        self.new_module_runtime(runtime=self.item_descriptor.runtime, **runtime_kwargs)
+        self.new_module_runtime(runtime=self.block.runtime, **runtime_kwargs)
 
-        self.item_url = str(self.item_descriptor.location)
+        self.item_url = str(self.block.location)
 
     def setup_course(self):  # lint-amnesty, pylint: disable=missing-function-docstring
         self.course = CourseFactory.create(data=self.COURSE_DATA)

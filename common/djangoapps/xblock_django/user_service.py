@@ -13,6 +13,7 @@ from common.djangoapps.student.models import anonymous_id_for_user, get_user_by_
 
 from .constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
     ATTR_KEY_IS_AUTHENTICATED,
     ATTR_KEY_REQUEST_COUNTRY_CODE,
     ATTR_KEY_USER_ID,
@@ -38,6 +39,9 @@ class DjangoXBlockUserService(UserService):
             user_is_staff(bool): optional - whether the user is staff in the course
             user_role(str): optional -- user's role in the course ('staff', 'instructor', or 'student')
             anonymous_user_id(str): optional - anonymous_user_id for the user in the course
+            deprecated_anonymous_user_id(str): optional - There are XBlocks (CAPA and HTML) that use the per-student
+                (course-agnostic) anonymized ID. To preserve backward compatibility, we will continue to provide it.
+                Using course-specific anonymous user ID (`anonymous_user_id`) is a preferred approach.
             request_country_code(str): optional -- country code determined from the user's request IP address.
         """
         super().__init__(**kwargs)
@@ -45,6 +49,7 @@ class DjangoXBlockUserService(UserService):
         self._user_is_staff = kwargs.get('user_is_staff', False)
         self._user_role = kwargs.get('user_role', 'student')
         self._anonymous_user_id = kwargs.get('anonymous_user_id', None)
+        self._deprecated_anonymous_user_id = kwargs.get('deprecated_anonymous_user_id', None)
         self._request_country_code = kwargs.get('request_country_code', None)
 
     def get_current_user(self):
@@ -111,6 +116,7 @@ class DjangoXBlockUserService(UserService):
             xblock_user.full_name = full_name
             xblock_user.emails = [django_user.email]
             xblock_user.opt_attrs[ATTR_KEY_ANONYMOUS_USER_ID] = self._anonymous_user_id
+            xblock_user.opt_attrs[ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID] = self._deprecated_anonymous_user_id
             xblock_user.opt_attrs[ATTR_KEY_IS_AUTHENTICATED] = True
             xblock_user.opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE] = self._request_country_code
             xblock_user.opt_attrs[ATTR_KEY_USER_ID] = django_user.id

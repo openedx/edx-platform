@@ -103,7 +103,7 @@
 # Drew Melim <nokostya.translation@gmail.com>, 2015
 # Rui Ribeiro <info@nau.edu.pt>, 2018-2019
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Portuguese (Portugal) (http://www.transifex.com/open-edx/edx-platform/language/pt_PT/)
+# edX community translations have been downloaded from Portuguese (Portugal) (http://app.transifex.com/open-edx/edx-platform/language/pt_PT/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -129,7 +129,7 @@
 # Ricardo Simões <xmcorporation@gmail.com>, 2014
 # Rui Ribeiro <info@nau.edu.pt>, 2019
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Portuguese (Portugal) (https://www.transifex.com/open-edx/teams/6205/pt_PT/)
+# edX community translations have been downloaded from Portuguese (Portugal) (https://app.transifex.com/open-edx/teams/6205/pt_PT/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -141,10 +141,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-03-26 20:42+0000\n"
+"POT-Creation-Date: 2023-05-28 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Cátia Lopes <catia.lopes@bridgelk.com>, 2019\n"
-"Language-Team: Portuguese (Portugal) (https://www.transifex.com/open-edx/teams/6205/pt_PT/)\n"
+"Language-Team: Portuguese (Portugal) (https://app.transifex.com/open-edx/teams/6205/pt_PT/)\n"
 "Language: pt_PT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -171,6 +171,7 @@ msgid "Discussion"
 msgstr "Fórum"
 
 #: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/helpers.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 msgid "Problem"
 msgstr "Problema"
@@ -180,6 +181,10 @@ msgstr "Problema"
 #: lms/templates/video.html
 msgid "Video"
 msgstr "Vídeo"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "Problema avançado em branco"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -233,9 +238,9 @@ msgstr "É necessário um ficheiro de transcrição."
 #. Translators: This is the status for a video that the servers have
 #. successfully processed
 #: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Ready"
-msgstr ""
+msgstr "Concluído"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -4109,10 +4114,6 @@ msgstr "Idioma"
 msgid "Location"
 msgstr "Local"
 
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "Ano de nascimento"
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
 #. the user's gender.
@@ -6042,7 +6043,7 @@ msgid "Allow"
 msgstr "Permitir"
 
 #: lms/templates/oauth2_provider/authorize.html
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "Erro"
@@ -7266,10 +7267,7 @@ msgstr "Não conseguimos encontrar um utilizador com esse endereço de e-mail."
 msgid "This user already has access to this library."
 msgstr "Este utilizador já tem acesso a esta biblioteca."
 
-#: openedx/core/djangoapps/content_staging/models.py
-msgid "Staged Content"
-msgstr ""
-
+#: openedx/core/djangoapps/content_staging/data.py
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -7280,9 +7278,13 @@ msgstr ""
 msgid "Loading"
 msgstr "A carregar"
 
-#: openedx/core/djangoapps/content_staging/models.py
+#: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
-msgstr ""
+msgstr "Expirado"
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr "Conteúdo Preparado"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid ""
@@ -7292,10 +7294,16 @@ msgid ""
 "            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
 "        "
 msgstr ""
+"\n"
+"            Que tipo de conteúdo é preparado. Só é suportado o conteúdo do OLX e\n"
+"            este campo tem de ser igual à etiqueta de raiz do OLX. \n"
+"            Por exemplo, \"video\" se for um vídeo preparado ou \"vertical\" para uma unidade."
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Original usage key/ID of the thing that is in the clipboard."
 msgstr ""
+"Chave de utilização/ID original do objecto que se encontra na área de "
+"transferência."
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -7600,6 +7608,12 @@ msgid ""
 msgstr ""
 "Se desativado, as discussões no contexto/curso de aprendizagem associado "
 "serão desativadas."
+
+#: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
@@ -8036,9 +8050,9 @@ msgid ""
 " participating in the discussion forums. What do you want to do to keep "
 "learning?"
 msgstr ""
-"Todas as semanas, muitos dos estudantes de %(platform_name)s estão a avançar"
-" na resolução de problemas e a participar ativamente nos fóruns de debate. O"
-" que deseja fazer para continuar a aprender?"
+"Todas as semanas, estudantes da %(platform_name)s estão a avançar na "
+"resolução de problemas e a participar ativamente nos fóruns de debate. O que"
+" deseja fazer para continuar a aprender?"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.txt
@@ -8048,10 +8062,9 @@ msgid ""
 "problems every week, and participating in the discussion forums. What do you"
 " want to do to keep learning?"
 msgstr ""
-"Todas as semanas, muitos dos estudantes de %(platform_name)s no curso "
-"%(course_name)s estão a avançar na resolução de problemas e a participar "
-"ativamente nos fóruns de debate. O que deseja fazer para continuar a a "
-"aprender?"
+"Todas as semanas, estudantes da %(platform_name)s no curso %(course_name)s "
+"estão a avançar na resolução de problemas e a participar ativamente nos "
+"fóruns de debate. O que deseja fazer para continuar a a aprender?"
 
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/body.html
 #: openedx/core/djangoapps/schedules/templates/schedules/edx_ace/recurringnudge_day10/email/subject.txt
@@ -8065,7 +8078,7 @@ msgid ""
 " completing more problems every week, and participating in the discussion "
 "forums. What do you want to do to keep learning?"
 msgstr ""
-"Todas as semanas, muitos dos estudantes de {platform_name} no curso "
+"Todas as semanas, estudantes da {platform_name} no curso "
 "{start_strong}{course_name}{end_strong} estão a avançar na resolução de "
 "problemas e a participar ativamente nos fóruns de debate. O que deseja fazer"
 " para continuar a a aprender?"
@@ -10070,10 +10083,6 @@ msgid "Invalid JSON response received from codejail api service."
 msgstr "Resposta JSON inválida recebida do serviço codejail api."
 
 #: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Problema avançado em branco"
-
-#: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
 msgstr "Número de tentativas efetuadas pelo estudante neste problema"
 
@@ -11506,6 +11515,17 @@ msgstr ""
 "'pública' (permite o acesso à estrutura e ao conteúdo do curso)."
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "Formador do curso"
 
@@ -12622,6 +12642,34 @@ msgstr "Permitir discussões em contexto para a Unidade"
 msgid "Add discussion for the Unit."
 msgstr "Acrescentar discussões para a Unidade."
 
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
+"\n"
+msgstr ""
+
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
@@ -13340,6 +13388,16 @@ msgstr "Grupo Apagado"
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Duplicado de {0}"
+
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Duplicado de '{0}'"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr ""
@@ -13428,6 +13486,14 @@ msgid "Invalid data ({details})"
 msgstr "Dados inválidos ({details})"
 
 #: cms/djangoapps/contentstore/views/block.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/block.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "Não pode mover {source_type} para {target_parent_type}."
@@ -13464,16 +13530,6 @@ msgstr ""
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr "Deve indicar o target_index ({target_index}) como um número inteiro."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Duplicado de {0}"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Duplicado de '{0}'"
 
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
@@ -15118,6 +15174,18 @@ msgstr "Página anterior"
 msgid "Next page"
 msgstr "Página seguinte"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "Acompanhamento de Registos"
@@ -15242,24 +15310,16 @@ msgid "Downloads and transcripts"
 msgstr "Transferências e transcrições"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Transferir ficheiro de vídeo"
-
-#: lms/templates/video.html
 msgid "Share on:"
 msgstr "Compartilhar no:"
 
 #: lms/templates/video.html
-msgid "Twitter"
-msgstr "Twitter"
+msgid "Share on {site}"
+msgstr ""
 
 #: lms/templates/video.html
-msgid "Facebook"
-msgstr "Facebook"
-
-#: lms/templates/video.html
-msgid "Linkedin"
-msgstr "Linkedin"
+msgid "Download video file"
+msgstr "Transferir ficheiro de vídeo"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -19769,7 +19829,7 @@ msgstr "Adicionar Moderador"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Group Community TA"
-msgstr "Professor Assistente da Comunidade"
+msgstr "Assistente de Comunidade de um grupo"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -21710,10 +21770,8 @@ msgstr "ID de Localização"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
-"Para criar um link para esta unidade a partir de um componente HTML neste "
-"curso, insira \"/jump_to_id/<location ID>\" como o valor URL."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"

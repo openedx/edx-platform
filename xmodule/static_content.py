@@ -13,7 +13,7 @@ import os
 import sys
 import textwrap
 from collections import defaultdict
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 
 import django
 from docopt import docopt
@@ -43,27 +43,27 @@ class VideoBlock(HTMLSnippet):  # lint-amnesty, pylint: disable=abstract-method
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/video/10_main.js'),
+            resource_filename(__name__, 'js/src/video/10_main.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
     preview_view_css = {
         'scss': [
-            resource_string(__name__, 'css/video/display.scss'),
-            resource_string(__name__, 'css/video/accessible_menu.scss'),
+            resource_filename(__name__, 'css/video/display.scss'),
+            resource_filename(__name__, 'css/video/accessible_menu.scss'),
         ],
     }
 
     studio_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/tabs/tabs-aggregator.js'),
+            resource_filename(__name__, 'js/src/tabs/tabs-aggregator.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     studio_view_css = {
         'scss': [
-            resource_string(__name__, 'css/tabs/tabs.scss'),
+            resource_filename(__name__, 'css/tabs/tabs.scss'),
         ]
     }
 
@@ -91,7 +91,7 @@ XBLOCK_CLASSES = [
 
 def write_module_styles(output_root):
     """Write all registered XModule css, sass, and scss files to output root."""
-    return _write_styles('.xmodule_display', output_root, XBLOCK_CLASSES, 'get_preview_view_css')
+    return _write_styles('.xmodule_display', output_root, XBLOCK_CLASSES, 'get_preview_view_css', 'Preview')
 
 
 def write_module_js(output_root):
@@ -101,7 +101,7 @@ def write_module_js(output_root):
 
 def write_descriptor_styles(output_root):
     """Write all registered XModuleDescriptor css, sass, and scss files to output root."""
-    return _write_styles('.xmodule_edit', output_root, XBLOCK_CLASSES, 'get_studio_view_css')
+    return _write_styles('.xmodule_edit', output_root, XBLOCK_CLASSES, 'get_studio_view_css', 'Studio')
 
 
 def write_descriptor_js(output_root):
@@ -120,46 +120,38 @@ def _ensure_dir(directory):
             raise
 
 
-def _write_styles(selector, output_root, classes, css_attribute):
+def _write_styles(selector, output_root, classes, css_attribute, suffix):
     """
     Write the css fragments from all XModules in `classes`
-    into `output_root` as individual files, hashed by the contents to remove
-    duplicates
+    into `output_root` as individual files
     """
     contents = {}
 
-    css_fragments = defaultdict(set)
     for class_ in classes:
         class_css = getattr(class_, css_attribute)()
-        for filetype in ('sass', 'scss', 'css'):
-            for idx, fragment in enumerate(class_css.get(filetype, [])):
-                css_fragments[idx, filetype, fragment].add(class_.__name__)
-    css_imports = defaultdict(set)
-    for (idx, filetype, fragment), classes in sorted(css_fragments.items()):  # lint-amnesty, pylint: disable=redefined-argument-from-local
-        fragment_name = "{idx:0=3d}-{hash}.{type}".format(
-            idx=idx,
-            hash=hashlib.md5(fragment).hexdigest(),
-            type=filetype)
-        # Prepend _ so that sass just includes the files into a single file
-        filename = '_' + fragment_name
-        contents[filename] = fragment
+        fragment_paths = class_css.get('scss', [])
+        if not fragment_paths:
+            continue
+        fragment_names = []
+        for fragment_path in fragment_paths:
+            with open(fragment_path, 'rb') as fragment_file:
+                fragment = fragment_file.read()
+            fragment_name = "{hash}.{type}".format(
+                hash=hashlib.md5(fragment).hexdigest(),
+                type='scss')
+            # Prepend _ so that sass just includes the files into a single file
+            filename = '_' + fragment_name
+            contents[filename] = fragment
+            fragment_names.append(fragment_name)
 
-        for class_ in classes:
-            css_imports[class_].add(fragment_name)
-
-    module_styles_lines = [
-        "@import 'bourbon/bourbon';",
-        "@import 'lms/theme/variables';",
-    ]
-    for class_, fragment_names in sorted(css_imports.items()):
-        fragment_names = sorted(fragment_names)
-        module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
+        module_styles_lines = []
+        module_styles_lines.append("""{selector}.xmodule_{class_.__name__} {{""".format(
             class_=class_, selector=selector
         ))
         module_styles_lines.extend(f'  @import "{name}";' for name in fragment_names)
         module_styles_lines.append('}')
 
-    contents['_module-styles.scss'] = '\n'.join(module_styles_lines)
+        contents[f"{class_.__name__}{suffix}.scss"] = '\n'.join(module_styles_lines)
 
     _write_files(output_root, contents)
 
@@ -178,10 +170,14 @@ def _write_js(output_root, classes, js_attribute):
     fragment_owners = defaultdict(list)
     for class_ in classes:
         module_js = getattr(class_, js_attribute)()
+        with open(module_js.get('xmodule_js'), 'rb') as xmodule_js_file:
+            xmodule_js_fragment = xmodule_js_file.read()
         # It will enforce 000 prefix for xmodule.js.
-        fragment_owners[(0, 'js', module_js.get('xmodule_js'))].append(getattr(class_, js_attribute + '_bundle_name')())
+        fragment_owners[(0, 'js', xmodule_js_fragment)].append(getattr(class_, js_attribute + '_bundle_name')())
         for filetype in ('coffee', 'js'):
-            for idx, fragment in enumerate(module_js.get(filetype, [])):
+            for idx, fragment_path in enumerate(module_js.get(filetype, [])):
+                with open(fragment_path, 'rb') as fragment_file:
+                    fragment = fragment_file.read()
                 fragment_owners[(idx + 1, filetype, fragment)].append(getattr(class_, js_attribute + '_bundle_name')())
 
     for (idx, filetype, fragment), owners in sorted(fragment_owners.items()):
@@ -307,9 +303,9 @@ def main():
     root = path(args['<output_root>'])
 
     descriptor_files = write_descriptor_js(root / 'descriptors/js')
-    write_descriptor_styles(root / 'descriptors/css')
+    write_descriptor_styles(root / 'descriptors/scss')
     module_files = write_module_js(root / 'modules/js')
-    write_module_styles(root / 'modules/css')
+    write_module_styles(root / 'modules/scss')
     write_webpack(root / 'webpack.xmodule.config.js', module_files, descriptor_files)
 
 

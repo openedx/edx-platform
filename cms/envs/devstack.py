@@ -296,10 +296,10 @@ CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 #   in the LMS and CMS.
 # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
 FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS'] = True
-EVENT_BUS_PRODUCER = 'edx_event_bus_kafka.create_producer'
-EVENT_BUS_KAFKA_SCHEMA_REGISTRY_URL = 'http://edx.devstack.schema-registry:8081'
-EVENT_BUS_KAFKA_BOOTSTRAP_SERVERS = 'edx.devstack.kafka:29092'
+EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
+EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
+EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

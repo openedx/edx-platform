@@ -79,6 +79,7 @@
                 }
             }
 
+            // eslint-disable-next-line brace-style
             if (match == -1) { needsRemoval = tagremove[ctag] = true; } // mark for removal
             else { tagpaired[match] = true; } // mark paired
         }

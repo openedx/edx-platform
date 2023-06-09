@@ -349,7 +349,7 @@ class CoursewareIndex(View):
         Prefetches all descendant data for the requested section and
         sets up the runtime, which binds the request user to the section.
         """
-        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        self.field_data_cache = FieldDataCache.cache_for_block_descendents(
             self.course_key,
             self.effective_user,
             self.course,
@@ -374,7 +374,7 @@ class CoursewareIndex(View):
         """
         # Pre-fetch all descendant data
         self.section = modulestore().get_item(self.section.location, depth=None, lazy=False)
-        self.field_data_cache.add_descriptor_descendents(self.section, depth=None)
+        self.field_data_cache.add_block_descendents(self.section, depth=None)
 
         # Bind section to user
         self.section = get_block_for_descriptor(
@@ -585,11 +585,11 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule, cour
         parent_location = modulestore().get_parent_location(current_block.location)
         parent = None
         if parent_location:
-            parent_descriptor = modulestore().get_item(parent_location)
+            parent_block = modulestore().get_item(parent_location)
             parent = get_block_for_descriptor(
                 user,
                 request,
-                parent_descriptor,
+                parent_block,
                 field_data_cache,
                 current_block.location.course_key,
                 course=course

@@ -7,6 +7,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.utils.translation import gettext as _
+  from common.djangoapps.student.auth import has_studio_advanced_settings_access
   from cms.djangoapps.contentstore import utils
   from lms.djangoapps.certificates.api import can_show_certificate_available_date_field
   from openedx.core.djangolib.js_utils import (
@@ -721,7 +722,9 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             <li class="nav-item"><a href="${grading_config_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
+            % if has_studio_advanced_settings_access(request.user):
             <li class="nav-item"><a href="${advanced_config_url}">${_("Advanced Settings")}</a></li>
+            % endif
             % if mfe_proctored_exam_settings_url:
               <li class="nav-item"><a href="${mfe_proctored_exam_settings_url}">${_("Proctored Exam Settings")}</a></li>
             % endif

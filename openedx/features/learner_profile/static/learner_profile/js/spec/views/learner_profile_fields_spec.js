@@ -138,10 +138,12 @@ define(
 
                     // Upon successful image upload, account settings model will be fetched to
                     // get the url for newly uploaded image, So we need to send the response for that GET
-                    data = {profile_image: {
-                        image_url_large: '/media/profile-images/' + imageName,
-                        has_image: true
-                    }};
+                    data = {
+                        profile_image: {
+                            image_url_large: '/media/profile-images/' + imageName,
+                            has_image: true
+                        }
+                    };
                     AjaxHelpers.respondWithJson(requests, data);
 
                     // Verify uploaded image name
@@ -160,7 +162,6 @@ define(
                     var data;
                     imageView.render();
 
-
                     // Verify image remove title
                     verifyImageRemoveButtonMessage(imageView, false);
 
@@ -177,10 +178,12 @@ define(
 
                     // Upon successful image removal, account settings model will be fetched to get default image url
                     // So we need to send the response for that GET
-                    data = {profile_image: {
-                        image_url_large: '/media/profile-images/default.jpg',
-                        has_image: false
-                    }};
+                    data = {
+                        profile_image: {
+                            image_url_large: '/media/profile-images/default.jpg',
+                            has_image: false
+                        }
+                    };
                     AjaxHelpers.respondWithJson(requests, data);
 
                     // Remove button should not be present for default image

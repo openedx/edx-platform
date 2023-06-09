@@ -83,8 +83,8 @@ class TestProblem:
         user = user or UserFactory()
         user_service = StubUserService(user)
         self.runtime = MagicMock(service=lambda _a, _b: user_service, is_author_mode=False)
-        self.descriptor = MagicMock()
-        self.descriptor.runtime.modulestore.get_course.return_value = course
+        self.block = MagicMock()
+        self.block.runtime.modulestore.get_course.return_value = course
 
     def get_html(self):
         """
@@ -171,7 +171,7 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         """
         Tests that get_html is not wrapped when problem is rendered by Blockstore runtime.
         """
-        del self.problem.descriptor.runtime.modulestore
+        del self.problem.block.runtime.modulestore
         assert 'original_get_html' == self.problem.get_html()
 
     def test_edxnotes_harvard_notes_enabled(self):
