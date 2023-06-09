@@ -7,7 +7,7 @@ from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.instructor_task import api
 from opaque_keys.edx.keys import CourseKey
 
-from lms.djangoapps.instructor_tools.all_grades_CSV import get_all_csv_file, process_grade_file, merge_all_csv, process_merged
+from lms.djangoapps.instructor_tools.all_grades_csv import get_all_csv_file, process_grade_file, merge_all_csv, process_merged
 
 @transaction.non_atomic_requests
 @require_POST
