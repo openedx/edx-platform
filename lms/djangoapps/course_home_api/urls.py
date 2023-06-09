@@ -51,6 +51,11 @@ urlpatterns += [
 # Funix Dates Tab URLs
 urlpatterns += [
     re_path(
+        fr'dates-funix/{settings.COURSE_KEY_PATTERN}/(?P<student_id>[^/]+)',
+        FunixRelativeDatesTabView.as_view(),
+        name='funix-dates-tab-other-student'
+    ),
+    re_path(
         fr'dates-funix/{settings.COURSE_KEY_PATTERN}',
         FunixRelativeDatesTabView.as_view(),
         name='funix-dates-tab'

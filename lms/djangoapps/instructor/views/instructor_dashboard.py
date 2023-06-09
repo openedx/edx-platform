@@ -572,6 +572,10 @@ def _section_student_admin(course, access):
             kwargs={'course_id': str(course_key)}
         ),
         'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': str(course_key)}),
+        'get_student_dates_url_url': reverse(
+            'get_student_dates_url',
+            kwargs={'course_id': str(course_key)}
+        ),
     }
     if is_writable_gradebook_enabled(course_key) and settings.WRITABLE_GRADEBOOK_URL:
         section_data['writable_gradebook_url'] = f'{settings.WRITABLE_GRADEBOOK_URL}/{str(course_key)}'

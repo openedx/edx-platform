@@ -3602,3 +3602,35 @@ def _get_branded_email_template(course_overview):
         template_name = template_name.get(course_overview.display_org_with_default)
 
     return template_name
+
+
+
+@require_POST
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_course_permission(permissions.ENROLLMENT_REPORT)
+@require_post_params(
+    unique_student_identifier="email or username of student for whom to get progress url"
+)
+@common_exceptions_400
+def get_student_dates_url(request, course_id):
+    """
+    Get the dates url of a student.
+    Limited to staff access.
+    Takes query parameter unique_student_identifier and if the student exists
+    returns e.g. {
+        'dates_url': '/../...'
+    }
+    """
+    course_id = CourseKey.from_string(course_id)
+    user = get_student_from_identifier(request.POST.get('unique_student_identifier'))
+
+    # only use mfe url
+    dates_url = get_learning_mfe_home_url(course_id, url_fragment='dates')
+    if user is not None:
+        dates_url += '/{}/'.format(user.id)
+    response_payload = {
+        'course_id': str(course_id),
+        'dates_url': dates_url,
+    }
+    return JsonResponse(response_payload)

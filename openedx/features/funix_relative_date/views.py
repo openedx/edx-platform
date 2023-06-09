@@ -25,6 +25,9 @@ from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.funix_goal.models import LearnGoal
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class FunixRelativeDatesTabView(RetrieveAPIView):
@@ -35,11 +38,32 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 	)
 	permission_classes = (IsAuthenticated,)
 	serializer_class = FUNiXDatesTabSerializer
+	def _get_student_user(self, request, course_key, student_id, is_staff):
+		if student_id:
+			try:
+				student_id = int(student_id)
+			except ValueError as e:
+				raise Http404 from e
+
+		if student_id is None or student_id == request.user.id:
+			_, student = setup_masquerade(
+				request,
+				course_key,
+				staff_access=is_staff,
+				reset_masquerade_data=True
+			)
+			return student
+
+		try:
+			return User.objects.get(id=student_id)
+		except User.DoesNotExist as exc:
+			raise Http404 from exc
+
 
 	def get(self, request, *args, **kwargs):
 		course_key_string = kwargs.get('course_key_string')
 		course_key = CourseKey.from_string(course_key_string)
-
+		student_id = kwargs.get('student_id')
 
 
 		# Enable NR tracing for this view based on course
@@ -50,13 +74,8 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 		course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
 		is_staff = bool(has_access(request.user, 'staff', course_key))
 
-		_, request.user = setup_masquerade(
-			request,
-			course_key,
-			staff_access=is_staff,
-			reset_masquerade_data=True,
-		)
-
+		request.user = self._get_student_user(request, course_key, student_id, is_staff)
+  
 		if not CourseEnrollment.is_enrolled(request.user, course_key) and not is_staff:
 			return Response('User not enrolled.', status=401)
 
@@ -80,7 +99,8 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 			'learner_is_full_access': learner_is_full_access,
 			'user_timezone': user_timezone,
 			'goal_hours_per_day': goal.hours_per_day,
-			'goal_weekdays': [getattr(goal, f'weekday_{i}') for i in range(7)]
+			'goal_weekdays': [getattr(goal, f'weekday_{i}') for i in range(7)],
+			'username': request.user.username
 		}
 		context = self.get_serializer_context()
 		context['learner_is_full_access'] = learner_is_full_access

@@ -35,8 +35,10 @@
             this.$field_student_select_enrollment_status = findAndAssert(this.$section, "input[name='student-select-enrollment-status']");
             this.$field_student_select_progress = findAndAssert(this.$section, "input[name='student-select-progress']");
             this.$field_student_select_grade = findAndAssert(this.$section, "input[name='student-select-grade']");
+            this.$field_student_select_dates = findAndAssert(this.$section, "input[name='student-select-dates']");
             this.$progress_link = findAndAssert(this.$section, 'a.progress-link');
             this.$field_problem_select_single = findAndAssert(this.$section, "input[name='problem-select-single']");
+            this.$dates_link = findAndAssert(this.$section, 'a.dates-link');
             this.$btn_reset_attempts_single = findAndAssert(this.$section, "input[name='reset-attempts-single']");
             this.$btn_delete_state_single = this.$section.find("input[name='delete-state-single']");
             this.$btn_rescore_problem_single = this.$section.find("input[name='rescore-problem-single']");
@@ -69,6 +71,7 @@
             this.$request_err_enrollment_status = findAndAssert(this.$section, '.student-enrollment-status-container .request-response-error');
             this.$request_err_progress = findAndAssert(this.$section, '.student-progress-container .request-response-error');
             this.$request_err_grade = findAndAssert(this.$section, '.student-grade-container .request-response-error');
+            this.$request_err_dates = findAndAssert(this.$section, '.student-dates-container .request-response-error');
             this.$request_err_ee = this.$section.find('.entrance-exam-grade-container .request-response-error');
             this.$request_response_error_all = this.$section.find('.course-specific-container .request-response-error');
             this.$enrollment_status_link = findAndAssert(this.$section, 'a.enrollment-status-link');
@@ -134,6 +137,36 @@
                     })
                 });
             });
+            this.$dates_link.click(function(e) {
+                var errorMessage, fullErrorMessage, uniqStudentIdentifier;
+                e.preventDefault();
+                uniqStudentIdentifier = studentadmin.$field_student_select_dates.val();
+                if (!uniqStudentIdentifier) {
+                    return studentadmin.$request_err_dates.text(
+                        gettext('Please enter a student email address or username.')
+                    );
+                }
+                errorMessage = gettext("Error getting student progress url for '<%- student_id %>'. Make sure that the student identifier is spelled correctly.");  // eslint-disable-line max-len
+                fullErrorMessage = _.template(errorMessage)({
+                    student_id: uniqStudentIdentifier
+                });
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: studentadmin.$dates_link.data('endpoint'),
+                    data: {
+                        unique_student_identifier: uniqStudentIdentifier
+                    },
+                    success: studentadmin.clear_errors_then(function(data) {
+                        window.location = data.dates_url;
+                        return window.location;
+                    }),
+                    error: statusAjaxError(function() {
+                        return studentadmin.$request_err_dates.text(fullErrorMessage);
+                    })
+                });
+            });
+
             this.$btn_reset_attempts_single.click(function() {
                 var errorMessage, fullErrorMessage, fullSuccessMessage,
                     problemToReset, sendData, successMessage, uniqStudentIdentifier;
