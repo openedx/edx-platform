@@ -698,7 +698,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==18.10.1
+faker==18.10.0
     # via factory-boy
 fastapi==0.96.0
     # via pact-python

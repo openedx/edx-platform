@@ -724,7 +724,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==18.10.1
+faker==18.10.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
