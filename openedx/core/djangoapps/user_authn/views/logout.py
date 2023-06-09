@@ -125,8 +125,8 @@ class LogoutView(TemplateView):
     def _show_tpa_logout_link(self, target, referrer):
         """
         Return Boolean value indicating if TPA logout link needs to displayed or not.
-        We display TPA logout link when user has active SSO session and logout flow is
-        triggered via learner portal.
+        We display TPA logout link when user has active SSO session, logout flow is
+        triggered via learner portal and TPA_AUTOMATIC_LOGOUT_ENABLED toggle is False.
         Args:
             target: url of the page to land after logout
             referrer: url of the page where logout request initiated
