@@ -86,3 +86,11 @@
 ##############################################################################
 
 # ... add dependencies here
+
+
+##############################################################################
+# Legacy URL dependencies. To be removed. Don't add new URLs here!
+##############################################################################
+
+# https://github.com/openedx/MongoDBProxy/issues/18
+-e git+https://github.com/openedx/edx-val/commit/7376d42429d0aa7e1f5f67e9951f7d8cd455d2ae#egg=edxval==2.2.0
