@@ -2,11 +2,13 @@
 Tests for the views in the notifications app.
 """
 import json
+from datetime import datetime, timedelta
 
 import ddt
 from django.dispatch import Signal
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
+from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
@@ -270,7 +272,7 @@ class NotificationListAPIViewTest(APITestCase):
     """
 
     def setUp(self):
-        self.user = self.user = UserFactory()
+        self.user = UserFactory()
         self.url = reverse('notifications-list')
 
     def test_list_notifications(self):
@@ -335,6 +337,36 @@ class NotificationListAPIViewTest(APITestCase):
 
         # Assert that the response is unauthorized.
         self.assertEqual(response.status_code, 403)
+
+    def test_list_notifications_on_two_months_limit(self):
+        """
+        Test that the view can filter notifications on created timestamp
+        """
+        today = datetime.now(UTC)
+
+        # Create two notifications for the user, one with current date and other with 3 months before date.
+        Notification.objects.create(
+            user=self.user,
+            notification_type='info',
+            created=today
+        )
+        Notification.objects.create(
+            user=self.user,
+            notification_type='info',
+            created=today + timedelta(days=90)
+        )
+        self.client.login(username=self.user.username, password='test')
+
+        # Make a request to the view
+        response = self.client.get(self.url)
+
+        # Assert that the response is successful.
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains only the notification for current date.
+        data = response.data['results']
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]['created'], today.strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
 
 
 class NotificationCountViewSetTestCase(APITestCase):
