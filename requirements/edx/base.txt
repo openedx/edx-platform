@@ -1144,10 +1144,6 @@ typing-extensions==4.6.3
     #   kombu
     #   pylti1p3
     #   snowflake-connector-python
-tzdata==2023.3
-    # via
-    #   backports-zoneinfo
-    #   celery
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.in
