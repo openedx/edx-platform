@@ -26,6 +26,7 @@ from lms.djangoapps.instructor_task.api_helper import (
     encode_problem_and_student_input,
     schedule_task,
     submit_task,
+    submit_task_not_async,
     submit_scheduled_task,
 )
 from lms.djangoapps.instructor_task.data import InstructorTaskTypes
@@ -366,6 +367,16 @@ def submit_calculate_grades_csv(request, course_key, **task_kwargs):
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+    
+def submit_calculate_grades_csv_not_async(request, course_key, **task_kwargs):
+    task_type = 'grade_course'
+    task_class = calculate_grades_csv
+    task_input = task_kwargs
+    task_key = ""
+
+    return submit_task_not_async(request, task_type, task_class, course_key, task_input, task_key)
+
+
 
 
 def submit_problem_grade_report(request, course_key, **task_kwargs):

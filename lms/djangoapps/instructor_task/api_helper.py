@@ -469,6 +469,23 @@ def submit_task(request, task_type, task_class, course_key, task_input, task_key
 
     return instructor_task
 
+def submit_task_not_async(request, task_type, task_class, course_key, task_input, task_key):
+    with outer_atomic():
+        # check to see if task is already running, and reserve it otherwise:
+        instructor_task = _reserve_task(course_key, task_type, task_key, task_input, request.user)
+
+    # make sure all data has been committed before handing off task to celery.
+
+    task_id = instructor_task.task_id
+    task_args = [instructor_task.id, _get_xmodule_instance_args(request, task_id)]
+    try:
+        task_class.apply(task_args, task_id=task_id)
+
+    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
+        _handle_instructor_task_failure(instructor_task, error)
+
+    return instructor_task
+
 
 def schedule_task(request, task_type, course_key, task_input, task_key, schedule):
     """
