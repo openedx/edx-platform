@@ -78,14 +78,7 @@ class Command(BaseCommand):
         programs_by_type_slug = {}
         organizations = {}
 
-        sites = Site.objects.all()
-        if domain:
-            site = Site.objects.filter(domain=domain)
-            if site.exists():
-                sites = site
-            else:
-                logger.exception(f"There does not exists any site with this domain: {domain}.")
-
+        sites = Site.objects.filter(domain=domain) if domain else Site.objects.all()
         for site in sites:
             site_config = getattr(site, 'configuration', None)
             if site_config is None or not site_config.get_value('COURSE_CATALOG_API_URL'):
