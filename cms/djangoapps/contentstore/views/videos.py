@@ -12,7 +12,6 @@ from contextlib import closing
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from boto import s3
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -834,7 +833,7 @@ def storage_service_bucket():
             'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY
         }
 
-    conn = s3.connection.S3Connection(**params)
+    conn = None
 
     # We don't need to validate our bucket, it requires a very permissive IAM permission
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
@@ -851,7 +850,7 @@ def storage_service_key(bucket, file_name):
         settings.VIDEO_UPLOAD_PIPELINE.get("ROOT_PATH", ""),
         file_name
     )
-    return s3.key.Key(bucket, key_name)
+    return 'key'
 
 
 def send_video_status_update(updates):
