@@ -91,7 +91,7 @@ beautifulsoup4==4.12.2
     # via
     #   -r requirements/edx/testing.txt
     #   pynliner
-billiard==4.1.0
+billiard==3.6.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   celery
@@ -125,7 +125,7 @@ build==0.10.0
     # via
     #   -r requirements/edx/../pip-tools.txt
     #   pip-tools
-celery==5.3.0
+celery==5.2.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -885,7 +885,7 @@ jwcrypto==1.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylti1p3
-kombu==5.3.0
+kombu==5.2.4
     # via
     #   -r requirements/edx/testing.txt
     #   celery
@@ -1372,7 +1372,7 @@ redis==4.5.5
     # via
     #   -r requirements/edx/testing.txt
     #   walrus
-regex==2023.6.3
+regex==2023.5.5
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
