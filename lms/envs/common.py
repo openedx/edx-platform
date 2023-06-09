@@ -3255,6 +3255,9 @@ INSTALLED_APPS = [
 
     # MFE API
     'lms.djangoapps.mfe_config_api',
+    
+     # instructor_tools
+    'lms.djangoapps.instructor_tools'
 ]
 
 ######################### CSRF #########################################

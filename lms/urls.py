@@ -50,6 +50,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.features.enterprise_support.api import enterprise_enabled
+from lms.djangoapps.instructor_tools import views as instructor_tools_views
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
@@ -98,6 +99,8 @@ urlpatterns = [
     path('', include('common.djangoapps.student.urls')),
     # TODO: Move lms specific student views out of common code
     re_path(r'^dashboard/?$', student_views.student_dashboard, name='dashboard'),
+    
+    path('instructor_tools', instructor_tools_views.instructor_tools_dashboard, name='instructor_tools_dashboard'),
     path('change_enrollment', student_views.change_enrollment, name='change_enrollment'),
 
     # Event tracking endpoints

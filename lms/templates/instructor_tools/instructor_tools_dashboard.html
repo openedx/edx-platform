@@ -1,0 +1,31 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%def name="online_help_token()"><% return "instructor_tools_dashboard" %></%def>
+
+<%!
+
+%>
+
+<%block name="headextra">
+  <link rel="stylesheet" href="/static/css/lms-course.css">
+</%block>
+
+<main id="main" aria-label="Content" tabindex="-1">
+  <div class="container">
+    <div class="instructor-dashboard-wrapper-2">
+          <main id="main" aria-label="Content" tabindex="-1">
+            <section class="instructor-dashboard-content-2" id="instructor-dashboard-content">
+              <h2 class="hd hd-2 instructor-dashboard-title">Instructor Tools</h2>
+
+              <div class="reports-download-container action-type-container">
+                <hr>
+                <h3 class="hd hd-3">Export all grades</h3>
+                <p></p>
+                <p><input type="button" name="list-profiles-csv" value="Export all student's grade as CSV" data-csv="true"></p>
+              </div>
+
+            </section>
+          </main>
+    </div>
+  </div>
+</main>
