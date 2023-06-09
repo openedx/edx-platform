@@ -131,7 +131,12 @@ class LogoutView(TemplateView):
             target: url of the page to land after logout
             referrer: url of the page where logout request initiated
         """
-        if bool(target == self.default_target and self.tpa_logout_url) and settings.LEARNER_PORTAL_URL_ROOT in referrer:
+        tpa_automatic_logout_enabled = getattr(settings, 'TPA_AUTOMATIC_LOGOUT_ENABLED', False)
+        if (
+            bool(target == self.default_target and self.tpa_logout_url) and
+            settings.LEARNER_PORTAL_URL_ROOT in referrer and
+            not tpa_automatic_logout_enabled
+        ):
             return True
 
         return False
