@@ -138,7 +138,7 @@ FEATURES = {
     #   attempting to expand those components will cause errors. So, this should only be set to False with an LMS that
     #   is running courses that do not contain discussion components.
     #   For consistency in user-experience, keep the value in sync with the setting of the same name in the CMS.
-    'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_DISCUSSION_SERVICE': False,
 
     # .. toggle_name: FEATURES['ENABLE_TEXTBOOK']
     # .. toggle_implementation: DjangoSetting

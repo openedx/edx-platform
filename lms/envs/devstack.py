@@ -396,6 +396,11 @@ FEATURES.update({
     'ENABLE_ENTERPRISE_INTEGRATION': True,
 })
 
+HELP_TOKENS_BOOKS = {
+    'course_author': 'https://funix.gitbook.io/funix-documentation/',
+    'learner': 'https://funix.gitbook.io/funix-documentation/',
+}
+
 ENABLE_MKTG_SITE = os.environ.get('ENABLE_MARKETING_SITE', False)
 MARKETING_SITE_ROOT = os.environ.get('MARKETING_SITE_ROOT', 'http://localhost:8080')
 
