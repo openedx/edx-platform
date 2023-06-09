@@ -22,19 +22,19 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
-from .helpers import (
+from ..helpers import (
     is_unit,
-    usage_key_with_run,
 )
 from .preview import get_preview_fragment
 
-from cms.djangoapps.contentstore.xblock_services.xblock_service import (
+from cms.djangoapps.contentstore.xblock_services import (
     handle_xblock,
     create_xblock_info,
     load_services_for_studio,
     get_block_info,
     get_xblock,
-    delete_orphans
+    delete_orphans,
+    usage_key_with_run
 )
 
 __all__ = [
