@@ -85,7 +85,8 @@ class CourseGradingView(DeveloperErrorViewMixin, APIView):
                 "minimum_grade_credit": 0.7
             },
             "show_credit_eligibility": false,
-            "is_credit_course": true
+            "is_credit_course": true,
+            "default_grade_designations": ["A","B","C","D"]
         }
         ```
         """
