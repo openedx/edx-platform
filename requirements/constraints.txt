@@ -78,7 +78,6 @@ pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticke
 
 # Deprecated version of the AWS SDK;
 # we should stop using this
-boto==2.39.0
 boto3==1.7.0                       # Amazon Web Services SDK for Python
 botocore==1.10.84                  # via boto3, s3transfer
 
