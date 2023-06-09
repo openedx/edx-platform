@@ -4,7 +4,7 @@
 {% load i18n %}
 {% load static %}
 {% block content %}
-<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="box-shadow: 0px 0px 10px 2px #c8c8c8;">
 {% if route_enabled %}
     <tr>
         <td>
@@ -18,51 +18,47 @@
     </tr>
 {% endif %}
     <tr>
-        <td>
-            <h1>
-                {% trans "Account activation" as header_msg %}{{ header_msg | force_escape }}
-            </h1>
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                    {% blocktrans %}You're almost there! Use the link below to activate your account to access engaging, high-quality {{ platform_name }} courses. Note that you will not be able to log back into your account until you have activated it.{% endblocktrans %}
-                {% endfilter %}
-                <br />
-            </p>
+        <td style="width: 100%;
+            max-width: 800px;
+            background-color: #FFF;
+            color: #000000;
+            margin: auto;
+            text-align: center;
+            padding: 20px;
+            ">
 
-            {% filter force_escape %}
-                {% blocktrans asvar course_cta_text %}Activate your account{% endblocktrans %}
-            {% endfilter %}
-            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=confirm_activation_link %}
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                    {% blocktrans %}Enjoy learning with {{ platform_name }}.{% endblocktrans %}
-                {% endfilter %}
-                <br />
-            </p>
-        </td>
-    </tr>
-        <td>
-            <p style="color: rgba(0,0,0,.75);">
-                {% blocktrans trimmed asvar assist_msg %}
-                If you need help, please use our web form at {start_anchor_web}{{ support_url }}{end_anchor} or email {start_anchor_email}{{ support_email }}{end_anchor}.
-                {% endblocktrans %}
-                {% interpolate_html assist_msg start_anchor_web='<a href="'|add:support_url|add:'">'|safe start_anchor_email='<a href="mailto:'|add:support_email|add:'">'|safe end_anchor='</a>'|safe %}
-                <br />
-            </p>
-        </td>
-    <tr>
+            <img src="https://mylearningx.pearson.com/static/pearson-pols-theme/images/PearsonLogo_Primary_Blk_RGB.png" style="width: 150px; padding: 5px; margin: auto;" />
 
+            <div style="width: 90%;
+                        background-color: #D4EAE4;
+                        text-align: left;
+                        padding: 2% 5%;
+                        background-image: url('https://mylearningx.pearson.com/static/pearson-pols-theme/images/laptop_transparent-bg.png');
+                        background-size: 50%;
+                        background-position: right bottom;
+                        background-repeat: no-repeat;">
+
+                <h1 style="font-family:'Playfair Display', serif; font-weight: 700; font-size: 1.7em; margin-top: 30px; margin-bottom: 20px;">
+                    {% trans "You're Nearly Signed Up" %}
+                </h1>
+                <p style="padding: 0px;
+                          width: 50%;
+                          min-width: 300px;
+                          margin-top: 20px;
+                          ">
+                    {% blocktrans %}To validate your new account, please click on the Validate Account button below.{% endblocktrans %}
+                    <br />
+                </p>
+
+                {% trans "Validate Account" as course_cta_text %}
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=confirm_activation_link %}
+            </div>
+        </td>
     </tr>
-    <tr>
+    <tr style="background-color: #FFF;">
         <td>
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                    {% blocktrans %}This email message was automatically sent by {{ lms_url }} because someone attempted to create an account on {{ platform_name }} using this email address.{% endblocktrans %}
-                {% endfilter %}
+            <p style="margin: 0 40px 40px 40px; text-align: center; color: #444; font-size: 0.9em;">
+                {% blocktrans %}This email message was automatically sent because someone attempted to create an account on {{ site_name }} using this email address.{% endblocktrans %}
                 <br />
             </p>
         </td>

@@ -3,33 +3,52 @@
 {% load i18n %}
 {% load static %}
 {% block content %}
-<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
-    <tr>
-        <td>
-            <h1>
-                {% filter force_escape %}
-                {% blocktrans %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="box-shadow: 0px 0px 10px 2px #c8c8c8;">
+   <tr>
+        <td style="width: 100%;
+            max-width: 800px;
+            background-color: #FFF;
+            color: #000000;
+            margin: auto;
+            text-align: center;
+            padding: 20px;
+            ">
+
+            <img src="https://mylearningx.pearson.com/static/pearson-pols-theme/images/PearsonLogo_Primary_Blk_RGB.png" style="width: 150px; padding: 5px; margin: auto;" />
+
+            <div style="width: 90%;
+                        background-color: #D4EAE4;
+                        text-align: left;
+                        padding: 2% 5%;
+                        background-image: url('https://mylearningx.pearson.com/static/pearson-pols-theme/images/laptop_transparent-bg.png');
+                        background-size: 50%;
+                        background-position: right bottom;
+                        background-repeat: no-repeat;
+                        padding-bottom: 35%;
+                        ">
+
+                <h1 style="font-family:'Playfair Display', serif; font-weight: 700;">
                     You have been enrolled in {{ course_name }}
-                {% endblocktrans %}
-                {% endfilter %}
-            </h1>
+                </h1>
+                <p style="padding: 0px;
+                          width: 50%;
+                          min-width: 300px;
+                          margin-top: 20px;
+                          ">
+                    {% blocktrans %}You have been enrolled in {{ course_name }} at {{ site_name }} by a member of the course staff. This course will now appear on your {{ site_name }} dashboard.{% endblocktrans %}
+                    <br />
+                </p>
 
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                {% blocktrans %}You have been enrolled in {{ course_name }} at {{ site_name }} by a member of the course staff. This course will now appear on your {{ site_name }} dashboard.{% endblocktrans %}
-                {% endfilter %}
-                <br />
-            </p>
+                {% trans "Access the Course Materials Now" as course_cta_text %}
+                {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=course_url %}
 
-            {% filter force_escape %}
-                {% blocktrans asvar course_cta_text %}Access the Course Materials Now{% endblocktrans %}
-            {% endfilter %}
-            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=course_url %}
-
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
+            </div>
+        </td>
+    </tr>
+    <tr style="background-color: #FFF;">
+        <td>
+            <p style="margin: 0 40px 40px 40px; text-align: center; color: #444; font-size: 0.9em;">
                 {% blocktrans %}This email was automatically sent from {{ site_name }} to {{ full_name }}{% endblocktrans %}
-                {% endfilter %}
                 <br />
             </p>
         </td>

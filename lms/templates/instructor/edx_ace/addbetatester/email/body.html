@@ -3,64 +3,63 @@
 {% load i18n %}
 {% load static %}
 {% block content %}
-<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="box-shadow: 0px 0px 10px 2px #c8c8c8;">
     <tr>
-        <td>
-            <h1>
-                {% filter force_escape %}
+        <td style="width: 100%;
+            max-width: 800px;
+            background-color: #FFF;
+            color: #000000;
+            margin: auto;
+            text-align: center;
+            padding: 20px;
+            ">
+
+            <img src="https://mylearningx.pearson.com/static/pearson-pols-theme/images/PearsonLogo_Primary_Blk_RGB.png" style="width: 150px; padding: 5px; margin: auto;" />
+
+            <div style="width: 90%;
+                        background-color: #D4EAE4;
+                        text-align: left;
+                        padding: 2% 5%;
+                        background-image: url('https://mylearningx.pearson.com/static/pearson-pols-theme/images/laptop_transparent-bg.png');
+                        background-size: 50%;
+                        background-position: right bottom;
+                        background-repeat: no-repeat;
+                        padding-bottom: 35%;
+                        ">
+
+                <h1 style="font-family:'Playfair Display', serif; font-weight: 700;">
                 {% blocktrans %}
                     You have been invited to be a beta tester for {{ course_name }} at {{ site_name }}
                 {% endblocktrans %}
-                {% endfilter %}
-            </h1>
-
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                {% blocktrans %}The invitation has been sent by a member of the course staff.{% endblocktrans %}
-                {% endfilter %}
-                <br />
-            </p>
-
-            {% if auto_enroll %}
-                <p style="color: rgba(0,0,0,.75);">
-                    {% filter force_escape %}
-                    {% blocktrans %}To start accessing course materials, please visit:{% endblocktrans %}
-                    {% endfilter %}
+                </h1>
+                <p style="padding: 0px;
+                          width: 50%;
+                          min-width: 300px;
+                          margin-top: 20px;
+                          ">
+                    {% blocktrans %}The invitation has been sent by a member of the course staff. To start accessing course materials, please click the button below.{% endblocktrans %}
                     <br />
                 </p>
 
+                {% trans "View Course" as course_cta_text %}
+
+                {% if auto_enroll %}
                 {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=display_name|default:course.display_name_with_default course_cta_url=course_url %}
-            {% elif course_about_url is not None %}
-                <p style="color: rgba(0,0,0,.75);">
-                    {% filter force_escape %}
-                    {% blocktrans %}To enroll in this course and begin the beta test:{% endblocktrans %}
-                    {% endfilter %}
-                    <br />
-                </p>
-                {% filter force_escape %}
+                {% elif course_about_url is not None %}
                 {% blocktrans asvar course_cta_text %}Visit {{ course_name }}{% endblocktrans %}
-                {% endfilter %}
-
                 {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=course_about_url %}
-            {% else %}
-                <p style="color: rgba(0,0,0,.75);">
-                    {% filter force_escape %}
-                    {% blocktrans %}To enroll in this course and begin the beta test:{% endblocktrans %}
-                    {% endfilter %}
-                    <br />
-                </p>
-                {% filter force_escape %}
-                {% blocktrans asvar course_cta_text %}Visit {{ site_name }}
-                {% endblocktrans %}
-                {%endfilter%}
-
+                {% else %}
+                {% blocktrans asvar course_cta_text %}Visit {{ site_name }}{% endblocktrans %}
                 {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text course_cta_url=course_url %}
-            {% endif %}
+                {% endif %}
 
-            <p style="color: rgba(0,0,0,.75);">
-                {% filter force_escape %}
-                {% blocktrans %}This email was automatically sent from {{ site_name }} to {{ email_address }}{% endblocktrans %}
-                {% endfilter %}
+            </div>
+        </td>
+    </tr>
+    <tr style="background-color: #FFF;">
+        <td>
+            <p style="margin: 0 40px 40px 40px; text-align: center; color: #444; font-size: 0.9em;">
+                {% blocktrans %}This email message was automatically sent because someone attempted to create an account on {{ site_name }} using this email address.{% endblocktrans %}
                 <br />
             </p>
         </td>
