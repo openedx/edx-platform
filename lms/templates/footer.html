@@ -132,14 +132,14 @@
           </p>
 
         <nav class="nav-legal" aria-label="${_('Legal')}">
-          <ul>
+          {% comment %} <ul>
             % for item_num, link in enumerate(footer['legal_links'], start=1):
               <li class="nav-legal-0${item_num}">
                 <a href="${link['url']}">${link['title']}</a>
               </li>
             % endfor
             <li><a href="${footer['edx_org_link']['url']}">${footer['edx_org_link']['text']}</a></li>
-          </ul>
+          </ul> {% endcomment %}
         </nav>
       </div>
 
@@ -148,16 +148,25 @@
       ## through an API to partner sites (such as marketing sites or blogs),
       ## which are not technically powered by OpenEdX.
       % if not hide_openedx_link:
-      <div class="footer-about-openedx">
+      {% comment %} <div class="footer-about-openedx">
         <p>
           <a href="${footer['openedx_link']['url']}">
             <img src="${footer['openedx_link']['image']}" alt="${footer['openedx_link']['title']}" width="175" />
           </a>
         </p>
-      </div>
+      </div> {% endcomment %}
       % endif
     </footer>
   </div>
+  <!-- Ask mentor button -->
+  <audio controls style="display:none;">
+    <source src="https://askmentor.funix.edu.vn/sounds/chime.mp3" type="audio/mpeg" />
+  </audio>
+  <link rel="stylesheet" href="https://askmentor.funix.edu.vn/hf40-livechat/hf40-livechat.css">
+  <script src="https://askmentor.funix.edu.vn/hf40-livechat/hf40-livechat.js"></script>
+  <script>
+    initHF40('https://askmentor.funix.edu.vn');
+  </script>
 % endif
 % if include_dependencies:
   <%static:js group='base_vendor'/>
