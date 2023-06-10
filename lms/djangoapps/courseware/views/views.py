@@ -476,6 +476,7 @@ class StaticCourseTabIFrameView(EdxFragmentView):
     """
     @method_decorator(ensure_csrf_cookie)
     @method_decorator(ensure_valid_course_key)
+    @method_decorator(xframe_options_exempt)
     def get(self, request, course_id, tab_slug, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         """
         Displays a static course tab page with a given name

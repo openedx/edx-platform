@@ -24,8 +24,24 @@ from openedx.core.djangolib.markup import HTML
 	</style>
 
     <section class="container">
-      <div class="static_tab_wrapper" style="border:none">
+        <div class="static_tab_wrapper" style="border:none" id="content">
         ${HTML(fragment.body_html())}
       </div>
     </section>
 </main>
+
+<script type="text/javascript">
+    (function() {
+      if (window !== window.parent) {
+          const contentElement = document.getElementById('content');
+          const newHeight = contentElement.offsetHeight;
+  
+          window.parent.postMessage({
+                  type: 'plugin.resize',
+                  payload: {
+                  height: newHeight,
+                  }
+          }, document.referrer);
+      }
+    }());
+  </script>
