@@ -132,14 +132,7 @@
           </p>
 
         <nav class="nav-legal" aria-label="${_('Legal')}">
-          {% comment %} <ul>
-            % for item_num, link in enumerate(footer['legal_links'], start=1):
-              <li class="nav-legal-0${item_num}">
-                <a href="${link['url']}">${link['title']}</a>
-              </li>
-            % endfor
-            <li><a href="${footer['edx_org_link']['url']}">${footer['edx_org_link']['text']}</a></li>
-          </ul> {% endcomment %}
+        
         </nav>
       </div>
 
@@ -148,13 +141,7 @@
       ## through an API to partner sites (such as marketing sites or blogs),
       ## which are not technically powered by OpenEdX.
       % if not hide_openedx_link:
-      {% comment %} <div class="footer-about-openedx">
-        <p>
-          <a href="${footer['openedx_link']['url']}">
-            <img src="${footer['openedx_link']['image']}" alt="${footer['openedx_link']['title']}" width="175" />
-          </a>
-        </p>
-      </div> {% endcomment %}
+    
       % endif
     </footer>
   </div>
