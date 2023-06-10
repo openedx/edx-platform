@@ -564,7 +564,7 @@ edx-when==2.3.0
     # via
     #   -r requirements/edx/base.in
     #   edx-proctoring
-edxval==2.2.0
+git+https://github.com/openedx/edx-val.git@7376d42429d0aa7e1f5f67e9951f7d8cd455d2ae#egg=edxval==2.3.0
     # via -r requirements/edx/base.in
 elasticsearch==7.13.4
     # via
