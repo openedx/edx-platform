@@ -17701,6 +17701,10 @@ msgid "Learner's {platform_name} email address or username"
 msgstr "Địa chỉ email hoặc tên đăng nhập {platform_name} của học viên"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "View a specific learner's dates"
+msgstr "Xem ngày học của học viên cụ thể "
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Progress Page"
 msgstr "Xem Trang Tiến độ"
 
