@@ -20,16 +20,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
         <nav class="nav-peripheral" aria-label="${_("Policies")}">
           <ol>
-            {% comment %} % if is_marketing_link_set('TOS'):
-              <li class="nav-item nav-peripheral-tos">
-                <a href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
-              </li>
-            % endif
-            % if is_marketing_link_set('PRIVACY'):
-              <li class="nav-item nav-peripheral-pp">
-                <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
-              </li>
-            % endif {% endcomment %}
+
             % if ENABLE_ACCESSIBILITY_POLICY_PAGE.is_enabled():
               <li class="nav-item nav-peripheral-aar">
                 <a href="${reverse('accessibility')}">${_("Accessibility Accommodation Request")}</a>
