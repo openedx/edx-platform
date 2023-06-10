@@ -470,6 +470,45 @@ class StaticCourseTabView(EdxFragmentView):
             'disable_courseware_js': True,
         })
 
+class StaticCourseTabIFrameView(EdxFragmentView):
+    """
+    View that displays a static course tab with a given name in iframe.
+    """
+    @method_decorator(ensure_csrf_cookie)
+    @method_decorator(ensure_valid_course_key)
+    def get(self, request, course_id, tab_slug, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+        """
+        Displays a static course tab page with a given name
+        """
+        course_key = CourseKey.from_string(course_id)
+        course = get_course_with_access(request.user, 'load', course_key)
+        tab = CourseTabList.get_tab_by_slug(course.tabs, tab_slug)
+        if tab is None:
+            raise Http404
+
+        # Show warnings if the user has limited access
+        CourseTabView.register_user_access_warning_messages(request, course)
+
+        return super().get(request, course=course, tab=tab, **kwargs)
+
+    def render_to_fragment(self, request, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+        """
+        Renders the static tab to a fragment.
+        """
+        return get_static_tab_fragment(request, course, tab)
+
+    def render_standalone_response(self, request, fragment, course=None, tab=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+        """
+        Renders this static tab's fragment to HTML for a standalone page.
+        """
+        return render_to_response('courseware/static_tab_iframe.html', {
+            'course': course,
+            'active_page': 'static_tab_{}'.format(tab['url_slug']),
+            'tab': tab,
+            'fragment': fragment,
+            'disable_courseware_js': True,
+        })
+
 
 class CourseTabView(EdxFragmentView):
     """

@@ -25,7 +25,7 @@ from lms.djangoapps.courseware.module_render import (
 )
 from lms.djangoapps.courseware.views import views as courseware_views
 from lms.djangoapps.courseware.views.index import CoursewareIndex
-from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
+from lms.djangoapps.courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView,StaticCourseTabIFrameView
 from lms.djangoapps.debug import views as debug_views
 from lms.djangoapps.discussion import views as discussion_views
 from lms.djangoapps.discussion.config.settings import is_forum_daily_digest_enabled
@@ -756,6 +756,18 @@ urlpatterns += [
         name='static_tab',
     ),
 ]
+
+urlpatterns += [
+    # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
+    re_path(
+        r'^iframe/{}/(?P<tab_slug>[^/]+)/$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        StaticCourseTabIFrameView.as_view(),
+        name='static_tab_iframe',
+    ),
+]
+
 
 if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
     urlpatterns += [
