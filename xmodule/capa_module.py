@@ -1763,17 +1763,17 @@ class ProblemBlock(
                 return {'success': msg, 'html': ''}
 
         # Wait time between resets: check if is too soon for submission.
-        if self.last_submission_time is not None and self.submission_wait_seconds not in [0, None]:
-            seconds_since_submission = (current_time - self.last_submission_time).total_seconds()
-            if seconds_since_submission < self.submission_wait_seconds:
-                remaining_secs = int(self.submission_wait_seconds - seconds_since_submission)
-                msg = _('You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
-                    wait_secs=self.pretty_print_seconds(self.submission_wait_seconds),
-                    remaining_secs=self.pretty_print_seconds(remaining_secs))
-                return {
-                    'success': msg,
-                    'html': ''
-                }
+        # if self.last_submission_time is not None and self.submission_wait_seconds not in [0, None]:
+        #     seconds_since_submission = (current_time - self.last_submission_time).total_seconds()
+        #     if seconds_since_submission < self.submission_wait_seconds:
+        #         remaining_secs = int(self.submission_wait_seconds - seconds_since_submission)
+        #         msg = _('You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
+        #             wait_secs=self.pretty_print_seconds(self.submission_wait_seconds),
+        #             remaining_secs=self.pretty_print_seconds(remaining_secs))
+        #         return {
+        #             'success': msg,
+        #             'html': ''
+        #         }
 
         try:
             # expose the attempt number to a potential python custom grader
