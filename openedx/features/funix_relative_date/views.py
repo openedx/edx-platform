@@ -75,15 +75,15 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 		course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
 		is_staff = bool(has_access(request.user, 'staff', course_key))
 
-		request.user = self._get_student_user(request, course_key, student_id, is_staff)
+		user_data = self._get_student_user(request, course_key, student_id, is_staff)
   
-		if not CourseEnrollment.is_enrolled(request.user, course_key) and not is_staff:
+		if not CourseEnrollment.is_enrolled(user_data, course_key) and not is_staff:
 			return Response('User not enrolled.', status=401)
 
-		blocks = FunixRelativeDateLibary.get_course_date_blocks(course=course,user=request.user, request=request)
+		blocks = FunixRelativeDateLibary.get_course_date_blocks(course=course,user=user_data, request=request)
 
 		learner_is_full_access = not ContentTypeGatingConfig.enabled_for_enrollment(
-			user=request.user,
+			user=user_data,
 			course_key=course_key,
 		)
 
@@ -92,7 +92,7 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 		user_timezone = user_timezone_locale['user_timezone']
 
 		# Get goal
-		goal = LearnGoal.get_goal(course_id=course_key_string, user_id=str(request.user.id))
+		goal = LearnGoal.get_goal(course_id=course_key_string, user_id=str(user_data.id))
 
 		data = {
 			'has_ended': course.has_ended(),
@@ -101,10 +101,10 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 			'user_timezone': user_timezone,
 			'goal_hours_per_day': goal.hours_per_day,
 			'goal_weekdays': [getattr(goal, f'weekday_{i}') for i in range(7)],
-			'username': request.user.username
+			'username': user_data.username
 		}
 		context = self.get_serializer_context()
 		context['learner_is_full_access'] = learner_is_full_access
 		serializer = self.get_serializer_class()(data, context=context)
-		mark_user_change_as_expected(request.user.id)
+		# mark_user_change_as_expected(request.user.id)
 		return Response(serializer.data)
