@@ -1,0 +1,33 @@
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 160px;
+    overflow: auto;
+    z-index: 1;
+    bottom: -40px;
+    right: 65px;
+}
+
+.hover:hover {
+    background-color: #adadad;
+}
+
+.show {
+    display: block;
+}
+
+.form-container textarea:focus {
+    outline: none;
+}
+
+.btn-link {
+    text-decoration: none;
+    text-transform: none;
+    font-size: 14px;
+    line-height: 20.72px;
+}

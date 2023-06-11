@@ -170,41 +170,7 @@
 <!-- Error Report -->
 
 % if request.user.is_authenticated:
-<style>
-	.dropdown {
-		position: relative;
-		display: inline-block;
-	}
-
-	.dropdown-content {
-		display: none;
-		position: absolute;
-		min-width: 160px;
-		overflow: auto;
-		z-index: 1;
-		bottom: -40px;
-		right: 65px;
-	}
-
-	.hover:hover {
-		background-color: #adadad;
-	}
-
-	.show {
-		display: block;
-	}
-
-	.form-container textarea:focus {
-		outline: none;
-	}
-
-	.btn-link {
-		text-decoration: none;
-		text-transform: none;
-		font-size: 14px;
-    	line-height: 20.72px;
-	}
-</style>
+<link rel="stylesheet" href="/static/feedback/feedback.css">
 <div style="z-index: 2000000002; position: fixed; bottom: 100px; right: -25px;">
 	<div class="dropdown">
 
@@ -213,7 +179,7 @@
 			style="text-decoration: none; color: rgb(193,39,45); transform: rotate(-90deg);">
 			<b>
 				<div style="transform: rotateY(180deg); display: inline-block;">
-					<i class="fa fa-comment" aria-hidden="true"></i>
+					<i class="fa fa-comment-o" aria-hidden="true"></i>
 				</div>
 				Báo lỗi
 			</b>
@@ -468,109 +434,5 @@ border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%;">
 		</div>
 	</div>
 </div>
-<script>
-	/* When the user clicks on the button, 
-	toggle between hiding and showing the dropdown content */
-	function dropupError() {
-		document.getElementById("dropupError").classList.toggle("show");
-	}
-
-	// Technical Error
-	function openTechError() {
-		document.getElementById("technicalError").classList.toggle("show");
-		document.getElementById("dropupError").classList.toggle("show");
-	}
-	function closeTechError() {
-		document.getElementById("technicalError").classList.toggle("show");
-	}
-
-	//Overall Content Error
-	function openOverallError() {
-		document.getElementById("overallError").classList.toggle("show");
-		document.getElementById("dropupError").classList.toggle("show");
-	}
-
-	function closeOverallError() {
-		document.getElementById("overallError").classList.toggle("show");
-	}
-
-	//Quiz Content Error
-	function openQuizError() {
-		document.getElementById("quizError").classList.toggle("show");
-		document.getElementById("dropupError").classList.toggle("show");
-	}
-
-	function closeQuizError() {
-		document.getElementById("quizError").classList.toggle("show");
-	}
-
-	//Ask Mentor Error
-	function openMentorError() {
-		document.getElementById("mentorError").classList.toggle("show");
-		document.getElementById("dropupError").classList.toggle("show");
-	}
-
-	function closeMentorError() {
-		document.getElementById("mentorError").classList.toggle("show");
-	}
-
-	function postFeedback(e, form, closeClass) {
-		e.preventDefault()
-
-		// Popolate hidden values
-		populateForm();
-
-
-		// Change loading icon
-		$(".btnSend").html('<i class="fa fa-refresh fa-spin fa-fw"></i>');
-
-		var url = "/feedback/";
-		var formData = new FormData(form);            
-		var xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function () {
-			if (this.readyState == 4 && this.status == 200) {                    
-				if (this.responseText == "success") {					
-					// Hide the feedback form
-					$(".btnSend").html('Gửi');
-					$('textarea[name="content"]').val('');
-					$('input[name="attachment"]').val('');
-					$('.' + closeClass).click();
-
-					alert('Cám ơn bạn đã gửi phản hồi lỗi!');
-				} else {
-					$(".btnSend").html('Gửi');
-					alert('Xin lỗi hiện hệ thống đang chưa gửi được phản hồi. Xin bạn vui lòng báo lại hannah nhé!');
-				}
-			}						
-		};
-		xhttp.open("POST", url, true);
-		xhttp.send(formData);
-	}
-
-	function populateForm() {
-		var url = window.location;
-		$("input[name='lesson_url']").val(url);
-
-		var patt = new RegExp("[+].*[+]");
-  		var res = patt.exec(url);
-		if (res) {
-			var instance_code = res[0].substring(1, res[0].length - 1);
-			$("input[name='instance_code']").val(instance_code);
-		} else {
-			$("input[name='instance_code']").val('N/A');
-		}
-
-		var title = $("div.xblock-student_view h2.unit-title");
-		if (title && title.text() != '') {	// Check if in a course lesson
-			var unit_title = title.text();			
-			$("input[name='unit_title']").val(unit_title);
-		} else {
-			$("input[name='unit_title']").val('N/A');
-		}
-	}
-
-	document.getElementById("technical_error_form").onsubmit = function(e) {postFeedback(e, this, 'btn-technical')};
-	document.getElementById("content_error_form").onsubmit = function(e) {postFeedback(e, this, 'btn-content')};
-	document.getElementById("quiz_error_form").onsubmit = function(e) {postFeedback(e, this, 'btn-quiz')};
-</script>
+<script src="/static/feedback/add_feedback.js"></script>
 % endif
