@@ -21,8 +21,8 @@ def index(request):
 
             # Save into CRM
             url = "https://crm2.funix.edu.vn/index.php?entryPoint=publicEntrypoint&subaction=LMSFeedback"
-            username = ''
-            password = ''
+            username = 'funix'
+            password = '@1231funixFeedback'
 
             if feedback.attachment == False:
                 attachmentURL = ''
