@@ -18,6 +18,8 @@ def doc_version():
     """
     if RELEASE_LINE == "master":
         return "latest"
+    elif RELEASE_LINE == "olive" :
+        return 
     else:
         return f"open-release-{RELEASE_LINE}.master"
 
