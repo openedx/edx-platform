@@ -16452,7 +16452,7 @@ msgstr "Trường"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Resume your last course"
-msgstr ""
+msgstr "Tiếp tục khóa học vừa học"
 
 #: lms/templates/header/user_dropdown.html
 msgid "Profile"
