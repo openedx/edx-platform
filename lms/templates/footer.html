@@ -166,3 +166,411 @@
     <link rel="stylesheet" type="text/css" href="${url}"></link>
   % endfor
 % endif
+
+<!-- Error Report -->
+
+% if request.user.is_authenticated:
+<style>
+	.dropdown {
+		position: relative;
+		display: inline-block;
+	}
+
+	.dropdown-content {
+		display: none;
+		position: absolute;
+		min-width: 160px;
+		overflow: auto;
+		z-index: 1;
+		bottom: -40px;
+		right: 65px;
+	}
+
+	.hover:hover {
+		background-color: #adadad;
+	}
+
+	.show {
+		display: block;
+	}
+
+	.form-container textarea:focus {
+		outline: none;
+	}
+
+	.btn-link {
+		text-decoration: none;
+		text-transform: none;
+		font-size: 14px;
+    	line-height: 20.72px;
+	}
+</style>
+<div style="z-index: 2000000002; position: fixed; bottom: 100px; right: -25px;">
+	<div class="dropdown">
+
+		<!--Button Report an error-->
+		<button onclick="dropupError()" class="dropbtn btn-link"
+			style="text-decoration: none; color: rgb(193,39,45); transform: rotate(-90deg);">
+			<b>
+				<div style="transform: rotateY(180deg); display: inline-block;">
+					<i class="fa fa-comment" aria-hidden="true"></i>
+				</div>
+				Báo lỗi
+			</b>
+		</button>
+
+		<!-- Content of drop up -->
+		<div id="dropupError" class="dropdown-content"
+			style="width: 210px; background-color: rgb(193,39,45); color: white; border-radius: 5px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);">
+
+			<!--Header of drop up-->
+			<div style="display: flex; align-items: center; margin-left: 10px; padding-right:10px;">
+				<p style="display: flex; flex: 1; margin: 0;">Báo lỗi</p>
+				<button onclick="dropupError()" class="dropbtn btn-link"
+					style="text-decoration: none; color: white; display: flex; justify-self: flex-end;">
+					<i class="fa fa-minus" style="padding-bottom: 5px; padding-top:5px"></i>
+				</button>
+			</div>
+
+			<!--Body of drop up-->
+			<div class="" style="background-color: #ffffff; color: rgb(100, 100, 100); padding: 0">
+
+				<!--Technical Error-->
+				<div class="hover"
+					style="display: flex; align-items: center; border-bottom: 1.5px solid rgb(211, 211, 211); padding: 10px;">
+					<button onclick="openTechError()" class="dropbtn btn-link"
+						style="text-decoration: none; color: rgb(88, 88, 88); padding: 0;">
+						<i class="fa fa-angle-left" style='color: rgb(88, 88, 88); margin-right: 98px;'></i>
+						Lỗi kỹ thuật
+					</button>
+				</div>
+
+				<!--Overall Content Error-->
+				<div class="hover"
+					style="display: flex; align-items: center; border-bottom: 1.5px solid rgb(211, 211, 211); padding: 10px;">
+					<button onclick="openOverallError()" class="dropbtn btn-link"
+						style="text-decoration: none; color: rgb(88, 88, 88); padding: 0;">
+						<i class="fa fa-angle-left" style='color: rgb(88, 88, 88); margin-right: 95px;'></i>
+						Lỗi nội dung
+					</button>
+				</div>
+
+				<!--Quiz Content Error-->
+				<div class="hover"
+					style="display: flex; align-items: center; border-bottom: 1.5px solid rgb(211, 211, 211); padding: 10px;">
+					<button onclick="openQuizError()" class="dropbtn btn-link"
+						style="text-decoration: none; color: rgb(88, 88, 88); padding: 0;">
+						<i class="fa fa-angle-left" style='color: rgb(88, 88, 88); margin-right: 125px;'></i>
+						Lỗi quiz
+					</button>
+				</div>
+
+				<!--Ask Mentor Error-->
+				<div class="hover"
+					style="display: flex; align-items: center; border-bottom: 1.5px solid rgb(211, 211, 211); padding: 10px;">
+					<button onclick="openMentorError()" class="dropbtn btn-link"
+						style="text-decoration: none; color: rgb(88, 88, 88); padding: 0;">
+						<i class="fa fa-angle-left" style='color: rgb(88, 88, 88); margin-right: 70px;'></i>
+						Lỗi Ask Mentors
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Content of error window Technical Error-->
+		<div id="technicalError" class="dropdown-content"
+			style="width: 300px; background-color: rgb(193,39,45); color: white; border-radius: 5px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);">
+
+			<!--Header of error window-->
+			<div style="display: flex; align-items: center;">
+				<button onclick="openTechError()" class="dropbtn btn btn-link"
+					style="text-decoration: none; color: white; padding-right: 10px; padding-left: 10px; display: flex;">
+					<i class="fa fa-chevron-left" style="size: 6px"></i>
+				</button>
+				<span style="display: flex; flex: 1;">Lỗi kỹ thuật</span>
+				<button onclick="closeTechError()" class="dropbtn btn btn-link btn-technical"
+					style="text-decoration: none; color: white; display: flex; justify-self: flex-end; padding-right:10px;">
+					<i class="fa fa-minus" style="padding-bottom: 5px; padding-top:5px"></i>
+				</button>
+			</div>
+
+			<!--Form to submit error-->
+			<form method="post" enctype="multipart/form-data" action="/feedback/" id="technical_error_form"
+				style='max-width: 300px; background-color: white;  color: rgb(100, 100, 100); padding: 0px 0px 10px 0px; margin-bottom: 0;'>
+
+				<input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+				<div style="width: 100%; padding: 10px 0 10px 10px;">
+					<p style="margin-bottom: 0"><b>Giải thích lỗi</b></p>
+					<textarea placeholder="nhập ở đây" name="content" style='font-size: 12px; border: 1px solid #e7e7e7;
+border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%; resize: none; height: 150px;' required></textarea>
+				</div>
+
+				<!--Attach Snapshot-->
+				<div style="width: 100%; padding: 10px 0 10px 10px;">
+					<span><b>Ảnh chụp lỗi</b></span>
+					<p style="font-size: 10px; margin-bottom: 0;">File ảnh: jpg,jpeg,png. Kích thước tối đa 5MB</p>
+					<input type="file" accept=".jpg,.jpeg,.png,.gif" name="attachment" style="font-size: 12px; border: 1px solid #e7e7e7;
+border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%;">
+				</div>
+
+				<!--Self-identified field-->
+				<div>
+					<input type="hidden" name="email" id="email" value="${ request.user.email }">
+					<input type="hidden" name="lesson_url" id="lesson_url" value="">
+					<input type="hidden" name="unit_title" id="unit_title" value="">
+					<input type="hidden" name="instance_code" id="instance_code" value="">
+					<input type="hidden" name="category_id" id="category_id" value="2">
+				</div>
+
+				<!--Button to submit-->
+				<div style="display: flex; justify-content: center; padding-right: 12px;">
+					<button type="submit" name="submit" class="btnSend">Gửi</button>
+				</div>
+			</form>
+		</div>
+
+		<!-- Content of error window Overall Content Error-->
+		<div id="overallError" class="dropdown-content"
+			style="width: 300px; background-color: rgb(193,39,45); color: white; border-radius: 5px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);">
+
+			<!--Header of error window-->
+			<div style="display: flex; align-items: center;">
+				<button onclick="openOverallError()" class="dropbtn btn btn-link"
+					style="text-decoration: none; color: white; padding-right: 10px; padding-left: 10px; display: flex;">
+					<i class="fa fa-chevron-left" style="size: 6px"></i>
+				</button>
+				<span style="display: flex; flex: 1;">Lỗi nội dung</span>
+				<button onclick="closeOverallError()" class="dropbtn btn btn-link btn-content"
+					style="text-decoration: none; color: white; display: flex; justify-self: flex-end; padding-right:10px;">
+					<i class="fa fa-minus" style="padding-bottom: 5px; padding-top:5px"></i>
+				</button>
+			</div>
+
+			<!--Form to submit error-->
+			<form method="post" enctype="multipart/form-data" action="/feedback/" id="content_error_form"
+				style='max-width: 300px; background-color: white;  color: rgb(100, 100, 100); padding: 0px 0px 10px 0px; margin-bottom: 0;'>
+
+				<input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+				<div style="width: 100%; padding: 10px 0 10px 10px;">
+					<p style="margin-bottom: 0"><b>Giải thích lỗi</b></p>
+					<textarea placeholder="nhập ở đây" name="content" style='font-size: 12px; border: 1px solid #e7e7e7;
+border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%; resize: none; height: 150px;' required></textarea>
+				</div>
+
+				<!--Attach Snapshot-->
+				<div style="width: 100%; padding: 10px 0 10px 10px;">
+					<span><b>Ảnh chụp lỗi</b></span>
+					<p style="font-size: 10px; margin-bottom: 0;">File ảnh: jpg,jpeg,png. Kích thước tối đa 5MB</p>
+					<input type="file" accept=".jpg,.jpeg,.png,.gif" name="attachment" style="font-size: 12px; border: 1px solid #e7e7e7;
+border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%;">
+				</div>
+
+				<!--Self-identified field-->
+				<div>
+					<input type="hidden" name="email" id="email" value="${ request.user.email }">
+					<input type="hidden" name="lesson_url" id="lesson_url" value="">
+					<input type="hidden" name="unit_title" id="unit_title" value="">
+					<input type="hidden" name="instance_code" id="instance_code" value="">
+					<input type="hidden" name="category_id" id="category_id" value="0">
+				</div>
+
+				<!--Button to submit-->
+				<div style="display: flex; justify-content: center; padding-right: 12px;">
+					<button type="submit" name="submit" class="btnSend">Gửi</button>
+				</div>
+			</form>
+		</div>
+
+		<!-- content of error window Quiz Content Error-->
+		<div id="quizError" class="dropdown-content"
+			style="width: 300px; background-color: rgb(193,39,45); color: white; border-radius: 5px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);">
+
+			<!--Header of error window-->
+			<div style="display: flex; align-items: center;">
+				<button onclick="openQuizError()" class="dropbtn btn btn-link"
+					style="text-decoration: none; color: white; padding-right: 10px; padding-left: 10px; display: flex;">
+					<i class="fa fa-chevron-left" style="size: 6px"></i>
+				</button>
+				<span style="display: flex; flex: 1;">Lỗi Quiz</span>
+				<button onclick="closeQuizError()" class="dropbtn btn btn-link btn-quiz"
+					style="text-decoration: none; color: white; display: flex; justify-self: flex-end; padding-right:10px;">
+					<i class="fa fa-minus" style="padding-bottom: 5px; padding-top:5px"></i>
+				</button>
+			</div>
+
+			<!--Form to submit error-->
+			<!--Form to submit error-->
+			<form method="post" enctype="multipart/form-data" action="/feedback/" id="quiz_error_form"
+				style='max-width: 300px; background-color: white;  color: rgb(100, 100, 100); padding: 0px 0px 10px 0px; margin-bottom: 0;'>
+
+				<input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+				<div style="width: 100%; padding: 10px 0 10px 10px;">
+					<p style="margin-bottom: 0"><b>Giải thích lỗi</b></p>
+					<textarea placeholder="nhập ở đây" name="content" style='font-size: 12px; border: 1px solid #e7e7e7;
+border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%; resize: none; height: 150px;' required></textarea>
+				</div>
+
+				<!--Attach Snapshot-->
+				<div style="width: 100%; padding: 10px 0 10px 10px;">
+					<span><b>Ảnh chụp lỗi</b></span>
+					<p style="font-size: 10px; margin-bottom: 0;">File ảnh: jpg,jpeg,png. Kích thước tối đa 5MB</p>
+					<input type="file" accept=".jpg,.jpeg,.png,.gif" name="attachment" style="font-size: 12px; border: 1px solid #e7e7e7;
+border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%;">
+				</div>
+
+				<!--Self-identified field-->
+				<div>					
+					<input type="hidden" name="email" id="email" value="${ request.user.email }">
+					<input type="hidden" name="lesson_url" id="lesson_url" value="">
+					<input type="hidden" name="unit_title" id="unit_title" value="">
+					<input type="hidden" name="instance_code" id="instance_code" value="">
+					<input type="hidden" name="category_id" id="category_id" value="1">
+				</div>
+
+				<!--Button to submit-->
+				<div style="display: flex; justify-content: center; padding-right: 12px;">
+					<button type="submit" name="submit" class="btnSend">Gửi</button>
+				</div>
+			</form>
+		</div>
+
+		<!-- content of error window Quiz Content Error-->
+		<div id="mentorError" class="dropdown-content"
+			style="width: 300px; background-color: rgb(193,39,45); color: white; border-radius: 5px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);">
+
+			<!--Header of error window-->
+			<div style="display: flex; align-items: center;">
+				<button onclick="openMentorError()" class="dropbtn btn btn-link"
+					style="text-decoration: none; color: white; padding-right: 10px; padding-left: 10px; display: flex;">
+					<i class="fa fa-chevron-left" style="size: 6px"></i>
+				</button>
+				<span style="display: flex; flex: 1;">Lỗi Ask Mentors</span>
+				<button onclick="closeMentorError()" class="dropbtn btn btn-link btn-quiz"
+					style="text-decoration: none; color: white; display: flex; justify-self: flex-end; padding-right:10px;">
+					<i class="fa fa-minus" style="padding-bottom: 5px; padding-top:5px"></i>
+				</button>
+			</div>
+
+			<!--Form to submit error-->
+			<div style="padding:10px;background-color:#FFF;color: #000; line-height: normal;">
+				<p>Trường hợp bạn gặp vấn đề với chức năng hỏi đ&aacute;p mentor, vui l&ograve;ng xem hướng dẫn dưới để xử l&yacute;:</p>
+				<p><strong>A. Trường hợp đ&atilde; gửi c&acirc;u hỏi nhưng kh&ocirc;ng t&igrave;m được mentor</strong></p>
+				<ol>
+				<li>Vui l&ograve;ng thử lại sau v&agrave;i ph&uacute;t, hoặc thử v&agrave;o giờ trực ch&iacute;nh từ <strong>8h-23h</strong>. Nếu kh&ocirc;ng được, h&atilde;y sang bước 2.</li>
+				<li>Nhắn hannah phụ tr&aacute;ch để được hỗ trợ</li>
+				</ol>
+				<p><strong>B. Trường hợp kh&ocirc;ng thấy mục Ask Mentors hoặc kh&ocirc;ng thấy hiện ra đầy đủ nội dung nhập c&acirc;u hỏi</strong></p>
+				<ol>
+				<li>Vui l&ograve;ng nhấn <strong>F5</strong> sau v&agrave;i ph&uacute;t. Nếu kh&ocirc;ng được, h&atilde;y sang bước 2</li>
+				<li>Nhắn hannah phụ tr&aacute;ch để được hỗ trợ</li>
+				</ol>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	/* When the user clicks on the button, 
+	toggle between hiding and showing the dropdown content */
+	function dropupError() {
+		document.getElementById("dropupError").classList.toggle("show");
+	}
+
+	// Technical Error
+	function openTechError() {
+		document.getElementById("technicalError").classList.toggle("show");
+		document.getElementById("dropupError").classList.toggle("show");
+	}
+	function closeTechError() {
+		document.getElementById("technicalError").classList.toggle("show");
+	}
+
+	//Overall Content Error
+	function openOverallError() {
+		document.getElementById("overallError").classList.toggle("show");
+		document.getElementById("dropupError").classList.toggle("show");
+	}
+
+	function closeOverallError() {
+		document.getElementById("overallError").classList.toggle("show");
+	}
+
+	//Quiz Content Error
+	function openQuizError() {
+		document.getElementById("quizError").classList.toggle("show");
+		document.getElementById("dropupError").classList.toggle("show");
+	}
+
+	function closeQuizError() {
+		document.getElementById("quizError").classList.toggle("show");
+	}
+
+	//Ask Mentor Error
+	function openMentorError() {
+		document.getElementById("mentorError").classList.toggle("show");
+		document.getElementById("dropupError").classList.toggle("show");
+	}
+
+	function closeMentorError() {
+		document.getElementById("mentorError").classList.toggle("show");
+	}
+
+	function postFeedback(e, form, closeClass) {
+		e.preventDefault()
+
+		// Popolate hidden values
+		populateForm();
+
+
+		// Change loading icon
+		$(".btnSend").html('<i class="fa fa-refresh fa-spin fa-fw"></i>');
+
+		var url = "/feedback/";
+		var formData = new FormData(form);            
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function () {
+			if (this.readyState == 4 && this.status == 200) {                    
+				if (this.responseText == "success") {					
+					// Hide the feedback form
+					$(".btnSend").html('Gửi');
+					$('textarea[name="content"]').val('');
+					$('input[name="attachment"]').val('');
+					$('.' + closeClass).click();
+
+					alert('Cám ơn bạn đã gửi phản hồi lỗi!');
+				} else {
+					$(".btnSend").html('Gửi');
+					alert('Xin lỗi hiện hệ thống đang chưa gửi được phản hồi. Xin bạn vui lòng báo lại hannah nhé!');
+				}
+			}						
+		};
+		xhttp.open("POST", url, true);
+		xhttp.send(formData);
+	}
+
+	function populateForm() {
+		var url = window.location;
+		$("input[name='lesson_url']").val(url);
+
+		var patt = new RegExp("[+].*[+]");
+  		var res = patt.exec(url);
+		if (res) {
+			var instance_code = res[0].substring(1, res[0].length - 1);
+			$("input[name='instance_code']").val(instance_code);
+		} else {
+			$("input[name='instance_code']").val('N/A');
+		}
+
+		var title = $("div.xblock-student_view h2.unit-title");
+		if (title && title.text() != '') {	// Check if in a course lesson
+			var unit_title = title.text();			
+			$("input[name='unit_title']").val(unit_title);
+		} else {
+			$("input[name='unit_title']").val('N/A');
+		}
+	}
+
+	document.getElementById("technical_error_form").onsubmit = function(e) {postFeedback(e, this, 'btn-technical')};
+	document.getElementById("content_error_form").onsubmit = function(e) {postFeedback(e, this, 'btn-content')};
+	document.getElementById("quiz_error_form").onsubmit = function(e) {postFeedback(e, this, 'btn-quiz')};
+</script>
+% endif

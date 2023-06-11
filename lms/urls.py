@@ -5,6 +5,7 @@ URLs for LMS
 from config_models.views import ConfigurationModelCurrentAPIView
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import autodiscover as django_autodiscover
 from django.urls import include, path, re_path
@@ -52,6 +53,7 @@ from openedx.core.djangoapps.user_authn.views.login import redirect_to_lms_login
 from openedx.features.enterprise_support.api import enterprise_enabled
 from lms.djangoapps.instructor_tools import views as instructor_tools_views
 from lms.djangoapps.instructor_tools import urls as instructor_tools_urls
+from lms.djangoapps.feedback import views as feedback_views
 
 RESET_COURSE_DEADLINES_NAME = 'reset_course_deadlines'
 RENDER_XBLOCK_NAME = 'render_xblock'
@@ -1047,3 +1049,8 @@ urlpatterns += [
     path('api/mfe_config/v1', include(('lms.djangoapps.mfe_config_api.urls', 'lms.djangoapps.mfe_config_api'), namespace='mfe_config_api'))
 ]
 urlpatterns += instructor_tools_urls.urlpatterns
+
+# FUNiX Feedback
+urlpatterns += [
+    url(r'^feedback/$', feedback_views.index, name='feedback_index')
+]
