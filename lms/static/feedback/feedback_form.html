@@ -1,4 +1,4 @@
-<div style="z-index: 2000000002; position: fixed; bottom: 100px; right: -25px;" id="funix-feedback">
+<div style="z-index: 2000000002; position: fixed; bottom: 100px; right: -25px;">
     <div class="dropdown">
         <!--Button Report an error-->
         <button onclick="dropupError()" class="dropbtn btn-link"
@@ -13,7 +13,7 @@
 
         <!-- Content of drop up -->
         <div id="dropupError" class="dropdown-content"
-            style="background-color: rgb(193,39,45); color: white; border-radius: 5px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);">
+            style="width: 210px; background-color: rgb(193,39,45); color: white; border-radius: 5px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);">
 
             <!--Header of drop up-->
             <div style="display: flex; align-items: center; margin-left: 10px; padding-right:10px;">
@@ -90,7 +90,7 @@
             <form method="post" enctype="multipart/form-data" action="/feedback/" id="technical_error_form"
                 style='max-width: 300px; background-color: white;  color: rgb(100, 100, 100); padding: 0px 0px 10px 0px; margin-bottom: 0;'>
 
-                {% csrf_token %}
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
                 <div style="width: 100%; padding: 10px 0 10px 10px;">
                     <p style="margin-bottom: 0"><b>Giải thích lỗi</b></p>
                     <textarea placeholder="nhập ở đây" name="content" style='font-size: 12px; border: 1px solid #e7e7e7;
@@ -107,7 +107,7 @@ border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%;">
 
                 <!--Self-identified field-->
                 <div>
-                    <input type="hidden" name="email" id="email" value="{{email}}">
+                    <input type="hidden" name="email" id="email" value="${ request.user.email }">
                     <input type="hidden" name="lesson_url" id="lesson_url" value="">
                     <input type="hidden" name="unit_title" id="unit_title" value="">
                     <input type="hidden" name="instance_code" id="instance_code" value="">
@@ -142,7 +142,7 @@ border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%;">
             <form method="post" enctype="multipart/form-data" action="/feedback/" id="content_error_form"
                 style='max-width: 300px; background-color: white;  color: rgb(100, 100, 100); padding: 0px 0px 10px 0px; margin-bottom: 0;'>
 
-                {% csrf_token %}
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
                 <div style="width: 100%; padding: 10px 0 10px 10px;">
                     <p style="margin-bottom: 0"><b>Giải thích lỗi</b></p>
                     <textarea placeholder="nhập ở đây" name="content" style='font-size: 12px; border: 1px solid #e7e7e7;
@@ -159,7 +159,7 @@ border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%;">
 
                 <!--Self-identified field-->
                 <div>
-                    <input type="hidden" name="email" id="email" value="{{email}}">
+                    <input type="hidden" name="email" id="email" value="${ request.user.email }">
                     <input type="hidden" name="lesson_url" id="lesson_url" value="">
                     <input type="hidden" name="unit_title" id="unit_title" value="">
                     <input type="hidden" name="instance_code" id="instance_code" value="">
@@ -195,7 +195,7 @@ border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%;">
             <form method="post" enctype="multipart/form-data" action="/feedback/" id="quiz_error_form"
                 style='max-width: 300px; background-color: white;  color: rgb(100, 100, 100); padding: 0px 0px 10px 0px; margin-bottom: 0;'>
 
-                {% csrf_token %}
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
                 <div style="width: 100%; padding: 10px 0 10px 10px;">
                     <p style="margin-bottom: 0"><b>Giải thích lỗi</b></p>
                     <textarea placeholder="nhập ở đây" name="content" style='font-size: 12px; border: 1px solid #e7e7e7;
@@ -212,7 +212,7 @@ border-radius: 5px; padding: 5px; margin: 5px 0; width: 90%;">
 
                 <!--Self-identified field-->
                 <div>
-                    <input type="hidden" name="email" id="email" value="{{email}}">
+                    <input type="hidden" name="email" id="email" value="${ request.user.email }">
                     <input type="hidden" name="lesson_url" id="lesson_url" value="">
                     <input type="hidden" name="unit_title" id="unit_title" value="">
                     <input type="hidden" name="instance_code" id="instance_code" value="">

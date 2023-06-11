@@ -54,7 +54,7 @@ function postFeedback(e, form, closeClass) {
 	// Change loading icon
 	$(".btnSend").html('<i class="fa fa-refresh fa-spin fa-fw"></i>');
 
-	let url = "/feedback/";
+	let url = this.LMSHost + "/feedback/";
 	let formData = new FormData(form);
 	let xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function () {
@@ -99,12 +99,28 @@ function populateForm() {
 	}
 }
 
-document.getElementById("technical_error_form").onsubmit = function (e) {
-	postFeedback(e, this, 'btn-technical')
-};
-document.getElementById("content_error_form").onsubmit = function (e) {
-	postFeedback(e, this, 'btn-content')
-};
-document.getElementById("quiz_error_form").onsubmit = function (e) {
-	postFeedback(e, this, 'btn-quiz')
+const addFeedbackForm = async () => {
+	// Get form html form api and append to body using fetch
+	let url = this.LMSHost + '/feedback';
+	await fetch(url)
+		.then(response => response.text())
+		.then(html => {
+			document.body.insertAdjacentHTML('beforeend', html);
+		});
+
+	document.getElementById("technical_error_form").onsubmit = function (e) {
+		postFeedback(e, this, 'btn-technical')
+	};
+	document.getElementById("content_error_form").onsubmit = function (e) {
+		postFeedback(e, this, 'btn-content')
+	};
+	document.getElementById("quiz_error_form").onsubmit = function (e) {
+		postFeedback(e, this, 'btn-quiz')
+	};
+}
+
+const initFUNiXFeedback = (LMSHost = '') => {	
+	this.LMSHost = LMSHost;
+
+	addFeedbackForm()
 };
