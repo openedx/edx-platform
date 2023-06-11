@@ -52,7 +52,7 @@ function postFeedback(e, form, closeClass) {
 
 
 	// Change loading icon
-	$(".btnSend").html('<i class="fa fa-refresh fa-spin fa-fw"></i>');
+	document.querySelector(".btnSend").innerHTML = '<i class="fa fa-refresh fa-spin fa-fw"></i>';
 
 	let url = this.LMSHost + "/feedback/";
 	let formData = new FormData(form);
@@ -61,14 +61,15 @@ function postFeedback(e, form, closeClass) {
 	if (this.readyState == 4 && this.status == 200) {
 		if (this.responseText == "success") {
 			// Hide the feedback form
-			$(".btnSend").html('Gửi');
-			$('textarea[name="content"]').val('');
-			$('input[name="attachment"]').val('');
-			$('.' + closeClass).click();
+            document.querySelector(".btnSend").innerHTML = 'Gửi';
+			document.querySelector('textarea[name="content"]').value = '';
+			document.querySelector('input[name="attachment"]').value = '';
+			document.querySelector('.' + closeClass).click();
+
 
 			alert('Cám ơn bạn đã gửi phản hồi lỗi!');
 		} else {
-			$(".btnSend").html('Gửi');
+			document.querySelector(".btnSend").innerHTML = 'Gửi';
 			alert('Xin lỗi hiện hệ thống đang chưa gửi được phản hồi. Xin bạn vui lòng báo lại hannah nhé!');
 		}
 	}
@@ -79,23 +80,24 @@ function postFeedback(e, form, closeClass) {
 
 function populateForm() {
 	let url = window.location;
-	$("input[name='lesson_url']").val(url);
+	document.querySelector("input[name='lesson_url").value = url;
 
 	let patt = new RegExp("[+].*[+]");
 	let res = patt.exec(url);
 	if (res) {
 		let instance_code = res[0].substring(1, res[0].length - 1);
-		$("input[name='instance_code']").val(instance_code);
-		} else {
-		$("input[name='instance_code']").val('N/A');
+		document.querySelector("input[name='instance_code']").value = instance_code;
+	} else {
+		document.querySelector("input[name='instance_code']").value = 'N/A';
+	
 	}
 
-	let title = $("div.xblock-student_view h2.unit-title");
-	if (title && title.text() != '') { // Check if in a course lesson
-		let unit_title = title.text();
-		$("input[name='unit_title']").val(unit_title);
+	let unit_title = document.querySelector("div.xblock-student_view h2.unit-title");
+	if (unit_title && unit_title.textContent != '') { // Check if in a course lesson
+		let unit_title = unit_title.textContent;
+		document.querySelector("input[name='unit_title']").value = unit_title;
 	} else {
-		$("input[name='unit_title']").val('N/A');
+		document.querySelector("input[name='unit_title']").value = 'N/A';
 	}
 }
 
