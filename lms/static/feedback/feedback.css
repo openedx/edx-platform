@@ -68,7 +68,7 @@
     vertical-align: baseline;
     line-height: normal;
     cursor: pointer;
-    -webkit-appearance: button;
+    /* -webkit-appearance: button; */
     text-transform: none;
     letter-spacing: 0;
     border: 1px solid #d2c9c9;
