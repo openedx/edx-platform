@@ -57,6 +57,7 @@ function postFeedback(e, form, closeClass) {
 	let url = this.LMSHost + "/feedback/";
 	let formData = new FormData(form);
 	let xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
 	xhttp.onreadystatechange = function () {
 	if (this.readyState == 4 && this.status == 200) {
 		if (this.responseText == "success") {
@@ -103,12 +104,17 @@ function populateForm() {
 
 const addFeedbackForm = async () => {
 	// Get form html form api and append to body using fetch
-	let url = this.LMSHost + '/feedback';
-	await fetch(url)
-		.then(response => response.text())
-		.then(html => {
-			document.body.insertAdjacentHTML('beforeend', html);
-		});
+	let url = this.LMSHost + '/feedback/';
+	await fetch(url, {
+		method: "GET",
+		headers: {},
+		credentials: 'include'
+	})
+	.then(response => response.text())
+	.then(html => {
+		document.body.insertAdjacentHTML('beforeend', html);
+	});
+
 
 	document.getElementById("technical_error_form").onsubmit = function (e) {
 		postFeedback(e, this, 'btn-technical')
