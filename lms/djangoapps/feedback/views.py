@@ -1,3 +1,5 @@
+from rest_framework.generics import RetrieveAPIView
+from common.djangoapps.edxmako.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.template import loader
 from .models import Feedback
@@ -46,5 +48,9 @@ def index(request):
             return HttpResponse(form.errors)
             #print(form.errors)
 
-    template = loader.get_template('feedback_form.html')
-    return HttpResponse(template.render({ 'email': request.user.email  }, request))
+    context = {
+        'email': request.user.email
+    }
+    response = render_to_response('feedback_form.html', context)
+    # template = loader.get_template('feedback_form.html')
+    return response

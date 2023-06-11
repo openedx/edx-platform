@@ -4716,6 +4716,7 @@ msgstr ""
 #: openedx/core/djangoapps/dark_lang/templates/dark_lang/preview-language-fragment.html
 #: openedx/core/djangoapps/theming/templates/theming/theming-admin-fragment.html
 #: themes/stanford-style/lms/templates/register-shib.html
+#: lms/templates/feedback_form.html
 msgid "Submit"
 msgstr "Gửi"
 
@@ -23800,3 +23801,43 @@ msgstr ""
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr ""
+
+#: lms/templates/feedback_form.html
+msgid "Feedback"
+msgstr "Báo lỗi"
+
+#: lms/templates/feedback_form.html
+msgid "Technical Error"
+msgstr "Lỗi kỹ thuật"
+
+#: lms/templates/feedback_form.html
+msgid "Overall Content Error"
+msgstr "Lỗi nội dung"
+
+#: lms/templates/feedback_form.html
+msgid "Quiz Content Error"
+msgstr "Lỗi Quiz"
+
+#: lms/templates/feedback_form.html
+msgid "Ask Mentor Error"
+msgstr "Lỗi Ask Mentors"
+
+#: lms/templates/feedback_form.html
+msgid "Error explanation"
+msgstr "Giải thích lỗi"
+
+#: lms/templates/feedback_form.html
+msgid "Type Here"
+msgstr "Nhập ở đây"
+
+#: lms/templates/feedback_form.html
+msgid "Error snapshot"
+msgstr "Ảnh chụp lỗi"
+
+#: lms/templates/feedback_form.html
+msgid "Image files: jpg, jpeg, png. Maximum size 5MB"
+msgstr "File ảnh: jpg,jpeg,png. Kích thước tối đa 5MB"
+
+#: lms/templates/feedback_form.html
+msgid "<p>In case you have problems with the mentor Q&A function, please see the instructions below to handle it:</p> <p><strong>A. In case you sent a question but couldn't find a mentor</strong></p> <ol> <li> Please try again in a few minutes, or try during direct hours from <strong>8h-23h</strong>. If not, go to step 2. </li> <li>Text to hannah in charge for support</li> </ol> <p><strong>B. In case you do not see the Ask Mentors section or do not see the full content of the question input</strong></p> <ol> <li>Please press <strong>F5</strong> after a few minutes. If not, go to step 2</li> <li>Text to hannah in charge for support</li> </ol>"
+msgstr "<p>Trường hợp bạn gặp vấn đề với chức năng hỏi đáp mentor, vui lòng xem hướng dẫn dưới để xử lý:</p> <p><strong>A. Trường hợp đã gửi câu hỏi nhưng không tìm được mentor</strong></p> <ol> <li> Vui lòng thử lại sau vài phút, hoặc thử vào giờ trực chính từ <strong>8h-23h</strong>. Nếu không được, hãy sang bước 2. </li> <li>Nhắn hannah phụ trách để được hỗ trợ</li> </ol> <p><strong>B. Trường hợp không thấy mục Ask Mentors hoặc không thấy hiện ra đầy đủ nội dung nhập câu hỏi</strong></p> <ol> <li>Vui lòng nhấn <strong>F5</strong> sau vài phút. Nếu không được, hãy sang bước 2</li> <li>Nhắn hannah phụ trách để được hỗ trợ</li> </ol>"
