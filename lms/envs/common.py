@@ -3257,7 +3257,11 @@ INSTALLED_APPS = [
     'lms.djangoapps.mfe_config_api',
     
      # instructor_tools
-    'lms.djangoapps.instructor_tools'
+    'lms.djangoapps.instructor_tools' ,
+    
+    # FUNiX Feedback
+    'lms.djangoapps.feedback',
+    
 ]
 
 ######################### CSRF #########################################
