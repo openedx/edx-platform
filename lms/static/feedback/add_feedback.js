@@ -52,17 +52,19 @@ function postFeedback(e, form, closeClass) {
 
 
 	// Change loading icon
+
 	document.querySelector(".btnSend").innerHTML = '<i class="fa fa-refresh fa-spin fa-fw"></i>';
 
 	let url = this.LMSHost + "/feedback/";
 	let formData = new FormData(form);
 	let xhttp = new XMLHttpRequest();
-    xhttp.withCredentials = true;
+	xhttp.withCredentials = true;
 	xhttp.onreadystatechange = function () {
 	if (this.readyState == 4 && this.status == 200) {
 		if (this.responseText == "success") {
 			// Hide the feedback form
-            document.querySelector(".btnSend").innerHTML = 'Gửi';
+	
+			document.querySelector(".btnSend").innerHTML = 'Gửi';
 			document.querySelector('textarea[name="content"]').value = '';
 			document.querySelector('input[name="attachment"]').value = '';
 			document.querySelector('.' + closeClass).click();
@@ -79,27 +81,39 @@ function postFeedback(e, form, closeClass) {
 	xhttp.send(formData);
 }
 
+function getInstanceCode(url) {
+	let patt = new RegExp("[+][^+]*[+]");
+	let res = patt.exec(url);
+
+	return res ? res[0].substring(1, res[0].length - 1) : 'N/A';
+}
+
+function getUnitTitle() {
+	if (this.isMFE) {
+		const iframe = document.getElementById('unit-iframe');
+
+		if (!iframe) {
+			return 'N/A';
+		}
+		
+		return iframe.title;
+	} else {
+		let unit_title = document.querySelector("div.xblock-student_view h2.unit-title");
+		if (unit_title && unit_title.textContent != '') {
+			let unit_title = unit_title.textContent;
+			return unit_title;
+		} else {
+			return 'N/A';
+		}
+	}
+}
+
 function populateForm() {
 	let url = window.location;
+
 	document.querySelector("input[name='lesson_url").value = url;
-
-	let patt = new RegExp("[+].*[+]");
-	let res = patt.exec(url);
-	if (res) {
-		let instance_code = res[0].substring(1, res[0].length - 1);
-		document.querySelector("input[name='instance_code']").value = instance_code;
-	} else {
-		document.querySelector("input[name='instance_code']").value = 'N/A';
-	
-	}
-
-	let unit_title = document.querySelector("div.xblock-student_view h2.unit-title");
-	if (unit_title && unit_title.textContent != '') { // Check if in a course lesson
-		let unit_title = unit_title.textContent;
-		document.querySelector("input[name='unit_title']").value = unit_title;
-	} else {
-		document.querySelector("input[name='unit_title']").value = 'N/A';
-	}
+	document.querySelector("input[name='instance_code']").value = getInstanceCode(url);
+	document.querySelector("input[name='unit_title']").value = getUnitTitle();
 }
 
 const addFeedbackForm = async () => {
@@ -115,7 +129,6 @@ const addFeedbackForm = async () => {
 		document.body.insertAdjacentHTML('beforeend', html);
 	});
 
-
 	document.getElementById("technical_error_form").onsubmit = function (e) {
 		postFeedback(e, this, 'btn-technical')
 	};
@@ -127,8 +140,9 @@ const addFeedbackForm = async () => {
 	};
 }
 
-const initFUNiXFeedback = (LMSHost = '') => {	
+const initFUNiXFeedback = (LMSHost = '', isMFE = false) => {	
 	this.LMSHost = LMSHost;
+	this.isMFE = isMFE;
 
 	addFeedbackForm()
 };
