@@ -72,6 +72,7 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_video_uploads_page,
 )
 from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_video_editor
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -1309,6 +1310,28 @@ def get_course_settings(request, course_key, course_block):
     return settings_context
 
 
+def get_course_grading(course_key):
+    """
+    Utils is used to get context of course grading.
+    It is used for both DRF and django views.
+    """
+
+    course_block = modulestore().get_course(course_key)
+    course_details = CourseGradingModel.fetch(course_key)
+    course_assignment_lists = get_subsections_by_assignment_type(course_key)
+    grading_context = {
+        'context_course': course_block,
+        'course_locator': course_key,
+        'course_details': course_details,
+        'grading_url': reverse_course_url('grading_handler', course_key),
+        'is_credit_course': is_credit_course(course_key),
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_key),
+        'course_assignment_lists': dict(course_assignment_lists)
+    }
+
+    return grading_context
+
+
 class StudioPermissionsService:
     """
     Service that can provide information about a user's permissions.
@@ -1317,6 +1340,7 @@ class StudioPermissionsService:
 
     Only used by LibraryContentBlock (and library_tools.py).
     """
+
     def __init__(self, user):
         self._user = user
 

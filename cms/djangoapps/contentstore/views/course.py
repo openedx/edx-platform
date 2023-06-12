@@ -58,7 +58,6 @@ from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadReq
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from common.djangoapps.xblock_django.api import deprecated_xblocks
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.credit.api import is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -90,9 +89,9 @@ from ..toggles import split_library_view_on_dashboard
 from ..utils import (
     add_instructor,
     get_course_settings,
+    get_course_grading,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
-    get_subsections_by_assignment_type,
     initialize_permissions,
     remove_all_instructors,
     reverse_course_url,
@@ -1186,20 +1185,12 @@ def grading_handler(request, course_key_string, grader_index=None):
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_block = get_course_and_check_access(course_key, request.user)
+        if not has_studio_read_access(request.user, course_key):
+            raise PermissionDenied()
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
-            course_details = CourseGradingModel.fetch(course_key)
-            course_assignment_lists = get_subsections_by_assignment_type(course_key)
-            return render_to_response('settings_graders.html', {
-                'context_course': course_block,
-                'course_locator': course_key,
-                'course_details': course_details,
-                'grading_url': reverse_course_url('grading_handler', course_key),
-                'is_credit_course': is_credit_course(course_key),
-                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
-                'course_assignment_lists': dict(course_assignment_lists)
-            })
+            grading_context = get_course_grading(course_key)
+            return render_to_response('settings_graders.html', grading_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
                 if grader_index is None:
