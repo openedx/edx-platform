@@ -74,8 +74,8 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
             self.programs += pathway['programs']
 
         self.uuids = {
-            f"{self.site_domain}" : [program['uuid'] for program in self.programs],
-            f"{self.site_domain2}" : [program['uuid'] for program in self.programs2],
+            f"{self.site_domain}": [program["uuid"] for program in self.programs],
+            f"{self.site_domain2}": [program["uuid"] for program in self.programs2],
         }
 
         # add some of the previously created programs to some pathways
@@ -173,7 +173,6 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         cached_uuids = cache.get(SITE_PROGRAM_UUIDS_CACHE_KEY_TPL.format(domain=self.site_domain2))
         assert set(cached_uuids) == set(self.uuids[self.site_domain2])
-        
 
     def test_handle_programs(self):
         """
