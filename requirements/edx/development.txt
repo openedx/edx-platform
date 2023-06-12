@@ -1028,6 +1028,8 @@ pansi==2020.7.3
     # via
     #   -r requirements/edx/testing.txt
     #   py2neo
+    #pandas
+pandas==2.0.2
 path==16.5.0
     # via
     #   -r requirements/edx/testing.txt

@@ -783,6 +783,8 @@ packaging==21.3
     #   redis
     #   tableauserverclient
 pansi==2020.7.3
+#pandas
+pandas==2.0.2
     # via py2neo
 path==16.5.0
     # via
