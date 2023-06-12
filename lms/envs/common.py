@@ -1351,6 +1351,11 @@ ELASTIC_SEARCH_CONFIG = [
     }
 ]
 
+# .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
+# .. setting_default: ''
+# .. setting_description: Specifies the prefix used when namixng elasticsearch indexes related to edx-search.
+ELASTICSEARCH_INDEX_PREFIX = ""
+
 VIDEO_CDN_URL = {
     'EXAMPLE_COUNTRY_CODE': "http://example.com/edx/video?s3_url="
 }
