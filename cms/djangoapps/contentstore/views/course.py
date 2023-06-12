@@ -1365,6 +1365,7 @@ def grading_handler(request, course_key_string, grader_index=None):
                 'grading_url': reverse_course_url('grading_handler', course_key),
                 'is_credit_course': is_credit_course(course_key),
                 'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
+                'default_grade_designations': settings.DEFAULT_GRADE_DESIGNATIONS
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':

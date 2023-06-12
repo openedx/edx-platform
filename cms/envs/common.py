@@ -2338,6 +2338,14 @@ SOFTWARE_SECURE_VERIFICATION_ROUTING_KEY = 'edx.lms.core.default'
 # Rate limit for regrading tasks that a grading policy change can kick off
 POLICY_CHANGE_TASK_RATE_LIMIT = '900/h'
 
+# .. setting_name: DEFAULT_GRADE_DESIGNATIONS
+# .. setting_default: ['A', 'B', 'C', 'D']
+# .. setting_description: The default 'pass' grade cutoff designations to be used. The failure grade
+#     is always 'F' and should not be included in this list.
+# .. setting_warning: The DEFAULT_GRADE_DESIGNATIONS list must have more than one designation,
+#     or else ['A', 'B', 'C', 'D'] will be used as the default grade designations.
+DEFAULT_GRADE_DESIGNATIONS = ['A', 'B', 'C', 'D']
+
 ############## Settings for CourseGraph ############################
 
 # .. setting_name: COURSEGRAPH_JOB_QUEUE
