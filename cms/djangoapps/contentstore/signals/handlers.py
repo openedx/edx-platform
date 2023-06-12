@@ -42,12 +42,10 @@ from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
 from openedx.core.djangoapps.credentials.utils import (
-    get_credentials_api_base_url,
-    get_credentials_api_client,
     delete_course_certificate_configuration,
     send_course_certificate_configuration,
 )
-from openedx.core.djangoapps.olx_rest_api.adapters import get_asset_content_from_path
+from openedx.core.lib.xblock_serializer.api import get_asset_content_from_path
 from openedx.core.lib.gating import api as gating_api
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore

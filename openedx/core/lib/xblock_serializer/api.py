@@ -3,6 +3,7 @@ Public python API for serializing XBlocks to OLX
 """
 # pylint: disable=unused-import
 from .block_serializer import StaticFile, XBlockSerializer, XBlockSerializerForBlockstore
+from .utils import get_asset_content_from_path
 
 
 def serialize_xblock_to_olx(block):

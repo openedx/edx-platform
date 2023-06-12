@@ -255,4 +255,3 @@ class Command(BaseCommand):
         self.validate_input(options)
         course_keys_to_migrate = self.get_course_keys_by_option(options)
         self.migrate(course_keys_to_migrate, options)
-
