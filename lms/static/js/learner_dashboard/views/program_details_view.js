@@ -217,10 +217,7 @@ class ProgramDetailsView extends Backbone.View {
             trialEndingAlerts: [],
         };
         if (this.subscriptionModel.get('subscriptionState') === 'active') {
-            if (
-                this.courseData.get('in_progress').length === 0 &&
-                this.courseData.get('not_started').length >= 1
-            ) {
+            if (this.courseData.get('all_unenrolled')) {
                 alerts.enrollmentAlerts.push({
                     title: this.programModel.get('title'),
                 });

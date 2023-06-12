@@ -3300,6 +3300,7 @@ REST_FRAMEWORK = {
         'user': '60/minute',
         'service_user': '800/minute',
         'registration_validation': '30/minute',
+        'high_service_user': '2000/minute',
     },
 }
 
