@@ -1,0 +1,21 @@
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+  from django.utils.translation import ugettext as _
+%>
+
+<h3 class="title">
+  <span class="label">
+    <span class="account-username" title="${ user.username }">${_("Gen+ Admin")}</span>
+  </span>
+  <span class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></span>
+</h3>
+<div class="wrapper wrapper-nav-sub">
+  <div class="nav-sub">
+    <ul>
+      <li class="nav-item nav-account-signout">
+        <a href="/genplus/assessment/skill-assessment-admin">${_("Skill Assessment")}</a>
+      </li>
+    </ul>
+  </div>
+</div>

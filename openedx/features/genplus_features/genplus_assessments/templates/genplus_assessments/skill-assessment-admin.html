@@ -1,0 +1,22 @@
+## mako
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML
+%>
+
+<div>
+  ${static.renderReact(
+    component="SkillAssessmentAdmin",
+    id="skill-assessment-admin",
+    props={
+      "courseId": course_id,
+      "baseUrl": api_base_url,
+      "excludeBlockTypes": ['html', 'video', 'discussion']
+    }
+  )}
+</div>

@@ -1,6 +1,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 import io
 import os
+import six
 from os.path import basename, splitext, dirname, join
 import tempfile
 from itertools import chain
@@ -15,7 +16,17 @@ from django.template import loader
 from django.test import override_settings
 from django.views.generic import TemplateView
 from django.template.loader import render_to_string
+from django.utils.decorators import method_decorator
 from django.contrib.staticfiles import finders
+from django.urls import reverse
+from django.views.decorators.csrf import ensure_csrf_cookie
+from web_fragments.fragment import Fragment
+
+from lms.djangoapps.courseware.courses import get_course_with_access
+from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.features.course_experience.course_updates import (
+    dismiss_current_update_for_user, get_current_update_for_user,
+)
 
 from opaque_keys.edx.keys import CourseKey
 from openedx.features.genplus_features.genplus_assessments.models import UserRating, UserResponse
@@ -281,3 +292,19 @@ class AssessmentReportPDFView(TemplateView):
         student_data['skills_assessment'] = self._get_skill_assessment_data(user_id, student, enrolled_programs)
         context['student_data'] = student_data
         return context
+
+
+class SkillAssessmentAdminFragmentView(EdxFragmentView):
+
+    @method_decorator(ensure_csrf_cookie)
+    def get(self, request, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+        return super().get(request, **kwargs)
+
+    def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
+        context = {
+            'api_base_url': settings.LMS_ROOT_URL,
+            'course_id': CourseKey.from_string('course-v1:genplus+GP101+2022_T1')
+        }
+
+        html = render_to_string('genplus_assessments/skill-assessment-admin.html', context)
+        return Fragment(html)

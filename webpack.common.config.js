@@ -115,6 +115,9 @@ module.exports = Merge.smart({
             LatestUpdate: './openedx/features/course_experience/static/course_experience/js/LatestUpdate.js',
             WelcomeMessage: './openedx/features/course_experience/static/course_experience/js/WelcomeMessage.js',
 
+            // GenPlus Features
+            SkillAssessmentAdmin: './openedx/features/genplus_features/genplus_assessments/static/genplus_assessments/js/index.jsx',
+
             AnnouncementsView: './openedx/features/announcements/static/announcements/jsx/Announcements.jsx',
             CookiePolicyBanner: './common/static/js/src/CookiePolicyBanner.jsx',
 
@@ -442,4 +445,3 @@ module.exports = Merge.smart({
 
     }
 }, {web: xmoduleJS}, workerConfig());
-

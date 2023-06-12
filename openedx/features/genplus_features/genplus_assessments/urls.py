@@ -2,13 +2,17 @@
 URLs for genplus learning app.
 """
 from django.conf.urls import url, include
-from .views import AssessmentReportPDFView
+from .views import AssessmentReportPDFView, SkillAssessmentAdminFragmentView
 
 
 app_name = 'genplus_assessments'
 
 urlpatterns = (
     url(r'^download-report/$', AssessmentReportPDFView.as_view()),
+    url(
+        r'^skill-assessment-admin/$',
+        SkillAssessmentAdminFragmentView.as_view()
+    ),
     url(
         r'^api/v1/',
         include(

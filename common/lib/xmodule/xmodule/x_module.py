@@ -731,7 +731,6 @@ class XModuleMixin(XModuleFields, XBlock):
 
         # Only use the fields from this class, not mixins
         fields = getattr(self, 'unmixed_class', self.__class__).fields
-
         for field in fields.values():
             if field in self.non_editable_metadata_fields:
                 continue
