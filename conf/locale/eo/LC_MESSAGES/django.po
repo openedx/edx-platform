@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-04 20:36+0000\n"
-"PO-Revision-Date: 2023-06-04 20:36:01.279673\n"
+"POT-Creation-Date: 2023-06-12 15:12+0000\n"
+"PO-Revision-Date: 2023-06-12 15:12:29.430098\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -15065,6 +15065,10 @@ msgstr "Düplïçäté öf {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 msgid "Duplicate of '{0}'"
 msgstr "Düplïçäté öf '{0}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "Ìnvälïd préréqüïsïté çöürsé kéý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr ""
@@ -15360,10 +15364,6 @@ msgstr ""
 "єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
 " νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυ#"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "Ìnvälïd préréqüïsïté çöürsé kéý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -17179,16 +17179,20 @@ msgid "Downloads and transcripts"
 msgstr "Döwnlöäds änd tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/video.html
-msgid "Share on:"
-msgstr "Shäré ön: Ⱡ'σяєм ιρѕυм ∂σł#"
+msgid "Download video file"
+msgstr "Döwnlöäd vïdéö fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/video.html
+msgid "Share this video"
+msgstr "Shäré thïs vïdéö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
 msgstr "Shäré ön {site} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Döwnlöäd vïdéö fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+msgid "Copy"
+msgstr "Çöpý Ⱡ'σяєм ι#"
 
 #: lms/templates/video.html
 msgid "Transcripts"

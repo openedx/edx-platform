@@ -132,7 +132,7 @@
 # Ettore Atalan <atalanttore@googlemail.com>, 2014-2016
 # kalei, 2014
 # 39e62ebcacb2326f6384f8b81e0898eb, 2014
-# Marc Höfken <marchoefken@gmx.de>, 2016
+# 9c59630875857e0e12ef1253bbeb0395_11a4cea <18d64ae3db73114170d5978e62e151a5_457778>, 2016
 # Maximilian Kindshofer <maximilian@kindshofer.net>, 2014
 # Maximilian Kindshofer <maximilian@kindshofer.net>, 2014
 # mc <marc.mannsfeld@phil.hhu.de>, 2015-2016
@@ -13161,6 +13161,10 @@ msgstr "Kopie von '{0}'"
 msgid "Duplicate of '{0}'"
 msgstr "Duplikat von '{0}'"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "Ungültiger Vorbedingungskursschlüssel."
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "In dem Bild müssen Name, Datei-Typ und Maße beinhaltet sein."
@@ -13412,10 +13416,6 @@ msgstr ""
 "Um fortzufahen müssen Sie diesen Kurs mit einer Organisation verknüpfen. Die"
 " ausgewählte Organisation existiert im System nicht, Sie müssen diese "
 "hinzufügen."
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "Ungültiger Vorbedingungskursschlüssel."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -14660,6 +14660,10 @@ msgid "Learn more about this course"
 msgstr ""
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr ""
 
@@ -15056,7 +15060,11 @@ msgid "Downloads and transcripts"
 msgstr "Downloads und Transkripte"
 
 #: lms/templates/video.html
-msgid "Share on:"
+msgid "Download video file"
+msgstr "Videodatei herunterladen"
+
+#: lms/templates/video.html
+msgid "Share this video"
 msgstr ""
 
 #: lms/templates/video.html
@@ -15064,8 +15072,8 @@ msgid "Share on {site}"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Videodatei herunterladen"
+msgid "Copy"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -24497,7 +24505,7 @@ msgid "Set Access"
 msgstr "Zugriff festlegen"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

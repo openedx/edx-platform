@@ -47,6 +47,7 @@
 # Vassileios-Marios Anastassiou, 2016
 # Chris Nikolo <dr_dreezhellas@yahoo.com>, 2016
 # Dimitris Agelakis <minoan07@gmail.com>, 2015-2016,2018-2019
+# Dimitris Voudouris <dimitrisvoudouris@yahoo.co.uk>, 2023
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
 # EEYEM, 2015
 # Eirini Mageiropoulou <eirmageir@yahoo.com>, 2021
@@ -96,7 +97,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-17 08:57+0000\n"
+"POT-Creation-Date: 2023-06-04 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Greek (https://app.transifex.com/open-edx/teams/6205/el/)\n"
@@ -5387,7 +5388,7 @@ msgstr ""
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 msgid "Enroll now"
-msgstr ""
+msgstr "Εγγραφείτε τώρα."
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
@@ -7457,7 +7458,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your country or region of residence"
-msgstr ""
+msgstr "Επιλέξτε τη χώρα ή την περιοχή διαμονής σας"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your profession"
@@ -8169,12 +8170,11 @@ msgid ""
 "process your personal data in accordance                   with the "
 "{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
-"Δημιουργώντας λογαριασμό, συναινείτε με τους "
+"Δημιουργώντας λογαριασμό, δέχεστε ότι οι "
 "{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end} "
-"και αναγνωρίζετε το δικαίωμα του {platform_name} και των μελών της Ομάδας "
-"του να επεξεργαστούν τα προσωπικά σας δεδομένα, σύμφωνα πάντοτε με "
-"{privacy_policy_link_start}την Πολιτική Προστασίας Δεδομένων Προσωπικού "
-"Χαρακτήρα{privacy_policy_link_end}."
+"σας βρίσκουν σύμφωνο και αναγνωρίζετε το δικαίωμα του {platform_name} και "
+"των μελών της ομάδας του να επεξεργαστούν τα προσωπικά σας δεδομένα, σύμφωνα"
+" πάντοτε με την  {privacy_policy_link_start} {privacy_policy_link_end}."
 
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
@@ -11854,6 +11854,10 @@ msgstr ""
 msgid "Duplicate of '{0}'"
 msgstr ""
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr ""
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr ""
@@ -12077,10 +12081,6 @@ msgid ""
 "You must link this course to an organization in order to continue. "
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
@@ -13284,6 +13284,10 @@ msgid "Learn more about this course"
 msgstr ""
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr ""
 
@@ -13665,7 +13669,11 @@ msgid "Downloads and transcripts"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Share on:"
+msgid "Download video file"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Share this video"
 msgstr ""
 
 #: lms/templates/video.html
@@ -13673,7 +13681,7 @@ msgid "Share on {site}"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
+msgid "Copy"
 msgstr ""
 
 #: lms/templates/video.html
@@ -16078,7 +16086,7 @@ msgstr ""
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most activity"
-msgstr ""
+msgstr "Πιο ενεργές"
 
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
@@ -21736,7 +21744,7 @@ msgid "Set Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

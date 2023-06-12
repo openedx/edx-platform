@@ -13612,6 +13612,10 @@ msgstr "Duplicado de {0}"
 msgid "Duplicate of '{0}'"
 msgstr "Duplicado de '{0}'"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "Clave inválida del curso prerrequisito"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "La imagen debe tener nombre, tipo de contenido y tamaño."
@@ -13865,10 +13869,6 @@ msgstr ""
 "Debe vincular este curso a una organización para poder continuar. La "
 "organización seleccionada no existe en el sistema, tendrá que añadirla al "
 "sistema."
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "Clave inválida del curso prerrequisito"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -15129,6 +15129,10 @@ msgid "Learn more about this course"
 msgstr ""
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr ""
 
@@ -15526,7 +15530,11 @@ msgid "Downloads and transcripts"
 msgstr "Descargas y transcripciones"
 
 #: lms/templates/video.html
-msgid "Share on:"
+msgid "Download video file"
+msgstr "Descargar archivo de video"
+
+#: lms/templates/video.html
+msgid "Share this video"
 msgstr ""
 
 #: lms/templates/video.html
@@ -15534,8 +15542,8 @@ msgid "Share on {site}"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Descargar archivo de video"
+msgid "Copy"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -25026,8 +25034,8 @@ msgid "Set Access"
 msgstr "Configuración de Acceso"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
-msgstr "Copiar"
+msgid "Copy to Clipboard"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
