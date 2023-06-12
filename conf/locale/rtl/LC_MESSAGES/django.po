@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-04 20:36+0000\n"
-"PO-Revision-Date: 2023-06-04 20:36:01.279673\n"
+"POT-Creation-Date: 2023-06-12 15:12+0000\n"
+"PO-Revision-Date: 2023-06-12 15:12:29.430098\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -12970,6 +12970,10 @@ msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
 msgid "Duplicate of '{0}'"
 msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "Ɨnʌɐlᴉd dɹǝɹǝbnᴉsᴉʇǝ ɔønɹsǝ ʞǝʎ"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "Ŧɥǝ ᴉɯɐƃǝ ɯnsʇ ɥɐʌǝ nɐɯǝ, ɔønʇǝnʇ ʇʎdǝ, ɐnd sᴉzǝ ᴉnɟøɹɯɐʇᴉøn."
@@ -13216,10 +13220,6 @@ msgstr ""
 "Ɏøn ɯnsʇ lᴉnʞ ʇɥᴉs ɔønɹsǝ ʇø ɐn øɹƃɐnᴉzɐʇᴉøn ᴉn øɹdǝɹ ʇø ɔønʇᴉnnǝ. "
 "Øɹƃɐnᴉzɐʇᴉøn ʎøn sǝlǝɔʇǝd døǝs nøʇ ǝxᴉsʇ ᴉn ʇɥǝ sʎsʇǝɯ, ʎøn ʍᴉll nǝǝd ʇø ɐdd"
 " ᴉʇ ʇø ʇɥǝ sʎsʇǝɯ"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "Ɨnʌɐlᴉd dɹǝɹǝbnᴉsᴉʇǝ ɔønɹsǝ ʞǝʎ"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -14853,16 +14853,20 @@ msgid "Downloads and transcripts"
 msgstr "Đøʍnløɐds ɐnd ʇɹɐnsɔɹᴉdʇs"
 
 #: lms/templates/video.html
-msgid "Share on:"
-msgstr "Sɥɐɹǝ øn:"
+msgid "Download video file"
+msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
+
+#: lms/templates/video.html
+msgid "Share this video"
+msgstr "Sɥɐɹǝ ʇɥᴉs ʌᴉdǝø"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
 msgstr "Sɥɐɹǝ øn {site}"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
+msgid "Copy"
+msgstr "Ȼødʎ"
 
 #: lms/templates/video.html
 msgid "Transcripts"
