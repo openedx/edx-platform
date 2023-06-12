@@ -1791,6 +1791,26 @@ ADVANCED_PROBLEM_TYPES = [
     {
         'component': 'edlyrating',
         'boilerplate_name': None
+    },
+    {
+        'component': 'lti_consumer',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'kwl',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'annotatable',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'google-document',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'library_content',
+        'boilerplate_name': None
     }
 ]
 
