@@ -303,8 +303,17 @@ class SkillAssessmentAdminFragmentView(EdxFragmentView):
     def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         context = {
             'api_base_url': settings.LMS_ROOT_URL,
+            'programs_with_units': self._get_programs_and_units(),
             'course_id': CourseKey.from_string('course-v1:genplus+GP101+2022_T1')
         }
 
         html = render_to_string('genplus_assessments/skill-assessment-admin.html', context)
         return Fragment(html)
+
+    def _get_programs_and_units(self):
+        programs = Program.objects.prefetch_related('units').filter(status=ProgramStatuses.ACTIVE)
+        context = {}
+        for program in programs:
+            context[program.slug] = list(program.units.all().values_list('course', flat=True))
+
+        return context

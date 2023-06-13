@@ -18,7 +18,7 @@ class Assessment(TimeStampedModel):
     program = models.ForeignKey(Program, on_delete=models.CASCADE)
     gen_class = models.ForeignKey(Class, on_delete=models.SET_NULL, null=True)
     problem_id = models.CharField(max_length=64)
-    assessment_time = models.CharField(max_length=64) 
+    assessment_time = models.CharField(max_length=64)
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
     class Meta:
         abstract = True
@@ -31,7 +31,7 @@ class UserResponse(Assessment):
 
     def __str__(self):
         return "Score:{} by {}".format(self.score, self.user_id)
-    
+
 class UserRating(Assessment):
     rating = models.IntegerField(db_index=True, default=1, validators=[MaxValueValidator(5),MinValueValidator(1)])
     class Meta:
@@ -39,3 +39,21 @@ class UserRating(Assessment):
 
     def __str__(self):
         return "Rating:{} by {}".format(self.rating, self.user_id)
+
+
+class SkillAssessmentQuestion(models.Model):
+    program = models.ForeignKey(Program, on_delete=models.CASCADE)
+    start_unit = CourseKeyField(max_length=255, db_index=True)
+    start_unit_location = UsageKeyField(max_length=255, db_index=True)
+    end_unit = CourseKeyField(max_length=255, db_index=True)
+    end_unit_location = UsageKeyField(max_length=255, db_index=True)
+
+
+class SkillAssessmentResponse(TimeStampedModel):
+    class Meta:
+        unique_together = ('user', 'question',)
+
+    user = models.ForeignKey(USER_MODEL, on_delete=models.CASCADE)
+    question = models.ForeignKey(SkillAssessmentQuestion, on_delete=models.CASCADE)
+    earned_score = models.IntegerField(blank=True, null=True, default=0)
+    total_score = models.IntegerField(blank=True, null=True, default=6)

@@ -4,12 +4,17 @@ import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBro
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 
+import AddDeleteTableRows from "./AddDeleteTableRows";
+
 export default class Main extends React.Component {
   constructor(props) {
     super(props);
     this.handleToggleDropdown = this.handleToggleDropdown.bind(this);
+    this.handleSelectProgram = this.handleSelectProgram.bind(this);
+    this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.state = {
       showDropdown: false,
+      selectedProgram: ''
     };
   }
 
@@ -22,8 +27,20 @@ export default class Main extends React.Component {
     this.setState({ showDropdown: false });
   }
 
+  handleSelectProgram(event){
+    this.setState({
+      selectedProgram: event.target.value
+    });
+  };
+
+  handleFormSubmit(event){
+    event.preventDefault();
+    console.log("You have submitted:", this.state.selectedProgram);
+  };
+
+
   render() {
-    const { selectedBlock, onSelectBlock } = this.props;
+    const { selectedBlock, onSelectBlock, programsWithUnits } = this.props;
     let selectorType = <Button onClick={this.handleToggleDropdown} label={gettext('Select a section or problem')} />;
     if (this.props.showBtnUi === 'false') {
       selectorType =
@@ -44,14 +61,44 @@ export default class Main extends React.Component {
 
     return (
       <div className="problem-browser-container">
+        <form onSubmit={this.handleFormSubmit}>
+          <div className="form-group">
+            <select
+              value={this.state.selectedProgram}
+              onChange={this.handleSelectProgram}
+              className="form-control"
+              id="select-program"
+            >
+              <option value="">Select Program</option>
+              {
+                Object.entries(programsWithUnits).map(([key, value], index) => (
+                  <option key={index} value={key}>{key}</option>
+                ))
+              }
+            </select>
+            {/* <select
+              value={this.state.selectedProgram}
+              onChange={this.handleSelectProgram}
+              className="form-control"
+              id="select-program"
+            >
+              <option value="">Select Intro Unit</option>
+              {
+                Object.entries(programsWithUnits).map(([key, value], index)=>(<option key={index} value={key}>{key}</option>))
+              }
+            </select> */}
+          </div>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={this.state.selectedValue === "noProgram"}
+          >
+            Submit
+          </button>
+        </form>
         <div className="problem-browser">
           {selectorType}
-          <input
-            type="text"
-            name="problem-location"
-            value={selectedBlock}
-            disabled
-          />
+          <span>{selectedBlock}</span>
           {this.state.showDropdown &&
             <BlockBrowserContainer
               onSelectBlock={(blockId) => {
@@ -60,7 +107,10 @@ export default class Main extends React.Component {
               }}
             />}
         </div>
-
+        {
+          this.state.selectedProgram !== "" &&
+          <AddDeleteTableRows unitKeys={programsWithUnits[this.state.selectedProgram]}/>
+        }
       </div>
     );
   }
