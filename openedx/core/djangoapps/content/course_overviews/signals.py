@@ -50,6 +50,7 @@ def _listen_for_course_delete(sender, course_key, **kwargs):  # pylint: disable=
     CourseOverview.objects.filter(id=course_key).delete()
     courserun_key = str(course_key)
     LOG.info(f'DELETE_COURSE_DETAILS triggered upon course_deleted signal. Key: [{courserun_key}]')
+    # This signal will be handled in `federated_content_connector` plugin
     DELETE_COURSE_DETAILS.send(
         sender=None,
         courserun_key=courserun_key,
