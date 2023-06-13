@@ -25,6 +25,7 @@ from openedx.features.announcements.models import Announcement
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.store_utilities import get_v1_libraries
 
 log = logging.getLogger(__name__)
 
@@ -299,3 +300,11 @@ class AnnouncementDeleteView(DeleteView, AnnouncementBaseView):
     model = Announcement
     success_url = reverse_lazy('maintenance:announcement_index')
     template_name = '/maintenance/_announcement_delete.html'
+
+
+class V1LibCleanupView(View):
+    template_name = '/maintenance/_announcement_delete.html'
+
+    def get(self, request, *args, **kwargs):
+        print("In do_v1_libraries")
+        get_v1_libraries(request)

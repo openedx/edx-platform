@@ -104,3 +104,8 @@ def get_draft_subtree_roots(draft_nodes):
     for draft_node in draft_nodes:
         if draft_node.parent_url not in urls:
             yield draft_node
+
+
+def get_v1_libraries(request):
+    print("******************* In get_v1_libraries ****************")
+
