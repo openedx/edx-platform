@@ -487,11 +487,10 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             self.mock_user, request, block, field_data_cache, course.id, course=course
         )
 
-        # check that _unwrapped_field_data is the same as the original
+        # check that block.runtime.service(block, 'field-data-unbound') is the same as the original
         # _field_data, but now _field_data as been reset.
-        # pylint: disable=protected-access
-        assert block._unwrapped_field_data is original_field_data  # lint-amnesty, pylint: disable=no-member
-        assert block._unwrapped_field_data is not block._field_data  # lint-amnesty, pylint: disable=no-member
+        assert block.runtime.service(block, 'field-data-unbound') is original_field_data
+        assert block.runtime.service(block, 'field-data-unbound') is not block._field_data  # pylint: disable=protected-access, line-too-long
 
         # now bind this block to a few other students
         for user in [UserFactory(), UserFactory(), self.mock_user]:
@@ -513,7 +512,8 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # the OverrideFieldData should point to the date FieldData
         assert isinstance(block._field_data._authored_data._source.fallback, DateLookupFieldData)    # lint-amnesty, pylint: disable=no-member, line-too-long
-        assert block._field_data._authored_data._source.fallback._defaults is block._unwrapped_field_data    # lint-amnesty, pylint: disable=no-member, line-too-long
+        assert block._field_data._authored_data._source.fallback._defaults \
+            is block.runtime.service(block, 'field-data-unbound')
 
     def test_hash_resource(self):
         """
