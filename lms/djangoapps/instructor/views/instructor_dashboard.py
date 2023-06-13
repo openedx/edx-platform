@@ -609,6 +609,7 @@ def _section_data_download(course, access):
         course.enable_proctored_exams
     )
     section_key = 'data_download_2' if data_download_v2_is_enabled() else 'data_download'
+    show_eng_report_button = 'ENG' in str(course_key)
     section_data = {
         'section_key': section_key,
         'section_display_name': _('Data Download'),
@@ -640,6 +641,7 @@ def _section_data_download(course, access):
             'export_ora2_submission_files', kwargs={'course_id': str(course_key)}
         ),
         'export_ora2_summary_url': reverse('export_ora2_summary', kwargs={'course_id': str(course_key)}),
+         show_eng_report_button: show_eng_report_button,
     }
     if not access.get('data_researcher'):
         section_data['is_hidden'] = True

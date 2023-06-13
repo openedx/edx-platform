@@ -59,6 +59,13 @@ class BlockCompletionTransformer(BlockStructureTransformer):
 
     def _get_complete_time(self, child_blocks, block_structure):
         return max([block_structure.get_xblock_field(child_key, self.COMPLETE_TIME, 0) for child_key in child_blocks])
+        # Fix compare datetime with int in get complete time => error tutor install
+        # arr = [block_structure.get_xblock_field(child_key, self.COMPLETE_TIME, None) for child_key in child_blocks]
+
+        # if len(arr) == 0:
+        #     return None;
+
+        # return max([el for el in arr if el is not None])
 
     def _get_complete_time_leaf_block(self, block_key, usage_info):
         complete_block = BlockCompletion.objects.get(

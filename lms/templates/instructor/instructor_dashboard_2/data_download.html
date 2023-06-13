@@ -29,6 +29,11 @@ from openedx.core.djangolib.markup import HTML, Text
 
     <p>${_("Please be patient and do not click these buttons multiple times. Clicking these buttons multiple times will significantly slow the generation process.")}</p>
 
+    %if section_data['get_anon_ids_url']:
+    <p>Click to download a CSV of the student's quiz answer (for ENG subject only)</p>
+    <p><input type="button" name="answer-list" value="${_("Get Student Answers CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" ></p>
+    %endif
+    
     <p>${_("Click to generate a CSV file of all students enrolled in this course, along with profile information such as email address and username:")}</p>
 
     <p><input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['get_students_features_url'] }" data-csv="true"></p>
