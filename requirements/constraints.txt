@@ -116,4 +116,5 @@ python3-saml<1.10.0
 openedx-django-pyfs==3.2.1
 
 # 5.3.0 versions breaking timezone related tests. Adding pin for time being to clear upgrade pipeline.
-kombu==5.2.4
+kombu<5.3.0
+
