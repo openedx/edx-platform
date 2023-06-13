@@ -20,7 +20,7 @@ from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
 )  # lint-amnesty, pylint: disable=wrong-import-order
 
-from ..mixins import PermissionAccessMixin
+from ...mixins import PermissionAccessMixin
 
 
 class ProctoringExamSettingsTestcase(AuthorizeStaffTestCase):
