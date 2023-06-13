@@ -190,7 +190,7 @@ def generate_answers_list_for_course(entry_id, xmodule_instance_args):
     # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
     # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
     action_name = gettext_noop('generate_anonymized_id')
-    task_fn = partial(generate_answers_list, xmodule_instance_args)
+    task_fn = partial(ProblemResponses.generate_answers_list, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
 
 

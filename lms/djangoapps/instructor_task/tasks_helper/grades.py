@@ -905,7 +905,7 @@ class ProblemResponses:
 
     @classmethod
     def _build_student_data(
-        cls, user_id, course_key, usage_key_str_list, filter_types=None,
+        cls, user_id, course_key, usage_key_str_list, filter_types=None, is_answer_list=False
     ):
         """
         Generate a list of problem responses for all problem under the
@@ -970,11 +970,13 @@ class ProblemResponses:
                     responses = []
 
                     for response in list_problem_responses(course_key, block_key, max_count):
-                        response['title'] = title
+                        if not is_answer_list:
+                            response['title'] = title
+                            response['block_key'] = str(block_key)
                         # A human-readable location for the current block
-                        response['location'] = ' > '.join(base_path + path)
+                        response['location'] = ' > '.join(base_path + path[2:(len(path) - 1)])
                         # A machine-friendly location for the current block
-                        response['block_key'] = str(block_key)
+                        # response['block_key'] = str(block_key)
                         # A block that has a single state per user can contain multiple responses
                         # within the same state.
                         user_states = generated_report_data.get(response['username'])
@@ -990,6 +992,7 @@ class ProblemResponses:
                                     user_state_keys = user_state.keys()
                                 else:
                                     user_state_keys = sorted(user_state.keys())
+                                    
                                 for key in user_state_keys:
                                     student_data_keys[key] = 1
 
@@ -1012,6 +1015,14 @@ class ProblemResponses:
             list(student_data_keys.keys()) +
             ['block_key', 'state']
         )
+        if is_answer_list:
+            del student_data_keys['Answer ID']
+            del student_data_keys['Correct Answer']
+            del student_data_keys['Question']
+            student_data_keys_list = (
+                ['username', 'location'] +
+                list(student_data_keys.keys())
+            )
 
         return student_data, student_data_keys_list
 
@@ -1059,6 +1070,74 @@ class ProblemResponses:
         # Perform the upload
         csv_name = cls._generate_upload_file_name(problem_locations, filter_types)
         report_name = upload_csv_to_report_store(rows, csv_name, course_id, start_date)
+        current_step = {
+            'step': 'CSV uploaded',
+            'report_name': report_name,
+        }
+
+        return task_progress.update_task_state(extra_meta=current_step)
+    
+    
+    @classmethod
+    def generate_answers_list(cls, _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
+        """
+        For a given `course_id`, generate a CSV file containing
+        all student answers to a given problem, and store using a `ReportStore`.
+        """
+        start_time = time()
+        start_date = datetime.now(UTC)
+        num_reports = 1
+        task_progress = TaskProgress(action_name, num_reports, start_time)
+        current_step = {'step': 'Calculating students answers to problem'}
+        task_progress.update_task_state(extra_meta=current_step)
+
+        course_str = str(course_id).replace("course-v1:", "block-v1:")
+        problem_locations = [f'{course_str}+type@course+block@course']
+        problem_types_filter = task_input.get('problem_types_filter')
+
+        filter_types = None
+        if problem_types_filter:
+            filter_types = problem_types_filter.split(',')
+
+        # Compute result table and format it
+        student_data, student_data_keys = cls._build_student_data(
+            user_id=task_input.get('user_id'),
+            course_key=course_id,
+            usage_key_str_list=problem_locations,
+            filter_types=filter_types,
+            is_answer_list=True,
+        )
+
+        for data in student_data:
+            for key in student_data_keys:
+                data.setdefault(key, '')
+
+        header, rows = format_dictlist(student_data, student_data_keys)
+
+        answers_arr = [
+            'Tôi đã xem phần học và thấy mình biết trước các kiến thức này rồi. Tôi xin bỏ qua phần speaking cho phần học này.',
+            'Tôi đã xem phần học và thấy mình biết trước các kiến thức này rồi. Tôi sẽ nộp bài speaking đầy đủ.',
+            'Tôi đã xem phần học và thấy mình chưa biết trước các kiến thức này. Tôi đã học xong phần học và đã nắm chắc kiến thức của bài học. Tôi sẽ nộp bài speaking như đầy đủ.',
+            'Tôi đã xem phần học và thấy mình chưa biết trước các kiến thức này. Tôi đã học xong phần học nhưng chưa tự tin nắm chắc kiến thức của bài học. Tôi sẽ nộp bài speaking đầy đủ.'
+        ]
+        output_rows = []
+        for row in rows:
+            if row[2] in answers_arr:
+                output_rows.append(row)
+
+        output_rows.sort(key=lambda x: x[0])
+
+        task_progress.attempted = task_progress.succeeded = len(output_rows)
+        task_progress.skipped = task_progress.total - task_progress.attempted
+
+        output_rows.insert(0, header)
+
+        current_step = {'step': 'Uploading CSV'}
+        task_progress.update_task_state(extra_meta=current_step)
+
+        # Perform the upload
+        csv_name = 'answers_list'
+        report_name = upload_csv_to_report_store(output_rows, csv_name, course_id, start_date)
         current_step = {
             'step': 'CSV uploaded',
             'report_name': report_name,

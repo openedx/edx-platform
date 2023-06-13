@@ -340,9 +340,11 @@ def generate_answers_list(request, course_key):
     """
     Generate anonymize id CSV report.
     """
-    task_type = 'generate_anonymous_ids_for_course'
+    task_type = 'generate_answers_list_for_course'
     task_class = generate_answers_list_for_course
-    task_input = {}
+    task_input = {
+        'user_id': request.user.pk,
+    }
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
