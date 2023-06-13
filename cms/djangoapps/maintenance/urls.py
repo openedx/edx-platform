@@ -10,7 +10,8 @@ from .views import (
     AnnouncementEditView,
     AnnouncementIndexView,
     ForcePublishCourseView,
-    MaintenanceIndexView
+    MaintenanceIndexView,
+    V1LibCleanupView
 )
 
 app_name = 'cms.djangoapps.maintenance'
@@ -22,4 +23,5 @@ urlpatterns = [
     path('announcements/create', AnnouncementCreateView.as_view(), name='announcement_create'),
     re_path(r'^announcements/edit/(?P<pk>\d+)?$', AnnouncementEditView.as_view(), name='announcement_edit'),
     path('announcements/delete/<int:pk>', AnnouncementDeleteView.as_view(), name='announcement_delete'),
+    path('v1_lib_cleanup', V1LibCleanupView.as_view(), name='v1_library_cleanup'),
 ]

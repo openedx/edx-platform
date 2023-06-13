@@ -134,3 +134,7 @@ def derived_key(courselike_source_key, block_key, dest_parent: BlockKey):
     )
     new_block_id = hashlib.sha1(unique_data.encode('utf-8')).hexdigest()[:20]
     return BlockKey(block_key.type, new_block_id)
+
+
+def get_v1_libraries(request):
+    print("******************* In get_v1_libraries ****************")
