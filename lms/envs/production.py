@@ -20,6 +20,7 @@ import codecs
 import copy
 import datetime
 import os
+from os.path import abspath, dirname, join
 
 import yaml
 from corsheaders.defaults import default_headers as corsheaders_default_headers
@@ -980,6 +981,11 @@ derive_settings(__name__)
 
 # Load production.py in plugins
 add_plugins(__name__, ProjectType.LMS, SettingsType.PRODUCTION)
+
+#####################################################################
+# See if the developer has any local overrides.
+if os.path.isfile(join(dirname(abspath(__file__)), 'private.py')):
+    from .private import *  # pylint: disable=import-error,wildcard-import
 
 ############## Settings for Completion API #########################
 
