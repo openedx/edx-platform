@@ -229,19 +229,19 @@ class NotificationListAPIView(generics.ListAPIView):
         """
         Override the get_queryset method to filter the queryset by app name, request.user and created
         """
-        max_days = datetime.now(UTC) - timedelta(days=settings.NOTIFICATIONS_MAX_DAYS)
+        expiry_date = datetime.now(UTC) - timedelta(days=settings.NOTIFICATIONS_EXPIRY)
         app_name = self.request.query_params.get('app_name')
 
         if app_name:
             return Notification.objects.filter(
                 user=self.request.user,
                 app_name=app_name,
-                created__gte=max_days,
+                created__gte=expiry_date,
             )
         else:
             return Notification.objects.filter(
                 user=self.request.user,
-                created__gte=max_days,
+                created__gte=expiry_date,
             )
 
 

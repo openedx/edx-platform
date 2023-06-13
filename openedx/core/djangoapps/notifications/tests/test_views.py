@@ -339,13 +339,13 @@ class NotificationListAPIViewTest(APITestCase):
         # Assert that the response is unauthorized.
         self.assertEqual(response.status_code, 403)
 
-    def test_list_notifications_with_max_days(self):
+    def test_list_notifications_with_expiry_date(self):
         """
-        Test that the view can filter notifications on created timestamp
+        Test that the view can filter notifications by expiry date.
         """
         today = datetime.now(UTC)
 
-        # Create two notifications for the user, one with current date and other with ENV defined limit.
+        # Create two notifications for the user, one with current date and other with expiry date.
         Notification.objects.create(
             user=self.user,
             notification_type='info',
@@ -354,7 +354,7 @@ class NotificationListAPIViewTest(APITestCase):
         Notification.objects.create(
             user=self.user,
             notification_type='info',
-            created=today - timedelta(days=settings.NOTIFICATIONS_MAX_DAYS)
+            created=today - timedelta(days=settings.NOTIFICATIONS_EXPIRY)
         )
         self.client.login(username=self.user.username, password='test')
 
