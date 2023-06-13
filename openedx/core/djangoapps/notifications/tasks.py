@@ -97,7 +97,8 @@ def send_notifications(user_ids, app_name, notification_type, context, content_u
                 app_name=app_name,
                 notification_type=notification_type,
                 content_context=context,
-                content_url=content_url
+                content_url=content_url,
+                course_id=context.get('course_id', None),
             ))
     # send notification to users but use bulk_create
     Notification.objects.bulk_create(notifications)

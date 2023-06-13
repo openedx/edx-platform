@@ -49,7 +49,7 @@ def generate_user_notifications(**kwargs):
     """
     Watches for USER_NOTIFICATION signal and calls  send_web_notifications task
     """
-    from .tasks import send_notifications
+    from openedx.core.djangoapps.notifications.tasks import send_notifications
     notification_data = kwargs.get('notification_data', {}).__dict__
 
-    send_notifications.delay(**notification_data)
+    send_notifications(**notification_data)
