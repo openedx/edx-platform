@@ -77,6 +77,7 @@ class CourseSettingsView(DeveloperErrorViewMixin, APIView):
             "lms_link_for_about_page": "http://localhost:18000/courses/course-v1:edX+E2E-101+course/about",
             "marketing_enabled": true,
             "mfe_proctored_exam_settings_url": "",
+            "platform_name": "edX",
             "possible_pre_requisite_courses": [
                 {
                 "course_key": "course-v1:edX+M12+2T2023",
@@ -108,6 +109,7 @@ class CourseSettingsView(DeveloperErrorViewMixin, APIView):
                 'can_show_certificate_available_date_field': can_show_certificate_available_date_field(course_block),
                 'course_display_name': course_block.display_name,
                 'course_display_name_with_default': course_block.display_name_with_default,
+                'platform_name': settings.PLATFORM_NAME,
                 'use_v2_cert_display_settings': settings.FEATURES.get("ENABLE_V2_CERT_DISPLAY_SETTINGS", False),
             })
 
