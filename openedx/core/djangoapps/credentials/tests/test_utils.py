@@ -1,4 +1,5 @@
 """Tests covering Credentials utilities."""
+import attr
 import uuid
 import json
 import httpretty
@@ -19,6 +20,7 @@ from openedx.core.djangoapps.credentials.utils import (
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
+from cms.djangoapps.contentstore.signals.handlers import create_course_certificate_config_data
 
 UTILS_MODULE = 'openedx.core.djangoapps.credentials.utils'
 
@@ -120,9 +122,22 @@ class TestCourseCertificateConfiguration(TestCase):
         super().setUp()
         self.user = UserFactory(username='cred-user')
         self.course_key = CourseLocator(org='TestU', course='sig101', run='Summer2022', branch=None, version_guid=None)
+        self.certificate_config_data = attr.asdict(create_course_certificate_config_data(
+            str(self.course_key),
+            "honor",
+            {
+                'foo': 'bar',
+                'baz': 'foo',
+                'is_active': True,
+                'signatories': [],
+            }
+        ))
         self.expected_body_data = {
-            'foo': 'bar',
-            'baz': 'foo'
+            'certificate_type': 'honor',
+            'course_id': str(self.course_key),
+            'title': None,
+            'signatories': [],
+            'is_active': True,
         }
 
     @override_settings(CREDENTIALS_SERVICE_USERNAME='cred-user')
@@ -136,10 +151,11 @@ class TestCourseCertificateConfiguration(TestCase):
         httpretty.register_uri(
             httpretty.DELETE,
             'http://test-server/course_certificates/',
+            body=json.dumps(self.expected_body_data)
         )
-        delete_course_certificate_configuration(self.course_key, self.expected_body_data)
-        last_request_body = httpretty.last_request().body.decode('utf-8')
-        assert json.loads(last_request_body) == self.expected_body_data
+        response = delete_course_certificate_configuration(self.course_key, self.certificate_config_data)
+        assert response.status_code == 200
+        assert response.json() == self.expected_body_data
 
     @override_settings(CREDENTIALS_SERVICE_USERNAME='cred-user')
     @httpretty.activate
@@ -152,7 +168,8 @@ class TestCourseCertificateConfiguration(TestCase):
         httpretty.register_uri(
             httpretty.POST,
             'http://test-server/course_certificates/',
+            body=json.dumps(self.expected_body_data)
         )
-        send_course_certificate_configuration(self.course_key, self.expected_body_data, signature_assets={})
-        last_request_body = httpretty.last_request().body.decode('utf-8')
-        assert json.loads(last_request_body) == self.expected_body_data
+        response = send_course_certificate_configuration(self.course_key, self.certificate_config_data, signature_assets={})
+        assert response.status_code == 200
+        assert response.json() == self.expected_body_data
