@@ -81,6 +81,7 @@ backoff==1.10.0
     #   analytics-python
 backports-zoneinfo[tzdata]==0.2.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   celery
     #   icalendar
