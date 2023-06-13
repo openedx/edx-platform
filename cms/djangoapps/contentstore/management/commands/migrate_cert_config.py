@@ -23,7 +23,7 @@ from common.djangoapps.course_modes.models import CourseMode
 from openedx.core.djangoapps.credentials.utils import send_course_certificate_configuration
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.course_module import CourseBlock
+from xmodule.course_block import CourseBlock
 
 
 class FakedUser:
