@@ -2809,6 +2809,12 @@ def update_forum_role_membership(request, course_id):
         ))
 
     user = get_student_from_identifier(unique_student_identifier)
+    if action == 'allow' and not is_user_enrolled_in_course(user, course_id):
+        response_payload = {
+            'unique_student_identifier': unique_student_identifier,
+            'userNotEnrolled': True,
+        }
+        return JsonResponse(response_payload)
 
     try:
         update_forum_role(course_id, user, rolename, action)
