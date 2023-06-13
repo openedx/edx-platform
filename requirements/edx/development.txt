@@ -82,14 +82,13 @@ backoff==1.10.0
 backports-zoneinfo[tzdata]==0.2.1
     # via
     #   -r requirements/edx/testing.txt
-    #   celery
     #   icalendar
     #   kombu
 beautifulsoup4==4.12.2
     # via
     #   -r requirements/edx/testing.txt
     #   pynliner
-billiard==4.1.0
+billiard==3.6.4.0
     # via
     #   -r requirements/edx/testing.txt
     #   celery
@@ -127,7 +126,7 @@ build==0.10.0
     # via
     #   -r requirements/edx/../pip-tools.txt
     #   pip-tools
-celery==5.3.0
+celery==5.2.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -1298,7 +1297,6 @@ python-dateutil==2.8.2
     #   -r requirements/edx/testing.txt
     #   analytics-python
     #   botocore
-    #   celery
     #   edx-ace
     #   edx-drf-extensions
     #   edx-enterprise
@@ -1334,6 +1332,7 @@ pytz==2022.7.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   babel
+    #   celery
     #   django
     #   django-ses
     #   drf-yasg
@@ -1650,7 +1649,6 @@ tzdata==2023.3
     # via
     #   -r requirements/edx/testing.txt
     #   backports-zoneinfo
-    #   celery
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/testing.txt
