@@ -33,8 +33,7 @@
                 <% if (completedCount === totalCount) { %>
                     <h2 class="program-heading-title"><%- gettext('Congratulations!') %></h2>
                     <div class="program-heading-message">
-                        <div><%- interpolate(gettext(
-                            'You have successfully completed all the requirements for the %(title)s %(type)s.'),
+                        <div><%- interpolate(gettext('You have successfully completed all the requirements for the %(title)s %(type)s.'),
                             { title: title, type: type }, true) %>
                         </div>
                     </div>
@@ -42,8 +41,7 @@
                     <h2 class="program-heading-title"><%- gettext('Your Program Journey') %></h2>
                     <div class="program-heading-message">
                         <div>
-                            <%- interpolate(gettext(
-                            'Track and plan your progress through the %(count)s course(s) in this program. To complete the program, you must earn a verified certificate for each course.'),
+                            <%- interpolate(gettext('Track and plan your progress through the %(count)s course(s) in this program. To complete the program, you must earn a verified certificate for each course.'),
                             { count: totalCount }, true) %>
                         </div>
                     </div>
@@ -177,12 +175,10 @@
             <aside class="col-md-4 program-heading">
                 <h2 class = "divider-heading program-heading-title"><%- gettext('Additional Credit Opportunities') %></h2>
                 <div class="program-heading-message">
-                   <div class="pb-4"><%- interpolate(gettext(
-                            'Transform your %(org)s %(type)s into a full master’s degree'),
+                   <div class="pb-4"><%- interpolate(gettext('Transform your %(org)s %(type)s into a full master’s degree'),
                             { org: authoring_organizations[0].key, type: type }, true) %>
                    </div>
-                   <div class="pb-4"><%- interpolate(gettext(
-                            'Successful completion of %(org)s %(program)s credential can be applied towards flexible, rigorous, and affordable masters degrees from the world’s leading universities.'),
+                   <div class="pb-4"><%- interpolate(gettext('Successful completion of %(org)s %(program)s credential can be applied towards flexible, rigorous, and affordable masters degrees from the world’s leading universities.'),
                             {org: authoring_organizations[0].key, program: title}, true) %>
                    </div>
                 </div>
