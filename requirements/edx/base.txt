@@ -53,12 +53,11 @@ backoff==1.10.0
     # via analytics-python
 backports-zoneinfo[tzdata]==0.2.1
     # via
-    #   celery
     #   icalendar
     #   kombu
 beautifulsoup4==4.12.2
     # via pynliner
-billiard==4.1.0
+billiard==3.6.4.0
     # via celery
 bleach[css]==6.0.0
     # via
@@ -88,7 +87,7 @@ botocore==1.10.84
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/base.in
-celery==5.3.0
+celery==5.2.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -922,7 +921,6 @@ python-dateutil==2.8.2
     #   -r requirements/edx/base.in
     #   analytics-python
     #   botocore
-    #   celery
     #   edx-ace
     #   edx-drf-extensions
     #   edx-enterprise
@@ -952,6 +950,7 @@ pytz==2022.7.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   babel
+    #   celery
     #   django
     #   django-ses
     #   drf-yasg
@@ -1147,9 +1146,7 @@ typing-extensions==4.6.3
     #   pylti1p3
     #   snowflake-connector-python
 tzdata==2023.3
-    # via
-    #   backports-zoneinfo
-    #   celery
+    # via backports-zoneinfo
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.in
