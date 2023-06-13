@@ -4126,3 +4126,6 @@ PLAN_FEATURES = {
         PANEL_ADMINS: 99999999,
     },
 }
+
+# OPEN AI API KEY
+OPENAI_SECRET_KEY = 'set-secret-key'

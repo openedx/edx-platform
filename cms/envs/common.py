@@ -2366,3 +2366,6 @@ USETIFUL_TOKEN = 'USETIFUL_TOKEN'
 
 # REDIRECT URL FOR EXPIRED SITES
 EXPIRE_REDIRECT_URL = 'http://wordpress.edx.devstack.lms/pricing-and-plans/'
+
+# OPEN AI API KEY
+OPENAI_SECRET_KEY = 'set-secret-key'
