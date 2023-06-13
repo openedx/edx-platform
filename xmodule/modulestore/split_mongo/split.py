@@ -57,7 +57,6 @@ Representation:
 
 import copy
 import datetime
-import hashlib
 import logging
 from collections import defaultdict
 from importlib import import_module
@@ -102,7 +101,7 @@ from xmodule.modulestore.exceptions import (
 )
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
 from xmodule.modulestore.split_mongo.mongo_connection import DuplicateKeyError, DjangoFlexPersistenceBackend
-from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES, derived_key
 from xmodule.partitions.partitions_service import PartitionService
 from xmodule.util.misc import get_library_or_course_attribute
 
@@ -2369,6 +2368,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         time this method is called for the same source block and dest_usage, the same resulting
         block id will be generated.
 
+        Note also that this function does not override any of the attributes on the destination
+        block-- it only replaces the destination block's children.
+
         :param source_keys: a list of BlockUsageLocators. Order is preserved.
 
         :param dest_usage: The BlockUsageLocator that will become the parent of an inherited copy
@@ -2442,7 +2444,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         for usage_key in source_keys:
             src_course_key = usage_key.course_key
-            hashable_source_id = src_course_key.for_version(None)
             block_key = BlockKey(usage_key.block_type, usage_key.block_id)
             source_structure = source_structures[src_course_key]
 
@@ -2450,15 +2451,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 raise ItemNotFoundError(usage_key)
             source_block_info = source_structure['blocks'][block_key]
 
-            # Compute a new block ID. This new block ID must be consistent when this
-            # method is called with the same (source_key, dest_structure) pair
-            unique_data = "{}:{}:{}".format(
-                str(hashable_source_id).encode("utf-8"),
-                block_key.id,
-                new_parent_block_key.id,
-            )
-            new_block_id = hashlib.sha1(unique_data.encode('utf-8')).hexdigest()[:20]
-            new_block_key = BlockKey(block_key.type, new_block_id)
+            new_block_key = derived_key(src_course_key, block_key, new_parent_block_key)
 
             # Now clone block_key to new_block_key:
             new_block_info = copy.deepcopy(source_block_info)

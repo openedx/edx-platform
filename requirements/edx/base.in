@@ -130,9 +130,11 @@ nodeenv                             # Utility for managing Node.js environments;
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 olxcleaner
 openedx-calc                        # Library supporting mathematical calculations for Open edX
+openedx-django-require
 # openedx-events 3.1.0 introduces producer API
 openedx-events>=3.1.0               # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
+openedx-mongodbproxy
 optimizely-sdk                      # Optimizely full stack SDK for Python
 ora2>=4.5.0
 outcome-surveys                     # edx-platform plugin to send and track segment events needed for surveys
@@ -149,7 +151,7 @@ pyjwkest
 # TODO Replace PyJWT usage with pyjwkest
 # PyJWT 1.6.3 contains PyJWTError, which is required by Apple auth in social-auth-core
 PyJWT>=1.6.3
-pylti1p3                            # Required by content_libraries core library to suport LTI 1.3 launches
+pylti1p3                            # Required by content_libraries core library to support LTI 1.3 launches
 pymongo                             # MongoDB driver
 pynliner                            # Inlines CSS styles into HTML for email notifications
 python-dateutil
@@ -165,11 +167,11 @@ redis                               # celery task broker
 requests-oauthlib                   # Simplifies use of OAuth via the requests library, used for CCX and LTI
 random2
 rules                               # Django extension for rules-based authorization checks
-recommender-xblock                  # https://github.com/edx/RecommenderXBlock
 social-auth-core
 simplejson
 Shapely                             # Geometry library, used for image click regions in capa
 six                                 # Utilities for supporting Python 2 & 3 in the same codebase
+skill-tagging                       # Library needed to support tagging of skills in unit/video xblocks via forms
 social-auth-app-django
 sorl-thumbnail
 sortedcontainers                    # Provides SortedKeyList, used for lists of XBlock assets
@@ -187,4 +189,3 @@ xss-utils                           # https://github.com/edx/edx-platform/pull/2
 xblock-poll                         # Xblock for polling users
 xblock-drag-and-drop-v2             # Drag and Drop XBlock
 xblock-google-drive                 # XBlock for google docs and calendar
-openedx-django-require

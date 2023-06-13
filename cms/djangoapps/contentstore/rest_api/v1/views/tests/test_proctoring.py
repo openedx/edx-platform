@@ -1,7 +1,6 @@
 """
 Unit tests for Contentstore Proctored Exam Settings.
 """
-
 import ddt
 from mock import patch
 from django.conf import settings
@@ -11,10 +10,19 @@ from edx_toggles.toggles.testutils import override_waffle_flag
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+<<<<<<<< HEAD:cms/djangoapps/contentstore/rest_api/v1/views/tests/test_views.py
 from cms.djangoapps.contentstore.tests.test_utils import AuthorizeStaffTestCase
+========
+from cms.djangoapps.contentstore.tests.utils import CourseTestCase
+from common.djangoapps.student.tests.factories import GlobalStaffFactory
+from common.djangoapps.student.tests.factories import InstructorFactory
+from common.djangoapps.student.tests.factories import UserFactory
+>>>>>>>> origin/master:cms/djangoapps/contentstore/rest_api/v1/views/tests/test_proctoring.py
 from openedx.core.djangoapps.course_apps.toggles import EXAMS_IDA
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+
+from ..mixins import PermissionAccessMixin
 
 
 class ProctoringExamSettingsTestcase(AuthorizeStaffTestCase):
@@ -385,3 +393,28 @@ class ProctoringExamSettingsPostTests(ProctoringExamSettingsTestcase, ModuleStor
         updated = modulestore().get_item(self.course.location)
         assert updated.enable_proctored_exams is False
         assert updated.proctoring_provider == 'null'
+
+
+@ddt.ddt
+class CourseProctoringErrorsViewTest(CourseTestCase, PermissionAccessMixin):
+    """
+    Tests for ProctoringErrorsView.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse(
+            'cms.djangoapps.contentstore:v1:proctoring_errors',
+            kwargs={"course_id": self.course.id},
+        )
+        self.non_staff_client, _ = self.create_non_staff_authed_user_client()
+
+    @ddt.data(False, True)
+    def test_disable_advanced_settings_feature(self, disable_advanced_settings):
+        """
+        If this feature is enabled, only Django Staff/Superuser should be able to see the proctoring errors.
+        For non-staff users the proctoring errors should be unavailable.
+        """
+        with override_settings(FEATURES={'DISABLE_ADVANCED_SETTINGS': disable_advanced_settings}):
+            response = self.non_staff_client.get(self.url)
+            self.assertEqual(response.status_code, 403 if disable_advanced_settings else 200)

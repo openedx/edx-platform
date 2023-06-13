@@ -6,7 +6,7 @@ from string import Template
 from xblock.core import XBlock
 
 from lxml import etree
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import RawMixin
@@ -67,17 +67,17 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
 
     preview_view_js = {
         'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     preview_view_css = {
         'scss': [],
     }
     studio_view_js = {
-        'js': [resource_string(__name__, 'js/src/raw/edit/xml.js')],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
+        'js': [resource_filename(__name__, 'js/src/raw/edit/xml.js')],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     studio_view_css = {
-        'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')],
+        'scss': [resource_filename(__name__, 'css/codemirror/codemirror.scss')],
     }
 
     def studio_view(self, _context):

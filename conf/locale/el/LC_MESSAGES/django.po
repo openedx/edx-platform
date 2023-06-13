@@ -8,6 +8,7 @@
 # Angelos Chraniotis, 2016,2023
 # Angelos Sfakianakis <giasas@gmail.com>, 2014
 # Dimitris Agelakis <minoan07@gmail.com>, 2015-2017,2019
+# Dimitris Voudouris <dimitrisvoudouris@yahoo.co.uk>, 2023
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
 # Eirini Mageiropoulou <eirmageir@yahoo.com>, 2021
 # Elisabeth Georgiado <almanean@yahoo.gr>, 2014
@@ -21,6 +22,7 @@
 # Panos Chronis <panosfyra4@yahoo.gr>, 2014
 # Anestis, 2014
 # kafroulitsa <zasimak@gmail.com>, 2014
+# Ειρήνη Απέργη, 2023
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/).
 # Copyright (C) 2023 EdX
@@ -45,6 +47,7 @@
 # Vassileios-Marios Anastassiou, 2016
 # Chris Nikolo <dr_dreezhellas@yahoo.com>, 2016
 # Dimitris Agelakis <minoan07@gmail.com>, 2015-2016,2018-2019
+# Dimitris Voudouris <dimitrisvoudouris@yahoo.co.uk>, 2023
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
 # EEYEM, 2015
 # Eirini Mageiropoulou <eirmageir@yahoo.com>, 2021
@@ -55,6 +58,7 @@
 # kostas kalatzis <koskalat@gmail.com>, 2015
 # Nick Gikopoulos, 2014-2017
 # Vassia Kouremenou <Vassiacat@hotmail.com>, 2016
+# Ειρήνη Απέργη, 2023
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Greek (http://app.transifex.com/open-edx/edx-platform/language/el/)
 # Copyright (C) 2023 edX
@@ -93,7 +97,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-17 08:57+0000\n"
+"POT-Creation-Date: 2023-06-04 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Greek (https://app.transifex.com/open-edx/teams/6205/el/)\n"
@@ -2908,11 +2912,11 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Course starts"
-msgstr ""
+msgstr "Έναρξη του μαθήματος"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Course ends"
-msgstr ""
+msgstr "Λήξη του μαθήματος"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -5384,7 +5388,7 @@ msgstr ""
 
 #: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 msgid "Enroll now"
-msgstr ""
+msgstr "Εγγραφείτε τώρα."
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/dashboard/_dashboard_course_resume.html
@@ -6795,6 +6799,12 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr ""
 
@@ -7373,7 +7383,7 @@ msgstr ""
 #. an invalid email format.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter a valid email address"
-msgstr ""
+msgstr "Εισάγετε μια έγκυρη διεύθυνση email."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 #, python-brace-format
@@ -7428,7 +7438,7 @@ msgstr "Το email που εισάγετε θα πρέπει να έχει το�
 #. into the required field or enter it incorrectly.
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your full name"
-msgstr ""
+msgstr "Εισάγετε ένα πλήρες ονοματεπώνυμο"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Enter your first name"
@@ -7448,7 +7458,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your country or region of residence"
-msgstr ""
+msgstr "Επιλέξτε τη χώρα ή την περιοχή διαμονής σας"
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid "Select your profession"
@@ -8160,12 +8170,11 @@ msgid ""
 "process your personal data in accordance                   with the "
 "{privacy_policy_link_start}Privacy Policy{privacy_policy_link_end}."
 msgstr ""
-"Δημιουργώντας λογαριασμό, συναινείτε με τους "
+"Δημιουργώντας λογαριασμό, δέχεστε ότι οι "
 "{terms_of_service_link_start}{terms_of_service}{terms_of_service_link_end} "
-"και αναγνωρίζετε το δικαίωμα του {platform_name} και των μελών της Ομάδας "
-"του να επεξεργαστούν τα προσωπικά σας δεδομένα, σύμφωνα πάντοτε με "
-"{privacy_policy_link_start}την Πολιτική Προστασίας Δεδομένων Προσωπικού "
-"Χαρακτήρα{privacy_policy_link_end}."
+"σας βρίσκουν σύμφωνο και αναγνωρίζετε το δικαίωμα του {platform_name} και "
+"των μελών της ομάδας του να επεξεργαστούν τα προσωπικά σας δεδομένα, σύμφωνα"
+" πάντοτε με την  {privacy_policy_link_start} {privacy_policy_link_end}."
 
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
@@ -11835,6 +11844,20 @@ msgstr ""
 msgid "{previous_groups}, {current_group}"
 msgstr ""
 
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr ""
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr ""
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr ""
@@ -11951,16 +11974,6 @@ msgstr ""
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr ""
-
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
@@ -12068,10 +12081,6 @@ msgid ""
 "You must link this course to an organization in order to continue. "
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
@@ -12789,7 +12798,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "You are not enrolled in any courses yet."
-msgstr ""
+msgstr "Δεν έχετε ακόμη εγγραφεί σε κάποιο από τα μαθήματα"
 
 #: lms/templates/dashboard.html
 #: lms/templates/header/navbar-not-authenticated.html
@@ -13275,6 +13284,10 @@ msgid "Learn more about this course"
 msgstr ""
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr ""
 
@@ -13656,7 +13669,11 @@ msgid "Downloads and transcripts"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Share on:"
+msgid "Download video file"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Share this video"
 msgstr ""
 
 #: lms/templates/video.html
@@ -13664,7 +13681,7 @@ msgid "Share on {site}"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
+msgid "Copy"
 msgstr ""
 
 #: lms/templates/video.html
@@ -15648,7 +15665,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "View grades"
-msgstr ""
+msgstr "Δείτε τους βαθμούς σας"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
@@ -15748,7 +15765,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
-msgstr ""
+msgstr "Αυτομελέτη"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Related Programs"
@@ -16033,13 +16050,13 @@ msgstr "Όλες οι αναρτήσεις"
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unread posts"
-msgstr "Οι μη διαβασμένες"
+msgstr "Μη διαβασμένες"
 
 #. Translators: This is a menu option for showing only unanswered forum
 #. question threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unanswered posts"
-msgstr "Οι αναπάντητες"
+msgstr "Αναπάντητες"
 
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse
@@ -16069,7 +16086,7 @@ msgstr ""
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most activity"
-msgstr ""
+msgstr "Πιο ενεργές"
 
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
@@ -17715,7 +17732,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View a specific learner's grades and progress"
-msgstr ""
+msgstr "Δείτε τους βαθμούς και την πρόοδο ενός συγκεκριμένου φοιτητή"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner's {platform_name} email address or username"
@@ -18337,7 +18354,7 @@ msgstr ""
 
 #: lms/templates/support/feature_based_enrollments.html
 msgid "No results found"
-msgstr ""
+msgstr "Κανένα αποτέλεσμα"
 
 #: lms/templates/support/manage_user.html
 msgid "Student Support: Manage User"
@@ -21727,7 +21744,7 @@ msgid "Set Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

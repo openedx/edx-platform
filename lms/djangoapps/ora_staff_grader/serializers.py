@@ -305,7 +305,8 @@ class StaffAssessSerializer(serializers.Serializer):
     def get_options_selected(self, instance):
         options_selected = {}
         for criterion in instance.get("criteria"):
-            options_selected[criterion["name"]] = criterion["selectedOption"]
+            if criterion["selectedOption"]:
+                options_selected[criterion["name"]] = criterion["selectedOption"]
 
         return options_selected
 

@@ -3,24 +3,40 @@
 import logging
 from collections import OrderedDict
 from functools import partial
+
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
-
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
 
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from common.djangoapps.edxmako.shortcuts import render_to_string
-from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
+from common.djangoapps.student.auth import (
+    has_studio_read_access,
+    has_studio_write_access,
+)
 from common.djangoapps.util.json_request import JsonResponse, expect_json
-from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.lib.xblock_utils import (
+    hash_resource,
+    request_token,
+    wrap_xblock,
+    wrap_xblock_aside,
+)
+from xmodule.modulestore.django import (
+    modulestore,
+)  # lint-amnesty, pylint: disable=wrong-import-order
 
 
-from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import (
+    AUTHOR_VIEW,
+    PREVIEW_VIEWS,
+    STUDENT_VIEW,
+    STUDIO_VIEW,
+)  # lint-amnesty, pylint: disable=wrong-import-order
+
 
 from ..helpers import (
     is_unit,
@@ -34,16 +50,20 @@ from cms.djangoapps.contentstore.xblock_services import (
     get_block_info,
     get_xblock,
     delete_orphans,
-    usage_key_with_run
+    usage_key_with_run,
 )
 
 __all__ = [
-    'orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler', 'xblock_container_handler'
+    "orphan_handler",
+    "xblock_handler",
+    "xblock_view_handler",
+    "xblock_outline_handler",
+    "xblock_container_handler",
 ]
 
-# log = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
-CREATE_IF_NOT_FOUND = ['course_info']
+CREATE_IF_NOT_FOUND = ["course_info"]
 
 # Useful constants for defining predicates
 NEVER = lambda x: False
@@ -125,29 +145,37 @@ def xblock_view_handler(request, usage_key_string, view_name):
     if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
-    accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
+    accept_header = request.META.get("HTTP_ACCEPT", "application/json")
 
-    if 'application/json' in accept_header:
+    if "application/json" in accept_header:
         store = modulestore()
         xblock = store.get_item(usage_key)
-        container_views = ['container_preview', 'reorderable_container_child_preview', 'container_child_preview']
+        container_views = [
+            "container_preview",
+            "reorderable_container_child_preview",
+            "container_child_preview",
+        ]
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
-        xblock.runtime.wrappers.append(partial(
-            wrap_xblock,
-            'StudioRuntime',
-            usage_id_serializer=str,
-            request_token=request_token(request),
-        ))
+        xblock.runtime.wrappers.append(
+            partial(
+                wrap_xblock,
+                "StudioRuntime",
+                usage_id_serializer=str,
+                request_token=request_token(request),
+            )
+        )
 
-        xblock.runtime.wrappers_asides.append(partial(
-            wrap_xblock_aside,
-            'StudioRuntime',
-            usage_id_serializer=str,
-            request_token=request_token(request),
-            extra_classes=['wrapper-comp-plugins']
-        ))
+        xblock.runtime.wrappers_asides.append(
+            partial(
+                wrap_xblock_aside,
+                "StudioRuntime",
+                usage_id_serializer=str,
+                request_token=request_token(request),
+                extra_classes=["wrapper-comp-plugins"],
+            )
+        )
 
         if view_name in (STUDIO_VIEW, VISIBILITY_VIEW):
             if view_name == STUDIO_VIEW:
@@ -158,12 +186,18 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # catch exceptions indiscriminately, since after this point they escape the
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
-            except Exception as exc:                          # pylint: disable=broad-except
-                log.debug("Unable to render %s for %r", view_name, xblock, exc_info=True)
-                fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
+            except Exception as exc:  # pylint: disable=broad-except
+                log.debug(
+                    "Unable to render %s for %r", view_name, xblock, exc_info=True
+                )
+                fragment = Fragment(
+                    render_to_string("html_error.html", {"message": str(exc)})
+                )
 
         elif view_name in PREVIEW_VIEWS + container_views:
-            is_pages_view = view_name == STUDENT_VIEW   # Only the "Pages" view uses student view in Studio
+            is_pages_view = (
+                view_name == STUDENT_VIEW
+            )  # Only the "Pages" view uses student view in Studio
             can_edit = has_studio_write_access(request.user, usage_key.course_key)
 
             # Determine the items to be shown as reorderable. Note that the view
@@ -171,58 +205,65 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # are being shown in a reorderable container, so the xblock is automatically
             # added to the list.
             reorderable_items = set()
-            if view_name == 'reorderable_container_child_preview':
+            if view_name == "reorderable_container_child_preview":
                 reorderable_items.add(xblock.location)
 
             paging = None
             try:
-                if request.GET.get('enable_paging', 'false') == 'true':
+                if request.GET.get("enable_paging", "false") == "true":
                     paging = {
-                        'page_number': int(request.GET.get('page_number', 0)),
-                        'page_size': int(request.GET.get('page_size', 0)),
+                        "page_number": int(request.GET.get("page_number", 0)),
+                        "page_size": int(request.GET.get("page_size", 0)),
                     }
             except ValueError:
                 return HttpResponse(
                     content="Couldn't parse paging parameters: enable_paging: "
-                            "{}, page_number: {}, page_size: {}".format(
-                                request.GET.get('enable_paging', 'false'),
-                                request.GET.get('page_number', 0),
-                                request.GET.get('page_size', 0)
-                            ),
+                    "{}, page_number: {}, page_size: {}".format(
+                        request.GET.get("enable_paging", "false"),
+                        request.GET.get("page_number", 0),
+                        request.GET.get("page_size", 0),
+                    ),
                     status=400,
                     content_type="text/plain",
                 )
 
-            force_render = request.GET.get('force_render', None)
+            force_render = request.GET.get("force_render", None)
 
             # Set up the context to be passed to each XBlock's render method.
             context = request.GET.dict()
-            context.update({
-                # This setting disables the recursive wrapping of xblocks
-                'is_pages_view': is_pages_view or view_name == AUTHOR_VIEW,
-                'is_unit_page': is_unit(xblock),
-                'can_edit': can_edit,
-                'root_xblock': xblock if (view_name == 'container_preview') else None,
-                'reorderable_items': reorderable_items,
-                'paging': paging,
-                'force_render': force_render,
-                'item_url': '/container/{usage_key}',
-            })
+            context.update(
+                {
+                    # This setting disables the recursive wrapping of xblocks
+                    "is_pages_view": is_pages_view or view_name == AUTHOR_VIEW,
+                    "is_unit_page": is_unit(xblock),
+                    "can_edit": can_edit,
+                    "root_xblock": xblock
+                    if (view_name == "container_preview")
+                    else None,
+                    "reorderable_items": reorderable_items,
+                    "paging": paging,
+                    "force_render": force_render,
+                    "item_url": "/container/{usage_key}",
+                }
+            )
             fragment = get_preview_fragment(request, xblock, context)
 
             # Note that the container view recursively adds headers into the preview fragment,
             # so only the "Pages" view requires that this extra wrapper be included.
             display_label = xblock.display_name or xblock.scope_ids.block_type
-            if not xblock.display_name and xblock.scope_ids.block_type == 'html':
+            if not xblock.display_name and xblock.scope_ids.block_type == "html":
                 display_label = _("Text")
             if is_pages_view:
-                fragment.content = render_to_string('component.html', {
-                    'xblock_context': context,
-                    'xblock': xblock,
-                    'locator': usage_key,
-                    'preview': fragment.content,
-                    'label': display_label,
-                })
+                fragment.content = render_to_string(
+                    "component.html",
+                    {
+                        "xblock_context": context,
+                        "xblock": xblock,
+                        "locator": usage_key,
+                        "preview": fragment.content,
+                        "label": display_label,
+                    },
+                )
         else:
             raise Http404
 
@@ -232,12 +273,11 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         fragment_content = fragment.content
         if isinstance(fragment_content, bytes):
-            fragment_content = fragment.content.decode('utf-8')
+            fragment_content = fragment.content.decode("utf-8")
 
-        return JsonResponse({
-            'html': fragment_content,
-            'resources': list(hashed_resources.items())
-        })
+        return JsonResponse(
+            {"html": fragment_content, "resources": list(hashed_resources.items())}
+        )
 
     else:
         return HttpResponse(status=406)
@@ -256,17 +296,22 @@ def xblock_outline_handler(request, usage_key_string):
     if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
-    response_format = request.GET.get('format', 'html')
-    if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+    response_format = request.GET.get("format", "html")
+    if response_format == "json" or "application/json" in request.META.get(
+        "HTTP_ACCEPT", "application/json"
+    ):
         store = modulestore()
         with store.bulk_operations(usage_key.course_key):
             root_xblock = store.get_item(usage_key, depth=None)
-            return JsonResponse(create_xblock_info(
-                root_xblock,
-                include_child_info=True,
-                course_outline=True,
-                include_children_predicate=lambda xblock: not xblock.category == 'vertical'
-            ))
+            return JsonResponse(
+                create_xblock_info(
+                    root_xblock,
+                    include_child_info=True,
+                    course_outline=True,
+                    include_children_predicate=lambda xblock: not xblock.category
+                    == "vertical",
+                )
+            )
     else:
         raise Http404
 
@@ -285,11 +330,15 @@ def xblock_container_handler(request, usage_key_string):
     if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
-    response_format = request.GET.get('format', 'html')
-    if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+    response_format = request.GET.get("format", "html")
+    if response_format == "json" or "application/json" in request.META.get(
+        "HTTP_ACCEPT", "application/json"
+    ):
         with modulestore().bulk_operations(usage_key.course_key):
             response = get_block_info(
-                get_xblock(usage_key, request.user), include_ancestor_info=True, include_publishing_info=True
+                get_xblock(usage_key, request.user),
+                include_ancestor_info=True,
+                include_publishing_info=True,
             )
         return JsonResponse(response)
     else:
@@ -307,14 +356,18 @@ def orphan_handler(request, course_key_string):
     from the root via children
     """
     course_usage_key = CourseKey.from_string(course_key_string)
-    if request.method == 'GET':
+    if request.method == "GET":
         if has_studio_read_access(request.user, course_usage_key):
-            return JsonResponse([str(item) for item in modulestore().get_orphans(course_usage_key)])
+            return JsonResponse(
+                [str(item) for item in modulestore().get_orphans(course_usage_key)]
+            )
         else:
             raise PermissionDenied()
-    if request.method == 'DELETE':
+    if request.method == "DELETE":
         if request.user.is_staff:
-            deleted_items = delete_orphans(course_usage_key, request.user.id, commit=True)
-            return JsonResponse({'deleted': deleted_items})
+            deleted_items = delete_orphans(
+                course_usage_key, request.user.id, commit=True
+            )
+            return JsonResponse({"deleted": deleted_items})
         else:
             raise PermissionDenied()

@@ -13,9 +13,10 @@ from rest_framework.response import Response
 from common.djangoapps.student.models import CourseEnrollment
 from lms.djangoapps.course_goals.models import UserActivity
 from lms.djangoapps.course_home_api.dates.serializers import DatesTabSerializer
+from lms.djangoapps.course_home_api.utils import get_course_or_403
 from lms.djangoapps.courseware.access import has_access
 from lms.djangoapps.courseware.context_processor import user_timezone_locale_prefs
-from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
+from lms.djangoapps.courseware.courses import get_course_date_blocks
 from lms.djangoapps.courseware.date_summary import TodaysDate
 from lms.djangoapps.courseware.masquerade import setup_masquerade
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
@@ -59,6 +60,7 @@ class DatesTabView(RetrieveAPIView):
 
         * 200 on success with above fields.
         * 401 if the user is not authenticated.
+        * 403 if the user does not have access to the course.
         * 404 if the course is not available or cannot be seen.
     """
 
@@ -79,7 +81,7 @@ class DatesTabView(RetrieveAPIView):
         monitoring_utils.set_custom_attribute('user_id', request.user.id)
         monitoring_utils.set_custom_attribute('is_staff', request.user.is_staff)
 
-        course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
+        course = get_course_or_403(request.user, 'load', course_key, check_if_enrolled=False)
         is_staff = bool(has_access(request.user, 'staff', course_key))
 
         _, request.user = setup_masquerade(

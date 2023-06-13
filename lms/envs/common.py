@@ -54,6 +54,7 @@ from enterprise.constants import (
     ENTERPRISE_CATALOG_ADMIN_ROLE,
     ENTERPRISE_DASHBOARD_ADMIN_ROLE,
     ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
+    ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
     ENTERPRISE_OPERATOR_ROLE
 )
@@ -1349,6 +1350,11 @@ ELASTIC_SEARCH_CONFIG = [
         'port': 9200
     }
 ]
+
+# .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
+# .. setting_default: ''
+# .. setting_description: Specifies the prefix used when namixng elasticsearch indexes related to edx-search.
+ELASTICSEARCH_INDEX_PREFIX = ""
 
 VIDEO_CDN_URL = {
     'EXAMPLE_COUNTRY_CODE': "http://example.com/edx/video?s3_url="
@@ -3299,6 +3305,7 @@ REST_FRAMEWORK = {
         'user': '60/minute',
         'service_user': '800/minute',
         'registration_validation': '30/minute',
+        'high_service_user': '2000/minute',
     },
 }
 
@@ -4633,6 +4640,7 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
         ENTERPRISE_CATALOG_ADMIN_ROLE,
         ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
+        ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ],
 }
 
@@ -5320,3 +5328,6 @@ SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
 SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
 SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
 SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
+
+############## NOTIFICATIONS EXPIRY ##############
+NOTIFICATIONS_EXPIRY = 60
