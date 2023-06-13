@@ -5,6 +5,7 @@ import json
 from datetime import datetime, timedelta
 
 import ddt
+from django.conf import settings
 from django.dispatch import Signal
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
@@ -338,13 +339,13 @@ class NotificationListAPIViewTest(APITestCase):
         # Assert that the response is unauthorized.
         self.assertEqual(response.status_code, 403)
 
-    def test_list_notifications_on_two_months_limit(self):
+    def test_list_notifications_with_max_days(self):
         """
         Test that the view can filter notifications on created timestamp
         """
         today = datetime.now(UTC)
 
-        # Create two notifications for the user, one with current date and other with 3 months before date.
+        # Create two notifications for the user, one with current date and other with ENV defined limit.
         Notification.objects.create(
             user=self.user,
             notification_type='info',
@@ -353,7 +354,7 @@ class NotificationListAPIViewTest(APITestCase):
         Notification.objects.create(
             user=self.user,
             notification_type='info',
-            created=today + timedelta(days=90)
+            created=today - timedelta(days=settings.NOTIFICATIONS_MAX_DAYS)
         )
         self.client.login(username=self.user.username, password='test')
 

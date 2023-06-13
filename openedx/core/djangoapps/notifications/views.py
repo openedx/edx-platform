@@ -3,6 +3,7 @@ Views for the notifications API.
 """
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from opaque_keys.edx.keys import CourseKey
@@ -228,22 +229,19 @@ class NotificationListAPIView(generics.ListAPIView):
         """
         Override the get_queryset method to filter the queryset by app name, request.user and created
         """
-        today = datetime.now(UTC)
-        two_months_ago = today - timedelta(days=60)
+        max_days = datetime.now(UTC) - timedelta(days=settings.NOTIFICATIONS_MAX_DAYS)
         app_name = self.request.query_params.get('app_name')
 
         if app_name:
             return Notification.objects.filter(
                 user=self.request.user,
                 app_name=app_name,
-                created__gte=two_months_ago,
-                created__lte=today
+                created__gte=max_days,
             )
         else:
             return Notification.objects.filter(
                 user=self.request.user,
-                created__gte=two_months_ago,
-                created__lte=today
+                created__gte=max_days,
             )
 
 
