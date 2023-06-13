@@ -48,6 +48,7 @@ class CourseSettingsViewTest(CourseTestCase, PermissionAccessMixin):
             "mfe_proctored_exam_settings_url": get_proctored_exam_settings_url(
                 self.course.id
             ),
+            "platform_name": settings.PLATFORM_NAME,
             "short_description_editable": True,
             "sidebar_html_enabled": False,
             "show_min_grade_warning": False,

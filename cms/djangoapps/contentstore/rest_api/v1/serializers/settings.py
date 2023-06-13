@@ -36,6 +36,7 @@ class CourseSettingsSerializer(serializers.Serializer):
     lms_link_for_about_page = serializers.URLField()
     marketing_enabled = serializers.BooleanField()
     mfe_proctored_exam_settings_url = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    platform_name = serializers.CharField()
     possible_pre_requisite_courses = PossiblePreRequisiteCourseSerializer(required=False, many=True)
     short_description_editable = serializers.BooleanField()
     show_min_grade_warning = serializers.BooleanField()
