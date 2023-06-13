@@ -21,6 +21,7 @@ class EDXJSONEncoder(DjangoJSONEncoder):
         want and also this is different from Django 1.4, In Django 1.4 if Decimal object has zeros after the decimal
         point then object will be serialized as `int` else `float`, so we are keeping this behavior.
     """
+
     def default(self, o):  # pylint: disable=method-hidden
         """
         Encode Decimal objects. If decimal object has zeros after the
@@ -40,6 +41,7 @@ def expect_json(view_function):
     CONTENT_TYPE is application/json, parses the json dict from request.body, and updates
     request.POST with the contents.
     """
+
     @wraps(view_function)
     def parse_json_into_request(request, *args, **kwargs):
         # cdodge: fix postback errors in CMS. The POST 'content-type' header can include additional information
@@ -53,8 +55,8 @@ def expect_json(view_function):
             request.json = {}
 
         return view_function(request, *args, **kwargs)
-
     return parse_json_into_request
+
 
 def expect_json_in_class_view(view):
     def _wrapper_view(self, request, *args, **kwargs):
@@ -66,12 +68,14 @@ def expect_json_in_class_view(view):
         else:
             request.json = {}
         return view(self, request, *args, **kwargs)
+
     return _wrapper_view
 
+
 def _add_json_to_request(request):
-    if "application/json" in request.META.get('CONTENT_TYPE', '') and request.body:
+    if "application/json" in request.META.get("CONTENT_TYPE", "") and request.body:
         try:
-            request.json = json.loads(request.body.decode('utf8'))
+            request.json = json.loads(request.body.decode("utf8"))
         except ValueError:
             return JsonResponseBadRequest({"error": "Invalid JSON"})
     else:
@@ -82,13 +86,20 @@ class JsonResponse(HttpResponse):
     """
     Django HttpResponse subclass that has sensible defaults for outputting JSON.
     """
-    def __init__(self, resp_obj=None, status=None, encoder=EDXJSONEncoder,  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
-                 *args, **kwargs):
+
+    def __init__(
+        self,
+        resp_obj=None,
+        status=None,
+        encoder=EDXJSONEncoder,  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
+        *args,
+        **kwargs
+    ):
         if resp_obj in (None, ""):
             content = ""
             status = status or 204
         elif isinstance(resp_obj, QuerySet):
-            content = serialize('json', resp_obj)
+            content = serialize("json", resp_obj)
         else:
             content = json.dumps(resp_obj, cls=encoder, indent=2, ensure_ascii=True)
         kwargs.setdefault("content_type", "application/json")
@@ -107,7 +118,10 @@ class JsonResponseBadRequest(HttpResponseBadRequest):
         status: 400
         encoder: DjangoJSONEncoder
     """
-    def __init__(self, obj=None, status=400, encoder=DjangoJSONEncoder, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
+
+    def __init__(
+        self, obj=None, status=400, encoder=DjangoJSONEncoder, *args, **kwargs
+    ):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
         if obj in (None, ""):
             content = ""
         else:

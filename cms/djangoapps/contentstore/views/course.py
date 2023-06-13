@@ -1785,7 +1785,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
                 i = course_block.pdf_textbooks.index(textbook)
                 new_textbooks = course_block.pdf_textbooks[0:i]
                 new_textbooks.append(new_textbook)
-                new_textbooks.extend(course_block.pdf_textbooks[i + 1 :])
+                new_textbooks.extend(course_block.pdf_textbooks[i + 1:])
                 course_block.pdf_textbooks = new_textbooks
             else:
                 course_block.pdf_textbooks.append(new_textbook)
@@ -1796,7 +1796,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
                 return JsonResponse(status=404)
             i = course_block.pdf_textbooks.index(textbook)
             remaining_textbooks = course_block.pdf_textbooks[0:i]
-            remaining_textbooks.extend(course_block.pdf_textbooks[i + 1 :])
+            remaining_textbooks.extend(course_block.pdf_textbooks[i + 1:])
             course_block.pdf_textbooks = remaining_textbooks
             store.update_item(course_block, request.user.id)
             return JsonResponse()

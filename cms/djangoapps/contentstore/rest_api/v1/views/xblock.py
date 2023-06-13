@@ -29,7 +29,7 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     def dispatch(self, request, *args, **kwargs):
         # TODO: probably want to refactor this to a decorator.
         """
-        The dispatch method of a View class handles HTTP requests in general 
+        The dispatch method of a View class handles HTTP requests in general
         and calls other methods to handle specific HTTP methods.
         We use this to raise a 404 if the content api is disabled.
         """
