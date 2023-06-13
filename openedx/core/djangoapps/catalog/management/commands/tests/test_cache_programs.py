@@ -77,7 +77,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
         for pathway in self.pathways:
             self.programs += pathway['programs']
-        
+
         for pathway in self.pathways2:
             self.programs2 += pathway['programs']
 
