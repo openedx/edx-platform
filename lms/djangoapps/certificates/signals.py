@@ -169,7 +169,7 @@ def listen_for_certificate_created_event(sender, signal, **kwargs):
     if SEND_CERTIFICATE_CREATED_SIGNAL.is_enabled():
         get_producer().send(
             signal=CERTIFICATE_CREATED,
-            topic='certificates',
+            topic='learning-certificate-lifecycle',
             event_key_field='certificate.course.course_key',
             event_data={'certificate': kwargs['certificate']},
             event_metadata=kwargs['metadata']

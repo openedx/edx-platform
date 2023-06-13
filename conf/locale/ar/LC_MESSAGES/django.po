@@ -259,7 +259,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-07 20:42+0000\n"
+"POT-Creation-Date: 2023-05-28 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: NELC Open edX Translation <openedx@elc.edu.sa>, 2020\n"
 "Language-Team: Arabic (https://app.transifex.com/open-edx/teams/6205/ar/)\n"
@@ -7449,6 +7449,12 @@ msgstr ""
 "إذا تم تعطيله، فسيتم تعطيل المناقشات في سياق / برنامج التعلم ذي الصلة."
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr "بيانات تكوين LTI لهذا السياق/المزود."
 
@@ -13021,6 +13027,20 @@ msgstr "مجموعة محذوفة"
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}، {current_group}"
 
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "نسخة مطابقة لـ {0}"
+
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "نسخة مطابقة لـ ’{0}‘"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "رقم المساق الأساسي غير صالح"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "يجب أن يكون للصورة اسم ونوع المحتوى ومعلومات الحجم."
@@ -13147,16 +13167,6 @@ msgstr "لا يمكنك نقل {source_usage_key} في فهرس غير صالح 
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr "يجب إدخال target_index ({target_index}) كعدد صحيح."
 
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "نسخة مطابقة لـ {0}"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "نسخة مطابقة لـ ’{0}‘"
-
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
@@ -13271,10 +13281,6 @@ msgid ""
 msgstr ""
 "يجب ربط هذا المساق بمؤسّسة لتتمكّن من المتابعة. إن المؤسّسة التي اخترتها غير"
 " موجودة ضمن النظام وهو ما سيتطلّب منك إضافتها إلى النظام."
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "رقم المساق الأساسي غير صالح"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -14519,6 +14525,10 @@ msgid "Learn more about this course"
 msgstr ""
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr ""
 
@@ -14911,7 +14921,11 @@ msgid "Downloads and transcripts"
 msgstr "التنزيلات والنصوص"
 
 #: lms/templates/video.html
-msgid "Share on:"
+msgid "Download video file"
+msgstr "تنزيل ملف الفيديو "
+
+#: lms/templates/video.html
+msgid "Share this video"
 msgstr ""
 
 #: lms/templates/video.html
@@ -14919,8 +14933,8 @@ msgid "Share on {site}"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "تنزيل ملف الفيديو "
+msgid "Copy"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -23969,7 +23983,7 @@ msgid "Set Access"
 msgstr "إعدادات ضبط إتاحة الوصول"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

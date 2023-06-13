@@ -167,11 +167,11 @@ redis                               # celery task broker
 requests-oauthlib                   # Simplifies use of OAuth via the requests library, used for CCX and LTI
 random2
 rules                               # Django extension for rules-based authorization checks
-recommender-xblock                  # https://github.com/edx/RecommenderXBlock
 social-auth-core
 simplejson
 Shapely                             # Geometry library, used for image click regions in capa
 six                                 # Utilities for supporting Python 2 & 3 in the same codebase
+skill-tagging                       # Library needed to support tagging of skills in unit/video xblocks via forms
 social-auth-app-django
 sorl-thumbnail
 sortedcontainers                    # Provides SortedKeyList, used for lists of XBlock assets

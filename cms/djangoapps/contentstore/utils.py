@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -17,25 +18,45 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locator import LibraryLocator
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
+from milestones import api as milestones_api
 from pytz import UTC
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
+from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.student import auth
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from common.djangoapps.student.models import CourseEnrollment
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole
+from common.djangoapps.student.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    GlobalStaff,
+)
+from common.djangoapps.util.course import get_link_for_about_page
+from common.djangoapps.util.milestones_helpers import (
+    is_prerequisite_courses_enabled,
+    is_valid_course_key,
+    remove_prerequisite_course,
+    set_prerequisite_courses,
+    get_namespace_choices,
+    generate_milestone_namespace
+)
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
+from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.course_apps.toggles import proctoring_settings_modal_view_enabled
+from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.django_comment_common.models import assign_default_role
 from openedx.core.djangoapps.django_comment_common.utils import seed_permissions_roles
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.lib.courses import course_image_url
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
+from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from cms.djangoapps.contentstore.toggles import (
     use_new_advanced_settings_page,
     use_new_course_outline_page,
@@ -51,12 +72,14 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_video_uploads_page,
 )
 from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_video_editor
+from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions_service import get_all_partitions_for_course  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.services import SettingsService, ConfigurationService, TeamsConfigurationService
+
 
 log = logging.getLogger(__name__)
 
@@ -1125,6 +1148,190 @@ def load_services_for_studio(runtime, user):
     runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
 
 
+def update_course_details(request, course_key, payload, course_block):
+    """
+    Utils is used to update course details.
+    It is used for both DRF and django views.
+    """
+
+    from .views.entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
+
+    # if pre-requisite course feature is enabled set pre-requisite course
+    if is_prerequisite_courses_enabled():
+        prerequisite_course_keys = payload.get('pre_requisite_courses', [])
+        if prerequisite_course_keys:
+            if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
+                raise ValidationError(_("Invalid prerequisite course key"))
+            set_prerequisite_courses(course_key, prerequisite_course_keys)
+        else:
+            # None is chosen, so remove the course prerequisites
+            course_milestones = milestones_api.get_course_milestones(
+                course_key=course_key,
+                relationship="requires",
+            )
+            for milestone in course_milestones:
+                entrance_exam_namespace = generate_milestone_namespace(
+                    get_namespace_choices().get('ENTRANCE_EXAM'),
+                    course_key
+                )
+                if milestone["namespace"] != entrance_exam_namespace:
+                    remove_prerequisite_course(course_key, milestone)
+
+    # If the entrance exams feature has been enabled, we'll need to check for some
+    # feature-specific settings and handle them accordingly
+    # We have to be careful that we're only executing the following logic if we actually
+    # need to create or delete an entrance exam from the specified course
+    if core_toggles.ENTRANCE_EXAMS.is_enabled():
+        course_entrance_exam_present = course_block.entrance_exam_enabled
+        entrance_exam_enabled = payload.get('entrance_exam_enabled', '') == 'true'
+        ee_min_score_pct = payload.get('entrance_exam_minimum_score_pct', None)
+        # If the entrance exam box on the settings screen has been checked...
+        if entrance_exam_enabled:
+            # Load the default minimum score threshold from settings, then try to override it
+            entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+            if ee_min_score_pct:
+                entrance_exam_minimum_score_pct = float(ee_min_score_pct)
+            if entrance_exam_minimum_score_pct.is_integer():
+                entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
+            # If there's already an entrance exam defined, we'll update the existing one
+            if course_entrance_exam_present:
+                exam_data = {
+                    'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct
+                }
+                update_entrance_exam(request, course_key, exam_data)
+            # If there's no entrance exam defined, we'll create a new one
+            else:
+                create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
+
+        # If the entrance exam box on the settings screen has been unchecked,
+        # and the course has an entrance exam attached...
+        elif not entrance_exam_enabled and course_entrance_exam_present:
+            delete_entrance_exam(request, course_key)
+
+    # Perform the normal update workflow for the CourseDetails model
+    return CourseDetails.update_from_json(course_key, payload, request.user)
+
+
+def get_course_settings(request, course_key, course_block):
+    """
+    Utils is used to get context of course settings.
+    It is used for both DRF and django views.
+    """
+
+    from .views.course import get_courses_accessible_to_user, _process_courses_list
+
+    credit_eligibility_enabled = settings.FEATURES.get('ENABLE_CREDIT_ELIGIBILITY', False)
+    upload_asset_url = reverse_course_url('assets_handler', course_key)
+
+    # see if the ORG of this course can be attributed to a defined configuration . In that case, the
+    # course about page should be editable in Studio
+    publisher_enabled = configuration_helpers.get_value_for_org(
+        course_block.location.org,
+        'ENABLE_PUBLISHER',
+        settings.FEATURES.get('ENABLE_PUBLISHER', False)
+    )
+    marketing_enabled = configuration_helpers.get_value_for_org(
+        course_block.location.org,
+        'ENABLE_MKTG_SITE',
+        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+    )
+    enable_extended_course_details = configuration_helpers.get_value_for_org(
+        course_block.location.org,
+        'ENABLE_EXTENDED_COURSE_DETAILS',
+        settings.FEATURES.get('ENABLE_EXTENDED_COURSE_DETAILS', False)
+    )
+
+    about_page_editable = not publisher_enabled
+    enrollment_end_editable = GlobalStaff().has_user(request.user) or not publisher_enabled
+    short_description_editable = configuration_helpers.get_value_for_org(
+        course_block.location.org,
+        'EDITABLE_SHORT_DESCRIPTION',
+        settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
+    )
+    sidebar_html_enabled = ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled()
+
+    verified_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
+    upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
+                        verified_mode.expiration_datetime.isoformat())
+    settings_context = {
+        'context_course': course_block,
+        'course_locator': course_key,
+        'lms_link_for_about_page': get_link_for_about_page(course_block),
+        'course_image_url': course_image_url(course_block, 'course_image'),
+        'banner_image_url': course_image_url(course_block, 'banner_image'),
+        'video_thumbnail_image_url': course_image_url(course_block, 'video_thumbnail_image'),
+        'details_url': reverse_course_url('settings_handler', course_key),
+        'about_page_editable': about_page_editable,
+        'marketing_enabled': marketing_enabled,
+        'short_description_editable': short_description_editable,
+        'sidebar_html_enabled': sidebar_html_enabled,
+        'upload_asset_url': upload_asset_url,
+        'course_handler_url': reverse_course_url('course_handler', course_key),
+        'language_options': settings.ALL_LANGUAGES,
+        'credit_eligibility_enabled': credit_eligibility_enabled,
+        'is_credit_course': False,
+        'show_min_grade_warning': False,
+        'enrollment_end_editable': enrollment_end_editable,
+        'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
+        'is_entrance_exams_enabled': core_toggles.ENTRANCE_EXAMS.is_enabled(),
+        'enable_extended_course_details': enable_extended_course_details,
+        'upgrade_deadline': upgrade_deadline,
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
+    }
+    if is_prerequisite_courses_enabled():
+        courses, in_process_course_actions = get_courses_accessible_to_user(request)
+        # exclude current course from the list of available courses
+        courses = [course for course in courses if course.id != course_key]
+        if courses:
+            courses, __ = _process_courses_list(courses, in_process_course_actions)
+        settings_context.update({'possible_pre_requisite_courses': courses})
+
+    if credit_eligibility_enabled:
+        if is_credit_course(course_key):
+            # get and all credit eligibility requirements
+            credit_requirements = get_credit_requirements(course_key)
+            # pair together requirements with same 'namespace' values
+            paired_requirements = {}
+            for requirement in credit_requirements:
+                namespace = requirement.pop("namespace")
+                paired_requirements.setdefault(namespace, []).append(requirement)
+
+            # if 'minimum_grade_credit' of a course is not set or 0 then
+            # show warning message to course author.
+            show_min_grade_warning = False if course_block.minimum_grade_credit > 0 else True  # lint-amnesty, pylint: disable=simplifiable-if-expression
+            settings_context.update(
+                {
+                    'is_credit_course': True,
+                    'credit_requirements': paired_requirements,
+                    'show_min_grade_warning': show_min_grade_warning,
+                }
+            )
+
+    return settings_context
+
+
+def get_course_grading(course_key):
+    """
+    Utils is used to get context of course grading.
+    It is used for both DRF and django views.
+    """
+
+    course_block = modulestore().get_course(course_key)
+    course_details = CourseGradingModel.fetch(course_key)
+    course_assignment_lists = get_subsections_by_assignment_type(course_key)
+    grading_context = {
+        'context_course': course_block,
+        'course_locator': course_key,
+        'course_details': course_details,
+        'grading_url': reverse_course_url('grading_handler', course_key),
+        'is_credit_course': is_credit_course(course_key),
+        'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_key),
+        'course_assignment_lists': dict(course_assignment_lists)
+    }
+
+    return grading_context
+
+
 class StudioPermissionsService:
     """
     Service that can provide information about a user's permissions.
@@ -1133,6 +1340,7 @@ class StudioPermissionsService:
 
     Only used by LibraryContentBlock (and library_tools.py).
     """
+
     def __init__(self, user):
         self._user = user
 

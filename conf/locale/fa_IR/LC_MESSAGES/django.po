@@ -133,7 +133,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-30 20:42+0000\n"
+"POT-Creation-Date: 2023-05-23 13:03+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -7371,6 +7371,12 @@ msgstr ""
 "خواهد شد."
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr "داده‌های پیکربندی LTI برای این متن/ ارائه‌دهنده."
 
@@ -13015,6 +13021,20 @@ msgstr "گروه حذف‌شده"
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}، {current_group}"
 
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "کپی{0}"
+
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "کپی '{0}' "
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "کلید دوره پیش‌نیاز معتبر نیست"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "تصویر باید نام و اطلاعات مربوط به اندازه و نوع را داشته باشد."
@@ -13141,16 +13161,6 @@ msgid "You must provide target_index ({target_index}) as an integer."
 msgstr ""
 "شما باید target_index ({target_index}) را به‌عنوان یک عدد صحیح ارائه دهید."
 
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "کپی{0}"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "کپی '{0}' "
-
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
@@ -13267,10 +13277,6 @@ msgid ""
 msgstr ""
 "برای ادامۀ کار باید این دوره را به یک سازمان پیوند دهید. سازمانی که برگزیدید"
 " در سامانه وجود ندارد، لذا نیاز است که ابتدا آن را بیفزایید"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "کلید دوره پیش‌نیاز معتبر نیست"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -14511,6 +14517,10 @@ msgid "Learn more about this course"
 msgstr ""
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr ""
 
@@ -14903,7 +14913,11 @@ msgid "Downloads and transcripts"
 msgstr "بارگیری‌ها و زیرنویس‌ها"
 
 #: lms/templates/video.html
-msgid "Share on:"
+msgid "Download video file"
+msgstr "بارگیری پرونده تصویری"
+
+#: lms/templates/video.html
+msgid "Share this video"
 msgstr ""
 
 #: lms/templates/video.html
@@ -14911,8 +14925,8 @@ msgid "Share on {site}"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "بارگیری پرونده تصویری"
+msgid "Copy"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -24155,7 +24169,7 @@ msgid "Set Access"
 msgstr "تنظیم دسترسی"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
