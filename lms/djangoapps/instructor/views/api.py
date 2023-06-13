@@ -1655,6 +1655,20 @@ def get_anon_ids(request, course_id):
     task_api.generate_anonymous_ids(request, course_id)
     return JsonResponse({"status": success_status})
 
+@transaction.non_atomic_requests
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_course_permission(permissions.CAN_RESEARCH)
+def get_answer_list(request, course_id):
+    """
+    <UPDATE DOC>
+    """
+    report_type = _('Answers List')
+    success_status = SUCCESS_MESSAGE_TEMPLATE.format(report_type=report_type)
+    task_api.generate_answers_list(request, course_id)
+    return JsonResponse({"status": success_status})
+
+
 
 @require_POST
 @ensure_csrf_cookie

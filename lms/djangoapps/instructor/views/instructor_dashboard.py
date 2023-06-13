@@ -625,6 +625,7 @@ def _section_data_download(course, access):
             'get_students_who_may_enroll', kwargs={'course_id': str(course_key)}
         ),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': str(course_key)}),
+        'get_answer_list_url': reverse('get_answer_list', kwargs={'course_id': str(course_key)}),
         'list_proctored_results_url': reverse(
             'get_proctored_exam_results', kwargs={'course_id': str(course_key)}
         ),
@@ -641,7 +642,7 @@ def _section_data_download(course, access):
             'export_ora2_submission_files', kwargs={'course_id': str(course_key)}
         ),
         'export_ora2_summary_url': reverse('export_ora2_summary', kwargs={'course_id': str(course_key)}),
-         show_eng_report_button: show_eng_report_button,
+         'show_eng_report_button': show_eng_report_button,
     }
     if not access.get('data_researcher'):
         section_data['is_hidden'] = True

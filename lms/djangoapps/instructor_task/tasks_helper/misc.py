@@ -531,3 +531,56 @@ def generate_anonymous_ids(_xmodule_instance_args, _entry_id, course_id, task_in
     upload_csv_to_report_store([header] + rows, csv_name, course_id, start_date)
 
     return UPDATE_STATUS_SUCCEEDED
+
+
+def generate_answers_list(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):  # lint-amnesty, pylint: disable=too-many-statements
+    """
+    Generate a 2-column CSV output of user-id, anonymized-user-id
+    """
+    def _log_and_update_progress(step):
+        """
+        Updates progress task and logs
+        Arguments:
+            step: current step task is on
+        """
+        TASK_LOG.info(
+            '%s, Task type: %s, Current step: %s for all learners',
+            task_info_string,
+            action_name,
+            step,
+        )
+        task_progress.update_task_state(extra_meta=step)
+    TASK_LOG.info('ANONYMOUS_IDS_TASK: Starting task execution.')
+
+    print("234234293042394089")
+
+    task_info_string_format = 'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
+    task_info_string = task_info_string_format.format(
+        task_id=_xmodule_instance_args.get('task_id') if _xmodule_instance_args is not None else None,
+        entry_id=_entry_id,
+        course_id=course_id,
+        task_input=task_input
+    )
+    TASK_LOG.info('%s, Task type: %s, Starting task execution', task_info_string, action_name)
+
+    start_time = time()
+    start_date = datetime.now(UTC)
+
+    students = User.objects.filter(
+        courseenrollment__course_id=course_id,
+    ).order_by('id')
+
+    task_progress = TaskProgress(action_name, students.count, start_time)
+    _log_and_update_progress({'step': "Compiling learner rows"})
+
+    header = ['User ID', 'Anonymized User ID', 'Course Specific Anonymized User ID']
+    rows = [[s.id, unique_id_for_user(s), anonymous_id_for_user(s, course_id)]
+            for s in students]
+
+    task_progress.attempted = students.count
+    _log_and_update_progress({'step': "Finished compiling learner rows"})
+
+    csv_name = 'anonymized_ids'
+    upload_csv_to_report_store([header] + rows, csv_name, course_id, start_date)
+
+    return UPDATE_STATUS_SUCCEEDED

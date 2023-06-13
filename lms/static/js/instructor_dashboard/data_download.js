@@ -103,6 +103,7 @@
             this.$list_problem_responses_csv_input = this.$section.find("input[name='problem-location']");
             this.$list_problem_responses_csv_btn = this.$section.find("input[name='list-problem-responses-csv']");
             this.$list_anon_btn = this.$section.find("input[name='list-anon-ids']");
+            this.$answer_list_btn = this.$section.find("input[name='answer-list']");
             this.$grade_config_btn = this.$section.find("input[name='dump-gradeconf']");
             this.$calculate_grades_csv_btn = this.$section.find("input[name='calculate-grades-csv']");
             this.$problem_grade_report_csv_btn = this.$section.find("input[name='problem-grade-report']");
@@ -143,6 +144,34 @@
                     }
                 });
             });
+
+            this.$answer_list_btn.click(function() {
+                var url = dataDownloadObj.$answer_list_btn.data('endpoint');
+                var errorMessage = gettext('Error generating Answer List. Please try again.');
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: url,
+                    error: function(error) {
+                        if (error.responseText) {
+                            errorMessage = JSON.parse(error.responseText);
+                        }
+                        dataDownloadObj.clear_display();
+                        dataDownloadObj.$reports_request_response_error.text(errorMessage);
+                        return dataDownloadObj.$reports_request_response_error.css({
+                            display: 'block'
+                        });
+                    },
+                    success: function(data) {
+                        dataDownloadObj.clear_display();
+                        dataDownloadObj.$reports_request_response.text(data.status);
+                        return $('.msg-confirm').css({
+                            display: 'block'
+                        });
+                    }
+                });
+            });
+
             this.$proctored_exam_csv_btn.click(function() {
                 var url = dataDownloadObj.$proctored_exam_csv_btn.data('endpoint');
                 var errorMessage = gettext('Error generating proctored exam results. Please try again.');

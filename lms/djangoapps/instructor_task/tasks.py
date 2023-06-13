@@ -39,7 +39,8 @@ from lms.djangoapps.instructor_task.tasks_helper.misc import (
     upload_ora2_submission_files,
     upload_ora2_summary,
     upload_proctored_exam_results_report,
-    generate_anonymous_ids
+    generate_anonymous_ids,
+    generate_answers_list
 )
 
 from lms.djangoapps.instructor_task.tasks_helper.module_state import (
@@ -178,6 +179,20 @@ def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     action_name = gettext_noop('generated')
     task_fn = partial(ProblemResponses.generate, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
+
+
+@shared_task(base=BaseInstructorTask)
+@set_code_owner_attribute
+def generate_answers_list_for_course(entry_id, xmodule_instance_args):
+    """
+    Generate a CSV of anonymize IDs for enrolled learner for course.
+    """
+    # Translators: This is a past-tense verb that is inserted into task progress messages as {action}.
+    # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
+    action_name = gettext_noop('generate_anonymized_id')
+    task_fn = partial(generate_answers_list, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
 
 
 @shared_task(base=BaseInstructorTask)
