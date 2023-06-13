@@ -63,15 +63,23 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         self.programs = ProgramFactory.create_batch(3)
         self.programs2 = ProgramFactory.create_batch(3)
         self.pathways = PathwayFactory.create_batch(3)
+        self.pathways2 = PathwayFactory.create_batch(3)
         self.child_program = ProgramFactory.create()
+        self.child_program2 = ProgramFactory.create()
 
         self.programs[0]['curricula'][0]['programs'].append(self.child_program)
         self.programs.append(self.child_program)
-
         self.programs[0]['authoring_organizations'] = OrganizationFactory.create_batch(2)
+
+        self.programs2[0]['curricula'][0]['programs'].append(self.child_program2)
+        self.programs2.append(self.child_program2)
+        self.programs2[0]['authoring_organizations'] = OrganizationFactory.create_batch(2)
 
         for pathway in self.pathways:
             self.programs += pathway['programs']
+        
+        for pathway in self.pathways2:
+            self.programs2 += pathway['programs']
 
         self.uuids = {
             f"{self.site_domain}": [program["uuid"] for program in self.programs],
@@ -81,6 +89,10 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         # add some of the previously created programs to some pathways
         self.pathways[0]['programs'].extend([self.programs[0], self.programs[1]])
         self.pathways[1]['programs'].append(self.programs[0])
+
+        # add some of the previously created programs to some pathways
+        self.pathways2[0]['programs'].extend([self.programs2[0], self.programs2[1]])
+        self.pathways2[1]['programs'].append(self.programs2[0])
 
     def mock_list(self, site=""):
         """ Mock the data returned by the program listing API endpoint. """
@@ -164,6 +176,7 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
         }
 
         self.mock_list(self.site2)
+        self.mock_pathways(self.pathways2)
 
         for uuid in self.uuids[self.site_domain2]:
             program = programs[PROGRAM_CACHE_KEY_TPL.format(uuid=uuid)]
