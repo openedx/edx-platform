@@ -214,6 +214,8 @@ urlpatterns = [
     ),
     path('api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                    namespace='api_discounts')),
+
+    # Provide URLs where we can see the rendered error pages without having to force an error.
     path('403', handler403),
     path('404', handler404),
     path('429', handler429),
