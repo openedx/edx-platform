@@ -115,5 +115,5 @@ python3-saml<1.10.0
 # its a temporary pin. Unpin after releasing xblock-sdk new version. It will be using `openedx-django-pyfs` new ver.
 openedx-django-pyfs==3.2.1
 
-# latest versions breaking new some tests.
-backports-zoneinfo==0.2.1
+# celery==5.3.0 versions breaking timezone related tests. Adding pin for time being to clear upgrade pipeline.
+celery==5.2.7
