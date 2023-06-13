@@ -282,6 +282,11 @@ such that the value can be defined later than this assignment (file load order).
                 return this.show_errors(
                     gettext('Error: You cannot remove yourself from the Instructor group!')
                 );
+            } else if (data.userNotEnrolled) {
+                msg = gettext("Error: User '<%- username %>' is not enrolled in this course.")
+                return this.show_errors(_.template(msg)({
+                    username: data.unique_student_identifier
+                }));
             } else {
                 return this.reload_list();
             }
