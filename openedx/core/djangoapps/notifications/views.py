@@ -237,12 +237,12 @@ class NotificationListAPIView(generics.ListAPIView):
                 user=self.request.user,
                 app_name=app_name,
                 created__gte=expiry_date,
-            )
+            ).order_by('-id')
         else:
             return Notification.objects.filter(
                 user=self.request.user,
                 created__gte=expiry_date,
-            )
+            ).order_by('-id')
 
 
 class NotificationCountView(APIView):

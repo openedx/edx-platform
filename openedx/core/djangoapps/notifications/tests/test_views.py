@@ -369,6 +369,33 @@ class NotificationListAPIViewTest(APITestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]['created'], today.strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
 
+    def test_list_notifications_with_order_by_reverse_id(self):
+        """
+        Test that the view can filter notifications and order by reverse id.
+        """
+
+        # Create two notifications for the user
+        notification1 = Notification.objects.create(
+            user=self.user,
+            notification_type='info',
+        )
+        notification2 = Notification.objects.create(
+            user=self.user,
+            notification_type='info',
+        )
+        self.client.login(username=self.user.username, password='test')
+
+        # Make a request to the view
+        response = self.client.get(self.url)
+
+        # Assert that the response is successful.
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response id list is in reverse order.
+        data = response.data['results']
+        self.assertEqual(len(data), 2)
+        self.assertEqual([data[0]['id'], data[1]['id']], [notification2.id, notification1.id])
+
 
 class NotificationCountViewSetTestCase(APITestCase):
     """
