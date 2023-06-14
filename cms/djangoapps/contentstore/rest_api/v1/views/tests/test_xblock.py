@@ -1,5 +1,6 @@
 """
-Tests for the xblock view for the Studio Content API. This tests only the view itself, not the underlying Xblock service.
+Tests for the xblock view of the Studio Content API. This tests only the view itself,
+not the underlying Xblock service.
 It checks that the xblock_handler method of the Xblock service is called with the expected parameters.
 """
 from unittest.mock import patch
@@ -289,6 +290,18 @@ class XblockViewPatchTest(XblockViewPutTest):
 
         response = self.client.patch(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_xblock_handler_called_with_correct_arguments(self):
+        self.client.login(
+            username=self.course_instructor.username, password=self.password
+        )
+        response = self.make_request(  # pylint: disable=no-value-for-parameter
+            run_assertions=self.assert_xblock_handler_called,
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["locator"] == TEST_LOCATOR
+        assert data["courseKey"] == self.get_course_key_string()
 
 
 class XblockViewDeleteTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
