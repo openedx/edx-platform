@@ -1,3 +1,6 @@
+"""
+general helper functions for xblocks
+"""
 
 from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore

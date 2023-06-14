@@ -7,13 +7,6 @@ from xmodule.tabs import StaticTab
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from openedx.core.toggles import ENTRANCE_EXAMS
 
-try:
-    # Technically this is a django app plugin, so we should not error if it's not installed:
-    import openedx.core.djangoapps.content_staging.api as content_staging_api
-except ImportError:
-    content_staging_api = None
-
-from ..utils import reverse_course_url, reverse_library_url, reverse_usage_url
 from .xblock_helpers import usage_key_with_run
 from ..helpers import GRADER_TYPES, remove_entrance_exam_graders
 

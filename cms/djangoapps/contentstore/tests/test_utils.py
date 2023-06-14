@@ -9,7 +9,7 @@ import ddt
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
-from opaque_keys.edx.keys import AssetKey, CourseKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from path import Path as path
 from pytz import UTC
@@ -838,27 +838,27 @@ class AuthorizeStaffTestCase():
     def get_url(self, course_key):
         raise NotImplementedError
 
-    def test_student(self, status=status.HTTP_403_FORBIDDEN):
+    def test_student(self):
         self.client.login(username=self.student.username, password=self.password)
         response = self.make_request()
-        assert response.status_code == status
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_instructor_in_another_course(self, status=status.HTTP_403_FORBIDDEN):
+    def test_instructor_in_another_course(self):
         self.client.login(
             username=self.other_course_instructor.username,
             password=self.password
         )
         response = self.make_request()
-        assert response.status_code == status
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_global_staff(self, status=status.HTTP_200_OK):
+    def test_global_staff(self):
         self.client.login(username=self.global_staff.username, password=self.password)
         response = self.make_request()
-        assert response.status_code == status
+        assert response.status_code == status.HTTP_200_OK
         return response
 
-    def test_course_instructor(self, status=status.HTTP_200_OK):
+    def test_course_instructor(self):
         self.client.login(username=self.course_instructor.username, password=self.password)
         response = self.make_request()
-        assert response.status_code == status
+        assert response.status_code == status.HTTP_200_OK
         return response

@@ -10,9 +10,7 @@ Along with it, we moved the business logic of the other views in that file, sinc
 """
 
 import logging
-from collections import OrderedDict
 from datetime import datetime
-from functools import partial
 from uuid import uuid4
 
 from django.conf import settings
@@ -21,10 +19,9 @@ from django.contrib.auth.models import (
     User,
 )  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.timezone import timezone
 from django.utils.translation import gettext as _
-from django.views.decorators.http import require_http_methods
 from edx_django_utils.plugins import pluggable_override
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
@@ -36,18 +33,14 @@ from edx_proctoring.api import (
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
-from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
 from common.djangoapps.edxmako.services import MakoService
-from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
     has_studio_read_access,
@@ -60,12 +53,6 @@ from openedx.core.djangoapps.bookmarks import api as bookmarks_api
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.xblock_utils import (
-    hash_resource,
-    request_token,
-    wrap_xblock,
-    wrap_xblock_aside,
-)
 from openedx.core.toggles import ENTRANCE_EXAMS
 from xmodule.course_block import (
     DEFAULT_START_DATE,
@@ -97,12 +84,6 @@ from xmodule.services import (
 )  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import (
     CourseTabList,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.x_module import (
-    AUTHOR_VIEW,
-    PREVIEW_VIEWS,
-    STUDENT_VIEW,
-    STUDIO_VIEW,
 )  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import (
@@ -173,6 +154,11 @@ def _is_library_component_limit_reached(usage_key):
 
 
 def handle_xblock(request, usage_key_string=None):
+    """
+    Service method with all business logic for handling xblock requests.
+    This method is used both by the internal xblock_handler API and by
+    the public studio content API.
+    """
     if usage_key_string:
         usage_key = usage_key_with_run(usage_key_string)
 
@@ -1273,8 +1259,10 @@ def create_xblock_info(
                 )
             xblock_info.update(
                 {
-                    "highlights_enabled": True,  # used to be controlled by a waffle switch, now just always enabled
-                    "highlights_preview_only": False,  # used to be controlled by a waffle flag, now just always disabled
+                    # used to be controlled by a waffle switch, now just always enabled
+                    "highlights_enabled": True,
+                    # used to be controlled by a waffle flag, now just always disabled
+                    "highlights_preview_only": False,
                     "highlights_doc_url": HelpUrlExpert.the_one().url_for_token(
                         "content_highlights"
                     ),
