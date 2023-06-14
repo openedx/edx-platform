@@ -838,27 +838,27 @@ class AuthorizeStaffTestCase():
     def get_url(self, course_key):
         raise NotImplementedError
 
-    def test_student(self):
+    def test_student(self, expect_status=status.HTTP_403_FORBIDDEN):
         self.client.login(username=self.student.username, password=self.password)
         response = self.make_request()
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == expect_status
 
-    def test_instructor_in_another_course(self):
+    def test_instructor_in_another_course(self, expect_status=status.HTTP_403_FORBIDDEN):
         self.client.login(
             username=self.other_course_instructor.username,
             password=self.password
         )
         response = self.make_request()
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == expect_status
 
-    def test_global_staff(self):
+    def test_global_staff(self, expect_status=status.HTTP_200_OK):
         self.client.login(username=self.global_staff.username, password=self.password)
         response = self.make_request()
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == expect_status
         return response
 
-    def test_course_instructor(self):
+    def test_course_instructor(self, expect_status=status.HTTP_200_OK):
         self.client.login(username=self.course_instructor.username, password=self.password)
         response = self.make_request()
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == expect_status
         return response

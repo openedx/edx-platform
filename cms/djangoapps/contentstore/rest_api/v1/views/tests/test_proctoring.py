@@ -68,14 +68,14 @@ class ProctoringExamSettingsGetTests(
         url = self.get_url(course_id)
         return self.client.get(url)
 
-    def test_global_staff(self):  # pylint: disable=arguments-differ
-        response = super().test_global_staff(status=status.HTTP_200_OK)
+    def test_global_staff(self, expect_status=status.HTTP_200_OK):
+        response = super().test_global_staff(expect_status=expect_status)
         assert response.data == self.get_expected_response_data(
             self.course, self.global_staff
         )
 
-    def test_course_instructor(self):  # pylint: disable=arguments-differ
-        response = super().test_course_instructor(status=status.HTTP_200_OK)
+    def test_course_instructor(self, expect_status=status.HTTP_200_OK):
+        response = super().test_course_instructor(expect_status=expect_status)
         assert response.data == self.get_expected_response_data(
             self.course, self.course_instructor
         )
@@ -157,8 +157,8 @@ class ProctoringExamSettingsPostTests(
             data = self.get_request_data()
         return self.client.post(url, data, format="json")
 
-    def test_course_instructor(self):  # pylint: disable=arguments-differ
-        return super().test_course_instructor(status=status.HTTP_403_FORBIDDEN)
+    def test_course_instructor(self, expect_status=status.HTTP_403_FORBIDDEN):
+        return super().test_course_instructor(expect_status=expect_status)
 
     @override_settings(
         PROCTORING_BACKENDS={"DEFAULT": "proctortrack", "proctortrack": {}},
