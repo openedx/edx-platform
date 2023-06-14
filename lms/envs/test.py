@@ -628,6 +628,10 @@ CORS_ORIGIN_WHITELIST = ['https://sandbox.edx.org']
 
 # enable /api/v1/save/course/ api for testing
 ENABLE_SAVE_FOR_LATER = True
+#################### Network configuration ####################
+# Tests are not behind any proxies
+CLOSEST_CLIENT_IP_FROM_HEADERS = []
+
 
 # rate limit for /api/v1/save/course/ api
 SAVE_FOR_LATER_IP_RATE_LIMIT = '5/d'
