@@ -1,11 +1,13 @@
 """
 Views for the notifications API.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from opaque_keys.edx.keys import CourseKey
+from pytz import UTC
 from rest_framework import generics, permissions, status
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
@@ -225,13 +227,22 @@ class NotificationListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         """
-        Override the get_queryset method to filter the queryset by app name and request.user.
+        Override the get_queryset method to filter the queryset by app name, request.user and created
         """
+        expiry_date = datetime.now(UTC) - timedelta(days=settings.NOTIFICATIONS_EXPIRY)
         app_name = self.request.query_params.get('app_name')
+
         if app_name:
-            return Notification.objects.filter(user=self.request.user, app_name=app_name)
+            return Notification.objects.filter(
+                user=self.request.user,
+                app_name=app_name,
+                created__gte=expiry_date,
+            ).order_by('-id')
         else:
-            return Notification.objects.filter(user=self.request.user)
+            return Notification.objects.filter(
+                user=self.request.user,
+                created__gte=expiry_date,
+            ).order_by('-id')
 
 
 class NotificationCountView(APIView):
