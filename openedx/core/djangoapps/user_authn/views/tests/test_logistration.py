@@ -1,7 +1,6 @@
 """ Tests for Logistration views. """
 
 
-from datetime import datetime, timedelta
 from http.cookies import SimpleCookie
 from urllib.parse import urlencode
 from unittest import mock
@@ -18,8 +17,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from freezegun import freeze_time
-from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.branding.api import get_privacy_url
