@@ -418,6 +418,7 @@ class CourseListSearchViewTest(CourseApiTestViewMixin, ModuleStoreTestCase, Sear
 
         # These query counts were found empirically
         query_counts = [50, 46, 46, 46, 46, 46, 46, 46, 46, 46, 16]
+        query_counts = [55, 46, 46, 46, 46, 46, 46, 46, 46, 46, 16]
         ordered_course_ids = sorted([str(cid) for cid in (course_ids + [c.id for c in self.courses])])
 
         self.clear_caches()

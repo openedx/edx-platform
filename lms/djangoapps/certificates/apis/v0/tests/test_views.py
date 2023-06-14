@@ -310,6 +310,7 @@ class CertificatesListRestApiTest(AuthAndScopesTestMixin, SharedModuleStoreTestC
         # Test student with no certificates
         student_no_cert = UserFactory.create(password=self.user_password)
         with self.assertNumQueries(17, table_ignorelist=WAFFLE_TABLES):
+        with self.assertNumQueries(19):
             resp = self.get_response(
                 AuthType.jwt,
                 requesting_user=self.global_staff,

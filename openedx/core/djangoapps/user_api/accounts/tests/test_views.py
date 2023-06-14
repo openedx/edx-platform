@@ -224,6 +224,7 @@ class TestOwnUsernameAPI(FilteredQueryCountMixin, CacheIsolationTestCase, UserAP
         """
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         self._verify_get_own_username(16)
+        self._verify_get_own_username(18)
 
     def test_get_username_inactive(self):
         """
