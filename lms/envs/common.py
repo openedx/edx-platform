@@ -1216,6 +1216,18 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 TPA_PROVIDER_BURST_THROTTLE = '10/min'
 TPA_PROVIDER_SUSTAINED_THROTTLE = '50/hr'
 
+# .. toggle_name: TPA_AUTOMATIC_LOGOUT_ENABLED
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Redirect the user to the TPA logout URL if this flag is enabled, the
+#   TPA logout URL is configured, and the user logs in through TPA.
+# .. toggle_use_cases: opt_in
+# .. toggle_warning: Enabling this toggle skips rendering logout.html, which is used to log the user out
+#   from the different IDAs. To ensure the user is logged out of all the IDAs be sure to redirect
+#   back to <LMS>/logout after logging out of the TPA.
+# .. toggle_creation_date: 2023-05-07
+TPA_AUTOMATIC_LOGOUT_ENABLED = False
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 import tempfile  # pylint: disable=wrong-import-position,wrong-import-order
