@@ -247,7 +247,7 @@ class XblockViewPutTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
         assert data["courseKey"] == self.get_course_key_string()
 
 
-class XblockViewPatchTest(XblockViewPutTest):
+class XblockViewPatchTest(XblockViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test PATCH operation on xblocks - update an xblock
     """
