@@ -1,3 +1,7 @@
+"""
+Xblock services for creating xblocks.
+"""
+
 from uuid import uuid4
 
 from django.utils.translation import gettext as _

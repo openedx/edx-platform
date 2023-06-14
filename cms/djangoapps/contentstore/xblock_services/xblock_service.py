@@ -15,9 +15,7 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import (
-    User,
-)  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import (User)  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.timezone import timezone
@@ -349,13 +347,13 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
     return modulestore().update_item(xblock, user.id)
 
 
-def _save_xblock(
+def _save_xblock(  # lint-amnesty, pylint: disable=too-many-statements
     user,
     xblock,
     data=None,
     children_strings=None,
     metadata=None,
-    nullout=None,  # lint-amnesty, pylint: disable=too-many-statements
+    nullout=None,
     grader_type=None,
     is_prereq=None,
     prereq_usage_key=None,
@@ -1047,12 +1045,12 @@ def _get_gating_info(course, xblock):
 
 
 @pluggable_override("OVERRIDE_CREATE_XBLOCK_INFO")
-def create_xblock_info(
+def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
     xblock,
     data=None,
     metadata=None,
     include_ancestor_info=False,
-    include_child_info=False,  # lint-amnesty, pylint: disable=too-many-statements
+    include_child_info=False,
     course_outline=False,
     include_children_predicate=NEVER,
     parent_xblock=None,

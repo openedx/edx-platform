@@ -1478,9 +1478,7 @@ class TestMoveItem(ItemTest):
             self.course,
             course_id=self.course.id,
         )
-        html.runtime._services[
-            "partitions"
-        ] = partitions_service  # lint-amnesty, pylint: disable=protected-access
+        html.runtime._services["partitions"] = partitions_service  # lint-amnesty, pylint: disable=protected-access
 
         # Set access settings so html will contradict vert2 when moved into that unit
         vert2.group_access = {self.course.user_partitions[0].id: [group1.id]}
@@ -2544,9 +2542,9 @@ class TestEditSplitModule(ItemTest):
         # CachingDescriptorSystem is used in tests.
         # CachingDescriptorSystem doesn't have user service, that's needed for
         # SplitTestBlock. So, in this line of code we add this service manually.
-        split_test.runtime._services["user"] = DjangoXBlockUserService(
+        split_test.runtime._services["user"] = DjangoXBlockUserService(  # pylint: disable=protected-access
             self.user
-        )  # pylint: disable=protected-access
+        )
 
         # Call add_missing_groups method to add the missing group.
         split_test.add_missing_groups(self.request)
