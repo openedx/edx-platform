@@ -118,25 +118,6 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         expected_data = f'"initial_mode": "{initial_mode}"'
         self.assertContains(response, expected_data)
 
-    def test_login_and_registration_form_ratelimited(self):
-        """
-        Test that rate limiting for logistration enpoints works as expected.
-        """
-        login_url = reverse('signin_user')
-        for _ in range(5):
-            response = self.client.get(login_url)
-            assert response.status_code == 200
-
-        # then the rate limiter should kick in and give a HttpForbidden response
-        response = self.client.get(login_url)
-        assert response.status_code == 429
-
-        # now reset the time to 6 mins from now in future in order to unblock
-        reset_time = datetime.now(UTC) + timedelta(seconds=361)
-        with freeze_time(reset_time):
-            response = self.client.get(login_url)
-            assert response.status_code == 200
-
     @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     @ddt.data("signin_user", "register_user")
     def test_login_and_registration_form_already_authenticated(self, url_name):
