@@ -126,20 +126,29 @@ def _write_styles(selector, output_root, classes, css_attribute, suffix):
     into `output_root` as individual files
     """
     contents = {}
-    xmodule_scss_path = resource_filename(__name__, "") + "/css/"
 
     for class_ in classes:
         class_css = getattr(class_, css_attribute)()
-        rel_fragment_paths = []
-        for fragment_path in class_css.get('scss', []):
-            rel_fragment_path = fragment_path.split(xmodule_scss_path)[1]
-            rel_fragment_paths.append(rel_fragment_path)
+        fragment_paths = class_css.get('scss', [])
+        if not fragment_paths:
+            continue
+        fragment_names = []
+        for fragment_path in fragment_paths:
+            with open(fragment_path, 'rb') as fragment_file:
+                fragment = fragment_file.read()
+            fragment_name = "{hash}.{type}".format(
+                hash=hashlib.md5(fragment).hexdigest(),
+                type='scss')
+            # Prepend _ so that sass just includes the files into a single file
+            filename = '_' + fragment_name
+            contents[filename] = fragment
+            fragment_names.append(fragment_name)
 
         module_styles_lines = []
         module_styles_lines.append("""{selector}.xmodule_{class_.__name__} {{""".format(
             class_=class_, selector=selector
         ))
-        module_styles_lines.extend(f'  @import "{path}";' for path in rel_fragment_paths)
+        module_styles_lines.extend(f'  @import "{name}";' for name in fragment_names)
         module_styles_lines.append('}')
 
         contents[f"{class_.__name__}{suffix}.scss"] = '\n'.join(module_styles_lines)
