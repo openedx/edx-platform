@@ -2,11 +2,12 @@
 OAuth Dispatch test mixins
 """
 
+from copy import deepcopy
+
 import pytest
-import jwt
 from django.conf import settings
-from jwt.api_jwk import PyJWK, PyJWKSet
-from jwt.utils import base64url_encode
+from django.test.utils import override_settings
+from edx_rest_framework_extensions.auth.jwt.decoder import jwt_decode_handler
 from jwt.exceptions import ExpiredSignatureError
 
 from common.djangoapps.student.models import UserProfile, anonymous_id_for_user
@@ -23,47 +24,23 @@ class AccessTokenMixin:
         Returns:
             dict: Decoded JWT payload
         """
-        scopes = scopes or []
-        audience = aud or settings.JWT_AUTH['JWT_AUDIENCE']
-        secret_key = secret or settings.JWT_AUTH['JWT_SECRET_KEY']
-        issuer = settings.JWT_AUTH['JWT_ISSUER']
-
         def _decode_jwt(verify_expiration):
-            """
-            Helper method to decode a JWT with the ability to
-            verify the expiration of said token
-            """
-            key_set = []
-            if should_be_asymmetric_key:
-                signing_jwk_set = settings.JWT_AUTH.get('JWT_PUBLIC_SIGNING_JWK_SET')
-                key_set.extend(PyJWKSet.from_json(signing_jwk_set).keys)
-            else:
-                encoded_secret_key = base64url_encode(secret_key.encode('utf-8'))
-                key_set.append(PyJWK({'k': encoded_secret_key, 'kty': 'oct'}))
+            auth_settings = deepcopy(settings.JWT_AUTH)
+            auth_settings['JWT_VERIFY_EXPIRATION'] = verify_expiration
+            if aud:
+                auth_settings['JWT_ISSUERS'][0]['AUDIENCE'] = aud
+            if secret:
+                auth_settings['JWT_ISSUERS'][0]['SECRET_KEY'] = secret
+            if not should_be_asymmetric_key:
+                del auth_settings['JWT_PUBLIC_SIGNING_JWK_SET']
 
-            for i in range(len(key_set)):
-                try:
-                    algorithms = None
-                    if key_set[i].key_type == 'RSA':
-                        algorithms = ['RS256', 'RS512']
-                    elif key_set[i].key_type == 'oct':
-                        algorithms = ['HS256']
+            with override_settings(JWT_AUTH=auth_settings):
+                # This method is not supposed to be called directly, but for test code, it's fine.
+                return jwt_decode_handler(access_token, decode_symmetric_token=not should_be_asymmetric_key)
 
-                    data = jwt.decode(
-                        access_token,
-                        key=key_set[i].key,
-                        issuer=issuer,
-                        algorithms=algorithms,
-                        audience=aud,
-                        options={
-                            "verify_exp": verify_expiration,
-                            "verify_aud": bool(aud)
-                        },
-                    )
-                    return data
-                except Exception:  # pylint: disable=broad-except
-                    if i == len(key_set) - 1:
-                        raise
+        scopes = scopes or []
+        audience = aud or settings.JWT_AUTH['JWT_ISSUERS'][0]['AUDIENCE']
+        issuer = settings.JWT_AUTH['JWT_ISSUERS'][0]['ISSUER']
 
         # Note that if we expect the claims to have expired
         # then we ask the JWT library not to verify expiration
