@@ -251,7 +251,7 @@ class NotificationCountView(APIView):
 
     def get(self, request):
         """
-        Get the unseen notifications count show_notification_tray flag for a user .
+        Get the unseen notifications count and show_notification_tray flag for a user.
 
         **Permissions**: User must be authenticated.
         **Response Format**:
@@ -277,25 +277,24 @@ class NotificationCountView(APIView):
         )
         count_total = 0
         count_by_app_name_dict = {}
+        show_notifications_tray_enabled = False
 
         for item in count_by_app_name:
             app_name = item['app_name']
             count = item['count']
-
             count_total += count
             count_by_app_name_dict[app_name] = count
 
-        # Retrieve active course enrollments for the current user
-        learner_enrollments = CourseEnrollment.objects.filter(user=request.user, is_active=True)
+        learner_enrollments_course_ids = CourseEnrollment.objects.filter(
+            user=request.user,
+            is_active=True
+        ).values_list('course_id', flat=True)
 
-        # Check if the show_notifications_tray flag is enabled for any of the learner's enrollments
-        show_notifications_tray_enabled = any(
-            SHOW_NOTIFICATIONS_TRAY.is_enabled(enrollment.course.id)
-            for enrollment in learner_enrollments
-        )
+        for course_id in learner_enrollments_course_ids:
+            if SHOW_NOTIFICATIONS_TRAY.is_enabled(course_id):
+                show_notifications_tray_enabled = True
+                break
 
-        # Return the unseen notifications count for the user, the count of unseen notifications for each app name,
-        # and whether the notifications tray should be shown or hidden.
         return Response({
             "show_notifications_tray": show_notifications_tray_enabled,
             "count": count_total,

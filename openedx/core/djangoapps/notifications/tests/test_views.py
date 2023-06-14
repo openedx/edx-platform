@@ -408,7 +408,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         super().setUp()
         self.user = UserFactory()
         self.client = APIClient()
-        self.user = UserFactory()
+
         course = CourseFactory.create(
             org='testorg',
             number='testcourse',
@@ -433,27 +433,22 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
 
     @ddt.data((False,), (True,))
     @ddt.unpack
-    def test_get_unseen_notifications_count_with_show_notifications_tray(self, show_notification_tray_enabled):
+    def test_get_unseen_notifications_count_with_show_notifications_tray(self, show_notifications_tray_enabled):
         """
-        Test that the endpoint returns the correct count of unseen notifications and show_notification_tray value.
+        Test that the endpoint returns the correct count of unseen notifications and show_notifications_tray value.
         """
         self.client.login(username=self.user.username, password='test')
 
         # Enable or disable the waffle flag based on the test case data
-        with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notification_tray_enabled):
+        with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notifications_tray_enabled):
 
             # Make a request to the view
             response = self.client.get(self.url)
-            learner_enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
-            expected_data = any(
-                SHOW_NOTIFICATIONS_TRAY.is_enabled(enrollment.course.id)
-                for enrollment in learner_enrollments
-            )
 
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data['count'], 4)
             self.assertEqual(response.data['count_by_app_name'], {'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1})
-            self.assertEqual(response.data['show_notifications_tray'], expected_data)
+            self.assertEqual(response.data['show_notifications_tray'], show_notifications_tray_enabled)
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
         """

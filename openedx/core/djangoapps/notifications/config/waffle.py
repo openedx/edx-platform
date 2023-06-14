@@ -24,6 +24,6 @@ ENABLE_NOTIFICATIONS = CourseWaffleFlag(f'{WAFFLE_NAMESPACE}.enable_notification
 # .. toggle_description: Waffle flag to show notifications tray
 # .. toggle_use_cases: temporary, open_edx
 # .. toggle_creation_date: 2023-06-07
-# .. toggle_target_removal_date: 2023-06-07
+# .. toggle_target_removal_date: 2023-12-07
 # .. toggle_tickets: INF-902
 SHOW_NOTIFICATIONS_TRAY = CourseWaffleFlag(f"{WAFFLE_NAMESPACE}.show_notifications_tray", __name__)
