@@ -48,7 +48,11 @@
                         </div>
                     </div>
                 <% } %>
-                <% if (isSubscriptionEligible) { %>
+                <% if (isSubscriptionEligible && (
+                        completedCount !== totalCount
+                        || subscriptionState === 'active'
+                    )
+                ) { %>
                 <div class="d-flex flex-column align-items-start flex-xl-row  align-items-xl-center upgrade-subscription">
                     <a
                         href="<%- subscriptionUrl %>"

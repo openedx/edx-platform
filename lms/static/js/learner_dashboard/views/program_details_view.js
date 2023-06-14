@@ -200,6 +200,7 @@ class ProgramDetailsView extends Backbone.View {
         ));
         const programPurchasedWithoutSubscription = (
             this.subscriptionModel.get('subscriptionState') !== 'active'
+            && this.subscriptionModel.get('subscriptionState') !== 'inactive'
             && !isSomeCoursePurchasable
             && this.remainingCourseCollection.length === 0
         );
