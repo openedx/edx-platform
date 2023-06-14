@@ -1,20 +1,18 @@
 import { combineReducers } from 'redux'; // eslint-disable-line
 import { blocks, selectedBlock, rootBlock } from 'BlockBrowser/data/reducers'; // eslint-disable-line
-import blockBrowserActions from 'BlockBrowser/data/actions/constants'; // eslint-disable-line
+import { GET_PROGRAM_SKILL_ASSESSMENT_MAPPING } from '../actions/actionTypes';
 
 const initialState = {
-  error: null,
-  inProgress: false,
-  succeeded: false,
-  reportPath: null,
-  reportName: null,
-  timeout: null,
+  mapping: []
 };
 
-export const reportStatus = (state = initialState, action) => {
+export const skillAssessmentReducer = (state = initialState, action) => {
   switch (action.type) {
-    case blockBrowserActions.SELECT_BLOCK:
-      return initialState;
+    case GET_PROGRAM_SKILL_ASSESSMENT_MAPPING:
+      return {
+        ...state,
+        mapping: action.payload
+      }
     default:
       return state;
   }
@@ -24,5 +22,5 @@ export default combineReducers({
   blocks,
   selectedBlock,
   rootBlock,
-  reportStatus,
+  skillAssessmentReducer,
 });

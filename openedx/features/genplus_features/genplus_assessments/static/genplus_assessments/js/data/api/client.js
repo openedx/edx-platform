@@ -2,6 +2,7 @@ import Cookies from 'js-cookie';
 import 'whatwg-fetch';
 
 const COURSE_BLOCKS_API = '/api/courses/v1/blocks/';
+const PROGRAM_MAPPING_API = '/genplus/assessment/api/v1/program-mapping'
 
 const HEADERS = {
   Accept: 'application/json',
@@ -32,3 +33,22 @@ export const getCourseBlocks = (baseUrl, courseId) => fetch(
     headers: HEADERS,
   },
 );
+
+
+export const getProgramQuestionsMapping = (program_slug) => fetch(
+  `${PROGRAM_MAPPING_API}/${program_slug}`, {
+    credentials: 'include',
+    method: 'get',
+    headers: HEADERS,
+  },
+)
+
+export const addProgramQuestionsMapping = (program_slug, mapping_data) => fetch(
+  `${PROGRAM_MAPPING_API}/${program_slug}/`, {
+    method: 'post',
+    mode: "cors",
+    credentials: 'include',
+    headers: HEADERS,
+    body: JSON.stringify(mapping_data)
+  },
+)

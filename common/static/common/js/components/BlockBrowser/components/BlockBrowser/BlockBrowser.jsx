@@ -35,7 +35,7 @@ const BlockType = PropTypes.shape({
 
 export const BlockList = ({ blocks, selectedBlock, onSelectBlock, onChangeRoot }) => (
   <ul className="block-list">
-    {blocks.map(block => (
+    {blocks && blocks.map(block => (
       <li
         key={block.id}
         className={classNames(`block-type-${block.type}`, { selected: block.id === selectedBlock })}

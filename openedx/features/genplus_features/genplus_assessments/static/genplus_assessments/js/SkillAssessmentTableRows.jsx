@@ -1,26 +1,36 @@
 import React from 'react';
+import { Button } from '@edx/paragon';
 import BlockBrowserContainer from 'BlockBrowser/components/BlockBrowser/BlockBrowserContainer';
 
-function TableRows(props) {
+function SkillAssessmentTableRows(props) {
     const {
         rowsData,
         deleteTableRows,
         unitKeys,
-        showDropdown,
         handleSelectIntro,
         handleSelectOutro,
-        handleToggleDropdown,
-        hideDropdown
+        handleIntroToggleDropdown,
+        handleOutroToggleDropdown,
+        hideIntroDropdown,
+        hideOutroDropdown,
+        onSelectBlock
     } = props;
     return(
         rowsData.map((data, index)=>{
-            const {selectedIntro, selectedOutro} = data;
+            const {
+                selectedIntro,
+                selectedOutro,
+                selectedIntroBlock,
+                selectedOutroBlock,
+                showIntroDropdown,
+                showOutroDropdown
+            } = data;
             return(
                 <tr key={index}>
                 <td>
                     <select
                     value={selectedIntro}
-                    onChange={handleSelectIntro}
+                    onChange={(event) => handleSelectIntro(index, event)}
                     className="form-control"
                     id={"select-intro-" + index}
                     >
@@ -34,14 +44,14 @@ function TableRows(props) {
                 </td>
                 <td>
                 <div className="problem-browser">
-                    <Button onClick={handleToggleDropdown} label={gettext('Select Intro Problem')} />
-                    <span>Intro</span>
+                    <Button onClick={()=>handleIntroToggleDropdown(index)} label={gettext('Select Intro Problem')} />
+                    <span>{selectedIntroBlock}</span>
                     {
-                        showDropdown &&
+                        showIntroDropdown && selectedIntro !== "" &&
                         <BlockBrowserContainer
                         onSelectBlock={(blockId) => {
-                            hideDropdown();
                             onSelectBlock(blockId);
+                            hideIntroDropdown(index, blockId);
                         }}
                         />
                     }
@@ -50,7 +60,7 @@ function TableRows(props) {
                 <td>
                     <select
                         value={selectedOutro}
-                        onChange={handleSelectOutro}
+                        onChange={(event) => handleSelectOutro(index, event)}
                         className="form-control"
                         id={"select-outro-" + index}
                         >
@@ -64,14 +74,14 @@ function TableRows(props) {
                 </td>
                 <td>
                 <div className="problem-browser">
-                    <Button onClick={handleToggleDropdown} label={gettext('Select Outro Problem')} />
-                    <span>Outro</span>
+                    <Button onClick={()=>handleOutroToggleDropdown(index)} label={gettext('Select Outro Problem')} />
+                    <span>{selectedOutroBlock}</span>
                     {
-                        showDropdown &&
+                        showOutroDropdown && selectedOutro !== "" &&
                         <BlockBrowserContainer
                         onSelectBlock={(blockId) => {
-                            hideDropdown();
                             onSelectBlock(blockId);
+                            hideOutroDropdown(index, blockId);
                         }}
                         />
                     }
@@ -85,4 +95,4 @@ function TableRows(props) {
     )
 
 }
-export default TableRows;
+export default SkillAssessmentTableRows;

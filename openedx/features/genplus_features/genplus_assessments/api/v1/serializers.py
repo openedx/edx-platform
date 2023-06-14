@@ -6,7 +6,8 @@ from openedx.features.genplus_features.genplus.models import Student
 from openedx.features.genplus_features.genplus.models import Class
 from openedx.features.genplus_features.genplus_assessments.models import (
     UserResponse,
-    UserRating
+    UserRating,
+    SkillAssessmentQuestion
 )
 from openedx.features.genplus_features.genplus_learning.models import (
     ClassLesson,
@@ -93,3 +94,9 @@ class RatingAssessmentSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         return get_user_model().objects.get(pk=obj.user_id).profile.name
+
+
+class SkillAssessmentQuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SkillAssessmentQuestion
+        fields = ('start_unit', 'start_unit_location', 'end_unit', 'end_unit_location')

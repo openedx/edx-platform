@@ -11,10 +11,15 @@ from opaque_keys.edx.keys import UsageKey, CourseKey
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import Class
-from openedx.features.genplus_features.genplus_assessments.models import UserResponse, UserRating
-from openedx.features.genplus_features.genplus_learning.models import Unit
-from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher
-from .serializers import ClassSerializer, TextAssessmentSerializer, RatingAssessmentSerializer
+from openedx.features.genplus_features.genplus_assessments.models import UserResponse, UserRating, SkillAssessmentQuestion
+from openedx.features.genplus_features.genplus_learning.models import Unit, Program
+from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher, IsAdmin
+from .serializers import (
+    ClassSerializer,
+    TextAssessmentSerializer,
+    RatingAssessmentSerializer,
+    SkillAssessmentQuestionSerializer
+)
 from openedx.features.genplus_features.genplus_assessments.constants import (
     TOTAL_PROBLEM_SCORE, INTRO_RATING_ASSESSMENT_RESPONSE,
     OUTRO_RATING_ASSESSMENT_RESPONSE, MAX_SKILLS_SCORE
@@ -420,3 +425,28 @@ class SkillAssessmentViewSet(viewsets.ViewSet):
                     response['student_response'][user_id]['score_end_of_year'] = data['rating']
 
         return response
+
+
+class SkillAssessmentAdminViewSet(viewsets.ViewSet):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+    permission_classes = [IsAuthenticated, IsAdmin]
+
+    def get_skills_assessment_question_mapping(self, request, **kwargs):
+        program_slug = kwargs.get('program_slug', None)
+        try:
+            program = Program.objects.get(slug=program_slug)
+        except Program.DoesNotExist:
+            return Response("Program not found", status=status.HTTP_400_BAD_REQUEST)
+
+        program_questions = SkillAssessmentQuestion.objects.filter(program=program)
+        program_questions_mapping = SkillAssessmentQuestionSerializer(program_questions, many=True).data
+        return Response({
+            'program_slug': program_slug,
+            'questions_mapping': program_questions_mapping
+        })
+
+    def add_skills_assessment_question_mapping(self, request, **kwargs):
+        program_slug = kwargs.get('program_slug', None)
+        return Response({
+            'program_slug': program_slug
+        })

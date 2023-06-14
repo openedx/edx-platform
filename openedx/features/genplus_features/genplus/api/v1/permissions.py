@@ -40,3 +40,9 @@ class FromPrivateSchool(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.gen_user.from_private_school
 
+
+class IsAdmin(permissions.BasePermission):
+    message = 'Current user is not admin'
+
+    def has_permission(self, request, view):
+        return request.user.is_superuser
