@@ -154,15 +154,12 @@ class TestCachePrograms(CatalogIntegrationMixin, CacheIsolationTestCase, SiteMix
 
             return (200, headers, json.dumps(body))
 
-        # NOTE: httpretty does not properly match against query strings here (using match_querystring arg)
-        # as such, it does not actually look at the query parameters (for page num), but returns items in a LIFO order.
-        # this means that for multiple pages, you must call this function starting from the last page.
-        # we do assert the page number query param above, however
         httpretty.register_uri(
             httpretty.GET,
-            self.pathway_url,
+            self.pathway_url + f'?exclude_utm=1&page={page_number}',
             body=pathways_callback,
             content_type='application/json',
+            match_querystring=True,
         )
 
     def test_handle_domain(self):
