@@ -83,11 +83,11 @@ class JsonResponse(HttpResponse):
     Django HttpResponse subclass that has sensible defaults for outputting JSON.
     """
 
-    def __init__(
+    def __init__(  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
         self,
         resp_obj=None,
         status=None,
-        encoder=EDXJSONEncoder,  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
+        encoder=EDXJSONEncoder,
         *args,
         **kwargs
     ):
