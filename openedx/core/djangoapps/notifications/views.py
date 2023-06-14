@@ -4,7 +4,6 @@ Views for the notifications API.
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db.models import Count
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
@@ -19,7 +18,7 @@ from openedx.core.djangoapps.notifications.models import (
     get_course_notification_preference_config_version
 )
 
-from .config.waffle import ENABLE_NOTIFICATIONS
+from .config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
 from .models import Notification
 from .serializers import (
     NotificationCourseEnrollmentSerializer,
@@ -27,8 +26,6 @@ from .serializers import (
     UserCourseNotificationPreferenceSerializer,
     UserNotificationPreferenceUpdateSerializer
 )
-
-User = get_user_model()
 
 
 class CourseEnrollmentListView(generics.ListAPIView):
@@ -247,19 +244,20 @@ class NotificationListAPIView(generics.ListAPIView):
 
 class NotificationCountView(APIView):
     """
-    API view for getting the unseen notifications count for a user.
+    API view for getting the unseen notifications count and show_notification_tray flag for a user.
     """
 
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
         """
-        Get the unseen notifications count for a user.
+        Get the unseen notifications count show_notification_tray flag for a user .
 
         **Permissions**: User must be authenticated.
         **Response Format**:
         ```json
         {
+            "show_notifications_tray": (bool) show_notifications_tray,
             "count": (int) total_number_of_unseen_notifications,
             "count_by_app_name": {
                 (str) app_name: (int) number_of_unseen_notifications,
@@ -286,9 +284,20 @@ class NotificationCountView(APIView):
 
             count_total += count
             count_by_app_name_dict[app_name] = count
-        # Return the unseen notifications count for the user and the unseen notifications count for each app name.
 
+        # Retrieve active course enrollments for the current user
+        learner_enrollments = CourseEnrollment.objects.filter(user=request.user, is_active=True)
+
+        # Check if the show_notifications_tray flag is enabled for any of the learner's enrollments
+        show_notifications_tray_enabled = any(
+            SHOW_NOTIFICATIONS_TRAY.is_enabled(enrollment.course.id)
+            for enrollment in learner_enrollments
+        )
+
+        # Return the unseen notifications count for the user, the count of unseen notifications for each app name,
+        # and whether the notifications tray should be shown or hidden.
         return Response({
+            "show_notifications_tray": show_notifications_tray_enabled,
             "count": count_total,
             "count_by_app_name": count_by_app_name_dict,
         })
