@@ -59,6 +59,12 @@ def expect_json(view_function):
 
 
 def expect_json_in_class_view(view):
+    """
+    Class-based View decorator for simplifying handing of requests that expect json.  If the request's
+    CONTENT_TYPE is application/json, parses the json dict from request.body, and updates
+    request.POST with the contents.
+    """
+
     def _wrapper_view(self, request, *args, **kwargs):
         if "application/json" in request.META.get("CONTENT_TYPE", "") and request.body:
             try:
@@ -70,16 +76,6 @@ def expect_json_in_class_view(view):
         return view(self, request, *args, **kwargs)
 
     return _wrapper_view
-
-
-def _add_json_to_request(request):
-    if "application/json" in request.META.get("CONTENT_TYPE", "") and request.body:
-        try:
-            request.json = json.loads(request.body.decode("utf8"))
-        except ValueError:
-            return JsonResponseBadRequest({"error": "Invalid JSON"})
-    else:
-        request.json = {}
 
 
 class JsonResponse(HttpResponse):

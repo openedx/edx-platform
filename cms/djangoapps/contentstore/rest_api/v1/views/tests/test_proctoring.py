@@ -68,13 +68,13 @@ class ProctoringExamSettingsGetTests(
         url = self.get_url(course_id)
         return self.client.get(url)
 
-    def test_global_staff(self):
+    def test_global_staff(self):  # pylint: disable=arguments-differ
         response = super().test_global_staff(status=status.HTTP_200_OK)
         assert response.data == self.get_expected_response_data(
             self.course, self.global_staff
         )
 
-    def test_course_instructor(self):
+    def test_course_instructor(self):  # pylint: disable=arguments-differ
         response = super().test_course_instructor(status=status.HTTP_200_OK)
         assert response.data == self.get_expected_response_data(
             self.course, self.course_instructor
@@ -157,7 +157,7 @@ class ProctoringExamSettingsPostTests(
             data = self.get_request_data()
         return self.client.post(url, data, format="json")
 
-    def test_course_instructor(self):
+    def test_course_instructor(self):  # pylint: disable=arguments-differ
         return super().test_course_instructor(status=status.HTTP_403_FORBIDDEN)
 
     @override_settings(
@@ -281,8 +281,10 @@ class ProctoringExamSettingsPostTests(
             {
                 "detail": [
                     {
-                        "proctoring_provider": "The selected proctoring provider, notvalidprovider, is not a valid provider. "
-                        "Please select from one of ['test_proctoring_provider']."
+                        "proctoring_provider": (
+                            "The selected proctoring provider, notvalidprovider, is not a valid provider. "
+                            "Please select from one of ['test_proctoring_provider']."
+                        )
                     }
                 ]
             },
@@ -410,8 +412,10 @@ class ProctoringExamSettingsPostTests(
             {
                 "detail": [
                     {
-                        "proctoring_provider": "The selected proctoring provider, lti_external, is not a valid provider. "
-                        "Please select from one of ['null']."
+                        "proctoring_provider": (
+                            "The selected proctoring provider, lti_external, is not a valid provider. "
+                            "Please select from one of ['null']."
+                        )
                     }
                 ]
             },

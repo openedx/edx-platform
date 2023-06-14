@@ -211,7 +211,6 @@ class ImportIdGenerator(IdGenerator):
 
 
 def import_staged_content_from_user_clipboard(parent_key: UsageKey, request):
-    from cms.djangoapps.contentstore.views.preview import _load_preview_block
     """
     Import a block (and any children it has) from "staged" OLX.
     Does not deal with permissions or REST stuff - do that before calling this.
@@ -219,6 +218,9 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request):
     Returns the newly created block on success or None if the clipboard is
     empty.
     """
+
+    from cms.djangoapps.contentstore.views.preview import _load_preview_block
+
     if not content_staging_api:
         raise RuntimeError("The required content_staging app is not installed")
     user_clipboard = content_staging_api.get_user_clipboard(request.user.id)

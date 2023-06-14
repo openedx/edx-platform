@@ -37,6 +37,7 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
             raise Http404
         return super().dispatch(request, *args, **kwargs)
 
+    # pylint: disable=arguments-differ
     @course_author_access_required
     @expect_json_in_class_view
     def retrieve(self, request, course_key, usage_key_string=None):
