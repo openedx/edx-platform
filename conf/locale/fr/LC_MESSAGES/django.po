@@ -316,7 +316,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-17 08:57+0000\n"
+"POT-Creation-Date: 2023-06-04 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Alexandre DS <alexandre@cleverm8.com>, 2020\n"
 "Language-Team: French (https://app.transifex.com/open-edx/teams/6205/fr/)\n"
@@ -7803,6 +7803,12 @@ msgstr ""
 "associé seront désactivées."
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr "Les données de configuration LTI pour ce contexte / fournisseur."
 
@@ -13621,6 +13627,20 @@ msgstr "Groupe Supprimé"
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Duplication de {0}"
+
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Duplication de '{0}'"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "Id du cours prérequis invalide"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr ""
@@ -13756,16 +13776,6 @@ msgid "You must provide target_index ({target_index}) as an integer."
 msgstr ""
 "Vous devez fournir l'index_cible ({target_index}) en un nombre entier."
 
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Duplication de {0}"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Duplication de '{0}'"
-
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
@@ -13886,10 +13896,6 @@ msgstr ""
 "Vous devez associer ce cours à une organisation pour continuer. "
 "L'organisation sélectionnée n'existe pas dans le système, vous allez devoir "
 "l'ajouter au système"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "Id du cours prérequis invalide"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -15151,6 +15157,10 @@ msgid "Learn more about this course"
 msgstr ""
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr ""
 
@@ -15552,7 +15562,11 @@ msgid "Downloads and transcripts"
 msgstr "Téléchargements et transcriptions"
 
 #: lms/templates/video.html
-msgid "Share on:"
+msgid "Download video file"
+msgstr "Télécharger le fichier vidéo"
+
+#: lms/templates/video.html
+msgid "Share this video"
 msgstr ""
 
 #: lms/templates/video.html
@@ -15560,8 +15574,8 @@ msgid "Share on {site}"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Télécharger le fichier vidéo"
+msgid "Copy"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -25058,7 +25072,7 @@ msgid "Set Access"
 msgstr "Définir l'accès"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

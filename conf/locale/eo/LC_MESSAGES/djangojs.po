@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-22 14:47+0000\n"
-"PO-Revision-Date: 2023-05-22 14:47:11.337765\n"
+"POT-Creation-Date: 2023-06-15 10:18+0000\n"
+"PO-Revision-Date: 2023-06-15 10:18:10.943782\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -3456,6 +3456,10 @@ msgstr "Stärtéd {start} Ⱡ'σяєм ιρѕυм ∂σłσя #"
 msgid "Ends {end}"
 msgstr "Énds {end} Ⱡ'σяєм ιρѕυм ∂#"
 
+#: lms/static/js/learner_dashboard/models/program_subscription_model.js
+msgid "${price}/month {currency}"
+msgstr "${price}/mönth {currency} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
 msgstr ""
@@ -3526,8 +3530,8 @@ msgid "View program"
 msgstr "Vïéw prögräm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
-msgid "Enroll in a {programName} course"
-msgstr "Énröll ïn ä {programName} çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+msgid "Enroll in a {programName}'s course"
+msgstr "Énröll ïn ä {programName}'s çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -3562,6 +3566,12 @@ msgstr ""
 " σƒƒι¢ια ∂єѕєяυ#"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Subscription trial expires in less than 24 hours"
+msgstr ""
+"Süßsçrïptïön trïäl éxpïrés ïn léss thän 24 höürs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Subscription trial expires in {remainingDays} day"
 msgid_plural "Subscription trial expires in {remainingDays} days"
 msgstr[0] ""
@@ -3573,21 +3583,30 @@ msgstr[1] ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
+"Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and"
+" the card on file will be charged {subscriptionPrice}."
+msgstr ""
+"Ýöür {programName} trïäl wïll éxpïré ät {trialEndTime} ön {trialEndDate} änd"
+" thé çärd ön fïlé wïll ßé çhärgéd {subscriptionPrice}. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
 "Your {programName} trial will expire in {remainingDays} day at "
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
-"{subscriptionPrice}/month."
+"{subscriptionPrice}."
 msgid_plural ""
 "Your {programName} trial will expire in {remainingDays} days at "
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
-"{subscriptionPrice}/month."
+"{subscriptionPrice}."
 msgstr[0] ""
 "Ýöür {programName} trïäl wïll éxpïré ïn {remainingDays} däý ät "
 "{trialEndTime} ön {trialEndDate} änd thé çärd ön fïlé wïll ßé çhärgéd "
-"{subscriptionPrice}/mönth. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+"{subscriptionPrice}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 msgstr[1] ""
 "Ýöür {programName} trïäl wïll éxpïré ïn {remainingDays} däýs ät "
 "{trialEndTime} ön {trialEndDate} änd thé çärd ön fïlé wïll ßé çhärgéd "
-"{subscriptionPrice}/mönth. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+"{subscriptionPrice}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
@@ -9714,13 +9733,12 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
-"Restart your subscription for {subscriptionPrice}/month. Your payment "
-"history is still available on the {a_start}Orders and subscriptions{a_end} "
-"page"
+"Restart your subscription for {subscriptionPrice}. Your payment history is "
+"still available on the {a_start}Orders and subscriptions{a_end} page"
 msgstr ""
-"Réstärt ýöür süßsçrïptïön för {subscriptionPrice}/mönth. Ýöür päýmént "
-"hïstörý ïs stïll äväïläßlé ön thé {a_start}Ördérs änd süßsçrïptïöns{a_end} "
-"pägé Ⱡ'σяєм ιρ#"
+"Réstärt ýöür süßsçrïptïön för {subscriptionPrice}. Ýöür päýmént hïstörý ïs "
+"stïll äväïläßlé ön thé {a_start}Ördérs änd süßsçrïptïöns{a_end} pägé Ⱡ'σяєм "
+"ιρѕυм ∂#"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
@@ -9788,8 +9806,34 @@ msgstr "Çöngrätülätïöns! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"You have successfully completed all the requirements for the %(title)s "
+"%(type)s."
+msgstr ""
+"Ýöü hävé süççéssfüllý çömplétéd äll thé réqüïréménts för thé %(title)s "
+"%(type)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr "Ýöür Prögräm Jöürnéý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s course(s) in this "
+"program. To complete the program, you must earn a verified certificate for "
+"each course."
+msgstr ""
+"Träçk änd plän ýöür prögréss thröügh thé %(count)s çöürsé(s) ïn thïs "
+"prögräm. Tö çömplété thé prögräm, ýöü müst éärn ä vérïfïéd çértïfïçäté för "
+"éäçh çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
+"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
+"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
+"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αη#"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -9808,34 +9852,30 @@ msgstr "Stärt {trialLength}-däý fréé trïäl Ⱡ'σяєм ιρѕυм ∂σ�
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid "Active trial ends {trialEndDate} at {trialEndTime}"
+msgid "Trial ends {trialEndDate} at {trialEndTime}"
 msgstr ""
-"Àçtïvé trïäl énds {trialEndDate} ät {trialEndTime} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢#"
+"Trïäl énds {trialEndDate} ät {trialEndTime} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid "Your next billing date is {nextPaymentDate}"
+msgid "Your next billing date is {currentPeriodEnd}"
 msgstr ""
-"Ýöür néxt ßïllïng däté ïs {nextPaymentDate} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Ýöür néxt ßïllïng däté ïs {currentPeriodEnd} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢#"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"Unlock verified access to all courses for {subscriptionPrice}/month. Cancel "
-"anytime."
+msgid "{subscriptionPrice} subscription. Cancel anytime."
 msgstr ""
-"Ûnlöçk vérïfïéd äççéss tö äll çöürsés för {subscriptionPrice}/mönth. Çänçél "
-"änýtïmé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"{subscriptionPrice} süßsçrïptïön. Çänçél änýtïmé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"{subscriptionPrice}/month subscription after trial ends. Cancel anytime."
+msgid "{subscriptionPrice} subscription after trial ends. Cancel anytime."
 msgstr ""
-"{subscriptionPrice}/mönth süßsçrïptïön äftér trïäl énds. Çänçél änýtïmé. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"{subscriptionPrice} süßsçrïptïön äftér trïäl énds. Çänçél änýtïmé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -9881,6 +9921,45 @@ msgid ""
 msgstr ""
 "Çömplété çöürsés ön ýöür sçhédülé tö énsüré ýöü ständ öüt ïn ýöür fïéld! "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid "Transform your %(org)s %(type)s into a full master’s degree"
+msgstr ""
+"Tränsförm ýöür %(org)s %(type)s ïntö ä füll mästér’s dégréé Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Successful completion of %(org)s %(program)s credential can be applied "
+"towards flexible, rigorous, and affordable masters degrees from the world’s "
+"leading universities."
+msgstr ""
+"Süççéssfül çömplétïön öf %(org)s %(program)s çrédéntïäl çän ßé äpplïéd "
+"töwärds fléxïßlé, rïgöröüs, änd äffördäßlé mästérs dégréés fröm thé wörld’s "
+"léädïng ünïvérsïtïés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
+"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
+"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσ#"
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s courses in this program. "
+"To complete the program, you must earn a verified certificate for each "
+"course."
+msgstr ""
+"Träçk änd plän ýöür prögréss thröügh thé %(count)s çöürsés ïn thïs prögräm. "
+"Tö çömplété thé prögräm, ýöü müst éärn ä vérïfïéd çértïfïçäté för éäçh "
+"çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
+" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
+"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
+" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм#"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
@@ -9934,16 +10013,16 @@ msgid "Upgrade with a subscription"
 msgstr "Ûpgrädé wïth ä süßsçrïptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
-msgid "Pay {subscriptionPrice}/month for all courses in this program"
+msgid "Pay {subscriptionPrice} for all courses in this program"
 msgstr ""
-"Päý {subscriptionPrice}/mönth för äll çöürsés ïn thïs prögräm Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+"Päý {subscriptionPrice} för äll çöürsés ïn thïs prögräm Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
-msgid "Pay {subscriptionPrice}/month after {trialLength}-day free trial"
+msgid "Pay {subscriptionPrice} after {trialLength}-day free trial"
 msgstr ""
-"Päý {subscriptionPrice}/mönth äftér {trialLength}-däý fréé trïäl Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"Päý {subscriptionPrice} äftér {trialLength}-däý fréé trïäl Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"

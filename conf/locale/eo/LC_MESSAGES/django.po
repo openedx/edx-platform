@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-22 14:47+0000\n"
-"PO-Revision-Date: 2023-05-22 14:47:11.867932\n"
+"POT-Creation-Date: 2023-06-15 10:18+0000\n"
+"PO-Revision-Date: 2023-06-15 10:18:10.980503\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -8449,6 +8449,14 @@ msgstr ""
 "ßé dïsäßléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+"Thé Pöstïng äväïläßïltý ïn dïsçüssïöns whéthér ït wïll ßé énäßléd, sçhédüléd"
+" ör ïndéfïnïtélý dïsäßléd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr ""
 "Thé LTÌ çönfïgürätïön dätä för thïs çöntéxt/prövïdér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
@@ -15047,6 +15055,20 @@ msgstr "Délétéd Gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group} Ⱡ'σяєм ιρѕυм ∂#"
 
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Düplïçäté öf {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Düplïçäté öf '{0}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "Ìnvälïd préréqüïsïté çöürsé kéý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr ""
@@ -15204,16 +15226,6 @@ msgstr ""
 "Ýöü müst prövïdé tärgét_ïndéx ({target_index}) äs än ïntégér. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Düplïçäté öf {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Düplïçäté öf '{0}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
@@ -15352,10 +15364,6 @@ msgstr ""
 "єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
 " νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυ#"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "Ìnvälïd préréqüïsïté çöürsé kéý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -16737,6 +16745,10 @@ msgid "Learn more about this course"
 msgstr "Léärn möré äßöüt thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr "Gö tö çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr "Énröll ïn thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
@@ -17167,16 +17179,20 @@ msgid "Downloads and transcripts"
 msgstr "Döwnlöäds änd tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/video.html
-msgid "Share on:"
-msgstr "Shäré ön: Ⱡ'σяєм ιρѕυм ∂σł#"
+msgid "Download video file"
+msgstr "Döwnlöäd vïdéö fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/video.html
+msgid "Share this video"
+msgstr "Shäré thïs vïdéö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
 msgstr "Shäré ön {site} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Döwnlöäd vïdéö fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+msgid "Copy"
+msgstr "Çöpý Ⱡ'σяєм ι#"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -27852,8 +27868,8 @@ msgid "Set Access"
 msgstr "Sét Àççéss Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
-msgstr "Çöpý Ⱡ'σяєм ι#"
+msgid "Copy to Clipboard"
+msgstr "Çöpý tö Çlïpßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"

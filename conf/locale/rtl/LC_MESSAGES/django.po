@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-22 14:47+0000\n"
-"PO-Revision-Date: 2023-05-22 14:47:11.867932\n"
+"POT-Creation-Date: 2023-06-15 10:18+0000\n"
+"PO-Revision-Date: 2023-06-15 10:18:10.980503\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -7323,6 +7323,14 @@ msgstr ""
 "bǝ dᴉsɐblǝd."
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+"Ŧɥǝ Ᵽøsʇᴉnƃ ɐʌɐᴉlɐbᴉlʇʎ ᴉn dᴉsɔnssᴉøns ʍɥǝʇɥǝɹ ᴉʇ ʍᴉll bǝ ǝnɐblǝd, sɔɥǝdnlǝd"
+" øɹ ᴉndǝɟᴉnᴉʇǝlʎ dᴉsɐblǝd."
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr "Ŧɥǝ ŁŦƗ ɔønɟᴉƃnɹɐʇᴉøn dɐʇɐ ɟøɹ ʇɥᴉs ɔønʇǝxʇ/dɹøʌᴉdǝɹ."
 
@@ -12952,6 +12960,20 @@ msgstr "Đǝlǝʇǝd Ǥɹønd"
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
+
+#: cms/djangoapps/contentstore/utils.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "Ɨnʌɐlᴉd dɹǝɹǝbnᴉsᴉʇǝ ɔønɹsǝ ʞǝʎ"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "Ŧɥǝ ᴉɯɐƃǝ ɯnsʇ ɥɐʌǝ nɐɯǝ, ɔønʇǝnʇ ʇʎdǝ, ɐnd sᴉzǝ ᴉnɟøɹɯɐʇᴉøn."
@@ -13080,16 +13102,6 @@ msgstr ""
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr "Ɏøn ɯnsʇ dɹøʌᴉdǝ ʇɐɹƃǝʇ_ᴉndǝx ({target_index}) ɐs ɐn ᴉnʇǝƃǝɹ."
 
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
-
 #. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
 #. in many languages. This is used to avoid Transifex's misinterpreting of
 #. '% o'. The percent sign is also translatable as a standalone string.
@@ -13208,10 +13220,6 @@ msgstr ""
 "Ɏøn ɯnsʇ lᴉnʞ ʇɥᴉs ɔønɹsǝ ʇø ɐn øɹƃɐnᴉzɐʇᴉøn ᴉn øɹdǝɹ ʇø ɔønʇᴉnnǝ. "
 "Øɹƃɐnᴉzɐʇᴉøn ʎøn sǝlǝɔʇǝd døǝs nøʇ ǝxᴉsʇ ᴉn ʇɥǝ sʎsʇǝɯ, ʎøn ʍᴉll nǝǝd ʇø ɐdd"
 " ᴉʇ ʇø ʇɥǝ sʎsʇǝɯ"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "Ɨnʌɐlᴉd dɹǝɹǝbnᴉsᴉʇǝ ɔønɹsǝ ʞǝʎ"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -14448,6 +14456,10 @@ msgid "Learn more about this course"
 msgstr "Łǝɐɹn ɯøɹǝ ɐbønʇ ʇɥᴉs ɔønɹsǝ"
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr "Ǥø ʇø ɔønɹsǝ"
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr "Ɇnɹøll ᴉn ʇɥᴉs ɔønɹsǝ"
 
@@ -14841,16 +14853,20 @@ msgid "Downloads and transcripts"
 msgstr "Đøʍnløɐds ɐnd ʇɹɐnsɔɹᴉdʇs"
 
 #: lms/templates/video.html
-msgid "Share on:"
-msgstr "Sɥɐɹǝ øn:"
+msgid "Download video file"
+msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
+
+#: lms/templates/video.html
+msgid "Share this video"
+msgstr "Sɥɐɹǝ ʇɥᴉs ʌᴉdǝø"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
 msgstr "Sɥɐɹǝ øn {site}"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
+msgid "Copy"
+msgstr "Ȼødʎ"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -24094,8 +24110,8 @@ msgid "Set Access"
 msgstr "Sǝʇ Ⱥɔɔǝss"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
-msgstr "Ȼødʎ"
+msgid "Copy to Clipboard"
+msgstr "Ȼødʎ ʇø Ȼlᴉdbøɐɹd"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"

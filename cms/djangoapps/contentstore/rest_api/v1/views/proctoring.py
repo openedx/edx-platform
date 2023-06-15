@@ -1,23 +1,29 @@
-"Contentstore Views"
+""" API Views for proctored exam settings and proctoring error """
 import copy
 
+from django.conf import settings
+import edx_api_doc_tools as apidocs
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from cms.djangoapps.contentstore.views.course import get_course_and_check_access
+from cms.djangoapps.contentstore.utils import get_proctored_exam_settings_url
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+from common.djangoapps.student.auth import has_studio_advanced_settings_access
 from xmodule.course_block import get_available_providers  # lint-amnesty, pylint: disable=wrong-import-order
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
-from openedx.core.lib.api.view_utils import view_auth_classes
+from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
-from .serializers import (
+from ..serializers import (
     LimitedProctoredExamSettingsSerializer,
     ProctoredExamConfigurationSerializer,
-    ProctoredExamSettingsSerializer
+    ProctoredExamSettingsSerializer,
+    ProctoringErrorsSerializer,
 )
 
 
@@ -182,3 +188,80 @@ class ProctoredExamSettingsView(APIView):
             )
 
         return course_block
+
+
+@view_auth_classes(is_authenticated=True)
+class ProctoringErrorsView(DeveloperErrorViewMixin, APIView):
+    """
+    View for getting the proctoring errors for a course with url to proctored exam settings.
+    """
+    @apidocs.schema(
+        parameters=[
+            apidocs.string_parameter("course_id", apidocs.ParameterLocation.PATH, description="Course ID"),
+        ],
+        responses={
+            200: ProctoringErrorsSerializer,
+            401: "The requester is not authenticated.",
+            403: "The requester cannot access the specified course.",
+            404: "The requested course does not exist.",
+        },
+    )
+    @verify_course_exists()
+    def get(self, request: Request, course_id: str) -> Response:
+        """
+        Get an object containing proctoring errors in a course.
+
+        **Example Request**
+
+            GET /api/contentstore/v1/proctoring_errors/{course_id}
+
+        **Response Values**
+
+        If the request is successful, an HTTP 200 "OK" response is returned.
+
+        The HTTP 200 response contains a list of object proctoring errors.
+        Also response contains mfe proctored exam settings url.
+        For each item returned an object that contains the following fields:
+
+        * **key**: This is proctoring settings key.
+        * **message**: This is a description for proctoring error.
+        * **model**: This is proctoring provider model object.
+
+        **Example Response**
+
+        ```json
+        {
+            "mfe_proctored_exam_settings_url": "http://course-authoring-mfe/course/course_key/proctored-exam-settings",
+            "proctoring_errors": [
+                {
+                "key": "proctoring_provider",
+                "message": "The proctoring provider cannot be modified after a course has started.",
+                "model": {
+                    "value": "null",
+                    "display_name": "Proctoring Provider",
+                    "help": "Enter the proctoring provider you want to use for this course run.",
+                    "deprecated": false,
+                    "hide_on_enabled_publisher": false
+                }}
+            ],
+        }
+        ```
+        """
+        course_key = CourseKey.from_string(course_id)
+        if not has_studio_advanced_settings_access(request.user):
+            self.permission_denied(request)
+
+        course_block = modulestore().get_course(course_key)
+        advanced_dict = CourseMetadata.fetch(course_block)
+        if settings.FEATURES.get('DISABLE_MOBILE_COURSE_AVAILABLE', False):
+            advanced_dict.get('mobile_available')['deprecated'] = True
+
+        proctoring_errors = CourseMetadata.validate_proctoring_settings(course_block, advanced_dict, request.user)
+        proctoring_context = {
+            'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_key),
+            'proctoring_errors': proctoring_errors,
+        }
+
+        serializer = ProctoringErrorsSerializer(data=proctoring_context)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)

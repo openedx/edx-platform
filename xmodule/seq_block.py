@@ -14,7 +14,7 @@ from django.conf import settings
 
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from pytz import UTC
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
@@ -273,14 +273,14 @@ class SequenceBlock(
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/sequence/display.js'),
+            resource_filename(__name__, 'js/src/sequence/display.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
 
     preview_view_css = {
         'scss': [
-            resource_string(__name__, 'css/sequence/display.scss'),
+            resource_filename(__name__, 'css/sequence/display.scss'),
         ],
     }
 
@@ -288,7 +288,7 @@ class SequenceBlock(
     # the static_content command happy.
     studio_view_js = {
         'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
 
     studio_view_css = {

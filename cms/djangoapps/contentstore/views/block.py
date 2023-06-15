@@ -4,19 +4,15 @@ import logging
 from collections import OrderedDict
 from datetime import datetime
 from functools import partial
-from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
-from django.utils.timezone import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from edx_django_utils.plugins import pluggable_override
-from openedx_events.content_authoring.data import DuplicatedXBlockData
-from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from edx_proctoring.api import (
     does_backend_support_onboarding,
     get_exam_by_content_id,
@@ -24,7 +20,6 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
 from help_tokens.core import HelpUrlExpert
-from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
@@ -35,13 +30,11 @@ from xblock.fields import Scope
 from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.authoring_mixin import VISIBILITY_VIEW
-from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, expect_json
-from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core.djangoapps.bookmarks import api as bookmarks_api
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
@@ -49,13 +42,11 @@ from openedx.core.lib.gating import api as gating_api
 from openedx.core.lib.xblock_utils import hash_resource, request_token, wrap_xblock, wrap_xblock_aside
 from openedx.core.toggles import ENTRANCE_EXAMS
 from xmodule.course_block import DEFAULT_START_DATE  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.library_tools import LibraryToolsService  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.inheritance import own_metadata  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.services import ConfigurationService, SettingsService, TeamsConfigurationService  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.tabs import CourseTabList  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import AUTHOR_VIEW, PREVIEW_VIEWS, STUDENT_VIEW, STUDIO_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -68,7 +59,7 @@ from ..utils import (
     get_visibility_partition_info,
     has_children_visible_to_specific_partition_groups,
     is_currently_visible_to_students,
-    is_self_paced
+    is_self_paced, duplicate_block, load_services_for_studio
 )
 from .helpers import (
     create_xblock,
@@ -245,11 +236,11 @@ def xblock_handler(request, usage_key_string=None):
                     status=400
                 )
 
-            dest_usage_key = _duplicate_block(
+            dest_usage_key = duplicate_block(
                 parent_usage_key,
                 duplicate_source_usage_key,
                 request.user,
-                request.json.get('display_name'),
+                display_name=request.json.get('display_name'),
             )
             return JsonResponse({
                 'locator': str(dest_usage_key),
@@ -275,45 +266,6 @@ def xblock_handler(request, usage_key_string=None):
             'Only instance creation is supported without a usage key.',
             content_type='text/plain'
         )
-
-
-class StudioPermissionsService:
-    """
-    Service that can provide information about a user's permissions.
-
-    Deprecated. To be replaced by a more general authorization service.
-
-    Only used by LibraryContentBlock (and library_tools.py).
-    """
-    def __init__(self, user):
-        self._user = user
-
-    def can_read(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_read_access(self._user, course_key)
-
-    def can_write(self, course_key):
-        """ Does the user have read access to the given course/library? """
-        return has_studio_write_access(self._user, course_key)
-
-
-def load_services_for_studio(runtime, user):
-    """
-    Function to set some required services used for XBlock edits and studio_view.
-    (i.e. whenever we're not loading _prepare_runtime_for_preview.) This is required to make information
-    about the current user (especially permissions) available via services as needed.
-    """
-    services = {
-        "user": DjangoXBlockUserService(user),
-        "studio_user_permissions": StudioPermissionsService(user),
-        "mako": MakoService(),
-        "settings": SettingsService(),
-        "lti-configuration": ConfigurationService(CourseAllowPIISharingInLTIFlag),
-        "teams_configuration": TeamsConfigurationService(),
-        "library_tools": LibraryToolsService(modulestore(), user.id)
-    }
-
-    runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
 
 
 @require_http_methods("GET")
@@ -878,103 +830,6 @@ def _move_item(source_usage_key, target_parent_usage_key, user, target_index=Non
             'source_index': target_index if target_index is not None else source_index
         }
         return JsonResponse(context)
-
-
-def _duplicate_block(parent_usage_key, duplicate_source_usage_key, user, display_name=None, is_child=False):
-    """
-    Duplicate an existing xblock as a child of the supplied parent_usage_key.
-    """
-    store = modulestore()
-    with store.bulk_operations(duplicate_source_usage_key.course_key):
-        source_item = store.get_item(duplicate_source_usage_key)
-        # Change the blockID to be unique.
-        dest_usage_key = source_item.location.replace(name=uuid4().hex)
-        category = dest_usage_key.block_type
-
-        # Update the display name to indicate this is a duplicate (unless display name provided).
-        # Can't use own_metadata(), b/c it converts data for JSON serialization -
-        # not suitable for setting metadata of the new block
-        duplicate_metadata = {}
-        for field in source_item.fields.values():
-            if field.scope == Scope.settings and field.is_set_on(source_item):
-                duplicate_metadata[field.name] = field.read_from(source_item)
-
-        if is_child:
-            display_name = display_name or source_item.display_name or source_item.category
-
-        if display_name is not None:
-            duplicate_metadata['display_name'] = display_name
-        else:
-            if source_item.display_name is None:
-                duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
-            else:
-                duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
-
-        asides_to_create = []
-        for aside in source_item.runtime.get_asides(source_item):
-            for field in aside.fields.values():
-                if field.scope in (Scope.settings, Scope.content,) and field.is_set_on(aside):
-                    asides_to_create.append(aside)
-                    break
-
-        for aside in asides_to_create:
-            for field in aside.fields.values():
-                if field.scope not in (Scope.settings, Scope.content,):
-                    field.delete_from(aside)
-
-        dest_block = store.create_item(
-            user.id,
-            dest_usage_key.course_key,
-            dest_usage_key.block_type,
-            block_id=dest_usage_key.block_id,
-            definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
-            metadata=duplicate_metadata,
-            runtime=source_item.runtime,
-            asides=asides_to_create
-        )
-
-        children_handled = False
-
-        if hasattr(dest_block, 'studio_post_duplicate'):
-            # Allow an XBlock to do anything fancy it may need to when duplicated from another block.
-            # These blocks may handle their own children or parenting if needed. Let them return booleans to
-            # let us know if we need to handle these or not.
-            load_services_for_studio(dest_block.runtime, user)
-            children_handled = dest_block.studio_post_duplicate(store, source_item)
-
-        # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
-        # Because DAGs are not fully supported, we need to actually duplicate each child as well.
-        if source_item.has_children and not children_handled:
-            dest_block.children = dest_block.children or []
-            for child in source_item.children:
-                dupe = _duplicate_block(dest_block.location, child, user=user, is_child=True)
-                if dupe not in dest_block.children:  # _duplicate_block may add the child for us.
-                    dest_block.children.append(dupe)
-            store.update_item(dest_block, user.id)
-
-        # pylint: disable=protected-access
-        if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
-            parent = store.get_item(parent_usage_key)
-            # If source was already a child of the parent, add duplicate immediately afterward.
-            # Otherwise, add child to end.
-            if source_item.location in parent.children:
-                source_index = parent.children.index(source_item.location)
-                parent.children.insert(source_index + 1, dest_block.location)
-            else:
-                parent.children.append(dest_block.location)
-            store.update_item(parent, user.id)
-
-        # .. event_implemented_name: XBLOCK_DUPLICATED
-        XBLOCK_DUPLICATED.send_event(
-            time=datetime.now(timezone.utc),
-            xblock_info=DuplicatedXBlockData(
-                usage_key=dest_block.location,
-                block_type=dest_block.location.block_type,
-                source_usage_key=duplicate_source_usage_key,
-            )
-        )
-
-        return dest_block.location
 
 
 @login_required

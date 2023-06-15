@@ -352,6 +352,9 @@ class ProgramProgressMeter:
                 'completed': len(completed) if count_only else completed,
                 'in_progress': len(in_progress) if count_only else in_progress,
                 'not_started': len(not_started) if count_only else not_started,
+                'all_unenrolled': all(
+                    not self._is_course_enrolled(course) for course in program_copy['courses']
+                ),
             })
 
         return progress

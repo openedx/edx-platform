@@ -21,8 +21,16 @@ from common.djangoapps.third_party_auth.appleid import AppleIdAuth
 
 log = logging.getLogger(__name__)
 
+INVALID_GRANT_ERROR = "invalid_grant"
+
 
 class AccessTokenExpiredException(Exception):
+    """
+    Raised when access token has been expired.
+    """
+
+
+class BadRequestException(Exception):
     """
     Raised when access token has been expired.
     """
@@ -115,7 +123,11 @@ class Command(BaseCommand):
         }
         response = requests.post(migration_url, data=payload, headers=headers)
         if response.status_code == 400:
-            raise AccessTokenExpiredException
+            error = response.json().get('error')
+            log.info("Error while fetching transfer_id for uid %s. Error: %s", apple_id, error)
+            if error == INVALID_GRANT_ERROR:
+                raise AccessTokenExpiredException
+            raise BadRequestException
 
         return response.json().get('transfer_sub')
 
@@ -123,6 +135,9 @@ class Command(BaseCommand):
         """
         Given an Apple ID from the old transferring team,
         create and return its respective transfer id.
+        Update access token if expired.
+        Skip the current apple_id in case of a malformed
+        request error and log info.
         """
         try:
             transfer_id = self._fetch_transfer_id(apple_id, target_team_id)
@@ -130,12 +145,15 @@ class Command(BaseCommand):
             log.info('Access token expired. Re-creating access token.')
             self._update_token_and_secret()
             transfer_id = self._fetch_transfer_id(apple_id, target_team_id)
+        except BadRequestException:
+            log.info('Bad request for uid %s.', apple_id)
+            transfer_id = ''
+
         return transfer_id
 
     def add_arguments(self, parser):
         parser.add_argument('target_team_id', help='Team ID to which the app is to be migrated to.')
 
-    @transaction.atomic
     def handle(self, *args, **options):
         target_team_id = options['target_team_id']
 
@@ -148,11 +166,13 @@ class Command(BaseCommand):
         apple_ids = UserSocialAuth.objects.filter(provider=AppleIdAuth.name).exclude(
             uid__in=already_processed_apple_ids).values_list('uid', flat=True)
         for apple_id in apple_ids:
+            log.info("Begin processing uid %s", apple_id)
             transfer_id = self._get_transfer_id_for_apple_id(apple_id, target_team_id)
             if transfer_id:
-                apple_user_id_info, _ = AppleMigrationUserIdInfo.objects.get_or_create(old_apple_id=apple_id)
-                apple_user_id_info.transfer_id = transfer_id
-                apple_user_id_info.save()
-                log.info('Updated transfer_id for uid %s', apple_id)
+                with transaction.atomic():
+                    apple_user_id_info, _ = AppleMigrationUserIdInfo.objects.get_or_create(old_apple_id=apple_id)
+                    apple_user_id_info.transfer_id = transfer_id
+                    apple_user_id_info.save()
+                    log.info('Updated transfer_id for uid %s', apple_id)
             else:
-                log.info('Unable to fetch transfer_id for uid %s', apple_id)
+                log.info('Unable to fetch transfer_id for uid %s. Skipping.', apple_id)
