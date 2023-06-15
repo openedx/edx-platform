@@ -517,7 +517,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
 
         # Create some sample notifications for the user with already existing apps and with invalid app name
         Notification.objects.create(user=self.user, app_name='app_name_2', notification_type='Type A')
-        for app_name in COURSE_NOTIFICATION_APPS.keys():
+        for app_name in COURSE_NOTIFICATION_APPS:
             Notification.objects.create(user=self.user, app_name=app_name, notification_type='Type A')
             Notification.objects.create(user=self.user, app_name=app_name, notification_type='Type B')
 
