@@ -16,7 +16,7 @@ from rest_framework.test import APIClient, APITestCase
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
-from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
 from openedx.core.djangoapps.notifications.models import (
     Notification,
     CourseNotificationPreference,
@@ -397,31 +397,58 @@ class NotificationListAPIViewTest(APITestCase):
         self.assertEqual([data[0]['id'], data[1]['id']], [notification2.id, notification1.id])
 
 
-class NotificationCountViewSetTestCase(APITestCase):
+@ddt.ddt
+class NotificationCountViewSetTestCase(ModuleStoreTestCase):
     """
     Tests for the NotificationCountViewSet.
     """
 
     def setUp(self):
         # Create a user.
+        super().setUp()
         self.user = UserFactory()
+        self.client = APIClient()
+
+        course = CourseFactory.create(
+            org='testorg',
+            number='testcourse',
+            run='testrun'
+        )
+
+        course_overview = CourseOverviewFactory.create(id=course.id, org='AwesomeOrg')
+        self.enrollment = CourseEnrollment.objects.create(
+            user=self.user,
+            course=course_overview,
+            is_active=True,
+            mode='audit'
+        )
+
         self.url = reverse('notifications-count')
+
         # Create some notifications for the user.
         Notification.objects.create(user=self.user, app_name='App Name 1', notification_type='Type A')
         Notification.objects.create(user=self.user, app_name='App Name 1', notification_type='Type B')
         Notification.objects.create(user=self.user, app_name='App Name 2', notification_type='Type A')
         Notification.objects.create(user=self.user, app_name='App Name 3', notification_type='Type C')
 
-    def test_get_unseen_notifications_count(self):
+    @ddt.data((False,), (True,))
+    @ddt.unpack
+    def test_get_unseen_notifications_count_with_show_notifications_tray(self, show_notifications_tray_enabled):
         """
-        Test that the endpoint returns the correct count of unseen notifications.
+        Test that the endpoint returns the correct count of unseen notifications and show_notifications_tray value.
         """
         self.client.login(username=self.user.username, password='test')
-        response = self.client.get(self.url)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 4)
-        self.assertEqual(response.data['count_by_app_name'], {'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1})
+        # Enable or disable the waffle flag based on the test case data
+        with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notifications_tray_enabled):
+
+            # Make a request to the view
+            response = self.client.get(self.url)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['count'], 4)
+            self.assertEqual(response.data['count_by_app_name'], {'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1})
+            self.assertEqual(response.data['show_notifications_tray'], show_notifications_tray_enabled)
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
         """

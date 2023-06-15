@@ -22,6 +22,7 @@ NOTIFY_CREDENTIALS_TASK = 'openedx.core.djangoapps.credentials.tasks.v1.tasks.ha
 
 
 @skip_unless_lms
+@mock.patch(NOTIFY_CREDENTIALS_TASK)
 class TestNotifyCredentials(TestCase):
     """
     Tests the ``notify_credentials`` management command.
@@ -51,9 +52,9 @@ class TestNotifyCredentials(TestCase):
             'verbose': False,
             'verbosity': 1,
             'skip_checks': True,
+            'revoke_program_certs': False,
         }
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     def test_course_args(self, mock_task):
         course_1_id = 'course-v1:edX+Test+1'
         course_2_id = 'course-v1:edX+Test+2'
@@ -63,7 +64,6 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     @mock.patch(
         'openedx.core.djangoapps.credentials.management.commands.notify_credentials.get_programs_from_cache_by_uuid'
     )
@@ -88,7 +88,6 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.call_args[0][0] == self.expected_options
         assert mock_task.call_args[0][1].sort() == [course_1_id, course_2_id].sort()
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     @mock.patch(
         'openedx.core.djangoapps.credentials.management.commands.notify_credentials.get_programs_from_cache_by_uuid'
     )
@@ -125,7 +124,6 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.call_args[0][1].sort() == [course_1_id, course_2_id].sort()
 
     @freeze_time(datetime(2017, 5, 1, 4))
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     def test_auto_execution(self, mock_task):
         self.expected_options['auto'] = True
         self.expected_options['start_date'] = '2017-05-01T00:00:00'
@@ -135,7 +133,6 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     def test_date_args(self, mock_task):
         self.expected_options['start_date'] = '2017-01-31T00:00:00Z'
         call_command(Command(), '--start-date', '2017-01-31')
@@ -163,7 +160,6 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     def test_username_arg(self, mock_task):
         self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
         self.expected_options['end_date'] = '2017-02-02T00:00:00Z'
@@ -215,13 +211,11 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.call_args[0][0] == self.expected_options
         mock_task.reset_mock()
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     def test_no_args(self, mock_task):
         with self.assertRaisesRegex(CommandError, 'You must specify a filter.*'):
             call_command(Command())
         assert not mock_task.called
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     def test_dry_run(self, mock_task):
         self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
         self.expected_options['dry_run'] = True
@@ -229,7 +223,6 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     def test_hand_off(self, mock_task):
         self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
         self.expected_options['notify_programs'] = True
@@ -237,7 +230,6 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     def test_delay(self, mock_task):
         self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
         self.expected_options['delay'] = 0.2
@@ -245,7 +237,6 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     def test_page_size(self, mock_task):
         self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
         self.expected_options['page_size'] = 2
@@ -253,7 +244,6 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     def test_site(self, mock_task):
         site_config = SiteConfigurationFactory.create(
             site_values={'course_org_filter': ['testX']}
@@ -265,7 +255,6 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
-    @mock.patch(NOTIFY_CREDENTIALS_TASK)
     def test_args_from_database(self, mock_task):
         # Nothing in the database, should default to disabled
         with self.assertRaisesRegex(CommandError, 'NotifyCredentialsConfig is disabled.*'):
@@ -296,3 +285,10 @@ class TestNotifyCredentials(TestCase):
         # Explicitly disabled
         with self.assertRaisesRegex(CommandError, 'NotifyCredentialsConfig is disabled.*'):
             call_command(Command(), '--start-date', '2017-01-01', '--args-from-database')
+
+    def test_args_revoke_program_cert(self, mock_task):
+        self.expected_options['user_ids'] = [str(self.user.id)]
+        self.expected_options['revoke_program_certs'] = True
+        call_command(Command(), '--user_ids', self.user.id, '--revoke_program_certs')
+        assert mock_task.called
+        assert mock_task.call_args[0][0] == self.expected_options
