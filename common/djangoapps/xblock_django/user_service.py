@@ -18,6 +18,8 @@ from .constants import (
     ATTR_KEY_REQUEST_COUNTRY_CODE,
     ATTR_KEY_USER_ID,
     ATTR_KEY_USERNAME,
+    ATTR_KEY_USER_IS_BETA_TESTER,
+    ATTR_KEY_USER_IS_GLOBAL_STAFF,
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_PREFERENCES,
     ATTR_KEY_USER_ROLE,
@@ -36,7 +38,10 @@ class DjangoXBlockUserService(UserService):
         Constructs a DjangoXBlockUserService object.
 
         Args:
-            user_is_staff(bool): optional - whether the user is staff in the course
+            django_user(User): optional - the user we are binding to the runtime. Is `None` for an anonymous user.
+            user_is_beta_tester(bool): optional - whether the user is enrolled in the course as a Beta Tester.
+            user_is_global_staff(bool): optional - whether the user has staff access to the platform.
+            user_is_staff(bool): optional - whether the user is a course team member with 'Staff' or 'Admin' access.
             user_role(str): optional -- user's role in the course ('staff', 'instructor', or 'student')
             anonymous_user_id(str): optional - anonymous_user_id for the user in the course
             deprecated_anonymous_user_id(str): optional - There are XBlocks (CAPA and HTML) that use the per-student
@@ -46,6 +51,8 @@ class DjangoXBlockUserService(UserService):
         """
         super().__init__(**kwargs)
         self._django_user = django_user
+        self._user_is_beta_tester = kwargs.get('user_is_beta_tester', False)
+        self._user_is_global_staff = kwargs.get('user_is_global_staff', False)
         self._user_is_staff = kwargs.get('user_is_staff', False)
         self._user_role = kwargs.get('user_role', 'student')
         self._anonymous_user_id = kwargs.get('anonymous_user_id', None)
@@ -121,6 +128,8 @@ class DjangoXBlockUserService(UserService):
             xblock_user.opt_attrs[ATTR_KEY_REQUEST_COUNTRY_CODE] = self._request_country_code
             xblock_user.opt_attrs[ATTR_KEY_USER_ID] = django_user.id
             xblock_user.opt_attrs[ATTR_KEY_USERNAME] = django_user.username
+            xblock_user.opt_attrs[ATTR_KEY_USER_IS_BETA_TESTER] = self._user_is_beta_tester
+            xblock_user.opt_attrs[ATTR_KEY_USER_IS_GLOBAL_STAFF] = self._user_is_global_staff
             xblock_user.opt_attrs[ATTR_KEY_USER_IS_STAFF] = self._user_is_staff
             xblock_user.opt_attrs[ATTR_KEY_USER_ROLE] = self._user_role
             user_preferences = get_user_preferences(django_user)
