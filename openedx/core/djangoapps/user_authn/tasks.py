@@ -69,7 +69,7 @@ def send_activation_email(self, msg_string, from_address=None):
     except AttributeError:
         site = Site.objects.get_current()
 
-    user = User.objects.get(username=msg.recipient.username)
+    user = User.objects.get(id=msg.recipient.lms_user_id)
 
     try:
         with emulate_http_request(site=site, user=user):
