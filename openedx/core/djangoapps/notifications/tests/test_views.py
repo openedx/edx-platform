@@ -25,6 +25,8 @@ from openedx.core.djangoapps.notifications.serializers import NotificationCourse
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from ..base_notification import COURSE_NOTIFICATION_APPS
+
 
 class CourseEnrollmentListViewTest(ModuleStoreTestCase):
     """
@@ -501,3 +503,89 @@ class MarkNotificationsUnseenAPIViewTestCase(APITestCase):
         # Assert the notifications for 'App Name 1' are marked as unseen for the user
         notifications = Notification.objects.filter(user=self.user, app_name=app_name, last_seen__isnull=False)
         self.assertEqual(notifications.count(), 2)
+
+
+class NotificationReadAPIViewTestCase(APITestCase):
+    """
+    Tests for the NotificationReadAPIView.
+    """
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.url = reverse('notifications-read')
+        self.client.login(username=self.user.username, password='test')
+
+        # Create some sample notifications for the user with already existing apps and with invalid app name
+        Notification.objects.create(user=self.user, app_name='app_name_2', notification_type='Type A')
+        for app_name in COURSE_NOTIFICATION_APPS.keys():
+            Notification.objects.create(user=self.user, app_name=app_name, notification_type='Type A')
+            Notification.objects.create(user=self.user, app_name=app_name, notification_type='Type B')
+
+    def test_mark_all_notifications_read_with_app_name(self):
+        # Create a PATCH request to mark all notifications as read for already existing app e.g 'discussion'
+        app_name = next(iter(COURSE_NOTIFICATION_APPS))
+        data = {'app_name': app_name}
+
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'message': 'Notifications marked read.'})
+        notifications = Notification.objects.filter(user=self.user, app_name=app_name, last_read__isnull=False)
+        self.assertEqual(notifications.count(), 2)
+
+    def test_mark_all_notifications_read_with_invalid_app_name(self):
+        # Create a PATCH request to mark all notifications as read for 'app_name_1'
+        app_name = 'app_name_1'
+        data = {'app_name': app_name}
+
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'message': 'Invalid app name.'})
+
+    def test_mark_notification_read_with_notification_id(self):
+        # Create a PATCH request to mark notification as read for notification_id: 2
+        notification_id = 2
+        data = {'notification_id': notification_id}
+
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'message': 'Notifications marked read.'})
+        notifications = Notification.objects.filter(user=self.user, id=notification_id, last_read__isnull=False)
+        self.assertEqual(notifications.count(), 1)
+
+    def test_mark_notification_read_with_invalid_notification_id(self):
+        # Create a PATCH request to mark notification as read for notification_id: 23345
+        notification_id = 23345
+        data = {'notification_id': notification_id}
+
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, {'message': 'Notification not found.'})
+
+    def test_mark_notification_read_with_app_name_and_notification_id(self):
+        # Create a PATCH request to mark notification as read for existing app e.g 'discussion' and notification_id: 2
+        app_name = next(iter(COURSE_NOTIFICATION_APPS))
+        notification_id = 2
+        data = {'app_name': app_name, 'notification_id': notification_id}
+
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'message': 'Notifications marked read.'})
+        notifications = Notification.objects.filter(
+            user=self.user,
+            app_name=app_name,
+            id=notification_id,
+            last_read__isnull=False
+        )
+        self.assertEqual(notifications.count(), 1)
+
+    def test_mark_notification_read_without_app_name_and_notification_id(self):
+        # Create a PATCH request to mark notification as read without app_name and notification_id
+        response = self.client.patch(self.url, {})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'message': 'Invalid app name or notification id.'})
