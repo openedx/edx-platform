@@ -30,25 +30,19 @@ class TestLearnerHomeRedirect(SharedModuleStoreTestCase):
         mock_enable_learner_home.is_enabled.return_value = False
 
         # When I check if I should redirect
-        redirect_choice = should_redirect_to_learner_home_mfe(self.user)
+        redirect_choice = should_redirect_to_learner_home_mfe()
 
         # Then I never redirect
         self.assertFalse(redirect_choice)
 
-    @ddt.data((0, True), (50, False), (100, True))
-    @ddt.unpack
     @patch("lms.djangoapps.learner_home.waffle.ENABLE_LEARNER_HOME_MFE")
-    @override_settings(LEARNER_HOME_MFE_REDIRECT_PERCENTAGE=50)
-    def test_should_redirect_to_learner_home_enabled(
-        self, user_id, expect_redirect, mock_enable_learner_home
-    ):
+    def test_should_redirect_to_learner_home_enabled(self, mock_enable_learner_home):
         # Given Learner Home MFE feature is enabled
         mock_enable_learner_home.is_enabled.return_value = True
-        self.user.id = user_id
 
         # When I check if I should redirect
-        redirect_choice = should_redirect_to_learner_home_mfe(self.user)
+        redirect_choice = should_redirect_to_learner_home_mfe()
 
         # Then I redirect based on configuration
         # (currently user ID % 100 < redirect percentage)
-        self.assertEqual(expect_redirect, redirect_choice)
+        self.assertEqual(mock_enable_learner_home, redirect_choice)
