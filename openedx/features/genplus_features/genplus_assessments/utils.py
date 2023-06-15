@@ -1,6 +1,7 @@
 import json
 from lxml import etree
 from django.test import RequestFactory
+from django.db.models import Q
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from collections import defaultdict
@@ -13,14 +14,15 @@ from lms.djangoapps.courseware.models import StudentModule
 from openedx.features.genplus_features.genplus.constants import JournalTypes
 from openedx.features.genplus_features.genplus.models import Student, JournalPost
 from openedx.features.genplus_features.genplus_learning.models import Unit
-from openedx.features.genplus_features.genplus_assessments.constants import ProblemTypes, JOURNAL_STYLE, TOTAL_PROBLEM_SCORE
-
+from openedx.features.genplus_features.genplus_assessments.constants import ProblemTypes, JOURNAL_STYLE, TOTAL_PROBLEM_SCORE, SkillAssessmentTypes, SkillAssessmentResponseTime
+from openedx.features.genplus_features.genplus_assessments.models import SkillAssessmentQuestion, SkillAssessmentResponse
 
 class StudentResponse:
 
     def __init__(self):
         self.problem_function_map = {
             ProblemTypes.JOURNAL: self.create_and_update_journal_post_from_lms,
+            # ProblemTypes.SKILL_ASSESSMENT: self.create_assessment_response_from_lms,
         }
 
     def save_problem_response(self, problem_block, student_response):
@@ -46,10 +48,13 @@ class StudentResponse:
             if not problem_classes:
                 return
 
-            for problem_type, problem_function in self.problem_function_map.items():
-                if problem_type in problem_classes:
-                    problem_function(student, problem_block, student_response)
-                    break
+        if problem_block.is_skill_assessment:
+            self.create_assessment_response_from_lms(problem_block, student_response)
+
+        for problem_type, problem_function in self.problem_function_map.items():
+            if problem_type in problem_classes:
+                problem_function(student, problem_block, student_response)
+                break
 
     def create_and_update_journal_post_from_lms(self, student, problem_block, student_response):
         if not problem_block.is_journal_entry:
@@ -95,7 +100,143 @@ class StudentResponse:
                 student=student,
                 defaults=defaults
             )
+    
+    def create_assessment_response_from_lms(self, problem_block, student_response):
+        """
+        Function to create a SkillAssessmentResponse instance from a given problem block and student response.
 
+        Args:
+            self: The instance of the calling class.
+            student (User): The student who submitted the response.
+            problem_block (Block): The problem block which the student has responded to.
+            problem_key (UsageKey): The identifier for the problem.
+            student_response (str): The response submitted by the student.
+
+        This function starts by extracting relevant data from the problem block, including the course key, problem key, 
+        and the HTML content of the problem. It parses the HTML content to extract the question text and choice options.
+
+        It then tries to retrieve a SkillAssessmentQuestion instance that matches either the start unit or end unit 
+        of the problem block.
+
+        If such a SkillAssessmentQuestion is found, the function then determines whether to set the response time to 
+        SkillAssessmentResponseTime.START_OF_YEAR or SkillAssessmentResponseTime.END_OF_YEAR, based on whether the 
+        problem key matches the start unit location or the end unit location.
+
+        Finally, it creates a SkillAssessmentResponse instance, setting the user to the student, the question to the 
+        retrieved SkillAssessmentQuestion, the earned score based on the correctness of the student's response, the total 
+        score to a problem weight value, the response time as determined earlier, and the question data to the 
+        parsed problem block data. It then saves the created SkillAssessmentResponse instance to the database.
+
+        If a matching SkillAssessmentQuestion is not found, the function prints a message and exits without creating 
+        a SkillAssessmentResponse.
+        """
+        user_id=getattr(problem_block.scope_ids, 'user_id')
+        user = get_user_model().objects.get(pk=user_id)
+        course_key = problem_block.scope_ids.usage_id.course_key
+        problem_key = problem_block.scope_ids.usage_id
+        total_score = int(problem_block.weight) if problem_block.weight else 0
+
+        problem_html = problem_block.data
+        # Parse the HTML
+        parser = etree.XMLParser(recover=True)
+        problem = etree.fromstring(problem_html, parser=parser)
+
+        # Extract the question
+        question = problem.find('.//*[@class="question-text"]/span').text
+
+        # Extract the choices and whether they are correct, Initialize empty dictionary to hold choices
+        choices = {}
+        # Loop through each 'choice' element in the parsed HTML
+        for choice in problem.xpath('.//choice'): 
+            choice_class = choice.attrib['class']
+            # Get the text content of the choice
+            choice_text = choice.text
+            # Get the 'correct' attribute and convert to boolean
+            is_correct = choice.attrib['correct'] == 'true'
+            choices[choice_class] = {'text': choice_text, 'correct': is_correct}
+
+        # Combine the question and choices into a single dictionary
+        question_and_responses_dict = {'question': question, 'choices': choices}
+
+        # Initialize an empty list to store multiple responses
+        student_responses = []
+
+        # Iterate over items in the MultiDict
+        for _, value in student_response.items():
+            # Each 'value' corresponds to a choice like 'choice_0'
+
+            # Get corresponding choice text and correctness
+            response_text = question_and_responses_dict['choices'][value]['text']
+            response_correct = question_and_responses_dict['choices'][value]['correct']
+
+            # Store this information in the student_responses list
+            student_responses.append({
+                'response_value': value,
+                'response_text': response_text,
+                'correct': response_correct
+            })
+
+        # Update the dictionary with the student's responses
+        question_and_responses_dict['student_responses'] = student_responses
+        earned_score = self.calculate_earned_score(question_and_responses_dict)
+
+        try:
+            # Fetch SkillAssessmentQuestion based on provided course_key and problem_key
+            question = SkillAssessmentQuestion.objects.get(
+                (Q(start_unit=course_key) & Q(start_unit_location=problem_key)) |
+                (Q(end_unit=course_key) & Q(end_unit_location=problem_key))
+            )
+        except SkillAssessmentQuestion.DoesNotExist:
+            # Handle case when the SkillAssessmentQuestion does not exist
+            print("SkillAssessmentQuestion does not exist with the provided keys")
+            return
+
+        if question.start_unit == course_key and question.start_unit_location == problem_key:
+            response_time = SkillAssessmentResponseTime.START_OF_YEAR
+        else:
+            response_time = SkillAssessmentResponseTime.END_OF_YEAR
+
+        # Create SkillAssessmentResponse object
+        skill_assessment_response = SkillAssessmentResponse.objects.create(
+            user=user,
+            question=question,
+            earned_score=earned_score,
+            total_score=total_score,
+            response_time=response_time,
+            question_data=question_and_responses_dict,
+        )
+
+    def calculate_earned_score(self, question_and_responses_dict):
+        """
+        Calculates the score a student earned based on their responses to a question. 
+
+        The score is calculated based on the number of correct responses a student 
+        provided, with a variable base score depending on the total number of correct 
+        choices available for the question.
+
+        Parameters:
+        question_and_responses_dict (dict): A dictionary containing question, available 
+                                            choices, and the student's responses. Each 
+                                            choice and response includes a boolean 
+                                            indicating if it is correct or not.
+                                            
+        Returns:
+        score (int): The total score the student earned for the question.
+        
+        """
+        num_correct_choices = sum(1 for choice in question_and_responses_dict['choices'].values() if choice['correct'])
+        num_correct_responses = sum(1 for response in question_and_responses_dict['student_responses'] if response['correct'])
+
+        if num_correct_choices == 1:
+            base_score = 6
+        elif num_correct_choices == 2:
+            base_score = 3
+        elif num_correct_choices == 3:
+            base_score = 2
+
+        score = base_score * num_correct_responses
+
+        return score
 
 def build_problem_list(course_blocks, root, path=None):
     """

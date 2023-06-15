@@ -1,10 +1,12 @@
 from django.db import models
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
+from jsonfield import JSONField
 from django_extensions.db.models import TimeStampedModel
 
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField  # pylint: disable=import-error
 
+from .constants import SkillAssessmentTypes, SkillAssessmentResponseTime
 from openedx.features.genplus_features.genplus.models import Skill, Class
 from openedx.features.genplus_features.genplus_learning.models import Program
 
@@ -42,18 +44,24 @@ class UserRating(Assessment):
 
 
 class SkillAssessmentQuestion(models.Model):
+    SKILL_ASSESSMENT_TYPE_CHOICES = SkillAssessmentTypes.__MODEL_CHOICES__
+
     program = models.ForeignKey(Program, on_delete=models.CASCADE)
     start_unit = CourseKeyField(max_length=255, db_index=True)
     start_unit_location = UsageKeyField(max_length=255, db_index=True)
     end_unit = CourseKeyField(max_length=255, db_index=True)
     end_unit_location = UsageKeyField(max_length=255, db_index=True)
-
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+    skill_assessment_type = models.CharField(max_length=32, choices=SKILL_ASSESSMENT_TYPE_CHOICES)
 
 class SkillAssessmentResponse(TimeStampedModel):
+    SKILL_ASSESSMENT_RESPONSE_TIME = SkillAssessmentResponseTime.__MODEL_CHOICES__
     class Meta:
-        unique_together = ('user', 'question',)
+        unique_together = ('user', 'question', 'response_time')
 
     user = models.ForeignKey(USER_MODEL, on_delete=models.CASCADE)
     question = models.ForeignKey(SkillAssessmentQuestion, on_delete=models.CASCADE)
     earned_score = models.IntegerField(blank=True, null=True, default=0)
     total_score = models.IntegerField(blank=True, null=True, default=6)
+    response_time = models.CharField(max_length=32, choices=SKILL_ASSESSMENT_RESPONSE_TIME)
+    question_response = JSONField(blank=True, null=True)

@@ -278,6 +278,13 @@ class CapaFields:
         scope=Scope.settings
     )
 
+    is_skill_assessment = Boolean(
+        display_name=_("Save as Skill Assessment"),
+        help=_("Save this problem response to Skill Assessment Response"),
+        default=False,
+        scope=Scope.settings
+    )
+
 
 class CapaMixin(ScorableXBlockMixin, CapaFields):
     """
