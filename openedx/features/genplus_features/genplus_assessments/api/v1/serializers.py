@@ -102,7 +102,7 @@ class SkillAssessmentQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = SkillAssessmentQuestion
         fields = ('start_unit', 'start_unit_location', 'end_unit',
-                  'end_unit_location', 'skill', 'skill_assessment_type')
+                  'end_unit_location', 'skill')
 
 class SkillAssessmentResponseSerializer(serializers.ModelSerializer):
     question = SkillAssessmentQuestionSerializer(many=False, read_only=True)
@@ -110,7 +110,8 @@ class SkillAssessmentResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SkillAssessmentResponse
-        fields = ('user', 'question', 'earned_score', 'total_score', 'response_time', 'question_data', 'full_name')
+        fields = ('user', 'question', 'earned_score', 'total_score', 'response_time',
+                  'skill_assessment_type', 'question_response', 'full_name')
 
     def get_full_name(self, obj):
         return get_user_model().objects.get(pk=obj.user_id).profile.name

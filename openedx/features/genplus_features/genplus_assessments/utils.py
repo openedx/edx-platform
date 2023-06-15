@@ -22,7 +22,6 @@ class StudentResponse:
     def __init__(self):
         self.problem_function_map = {
             ProblemTypes.JOURNAL: self.create_and_update_journal_post_from_lms,
-            # ProblemTypes.SKILL_ASSESSMENT: self.create_assessment_response_from_lms,
         }
 
     def save_problem_response(self, problem_block, student_response):
@@ -48,8 +47,9 @@ class StudentResponse:
             if not problem_classes:
                 return
 
-        if problem_block.is_skill_assessment:
-            self.create_assessment_response_from_lms(problem_block, student_response)
+        problem_type = problem_classes[0]
+        if problem_block.is_skill_assessment and problem_type in ProblemTypes.SKILL_ASSESSMENT_PROBLEMS:
+             self.create_assessment_response_from_lms(problem_block, student_response, problem_type)
 
         for problem_type, problem_function in self.problem_function_map.items():
             if problem_type in problem_classes:
@@ -101,16 +101,15 @@ class StudentResponse:
                 defaults=defaults
             )
     
-    def create_assessment_response_from_lms(self, problem_block, student_response):
+    def create_assessment_response_from_lms(self, problem_block, student_response, problem_type):
         """
         Function to create a SkillAssessmentResponse instance from a given problem block and student response.
 
         Args:
             self: The instance of the calling class.
-            student (User): The student who submitted the response.
             problem_block (Block): The problem block which the student has responded to.
-            problem_key (UsageKey): The identifier for the problem.
             student_response (str): The response submitted by the student.
+            assessment_type (str): Type of Skill Assessment
 
         This function starts by extracting relevant data from the problem block, including the course key, problem key, 
         and the HTML content of the problem. It parses the HTML content to extract the question text and choice options.
@@ -139,15 +138,15 @@ class StudentResponse:
         problem_html = problem_block.data
         # Parse the HTML
         parser = etree.XMLParser(recover=True)
-        problem = etree.fromstring(problem_html, parser=parser)
+        problem_xml = etree.fromstring(problem_html, parser=parser)
 
         # Extract the question
-        question = problem.find('.//*[@class="question-text"]/span').text
+        question = problem_xml.find('.//*[@class="question-text"]/span').text
 
         # Extract the choices and whether they are correct, Initialize empty dictionary to hold choices
         choices = {}
         # Loop through each 'choice' element in the parsed HTML
-        for choice in problem.xpath('.//choice'): 
+        for choice in problem_xml.xpath('.//choice'): 
             choice_class = choice.attrib['class']
             # Get the text content of the choice
             choice_text = choice.text
@@ -178,7 +177,7 @@ class StudentResponse:
 
         # Update the dictionary with the student's responses
         question_and_responses_dict['student_responses'] = student_responses
-        earned_score = self.calculate_earned_score(question_and_responses_dict)
+        earned_score = self.calculate_earned_score(question_and_responses_dict, total_score)
 
         try:
             # Fetch SkillAssessmentQuestion based on provided course_key and problem_key
@@ -196,43 +195,45 @@ class StudentResponse:
         else:
             response_time = SkillAssessmentResponseTime.END_OF_YEAR
 
+        if problem_type == SkillAssessmentTypes.SINGLE_CHOICE:
+            skill_assessment_type = SkillAssessmentTypes.SINGLE_CHOICE
+        elif problem_type == SkillAssessmentTypes.MULTIPLE_CHOICE:
+            skill_assessment_type = SkillAssessmentTypes.MULTIPLE_CHOICE
+        else:
+            skill_assessment_type = SkillAssessmentTypes.RATING
+
         # Create SkillAssessmentResponse object
-        skill_assessment_response = SkillAssessmentResponse.objects.create(
+        SkillAssessmentResponse.objects.create(
             user=user,
             question=question,
             earned_score=earned_score,
             total_score=total_score,
             response_time=response_time,
+            skill_assessment_type=skill_assessment_type,
             question_data=question_and_responses_dict,
         )
 
-    def calculate_earned_score(self, question_and_responses_dict):
+    def calculate_earned_score(self, question_and_responses_dict, total_score):
         """
-        Calculates the score a student earned based on their responses to a question. 
+        Calculates the score a student earned based on their responses to a question.
 
-        The score is calculated based on the number of correct responses a student 
-        provided, with a variable base score depending on the total number of correct 
+        The score is calculated based on the number of correct responses a student
+        provided, with a variable base score depending on the total number of correct
         choices available for the question.
 
         Parameters:
-        question_and_responses_dict (dict): A dictionary containing question, available 
-                                            choices, and the student's responses. Each 
-                                            choice and response includes a boolean 
+        question_and_responses_dict (dict): A dictionary containing question, available
+                                            choices, and the student's responses. Each
+                                            choice and response includes a boolean
                                             indicating if it is correct or not.
-                                            
+        total_score (int): Max possible score for a problem
+
         Returns:
         score (int): The total score the student earned for the question.
-        
         """
         num_correct_choices = sum(1 for choice in question_and_responses_dict['choices'].values() if choice['correct'])
         num_correct_responses = sum(1 for response in question_and_responses_dict['student_responses'] if response['correct'])
-
-        if num_correct_choices == 1:
-            base_score = 6
-        elif num_correct_choices == 2:
-            base_score = 3
-        elif num_correct_choices == 3:
-            base_score = 2
+        base_score = total_score / num_correct_choices
 
         score = base_score * num_correct_responses
 
