@@ -51,11 +51,14 @@ babel==2.11.0
     #   enmerkar-underscore
 backoff==1.10.0
     # via analytics-python
-backports-zoneinfo==0.2.1
-    # via icalendar
+backports-zoneinfo[tzdata]==0.2.1
+    # via
+    #   celery
+    #   icalendar
+    #   kombu
 beautifulsoup4==4.12.2
     # via pynliner
-billiard==3.6.4.0
+billiard==4.1.0
     # via celery
 bleach[css]==6.0.0
     # via
@@ -85,7 +88,7 @@ botocore==1.10.84
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/base.in
-celery==5.2.7
+celery==5.3.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
@@ -664,10 +667,8 @@ jsonschema==4.17.3
     # via optimizely-sdk
 jwcrypto==1.5.0
     # via pylti1p3
-kombu==5.2.4
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   celery
+kombu==5.3.0
+    # via celery
 laboratory==1.0.2
     # via -r requirements/edx/base.in
 lazy==1.5
@@ -922,6 +923,7 @@ python-dateutil==2.8.2
     #   -r requirements/edx/base.in
     #   analytics-python
     #   botocore
+    #   celery
     #   edx-ace
     #   edx-drf-extensions
     #   edx-enterprise
@@ -951,7 +953,6 @@ pytz==2022.7.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   babel
-    #   celery
     #   django
     #   django-ses
     #   djangorestframework
@@ -1143,8 +1144,13 @@ typing-extensions==4.6.3
     # via
     #   asgiref
     #   django-countries
+    #   kombu
     #   pylti1p3
     #   snowflake-connector-python
+tzdata==2023.3
+    # via
+    #   backports-zoneinfo
+    #   celery
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.in
