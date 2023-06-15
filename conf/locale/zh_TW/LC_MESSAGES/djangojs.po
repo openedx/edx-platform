@@ -2880,7 +2880,7 @@ msgid "View program"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
-msgid "Enroll in a {programName} course"
+msgid "Enroll in a {programName}'s course"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
@@ -8254,7 +8254,23 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"You have successfully completed all the requirements for the %(title)s "
+"%(type)s."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s course(s) in this "
+"program. To complete the program, you must earn a verified certificate for "
+"each course."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
@@ -8331,6 +8347,27 @@ msgstr ""
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid "Transform your %(org)s %(type)s into a full master’s degree"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Successful completion of %(org)s %(program)s credential can be applied "
+"towards flexible, rigorous, and affordable masters degrees from the world’s "
+"leading universities."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s courses in this program. "
+"To complete the program, you must earn a verified certificate for each "
+"course."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore

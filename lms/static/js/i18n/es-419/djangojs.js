@@ -810,7 +810,6 @@
     "Ends {end}": "Termina {end}",
     "Engage with posts": "Trabajar con las publicaciones",
     "Enroll Now": "Incr\u00edbase ahora",
-    "Enroll in a {programName} course": "Inscr\u00edbete en un curso de {programName}",
     "Enrolled": "Inscrito",
     "Enrolling you in the selected course": "Inscribi\u00e9ndote en el curso seleccionado",
     "Enrollment Date": "Fecha de inscripci\u00f3n",
