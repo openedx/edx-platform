@@ -51,8 +51,8 @@ def inactive_user_view(request):
             user.is_active = True
             user.save()
             activated = True
-    # if not activated:
-    compose_and_send_activation_email(user, profile)
+    if not activated:
+        compose_and_send_activation_email(user, profile)
 
     request_params = request.GET
     redirect_to = request_params.get('next')
