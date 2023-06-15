@@ -214,10 +214,12 @@ urlpatterns = [
     ),
     path('api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                    namespace='api_discounts')),
-    path('403', handler403),
-    path('404', handler404),
-    path('429', handler429),
-    path('500', handler500),
+
+    # Provide URLs where we can see the rendered error pages without having to force an error.
+    path('403', handler403, name='render_403'),
+    path('404', handler404, name='render_404'),
+    path('429', handler429, name='render_429'),
+    path('500', handler500, name='render_500'),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
