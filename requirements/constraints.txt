@@ -14,12 +14,7 @@
 
 # As it is not clarified what exact breaking changes will be introduced as per
 # the next major release, ensure the installed version is within boundaries.
-# celery>=5.2.2,<6.0.0
-
-# 5.3.0 versions breaking timezone related tests. Adding pin for time being to clear upgrade pipeline. Unpin above
-# after fixing these failures.
-celery<5.3.0
-kombu<5.3.0
+celery>=5.2.2,<6.0.0
 
 
 # required for celery>=5.2.0;<5.3.0
