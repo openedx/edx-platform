@@ -3606,6 +3606,7 @@ BADGR_TIMEOUT = 10
 # .. toggle_warnings: Review FEATURES['ENABLE_OPENBADGES'] for further context.
 BADGR_ENABLE_NOTIFICATIONS = False
 
+QUALTRICS_SCORE_ID = None
 ###################### Grade Downloads ######################
 # These keys are used for all of our asynchronous downloadable files, including
 # the ones that contain information other than grades.

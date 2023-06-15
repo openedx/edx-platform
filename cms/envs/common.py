@@ -2444,6 +2444,7 @@ BULK_EMAIL_LOG_SENT_EMAILS = False
 ############### Settings for django file storage ##################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
+QUALTRICS_SCORE_ID = None
 ###################### Grade Downloads ######################
 # These keys are used for all of our asynchronous downloadable files, including
 # the ones that contain information other than grades.
