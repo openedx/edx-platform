@@ -178,3 +178,15 @@ class NotificationAppManager:
 
             return course_notification_preference_config
         return None
+
+
+def get_notification_content(notification_type, context):
+    """
+    Returns notification content for the given notification type with provided context.
+    """
+    notification_type = NotificationTypeManager().notification_types.get(notification_type, None)
+    if notification_type:
+        notification_type_content_template = notification_type.get('content_template', None)
+        if notification_type_content_template:
+            return notification_type_content_template.format(**context)
+    return ''
