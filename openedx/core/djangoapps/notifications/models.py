@@ -6,7 +6,7 @@ from django.db import models
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangoapps.notifications.base_notification import NotificationAppManager
+from openedx.core.djangoapps.notifications.base_notification import NotificationAppManager, get_notification_content
 
 User = get_user_model()
 
@@ -93,6 +93,13 @@ class Notification(TimeStampedModel):
 
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.app_name} - {self.notification_type}'
+
+    @property
+    def content(self):
+        """
+        Returns the content for the notification.
+        """
+        return get_notification_content(self.notification_type, self.content_context)
 
 
 class CourseNotificationPreference(TimeStampedModel):
