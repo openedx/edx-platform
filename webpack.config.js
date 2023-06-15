@@ -10,6 +10,13 @@ var _ = require('underscore');
 var commonConfig = require('./webpack.common.config.js');
 
 var optimizedConfig = Merge.smart(commonConfig, {
+    optimization: {
+        splitChunks: {
+            chunks: 'all'
+        },
+        runtimeChunk: true,
+    },
+    mode: 'production',
     web: {
         output: {
             filename: '[name].[chunkhash].js'
@@ -22,19 +29,6 @@ var optimizedConfig = Merge.smart(commonConfig, {
             }),
             new webpack.LoaderOptionsPlugin({ // This may not be needed; legacy option for loaders written for webpack 1
                 minimize: true
-            }),
-            new webpack.optimize.UglifyJsPlugin({
-                sourceMap: true,
-                compress: {
-                    warnings: true
-                }
-            }),
-            new webpack.optimize.CommonsChunkPlugin({
-            // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html
-                name: 'commons',
-                filename: 'commons.[chunkhash].js',
-                minChunks: 3
             })
         ]
     }
@@ -57,16 +51,7 @@ var requireCompatConfig = Merge.smart(optimizedConfig, {
     web: {
         output: {
             filename: '[name].js'
-        },
-        plugins: [
-            new webpack.optimize.CommonsChunkPlugin({
-            // If the value below changes, update the render_bundle call in
-            // common/djangoapps/pipeline_mako/templates/static_content.html
-                name: 'commons',
-                filename: 'commons.js',
-                minChunks: 3
-            })
-        ]
+        }
     }
 });
 

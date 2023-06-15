@@ -2703,7 +2703,7 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-worker-stats.json')
     }
 }
-WEBPACK_CONFIG_PATH = 'webpack.prod.config.js'
+WEBPACK_CONFIG_PATH = 'webpack.config.js'
 
 ########################## DJANGO DEBUG TOOLBAR ###############################
 
