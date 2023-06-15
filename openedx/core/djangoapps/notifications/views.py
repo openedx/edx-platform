@@ -350,8 +350,7 @@ class NotificationReadAPIView(APIView):
         app name or notification id for the authenticated user.
 
         Requests:
-        PATCH /api/notifications/read/{app_name}
-        PATCH /api/notifications/read/{notification_id
+        PATCH /api/notifications/read/
 
         Parameters:
             request (Request): The request object containing the app name or notification id.
