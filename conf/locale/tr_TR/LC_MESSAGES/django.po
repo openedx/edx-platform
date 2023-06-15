@@ -13205,6 +13205,10 @@ msgstr "{0}'ın kopyası"
 msgid "Duplicate of '{0}'"
 msgstr "'{0}'ın tekrarı"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "Geçersiz ders anahtar koşulu."
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "Görsel bir isme, içerik türüne ve boyut bilgisine sahip olmalı."
@@ -13451,10 +13455,6 @@ msgid ""
 msgstr ""
 "Devam etmek için bu dersi bir organizasyona bağlamalısınız. Seçtiğiniz "
 "organizasyon sistemde mevcut değil, organizasyonu sisteme eklemeniz gerekir"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "Geçersiz ders anahtar koşulu."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -14690,6 +14690,10 @@ msgid "Learn more about this course"
 msgstr "Bu ders hakkında daha fazla bilgi"
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr "Bu derse kaydol"
 
@@ -15084,16 +15088,20 @@ msgid "Downloads and transcripts"
 msgstr "İndirmeler ve altyazılar"
 
 #: lms/templates/video.html
-msgid "Share on:"
-msgstr "Şurada paylaş:"
+msgid "Download video file"
+msgstr "Video dosyasını indir"
+
+#: lms/templates/video.html
+msgid "Share this video"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Share on {site}"
 msgstr "{site} sitesinde paylaş"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Video dosyasını indir"
+msgid "Copy"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -24271,8 +24279,8 @@ msgid "Set Access"
 msgstr "Erişim Ver"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
-msgstr "Kopyala"
+msgid "Copy to Clipboard"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"

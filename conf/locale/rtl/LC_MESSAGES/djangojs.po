@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-04 20:35+0000\n"
-"PO-Revision-Date: 2023-06-04 20:36:01.165758\n"
+"POT-Creation-Date: 2023-06-12 15:12+0000\n"
+"PO-Revision-Date: 2023-06-12 15:12:29.628242\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -3060,8 +3060,8 @@ msgid "View program"
 msgstr "Vᴉǝʍ dɹøƃɹɐɯ"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
-msgid "Enroll in a {programName} course"
-msgstr "Ɇnɹøll ᴉn ɐ {programName} ɔønɹsǝ"
+msgid "Enroll in a {programName}'s course"
+msgstr "Ɇnɹøll ᴉn ɐ {programName}'s ɔønɹsǝ"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -3084,10 +3084,22 @@ msgstr ""
 "{i_start}Ᵽɹøƃɹɐɯ Đǝʇɐᴉls{i_end} dɐƃǝ."
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Subscription trial expires in less than 24 hours"
+msgstr "Snbsɔɹᴉdʇᴉøn ʇɹᴉɐl ǝxdᴉɹǝs ᴉn lǝss ʇɥɐn 24 ɥønɹs"
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Subscription trial expires in {remainingDays} day"
 msgid_plural "Subscription trial expires in {remainingDays} days"
 msgstr[0] "Snbsɔɹᴉdʇᴉøn ʇɹᴉɐl ǝxdᴉɹǝs ᴉn {remainingDays} dɐʎ"
 msgstr[1] "Snbsɔɹᴉdʇᴉøn ʇɹᴉɐl ǝxdᴉɹǝs ᴉn {remainingDays} dɐʎs"
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and"
+" the card on file will be charged {subscriptionPrice}."
+msgstr ""
+"Ɏønɹ {programName} ʇɹᴉɐl ʍᴉll ǝxdᴉɹǝ ɐʇ {trialEndTime} øn {trialEndDate} ɐnd"
+" ʇɥǝ ɔɐɹd øn ɟᴉlǝ ʍᴉll bǝ ɔɥɐɹƃǝd {subscriptionPrice}."
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -8785,8 +8797,8 @@ msgstr "Sʇɐɹʇ {trialLength}-dɐʎ ɟɹǝǝ ʇɹᴉɐl"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid "Active trial ends {trialEndDate} at {trialEndTime}"
-msgstr "Ⱥɔʇᴉʌǝ ʇɹᴉɐl ǝnds {trialEndDate} ɐʇ {trialEndTime}"
+msgid "Trial ends {trialEndDate} at {trialEndTime}"
+msgstr "Ŧɹᴉɐl ǝnds {trialEndDate} ɐʇ {trialEndTime}"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -8795,12 +8807,8 @@ msgstr "Ɏønɹ nǝxʇ bᴉllᴉnƃ dɐʇǝ ᴉs {currentPeriodEnd}"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"Unlock verified access to all courses for {subscriptionPrice}. Cancel "
-"anytime."
-msgstr ""
-"Ʉnløɔʞ ʌǝɹᴉɟᴉǝd ɐɔɔǝss ʇø ɐll ɔønɹsǝs ɟøɹ {subscriptionPrice}. Ȼɐnɔǝl "
-"ɐnʎʇᴉɯǝ."
+msgid "{subscriptionPrice} subscription. Cancel anytime."
+msgstr "{subscriptionPrice} snbsɔɹᴉdʇᴉøn. Ȼɐnɔǝl ɐnʎʇᴉɯǝ."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore

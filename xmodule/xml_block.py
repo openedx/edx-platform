@@ -360,6 +360,9 @@ class XmlMixin:
         field_data['children'] = children
 
         field_data['xml_attributes']['filename'] = definition.get('filename', ['', None])  # for git link
+        # TODO: we shouldn't be instantiating our own field data instance here, but rather just call to
+        # runtime.construct_xblock_from_class() and then set fields on the returned block.
+        # See the base XBlock class (XmlSerializationMixin.parse_xml) for how it should be done.
         kvs = InheritanceKeyValueStore(initial_values=field_data)
         field_data = KvsFieldData(kvs)
 

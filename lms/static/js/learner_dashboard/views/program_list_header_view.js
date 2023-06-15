@@ -58,18 +58,15 @@ class ProgramListHeaderView extends Backbone.View {
 
     getEnrollmentAlerts() {
         return this.programAndSubscriptionData
-            .map(({ programData, subscriptionData }) => {
-                const progress = this.context.progressCollection?.findWhere({
+            .map(({ programData, subscriptionData }) =>
+                this.context.progressCollection?.findWhere({
                     uuid: programData.uuid,
-                    in_progress: 0,
-                });
-                return (
-                    progress?.get('not_started') >= 1 && {
-                        title: programData.title,
-                        url: programData.detail_url,
-                    }
-                );
-            })
+                    all_unenrolled: true,
+                }) ? {
+                    title: programData.title,
+                    url: programData.detail_url,
+                } : null
+            )
             .filter(Boolean);
     }
 

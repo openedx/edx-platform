@@ -227,11 +227,11 @@ ENABLE_NEW_STUDIO_CUSTOM_PAGES = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_custom_pages', __name__)
 
 
-def use_new_custom_pages():
+def use_new_custom_pages(course_key):
     """
     Returns a boolean if new studio custom pages mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_CUSTOM_PAGES.is_enabled()
+    return ENABLE_NEW_STUDIO_CUSTOM_PAGES.is_enabled(course_key)
 
 
 # .. toggle_name: new_studio_mfe.use_new_schedule_details_page

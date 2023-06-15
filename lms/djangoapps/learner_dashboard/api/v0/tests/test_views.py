@@ -217,7 +217,8 @@ class TestProgramsView(SharedModuleStoreTestCase, ProgramCacheMixin):
             'uuid': self.program['uuid'],
             'completed': 0,
             'in_progress': 0,
-            'not_started': 1
+            'not_started': 1,
+            'all_unenrolled': False,
         }
 
     @with_site_configuration(configuration={'COURSE_CATALOG_API_URL': 'foo'})

@@ -403,7 +403,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-17 08:57+0000\n"
+"POT-Creation-Date: 2023-06-04 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -12187,6 +12187,10 @@ msgstr "“{0}”的副本"
 msgid "Duplicate of '{0}'"
 msgstr "“{0}”的副本"
 
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "先修课程标识无效"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "图片必须有名称、内容类型、尺寸信息。"
@@ -12411,10 +12415,6 @@ msgid ""
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
 msgstr "您必须将此课程链接到机构以继续。您选择的机构在系统中不存在，您需要将此机构添加至系统中。"
-
-#: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "先修课程标识无效"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
@@ -13597,6 +13597,10 @@ msgid "Learn more about this course"
 msgstr ""
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr ""
 
@@ -13975,16 +13979,20 @@ msgid "Downloads and transcripts"
 msgstr "下载的文件及字幕"
 
 #: lms/templates/video.html
-msgid "Share on:"
-msgstr "共享"
+msgid "Download video file"
+msgstr "下载视频文件"
+
+#: lms/templates/video.html
+msgid "Share this video"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Share on {site}"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "下载视频文件"
+msgid "Copy"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -22128,7 +22136,7 @@ msgid "Set Access"
 msgstr "设置访问限制"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

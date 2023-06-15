@@ -36,7 +36,7 @@ class ProgramAlertListView extends Backbone.View {
                 url,
                 urlText: gettext('View program'),
                 title: StringUtils.interpolate(
-                    gettext('Enroll in a {programName} course'),
+                    gettext('Enroll in a {programName}\'s course'),
                     { programName }
                 ),
                 message: this.pageType === 'programDetails'

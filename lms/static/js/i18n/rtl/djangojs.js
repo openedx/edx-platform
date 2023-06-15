@@ -143,7 +143,6 @@
     "Active": "\u023a\u0254\u0287\u1d09\u028c\u01dd",
     "Active Uploads": "\u023a\u0254\u0287\u1d09\u028c\u01dd \u0244dl\u00f8\u0250ds",
     "Active subscription": "\u023a\u0254\u0287\u1d09\u028c\u01dd snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n",
-    "Active trial ends {trialEndDate} at {trialEndTime}": "\u023a\u0254\u0287\u1d09\u028c\u01dd \u0287\u0279\u1d09\u0250l \u01ddnds {trialEndDate} \u0250\u0287 {trialEndTime}",
     "Add": "\u023add",
     "Add Additional Signatory": "\u023add \u023add\u1d09\u0287\u1d09\u00f8n\u0250l S\u1d09\u0183n\u0250\u0287\u00f8\u0279\u028e",
     "Add Attachment": "\u023add \u023a\u0287\u0287\u0250\u0254\u0265\u026f\u01ddn\u0287",
@@ -645,7 +644,7 @@
     "Ends {end}": "\u0246nds {end}",
     "Engage with posts": "\u0246n\u0183\u0250\u0183\u01dd \u028d\u1d09\u0287\u0265 d\u00f8s\u0287s",
     "Enroll Now": "\u0246n\u0279\u00f8ll N\u00f8\u028d",
-    "Enroll in a {programName} course": "\u0246n\u0279\u00f8ll \u1d09n \u0250 {programName} \u0254\u00f8n\u0279s\u01dd",
+    "Enroll in a {programName}'s course": "\u0246n\u0279\u00f8ll \u1d09n \u0250 {programName}'s \u0254\u00f8n\u0279s\u01dd",
     "Enrolled": "\u0246n\u0279\u00f8ll\u01ddd",
     "Enrolling you in the selected course": "\u0246n\u0279\u00f8ll\u1d09n\u0183 \u028e\u00f8n \u1d09n \u0287\u0265\u01dd s\u01ddl\u01dd\u0254\u0287\u01ddd \u0254\u00f8n\u0279s\u01dd",
     "Enrollment Date": "\u0246n\u0279\u00f8ll\u026f\u01ddn\u0287 \u0110\u0250\u0287\u01dd",
@@ -1555,6 +1554,7 @@
     "Submitted": "Snb\u026f\u1d09\u0287\u0287\u01ddd",
     "Subscribed": "Snbs\u0254\u0279\u1d09b\u01ddd",
     "Subscript": "Snbs\u0254\u0279\u1d09d\u0287",
+    "Subscription trial expires in less than 24 hours": "Snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n \u0287\u0279\u1d09\u0250l \u01ddxd\u1d09\u0279\u01dds \u1d09n l\u01ddss \u0287\u0265\u0250n 24 \u0265\u00f8n\u0279s",
     "Subscription trial expires in {remainingDays} day": [
       "Snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n \u0287\u0279\u1d09\u0250l \u01ddxd\u1d09\u0279\u01dds \u1d09n {remainingDays} d\u0250\u028e",
       "Snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n \u0287\u0279\u1d09\u0250l \u01ddxd\u1d09\u0279\u01dds \u1d09n {remainingDays} d\u0250\u028es"
@@ -1829,6 +1829,7 @@
     "Transcript Turnaround": "\u0166\u0279\u0250ns\u0254\u0279\u1d09d\u0287 \u0166n\u0279n\u0250\u0279\u00f8nnd",
     "Transcript will be displayed when you start playing the video.": "\u0166\u0279\u0250ns\u0254\u0279\u1d09d\u0287 \u028d\u1d09ll b\u01dd d\u1d09sdl\u0250\u028e\u01ddd \u028d\u0265\u01ddn \u028e\u00f8n s\u0287\u0250\u0279\u0287 dl\u0250\u028e\u1d09n\u0183 \u0287\u0265\u01dd \u028c\u1d09d\u01dd\u00f8.",
     "Transcripts": "\u0166\u0279\u0250ns\u0254\u0279\u1d09d\u0287s",
+    "Trial ends {trialEndDate} at {trialEndTime}": "\u0166\u0279\u1d09\u0250l \u01ddnds {trialEndDate} \u0250\u0287 {trialEndTime}",
     "Trial subscription": "\u0166\u0279\u1d09\u0250l snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n",
     "Try the transaction again in a few minutes.": "\u0166\u0279\u028e \u0287\u0265\u01dd \u0287\u0279\u0250ns\u0250\u0254\u0287\u1d09\u00f8n \u0250\u0183\u0250\u1d09n \u1d09n \u0250 \u025f\u01dd\u028d \u026f\u1d09nn\u0287\u01dds.",
     "Try using a different browser, such as Google Chrome.": "\u0166\u0279\u028e ns\u1d09n\u0183 \u0250 d\u1d09\u025f\u025f\u01dd\u0279\u01ddn\u0287 b\u0279\u00f8\u028ds\u01dd\u0279, sn\u0254\u0265 \u0250s \u01e4\u00f8\u00f8\u0183l\u01dd \u023b\u0265\u0279\u00f8\u026f\u01dd.",
@@ -1862,7 +1863,6 @@
     "Unlink This Account": "\u0244nl\u1d09n\u029e \u0166\u0265\u1d09s \u023a\u0254\u0254\u00f8nn\u0287",
     "Unlink your {accountName} account": "\u0244nl\u1d09n\u029e \u028e\u00f8n\u0279 {accountName} \u0250\u0254\u0254\u00f8nn\u0287",
     "Unlinking": "\u0244nl\u1d09n\u029e\u1d09n\u0183",
-    "Unlock verified access to all courses for {subscriptionPrice}. Cancel anytime.": "\u0244nl\u00f8\u0254\u029e \u028c\u01dd\u0279\u1d09\u025f\u1d09\u01ddd \u0250\u0254\u0254\u01ddss \u0287\u00f8 \u0250ll \u0254\u00f8n\u0279s\u01dds \u025f\u00f8\u0279 {subscriptionPrice}. \u023b\u0250n\u0254\u01ddl \u0250n\u028e\u0287\u1d09\u026f\u01dd.",
     "Unmark as Answer": "\u0244n\u026f\u0250\u0279\u029e \u0250s \u023ans\u028d\u01dd\u0279",
     "Unmute": "\u0244n\u026fn\u0287\u01dd",
     "Unpin": "\u0244nd\u1d09n",
@@ -2168,6 +2168,7 @@
     "Your upload of '{file}' succeeded.": "\u024e\u00f8n\u0279 ndl\u00f8\u0250d \u00f8\u025f '{file}' sn\u0254\u0254\u01dd\u01ddd\u01ddd.",
     "Your verification status is good until {verificationGoodUntil}.": "\u024e\u00f8n\u0279 \u028c\u01dd\u0279\u1d09\u025f\u1d09\u0254\u0250\u0287\u1d09\u00f8n s\u0287\u0250\u0287ns \u1d09s \u0183\u00f8\u00f8d nn\u0287\u1d09l {verificationGoodUntil}.",
     "Your video uploads are not complete.": "\u024e\u00f8n\u0279 \u028c\u1d09d\u01dd\u00f8 ndl\u00f8\u0250ds \u0250\u0279\u01dd n\u00f8\u0287 \u0254\u00f8\u026fdl\u01dd\u0287\u01dd.",
+    "Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.": "\u024e\u00f8n\u0279 {programName} \u0287\u0279\u1d09\u0250l \u028d\u1d09ll \u01ddxd\u1d09\u0279\u01dd \u0250\u0287 {trialEndTime} \u00f8n {trialEndDate} \u0250nd \u0287\u0265\u01dd \u0254\u0250\u0279d \u00f8n \u025f\u1d09l\u01dd \u028d\u1d09ll b\u01dd \u0254\u0265\u0250\u0279\u0183\u01ddd {subscriptionPrice}.",
     "Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.": [
       "\u024e\u00f8n\u0279 {programName} \u0287\u0279\u1d09\u0250l \u028d\u1d09ll \u01ddxd\u1d09\u0279\u01dd \u1d09n {remainingDays} d\u0250\u028e \u0250\u0287 {trialEndTime} \u00f8n {trialEndDate} \u0250nd \u0287\u0265\u01dd \u0254\u0250\u0279d \u00f8n \u025f\u1d09l\u01dd \u028d\u1d09ll b\u01dd \u0254\u0265\u0250\u0279\u0183\u01ddd {subscriptionPrice}.",
       "\u024e\u00f8n\u0279 {programName} \u0287\u0279\u1d09\u0250l \u028d\u1d09ll \u01ddxd\u1d09\u0279\u01dd \u1d09n {remainingDays} d\u0250\u028es \u0250\u0287 {trialEndTime} \u00f8n {trialEndDate} \u0250nd \u0287\u0265\u01dd \u0254\u0250\u0279d \u00f8n \u025f\u1d09l\u01dd \u028d\u1d09ll b\u01dd \u0254\u0265\u0250\u0279\u0183\u01ddd {subscriptionPrice}."
@@ -2357,6 +2358,7 @@
     "{start_strong}{total}{end_strong} words submitted in total.": "{start_strong}{total}{end_strong} \u028d\u00f8\u0279ds snb\u026f\u1d09\u0287\u0287\u01ddd \u1d09n \u0287\u00f8\u0287\u0250l.",
     "{strongStart}Warning: Account deletion is permanent.{strongEnd} Please read the above carefully before proceeding. This is an irreversible action, and {strongStart}you will no longer be able to use the same email on {platformName}.{strongEnd}": "{strongStart}W\u0250\u0279n\u1d09n\u0183: \u023a\u0254\u0254\u00f8nn\u0287 d\u01ddl\u01dd\u0287\u1d09\u00f8n \u1d09s d\u01dd\u0279\u026f\u0250n\u01ddn\u0287.{strongEnd} \u2c63l\u01dd\u0250s\u01dd \u0279\u01dd\u0250d \u0287\u0265\u01dd \u0250b\u00f8\u028c\u01dd \u0254\u0250\u0279\u01dd\u025fnll\u028e b\u01dd\u025f\u00f8\u0279\u01dd d\u0279\u00f8\u0254\u01dd\u01ddd\u1d09n\u0183. \u0166\u0265\u1d09s \u1d09s \u0250n \u1d09\u0279\u0279\u01dd\u028c\u01dd\u0279s\u1d09bl\u01dd \u0250\u0254\u0287\u1d09\u00f8n, \u0250nd {strongStart}\u028e\u00f8n \u028d\u1d09ll n\u00f8 l\u00f8n\u0183\u01dd\u0279 b\u01dd \u0250bl\u01dd \u0287\u00f8 ns\u01dd \u0287\u0265\u01dd s\u0250\u026f\u01dd \u01dd\u026f\u0250\u1d09l \u00f8n {platformName}.{strongEnd}",
     "{subscriptionPrice} subscription after trial ends. Cancel anytime.": "{subscriptionPrice} snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n \u0250\u025f\u0287\u01dd\u0279 \u0287\u0279\u1d09\u0250l \u01ddnds. \u023b\u0250n\u0254\u01ddl \u0250n\u028e\u0287\u1d09\u026f\u01dd.",
+    "{subscriptionPrice} subscription. Cancel anytime.": "{subscriptionPrice} snbs\u0254\u0279\u1d09d\u0287\u1d09\u00f8n. \u023b\u0250n\u0254\u01ddl \u0250n\u028e\u0287\u1d09\u026f\u01dd.",
     "{team_count} Team": [
       "{team_count} \u0166\u01dd\u0250\u026f",
       "{team_count} \u0166\u01dd\u0250\u026fs"

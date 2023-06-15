@@ -40,7 +40,7 @@ describe('Program Alert List View', () => {
 
     it('should render no enrollement alert', () => {
         expect(view.$('.alert:first .alert-heading').text().trim()).toEqual(
-            'Enroll in a Test Program course'
+            'Enroll in a Test Program\'s course'
         );
         expect(view.$('.alert:first .alert-message').text().trim()).toEqual(
             'You have an active subscription to the Test Program program but are not enrolled in any courses. Enroll in a remaining course and enjoy verified access.'
