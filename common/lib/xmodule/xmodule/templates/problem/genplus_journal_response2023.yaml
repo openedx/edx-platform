@@ -1,0 +1,43 @@
+---
+metadata:
+    display_name: 2023 Journal Response
+    markdown: !!null
+data: |
+    <div class="journals-xblock journal-listed theme-lightblue">
+      <problem class="journal_responses">
+        <div class="journals-xblock-wapper">
+          <!-- <div class="asn-icon top-left">
+            <img src="/static/images/asset-logo-black.svg" alt="Logo Left" />
+            <img src="/static/images/Read.png" width="50" alt="Icon Read" />
+          </div> -->
+          <!-- <div class="asn-icon top-right">
+            <img src="/static/images/Read.png" width="50" alt="Icon Read" />
+            <img src="/static/images/asset-logo-black.svg" alt="Logo Left" />
+          </div> -->
+          <div class="journals-form">
+            <div class="col">
+              <div class="journals-info">
+                <h2>YOUR JOURNAL</h2>
+                <div class="img-block">
+                  <img src="/static/images/icon-think.svg" width="25" alt="Info" />
+                  <span>Type your answer in the journal.</span>
+                </div>
+                <img src="/static/images/reflection-badge.svg" class="align-center" alt="Badge opportunity - Great Reflection" />
+              </div>
+            </div>
+            <div class="col">
+              <stringresponse answer="\w" type="regexp ci">
+                <label class="question-text">
+                  <img src="/static/images/icon-tag.svg" width="25" alt="Tag" />
+                  <span>I am able to change my PACE, TONE, and VOLUME to make my communication more effective. For example I can...</span>
+                </label>
+                <additional_answer answer="Please type a response"/>
+                <div class="text-wrapper">
+                  <textline multiline="true" size="20" placeholder="Type in your answer here..." />
+                </div>
+              </stringresponse>
+            </div>
+          </div>
+        </div>
+      </problem>
+    </div>

@@ -16,9 +16,9 @@ data: |
         <div class="choices-xblock-wapper">
           <div class="choices-form">
             <multiplechoiceresponse>
-              <strong class="question-text">
-                <span>What did your meta-skills profile show as your top skill strength(s)?</span>
-              </strong>
+              <span class="question-text-wrapper">
+                <strong class="question-text">What did your meta-skills profile show as your top skill strength(s)?</strong>
+              </span>
               <choicegroup type="MultipleChoice">
                 <choice class="choice_0" correct="true">The ability to make independent decisions quickly and effectively</choice>
                 <choice class="choice_1" correct="false">The ability to recover quickly from difficult situiations</choice>
