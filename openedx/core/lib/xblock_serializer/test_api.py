@@ -6,7 +6,7 @@ from xml.etree import ElementTree
 from openedx.core.djangolib.testing.utils import skip_unless_cms
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory
 
 from . import api
 
@@ -133,6 +133,32 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         self.assertEqual(serialized.static_files, serialized_blockstore.static_files)
         # This is the only other difference - an extra field with the blockstore-specific definition ID:
         self.assertEqual(serialized_blockstore.def_id, "html/just_img")
+
+    def test_html_with_fields(self):
+        """ Test an HTML Block with non-default fields like editor='raw' """
+        course = CourseFactory.create(display_name='test course', run="Testing_course")
+        html_block = BlockFactory.create(
+            parent_location=course.location,
+            category="html",
+            display_name="Non-default HTML Block",
+            editor="raw",
+            use_latex_compiler=True,
+            data="🍔",
+        )
+        serialized = api.serialize_xblock_to_olx(html_block)
+        self.assertXmlEqual(
+            serialized.olx_str,
+            """
+            <html
+                url_name="Non-default_HTML_Block"
+                display_name="Non-default HTML Block"
+                editor="raw"
+                use_latex_compiler="true"
+            ><![CDATA[
+                🍔
+            ]]></html>
+            """
+        )
 
     def test_export_sequential(self):
         """

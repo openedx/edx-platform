@@ -106,6 +106,10 @@ class XBlockSerializer:
         olx_node.attrib["url_name"] = block.scope_ids.usage_id.block_id
         if block.display_name:
             olx_node.attrib["display_name"] = block.display_name
+        if block.fields["editor"].is_set_on(block):
+            olx_node.attrib["editor"] = block.editor
+        if block.use_latex_compiler:
+            olx_node.attrib["use_latex_compiler"] = "true"
         olx_node.text = etree.CDATA("\n" + block.data + "\n")
         return olx_node
 
