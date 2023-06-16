@@ -5,7 +5,8 @@ from textwrap import dedent
 from xml.etree import ElementTree
 
 from rest_framework.test import APIClient
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_file_to_course
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from openedx.core.djangoapps.content_staging import api as python_api
@@ -134,7 +135,7 @@ class ClipboardTestCase(ModuleStoreTestCase):
         """
         course_key, client = self._setup_course()
 
-        # Copy the video
+        # Copy the HTML
         html_key = course_key.make_usage_key("html", "toyhtml")
         response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(html_key)}, format="json")
 
@@ -198,6 +199,38 @@ class ClipboardTestCase(ModuleStoreTestCase):
 
         # The OLX link from the video will no longer work:
         self.assertEqual(client.get(old_olx_url).status_code, 404)
+
+    def test_copy_static_assets(self):
+        """
+        Test copying an HTML from the course that references a static asset file.
+        """
+        course_key, client = self._setup_course()
+        # The toy course references static files that don't actually exist yet, so we have to upload one now:
+        upload_file_to_course(
+            course_key=course_key,
+            contentstore=contentstore(),
+            source_file='./common/test/data/toy/static/just_a_test.jpg',
+            target_filename="foo_bar.jpg",
+        )
+
+        # Copy the HTML XBlock to the clipboard:
+        html_key = course_key.make_usage_key("html", "just_img")
+        response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(html_key)}, format="json")
+
+        # Validate the response:
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        staged_content_id = response_data["content"]["id"]
+        olx_str = python_api.get_staged_content_olx(staged_content_id)
+        assert '<img src="/static/foo_bar.jpg" />' in olx_str
+        static_assets = python_api.get_staged_content_static_files(staged_content_id)
+
+        assert static_assets == [python_api.StagedContentFileData(
+            filename="foo_bar.jpg",
+            source_key=course_key.make_asset_key("asset", "foo_bar.jpg"),
+            md5_hash="addd3c218c0c0c41e7e1ae73f5969810",
+            data=None,
+        )]
 
     def test_no_course_permission(self):
         """
