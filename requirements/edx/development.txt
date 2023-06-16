@@ -595,7 +595,7 @@ edx-django-utils==5.4.0
     #   ora2
     #   outcome-surveys
     #   super-csv
-edx-drf-extensions==8.8.0
+edx-drf-extensions @ git+https://github.com/openedx/edx-drf-extensions.git@umar/make-verify-signature-method-generic
     # via
     #   -r requirements/edx/testing.txt
     #   edx-completion
