@@ -80,25 +80,22 @@ def send_notifications(user_ids, app_name, notification_type, context, content_u
     """
     from .models import Notification
     user_ids = list(set(user_ids))
+    course_id = context.get('course_id', None)
     # check if what is preferences of user and make decision to send notification or not
     preferences = CourseNotificationPreference.objects.filter(
         user_id__in=user_ids,
-        course_id=context.get('course_id', None),
+        course_id=course_id,
     )
-    preferences = {pref.user_id: pref for pref in preferences}
     notifications = []
-
-    for user_id in user_ids:
-        app_pref = preferences.get(user_id, None)
-        # There might be no config for the app, notification_type, so we need to check for it
-        if app_pref and app_pref.get_web_config(app_name, notification_type):
+    for preference in preferences:
+        if preference and preference.get_web_config(app_name, notification_type):
             notifications.append(Notification(
-                user_id=user_id,
+                user_id=preference.user_id,
                 app_name=app_name,
                 notification_type=notification_type,
                 content_context=context,
                 content_url=content_url,
-                course_id=context.get('course_id', None),
+                course_id=course_id,
             ))
     # send notification to users but use bulk_create
     Notification.objects.bulk_create(notifications)

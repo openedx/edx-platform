@@ -16,19 +16,21 @@ from openedx.core.djangoapps.notifications.models import CourseNotificationPrefe
 log = logging.getLogger(__name__)
 
 
-@receiver(COURSE_ENROLLMENT_CREATED, sender='student.CourseEnrollment')
-def course_enrollment_post_save(sender, instance, created, **kwargs):
+@receiver(COURSE_ENROLLMENT_CREATED)
+def course_enrollment_post_save(signal, sender, enrollment, metadata):
     """
     Watches for post_save signal for creates on the CourseEnrollment table.
     Generate a CourseNotificationPreference if new Enrollment is created
     """
-    if created and ENABLE_NOTIFICATIONS.is_enabled(instance.course_id):
+    if ENABLE_NOTIFICATIONS.is_enabled(enrollment.course.course_key):
         try:
-            CourseNotificationPreference.objects.create(user=instance.user, course_id=instance.course_id)
+            CourseNotificationPreference.objects.create(
+                user_id=enrollment.user.id,
+                course_id=enrollment.course.course_key
+            )
         except IntegrityError:
-            log.info(f'CourseNotificationPreference already exists for user {instance.user} '
-                     f'and course {instance.course_id}')
-
+            log.info(f'CourseNotificationPreference already exists for user {enrollment.user} '
+                     f'and course {enrollment.course_id}')
 
 @receiver(COURSE_UNENROLLMENT_COMPLETED)
 def on_user_course_unenrollment(enrollment, **kwargs):
@@ -45,11 +47,9 @@ def on_user_course_unenrollment(enrollment, **kwargs):
 
 
 @receiver(USER_NOTIFICATION)
-def generate_user_notifications(**kwargs):
+def generate_user_notifications(signal, sender, notification_data, metadata):
     """
     Watches for USER_NOTIFICATION signal and calls  send_web_notifications task
     """
     from openedx.core.djangoapps.notifications.tasks import send_notifications
-    notification_data = kwargs.get('notification_data', {}).__dict__
-
-    send_notifications(**notification_data)
+    send_notifications.delay(**notification_data)

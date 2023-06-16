@@ -373,14 +373,15 @@ def send_response_notifications(thread, course, creator, parent_id=None):
         notification_data = UserNotificationData(
             user_ids=user_ids,
             context={
-                "course_id": str(course.id),
                 "replier_name": creator.username,
                 "post_title": thread.title,
+                "course_name": course.display_name,
                 **extra_context,
             },
             notification_type=notification_type,
             content_url=thread.url_with_id(params={'id': thread.id}),
             app_name="discussion",
+            course_id=str(course.id),
         )
         USER_NOTIFICATION.send_event(notification_data=notification_data)
 
