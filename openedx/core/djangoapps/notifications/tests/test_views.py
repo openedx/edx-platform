@@ -541,7 +541,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         response = self.client.patch(self.url, data)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'message': 'Invalid app name.'})
+        self.assertEqual(response.data, {'message': 'Invalid app_name or notification_id.'})
 
     def test_mark_notification_read_with_notification_id(self):
         # Create a PATCH request to mark notification as read for notification_id: 2
@@ -551,9 +551,23 @@ class NotificationReadAPIViewTestCase(APITestCase):
         response = self.client.patch(self.url, data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'message': 'Notifications marked read.'})
+        self.assertEqual(response.data, {'message': 'Notification marked read.'})
         notifications = Notification.objects.filter(user=self.user, id=notification_id, last_read__isnull=False)
         self.assertEqual(notifications.count(), 1)
+
+    def test_mark_notification_read_with_other_user_notification_id(self):
+        # Create a PATCH request to mark notification as read for notification_id: 2 through a different user
+        self.client.logout()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password='test')
+
+        notification_id = 2
+        data = {'notification_id': notification_id}
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        notifications = Notification.objects.filter(user=self.user, id=notification_id, last_read__isnull=False)
+        self.assertEqual(notifications.count(), 0)
 
     def test_mark_notification_read_with_invalid_notification_id(self):
         # Create a PATCH request to mark notification as read for notification_id: 23345
@@ -563,10 +577,11 @@ class NotificationReadAPIViewTestCase(APITestCase):
         response = self.client.patch(self.url, data)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, {'message': 'Notification not found.'})
+        self.assertEqual(response.data["detail"], 'Not found.')
 
     def test_mark_notification_read_with_app_name_and_notification_id(self):
         # Create a PATCH request to mark notification as read for existing app e.g 'discussion' and notification_id: 2
+        # notification_id has higher priority than app_name in this case app_name is ignored
         app_name = next(iter(COURSE_NOTIFICATION_APPS))
         notification_id = 2
         data = {'app_name': app_name, 'notification_id': notification_id}
@@ -574,10 +589,9 @@ class NotificationReadAPIViewTestCase(APITestCase):
         response = self.client.patch(self.url, data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {'message': 'Notifications marked read.'})
+        self.assertEqual(response.data, {'message': 'Notification marked read.'})
         notifications = Notification.objects.filter(
             user=self.user,
-            app_name=app_name,
             id=notification_id,
             last_read__isnull=False
         )
@@ -588,4 +602,4 @@ class NotificationReadAPIViewTestCase(APITestCase):
         response = self.client.patch(self.url, {})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'message': 'Invalid app name or notification id.'})
+        self.assertEqual(response.data, {'message': 'Invalid app_name or notification_id.'})

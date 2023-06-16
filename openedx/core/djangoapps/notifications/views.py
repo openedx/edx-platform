@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import Count
+from django.shortcuts import get_object_or_404
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import generics, permissions, status
@@ -361,35 +362,28 @@ class NotificationReadAPIView(APIView):
 
         Returns:
         - 200: OK status code if the notification or notifications were successfully marked read.
-        - 400: Bad Request status code if the app name or notification id is invalid.
+        - 400: Bad Request status code if the app name is invalid.
         - 403: Forbidden status code if the user is not authenticated.
-        - 404: Not Found status code if the notification or notifications were not found.
+        - 404: Not Found status code if the notification was not found.
         """
-        app_name = request.data.get('app_name')
-        notification_id = request.data.get('notification_id')
-
-        if not app_name and not notification_id:
-            return Response({'message': 'Invalid app name or notification id.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if app_name and app_name not in COURSE_NOTIFICATION_APPS:
-            return Response({'message': 'Invalid app name.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        query_params = {
-            'user': request.user,
-            'last_read__isnull': True,
-        }
-
-        if app_name:
-            query_params['app_name'] = app_name
+        notification_id = request.data.get('notification_id', None)
+        read_at = datetime.now(UTC)
 
         if notification_id:
-            query_params['id'] = notification_id
+            notification = get_object_or_404(Notification, pk=notification_id, user=request.user)
+            notification.last_read = read_at
+            notification.save()
+            return Response({'message': 'Notification marked read.'}, status=status.HTTP_200_OK)
 
-        notifications = Notification.objects.filter(**query_params)
+        app_name = request.data.get('app_name', '')
 
-        if notification_id and not notifications.exists():
-            return Response({'message': 'Notification not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if app_name and app_name in COURSE_NOTIFICATION_APPS:
+            notifications = Notification.objects.filter(
+                user=request.user,
+                app_name=app_name,
+                last_read__isnull=True,
+            )
+            notifications.update(last_read=read_at)
+            return Response({'message': 'Notifications marked read.'}, status=status.HTTP_200_OK)
 
-        notifications.update(last_read=datetime.now())
-
-        return Response({'message': 'Notifications marked read.'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Invalid app_name or notification_id.'}, status=status.HTTP_400_BAD_REQUEST)
