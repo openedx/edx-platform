@@ -18,4 +18,4 @@ class ServiceUserThrottle(UserRateThrottle):
         ]
         if request.user.username in service_users:
             return True
-        return super(ServiceUserThrottle, self).allow_request(request, view)
+        return super().allow_request(request, view)
