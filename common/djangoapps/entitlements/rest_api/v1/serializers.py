@@ -50,8 +50,6 @@ class CourseEntitlementSupportDetailSerializer(serializers.ModelSerializer):
         slug_field='username',
         default=serializers.CurrentUserDefault()
     )
-    import pdb;
-    pdb.set_trace()
     unenrolled_run = CourseKeyField(read_only='unenrolled_run.id')
 
     class Meta:
