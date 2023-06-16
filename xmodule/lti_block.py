@@ -378,11 +378,6 @@ class LTIBlock(
         ],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
-    preview_view_css = {
-        'scss': [
-            resource_filename(__name__, 'css/lti/lti.scss')
-        ],
-    }
 
     mako_template = 'widgets/metadata-only-edit.html'
 
@@ -392,9 +387,6 @@ class LTIBlock(
             resource_filename(__name__, 'js/src/raw/edit/metadata-only.js')
         ],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [],
     }
 
     def studio_view(self, _context):
