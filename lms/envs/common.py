@@ -2867,22 +2867,6 @@ BLOCK_STRUCTURES_SETTINGS = dict(
     #   For more information, check https://github.com/openedx/edx-platform/pull/13388 and
     #   https://github.com/openedx/edx-platform/pull/14571.
     TASK_MAX_RETRIES=5,
-
-    # .. toggle_name: BLOCK_STRUCTURES_SETTINGS['PRUNING_ACTIVE']
-    # .. toggle_implementation: DjangoSetting
-    # .. toggle_default: False
-    # .. toggle_description: When `True`, only a specified number of versions of block structure
-    #   files are kept for each structure, and the rest are cleaned up. The number of versions that
-    #   are kept can be specified in the `BlockStructureConfiguration`, which can be edited in
-    #   Django Admin. The default number of versions that are kept is `5`.
-    # .. toggle_warning: This toggle will likely be deprecated and removed.
-    # .. toggle_use_cases: temporary
-    # .. toggle_creation_date: 2018-03-22
-    # .. toggle_target_removal_date: 2018-06-22
-    # .. toggle_tickets: https://github.com/openedx/edx-platform/pull/14571,
-    #   https://github.com/openedx/edx-platform/pull/17760,
-    #   https://openedx.atlassian.net/browse/DEPR-146
-    PRUNING_ACTIVE=False,
 )
 
 ################################ Bulk Email ###################################
