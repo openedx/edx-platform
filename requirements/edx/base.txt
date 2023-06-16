@@ -539,7 +539,7 @@ edx-search==3.5.0
     # via -r requirements/edx/base.in
 edx-sga==0.21.1
     # via -r requirements/edx/base.in
-edx-submissions==3.5.5
+edx-submissions==3.5.6
     # via
     #   -r requirements/edx/base.in
     #   ora2
