@@ -263,7 +263,6 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
 
     instructor_template = 'instructor/instructor_dashboard_2/instructor_dashboard_2.html'
 
-    context, instructor_template = InstructorDashboardRenderStarted.run_filter(context, instructor_template)
     try:
         # .. filter_implemented_name: InstructorDashboardRenderStarted
         # .. filter_type: org.openedx.learning.instructor.dashboard.render.started.v1
