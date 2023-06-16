@@ -180,6 +180,27 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         self.instructor.save()
         self._assert_escalation_email_available(True)
 
+    @patch.dict(
+        settings.PROCTORING_BACKENDS,
+        {
+            'DEFAULT': 'test_proctoring_provider',
+            'test_proctoring_provider': {},
+            'lti_external': {}
+        },
+    )
+    @patch.dict(settings.FEATURES, {'ENABLE_PROCTORED_EXAMS': True})
+    def test_lti_proctoring_dashboard(self):
+        """
+        The exams dasboard MFE will be shown instead of the default special exams tab content
+        """
+        self.setup_course_with_proctoring_backend('lti_external', 'foo@bar.com')
+
+        self.instructor.is_staff = True
+        self.instructor.save()
+        response = self.client.get(self.url)
+        self.assertIn('proctoring-mfe-view', response.content.decode('utf-8'))
+        self.assertNotIn('proctoring-accordion', response.content.decode('utf-8'))
+
     def test_review_dashboard(self):
         """
         The exam review dashboard will appear for backends that support the feature
