@@ -21,6 +21,7 @@ from common.djangoapps.util.query import use_read_replica_if_available
 from lms.djangoapps.verify_student.message_types import VerificationExpiry
 from lms.djangoapps.verify_student.models import ManualVerification, SoftwareSecurePhotoVerification, SSOVerification
 from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from openedx.core.lib.celery.task_utils import emulate_http_request
@@ -191,7 +192,10 @@ class Command(BaseCommand):
         message_context = get_base_template_context(site)
         message_context.update({
             'platform_name': settings.PLATFORM_NAME,
-            'lms_verification_link': f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification',
+            'lms_verification_link': (
+                f'{configuration_helpers.get_value("ACCOUNT_MICROFRONTEND_URL", settings.ACCOUNT_MICROFRONTEND_URL)}'
+                f'/id-verification'
+            ),
             'help_center_link': settings.ID_VERIFICATION_SUPPORT_LINK
         })
 

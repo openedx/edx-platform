@@ -58,7 +58,10 @@ def account_settings(request):
 
     """
     if should_redirect_to_account_microfrontend():
-        url = settings.ACCOUNT_MICROFRONTEND_URL
+        url = configuration_helpers.get_value(
+            'ACCOUNT_MICROFRONTEND_URL',
+            settings.ACCOUNT_MICROFRONTEND_URL,
+        )
 
         duplicate_provider = pipeline.get_duplicate_provider(messages.get_messages(request))
         if duplicate_provider:

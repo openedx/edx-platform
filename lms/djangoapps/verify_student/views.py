@@ -1122,7 +1122,10 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
     elif result == "FAIL":
         log.debug("Denying verification for %s", receipt_id)
         attempt.deny(json.dumps(reason), error_code=error_code)
-        reverify_url = f'{settings.ACCOUNT_MICROFRONTEND_URL}/id-verification'
+        reverify_url = (
+            f'{configuration_helpers.get_value("ACCOUNT_MICROFRONTEND_URL", settings.ACCOUNT_MICROFRONTEND_URL)}'
+            f'/id-verification'
+        )
         verification_status_email_vars['reasons'] = reason
         verification_status_email_vars['reverify_url'] = reverify_url
         verification_status_email_vars['faq_url'] = settings.ID_VERIFICATION_SUPPORT_LINK
