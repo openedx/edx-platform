@@ -195,7 +195,7 @@ click-plugins==1.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   celery
-click-repl==0.2.0
+click-repl==0.3.0
     # via
     #   -r requirements/edx/testing.txt
     #   celery
@@ -209,15 +209,6 @@ codejail-includes==1.0.0
     # via -r requirements/edx/testing.txt
 contextlib2==21.6.0
     # via -r requirements/edx/testing.txt
-coreapi==2.3.3
-    # via
-    #   -r requirements/edx/testing.txt
-    #   drf-yasg
-coreschema==0.0.4
-    # via
-    #   -r requirements/edx/testing.txt
-    #   coreapi
-    #   drf-yasg
 coverage[toml]==7.2.7
     # via
     #   -r requirements/edx/testing.txt
@@ -363,7 +354,7 @@ django-config-models==2.3.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==4.0.0
+django-cors-headers==4.1.0
     # via -r requirements/edx/testing.txt
 django-countries==7.5.1
     # via
@@ -494,7 +485,7 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
-djangorestframework==3.12.4
+djangorestframework==3.14.0
     # via
     #   -r requirements/edx/testing.txt
     #   django-config-models
@@ -541,7 +532,7 @@ drf-nested-routers==0.93.4
     # via
     #   -r requirements/edx/testing.txt
     #   openedx-blockstore
-drf-yasg==1.21.5
+drf-yasg==1.21.6
     # via
     #   -r requirements/edx/testing.txt
     #   edx-api-doc-tools
@@ -666,11 +657,11 @@ edx-rest-api-client==5.5.2
     #   edx-proctoring
 edx-search==3.5.0
     # via -r requirements/edx/testing.txt
-edx-sga==0.21.1
+edx-sga==0.22.0
     # via -r requirements/edx/testing.txt
 edx-sphinx-theme==3.1.0
     # via -r requirements/edx/development.in
-edx-submissions==3.5.5
+edx-submissions==3.5.6
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
@@ -843,15 +834,10 @@ isort==5.12.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
-itypes==1.2.0
-    # via
-    #   -r requirements/edx/testing.txt
-    #   coreapi
 jinja2==3.1.2
     # via
     #   -r requirements/edx/testing.txt
     #   code-annotations
-    #   coreschema
     #   diff-cover
     #   sphinx
 jmespath==0.10.0
@@ -1334,6 +1320,7 @@ pytz==2022.7.1
     #   celery
     #   django
     #   django-ses
+    #   djangorestframework
     #   drf-yasg
     #   edx-completion
     #   edx-enterprise
@@ -1358,6 +1345,7 @@ pyyaml==6.0
     # via
     #   -r requirements/edx/testing.txt
     #   code-annotations
+    #   drf-yasg
     #   edx-django-release-util
     #   edx-i18n-tools
     #   sphinxcontrib-openapi
@@ -1383,7 +1371,6 @@ requests==2.31.0
     #   -r requirements/edx/testing.txt
     #   algoliasearch
     #   analytics-python
-    #   coreapi
     #   django-oauth-toolkit
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -1412,14 +1399,6 @@ rfc3986[idna2008]==1.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   httpx
-ruamel-yaml==0.17.31
-    # via
-    #   -r requirements/edx/testing.txt
-    #   drf-yasg
-ruamel-yaml-clib==0.2.7
-    # via
-    #   -r requirements/edx/testing.txt
-    #   ruamel-yaml
 rules==3.3
     # via
     #   -r requirements/edx/testing.txt
@@ -1463,7 +1442,6 @@ six==1.16.0
     #   analytics-python
     #   bleach
     #   chem
-    #   click-repl
     #   codejail-includes
     #   crowdsourcehinter-xblock
     #   edx-ace
@@ -1652,7 +1630,6 @@ unidiff==0.7.5
 uritemplate==4.1.1
     # via
     #   -r requirements/edx/testing.txt
-    #   coreapi
     #   drf-yasg
 urllib3==1.26.16
     # via
@@ -1745,7 +1722,7 @@ xblock-google-drive==0.3.0
     # via -r requirements/edx/testing.txt
 xblock-poll==1.13.0
     # via -r requirements/edx/testing.txt
-xblock-utils==3.1.0
+xblock-utils==3.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-sga
