@@ -14,6 +14,7 @@ from unittest.mock import Mock, patch
 import dateutil.parser
 import ddt
 import pytz
+from django.test import TestCase
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -27,7 +28,6 @@ from edxval.api import (
     get_transcript_preferences,
     get_video_info
 )
-
 from cms.djangoapps.contentstore.models import VideoUploadConfig
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
@@ -47,7 +47,7 @@ from ..videos import (
     StatusDisplayStrings,
     TranscriptProvider,
     _get_default_video_image_url,
-    convert_video_status
+    convert_video_status, storage_service_bucket, storage_service_key
 )
 
 
@@ -1626,3 +1626,26 @@ class GetVideoFeaturesTestCase(
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()[key], is_enabled)
+
+
+class GetStorageBucketTestCase(TestCase):
+    """ This test just check that connection works and returns the bucket.
+    It does not involve any mocking and triggers errors if has any import issue.
+    """
+    @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
+    @override_settings(VIDEO_UPLOAD_PIPELINE={
+        "VEM_S3_BUCKET": "vem_test_bucket", "BUCKET": "test_bucket", "ROOT_PATH": "test_root"
+    })
+    def test_storage_bucket(self):
+        """ get bucket and generate url. It will not hit actual s3."""
+        bucket = storage_service_bucket()
+        edx_video_id = 'dummy_video'
+        key = storage_service_key(bucket, file_name=edx_video_id)
+        upload_url = key.generate_url(
+            KEY_EXPIRATION_IN_SECONDS,
+            'PUT',
+            headers={'Content-Type': 'mp4'}
+        )
+
+        self.assertIn("https://vem_test_bucket.s3.amazonaws.com:443/test_root/", upload_url)
+        self.assertIn(edx_video_id, upload_url)
