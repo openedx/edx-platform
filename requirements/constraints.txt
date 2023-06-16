@@ -117,3 +117,5 @@ docutils<0.20
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/32327
 python3-saml<1.10.0
 
+# upgrading djangorestframework in incremental way
+djangorestframework<3.14.0
