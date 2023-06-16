@@ -99,6 +99,9 @@ class LibraryContentBlock(
         'js': [],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
+    preview_view_css = {
+        'scss': [],
+    }
 
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = "VerticalDescriptor"
@@ -107,6 +110,9 @@ class LibraryContentBlock(
             resource_filename(__name__, 'js/src/vertical/edit.js'),
         ],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
+    }
+    studio_view_css = {
+        'scss': [],
     }
 
     show_in_read_only_mode = True
