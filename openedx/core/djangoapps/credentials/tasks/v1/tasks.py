@@ -151,7 +151,8 @@ def handle_notify_credentials(options, course_keys):
             delay=options['delay'],
             page_size=options['page_size'],
             verbose=options['verbose'],
-            notify_programs=options['notify_programs']
+            notify_programs=options['notify_programs'],
+            revoke_program_certs=options['revoke_program_certs']
         )
 
 

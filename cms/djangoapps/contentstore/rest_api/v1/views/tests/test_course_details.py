@@ -10,7 +10,7 @@ from rest_framework import status
 
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 
-from ..mixins import PermissionAccessMixin
+from ...mixins import PermissionAccessMixin
 
 
 @ddt.ddt
@@ -22,7 +22,7 @@ class CourseDetailsViewTest(CourseTestCase, PermissionAccessMixin):
     def setUp(self):
         super().setUp()
         self.url = reverse(
-            'cms.djangoapps.contentstore:v1:course_details',
+            "cms.djangoapps.contentstore:v1:course_details",
             kwargs={"course_id": self.course.id},
         )
 
@@ -46,13 +46,17 @@ class CourseDetailsViewTest(CourseTestCase, PermissionAccessMixin):
         self.assertEqual(error, "You do not have permission to perform this action.")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_PREREQUISITE_COURSES": True})
     def test_put_invalid_pre_requisite_course(self):
-        pre_requisite_course_keys = [str(self.course.id), 'invalid_key']
+        pre_requisite_course_keys = [str(self.course.id), "invalid_key"]
         request_data = {"pre_requisite_courses": pre_requisite_course_keys}
-        response = self.client.put(path=self.url, data=json.dumps(request_data), content_type="application/json")
+        response = self.client.put(
+            path=self.url,
+            data=json.dumps(request_data),
+            content_type="application/json",
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.json()['error'], 'Invalid prerequisite course key')
+        self.assertEqual(response.json()["error"], "Invalid prerequisite course key")
 
     def test_put_course_details(self):
         request_data = {
@@ -75,13 +79,10 @@ class CourseDetailsViewTest(CourseTestCase, PermissionAccessMixin):
             "entrance_exam_minimum_score_pct": "50",
             "intro_video": None,
             "language": "creative-commons: ver=4.0 BY NC ND",
-            "learning_info": [
-                "foo",
-                "bar"
-            ],
+            "learning_info": ["foo", "bar"],
             "license": "creative-commons: ver=4.0 BY NC ND",
             "org": "edX",
-            "overview": "<section class=\"about\"></section>",
+            "overview": '<section class="about"></section>',
             "pre_requisite_courses": [],
             "run": "course",
             "self_paced": None,
@@ -99,10 +100,14 @@ class CourseDetailsViewTest(CourseTestCase, PermissionAccessMixin):
                         "title": "title",
                         "organization": "org",
                         "image": "image",
-                        "bio": ""
+                        "bio": "",
                     }
                 ]
             },
         }
-        response = self.client.put(path=self.url, data=json.dumps(request_data), content_type="application/json")
+        response = self.client.put(
+            path=self.url,
+            data=json.dumps(request_data),
+            content_type="application/json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)

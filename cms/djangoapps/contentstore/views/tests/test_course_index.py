@@ -39,7 +39,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory, LibraryFactory, check_mongo_calls  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..course import _deprecated_blocks_info, course_outline_initial_state, reindex_course_and_check_access
-from ..block import VisibilityState, create_xblock_info
+from cms.djangoapps.contentstore.xblock_services.xblock_service import VisibilityState, create_xblock_info
 
 
 class TestCourseIndex(CourseTestCase):

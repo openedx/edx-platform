@@ -14,7 +14,7 @@ from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from .views.helpers import is_item_in_course_tree
+from .helpers import is_item_in_course_tree
 
 log = logging.getLogger(__name__)
 User = get_user_model()

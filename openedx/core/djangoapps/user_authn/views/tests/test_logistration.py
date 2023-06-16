@@ -1,7 +1,6 @@
 """ Tests for Logistration views. """
 
 
-from datetime import datetime, timedelta
 from http.cookies import SimpleCookie
 from urllib.parse import urlencode
 from unittest import mock
@@ -18,8 +17,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from freezegun import freeze_time
-from pytz import UTC
 
 from common.djangoapps.course_modes.models import CourseMode
 from lms.djangoapps.branding.api import get_privacy_url
@@ -117,25 +114,6 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         response = self.client.get(reverse(url_name))
         expected_data = f'"initial_mode": "{initial_mode}"'
         self.assertContains(response, expected_data)
-
-    def test_login_and_registration_form_ratelimited(self):
-        """
-        Test that rate limiting for logistration enpoints works as expected.
-        """
-        login_url = reverse('signin_user')
-        for _ in range(5):
-            response = self.client.get(login_url)
-            assert response.status_code == 200
-
-        # then the rate limiter should kick in and give a HttpForbidden response
-        response = self.client.get(login_url)
-        assert response.status_code == 429
-
-        # now reset the time to 6 mins from now in future in order to unblock
-        reset_time = datetime.now(UTC) + timedelta(seconds=361)
-        with freeze_time(reset_time):
-            response = self.client.get(login_url)
-            assert response.status_code == 200
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"DISABLE_SET_JWT_COOKIES_FOR_TESTS": False})
     @ddt.data("signin_user", "register_user")

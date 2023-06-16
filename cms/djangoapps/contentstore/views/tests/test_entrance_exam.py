@@ -26,7 +26,8 @@ from ..entrance_exam import (
     remove_entrance_exam_milestone_reference,
     update_entrance_exam
 )
-from ..helpers import GRADER_TYPES, create_xblock
+from cms.djangoapps.contentstore.helpers import GRADER_TYPES
+from cms.djangoapps.contentstore.xblock_services.create_xblock import create_xblock
 
 
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
@@ -34,6 +35,7 @@ class EntranceExamHandlerTests(CourseTestCase, MilestonesTestCaseMixin):
     """
     Base test class for create, save, and delete
     """
+
     def setUp(self):
         """
         Shared scaffolding for individual test runs
