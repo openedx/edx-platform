@@ -53,6 +53,3 @@ class IgnoreLargeFiles(PipelineStep):
             return fd
 
         return {"file_datas": [remove_large_data(fd) for fd in file_datas]}
-
-#class DetectPythonLibZip(PipelineStep):
-# python_lib_filename = getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)

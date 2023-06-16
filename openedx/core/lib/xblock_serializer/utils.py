@@ -1,21 +1,26 @@
 """
 Helper functions for XBlock serialization
 """
+from __future__ import annotations
 import logging
 import re
 from contextlib import contextmanager
 
+from django.conf import settings
 from fs.memoryfs import MemoryFS
 from fs.wrapfs import WrapFS
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import AssetKey, CourseKey
+
+from common.djangoapps.static_replace import replace_static_urls
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 from xmodule.xml_block import XmlMixin
 
-from common.djangoapps.static_replace import replace_static_urls
+from .data import StaticFile
 
 log = logging.getLogger(__name__)
 
@@ -87,6 +92,38 @@ def collect_assets_from_text(text, course_id, include_content=False):
             else:
                 info['content'] = content
         yield info
+
+
+def get_python_lib_zip_if_using(olx: str, course_id: CourseKey) -> StaticFile | None:
+    """
+    When python_lib is in use, capa problems that contain python code should be assumed to depend on it.
+
+    Note: for any given problem that uses python, there is no way to tell if it
+    actually uses any imports from python_lib.zip because the imports could be
+    named anything. So we just have to assume that any python problems may be
+    using python_lib.zip
+    """
+    MATCH_STRINGS = (
+        '<script type="text/python">',
+        "<script type='text/python'>",
+        '<script type="loncapa/python">'
+        "<script type='loncapa/python'>",
+    )
+    found = False
+    for check in MATCH_STRINGS:
+        if check in olx:
+            found = True
+            break
+    if found:
+        python_lib_filename = getattr(settings, 'PYTHON_LIB_FILENAME', DEFAULT_PYTHON_LIB_FILENAME)
+        asset_key = StaticContent.get_asset_key_from_path(course_id, python_lib_filename)
+        # Now, it seems like this capa problem uses python_lib.zip - but does it exist in the course?
+        asset_handle = AssetManager.find(asset_key, throw_on_not_found=True, as_stream=True)
+        if asset_handle:
+            asset_handle.close()  # We don't need to read the contents at this time.
+            url = '/' + str(StaticContent.compute_location(course_id, python_lib_filename))
+            return StaticFile(name=python_lib_filename, url=url, data=None)
+    return None
 
 
 @contextmanager

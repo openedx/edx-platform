@@ -4,20 +4,13 @@ Code for serializing a modulestore XBlock to OLX.
 from __future__ import annotations
 import logging
 import os
-from typing import NamedTuple
 
 from lxml import etree
 
+from .data import StaticFile
 from . import utils
 
 log = logging.getLogger(__name__)
-
-
-class StaticFile(NamedTuple):
-    """ A static file required by an XBlock """
-    name: str
-    url: str | None
-    data: bytes | None
 
 
 class XBlockSerializer:
@@ -44,6 +37,11 @@ class XBlockSerializer:
             path = asset['path']
             if path not in [sf.name for sf in self.static_files]:
                 self.static_files.append(StaticFile(name=path, url=asset['url'], data=None))
+
+        if block.scope_ids.usage_id.block_type == 'problem':
+            py_lib_zip_file = utils.get_python_lib_zip_if_using(self.olx_str, course_key)
+            if py_lib_zip_file:
+                self.static_files.append(py_lib_zip_file)
 
     def _serialize_block(self, block) -> etree.Element:
         """ Serialize an XBlock to OLX/XML. """
