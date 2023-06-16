@@ -177,24 +177,11 @@ class ProblemBlock(
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
 
-    preview_view_css = {
-        'scss': [
-            resource_filename(__name__, 'css/capa/display.scss'),
-        ],
-    }
-
     studio_view_js = {
         'js': [
             resource_filename(__name__, 'js/src/problem/edit.js'),
         ],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
-    studio_view_css = {
-        'scss': [
-            resource_filename(__name__, 'css/editor/edit.scss'),
-            resource_filename(__name__, 'css/problem/edit.scss'),
-        ]
     }
 
     display_name = String(
