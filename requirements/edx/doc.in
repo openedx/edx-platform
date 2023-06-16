@@ -2,6 +2,8 @@
 -c ../constraints.txt
 
 code-annotations          # provides annotations for certain documentation
+coreapi                   # drf-yasg in 1.21.6 dropped this. https://drf-yasg.readthedocs.io/en/stable/changelog.html#id1
+coreschema                # drf-yasg in 1.21.6 dropped this.  https://drf-yasg.readthedocs.io/en/stable/changelog.html#id1
 sphinx-book-theme         # Common theme for all Open edX projects
 gitpython                 # fetch git repo information
 Sphinx                    # Documentation builder
