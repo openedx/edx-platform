@@ -209,6 +209,12 @@ codejail-includes==1.0.0
     # via -r requirements/edx/testing.txt
 contextlib2==21.6.0
     # via -r requirements/edx/testing.txt
+coreapi==2.3.3
+    # via -r requirements/edx/testing.txt
+coreschema==0.0.4
+    # via
+    #   -r requirements/edx/testing.txt
+    #   coreapi
 coverage[toml]==7.2.7
     # via
     #   -r requirements/edx/testing.txt
@@ -834,10 +840,15 @@ isort==5.12.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
+itypes==1.2.0
+    # via
+    #   -r requirements/edx/testing.txt
+    #   coreapi
 jinja2==3.1.2
     # via
     #   -r requirements/edx/testing.txt
     #   code-annotations
+    #   coreschema
     #   diff-cover
     #   sphinx
 jmespath==0.10.0
@@ -1372,6 +1383,7 @@ requests==2.31.0
     #   -r requirements/edx/testing.txt
     #   algoliasearch
     #   analytics-python
+    #   coreapi
     #   django-oauth-toolkit
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -1631,6 +1643,7 @@ unidiff==0.7.5
 uritemplate==4.1.1
     # via
     #   -r requirements/edx/testing.txt
+    #   coreapi
     #   drf-yasg
 urllib3==1.26.16
     # via
@@ -1654,7 +1667,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.23.0
+virtualenv==20.23.1
     # via
     #   -r requirements/edx/testing.txt
     #   tox

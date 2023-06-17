@@ -142,6 +142,12 @@ codejail-includes==1.0.0
     # via -r requirements/edx/base.in
 contextlib2==21.6.0
     # via -r requirements/edx/base.in
+coreapi==2.3.3
+    # via -r requirements/edx/base.in
+coreschema==0.0.4
+    # via
+    #   -r requirements/edx/base.in
+    #   coreapi
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.in
 cryptography==38.0.4
@@ -626,8 +632,12 @@ ipaddress==1.0.23
     # via -r requirements/edx/base.in
 isodate==0.6.1
     # via python3-saml
+itypes==1.2.0
+    # via coreapi
 jinja2==3.1.2
-    # via code-annotations
+    # via
+    #   code-annotations
+    #   coreschema
 jmespath==0.10.0
     # via
     #   boto3
@@ -987,6 +997,7 @@ requests==2.31.0
     #   -r requirements/edx/paver.txt
     #   algoliasearch
     #   analytics-python
+    #   coreapi
     #   django-oauth-toolkit
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -1135,7 +1146,9 @@ unicodecsv==0.14.1
     #   -r requirements/edx/base.in
     #   edx-enterprise
 uritemplate==4.1.1
-    # via drf-yasg
+    # via
+    #   coreapi
+    #   drf-yasg
 urllib3==1.26.16
     # via
     #   -c requirements/edx/../constraints.txt
