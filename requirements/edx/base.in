@@ -38,6 +38,8 @@ celery                              # Asynchronous task execution library
 chem                                # A helper library for chemistry calculations
 codejail-includes                   # CodeJail manages execution of untrusted code in secure sandboxes.
 contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
+coreapi                             # drf-yasg in 1.21.6 dropped this. https://drf-yasg.readthedocs.io/en/stable/changelog.html#id1
+coreschema                          # drf-yasg in 1.21.6 dropped this.  https://drf-yasg.readthedocs.io/en/stable/changelog.html#id1
 crowdsourcehinter-xblock
 cryptography                        # Implementations of assorted cryptography algorithms
 defusedxml
