@@ -52,7 +52,7 @@ class SkillAssessmentQuestion(models.Model):
     start_unit_location = UsageKeyField(max_length=255, db_index=True)
     end_unit = CourseKeyField(max_length=255, db_index=True)
     end_unit_location = UsageKeyField(max_length=255, db_index=True)
-    skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+    skill = models.ForeignKey(Skill, null=True, on_delete=models.CASCADE)
 
 
 class SkillAssessmentResponse(TimeStampedModel):
@@ -65,7 +65,7 @@ class SkillAssessmentResponse(TimeStampedModel):
     question = models.ForeignKey(SkillAssessmentQuestion, on_delete=models.CASCADE)
     earned_score = models.IntegerField(blank=True, null=True, default=0)
     total_score = models.IntegerField(blank=True, null=True, default=6)
-    response_time = models.CharField(max_length=32, choices=SKILL_ASSESSMENT_RESPONSE_TIME)
-    skill_assessment_type = models.CharField(max_length=32, choices=SKILL_ASSESSMENT_TYPE_CHOICES)
+    response_time = models.CharField(max_length=32, null=True, choices=SKILL_ASSESSMENT_RESPONSE_TIME)
+    skill_assessment_type = models.CharField(max_length=32, null=True, choices=SKILL_ASSESSMENT_TYPE_CHOICES)
     question_response = JSONField(blank=True, null=True)
 

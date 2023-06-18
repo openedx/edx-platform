@@ -1375,8 +1375,9 @@ class CapaMixin(ScorableXBlockMixin, CapaFields):
             success = 'submitted'
 
         # save genplus student response
+        event_info['real_answers'] = self.lcp.get_question_answers()
         from openedx.features.genplus_features.genplus_assessments.utils import StudentResponse
-        StudentResponse().save_problem_response(self, data)
+        StudentResponse().save_problem_response(self, data, event_info)
 
         return {
             'success': success,

@@ -48,8 +48,9 @@ class JournalTypes:
     """
     TEACHER_FEEDBACK = 'TeacherFeedback'
     STUDENT_POST = 'StudentReflection'
+    PROBLEM_ENTRY = 'ProblemEntry'
 
-    __ALL__ = (TEACHER_FEEDBACK, STUDENT_POST)
+    __ALL__ = (TEACHER_FEEDBACK, STUDENT_POST, PROBLEM_ENTRY)
     __MODEL_CHOICES__ = (
         (journal_type, journal_type) for journal_type in __ALL__
     )

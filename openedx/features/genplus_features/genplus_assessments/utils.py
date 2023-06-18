@@ -14,8 +14,11 @@ from lms.djangoapps.courseware.models import StudentModule
 from openedx.features.genplus_features.genplus.constants import JournalTypes
 from openedx.features.genplus_features.genplus.models import Student, JournalPost
 from openedx.features.genplus_features.genplus_learning.models import Unit
-from openedx.features.genplus_features.genplus_assessments.constants import ProblemTypes, JOURNAL_STYLE, TOTAL_PROBLEM_SCORE, SkillAssessmentTypes, SkillAssessmentResponseTime
-from openedx.features.genplus_features.genplus_assessments.models import SkillAssessmentQuestion, SkillAssessmentResponse
+from openedx.features.genplus_features.genplus_assessments.constants import ProblemTypes, JOURNAL_STYLE, \
+    TOTAL_PROBLEM_SCORE, SkillAssessmentTypes, SkillAssessmentResponseTime
+from openedx.features.genplus_features.genplus_assessments.models import SkillAssessmentQuestion, \
+    SkillAssessmentResponse
+
 
 class StudentResponse:
 
@@ -24,7 +27,17 @@ class StudentResponse:
             ProblemTypes.JOURNAL: self.create_and_update_journal_post_from_lms,
         }
 
-    def save_problem_response(self, problem_block, student_response):
+    def get_problem_metadata(self, problem_block):
+        problem_html = problem_block.get_problem_html(encapsulate=True)
+        parser = etree.XMLParser(remove_blank_text=True)
+        problem = etree.XML(problem_html, parser=parser)
+        course_key = problem_block.scope_ids.usage_id.course_key
+        unit = Unit.objects.filter(course__id=course_key).first()
+        skill = unit.skill if unit else None
+        return problem, course_key, unit, skill
+
+
+    def save_problem_response(self, problem_block, student_response, event_info):
         user_id = getattr(problem_block.scope_ids, 'user_id')
         block_type = getattr(problem_block.scope_ids, 'block_type')
         if not (block_type and block_type == 'problem') or not user_id:
@@ -49,8 +62,11 @@ class StudentResponse:
 
         problem_type = problem_classes[0]
         if problem_block.is_skill_assessment and problem_type in ProblemTypes.SKILL_ASSESSMENT_PROBLEMS:
-             self.create_assessment_response_from_lms(problem_block, student_response, problem_type)
-
+            self.create_assessment_response_from_lms(problem_block, student_response, problem_type)
+        if problem_type == ProblemTypes.MULTIPLE_CHOICE:
+            self.create_and_update_choices_journal_post(student, problem_block,
+                                                        metadata={'event_info': event_info,
+                                                                  'problem_element': problem_element})
         for problem_type, problem_function in self.problem_function_map.items():
             if problem_type in problem_classes:
                 problem_function(student, problem_block, student_response)
@@ -59,14 +75,7 @@ class StudentResponse:
     def create_and_update_journal_post_from_lms(self, student, problem_block, student_response):
         if not problem_block.is_journal_entry:
             return
-
-        problem_html = problem_block.get_problem_html(encapsulate=True)
-        parser = etree.XMLParser(remove_blank_text=True)
-        problem = etree.XML(problem_html, parser=parser)
-        course_key = problem_block.scope_ids.usage_id.course_key
-        unit = Unit.objects.filter(course__id=course_key).first()
-        skill = unit.skill if unit else None
-
+        problem, course_key, unit, skill = self.get_problem_metadata(problem_block)
         try:
             student_module = StudentModule.objects.get(
                 student=student.user,
@@ -100,7 +109,56 @@ class StudentResponse:
                 student=student,
                 defaults=defaults
             )
-    
+
+    def create_and_update_choices_journal_post(self, student, problem_block, metadata):
+
+        problem, course_key, unit, skill = self.get_problem_metadata(problem_block)
+        try:
+            student_module = StudentModule.objects.get(
+                student=student.user,
+                course_id=course_key,
+                module_state_key=problem_block.scope_ids.usage_id,
+            )
+
+        except StudentModule.DoesNotExist:
+            student_module = None
+            print(f"===============Student module not found===================")
+        title = problem.find(".//*[@class='question-text']").text
+        answer = self.aggregate_student_answer(metadata)
+        defaults = {
+            'skill': skill,
+            'journal_type': JournalTypes.PROBLEM_ENTRY,
+            'is_editable': False,
+            'title': title,
+            'description': json.dumps(answer),
+        }
+        if student_module:
+            defaults['created'] = student_module.created
+            defaults['modified'] = student_module.modified
+
+        obj, created = JournalPost.objects.update_or_create(
+            uuid=answer['key'],
+            student=student,
+            defaults=defaults
+        )
+
+    def aggregate_student_answer(self, metadata):
+        event_info = metadata['event_info']
+        problem_xml = metadata['problem_element']
+        key, answers = next(iter(event_info['real_answers'].items()))
+        total = len(event_info['real_answers'][key])
+        correct = sum(answer in event_info['answers'][key] for answer in answers)
+        aggregate_result = {
+            'answers': [{'name': problem_xml.find(f".//choice[@class='{answer}']").text,
+                         'value': answer in event_info['answers'][key]} for answer in answers]
+        }
+        return {
+            'results': aggregate_result,
+            'correct': correct,
+            'total': total,
+            'key': key
+        }
+
     def create_assessment_response_from_lms(self, problem_block, student_response, problem_type):
         """
         Function to create a SkillAssessmentResponse instance from a given problem block and student response.
@@ -111,25 +169,25 @@ class StudentResponse:
             student_response (str): The response submitted by the student.
             assessment_type (str): Type of Skill Assessment
 
-        This function starts by extracting relevant data from the problem block, including the course key, problem key, 
+        This function starts by extracting relevant data from the problem block, including the course key, problem key,
         and the HTML content of the problem. It parses the HTML content to extract the question text and choice options.
 
-        It then tries to retrieve a SkillAssessmentQuestion instance that matches either the start unit or end unit 
+        It then tries to retrieve a SkillAssessmentQuestion instance that matches either the start unit or end unit
         of the problem block.
 
-        If such a SkillAssessmentQuestion is found, the function then determines whether to set the response time to 
-        SkillAssessmentResponseTime.START_OF_YEAR or SkillAssessmentResponseTime.END_OF_YEAR, based on whether the 
+        If such a SkillAssessmentQuestion is found, the function then determines whether to set the response time to
+        SkillAssessmentResponseTime.START_OF_YEAR or SkillAssessmentResponseTime.END_OF_YEAR, based on whether the
         problem key matches the start unit location or the end unit location.
 
-        Finally, it creates a SkillAssessmentResponse instance, setting the user to the student, the question to the 
-        retrieved SkillAssessmentQuestion, the earned score based on the correctness of the student's response, the total 
-        score to a problem weight value, the response time as determined earlier, and the question data to the 
+        Finally, it creates a SkillAssessmentResponse instance, setting the user to the student, the question to the
+        retrieved SkillAssessmentQuestion, the earned score based on the correctness of the student's response, the total
+        score to a problem weight value, the response time as determined earlier, and the question data to the
         parsed problem block data. It then saves the created SkillAssessmentResponse instance to the database.
 
-        If a matching SkillAssessmentQuestion is not found, the function prints a message and exits without creating 
+        If a matching SkillAssessmentQuestion is not found, the function prints a message and exits without creating
         a SkillAssessmentResponse.
         """
-        user_id=getattr(problem_block.scope_ids, 'user_id')
+        user_id = getattr(problem_block.scope_ids, 'user_id')
         user = get_user_model().objects.get(pk=user_id)
         course_key = problem_block.scope_ids.usage_id.course_key
         problem_key = problem_block.scope_ids.usage_id
@@ -143,16 +201,14 @@ class StudentResponse:
         # Extract the question
         question = problem_xml.find('.//*[@class="question-text"]/span').text
 
-        # Extract the choices and whether they are correct, Initialize empty dictionary to hold choices
-        choices = {}
-        # Loop through each 'choice' element in the parsed HTML
-        for choice in problem_xml.xpath('.//choice'): 
-            choice_class = choice.attrib['class']
-            # Get the text content of the choice
-            choice_text = choice.text
-            # Get the 'correct' attribute and convert to boolean
-            is_correct = choice.attrib['correct'] == 'true'
-            choices[choice_class] = {'text': choice_text, 'correct': is_correct}
+        # Extract the choices and whether they are correct
+        choices = {
+            choice.attrib['class']: {
+                'text': choice.text,
+                'correct': choice.attrib['correct'] == 'true'
+            }
+            for choice in problem_xml.xpath('.//choice')
+        }
 
         # Combine the question and choices into a single dictionary
         question_and_responses_dict = {'question': question, 'choices': choices}
@@ -232,12 +288,14 @@ class StudentResponse:
         score (int): The total score the student earned for the question.
         """
         num_correct_choices = sum(1 for choice in question_and_responses_dict['choices'].values() if choice['correct'])
-        num_correct_responses = sum(1 for response in question_and_responses_dict['student_responses'] if response['correct'])
+        num_correct_responses = sum(
+            1 for response in question_and_responses_dict['student_responses'] if response['correct'])
         base_score = total_score / num_correct_choices
 
         score = base_score * num_correct_responses
 
         return score
+
 
 def build_problem_list(course_blocks, root, path=None):
     """
@@ -345,7 +403,10 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                                     user_short_answers[answer_id] = {
                                         'question_text': user_state['Question'],
                                         'answer_id': user_state['Answer ID'],
-                                        'answers': [get_students_short_answer_response(user_state, user)] if answer_id == user_state['Answer ID'] else []
+                                        'answers': [
+                                            get_students_short_answer_response(user_state, user)] if answer_id ==
+                                                                                                     user_state[
+                                                                                                         'Answer ID'] else []
                                     }
                                 else:
                                     if answer_id == user_state['Answer ID']:
@@ -355,7 +416,8 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                 if responses['problem_type'] == ProblemTypes.SHORT_ANSWER and len(user_short_answers) > 0:
                     responses['results'].update(user_short_answers)
 
-                if responses['problem_type'] in ProblemTypes.CHOICE_TYPE_PROBLEMS and filter_type == "aggregate_response":
+                if responses[
+                    'problem_type'] in ProblemTypes.CHOICE_TYPE_PROBLEMS and filter_type == "aggregate_response":
                     for key, value in aggregate_result.items():
                         responses['results'].append({
                             'title': key,
@@ -424,7 +486,8 @@ def get_problem_attributes(raw_data, block_key):
     for e in problem.iter("*"):
         if e.tag == 'problem':
             responses['problem_type'] = e.attrib.get('class')
-        elif e.text and e.attrib.get('class') == 'question-text' and responses['problem_type'] != ProblemTypes.SHORT_ANSWER:
+        elif e.text and e.attrib.get('class') == 'question-text' and responses[
+            'problem_type'] != ProblemTypes.SHORT_ANSWER:
             responses['question_text'] = e.text
         elif e.text and e.tag == 'choice':
             choice_dict = {
@@ -563,6 +626,7 @@ def get_absolute_url(request, file):
     """
     return request.build_absolute_uri(file.url) if file else None
 
+
 def get_assessment_problem_data(course_key, user, request=None):
     """
     Generate skill assessment problem data from a course
@@ -586,6 +650,7 @@ def get_assessment_problem_data(course_key, user, request=None):
 
     return assessments
 
+
 def get_assessment_course_block(course_blocks_children):
     """
     Generate assessment xblock usage key and type of that assessment xblock with in a course.
@@ -601,7 +666,7 @@ def get_assessment_course_block(course_blocks_children):
             return [{
                 'id': course_block.get('id'),
                 'type': course_block_type,
-                'completion':  course_block.get('completion')
+                'completion': course_block.get('completion')
             }]
         else:
             children = course_block.get('children')
@@ -609,6 +674,7 @@ def get_assessment_course_block(course_blocks_children):
                 assessments.extend(get_assessment_course_block(children))
 
     return assessments
+
 
 def get_assessment_completion(assessments):
     """
@@ -663,7 +729,7 @@ def get_student_program_skills_assessment(student, gen_program=None):
 
 
 def get_user_assessment_result(user, raw_data, program):
-        """
+    """
         Generate result for single user for bar and graph char on base of single assessment
         as per the user state  under the ``problem_location`` root.
         Arguments:
@@ -672,50 +738,50 @@ def get_user_assessment_result(user, raw_data, program):
                 [Dict]: Returns a dictionaries
                 containing a student result for all single assessment.
         """
-        store = modulestore()
-        assessments = []
-        aggregate_result = {}
+    store = modulestore()
+    assessments = []
+    aggregate_result = {}
 
-        # get assessment usage key and type for program intro assessment course
-        if program.intro_unit:
-            assessments.extend(get_assessment_problem_data(program.intro_unit.id, user))
+    # get assessment usage key and type for program intro assessment course
+    if program.intro_unit:
+        assessments.extend(get_assessment_problem_data(program.intro_unit.id, user))
 
-        # get assessment usage key and type for program outro assessment course
-        if program.outro_unit:
-            assessments.extend(get_assessment_problem_data(program.outro_unit.id, user))
-        # prepare dictionary for every particular assessment problem in a course
-        for assessment in assessments:
-            usage_key = UsageKey.from_string(assessment.get('id'))
-            assessment_xblock = store.get_item(usage_key)
-            problem_id = str(assessment_xblock.problem_id)
-            if problem_id not in aggregate_result:
-                aggregate_result[problem_id] = {
-                    'problem_statement': assessment_xblock.question_statement,
-                    'assessment_type': assessment.get('type'),
-                    'skill': assessment_xblock.select_assessment_skill,
-                    'total_problem_score': TOTAL_PROBLEM_SCORE,
-                    'score_start_of_year': 0,
-                    'score_end_of_year': 0,
-                }
-                if assessment.get('type') == 'genz_text_assessment':
-                    aggregate_result[problem_id]['response_start_of_year'] = None
-                    aggregate_result[problem_id]['response_end_of_year'] = None
+    # get assessment usage key and type for program outro assessment course
+    if program.outro_unit:
+        assessments.extend(get_assessment_problem_data(program.outro_unit.id, user))
+    # prepare dictionary for every particular assessment problem in a course
+    for assessment in assessments:
+        usage_key = UsageKey.from_string(assessment.get('id'))
+        assessment_xblock = store.get_item(usage_key)
+        problem_id = str(assessment_xblock.problem_id)
+        if problem_id not in aggregate_result:
+            aggregate_result[problem_id] = {
+                'problem_statement': assessment_xblock.question_statement,
+                'assessment_type': assessment.get('type'),
+                'skill': assessment_xblock.select_assessment_skill,
+                'total_problem_score': TOTAL_PROBLEM_SCORE,
+                'score_start_of_year': 0,
+                'score_end_of_year': 0,
+            }
+            if assessment.get('type') == 'genz_text_assessment':
+                aggregate_result[problem_id]['response_start_of_year'] = None
+                aggregate_result[problem_id]['response_end_of_year'] = None
 
-        for data in raw_data:
-            problem_id = data['problem_id']
-            if data['assessment_time'] == "start_of_year":
-                if 'score' in data:
-                    aggregate_result[problem_id]['response_start_of_year'] = json.loads(
-                        data['student_response'])
-                    aggregate_result[problem_id]['score_start_of_year'] = data['score']
-                else:
-                    aggregate_result[problem_id]['score_start_of_year'] = data['rating']
+    for data in raw_data:
+        problem_id = data['problem_id']
+        if data['assessment_time'] == "start_of_year":
+            if 'score' in data:
+                aggregate_result[problem_id]['response_start_of_year'] = json.loads(
+                    data['student_response'])
+                aggregate_result[problem_id]['score_start_of_year'] = data['score']
             else:
-                if 'score' in data:
-                    aggregate_result[problem_id]['response_end_of_year'] = json.loads(
-                        data['student_response'])
-                    aggregate_result[problem_id]['score_end_of_year'] = data['score']
-                else:
-                    aggregate_result[problem_id]['score_end_of_year'] = data['rating']
+                aggregate_result[problem_id]['score_start_of_year'] = data['rating']
+        else:
+            if 'score' in data:
+                aggregate_result[problem_id]['response_end_of_year'] = json.loads(
+                    data['student_response'])
+                aggregate_result[problem_id]['score_end_of_year'] = data['score']
+            else:
+                aggregate_result[problem_id]['score_end_of_year'] = data['rating']
 
-        return aggregate_result
+    return aggregate_result
