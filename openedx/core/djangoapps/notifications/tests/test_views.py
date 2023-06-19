@@ -541,7 +541,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         response = self.client.patch(self.url, data)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'message': 'Invalid app_name or notification_id.'})
+        self.assertEqual(response.data, {'error': 'Invalid app_name or notification_id.'})
 
     def test_mark_notification_read_with_notification_id(self):
         # Create a PATCH request to mark notification as read for notification_id: 2
@@ -602,4 +602,4 @@ class NotificationReadAPIViewTestCase(APITestCase):
         response = self.client.patch(self.url, {})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, {'message': 'Invalid app_name or notification_id.'})
+        self.assertEqual(response.data, {'error': 'Invalid app_name or notification_id.'})

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import generics, permissions, status
@@ -176,7 +177,7 @@ class UserNotificationPreferenceView(APIView):
         )
         if user_course_notification_preference.config_version != get_course_notification_preference_config_version():
             return Response(
-                {'error': 'The notification preference config version is not up to date.'},
+                {'error': _('The notification preference config version is not up to date.')},
                 status=status.HTTP_409_CONFLICT,
             )
 
@@ -325,7 +326,7 @@ class MarkNotificationsUnseenAPIView(UpdateAPIView):
         app_name = self.kwargs.get('app_name')
 
         if not app_name:
-            return Response({'message': 'Invalid app name.'}, status=400)
+            return Response({'error': _('Invalid app name.')}, status=400)
 
         notifications = Notification.objects.filter(
             user=request.user,
@@ -335,7 +336,7 @@ class MarkNotificationsUnseenAPIView(UpdateAPIView):
 
         notifications.update(last_seen=datetime.now())
 
-        return Response({'message': 'Notifications marked unseen.'}, status=200)
+        return Response({'message': _('Notifications marked unseen.')}, status=200)
 
 
 class NotificationReadAPIView(APIView):
@@ -373,7 +374,7 @@ class NotificationReadAPIView(APIView):
             notification = get_object_or_404(Notification, pk=notification_id, user=request.user)
             notification.last_read = read_at
             notification.save()
-            return Response({'message': 'Notification marked read.'}, status=status.HTTP_200_OK)
+            return Response({'message': _('Notification marked read.')}, status=status.HTTP_200_OK)
 
         app_name = request.data.get('app_name', '')
 
@@ -384,6 +385,6 @@ class NotificationReadAPIView(APIView):
                 last_read__isnull=True,
             )
             notifications.update(last_read=read_at)
-            return Response({'message': 'Notifications marked read.'}, status=status.HTTP_200_OK)
+            return Response({'message': _('Notifications marked read.')}, status=status.HTTP_200_OK)
 
-        return Response({'message': 'Invalid app_name or notification_id.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': _('Invalid app_name or notification_id.')}, status=status.HTTP_400_BAD_REQUEST)
