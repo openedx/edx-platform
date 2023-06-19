@@ -19,4 +19,5 @@ jobs:
         env:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        platforms: linux/amd64,linux/arm64  
         run : make docker_push

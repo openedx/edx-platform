@@ -165,14 +165,14 @@ docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
 
 docker_push: docker_tag docker_auth ## push to docker hub
-	docker push "openedx/lms:latest"
-	docker push "openedx/lms:${GITHUB_SHA}"
-	docker push "openedx/lms-dev:latest"
-	docker push "openedx/lms-dev:${GITHUB_SHA}"
-	docker push "openedx/cms:latest"
-	docker push "openedx/cms:${GITHUB_SHA}"
-	docker push "openedx/cms-dev:latest"
-	docker push "openedx/cms-dev:${GITHUB_SHA}"
+# docker push "openedx/lms:latest"
+# docker push "openedx/lms:${GITHUB_SHA}"
+	docker push "openedx/lms-dev:latest-test"
+# docker push "openedx/lms-dev:${GITHUB_SHA}"
+# docker push "openedx/cms:latest"
+# docker push "openedx/cms:${GITHUB_SHA}"
+# docker push "openedx/cms-dev:latest"
+# docker push "openedx/cms-dev:${GITHUB_SHA}"
 
 lint-imports:
 	lint-imports
