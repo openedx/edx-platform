@@ -210,7 +210,7 @@ class VideoUploadPostTestsMixin:
     """
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
-    @patch('boto.s3.connection.S3Connection')
+    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
     def test_post_success(self, mock_conn, mock_key):
         files = [
             {
@@ -231,8 +231,7 @@ class VideoUploadPostTestsMixin:
             },
         ]
 
-        bucket = Mock()
-        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
+        mock_conn.get_bucket.return_value = Mock()
         mock_key_instances = [
             Mock(
                 generate_url=Mock(
@@ -467,7 +466,7 @@ class VideosHandlerTestCase(
 
     @override_settings(AWS_ACCESS_KEY_ID="test_key_id", AWS_SECRET_ACCESS_KEY="test_secret")
     @patch("boto.s3.key.Key")
-    @patch("boto.s3.connection.S3Connection")
+    @patch("cms.djangoapps.contentstore.views.videos.S3Connection")
     @ddt.data(
         (
             [
@@ -501,8 +500,7 @@ class VideosHandlerTestCase(
         """
         Test that video upload works correctly against supported and unsupported file formats.
         """
-        bucket = Mock()
-        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
+        mock_conn.get_bucket = Mock()
         mock_key_instances = [
             Mock(
                 generate_url=Mock(
@@ -530,11 +528,12 @@ class VideosHandlerTestCase(
             self.assertEqual(response['error'], "Request 'files' entry contain unsupported content_type")
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('boto.s3.connection.S3Connection')
+    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
     def test_upload_with_non_ascii_charaters(self, mock_conn):
         """
         Test that video uploads throws error message when file name contains special characters.
         """
+        mock_conn.get_bucket = Mock()
         file_name = 'test\u2019_file.mp4'
         files = [{'file_name': file_name, 'content_type': 'video/mp4'}]
 
@@ -552,10 +551,11 @@ class VideosHandlerTestCase(
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret', AWS_SECURITY_TOKEN='token')
     @patch('boto.s3.key.Key')
-    @patch('boto.s3.connection.S3Connection')
+    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
     @override_waffle_flag(ENABLE_DEVSTACK_VIDEO_UPLOADS, active=True)
     def test_devstack_upload_connection(self, mock_conn, mock_key):
         files = [{'file_name': 'first.mp4', 'content_type': 'video/mp4'}]
+        mock_conn.get_bucket = Mock()
         mock_key_instances = [
             Mock(
                 generate_url=Mock(
@@ -579,11 +579,12 @@ class VideosHandlerTestCase(
         )
 
     @patch('boto.s3.key.Key')
-    @patch('boto.s3.connection.S3Connection')
+    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
     def test_send_course_to_vem_pipeline(self, mock_conn, mock_key):
         """
         Test that uploads always go to VEM S3 bucket by default.
         """
+        mock_conn.get_bucket = Mock()
         files = [{'file_name': 'first.mp4', 'content_type': 'video/mp4'}]
         mock_key_instances = [
             Mock(
@@ -608,7 +609,7 @@ class VideosHandlerTestCase(
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
-    @patch('boto.s3.connection.S3Connection')
+    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
     @ddt.data(
         {
             'global_waffle': True,
@@ -646,7 +647,7 @@ class VideosHandlerTestCase(
             'file_name': 'first.mp4',
             'content_type': 'video/mp4',
         }
-        mock_conn.return_value = Mock(get_bucket=Mock(return_value=Mock()))
+        mock_conn.get_bucket = Mock()
         mock_key_instance = Mock(
             generate_url=Mock(
                 return_value='http://example.com/url_{}'.format(file_data['file_name'])
