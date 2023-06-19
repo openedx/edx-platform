@@ -231,7 +231,8 @@ class VideoUploadPostTestsMixin:
             },
         ]
 
-        mock_conn.get_bucket.return_value = Mock()
+        bucket = Mock()
+        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
         mock_key_instances = [
             Mock(
                 generate_url=Mock(
@@ -1446,7 +1447,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
     @ddt.unpack
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
-    @patch('boto.s3.connection.S3Connection')
+    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
     @patch('cms.djangoapps.contentstore.views.videos.get_transcript_preferences')
     def test_transcript_preferences_metadata(self, transcript_preferences, is_video_transcript_enabled,
                                              mock_transcript_preferences, mock_conn, mock_key):
