@@ -727,7 +727,6 @@
     "Ends {end}": "Bitti {end}",
     "Engage with posts": "G\u00f6nderilerle etkile\u015fimde bulunun",
     "Enroll Now": "Hemen Kaydol",
-    "Enroll in a {programName} course": "{programName} dersine kaydol",
     "Enrolled": "Kay\u0131tland\u0131",
     "Enrolling you in the selected course": "Se\u00e7ilen derse sizi kay\u0131t ediyor",
     "Enrollment Date": "Kay\u0131t Tarihi",

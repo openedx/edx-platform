@@ -976,8 +976,9 @@ openedx-blockstore==1.3.1
     # via -r requirements/edx/base.txt
 openedx-calc==3.0.1
     # via -r requirements/edx/base.txt
-openedx-django-pyfs==3.3.0
+openedx-django-pyfs==3.2.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   xblock
 openedx-django-require==2.0.0
@@ -999,7 +1000,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==5.0.2
+ora2==5.0.3
     # via -r requirements/edx/base.txt
 oscrypto==1.3.0
     # via

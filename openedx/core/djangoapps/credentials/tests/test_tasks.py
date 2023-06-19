@@ -92,6 +92,7 @@ class TestSendGradeToCredentialTask(TestCase):
         assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
 
 
+@ddt.ddt
 @skip_unless_lms
 class TestHandleNotifyCredentialsTask(TestCase):
     """
@@ -145,6 +146,7 @@ class TestHandleNotifyCredentialsTask(TestCase):
             'verbose': False,
             'verbosity': 1,
             'skip_checks': True,
+            'revoke_program_certs': False,
         }
 
     @mock.patch(TASKS_MODULE + '.send_notifications')
@@ -426,6 +428,19 @@ class TestHandleNotifyCredentialsTask(TestCase):
         mock_send_grade.side_effect = boom
         with pytest.raises(Exception):
             tasks.handle_notify_credentials(options=self.options, course_keys=[])
+
+    @ddt.data([True], [False])
+    @ddt.unpack
+    @mock.patch(TASKS_MODULE + '.send_notifications')
+    def test_revoke_program_certs(self, revoke_program_certs, mock_send_notifications):
+        """
+        This test verifies that the `revoke_program_certs` option is forwarded as expected when included in the options.
+        """
+        self.options['revoke_program_certs'] = revoke_program_certs
+        tasks.handle_notify_credentials(options=self.options, course_keys=[])
+        assert mock_send_notifications.called
+        mock_call_args = mock_send_notifications.call_args_list[0]
+        assert mock_call_args.kwargs['revoke_program_certs'] == revoke_program_certs
 
 
 @ddt.ddt

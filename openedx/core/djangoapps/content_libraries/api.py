@@ -964,7 +964,7 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
     # This import breaks in the LMS so keep it here. The LMS doesn't generally
     # use content libraries APIs directly but some tests may want to use them to
     # create libraries and then test library learning or course-library integration.
-    from cms.djangoapps.contentstore.views.helpers import xblock_type_display_name
+    from cms.djangoapps.contentstore.helpers import xblock_type_display_name
     # TODO: return support status and template options
     # See cms/djangoapps/contentstore/views/component.py
     block_types = sorted(name for name, class_ in XBlock.load_classes())
