@@ -209,6 +209,15 @@ codejail-includes==1.0.0
     # via -r requirements/edx/testing.txt
 contextlib2==21.6.0
     # via -r requirements/edx/testing.txt
+coreapi==2.3.3
+    # via
+    #   -r requirements/edx/testing.txt
+    #   drf-yasg
+coreschema==0.0.4
+    # via
+    #   -r requirements/edx/testing.txt
+    #   coreapi
+    #   drf-yasg
 coverage[toml]==7.2.7
     # via
     #   -r requirements/edx/testing.txt
@@ -532,8 +541,9 @@ drf-nested-routers==0.93.4
     # via
     #   -r requirements/edx/testing.txt
     #   openedx-blockstore
-drf-yasg==1.21.6
+drf-yasg==1.21.5
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-api-doc-tools
 edx-ace==1.6.1
@@ -834,10 +844,15 @@ isort==5.12.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
+itypes==1.2.0
+    # via
+    #   -r requirements/edx/testing.txt
+    #   coreapi
 jinja2==3.1.2
     # via
     #   -r requirements/edx/testing.txt
     #   code-annotations
+    #   coreschema
     #   diff-cover
     #   sphinx
 jmespath==0.10.0
@@ -1346,7 +1361,6 @@ pyyaml==6.0
     # via
     #   -r requirements/edx/testing.txt
     #   code-annotations
-    #   drf-yasg
     #   edx-django-release-util
     #   edx-i18n-tools
     #   sphinxcontrib-openapi
@@ -1372,6 +1386,7 @@ requests==2.31.0
     #   -r requirements/edx/testing.txt
     #   algoliasearch
     #   analytics-python
+    #   coreapi
     #   django-oauth-toolkit
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -1400,6 +1415,14 @@ rfc3986[idna2008]==1.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   httpx
+ruamel-yaml==0.17.32
+    # via
+    #   -r requirements/edx/testing.txt
+    #   drf-yasg
+ruamel-yaml-clib==0.2.7
+    # via
+    #   -r requirements/edx/testing.txt
+    #   ruamel-yaml
 rules==3.3
     # via
     #   -r requirements/edx/testing.txt
@@ -1631,6 +1654,7 @@ unidiff==0.7.5
 uritemplate==4.1.1
     # via
     #   -r requirements/edx/testing.txt
+    #   coreapi
     #   drf-yasg
 urllib3==1.26.16
     # via
