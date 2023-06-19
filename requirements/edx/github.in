@@ -86,3 +86,5 @@
 ##############################################################################
 
 # ... add dependencies here
+
+git+https://github.com/openedx/edx-api-doc-tools.git@7ef4cd0882c61e4f36c8dc28014e4fbdde403b12#egg=edx-api-doc-tools==1.6.1

@@ -71,7 +71,6 @@ djangorestframework
 docopt
 done-xblock
 edx-ace
-edx-api-doc-tools
 edx-auth-backends                   # Allow Studio to use LMS SSO
 edx-braze-client
 edx-bulk-grades                     # LMS REST API for managing bulk grading operations
