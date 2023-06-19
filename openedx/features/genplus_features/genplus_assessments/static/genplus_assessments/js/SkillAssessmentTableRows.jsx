@@ -28,7 +28,7 @@ function SkillAssessmentTableRows(props) {
             return(
                 <tr key={index}>
                 <td>
-                    <select
+                  <select
                     value={selectedIntro}
                     onChange={(event) => handleSelectIntro(index, event)}
                     className="form-control"
@@ -40,54 +40,54 @@ function SkillAssessmentTableRows(props) {
                             <option key={index} value={unitKey}>{unitKey}</option>
                         ))
                     }
-                    </select>
+                  </select>
+                  <div className="problem-browser">
+                      <Button onClick={()=>handleIntroToggleDropdown(index)} label={gettext('Select Intro Problem')} />
+                      <div>{selectedIntroBlock}</div>
+                      {
+                          showIntroDropdown && selectedIntro !== "" &&
+                          <BlockBrowserContainer
+                          onSelectBlock={(blockId) => {
+                              onSelectBlock(blockId);
+                              hideIntroDropdown(index, blockId);
+                          }}
+                          />
+                      }
+                  </div>
                 </td>
                 <td>
-                <div className="problem-browser">
-                    <Button onClick={()=>handleIntroToggleDropdown(index)} label={gettext('Select Intro Problem')} />
-                    <span>{selectedIntroBlock}</span>
-                    {
-                        showIntroDropdown && selectedIntro !== "" &&
-                        <BlockBrowserContainer
-                        onSelectBlock={(blockId) => {
-                            onSelectBlock(blockId);
-                            hideIntroDropdown(index, blockId);
-                        }}
-                        />
-                    }
-                </div>
+                  <select
+                      value={selectedOutro}
+                      onChange={(event) => handleSelectOutro(index, event)}
+                      className="form-control"
+                      id={"select-outro-" + index}
+                      >
+                      <option value="">Select Outro Unit</option>
+                      {
+                          unitKeys.map((unitKey, index) => (
+                              <option key={index} value={unitKey}>{unitKey}</option>
+                          ))
+                      }
+                  </select>
+                  <div className="problem-browser">
+                      <Button onClick={()=>handleOutroToggleDropdown(index)} label={gettext('Select Outro Problem')} />
+                      <span>{selectedOutroBlock}</span>
+                      {
+                          showOutroDropdown && selectedOutro !== "" &&
+                          <BlockBrowserContainer
+                          onSelectBlock={(blockId) => {
+                              onSelectBlock(blockId);
+                              hideOutroDropdown(index, blockId);
+                          }}
+                          />
+                      }
+                  </div>
                 </td>
                 <td>
-                    <select
-                        value={selectedOutro}
-                        onChange={(event) => handleSelectOutro(index, event)}
-                        className="form-control"
-                        id={"select-outro-" + index}
-                        >
-                        <option value="">Select Outro Unit</option>
-                        {
-                            unitKeys.map((unitKey, index) => (
-                                <option key={index} value={unitKey}>{unitKey}</option>
-                            ))
-                        }
-                    </select>
+                  <button className="btn btn-outline-danger" onClick={()=>(deleteTableRows(index))}>
+                    <span className="fa fa-close"></span>
+                  </button>
                 </td>
-                <td>
-                <div className="problem-browser">
-                    <Button onClick={()=>handleOutroToggleDropdown(index)} label={gettext('Select Outro Problem')} />
-                    <span>{selectedOutroBlock}</span>
-                    {
-                        showOutroDropdown && selectedOutro !== "" &&
-                        <BlockBrowserContainer
-                        onSelectBlock={(blockId) => {
-                            onSelectBlock(blockId);
-                            hideOutroDropdown(index, blockId);
-                        }}
-                        />
-                    }
-                </div>
-                </td>
-                <td><button className="btn btn-outline-danger" onClick={()=>(deleteTableRows(index))}>x</button></td>
             </tr>
             )
         })

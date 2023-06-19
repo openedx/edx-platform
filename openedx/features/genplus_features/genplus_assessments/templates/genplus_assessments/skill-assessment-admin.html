@@ -2,14 +2,20 @@
 
 <%page expression_filter="h"/>
 <%namespace name='static' file='../static_content.html'/>
+<%! main_css = "style-main-v1" %>
 
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 from openedx.core.djangolib.markup import HTML
 %>
+% if uses_bootstrap:
+<link rel="stylesheet" href="${static.url(self.attr.main_css)}" type="text/css" media="all" />
+% else:
+<%static:css group='${self.attr.main_css}'/>
+% endif
 
-<div>
+<div class="skill-assessment-admin">
   ${static.renderReact(
     component="SkillAssessmentAdmin",
     id="skill-assessment-admin",

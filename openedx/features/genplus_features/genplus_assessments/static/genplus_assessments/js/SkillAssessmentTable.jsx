@@ -125,68 +125,64 @@ class SkillAssessmentTable extends React.Component {
     render(){
         const { programsWithUnits, onSelectBlock } = this.props;
         return(
-            <div className="container">
-                <h2>{"Add/Update Skill Assessment"}</h2>
-                <div className="row">
-                    <div className="form-group">
-                        <select
-                            value={this.state.selectedProgram}
-                            onChange={this.handleSelectProgram}
-                            className="form-control"
-                            id="select-program">
-                            <option value="">Select Program</option>
-                            {
-                            Object.entries(programsWithUnits).map(([key, value], index) => (
-                                <option key={index} value={key}>{key}</option>
-                            ))
-                            }
-                        </select>
-                    </div>
+            <div>
+                <header className="mast">
+                  <h1 className="page-header">{"Add/Update Skill Assessment"}</h1>
+                </header>
+                <div className="form-group">
+                    <select
+                        value={this.state.selectedProgram}
+                        onChange={this.handleSelectProgram}
+                        className="form-control"
+                        id="select-program">
+                        <option value="">Select Program</option>
+                        {
+                        Object.entries(programsWithUnits).map(([key, value], index) => (
+                            <option key={index} value={key}>{key}</option>
+                        ))
+                        }
+                    </select>
                 </div>
                 {
                     this.state.selectedProgram !== "" &&
-                    <div className="row">
-                        <div className="col-sm-8">
-                            <table className="table">
-                                <thead>
-                                <tr>
-                                    <th>Intro Unit</th>
-                                    <th>Intro Problem Location</th>
-                                    <th>Outro Unit</th>
-                                    <th>Outro Problem Location</th>
-                                    <th><button className="btn btn-outline-success" onClick={this.addTableRows} >+</button></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    <SkillAssessmentTableRows
-                                        rowsData={this.state.rowsData}
-                                        deleteTableRows={this.deleteTableRows}
-                                        unitKeys={programsWithUnits[this.state.selectedProgram]}
-                                        handleSelectIntro={this.handleSelectIntro}
-                                        handleSelectOutro={this.handleSelectOutro}
-                                        handleIntroToggleDropdown={this.handleIntroToggleDropdown}
-                                        handleOutroToggleDropdown={this.handleOutroToggleDropdown}
-                                        hideIntroDropdown={this.hideIntroDropdown}
-                                        hideOutroDropdown={this.hideOutroDropdown}
-                                        onSelectBlock={onSelectBlock}
-                                    />
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <table className="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Intro</th>
+                            <th>Outro</th>
+                            <th className="actions">
+                              <button className="btn btn-outline-success" onClick={this.addTableRows}>
+                                <span className="fa fa-plus"></span>
+                              </button>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <SkillAssessmentTableRows
+                                rowsData={this.state.rowsData}
+                                deleteTableRows={this.deleteTableRows}
+                                unitKeys={programsWithUnits[this.state.selectedProgram]}
+                                handleSelectIntro={this.handleSelectIntro}
+                                handleSelectOutro={this.handleSelectOutro}
+                                handleIntroToggleDropdown={this.handleIntroToggleDropdown}
+                                handleOutroToggleDropdown={this.handleOutroToggleDropdown}
+                                hideIntroDropdown={this.hideIntroDropdown}
+                                hideOutroDropdown={this.hideOutroDropdown}
+                                onSelectBlock={onSelectBlock}
+                            />
+                        </tbody>
+                    </table>
                 }
                 {
                     this.state.selectedProgram !== "" &&
-                    <div className="row">
-                        <form onSubmit={this.handleFormSubmit}>
-                            <button
-                                type="submit"
-                                className="btn btn-primary"
-                            >
-                                Submit
-                            </button>
-                        </form>
-                    </div>
+                    <form onSubmit={this.handleFormSubmit}>
+                        <button
+                            type="submit"
+                            className="btn btn-primary"
+                        >
+                            Submit
+                        </button>
+                    </form>
                 }
             </div>
         )
