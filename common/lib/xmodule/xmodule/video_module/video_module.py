@@ -376,7 +376,7 @@ class VideoBlock(
         except Exception as e:
             log.info('EolVimeo - Video id does not exist, edx_video_id: {} or Import Error, error: {}'.format(self.edx_video_id.strip(), str(e)))
         try:
-            if sources and 'player.vimeo.com' not in sources[0]:
+            if sources and sources[0][0] == '/':
                 sources[0] = 'https://player.vimeo.com/progressive_redirect/playback{}'.format(sources[0])
             if sources and 'progressive_redirect' in sources[0]:
                 import urllib.request
