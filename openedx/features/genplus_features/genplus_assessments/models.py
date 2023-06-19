@@ -68,4 +68,3 @@ class SkillAssessmentResponse(TimeStampedModel):
     response_time = models.CharField(max_length=32, null=True, choices=SKILL_ASSESSMENT_RESPONSE_TIME)
     skill_assessment_type = models.CharField(max_length=32, null=True, choices=SKILL_ASSESSMENT_TYPE_CHOICES)
     question_response = JSONField(blank=True, null=True)
-

@@ -266,7 +266,7 @@ class StudentResponse:
             total_score=total_score,
             response_time=response_time,
             skill_assessment_type=skill_assessment_type,
-            question_data=question_and_responses_dict,
+            question_response=question_and_responses_dict,
         )
 
     def calculate_earned_score(self, question_and_responses_dict, total_score):
