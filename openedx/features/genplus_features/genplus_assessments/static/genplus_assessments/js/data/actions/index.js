@@ -2,7 +2,8 @@ import { fetchCourseBlocksSuccess } from 'BlockBrowser/data/actions/courseBlocks
 import { getCourseBlocks, getProgramQuestionsMapping, addProgramQuestionsMapping } from '../api/client';
 import {
   GET_PROGRAM_SKILL_ASSESSMENT_MAPPING,
-  ADD_PROGRAM_SKILL_ASSESSMENT_MAPPING
+  ADD_PROGRAM_SKILL_ASSESSMENT_MAPPING,
+  UPDATE_MAPPING_DATA
 } from './actionTypes'
 
 const fetchCourseBlocks = (baseUrl, courseId, excludeBlockTypes) => dispatch =>
@@ -19,34 +20,50 @@ const fetchCourseBlocks = (baseUrl, courseId, excludeBlockTypes) => dispatch =>
     );
 
 
-const fetchProgramSkillAssessmentMapping = (program_slug) =>{
-  getProgramQuestionsMapping(program_slug)
-  .then((response)=>{
-    if(response.ok){
-      return {
-        type: GET_PROGRAM_SKILL_ASSESSMENT_MAPPING,
-        payload: response.json()
-      };
+const fetchProgramSkillAssessmentMapping = (programSlug) => dispatch => {
+  getProgramQuestionsMapping(programSlug)
+  .then((response) => {
+    if (response.ok) {
+      return response.json();
     }
     throw new Error(response);
   })
+  .then(
+      json => dispatch({
+        type: GET_PROGRAM_SKILL_ASSESSMENT_MAPPING,
+        payload: json
+      }),
+      error => console.log(error)
+  )
 }
 
-const addProgramSkillAssessmentMapping = (program_slug, mapping_data) =>{
-  addProgramQuestionsMapping(program_slug, mapping_data)
+const addProgramSkillAssessmentMapping = (programSlug, mappingData) => dispatch => {
+  addProgramQuestionsMapping(programSlug, mappingData)
   .then((response)=>{
-    if(response.ok){
-      return {
-        type: ADD_PROGRAM_SKILL_ASSESSMENT_MAPPING,
-        payload: response.json()
-      };
+    if (response.ok) {
+      return response.json();
     }
     throw new Error(response);
   })
+  .then(
+    json => dispatch({
+      type: ADD_PROGRAM_SKILL_ASSESSMENT_MAPPING,
+      payload: json
+    }),
+    error => console.log(error)
+)
+}
+
+const updateMappingData = (mappingData) => dispatch => {
+  dispatch({
+    type: UPDATE_MAPPING_DATA,
+    payload: mappingData
+  });
 }
 
 export {
   fetchCourseBlocks,
   fetchProgramSkillAssessmentMapping,
-  addProgramSkillAssessmentMapping
+  addProgramSkillAssessmentMapping,
+  updateMappingData
 };

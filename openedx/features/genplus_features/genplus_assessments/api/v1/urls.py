@@ -21,6 +21,6 @@ urlpatterns = [
     url(r'^genz-filters/(?P<class_id>\w+)/$', ClassFilterApiView.as_view()),
     url(r'^program-mapping/(?P<program_slug>\w+)/$', SkillAssessmentAdminViewSet.as_view({
             'get': 'get_skills_assessment_question_mapping',
-            'post': 'add_skills_assessment_question_mapping'
+            'post': 'update_skills_assessment_question_mapping'
         }), name='skills-assessment-question-mapping')
 ]

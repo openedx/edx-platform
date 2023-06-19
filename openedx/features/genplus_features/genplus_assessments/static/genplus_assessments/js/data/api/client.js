@@ -35,20 +35,20 @@ export const getCourseBlocks = (baseUrl, courseId) => fetch(
 );
 
 
-export const getProgramQuestionsMapping = (program_slug) => fetch(
-  `${PROGRAM_MAPPING_API}/${program_slug}`, {
+export const getProgramQuestionsMapping = (programSlug) => fetch(
+  `${PROGRAM_MAPPING_API}/${programSlug}`, {
     credentials: 'include',
     method: 'get',
     headers: HEADERS,
   },
 )
 
-export const addProgramQuestionsMapping = (program_slug, mapping_data) => fetch(
-  `${PROGRAM_MAPPING_API}/${program_slug}/`, {
+export const addProgramQuestionsMapping = (programSlug, mappingData) => fetch(
+  `${PROGRAM_MAPPING_API}/${programSlug}/`, {
     method: 'post',
     mode: "cors",
     credentials: 'include',
     headers: HEADERS,
-    body: JSON.stringify(mapping_data)
+    body: JSON.stringify(mappingData)
   },
 )

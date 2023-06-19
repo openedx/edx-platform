@@ -36,7 +36,7 @@ from .utils import (
     get_student_program_skills_assessment,
     get_user_assessment_result
 )
-from openedx.features.genplus_features.genplus.models import GenUser, Student, JournalPost, Teacher
+from openedx.features.genplus_features.genplus.models import GenUser, Student, JournalPost, Teacher, Skill
 from openedx.features.genplus_features.genplus_learning.models import Program, Unit, UnitCompletion, ProgramEnrollment
 from openedx.features.genplus_features.genplus_learning.constants import ProgramStatuses
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
@@ -303,7 +303,8 @@ class SkillAssessmentAdminFragmentView(EdxFragmentView):
     def render_to_fragment(self, request, course_id=None, **kwargs):  # lint-amnesty, pylint: disable=arguments-differ
         context = {
             'api_base_url': settings.LMS_ROOT_URL,
-            'programs_with_units': self._get_programs_and_units()
+            'programs_with_units': self._get_programs_and_units(),
+            'skills': list(Skill.objects.all().values_list('name', flat=True))
         }
 
         html = render_to_string('genplus_assessments/skill-assessment-admin.html', context)

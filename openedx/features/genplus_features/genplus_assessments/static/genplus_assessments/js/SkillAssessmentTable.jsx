@@ -5,7 +5,8 @@ import { selectBlock } from 'BlockBrowser/data/actions/courseBlocks';
 import {
     fetchCourseBlocks,
     fetchProgramSkillAssessmentMapping,
-    addProgramSkillAssessmentMapping
+    addProgramSkillAssessmentMapping,
+    updateMappingData
 } from './data/actions/index';
 import SkillAssessmentTableRows from "./SkillAssessmentTableRows"
 
@@ -22,97 +23,105 @@ class SkillAssessmentTable extends React.Component {
       this.hideOutroDropdown = this.hideOutroDropdown.bind(this);
       this.handleFormSubmit = this.handleFormSubmit.bind(this);
       this.handleSelectProgram = this.handleSelectProgram.bind(this);
+      this.handleSelectSkill = this.handleSelectSkill.bind(this);
       this.state = {
-        selectedProgram: '',
-        rowsData: []
+        selectedProgram: ''
       };
     }
 
     addTableRows(){
         const rowsInput={
-            selectedIntro:'',
-            selectedOutro:'',
-            selectedIntroBlock:'',
-            selectedOutroBlock:'',
+            start_unit:'',
+            end_unit:'',
+            start_unit_location:'',
+            end_unit_location:'',
+            skill: '',
             showIntroDropdown: false,
             showOutroDropdown: false
         }
-        this.setState({ rowsData: [...this.state.rowsData, rowsInput]})
+        this.props.updateMappingData([...this.props.mappingData, rowsInput])
     }
 
     deleteTableRows(index){
-        const rows = [...this.state.rowsData];
+        const rows = [...this.props.mappingData];
         rows.splice(index, 1);
-        this.setState({rowsData: rows});
+        this.props.updateMappingData(rows);
     }
 
     handleIntroToggleDropdown(index) {
-        const rowsInput = [...this.state.rowsData];
-        if(rowsInput[index]["selectedIntro"] === ""){
+        const rowsInput = [...this.props.mappingData];
+        if(rowsInput[index]["start_unit"] === ""){
             return;
         }
         rowsInput[index]["showIntroDropdown"] = !rowsInput[index]["showIntroDropdown"];
         if(rowsInput[index]["showIntroDropdown"] === true){
             rowsInput[index]["showOutroDropdown"] = false;
-            for(var i=0; i<this.state.rowsData.length; i++){
+            for(var i=0; i<this.props.mappingData.length; i++){
                 if(i!==index){
                     rowsInput[i]["showIntroDropdown"] = false;
                     rowsInput[i]["showOutroDropdown"] = false;
                 }
             }
         }
-        this.props.fetchCourseBlocks(this.props.baseUrl, this.state.rowsData[index]['selectedIntro'], this.props.excludeBlockTypes);
-        this.setState({rowsData: rowsInput});
+        this.props.fetchCourseBlocks(this.props.baseUrl, this.props.mappingData[index]['start_unit'], this.props.excludeBlockTypes);
+        this.props.updateMappingData(rowsInput);
     }
 
     handleOutroToggleDropdown(index) {
-        const rowsInput = [...this.state.rowsData];
-        if(rowsInput[index]["selectedOutro"] === ""){
+        const rowsInput = [...this.props.mappingData];
+        if(rowsInput[index]["end_unit"] === ""){
             return
         }
         rowsInput[index]["showOutroDropdown"] = !rowsInput[index]["showOutroDropdown"];
         if(rowsInput[index]["showOutroDropdown"] === true){
             rowsInput[index]["showIntroDropdown"] = false;
-            for(var i=0; i<this.state.rowsData.length; i++){
+            for(var i=0; i<this.props.mappingData.length; i++){
                 if(i!==index){
                     rowsInput[i]["showIntroDropdown"] = false;
                     rowsInput[i]["showOutroDropdown"] = false;
                 }
             }
         }
-        this.props.fetchCourseBlocks(this.props.baseUrl, this.state.rowsData[index]['selectedOutro'], this.props.excludeBlockTypes);
-        this.setState({rowsData: rowsInput});
+        this.props.fetchCourseBlocks(this.props.baseUrl, this.props.mappingData[index]['end_unit'], this.props.excludeBlockTypes);
+        this.props.updateMappingData(rowsInput);
     }
 
     hideIntroDropdown(index, blockId) {
-        const rowsInput = [...this.state.rowsData];
-        rowsInput[index]["selectedIntroBlock"] = blockId;
+        const rowsInput = [...this.props.mappingData];
+        rowsInput[index]["start_unit_location"] = blockId;
         rowsInput[index]["showIntroDropdown"] = false;
-        this.setState({rowsData: rowsInput});
+        this.props.updateMappingData(rowsInput);
     }
 
     hideOutroDropdown(index, blockId) {
-        const rowsInput = [...this.state.rowsData];
-        rowsInput[index]["selectedOutroBlock"] = blockId;
+        const rowsInput = [...this.props.mappingData];
+        rowsInput[index]["end_unit_location"] = blockId;
         rowsInput[index]["showOutroDropdown"] = false;
-        this.setState({rowsData: rowsInput});
+        this.props.updateMappingData(rowsInput);
+    }
+
+    handleSelectSkill(index, event){
+        const rowsInput = [...this.props.mappingData];
+        rowsInput[index]["skill"] = event.target.value;
+        this.props.updateMappingData(rowsInput);
     }
 
     handleSelectIntro(index, event){
-        const rowsInput = [...this.state.rowsData];
-        rowsInput[index]["selectedIntro"] = event.target.value;
-        this.setState({rowsData: rowsInput});
+        const rowsInput = [...this.props.mappingData];
+        rowsInput[index]["start_unit"] = event.target.value;
+        this.props.updateMappingData(rowsInput);
     }
 
     handleSelectOutro(index, event){
-        const rowsInput = [...this.state.rowsData];
-        rowsInput[index]["selectedOutro"] = event.target.value;
-        this.setState({rowsData: rowsInput});
+        const rowsInput = [...this.props.mappingData];
+        rowsInput[index]["end_unit"] = event.target.value;
+        this.props.updateMappingData(rowsInput);
     }
 
     handleFormSubmit(event){
         event.preventDefault();
-        this.props.addProgramSkillAssessmentMapping(this.state.selectedProgram, this.state.rowsData);
+        const rowsInput = this.props.mappingData.map(({ showIntroDropdown, showOutroDropdown,...rest}) => ({...rest}));
+        this.props.addProgramSkillAssessmentMapping(this.state.selectedProgram, rowsInput);
     };
 
     handleSelectProgram(event){
@@ -123,7 +132,7 @@ class SkillAssessmentTable extends React.Component {
     };
 
     render(){
-        const { programsWithUnits, onSelectBlock } = this.props;
+        const { programsWithUnits, onSelectBlock, skills } = this.props;
         return(
             <div>
                 <header className="mast">
@@ -145,9 +154,10 @@ class SkillAssessmentTable extends React.Component {
                 </div>
                 {
                     this.state.selectedProgram !== "" &&
-                    <table className="table table-striped">
+                    <table className="table table table-striped">
                         <thead>
                         <tr>
+                            <th>Skill</th>
                             <th>Intro</th>
                             <th>Outro</th>
                             <th className="actions">
@@ -159,11 +169,13 @@ class SkillAssessmentTable extends React.Component {
                         </thead>
                         <tbody>
                             <SkillAssessmentTableRows
-                                rowsData={this.state.rowsData}
+                                rowsData={this.props.mappingData}
                                 deleteTableRows={this.deleteTableRows}
+                                skills={skills}
                                 unitKeys={programsWithUnits[this.state.selectedProgram]}
                                 handleSelectIntro={this.handleSelectIntro}
                                 handleSelectOutro={this.handleSelectOutro}
+                                handleSelectSkill={this.handleSelectSkill}
                                 handleIntroToggleDropdown={this.handleIntroToggleDropdown}
                                 handleOutroToggleDropdown={this.handleOutroToggleDropdown}
                                 hideIntroDropdown={this.hideIntroDropdown}
@@ -200,19 +212,18 @@ SkillAssessmentTable.defaultProps = {
     excludeBlockTypes: null,
 };
 
-
 const mapStateToProps = state => ({
-    mapping: state.mapping
+    mappingData: state.skillAssessment.mappingData
 });
-
 
 const mapDispatchToProps = dispatch => ({
     onSelectBlock: blockId => dispatch(selectBlock(blockId)),
     fetchCourseBlocks:
         (baseUrl, courseId, excludeBlockTypes) =>
         dispatch(fetchCourseBlocks(baseUrl, courseId, excludeBlockTypes)),
-    fetchProgramSkillAssessmentMapping: program_slug => (fetchProgramSkillAssessmentMapping(program_slug)),
-    addProgramSkillAssessmentMapping: (program_slug, mapping_data) => (addProgramSkillAssessmentMapping(program_slug, mapping_data))
+    fetchProgramSkillAssessmentMapping: (programSlug) => dispatch(fetchProgramSkillAssessmentMapping(programSlug)),
+    addProgramSkillAssessmentMapping: (programSlug, mappingData) => dispatch(addProgramSkillAssessmentMapping(programSlug, mappingData)),
+    updateMappingData: (mappingData) => dispatch(updateMappingData(mappingData)),
 });
 
 

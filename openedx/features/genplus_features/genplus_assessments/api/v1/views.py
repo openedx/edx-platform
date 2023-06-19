@@ -1,16 +1,17 @@
 import json
 import logging
 import copy
-from django.db.models import Q
+from operator import itemgetter
 
-from rest_framework import views, viewsets
+from django.db.models import Q
+from rest_framework import views, viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import UsageKey, CourseKey
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from openedx.features.genplus_features.genplus.models import Class
+from openedx.features.genplus_features.genplus.models import Class, Skill
 from openedx.features.genplus_features.genplus_assessments.models import UserResponse, UserRating, SkillAssessmentQuestion
 from openedx.features.genplus_features.genplus_learning.models import Unit, Program
 from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher, IsAdmin
@@ -441,12 +442,45 @@ class SkillAssessmentAdminViewSet(viewsets.ViewSet):
         program_questions = SkillAssessmentQuestion.objects.filter(program=program)
         program_questions_mapping = SkillAssessmentQuestionSerializer(program_questions, many=True).data
         return Response({
-            'program_slug': program_slug,
             'questions_mapping': program_questions_mapping
-        })
+        }, status=status.HTTP_200_OK)
 
-    def add_skills_assessment_question_mapping(self, request, **kwargs):
+    def update_skills_assessment_question_mapping(self, request, **kwargs):
         program_slug = kwargs.get('program_slug', None)
+        try:
+            program = Program.objects.get(slug=program_slug)
+        except Program.DoesNotExist:
+            return Response("Program not found", status=status.HTTP_400_BAD_REQUEST)
+
+        skills = {}
+        for skill in Skill.objects.all():
+            skills[skill.name] = skill
+
+        data = {}
+        add_questions_data = []
+        remove_questions_ids = []
+        for question in request.data:
+            data[f"{program_slug}{question['start_unit_location']}{question['end_unit_location']}"] = question
+
+        program_questions_qs = SkillAssessmentQuestion.objects.filter(program__slug=program_slug)
+        for question in program_questions_qs:
+            if f"{program_slug}{question.start_unit_location}{question.end_unit_location}" not in data.keys():
+                remove_questions_ids.append(question.id)
+
+        SkillAssessmentQuestion.objects.filter(id__in=remove_questions_ids).delete()
+
+        for key, value in data.items():
+            SkillAssessmentQuestion.objects.update_or_create(
+                program=program,
+                start_unit_location=value['start_unit_location'],
+                end_unit_location=value['end_unit_location'],
+                defaults={
+                    'skill': skills.get(value['skill']),
+                    'start_unit': value['start_unit'],
+                    'end_unit': value['end_unit']
+                }
+            )
+
         return Response({
             'program_slug': program_slug
-        })
+        }, status=status.HTTP_200_OK)

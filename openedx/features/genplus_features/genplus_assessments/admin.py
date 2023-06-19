@@ -1,5 +1,5 @@
 from django.contrib import admin
-from openedx.features.genplus_features.genplus_assessments.models import UserResponse, UserRating, SkillAssessmentResponse
+from openedx.features.genplus_features.genplus_assessments.models import UserResponse, UserRating, SkillAssessmentResponse, SkillAssessmentQuestion
 
 
 class BaseModelAdmin(admin.ModelAdmin):
@@ -19,6 +19,11 @@ class UserRatingAdmin(BaseModelAdmin):
     pass
 
 
+@admin.register(SkillAssessmentQuestion)
+class SkillAssessmentQuestionAdmin(admin.ModelAdmin):
+    pass
+
+
 @admin.register(SkillAssessmentResponse)
-class SkillAssessmentResponseAdmin(BaseModelAdmin):
+class SkillAssessmentResponseAdmin(admin.ModelAdmin):
     pass

@@ -6,9 +6,11 @@ function SkillAssessmentTableRows(props) {
     const {
         rowsData,
         deleteTableRows,
+        skills,
         unitKeys,
         handleSelectIntro,
         handleSelectOutro,
+        handleSelectSkill,
         handleIntroToggleDropdown,
         handleOutroToggleDropdown,
         hideIntroDropdown,
@@ -18,18 +20,34 @@ function SkillAssessmentTableRows(props) {
     return(
         rowsData.map((data, index)=>{
             const {
-                selectedIntro,
-                selectedOutro,
-                selectedIntroBlock,
-                selectedOutroBlock,
+                skill,
+                start_unit,
+                end_unit,
+                start_unit_location,
+                end_unit_location,
                 showIntroDropdown,
                 showOutroDropdown
             } = data;
             return(
                 <tr key={index}>
                 <td>
-                  <select
-                    value={selectedIntro}
+                    <select
+                    value={skill}
+                    onChange={(event) => handleSelectSkill(index, event)}
+                    className="form-control"
+                    id={"select-skill-" + index}
+                    >
+                    <option value="">Select Skill</option>
+                    {
+                        skills.map((skillName, index) => (
+                            <option key={index} value={skillName}>{skillName}</option>
+                        ))
+                    }
+                    </select>
+                </td>
+                <td>
+                    <select
+                    value={start_unit}
                     onChange={(event) => handleSelectIntro(index, event)}
                     className="form-control"
                     id={"select-intro-" + index}
@@ -40,54 +58,50 @@ function SkillAssessmentTableRows(props) {
                             <option key={index} value={unitKey}>{unitKey}</option>
                         ))
                     }
-                  </select>
-                  <div className="problem-browser">
-                      <Button onClick={()=>handleIntroToggleDropdown(index)} label={gettext('Select Intro Problem')} />
-                      <div>{selectedIntroBlock}</div>
-                      {
-                          showIntroDropdown && selectedIntro !== "" &&
-                          <BlockBrowserContainer
-                          onSelectBlock={(blockId) => {
-                              onSelectBlock(blockId);
-                              hideIntroDropdown(index, blockId);
-                          }}
-                          />
-                      }
-                  </div>
+                    </select>
+                    <div className="problem-browser">
+                        <Button onClick={()=>handleIntroToggleDropdown(index)} label={gettext('Select Intro Problem')} />
+                        <span>{start_unit_location}</span>
+                        {
+                            showIntroDropdown && start_unit !== "" &&
+                            <BlockBrowserContainer
+                            onSelectBlock={(blockId) => {
+                                onSelectBlock(blockId);
+                                hideIntroDropdown(index, blockId);
+                            }}
+                            />
+                        }
+                    </div>
                 </td>
                 <td>
-                  <select
-                      value={selectedOutro}
-                      onChange={(event) => handleSelectOutro(index, event)}
-                      className="form-control"
-                      id={"select-outro-" + index}
-                      >
-                      <option value="">Select Outro Unit</option>
-                      {
-                          unitKeys.map((unitKey, index) => (
-                              <option key={index} value={unitKey}>{unitKey}</option>
-                          ))
-                      }
-                  </select>
-                  <div className="problem-browser">
-                      <Button onClick={()=>handleOutroToggleDropdown(index)} label={gettext('Select Outro Problem')} />
-                      <span>{selectedOutroBlock}</span>
-                      {
-                          showOutroDropdown && selectedOutro !== "" &&
-                          <BlockBrowserContainer
-                          onSelectBlock={(blockId) => {
-                              onSelectBlock(blockId);
-                              hideOutroDropdown(index, blockId);
-                          }}
-                          />
-                      }
-                  </div>
+                    <select
+                        value={end_unit}
+                        onChange={(event) => handleSelectOutro(index, event)}
+                        className="form-control"
+                        id={"select-outro-" + index}
+                        >
+                        <option value="">Select Outro Unit</option>
+                        {
+                            unitKeys.map((unitKey, index) => (
+                                <option key={index} value={unitKey}>{unitKey}</option>
+                            ))
+                        }
+                    </select>
+                    <div className="problem-browser">
+                        <Button onClick={()=>handleOutroToggleDropdown(index)} label={gettext('Select Outro Problem')} />
+                        <span>{end_unit_location}</span>
+                        {
+                            showOutroDropdown && end_unit !== "" &&
+                            <BlockBrowserContainer
+                            onSelectBlock={(blockId) => {
+                                onSelectBlock(blockId);
+                                hideOutroDropdown(index, blockId);
+                            }}
+                            />
+                        }
+                    </div>
                 </td>
-                <td>
-                  <button className="btn btn-outline-danger" onClick={()=>(deleteTableRows(index))}>
-                    <span className="fa fa-close"></span>
-                  </button>
-                </td>
+                <td><button className="btn btn-outline-danger" onClick={()=>(deleteTableRows(index))}>x</button></td>
             </tr>
             )
         })
