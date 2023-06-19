@@ -18,7 +18,7 @@ lazy==1.5
     # via -r requirements/edx/paver.in
 libsass==0.10.0
     # via -r requirements/edx/paver.in
-markupsafe==2.1.2
+markupsafe==2.1.3
     # via -r requirements/edx/paver.in
 mock==5.0.2
     # via -r requirements/edx/paver.in
@@ -37,7 +37,7 @@ pymongo==3.13.0
     #   edx-opaque-keys
 python-memcached==1.59
     # via -r requirements/edx/paver.in
-requests==2.30.0
+requests==2.31.0
     # via -r requirements/edx/paver.in
 six==1.16.0
     # via
@@ -48,7 +48,7 @@ stevedore==5.1.0
     # via
     #   -r requirements/edx/paver.in
     #   edx-opaque-keys
-urllib3==1.26.15
+urllib3==1.26.16
     # via
     #   -c requirements/edx/../constraints.txt
     #   requests

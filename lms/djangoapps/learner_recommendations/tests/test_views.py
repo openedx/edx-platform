@@ -15,7 +15,10 @@ from lms.djangoapps.learner_recommendations.toggles import (
     ENABLE_COURSE_ABOUT_PAGE_RECOMMENDATIONS,
     ENABLE_DASHBOARD_RECOMMENDATIONS,
 )
-from lms.djangoapps.learner_recommendations.tests.test_data import mock_cross_product_recommendation_keys
+from lms.djangoapps.learner_recommendations.tests.test_data import (
+    mock_cross_product_recommendation_keys,
+    get_general_recommendations
+)
 
 
 class TestRecommendationsBase(APITestCase):
@@ -329,6 +332,348 @@ class TestCrossProductRecommendationsView(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(course_data), 0)
+
+
+class TestProductRecommendationsView(APITestCase):
+    """Unit tests for ProductRecommendations View"""
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password="test")
+        self.associated_course_keys = ["edx+HL1", "edx+HL2"]
+        self.amplitude_keys = [
+            "edx+CS0",
+            "edx+CS10",
+            "edx+CS20",
+            "edx+CS30",
+            "edx+CS40",
+            "edx+CS50",
+            "edx+CS60",
+            "edx+CS70",
+            "edx+CS80",
+            "edx+CS90",
+        ]
+        self.amplitude_course_run_keys = [f"course-v1:{course_key}+2023_T2" for course_key in self.amplitude_keys]
+        self.enrolled_course_run_keys = self.amplitude_course_run_keys[3:8]
+        self.enrolled_course_keys = self.amplitude_keys[3:8]
+        self.amplitude_location_restriction_keys = self.amplitude_keys[0:3]
+        self.cross_product_location_restriction_keys = self.associated_course_keys[0]
+
+    def _get_url(self, course_key=None):
+        """
+        Returns the product recommendations url with or without the course key
+        """
+        if course_key:
+            return reverse_lazy(
+                "learner_recommendations:product_recommendations",
+                kwargs={'course_id': f'course-v1:{course_key}+Test_Course'}
+            )
+
+        return reverse_lazy(
+            "learner_recommendations:product_recommendations_amplitude_only"
+        )
+
+    def _get_product_recommendations(self, course_keys, keys_with_restriction=None):
+        """
+        Returns course data based on the number of course keys passed in
+        with a location restriction object if a list of keys for location restriction courses is passed in
+        """
+        courses = []
+
+        for key in course_keys:
+            course = {
+                "title": f"Title for {key}",
+                "image": {
+                    "src": "https://www.logo_image_url.com",
+                },
+                "url_slug": "https://www.marketing_url.com",
+                "course_type": "executive-education",
+                "owners": [
+                    {
+                            "key": "org-1",
+                            "name": "org 1",
+                            "logo_image_url": "https://discovery.com/organization/logos/org-1.png",
+                    },
+                ],
+                "course_runs": [
+                    {
+                        "key": f"course-v1:{key}+2023_T2",
+                        "marketing_url": "https://www.marketing_url.com",
+                        "availability": "Current",
+                        "uuid": "jh76b2c9-589b-4d1e-88c1-b01a02db3a9c",
+                        "status": "published"
+                    }
+                ],
+            }
+            if keys_with_restriction and key in keys_with_restriction:
+                course.update({
+                    "location_restriction": {
+                        "restriction_type": "blocklist",
+                        "countries": ["CN"],
+                        "states": []
+                    }
+                })
+
+            courses.append(course)
+
+        return courses
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @mock.patch("lms.djangoapps.learner_recommendations.utils._get_user_enrolled_course_keys")
+    @mock.patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_successful_response(
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_view_mock,
+        get_course_data_util_mock,
+        get_user_enrolled_course_keys_mock,
+    ):
+        """
+        Verify 2 cross product course recommendations are returned
+        and 4 amplitude courses are returned
+        """
+        country_code_from_ip_mock.return_value = "za"
+        get_user_enrolled_course_keys_mock.return_value = []
+        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
+
+        mock_cross_product_course_data = self._get_product_recommendations(self.associated_course_keys)
+        mock_amplitude_course_data = self._get_product_recommendations(self.amplitude_keys)
+        get_course_data_view_mock.side_effect = mock_cross_product_course_data
+        get_course_data_util_mock.side_effect = mock_amplitude_course_data
+
+        response = self.client.get(self._get_url('edx+HL0'))
+        response_content = json.loads(response.content)
+        cross_product_course_data = response_content["crossProductCourses"]
+        amplitude_course_data = response_content["amplitudeCourses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(cross_product_course_data), 2)
+        self.assertEqual(len(amplitude_course_data), 4)
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @mock.patch("lms.djangoapps.learner_recommendations.utils._get_user_enrolled_course_keys")
+    @mock.patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_successful_course_filtering(
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_view_mock,
+        get_course_data_util_mock,
+        get_user_enrolled_course_keys_mock,
+    ):
+        """
+        Verify 1 cross product course recommendation is returned
+        and 2 amplitude courses are returned with filtering done for
+        enrolled courses and courses with country restrictions
+        """
+        country_code_from_ip_mock.return_value = "cn"
+        get_user_enrolled_course_keys_mock.return_value = self.enrolled_course_run_keys
+        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
+
+        mock_cross_product_course_data = self._get_product_recommendations(
+            self.associated_course_keys, self.cross_product_location_restriction_keys
+        )
+        mock_amplitude_course_data = self._get_product_recommendations(
+            self.amplitude_keys, self.amplitude_location_restriction_keys
+        )
+        get_course_data_view_mock.side_effect = mock_cross_product_course_data
+        get_course_data_util_mock.side_effect = mock_amplitude_course_data
+
+        response = self.client.get(self._get_url('edx+HL0'))
+        response_content = json.loads(response.content)
+        cross_product_course_data = response_content["crossProductCourses"]
+        amplitude_course_data = response_content["amplitudeCourses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(cross_product_course_data), 1)
+        self.assertEqual(len(amplitude_course_data), 2)
+        for course in amplitude_course_data:
+            course_key = course["title"][2]
+            assert course_key not in [*self.amplitude_location_restriction_keys, *self.enrolled_course_keys]
+        for course in cross_product_course_data:
+            course_key = course["title"][2]
+            assert course_key not in self.cross_product_location_restriction_keys
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", get_general_recommendations())
+    @mock.patch("lms.djangoapps.learner_recommendations.utils._get_user_enrolled_course_keys")
+    @mock.patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_fallback_recommendations_when_enrolled_courses_removed(
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_view_mock,
+        get_course_data_util_mock,
+        get_user_enrolled_course_keys_mock
+    ):
+        """
+        Verify 2 cross product course recommendations are returned
+        and 4 fallback amplitude recommendations are returned if no courses are left
+        after filtering due to courses being already enrolled in
+        """
+
+        country_code_from_ip_mock.return_value = "za"
+        get_user_enrolled_course_keys_mock.return_value = self.amplitude_course_run_keys
+        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
+
+        mock_cross_product_course_data = self._get_product_recommendations(self.associated_course_keys)
+        mock_amplitude_course_data = self._get_product_recommendations(self.amplitude_keys)
+        get_course_data_view_mock.side_effect = mock_cross_product_course_data
+        get_course_data_util_mock.side_effect = mock_amplitude_course_data
+
+        response = self.client.get(self._get_url('edx+HL0'))
+        response_content = json.loads(response.content)
+        cross_product_course_data = response_content["crossProductCourses"]
+        amplitude_course_data = response_content["amplitudeCourses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(cross_product_course_data), 2)
+        self.assertEqual(len(amplitude_course_data), 4)
+        for course in amplitude_course_data:
+            self.assertEqual(course["title"], "Introduction to Computer Science and Programming Using Python")
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", get_general_recommendations())
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_fallback_recommendations_when_error_querying_amplitude(
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_mock,
+    ):
+        """
+        Verify 2 cross product course recommendations are returned
+        and 4 fallback amplitude recommendations are returned
+        if there was an error querying amplitude for recommendations
+        """
+
+        country_code_from_ip_mock.return_value = "za"
+        get_amplitude_course_recommendations_mock.side_effect = Exception()
+
+        mock_cross_product_course_data = self._get_product_recommendations(self.associated_course_keys)
+        get_course_data_mock.side_effect = mock_cross_product_course_data
+
+        response = self.client.get(self._get_url('edx+HL0'))
+        response_content = json.loads(response.content)
+        cross_product_course_data = response_content["crossProductCourses"]
+        amplitude_course_data = response_content["amplitudeCourses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(cross_product_course_data), 2)
+        self.assertEqual(len(amplitude_course_data), 4)
+        for course in amplitude_course_data:
+            self.assertEqual(course["title"], "Introduction to Computer Science and Programming Using Python")
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @mock.patch("django.conf.settings.GENERAL_RECOMMENDATIONS", get_general_recommendations())
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_fallback_recommendations_when_no_amplitude_recommended_keys(
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_mock,
+    ):
+        """
+        Verify 2 cross product course recommendations are returned
+        and 4 fallback amplitude recommendations are returned
+        if amplitude gave back no course keys
+        """
+
+        country_code_from_ip_mock.return_value = "za"
+        get_amplitude_course_recommendations_mock.side_effect = [False, True, []]
+
+        mock_cross_product_course_data = self._get_product_recommendations(self.associated_course_keys)
+        get_course_data_mock.side_effect = mock_cross_product_course_data
+
+        response = self.client.get(self._get_url('edx+HL0'))
+        response_content = json.loads(response.content)
+        cross_product_course_data = response_content["crossProductCourses"]
+        amplitude_course_data = response_content["amplitudeCourses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(cross_product_course_data), 2)
+        self.assertEqual(len(amplitude_course_data), 4)
+        for course in amplitude_course_data:
+            self.assertEqual(course["title"], "Introduction to Computer Science and Programming Using Python")
+
+    @mock.patch("django.conf.settings.CROSS_PRODUCT_RECOMMENDATIONS_KEYS", mock_cross_product_recommendation_keys)
+    @mock.patch("lms.djangoapps.learner_recommendations.utils._get_user_enrolled_course_keys")
+    @mock.patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_response_with_amplitude_and_no_cross_product_courses(
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_mock,
+        get_user_enrolled_course_keys_mock
+    ):
+        """
+        Verify that if no cross product courses are returned,
+        then 4 fallback amplitude recommendations will still be returned
+        """
+
+        country_code_from_ip_mock.return_value = "za"
+        get_user_enrolled_course_keys_mock.return_value = self.enrolled_course_run_keys
+        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
+
+        mock_amplitude_course_data = self._get_product_recommendations(self.amplitude_keys)
+        get_course_data_mock.side_effect = mock_amplitude_course_data
+
+        response = self.client.get(self._get_url('No+Association'))
+        response_content = json.loads(response.content)
+        cross_product_course_data = response_content["crossProductCourses"]
+        amplitude_course_data = response_content["amplitudeCourses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(cross_product_course_data), 0)
+        self.assertEqual(len(amplitude_course_data), 4)
+
+    @mock.patch("lms.djangoapps.learner_recommendations.utils._get_user_enrolled_course_keys")
+    @mock.patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_amplitude_only_url_response(
+        self,
+        country_code_from_ip_mock,
+        get_amplitude_course_recommendations_mock,
+        get_course_data_mock,
+        get_user_enrolled_course_keys_mock
+    ):
+        """
+        Verify that if no course key was provided in the url,
+        only 1 field for amplitude courses are sent back
+        """
+
+        country_code_from_ip_mock.return_value = "za"
+        get_user_enrolled_course_keys_mock.return_value = self.enrolled_course_run_keys
+        get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
+
+        mock_amplitude_course_data = self._get_product_recommendations(self.amplitude_keys)
+        get_course_data_mock.side_effect = mock_amplitude_course_data
+
+        response = self.client.get(self._get_url())
+        response_content = json.loads(response.content)
+        amplitude_course_data = response_content["amplitudeCourses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response_content), 1)
+        self.assertEqual(len(amplitude_course_data), 4)
 
 
 @ddt.ddt

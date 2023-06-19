@@ -493,32 +493,6 @@ def prepare_runtime_for_user(
             will_recheck_access=will_recheck_access,
         )
 
-    user_is_staff = bool(has_access(user, 'staff', block.location, course_id))
-    user_service = DjangoXBlockUserService(
-        user,
-        user_is_staff=user_is_staff,
-        user_role=get_user_role(user, course_id),
-        anonymous_user_id=anonymous_id_for_user(user, course_id),
-        # See the docstring of `DjangoXBlockUserService`.
-        deprecated_anonymous_user_id=anonymous_id_for_user(user, None),
-        request_country_code=user_location,
-    )
-
-    # Rebind module service to deal with noauth modules getting attached to users
-    rebind_user_service = RebindUserService(
-        user,
-        course_id,
-        prepare_runtime_for_user,
-        track_function=track_function,
-        position=position,
-        wrap_xblock_display=wrap_xblock_display,
-        grade_bucket_type=grade_bucket_type,
-        static_asset_path=static_asset_path,
-        user_location=user_location,
-        request_token=request_token,
-        will_recheck_access=will_recheck_access,
-    )
-
     # Build a list of wrapping functions that will be applied in order
     # to the Fragment content coming out of the xblocks that are about to be rendered.
     block_wrappers = []
@@ -555,6 +529,8 @@ def prepare_runtime_for_user(
     block_wrappers.append(partial(course_expiration_wrapper, user))
     block_wrappers.append(partial(offer_banner_wrapper, user))
 
+    user_is_staff = bool(has_access(user, 'staff', course_id))
+
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if is_masquerading_as_specific_student(user, course_id):
             # When masquerading as a specific student, we want to show the debug button
@@ -568,7 +544,7 @@ def prepare_runtime_for_user(
             del user.real_user.masquerade_settings
             user.real_user.masquerade_settings = masquerade_settings
         else:
-            staff_access = has_access(user, 'staff', block, course_id)
+            staff_access = user_is_staff
         if staff_access:
             block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
@@ -581,7 +557,17 @@ def prepare_runtime_for_user(
         'fs': FSService(),
         'field-data': field_data,
         'mako': mako_service,
-        'user': user_service,
+        'user': DjangoXBlockUserService(
+            user,
+            user_is_beta_tester=CourseBetaTesterRole(course_id).has_user(user),
+            user_is_staff=user_is_staff,
+            user_is_global_staff=bool(has_access(user, 'staff', 'global')),
+            user_role=get_user_role(user, course_id),
+            anonymous_user_id=anonymous_id_for_user(user, course_id),
+            # See the docstring of `DjangoXBlockUserService`.
+            deprecated_anonymous_user_id=anonymous_id_for_user(user, None),
+            request_country_code=user_location,
+        ),
         'verification': XBlockVerificationService(),
         'proctoring': ProctoringService(),
         'milestones': milestones_helpers.get_service(),
@@ -595,10 +581,21 @@ def prepare_runtime_for_user(
         'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
         'xqueue': xqueue_service,
         'replace_urls': replace_url_service,
-        'rebind_user': rebind_user_service,
-        'completion': CompletionService(user=user, context_key=course_id)
-        if user and user.is_authenticated
-        else None,
+        # Rebind module service to deal with noauth modules getting attached to users.
+        'rebind_user': RebindUserService(
+            user,
+            course_id,
+            prepare_runtime_for_user,
+            track_function=track_function,
+            position=position,
+            wrap_xblock_display=wrap_xblock_display,
+            grade_bucket_type=grade_bucket_type,
+            static_asset_path=static_asset_path,
+            user_location=user_location,
+            request_token=request_token,
+            will_recheck_access=will_recheck_access,
+        ),
+        'completion': CompletionService(user=user, context_key=course_id) if user and user.is_authenticated else None,
         'i18n': XBlockI18nService,
         'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
         'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
@@ -628,11 +625,6 @@ def prepare_runtime_for_user(
             position = None
 
     block.runtime.set('position', position)
-
-    block.runtime.set('user_is_staff', user_is_staff)
-    block.runtime.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
-    block.runtime.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
-    block.runtime.set('days_early_for_beta', block.days_early_for_beta)
 
     return field_data
 

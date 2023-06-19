@@ -19,7 +19,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_str
 from django.utils.functional import cached_property
 from lxml import etree
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -168,33 +168,20 @@ class ProblemBlock(
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/capa/display.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
-            resource_string(__name__, 'js/src/capa/imageinput.js'),
-            resource_string(__name__, 'js/src/capa/schematic.js'),
+            resource_filename(__name__, 'js/src/javascript_loader.js'),
+            resource_filename(__name__, 'js/src/capa/display.js'),
+            resource_filename(__name__, 'js/src/collapsible.js'),
+            resource_filename(__name__, 'js/src/capa/imageinput.js'),
+            resource_filename(__name__, 'js/src/capa/schematic.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
-    }
-
-    preview_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/capa/display.scss'),
-        ],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
 
     studio_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/problem/edit.js'),
+            resource_filename(__name__, 'js/src/problem/edit.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-
-    studio_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/editor/edit.scss'),
-            resource_string(__name__, 'css/problem/edit.scss'),
-        ]
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     display_name = String(

@@ -61,12 +61,19 @@ from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wron
 from xmodule.x_module import STUDENT_VIEW, DescriptorSystem  # lint-amnesty, pylint: disable=wrong-import-order
 from common.djangoapps import static_replace
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
-from common.djangoapps.student.tests.factories import GlobalStaffFactory
-from common.djangoapps.student.tests.factories import RequestFactoryNoCsrf
-from common.djangoapps.student.tests.factories import UserFactory
+from common.djangoapps.student.tests.factories import (
+    BetaTesterFactory,
+    GlobalStaffFactory,
+    InstructorFactory,
+    RequestFactoryNoCsrf,
+    StaffFactory,
+    UserFactory,
+)
 from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,
     ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
+    ATTR_KEY_USER_IS_BETA_TESTER,
+    ATTR_KEY_USER_IS_GLOBAL_STAFF,
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ROLE,
 )
@@ -487,11 +494,10 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             self.mock_user, request, block, field_data_cache, course.id, course=course
         )
 
-        # check that _unwrapped_field_data is the same as the original
+        # check that block.runtime.service(block, 'field-data-unbound') is the same as the original
         # _field_data, but now _field_data as been reset.
-        # pylint: disable=protected-access
-        assert block._unwrapped_field_data is original_field_data  # lint-amnesty, pylint: disable=no-member
-        assert block._unwrapped_field_data is not block._field_data  # lint-amnesty, pylint: disable=no-member
+        assert block.runtime.service(block, 'field-data-unbound') is original_field_data
+        assert block.runtime.service(block, 'field-data-unbound') is not block._field_data  # pylint: disable=protected-access, line-too-long
 
         # now bind this block to a few other students
         for user in [UserFactory(), UserFactory(), self.mock_user]:
@@ -513,7 +519,8 @@ class BlockRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # the OverrideFieldData should point to the date FieldData
         assert isinstance(block._field_data._authored_data._source.fallback, DateLookupFieldData)    # lint-amnesty, pylint: disable=no-member, line-too-long
-        assert block._field_data._authored_data._source.fallback._defaults is block._unwrapped_field_data    # lint-amnesty, pylint: disable=no-member, line-too-long
+        assert block._field_data._authored_data._source.fallback._defaults \
+            is block.runtime.service(block, 'field-data-unbound')
 
     def test_hash_resource(self):
         """
@@ -2346,17 +2353,6 @@ class LMSXBlockServiceBindingTest(LMSXBlockServiceMixin):
         service = self.block.runtime.service(self.block, expected_service)
         assert service is not None
 
-    def test_beta_tester_fields_added(self):
-        """
-        Tests that the beta tester fields are set on LMS runtime.
-        """
-        self.block.days_early_for_beta = 5
-        self._prepare_runtime()
-
-        # pylint: disable=no-member
-        assert not self.block.runtime.user_is_beta_tester
-        assert self.block.runtime.days_early_for_beta == 5
-
     def test_get_set_tag(self):
         """
         Tests the user service interface.
@@ -2684,8 +2680,12 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         """
         assert getattr(self.block.runtime, attribute) == expected_value
 
-    @patch('lms.djangoapps.courseware.block_render.has_access', Mock(return_value=True, autospec=True))
-    def test_user_is_staff(self):
+    @ddt.data((True, 'staff'), (False, 'student'))
+    @ddt.unpack
+    def test_user_is_staff(self, is_staff, expected_role):
+        if is_staff:
+            self.user = StaffFactory(course_key=self.course.id)
+
         _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
@@ -2696,15 +2696,18 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             course=self.course,
         )
         block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
-        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
-        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_ROLE) == 'student'
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_IS_STAFF) == is_staff
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_ROLE) == expected_role
         with warnings.catch_warnings():  # For now, also test the deprecated accessors for backwards compatibility:
             warnings.simplefilter("ignore", category=DeprecationWarning)
-            assert self.block.runtime.user_is_staff
-            assert self.block.runtime.get_user_role() == 'student'
+            assert self.block.runtime.user_is_staff == is_staff
+            assert self.block.runtime.get_user_role() == expected_role
 
-    @patch('lms.djangoapps.courseware.block_render.get_user_role', Mock(return_value='instructor', autospec=True))
-    def test_get_user_role(self):
+    @ddt.data(True, False)
+    def test_user_is_admin(self, is_global_staff):
+        if is_global_staff:
+            self.user = GlobalStaffFactory.create()
+
         _ = render.prepare_runtime_for_user(
             self.user,
             self.student_data,
@@ -2715,10 +2718,51 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             course=self.course,
         )
         block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
-        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_ROLE) == 'instructor'
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_IS_GLOBAL_STAFF) == is_global_staff
+        with warnings.catch_warnings():  # For now, also test the deprecated accessors for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.user_is_admin == is_global_staff
+
+    @ddt.data(True, False)
+    def test_user_is_beta_tester(self, is_beta_tester):
+        if is_beta_tester:
+            self.user = BetaTesterFactory(course_key=self.course.id)
+
+        _ = render.prepare_runtime_for_user(
+            self.user,
+            self.student_data,
+            self.block,
+            self.course.id,
+            self.track_function,
+            self.request_token,
+            course=self.course,
+        )
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_IS_BETA_TESTER) == is_beta_tester
+        with warnings.catch_warnings():  # For now, also test the deprecated accessors for backwards compatibility:
+            warnings.simplefilter("ignore", category=DeprecationWarning)
+            assert self.block.runtime.user_is_beta_tester == is_beta_tester
+
+    @ddt.data((True, 'instructor'), (False, 'student'))
+    @ddt.unpack
+    def test_get_user_role(self, is_instructor, expected_role):
+        if is_instructor:
+            self.user = InstructorFactory(course_key=self.course.id)
+
+        _ = render.prepare_runtime_for_user(
+            self.user,
+            self.student_data,
+            self.block,
+            self.course.id,
+            self.track_function,
+            self.request_token,
+            course=self.course,
+        )
+        block_user_info = self.block.runtime.service(self.block, "user").get_current_user()
+        assert block_user_info.opt_attrs.get(ATTR_KEY_USER_ROLE) == expected_role
         with warnings.catch_warnings():  # For now, also test the deprecated accessor for backwards compatibility:
             warnings.simplefilter("ignore", category=DeprecationWarning)
-            assert self.block.runtime.get_user_role() == 'instructor'
+            assert self.block.runtime.get_user_role() == expected_role
 
     def test_anonymous_student_id(self):
         expected_anon_id = anonymous_id_for_user(self.user, self.course.id)

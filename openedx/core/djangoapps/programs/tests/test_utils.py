@@ -157,7 +157,11 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
         assert meter.engaged_programs == [program]
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program['uuid'], in_progress=1)
+            ProgressFactory(
+                uuid=program['uuid'],
+                in_progress=1,
+                all_unenrolled=False,
+            )
         )
         assert not list(meter.completed_programs_with_available_dates.keys())
 
@@ -256,6 +260,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
                 completed=[],
                 in_progress=[program['courses'][0]],
                 not_started=[],
+                all_unenrolled=False,
             )
         ]
 
@@ -292,6 +297,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
                 completed=[],
                 in_progress=[program['courses'][0]],
                 not_started=[],
+                all_unenrolled=False,
             )
         ]
 
@@ -333,6 +339,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
                 completed=0,
                 in_progress=1 if offset in [None, 1] else 0,
                 not_started=1 if offset in [-1] else 0,
+                all_unenrolled=False,
             )
         ]
 
@@ -374,7 +381,11 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
 
         self._assert_progress(
             meter,
-            *(ProgressFactory(uuid=program['uuid'], in_progress=1) for program in programs)
+            *(ProgressFactory(
+                uuid=program['uuid'],
+                in_progress=1,
+                all_unenrolled=False,
+            ) for program in programs)
         )
         assert not list(meter.completed_programs_with_available_dates.keys())
 
@@ -442,7 +453,11 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
 
         self._assert_progress(
             meter,
-            *(ProgressFactory(uuid=program['uuid'], in_progress=1) for program in programs)
+            *(ProgressFactory(
+                uuid=program['uuid'],
+                in_progress=1,
+                all_unenrolled=False,
+            ) for program in programs)
         )
         assert not list(meter.completed_programs_with_available_dates.keys())
 
@@ -531,7 +546,12 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
         _, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program_uuid, in_progress=1, not_started=2)
+            ProgressFactory(
+                uuid=program_uuid,
+                in_progress=1,
+                not_started=2,
+                all_unenrolled=False,
+            )
         )
         assert not list(meter.completed_programs_with_available_dates.keys())
 
@@ -544,6 +564,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
             ProgressFactory(
                 uuid=program_uuid,
                 in_progress=3,
+                all_unenrolled=False,
             )
         )
         assert not list(meter.completed_programs_with_available_dates.keys())
@@ -557,6 +578,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
                 uuid=program_uuid,
                 completed=1,
                 in_progress=2,
+                all_unenrolled=False,
             )
         )
         assert not list(meter.completed_programs_with_available_dates.keys())
@@ -571,6 +593,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
                 uuid=program_uuid,
                 completed=1,
                 in_progress=2,
+                all_unenrolled=False,
             )
         )
         assert not list(meter.completed_programs_with_available_dates.keys())
@@ -585,6 +608,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
                 uuid=program_uuid,
                 completed=2,
                 in_progress=1,
+                all_unenrolled=False,
             )
         )
         assert not list(meter.completed_programs_with_available_dates.keys())
@@ -598,6 +622,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
                 uuid=program_uuid,
                 completed=2,
                 not_started=1,
+                all_unenrolled=False,
             )
         )
         assert list(meter.completed_programs_with_available_dates.keys()) == [program_uuid]
@@ -614,6 +639,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
             ProgressFactory(
                 uuid=program_uuid,
                 completed=3,
+                all_unenrolled=False,
             )
         )
         assert list(meter.completed_programs_with_available_dates.keys()) == [program_uuid]
@@ -641,7 +667,8 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
             meter,
             ProgressFactory(
                 uuid=program_data['uuid'],
-                not_started=1
+                not_started=1,
+                all_unenrolled=False,
             )
         )
 
@@ -674,7 +701,7 @@ class TestProgramProgressMeter(ModuleStoreTestCase):
         program_uuid = program['uuid']
         self._assert_progress(
             meter,
-            ProgressFactory(uuid=program_uuid, completed=1)
+            ProgressFactory(uuid=program_uuid, completed=1, all_unenrolled=False)
         )
         assert list(meter.completed_programs_with_available_dates.keys()) == [program_uuid]
 
@@ -1747,12 +1774,12 @@ class TestGetProgramsSubscriptionData(TestCase):
             {'id': uuid.uuid4(), 'resource_id': uuid.uuid4(),
              'resource_type': 'program', 'resource_data': None, 'trial_end': '1970-01-01T00:02:03Z',
              'price': '100.00', 'currency': 'USD', 'sub_type': 'stripe', 'identifier': 'dummy_1',
-             'next_payment_date': '1970-01-01T00:02:03Z', 'status': 'active',
+             'current_period_end': '1970-01-01T00:02:03Z', 'status': 'active',
              'customer': 1, 'subscription_state': 'active'},
             {'id': uuid.uuid4(), 'resource_id': uuid.uuid4(),
              'resource_type': 'program', 'resource_data': None, 'trial_end': '1970-01-01T03:25:12Z',
              'price': '1000.00', 'currency': 'USD', 'sub_type': 'stripe', 'identifier': 'dummy_2',
-             'next_payment_date': '1970-05-23T12:05:21Z', 'status': 'subscription_initiated',
+             'current_period_end': '1970-05-23T12:05:21Z', 'status': 'subscription_initiated',
              'customer': 1, 'subscription_state': 'notStarted'}
         ]
 

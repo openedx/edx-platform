@@ -7,6 +7,7 @@
 # Alexandra Messini <alexandra_messini@yahoo.com>, 2015
 # Angelos Chraniotis, 2016,2023
 # Dimitris Agelakis <minoan07@gmail.com>, 2015-2016,2019
+# Dimitris Voudouris <dimitrisvoudouris@yahoo.co.uk>, 2023
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
 # EEYEM, 2015
 # Eirini Mageiropoulou <eirmageir@yahoo.com>, 2021
@@ -86,7 +87,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-17 08:57+0000\n"
+"POT-Creation-Date: 2023-05-28 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Angelos Chraniotis, 2023\n"
 "Language-Team: Greek (http://app.transifex.com/open-edx/edx-platform/language/el/)\n"
@@ -1680,8 +1681,7 @@ msgstr ""
 #: lms/static/js/dashboard/legacy.js
 msgid "Are you sure you want to unenroll from {courseName} ({courseNumber})?"
 msgstr ""
-"Είστε σίγουροι πως θέλετε να διαγραφείτε από το μάθημα {courseName} "
-"({courseNumber});"
+"Θέλετε σίγουρα να διαγραφείτε από το μάθημα {courseName} ({courseNumber});"
 
 #: lms/static/js/dashboard/legacy.js
 msgid ""
@@ -2836,6 +2836,10 @@ msgstr ""
 msgid "Ends {end}"
 msgstr ""
 
+#: lms/static/js/learner_dashboard/models/program_subscription_model.js
+msgid "${price}/month {currency}"
+msgstr ""
+
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
 msgstr ""
@@ -2890,7 +2894,7 @@ msgid "View program"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
-msgid "Enroll in a {programName} course"
+msgid "Enroll in a {programName}'s course"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
@@ -2908,6 +2912,10 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Subscription trial expires in less than 24 hours"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Subscription trial expires in {remainingDays} day"
 msgid_plural "Subscription trial expires in {remainingDays} days"
 msgstr[0] ""
@@ -2915,13 +2923,19 @@ msgstr[1] ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
+"Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and"
+" the card on file will be charged {subscriptionPrice}."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
 "Your {programName} trial will expire in {remainingDays} day at "
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
-"{subscriptionPrice}/month."
+"{subscriptionPrice}."
 msgid_plural ""
 "Your {programName} trial will expire in {remainingDays} days at "
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
-"{subscriptionPrice}/month."
+"{subscriptionPrice}."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3028,7 +3042,7 @@ msgstr ""
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid "Before proceeding, please {htmlStart}{emailMsg}{htmlEnd}."
-msgstr ""
+msgstr "Πριν συνεχίσετε, παρακαλούμε {htmlStart}{emailMsg}{htmlEnd}."
 
 #: lms/static/js/student_account/components/StudentAccountDeletion.jsx
 msgid ""
@@ -3478,7 +3492,8 @@ msgid ""
 msgstr ""
 "Έχουμε αποστείλει μήνυμα στη διεύθυνση {email}. Κάντε κλικ στο σύνδεσμο που "
 "θα βρείτε στο μήνυμα για να αλλάξετε τον κωδικό σας. Εάν δεν λάβατε το "
-"μήνυμα, επικοινωνήστε με την  {anchorStart}τεχνική υποστήριξη{anchorEnd}."
+"μήνυμα, παρακαλούμε επικοινωνήστε με την  {anchorStart}τεχνική "
+"υποστήριξη{anchorEnd}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account"
@@ -5195,7 +5210,7 @@ msgstr ""
 #. displayed in the browser when a user needs to edit HTML
 #: xmodule/js/src/html/edit.js
 msgid "Insert/Edit Image"
-msgstr ""
+msgstr "Προσθήκη/Επεξεργασία Εικόνας"
 
 #: xmodule/js/src/lti/lti.js
 msgid ""
@@ -7032,7 +7047,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Reported"
-msgstr ""
+msgstr "Αναφερθείσες"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Closed"
@@ -7095,12 +7110,12 @@ msgstr ""
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "endorsed %(time_ago)s by %(user)s"
-msgstr ""
+msgstr "Προτάθηκε %(time_ago)s από τον χρήστη %(user)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "endorsed %(time_ago)s"
-msgstr ""
+msgstr "Προτάθηκε %(time_ago)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Editing response"
@@ -7175,7 +7190,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "All Groups"
-msgstr ""
+msgstr "Όλες οι ομάδες"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "follow this post"
@@ -7252,11 +7267,11 @@ msgstr "Ερώτηση"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Endorse"
-msgstr ""
+msgstr "Προτείνω"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Unendorse"
-msgstr ""
+msgstr "Δεν προτείνω"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Mark as Answer"
@@ -8193,7 +8208,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
-msgstr ""
+msgstr "Αυτομελέτη"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "View Course"
@@ -8323,9 +8338,8 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
-"Restart your subscription for {subscriptionPrice}/month. Your payment "
-"history is still available on the {a_start}Orders and subscriptions{a_end} "
-"page"
+"Restart your subscription for {subscriptionPrice}. Your payment history is "
+"still available on the {a_start}Orders and subscriptions{a_end} page"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
@@ -8379,7 +8393,23 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"You have successfully completed all the requirements for the %(title)s "
+"%(type)s."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s course(s) in this "
+"program. To complete the program, you must earn a verified certificate for "
+"each course."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
@@ -8399,25 +8429,22 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid "Active trial ends {trialEndDate} at {trialEndTime}"
+msgid "Trial ends {trialEndDate} at {trialEndTime}"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid "Your next billing date is {nextPaymentDate}"
+msgid "Your next billing date is {currentPeriodEnd}"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"Unlock verified access to all courses for {subscriptionPrice}/month. Cancel "
-"anytime."
+msgid "{subscriptionPrice} subscription. Cancel anytime."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"{subscriptionPrice}/month subscription after trial ends. Cancel anytime."
+msgid "{subscriptionPrice} subscription after trial ends. Cancel anytime."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
@@ -8459,6 +8486,27 @@ msgstr ""
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid "Transform your %(org)s %(type)s into a full master’s degree"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Successful completion of %(org)s %(program)s credential can be applied "
+"towards flexible, rigorous, and affordable masters degrees from the world’s "
+"leading universities."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s courses in this program. "
+"To complete the program, you must earn a verified certificate for each "
+"course."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
@@ -8503,11 +8551,11 @@ msgid "Upgrade with a subscription"
 msgstr ""
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
-msgid "Pay {subscriptionPrice}/month for all courses in this program"
+msgid "Pay {subscriptionPrice} for all courses in this program"
 msgstr ""
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
-msgid "Pay {subscriptionPrice}/month after {trialLength}-day free trial"
+msgid "Pay {subscriptionPrice} after {trialLength}-day free trial"
 msgstr ""
 
 #: lms/templates/student_account/account.underscore

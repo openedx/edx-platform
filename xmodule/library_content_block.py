@@ -17,7 +17,7 @@ from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys.edx.locator import LibraryLocator
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
@@ -97,22 +97,16 @@ class LibraryContentBlock(
 
     preview_view_js = {
         'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = "VerticalDescriptor"
     studio_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/vertical/edit.js'),
+            resource_filename(__name__, 'js/src/vertical/edit.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     show_in_read_only_mode = True

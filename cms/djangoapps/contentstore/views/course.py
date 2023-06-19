@@ -17,7 +17,7 @@ from ccx_keys.locator import CCXLocator
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError as DjangoValidationError
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -26,7 +26,6 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods
 from edx_django_utils.monitoring import function_trace
 from edx_toggles.toggles import WaffleSwitch
-from milestones import api as milestones_api
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
@@ -41,7 +40,6 @@ from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.models.settings.encoder import CourseSettingsEncoder
 from common.djangoapps.course_action_state.managers import CourseActionStateItemNotFoundError
 from common.djangoapps.course_action_state.models import CourseRerunState, CourseRerunUIStateManager
-from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.student.auth import (
     has_course_author_access,
@@ -55,31 +53,18 @@ from common.djangoapps.student.roles import (
     GlobalStaff,
     UserBasedRole
 )
-from common.djangoapps.util.course import get_link_for_about_page
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
-from common.djangoapps.util.milestones_helpers import (
-    is_prerequisite_courses_enabled,
-    is_valid_course_key,
-    remove_prerequisite_course,
-    set_prerequisite_courses,
-    get_namespace_choices,
-    generate_milestone_namespace
-)
 from common.djangoapps.util.string_utils import _has_non_ascii_characters
 from common.djangoapps.xblock_django.api import deprecated_xblocks
-from openedx.core import toggles as core_toggles
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credit_course
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
-from openedx.core.lib.courses import course_image_url
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
-from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from organizations.models import Organization
 from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_block import CourseBlock, DEFAULT_START_DATE, CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
@@ -103,9 +88,10 @@ from ..tasks import rerun_course as rerun_course_task
 from ..toggles import split_library_view_on_dashboard
 from ..utils import (
     add_instructor,
+    get_course_settings,
+    get_course_grading,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
-    get_subsections_by_assignment_type,
     initialize_permissions,
     remove_all_instructors,
     reverse_course_url,
@@ -113,11 +99,13 @@ from ..utils import (
     reverse_url,
     reverse_usage_url,
     update_course_discussions_settings,
+    update_course_details,
 )
 from .component import ADVANCED_COMPONENT_TYPES
-from .helpers import is_content_creator
-from .entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
-from .block import create_xblock_info
+from ..helpers import is_content_creator
+from cms.djangoapps.contentstore.xblock_services.xblock_service import (
+    create_xblock_info,
+)
 from .library import (
     LIBRARIES_ENABLED,
     LIBRARY_AUTHORING_MICROFRONTEND_URL,
@@ -1158,96 +1146,11 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
         json: update the Course and About xblocks through the CourseDetails model
     """
     course_key = CourseKey.from_string(course_key_string)
-    credit_eligibility_enabled = settings.FEATURES.get('ENABLE_CREDIT_ELIGIBILITY', False)
+
     with modulestore().bulk_operations(course_key):
         course_block = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
-            upload_asset_url = reverse_course_url('assets_handler', course_key)
-
-            # see if the ORG of this course can be attributed to a defined configuration . In that case, the
-            # course about page should be editable in Studio
-            publisher_enabled = configuration_helpers.get_value_for_org(
-                course_block.location.org,
-                'ENABLE_PUBLISHER',
-                settings.FEATURES.get('ENABLE_PUBLISHER', False)
-            )
-            marketing_enabled = configuration_helpers.get_value_for_org(
-                course_block.location.org,
-                'ENABLE_MKTG_SITE',
-                settings.FEATURES.get('ENABLE_MKTG_SITE', False)
-            )
-            enable_extended_course_details = configuration_helpers.get_value_for_org(
-                course_block.location.org,
-                'ENABLE_EXTENDED_COURSE_DETAILS',
-                settings.FEATURES.get('ENABLE_EXTENDED_COURSE_DETAILS', False)
-            )
-
-            about_page_editable = not publisher_enabled
-            enrollment_end_editable = GlobalStaff().has_user(request.user) or not publisher_enabled
-            short_description_editable = configuration_helpers.get_value_for_org(
-                course_block.location.org,
-                'EDITABLE_SHORT_DESCRIPTION',
-                settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
-            )
-            sidebar_html_enabled = ENABLE_COURSE_ABOUT_SIDEBAR_HTML.is_enabled()
-
-            verified_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
-            upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
-                                verified_mode.expiration_datetime.isoformat())
-            settings_context = {
-                'context_course': course_block,
-                'course_locator': course_key,
-                'lms_link_for_about_page': get_link_for_about_page(course_block),
-                'course_image_url': course_image_url(course_block, 'course_image'),
-                'banner_image_url': course_image_url(course_block, 'banner_image'),
-                'video_thumbnail_image_url': course_image_url(course_block, 'video_thumbnail_image'),
-                'details_url': reverse_course_url('settings_handler', course_key),
-                'about_page_editable': about_page_editable,
-                'marketing_enabled': marketing_enabled,
-                'short_description_editable': short_description_editable,
-                'sidebar_html_enabled': sidebar_html_enabled,
-                'upload_asset_url': upload_asset_url,
-                'course_handler_url': reverse_course_url('course_handler', course_key),
-                'language_options': settings.ALL_LANGUAGES,
-                'credit_eligibility_enabled': credit_eligibility_enabled,
-                'is_credit_course': False,
-                'show_min_grade_warning': False,
-                'enrollment_end_editable': enrollment_end_editable,
-                'is_prerequisite_courses_enabled': is_prerequisite_courses_enabled(),
-                'is_entrance_exams_enabled': core_toggles.ENTRANCE_EXAMS.is_enabled(),
-                'enable_extended_course_details': enable_extended_course_details,
-                'upgrade_deadline': upgrade_deadline,
-                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
-            }
-            if is_prerequisite_courses_enabled():
-                courses, in_process_course_actions = get_courses_accessible_to_user(request)
-                # exclude current course from the list of available courses
-                courses = [course for course in courses if course.id != course_key]
-                if courses:
-                    courses, __ = _process_courses_list(courses, in_process_course_actions)
-                settings_context.update({'possible_pre_requisite_courses': courses})
-
-            if credit_eligibility_enabled:
-                if is_credit_course(course_key):
-                    # get and all credit eligibility requirements
-                    credit_requirements = get_credit_requirements(course_key)
-                    # pair together requirements with same 'namespace' values
-                    paired_requirements = {}
-                    for requirement in credit_requirements:
-                        namespace = requirement.pop("namespace")
-                        paired_requirements.setdefault(namespace, []).append(requirement)
-
-                    # if 'minimum_grade_credit' of a course is not set or 0 then
-                    # show warning message to course author.
-                    show_min_grade_warning = False if course_block.minimum_grade_credit > 0 else True  # lint-amnesty, pylint: disable=simplifiable-if-expression
-                    settings_context.update(
-                        {
-                            'is_credit_course': True,
-                            'credit_requirements': paired_requirements,
-                            'show_min_grade_warning': show_min_grade_warning,
-                        }
-                    )
-
+            settings_context = get_course_settings(request, course_key, course_block)
             return render_to_response('settings.html', settings_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):  # pylint: disable=too-many-nested-blocks
             if request.method == 'GET':
@@ -1259,63 +1162,12 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                 )
             # For every other possible method type submitted by the caller...
             else:
-                # if pre-requisite course feature is enabled set pre-requisite course
-                if is_prerequisite_courses_enabled():
-                    prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
-                    if prerequisite_course_keys:
-                        if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
-                            return JsonResponseBadRequest({"error": _("Invalid prerequisite course key")})
-                        set_prerequisite_courses(course_key, prerequisite_course_keys)
-                    else:
-                        # None is chosen, so remove the course prerequisites
-                        course_milestones = milestones_api.get_course_milestones(
-                            course_key=course_key,
-                            relationship="requires",
-                        )
-                        for milestone in course_milestones:
-                            entrance_exam_namespace = generate_milestone_namespace(
-                                get_namespace_choices().get('ENTRANCE_EXAM'),
-                                course_key
-                            )
-                            if milestone["namespace"] != entrance_exam_namespace:
-                                remove_prerequisite_course(course_key, milestone)
+                try:
+                    update_data = update_course_details(request, course_key, request.json, course_block)
+                except DjangoValidationError as err:
+                    return JsonResponseBadRequest({"error": err.message})
 
-                # If the entrance exams feature has been enabled, we'll need to check for some
-                # feature-specific settings and handle them accordingly
-                # We have to be careful that we're only executing the following logic if we actually
-                # need to create or delete an entrance exam from the specified course
-                if core_toggles.ENTRANCE_EXAMS.is_enabled():
-                    course_entrance_exam_present = course_block.entrance_exam_enabled
-                    entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
-                    ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
-                    # If the entrance exam box on the settings screen has been checked...
-                    if entrance_exam_enabled:
-                        # Load the default minimum score threshold from settings, then try to override it
-                        entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
-                        if ee_min_score_pct:
-                            entrance_exam_minimum_score_pct = float(ee_min_score_pct)
-                        if entrance_exam_minimum_score_pct.is_integer():
-                            entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
-                        # If there's already an entrance exam defined, we'll update the existing one
-                        if course_entrance_exam_present:
-                            exam_data = {
-                                'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct
-                            }
-                            update_entrance_exam(request, course_key, exam_data)
-                        # If there's no entrance exam defined, we'll create a new one
-                        else:
-                            create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
-
-                    # If the entrance exam box on the settings screen has been unchecked,
-                    # and the course has an entrance exam attached...
-                    elif not entrance_exam_enabled and course_entrance_exam_present:
-                        delete_entrance_exam(request, course_key)
-
-                # Perform the normal update workflow for the CourseDetails model
-                return JsonResponse(
-                    CourseDetails.update_from_json(course_key, request.json, request.user),
-                    encoder=CourseSettingsEncoder
-                )
+                return JsonResponse(update_data, encoder=CourseSettingsEncoder)
 
 
 @login_required
@@ -1335,20 +1187,12 @@ def grading_handler(request, course_key_string, grader_index=None):
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_block = get_course_and_check_access(course_key, request.user)
+        if not has_studio_read_access(request.user, course_key):
+            raise PermissionDenied()
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
-            course_details = CourseGradingModel.fetch(course_key)
-            course_assignment_lists = get_subsections_by_assignment_type(course_key)
-            return render_to_response('settings_graders.html', {
-                'context_course': course_block,
-                'course_locator': course_key,
-                'course_details': course_details,
-                'grading_url': reverse_course_url('grading_handler', course_key),
-                'is_credit_course': is_credit_course(course_key),
-                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
-                'course_assignment_lists': dict(course_assignment_lists)
-            })
+            grading_context = get_course_grading(course_key)
+            return render_to_response('settings_graders.html', grading_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
                 if grader_index is None:

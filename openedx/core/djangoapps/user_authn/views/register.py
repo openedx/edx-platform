@@ -393,6 +393,7 @@ def _track_user_registration(user, profile, params, third_party_provider, regist
             'is_goal_set': bool(profile.goals),
             'total_registration_time': round(float(params.get('totalRegistrationTime', '0'))),
             'activation_key': registration.activation_key if registration else None,
+            'host': params.get('host', ''),
         }
         # VAN-738 - added below properties to experiment marketing emails opt in/out events on Braze.
         if params.get('marketing_emails_opt_in') and settings.MARKETING_EMAILS_OPT_IN:

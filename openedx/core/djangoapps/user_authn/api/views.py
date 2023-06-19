@@ -33,6 +33,21 @@ class MFEContextView(APIView):
     """
     throttle_classes = [MFEContextThrottle]
 
+    def _get_optional_fields_context(self):
+        """
+        Fetch optional fields data for registration form
+        """
+        optional_fields_context = {}
+        optional_fields = RegistrationFieldsContext('optional').get_fields()
+        if optional_fields:
+            extended_profile_fields = configuration_helpers.get_value('extended_profile_fields')
+            optional_fields_context = {
+                'fields': optional_fields,
+                'extended_profile': extended_profile_fields if extended_profile_fields else []
+            }
+
+        return optional_fields_context
+
     def get(self, request, **kwargs):  # lint-amnesty, pylint: disable=unused-argument
         """
         Returns
@@ -45,14 +60,16 @@ class MFEContextView(APIView):
         Arguments:
             request (HttpRequest): The request, used to determine if a pipeline
                 is currently running.
-            tpa_hint (string): An override flag that will return a matching provider
-                as long as its configuration has been enabled
-            is_register_page (boolen): Determine the call is from register or login page
+            kwargs (dict):
+                tpa_hint (string): An override flag that will return a matching provider
+                    as long as its configuration has been enabled
+                is_register_page (bool): Determine the call is from register or login page
+                is_welcome_page (bool): Checks if the call is from the Welcome Page
         """
         request_params = request.GET
         redirect_to = get_next_url_for_login_page(request)
         third_party_auth_hint = request_params.get('tpa_hint')
-        is_register_page = request_params.get('is_register_page')
+
         context = {
             'context_data': get_mfe_context(request, redirect_to, third_party_auth_hint),
             'registration_fields': {},
@@ -61,18 +78,25 @@ class MFEContextView(APIView):
             },
         }
 
-        if settings.ENABLE_DYNAMIC_REGISTRATION_FIELDS and is_register_page:
-            registration_fields = RegistrationFieldsContext().get_fields()
-            context['registration_fields'].update({
-                'fields': registration_fields,
-            })
+        if settings.ENABLE_DYNAMIC_REGISTRATION_FIELDS:
+            if request_params.get('is_welcome_page'):
+                optional_fields = self._get_optional_fields_context()
+                return Response(
+                    status=status.HTTP_200_OK,
+                    data=MFEContextSerializer(
+                        {'optional_fields': optional_fields} if optional_fields else {}
+                    ).data
+                )
 
-            optional_fields = RegistrationFieldsContext('optional').get_fields()
-            if optional_fields:
-                context['optional_fields'].update({
-                    'fields': optional_fields,
-                    'extended_profile': configuration_helpers.get_value('extended_profile_fields', []),
+            if request_params.get('is_register_page'):
+                registration_fields = RegistrationFieldsContext().get_fields()
+                context['registration_fields'].update({
+                    'fields': registration_fields,
                 })
+
+                optional_fields = self._get_optional_fields_context()
+                if optional_fields:
+                    context['optional_fields'].update(optional_fields)
 
         return Response(
             status=status.HTTP_200_OK,

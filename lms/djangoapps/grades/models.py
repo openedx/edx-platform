@@ -654,13 +654,13 @@ class PersistentCourseGrade(TimeStampedModel):
                 course_id=course_id,
                 user_id=user_id
             )
+            grade.passed_timestamp = now()
+            grade.save()
             COURSE_GRADE_PASSED_UPDATE_IN_LEARNER_PATHWAY.send(
                 sender=None,
                 user_id=user_id,
                 course_id=course_id,
             )
-            grade.passed_timestamp = now()
-            grade.save()
 
         cls._emit_grade_calculated_event(grade)
         cls._update_cache(course_id, user_id, grade)

@@ -61,9 +61,9 @@ class XModuleWebpackLoader(WebpackLoader):
                             'path': '/openedx/edx-platform/common/static/bundles/AnnotatableBlockPreview.js.map'
                         },
                         {
-                            'name': 'AnnotatableBlockPreview.85745121.css',
-                            'path': 'common/static/css/xmodule/AnnotatableBlockPreview.85745121.css',
-                            'publicPath': '/static/css/xmodule/AnnotatableBlockPreview.85745121.css'
+                            'name': 'AnnotatableBlockPreview.css',
+                            'path': 'common/static/css/xmodule/AnnotatableBlockPreview.css',
+                            'publicPath': '/static/css/xmodule/AnnotatableBlockPreview.css'
                         }
                     ],
                     ...
