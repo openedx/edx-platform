@@ -8,6 +8,7 @@ import logging
 import requests
 import time
 
+import requests.exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.db.models import Q
@@ -147,6 +148,9 @@ class Command(BaseCommand):
             transfer_id = self._fetch_transfer_id(apple_id, target_team_id)
         except BadRequestException:
             log.info('Bad request for uid %s.', apple_id)
+            transfer_id = ''
+        except (requests.exceptions.JSONDecodeError, AttributeError):
+            log.info('JSONDecodeError/AttributeError for uid %s.', apple_id)
             transfer_id = ''
 
         return transfer_id
