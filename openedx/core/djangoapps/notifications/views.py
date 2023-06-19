@@ -305,21 +305,21 @@ class NotificationCountView(APIView):
         })
 
 
-class MarkNotificationsUnseenAPIView(UpdateAPIView):
+class MarkNotificationsSeenAPIView(UpdateAPIView):
     """
-    API view for marking user's all notifications unseen for a provided app_name.
+    API view for marking user's all notifications seen for a provided app_name.
     """
 
     permission_classes = (permissions.IsAuthenticated,)
 
     def update(self, request, *args, **kwargs):
         """
-        Marks all notifications for the given app name unseen for the authenticated user.
+        Marks all notifications for the given app name seen for the authenticated user.
 
         **Args:**
-            app_name: The name of the app to mark notifications unseen for.
+            app_name: The name of the app to mark notifications seen for.
         **Response Format:**
-            A `Response` object with a 200 OK status code if the notifications were successfully marked unseen.
+            A `Response` object with a 200 OK status code if the notifications were successfully marked seen.
         **Response Error Codes**:
         - 400: Bad Request status code if the app name is invalid.
         """
@@ -336,7 +336,7 @@ class MarkNotificationsUnseenAPIView(UpdateAPIView):
 
         notifications.update(last_seen=datetime.now())
 
-        return Response({'message': _('Notifications marked unseen.')}, status=200)
+        return Response({'message': _('Notifications marked as seen.')}, status=200)
 
 
 class NotificationReadAPIView(APIView):
