@@ -11,7 +11,7 @@ import logging
 from contextlib import closing
 from datetime import datetime, timedelta
 from uuid import uuid4
-from boto.s3.connection import S3Connection
+
 from boto import s3
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -834,7 +834,7 @@ def storage_service_bucket():
             'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY
         }
 
-    conn = S3Connection(**params)
+    conn = s3.connection.S3Connection(**params)
 
     # We don't need to validate our bucket, it requires a very permissive IAM permission
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()

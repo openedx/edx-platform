@@ -14,7 +14,6 @@ from unittest.mock import Mock, patch
 import dateutil.parser
 import ddt
 import pytz
-from django.test import TestCase
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -28,6 +27,7 @@ from edxval.api import (
     get_transcript_preferences,
     get_video_info
 )
+
 from cms.djangoapps.contentstore.models import VideoUploadConfig
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
@@ -47,7 +47,7 @@ from ..videos import (
     StatusDisplayStrings,
     TranscriptProvider,
     _get_default_video_image_url,
-    convert_video_status, storage_service_bucket, storage_service_key
+    convert_video_status
 )
 
 
@@ -210,7 +210,7 @@ class VideoUploadPostTestsMixin:
     """
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('boto.s3.connection.S3Connection')
     def test_post_success(self, mock_conn, mock_key):
         files = [
             {
@@ -467,7 +467,7 @@ class VideosHandlerTestCase(
 
     @override_settings(AWS_ACCESS_KEY_ID="test_key_id", AWS_SECRET_ACCESS_KEY="test_secret")
     @patch("boto.s3.key.Key")
-    @patch("cms.djangoapps.contentstore.views.videos.S3Connection")
+    @patch("boto.s3.connection.S3Connection")
     @ddt.data(
         (
             [
@@ -501,7 +501,8 @@ class VideosHandlerTestCase(
         """
         Test that video upload works correctly against supported and unsupported file formats.
         """
-        mock_conn.get_bucket = Mock()
+        bucket = Mock()
+        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
         mock_key_instances = [
             Mock(
                 generate_url=Mock(
@@ -529,12 +530,11 @@ class VideosHandlerTestCase(
             self.assertEqual(response['error'], "Request 'files' entry contain unsupported content_type")
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('boto.s3.connection.S3Connection')
     def test_upload_with_non_ascii_charaters(self, mock_conn):
         """
         Test that video uploads throws error message when file name contains special characters.
         """
-        mock_conn.get_bucket = Mock()
         file_name = 'test\u2019_file.mp4'
         files = [{'file_name': file_name, 'content_type': 'video/mp4'}]
 
@@ -552,11 +552,10 @@ class VideosHandlerTestCase(
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret', AWS_SECURITY_TOKEN='token')
     @patch('boto.s3.key.Key')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('boto.s3.connection.S3Connection')
     @override_waffle_flag(ENABLE_DEVSTACK_VIDEO_UPLOADS, active=True)
     def test_devstack_upload_connection(self, mock_conn, mock_key):
         files = [{'file_name': 'first.mp4', 'content_type': 'video/mp4'}]
-        mock_conn.get_bucket = Mock()
         mock_key_instances = [
             Mock(
                 generate_url=Mock(
@@ -580,12 +579,11 @@ class VideosHandlerTestCase(
         )
 
     @patch('boto.s3.key.Key')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('boto.s3.connection.S3Connection')
     def test_send_course_to_vem_pipeline(self, mock_conn, mock_key):
         """
         Test that uploads always go to VEM S3 bucket by default.
         """
-        mock_conn.get_bucket = Mock()
         files = [{'file_name': 'first.mp4', 'content_type': 'video/mp4'}]
         mock_key_instances = [
             Mock(
@@ -610,7 +608,7 @@ class VideosHandlerTestCase(
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('boto.s3.connection.S3Connection')
     @ddt.data(
         {
             'global_waffle': True,
@@ -648,7 +646,7 @@ class VideosHandlerTestCase(
             'file_name': 'first.mp4',
             'content_type': 'video/mp4',
         }
-        mock_conn.get_bucket = Mock()
+        mock_conn.return_value = Mock(get_bucket=Mock(return_value=Mock()))
         mock_key_instance = Mock(
             generate_url=Mock(
                 return_value='http://example.com/url_{}'.format(file_data['file_name'])
@@ -1447,7 +1445,7 @@ class TranscriptPreferencesTestCase(VideoUploadTestBase, CourseTestCase):
     @ddt.unpack
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('boto.s3.connection.S3Connection')
     @patch('cms.djangoapps.contentstore.views.videos.get_transcript_preferences')
     def test_transcript_preferences_metadata(self, transcript_preferences, is_video_transcript_enabled,
                                              mock_transcript_preferences, mock_conn, mock_key):
@@ -1628,26 +1626,3 @@ class GetVideoFeaturesTestCase(
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()[key], is_enabled)
-
-
-class GetStorageBucketTestCase(TestCase):
-    """ This test just check that connection works and returns the bucket.
-    It does not involve any mocking and triggers errors if has any import issue.
-    """
-    @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @override_settings(VIDEO_UPLOAD_PIPELINE={
-        "VEM_S3_BUCKET": "vem_test_bucket", "BUCKET": "test_bucket", "ROOT_PATH": "test_root"
-    })
-    def test_storage_bucket(self):
-        """ get bucket and generate url. It will not hit actual s3."""
-        bucket = storage_service_bucket()
-        edx_video_id = 'dummy_video'
-        key = storage_service_key(bucket, file_name=edx_video_id)
-        upload_url = key.generate_url(
-            KEY_EXPIRATION_IN_SECONDS,
-            'PUT',
-            headers={'Content-Type': 'mp4'}
-        )
-
-        self.assertIn("https://vem_test_bucket.s3.amazonaws.com:443/test_root/", upload_url)
-        self.assertIn(edx_video_id, upload_url)
