@@ -861,7 +861,7 @@ lazy==1.5
     #   xblock
 lazy-object-proxy==1.9.0
     # via astroid
-learner-pathway-progress==1.3.3
+learner-pathway-progress==1.3.4
     # via -r requirements/edx/base.txt
 levenshtein==0.21.1
     # via

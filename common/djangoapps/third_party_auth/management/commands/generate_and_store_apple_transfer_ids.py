@@ -148,6 +148,9 @@ class Command(BaseCommand):
         except BadRequestException:
             log.info('Bad request for uid %s.', apple_id)
             transfer_id = ''
+        except (requests.exceptions.JSONDecodeError, AttributeError):
+            log.info('JSONDecodeError/AttributeError for uid %s.', apple_id)
+            transfer_id = ''
 
         return transfer_id
 
