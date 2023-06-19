@@ -142,12 +142,6 @@ codejail-includes==1.0.0
     # via -r requirements/edx/base.in
 contextlib2==21.6.0
     # via -r requirements/edx/base.in
-coreapi==2.3.3
-    # via -r requirements/edx/base.in
-coreschema==0.0.4
-    # via
-    #   -r requirements/edx/base.in
-    #   coreapi
 crowdsourcehinter-xblock==0.6
     # via -r requirements/edx/base.in
 cryptography==38.0.4
@@ -620,7 +614,7 @@ idna==3.4
     #   requests
     #   snowflake-connector-python
     #   yarl
-importlib-metadata==6.6.0
+importlib-metadata==6.7.0
     # via markdown
 importlib-resources==5.12.0
     # via jsonschema
@@ -632,12 +626,8 @@ ipaddress==1.0.23
     # via -r requirements/edx/base.in
 isodate==0.6.1
     # via python3-saml
-itypes==1.2.0
-    # via coreapi
 jinja2==3.1.2
-    # via
-    #   code-annotations
-    #   coreschema
+    # via code-annotations
 jmespath==0.10.0
     # via
     #   boto3
@@ -674,7 +664,7 @@ lazy==1.5
     #   lti-consumer-xblock
     #   ora2
     #   xblock
-learner-pathway-progress==1.3.3
+learner-pathway-progress==1.3.4
     # via -r requirements/edx/base.in
 levenshtein==0.21.1
     # via python-levenshtein
@@ -904,7 +894,7 @@ pyopenssl==22.0.0
     #   -c requirements/edx/../constraints.txt
     #   optimizely-sdk
     #   snowflake-connector-python
-pyparsing==3.0.9
+pyparsing==3.1.0
     # via
     #   chem
     #   openedx-calc
@@ -997,7 +987,6 @@ requests==2.31.0
     #   -r requirements/edx/paver.txt
     #   algoliasearch
     #   analytics-python
-    #   coreapi
     #   django-oauth-toolkit
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -1146,9 +1135,7 @@ unicodecsv==0.14.1
     #   -r requirements/edx/base.in
     #   edx-enterprise
 uritemplate==4.1.1
-    # via
-    #   coreapi
-    #   drf-yasg
+    # via drf-yasg
 urllib3==1.26.16
     # via
     #   -c requirements/edx/../constraints.txt
