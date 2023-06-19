@@ -198,12 +198,6 @@ codejail-includes==1.0.0
     # via -r requirements/edx/base.txt
 contextlib2==21.6.0
     # via -r requirements/edx/base.txt
-coreapi==2.3.3
-    # via -r requirements/edx/base.txt
-coreschema==0.0.4
-    # via
-    #   -r requirements/edx/base.txt
-    #   coreapi
 coverage[toml]==7.2.7
     # via
     #   -r requirements/edx/coverage.txt
@@ -769,7 +763,7 @@ idna==3.4
     #   yarl
 import-linter==1.9.0
     # via -r requirements/edx/testing.in
-importlib-metadata==6.6.0
+importlib-metadata==6.7.0
     # via
     #   -r requirements/edx/base.txt
     #   markdown
@@ -798,16 +792,11 @@ isort==5.12.0
     # via
     #   -r requirements/edx/testing.in
     #   pylint
-itypes==1.2.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   coreapi
 jinja2==3.1.2
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
     #   code-annotations
-    #   coreschema
     #   diff-cover
 jmespath==0.10.0
     # via
@@ -858,7 +847,7 @@ lazy==1.5
     #   xblock
 lazy-object-proxy==1.9.0
     # via astroid
-learner-pathway-progress==1.3.3
+learner-pathway-progress==1.3.4
     # via -r requirements/edx/base.txt
 levenshtein==0.21.1
     # via
@@ -1052,11 +1041,11 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
-platformdirs==3.5.3
+platformdirs==3.6.0
     # via
     #   pylint
     #   virtualenv
-pluggy==1.0.0
+pluggy==1.1.0
     # via
     #   -r requirements/edx/coverage.txt
     #   diff-cover
@@ -1172,7 +1161,7 @@ pyopenssl==22.0.0
     #   -r requirements/edx/base.txt
     #   optimizely-sdk
     #   snowflake-connector-python
-pyparsing==3.0.9
+pyparsing==3.1.0
     # via
     #   -r requirements/edx/base.txt
     #   chem
@@ -1306,7 +1295,6 @@ requests==2.31.0
     #   -r requirements/edx/base.txt
     #   algoliasearch
     #   analytics-python
-    #   coreapi
     #   django-oauth-toolkit
     #   edx-bulk-grades
     #   edx-drf-extensions
@@ -1522,7 +1510,6 @@ unidiff==0.7.5
 uritemplate==4.1.1
     # via
     #   -r requirements/edx/base.txt
-    #   coreapi
     #   drf-yasg
 urllib3==1.26.16
     # via
