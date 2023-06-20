@@ -135,9 +135,6 @@ class SkillAssessmentTable extends React.Component {
         const { programsWithUnits, onSelectBlock, skills } = this.props;
         return(
             <div>
-                <header className="mast">
-                  <h1 className="page-header">{"Add/Update Skill Assessment"}</h1>
-                </header>
                 <div className="form-group">
                     <select
                         value={this.state.selectedProgram}

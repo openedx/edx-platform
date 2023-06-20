@@ -314,6 +314,6 @@ class SkillAssessmentAdminFragmentView(EdxFragmentView):
         programs = Program.objects.prefetch_related('units').filter(status=ProgramStatuses.ACTIVE)
         context = {}
         for program in programs:
-            context[program.slug] = list(program.units.all().values_list('course', flat=True))
+            context[program.slug] = program.all_units_ids
 
         return context
