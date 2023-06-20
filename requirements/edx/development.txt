@@ -195,7 +195,7 @@ click-plugins==1.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   celery
-click-repl==0.3.0
+click-repl==0.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   celery
@@ -363,7 +363,7 @@ django-config-models==2.3.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==4.1.0
+django-cors-headers==4.0.0
     # via -r requirements/edx/testing.txt
 django-countries==7.5.1
     # via
@@ -436,7 +436,7 @@ django-multi-email-field==0.6.2
     # via
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-django-mysql==4.10.0
+django-mysql==4.9.0
     # via -r requirements/edx/testing.txt
 django-oauth-toolkit==1.3.2
     # via
@@ -494,9 +494,8 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
-djangorestframework==3.13.1
+djangorestframework==3.12.4
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-config-models
     #   django-user-tasks
@@ -544,7 +543,6 @@ drf-nested-routers==0.93.4
     #   openedx-blockstore
 drf-yasg==1.21.5
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-api-doc-tools
 edx-ace==1.6.1
@@ -668,11 +666,11 @@ edx-rest-api-client==5.5.2
     #   edx-proctoring
 edx-search==3.5.0
     # via -r requirements/edx/testing.txt
-edx-sga==0.22.0
+edx-sga==0.21.1
     # via -r requirements/edx/testing.txt
 edx-sphinx-theme==3.1.0
     # via -r requirements/edx/development.in
-edx-submissions==3.5.6
+edx-submissions==3.5.5
     # via
     #   -r requirements/edx/testing.txt
     #   ora2
@@ -813,7 +811,7 @@ imagesize==1.4.1
     # via sphinx
 import-linter==1.9.0
     # via -r requirements/edx/testing.txt
-importlib-metadata==6.7.0
+importlib-metadata==6.6.0
     # via
     #   -r requirements/edx/testing.txt
     #   markdown
@@ -1115,7 +1113,7 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/edx/testing.txt
     #   jsonschema
-platformdirs==3.6.0
+platformdirs==3.5.3
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
@@ -1246,7 +1244,7 @@ pyopenssl==22.0.0
     #   -r requirements/edx/testing.txt
     #   optimizely-sdk
     #   snowflake-connector-python
-pyparsing==3.1.0
+pyparsing==3.0.9
     # via
     #   -r requirements/edx/testing.txt
     #   chem
@@ -1336,7 +1334,6 @@ pytz==2022.7.1
     #   celery
     #   django
     #   django-ses
-    #   djangorestframework
     #   drf-yasg
     #   edx-completion
     #   edx-enterprise
@@ -1415,7 +1412,7 @@ rfc3986[idna2008]==1.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   httpx
-ruamel-yaml==0.17.32
+ruamel-yaml==0.17.31
     # via
     #   -r requirements/edx/testing.txt
     #   drf-yasg
@@ -1466,6 +1463,7 @@ six==1.16.0
     #   analytics-python
     #   bleach
     #   chem
+    #   click-repl
     #   codejail-includes
     #   crowdsourcehinter-xblock
     #   edx-ace
@@ -1678,7 +1676,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.23.1
+virtualenv==20.23.0
     # via
     #   -r requirements/edx/testing.txt
     #   tox
@@ -1747,7 +1745,7 @@ xblock-google-drive==0.3.0
     # via -r requirements/edx/testing.txt
 xblock-poll==1.13.0
     # via -r requirements/edx/testing.txt
-xblock-utils==3.2.0
+xblock-utils==3.1.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-sga
