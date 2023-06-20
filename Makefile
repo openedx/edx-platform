@@ -168,7 +168,7 @@ docker_auth:
 docker_push: docker_tag docker_auth ## push to docker hub
 # docker push "openedx/lms:latest"
 # docker push "openedx/lms:${GITHUB_SHA}"
-	docker push "openedx/lms-dev:latest-test"
+	docker push "openedx/lms-dev:test"
 # docker push "openedx/lms-dev:${GITHUB_SHA}"
 # docker push "openedx/cms:latest"
 # docker push "openedx/cms:${GITHUB_SHA}"
