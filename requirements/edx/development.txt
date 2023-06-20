@@ -494,8 +494,9 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
-djangorestframework==3.14.0
+djangorestframework==3.13.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-config-models
     #   django-user-tasks
@@ -1119,7 +1120,7 @@ platformdirs==3.6.0
     #   -r requirements/edx/testing.txt
     #   pylint
     #   virtualenv
-pluggy==1.1.0
+pluggy==1.0.0
     # via
     #   -r requirements/edx/testing.txt
     #   diff-cover
