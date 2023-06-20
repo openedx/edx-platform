@@ -4604,6 +4604,7 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'enterprise_channel_worker',
     'enterprise_access_worker',
     'enterprise_subsidy_worker',
+    'subscriptions_worker'
 ]
 
 
@@ -5342,6 +5343,7 @@ SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
 SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
 SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
 SUBSCRIPTIONS_ORDERS_MENU_ITEM_ENABLED = False
+SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 
 ############## NOTIFICATIONS EXPIRY ##############
 NOTIFICATIONS_EXPIRY = 60
