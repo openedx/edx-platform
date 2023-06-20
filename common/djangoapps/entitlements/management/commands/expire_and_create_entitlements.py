@@ -64,7 +64,7 @@ class Command(BaseCommand):
 
         while total > 0:
             total = total - batch_size
-            no_of_entitlements = min(total, batch_size) 
+            no_of_entitlements = min(total, batch_size)
             expire_and_create_entitlements.delay(no_of_entitlements)
 
         logger.info('Done. Successfully enqueued %d tasks.', num_batches)
