@@ -19,7 +19,6 @@ from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 
-# from cms.djangoapps.contentstore.views.preview import _load_preview_block
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from common.djangoapps.student import auth
 from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
@@ -221,13 +220,16 @@ class StaticFileNotices:
     error_files: list[str] = Factory(list)
 
 
-def import_staged_content_from_user_clipboard(parent_key: UsageKey, request):
+def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> tuple[XBlock | None, StaticFileNotices]:
     """
-    Import a block (and any children it has) from "staged" OLX.
+    Import a block (along with its children and any required static assets) from
+    the "staged" OLX in the user's clipboard.
+
     Does not deal with permissions or REST stuff - do that before calling this.
 
-    Returns the newly created block on success or None if the clipboard is
-    empty.
+    Returns (1) the newly created block on success or None if the clipboard is
+    empty, and (2) a summary of changes made to static files in the destination
+    course.
     """
 
     from cms.djangoapps.contentstore.views.preview import _load_preview_block
