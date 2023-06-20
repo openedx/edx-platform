@@ -156,10 +156,11 @@ docker_build:
 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target production -t openedx/cms
 
 docker_tag: docker_build
-	docker tag openedx/lms     openedx/lms:${GITHUB_SHA}
-	docker tag openedx/lms-dev-test openedx/lms-dev:${GITHUB_SHA}
-	docker tag openedx/cms     openedx/cms:${GITHUB_SHA}
-	docker tag openedx/cms-dev-test openedx/cms-dev:${GITHUB_SHA}
+# docker tag openedx/lms     openedx/lms:${GITHUB_SHA}
+# docker tag openedx/lms-dev openedx/lms-dev:${GITHUB_SHA}
+	docker tag openedx/lms-dev openedx/lms-dev:test
+# docker tag openedx/cms     openedx/cms:${GITHUB_SHA}
+# docker tag openedx/cms-dev openedx/cms-dev:${GITHUB_SHA}
 
 docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
