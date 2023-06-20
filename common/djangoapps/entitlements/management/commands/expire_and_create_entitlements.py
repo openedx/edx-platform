@@ -19,14 +19,8 @@ class Command(BaseCommand):
     """
     Management command for expiring old entitlements and issuing new one against them.
 
-    Most entitlements get expired as the user interacts with the platform,
-    because the LMS checks as it goes. This command is to expire entitlements older than one year and issue new one
-    against them. But if the learner has not logged in
-    for a while, we still want to reap these old entitlements. So this command
-    should be run every now and then (probably daily) to expire old
-    entitlements.
 
-    The command's goal is to pass a narrow subset of entitlements to an
+    The command's goal is expire a set of entitlements depending on the --count argument passed to an
     idempotent Celery task for further (parallelized) processing.
     """
     help = dedent(__doc__).strip()
@@ -69,9 +63,9 @@ class Command(BaseCommand):
             )
             return
 
-        for batch_num in range(int(num_batches)):
-            start = batch_num * batch_size + 1  # ids are 1-based, so add 1
-            end = min(start + batch_size, total + 1)
-            expire_and_create_entitlements.delay(start, end, logid=str(batch_num))
+        while total > 0:
+            total = total - batch_size
+            no_of_entitlements = min(total, batch_size) 
+            expire_and_create_entitlements.delay(no_of_entitlements)
 
         logger.info('Done. Successfully enqueued %d tasks.', num_batches)

@@ -76,7 +76,7 @@ def expire_old_entitlements(self, start, end, logid='...'):
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def expire_and_create_entitlements(self):
+def expire_and_create_entitlements(self, no_of_entitlements):
     """
     This task is designed to be called to process and expire bundle of entitlements
     that are older than one year on in exceptional case 18 months. 
@@ -101,11 +101,8 @@ def expire_and_create_entitlements(self):
 
 
     try:
-        for entitlement in entitlements:
-            # This property request will update the expiration if necessary as
-            # a side effect. We could manually call update_expired_at(), but
-            # let's use the same API the rest of the LMS does, to mimic normal
-            # usage and allow the update call to be an internal detail.
+        for entitlement in entitlements[:no_of_entitlements]:
+
             entitlement.expire_entitlement()
             LOGGER.info('Expired entitlement with id %d ', entitlement.id)
             entitlement.pk = None
