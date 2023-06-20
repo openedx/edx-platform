@@ -285,8 +285,12 @@ class NotificationListAPIViewTest(APITestCase):
         # Create a notification for the user.
         Notification.objects.create(
             user=self.user,
-            app_name='app1',
-            notification_type='info',
+            app_name='discussion',
+            notification_type='new_response',
+            content_context={
+                'replier_name': 'test_user',
+                'post_title': 'This is a test post.',
+            }
         )
         self.client.login(username=self.user.username, password='test')
 
@@ -299,8 +303,12 @@ class NotificationListAPIViewTest(APITestCase):
         data = response.data['results']
         # Assert that the response contains the notification.
         self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]['app_name'], 'app1')
-        self.assertEqual(data[0]['notification_type'], 'info')
+        self.assertEqual(data[0]['app_name'], 'discussion')
+        self.assertEqual(data[0]['notification_type'], 'new_response')
+        self.assertEqual(
+            data[0]['content'],
+            '<p><strong>test_user</strong> responded to your post <strong>This is a test post.</strong></p>'
+        )
 
     def test_list_notifications_with_app_name_filter(self):
         """
@@ -309,8 +317,12 @@ class NotificationListAPIViewTest(APITestCase):
         # Create two notifications for the user, one for each app name.
         Notification.objects.create(
             user=self.user,
-            app_name='app1',
-            notification_type='info',
+            app_name='discussion',
+            notification_type='new_response',
+            content_context={
+                'replier_name': 'test_user',
+                'post_title': 'This is a test post.',
+            }
         )
         Notification.objects.create(
             user=self.user,
@@ -320,7 +332,7 @@ class NotificationListAPIViewTest(APITestCase):
         self.client.login(username=self.user.username, password='test')
 
         # Make a request to the view with the app_name query parameter set to 'app1'.
-        response = self.client.get(self.url + "?app_name=app1")
+        response = self.client.get(self.url + "?app_name=discussion")
 
         # Assert that the response is successful.
         self.assertEqual(response.status_code, 200)
@@ -328,8 +340,12 @@ class NotificationListAPIViewTest(APITestCase):
         # Assert that the response contains only the notification for app1.
         data = response.data['results']
         self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]['app_name'], 'app1')
-        self.assertEqual(data[0]['notification_type'], 'info')
+        self.assertEqual(data[0]['app_name'], 'discussion')
+        self.assertEqual(data[0]['notification_type'], 'new_response')
+        self.assertEqual(
+            data[0]['content'],
+            '<p><strong>test_user</strong> responded to your post <strong>This is a test post.</strong></p>'
+        )
 
     def test_list_notifications_without_authentication(self):
         """

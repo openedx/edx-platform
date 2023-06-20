@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
-    get_course_notification_preference_config_version
+    get_course_notification_preference_config_version,
 )
 
 from .base_notification import COURSE_NOTIFICATION_APPS
@@ -147,12 +147,8 @@ class UserNotificationPreferenceView(APIView):
             }
          """
         course_id = CourseKey.from_string(course_key_string)
-        user_notification_preference, _ = CourseNotificationPreference.objects.get_or_create(
-            user=request.user,
-            course_id=course_id,
-            is_active=True,
-        )
-        serializer = UserCourseNotificationPreferenceSerializer(user_notification_preference)
+        user_preference = CourseNotificationPreference.get_updated_user_course_preferences(request.user, course_id)
+        serializer = UserCourseNotificationPreferenceSerializer(user_preference)
         return Response(serializer.data)
 
     def patch(self, request, course_key_string):
