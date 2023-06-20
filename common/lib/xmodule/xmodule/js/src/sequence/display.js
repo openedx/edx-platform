@@ -23,6 +23,12 @@
             this.selectNext = function(event) {
                 return Sequence.prototype.selectNext.apply(self, [event]);
             };
+            this.navigateToQuestion = function(event){
+                return Sequence.prototype.navigateToQuestion.apply(self, [event]);
+            }
+            this.hideModal = function(event){
+                return Sequence.prototype.hideModal.apply(self);
+            }
             this.goto = function(event) {
                 return Sequence.prototype.goto.apply(self, [event]);
             };
@@ -59,6 +65,8 @@
             this.prevUrl = this.el.data('prev-url');
             this.savePosition = this.el.data('save-position');
             this.showCompletion = this.el.data('show-completion');
+            $('#back-to-question').on('click', this.hideModal);
+            $('#navigate-question').on('click', this.navigateToQuestion);
             this.keydownHandler($(element).find('#sequence-list .tab'));
             this.base_page_title = ($('title').data('base-title') || '').trim();
             this.bind();
@@ -229,6 +237,7 @@
         Sequence.prototype.render = function(newPosition) {
             var bookmarked, currentTab, modxFullUrl, sequenceLinks,
                 self = this;
+
             if (this.position !== newPosition) {
                 if (this.position) {
                     this.mark_visited(this.position);
@@ -302,6 +311,10 @@
                 newPosition = $(event.currentTarget).data('element');
             }
 
+            if(this.shouldNavigateModal('', newPosition)){
+                return;
+            }
+
             if ((newPosition >= 1) && (newPosition <= this.num_contents)) {
                 isBottomNav = $(event.target).closest('nav[class="sequence-bottom"]').length > 0;
 
@@ -336,26 +349,77 @@
             }
         };
 
+        Sequence.prototype.navigateToQuestion = function(event){
+            var isBottomNav, widgetPlacement, alertTemplate, alertText;
+            var navigation_direction = $('#navigationModal').attr('data-navigate');
+            var navigation_new_position = parseInt($('#navigationModal').attr('data-new-position'));
+            var navigation_event_type = $('#navigationModal').attr('data-event-type');
+            if (navigation_event_type == 'sequential') {
+                this._change_sequential(navigation_direction, event);
+            }
+            else if(navigation_event_type == 'direct' && !isNaN(navigation_new_position)) {
+                if ((navigation_new_position >= 1) && (navigation_new_position <= this.num_contents)) {
+                    isBottomNav = $(event.target).closest('nav[class="sequence-bottom"]').length > 0;
+
+                    if (isBottomNav) {
+                        widgetPlacement = 'bottom';
+                    } else {
+                        widgetPlacement = 'top';
+                    }
+
+                    // Formerly known as seq_goto
+                    Logger.log('edx.ui.lms.sequence.tab_selected', {
+                        current_tab: this.position,
+                        target_tab: navigation_new_position,
+                        tab_count: this.num_contents,
+                        id: this.id,
+                        widget_placement: widgetPlacement
+                    });
+
+                    // On Sequence change, destroy any existing polling thread
+                    // for queued submissions, see ../capa/display.js
+                    if (window.queuePollerID) {
+                        window.clearTimeout(window.queuePollerID);
+                        delete window.queuePollerID;
+                    }
+                    this.render(navigation_new_position);
+                } else {
+                    alertTemplate = gettext('Sequence error! Cannot navigate to %(tab_name)s in the current SequenceModule. Please contact the course staff.');  // eslint-disable-line max-len
+                    alertText = interpolate(alertTemplate, {
+                        tab_name: navigation_new_position
+                    }, true);
+                    alert(alertText);  // eslint-disable-line no-alert
+                }
+            }
+            this.hideModal();
+        }
+
+        Sequence.prototype.hideModal = function(){
+            $('#navigationModal').modal('hide');
+        }
+
         Sequence.prototype.selectNext = function(event) {
-            this._change_sequential('next', event);
+            if(!this.shouldNavigateModal('next')){
+                this._change_sequential('next', event);
+            }
         };
 
         Sequence.prototype.selectPrevious = function(event) {
-            this._change_sequential('previous', event);
+            if(!this.shouldNavigateModal('previous')){
+                this._change_sequential('previous', event);
+            }
         };
 
         // `direction` can be 'previous' or 'next'
         Sequence.prototype._change_sequential = function(direction, event) {
             var analyticsEventName, isBottomNav, newPosition, offset, targetUrl, widgetPlacement;
-
             // silently abort if direction is invalid.
             if (direction !== 'previous' && direction !== 'next') {
                 return;
             }
             event.preventDefault();
-            analyticsEventName = 'edx.ui.lms.sequence.' + direction + '_selected';
-            isBottomNav = $(event.target).closest('nav[class="sequence-bottom"]').length > 0;
 
+            isBottomNav = $(event.target).closest('nav[class="sequence-bottom"]').length > 0;
             if (isBottomNav) {
                 widgetPlacement = 'bottom';
             } else {
@@ -367,7 +431,6 @@
             } else if ((direction === 'previous') && (this.position === 1)) {
                 targetUrl = this.prevUrl;
             }
-
             // Formerly known as seq_next and seq_prev
             Logger.log(analyticsEventName, {
                 id: this.id,
@@ -397,6 +460,30 @@
                 this.render(newPosition);
             }
         };
+
+        Sequence.prototype.shouldNavigateModal = function (direction, newPosition) {
+            if($('.submit-attempt-container').length > 0 && $("span.status").attr("class").split(' ').indexOf('unanswered') > -1){
+                if(direction == 'next'){
+                    $('#navigate-question').html('Go to Next Question');
+                    $('#navigationModal').attr('data-event-type', 'sequential');
+                    $('#navigationModal').attr('data-navigate', 'next');
+                }
+                else if(direction == 'previous'){
+                    $('#navigate-question').html('Go to Previous Question');
+                    $('#navigationModal').attr('data-event-type', 'sequential');
+                    $('#navigationModal').attr('data-navigate', 'previous');
+                }
+                else if(newPosition !== undefined){
+                    $('#navigate-question').html('Leave Question');
+                    $('#navigationModal').attr('data-new-position', newPosition);
+                    $('#navigationModal').attr('data-event-type', 'direct');
+                }
+
+                $('#navigationModal').modal('show');
+                return true;
+            }
+            return false;
+        }
 
         Sequence.prototype.link_for = function(position) {
             return this.$('#sequence-list .nav-item[data-element=' + position + ']');
