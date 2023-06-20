@@ -9,7 +9,6 @@ from textwrap import dedent
 
 from django.core.management import BaseCommand
 
-from common.djangoapps.entitlements.models import CourseEntitlement
 from common.djangoapps.entitlements.tasks import expire_and_create_entitlements
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name

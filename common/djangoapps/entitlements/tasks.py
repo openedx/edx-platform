@@ -26,7 +26,7 @@ MIT_SUPPLY_CHAIN_COURSES = [
     '324970b703a444d7b39e10bbda6f119f',
     '5f1c55b4354e4155af4a76450953e10d',
     'ed927a1a4a95415ba865c3d722ac549c',
-    '6513ed9c112a495182ad7036cbe52831',    
+    '6513ed9c112a495182ad7036cbe52831',
 ]
 
 @shared_task(bind=True, ignore_result=True)
@@ -72,14 +72,14 @@ def expire_old_entitlements(self, start, end, logid='...'):
         raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
 
     LOGGER.info('Successfully completed the task expire_old_entitlements after examining %d entries [%s]', entitlements.count(), logid)  # lint-amnesty, pylint: disable=line-too-long
-
+    
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def expire_and_create_entitlements(self, no_of_entitlements):
     """
     This task is designed to be called to process and expire bundle of entitlements
-    that are older than one year on in exceptional case 18 months. 
+    that are older than one year on in exceptional case 18 months.
 
     Args:
         None
@@ -93,8 +93,11 @@ def expire_and_create_entitlements(self, no_of_entitlements):
     current_date = date.today()
     expiration_period = current_date - relativedelta(years=1)
     exceptional_expiration_period = current_date - relativedelta(years=1, months=6)
-    normal_entitlements = CourseEntitlement.objects.filter(expired_at__isnull=True, created__lte=expiration_period).exclude(course_uuid__in=MIT_SUPPLY_CHAIN_COURSES)
-    exceptional_entitlements = CourseEntitlement.objects.filter(expired_at__isnull=True, created__lte=exceptional_expiration_period, course_uuid__in=MIT_SUPPLY_CHAIN_COURSES)
+    normal_entitlements = CourseEntitlement.objects.filter(expired_at__isnull=True,
+                                                           created__lte=expiration_period).exclude(course_uuid__in=MIT_SUPPLY_CHAIN_COURSES)
+    exceptional_entitlements = CourseEntitlement.objects.filter(expired_at__isnull=True,
+                                                                created__lte=exceptional_expiration_period, course_uuid__in=MIT_SUPPLY_CHAIN_COURSES)
+   
     entitlements = normal_entitlements | exceptional_entitlements
 
     countdown = 2 ** self.request.retries
@@ -110,7 +113,7 @@ def expire_and_create_entitlements(self, no_of_entitlements):
             entitlement.modified = None
             entitlement.save()
             LOGGER.info('created new entitlement with id %d ', entitlement.id)
-            
+
 
     except Exception as exc:
         LOGGER.exception('Failed to expire entitlements ',)
