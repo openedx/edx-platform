@@ -10,6 +10,7 @@ from .views import (
     MarkNotificationsUnseenAPIView,
     NotificationCountView,
     NotificationListAPIView,
+    NotificationReadAPIView,
     UserNotificationPreferenceView
 )
 
@@ -30,6 +31,7 @@ urlpatterns = [
         MarkNotificationsUnseenAPIView.as_view(),
         name='mark-notifications-unseen'
     ),
+    path('read/', NotificationReadAPIView.as_view(), name='notifications-read'),
 
 ]
 
