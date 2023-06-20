@@ -513,7 +513,7 @@ class MarkNotificationsSeenAPIViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Assert the response data contains the expected message
-        expected_data = {'message': 'Notifications marked seen.'}
+        expected_data = {'message': 'Notifications marked as seen.'}
         self.assertEqual(response.data, expected_data)
 
         # Assert the notifications for 'App Name 1' are marked as seen for the user
