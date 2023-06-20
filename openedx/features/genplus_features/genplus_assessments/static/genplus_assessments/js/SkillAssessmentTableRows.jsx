@@ -28,23 +28,8 @@ function SkillAssessmentTableRows(props) {
                 showIntroDropdown,
                 showOutroDropdown
             } = data;
-            return(
-                <tr key={index}>
-                <td>
-                    <select
-                    value={skill}
-                    onChange={(event) => handleSelectSkill(index, event)}
-                    className="form-control"
-                    id={"select-skill-" + index}
-                    >
-                    <option value="">Select Skill</option>
-                    {
-                        skills.map((skillName, index) => (
-                            <option key={index} value={skillName}>{skillName}</option>
-                        ))
-                    }
-                    </select>
-                </td>
+            return (
+              <tr key={index}>
                 <td>
                     <select
                     value={start_unit}
@@ -61,7 +46,9 @@ function SkillAssessmentTableRows(props) {
                     </select>
                     <div className="problem-browser">
                         <Button onClick={()=>handleIntroToggleDropdown(index)} label={gettext('Select Intro Problem')} />
-                        <span>{start_unit_location}</span>
+                        {
+                          start_unit_location && <div className="unit-label">{start_unit_location}</div>
+                        }
                         {
                             showIntroDropdown && start_unit !== "" &&
                             <BlockBrowserContainer
@@ -89,7 +76,9 @@ function SkillAssessmentTableRows(props) {
                     </select>
                     <div className="problem-browser">
                         <Button onClick={()=>handleOutroToggleDropdown(index)} label={gettext('Select Outro Problem')} />
-                        <span>{end_unit_location}</span>
+                        {
+                          end_unit_location && <div className="unit-label">{end_unit_location}</div>
+                        }
                         {
                             showOutroDropdown && end_unit !== "" &&
                             <BlockBrowserContainer
@@ -101,12 +90,26 @@ function SkillAssessmentTableRows(props) {
                         }
                     </div>
                 </td>
+                <td>
+                    <select
+                    value={skill}
+                    onChange={(event) => handleSelectSkill(index, event)}
+                    className="form-control"
+                    id={"select-skill-" + index}
+                    >
+                    <option value="">Select Skill</option>
+                    {
+                        skills.map((skillName, index) => (
+                            <option key={index} value={skillName}>{skillName}</option>
+                        ))
+                    }
+                    </select>
+                </td>
                 <td><button className="btn btn-outline-danger" onClick={()=>(deleteTableRows(index))}>x</button></td>
-            </tr>
+              </tr>
             )
         })
-
     )
-
 }
+
 export default SkillAssessmentTableRows;

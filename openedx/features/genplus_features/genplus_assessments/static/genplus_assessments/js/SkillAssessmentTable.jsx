@@ -157,9 +157,9 @@ class SkillAssessmentTable extends React.Component {
                     <table className="table table table-striped">
                         <thead>
                         <tr>
-                            <th>Skill</th>
-                            <th>Intro</th>
-                            <th>Outro</th>
+                            <th className="intro">Intro</th>
+                            <th className="outro">Outro</th>
+                            <th className="skill">Skill</th>
                             <th className="actions">
                               <button className="btn btn-outline-success" onClick={this.addTableRows}>
                                 <span className="fa fa-plus"></span>
