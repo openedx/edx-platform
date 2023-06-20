@@ -90,7 +90,16 @@
           ["\\[","\\]"],
           ['[mathjax]','[/mathjax]']
         ]
-      }
+      },
+      styles: {
+        '.MathJax_SVG': {
+          'overflow-x': 'scroll',
+          'max-width': '100% !important',
+        },
+        '.MathJax_SVG>svg': {
+          'display': 'block',
+        },
+      },
     });
   </script>
   <script type="text/x-mathjax-config">

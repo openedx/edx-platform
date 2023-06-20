@@ -32,7 +32,16 @@ define(
                             ['\\[', '\\]'],
                             ['[mathjax]', '[/mathjax]']
                         ]
-                    }
+                    },
+                    styles: {
+                        '.MathJax_SVG': {
+                            'overflow-x': 'scroll',
+                            'max-width': '100% !important',
+                        },
+                        '.MathJax_SVG>svg': {
+                            'display': 'block',
+                        },
+                    },
                 });
 
                 // In order to eliminate all flashing during interactive

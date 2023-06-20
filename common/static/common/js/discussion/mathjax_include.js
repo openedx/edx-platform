@@ -24,7 +24,16 @@ if (typeof MathJax === 'undefined') {
                     ['\\[', '\\]'],
                     ['[mathjax]', '[/mathjax]']
                 ]
-            }
+            },
+            styles: {
+                '.MathJax_SVG': {
+                    'overflow-x': 'scroll',
+                    'max-width': '100% !important',
+                },
+                '.MathJax_SVG>svg': {
+                    'display': 'block',
+                },
+              },
         });
         if (disableFastPreview) {
             MathJax.Hub.processSectionDelay = 0;
