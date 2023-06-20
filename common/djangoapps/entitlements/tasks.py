@@ -28,6 +28,7 @@ MIT_SUPPLY_CHAIN_COURSES = [
     '6513ed9c112a495182ad7036cbe52831',
 ]
 
+
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
 def expire_old_entitlements(self, start, end, logid='...'):
@@ -110,7 +111,6 @@ def expire_and_create_entitlements(self, no_of_entitlements):
             entitlement.modified = None
             entitlement.save()
             LOGGER.info('created new entitlement with id %d ', entitlement.id)
-
 
     except Exception as exc:
         LOGGER.exception('Failed to expire entitlements ',)
