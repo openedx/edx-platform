@@ -75,14 +75,11 @@ Currently, edx-platform XBlock JS is defined both here in `xmodule/assets`_ and 
   * `VerticalBlock`_
   * `LibrarySourcedBlock`_
 
-* Some XBlock JS is also processed through Django Pipeline and used in a couple specific legacy places.
-
 As part of an `active build refactoring`_:
 
 * We update the older builtin XBlocks to reference their JS directly rather than using copies of it.
 * We will move ``webpack.xmodule.config.js`` here instead of generating it.
 * We will consolidate all edx-platform XBlock JS here in `xmodule/assets`_.
-* We will remove XBlock JS from Django Pipeline.
 * We will delete the ``xmodule_assets`` script.
 
 .. _xmodule/assets: https://github.com/openedx/edx-platform/tree/master/xmodule/assets
