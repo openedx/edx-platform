@@ -117,6 +117,8 @@ docutils<0.20
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/32327
 python3-saml<1.10.0
 
+# greater version has dropped few dependencies. Fix this in other ticket.
+drf-yasg<1.21.6
 
-# its a temporary pin. Unpin after releasing xblock-sdk new version. It will be using `openedx-django-pyfs` new ver.
-openedx-django-pyfs==3.2.1
+# incremental upgrade approach. After successfull deploy remove this pin and try latest version.
+djangorestframework<3.14.0

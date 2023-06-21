@@ -1,7 +1,11 @@
 """
 Base setup for Notification Apps and Types.
 """
-from typing import Dict
+from .utils import (
+    find_app_in_normalized_apps,
+    find_pref_in_normalized_prefs,
+)
+
 
 COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
@@ -65,11 +69,111 @@ COURSE_NOTIFICATION_APPS = {
 }
 
 
+class NotificationPreferenceSyncManager:
+    """
+    Sync Manager for Notification Preferences
+    """
+
+    @staticmethod
+    def normalize_preferences(preferences):
+        """
+        Normalizes preferences to reduce depth of structure.
+        This simplifies matching of preferences reducing effort to get difference.
+        """
+        apps = []
+        prefs = []
+        non_editable = {}
+        core_notifications = {}
+
+        for app, app_pref in preferences.items():
+            apps.append({
+                'name': app,
+                'enabled': app_pref.get('enabled')
+            })
+            for pref_name, pref_values in app_pref.get('notification_types', {}).items():
+                prefs.append({
+                    'name': pref_name,
+                    'app_name': app,
+                    **pref_values
+                })
+            non_editable[app] = app_pref.get('non_editable', {})
+            core_notifications[app] = app_pref.get('core_notification_types', [])
+
+        normalized_preferences = {
+            'apps': apps,
+            'preferences': prefs,
+            'non_editable': non_editable,
+            'core_notifications': core_notifications,
+        }
+        return normalized_preferences
+
+    @staticmethod
+    def denormalize_preferences(normalized_preferences):
+        """
+        Denormalizes preference from simplified to normal structure for saving it in database
+        """
+        denormalized_preferences = {}
+        for app in normalized_preferences.get('apps', []):
+            app_name = app.get('name')
+            app_toggle = app.get('enabled')
+            denormalized_preferences[app_name] = {
+                'enabled': app_toggle,
+                'core_notification_types': normalized_preferences.get('core_notifications', {}).get(app_name, []),
+                'notification_types': {},
+                'non_editable': normalized_preferences.get('non_editable', {}).get(app_name, {}),
+            }
+
+        for preference in normalized_preferences.get('preferences', []):
+            pref_name = preference.get('name')
+            app_name = preference.get('app_name')
+            denormalized_preferences[app_name]['notification_types'][pref_name] = {
+                'web': preference.get('web'),
+                'push': preference.get('push'),
+                'email': preference.get('email'),
+                'info': preference.get('info'),
+            }
+        return denormalized_preferences
+
+    @staticmethod
+    def update_preferences(preferences):
+        """
+        Creates a new preference version from old preferences.
+        New preference is created instead of updating old preference
+
+        Steps to update existing user preference
+            1) Normalize existing user preference
+            2) Normalize default preferences
+            3) Iterate over all the apps in default preference, if app_name exists in
+               existing preference, update new preference app enabled value as
+               existing enabled value
+            4) Iterate over all preferences, if preference_name exists in existing
+               preference, update new preference values of web, email and push as
+               existing web, email and push respectively
+            5) Denormalize new preference
+        """
+        old_preferences = NotificationPreferenceSyncManager.normalize_preferences(preferences)
+        default_prefs = NotificationAppManager().get_notification_app_preferences()
+        new_prefs = NotificationPreferenceSyncManager.normalize_preferences(default_prefs)
+
+        for app in new_prefs.get('apps'):
+            app_pref = find_app_in_normalized_apps(app.get('name'), old_preferences.get('apps'))
+            if app_pref:
+                app['enabled'] = app_pref['enabled']
+
+        for preference in new_prefs.get('preferences'):
+            pref_name = preference.get('name')
+            app_name = preference.get('app_name')
+            pref = find_pref_in_normalized_prefs(pref_name, app_name, old_preferences.get('preferences'))
+            if pref:
+                for channel in ['web', 'email', 'push']:
+                    preference[channel] = pref[channel]
+        return NotificationPreferenceSyncManager.denormalize_preferences(new_prefs)
+
+
 class NotificationTypeManager:
     """
     Manager for notification types
     """
-    notification_types: Dict = {}
 
     def __init__(self):
         self.notification_types = COURSE_NOTIFICATION_TYPES
@@ -143,10 +247,6 @@ class NotificationAppManager:
     """
     Notification app manager
     """
-    notification_apps: Dict = {}
-
-    def __init__(self):
-        self.notification_apps = COURSE_NOTIFICATION_APPS
 
     def add_core_notification_preference(self, notification_app_attrs, notification_types):
         """
@@ -175,6 +275,16 @@ class NotificationAppManager:
             notification_app_preferences['notification_types'] = notification_types
             notification_app_preferences['non_editable'] = non_editable_channels
             course_notification_preference_config[notification_app_key] = notification_app_preferences
+        return course_notification_preference_config
 
-            return course_notification_preference_config
-        return None
+
+def get_notification_content(notification_type, context):
+    """
+    Returns notification content for the given notification type with provided context.
+    """
+    notification_type = NotificationTypeManager().notification_types.get(notification_type, None)
+    if notification_type:
+        notification_type_content_template = notification_type.get('content_template', None)
+        if notification_type_content_template:
+            return notification_type_content_template.format(**context)
+    return ''
