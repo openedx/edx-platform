@@ -52,6 +52,7 @@ from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_USER_ID,
 )
 from openedx.core.djangolib.markup import HTML, Text
+from .capa.xqueue_interface import XQueueService
 
 from .fields import Date, ScoreField, Timedelta
 from .progress import Progress
@@ -123,8 +124,6 @@ class Randomization(String):
 @XBlock.needs('cache')
 @XBlock.needs('sandbox')
 @XBlock.needs('replace_urls')
-# Studio doesn't provide XQueueService, but the LMS does.
-@XBlock.wants('xqueue')
 @XBlock.wants('call_to_action')
 class ProblemBlock(
     ScorableXBlockMixin,
@@ -814,6 +813,8 @@ class ProblemBlock(
         sandbox_service = self.runtime.service(self, 'sandbox')
         cache_service = self.runtime.service(self, 'cache')
 
+        is_studio = getattr(self.runtime, 'is_author_mode', False)
+
         capa_system = LoncapaSystem(
             ajax_url=self.ajax_url,
             anonymous_student_id=anonymous_student_id,
@@ -825,7 +826,7 @@ class ProblemBlock(
             render_template=self.runtime.service(self, 'mako').render_template,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
-            xqueue=self.runtime.service(self, 'xqueue'),
+            xqueue=None if is_studio else XQueueService(self),
             matlab_api_key=self.matlab_api_key
         )
 
@@ -1736,7 +1737,7 @@ class ProblemBlock(
         if self.lcp.is_queued():
             prev_submit_time = self.lcp.get_recentmost_queuetime()
 
-            xqueue_service = self.runtime.service(self, 'xqueue')
+            xqueue_service = self.lcp.capa_system.xqueue
             waittime_between_requests = xqueue_service.waittime if xqueue_service else 0
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = _("You must wait at least {wait} seconds between submissions.").format(
