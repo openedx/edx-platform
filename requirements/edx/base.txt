@@ -383,7 +383,7 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
     #   edx-proctoring
-djangorestframework==3.13.1
+djangorestframework==3.14.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.in
