@@ -12,7 +12,12 @@ from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,
     CourseRole,
+    CourseLimitedStaffRole,
     CourseStaffRole,
+    CourseFinanceAdminRole,
+    CourseSalesAdminRole,
+    LibraryUserRole,
+    CourseDataResearcherRole,
     GlobalStaff,
     OrgContentCreatorRole,
     OrgInstructorRole,
@@ -162,8 +167,13 @@ class RoleCacheTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-clas
 
     ROLES = (
         (CourseStaffRole(IN_KEY), ('staff', IN_KEY, 'edX')),
+        (CourseLimitedStaffRole(IN_KEY), ('limited_staff', IN_KEY, 'edX')),
         (CourseInstructorRole(IN_KEY), ('instructor', IN_KEY, 'edX')),
         (OrgStaffRole(IN_KEY.org), ('staff', None, 'edX')),
+        (CourseFinanceAdminRole(IN_KEY), ('finance_admin', IN_KEY, 'edX')),
+        (CourseSalesAdminRole(IN_KEY), ('sales_admin', IN_KEY, 'edX')),
+        (LibraryUserRole(IN_KEY), ('library_user', IN_KEY, 'edX')),
+        (CourseDataResearcherRole(IN_KEY), ('data_researcher', IN_KEY, 'edX')),
         (OrgInstructorRole(IN_KEY.org), ('instructor', None, 'edX')),
         (CourseBetaTesterRole(IN_KEY), ('beta_testers', IN_KEY, 'edX')),
     )
@@ -183,7 +193,13 @@ class RoleCacheTestCase(TestCase):  # lint-amnesty, pylint: disable=missing-clas
             if other_role == role:
                 continue
 
-            assert not cache.has_role(*other_target)
+            role_base_id = getattr(role, "BASE_ROLE", None)
+            other_role_id = getattr(other_role, "ROLE", None)
+
+            if other_role_id and role_base_id == other_role_id:
+                assert cache.has_role(*other_target)
+            else:
+                assert not cache.has_role(*other_target)
 
     @ddt.data(*ROLES)
     @ddt.unpack
