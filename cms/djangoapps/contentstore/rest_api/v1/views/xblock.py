@@ -9,12 +9,11 @@ from common.djangoapps.util.json_request import expect_json_in_class_view
 
 from ....api import course_author_access_required
 
-from cms.djangoapps.contentstore.xblock_storage_handlers import helpers
+from cms.djangoapps.contentstore.xblock_storage_handlers import helpers, handle_xblock
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
 log = logging.getLogger(__name__)
 toggles = contentstore_toggles
-handle_xblock = helpers.handle_xblock
 
 
 @view_auth_classes()
