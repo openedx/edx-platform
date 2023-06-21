@@ -150,12 +150,9 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Equivalent paver task and console script, both pointing at to an application-level Python module. That module inspects attributes from legacy XModule-style XBlock classes in order to determine which static assets to copy and what to name them.
 
-     - ``scripts/build-assets.sh xmodule``
+     - (step no longer needed)
 
-       Initially, this command will just call out to the existing ``xmodule_assets`` command. Eventually, in order to make this step Python-free, we will need do either one or both of the following:
-
-       + `Reimplement this step in Bash <https://github.com/openedx/edx-platform/issues/31611>`_.
-       + `Remove the need for this step entirely <https://github.com/openedx/edx-platform/issues/31624>`_.
+       We will `remove the need for this step entirely <https://github.com/openedx/edx-platform/issues/31624>`_.
 
    * - + **Build stage 3: Run Webpack** in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
 
@@ -302,7 +299,7 @@ Either way, the migration path is straightforward:
    * - ``openedx-assets npm``
      - ``scripts/copy-node-modules.sh  # (automatically invoked by 'npm install'!)
    * - ``openedx-assets xmodule``
-     - ``scripts/build-assets.sh xmodule``
+     - (no longer needed)
    * - ``openedx-assets common``
      - ``scripts/build-assets.sh css``
    * - ``openedx-assets themes``

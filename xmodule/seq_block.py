@@ -14,7 +14,6 @@ from django.conf import settings
 
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_filename
 from pytz import UTC
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
@@ -25,7 +24,6 @@ from xblock.fields import Boolean, Integer, List, Scope, String
 from edx_toggles.toggles import WaffleFlag, SettingDictToggle
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     STUDENT_VIEW,
@@ -258,7 +256,6 @@ class SequenceBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):
@@ -270,20 +267,6 @@ class SequenceBlock(
 
     show_in_read_only_mode = True
     uses_xmodule_styles_setup = True
-
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/sequence/display.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
-    }
-
-    # There is no studio_view() for this XBlock but this is needed to make the
-    # the static_content command happy.
-    studio_view_js = {
-        'js': [],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
-    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

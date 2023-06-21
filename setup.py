@@ -186,8 +186,5 @@ setup(
         ],
         'xblock.v1': XBLOCKS,
         'xblock_asides.v1': XBLOCKS_ASIDES,
-        'console_scripts': [
-            'xmodule_assets = xmodule.static_content:main',
-        ],
     }
 )
