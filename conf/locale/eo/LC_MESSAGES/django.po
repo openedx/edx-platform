@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-18 20:36+0000\n"
-"PO-Revision-Date: 2023-06-18 20:36:01.097323\n"
+"POT-Creation-Date: 2023-06-21 17:07+0000\n"
+"PO-Revision-Date: 2023-06-21 17:07:01.030005\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -8663,6 +8663,34 @@ msgstr "Bläçklïst {country} för {course} Ⱡ'σяєм ιρѕυм ∂σłσя
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
 msgstr "Léärnér Päthwäýs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "The notification preference config version is not up to date."
+msgstr ""
+"Thé nötïfïçätïön préférénçé çönfïg vérsïön ïs nöt üp tö däté. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app name."
+msgstr "Ìnvälïd äpp nämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked as seen."
+msgstr "Nötïfïçätïöns märkéd äs séén. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notification marked read."
+msgstr "Nötïfïçätïön märkéd réäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked read."
+msgstr "Nötïfïçätïöns märkéd réäd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app_name or notification_id."
+msgstr ""
+"Ìnvälïd äpp_nämé ör nötïfïçätïön_ïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""

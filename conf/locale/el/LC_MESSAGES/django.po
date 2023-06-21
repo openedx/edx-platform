@@ -7,7 +7,7 @@
 # Alexandra Messini <alexandra_messini@yahoo.com>, 2015
 # Angelos Chraniotis, 2016,2023
 # Angelos Sfakianakis <giasas@gmail.com>, 2014
-# Dimitris Agelakis <minoan07@gmail.com>, 2015-2017,2019
+# Dimitris Agelakis <minoan07@gmail.com>, 2015-2017,2019,2023
 # Dimitris Voudouris <dimitrisvoudouris@yahoo.co.uk>, 2023
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
 # Eirini Mageiropoulou <eirmageir@yahoo.com>, 2021
@@ -30,7 +30,7 @@
 #
 # Translators:
 # Angelos Chraniotis, 2023
-# Dimitris Agelakis <minoan07@gmail.com>, 2019
+# Dimitris Agelakis <minoan07@gmail.com>, 2019,2023
 # Giannoulis Thanasis <thanasis@giannoulis.net>, 2015
 # EEYEM, 2015
 # Aika1 <katepapastavrou@gmail.com>, 2014
@@ -108,6 +108,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
 
+#: cms/djangoapps/contentstore/helpers.py
+#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Unit"
+msgstr "Κεφάλαιο"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr ""
+
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
 #: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
@@ -125,12 +137,6 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Συζήτηση"
-
-#: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/helpers.py
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Problem"
-msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -151,17 +157,6 @@ msgstr ""
 #: lms/djangoapps/courseware/tabs.py
 msgid "Entrance Exam"
 msgstr "Εισαγωγική εξέταση"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
-msgid "Unit"
-msgstr "Κεφάλαιο"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_block.py
-msgid "Empty"
-msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: xmodule/video_block/video_handlers.py
@@ -214,6 +209,11 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/videos.py
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/create_xblock.py
+#: xmodule/library_content_block.py
+msgid "Empty"
 msgstr ""
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
@@ -3498,6 +3498,8 @@ msgstr ""
 msgid ""
 "Cohort name not found: {cohort}. Ignoring cohort assignment for all users."
 msgstr ""
+"Το όνομα κοόρτης δε βρέθηκε: {cohort}. Παράβλεψη ανάθεσης κοόρτης για όλους "
+"τους χρήστες."
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-brace-format
@@ -5020,7 +5022,7 @@ msgstr ""
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/body.txt
 #, python-format
 msgid "You may access your course at: %(course_url)s."
-msgstr ""
+msgstr "Μπορείτε να εισέλθετε στο μάθημά σας στη διεύθυνση: %(course_url)s."
 
 #: lms/templates/instructor/edx_ace/accountcreationandenrollment/email/subject.txt
 #: lms/templates/instructor/edx_ace/enrollenrolled/email/subject.txt
@@ -11762,6 +11764,19 @@ msgstr ""
 msgid "Missing branch on fresh clone"
 msgstr ""
 
+#: cms/djangoapps/contentstore/helpers.py
+msgid "Vertical"
+msgstr ""
+
+#: cms/djangoapps/contentstore/helpers.py cms/templates/course_outline.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Section"
+msgstr ""
+
+#: cms/djangoapps/contentstore/helpers.py lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr ""
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -11845,11 +11860,13 @@ msgid "{previous_groups}, {current_group}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr ""
@@ -11913,85 +11930,6 @@ msgstr "Η μεταφόρτωση ολοκληρώθηκε."
 #, python-brace-format
 msgid ""
 "File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Invalid data"
-msgstr "Μη έγκυρα δεδομένα"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "There was a problem pasting your component."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Your clipboard is empty or invalid."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Item is already present in target location."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into itself."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into it's child."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item directly into content experiment."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr ""
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/block.py
-msgid "%"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/certificates.py
@@ -12109,21 +12047,6 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Vertical"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_block.html
-msgid "Section"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/import_export.py
@@ -12364,6 +12287,82 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "A non zero positive integer is expected"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Invalid data"
+msgstr "Μη έγκυρα δεδομένα"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Item is already present in target location."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item into itself."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item into it's child."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item directly into content experiment."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "%"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
 msgstr ""
 
 #: cms/djangoapps/course_creators/models.py
