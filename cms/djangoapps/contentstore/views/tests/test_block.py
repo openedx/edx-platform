@@ -76,11 +76,13 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from ..component import component_handler, get_component_templates
 from cms.djangoapps.contentstore.xblock_storage_handlers.helpers import (
     ALWAYS,
-    VisibilityState,
-    get_block_info,
+    VisibilityState,=
     _get_source_index,
     _xblock_type_and_display_name,
     add_container_page_publishing_info,
+)
+from cms.djangoapps.contentstore.xblock_storage_handlers import (
+    get_block_info,
     create_xblock_info,
 )
 
