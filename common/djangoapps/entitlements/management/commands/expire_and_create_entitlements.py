@@ -9,7 +9,7 @@ from math import ceil
 from textwrap import dedent
 
 from django.core.management import BaseCommand
-
+from django.contrib.auth.models import User
 from common.djangoapps.entitlements.tasks import expire_and_create_entitlements
 from common.djangoapps.entitlements.models import CourseEntitlement
 
@@ -62,6 +62,7 @@ class Command(BaseCommand):
 
         logger.info('Looking for entitlements which may be expirable.')
 
+        support_user = User.objects.get(username='cbrash-edx')
         current_date = date.today()
         expiration_period = current_date - relativedelta(years=1)
         exceptional_expiration_period = current_date - relativedelta(years=1, months=6)
@@ -89,6 +90,6 @@ class Command(BaseCommand):
         for batch_num in range(num_batches):
             start = batch_num * batch_size
             end = min(start + batch_size, entitlements_to_expire)
-            expire_and_create_entitlements.delay(entitlements[start:end])
+            expire_and_create_entitlements.delay(entitlements[start:end], support_user)
 
         logger.info('Done. Successfully enqueued %d tasks.', num_batches)

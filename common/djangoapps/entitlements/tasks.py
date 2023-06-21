@@ -1,9 +1,6 @@
 """
 This file contains celery tasks for entitlements-related functionality.
 """
-from datetime import date
-from dateutil.relativedelta import relativedelta
-
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
@@ -67,7 +64,7 @@ def expire_old_entitlements(self, start, end, logid='...'):
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def expire_and_create_entitlements(self, entitlements):
+def expire_and_create_entitlements(self, entitlements, support_user):
     """
     Expire entitlements older than one year.
     
@@ -91,7 +88,14 @@ def expire_and_create_entitlements(self, entitlements):
             LOGGER.info('Started expiring entitlement with id %d', entitlement.id)
             entitlement.expire_entitlement()
             LOGGER.info('Expired entitlement with id %d as expiration period has reached', entitlement.id)
-           
+            support_detail = {
+                'action': 'EXPIRED',
+                'comments': 'REV-3574',
+                'entitlement': entitlement,
+                'support_user': support_user,
+            }
+            CourseEntitlementSupportDetail.objects.create(**support_detail)
+
            # Creating new entitlement with old entitlement's data 
             entitlement.pk = None
             entitlement.id = None
@@ -105,6 +109,7 @@ def expire_and_create_entitlements(self, entitlements):
                 'action': 'CREATE',
                 'comments': 'REV-3574',
                 'entitlement': entitlement,
+                'support_user': support_user,
             }
             CourseEntitlementSupportDetail.objects.create(**support_detail)
             LOGGER.info('created new entitlement with id %d in a correspondence of above expired entitlement', entitlement.id)
