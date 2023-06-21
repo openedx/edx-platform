@@ -62,7 +62,7 @@ from cms.djangoapps.contentstore.utils import (
     duplicate_block,
     update_from_source,
 )
-from cms.djangoapps.contentstore.xblock_storage_handlers import xblock_service as item_module
+from cms.djangoapps.contentstore.xblock_storage_handlers import helpers as item_module
 from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from common.djangoapps.xblock_django.models import (
     XBlockConfiguration,
@@ -74,7 +74,7 @@ from lms.djangoapps.lms_xblock.mixin import NONSENSICAL_ACCESS_RESTRICTION
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 
 from ..component import component_handler, get_component_templates
-from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_service import (
+from cms.djangoapps.contentstore.xblock_storage_handlers.helpers import (
     ALWAYS,
     VisibilityState,
     get_block_info,
@@ -1509,7 +1509,7 @@ class TestMoveItem(ItemTest):
         validation = html.validate()
         self.assertEqual(len(validation.messages), 0)
 
-    @patch("cms.djangoapps.contentstore.xblock_storage_handlers.xblock_service.log")
+    @patch("cms.djangoapps.contentstore.xblock_storage_handlers.helpers.log")
     def test_move_logging(self, mock_logger):
         """
         Test logging when an item is successfully moved.
