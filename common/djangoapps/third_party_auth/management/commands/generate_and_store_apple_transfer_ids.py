@@ -22,6 +22,7 @@ from common.djangoapps.third_party_auth.appleid import AppleIdAuth
 log = logging.getLogger(__name__)
 
 INVALID_GRANT_ERROR = "invalid_grant"
+INVALID_CLIENT_ERROR = "invalid_client"
 
 
 class AccessTokenExpiredException(Exception):
@@ -50,7 +51,7 @@ class Command(BaseCommand):
         Generate client secret for use in Apple API's
         """
         now = int(time.time())
-        expiry = 60 * 60 * 3  # 3 hours
+        expiry = 60 * 60 * 12  # 12 hours
 
         backend = load_strategy().get_backend(AppleIdAuth.name)
         team_id = backend.setting('TEAM')
@@ -124,9 +125,12 @@ class Command(BaseCommand):
         response = requests.post(migration_url, data=payload, headers=headers)
         if response.status_code == 400:
             error = response.json().get('error')
-            log.info("Error while fetching transfer_id for uid %s. Error: %s", apple_id, error)
-            if error == INVALID_GRANT_ERROR:
+            if error in [INVALID_GRANT_ERROR, INVALID_CLIENT_ERROR]:
+                log.info("Error while fetching transfer_id for uid %s. Error: %s", apple_id, error)
                 raise AccessTokenExpiredException
+
+            log.info("Request error while fetching transfer_id for uid %s. Error: %s "
+                     "\nPayload: %s \nHeaders: %s", apple_id, error, str(payload), str(headers))
             raise BadRequestException
 
         return response.json().get('transfer_sub')
