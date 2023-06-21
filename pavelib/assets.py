@@ -356,7 +356,6 @@ class SassWatcher(PatternMatchingEventHandler):
     """
     ignore_directories = True
     patterns = ['*.scss']
-    ignore_patterns = ['common/static/xmodule/*']
 
     def register(self, observer, directories):
         """
@@ -383,47 +382,6 @@ class SassWatcher(PatternMatchingEventHandler):
             compile_sass()      # pylint: disable=no-value-for-parameter
         except Exception:       # pylint: disable=broad-except
             traceback.print_exc()
-
-
-class XModuleSassWatcher(SassWatcher):
-    """
-    Watches for sass file changes
-    """
-    ignore_directories = True
-    ignore_patterns = []
-
-    @debounce()
-    def on_any_event(self, event):
-        print('\tCHANGED:', event.src_path)
-        try:
-            process_xmodule_assets()
-        except Exception:  # pylint: disable=broad-except
-            traceback.print_exc()
-
-
-class XModuleAssetsWatcher(PatternMatchingEventHandler):
-    """
-    Watches for css and js file changes
-    """
-    ignore_directories = True
-    patterns = ['*.css', '*.js']
-
-    def register(self, observer):
-        """
-        Register files with observer
-        """
-        observer.schedule(self, 'xmodule/', recursive=True)
-
-    @debounce()
-    def on_any_event(self, event):
-        print('\tCHANGED:', event.src_path)
-        try:
-            process_xmodule_assets()
-        except Exception:  # pylint: disable=broad-except
-            traceback.print_exc()
-
-        # To refresh the hash values of static xmodule content
-        restart_django_servers()
 
 
 @task
@@ -701,16 +659,13 @@ def process_npm_assets():
 
 
 @task
-@needs(
-    'pavelib.prereqs.install_python_prereqs',
-)
 @no_help
 def process_xmodule_assets():
     """
     Process XModule static assets.
     """
-    sh('xmodule_assets common/static/xmodule')
-    print("\t\tFinished processing xmodule assets.")
+    print("\t\tProcessing xmodule assets is no longer needed. This task is now a no-op.")
+    print("\t\tWhen paver is removed from edx-platform, this step will not replaced.")
 
 
 def restart_django_servers():
@@ -908,8 +863,6 @@ def watch_assets(options):
     observer = Observer(timeout=wait)
 
     SassWatcher().register(observer, sass_directories)
-    XModuleSassWatcher().register(observer, ['xmodule/'])
-    XModuleAssetsWatcher().register(observer)
 
     print("Starting asset watcher...")
     observer.start()
@@ -931,6 +884,7 @@ def watch_assets(options):
 @task
 @needs(
     'pavelib.prereqs.install_node_prereqs',
+    'pavelib.prereqs.install_python_prereqs',
 )
 @consume_args
 @timed
@@ -982,7 +936,6 @@ def update_assets(args):
     args = parser.parse_args(args)
     collect_log_args = {}
 
-    process_xmodule_assets()
     process_npm_assets()
 
     # Build Webpack

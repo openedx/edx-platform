@@ -6,13 +6,11 @@ from string import Template
 from xblock.core import XBlock
 
 from lxml import etree
-from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import RawMixin
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
@@ -28,7 +26,6 @@ class CustomTagTemplateBlock(  # pylint: disable=abstract-method
     XmlMixin,
     EditingMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):
@@ -64,15 +61,6 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
     """
     resources_dir = None
     template_dir_name = 'customtag'
-
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_js = {
-        'js': [resource_filename(__name__, 'js/src/raw/edit/xml.js')],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     def studio_view(self, _context):
         """
