@@ -77,7 +77,7 @@ class TestSendGradeToCredentialTask(TestCase):
             'letter_grade': 'A',
             'percent_grade': 1.0,
             'verified': True,
-            'lms_last_updated_at': last_updated.isoformat(),
+            'lms_last_updated_at': last_updated,
         })
 
     def test_retry(self, mock_get_api_client):

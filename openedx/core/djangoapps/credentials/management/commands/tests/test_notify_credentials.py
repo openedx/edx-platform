@@ -2,7 +2,7 @@
 Tests the ``notify_credentials`` management command.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest import mock
 
 from django.core.management import call_command
@@ -126,43 +126,43 @@ class TestNotifyCredentials(TestCase):
     @freeze_time(datetime(2017, 5, 1, 4))
     def test_auto_execution(self, mock_task):
         self.expected_options['auto'] = True
-        self.expected_options['start_date'] = '2017-05-01T00:00:00'
-        self.expected_options['end_date'] = '2017-05-01T04:00:00'
+        self.expected_options['start_date'] = datetime(2017, 5, 1, 0, 0)
+        self.expected_options['end_date'] = datetime(2017, 5, 1, 4, 0)
 
         call_command(Command(), '--auto')
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
     def test_date_args(self, mock_task):
-        self.expected_options['start_date'] = '2017-01-31T00:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 1, 31, 0, 0, tzinfo=timezone.utc)
         call_command(Command(), '--start-date', '2017-01-31')
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
         mock_task.reset_mock()
 
-        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
-        self.expected_options['end_date'] = '2017-02-02T00:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.expected_options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         call_command(Command(), '--start-date', '2017-02-01', '--end-date', '2017-02-02')
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
         mock_task.reset_mock()
 
         self.expected_options['start_date'] = None
-        self.expected_options['end_date'] = '2017-02-02T00:00:00Z'
+        self.expected_options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         call_command(Command(), '--end-date', '2017-02-02')
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
         mock_task.reset_mock()
 
-        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
-        self.expected_options['end_date'] = '2017-02-01T04:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.expected_options['end_date'] = datetime(2017, 2, 2, 4, 0, tzinfo=timezone.utc)
         call_command(Command(), '--start-date', "2017-02-01 00:00:00", '--end-date', '2017-02-01 04:00:00')
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
     def test_username_arg(self, mock_task):
-        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
-        self.expected_options['end_date'] = '2017-02-02T00:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.expected_options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         self.expected_options['user_ids'] = [str(self.user2.id)]
         call_command(
             'notify_credentials', '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--user_ids', self.user2.id
@@ -217,14 +217,14 @@ class TestNotifyCredentials(TestCase):
         assert not mock_task.called
 
     def test_dry_run(self, mock_task):
-        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.expected_options['dry_run'] = True
         call_command(Command(), '--dry-run', '--start-date', '2017-02-01')
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
     def test_hand_off(self, mock_task):
-        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.expected_options['notify_programs'] = True
         call_command(Command(), '--start-date', '2017-02-01', '--notify_programs')
         assert mock_task.called
@@ -238,7 +238,7 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.call_args[0][0] == self.expected_options
 
     def test_page_size(self, mock_task):
-        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.expected_options['page_size'] = 2
         call_command(Command(), '--start-date', '2017-02-01', '--page-size=2')
         assert mock_task.called
@@ -249,7 +249,7 @@ class TestNotifyCredentials(TestCase):
             site_values={'course_org_filter': ['testX']}
         )
         self.expected_options['site'] = site_config.site.domain
-        self.expected_options['start_date'] = '2017-01-01T00:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 1, 1, 0, 0, tzinfo=timezone.utc)
 
         call_command(Command(), '--site', site_config.site.domain, '--start-date', '2017-01-01')
         assert mock_task.called
@@ -267,13 +267,13 @@ class TestNotifyCredentials(TestCase):
         config.save()
 
         # Not told to use config, should ignore it
-        self.expected_options['start_date'] = '2017-01-01T00:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 1, 1, 0, 0, tzinfo=timezone.utc)
         call_command(Command(), '--start-date', '2017-01-01')
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
 
         # Told to use it, and enabled. Should use config in preference of command line
-        self.expected_options['start_date'] = '2017-03-01T00:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 3, 1, 0, 0, tzinfo=timezone.utc)
         self.expected_options['skip_checks'] = False
         call_command(Command(), '--start-date', '2017-01-01', '--args-from-database')
         assert mock_task.called
