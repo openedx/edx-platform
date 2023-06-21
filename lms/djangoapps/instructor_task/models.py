@@ -233,7 +233,7 @@ class ReportStore:
             return DjangoStorageReportStore(
                 storage_class=DJANGO_STORE_STORAGE_CLASS,
                 storage_kwargs={
-                    'bucket_name': config['BUCKET'],
+                    'bucket': config['BUCKET'],
                     'location': config['ROOT_PATH'],
                     'custom_domain': config.get("CUSTOM_DOMAIN", None),
                     'querystring_expire': 300,
