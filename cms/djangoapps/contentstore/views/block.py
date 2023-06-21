@@ -43,7 +43,7 @@ from ..helpers import (
 )
 from .preview import get_preview_fragment
 
-from cms.djangoapps.contentstore.xblock_services import (
+from cms.djangoapps.contentstore.xblock_storage_handlers import (
     handle_xblock,
     create_xblock_info,
     load_services_for_studio,

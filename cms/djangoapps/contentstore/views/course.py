@@ -103,7 +103,7 @@ from ..utils import (
 )
 from .component import ADVANCED_COMPONENT_TYPES
 from ..helpers import is_content_creator
-from cms.djangoapps.contentstore.xblock_services.xblock_service import (
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_service import (
     create_xblock_info,
 )
 from .library import (

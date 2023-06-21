@@ -37,7 +37,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 
 from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
 from ..helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from cms.djangoapps.contentstore.xblock_services.xblock_service import (
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_service import (
     add_container_page_publishing_info,
     create_xblock_info,
     load_services_for_studio,

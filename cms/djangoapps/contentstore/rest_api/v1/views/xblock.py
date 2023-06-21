@@ -9,7 +9,7 @@ from common.djangoapps.util.json_request import expect_json_in_class_view
 
 from ....api import course_author_access_required
 
-from cms.djangoapps.contentstore.xblock_services import xblock_service
+from cms.djangoapps.contentstore.xblock_storage_handlers import xblock_service
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
 log = logging.getLogger(__name__)

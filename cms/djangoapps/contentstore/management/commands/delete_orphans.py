@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from cms.djangoapps.contentstore.xblock_services.xblock_service import delete_orphans
+from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_service import delete_orphans
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 
 
