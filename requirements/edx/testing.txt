@@ -474,7 +474,7 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-djangorestframework==3.13.1
+djangorestframework==3.14.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -702,7 +702,7 @@ execnet==1.9.0
     # via pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.in
-faker==18.10.1
+faker==18.11.1
     # via factory-boy
 fastapi==0.97.0
     # via pact-python
@@ -1056,11 +1056,11 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
-platformdirs==3.6.0
+platformdirs==3.7.0
     # via
     #   pylint
     #   virtualenv
-pluggy==1.0.0
+pluggy==1.2.0
     # via
     #   -r requirements/edx/coverage.txt
     #   diff-cover

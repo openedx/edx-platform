@@ -494,7 +494,7 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
-djangorestframework==3.13.1
+djangorestframework==3.14.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -728,7 +728,7 @@ execnet==1.9.0
     #   pytest-xdist
 factory-boy==3.2.1
     # via -r requirements/edx/testing.txt
-faker==18.10.1
+faker==18.11.1
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
@@ -991,7 +991,7 @@ multidict==6.0.4
     #   -r requirements/edx/testing.txt
     #   aiohttp
     #   yarl
-mypy==1.3.0
+mypy==1.4.0
     # via -r requirements/edx/development.in
 mypy-extensions==1.0.0
     # via mypy
@@ -1115,12 +1115,12 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/edx/testing.txt
     #   jsonschema
-platformdirs==3.6.0
+platformdirs==3.7.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
     #   virtualenv
-pluggy==1.0.0
+pluggy==1.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   diff-cover
@@ -1540,7 +1540,6 @@ soupsieve==2.4.1
     #   beautifulsoup4
 sphinx==5.3.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   edx-sphinx-theme
     #   sphinxcontrib-httpdomain
     #   sphinxcontrib-openapi
