@@ -68,10 +68,7 @@ from xmodule.modulestore.django import (
 from xmodule.modulestore.draft_and_published import (
     DIRECT_ONLY_CATEGORIES,
 )  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import (
-    InvalidLocationError,
-    ItemNotFoundError,
-)  # lint-amnesty, pylint: disable=wrong-import-order
+
 from xmodule.modulestore.inheritance import (
     own_metadata,
 )  # lint-amnesty, pylint: disable=wrong-import-order
@@ -117,7 +114,6 @@ ALWAYS = lambda x: True
 
 __all__ = [
     "load_services_for_studio",
-    "get_xblock",
     "delete_orphans",
 ]
 
@@ -478,34 +474,6 @@ def delete_orphans(course_usage_key, user_id, commit=False):
                     revision = ModuleStoreEnum.RevisionOption.published_only
                 store.delete_item(blockloc, user_id, revision=revision)
     return [str(block) for block in blocks]
-
-
-def get_xblock(usage_key, user):
-    """
-    Returns the xblock for the specified usage key. Note: if failing to find a key with a category
-    in the CREATE_IF_NOT_FOUND list, an xblock will be created and saved automatically.
-    """
-    store = modulestore()
-    with store.bulk_operations(usage_key.course_key):
-        try:
-            return store.get_item(usage_key, depth=None)
-        except ItemNotFoundError:
-            if usage_key.block_type in CREATE_IF_NOT_FOUND:
-                # Create a new one for certain categories only. Used for course info handouts.
-                return store.create_item(
-                    user.id,
-                    usage_key.course_key,
-                    usage_key.block_type,
-                    block_id=usage_key.block_id,
-                )
-            else:
-                raise
-        except InvalidLocationError:
-            log.error("Can't find item by location.")
-            return JsonResponse(
-                {"error": "Can't find item by location: " + str(usage_key)}, 404
-            )
-
 
 
 def _get_gating_info(course, xblock):

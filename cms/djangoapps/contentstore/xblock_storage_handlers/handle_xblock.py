@@ -107,7 +107,6 @@ from .helpers import (
     _create_block,
     _delete_item,
     _is_library_component_limit_reached,
-    get_xblock,
     _get_source_index,
     validate_and_update_xblock_due_date,
     _update_with_callback,
@@ -117,6 +116,7 @@ from .helpers import (
 from .get_block_info import get_block_info
 from .create_xblock_info import _create_xblock_ancestor_info
 from .usage_key_with_run import usage_key_with_run
+from .get_xblock import get_xblock
 
 
 def is_source_item_in_target_parents(source_item, target_parent):

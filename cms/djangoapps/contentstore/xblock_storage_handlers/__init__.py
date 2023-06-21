@@ -7,3 +7,4 @@ from .usage_key_with_run import *
 from .handle_xblock import *
 from .create_xblock_info import *
 from .get_block_info import *
+from .get_xblock import *
