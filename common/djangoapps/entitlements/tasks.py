@@ -9,7 +9,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
 from edx_django_utils.monitoring import set_code_owner_attribute
 
-from common.djangoapps.entitlements.models import CourseEntitlement
+from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
 
 LOGGER = get_task_logger(__name__)
 
@@ -18,15 +18,6 @@ LOGGER = get_task_logger(__name__)
 # time of 2047 seconds (about 30 minutes). Setting this to None could yield
 # unwanted behavior: infinite retries.
 MAX_RETRIES = 11
-#course uuids for which entitlements should be expired after 18 months.
-MIT_SUPPLY_CHAIN_COURSES = [
-    '0d9b47982e3d486aa3189a7035bbda77',
-    '09532745c837467b9078093b8e1265a8',
-    '324970b703a444d7b39e10bbda6f119f',
-    '5f1c55b4354e4155af4a76450953e10d',
-    'ed927a1a4a95415ba865c3d722ac549c',
-    '6513ed9c112a495182ad7036cbe52831',
-]
 
 
 @shared_task(bind=True, ignore_result=True)
@@ -76,13 +67,18 @@ def expire_old_entitlements(self, start, end, logid='...'):
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def expire_and_create_entitlements(self, no_of_entitlements):
+def expire_and_create_entitlements(self, entitlements):
     """
-    This task is designed to be called to process and expire bundle of entitlements
-    that are older than one year on in exceptional case 18 months.
+    Expire entitlements older than one year.
+    
+    Exception: if the entitlement is for a course in a list of exceptional courses,
+    expire those entitlements if they're older than 18 months instead.
+     
+    Then create a copy of the expired entitlement to renew it for another year
+    / 18 months.
 
     Args:
-        None
+        no_of_entitlements (int): Limit the operation to this number of entitlements.
 
     Returns:
         None
@@ -90,31 +86,30 @@ def expire_and_create_entitlements(self, no_of_entitlements):
     """
     LOGGER.info('Running task expire_and_create_entitlements')
 
-    current_date = date.today()
-    expiration_period = current_date - relativedelta(years=1)
-    exceptional_expiration_period = current_date - relativedelta(years=1, months=6)
-    normal_entitlements = CourseEntitlement.objects.filter(
-        expired_at__isnull=True, created__lte=expiration_period).exclude(course_uuid__in=MIT_SUPPLY_CHAIN_COURSES)
-    exceptional_entitlements = CourseEntitlement.objects.filter(
-        expired_at__isnull=True, created__lte=exceptional_expiration_period, course_uuid__in=MIT_SUPPLY_CHAIN_COURSES)
-
-    entitlements = normal_entitlements | exceptional_entitlements
-    countdown = 2 ** self.request.retries
-
     try:
-        for entitlement in entitlements[:no_of_entitlements]:
-
+        for entitlement in entitlements:
+            LOGGER.info('Started expiring entitlement with id %d', entitlement.id)
             entitlement.expire_entitlement()
-            LOGGER.info('Expired entitlement with id %d ', entitlement.id)
+            LOGGER.info('Expired entitlement with id %d as expiration period has reached', entitlement.id)
+           
+           # Creating new entitlement with old entitlement's data 
             entitlement.pk = None
+            entitlement.id = None
+            entitlement._state.adding = True
             entitlement.expired_at = None
             entitlement.modified = None
+            entitlement.refund_locked = True
             entitlement.save()
-            LOGGER.info('created new entitlement with id %d ', entitlement.id)
+
+            support_detail = {
+                'action': 'CREATE',
+                'comments': 'REV-3574',
+                'entitlement': entitlement,
+            }
+            CourseEntitlementSupportDetail.objects.create(**support_detail)
+            LOGGER.info('created new entitlement with id %d in a correspondence of above expired entitlement', entitlement.id)
 
     except Exception as exc:
-        LOGGER.exception('Failed to expire entitlements ',)
-        # The call above is idempotent, so retry at will
-        raise self.retry(exc=exc, countdown=countdown, max_retries=MAX_RETRIES)
+        LOGGER.exception('Failed to expire entitlements that reached their expiration period',)
 
     LOGGER.info('Successfully completed the task expire_and_create_entitlements after examining %d entries', entitlements.count())  # lint-amnesty, pylint: disable=line-too-long
