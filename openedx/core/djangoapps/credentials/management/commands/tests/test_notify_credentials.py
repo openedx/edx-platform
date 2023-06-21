@@ -155,7 +155,7 @@ class TestNotifyCredentials(TestCase):
         mock_task.reset_mock()
 
         self.expected_options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
-        self.expected_options['end_date'] = datetime(2017, 2, 2, 4, 0, tzinfo=timezone.utc)
+        self.expected_options['end_date'] = datetime(2017, 2, 1, 4, 0, tzinfo=timezone.utc)
         call_command(Command(), '--start-date', "2017-02-01 00:00:00", '--end-date', '2017-02-01 04:00:00')
         assert mock_task.called
         assert mock_task.call_args[0][0] == self.expected_options
@@ -181,8 +181,8 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.call_args[0][0] == self.expected_options
         mock_task.reset_mock()
 
-        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
-        self.expected_options['end_date'] = '2017-02-02T00:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.expected_options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         self.expected_options['user_ids'] = [str(self.user.id)]
         call_command(
             'notify_credentials', '--start-date', '2017-02-01', '--end-date', '2017-02-02', '--user_ids', self.user.id
@@ -231,7 +231,7 @@ class TestNotifyCredentials(TestCase):
         assert mock_task.call_args[0][0] == self.expected_options
 
     def test_delay(self, mock_task):
-        self.expected_options['start_date'] = '2017-02-01T00:00:00Z'
+        self.expected_options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.expected_options['delay'] = 0.2
         call_command(Command(), '--start-date', '2017-02-01', '--delay', '0.2')
         assert mock_task.called
