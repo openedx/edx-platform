@@ -1,5 +1,5 @@
 """
-general helper functions for xblocks
+usage_key_with_run helper method
 """
 
 from opaque_keys.edx.keys import UsageKey

@@ -97,7 +97,7 @@ from ..utils import (
 )
 
 from .create_xblock import create_xblock
-from .xblock_helpers import usage_key_with_run
+from .usage_key_with_run import usage_key_with_run
 from ..helpers import (
     get_parent_xblock,
     import_staged_content_from_user_clipboard,
