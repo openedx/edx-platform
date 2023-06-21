@@ -59,7 +59,7 @@ Currently, edx-platform XBlock JS is defined both here in `xmodule/assets`_ and 
 
 * For many older blocks, their JS is:
 
-  * bundled using a generated Webpack config at ``common/static/xmodule/webpack.xmodule.config.js``,
+  * bundled using a `webpack.xmodule.config.js`_,
   * which is included into `webpack.common.config.js`_,
   * allowing it to be included into XBlock fragments using ``add_webpack_js_to_fragment`` from `builtin_assets.py`_.
 
@@ -74,11 +74,7 @@ Currently, edx-platform XBlock JS is defined both here in `xmodule/assets`_ and 
   * `VerticalBlock`_
   * `LibrarySourcedBlock`_
 
-As part of an `active build refactoring`_:
-
-* We will move ``webpack.xmodule.config.js`` here instead of generating it.
-* We will consolidate all edx-platform XBlock JS here in `xmodule/assets`_.
-* We will delete the ``xmodule_assets`` script.
+As part of an `active build refactoring`_, we will soon consolidate all edx-platform XBlock JS here in `xmodule/assets`_.
 
 .. _xmodule/assets: https://github.com/openedx/edx-platform/tree/master/xmodule/assets
 .. _xmodule/js: https://github.com/openedx/edx-platform/tree/master/xmodule/js
@@ -91,4 +87,5 @@ As part of an `active build refactoring`_:
 .. _builtin_assets.py: https://github.com/openedx/edx-platform/tree/master/xmodule/util/builtin_assets.py
 .. _static_content.py: https://github.com/openedx/edx-platform/blob/master/xmodule/static_content.py
 .. _library_source_block/style.css: https://github.com/openedx/edx-platform/blob/master/xmodule/assets/library_source_block/style.css
+.. _webpack.xmodule.config.js: https://github.com/openedx/edx-platform/blob/master/webpack.xmodule.config.js
 .. _webpack.common.config.js: https://github.com/openedx/edx-platform/blob/master/webpack.common.config.js
