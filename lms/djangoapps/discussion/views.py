@@ -66,6 +66,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
 )
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.features.course_duration_limits.access import generate_course_expired_fragment
 
 User = get_user_model()
@@ -272,7 +273,10 @@ def redirect_forum_url_to_new_mfe(request, course_id):
 
     redirect_url = None
     if discussions_mfe_enabled:
-        mfe_base_url = settings.DISCUSSIONS_MICROFRONTEND_URL
+        mfe_base_url = configuration_helpers.get_value(
+            'DISCUSSIONS_MICROFRONTEND_URL',
+            settings.DISCUSSIONS_MICROFRONTEND_URL,
+        )
         redirect_url = f"{mfe_base_url}/{str(course_key)}"
     return redirect_url
 
@@ -332,7 +336,10 @@ def redirect_thread_url_to_new_mfe(request, course_id, thread_id):
     discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
     redirect_url = None
     if discussions_mfe_enabled:
-        mfe_base_url = settings.DISCUSSIONS_MICROFRONTEND_URL
+        mfe_base_url = configuration_helpers.get_value(
+            'DISCUSSIONS_MICROFRONTEND_URL',
+            settings.DISCUSSIONS_MICROFRONTEND_URL,
+        )
         if thread_id:
             redirect_url = f"{mfe_base_url}/{str(course_key)}/posts/{thread_id}"
     return redirect_url
@@ -652,7 +659,10 @@ def user_profile(request, course_key, user_id):
         else:
             discussions_mfe_enabled = ENABLE_DISCUSSIONS_MFE.is_enabled(course_key)
             if discussions_mfe_enabled:
-                mfe_base_url = settings.DISCUSSIONS_MICROFRONTEND_URL
+                mfe_base_url = configuration_helpers.get_value(
+                    'DISCUSSIONS_MICROFRONTEND_URL',
+                    settings.DISCUSSIONS_MICROFRONTEND_URL,
+                )
                 return redirect(f"{mfe_base_url}/{str(course_key)}/learners")
 
             tab_view = CourseTabView()
