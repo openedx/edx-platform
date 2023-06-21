@@ -273,14 +273,19 @@ class CapaFields:
     )
     is_journal_entry = Boolean(
         display_name=_("Save as Journal Entry"),
-        help=_("Save this problem response to Student Journal"),
+        help=_("Show this problem response on Student Journals page"),
         default=False,
         scope=Scope.settings
     )
-
     is_skill_assessment = Boolean(
         display_name=_("Save as Skill Assessment"),
-        help=_("Save this problem response to Skill Assessment Response"),
+        help=_("Show this problem response on Teacher Skill Assessment Dashboard"),
+        default=False,
+        scope=Scope.settings
+    )
+    is_student_answer = Boolean(
+        display_name=_("Show In Student Answers"),
+        help=_("Show this problem response on Student Answers page"),
         default=False,
         scope=Scope.settings
     )

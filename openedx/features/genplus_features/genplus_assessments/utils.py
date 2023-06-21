@@ -14,7 +14,7 @@ from lms.djangoapps.courseware.models import StudentModule
 from openedx.features.genplus_features.genplus.constants import JournalTypes
 from openedx.features.genplus_features.genplus.models import Student, JournalPost
 from openedx.features.genplus_features.genplus_learning.models import Unit
-from openedx.features.genplus_features.genplus_assessments.constants import ProblemTypes, JOURNAL_STYLE, \
+from openedx.features.genplus_features.genplus_assessments.constants import ProblemTypes, ProblemSetting, JOURNAL_STYLE, \
     TOTAL_PROBLEM_SCORE, SkillAssessmentTypes, SkillAssessmentResponseTime
 from openedx.features.genplus_features.genplus_assessments.models import SkillAssessmentQuestion, \
     SkillAssessmentResponse
@@ -24,18 +24,13 @@ class StudentResponse:
 
     def __init__(self):
         self.problem_function_map = {
-            ProblemTypes.JOURNAL: self.create_and_update_journal_post_from_lms,
+            ProblemSetting.IS_JOURNAL_ENTRY: self.create_and_update_journal_post_from_lms,
+            ProblemSetting.IS_SKILL_ASSESSMENT: self.create_assessment_response_from_lms,
         }
-
-    def get_problem_metadata(self, problem_block):
-        problem_html = problem_block.get_problem_html(encapsulate=True)
-        parser = etree.XMLParser(remove_blank_text=True)
-        problem = etree.XML(problem_html, parser=parser)
-        course_key = problem_block.scope_ids.usage_id.course_key
-        unit = Unit.objects.filter(course__id=course_key).first()
-        skill = unit.skill if unit else None
-        return problem, course_key, unit, skill
-
+        self.problem_setting_map = {
+            ProblemSetting.IS_JOURNAL_ENTRY: ProblemTypes.JOURNAL_PROBLEMS,
+            ProblemSetting.IS_SKILL_ASSESSMENT: ProblemTypes.SKILL_ASSESSMENT_PROBLEMS,
+        }
 
     def save_problem_response(self, problem_block, student_response, event_info):
         user_id = getattr(problem_block.scope_ids, 'user_id')
@@ -61,33 +56,51 @@ class StudentResponse:
                 return
 
         problem_type = problem_classes[0]
-        if problem_block.is_skill_assessment and problem_type in ProblemTypes.SKILL_ASSESSMENT_PROBLEMS:
-            self.create_assessment_response_from_lms(problem_block, student_response, problem_type)
-        if problem_type == ProblemTypes.MULTIPLE_CHOICE:
-            self.create_and_update_choices_journal_post(student, problem_block,
-                                                        metadata={'event_info': event_info,
-                                                                  'problem_element': problem_element})
-        for problem_type, problem_function in self.problem_function_map.items():
-            if problem_type in problem_classes:
-                problem_function(student, problem_block, student_response)
-                break
 
-    def create_and_update_journal_post_from_lms(self, student, problem_block, student_response):
-        if not problem_block.is_journal_entry:
-            return
-        problem, course_key, unit, skill = self.get_problem_metadata(problem_block)
+        for problem_attr, problem_function in self.problem_function_map.items():
+            if(getattr(problem_block, problem_attr) == True and problem_type in self.problem_setting_map.get(problem_attr)):
+                problem_function(**{
+                    'student': student,
+                    'problem_type': problem_type,
+                    'problem_block': problem_block,
+                    'event_info': event_info,
+                    'student_response': student_response,
+                    'problem_element': problem_element
+                })
+
+    def create_and_update_journal_post_from_lms(self, **kwargs):
+        problem_block = kwargs.get('problem_block')
+        problem_type = kwargs.get('problem_type')
+        usage_id = problem_block.scope_ids.usage_id
         try:
             student_module = StudentModule.objects.get(
-                student=student.user,
-                course_id=course_key,
-                module_state_key=problem_block.scope_ids.usage_id,
+                student=kwargs.get('student').user,
+                course_id=usage_id.course_key,
+                module_state_key=usage_id,
             )
 
         except StudentModule.DoesNotExist:
             student_module = None
             print(f"===============Student module not found===================")
 
-        for key, value in student_response.items():
+        if problem_type == ProblemTypes.SHORT_ANSWER:
+            self._create_and_update_text_journal_entry(student_module=student_module, **kwargs)
+        elif problem_type in ProblemTypes.CHOICE_TYPE_PROBLEMS:
+            self._create_and_update_choice_journal_entry(student_module=student_module, **kwargs)
+
+    def _get_course_skill(self, problem_block):
+        course_key = problem_block.scope_ids.usage_id.course_key
+        unit = Unit.objects.filter(course__id=course_key).first()
+        return unit.skill if unit else None
+
+    def _create_and_update_text_journal_entry(self, **kwargs):
+        problem_block = kwargs.get('problem_block')
+        parser = etree.XMLParser(remove_blank_text=True)
+        problem = etree.XML(problem_block.get_problem_html(encapsulate=True), parser=parser)
+        skill = self._get_course_skill(problem_block)
+
+        student_module = kwargs.get('student_module')
+        for key, value in kwargs.get('student_response').items():
             if not value:
                 continue
             uuid = key.replace('input_', '')
@@ -106,25 +119,19 @@ class StudentResponse:
 
             obj, created = JournalPost.objects.update_or_create(
                 uuid=uuid,
-                student=student,
+                student=kwargs.get('student'),
                 defaults=defaults
             )
 
-    def create_and_update_choices_journal_post(self, student, problem_block, metadata):
+    def _create_and_update_choice_journal_entry(self, **kwargs):
+        problem_block = kwargs.get('problem_block')
+        parser = etree.XMLParser(remove_blank_text=True)
+        problem = etree.XML(problem_block.data, parser=parser)
+        skill = self._get_course_skill(problem_block)
 
-        problem, course_key, unit, skill = self.get_problem_metadata(problem_block)
-        try:
-            student_module = StudentModule.objects.get(
-                student=student.user,
-                course_id=course_key,
-                module_state_key=problem_block.scope_ids.usage_id,
-            )
-
-        except StudentModule.DoesNotExist:
-            student_module = None
-            print(f"===============Student module not found===================")
+        student_module = kwargs.get('student_module')
         title = problem.find(".//*[@class='question-text']").text
-        answer = self.aggregate_student_answer(metadata)
+        answer = self._aggregate_student_answer(**kwargs)
         defaults = {
             'skill': skill,
             'journal_type': JournalTypes.PROBLEM_ENTRY,
@@ -138,13 +145,13 @@ class StudentResponse:
 
         obj, created = JournalPost.objects.update_or_create(
             uuid=answer['key'],
-            student=student,
+            student=kwargs.get('student'),
             defaults=defaults
         )
 
-    def aggregate_student_answer(self, metadata):
-        event_info = metadata['event_info']
-        problem_xml = metadata['problem_element']
+    def _aggregate_student_answer(self, **kwargs):
+        event_info = kwargs.get('event_info')
+        problem_xml = kwargs.get('problem_element')
         key, answers = next(iter(event_info['real_answers'].items()))
         total = len(event_info['real_answers'][key])
         correct = sum(answer in event_info['answers'][key] for answer in answers)
@@ -159,7 +166,7 @@ class StudentResponse:
             'key': key
         }
 
-    def create_assessment_response_from_lms(self, problem_block, student_response, problem_type):
+    def create_assessment_response_from_lms(self, **kwargs):
         """
         Function to create a SkillAssessmentResponse instance from a given problem block and student response.
 
@@ -187,6 +194,9 @@ class StudentResponse:
         If a matching SkillAssessmentQuestion is not found, the function prints a message and exits without creating
         a SkillAssessmentResponse.
         """
+        student_response = kwargs.get('student_response')
+        problem_block = kwargs.get('problem_block')
+        problem_type = kwargs.get('problem_type')
         user_id = getattr(problem_block.scope_ids, 'user_id')
         user = get_user_model().objects.get(pk=user_id)
         course_key = problem_block.scope_ids.usage_id.course_key
@@ -199,7 +209,7 @@ class StudentResponse:
         problem_xml = etree.fromstring(problem_html, parser=parser)
 
         # Extract the question
-        question = problem_xml.find('.//*[@class="question-text"]/span').text
+        question = problem_xml.find('.//*[@class="question-text"]').text
 
         # Extract the choices and whether they are correct
         choices = {
@@ -425,7 +435,7 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                             'is_correct': value['is_correct'],
                         })
 
-                if responses['problem_type'] in ProblemTypes.SHOW_IN_STUDENT_ANSWERS_PROBLEMS:
+                if responses['problem_type'] in ProblemTypes.STUDENT_ANSWER_PROBLEMS:
                     if not single_problem:
                         if not filter_type == "individual_response":
                             responses['students_count'] = len(student_list)
@@ -486,8 +496,7 @@ def get_problem_attributes(raw_data, block_key):
     for e in problem.iter("*"):
         if e.tag == 'problem':
             responses['problem_type'] = e.attrib.get('class')
-        elif e.text and e.attrib.get('class') == 'question-text' and responses[
-            'problem_type'] != ProblemTypes.SHORT_ANSWER:
+        elif e.text and e.attrib.get('class') == 'question-text' and responses['problem_type'] != ProblemTypes.SHORT_ANSWER:
             responses['question_text'] = e.text
         elif e.text and e.tag == 'choice':
             choice_dict = {
