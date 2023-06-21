@@ -151,7 +151,7 @@ check-types: ## run static type-checking tests
 
 docker_build:
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
-	DOCKER_BUILDKIT=1 docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
+	DOCKER_BUILDKIT=1 docker buildx build . --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
 
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production -t openedx/lms
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development -t openedx/cms-dev
@@ -160,6 +160,7 @@ docker_build:
 docker_tag: docker_build
 # docker tag openedx/lms     openedx/lms:${GITHUB_SHA}
 # docker tag openedx/lms-dev openedx/lms-dev:${GITHUB_SHA}
+	
 	docker tag openedx/lms-dev openedx/lms-dev:test
 # docker tag openedx/cms     openedx/cms:${GITHUB_SHA}
 # docker tag openedx/cms-dev openedx/cms-dev:${GITHUB_SHA}
