@@ -151,7 +151,7 @@ check-types: ## run static type-checking tests
 
 docker_build:
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
-	DOCKER_BUILDKIT=1 docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev .
+	DOCKER_BUILDKIT=1 docker buildx build --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
 
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production -t openedx/lms
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development -t openedx/cms-dev
@@ -168,7 +168,7 @@ docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
 
 docker_push: docker_tag docker_auth ## push to docker hub
-# docker push "openedx/lms:latest"
+	docker push "openedx/lms:latest"
 # docker push "openedx/lms:${GITHUB_SHA}"
 	docker push "openedx/lms-dev:test"
 # docker push "openedx/lms-dev:${GITHUB_SHA}"
