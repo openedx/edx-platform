@@ -20,7 +20,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.auth import has_studio_read_access
 
 from openedx.core.lib.api.view_utils import view_auth_classes
-from openedx.core.lib.xblock_serializer.api import serialize_xblock_to_olx
+from openedx.core.lib.xblock_serializer.api import serialize_xblock_to_olx, StaticFile
 from xmodule import block_metadata_utils
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -160,7 +160,7 @@ class ClipboardEndpoint(APIView):
         # because intra-course pasting will still work fine, and in any case users can manually resolve the file issue.
         try:
             self._save_static_assets_to_clipboard(block_data.static_files, usage_key, staged_content)
-        except Exception as err:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             # Regardless of what happened, with get_asset_key_from_path or contentstore or run_filter, we don't want the
             # whole "copy to clipboard" operation to fail, which would be a bad user experience. For copying and pasting
             # within a single course, static assets don't even matter. So any such errors become warnings here.
@@ -169,12 +169,15 @@ class ClipboardEndpoint(APIView):
         # Enqueue a (potentially slow) task to delete the old staged content
         try:
             delete_expired_clipboards.delay(expired_ids)
-        except Exception as err:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             log.exception(f"Unable to enqueue cleanup task for StagedContents: {','.join(str(x) for x in expired_ids)}")
         # Return the response:
         return Response(serializer.data)
 
-    def _save_static_assets_to_clipboard(self, static_files, usage_key, staged_content):
+    @staticmethod
+    def _save_static_assets_to_clipboard(
+        static_files: list[StaticFile], usage_key: UsageKey, staged_content: StagedContent
+    ):
         """
         Helper method for "post to clipboard" API endpoint. This deals with copying static files into the clipboard.
         """
@@ -186,16 +189,17 @@ class ClipboardEndpoint(APIView):
             )
             # Compute the MD5 hash and get the content:
             content: bytes | None = f.data
+            md5_hash = ""  # Unknown
             if content:
                 md5_hash = hashlib.md5(f.data).hexdigest()
                 # This asset came from the XBlock's filesystem, e.g. a video block's transcript file
                 source_key = usage_key
-            elif source_key:
-                sc = contentstore().find(source_key)
+            # Check if the asset file exists. It can be absent if an XBlock contains an invalid link.
+            elif source_key and (sc := contentstore().find(source_key, throw_on_not_found=False)):
                 md5_hash = sc.content_digest
                 content = sc.data
             else:
-                md5_hash = ""  # Unknown
+                continue  # Skip this file - we don't need a reference to a non-existent file.
 
             # Load the data:
             entry = StagedContentFileData(
@@ -219,8 +223,8 @@ class ClipboardEndpoint(APIView):
                     # and then either inform the user or find another way to import the file (e.g. if the file still
                     # exists in the "Files & Uploads" contentstore of the source course, based on source_key_str).
                     data_file=ContentFile(content=f.data, name=f.filename) if f.data else None,
-                    source_key_str=str(source_key) if source_key else "",
+                    source_key_str=str(f.source_key) if f.source_key else "",
                     md5_hash=f.md5_hash or "",
                 )
-            except Exception as err:  # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 log.exception(f"Unable to copy static file {f.filename} to clipboard for component {usage_key}")

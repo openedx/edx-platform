@@ -7,7 +7,7 @@ from xml.etree import ElementTree
 from rest_framework.test import APIClient
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_file_to_course
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory
 
 from openedx.core.djangoapps.content_staging import api as python_api
 
@@ -231,6 +231,35 @@ class ClipboardTestCase(ModuleStoreTestCase):
             md5_hash="addd3c218c0c0c41e7e1ae73f5969810",
             data=None,
         )]
+
+    def test_copy_static_assets_nonexistent(self):
+        """
+        Test copying a HTML block which references non-existent static assets.
+        """
+        _other_course_key, client = self._setup_course()
+        course = CourseFactory.create()
+        html_block = BlockFactory.create(
+            parent_location=course.location,
+            category="html",
+            display_name="Some HTML",
+            data="""
+            <p>
+                <a href="/static/nonexistent1.jpg">Picture 1</a>
+                <a href="/static/nonexistent2.jpg">Picture 2</a>
+            </p>
+            """,
+        )
+        # Copy the HTML
+        response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(html_block.location)}, format="json")
+
+        # Validate the response:
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        staged_content_id = response_data["content"]["id"]
+        olx_str = python_api.get_staged_content_olx(staged_content_id)
+        assert '<a href="/static/nonexistent1.jpg">' in olx_str
+        static_assets = python_api.get_staged_content_static_files(staged_content_id)
+        assert static_assets == []
 
     def test_no_course_permission(self):
         """

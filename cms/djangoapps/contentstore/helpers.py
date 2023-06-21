@@ -351,6 +351,10 @@ def _import_file_into_course(
         if data is None:
             raise NotFoundError(file_data_obj.source_key)
         content = StaticContent(new_key, name=filename, content_type=content_type, data=data)
+        # If it's an image file, also generate the thumbnail:
+        thumbnail_content, thumbnail_location = contentstore().generate_thumbnail(content)
+        if thumbnail_content is not None:
+            content.thumbnail_location = thumbnail_location
         contentstore().save(content)
         return True
     elif current_file.content_digest == file_data_obj.md5_hash:
