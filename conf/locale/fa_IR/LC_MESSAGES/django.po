@@ -144,6 +144,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.8.0\n"
 
+#: cms/djangoapps/contentstore/helpers.py
+#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Unit"
+msgstr "واحد"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr "مساله"
+
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
 #: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
@@ -161,12 +173,6 @@ msgstr "متن"
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "گفتگو"
-
-#: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/helpers.py
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Problem"
-msgstr "مساله"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
@@ -187,17 +193,6 @@ msgstr "پیشرفته"
 #: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "آزمون ورودی"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
-msgid "Unit"
-msgstr "واحد"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_block.py
-msgid "Empty"
-msgstr "خالی"
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: xmodule/video_block/video_handlers.py
@@ -251,6 +246,11 @@ msgstr "شناسه ویدیو"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "در حال انتظار"
+
+#: cms/djangoapps/contentstore/xblock_services/create_xblock.py
+#: xmodule/library_content_block.py
+msgid "Empty"
+msgstr "خالی"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -12936,6 +12936,19 @@ msgstr "مکان دوره آموزشی به‌درستی تعیین نشده‌�
 msgid "Missing branch on fresh clone"
 msgstr "شاخه مفقودی در کلون تازه "
 
+#: cms/djangoapps/contentstore/helpers.py
+msgid "Vertical"
+msgstr "عمودی"
+
+#: cms/djangoapps/contentstore/helpers.py cms/templates/course_outline.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Section"
+msgstr "بخش"
+
+#: cms/djangoapps/contentstore/helpers.py lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr "زیربخش"
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -13022,11 +13035,13 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}، {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "کپی{0}"
 
 #: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "کپی '{0}' "
@@ -13098,90 +13113,6 @@ msgid ""
 "File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
 msgstr ""
 "اندازۀ پروندۀ  {filename} بیش از{maximum_size_in_megabytes} مگابایت است"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr "کتابخانه‌ها نمی‌توانند بیش از {limit} مؤلفه داشته باشند"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Invalid data"
-msgstr "داده معتبر نیست"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "داده معتبر ({details}) نیست"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "There was a problem pasting your component."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Your clipboard is empty or invalid."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr "نمی‌توانید {source_type} را به {target_parent_type} منتقل کنید."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Item is already present in target location."
-msgstr "الان این محصول در محل مورد نظر است."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into itself."
-msgstr "نمی‌توانید موردی را به خود منتقل کنید."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into it's child."
-msgstr "شما نمی‌توانید این مورد را به زیر مجموعه‌اش بیفزایید."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item directly into content experiment."
-msgstr "نمی‌‌توانید موردی را مستقیماً به تجربه محتوا منتقل کنید."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr "{source_usage_key} در {parent_usage_key} پیدا نشد."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-"نمی‌توانید {source_usage_key} را در یک نمایۀ نامعتبر به ({target_index}) "
-"منتقل کنید. "
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr ""
-"شما باید target_index ({target_index}) را به‌عنوان یک عدد صحیح ارائه دهید."
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-"دانش آموزان باید {score}{pct_sign} یا بیشتر از آن را برای شرکت در دوره "
-"آموزشی کسب کنند."
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/block.py
-msgid "%"
-msgstr "درصد"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -13305,21 +13236,6 @@ msgstr "امتحان ورودی دورۀ تکمیل شده"
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "دوره با موفقیت به مخزن git صادر شد"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Vertical"
-msgstr "عمودی"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_block.html
-msgid "Section"
-msgstr "بخش"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
-msgstr "زیربخش"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Some chunks missed during file upload. Please try again"
@@ -13571,6 +13487,87 @@ msgstr "{course}_آدرس_فیلم"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "A non zero positive integer is expected"
 msgstr "عددی صحیح به غیر از صفر مجاز است."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr "کتابخانه‌ها نمی‌توانند بیش از {limit} مؤلفه داشته باشند"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Invalid data"
+msgstr "داده معتبر نیست"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "داده معتبر ({details}) نیست"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr "نمی‌توانید {source_type} را به {target_parent_type} منتقل کنید."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Item is already present in target location."
+msgstr "الان این محصول در محل مورد نظر است."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item into itself."
+msgstr "نمی‌توانید موردی را به خود منتقل کنید."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item into it's child."
+msgstr "شما نمی‌توانید این مورد را به زیر مجموعه‌اش بیفزایید."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item directly into content experiment."
+msgstr "نمی‌‌توانید موردی را مستقیماً به تجربه محتوا منتقل کنید."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr "{source_usage_key} در {parent_usage_key} پیدا نشد."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+"نمی‌توانید {source_usage_key} را در یک نمایۀ نامعتبر به ({target_index}) "
+"منتقل کنید. "
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr ""
+"شما باید target_index ({target_index}) را به‌عنوان یک عدد صحیح ارائه دهید."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+"دانش آموزان باید {score}{pct_sign} یا بیشتر از آن را برای شرکت در دوره "
+"آموزشی کسب کنند."
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "%"
+msgstr "درصد"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
