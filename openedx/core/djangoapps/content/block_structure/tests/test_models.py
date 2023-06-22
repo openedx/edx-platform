@@ -9,7 +9,6 @@ from unittest.mock import Mock, patch
 
 import ddt
 import pytest
-from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.test import TestCase
 from django.utils.timezone import now
