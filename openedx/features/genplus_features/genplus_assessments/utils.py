@@ -32,32 +32,6 @@ class StudentResponse:
             ProblemSetting.IS_SKILL_ASSESSMENT: ProblemTypes.SKILL_ASSESSMENT_PROBLEMS,
         }
 
-    def get_problem_metadata(self, problem_block):
-        problem_html = problem_block.get_problem_html(encapsulate=True)
-        parser = etree.XMLParser(remove_blank_text=True)
-        problem = etree.XML(problem_html, parser=parser)
-        course_key = problem_block.scope_ids.usage_id.course_key
-        unit = Unit.objects.filter(course__id=course_key).first()
-        skill = unit.skill if unit else None
-        return problem, course_key, unit, skill
-
-    def get_assessment_time(self, course_key, problem_key):
-        try:
-            # Fetch SkillAssessmentQuestion based on provided course_key and problem_key
-            question = SkillAssessmentQuestion.objects.get(
-                (Q(start_unit=course_key) & Q(start_unit_location=problem_key)) |
-                (Q(end_unit=course_key) & Q(end_unit_location=problem_key))
-            )
-        except SkillAssessmentQuestion.DoesNotExist:
-            # Handle case when the SkillAssessmentQuestion does not exist
-            print("SkillAssessmentQuestion does not exist with the provided keys")
-            return None, None
-
-        if question.start_unit == course_key and question.start_unit_location == problem_key:
-            return SkillAssessmentResponseTime.START_OF_YEAR, question
-
-        return SkillAssessmentResponseTime.END_OF_YEAR, question
-
     def save_problem_response(self, problem_block, student_response, event_info):
         user_id = getattr(problem_block.scope_ids, 'user_id')
         block_type = getattr(problem_block.scope_ids, 'block_type')
@@ -123,7 +97,6 @@ class StudentResponse:
         problem_block = kwargs.get('problem_block')
         parser = etree.XMLParser(remove_blank_text=True)
         problem = etree.XML(problem_block.get_problem_html(encapsulate=True), parser=parser)
-        skill = self._get_course_skill(problem_block)
 
         student_module = kwargs.get('student_module')
         for key, value in kwargs.get('student_response').items():
@@ -133,7 +106,7 @@ class StudentResponse:
             title = problem.find(f".//label[@for='{key}']").text
             answer = json.loads(JOURNAL_STYLE.format(value), strict=False)
             defaults = {
-                'skill': skill,
+                'skill': self._get_course_skill(problem_block),
                 'journal_type': JournalTypes.STUDENT_POST,
                 'is_editable': False,
                 'title': title,
@@ -153,13 +126,12 @@ class StudentResponse:
         problem_block = kwargs.get('problem_block')
         parser = etree.XMLParser(remove_blank_text=True)
         problem = etree.XML(problem_block.data, parser=parser)
-        skill = self._get_course_skill(problem_block)
 
         student_module = kwargs.get('student_module')
         title = problem.find(".//*[@class='question-text']").text
         answer = self._aggregate_student_answer(**kwargs)
         defaults = {
-            'skill': skill,
+            'skill': self._get_course_skill(problem_block),
             'journal_type': JournalTypes.PROBLEM_ENTRY,
             'is_editable': False,
             'title': title,
@@ -232,7 +204,7 @@ class StudentResponse:
         problem_xml = etree.fromstring(problem_html, parser=parser)
 
         # Extract the question
-        question_text = problem_xml.find('.//*[@class="question-text"]/span').text
+        question_text = problem_xml.find('.//*[@class="question-text"]').text
 
         # Extract the choices and whether they are correct
         choices = {
@@ -266,8 +238,8 @@ class StudentResponse:
 
         # Update the dictionary with the student's responses
         question_responses_dict['student_responses'] = student_responses
-        earned_score = self.calculate_earned_score(question_responses_dict, total_score)
-        response_time, question = self.get_assessment_time(course_key, problem_key)
+        earned_score = self._calculate_earned_score(question_responses_dict, total_score)
+        response_time, question = self._get_assessment_time(course_key, problem_key)
 
         if problem_type == SkillAssessmentTypes.SINGLE_CHOICE:
             skill_assessment_type = SkillAssessmentTypes.SINGLE_CHOICE
@@ -311,7 +283,7 @@ class StudentResponse:
         course_key = CourseKey.from_string(course_id)
         problem_key = UsageKey.from_string(problem_id).map_into_course(course_key)
         user = get_user_model().objects.get(pk=user_id)
-        response_time, question = self.get_assessment_time(course_key, problem_key)
+        response_time, question = self._get_assessment_time(course_key, problem_key)
 
         # Update and create SkillAssessmentResponse object
         if response_time and question:
@@ -330,8 +302,24 @@ class StudentResponse:
 
         return False
 
+    def _get_assessment_time(self, course_key, problem_key):
+        try:
+            # Fetch SkillAssessmentQuestion based on provided course_key and problem_key
+            question = SkillAssessmentQuestion.objects.get(
+                (Q(start_unit=course_key) & Q(start_unit_location=problem_key)) |
+                (Q(end_unit=course_key) & Q(end_unit_location=problem_key))
+            )
+        except SkillAssessmentQuestion.DoesNotExist:
+            # Handle case when the SkillAssessmentQuestion does not exist
+            print("SkillAssessmentQuestion does not exist with the provided keys")
+            return None, None
 
-    def calculate_earned_score(self, question_responses_dict, total_score):
+        if question.start_unit == course_key and question.start_unit_location == problem_key:
+            return SkillAssessmentResponseTime.START_OF_YEAR, question
+
+        return SkillAssessmentResponseTime.END_OF_YEAR, question
+
+    def _calculate_earned_score(self, question_responses_dict, total_score):
         """
         Calculates the score a student earned based on their responses to a question.
 
@@ -353,7 +341,7 @@ class StudentResponse:
         num_correct_responses = sum(
             1 for response in question_responses_dict['student_responses'] if response['correct'])
 
-        base_score = total_score / num_correct_choices
+        base_score = float(total_score / num_correct_choices)
         score = base_score * num_correct_responses
 
         return score
