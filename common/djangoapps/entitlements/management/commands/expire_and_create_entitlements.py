@@ -72,7 +72,7 @@ class Command(BaseCommand):
             expired_at__isnull=True, created__lte=exceptional_expiration_period, course_uuid__in=MIT_SUPPLY_CHAIN_COURSES)
 
         entitlements = normal_entitlements | exceptional_entitlements
-        logger.info('Total entitlements that have reached expiration period are %d ', entitlements)
+        logger.info('Total entitlements that have reached expiration period are %d ', entitlements.count())
 
         entitlements_to_expire = max(1, options.get('count'))
         batch_size = max(1, options.get('batch_size'))
@@ -89,7 +89,7 @@ class Command(BaseCommand):
 
         for batch_num in range(num_batches):
             start = batch_num * batch_size
-            end = min(start + batch_size, entitlements_to_expire)
+            end = min(start + batch_size, entitlements_to_expire, entitlements.count())
             expire_and_create_entitlements.delay(entitlements[start:end], support_user)
 
         logger.info('Done. Successfully enqueued %d tasks.', num_batches)

@@ -96,15 +96,15 @@ def expire_and_create_entitlements(self, entitlements, support_user):
             }
             CourseEntitlementSupportDetail.objects.create(**support_detail)
 
-           # Creating new entitlement with old entitlement's data 
-            entitlement.pk = None
-            entitlement.id = None
-            entitlement._state.adding = True
-            entitlement.expired_at = None
-            entitlement.modified = None
-            entitlement.refund_locked = True
-            entitlement.save()
-
+           # Creating new entitlement and support details 
+            new_entitlement = { 
+                'course_uuid': entitlement.course_uuid,
+                'user': entitlement.user,
+                'mode': entitlement.mode,
+                'refund_locked': True,                
+                
+            }
+            CourseEntitlement.objects.create(**new_entitlement)
             support_detail = {
                 'action': 'CREATE',
                 'comments': 'REV-3574',
@@ -112,7 +112,7 @@ def expire_and_create_entitlements(self, entitlements, support_user):
                 'support_user': support_user,
             }
             CourseEntitlementSupportDetail.objects.create(**support_detail)
-            LOGGER.info('created new entitlement with id %d in a correspondence of above expired entitlement', entitlement.id)
+            LOGGER.info('created new entitlement with id %d in a correspondence of above expired entitlement', new_entitlement.id)
 
     except Exception as exc:
         LOGGER.exception('Failed to expire entitlements that reached their expiration period',)
