@@ -10,8 +10,6 @@ from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import clean_dangerous_html, HTML, Text
 from openedx.core.lib.courses import course_image_url
-
-from six import string_types
 %>
 
 <%inherit file="../main.html" />
@@ -170,7 +168,7 @@ from six import string_types
             <li class="important-dates-item">
               <span class="icon fa fa-calendar" aria-hidden="true"></span>
               <p class="important-dates-item-title">${_("Classes Start")}</p>
-              % if isinstance(course_start_date, string_types):
+              % if isinstance(course_start_date, str):
                   <span class="important-dates-item-text start-date">${course_start_date}</span>
               % else:
                   <%
@@ -190,7 +188,7 @@ from six import string_types
             <li class="important-dates-item">
                 <span class="icon fa fa-calendar" aria-hidden="true"></span>
                 <p class="important-dates-item-title">${_("Classes End")}</p>
-                  % if isinstance(course_end_date, string_types):
+                  % if isinstance(course_end_date, str):
                       <span class="important-dates-item-text final-date">${course_end_date}</span>
                   % else:
                     <%

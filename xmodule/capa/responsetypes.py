@@ -2291,7 +2291,7 @@ class CustomResponse(LoncapaResponse):
 
     def execute_check_function(self, idset, submission):  # lint-amnesty, pylint: disable=missing-function-docstring, too-many-statements
         # exec the check function
-        if isinstance(self.code, six.string_types):  # lint-amnesty, pylint: disable=too-many-nested-blocks
+        if isinstance(self.code, str):  # lint-amnesty, pylint: disable=too-many-nested-blocks
             try:
                 safe_exec.safe_exec(
                     self.code,
@@ -3547,7 +3547,7 @@ class AnnotationResponse(LoncapaResponse):
             json_d = {}
 
         comment_value = json_d.get('comment', '')
-        if not isinstance(json_d, six.string_types):
+        if not isinstance(json_d, str):
             comment_value = ''
 
         options_value = json_d.get('options', [])
