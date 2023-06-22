@@ -75,8 +75,9 @@ def expire_and_create_entitlements(self, entitlements, support_user):
     / 18 months.
 
     Args:
-        no_of_entitlements (int): Limit the operation to this number of entitlements.
-
+        entitlements (QuerySet): A QuerySet with the entitlements to expire.
+        support_user (django.contrib.auth.models.user): The username to attribute the entitlement expiration and recreation to.
+    
     Returns:
         None
 
