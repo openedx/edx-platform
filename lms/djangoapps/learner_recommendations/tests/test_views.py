@@ -693,7 +693,7 @@ class TestProductRecommendationsView(APITestCase):
 
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
-    def test_is_enrolled_in_masters_program(
+    def test_zero_cross_product_and_amplitude_recommendations(
         self,
         is_user_enrolled_in_ut_austin_masters_program_mock,
         country_code_from_ip_mock,
@@ -717,13 +717,14 @@ class TestProductRecommendationsView(APITestCase):
 
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
-    def test_successful_response(
+    def test_zero_amplitude_recommendations(
         self,
         is_user_enrolled_in_ut_austin_masters_program_mock,
         country_code_from_ip_mock,
     ):
         """
-        0 amplitude courses are returned if the user is enrolled in ut austin masters program
+        Verify that 0 amplitude courses are returned
+        if the user is enrolled in ut austin masters program
         """
         is_user_enrolled_in_ut_austin_masters_program_mock.return_value = True
         country_code_from_ip_mock.return_value = "za"
