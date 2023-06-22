@@ -113,9 +113,9 @@ def expire_and_create_entitlements(self, entitlements, support_user):
                 'support_user': support_user,
             }
             CourseEntitlementSupportDetail.objects.create(**support_detail)
-            LOGGER.info('created new entitlement with id %d in a correspondence of above expired entitlement', new_entitlement.id) # lint-amnesty, pylint: disable=line-too-long
+            LOGGER.info('created new entitlement with id %d in a correspondence of above expired entitlement', new_entitlement.id)  # lint-amnesty, pylint: disable=line-too-long
 
     except Exception as exc:
-        LOGGER.exception('Failed to expire entitlements that reached their expiration period',)
+        LOGGER.exception('Failed to expire entitlements that reached their expiration period',)  # pylint: disable=broad-except
 
     LOGGER.info('Successfully completed the task expire_and_create_entitlements after examining %d entries', entitlements.count())  # lint-amnesty, pylint: disable=line-too-long

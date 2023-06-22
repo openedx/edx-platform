@@ -67,7 +67,7 @@ class Command(BaseCommand):
         expiration_period = current_date - relativedelta(years=1)
         exceptional_expiration_period = current_date - relativedelta(years=1, months=6)
         normal_entitlements = CourseEntitlement.objects.filter(
-            expired_at__isnull=True,created__lte=expiration_period,
+            expired_at__isnull=True, created__lte=expiration_period,
             enrollment_course_run__isnull=True).exclude(course_uuid__in=MIT_SUPPLY_CHAIN_COURSES)
 
         exceptional_entitlements = CourseEntitlement.objects.filter(
