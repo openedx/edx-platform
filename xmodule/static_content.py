@@ -16,7 +16,6 @@ from collections import defaultdict
 from pkg_resources import resource_filename
 
 import django
-from docopt import docopt
 from path import Path as path
 
 from xmodule.annotatable_block import AnnotatableBlock
@@ -241,8 +240,10 @@ def main():
         )
     django.setup()
 
-    args = docopt(main.__doc__)
-    root = path(args['<output_root>'])
+    try:
+        root = path(sys.argv[1])
+    except IndexError:
+        sys.exit(main.__doc__)
 
     descriptor_files = write_descriptor_js(root / 'descriptors/js')
     module_files = write_module_js(root / 'modules/js')

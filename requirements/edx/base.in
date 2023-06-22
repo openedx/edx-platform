@@ -24,8 +24,7 @@
 # 4. If the package is not needed in production, add it to another file such
 #    as development.in or testing.in instead.
 
-acid-xblock
-algoliasearch                       # Algolia’s API client for indexed searching
+acid-xblock                         # This XBlock is used for unit tests as well as manual tests
 analytics-python                    # Used for Segment analytics
 attrs                               # Reduces boilerplate code involving class attributes
 Babel                               # Internationalization utilities, used for date formatting in a few places
@@ -33,22 +32,18 @@ bleach[css]                         # Allowed-list-based HTML sanitizing library
 boto                                # Deprecated version of the AWS SDK; we should stop using this
 boto3                               # Amazon Web Services SDK for Python
 botocore                            # via boto3, s3transfer
-bridgekeeper                        # Used for determining permissions for courseware.
+bridgekeeper                        # Used for determining permissions for courseware. Use of django-rules is preferred.
 celery                              # Asynchronous task execution library
 chem                                # A helper library for chemistry calculations
 codejail-includes                   # CodeJail manages execution of untrusted code in secure sandboxes.
-contextlib2                         # We need contextlib2.ExitStack so we can stop using contextlib.nested which doesn't exist in python 3
-crowdsourcehinter-xblock
 cryptography                        # Implementations of assorted cryptography algorithms
 defusedxml
 Django                              # Web application framework
-django-appconf
 django-celery-results               # Only used for the CacheBackend for celery results
 django-config-models                # Configuration models for Django allowing config management with auditing
 django-cors-headers                 # Used to allow to configure CORS headers for cross-domain requests
 django-countries                    # Country data for Django forms and model fields
 django-crum                         # Middleware that stores the current request and user in thread local storage
-django-fernet-fields                # via edx-enterprise (should be added to its setup.py)
 django-filter                       # Allows users to filter Django querysets dynamically
 django-ipware                       # Get the client's real IP address
 django-method-override              # Allow use of HTTP methods normally not supported by browsers via the X-HTTP-Method-Override header
@@ -59,7 +54,6 @@ django-oauth-toolkit                # Provides oAuth2 capabilities for Django
 django-pipeline
 django-ratelimit
 django-sekizai
-django-ses
 django-simple-history
 django-splash
 django-statici18n
@@ -68,12 +62,9 @@ django-user-tasks
 django-waffle
 django-webpack-loader               # Used to wire webpack bundles into the django asset pipeline
 djangorestframework
-docopt
-done-xblock
 edx-ace
 edx-api-doc-tools
 edx-auth-backends                   # Allow Studio to use LMS SSO
-edx-braze-client
 edx-bulk-grades                     # LMS REST API for managing bulk grading operations
 edx-ccx-keys
 edx-celeryutils
@@ -96,7 +87,6 @@ edx-proctoring>=2.0.1
 edx-proctoring-proctortrack==1.0.5  # Intentionally and permanently pinned to ensure code changes are reviewed
 edx-rest-api-client
 edx-search
-edx-sga
 edx-submissions
 edx-toggles                         # Feature toggles management
 edx-token-utils			    # Validate exam access tokens
@@ -117,15 +107,11 @@ ipaddress                           # Ip network support for Embargo feature
 jsonfield                           # Django model field for validated JSON; used in several apps
 laboratory                          # Library for testing that code refactors/infrastructure changes produce identical results
 lxml                                # XML parser
-learner-pathway-progress    # A plugin for lms to track learners progress in pathays
 lti-consumer-xblock>=7.3.0
-mailsnake                           # Needed for mailchimp (mailing djangoapp)
 mako                                # Primary template language used for server-side page rendering
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
 mongoengine                         # Object-document mapper for MongoDB, used in the LMS dashboard
 mysqlclient                         # Driver for the default production relational database
-newrelic                            # New Relic agent for performance monitoring
-nltk                                # Natural language processing; used by the chem package
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 olxcleaner
@@ -135,18 +121,13 @@ openedx-django-require
 openedx-events>=3.1.0               # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
 openedx-mongodbproxy
-optimizely-sdk                      # Optimizely full stack SDK for Python
-ora2>=4.5.0
-outcome-surveys                     # edx-platform plugin to send and track segment events needed for surveys
 openedx-django-wiki
 openedx-blockstore
 path
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
-py2neo                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
 pycountry
 pycryptodomex
-pygments                            # Used to support colors in paver command output
 pyjwkest
 # TODO Replace PyJWT usage with pyjwkest
 # PyJWT 1.6.3 contains PyJWTError, which is required by Apple auth in social-auth-core
@@ -155,14 +136,12 @@ pylti1p3                            # Required by content_libraries core library
 pymongo                             # MongoDB driver
 pynliner                            # Inlines CSS styles into HTML for email notifications
 python-dateutil
-python-Levenshtein
 python3-openid ; python_version>='3'
 python3-saml
 pyuca                               # For more accurate sorting of translated country names in django-countries
 pysrt                               # Support for SubRip subtitle files, used in the video XModule
 pytz                                # Time zone information database
 PyYAML                              # Used to parse XModule resource templates
-recommender-xblock                  # https://github.com/edx/RecommenderXBlock
 redis                               # celery task broker
 requests-oauthlib                   # Simplifies use of OAuth via the requests library, used for CCX and LTI
 random2
@@ -171,14 +150,11 @@ social-auth-core
 simplejson
 Shapely                             # Geometry library, used for image click regions in capa
 six                                 # Utilities for supporting Python 2 & 3 in the same codebase
-skill-tagging                       # Library needed to support tagging of skills in unit/video xblocks via forms
 social-auth-app-django
 sorl-thumbnail
 sortedcontainers                    # Provides SortedKeyList, used for lists of XBlock assets
 sqlparse                            # Required by Django to run migrations.RunSQL
 stevedore                           # Support for runtime plugins, used for XBlocks and edx-platform Django app plugins
-staff-graded-xblock                 # An XBlock that allows for off-site bulk scoring of problems
-super-csv                           # Generic CSV processor
 unicodecsv                          # Easier support for CSV files with unicode text
 user-util                           # Functionality for retiring users (GDPR compliance)
 webob
@@ -186,6 +162,36 @@ web-fragments                       # Provides the ability to render fragments o
 XBlock[django]                      # Courseware component architecture
 xblock-utils                        # Provides utilities used by the Discussion XBlock
 xss-utils                           # https://github.com/edx/edx-platform/pull/20633 Fix XSS via Translations
+
+########################################################################################################################
+## Non-kernel dependencies
+# The following dependencies do not seem to be core to the platform's functionality, and will soon be moved to a
+# separate "default.in" file. They may still be installed by default, but they should not be required for the platform
+# to run nor for the test suite to pass.
+
+py2neo                              # Driver for converting Python modulestore structures to Neo4j's schema (for Coursegraph).
+pygments                            # Used to support colors in paver command output
+
+## Third party integrations
+algoliasearch                       # Algolia’s API client for indexed searching
+django-ses                          # Django email backend for Amazon’s Simple Email Service
+edx-braze-client                    # a customer engagement platform used for edx.org
+mailsnake                           # MailChimp API; used for two management commands in the "mailing" djangoapp
+newrelic                            # New Relic agent for performance monitoring
+optimizely-sdk                      # Optimizely provides A/B testing and other features, used by edx.org
+
+## Plugins used on edx.org
+learner-pathway-progress            # A plugin for lms to track learners progress in pathays
+outcome-surveys                     # plugin "to send follow up events for learners who have passed a course"
+skill-tagging                       # Library to support tagging of skills on edx.org in unit/video xblocks via forms
+
+## XBLOCKS
+crowdsourcehinter-xblock
+done-xblock                         # a very simple XBlock that allows learners to mark an activity as Done
+recommender-xblock                  # https://github.com/edx/RecommenderXBlock
+staff-graded-xblock                 # https://github.com/openedx/staff_graded-xblock Allows off-site bulk scoring.
+edx-sga                             # The more well known "staff graded assignment" XBlock, from MIT.
+ora2>=4.5.0                         # Open Response Assessment XBlock
 xblock-poll                         # Xblock for polling users
 xblock-drag-and-drop-v2             # Drag and Drop XBlock
 xblock-google-drive                 # XBlock for google docs and calendar
