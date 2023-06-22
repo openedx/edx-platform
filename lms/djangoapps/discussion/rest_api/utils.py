@@ -16,7 +16,7 @@ from openedx.core.djangoapps.django_comment_common.models import (
     FORUM_ROLE_GROUP_MODERATOR,
     FORUM_ROLE_COMMUNITY_TA,
 )
-from openedx_events.learning.signals import USER_NOTIFICATION
+from openedx_events.learning.signals import USER_NOTIFICATION_REQUESTED
 from openedx_events.learning.data import UserNotificationData
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
 
@@ -383,7 +383,7 @@ def send_response_notifications(thread, course, creator, parent_id=None):
             app_name="discussion",
             course_id=str(course.id),
         )
-        USER_NOTIFICATION.send_event(notification_data=notification_data)
+        USER_NOTIFICATION_REQUESTED.send_event(notification_data=notification_data)
 
     if not parent_id:
         # Send notification on main thread/post i.e. there is a response to the main thread

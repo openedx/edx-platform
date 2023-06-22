@@ -23,7 +23,7 @@ from lms.djangoapps.discussion.rest_api.utils import (
     get_moderator_users_list,
     get_archived_topics, remove_empty_sequentials, send_response_notifications
 )
-from openedx_events.learning.signals import USER_NOTIFICATION
+from openedx_events.learning.signals import USER_NOTIFICATION_REQUESTED
 
 
 class DiscussionAPIUtilsTestCase(ModuleStoreTestCase):
@@ -176,7 +176,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         Test that the notification is sent to the thread creator
         """
         handler = Mock()
-        USER_NOTIFICATION.connect(handler)
+        USER_NOTIFICATION_REQUESTED.connect(handler)
 
         # Post the form or do what it takes to send the signal
 
@@ -201,7 +201,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         types of notifications.
         """
         handler = Mock()
-        USER_NOTIFICATION.connect(handler)
+        USER_NOTIFICATION_REQUESTED.connect(handler)
 
         self.register_get_comment_response({
             'id': self.thread_2.id,
@@ -246,7 +246,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         their own thread.
         """
         handler = Mock()
-        USER_NOTIFICATION.connect(handler)
+        USER_NOTIFICATION_REQUESTED.connect(handler)
         send_response_notifications(self.thread, self.course, self.user_1, parent_id=None)
         self.assertEqual(handler.call_count, 0)
 
