@@ -600,7 +600,7 @@ class RegistrationView(APIView):
 
         redirect_to, root_url = get_next_url_for_login_page(request, include_host=True)
         redirect_url = get_redirect_url_with_host(root_url, redirect_to)
-        response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url, user=user)
+        response = self._create_response(request, {}, status_code=200, redirect_url=redirect_url)
         set_logged_in_cookies(request, response, user)
         if not user.is_active and settings.SHOW_ACCOUNT_ACTIVATION_CTA and not settings.MARKETING_EMAILS_OPT_IN:
             response.set_cookie(
@@ -694,7 +694,7 @@ class RegistrationView(APIView):
 
         return response, user
 
-    def _create_response(self, request, response_dict, status_code, redirect_url=None, error_code=None, user=None):
+    def _create_response(self, request, response_dict, status_code, redirect_url=None, error_code=None):
         if status_code == 200:
             # keeping this `success` field in for now, as we have outstanding clients expecting this
             response_dict['success'] = True
@@ -705,8 +705,6 @@ class RegistrationView(APIView):
         if error_code:
             response_dict['error_code'] = error_code
             set_custom_attribute('register_error_code', error_code)
-        if user:
-            response_dict['user_id'] = user.id
         return JsonResponse(response_dict, status=status_code)
 
     def _log_validation_errors(self, request, errors, status_code):
