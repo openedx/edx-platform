@@ -67,17 +67,17 @@ def expire_old_entitlements(self, start, end, logid='...'):
 def expire_and_create_entitlements(self, entitlements, support_user):
     """
     Expire entitlements older than one year.
-    
+
     Exception: if the entitlement is for a course in a list of exceptional courses,
     expire those entitlements if they're older than 18 months instead.
-     
+ 
     Then create a copy of the expired entitlement to renew it for another year
     / 18 months.
 
     Args:
         entitlements (QuerySet): A QuerySet with the entitlements to expire.
         support_user (django.contrib.auth.models.user): The username to attribute the entitlement expiration and recreation to.
-    
+
     Returns:
         None
 
@@ -97,13 +97,12 @@ def expire_and_create_entitlements(self, entitlements, support_user):
             }
             CourseEntitlementSupportDetail.objects.create(**support_detail)
 
-           # Creating new entitlement and support details 
-            new_entitlement = { 
+            # Creating new entitlement and support details 
+            new_entitlement = {
                 'course_uuid': entitlement.course_uuid,
                 'user': entitlement.user,
                 'mode': entitlement.mode,
-                'refund_locked': True,                
-                
+                'refund_locked': True,
             }
             CourseEntitlement.objects.create(**new_entitlement)
             support_detail = {
@@ -119,3 +118,4 @@ def expire_and_create_entitlements(self, entitlements, support_user):
         LOGGER.exception('Failed to expire entitlements that reached their expiration period',)
 
     LOGGER.info('Successfully completed the task expire_and_create_entitlements after examining %d entries', entitlements.count())  # lint-amnesty, pylint: disable=line-too-long
+    
