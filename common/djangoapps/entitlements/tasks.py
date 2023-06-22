@@ -70,13 +70,14 @@ def expire_and_create_entitlements(self, entitlements, support_user):
 
     Exception: if the entitlement is for a course in a list of exceptional courses,
     expire those entitlements if they're older than 18 months instead.
- 
+
     Then create a copy of the expired entitlement to renew it for another year
     / 18 months.
 
     Args:
         entitlements (QuerySet): A QuerySet with the entitlements to expire.
-        support_user (django.contrib.auth.models.user): The username to attribute the entitlement expiration and recreation to.
+        support_user (django.contrib.auth.models.user): The username to attribute
+        the entitlement expiration and recreation to.
 
     Returns:
         None
@@ -97,7 +98,7 @@ def expire_and_create_entitlements(self, entitlements, support_user):
             }
             CourseEntitlementSupportDetail.objects.create(**support_detail)
 
-            # Creating new entitlement and support details 
+            # Creating new entitlement and support details
             new_entitlement = {
                 'course_uuid': entitlement.course_uuid,
                 'user': entitlement.user,
@@ -112,10 +113,9 @@ def expire_and_create_entitlements(self, entitlements, support_user):
                 'support_user': support_user,
             }
             CourseEntitlementSupportDetail.objects.create(**support_detail)
-            LOGGER.info('created new entitlement with id %d in a correspondence of above expired entitlement', new_entitlement.id)
+            LOGGER.info('created new entitlement with id %d in a correspondence of above expired entitlement', new_entitlement.id) # lint-amnesty, pylint: disable=line-too-long
 
     except Exception as exc:
         LOGGER.exception('Failed to expire entitlements that reached their expiration period',)
 
     LOGGER.info('Successfully completed the task expire_and_create_entitlements after examining %d entries', entitlements.count())  # lint-amnesty, pylint: disable=line-too-long
-    
