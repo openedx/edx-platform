@@ -212,17 +212,17 @@ class VerticalBlockTestCase(BaseVerticalBlockTest):
         """
         Test the rendering of the student and public view.
         """
-        self.course.runtime._runtime_services['bookmarks'] = Mock()
+        self.course.runtime._services['bookmarks'] = Mock()
         now = datetime.now(pytz.UTC)
         self.vertical.due = now + timedelta(days=days)
         if view == STUDENT_VIEW:
-            self.course.runtime._runtime_services['user'] = StubUserService(user=Mock(username=self.username))
-            self.course.runtime._runtime_services['completion'] = StubCompletionService(
+            self.course.runtime._services['user'] = StubUserService(user=Mock(username=self.username))
+            self.course.runtime._services['completion'] = StubCompletionService(
                 enabled=True,
                 completion_value=completion_value
             )
         elif view == PUBLIC_VIEW:
-            self.course.runtime._runtime_services['user'] = StubUserService(user=AnonymousUser())
+            self.course.runtime._services['user'] = StubUserService(user=AnonymousUser())
 
         html = self.course.runtime.render(
             self.vertical, view, self.default_context if context is None else context

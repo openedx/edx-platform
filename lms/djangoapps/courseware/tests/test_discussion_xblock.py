@@ -21,7 +21,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_SPLIT_MODULESTORE, 
 from xmodule.modulestore.tests.factories import BlockFactory, ToyCourseFactory
 
 from lms.djangoapps.course_api.blocks.tests.helpers import deserialize_usage_key
-from lms.djangoapps.courseware.block_render import get_block_for_descriptor_internal
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor
 from lms.djangoapps.courseware.tests.helpers import XModuleRenderingTestBase
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -293,13 +293,15 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         """
         Test rendered DiscussionXBlock permissions.
         """
-        discussion_xblock = get_block_for_descriptor_internal(
+        discussion_xblock = get_block_for_descriptor(
             user=self.user,
             block=self.discussion,
             student_data=mock.Mock(name='student_data'),
-            course_id=self.course.id,
+            course_key=self.course.id,
             track_function=mock.Mock(name='track_function'),
             request_token='request_token',
+            request=None,
+            field_data_cache=None,
         )
 
         fragment = discussion_xblock.render('student_view')
@@ -336,13 +338,15 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         assert orphan_sequential.location.block_id == root.location.block_id
 
         # Get xblock bound to a user and a block.
-        discussion_xblock = get_block_for_descriptor_internal(
+        discussion_xblock = get_block_for_descriptor(
             user=self.user,
             block=discussion,
             student_data=mock.Mock(name='student_data'),
-            course_id=self.course.id,
+            course_key=self.course.id,
             track_function=mock.Mock(name='track_function'),
             request_token='request_token',
+            request=None,
+            field_data_cache=None,
         )
 
         fragment = discussion_xblock.render('student_view')
@@ -386,13 +390,15 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             provider_type=Provider.OPEN_EDX,
         )
 
-        discussion_xblock = get_block_for_descriptor_internal(
+        discussion_xblock = get_block_for_descriptor(
             user=self.user,
             block=self.discussion,
             student_data=mock.Mock(name='student_data'),
-            course_id=self.course.id,
+            course_key=self.course.id,
             track_function=mock.Mock(name='track_function'),
             request_token='request_token',
+            request=None,
+            field_data_cache=None,
         )
 
         fragment = discussion_xblock.render('student_view')
@@ -436,13 +442,15 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
         num_queries = 6
 
         for discussion in discussions:
-            discussion_xblock = get_block_for_descriptor_internal(
+            discussion_xblock = get_block_for_descriptor(
                 user=user,
                 block=discussion,
                 student_data=mock.Mock(name='student_data'),
-                course_id=course.id,
+                course_key=course.id,
                 track_function=mock.Mock(name='track_function'),
                 request_token='request_token',
+                request=None,
+                field_data_cache=None,
             )
             with self.assertNumQueries(num_queries):
                 fragment = discussion_xblock.render('student_view')
