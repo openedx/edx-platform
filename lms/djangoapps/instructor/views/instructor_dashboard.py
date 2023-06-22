@@ -286,8 +286,11 @@ def _section_special_exams(course, access):
     course_key = str(course.id)
     proctoring_provider = course.proctoring_provider
     escalation_email = None
+    mfe_view_url = None
     if proctoring_provider == 'proctortrack':
         escalation_email = course.proctoring_escalation_email
+    elif proctoring_provider == 'lti_external':
+        mfe_view_url = f'{settings.EXAMS_DASHBOARD_MICROFRONTEND_URL}/course/{course_key}/exams/embed'
     from edx_proctoring.api import is_backend_dashboard_available
 
     section_data = {
@@ -298,6 +301,7 @@ def _section_special_exams(course, access):
         'escalation_email': escalation_email,
         'show_dashboard': is_backend_dashboard_available(course_key),
         'show_onboarding': does_backend_support_onboarding(course.proctoring_provider),
+        'mfe_view_url': mfe_view_url,
     }
     return section_data
 

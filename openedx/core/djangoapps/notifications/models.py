@@ -1,44 +1,87 @@
 """
 Models for notifications
 """
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+import logging
+
+from django.contrib.auth import get_user_model
 from django.db import models
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
-# When notification preferences are updated, we need to update the CONFIG_VERSION.
-NOTIFICATION_PREFERENCE_CONFIG = {
-    "discussion": {
-        "new_post": {
-            "web": False,
-            "push": False,
-            "email": False,
-        },
-    },
-}
-# Update this version when NOTIFICATION_PREFERENCE_CONFIG is updated.
-CONFIG_VERSION = 1
+from openedx.core.djangoapps.notifications.base_notification import (
+    NotificationAppManager,
+    NotificationPreferenceSyncManager,
+    get_notification_content,
+)
 
 
-class NotificationApplication(models.TextChoices):
-    """
-    Application choices where notifications are generated from
-    """
-    DISCUSSION = 'DISCUSSION'
+User = get_user_model()
+log = logging.getLogger(__name__)
+
+NOTIFICATION_CHANNELS = ['web', 'push', 'email']
+
+# Update this version when there is a change to any course specific notification type or app.
+COURSE_NOTIFICATION_CONFIG_VERSION = 1
 
 
-class NotificationType(models.TextChoices):
+def get_course_notification_preference_config():
     """
-    Notification type choices
+    Returns the course specific notification preference config.
+
+    Sample Response:
+    {
+        'discussion': {
+            'enabled': True,
+            'not_editable': {
+                'new_comment_on_post': ['push'],
+                'new_response_on_post': ['web'],
+                'new_response_on_comment': ['web', 'push']
+            },
+            'notification_types': {
+                'new_comment_on_post': {
+                    'email': True,
+                    'push': True,
+                    'web': True,
+                    'info': 'Comment on post'
+                },
+                'new_response_on_comment': {
+                    'email': True,
+                    'push': True,
+                    'web': True,
+                    'info': 'Response on comment'
+                },
+                'new_response_on_post': {
+                    'email': True,
+                    'push': True,
+                    'web': True,
+                    'info': 'New Response on Post'
+                },
+                'core': {
+                    'email': True,
+                    'push': True,
+                    'web': True,
+                    'info': 'comment on post and response on comment'
+                }
+            },
+            'core_notification_types': []
+        }
+    }
     """
-    NEW_CONTRIBUTION = 'NEW_CONTRIBUTION'
+    return NotificationAppManager().get_notification_app_preferences()
 
 
-class NotificationTypeContent:
+def get_course_notification_preference_config_version():
     """
-    Notification type content
+    Returns the notification preference config version.
     """
-    NEW_CONTRIBUTION_NOTIFICATION_CONTENT = 'There is a new contribution. {new_contribution}'
+    return COURSE_NOTIFICATION_CONFIG_VERSION
+
+
+def get_notification_channels():
+    """
+    Returns the notification channels.
+    """
+    return NOTIFICATION_CHANNELS
 
 
 class Notification(TimeStampedModel):
@@ -48,63 +91,63 @@ class Notification(TimeStampedModel):
     .. no_pii:
     """
     user = models.ForeignKey(User, related_name="notifications", on_delete=models.CASCADE)
-    app_name = models.CharField(max_length=64, choices=NotificationApplication.choices, db_index=True)
-    notification_type = models.CharField(max_length=64, choices=NotificationType.choices)
-    content = models.CharField(max_length=1024)
-    content_context = models.JSONField(default={})
+    course_id = CourseKeyField(max_length=255, null=True, blank=True)
+    app_name = models.CharField(max_length=64, db_index=True)
+    notification_type = models.CharField(max_length=64)
+    content_context = models.JSONField(default=dict)
     content_url = models.URLField(null=True, blank=True)
     last_read = models.DateTimeField(null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.user.username} - {self.app_name} - {self.notification_type} - {self.content}'
+        return f'{self.user.username} - {self.course_id} - {self.app_name} - {self.notification_type}'
 
-    def get_content(self):
-        return self.content
-
-    def get_content_url(self):
-        return self.content_url
-
-    def get_notification_type(self):
-        return self.notification_type
-
-    def get_app_name(self):
-        return self.app_name
-
-    def get_content_context(self):
-        return self.content_context
-
-    def get_user(self):
-        return self.user
+    @property
+    def content(self):
+        """
+        Returns the content for the notification.
+        """
+        return get_notification_content(self.notification_type, self.content_context)
 
 
-class NotificationPreference(TimeStampedModel):
+class CourseNotificationPreference(TimeStampedModel):
     """
     Model to store notification preferences for users
 
     .. no_pii:
     """
     user = models.ForeignKey(User, related_name="notification_preferences", on_delete=models.CASCADE)
-    course_id = CourseKeyField(max_length=255, blank=True, default=None)
-    notification_preference_config = models.JSONField(default=NOTIFICATION_PREFERENCE_CONFIG)
+    course_id = CourseKeyField(max_length=255, null=False, blank=False)
+    notification_preference_config = models.JSONField(default=get_course_notification_preference_config)
     # This version indicates the current version of this notification preference.
-    config_version = models.IntegerField(blank=True, default=1)
+    config_version = models.IntegerField(default=get_course_notification_preference_config_version)
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('user', 'course_id')
 
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.notification_preference_config}'
 
-    def get_user(self):
-        return self.user
-
-    def get_course_id(self):
-        return self.course_id
-
-    def get_notification_preference_config(self):
-        return self.notification_preference_config
-
-    def get_config_version(self):
-        return self.config_version
-
-    def get_is_active(self):
-        return self.is_active
+    @staticmethod
+    def get_updated_user_course_preferences(user, course_id):
+        """
+        Returns updated courses preferences for a user
+        """
+        preferences, _ = CourseNotificationPreference.objects.get_or_create(
+            user=user,
+            course_id=course_id,
+            is_active=True,
+        )
+        current_config_version = get_course_notification_preference_config_version()
+        if current_config_version != preferences.config_version:
+            try:
+                current_prefs = preferences.notification_preference_config
+                new_prefs = NotificationPreferenceSyncManager.update_preferences(current_prefs)
+                preferences.config_version = current_config_version
+                preferences.notification_preference_config = new_prefs
+                preferences.save()
+                # pylint: disable-next=broad-except
+            except Exception as e:
+                log.error(f'Unable to update notification preference for {user.username} to new config. {e}')
+        return preferences

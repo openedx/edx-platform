@@ -195,6 +195,30 @@ ENABLE_COPY_PASTE_FEATURE = WaffleFlag(
 )
 
 
+# .. toggle_name: contentstore.enable_studio_content_api
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Enables the new (experimental and unsafe!) Studio Content REST API for course authors,
+# .. which provides CRUD capabilities for course content and xblock editing.
+# .. Use at your own peril - you can easily delete learner data when editing running courses.
+# .. This can be triggered by deleting blocks, editing subsections, problems, assignments, discussions,
+# .. creating new problems or graded sections, and by other things you do.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-05-26
+# .. toggle_tickets: TNL-10208
+ENABLE_STUDIO_CONTENT_API = WaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.enable_studio_content_api',
+    __name__,
+)
+
+
+def use_studio_content_api():
+    """
+    Returns a boolean if studio editing API is enabled
+    """
+    return ENABLE_STUDIO_CONTENT_API.is_enabled()
+
+
 # .. toggle_name: new_studio_mfe.use_new_home_page
 # .. toggle_implementation: WaffleFlag
 # .. toggle_default: False
@@ -227,11 +251,11 @@ ENABLE_NEW_STUDIO_CUSTOM_PAGES = CourseWaffleFlag(
     f'{CONTENTSTORE_NAMESPACE}.new_studio_mfe.use_new_custom_pages', __name__)
 
 
-def use_new_custom_pages():
+def use_new_custom_pages(course_key):
     """
     Returns a boolean if new studio custom pages mfe is enabled
     """
-    return ENABLE_NEW_STUDIO_CUSTOM_PAGES.is_enabled()
+    return ENABLE_NEW_STUDIO_CUSTOM_PAGES.is_enabled(course_key)
 
 
 # .. toggle_name: new_studio_mfe.use_new_schedule_details_page

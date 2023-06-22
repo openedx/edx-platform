@@ -48,7 +48,7 @@ describe('Program Details Header View', () => {
         subscriptionData: [
             {
                 trial_end: '1970-01-01T03:25:45Z',
-                next_payment_date: '1970-06-03T07:12:04Z',
+                current_period_end: '1970-06-03T07:12:04Z',
                 price: '100.00',
                 currency: 'USD',
                 subscription_state: 'active',
