@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-21 17:07+0000\n"
-"PO-Revision-Date: 2023-06-21 17:07:01.030005\n"
+"POT-Creation-Date: 2023-06-22 16:06+0000\n"
+"PO-Revision-Date: 2023-06-22 16:06:39.352060\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -1997,7 +1997,7 @@ msgid "Cookie Policy"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Information"
+msgid "Your Privacy Choices"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
