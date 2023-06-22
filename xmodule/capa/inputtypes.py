@@ -427,10 +427,7 @@ class OptionInput(InputTypeBase):
         options = re.sub(r"([a-zA-Z])('|\\')([a-zA-Z])", r"\1&#39;\3", options)
         options = re.sub(r"\\'", r"&#39;", options)  # replace already escaped single quotes
         # parse the set of possible options
-        if six.PY3:
-            lexer = shlex.shlex(options[1:-1])
-        else:
-            lexer = shlex.shlex(options[1:-1].encode('utf-8'))
+        lexer = shlex.shlex(options[1:-1])
 
         lexer.quotes = "'"
         # Allow options to be separated by whitespace as well as commas
@@ -438,10 +435,7 @@ class OptionInput(InputTypeBase):
 
         # remove quotes
         # convert escaped single quotes (html encoded string) back to single quotes
-        if six.PY3:
-            tokens = [x[1:-1].replace("&#39;", "'") for x in lexer]
-        else:
-            tokens = [x[1:-1].decode('utf-8').replace("&#39;", "'") for x in lexer]
+        tokens = [x[1:-1].replace("&#39;", "'") for x in lexer]
 
         # make list of (option_id, option_description), with description=id
         return [(t, t) for t in tokens]
