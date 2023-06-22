@@ -8,3 +8,4 @@ from .handle_xblock import *
 from .create_xblock_info import *
 from .get_block_info import *
 from .get_xblock import *
+from .delete_orphans import *

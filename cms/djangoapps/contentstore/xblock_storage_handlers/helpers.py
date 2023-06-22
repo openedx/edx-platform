@@ -114,7 +114,6 @@ ALWAYS = lambda x: True
 
 __all__ = [
     "load_services_for_studio",
-    "delete_orphans",
 ]
 
 
@@ -454,26 +453,6 @@ def _delete_item(usage_key, user):
         # Delete user bookmarks
         bookmarks_api.delete_bookmarks(usage_key)
         store.delete_item(usage_key, user.id)
-
-
-def delete_orphans(course_usage_key, user_id, commit=False):
-    """
-    Helper function to delete orphans for a given course.
-    If `commit` is False, this function does not actually remove
-    the orphans.
-    """
-    store = modulestore()
-    blocks = store.get_orphans(course_usage_key)
-    branch = course_usage_key.branch
-    if commit:
-        with store.bulk_operations(course_usage_key):
-            for blockloc in blocks:
-                revision = ModuleStoreEnum.RevisionOption.all
-                # specify branches when deleting orphans
-                if branch == ModuleStoreEnum.BranchName.published:
-                    revision = ModuleStoreEnum.RevisionOption.published_only
-                store.delete_item(blockloc, user_id, revision=revision)
-    return [str(block) for block in blocks]
 
 
 def _get_gating_info(course, xblock):
