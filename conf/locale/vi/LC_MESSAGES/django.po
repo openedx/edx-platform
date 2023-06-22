@@ -209,6 +209,16 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.8.0\n"
 
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Unit"
+msgstr "Đơn vị"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr ""
+
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
 #: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
@@ -219,12 +229,6 @@ msgstr ""
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
 msgstr "Thảo Luận"
-
-#: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/helpers.py
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Problem"
-msgstr ""
 
 #: lms/templates/video.html
 msgid "Video"
@@ -242,15 +246,6 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "Bài kiểm tra đầu vào"
-
-#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
-msgid "Unit"
-msgstr "Đơn vị"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_block.py
-msgid "Empty"
-msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: xmodule/video_block/video_handlers.py
@@ -297,6 +292,11 @@ msgstr ""
 #: cms/templates/index.html
 msgid "Pending"
 msgstr "Đang đợi"
+
+#: cms/djangoapps/contentstore/xblock_services/create_xblock.py
+#: xmodule/library_content_block.py
+msgid "Empty"
+msgstr ""
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -11474,6 +11474,19 @@ msgstr "Địa chỉ bị lỗi"
 msgid "Missing branch on fresh clone"
 msgstr "Thiếu nhánh trên fresh clone"
 
+#: cms/djangoapps/contentstore/helpers.py
+msgid "Vertical"
+msgstr "Xếp dọc"
+
+#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
+#: lms/templates/seq_block.html
+msgid "Section"
+msgstr "Mục"
+
+#: lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr "Phần nhỏ"
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -11559,11 +11572,13 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Sao chép của {0}"
 
 #: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Sao chép của '{0}'"
@@ -11638,89 +11653,6 @@ msgid ""
 "File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
 msgstr ""
 "Tệp {filename} vượt quá kích thước tối đa {maximum_size_in_megabytes} MB."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Invalid data"
-msgstr "Dữ liệu không hợp lệ"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Dữ liệu không hợp lệ ({details})"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "There was a problem pasting your component."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Your clipboard is empty or invalid."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr "Bạn không thể di chuyển {source_type} vào {target_parent_type}."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Item is already present in target location."
-msgstr "Mục đã có trong vị trí đích."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into itself."
-msgstr "Bạn không thể di chuyển một mục vào chính nó."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into it's child."
-msgstr "Bạn không thể di chuyển một mục vào mục con của nó."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item directly into content experiment."
-msgstr "Bạn không thể di chuyển một mục trực tiếp vào thử nghiệm nội dung."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr "{source_usage_key} không tìm thấy trong {parent_usage_key}."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-"Bạn không thể di chuyển {source_usage_key} tại một chỉ mục không hợp lệ "
-"({target_index})."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr "Bạn phải nhập target_index ({target_index}) là một số nguyên."
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-"Học sinh phải đạt điểm {score} {pct_sign} hoặc cao hơn để truy cập tài liệu "
-"khóa học."
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/block.py
-msgid "%"
-msgstr "%"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -11844,19 +11776,6 @@ msgstr "Đã hoàn thành Bài kiểm tra đầu vào Khoá học"
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "Xuất thành công khoá học vào kho git"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Vertical"
-msgstr "Xếp dọc"
-
-#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_block.html
-msgid "Section"
-msgstr "Mục"
-
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
-msgstr "Phần nhỏ"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Some chunks missed during file upload. Please try again"
@@ -12105,6 +12024,86 @@ msgstr "{course}_video_urls"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "A non zero positive integer is expected"
 msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Invalid data"
+msgstr "Dữ liệu không hợp lệ"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "Dữ liệu không hợp lệ ({details})"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr "Bạn không thể di chuyển {source_type} vào {target_parent_type}."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Item is already present in target location."
+msgstr "Mục đã có trong vị trí đích."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item into itself."
+msgstr "Bạn không thể di chuyển một mục vào chính nó."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item into it's child."
+msgstr "Bạn không thể di chuyển một mục vào mục con của nó."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item directly into content experiment."
+msgstr "Bạn không thể di chuyển một mục trực tiếp vào thử nghiệm nội dung."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr "{source_usage_key} không tìm thấy trong {parent_usage_key}."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+"Bạn không thể di chuyển {source_usage_key} tại một chỉ mục không hợp lệ "
+"({target_index})."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr "Bạn phải nhập target_index ({target_index}) là một số nguyên."
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+"Học sinh phải đạt điểm {score} {pct_sign} hoặc cao hơn để truy cập tài liệu "
+"khóa học."
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "%"
+msgstr "%"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
