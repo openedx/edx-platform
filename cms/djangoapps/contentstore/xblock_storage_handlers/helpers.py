@@ -1,12 +1,5 @@
 """
-Service functions for xblock views, as found in:
-
-- contentstore/views/block.py
-- rest_api/v1/viewx/xblock.py
-
-We extracted all the logic from the `xblock_handler` endpoint that lives in
-contentstore/views/block.py to this file, because the logic is reused in another view now.
-Along with it, we moved the business logic of the other views in that file, since that is related.
+Helper functions that are related to xblock storage/retrieval.
 """
 
 import logging
