@@ -714,7 +714,6 @@ class TestProductRecommendationsView(APITestCase):
         self.assertEqual(len(cross_product_course_data), 0)
         self.assertEqual(len(amplitude_course_data), 0)
 
-
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
     @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
     def test_zero_amplitude_recommendations(
@@ -735,6 +734,7 @@ class TestProductRecommendationsView(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(amplitude_course_data), 0)
+
 
 @ddt.ddt
 class TestDashboardRecommendationsApiView(TestRecommendationsBase):

@@ -276,10 +276,10 @@ class ProductRecommendationsView(APIView):
         if is_user_enrolled_in_ut_austin_masters_program(user):
             return Response(
                 CrossProductAndAmplitudeRecommendationsSerializer(
-                {
-                    "crossProductCourses": [],
-                    "amplitudeCourses": []
-                }
+                    {
+                        "crossProductCourses": [],
+                        "amplitudeCourses": []
+                    }
                 ).data,
                 status=200
             )
@@ -305,7 +305,7 @@ class ProductRecommendationsView(APIView):
         if is_user_enrolled_in_ut_austin_masters_program(user):
             return Response(
                 AmplitudeRecommendationsSerializer({
-                  "amplitudeCourses": []
+                    "amplitudeCourses": []
                 }).data,
                 status=200
             )
