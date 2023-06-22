@@ -1,3 +1,8 @@
+"""
+Retrieves an xblock from the modulestore.
+"""
+
+
 import logging
 
 from xmodule.modulestore.exceptions import (
@@ -10,6 +15,8 @@ from xmodule.modulestore.django import (
 )  # lint-amnesty, pylint: disable=wrong-import-order
 
 from common.djangoapps.util.json_request import JsonResponse
+from .helpers import CREATE_IF_NOT_FOUND
+
 
 log = logging.getLogger(__name__)
 

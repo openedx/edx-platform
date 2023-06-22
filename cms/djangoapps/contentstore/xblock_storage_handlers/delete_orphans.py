@@ -8,6 +8,7 @@ from xmodule.modulestore.django import (
     modulestore,
 )  # lint-amnesty, pylint: disable=wrong-import-order
 
+
 def delete_orphans(course_usage_key, user_id, commit=False):
     """
     Helper function to delete orphans for a given course.

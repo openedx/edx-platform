@@ -1,5 +1,6 @@
 """
-Xblock services that contain the business logic for xblock views.
+Business logic that is related to storing and retrieving XBlocks.
+Directly supports xblock-related views.
 """
 from .create_xblock import *
 from .helpers import *

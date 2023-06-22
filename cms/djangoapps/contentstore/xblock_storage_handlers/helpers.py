@@ -17,29 +17,21 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import (User)  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest
 from django.utils.timezone import timezone
 from django.utils.translation import gettext as _
-from edx_django_utils.plugins import pluggable_override
 from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from edx_proctoring.api import (
-    does_backend_support_onboarding,
     get_exam_by_content_id,
-    get_exam_configuration_dashboard_url,
 )
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
-from help_tokens.core import HelpUrlExpert
 from lti_consumer.models import CourseAllowPIISharingInLTIFlag
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
-from xblock.core import XBlock
 from xblock.fields import Scope
 
-from cms.djangoapps.contentstore.config.waffle import SHOW_REVIEW_RULES_FLAG
-from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from common.djangoapps.edxmako.services import MakoService
-from common.djangoapps.static_replace import replace_static_urls
 from common.djangoapps.student.auth import (
     has_studio_read_access,
     has_studio_write_access,
@@ -48,8 +40,6 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core.djangoapps.bookmarks import api as bookmarks_api
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
-from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
 from openedx.core.toggles import ENTRANCE_EXAMS
 from xmodule.course_block import (
@@ -58,15 +48,8 @@ from xmodule.course_block import (
 from xmodule.library_tools import (
     LibraryToolsService,
 )  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore import (
-    EdxJSONEncoder,
-    ModuleStoreEnum,
-)  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import (
     modulestore,
-)  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.draft_and_published import (
-    DIRECT_ONLY_CATEGORIES,
 )  # lint-amnesty, pylint: disable=wrong-import-order
 
 from xmodule.modulestore.inheritance import (
@@ -77,28 +60,16 @@ from xmodule.services import (
     SettingsService,
     TeamsConfigurationService,
 )  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.tabs import (
-    CourseTabList,
-)  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..utils import (
-    ancestor_has_staff_lock,
     find_release_date_source,
     find_staff_lock_source,
-    get_split_group_display_name,
-    get_user_partition_info,
-    get_visibility_partition_info,
     has_children_visible_to_specific_partition_groups,
     is_currently_visible_to_students,
-    is_self_paced,
 )
 
 from ..helpers import (
-    get_parent_xblock,
     import_staged_content_from_user_clipboard,
-    is_unit,
-    xblock_primary_child_category,
-    xblock_studio_url,
     xblock_type_display_name,
 )
 from .usage_key_with_run import usage_key_with_run
@@ -143,9 +114,6 @@ def _is_library_component_limit_reached(usage_key):
     return total_children + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
 
 
-
-
-
 class StudioPermissionsService:
     """
     Service that can provide information about a user's permissions.
@@ -154,7 +122,6 @@ class StudioPermissionsService:
 
     Only used by LibraryContentBlock (and library_tools.py).
     """
-
     def __init__(self, user):
         self._user = user
 
@@ -201,7 +168,6 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
 
     # Update after the callback so any changes made in the callback will get persisted.
     return modulestore().update_item(xblock, user.id)
-
 
 
 @login_required
@@ -638,8 +604,6 @@ def _compute_visibility_state(
         return VisibilityState.unscheduled
     else:
         return VisibilityState.ready
-
-
 
 
 def _get_release_date(xblock, user=None):
