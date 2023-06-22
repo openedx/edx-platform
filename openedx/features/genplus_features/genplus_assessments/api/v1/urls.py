@@ -4,7 +4,7 @@ URLs for genplus badges API v1.
 from django.conf.urls import url
 
 from .views import (
-    StudentAnswersViewSet, ClassFilterApiView, SkillAssessmentViewSet, SkillAssessmentAdminViewSet,
+    StudentAnswersViewSet, ClassFilterApiView, SkillAssessmentViewSet, SkillAssessmentAdminViewSet, SaveRatingResponseApiView
 )
 
 # TODO: remove this ClassFilterApiView endpoint
@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'^program-mapping/(?P<program_slug>\w+)/$', SkillAssessmentAdminViewSet.as_view({
             'get': 'get_skills_assessment_question_mapping',
             'post': 'update_skills_assessment_question_mapping'
-        }), name='skills-assessment-question-mapping')
+        }), name='skills-assessment-question-mapping'),
+    url(r'^save-rating-response/$', SaveRatingResponseApiView.as_view()),
 ]

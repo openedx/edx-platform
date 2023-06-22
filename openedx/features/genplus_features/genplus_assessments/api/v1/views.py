@@ -30,6 +30,7 @@ from openedx.features.genplus_features.genplus_assessments.utils import (
     get_assessment_problem_data,
     get_assessment_completion,
     get_user_assessment_result,
+    StudentResponse
 )
 
 logger = logging.getLogger(__name__)
@@ -484,3 +485,16 @@ class SkillAssessmentAdminViewSet(viewsets.ViewSet):
         return Response({
             'program_slug': program_slug
         }, status=status.HTTP_200_OK)
+
+class SaveRatingResponseApiView(views.APIView):
+    authentication_classes = [SessionAuthenticationCrossDomainCsrf]
+
+    def post(self, request, **kwargs):
+        data = request.data  # This is the data from the POST request
+        response = StudentResponse().create_assessment_response_from_rating(data)
+
+        # Handle the response accordingly
+        if response:  # Replace with your condition for a successful response
+            return Response({'status': 'success', 'message': 'POST request was successful'}, status=200)
+
+        return Response({'status': 'fail', 'error': 'POST request failed', 'message': 'POST request failed with status code'}, status=400)
