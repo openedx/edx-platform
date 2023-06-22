@@ -22,7 +22,6 @@ from copy import deepcopy
 from datetime import datetime
 from xml.sax.saxutils import unescape
 
-import six
 from django.conf import settings
 
 from lxml import etree
@@ -182,7 +181,7 @@ class LoncapaProblem(object):
         self.problem_text = problem_text
 
         # parse problem XML file into an element tree
-        if isinstance(problem_text, six.text_type):
+        if isinstance(problem_text, str):
             # etree chokes on Unicode XML with an encoding declaration
             problem_text = problem_text.encode('utf-8')
         self.tree = etree.XML(problem_text)
@@ -659,7 +658,7 @@ class LoncapaProblem(object):
                 self.find_answer_text(answer_id, answer) for answer in current_answer
             )
 
-        elif isinstance(current_answer, six.string_types) and current_answer.startswith('choice_'):
+        elif isinstance(current_answer, str) and current_answer.startswith('choice_'):
             # Many problem (e.g. checkbox) report "choice_0" "choice_1" etc.
             # Here we transform it
             elems = self.tree.xpath('//*[@id="{answer_id}"]//*[@name="{choice_number}"]'.format(
@@ -678,7 +677,7 @@ class LoncapaProblem(object):
                 log.warning("Multiple answers found for answer id: %s and choice number: %s", answer_id, current_answer)
                 answer_text = "Multiple answers found"
 
-        elif isinstance(current_answer, six.string_types):
+        elif isinstance(current_answer, str):
             # Already a string with the answer
             answer_text = current_answer
 
@@ -809,7 +808,7 @@ class LoncapaProblem(object):
         """
         includes = self.tree.findall('.//include')
         for inc in includes:
-            filename = inc.get('file') if six.PY3 else inc.get('file').decode('utf-8')
+            filename = inc.get('file')
             if filename is not None:
                 try:
                     # open using LoncapaSystem OSFS filesystem
@@ -962,7 +961,7 @@ class LoncapaProblem(object):
 
         Used by get_html.
         """
-        if not isinstance(problemtree.tag, six.string_types):
+        if not isinstance(problemtree.tag, str):
             # Comment and ProcessingInstruction nodes are not Elements,
             # and we're ok leaving those behind.
             # BTW: etree gives us no good way to distinguish these things

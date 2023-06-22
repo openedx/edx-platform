@@ -1,7 +1,6 @@
 <%page expression_filter="h" args="online_help_token"/>
 <%namespace name='static' file='../static_content.html'/>
 <%!
-  import six
   from six.moves.urllib.parse import quote
   from django.conf import settings
   from django.urls import reverse
@@ -39,23 +38,23 @@
       % if context_course:
       <%
             course_key = context_course.id
-            url_encoded_course_key = quote(six.text_type(course_key).encode('utf-8'), safe='')
-            index_url = reverse('course_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            course_team_url = reverse('course_team_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            assets_url = reverse('assets_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            textbooks_url = reverse('textbooks_list_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            videos_url = reverse('videos_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            import_url = reverse('import_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            course_info_url = reverse('course_info_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            export_url = reverse('export_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            settings_url = reverse('settings_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            grading_url = reverse('grading_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            advanced_settings_url = reverse('advanced_settings_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            tabs_url = reverse('tabs_handler', kwargs={'course_key_string': six.text_type(course_key)})
+            url_encoded_course_key = quote(str(course_key).encode('utf-8'), safe='')
+            index_url = reverse('course_handler', kwargs={'course_key_string': str(course_key)})
+            course_team_url = reverse('course_team_handler', kwargs={'course_key_string': str(course_key)})
+            assets_url = reverse('assets_handler', kwargs={'course_key_string': str(course_key)})
+            textbooks_url = reverse('textbooks_list_handler', kwargs={'course_key_string': str(course_key)})
+            videos_url = reverse('videos_handler', kwargs={'course_key_string': str(course_key)})
+            import_url = reverse('import_handler', kwargs={'course_key_string': str(course_key)})
+            course_info_url = reverse('course_info_handler', kwargs={'course_key_string': str(course_key)})
+            export_url = reverse('export_handler', kwargs={'course_key_string': str(course_key)})
+            settings_url = reverse('settings_handler', kwargs={'course_key_string': str(course_key)})
+            grading_url = reverse('grading_handler', kwargs={'course_key_string': str(course_key)})
+            advanced_settings_url = reverse('advanced_settings_handler', kwargs={'course_key_string': str(course_key)})
+            tabs_url = reverse('tabs_handler', kwargs={'course_key_string': str(course_key)})
             certificates_url = ''
             if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
-                certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': six.text_type(course_key)})
-            checklists_url = reverse('checklists_handler', kwargs={'course_key_string': six.text_type(course_key)})
+                certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': str(course_key)})
+            checklists_url = reverse('checklists_handler', kwargs={'course_key_string': str(course_key)})
             pages_and_resources_mfe_enabled = ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND.is_enabled(context_course.id)
             studio_home_mfe_enabled = toggles.use_new_home_page()
             course_outline_mfe_enabled = toggles.use_new_course_outline_page(context_course.id)
@@ -185,7 +184,7 @@
                   </li>
                   % endif
                   <li class="nav-item nav-course-settings-group-configurations">
-                    <a href="${reverse('group_configurations_list_handler', kwargs={'course_key_string': six.text_type(course_key)})}">${_("Group Configurations")}</a>
+                    <a href="${reverse('group_configurations_list_handler', kwargs={'course_key_string': str(course_key)})}">${_("Group Configurations")}</a>
                   </li>
                   % if mfe_proctored_exam_settings_url:
                   <li class="nav-item nav-course-settings-exams">
@@ -230,7 +229,7 @@
                   </li>
                   % if toggles.EXPORT_GIT.is_enabled() and context_course.giturl:
                   <li class="nav-item nav-course-tools-export-git">
-                    <a href="${reverse('export_git', kwargs=dict(course_key_string=six.text_type(course_key)))}">${_("Export to Git")}</a>
+                    <a href="${reverse('export_git', kwargs=dict(course_key_string=str(course_key)))}">${_("Export to Git")}</a>
                   </li>
                   % endif
                   <li class="nav-item nav-course-tools-checklists">
@@ -245,10 +244,10 @@
       % elif context_library:
        <%
             library_key = context_library.location.course_key
-            index_url = reverse('library_handler', kwargs={'library_key_string': six.text_type(library_key)})
-            import_url = reverse('import_handler', kwargs={'course_key_string': six.text_type(library_key)})
-            lib_users_url = reverse('manage_library_users', kwargs={'library_key_string': six.text_type(library_key)})
-            export_url = reverse('export_handler', kwargs={'course_key_string': six.text_type(library_key)})
+            index_url = reverse('library_handler', kwargs={'library_key_string': str(library_key)})
+            import_url = reverse('import_handler', kwargs={'course_key_string': str(library_key)})
+            lib_users_url = reverse('manage_library_users', kwargs={'library_key_string': str(library_key)})
+            export_url = reverse('export_handler', kwargs={'course_key_string': str(library_key)})
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Library:")}</span>

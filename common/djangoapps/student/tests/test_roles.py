@@ -4,7 +4,6 @@ Tests of student.roles
 
 
 import ddt
-import six
 from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
@@ -70,7 +69,7 @@ class RolesTestCase(TestCase):
             f'Student has premature access to {self.course_key}'
         CourseStaffRole(self.course_key).add_users(self.student)
         assert CourseStaffRole(self.course_key).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key)}"
+            f"Student doesn't have access to {str(self.course_key)}"
 
         # remove access and confirm
         CourseStaffRole(self.course_key).remove_users(self.student)
@@ -85,7 +84,7 @@ class RolesTestCase(TestCase):
             f'Student has premature access to {self.course_key.org}'
         OrgStaffRole(self.course_key.org).add_users(self.student)
         assert OrgStaffRole(self.course_key.org).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key.org)}"
+            f"Student doesn't have access to {str(self.course_key.org)}"
 
         # remove access and confirm
         OrgStaffRole(self.course_key.org).remove_users(self.student)
@@ -101,16 +100,16 @@ class RolesTestCase(TestCase):
         OrgInstructorRole(self.course_key.org).add_users(self.student)
         CourseInstructorRole(self.course_key).add_users(self.student)
         assert OrgInstructorRole(self.course_key.org).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key.org)}"
+            f"Student doesn't have access to {str(self.course_key.org)}"
         assert CourseInstructorRole(self.course_key).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key)}"
+            f"Student doesn't have access to {str(self.course_key)}"
 
         # remove access and confirm
         OrgInstructorRole(self.course_key.org).remove_users(self.student)
         assert not OrgInstructorRole(self.course_key.org).has_user(self.student), \
             f'Student still has access to {self.course_key.org}'
         assert CourseInstructorRole(self.course_key).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key)}"
+            f"Student doesn't have access to {str(self.course_key)}"
 
         # ok now keep org role and get rid of course one
         OrgInstructorRole(self.course_key.org).add_users(self.student)
@@ -118,7 +117,7 @@ class RolesTestCase(TestCase):
         assert OrgInstructorRole(self.course_key.org).has_user(self.student), \
             f'Student lost has access to {self.course_key.org}'
         assert not CourseInstructorRole(self.course_key).has_user(self.student), \
-            f"Student doesn't have access to {six.text_type(self.course_key)}"
+            f"Student doesn't have access to {str(self.course_key)}"
 
     def test_get_user_for_role(self):
         """

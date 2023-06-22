@@ -8,7 +8,6 @@ from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
 from codejail.safe_exec import safe_exec as codejail_safe_exec
 from edx_django_utils.monitoring import function_trace
 import six
-from six import text_type
 
 from . import lazymod
 from .remote_exec import is_codejail_rest_service_enabled, get_remote_exec
@@ -178,7 +177,7 @@ def safe_exec(
         except SafeExecException as e:
             # Saving SafeExecException e in exception to be used later.
             exception = e
-            emsg = text_type(e)
+            emsg = str(e)
         else:
             emsg = None
 

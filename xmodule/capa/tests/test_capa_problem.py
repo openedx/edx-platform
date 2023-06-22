@@ -733,4 +733,4 @@ class CAPAProblemReportHelpersTest(unittest.TestCase):
 
         # Ensure that the answer is a string so that the dict returned from this
         # function can eventualy be serialized to json without issues.
-        assert isinstance(problem.get_question_answers()['1_solution_1'], six.text_type)
+        assert isinstance(problem.get_question_answers()['1_solution_1'], str)

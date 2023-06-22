@@ -6,7 +6,6 @@ from django.utils.translation import pgettext
 from django.urls import reverse
 from lms.djangoapps.courseware.courses import get_course_about_section
 from django.conf import settings
-from six import text_type
 from common.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangolib.markup import clean_dangerous_html, HTML, Text
@@ -217,7 +216,7 @@ from six import string_types
           %endif
 
           % if pre_requisite_courses:
-          <% prc_target = reverse('about_course', args=[text_type(pre_requisite_courses[0]['key'])]) %>
+          <% prc_target = reverse('about_course', args=[str(pre_requisite_courses[0]['key'])]) %>
           <li class="prerequisite-course important-dates-item">
             <span class="icon fa fa-list-ul" aria-hidden="true"></span>
             <p class="important-dates-item-title">${_("Prerequisites")}</p>
