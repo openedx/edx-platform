@@ -76,7 +76,7 @@ from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from ..component import component_handler, get_component_templates
 from cms.djangoapps.contentstore.xblock_storage_handlers.helpers import (
     ALWAYS,
-    VisibilityState,=
+    VisibilityState,
     _get_source_index,
     _xblock_type_and_display_name,
     add_container_page_publishing_info,
