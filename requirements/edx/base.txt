@@ -259,7 +259,6 @@ xss-utils==0.1.3          # via -r requirements/edx/base.in
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/paver.txt, importlib-metadata
 
 # edly forked apps
--e git+https://github.com/edly-io/bridgekeeper.git@edly-1.0#egg=bridgekeeper==edly-1.0
 -e git+https://github.com/edly-io/figures.git@edly-3.0.1#egg=figures==edly-3.0.1
 -e git+https://github.com/edly-io/edx-sga.git@v0.11.0-gptz-0.1.2#egg=edx-sga==v0.11.0-gptz-0.1.2
 -e git+https://github.com/edly-io/edx_xblock_scorm.git@v1.1.1#egg=edx_xblock_scorm==v1.1.1

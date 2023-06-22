@@ -261,19 +261,6 @@ if settings.WIKI_ENABLED:
         url(r'^api/edly_panel/', include('edly_panel_app.api.urls', namespace='edly_panel_api')),
     ]
 
-COURSE_URLS = [
-    url(
-        r'^look_up_registration_code$',
-        instructor_registration_codes_views.look_up_registration_code,
-        name='look_up_registration_code',
-    ),
-    url(
-        r'^registration_code_details$',
-        instructor_registration_codes_views.registration_code_details,
-        name='registration_code_details',
-    ),
-]
-
 urlpatterns += [
     # jump_to URLs for direct access to a location in the course
     url(

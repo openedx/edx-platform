@@ -1415,8 +1415,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_celery_results',
     'method_override',
-    'corsheaders',
-    'openedx.core.djangoapps.cors_csrf',
 
     # Common Initialization
     'openedx.core.djangoapps.common_initialization.apps.CommonInitializationConfig',

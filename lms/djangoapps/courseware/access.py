@@ -46,6 +46,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.mobile_api.models import IgnoreMobileAvailableFlagConfig
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.features.course_duration_limits.access import check_course_expired
+from openedx.features.subscriptions.utils import is_course_accessible_with_subscription
 from common.djangoapps.student import auth
 from common.djangoapps.student.models import CourseEnrollmentAllowed
 from common.djangoapps.student.roles import (
