@@ -4,7 +4,7 @@ metadata:
     markdown: !!null
 data: |
     <div class="journals-xblock journal-listed theme-lightblue">
-      <problem class="journal_responses">
+      <problem class="short_answers">
         <div class="journals-xblock-wapper">
           <!-- <div class="asn-icon top-left">
             <img src="/static/images/asset-logo-black.svg" alt="Logo Left" />
@@ -27,9 +27,9 @@ data: |
             </div>
             <div class="col">
               <stringresponse answer="\w" type="regexp ci">
-                <label class="question-text">
+                <label>
                   <img src="/static/images/icon-tag.svg" width="25" alt="Tag" />
-                  <span>I am able to change my PACE, TONE, and VOLUME to make my communication more effective. For example I can...</span>
+                  <span class="question-text">I am able to change my PACE, TONE, and VOLUME to make my communication more effective. For example I can...</span>
                 </label>
                 <additional_answer answer="Please type a response"/>
                 <div class="text-wrapper">

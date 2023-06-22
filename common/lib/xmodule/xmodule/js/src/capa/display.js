@@ -65,6 +65,9 @@
             this.gentle_alert = function(msg) { // eslint-disable-line no-unused-vars
                 return Problem.prototype.gentle_alert.apply(that, arguments);
             };
+            this.gentle_info = function(msg) { // eslint-disable-line no-unused-vars
+              return Problem.prototype.gentle_info.apply(that, arguments);
+            };
             this.clear_all_notifications = function() {
                 return Problem.prototype.clear_all_notifications.apply(that, arguments);
             };
@@ -126,6 +129,9 @@
             this.renderProgressState = function() {
                 return Problem.prototype.renderProgressState.apply(that, arguments);
             };
+            this.restrictMultipleChoices = function() {
+              return Problem.prototype.restrictMultipleChoices.apply(that, arguments);
+            };
             this.bind = function() {
                 return Problem.prototype.bind.apply(that, arguments);
             };
@@ -160,6 +166,7 @@
             }
             problemPrefix = this.element_id.replace(/problem_/, '');
             this.inputs = this.$('[id^="input_' + problemPrefix + '_"]');
+            this.inputs.change(this.restrictMultipleChoices);
             this.$('div.action button').click(this.refreshAnswers);
             this.reviewButton = this.$('.notification-btn.review-btn');
             this.reviewButton.click(this.scroll_to_problem_meta);
@@ -180,6 +187,7 @@
             this.saveButton.click(this.save);
             this.gentleAlertNotification = this.$('.notification-gentle-alert');
             this.submitNotification = this.$('.notification-submit');
+            this.restrictions = this.$('.choices-xblock-wapper').data('restrictions');
 
             // Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
             this.$('.clarification').focus(function(ev) {
@@ -207,6 +215,18 @@
                     return MathJax.Hub.Queue([that.refreshMath, null, element]);
                 });
             }
+        };
+
+        Problem.prototype.restrictMultipleChoices = function(e) {
+          this.clear_all_notifications();
+          let checked = this.$('input:checked').length;
+          let restrictions = this.restrictions;
+          if (restrictions !== undefined && checked > restrictions) {
+            $(e.target).attr('checked', false);
+            this.gentle_info(
+              gettext('You can select upto ' + restrictions + ' options only.')
+            );
+          }
         };
 
         Problem.prototype.renderProgressState = function() {
@@ -787,6 +807,15 @@
             this.clear_all_notifications();
             this.gentleAlertNotification.show();
             this.gentleAlertNotification.focus();
+        };
+
+        Problem.prototype.gentle_info = function(msg) {
+          if($('#restrictionsAlert').length == 0) {
+            var restrictionAlert = $('<div class="restrictions-alert" id="restrictionsAlert"><span class="icon fa fa-warning" aria-hidden="true"></span></div>').append(msg);
+            $('body').append(restrictionAlert);
+          }
+          $('#restrictionsAlert')
+          .fadeOut(8000, function () { $(this).remove(); })
         };
 
         Problem.prototype.save = function() {
