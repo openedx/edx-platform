@@ -95,7 +95,7 @@ class UserViewsMixin:
             return []
         return [
             {
-                "provider_id": "oa2-google-oauth2",
+                "provider_id": "oa2-1-google-oauth2",
                 "name": "Google",
                 "remote_id": f"{username}@gmail.com",
             },
@@ -383,5 +383,5 @@ class TestThirdPartyAuthUserStatusView(ThirdPartyAuthTestMixin, APITestCase):
                    'accepts_logins': True, 'name': 'Google',
                    'disconnect_url': '/auth/disconnect/google-oauth2/?',
                    'connect_url': '/auth/login/google-oauth2/?auth_entry=account_settings&next=%2Faccount%2Fsettings',
-                   'connected': False, 'id': 'oa2-google-oauth2'
+                   'connected': False, 'id': 'oa2-1-google-oauth2'
                }])

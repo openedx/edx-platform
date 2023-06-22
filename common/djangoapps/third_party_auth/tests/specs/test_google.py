@@ -89,7 +89,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):  # lint-amnesty, 
         data_parsed = json.loads(data_decoded)
         # The user's details get passed to the custom page as a base64 encoded query parameter:
         assert data_parsed == {'auth_entry': 'custom1', 'backend_name': 'google-oauth2',
-                               'provider_id': 'oa2-google-oauth2',
+                               'provider_id': 'oa2-1-google-oauth2',
                                'user_details': {'username': 'user', 'email': 'user@email.com',
                                                 'fullname': 'name_value', 'first_name': 'given_name_value',
                                                 'last_name': 'family_name_value'}}

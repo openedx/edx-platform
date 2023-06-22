@@ -187,7 +187,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         expected_url = f'/login?{self._finish_auth_url_param(params)}'
         self.assertNotContains(response, expected_url)
 
-    @mock.patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
+    @mock.patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH_FOR_TEST": False})
     @ddt.data("signin_user", "register_user")
     def test_third_party_auth_disabled(self, url_name):
         response = self.client.get(reverse(url_name))
@@ -262,7 +262,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         # This relies on the THIRD_PARTY_AUTH configuration in the test settings
         expected_providers = [
             {
-                "id": "oa2-dummy",
+                "id": "oa2-1-dummy",
                 "name": "Dummy",
                 "iconClass": None,
                 "iconImage": settings.MEDIA_URL + "icon.svg",
@@ -272,7 +272,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 "registerUrl": self._third_party_login_url("dummy", "register", params)
             },
             {
-                "id": "oa2-facebook",
+                "id": "oa2-1-facebook",
                 "name": "Facebook",
                 "iconClass": "fa-facebook",
                 "iconImage": None,
@@ -282,7 +282,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
                 "registerUrl": self._third_party_login_url("facebook", "register", params)
             },
             {
-                "id": "oa2-google-oauth2",
+                "id": "oa2-1-google-oauth2",
                 "name": "Google",
                 "iconClass": "fa-google-plus",
                 "iconImage": None,
@@ -385,9 +385,9 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         )
 
     def test_hinted_login(self):
-        params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
+        params = [("next", "/courses/something/?tpa_hint=oa2-1-google-oauth2")]
         response = self.client.get(reverse('signin_user'), params, HTTP_ACCEPT="text/html")
-        self.assertContains(response, '"third_party_auth_hint": "oa2-google-oauth2"')
+        self.assertContains(response, '"third_party_auth_hint": "oa2-1-google-oauth2"')
 
         tpa_hint = self.hidden_enabled_provider.provider_id
         params = [("next", f"/courses/something/?tpa_hint={tpa_hint}")]
@@ -408,17 +408,17 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         """Test that the dialog doesn't show up for hinted logins when disabled. """
         self.google_provider.skip_hinted_login_dialog = True
         self.google_provider.save()
-        params = [("next", "/courses/something/?tpa_hint=oa2-google-oauth2")]
+        params = [("next", "/courses/something/?tpa_hint=oa2-1-google-oauth2")]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
         expected_url = '/auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses'\
-                       '%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry)
+                       '%2Fsomething%2F%3Ftpa_hint%3Doa2-1-google-oauth2'.format(auth_entry)
         self.assertRedirects(
             response,
             expected_url,
             target_status_code=302
         )
 
-    @override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT='oa2-google-oauth2'))
+    @override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT='oa2-1-google-oauth2'))
     @ddt.data(
         'signin_user',
         'register_user',
@@ -429,7 +429,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         """
         params = [("next", "/courses/something/")]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
-        self.assertContains(response, '"third_party_auth_hint": "oa2-google-oauth2"')
+        self.assertContains(response, '"third_party_auth_hint": "oa2-1-google-oauth2"')
 
         # THIRD_PARTY_AUTH_HINT can be overridden via the query string
         tpa_hint = self.hidden_enabled_provider.provider_id
@@ -443,7 +443,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
         assert response.content.decode('utf-8') not in tpa_hint
 
-    @override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT='oa2-google-oauth2'))
+    @override_settings(FEATURES=dict(settings.FEATURES, THIRD_PARTY_AUTH_HINT='oa2-1-google-oauth2'))
     @ddt.data(
         ('signin_user', 'login'),
         ('register_user', 'register'),
@@ -456,7 +456,7 @@ class LoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMixin, ModuleSto
         params = [("next", "/courses/something/")]
         response = self.client.get(reverse(url_name), params, HTTP_ACCEPT="text/html")
         expected_url = '/auth/login/google-oauth2/?auth_entry={}&next=%2Fcourses'\
-                       '%2Fsomething%2F%3Ftpa_hint%3Doa2-google-oauth2'.format(auth_entry)
+                       '%2Fsomething%2F%3Ftpa_hint%3Doa2-1-google-oauth2'.format(auth_entry)
         self.assertRedirects(
             response,
             expected_url,
