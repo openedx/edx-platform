@@ -64,7 +64,7 @@ def expire_old_entitlements(self, start, end, logid='...'):
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def expire_and_create_entitlements(self, entitlement_ids, support_user):
+def expire_and_create_entitlements(self, entitlement_ids, support_username):
     """
     Expire entitlements older than one year.
 
@@ -76,13 +76,15 @@ def expire_and_create_entitlements(self, entitlement_ids, support_user):
 
     Args:
         entitlement_ids (List<int>): A list of entitlement ids to expire.
-        support_user (django.contrib.auth.models.user): The username to attribute
-        the entitlement expiration and recreation to.
+        support_username (str): The username to attribute the entitlement
+            expiration and recreation to.
 
     Returns:
         None
 
     """
+    support_user = User.objects.get(username=support_username)
+
     first_entitlement_id = entitlement_ids[0]
     last_entitlement_id = entitlement_ids[-1]
 

@@ -69,7 +69,7 @@ class Command(BaseCommand):
 
         logger.info('Looking for entitlements which may be expirable.')
 
-        support_user = User.objects.get(username=options.get('username'))
+        support_username = options.get('username')
         current_date = date.today()
         exceptional_courses = options.get('exceptional_course_uuids')
 
@@ -105,6 +105,6 @@ class Command(BaseCommand):
             start = batch_num * batch_size
             end = min(start + batch_size, entitlements_to_expire, entitlements_count)
             entitlement_ids = [entitlement.id for entitlement in entitlements[start:end]]
-            expire_and_create_entitlements.delay(entitlement_ids, support_user)
+            expire_and_create_entitlements.delay(entitlement_ids, support_username)
 
         logger.info('Done. Successfully enqueued %d tasks.', num_batches)
