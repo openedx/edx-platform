@@ -10,22 +10,13 @@ from textwrap import dedent
 
 from django.core.management import BaseCommand
 from django.contrib.auth import get_user_model
+
 from common.djangoapps.entitlements.tasks import expire_and_create_entitlements
 from common.djangoapps.entitlements.models import CourseEntitlement
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 User = get_user_model()
-
-#course uuids for which entitlements should be expired after 18 months.
-MIT_SUPPLY_CHAIN_COURSES = [
-    '0d9b47982e3d486aa3189a7035bbda77',
-    '09532745c837467b9078093b8e1265a8',
-    '324970b703a444d7b39e10bbda6f119f',
-    '5f1c55b4354e4155af4a76450953e10d',
-    'ed927a1a4a95415ba865c3d722ac549c',
-    '6513ed9c112a495182ad7036cbe52831',
-]
 
 
 class Command(BaseCommand):
@@ -60,21 +51,38 @@ class Command(BaseCommand):
             help='How many entitlements to give each celery task'
         )
 
+        parser.add_argument(
+            '--username',
+            required=True,
+            help='Username to record in CourseEntitlementSupportDetail as author of operation.'
+        )
+
+        parser.add_argument(
+            '--exceptional-course-uuids',
+            action='extend',
+            nargs='+',
+            default=[],
+            help='Space separated list of course UUIDs that should be expired in 18 months instead of 12 months.'
+        )
+
     def handle(self, *args, **options):
 
         logger.info('Looking for entitlements which may be expirable.')
 
-        support_user = User.objects.get(username='cbrash-edx')
+        support_user = User.objects.get(username=options.get('username'))
         current_date = date.today()
+        exceptional_courses = options.get('exceptional_course_uuids')
+
         expiration_period = current_date - relativedelta(years=1)
         exceptional_expiration_period = current_date - relativedelta(years=1, months=6)
+
         normal_entitlements = CourseEntitlement.objects.filter(
             expired_at__isnull=True, created__lte=expiration_period,
-            enrollment_course_run__isnull=True).exclude(course_uuid__in=MIT_SUPPLY_CHAIN_COURSES)
+            enrollment_course_run__isnull=True).exclude(course_uuid__in=exceptional_courses)
 
         exceptional_entitlements = CourseEntitlement.objects.filter(
             expired_at__isnull=True, created__lte=exceptional_expiration_period,
-            enrollment_course_run__isnull=True, course_uuid__in=MIT_SUPPLY_CHAIN_COURSES)
+            enrollment_course_run__isnull=True, course_uuid__in=exceptional_courses)
 
         entitlements = normal_entitlements | exceptional_entitlements
         logger.info('Total entitlements that have reached expiration period are %d ', entitlements.count())
