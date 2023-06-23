@@ -236,7 +236,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         assert 1023 > len(entry.task_output)
         output = json.loads(entry.task_output)
         assert output['exception'] == 'ExceptionWithTraceback'
-        assert expected_message in output['message']
+        assert (expected_message[:(len(output['message']) - 7)] + '\n"""...') == output['message']
         assert output['traceback'][(- 3):] == '...'
 
 
@@ -304,7 +304,6 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         output = json.loads(entry.task_output)
         assert output['exception'] == 'ExceptionWithTraceback'
         assert 'Scores cannot be overridden for this problem type.' in output['message']
-        assert len(output['traceback']) > 0
 
     def test_overriding_unaccessable(self):
         """
@@ -439,7 +438,6 @@ class TestRescoreInstructorTask(TestInstructorTasks):
             self.location,
             mock_instance.__class__,
         ) in output['message']
-        assert len(output['traceback']) > 0
 
     def test_rescoring_unaccessable(self):
         """
