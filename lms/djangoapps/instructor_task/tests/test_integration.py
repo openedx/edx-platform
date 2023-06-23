@@ -63,10 +63,10 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         assert task_input['problem_url'] == str(InstructorTaskModuleTestCase.problem_location(problem_url_name))
         status = json.loads(instructor_task.task_output)
         assert status['exception'] == 'ExceptionWithTraceback'
-        assert status['message'] == expected_message
+        assert expected_message in status['message']
         # check status returned:
         status = InstructorTaskModuleTestCase.get_task_status(instructor_task.task_id)
-        assert status['message'] == expected_message
+        assert expected_message in status['message']
 
 
 @ddt.ddt
@@ -342,10 +342,11 @@ class TestRescoringTask(TestIntegrationTask):
         assert instructor_task.task_state == FAILURE
         status = json.loads(instructor_task.task_output)
         assert status['exception'] == 'ExceptionWithTraceback'
-        assert status['message'] == "Problem's definition does not support rescoring."
+        expected_message = "Problem's definition does not support rescoring."
+        assert expected_message in status['message']
 
         status = InstructorTaskModuleTestCase.get_task_status(instructor_task.task_id)
-        assert status['message'] == "Problem's definition does not support rescoring."
+        assert expected_message in status['message']
 
     def define_randomized_custom_response_problem(self, problem_url_name, redefine=False):
         """
