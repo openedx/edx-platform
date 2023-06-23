@@ -11,6 +11,7 @@ import dateutil.parser
 import requests
 from django.conf import settings
 from django.core.validators import validate_email
+from edx_toggles.toggles import SettingDictToggle
 from lazy import lazy
 from lxml import etree
 from path import Path as path
@@ -57,6 +58,17 @@ COURSE_VISIBILITY_PUBLIC = 'public'
 COURSE_VIDEO_SHARING_PER_VIDEO = 'per-video'
 COURSE_VIDEO_SHARING_ALL_VIDEOS = 'all-on'
 COURSE_VIDEO_SHARING_NONE = 'all-off'
+# .. toggle_name: FEATURES['CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE']
+# .. toggle_implementation: SettingDictToggle
+# .. toggle_default: False
+# .. toggle_description: When enabled the newly created courses will have the enrollment_start_date
+#   set to DEFAULT_START_DATE.
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-06-22
+# .. toggle_target_removal_date: None
+CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE = SettingDictToggle(
+    "FEATURES", "CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE", default=False, module_name=__name__
+)
 
 
 class StringOrDate(Date):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -317,7 +329,7 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     wiki_slug = String(help=_("Slug that points to the wiki for this course"), scope=Scope.content)
     enrollment_start = Date(
         help=_("Date that enrollment for this class is opened"),
-        default=DEFAULT_START_DATE,
+        default=DEFAULT_START_DATE if CREATE_COURSE_WITH_DEFAULT_ENROLLMENT_START_DATE.is_enabled() else None,
         scope=Scope.settings
     )
     enrollment_end = Date(help=_("Date that enrollment for this class is closed"), scope=Scope.settings)
