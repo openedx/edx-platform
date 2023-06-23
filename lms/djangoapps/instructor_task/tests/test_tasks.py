@@ -214,7 +214,9 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         assert 1023 > len(entry.task_output)
         output = json.loads(entry.task_output)
         assert output['exception'] == 'ExceptionWithTraceback'
-        assert (expected_message[:(len(output['message']) - 3)] + '...') in output['message']
+        assert (
+            expected_message[:(len(output['message']) - 7)] + '\n"""...'
+        ) == output['message']
         assert 'traceback' not in output
 
     def _test_run_with_short_error_msg(self, task_class):
