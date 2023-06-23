@@ -431,6 +431,7 @@ MKTG_URLS = {
     'TOS': '/edx-terms-service',
     'TOS_AND_HONOR': '/edx-terms-service',
     'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
+    'PROGRAM_SUBSCRIPTIONS': '/program-subscriptions',
 }
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
