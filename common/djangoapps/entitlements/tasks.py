@@ -4,6 +4,7 @@ This file contains celery tasks for entitlements-related functionality.
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
+from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
@@ -15,6 +16,8 @@ LOGGER = get_task_logger(__name__)
 # time of 2047 seconds (about 30 minutes). Setting this to None could yield
 # unwanted behavior: infinite retries.
 MAX_RETRIES = 11
+
+User = get_user_model()
 
 
 @shared_task(bind=True, ignore_result=True)
@@ -64,7 +67,7 @@ def expire_old_entitlements(self, start, end, logid='...'):
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def expire_and_create_entitlements(self, entitlement_ids, support_user):
+def expire_and_create_entitlements(self, entitlement_ids, support_username):
     """
     Expire entitlements older than one year.
 
@@ -76,13 +79,15 @@ def expire_and_create_entitlements(self, entitlement_ids, support_user):
 
     Args:
         entitlement_ids (List<int>): A list of entitlement ids to expire.
-        support_user (django.contrib.auth.models.user): The username to attribute
-        the entitlement expiration and recreation to.
+        support_username (str): The username to attribute the entitlement
+            expiration and recreation to.
 
     Returns:
         None
 
     """
+    support_user = User.objects.get(username=support_username)
+
     first_entitlement_id = entitlement_ids[0]
     last_entitlement_id = entitlement_ids[-1]
 
