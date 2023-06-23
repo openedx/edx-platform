@@ -47,7 +47,7 @@ class CourseFieldsTestCase(unittest.TestCase):  # lint-amnesty, pylint: disable=
         with override_settings(FEATURES=features):
             # reimport, so settings override could take effect
             del sys.modules['xmodule.course_block']
-            import xmodule.course_block
+            import xmodule.course_block  # lint-amnesty, pylint: disable=redefined-outer-name, reimported
             expected = DEFAULT_START_DATE if should_have_default_enroll_start else None
             assert xmodule.course_block.CourseFields.enrollment_start.default == expected
 
