@@ -2329,6 +2329,7 @@ INSTALLED_APPS = [
 
     # API Documentation
     'drf_yasg',
+    'drf_spectacular',
 
     # edx-drf-extensions
     'csrf.apps.CsrfAppConfig',  # Enables frontend apps to retrieve CSRF tokens.
@@ -2389,6 +2390,15 @@ INSTALLED_APPS = [
 ]
 
 ######################### Django Rest Framework ########################
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Open edX LMS API',
+    'DESCRIPTION': 'APIs available in the Open edX LMS',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+    'SCHEMA_PATH_PREFIX': '/api/'
+}
 
 SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'openedx.core.apidocs.api_info',

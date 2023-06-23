@@ -486,6 +486,7 @@ REST_FRAMEWORK = {
         'registration_validation': '30/minute',
         'high_service_user': '2000/minute',
     },
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # .. setting_name: REGISTRATION_VALIDATION_RATELIMIT
