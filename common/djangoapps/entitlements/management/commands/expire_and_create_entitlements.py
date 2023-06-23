@@ -9,14 +9,11 @@ from math import ceil
 from textwrap import dedent
 
 from django.core.management import BaseCommand
-from django.contrib.auth import get_user_model
 
 from common.djangoapps.entitlements.tasks import expire_and_create_entitlements
 from common.djangoapps.entitlements.models import CourseEntitlement
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
-
-User = get_user_model()
 
 
 class Command(BaseCommand):

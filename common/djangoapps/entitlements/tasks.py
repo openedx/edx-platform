@@ -4,6 +4,7 @@ This file contains celery tasks for entitlements-related functionality.
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
+from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
@@ -15,6 +16,8 @@ LOGGER = get_task_logger(__name__)
 # time of 2047 seconds (about 30 minutes). Setting this to None could yield
 # unwanted behavior: infinite retries.
 MAX_RETRIES = 11
+
+User = get_user_model()
 
 
 @shared_task(bind=True, ignore_result=True)
