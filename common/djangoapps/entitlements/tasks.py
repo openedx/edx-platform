@@ -122,8 +122,7 @@ def expire_and_create_entitlements(self, entitlements, support_user):
             }
             CourseEntitlementSupportDetail.objects.create(**support_detail)
             LOGGER.info(
-                'created new entitlement with id %d corresponding to above ' +
-                'expired entitlement with id %d',
+                'created new entitlement with id %d corresponding to above expired entitlement with id %d',
                 new_entitlement.id,
                 entitlement.id,
             )
