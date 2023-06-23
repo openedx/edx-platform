@@ -46,7 +46,9 @@ class UserRating(Assessment):
 class SkillAssessmentQuestion(models.Model):
     class Meta:
         unique_together = ('program', 'start_unit_location', 'end_unit_location')
+        ordering = ('question_number',)
 
+    question_number = models.PositiveIntegerField(default=0, blank=False, null=False)
     program = models.ForeignKey(Program, on_delete=models.CASCADE)
     start_unit = CourseKeyField(max_length=255, db_index=True)
     start_unit_location = UsageKeyField(max_length=255, db_index=True)

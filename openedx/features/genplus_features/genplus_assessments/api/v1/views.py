@@ -470,12 +470,13 @@ class SkillAssessmentAdminViewSet(viewsets.ViewSet):
 
         SkillAssessmentQuestion.objects.filter(id__in=remove_questions_ids).delete()
 
-        for key, value in data.items():
+        for index, (key, value) in enumerate(data.items()):
             SkillAssessmentQuestion.objects.update_or_create(
                 program=program,
                 start_unit_location=value['start_unit_location'],
                 end_unit_location=value['end_unit_location'],
                 defaults={
+                    'question_number': index+1,
                     'skill': skills.get(value['skill']),
                     'start_unit': value['start_unit'],
                     'end_unit': value['end_unit']
