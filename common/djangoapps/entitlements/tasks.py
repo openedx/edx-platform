@@ -83,7 +83,15 @@ def expire_and_create_entitlements(self, entitlements, support_user):
         None
 
     """
-    LOGGER.info('Running task expire_and_create_entitlements')
+    first_entitlement_id = entitlements[0].id
+    last_entitlement_id = entitlements[-1].id
+
+    LOGGER.info(
+        'Running task expire_and_create_entitlements over %d entitlements from id %d to id %d',
+        len(entitlements),
+        first_entitlement_id,
+        last_entitlement_id,
+    )
 
     try:
         for entitlement in entitlements:
