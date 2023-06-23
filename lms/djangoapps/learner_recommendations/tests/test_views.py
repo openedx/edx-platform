@@ -425,8 +425,10 @@ class TestProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
     def test_successful_response(
         self,
+        is_user_enrolled_in_ut_austin_masters_program_mock,
         country_code_from_ip_mock,
         get_amplitude_course_recommendations_mock,
         get_course_data_view_mock,
@@ -437,6 +439,7 @@ class TestProductRecommendationsView(APITestCase):
         Verify 2 cross product course recommendations are returned
         and 4 amplitude courses are returned
         """
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = False
         country_code_from_ip_mock.return_value = "za"
         get_user_enrolled_course_keys_mock.return_value = []
         get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
@@ -461,8 +464,10 @@ class TestProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
     def test_successful_course_filtering(
         self,
+        is_user_enrolled_in_ut_austin_masters_program_mock,
         country_code_from_ip_mock,
         get_amplitude_course_recommendations_mock,
         get_course_data_view_mock,
@@ -474,6 +479,7 @@ class TestProductRecommendationsView(APITestCase):
         and 2 amplitude courses are returned with filtering done for
         enrolled courses and courses with country restrictions
         """
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = False
         country_code_from_ip_mock.return_value = "cn"
         get_user_enrolled_course_keys_mock.return_value = self.enrolled_course_run_keys
         get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
@@ -509,8 +515,10 @@ class TestProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
     def test_fallback_recommendations_when_enrolled_courses_removed(
         self,
+        is_user_enrolled_in_ut_austin_masters_program_mock,
         country_code_from_ip_mock,
         get_amplitude_course_recommendations_mock,
         get_course_data_view_mock,
@@ -522,7 +530,7 @@ class TestProductRecommendationsView(APITestCase):
         and 4 fallback amplitude recommendations are returned if no courses are left
         after filtering due to courses being already enrolled in
         """
-
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = False
         country_code_from_ip_mock.return_value = "za"
         get_user_enrolled_course_keys_mock.return_value = self.amplitude_course_run_keys
         get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
@@ -548,8 +556,10 @@ class TestProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
     def test_fallback_recommendations_when_error_querying_amplitude(
         self,
+        is_user_enrolled_in_ut_austin_masters_program_mock,
         country_code_from_ip_mock,
         get_amplitude_course_recommendations_mock,
         get_course_data_mock,
@@ -559,7 +569,7 @@ class TestProductRecommendationsView(APITestCase):
         and 4 fallback amplitude recommendations are returned
         if there was an error querying amplitude for recommendations
         """
-
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = False
         country_code_from_ip_mock.return_value = "za"
         get_amplitude_course_recommendations_mock.side_effect = Exception()
 
@@ -582,8 +592,10 @@ class TestProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_course_data")
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
     def test_fallback_recommendations_when_no_amplitude_recommended_keys(
         self,
+        is_user_enrolled_in_ut_austin_masters_program_mock,
         country_code_from_ip_mock,
         get_amplitude_course_recommendations_mock,
         get_course_data_mock,
@@ -593,7 +605,7 @@ class TestProductRecommendationsView(APITestCase):
         and 4 fallback amplitude recommendations are returned
         if amplitude gave back no course keys
         """
-
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = False
         country_code_from_ip_mock.return_value = "za"
         get_amplitude_course_recommendations_mock.side_effect = [False, True, []]
 
@@ -616,8 +628,10 @@ class TestProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
     def test_response_with_amplitude_and_no_cross_product_courses(
         self,
+        is_user_enrolled_in_ut_austin_masters_program_mock,
         country_code_from_ip_mock,
         get_amplitude_course_recommendations_mock,
         get_course_data_mock,
@@ -627,7 +641,7 @@ class TestProductRecommendationsView(APITestCase):
         Verify that if no cross product courses are returned,
         then 4 fallback amplitude recommendations will still be returned
         """
-
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = False
         country_code_from_ip_mock.return_value = "za"
         get_user_enrolled_course_keys_mock.return_value = self.enrolled_course_run_keys
         get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
@@ -648,8 +662,10 @@ class TestProductRecommendationsView(APITestCase):
     @mock.patch("lms.djangoapps.learner_recommendations.utils.get_course_data")
     @mock.patch("lms.djangoapps.learner_recommendations.views.get_amplitude_course_recommendations")
     @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
     def test_amplitude_only_url_response(
         self,
+        is_user_enrolled_in_ut_austin_masters_program_mock,
         country_code_from_ip_mock,
         get_amplitude_course_recommendations_mock,
         get_course_data_mock,
@@ -659,7 +675,7 @@ class TestProductRecommendationsView(APITestCase):
         Verify that if no course key was provided in the url,
         only 1 field for amplitude courses are sent back
         """
-
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = False
         country_code_from_ip_mock.return_value = "za"
         get_user_enrolled_course_keys_mock.return_value = self.enrolled_course_run_keys
         get_amplitude_course_recommendations_mock.return_value = [False, True, self.amplitude_keys]
@@ -674,6 +690,50 @@ class TestProductRecommendationsView(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response_content), 1)
         self.assertEqual(len(amplitude_course_data), 4)
+
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
+    def test_zero_cross_product_and_amplitude_recommendations(
+        self,
+        is_user_enrolled_in_ut_austin_masters_program_mock,
+        country_code_from_ip_mock,
+    ):
+        """
+        Verify 0 cross product course recommendations are returned
+        and 0 amplitude courses are returned if the user is enrolled in ut austin masters program
+        """
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = True
+        country_code_from_ip_mock.return_value = "za"
+
+        response = self.client.get(self._get_url('edx+HL0'))
+        response_content = json.loads(response.content)
+        cross_product_course_data = response_content["crossProductCourses"]
+        amplitude_course_data = response_content["amplitudeCourses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(cross_product_course_data), 0)
+        self.assertEqual(len(amplitude_course_data), 0)
+
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    @mock.patch("lms.djangoapps.learner_recommendations.views.is_user_enrolled_in_ut_austin_masters_program")
+    def test_zero_amplitude_recommendations(
+        self,
+        is_user_enrolled_in_ut_austin_masters_program_mock,
+        country_code_from_ip_mock,
+    ):
+        """
+        Verify that 0 amplitude courses are returned
+        if the user is enrolled in ut austin masters program
+        """
+        is_user_enrolled_in_ut_austin_masters_program_mock.return_value = True
+        country_code_from_ip_mock.return_value = "za"
+
+        response = self.client.get(self._get_url())
+        response_content = json.loads(response.content)
+        amplitude_course_data = response_content["amplitudeCourses"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(amplitude_course_data), 0)
 
 
 @ddt.ddt

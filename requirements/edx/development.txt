@@ -4,6 +4,8 @@
 #
 #    make upgrade
 #
+accessible-pygments==0.0.4
+    # via pydata-sphinx-theme
 acid-xblock==0.2.1
     # via -r requirements/edx/testing.txt
 aiohttp==3.8.4
@@ -74,6 +76,7 @@ babel==2.11.0
     #   -r requirements/edx/testing.txt
     #   enmerkar
     #   enmerkar-underscore
+    #   pydata-sphinx-theme
     #   sphinx
 backoff==1.10.0
     # via
@@ -86,6 +89,7 @@ backports-zoneinfo==0.2.1
 beautifulsoup4==4.12.2
     # via
     #   -r requirements/edx/testing.txt
+    #   pydata-sphinx-theme
     #   pynliner
 billiard==3.6.4.0
     # via
@@ -529,6 +533,7 @@ docutils==0.19
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   botocore
+    #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
 done-xblock==2.0.5
@@ -610,7 +615,7 @@ edx-drf-extensions==8.8.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.67.0
+edx-enterprise==3.67.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -1066,6 +1071,7 @@ packaging==23.1
     #   build
     #   drf-yasg
     #   py2neo
+    #   pydata-sphinx-theme
     #   pytest
     #   snowflake-connector-python
     #   sphinx
@@ -1171,11 +1177,15 @@ pydantic==1.10.9
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
+pydata-sphinx-theme==0.13.3
+    # via sphinx-book-theme
 pygments==2.15.1
     # via
     #   -r requirements/edx/testing.txt
+    #   accessible-pygments
     #   diff-cover
     #   py2neo
+    #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
 pyjwkest==1.4.2
@@ -1475,7 +1485,6 @@ six==1.16.0
     #   edx-lint
     #   edx-milestones
     #   edx-rbac
-    #   edx-sphinx-theme
     #   event-tracking
     #   fs
     #   fs-s3fs
@@ -1539,9 +1548,12 @@ soupsieve==2.4.1
 sphinx==5.3.0
     # via
     #   -c requirements/edx/../common_constraints.txt
-    #   edx-sphinx-theme
+    #   pydata-sphinx-theme
+    #   sphinx-book-theme
     #   sphinxcontrib-httpdomain
     #   sphinxcontrib-openapi
+sphinx-book-theme==1.0.1
+    # via -r requirements/edx/development.in
 sphinx-mdinclude==0.5.3
     # via sphinxcontrib-openapi
 sphinxcontrib-applehelp==1.0.4
@@ -1639,6 +1651,7 @@ typing-extensions==4.6.3
     #   import-linter
     #   mypy
     #   pydantic
+    #   pydata-sphinx-theme
     #   pylint
     #   pylti1p3
     #   snowflake-connector-python

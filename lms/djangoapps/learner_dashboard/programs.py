@@ -17,7 +17,7 @@ from web_fragments.fragment import Fragment
 
 from common.djangoapps.student.models import anonymous_id_for_user
 from common.djangoapps.student.roles import GlobalStaff
-from lms.djangoapps.learner_dashboard.utils import program_tab_view_is_enabled, user_b2c_subscriptions_enabled
+from lms.djangoapps.learner_dashboard.utils import b2c_subscriptions_enabled, program_tab_view_is_enabled
 from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 from openedx.core.djangoapps.programs.models import (
@@ -58,7 +58,7 @@ class ProgramsFragmentView(EdxFragmentView):
             raise Http404
 
         meter = ProgramProgressMeter(request.site, user, mobile_only=mobile_only)
-        is_user_b2c_subscriptions_enabled = user_b2c_subscriptions_enabled(user, mobile_only)
+        is_user_b2c_subscriptions_enabled = b2c_subscriptions_enabled(mobile_only)
         programs_subscription_data = get_programs_subscription_data(user) if is_user_b2c_subscriptions_enabled else []
 
         context = {
@@ -120,7 +120,7 @@ class ProgramDetailsFragmentView(EdxFragmentView):
 
         program_discussion_lti = ProgramDiscussionLTI(program_uuid, request)
         program_live_lti = ProgramLiveLTI(program_uuid, request)
-        is_user_b2c_subscriptions_enabled = user_b2c_subscriptions_enabled(user, mobile_only)
+        is_user_b2c_subscriptions_enabled = b2c_subscriptions_enabled(mobile_only)
         program_subscription_data = (
             get_programs_subscription_data(user, program_uuid)
             if is_user_b2c_subscriptions_enabled

@@ -489,7 +489,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         self.assertEqual(response.data['count_by_app_name'], {})
 
 
-class MarkNotificationsUnseenAPIViewTestCase(APITestCase):
+class MarkNotificationsSeenAPIViewTestCase(APITestCase):
     """
     Tests for the MarkNotificationsUnseenAPIView.
     """
@@ -503,20 +503,20 @@ class MarkNotificationsUnseenAPIViewTestCase(APITestCase):
         Notification.objects.create(user=self.user, app_name='App Name 2', notification_type='Type A')
         Notification.objects.create(user=self.user, app_name='App Name 3', notification_type='Type C')
 
-    def test_mark_notifications_unseen(self):
-        # Create a POST request to mark notifications as unseen for 'App Name 1'
+    def test_mark_notifications_seen(self):
+        # Create a POST request to mark notifications as seen for 'App Name 1'
         app_name = 'App Name 1'
-        url = reverse('mark-notifications-unseen', kwargs={'app_name': app_name})
+        url = reverse('mark-notifications-seen', kwargs={'app_name': app_name})
         self.client.login(username=self.user.username, password='test')
         response = self.client.put(url)
         # Assert the response status code is 200 (OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Assert the response data contains the expected message
-        expected_data = {'message': 'Notifications marked unseen.'}
+        expected_data = {'message': 'Notifications marked as seen.'}
         self.assertEqual(response.data, expected_data)
 
-        # Assert the notifications for 'App Name 1' are marked as unseen for the user
+        # Assert the notifications for 'App Name 1' are marked as seen for the user
         notifications = Notification.objects.filter(user=self.user, app_name=app_name, last_seen__isnull=False)
         self.assertEqual(notifications.count(), 2)
 

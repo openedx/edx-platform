@@ -188,6 +188,18 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.8.0\n"
 
+#: cms/djangoapps/contentstore/helpers.py
+#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Unit"
+msgstr "單元"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr ""
+
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
 #: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
@@ -202,12 +214,6 @@ msgstr "文本"
 #: openedx/features/lti_course_tab/tab.py xmodule/discussion_block.py
 msgid "Discussion"
 msgstr "討論區"
-
-#: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/helpers.py
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Problem"
-msgstr ""
 
 #: lms/templates/video.html
 msgid "Video"
@@ -226,17 +232,6 @@ msgstr "進階"
 #: lms/djangoapps/courseware/tabs.py
 msgid "Entrance Exam"
 msgstr "資格考試"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
-msgid "Unit"
-msgstr "單元"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_block.py
-msgid "Empty"
-msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: xmodule/video_block/video_handlers.py
@@ -289,6 +284,11 @@ msgstr "影片ID"
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "Pending"
 msgstr "暫停"
+
+#: cms/djangoapps/contentstore/xblock_services/create_xblock.py
+#: xmodule/library_content_block.py
+msgid "Empty"
+msgstr ""
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -11639,6 +11639,19 @@ msgstr "您提供的課程位置是錯的"
 msgid "Missing branch on fresh clone"
 msgstr "在新的副本中漏失了分支資訊"
 
+#: cms/djangoapps/contentstore/helpers.py
+msgid "Vertical"
+msgstr "垂直"
+
+#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
+#: lms/templates/seq_block.html
+msgid "Section"
+msgstr "章節"
+
+#: lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr "小節"
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -11724,11 +11737,13 @@ msgid "{previous_groups}, {current_group}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "與{0}重複"
 
 #: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "與'{0}'重複"
@@ -11793,85 +11808,6 @@ msgstr "上傳完成"
 msgid ""
 "File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
 msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Invalid data"
-msgstr "無效的資料"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "無效資料 ({details})"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "There was a problem pasting your component."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Your clipboard is empty or invalid."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Item is already present in target location."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into itself."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into it's child."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item directly into content experiment."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr ""
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr "學生必須得分 {score}{pct_sign} 或高於此分數以存取課程教材。"
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/block.py
-msgid "%"
-msgstr "%"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -11988,19 +11924,6 @@ msgstr "完成課程資格考試"
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "課程成功匯出到Git資源庫"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Vertical"
-msgstr "垂直"
-
-#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_block.html
-msgid "Section"
-msgstr "章節"
-
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
-msgstr "小節"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Some chunks missed during file upload. Please try again"
@@ -12244,6 +12167,82 @@ msgstr "{course}_video_urls"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "A non zero positive integer is expected"
 msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Invalid data"
+msgstr "無效的資料"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "無效資料 ({details})"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Item is already present in target location."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item into itself."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item into it's child."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item directly into content experiment."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr "學生必須得分 {score}{pct_sign} 或高於此分數以存取課程教材。"
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "%"
+msgstr "%"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
