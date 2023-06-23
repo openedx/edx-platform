@@ -130,6 +130,7 @@ def get_program_marketing_url(programs_config, mobile_only=False):
 
     return marketing_url
 
+
 def get_program_subscriptions_marketing_url():
     """Build a URL used to link to subscription eligible programs on the marketing site."""
     marketing_urls = settings.MKTG_URLS

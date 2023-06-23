@@ -675,8 +675,6 @@ edx-search==3.5.0
     # via -r requirements/edx/testing.txt
 edx-sga==0.22.0
     # via -r requirements/edx/testing.txt
-edx-sphinx-theme==3.1.0
-    # via -r requirements/edx/development.in
 edx-submissions==3.5.6
     # via
     #   -r requirements/edx/testing.txt
@@ -1547,9 +1545,8 @@ soupsieve==2.4.1
     # via
     #   -r requirements/edx/testing.txt
     #   beautifulsoup4
-sphinx==5.3.0
+sphinx==6.2.1
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   pydata-sphinx-theme
     #   sphinx-book-theme
     #   sphinxcontrib-httpdomain
