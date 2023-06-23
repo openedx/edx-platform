@@ -136,4 +136,4 @@ def expire_and_create_entitlements(self, entitlement_ids, support_username):
     except Exception as exc:  # pylint: disable=broad-except
         LOGGER.exception('Failed to expire entitlements that reached their expiration period')
 
-    LOGGER.info('Successfully completed the task expire_and_create_entitlements after examining %d entries', entitlement_ids.count())  # lint-amnesty, pylint: disable=line-too-long
+    LOGGER.info('Successfully completed the task expire_and_create_entitlements after examining %d entries', len(entitlement_ids))  # lint-amnesty, pylint: disable=line-too-long
