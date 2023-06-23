@@ -104,6 +104,7 @@ class Command(BaseCommand):
         for batch_num in range(num_batches):
             start = batch_num * batch_size
             end = min(start + batch_size, entitlements_to_expire, entitlements_count)
-            expire_and_create_entitlements.delay(entitlements[start:end], support_user)
+            entitlement_ids = [entitlement.id for entitlement in entitlements[start:end]]
+            expire_and_create_entitlements.delay(entitlement_ids, support_user)
 
         logger.info('Done. Successfully enqueued %d tasks.', num_batches)

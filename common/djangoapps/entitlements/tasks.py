@@ -64,7 +64,7 @@ def expire_old_entitlements(self, start, end, logid='...'):
 
 @shared_task(bind=True, ignore_result=True)
 @set_code_owner_attribute
-def expire_and_create_entitlements(self, entitlements, support_user):
+def expire_and_create_entitlements(self, entitlement_ids, support_user):
     """
     Expire entitlements older than one year.
 
@@ -75,7 +75,7 @@ def expire_and_create_entitlements(self, entitlements, support_user):
     / 18 months.
 
     Args:
-        entitlements (QuerySet): A QuerySet with the entitlements to expire.
+        entitlement_ids (List<int>): A list of entitlement ids to expire.
         support_user (django.contrib.auth.models.user): The username to attribute
         the entitlement expiration and recreation to.
 
@@ -83,23 +83,24 @@ def expire_and_create_entitlements(self, entitlements, support_user):
         None
 
     """
-    first_entitlement_id = entitlements[0].id
-    last_entitlement_id = entitlements[-1].id
+    first_entitlement_id = entitlement_ids[0]
+    last_entitlement_id = entitlement_ids[-1]
 
     LOGGER.info(
         'Running task expire_and_create_entitlements over %d entitlements from id %d to id %d',
-        len(entitlements),
+        len(entitlement_ids),
         first_entitlement_id,
         last_entitlement_id,
     )
 
     try:
-        for entitlement in entitlements:
+        for entitlement_id in entitlement_ids:
+            entitlement = CourseEntitlement.object.get(_id=entitlement_id)
             LOGGER.info('Started expiring entitlement with id %d', entitlement.id)
             entitlement.expire_entitlement()
             LOGGER.info('Expired entitlement with id %d as expiration period has reached', entitlement.id)
             support_detail = {
-                'action': 'EXPIRED',
+                'action': 'EXPIRE',
                 'comments': 'REV-3574',
                 'entitlement': entitlement,
                 'support_user': support_user,
@@ -130,4 +131,4 @@ def expire_and_create_entitlements(self, entitlements, support_user):
     except Exception as exc:  # pylint: disable=broad-except
         LOGGER.exception('Failed to expire entitlements that reached their expiration period')
 
-    LOGGER.info('Successfully completed the task expire_and_create_entitlements after examining %d entries', entitlements.count())  # lint-amnesty, pylint: disable=line-too-long
+    LOGGER.info('Successfully completed the task expire_and_create_entitlements after examining %d entries', entitlement_ids.count())  # lint-amnesty, pylint: disable=line-too-long
