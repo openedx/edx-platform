@@ -358,6 +358,8 @@ django==3.2.20
     #   django-splash
     #   django-statici18n
     #   django-storages
+    #   django-stubs
+    #   django-stubs-ext
     #   django-user-tasks
     #   djangorestframework
     #   drf-jwt
@@ -576,6 +578,13 @@ django-storages==1.9.1
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edxval
+django-stubs==1.16.0
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/development.in
+    #   djangorestframework-stubs
+django-stubs-ext==4.2.2
+    # via django-stubs
 django-user-tasks==3.0.0
     # via
     #   -r requirements/edx/doc.txt
@@ -618,6 +627,10 @@ djangorestframework==3.14.0
     #   openedx-blockstore
     #   ora2
     #   super-csv
+djangorestframework-stubs==3.14.0
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/development.in
 djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1226,7 +1239,10 @@ multidict==6.0.4
     #   aiohttp
     #   yarl
 mypy==1.4.1
-    # via -r requirements/edx/development.in
+    # via
+    #   -r requirements/edx/development.in
+    #   django-stubs
+    #   djangorestframework-stubs
 mypy-extensions==1.0.0
     # via mypy
 mysqlclient==2.2.0
@@ -1721,6 +1737,7 @@ requests==2.31.0
     #   analytics-python
     #   coreapi
     #   django-oauth-toolkit
+    #   djangorestframework-stubs
     #   edx-bulk-grades
     #   edx-drf-extensions
     #   edx-enterprise
@@ -2012,6 +2029,7 @@ tomli==2.0.1
     #   -r requirements/edx/testing.txt
     #   build
     #   coverage
+    #   django-stubs
     #   import-linter
     #   mypy
     #   pip-tools
@@ -2043,6 +2061,9 @@ typing-extensions==4.7.1
     #   asgiref
     #   astroid
     #   django-countries
+    #   django-stubs
+    #   django-stubs-ext
+    #   djangorestframework-stubs
     #   faker
     #   fastapi
     #   grimp
