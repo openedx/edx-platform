@@ -99,7 +99,7 @@ def expire_and_create_entitlements(self, entitlements, support_user):
             entitlement.expire_entitlement()
             LOGGER.info('Expired entitlement with id %d as expiration period has reached', entitlement.id)
             support_detail = {
-                'action': 'EXPIRED',
+                'action': 'EXPIRE',
                 'comments': 'REV-3574',
                 'entitlement': entitlement,
                 'support_user': support_user,
