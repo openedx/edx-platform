@@ -107,21 +107,26 @@ def expire_and_create_entitlements(self, entitlements, support_user):
             CourseEntitlementSupportDetail.objects.create(**support_detail)
 
             # Creating new entitlement and support details
-            new_entitlement = {
+            new_entitlement_detail = {
                 'course_uuid': entitlement.course_uuid,
                 'user': entitlement.user,
                 'mode': entitlement.mode,
                 'refund_locked': True,
             }
-            CourseEntitlement.objects.create(**new_entitlement)
+            new_entitlement = CourseEntitlement.objects.create(**new_entitlement_detail)
             support_detail = {
                 'action': 'CREATE',
                 'comments': 'REV-3574',
-                'entitlement': entitlement,
+                'entitlement': new_entitlement,
                 'support_user': support_user,
             }
             CourseEntitlementSupportDetail.objects.create(**support_detail)
-            LOGGER.info('created new entitlement with id %d in a correspondence of above expired entitlement', new_entitlement.id)  # lint-amnesty, pylint: disable=line-too-long
+            LOGGER.info(
+                'created new entitlement with id %d corresponding to above ' +
+                'expired entitlement with id %d',
+                new_entitlement.id,
+                entitlement.id,
+            )
 
     except Exception as exc:  # pylint: disable=broad-except
         LOGGER.exception('Failed to expire entitlements that reached their expiration period')
