@@ -2,8 +2,6 @@
 """
 Tests of responsetypes
 """
-
-
 import io
 import json
 import os
@@ -18,7 +16,6 @@ import mock
 import pyparsing
 import random2 as random
 import requests
-import six
 from pytz import UTC
 
 from xmodule.capa.correctmap import CorrectMap
@@ -2727,7 +2724,7 @@ class ChoiceTextResponseTest(ResponseTest):
         radiotextgroup.
         """
 
-        for name, inputs in six.iteritems(self.TEST_INPUTS):
+        for name, inputs in self.TEST_INPUTS.items():
             # Turn submission into the form expected when grading this problem.
             submission = self._make_answer_dict(inputs)
             # Lookup the problem_name, and the whether this test problem
@@ -2807,7 +2804,7 @@ class ChoiceTextResponseTest(ResponseTest):
             "checkbox_2_choices_2_inputs": checkbox_two_choices_two_inputs
         }
 
-        for name, inputs in six.iteritems(inputs):
+        for name, inputs in inputs.items():
             submission = self._make_answer_dict(inputs)
             # Load the test problem's name and desired correctness
             problem_name, correctness = scenarios[name]

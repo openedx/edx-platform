@@ -1,13 +1,11 @@
 """
 Test capa problem.
 """
-
-
 import textwrap
 import unittest
+
 import pytest
 import ddt
-import six
 from lxml import etree
 from markupsafe import Markup
 from mock import patch
@@ -430,7 +428,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
 
     def assert_problem_data(self, problem_data):
         """Verify problem data is in expected state"""
-        for problem_value in six.viewvalues(problem_data):
+        for problem_value in problem_data.values():
             assert isinstance(problem_value['label'], Markup)
 
     def assert_problem_html(self, problem_html, group_label, *input_labels):
