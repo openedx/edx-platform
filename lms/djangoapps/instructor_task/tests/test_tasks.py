@@ -237,7 +237,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         output = json.loads(entry.task_output)
         assert output['exception'] == 'ExceptionWithTraceback'
         assert (expected_message[:(len(output['message']) - 7)] + '\n"""...') == output['message']
-        assert output['traceback'][(- 3):] == '...'
+        assert output['message'][(- 3):] == '...'
 
 
 class TestOverrideScoreInstructorTask(TestInstructorTasks):
