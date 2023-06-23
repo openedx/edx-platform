@@ -85,7 +85,8 @@ class Command(BaseCommand):
             enrollment_course_run__isnull=True, course_uuid__in=exceptional_courses)
 
         entitlements = normal_entitlements | exceptional_entitlements
-        logger.info('Total entitlements that have reached expiration period are %d ', entitlements.count())
+        entitlements_count = entitlements.count()
+        logger.info('Total entitlements that have reached expiration period are %d ', entitlements_count)
 
         entitlements_to_expire = max(1, options.get('count'))
         batch_size = max(1, options.get('batch_size'))
@@ -102,7 +103,7 @@ class Command(BaseCommand):
 
         for batch_num in range(num_batches):
             start = batch_num * batch_size
-            end = min(start + batch_size, entitlements_to_expire, entitlements.count())
+            end = min(start + batch_size, entitlements_to_expire, entitlements_count)
             expire_and_create_entitlements.delay(entitlements[start:end], support_user)
 
         logger.info('Done. Successfully enqueued %d tasks.', num_batches)
