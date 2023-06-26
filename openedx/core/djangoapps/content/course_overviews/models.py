@@ -657,7 +657,7 @@ class CourseOverview(TimeStampedModel):
         log.info('Finished generating course overviews.')
 
     @classmethod
-    def get_all_courses(cls, orgs=None, filter_=None, active_only=False):
+    def get_all_courses(cls, orgs=None, filter_=None, active_only=False, course_keys=None):
         """
         Return a queryset containing all CourseOverview objects in the database.
 
@@ -666,11 +666,16 @@ class CourseOverview(TimeStampedModel):
                 filtering by organization.
             filter_ (dict): Optional parameter that allows custom filtering.
             active_only (bool): If provided, only the courses that have not ended will be returned.
+            course_keys (list[string]): Optional parameter that allows case-insensitive
+                filter by course ids
         """
         # Note: If a newly created course is not returned in this QueryList,
         # make sure the "publish" signal was emitted when the course was
         # created. For tests using CourseFactory, use emit_signals=True.
         course_overviews = CourseOverview.objects.all()
+
+        if course_keys:
+            course_overviews = course_overviews.filter(id__in=course_keys)
 
         if orgs:
             # In rare cases, courses belonging to the same org may be accidentally assigned

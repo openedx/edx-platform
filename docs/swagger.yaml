@@ -2084,6 +2084,21 @@ paths:
                 provided org code (e.g., "HarvardX") are returned.
                 Case-insensitive.
 
+            permissions (optional):
+                If specified, it filters visible `CourseOverview` objects by
+                checking if each permission specified is granted for the username.
+                Notice that Staff users are always granted permission to list any
+                course.
+
+            active_only (optional):
+                If this boolean is specified, only the courses that have not ended or do not have any end
+                date are returned. This is different from search_term because this filtering is done on
+                CourseOverview and not ElasticSearch.
+
+            course_keys (optional):
+                If specified, it filters visible `CourseOverview` objects by
+                the course keys (ids) provided
+
         **Returns**
 
             * 200 on success, with a list of course discovery objects as returned
