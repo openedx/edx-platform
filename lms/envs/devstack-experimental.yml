@@ -615,16 +615,14 @@ VIDEO_IMAGE_MAX_AGE: 31536000
 VIDEO_IMAGE_SETTINGS:
     DIRECTORY_PREFIX: video-images/
     STORAGE_KWARGS:
-        base_url: /media/
-        location: /edx/var/edxapp/media//
+        location: edx/var/edxapp/media//
     VIDEO_IMAGE_MAX_BYTES: 2097152
     VIDEO_IMAGE_MIN_BYTES: 2048
 VIDEO_TRANSCRIPTS_MAX_AGE: 31536000
 VIDEO_TRANSCRIPTS_SETTINGS:
     DIRECTORY_PREFIX: video-transcripts/
     STORAGE_KWARGS:
-        base_url: /media/
-        location: /edx/var/edxapp/media//
+        location: edx/var/edxapp/media//
     VIDEO_TRANSCRIPTS_MAX_BYTES: 3145728
 VIDEO_UPLOAD_PIPELINE:
     BUCKET: ''
