@@ -98,7 +98,7 @@ def expire_and_create_entitlements(self, entitlement_ids, support_username):
         len(entitlement_ids),
         first_entitlement_id,
         last_entitlement_id,
-        self.id
+        self.request.id
     )
 
     try:
@@ -106,11 +106,11 @@ def expire_and_create_entitlements(self, entitlement_ids, support_username):
             entitlement = CourseEntitlement.objects.get(id=entitlement_id)
             log.info('Started expiring entitlement with id %d, task id :%s',
                      entitlement.id,
-                     self.id)
+                     self.request.id)
             entitlement.expire_entitlement()
             log.info('Expired entitlement with id %d as expiration period has reached, task id :%s',
                      entitlement.id,
-                     self.id)
+                     self.request.id)
             support_detail = {
                 'action': 'EXPIRE',
                 'comments': 'REV-3574',
@@ -135,16 +135,18 @@ def expire_and_create_entitlements(self, entitlement_ids, support_username):
             }
             CourseEntitlementSupportDetail.objects.create(**support_detail)
             log.info(
-                'created new entitlement with id %d corresponding to above expired entitlement with id %d, task id :%s ',
+                'created new entitlement with id %d corresponding to above expired entitlement'
+                'with id %d, task id :%s ',
                 new_entitlement.id,
                 entitlement.id,
-                self.id
+                self.request.id
             )
 
     except Exception as exc:  # pylint: disable=broad-except
         log.exception('Failed to expire entitlements that reached their expiration period, task id :%s',
-                      self.id)
+                      self.request.id)
 
-    log.info('Successfully completed the task expire_and_create_entitlements after examining %d entries, task id :%s',
+    log.info('Successfully completed the task expire_and_create_entitlements after examining'
+             '%d entries, task id :%s',
              len(entitlement_ids),
-             self.id)
+             self.request.id)
