@@ -1,9 +1,8 @@
 """Tests for static_replace"""
-
+from functools import partial
 
 import re
 from io import BytesIO
-from unittest import TestCase
 from unittest.mock import Mock, patch
 from urllib.parse import parse_qsl, quote, urlparse, urlunparse, urlencode
 
@@ -19,7 +18,8 @@ from common.djangoapps.static_replace import (
     make_static_urls_absolute,
     process_static_urls,
     replace_course_urls,
-    replace_static_urls
+    replace_static_urls,
+    replace_jump_to_id_urls,
 )
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
@@ -593,10 +593,15 @@ class CanonicalContentTest(SharedModuleStoreTestCase):
             assert re.match(expected, asset_path) is not None
 
 
-class ReplaceURLServiceTest(TestCase):
+class ReplaceURLServiceTest(SharedModuleStoreTestCase):
     """
     Test ReplaceURLService methods
     """
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.course = CourseFactory.create(org='TestX', number='TS02', run='2015')
+
     def setUp(self):
         super().setUp()
         self.mock_replace_static_urls = self.create_patch(
@@ -619,8 +624,16 @@ class ReplaceURLServiceTest(TestCase):
         """
         Test only replace_static_urls method called when static_replace_only is passed as True.
         """
-        replace_url_service = ReplaceURLService(course_id=COURSE_KEY)
-        return_text = replace_url_service.replace_urls("text", static_replace_only=True)
+        replace_url_service = ReplaceURLService(xblock=self.course)
+        replace_url_service.replace_urls("text", static_replace_only=True)
+        assert self.mock_replace_static_urls.called
+        assert not self.mock_replace_course_urls.called
+        assert not self.mock_replace_jump_to_id_urls.called
+
+    def test_service_block_argument(self):
+        """This service accepts either `block` or `xblock` keyword argument."""
+        replace_url_service = ReplaceURLService(block=self.course)
+        replace_url_service.replace_urls("text", static_replace_only=True)
         assert self.mock_replace_static_urls.called
         assert not self.mock_replace_course_urls.called
         assert not self.mock_replace_jump_to_id_urls.called
@@ -629,24 +642,24 @@ class ReplaceURLServiceTest(TestCase):
         """
         Test replace_course_urls method called static_replace_only is passed as False.
         """
-        replace_url_service = ReplaceURLService(course_id=COURSE_KEY)
-        return_text = replace_url_service.replace_urls("text")
+        replace_url_service = ReplaceURLService(xblock=self.course)
+        replace_url_service.replace_urls("text")
         assert self.mock_replace_course_urls.called
 
     def test_replace_jump_to_id_urls_called(self):
         """
         Test replace_jump_to_id_urls method called jump_to_id_base_url is provided.
         """
-        replace_url_service = ReplaceURLService(course_id=COURSE_KEY, jump_to_id_base_url="/course/course_id")
-        return_text = replace_url_service.replace_urls("text")
+        replace_url_service = ReplaceURLService(xblock=self.course, jump_to_id_base_url="/course/course_id")
+        replace_url_service.replace_urls("text")
         assert self.mock_replace_jump_to_id_urls.called
 
     def test_replace_jump_to_id_urls_not_called(self):
         """
         Test replace_jump_to_id_urls method called jump_to_id_base_url is not provided.
         """
-        replace_url_service = ReplaceURLService(course_id=COURSE_KEY)
-        return_text = replace_url_service.replace_urls("text")
+        replace_url_service = ReplaceURLService(xblock=self.course)
+        replace_url_service.replace_urls("text")
         assert not self.mock_replace_jump_to_id_urls.called
 
 
@@ -659,54 +672,53 @@ class TestReplaceURLWrapper(SharedModuleStoreTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.course = CourseFactory.create(
-            org='TestX',
-            number='TS02',
-            run='2015'
-        )
+        cls.course = CourseFactory.create(org='TestX', number='TS02', run='2015')
 
     def test_replace_jump_to_id_urls(self):
         """
         Verify that the jump-to URL has been replaced.
         """
-        replace_url_service = ReplaceURLService(course_id=self.course.id, jump_to_id_base_url='/base_url/')
+        fragment = Fragment('<a href="/jump_to_id/id">')
         test_replace = replace_urls_wrapper(
             block=self.course,
             view='baseview',
-            frag=Fragment('<a href="/jump_to_id/id">'),
+            frag=fragment,
             context=None,
-            replace_url_service=replace_url_service
+            replace_url_service=partial(ReplaceURLService, jump_to_id_base_url='/base_url/'),
         )
         assert isinstance(test_replace, Fragment)
+        assert test_replace.content == replace_jump_to_id_urls(fragment.content, self.course.id, '/base_url/')
         assert test_replace.content == '<a href="/base_url/id">'
 
     def test_replace_course_urls(self):
         """
         Verify that the course URL has been replaced.
         """
-        replace_url_service = ReplaceURLService(course_id=self.course.id)
+        fragment = Fragment('<a href="/course/id">')
         test_replace = replace_urls_wrapper(
             block=self.course,
             view='baseview',
-            frag=Fragment('<a href="/course/id">'),
+            frag=fragment,
             context=None,
-            replace_url_service=replace_url_service
+            replace_url_service=ReplaceURLService,
         )
         assert isinstance(test_replace, Fragment)
+        assert test_replace.content == replace_course_urls(fragment.content, course_key=self.course.id)
         assert test_replace.content == '<a href="/courses/course-v1:TestX+TS02+2015/id">'
 
     def test_replace_static_urls(self):
         """
         Verify that the static URL has been replaced.
         """
-        replace_url_service = ReplaceURLService(course_id=self.course.id)
+        fragment = Fragment('<a href="/static/id">')
         test_replace = replace_urls_wrapper(
             block=self.course,
             view='baseview',
-            frag=Fragment('<a href="/static/id">'),
+            frag=fragment,
             context=None,
-            replace_url_service=replace_url_service,
-            static_replace_only=True
+            replace_url_service=ReplaceURLService,
+            static_replace_only=True,
         )
         assert isinstance(test_replace, Fragment)
+        assert test_replace.content == replace_static_urls(fragment.content, course_id=self.course.id)
         assert test_replace.content == '<a href="/asset-v1:TestX+TS02+2015+type@asset+block/id">'

@@ -131,6 +131,15 @@ def get_program_marketing_url(programs_config, mobile_only=False):
     return marketing_url
 
 
+def get_program_subscriptions_marketing_url():
+    """Build a URL used to link to subscription eligible programs on the marketing site."""
+    marketing_urls = settings.MKTG_URLS
+    return urljoin(
+        marketing_urls.get('ROOT'),
+        marketing_urls.get('PROGRAM_SUBSCRIPTIONS'),
+    )
+
+
 def attach_program_detail_url(programs, mobile_only=False):
     """Extend program representations by attaching a URL to be used when linking to program details.
 

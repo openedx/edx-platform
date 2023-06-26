@@ -272,6 +272,18 @@ class ProductRecommendationsView(APIView):
         Helper for collecting and forming a response for
         cross product and Amplitude recommendations
         """
+
+        if is_user_enrolled_in_ut_austin_masters_program(user):
+            return Response(
+                CrossProductAndAmplitudeRecommendationsSerializer(
+                    {
+                        "crossProductCourses": [],
+                        "amplitudeCourses": []
+                    }
+                ).data,
+                status=200
+            )
+
         amplitude_recommendations = self._get_amplitude_recommendations(user, user_country_code)
         cross_product_recommendations = self._get_cross_product_recommendations(course_key, user_country_code)
 
@@ -289,6 +301,15 @@ class ProductRecommendationsView(APIView):
         """
         Helper for collecting and forming a response for Amplitude recommendations only
         """
+
+        if is_user_enrolled_in_ut_austin_masters_program(user):
+            return Response(
+                AmplitudeRecommendationsSerializer({
+                    "amplitudeCourses": []
+                }).data,
+                status=200
+            )
+
         amplitude_recommendations = self._get_amplitude_recommendations(user, user_country_code)
 
         return Response(

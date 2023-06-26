@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
-    get_course_notification_preference_config_version
+    get_course_notification_preference_config_version,
 )
 
 from .base_notification import COURSE_NOTIFICATION_APPS
@@ -147,12 +147,8 @@ class UserNotificationPreferenceView(APIView):
             }
          """
         course_id = CourseKey.from_string(course_key_string)
-        user_notification_preference, _ = CourseNotificationPreference.objects.get_or_create(
-            user=request.user,
-            course_id=course_id,
-            is_active=True,
-        )
-        serializer = UserCourseNotificationPreferenceSerializer(user_notification_preference)
+        user_preference = CourseNotificationPreference.get_updated_user_course_preferences(request.user, course_id)
+        serializer = UserCourseNotificationPreferenceSerializer(user_preference)
         return Response(serializer.data)
 
     def patch(self, request, course_key_string):
@@ -305,21 +301,21 @@ class NotificationCountView(APIView):
         })
 
 
-class MarkNotificationsUnseenAPIView(UpdateAPIView):
+class MarkNotificationsSeenAPIView(UpdateAPIView):
     """
-    API view for marking user's all notifications unseen for a provided app_name.
+    API view for marking user's all notifications seen for a provided app_name.
     """
 
     permission_classes = (permissions.IsAuthenticated,)
 
     def update(self, request, *args, **kwargs):
         """
-        Marks all notifications for the given app name unseen for the authenticated user.
+        Marks all notifications for the given app name seen for the authenticated user.
 
         **Args:**
-            app_name: The name of the app to mark notifications unseen for.
+            app_name: The name of the app to mark notifications seen for.
         **Response Format:**
-            A `Response` object with a 200 OK status code if the notifications were successfully marked unseen.
+            A `Response` object with a 200 OK status code if the notifications were successfully marked seen.
         **Response Error Codes**:
         - 400: Bad Request status code if the app name is invalid.
         """
@@ -336,7 +332,7 @@ class MarkNotificationsUnseenAPIView(UpdateAPIView):
 
         notifications.update(last_seen=datetime.now())
 
-        return Response({'message': _('Notifications marked unseen.')}, status=200)
+        return Response({'message': _('Notifications marked as seen.')}, status=200)
 
 
 class NotificationReadAPIView(APIView):

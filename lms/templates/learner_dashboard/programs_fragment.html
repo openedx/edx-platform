@@ -21,6 +21,7 @@ from openedx.core.djangolib.js_utils import (
 <%static:webpack entry="ProgramListFactory">
 ProgramListFactory({
     marketingUrl: '${marketing_url | n, js_escaped_string}',
+    subscriptionsMarketingUrl: '${subscriptions_marketing_url | n, js_escaped_string}',
     programsData: ${programs | n, dump_js_escaped_json},
     programsSubscriptionData: ${programs_subscription_data | n, dump_js_escaped_json},
     userProgress: ${progress | n, dump_js_escaped_json},

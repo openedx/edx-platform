@@ -1,14 +1,22 @@
 """
 Models for notifications
 """
+import logging
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.django.models import CourseKeyField
 
-from openedx.core.djangoapps.notifications.base_notification import NotificationAppManager
+from openedx.core.djangoapps.notifications.base_notification import (
+    NotificationAppManager,
+    NotificationPreferenceSyncManager,
+    get_notification_content,
+)
+
 
 User = get_user_model()
+log = logging.getLogger(__name__)
 
 NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 
@@ -94,6 +102,13 @@ class Notification(TimeStampedModel):
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.app_name} - {self.notification_type}'
 
+    @property
+    def content(self):
+        """
+        Returns the content for the notification.
+        """
+        return get_notification_content(self.notification_type, self.content_context)
+
 
 class CourseNotificationPreference(TimeStampedModel):
     """
@@ -113,3 +128,26 @@ class CourseNotificationPreference(TimeStampedModel):
 
     def __str__(self):
         return f'{self.user.username} - {self.course_id} - {self.notification_preference_config}'
+
+    @staticmethod
+    def get_updated_user_course_preferences(user, course_id):
+        """
+        Returns updated courses preferences for a user
+        """
+        preferences, _ = CourseNotificationPreference.objects.get_or_create(
+            user=user,
+            course_id=course_id,
+            is_active=True,
+        )
+        current_config_version = get_course_notification_preference_config_version()
+        if current_config_version != preferences.config_version:
+            try:
+                current_prefs = preferences.notification_preference_config
+                new_prefs = NotificationPreferenceSyncManager.update_preferences(current_prefs)
+                preferences.config_version = current_config_version
+                preferences.notification_preference_config = new_prefs
+                preferences.save()
+                # pylint: disable-next=broad-except
+            except Exception as e:
+                log.error(f'Unable to update notification preference for {user.username} to new config. {e}')
+        return preferences

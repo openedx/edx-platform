@@ -285,8 +285,12 @@ class NotificationListAPIViewTest(APITestCase):
         # Create a notification for the user.
         Notification.objects.create(
             user=self.user,
-            app_name='app1',
-            notification_type='info',
+            app_name='discussion',
+            notification_type='new_response',
+            content_context={
+                'replier_name': 'test_user',
+                'post_title': 'This is a test post.',
+            }
         )
         self.client.login(username=self.user.username, password='test')
 
@@ -299,8 +303,12 @@ class NotificationListAPIViewTest(APITestCase):
         data = response.data['results']
         # Assert that the response contains the notification.
         self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]['app_name'], 'app1')
-        self.assertEqual(data[0]['notification_type'], 'info')
+        self.assertEqual(data[0]['app_name'], 'discussion')
+        self.assertEqual(data[0]['notification_type'], 'new_response')
+        self.assertEqual(
+            data[0]['content'],
+            '<p><strong>test_user</strong> responded to your post <strong>This is a test post.</strong></p>'
+        )
 
     def test_list_notifications_with_app_name_filter(self):
         """
@@ -309,8 +317,12 @@ class NotificationListAPIViewTest(APITestCase):
         # Create two notifications for the user, one for each app name.
         Notification.objects.create(
             user=self.user,
-            app_name='app1',
-            notification_type='info',
+            app_name='discussion',
+            notification_type='new_response',
+            content_context={
+                'replier_name': 'test_user',
+                'post_title': 'This is a test post.',
+            }
         )
         Notification.objects.create(
             user=self.user,
@@ -320,7 +332,7 @@ class NotificationListAPIViewTest(APITestCase):
         self.client.login(username=self.user.username, password='test')
 
         # Make a request to the view with the app_name query parameter set to 'app1'.
-        response = self.client.get(self.url + "?app_name=app1")
+        response = self.client.get(self.url + "?app_name=discussion")
 
         # Assert that the response is successful.
         self.assertEqual(response.status_code, 200)
@@ -328,8 +340,12 @@ class NotificationListAPIViewTest(APITestCase):
         # Assert that the response contains only the notification for app1.
         data = response.data['results']
         self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]['app_name'], 'app1')
-        self.assertEqual(data[0]['notification_type'], 'info')
+        self.assertEqual(data[0]['app_name'], 'discussion')
+        self.assertEqual(data[0]['notification_type'], 'new_response')
+        self.assertEqual(
+            data[0]['content'],
+            '<p><strong>test_user</strong> responded to your post <strong>This is a test post.</strong></p>'
+        )
 
     def test_list_notifications_without_authentication(self):
         """
@@ -473,7 +489,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         self.assertEqual(response.data['count_by_app_name'], {})
 
 
-class MarkNotificationsUnseenAPIViewTestCase(APITestCase):
+class MarkNotificationsSeenAPIViewTestCase(APITestCase):
     """
     Tests for the MarkNotificationsUnseenAPIView.
     """
@@ -487,20 +503,20 @@ class MarkNotificationsUnseenAPIViewTestCase(APITestCase):
         Notification.objects.create(user=self.user, app_name='App Name 2', notification_type='Type A')
         Notification.objects.create(user=self.user, app_name='App Name 3', notification_type='Type C')
 
-    def test_mark_notifications_unseen(self):
-        # Create a POST request to mark notifications as unseen for 'App Name 1'
+    def test_mark_notifications_seen(self):
+        # Create a POST request to mark notifications as seen for 'App Name 1'
         app_name = 'App Name 1'
-        url = reverse('mark-notifications-unseen', kwargs={'app_name': app_name})
+        url = reverse('mark-notifications-seen', kwargs={'app_name': app_name})
         self.client.login(username=self.user.username, password='test')
         response = self.client.put(url)
         # Assert the response status code is 200 (OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Assert the response data contains the expected message
-        expected_data = {'message': 'Notifications marked unseen.'}
+        expected_data = {'message': 'Notifications marked as seen.'}
         self.assertEqual(response.data, expected_data)
 
-        # Assert the notifications for 'App Name 1' are marked as unseen for the user
+        # Assert the notifications for 'App Name 1' are marked as seen for the user
         notifications = Notification.objects.filter(user=self.user, app_name=app_name, last_seen__isnull=False)
         self.assertEqual(notifications.count(), 2)
 
