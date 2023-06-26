@@ -78,7 +78,7 @@ class CourseEnrollmentListView(generics.ListAPIView):
             if not ENABLE_NOTIFICATIONS.is_enabled(course_id):
                 queryset = queryset.exclude(course_id=course_id)
 
-        queryset = queryset.order_by('-id').select_related('course')
+        queryset = queryset.select_related('course').order_by('-id')
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
