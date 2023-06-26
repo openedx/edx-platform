@@ -46,7 +46,7 @@ class StagedContentData:
 
 @frozen
 class StagedContentFileData:
-    """ Read-only data model for a single file used by some staged content """
+    """Read-only data model for a single file used by some staged content."""
     filename: str = field(validator=validators.instance_of(str))
     # Everything below is optional:
     data: bytes | None = field(validator=validators.optional(validators.instance_of(bytes)))
