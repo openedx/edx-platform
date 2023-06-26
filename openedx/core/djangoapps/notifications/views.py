@@ -72,12 +72,13 @@ class CourseEnrollmentListView(generics.ListAPIView):
         Waffle flag is enabled
         """
         queryset = self.filter_queryset(self.get_queryset())
-        course_ids = queryset.order_by('-id').values_list('course_id', flat=True)
+        course_ids = queryset.values_list('course_id', flat=True)
 
         for course_id in course_ids:
             if not ENABLE_NOTIFICATIONS.is_enabled(course_id):
                 queryset = queryset.exclude(course_id=course_id)
 
+        queryset = queryset.order_by('-id').select_related('course')
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
