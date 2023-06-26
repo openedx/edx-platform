@@ -219,8 +219,8 @@
 
         Problem.prototype.restrictMultipleChoices = function(e) {
           this.clear_all_notifications();
-          let checked = this.$('input:checked').length;
-          let restrictions = this.restrictions;
+          var checked = this.$('input:checked').length;
+          var restrictions = this.restrictions;
           if (restrictions !== undefined && checked > restrictions) {
             $(e.target).attr('checked', false);
             this.gentle_info(
