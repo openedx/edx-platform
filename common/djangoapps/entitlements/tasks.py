@@ -65,7 +65,7 @@ def expire_old_entitlements(self, start, end, logid='...'):
     LOGGER.info('Successfully completed the task expire_old_entitlements after examining %d entries [%s]', entitlements.count(), logid)  # lint-amnesty, pylint: disable=line-too-long
 
 
-@shared_task(bind=True, ignore_result=True)
+@shared_task(bind=True)
 @set_code_owner_attribute
 def expire_and_create_entitlements(self, entitlement_ids, support_username):
     """
@@ -100,7 +100,7 @@ def expire_and_create_entitlements(self, entitlement_ids, support_username):
 
     try:
         for entitlement_id in entitlement_ids:
-            entitlement = CourseEntitlement.object.get(_id=entitlement_id)
+            entitlement = CourseEntitlement.objects.get(id=entitlement_id)
             LOGGER.info('Started expiring entitlement with id %d', entitlement.id)
             entitlement.expire_entitlement()
             LOGGER.info('Expired entitlement with id %d as expiration period has reached', entitlement.id)
