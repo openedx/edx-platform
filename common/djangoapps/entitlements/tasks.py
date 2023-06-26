@@ -65,7 +65,7 @@ def expire_old_entitlements(self, start, end, logid='...'):
     LOGGER.info('Successfully completed the task expire_old_entitlements after examining %d entries [%s]', entitlements.count(), logid)  # lint-amnesty, pylint: disable=line-too-long
 
 
-@shared_task(bind=True, ignore_result=True)
+@shared_task(bind=True)
 @set_code_owner_attribute
 def expire_and_create_entitlements(self, entitlement_ids, support_username):
     """
