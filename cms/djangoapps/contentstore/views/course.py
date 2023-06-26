@@ -61,6 +61,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.features.content_type_gating.models import ContentTypeGatingConfig
@@ -1055,6 +1056,11 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     fields['enrollment_start'] = None
     fields['enrollment_end'] = None
     fields['video_upload_pipeline'] = {}
+
+    # Enable certain fields rolling forward, where configured
+    fields['force_on_flexible_peer_openassessments'] = \
+        CourseWaffleFlag('openresponseassessment.force_on_flexible_peer_grading', __name__) \
+        .is_enabled(source_course_key)
 
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     args = [str(source_course_key), str(destination_course_key), user.id, json_fields]
