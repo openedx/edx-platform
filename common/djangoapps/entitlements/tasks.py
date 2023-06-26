@@ -100,7 +100,7 @@ def expire_and_create_entitlements(self, entitlement_ids, support_username):
 
     try:
         for entitlement_id in entitlement_ids:
-            entitlement = CourseEntitlement.object.get(_id=entitlement_id)
+            entitlement = CourseEntitlement.objects.get(id=entitlement_id)
             LOGGER.info('Started expiring entitlement with id %d', entitlement.id)
             entitlement.expire_entitlement()
             LOGGER.info('Expired entitlement with id %d as expiration period has reached', entitlement.id)
