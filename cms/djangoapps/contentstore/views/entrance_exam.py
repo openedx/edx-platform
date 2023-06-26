@@ -25,7 +25,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, py
 
 from ..helpers import remove_entrance_exam_graders
 from ..xblock_storage_handlers.create_xblock import create_xblock
-from cms.djangoapps.contentstore.xblock_storage_handlers.xblock_service import delete_item
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import delete_item
 
 __all__ = ['entrance_exam', ]
 

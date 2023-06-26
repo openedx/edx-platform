@@ -15110,13 +15110,13 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group} Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Düplïçäté öf {0} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Düplïçäté öf '{0}' Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
@@ -15637,72 +15637,72 @@ msgstr ""
 "À nön zérö pösïtïvé ïntégér ïs éxpéçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr ""
 "Lïßrärïés çännöt hävé möré thän {limit} çömpönénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Invalid data"
 msgstr "Ìnvälïd dätä Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Invalid data ({details})"
 msgstr "Ìnvälïd dätä ({details}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "There was a problem pasting your component."
 msgstr ""
 "Théré wäs ä prößlém pästïng ýöür çömpönént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Your clipboard is empty or invalid."
 msgstr ""
 "Ýöür çlïpßöärd ïs émptý ör ïnvälïd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr ""
 "Ýöü çän nöt mövé {source_type} ïntö {target_parent_type}. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢т#"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Item is already present in target location."
 msgstr ""
 "Ìtém ïs älréädý présént ïn tärgét löçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item into itself."
 msgstr ""
 "Ýöü çän nöt mövé än ïtém ïntö ïtsélf. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item into it's child."
 msgstr ""
 "Ýöü çän nöt mövé än ïtém ïntö ït's çhïld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item directly into content experiment."
 msgstr ""
 "Ýöü çän nöt mövé än ïtém dïréçtlý ïntö çöntént éxpérïmént. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "{source_usage_key} not found in {parent_usage_key}."
 msgstr ""
 "{source_usage_key} nöt föünd ïn {parent_usage_key}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, #"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid ""
 "You can not move {source_usage_key} at an invalid index ({target_index})."
@@ -15710,14 +15710,14 @@ msgstr ""
 "Ýöü çän nöt mövé {source_usage_key} ät än ïnvälïd ïndéx ({target_index}). "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr ""
 "Ýöü müst prövïdé tärgét_ïndéx ({target_index}) äs än ïntégér. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
@@ -15727,11 +15727,11 @@ msgstr ""
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "%"
 msgstr "% Ⱡ#"
 
-#: cms/djangoapps/contentstore/xblock_storage_handlers/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\" Ⱡ'σяєм ιρѕυм ∂σł#"
