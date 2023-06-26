@@ -30,7 +30,8 @@ from common.djangoapps.student.auth import (
     STUDIO_VIEW_USERS,
     get_user_permissions,
     has_studio_read_access,
-    has_studio_write_access
+    has_studio_write_access,
+    is_content_creator,
 )
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
@@ -42,7 +43,6 @@ from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadReq
 from ..config.waffle import REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND
 from ..utils import add_instructor, reverse_library_url
 from .component import CONTAINER_TEMPLATES, get_component_templates
-from ..helpers import is_content_creator
 from cms.djangoapps.contentstore.xblock_services.xblock_service import create_xblock_info
 from .user import user_with_role
 

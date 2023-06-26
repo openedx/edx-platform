@@ -15,8 +15,6 @@ from xmodule.modulestore.django import modulestore
 
 # from cms.djangoapps.contentstore.views.preview import _load_preview_block
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from common.djangoapps.student import auth
-from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
 
 try:
     # Technically this is a django app plugin, so we should not error if it's not installed:
@@ -272,15 +270,3 @@ def is_item_in_course_tree(item):
         ancestor = ancestor.get_parent()
 
     return ancestor is not None
-
-
-def is_content_creator(user, org):
-    """
-    Check if the user has the role to create content.
-
-    This function checks if the User has role to create content
-    or if the org is supplied, it checks for Org level course content
-    creator.
-    """
-    return (auth.user_has_role(user, CourseCreatorRole()) or
-            auth.user_has_role(user, OrgContentCreatorRole(org=org)))

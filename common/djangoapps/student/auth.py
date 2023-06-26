@@ -150,6 +150,18 @@ def has_studio_read_access(user, course_key):
     return bool(STUDIO_VIEW_CONTENT & get_user_permissions(user, course_key))
 
 
+def is_content_creator(user, org):
+    """
+    Check if the user has the role to create content.
+
+    This function checks if the User has role to create content
+    or if the org is supplied, it checks for Org level course content
+    creator.
+    """
+    return (user_has_role(user, CourseCreatorRole()) or
+            user_has_role(user, OrgContentCreatorRole(org=org)))
+
+
 def add_users(caller, role, *users):
     """
     The caller requests adding the given users to the role. Checks that the caller

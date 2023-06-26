@@ -45,7 +45,8 @@ from common.djangoapps.student.auth import (
     has_course_author_access,
     has_studio_read_access,
     has_studio_write_access,
-    has_studio_advanced_settings_access
+    has_studio_advanced_settings_access,
+    is_content_creator,
 )
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
@@ -102,7 +103,6 @@ from ..utils import (
     update_course_details,
 )
 from .component import ADVANCED_COMPONENT_TYPES
-from ..helpers import is_content_creator
 from cms.djangoapps.contentstore.xblock_services.xblock_service import (
     create_xblock_info,
 )
