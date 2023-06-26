@@ -50,7 +50,7 @@ def on_user_course_unenrollment(enrollment, **kwargs):
 
 
 @receiver(USER_NOTIFICATION_REQUESTED)
-def generate_user_notifications(signal, sender, notification_data, metadata):
+def generate_user_notifications(signal, sender, notification_data, metadata, **kwargs):
     """
     Watches for USER_NOTIFICATION_REQUESTED signal and calls  send_web_notifications task
     """

@@ -11,9 +11,8 @@ from opaque_keys.edx.django.models import CourseKeyField
 from openedx.core.djangoapps.notifications.base_notification import (
     NotificationAppManager,
     NotificationPreferenceSyncManager,
-    get_notification_content,
+    get_notification_content
 )
-
 
 User = get_user_model()
 log = logging.getLogger(__name__)

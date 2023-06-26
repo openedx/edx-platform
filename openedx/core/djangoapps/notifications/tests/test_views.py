@@ -9,7 +9,7 @@ from django.conf import settings
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
-from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED, USER_NOTIFICATION
+from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
