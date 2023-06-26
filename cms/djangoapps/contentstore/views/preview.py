@@ -162,8 +162,6 @@ def _prepare_runtime_for_preview(request, block, field_data):
     course_id = block.location.course_key
     display_name_only = (block.category == 'static_tab')
 
-    replace_url_service = ReplaceURLService(course_id=course_id)
-
     wrappers = [
         # This wrapper wraps the block in the template specified above
         partial(
@@ -176,7 +174,7 @@ def _prepare_runtime_for_preview(request, block, field_data):
 
         # This wrapper replaces urls in the output that start with /static
         # with the correct course-specific url for the static content
-        partial(replace_urls_wrapper, replace_url_service=replace_url_service, static_replace_only=True),
+        partial(replace_urls_wrapper, replace_url_service=ReplaceURLService, static_replace_only=True),
         _studio_wrap_xblock,
     ]
 
@@ -215,7 +213,7 @@ def _prepare_runtime_for_preview(request, block, field_data):
         "teams_configuration": TeamsConfigurationService(),
         "sandbox": SandboxService(contentstore=contentstore, course_id=course_id),
         "cache": CacheService(cache),
-        'replace_urls': replace_url_service
+        'replace_urls': ReplaceURLService
     }
 
     block.runtime.get_block_for_descriptor = partial(_load_preview_block, request)

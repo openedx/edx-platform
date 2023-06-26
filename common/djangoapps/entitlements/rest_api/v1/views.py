@@ -25,6 +25,7 @@ from common.djangoapps.entitlements.models import (  # lint-amnesty, pylint: dis
 from common.djangoapps.entitlements.rest_api.v1.filters import CourseEntitlementFilter
 from common.djangoapps.entitlements.rest_api.v1.permissions import IsAdminOrSupportOrAuthenticatedReadOnly
 from common.djangoapps.entitlements.rest_api.v1.serializers import CourseEntitlementSerializer
+from common.djangoapps.entitlements.rest_api.v1.throttles import ServiceUserThrottle
 from common.djangoapps.entitlements.utils import is_course_run_entitlement_fulfillable
 from common.djangoapps.student.models import AlreadyEnrolledError, CourseEnrollment, CourseEnrollmentException
 from openedx.core.djangoapps.catalog.utils import get_course_runs_for_course, get_owners_for_course
@@ -121,6 +122,7 @@ class EntitlementViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = CourseEntitlementFilter
     pagination_class = EntitlementsPagination
+    throttle_classes = (ServiceUserThrottle,)
 
     def get_queryset(self):
         user = self.request.user

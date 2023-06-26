@@ -12,14 +12,14 @@ class SubscriptionUpsellView extends Backbone.View {
         super(Object.assign({}, defaults, options));
     }
 
-    initialize(options) {
+    initialize({ context }) {
         this.tpl = HtmlUtils.template(subscriptionUpsellTpl);
-        this.data = options.context;
+        this.context = context;
         this.render();
     }
 
     render() {
-        const data = $.extend(this.context, {
+        const data = $.extend({}, this.context, {
             minSubscriptionPrice: '$39',
             trialLength: 7,
         });
