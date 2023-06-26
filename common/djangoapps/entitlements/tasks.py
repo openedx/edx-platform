@@ -147,4 +147,4 @@ def expire_and_create_entitlements(self, entitlement_ids, support_username):
 
     log.info('Successfully completed the task expire_and_create_entitlements after examining %d entries, task id :%s',
              len(entitlement_ids),
-             self.id)  # lint-amnesty, pylint: disable=line-too-long
+             self.id)
