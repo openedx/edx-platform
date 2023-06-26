@@ -139,7 +139,6 @@ class TestExpireAndCreateEntitlementsTaskIntegration(TestCase):
 
         assert entitlement.expired_at is not None
 
-
     def test_actually_created(self):
         """
         Integration test with CourseEntitlement to make sure we are creating an
