@@ -85,7 +85,7 @@ class Command(BaseCommand):
         entitlements_count = entitlements.count()
         logger.info('Total entitlements that have reached expiration period are %d ', entitlements_count)
 
-        entitlements_to_expire = max(1, options.get('count'))
+        entitlements_to_expire = min(max(1, options.get('count')), entitlements_count)
         batch_size = max(1, options.get('batch_size'))
         num_batches = ceil(entitlements_to_expire / batch_size) if entitlements else 0
 
@@ -100,7 +100,7 @@ class Command(BaseCommand):
 
         for batch_num in range(num_batches):
             start = batch_num * batch_size
-            end = min(start + batch_size, entitlements_to_expire, entitlements_count)
+            end = min(start + batch_size, entitlements_to_expire)
             entitlement_ids = [entitlement.id for entitlement in entitlements[start:end]]
             expire_and_create_entitlements.delay(entitlement_ids, support_username)
 
