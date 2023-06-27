@@ -13,9 +13,12 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from student.tests.factories import UserFactory
 
+from . import patches
+
 
 @ddt.ddt
 @skip_unless_lms
+@patch('tahoe_idp.receivers.helpers.is_tahoe_idp_enabled', new=patches.dummy_receivers_idp_not_enabled)
 @patch('tahoe_idp.api.request_password_reset')
 class TahoeIdpResetPasswordTests(TestCase):
     """
