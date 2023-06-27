@@ -27,7 +27,7 @@ from xblock.fields import Integer, List, Scope, String, Boolean
 from xmodule.capa.responsetypes import registry
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.studio_editable import StudioEditableBlock
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
@@ -458,7 +458,7 @@ class LibraryContentBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'LibraryContentBlockStudio')
+        add_webpack_js_to_fragment(fragment, 'LibraryContentBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 
