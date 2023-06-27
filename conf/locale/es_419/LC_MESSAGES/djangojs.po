@@ -44,6 +44,7 @@
 # Natalia Berdnikov <nberdnikov@edx.org>, 2023
 # Natalia, 2013
 # Natalia, 2013-2014,2016,2018
+# Nawfal Ahmed, 2023
 # Ned Batchelder <ned@edx.org>, 2017
 # Ned Weitzman <nweitzman@edx.org>, 2017-2018
 # Nuri Plans Toral <nplans@gmail.com>, 2015
@@ -2008,19 +2009,19 @@ msgstr "Selecciona estatus militar"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select level of education"
-msgstr "Seleccione el nivel de educación"
+msgstr "Seleccionar nivel de estudios"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select guardian education"
-msgstr "Seleccionar educación de tutores"
+msgstr "Seleccionar estudios del tutor"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select current industry"
-msgstr "Seleccione la industria actual"
+msgstr "Seleccionar sector actual"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Select prospective industry"
-msgstr "Seleccione la industria potencial"
+msgstr "Seleccionar sector de actividad"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
 msgid "Thank you! You’re helping make edX better for everyone."
@@ -3262,7 +3263,7 @@ msgstr "Termina {end}"
 
 #: lms/static/js/learner_dashboard/models/program_subscription_model.js
 msgid "${price}/month {currency}"
-msgstr "${price}/mes {currency}"
+msgstr "${price} {currency} al mes"
 
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
@@ -3321,11 +3322,11 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "View program"
-msgstr "ver programa"
+msgstr "Ver programa"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Enroll in a {programName}'s course"
-msgstr ""
+msgstr "Inscríbete en un curso de {programName}"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -3333,9 +3334,9 @@ msgid ""
 "enrolled in any courses. Enroll in a remaining course and enjoy verified "
 "access."
 msgstr ""
-"Tiene una suscripción activa al programa {programName} pero no está inscrito"
-" en ningún curso. Inscríbete en un curso restante y disfruta de un acceso "
-"verificado."
+"Tienes una suscripción activa al programa {programName}, pero no estás "
+"inscrito en ningún curso. Inscríbete en alguno de los cursos existentes y "
+"disfruta de acceso verificado."
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -3349,20 +3350,24 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Subscription trial expires in less than 24 hours"
-msgstr ""
+msgstr "El periodo de prueba de la suscripción caduca en menos de 24 horas"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Subscription trial expires in {remainingDays} day"
 msgid_plural "Subscription trial expires in {remainingDays} days"
 msgstr[0] "La prueba de suscripción vence en {remainingDays} día"
 msgstr[1] "La prueba de suscripción vence en {remainingDays} días"
-msgstr[2] "La prueba de suscripción vence en {remainingDays} días"
+msgstr[2] ""
+"El periodo de prueba de la suscripción caduca dentro de {remainingDays} días"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
 "Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and"
 " the card on file will be charged {subscriptionPrice}."
 msgstr ""
+"La prueba de {programName} caducará el {trialEndDate} a las {trialEndTime}, "
+"tras lo cual haremos un cargo de {subscriptionPrice} en la tarjeta "
+"registrada."
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -3382,9 +3387,9 @@ msgstr[1] ""
 "{trialEndTime} el {trialEndDate} y se cargará a la tarjeta registrada "
 "{subscriptionPrice}."
 msgstr[2] ""
-"Su prueba de {programName} caducará en {remainingDays} días a las "
-"{trialEndTime} el {trialEndDate} y se cargará a la tarjeta registrada "
-"{subscriptionPrice}."
+"La prueba de {programName} caducará dentro de {remainingDays} días, a las "
+"{trialEndTime} del {trialEndDate}, tras lo cual haremos un cargo en tarjeta "
+"de {subscriptionPrice}."
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
@@ -9014,7 +9019,7 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid "Explore new programs"
-msgstr "Explora nuevos programas"
+msgstr "Explorar nuevos programas"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
@@ -9057,7 +9062,7 @@ msgstr "Suscripción de prueba"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Active subscription"
-msgstr "suscripción activa"
+msgstr "Suscripción activa"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Inactive subscription"
@@ -9076,16 +9081,16 @@ msgid ""
 "Restart your subscription for {subscriptionPrice}. Your payment history is "
 "still available on the {a_start}Orders and subscriptions{a_end} page"
 msgstr ""
-"Reinicie su suscripción por {subscriptionPrice}. Su historial de pagos aún "
-"está disponible en la página {a_start}Pedidos y suscripciones{a_end}"
+"Reinicia tu suscripción por {subscriptionPrice}. Tu historial de pagos "
+"seguirá disponible en la página {a_start}Pedidos y suscripciones{a_end}"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
 "If you had a subscription previously, your payment history is still "
 "available on the {a_start}Orders and subscriptions{a_end} page"
 msgstr ""
-"Si tenía una suscripción anteriormente, su historial de pago todavía está "
-"disponible en la página {a_start}Pedidos y suscripciones{a_end}"
+"Si ya tenías contratada una suscripción, tu historial de pagos sigue "
+"disponible en la página de {a_start}Pedidos y suscripciones{a_end}"
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
@@ -9093,9 +9098,9 @@ msgid ""
 "Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact "
 "support"
 msgstr ""
-"¿Necesitas ayuda? Consulte el {a_start}Centro de ayuda para "
-"estudiantes{span_start}{icon}{span_end}{a_end} para solucionar problemas o "
-"ponerse en contacto con el servicio de asistencia."
+"¿Necesitas ayuda? Pásate por el {a_start}Centro de ayuda para "
+"estudiantes{span_start}{icon}{span_end}{a_end} para encontrar soluciones a "
+"problemas o ponte en contacto con el servicio de asistencia."
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Program Record"
@@ -9144,7 +9149,7 @@ msgstr "¡Felicitaciones!"
 msgid ""
 "You have successfully completed all the requirements for the %(title)s "
 "%(type)s."
-msgstr ""
+msgstr "Has cumplido todos los requisitos del %(type)s %(title)s con éxito."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -9158,36 +9163,40 @@ msgid ""
 "program. To complete the program, you must earn a verified certificate for "
 "each course."
 msgstr ""
+"Supervisa y planifica tu progreso con los %(count)s cursos de este programa."
+" Para completar el programa, debes obtener un certificado verificado para "
+"cada curso."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Manage my subscription"
-msgstr "Administrar mi suscripción"
+msgstr "Gestionar mi suscripción"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Restart my subscription"
-msgstr "reiniciar mi suscripción"
+msgstr "Reiniciar mi suscripción"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Start {trialLength}-day free trial"
-msgstr "Inicie la prueba gratuita de {trialLength} días"
+msgstr "Iniciar prueba gratuita de {trialLength} días"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Trial ends {trialEndDate} at {trialEndTime}"
-msgstr ""
+msgstr "El periodo de prueba finaliza el {trialEndDate} a las {trialEndTime}"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your next billing date is {currentPeriodEnd}"
-msgstr "Su próxima fecha de facturación es {currentPeriodEnd}"
+msgstr "Tu próxima fecha de facturación es el {currentPeriodEnd}"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "{subscriptionPrice} subscription. Cancel anytime."
 msgstr ""
+"Suscripción de {subscriptionPrice}. Puedes cancelarla en cualquier momento."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -9242,7 +9251,7 @@ msgstr ""
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #, python-format
 msgid "Transform your %(org)s %(type)s into a full master’s degree"
-msgstr ""
+msgstr "Transforma tu %(type)s de %(org)s en un máster completo"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #, python-format
@@ -9251,6 +9260,9 @@ msgid ""
 "towards flexible, rigorous, and affordable masters degrees from the world’s "
 "leading universities."
 msgstr ""
+"Si has completado con éxito los %(program)s de %(org)s, puedes presentar las"
+" credenciales para acceder a másteres flexibles, rigurosos y asequibles de "
+"las mejores universidades del mundo."
 
 #: lms/templates/learner_dashboard/program_details_view.underscore
 #, python-format
@@ -9259,6 +9271,9 @@ msgid ""
 "To complete the program, you must earn a verified certificate for each "
 "course."
 msgstr ""
+"Supervisa y planifica tu progreso con los %(count)s cursos de este programa."
+" Para completar el programa, debes obtener un certificado verificado "
+"correspondiente a cada curso."
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
@@ -9266,7 +9281,7 @@ msgstr "Logo de la {organization}"
 
 #: lms/templates/learner_dashboard/program_list_header_view.underscore
 msgid "My programs"
-msgstr "mis programas"
+msgstr "Mis programas"
 
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid "New"
@@ -9275,7 +9290,7 @@ msgstr "Nuevo"
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid "Monthly program subscriptions {emDash} more flexible, more affordable"
 msgstr ""
-"Suscripciones mensuales al programa {emDash} más flexibles, más asequibles"
+"Suscripciones mensuales a programas {emDash} más flexibles y asequibles"
 
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid ""
@@ -9284,15 +9299,16 @@ msgid ""
 "start at {minSubscriptionPrice}/month USD per program, after a 7-day full "
 "access free trial. Cancel at any time."
 msgstr ""
-"Ahora disponible para muchos programas populares, el precio de suscripción "
-"mensual asequible puede ayudarlo a administrar su presupuesto de manera más "
-"efectiva. Las suscripciones comienzan en {minSubscriptionPrice}/mes USD por "
-"programa, después de una prueba gratuita de acceso completo de 7 días. "
-"Cancelar en cualquier momento."
+"Los asequibles precios de suscripción mensual, que están disponibles desde "
+"ya mismo para muchos programas populares, pueden ayudarte a gestionar tu "
+"presupuesto de forma más eficaz. Las suscripciones parten de "
+"{minSubscriptionPrice} USD al mes por programa una vez completada una prueba"
+" gratuita de acceso completo de 7 días, y es posible cancelarlas en "
+"cualquier momento."
 
 #: lms/templates/learner_dashboard/subscription_upsell_view.underscore
 msgid "Explore subscription options"
-msgstr "Explora las opciones de suscripción"
+msgstr "Explorar las opciones de suscripción"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
@@ -9305,7 +9321,7 @@ msgstr "Optar por el Certificado Verificado"
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Upgrade with a subscription"
-msgstr "Actualizar con una suscripción"
+msgstr "Mejorar con una suscripción"
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Pay {subscriptionPrice} for all courses in this program"
@@ -9314,7 +9330,7 @@ msgstr "Paga {subscriptionPrice} por todos los cursos de este programa"
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Pay {subscriptionPrice} after {trialLength}-day free trial"
 msgstr ""
-"Pague {subscriptionPrice} después de una prueba gratuita de {trialLength} "
+"Paga {subscriptionPrice} cuando termine la prueba gratuita de {trialLength} "
 "días"
 
 #: lms/templates/student_account/account.underscore

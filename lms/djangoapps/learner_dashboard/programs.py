@@ -31,6 +31,7 @@ from openedx.core.djangoapps.programs.utils import (
     get_industry_and_credit_pathways,
     get_program_and_course_data,
     get_program_marketing_url,
+    get_program_subscriptions_marketing_url,
     get_program_urls,
     get_programs_subscription_data
 )
@@ -59,10 +60,20 @@ class ProgramsFragmentView(EdxFragmentView):
 
         meter = ProgramProgressMeter(request.site, user, mobile_only=mobile_only)
         is_user_b2c_subscriptions_enabled = b2c_subscriptions_enabled(mobile_only)
-        programs_subscription_data = get_programs_subscription_data(user) if is_user_b2c_subscriptions_enabled else []
+        programs_subscription_data = (
+            get_programs_subscription_data(user)
+            if is_user_b2c_subscriptions_enabled
+            else []
+        )
+        subscriptions_marketing_url = (
+            get_program_subscriptions_marketing_url()
+            if is_user_b2c_subscriptions_enabled
+            else ''
+        )
 
         context = {
             'marketing_url': get_program_marketing_url(programs_config, mobile_only),
+            'subscriptions_marketing_url': subscriptions_marketing_url,
             'programs': meter.engaged_programs,
             'progress': meter.progress(),
             'programs_subscription_data': programs_subscription_data,
