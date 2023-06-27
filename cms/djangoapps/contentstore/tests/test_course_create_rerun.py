@@ -317,3 +317,40 @@ class TestCourseListing(ModuleStoreTestCase):
             'run': '2021_T1'
         })
         self.assertEqual(response.status_code, 403)
+
+    @ddt.data(True, False)
+    @mock.patch(
+        'cms.djangoapps.contentstore.views.course.enable_flexible_peer_openassessments_on_rerun'
+    )
+    def test_course_rerun_enable_ora_flexible_peer_grading(
+        self,
+        mock_toggle_state,
+        mock_enable_flexible_peer_openassessments_on_rerun
+    ):
+        """
+        Test that flex peer grading is forced on, when enabled
+        """
+        # Given a valid course to rerun
+        add_organization({
+            'name': 'Test Flex Grading',
+            'short_name': self.source_course_key.org,
+            'description': 'Test roll-forward of flex grading setting',
+        })
+        mock_enable_flexible_peer_openassessments_on_rerun.return_val = mock_toggle_state
+
+        # When I rerun the course
+        response = self.client.ajax_post(self.course_create_rerun_url, {
+            'source_course_key': str(self.source_course_key),
+            'org': self.source_course_key.org, 'course': self.source_course_key.course, 'run': 'copy',
+            'display_name': 'New, exciting course run!',
+        })
+
+        # Then the process completes successfully
+        self.assertEqual(response.status_code, 200)
+
+        data = parse_json(response)
+        dest_course_key = CourseKey.from_string(data['destination_course_key'])
+        dest_course = self.store.get_course(dest_course_key)
+
+        # ... and our setting got toggled appropriately on the course
+        self.assertEqual(dest_course.force_on_flexible_peer_openassessments, mock_toggle_state)
