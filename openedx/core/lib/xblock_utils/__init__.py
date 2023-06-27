@@ -11,7 +11,6 @@ import re
 import uuid
 
 import markupsafe
-import webpack_loader.utils
 from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -29,7 +28,6 @@ from xblock.scorable import ScorableXBlockMixin
 from common.djangoapps import static_replace
 from common.djangoapps.edxmako.shortcuts import render_to_string
 from xmodule.seq_block import SequenceBlock  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.util.xmodule_django import add_webpack_to_fragment  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.vertical_block import VerticalBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import (  # lint-amnesty, pylint: disable=wrong-import-order
     PREVIEW_VIEWS,
@@ -116,6 +114,9 @@ def wrap_xblock(
     if view == STUDENT_VIEW and getattr(block, 'HIDDEN', False):
         css_classes.append('is-hidden')
 
+    # TODO: This special case will be removed when we update the SCSS under
+    #       xmodule/assets to use the standard XBlock CSS classes.
+    #       See https://github.com/openedx/edx-platform/issues/32617.
     if getattr(block, 'uses_xmodule_styles_setup', False):
         if view in PREVIEW_VIEWS:
             # The block is acting as an XModule
@@ -444,16 +445,22 @@ def xblock_resource_pkg(block):
     openassessment.xblock.openassessmentblock.OpenAssessmentBlock, the value
     returned is 'openassessment.xblock'.
 
-    XModules are special cased because they're local to this repo and they
-    actually don't share their resource files when compiled out as part of the
-    XBlock asset pipeline. This only covers XBlocks and XModules using the
-    XBlock-style of asset specification. If they use the XModule bundling part
-    of the asset pipeline (xmodule_assets), their assets are compiled through an
-    entirely separate mechanism and put into lms-modules.js/css.
+    Built-in edx-platform XBlocks (defined under ./xmodule/) are special cases.
+    They currently use two different mechanisms to load assets:
+    1. The `builtin_assets` utilities, which let the blocks add JS and CSS
+       compiled completely outside of the XBlock pipeline. Used by HtmlBlock,
+       ProblemBlock, and most other built-in blocks currently. Handling for these
+       assets does not interact with this function.
+    2. The (preferred) standard XBlock runtime resource loading system, used by
+       LibrarySourdedBlock. Handling for these assets *does* interact with this
+       function.
+
+    We hope to migrate to (2) eventually, tracked by:
+    https://github.com/openedx/edx-platform/issues/32618.
     """
-    # XModules are a special case because they map to different dirs for
-    # sub-modules.
     module_name = block.__module__
+    # Special handling for case (2) of the built-in XBlocks because they map to different
+    # dirs for sub-modules.
     if module_name.startswith('xmodule.'):
         return module_name
 

@@ -37,7 +37,7 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_block import RawMixin
 from xmodule.util.sandboxing import SandboxService
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
     ResourceTemplates,
@@ -347,7 +347,8 @@ class ProblemBlock(
         else:
             html = self.get_html()
         fragment = Fragment(html)
-        add_webpack_to_fragment(fragment, 'ProblemBlockPreview')
+        add_sass_to_fragment(fragment, "ProblemBlockDisplay.scss")
+        add_webpack_js_to_fragment(fragment, 'ProblemBlockDisplay')
         shim_xmodule_js(fragment, 'Problem')
         return fragment
 
@@ -378,7 +379,8 @@ class ProblemBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'ProblemBlockStudio')
+        add_sass_to_fragment(fragment, 'ProblemBlockEditor.scss')
+        add_webpack_js_to_fragment(fragment, 'ProblemBlockEditor')
         shim_xmodule_js(fragment, 'MarkdownEditingDescriptor')
         return fragment
 
