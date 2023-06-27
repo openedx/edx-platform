@@ -1,11 +1,18 @@
 """Helper functions for working with Credentials."""
-import requests
-from edx_rest_api_client.auth import SuppliedJwtAuth
+import logging
 from urllib.parse import urljoin
+
+import requests
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from edx_rest_api_client.auth import SuppliedJwtAuth
 
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_api_data
+
+log = logging.getLogger(__name__)
+User = get_user_model()
 
 
 def get_credentials_records_url(program_uuid=None):
@@ -101,3 +108,52 @@ def get_credentials(user, program_uuid=None, credential_type=None):
         querystring=querystring,
         cache_key=cache_key
     )
+
+
+# TODO: By the course run Ids, what do we mean? course run uuids? or course run keys?
+def get_course_completion_status(lms_user_id, course_run_ids):
+    """
+    Given a lms_user_id and course run ids, checks for course completion status
+    Arguments:
+        lms_user_id (User): The user to authenticate as when requesting credentials.
+    Returns:
+        list of course_run_ids for which user has completed the course
+    """
+    credential_configuration = CredentialsApiConfig.current()
+    if not credential_configuration.enabled:
+        log.warning('%s configuration is disabled.', credential_configuration.API_NAME)
+        return []
+
+    base_api_url = get_credentials_api_base_url()
+    completion_status_url = f'{base_api_url}/api/credentials/learner_cert_status'
+    try:
+        api_client = get_credentials_api_client(
+            User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)
+        )
+        api_response = api_client.post(
+            completion_status_url,
+            data={
+                'lms_user_id': lms_user_id,
+                'course_runs': course_run_ids,
+            }
+        )
+
+        api_response.raise_for_status()
+        course_completion_response = api_response.json()
+    except Exception as exc:  # pylint: disable=broad-except
+        log.exception("An unexpected error occurred while reqeusting course completion statuses "
+                      "for lms_user_id [%s] for course_run_ids [%s] with exc [%s]:",
+                      lms_user_id,
+                      course_run_ids,
+                      exc
+                      )
+        return []
+    if course_completion_response is not None:
+        # Yes, This is course_credentials_data. The key is named status but
+        # it contains all the courses data from credentials.
+        course_credentials_data = course_completion_response.get('status')
+        # Based on the first to-do we may need a change here.
+        filtered_records = [course_data for course_data in course_credentials_data if
+                            course_data['course_run']['uuid'] in course_run_ids]
+        return filtered_records
+    return []

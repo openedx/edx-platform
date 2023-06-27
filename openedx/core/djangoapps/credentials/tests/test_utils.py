@@ -2,13 +2,21 @@
 import uuid
 from unittest import mock
 
+from django.conf import settings
+from requests import Response
+from requests.exceptions import HTTPError
+
+from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests import factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
-from openedx.core.djangoapps.credentials.utils import get_credentials, get_credentials_records_url
+from openedx.core.djangoapps.credentials.utils import (
+    get_course_completion_status,
+    get_credentials,
+    get_credentials_records_url
+)
 from openedx.core.djangoapps.oauth_dispatch.tests.factories import ApplicationFactory
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
-from common.djangoapps.student.tests.factories import UserFactory
 
 UTILS_MODULE = 'openedx.core.djangoapps.credentials.utils'
 
@@ -98,3 +106,28 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
 
         result = get_credentials_records_url("abcdefgh-ijkl-mnop-qrst-uvwxyz123456")
         assert result == "https://credentials.example.com/records/programs/abcdefghijklmnopqrstuvwxyz123456"
+
+    @mock.patch('requests.Response.raise_for_status')
+    @mock.patch('requests.Response.json')
+    @mock.patch(UTILS_MODULE + '.get_credentials_api_client')
+    def test_get_course_completion_status(self, mock_get_api_client, mock_json, mock_raise):
+        """
+        Test to verify the functionality of get_course_completion_status
+        """
+        UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
+        course_statuses = factories.UserCredentialsCourseRunStatus.create_batch(3)
+        mock_raise.return_value = None
+        mock_json.return_value = {'lms_user_id': self.user.id,
+                                  'status': course_statuses,
+                                  'username': self.user.username}
+        mock_get_api_client.return_value.post.return_value = Response()
+        course_run_ids = [course_status['course_run']['uuid'] for course_status in course_statuses]
+        api_response = get_course_completion_status(self.user.id, course_run_ids)
+        assert api_response == course_statuses
+
+    @mock.patch('requests.Response.raise_for_status')
+    def test_get_course_completion_status_api_error(self, mock_raise):
+        mock_raise.return_value = HTTPError('An Error occured')
+        UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
+        api_response = get_course_completion_status(self.user.id, ['fake1', 'fake2', 'fake3'])
+        assert api_response == []
