@@ -87,13 +87,14 @@ from ..course_info_model import delete_course_update, get_course_updates, update
 from ..courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from ..tasks import rerun_course as rerun_course_task
 from ..toggles import (
+    enable_flexible_peer_openassessments_on_rerun,
     split_library_view_on_dashboard,
     use_new_course_outline_page,
     use_new_home_page,
     use_new_updates_page,
     use_new_advanced_settings_page,
     use_new_grading_page,
-    use_new_schedule_details_page,
+    use_new_schedule_details_page
 )
 from ..utils import (
     add_instructor,
@@ -1058,9 +1059,7 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     fields['video_upload_pipeline'] = {}
 
     # Enable certain fields rolling forward, where configured
-    fields['force_on_flexible_peer_openassessments'] = \
-        CourseWaffleFlag('openresponseassessment.force_on_flexible_peer_grading', __name__) \
-        .is_enabled(source_course_key)
+    fields['force_on_flexible_peer_openassessments'] = enable_flexible_peer_openassessments_on_rerun(source_course_key)
 
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     args = [str(source_course_key), str(destination_course_key), user.id, json_fields]
