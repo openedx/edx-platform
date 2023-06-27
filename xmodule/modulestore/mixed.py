@@ -159,6 +159,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 continue
 
         for store_settings in stores:
+            print (f"*** Creating mixed store with name = {store_settings['NAME']} ***")
+            print (f"Options = {store_settings.get('OPTIONS', {})}")
             key = store_settings['NAME']
             store = create_modulestore_instance(
                 store_settings['ENGINE'],

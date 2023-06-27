@@ -1023,6 +1023,7 @@ MODULESTORE = {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
                         'fs_root': DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
+                        'bis_doit': 'xmodule.modulestore.split_mongo.split.bis_doit'
                     }
                 },
                 {

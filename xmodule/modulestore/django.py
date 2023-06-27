@@ -7,6 +7,7 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 from contextlib import contextmanager
 from importlib import import_module
 import gettext
+import json
 import logging
 
 from pkg_resources import resource_filename
@@ -261,10 +262,19 @@ def create_modulestore_instance(
 
     _options = {}
     _options.update(options)
+    # BIS DEBUG
 
-    FUNCTION_KEYS = ['render_template']
+    print ("**** in django.py with force-modified options****")
+    if ('stores' in _options and 'OPTIONS' in _options['stores'][0]):
+        _options['stores'][0]['OPTIONS']['bis_doit'] = \
+            'xmodule.modulestore.split_mongo.split:SplitMongoModuleStore.bis_doit_implementation)'
+    print(f'*** _options = {_options} ***')
+    # End of BIS DEBUG
+
+    FUNCTION_KEYS = ['render_template', 'bis_doit']
     for key in FUNCTION_KEYS:
         if key in _options and isinstance(_options[key], str):
+            print (f'Loading function {_options[key]}')
             _options[key] = load_function(_options[key])
 
     request_cache = DEFAULT_REQUEST_CACHE
@@ -299,6 +309,7 @@ def create_modulestore_instance(
         if 'disabled_xblock_types' not in request_cache.data:
             request_cache.data['disabled_xblock_types'] = [block.name for block in disabled_xblocks()]
         return request_cache.data['disabled_xblock_types']
+
 
     return class_(
         contentstore=content_store,

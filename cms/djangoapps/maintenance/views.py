@@ -7,6 +7,7 @@ import logging
 
 from django.core.validators import ValidationError
 from django.db import transaction
+from django.http import HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
@@ -25,7 +26,7 @@ from openedx.features.announcements.models import Announcement
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.store_utilities import get_v1_libraries
+from .tasks import get_v1_libraries
 
 log = logging.getLogger(__name__)
 
@@ -307,4 +308,5 @@ class V1LibCleanupView(View):
 
     def get(self, request, *args, **kwargs):
         print("In do_v1_libraries")
-        get_v1_libraries(request)
+        get_v1_libraries.delay(request)
+        return HttpResponse("{'hello, world'}", content_type='application/json; charset=utf-8')
