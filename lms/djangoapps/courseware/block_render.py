@@ -577,20 +577,10 @@ def prepare_runtime_for_user(
     user_is_staff = bool(has_access(user, 'staff', course_id))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
-        if is_masquerading_as_specific_student(user, course_id):
+        if user_is_staff or is_masquerading_as_specific_student(user, course_id):
             # When masquerading as a specific student, we want to show the debug button
             # unconditionally to enable resetting the state of the student we are masquerading as.
             # We already know the user has staff access when masquerading is active.
-            staff_access = True
-            # To figure out whether the user has instructor access, we temporarily remove the
-            # masquerade_settings from the real_user.  With the masquerading settings in place,
-            # the result would always be "False".
-            masquerade_settings = user.real_user.masquerade_settings
-            del user.real_user.masquerade_settings
-            user.real_user.masquerade_settings = masquerade_settings
-        else:
-            staff_access = user_is_staff
-        if staff_access:
             block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
     store = modulestore()
