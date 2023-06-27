@@ -5,7 +5,6 @@ from unittest.mock import patch
 
 import pytest
 import ddt
-from edx_toggles.toggles.testutils import override_waffle_switch
 from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
