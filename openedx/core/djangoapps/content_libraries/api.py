@@ -268,14 +268,6 @@ class LibraryBundleLink:
     opaque_key = attr.ib(type=LearningContextKey, default=None)
 
 
-class AccessLevel:  # lint-amnesty, pylint: disable=function-redefined
-    """ Enum defining library access levels/permissions """
-    ADMIN_LEVEL = ContentLibraryPermission.ADMIN_LEVEL
-    AUTHOR_LEVEL = ContentLibraryPermission.AUTHOR_LEVEL
-    READ_LEVEL = ContentLibraryPermission.READ_LEVEL
-    NO_ACCESS = None
-
-
 # General APIs
 # ============
 
