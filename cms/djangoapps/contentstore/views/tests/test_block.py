@@ -16,6 +16,7 @@ from openedx_events.content_authoring.data import DuplicatedXBlockData
 from openedx_events.content_authoring.signals import XBLOCK_DUPLICATED
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 from edx_proctoring.exceptions import ProctoredExamNotFoundException
+from edx_toggles.toggles.testutils import override_waffle_flag
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.asides import AsideUsageKeyV2
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -49,6 +50,8 @@ from xmodule.x_module import STUDENT_VIEW, STUDIO_VIEW
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url, reverse_usage_url
 from cms.djangoapps.contentstore.views import block as item_module
+from cms.djangoapps.contentstore.config.waffle import PREVENT_STAFF_STRUCTURE_DELETION
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
 from common.djangoapps.student.tests.factories import StaffFactory, UserFactory
 from common.djangoapps.xblock_django.models import (
     XBlockConfiguration,
@@ -67,7 +70,7 @@ from ..block import (
     _get_source_index,
     _xblock_type_and_display_name,
     add_container_page_publishing_info,
-    create_xblock_info,
+    create_xblock_info, duplicate_block, update_from_source,
 )
 
 
@@ -785,6 +788,29 @@ class TestDuplicateItem(ItemTest, DuplicateHelper, OpenEdxEventsTestMixin):
 
         # Now send a custom display name for the duplicate.
         verify_name(self.seq_usage_key, self.chapter_usage_key, "customized name", display_name="customized name")
+
+    def test_shallow_duplicate(self):
+        """
+        Test that shallow_duplicate creates a new block.
+        """
+        source_course = CourseFactory()
+        user = UserFactory.create()
+        source_chapter = BlockFactory(parent=source_course, category='chapter', display_name='Source Chapter')
+        BlockFactory(parent=source_chapter, category='html', display_name='Child')
+        # Refresh.
+        source_chapter = self.store.get_item(source_chapter.location)
+        self.assertEqual(len(source_chapter.get_children()), 1)
+        destination_course = CourseFactory()
+        destination_location = duplicate_block(
+            parent_usage_key=destination_course.location, duplicate_source_usage_key=source_chapter.location,
+            user=user,
+            display_name=source_chapter.display_name,
+            shallow=True,
+        )
+        # Refresh here, too, just to be sure.
+        destination_chapter = self.store.get_item(destination_location)
+        self.assertEqual(len(destination_chapter.get_children()), 0)
+        self.assertEqual(destination_chapter.display_name, 'Source Chapter')
 
 
 @ddt.ddt
@@ -3473,3 +3499,255 @@ class TestXBlockPublishingInfo(ItemTest):
         # Check that in self paced course content has live state now
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.live)
+
+    def test_staff_show_delete_button(self):
+        """
+        Test delete button is *not visible* to user with CourseStaffRole
+        """
+        # Add user as course staff
+        CourseStaffRole(self.course_key).add_users(self.user)
+
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            self.course,
+            include_child_info=True,
+            course_outline=True,
+            include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+            user=self.user
+        )
+        self.assertTrue(xblock_info['show_delete_button'])
+
+    def test_staff_show_delete_button_with_waffle(self):
+        """
+        Test delete button is *not visible* to user with CourseStaffRole and
+        PREVENT_STAFF_STRUCTURE_DELETION waffle set
+        """
+        # Add user as course staff
+        CourseStaffRole(self.course_key).add_users(self.user)
+
+        with override_waffle_flag(PREVENT_STAFF_STRUCTURE_DELETION, active=True):
+            # Get xblock outline
+            xblock_info = create_xblock_info(
+                self.course,
+                include_child_info=True,
+                course_outline=True,
+                include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+                user=self.user
+            )
+
+        self.assertFalse(xblock_info['show_delete_button'])
+
+    def test_no_user_show_delete_button(self):
+        """
+        Test delete button is *visible* when user attribute is not set on
+        xblock. This happens with ajax requests.
+        """
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            self.course,
+            include_child_info=True,
+            course_outline=True,
+            include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+            user=None
+        )
+        self.assertTrue(xblock_info['show_delete_button'])
+
+    def test_no_user_show_delete_button_with_waffle(self):
+        """
+        Test delete button is *visible* when user attribute is not set on
+        xblock (this happens with ajax requests) and PREVENT_STAFF_STRUCTURE_DELETION waffle set.
+        """
+
+        with override_waffle_flag(PREVENT_STAFF_STRUCTURE_DELETION, active=True):
+            # Get xblock outline
+            xblock_info = create_xblock_info(
+                self.course,
+                include_child_info=True,
+                course_outline=True,
+                include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+                user=None
+            )
+
+        self.assertFalse(xblock_info['show_delete_button'])
+
+    def test_instructor_show_delete_button(self):
+        """
+        Test delete button is *visible* to user with CourseInstructorRole only
+        """
+        # Add user as course instructor
+        CourseInstructorRole(self.course_key).add_users(self.user)
+
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            self.course,
+            include_child_info=True,
+            course_outline=True,
+            include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+            user=self.user
+        )
+        self.assertTrue(xblock_info['show_delete_button'])
+
+    def test_instructor_show_delete_button_with_waffle(self):
+        """
+        Test delete button is *visible* to user with CourseInstructorRole only
+        and PREVENT_STAFF_STRUCTURE_DELETION waffle set
+        """
+        # Add user as course instructor
+        CourseInstructorRole(self.course_key).add_users(self.user)
+
+        with override_waffle_flag(PREVENT_STAFF_STRUCTURE_DELETION, active=True):
+            # Get xblock outline
+            xblock_info = create_xblock_info(
+                self.course,
+                include_child_info=True,
+                course_outline=True,
+                include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+                user=self.user
+            )
+
+        self.assertTrue(xblock_info['show_delete_button'])
+
+    def test_creator_show_delete_button(self):
+        """
+        Test delete button is *visible* to user with CourseInstructorRole only
+        """
+        # Add user as course creator
+        CourseCreatorRole(self.course_key).add_users(self.user)
+
+        # Get xblock outline
+        xblock_info = create_xblock_info(
+            self.course,
+            include_child_info=True,
+            course_outline=True,
+            include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+            user=self.user
+        )
+        self.assertTrue(xblock_info['show_delete_button'])
+
+    def test_creator_show_delete_button_with_waffle(self):
+        """
+        Test delete button is *visible* to user with CourseInstructorRole only
+        and PREVENT_STAFF_STRUCTURE_DELETION waffle set
+        """
+        # Add user as course creator
+        CourseCreatorRole(self.course_key).add_users(self.user)
+
+        with override_waffle_flag(PREVENT_STAFF_STRUCTURE_DELETION, active=True):
+            # Get xblock outline
+            xblock_info = create_xblock_info(
+                self.course,
+                include_child_info=True,
+                course_outline=True,
+                include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+                user=self.user
+            )
+
+        self.assertFalse(xblock_info['show_delete_button'])
+
+
+@patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.applicable_aside_types',
+       lambda self, block: ['test_aside'])
+class TestUpdateFromSource(ModuleStoreTestCase):
+    """
+    Test update_from_source.
+    """
+
+    def setUp(self):
+        """
+        Set up the runtime for tests.
+        """
+        super().setUp()
+        key_store = DictKeyValueStore()
+        field_data = KvsFieldData(key_store)
+        self.runtime = TestRuntime(services={'field-data': field_data})
+
+    def create_source_block(self, course):
+        """
+        Create a chapter with all the fixings.
+        """
+        source_block = BlockFactory(
+            parent=course,
+            category='course_info',
+            display_name='Source Block',
+            metadata={'due': datetime(2010, 11, 22, 4, 0, tzinfo=UTC)},
+        )
+
+        def_id = self.runtime.id_generator.create_definition('html')
+        usage_id = self.runtime.id_generator.create_usage(def_id)
+
+        aside = AsideTest(scope_ids=ScopeIds('user', 'html', def_id, usage_id), runtime=self.runtime)
+        aside.field11 = 'html_new_value1'
+
+        # The data attribute is handled in a special manner and should be updated.
+        source_block.data = '<div>test</div>'
+        # This field is set on the content scope (definition_data), which should be updated.
+        source_block.items = ['test', 'beep']
+
+        self.store.update_item(source_block, self.user.id, asides=[aside])
+
+        # quick sanity checks
+        source_block = self.store.get_item(source_block.location)
+        self.assertEqual(source_block.due, datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
+        self.assertEqual(source_block.display_name, 'Source Block')
+        self.assertEqual(source_block.runtime.get_asides(source_block)[0].field11, 'html_new_value1')
+        self.assertEqual(source_block.data, '<div>test</div>')
+        self.assertEqual(source_block.items, ['test', 'beep'])
+
+        return source_block
+
+    def check_updated(self, source_block, destination_key):
+        """
+        Check that the destination block has been updated to match our source block.
+        """
+        revised = self.store.get_item(destination_key)
+        self.assertEqual(source_block.display_name, revised.display_name)
+        self.assertEqual(source_block.due, revised.due)
+        self.assertEqual(revised.data, source_block.data)
+        self.assertEqual(revised.items, source_block.items)
+
+        self.assertEqual(
+            revised.runtime.get_asides(revised)[0].field11,
+            source_block.runtime.get_asides(source_block)[0].field11,
+        )
+
+    @XBlockAside.register_temp_plugin(AsideTest, 'test_aside')
+    def test_update_from_source(self):
+        """
+        Test that update_from_source updates the destination block.
+        """
+        course = CourseFactory()
+        user = UserFactory.create()
+
+        source_block = self.create_source_block(course)
+
+        destination_block = BlockFactory(parent=course, category='course_info', display_name='Destination Problem')
+        update_from_source(source_block=source_block, destination_block=destination_block, user_id=user.id)
+        self.check_updated(source_block, destination_block.location)
+
+    @XBlockAside.register_temp_plugin(AsideTest, 'test_aside')
+    def test_update_clobbers(self):
+        """
+        Verify that our update clobbers everything.
+        """
+        course = CourseFactory()
+        user = UserFactory.create()
+
+        source_block = self.create_source_block(course)
+
+        destination_block = BlockFactory(
+            parent=course,
+            category='course_info',
+            display_name='Destination Chapter',
+            metadata={'due': datetime(2025, 10, 21, 6, 5, tzinfo=UTC)},
+        )
+
+        def_id = self.runtime.id_generator.create_definition('html')
+        usage_id = self.runtime.id_generator.create_usage(def_id)
+        aside = AsideTest(scope_ids=ScopeIds('user', 'html', def_id, usage_id), runtime=self.runtime)
+        aside.field11 = 'Other stuff'
+        destination_block.data = '<div>other stuff</div>'
+        destination_block.items = ['other stuff', 'boop']
+        self.store.update_item(destination_block, user.id, asides=[aside])
+
+        update_from_source(source_block=source_block, destination_block=destination_block, user_id=user.id)
+        self.check_updated(source_block, destination_block.location)

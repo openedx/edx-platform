@@ -18,3 +18,30 @@ kombu.utils.entrypoints = lambda namespace: iter([])
 # that shared_task will use this app, and also ensures that the celery
 # singleton is always configured for the LMS.
 from .celery import APP as CELERY_APP  # lint-amnesty, pylint: disable=wrong-import-position
+
+# FAL-2248: Monkey patch django's get_storage_engine to work around long migrations times.
+# This fixes a performance issue with database migrations in Ocim. We will need to keep
+# this patch in our opencraft-release/* branches until edx-platform upgrades to Django 4.*
+# which will include this commit:
+# https://github.com/django/django/commit/518ce7a51f994fc0585d31c4553e2072bf816f76
+import django.db.backends.mysql.introspection
+
+
+def get_storage_engine(self, cursor, table_name):
+    """
+    This is a patched version of `get_storage_engine` that fixes a
+    performance issue with migrations. For more info see FAL-2248 and
+    https://github.com/django/django/pull/14766
+    """
+    cursor.execute("""
+        SELECT engine
+        FROM information_schema.tables
+        WHERE table_name = %s
+            AND table_schema = DATABASE()""", [table_name])
+    result = cursor.fetchone()
+    if not result:
+        return self.connection.features._mysql_storage_engine  # pylint: disable=protected-access
+    return result[0]
+
+
+django.db.backends.mysql.introspection.DatabaseIntrospection.get_storage_engine = get_storage_engine

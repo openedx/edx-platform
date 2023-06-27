@@ -777,6 +777,15 @@ FEATURES = {
     # .. toggle_tickets: https://openedx.atlassian.net/browse/YONK-513
     'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
+    # .. toggle_name: FEATURES['SHOW_REGISTRATION_LINKS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: True
+    # .. toggle_description: Allow registration links. If this is disabled, users will no longer see buttons to the
+    #   the signup page.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-03-27
+    'SHOW_REGISTRATION_LINKS': True,
+
     # .. toggle_name: FEATURES['ENABLE_COOKIE_CONSENT']
     # .. toggle_implementation: DjangoSetting
     # .. toggle_default: False
@@ -1028,6 +1037,17 @@ FEATURES = {
     # .. toggle_creation_date: 2022-06-06
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/29538'
     'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': False,
+
+    # .. toggle_name: FEATURES['ENABLE_LEGACY_MD5_HASH_FOR_ANONYMOUS_USER_ID']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Whether to enable the legacy MD5 hashing algorithm to generate anonymous user id
+    #   instead of the newer SHAKE128 hashing algorithm
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2022-08-08
+    # .. toggle_target_removal_date: None
+    # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/30832'
+    'ENABLE_LEGACY_MD5_HASH_FOR_ANONYMOUS_USER_ID': False,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -1214,6 +1234,19 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 ################################## THIRD_PARTY_AUTH CONFIGURATION #############################
 TPA_PROVIDER_BURST_THROTTLE = '10/min'
 TPA_PROVIDER_SUSTAINED_THROTTLE = '50/hr'
+
+# .. toggle_name: TPA_AUTOMATIC_LOGOUT_ENABLED
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Redirect the user to the TPA logout URL if this flag is enabled, the
+#   TPA logout URL is configured, and the user logs in through TPA.
+# .. toggle_use_cases: open_edx
+# .. toggle_warning: Enabling this toggle skips rendering logout.html, which is used to log the user out
+#   from the different IDAs. To ensure the user is logged out of all the IDAs be sure to redirect
+#   back to <LMS>/logout after logging out of the TPA.
+# .. toggle_creation_date: 2023-05-07
+# .. toggle_tickets: https://github.com/openedx/edx-platform/pull/32193
+TPA_AUTOMATIC_LOGOUT_ENABLED = False
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating

@@ -34,7 +34,8 @@
         SettingsGradersFactory(
             _.extend(${dump_js_escaped_json(course_details, cls=CourseSettingsEncoder) | n, decode.utf8},
                 {is_credit_course: ${is_credit_course | n, dump_js_escaped_json}}),
-            "${grading_url | n, js_escaped_string}"
+            "${grading_url | n, js_escaped_string}",
+            ${default_grade_designations | n, dump_js_escaped_json},
         );
     });
 </%block>

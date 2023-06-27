@@ -29,6 +29,12 @@
                             <span class="certificate-value"><%- course_title %></span>
                         </p>
                     <% } %>
+                    <% if (course_description) { %>
+                        <p class="course-description">
+                            <span class="certificate-label"><b><%- gettext('Course Description') %>: </b></span>
+                            <span class="certificate-value"><%- course_description %></span>
+                        </p>
+                    <% } %>
                  </div>
 
                 <div class='course-number-section pull-left'>

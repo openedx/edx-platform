@@ -52,6 +52,7 @@
                 this.supportURL = data.supportURL;
                 this.passwordResetSupportUrl = data.passwordResetSupportUrl;
                 this.createAccountOption = data.createAccountOption;
+                this.showRegisterLinks = data.showRegisterLinks;
                 this.accountActivationMessages = data.accountActivationMessages;
                 this.accountRecoveryMessages = data.accountRecoveryMessages;
                 this.hideAuthWarnings = data.hideAuthWarnings;
@@ -212,6 +213,7 @@
             saveError: function(error) {
                 var errorCode;
                 var msg;
+                var redirectURL;
                 if (error.status === 0) {
                     msg = gettext('An error has occurred. Check your Internet connection and try again.');
                 } else if (error.status === 500) {
@@ -241,6 +243,7 @@
                 } else if (error.responseJSON !== undefined) {
                     msg = error.responseJSON.value;
                     errorCode = error.responseJSON.error_code;
+                    redirectURL = error.responseJSON.redirect_url;
                 } else {
                     msg = gettext('An unexpected error has occurred.');
                 }
@@ -262,6 +265,7 @@
                         this.clearFormErrors();
                         this.renderThirdPartyAuthWarning();
                     }
+                    window.location.href = redirectURL;
                 } else {
                     this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                 }

@@ -109,8 +109,8 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 includesChildren: this.shouldRenderChildren(),
                 hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
                 staffOnlyMessage: this.model.get('staff_only_message'),
-                course: course
-            };
+                course: course,
+            showDeleteButton: this.model.get('show_delete_button')};
         },
 
         renderChildren: function() {

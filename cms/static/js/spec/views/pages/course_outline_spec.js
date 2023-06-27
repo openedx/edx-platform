@@ -41,7 +41,8 @@ describe('CourseOutlinePage', function() {
             user_partitions: [],
             user_partition_info: {},
             highlights_enabled: true,
-            highlights_enabled_for_messaging: false
+            highlights_enabled_for_messaging: false,
+            show_delete_button: true
         }, options, {child_info: {children: children}});
     };
 
@@ -68,7 +69,8 @@ describe('CourseOutlinePage', function() {
             show_review_rules: true,
             user_partition_info: {},
             highlights_enabled: true,
-            highlights_enabled_for_messaging: false
+            highlights_enabled_for_messaging: false,
+            show_delete_button: true
         }, options, {child_info: {children: children}});
     };
 
@@ -93,7 +95,8 @@ describe('CourseOutlinePage', function() {
             group_access: {},
             user_partition_info: {},
             highlights: [],
-            highlights_enabled: true
+            highlights_enabled: true,
+            show_delete_button: true
         }, options, {child_info: {children: children}});
     };
 
@@ -123,7 +126,8 @@ describe('CourseOutlinePage', function() {
             },
             user_partitions: [],
             group_access: {},
-            user_partition_info: {}
+            user_partition_info: {},
+            show_delete_button: true
         }, options, {child_info: {children: children}});
     };
 
@@ -141,7 +145,8 @@ describe('CourseOutlinePage', function() {
             edited_by: 'MockUser',
             user_partitions: [],
             group_access: {},
-            user_partition_info: {}
+            user_partition_info: {},
+            show_delete_button: true
         }, options);
     };
 
@@ -860,6 +865,13 @@ describe('CourseOutlinePage', function() {
             AjaxHelpers.expectNoRequests(requests); // No fetch should be performed
             expect(outlinePage.$('[data-locator="mock-section"]')).not.toExist();
             expect(outlinePage.$('[data-locator="mock-section-2"]')).toExist();
+        });
+
+        it('remains un-visible if show_delete_button is false ', function() {
+            createCourseOutlinePage(this, createMockCourseJSON({show_delete_button: false}, [
+                createMockSectionJSON({show_delete_button: false})
+            ]));
+            expect(getItemHeaders('section').find('.delete-button').first()).not.toExist();
         });
 
         it('can be deleted if it is the only section', function() {
@@ -2246,13 +2258,6 @@ describe('CourseOutlinePage', function() {
             it('shows validation error on relative date', function() {
                 outlinePage.$('.outline-subsection .configure-button').click();
 
-                // when due number of weeks goes over 18
-                selectRelativeWeeksSubsection('19');
-                expect($('#relative_weeks_due_warning_max').css('display')).not.toBe('none');
-                expect($('#relative_weeks_due_warning_max')).toContainText('The maximum number of weeks this subsection can be due in is 18 weeks from the learner enrollment date.');
-                expect($('.wrapper-modal-window .action-save').prop('disabled')).toBe(true);
-                expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(true);
-
                 // when due number of weeks is less than 1
                 selectRelativeWeeksSubsection('-1');
                 expect($('#relative_weeks_due_warning_min').css('display')).not.toBe('none');
@@ -2261,8 +2266,7 @@ describe('CourseOutlinePage', function() {
                 expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(true);
 
                 // when no validation error should show up
-                selectRelativeWeeksSubsection('10');
-                expect($('#relative_weeks_due_warning_max').css('display')).toBe('none');
+                selectRelativeWeeksSubsection('19');
                 expect($('#relative_weeks_due_warning_min').css('display')).toBe('none');
                 expect($('.wrapper-modal-window .action-save').prop('disabled')).toBe(false);
                 expect($('.wrapper-modal-window .action-save').hasClass('is-disabled')).toBe(false);

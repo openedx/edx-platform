@@ -75,7 +75,8 @@
                 this.platformName = options.platform_name;
                 this.supportURL = options.support_link;
                 this.passwordResetSupportUrl = options.password_reset_support_link;
-                this.createAccountOption = options.account_creation_allowed;
+                this.createAccountOption = options.account_creation_allowed && options.register_links_allowed;
+                    this.showRegisterLinks = options.register_links_allowed
                 this.hideAuthWarnings = options.hide_auth_warnings || false;
                 this.pipelineUserDetails = options.third_party_auth.pipeline_user_details;
                 this.enterpriseName = options.enterprise_name || '';
@@ -161,7 +162,7 @@
                         supportURL: this.supportURL,
                         passwordResetSupportUrl: this.passwordResetSupportUrl,
                         createAccountOption: this.createAccountOption,
-                        hideAuthWarnings: this.hideAuthWarnings,
+                        showRegisterLinks: this.showRegisterLinks,hideAuthWarnings: this.hideAuthWarnings,
                         pipelineUserDetails: this.pipelineUserDetails,
                         enterpriseName: this.enterpriseName,
                         enterpriseSlugLoginURL: this.enterpriseSlugLoginURL,
@@ -186,8 +187,9 @@
 
                     this.subview.passwordHelp = new PasswordResetView({
                         fields: data.fields,
-                        model: this.resetModel
-                    });
+                        model: this.resetModel,
+                    showRegisterLinks: this.showRegisterLinks
+                        });
 
                     // Listen for 'password-email-sent' event to toggle sub-views
                     this.listenTo(this.subview.passwordHelp, 'password-email-sent', this.passwordEmailSent);
@@ -211,7 +213,8 @@
                         hideAuthWarnings: this.hideAuthWarnings,
                         is_require_third_party_auth_enabled: this.is_require_third_party_auth_enabled,
                         enableCoppaCompliance: this.enable_coppa_compliance,
-                    });
+                    showRegisterLinks: this.showRegisterLinks
+                        });
 
                     // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
                     this.listenTo(this.subview.register, 'auth-complete', this.authComplete);

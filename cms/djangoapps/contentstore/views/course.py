@@ -74,6 +74,7 @@ from openedx.core.djangoapps.credit.api import get_credit_requirements, is_credi
 from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from openedx.core.lib.courses import course_image_url
@@ -1191,6 +1192,13 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
             verified_mode = CourseMode.verified_mode_for_course(course_key, include_expired=True)
             upgrade_deadline = (verified_mode and verified_mode.expiration_datetime and
                                 verified_mode.expiration_datetime.isoformat())
+
+            date_placeholder_format = configuration_helpers.get_value_for_org(
+                course_block.location.org,
+                'SCHEDULE_DETAIL_FORMAT',
+                settings.SCHEDULE_DETAIL_FORMAT
+            ).upper()
+
             settings_context = {
                 'context_course': course_block,
                 'course_locator': course_key,
@@ -1215,6 +1223,7 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                 'enable_extended_course_details': enable_extended_course_details,
                 'upgrade_deadline': upgrade_deadline,
                 'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
+                'date_placeholder_format': date_placeholder_format,
             }
             if is_prerequisite_courses_enabled():
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
@@ -1249,6 +1258,12 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):  # pylint: disable=too-many-nested-blocks
             if request.method == 'GET':
                 course_details = CourseDetails.fetch(course_key)
+
+                # Fetch the prefered timezone setup by the user
+                # and pass it as part of Json response
+                user_timezone = UserPreference.get_value(request.user, 'time_zone')
+                course_details.user_timezone = user_timezone
+
                 return JsonResponse(
                     course_details,
                     # encoder serializes dates, old locations, and instances
@@ -1256,63 +1271,70 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
                 )
             # For every other possible method type submitted by the caller...
             else:
-                # if pre-requisite course feature is enabled set pre-requisite course
-                if is_prerequisite_courses_enabled():
-                    prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
-                    if prerequisite_course_keys:
-                        if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
-                            return JsonResponseBadRequest({"error": _("Invalid prerequisite course key")})
-                        set_prerequisite_courses(course_key, prerequisite_course_keys)
-                    else:
-                        # None is chosen, so remove the course prerequisites
-                        course_milestones = milestones_api.get_course_milestones(
-                            course_key=course_key,
-                            relationship="requires",
-                        )
-                        for milestone in course_milestones:
-                            entrance_exam_namespace = generate_milestone_namespace(
-                                get_namespace_choices().get('ENTRANCE_EXAM'),
-                                course_key
-                            )
-                            if milestone["namespace"] != entrance_exam_namespace:
-                                remove_prerequisite_course(course_key, milestone)
+                return update_course_details_settings(course_key, course_block, request)
 
-                # If the entrance exams feature has been enabled, we'll need to check for some
-                # feature-specific settings and handle them accordingly
-                # We have to be careful that we're only executing the following logic if we actually
-                # need to create or delete an entrance exam from the specified course
-                if core_toggles.ENTRANCE_EXAMS.is_enabled():
-                    course_entrance_exam_present = course_block.entrance_exam_enabled
-                    entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
-                    ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
-                    # If the entrance exam box on the settings screen has been checked...
-                    if entrance_exam_enabled:
-                        # Load the default minimum score threshold from settings, then try to override it
-                        entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
-                        if ee_min_score_pct:
-                            entrance_exam_minimum_score_pct = float(ee_min_score_pct)
-                        if entrance_exam_minimum_score_pct.is_integer():
-                            entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
-                        # If there's already an entrance exam defined, we'll update the existing one
-                        if course_entrance_exam_present:
-                            exam_data = {
-                                'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct
-                            }
-                            update_entrance_exam(request, course_key, exam_data)
-                        # If there's no entrance exam defined, we'll create a new one
-                        else:
-                            create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
 
-                    # If the entrance exam box on the settings screen has been unchecked,
-                    # and the course has an entrance exam attached...
-                    elif not entrance_exam_enabled and course_entrance_exam_present:
-                        delete_entrance_exam(request, course_key)
-
-                # Perform the normal update workflow for the CourseDetails model
-                return JsonResponse(
-                    CourseDetails.update_from_json(course_key, request.json, request.user),
-                    encoder=CourseSettingsEncoder
+def update_course_details_settings(course_key, course_block: CourseBlock, request):
+    """
+    Helper function to update course details settings from API data
+    """
+    # if pre-requisite course feature is enabled set pre-requisite course
+    if is_prerequisite_courses_enabled():
+        prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
+        if prerequisite_course_keys:
+            if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
+                return JsonResponseBadRequest({"error": _("Invalid prerequisite course key")})
+            set_prerequisite_courses(course_key, prerequisite_course_keys)
+        else:
+            # None is chosen, so remove the course prerequisites
+            course_milestones = milestones_api.get_course_milestones(
+                course_key=course_key,
+                relationship="requires",
+            )
+            for milestone in course_milestones:
+                entrance_exam_namespace = generate_milestone_namespace(
+                    get_namespace_choices().get('ENTRANCE_EXAM'),
+                    course_key
                 )
+                if milestone["namespace"] != entrance_exam_namespace:
+                    remove_prerequisite_course(course_key, milestone)
+
+    # If the entrance exams feature has been enabled, we'll need to check for some
+    # feature-specific settings and handle them accordingly
+    # We have to be careful that we're only executing the following logic if we actually
+    # need to create or delete an entrance exam from the specified course
+    if core_toggles.ENTRANCE_EXAMS.is_enabled():
+        course_entrance_exam_present = course_block.entrance_exam_enabled
+        entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
+        ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
+        # If the entrance exam box on the settings screen has been checked...
+        if entrance_exam_enabled:
+            # Load the default minimum score threshold from settings, then try to override it
+            entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+            if ee_min_score_pct:
+                entrance_exam_minimum_score_pct = float(ee_min_score_pct)
+            if entrance_exam_minimum_score_pct.is_integer():
+                entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
+            # If there's already an entrance exam defined, we'll update the existing one
+            if course_entrance_exam_present:
+                exam_data = {
+                    'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct
+                }
+                update_entrance_exam(request, course_key, exam_data)
+            # If there's no entrance exam defined, we'll create a new one
+            else:
+                create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
+
+        # If the entrance exam box on the settings screen has been unchecked,
+        # and the course has an entrance exam attached...
+        elif not entrance_exam_enabled and course_entrance_exam_present:
+            delete_entrance_exam(request, course_key)
+
+    # Perform the normal update workflow for the CourseDetails model
+    return JsonResponse(
+        CourseDetails.update_from_json(course_key, request.json, request.user),
+        encoder=CourseSettingsEncoder
+    )
 
 
 @login_required
@@ -1343,6 +1365,7 @@ def grading_handler(request, course_key_string, grader_index=None):
                 'grading_url': reverse_course_url('grading_handler', course_key),
                 'is_credit_course': is_credit_course(course_key),
                 'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
+                'default_grade_designations': settings.DEFAULT_GRADE_DESIGNATIONS
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':

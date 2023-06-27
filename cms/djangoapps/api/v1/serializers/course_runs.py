@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 from rest_framework.fields import empty
 
@@ -203,3 +204,35 @@ class CourseRunRerunSerializer(CourseRunSerializerCommonFieldsMixin, CourseRunTe
         course_run = get_course_and_check_access(new_course_run_key, user)
         self.update_team(course_run, team)
         return course_run
+
+
+class CourseCloneSerializer(serializers.Serializer):  # lint-amnesty, pylint: disable=abstract-method, missing-class-docstring
+    source_course_id = serializers.CharField()
+    destination_course_id = serializers.CharField()
+
+    def validate(self, attrs):
+        source_course_id = attrs.get('source_course_id')
+        destination_course_id = attrs.get('destination_course_id')
+        store = modulestore()
+        source_key = CourseKey.from_string(source_course_id)
+        dest_key = CourseKey.from_string(destination_course_id)
+
+        # Check if the source course exists
+        if not store.has_course(source_key):
+            raise serializers.ValidationError('Source course does not exist.')
+
+        # Check if the destination course already exists
+        if store.has_course(dest_key):
+            raise serializers.ValidationError('Destination course already exists.')
+        return attrs
+
+    def create(self, validated_data):
+        source_course_id = validated_data.get('source_course_id')
+        destination_course_id = validated_data.get('destination_course_id')
+        user_id = self.context['request'].user.id
+        store = modulestore()
+        source_key = CourseKey.from_string(source_course_id)
+        dest_key = CourseKey.from_string(destination_course_id)
+        with store.default_store('split'):
+            new_course = store.clone_course(source_key, dest_key, user_id)
+        return new_course
