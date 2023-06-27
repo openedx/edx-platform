@@ -108,6 +108,11 @@ class ConsentApiClient:
         conceptual scope of the consent involved in the request.
         """
 
+        # If enterprise-catalog is not enabled it is necessary disable data sharing consent
+        # for enterprise customers.
+        if configuration_helpers.get_value('DISABLE_DATA_SHARING_CONSENT', False):
+            return False
+
         # Call the endpoint with the given kwargs, and check the value that it provides.
         response = self.client.get(self.consent_endpoint, params=kwargs)
         response.raise_for_status()
