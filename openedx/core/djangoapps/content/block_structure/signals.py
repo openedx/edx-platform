@@ -11,7 +11,6 @@ from opaque_keys.edx.locator import LibraryLocator
 from xmodule.modulestore.django import SignalHandler
 
 from .api import clear_course_from_cache
-from .models import BlockStructureNotFound
 from .tasks import update_course_in_cache_v2
 
 log = logging.getLogger(__name__)
