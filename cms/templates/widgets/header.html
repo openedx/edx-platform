@@ -7,6 +7,7 @@
   from django.urls import reverse
   from django.utils.translation import gettext as _
   from urllib.parse import quote_plus
+  from common.djangoapps.student.auth import has_studio_advanced_settings_access
   from cms.djangoapps.contentstore import toggles
   from cms.djangoapps.contentstore.utils import get_pages_and_resources_url
   from openedx.core.djangoapps.discussions.config.waffle import ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND
@@ -120,7 +121,7 @@
                     <a href="${mfe_proctored_exam_settings_url}">${_("Proctored Exam Settings")}</a>
                   </li>
                   % endif
-                  % if advance_settings_access:
+                  % if has_studio_advanced_settings_access(request.user):
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
                   </li>
