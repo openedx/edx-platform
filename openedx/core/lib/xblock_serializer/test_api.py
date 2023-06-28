@@ -4,9 +4,10 @@ Test for the XBlock serialization lib's API
 from xml.etree import ElementTree
 
 from openedx.core.djangolib.testing.utils import skip_unless_cms
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.django import contentstore, modulestore
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, upload_file_to_course
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory
+from xmodule.util.sandboxing import DEFAULT_PYTHON_LIB_FILENAME
 
 from . import api
 
@@ -134,6 +135,32 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
         # This is the only other difference - an extra field with the blockstore-specific definition ID:
         self.assertEqual(serialized_blockstore.def_id, "html/just_img")
 
+    def test_html_with_fields(self):
+        """ Test an HTML Block with non-default fields like editor='raw' """
+        course = CourseFactory.create(display_name='test course', run="Testing_course")
+        html_block = BlockFactory.create(
+            parent_location=course.location,
+            category="html",
+            display_name="Non-default HTML Block",
+            editor="raw",
+            use_latex_compiler=True,
+            data="🍔",
+        )
+        serialized = api.serialize_xblock_to_olx(html_block)
+        self.assertXmlEqual(
+            serialized.olx_str,
+            """
+            <html
+                url_name="Non-default_HTML_Block"
+                display_name="Non-default HTML Block"
+                editor="raw"
+                use_latex_compiler="true"
+            ><![CDATA[
+                🍔
+            ]]></html>
+            """
+        )
+
     def test_export_sequential(self):
         """
         Export a sequential from the toy course, including all of its children.
@@ -165,3 +192,55 @@ class XBlockSerializationTestCase(SharedModuleStoreTestCase):
                 <xblock-include definition="video/Video_Resources"/>
             </sequential>
         """)
+
+    def test_capa_python_lib(self):
+        """ Test capa problem blocks with and without python_lib.zip """
+        course = CourseFactory.create(display_name='Python Testing course', run="PY")
+        upload_file_to_course(
+            course_key=course.id,
+            contentstore=contentstore(),
+            source_file='./common/test/data/uploads/python_lib.zip',
+            target_filename=DEFAULT_PYTHON_LIB_FILENAME,
+        )
+
+        regular_problem = BlockFactory.create(
+            parent_location=course.location,
+            category="problem",
+            display_name="Problem No Python",
+            max_attempts=3,
+            data="<problem><optionresponse></optionresponse></problem>",
+        )
+
+        python_problem = BlockFactory.create(
+            parent_location=course.location,
+            category="problem",
+            display_name="Python Problem",
+            data='<problem>This uses python: <script type="text/python">...</script>...</problem>',
+        )
+
+        # The regular problem doesn't use python so shouldn't contain python_lib.zip:
+
+        serialized = api.serialize_xblock_to_olx(regular_problem)
+        assert not serialized.static_files
+        self.assertXmlEqual(
+            serialized.olx_str,
+            """
+            <problem display_name="Problem No Python" url_name="Problem_No_Python" max_attempts="3">
+                <optionresponse></optionresponse>
+            </problem>
+            """
+        )
+
+        # The python problem should contain python_lib.zip:
+
+        serialized = api.serialize_xblock_to_olx(python_problem)
+        assert len(serialized.static_files) == 1
+        assert serialized.static_files[0].name == "python_lib.zip"
+        self.assertXmlEqual(
+            serialized.olx_str,
+            """
+            <problem display_name="Python Problem" url_name="Python_Problem">
+                This uses python: <script type="text/python">...</script>...
+            </problem>
+            """
+        )

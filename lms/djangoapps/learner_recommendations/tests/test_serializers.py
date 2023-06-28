@@ -97,7 +97,7 @@ class TestCrossProductRecommendationsSerializers(TestCase):
     AmplitudeRecommendationsSerializer, and CrossProductAndAmplitudeRecommendations Serializer
     """
 
-    def mock_recommended_courses(self, num_of_courses=2, amplitude_courses=False):
+    def mock_recommended_courses(self, num_of_courses=2):
         """Course data mock"""
 
         recommended_courses = []
@@ -132,19 +132,11 @@ class TestCrossProductRecommendationsSerializers(TestCase):
                         "marketing_url": f"https://www.marketing_url{index}.com",
                         "availability": "Current",
                     },
+                    "active_course_run_key": f"course-v1:Test+2023_T{index}",
+                    "marketing_url": f"https://www.marketing_url{index}.com",
                     "location_restriction": None
                 },
             )
-
-        if amplitude_courses:
-            keys_to_remove = ["active_course_run", "key", "uuid"]
-            amplitude_courses = []
-
-            for course in recommended_courses:
-                new_course = {key: value for key, value in course.items() if key not in keys_to_remove}
-                amplitude_courses.append(new_course)
-
-            return amplitude_courses
 
         return recommended_courses
 
@@ -178,7 +170,7 @@ class TestCrossProductRecommendationsSerializers(TestCase):
         """Test that course data serializes correctly for CrossProductAndAmplitudeRecommendationSerializer"""
 
         cross_product_courses = self.mock_recommended_courses(num_of_courses=2)
-        amplitude_courses = self.mock_recommended_courses(num_of_courses=4, amplitude_courses=True)
+        amplitude_courses = self.mock_recommended_courses(num_of_courses=4)
 
         serialized_data = CrossProductAndAmplitudeRecommendationsSerializer({
             "crossProductCourses": cross_product_courses,

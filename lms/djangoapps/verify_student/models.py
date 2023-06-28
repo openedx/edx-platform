@@ -919,7 +919,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         if "AWS_SECRET_KEY" in config:
             storage_kwargs["secret_key"] = config["AWS_SECRET_KEY"]
         if "S3_BUCKET" in config:
-            storage_kwargs["bucket"] = config["S3_BUCKET"]
+            storage_kwargs["bucket_name"] = config["S3_BUCKET"]
             storage_kwargs["querystring_expire"] = self.IMAGE_LINK_DURATION
 
         return get_storage(storage_class, **storage_kwargs)

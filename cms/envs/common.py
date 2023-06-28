@@ -2733,3 +2733,11 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
 DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
 DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
+
+OPEN_EDX_FILTERS_CONFIG = {
+    "org.openedx.content_authoring.staged_content.static_filter_source.v1": {
+        "pipeline": [
+            "openedx.core.djangoapps.content_staging.filters.IgnoreLargeFiles",
+        ]
+    }
+}
