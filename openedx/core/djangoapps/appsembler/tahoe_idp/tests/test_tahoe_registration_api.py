@@ -12,6 +12,8 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from ...multi_tenant_emails.tests.test_utils import with_organization_context
 
+from . import patches
+
 APPSEMBLER_API_VIEWS_MODULE = 'openedx.core.djangoapps.appsembler.api.v1.views'
 
 
@@ -51,6 +53,7 @@ class TahoeIdPDisablesRegisrationAPITest(APITestCase):
             content = response.content.decode('utf-8')
             assert response.status_code == status.HTTP_200_OK, '{} {}'.format(color1, content)
 
+    @patch('tahoe_idp.receivers.helpers.is_tahoe_idp_enabled', new=patches.dummy_receivers_idp_not_enabled)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_TAHOE_IDP': True})
     @ddt.data(
         reverse_lazy('tahoe-api:v1:registrations-list'),
@@ -60,6 +63,7 @@ class TahoeIdPDisablesRegisrationAPITest(APITestCase):
         """
         Both v1 and v2 API shouldn't work with Tahoe IdP.
         """
+
         color1 = 'red1'
         with with_organization_context(site_color=color1):
             response = self.register_user(url, 'red_learner')

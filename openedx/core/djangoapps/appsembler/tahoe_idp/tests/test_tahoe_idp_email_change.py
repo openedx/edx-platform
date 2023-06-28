@@ -12,6 +12,8 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import PendingEmailChange
 from student.tests.factories import PendingEmailChangeFactory, UserFactory
 
+from . import patches
+
 
 @skip_unless_lms
 class EmailChangeWithIdpTests(TestCase):
@@ -37,11 +39,13 @@ class EmailChangeWithIdpTests(TestCase):
             'Should not use idp unless explicitly enabled via ENABLE_TAHOE_IDP'
         )
 
+    @patch('tahoe_idp.receivers.helpers.is_tahoe_idp_enabled', new=patches.dummy_receivers_idp_not_enabled)
     @patch('tahoe_idp.api.update_user_email')
     def test_successful_email_change_with_idp(self, mock_update_user_email):
         """
         Test `confirm_email_change` with ENABLE_TAHOE_IDP = True.
         """
+
         with patch.dict(settings.FEATURES, {'ENABLE_TAHOE_IDP': True}):
             response = self.client.get(reverse('confirm_email_change', args=[self.key]))
 
