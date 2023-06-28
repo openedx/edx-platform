@@ -819,12 +819,12 @@ class CourseOverview(TimeStampedModel):
         """
         return modulestore().get_course(self.id)
 
-    # @property
-    # def allow_public_wiki_access(self):
-    #     """
-    #     TODO: move this to the model.
-    #     """
-    #     return self._original_course.allow_public_wiki_access
+    @property
+    def allow_public_wiki_access(self):
+        """
+        TODO: move this to the model.
+        """
+        return self._original_course.allow_public_wiki_access
 
     @property
     def textbooks(self):
