@@ -65,7 +65,7 @@ mock_cross_product_data = [
     {
         "title": "Title 1",
         "courseRunKey": "course-v1:Test+2023_T1",
-        "marketingUrl": f"https://www.marketing_url1.com",
+        "marketingUrl": "https://www.marketing_url1.com",
         "courseType": "executive-education",
         "image": {
             "src": "https://www.logo_image_url1.com"
@@ -101,7 +101,7 @@ mock_amplitude_data = [
     {
         "title": "Title 3",
         "courseRunKey": "course-v1:Test+2023_T3",
-        "marketingUrl": f"https://www.marketing_url3.com",
+        "marketingUrl": "https://www.marketing_url3.com",
         "courseType": "executive-education",
         "image": {
             "src": "https://www.logo_image_url3.com"
