@@ -2,14 +2,19 @@
 
 import openedx_tagging.core.tagging.rules as oel_tagging
 import rules
+from django.contrib.auth import get_user_model
 from organizations.models import Organization
 
 from common.djangoapps.student.auth import is_content_creator
 
+from .models import ContentTaxonomy
 
-def is_taxonomy_admin(user, taxonomy=None):
+User = get_user_model()
+
+
+def is_taxonomy_admin(user: User, taxonomy: ContentTaxonomy = None) -> bool:
     """
-    Returns True if the given user is a Taxonomy Admin for the given taxonomy.
+    Returns True if the given user is a Taxonomy Admin for the given content taxonomy.
 
     Global Taxonomy Admins include global staff and superusers, plus course creators who can create courses for any org.
 
@@ -39,7 +44,7 @@ def is_taxonomy_admin(user, taxonomy=None):
 
 
 @rules.predicate
-def can_view_taxonomy(user, taxonomy=None):
+def can_view_taxonomy(user: User, taxonomy: ContentTaxonomy = None) -> bool:
     """
     Anyone can view an enabled taxonomy,
     but only taxonomy admins can view a disabled taxonomy.
@@ -48,7 +53,7 @@ def can_view_taxonomy(user, taxonomy=None):
 
 
 @rules.predicate
-def can_change_taxonomy(user, taxonomy=None):
+def can_change_taxonomy(user: User, taxonomy: ContentTaxonomy = None) -> bool:
     """
     Even taxonomy admins cannot change system taxonomies.
     """
@@ -58,7 +63,7 @@ def can_change_taxonomy(user, taxonomy=None):
 
 
 @rules.predicate
-def can_change_taxonomy_tag(user, tag=None):
+def can_change_taxonomy_tag(user: User, tag: oel_tagging.Tag = None) -> bool:
     """
     Even taxonomy admins cannot add tags to system taxonomies (their tags are system-defined), or free-text taxonomies
     (these don't have predefined tags).
@@ -72,7 +77,7 @@ def can_change_taxonomy_tag(user, tag=None):
 
 
 @rules.predicate
-def can_change_object_tag(user, object_tag=None):
+def can_change_object_tag(user: User, object_tag: oel_tagging.ObjectTag = None) -> bool:
     """
     Taxonomy admins can create or modify object tags on enabled taxonomies.
     """
