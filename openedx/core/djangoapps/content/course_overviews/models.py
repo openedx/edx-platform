@@ -271,7 +271,7 @@ class CourseOverview(TimeStampedModel):
             course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct / 100
         else:
             course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct
-        
+
         course_overview.force_on_flexible_peer_openassessments = course.force_on_flexible_peer_openassessments
 
         if not CatalogIntegration.is_enabled():
