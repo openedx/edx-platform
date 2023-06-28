@@ -60,16 +60,18 @@ class AboutPageProductRecommendationsSerializer(serializers.Serializer):
 class LearnerDashboardProductRecommendationsSerializer(serializers.Serializer):
     """Serializer for product recommendations for the Learner Dashboard"""
     title = serializers.CharField()
+    courseRunKey = serializers.SerializerMethodField()
+    marketingUrl = serializers.URLField(source="marketing_url")
+    courseType = serializers.CharField(source="course_type")
     image = CourseImageSerializer()
-    prospectusPath = serializers.SerializerMethodField()
     owners = serializers.ListField(
         child=CourseOwnersSerializer(), allow_empty=True
     )
-    courseType = serializers.CharField(source="course_type")
 
-    def get_prospectusPath(self, instance):
-        url_slug = instance.get("url_slug")
-        return f"course/{url_slug}"
+    def get_courseRunKey(self, instance):
+        active_course_run_key = instance.get('active_course_run_key')
+
+        return active_course_run_key if active_course_run_key else instance.get('course_runs')[0]['key']
 
 
 class AboutPageRecommendationsSerializer(serializers.Serializer):
