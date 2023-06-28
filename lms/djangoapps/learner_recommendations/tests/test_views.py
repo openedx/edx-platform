@@ -387,7 +387,6 @@ class TestProductRecommendationsView(APITestCase):
                 "image": {
                     "src": "https://www.logo_image_url.com",
                 },
-                "url_slug": "https://www.marketing_url.com",
                 "course_type": "executive-education",
                 "owners": [
                     {
@@ -405,6 +404,8 @@ class TestProductRecommendationsView(APITestCase):
                         "status": "published"
                     }
                 ],
+                "marketing_url": "https://www.marketing_url.com/course/some-course",
+                "advertised_course_run_uuid": f"course-v1:{key}+2023_T2",
             }
             if keys_with_restriction and key in keys_with_restriction:
                 course.update({
