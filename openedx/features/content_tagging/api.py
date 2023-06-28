@@ -70,36 +70,9 @@ def get_taxonomies(org_owner: Organization = None, enabled=True) -> QuerySet:
     )
 
 
-# Expose the oel_tagging APIs
+# Expose the oel_tagging APIs that we haven't overridden here:
 
-
-def get_tags(taxonomy: Taxonomy) -> List[Tag]:
-    """
-    Exposes the oel_tagging.get_tags API method.
-    """
-    return oel_tagging.get_tags(taxonomy)
-
-
-def resync_object_tags(object_tags: QuerySet = None) -> int:
-    """
-    Exposes the oel_tagging.resync_object_tags API method.
-    """
-    return oel_tagging.resync_object_tags(object_tags)
-
-
-def get_object_tags(
-    taxonomy: Taxonomy, object_id: str, object_type: str, valid_only=True
-) -> List[ObjectTag]:
-    """
-    Exposes the oel_tagging.get_object_tags API method.
-    """
-    return oel_tagging.get_object_tags(taxonomy, object_id, object_type, valid_only)
-
-
-def tag_object(
-    taxonomy: Taxonomy, tags: List, object_id: str, object_type: str
-) -> List[ObjectTag]:
-    """
-    Exposes the oel_tagging.tag_object API method.
-    """
-    return oel_tagging.tag_object(taxonomy, tags, object_id, object_type)
+get_tags = oel_tagging.get_tags
+resync_object_tags = oel_tagging.resync_object_tags
+get_object_tags = oel_tagging.get_object_tags
+tag_object = oel_tagging.tag_object
