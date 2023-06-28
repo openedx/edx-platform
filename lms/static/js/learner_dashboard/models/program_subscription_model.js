@@ -79,7 +79,9 @@ class ProgramSubscriptionModel extends Backbone.Model {
             return ['', ''];
         }
 
-        const userTimezone = userPreferences.time_zone || 'UTC';
+        const userTimezone = (
+            userPreferences.time_zone || moment.tz.guess() || 'UTC'
+        );
         const userLanguage = userPreferences['pref-lang'] || 'en';
         const context = {
             datetime: date,
@@ -102,7 +104,9 @@ class ProgramSubscriptionModel extends Backbone.Model {
             return 0;
         }
 
-        const userTimezone = userPreferences.time_zone || 'UTC';
+        const userTimezone = (
+            userPreferences.time_zone || moment.tz.guess() || 'UTC'
+        );
         const trialEndTime = DateUtils.localizeTime(
             DateUtils.stringToMoment(trialEndDate),
             userTimezone

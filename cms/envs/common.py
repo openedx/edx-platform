@@ -1052,7 +1052,7 @@ DATABASES = {
         'ATOMIC_REQUESTS': True,
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'NAME': 'edxapp',
         'OPTIONS': {},
         'PASSWORD': 'password',
@@ -1062,7 +1062,7 @@ DATABASES = {
     'read_replica': {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'NAME': 'edxapp',
         'OPTIONS': {},
         'PASSWORD': 'password',
@@ -1072,7 +1072,7 @@ DATABASES = {
     'student_module_history': {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'NAME': 'edxapp_csmh',
         'OPTIONS': {},
         'PASSWORD': 'password',
@@ -2728,3 +2728,11 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
 DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
 DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
+
+OPEN_EDX_FILTERS_CONFIG = {
+    "org.openedx.content_authoring.staged_content.static_filter_source.v1": {
+        "pipeline": [
+            "openedx.core.djangoapps.content_staging.filters.IgnoreLargeFiles",
+        ]
+    }
+}

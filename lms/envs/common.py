@@ -1216,6 +1216,18 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 TPA_PROVIDER_BURST_THROTTLE = '10/min'
 TPA_PROVIDER_SUSTAINED_THROTTLE = '50/hr'
 
+# .. toggle_name: TPA_AUTOMATIC_LOGOUT_ENABLED
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Redirect the user to the TPA logout URL if this flag is enabled, the
+#   TPA logout URL is configured, and the user logs in through TPA.
+# .. toggle_use_cases: opt_in
+# .. toggle_warning: Enabling this toggle skips rendering logout.html, which is used to log the user out
+#   from the different IDAs. To ensure the user is logged out of all the IDAs be sure to redirect
+#   back to <LMS>/logout after logging out of the TPA.
+# .. toggle_creation_date: 2023-05-07
+TPA_AUTOMATIC_LOGOUT_ENABLED = False
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 import tempfile  # pylint: disable=wrong-import-position,wrong-import-order
@@ -1350,6 +1362,11 @@ ELASTIC_SEARCH_CONFIG = [
         'port': 9200
     }
 ]
+
+# .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
+# .. setting_default: ''
+# .. setting_description: Specifies the prefix used when namixng elasticsearch indexes related to edx-search.
+ELASTICSEARCH_INDEX_PREFIX = ""
 
 VIDEO_CDN_URL = {
     'EXAMPLE_COUNTRY_CODE': "http://example.com/edx/video?s3_url="
@@ -1614,7 +1631,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': DATA_DIR,
+                        'fs_root': lambda settings: settings.DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
@@ -1624,7 +1641,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': DATA_DIR,
+                        'fs_root': lambda settings: settings.DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 }
@@ -1632,6 +1649,7 @@ MODULESTORE = {
         }
     }
 }
+
 
 DATABASES = {
     # edxapp's edxapp-migrate scripts and the edxapp_migrate play
@@ -3300,6 +3318,7 @@ REST_FRAMEWORK = {
         'user': '60/minute',
         'service_user': '800/minute',
         'registration_validation': '30/minute',
+        'high_service_user': '2000/minute',
     },
 }
 
@@ -4585,6 +4604,7 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'enterprise_channel_worker',
     'enterprise_access_worker',
     'enterprise_subsidy_worker',
+    'subscriptions_worker'
 ]
 
 
@@ -4943,6 +4963,10 @@ DISCUSSIONS_MICROFRONTEND_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the discussions micro-frontend google form based feedback.
 DISCUSSIONS_MFE_FEEDBACK_URL = None
+# .. setting_name: EXAMS_DASHBOARD_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the exams dashboard micro-frontend for instructors.
+EXAMS_DASHBOARD_MICROFRONTEND_URL = None
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -5322,3 +5346,7 @@ SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
 SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
 SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
 SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
+SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
+
+############## NOTIFICATIONS EXPIRY ##############
+NOTIFICATIONS_EXPIRY = 60

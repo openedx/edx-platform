@@ -20,6 +20,7 @@ from xmodule.tests.test_transcripts_utils import YoutubeVideoHTMLResponse
 from cms.djangoapps.contentstore.utils import reverse_url
 from common.djangoapps.student.models import Registration
 
+
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
@@ -42,6 +43,7 @@ class AjaxEnabledTestClient(Client):
     """
     Convenience class to make testing easier.
     """
+
     def ajax_post(self, path, data=None, content_type="application/json", **kwargs):
         """
         Convenience method for client post which serializes the data into json and sets the accept type
@@ -214,6 +216,7 @@ class HTTPGetResponse:
     """
     Generic object used to return results from a mock patch to an HTTP GET request
     """
+
     def __init__(self, status_code, response_string):
         self.status_code = status_code
         self.text = response_string

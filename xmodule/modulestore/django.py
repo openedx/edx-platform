@@ -176,11 +176,11 @@ class SignalHandler:
 
     # If you add a new signal, please don't forget to add it to the _mapping
     # as well.
-    pre_publish = SwitchedSignal("pre_publish", providing_args=["course_key"])
-    course_published = SwitchedSignal("course_published", providing_args=["course_key"])
-    course_deleted = SwitchedSignal("course_deleted", providing_args=["course_key"])
-    library_updated = SwitchedSignal("library_updated", providing_args=["library_key"])
-    item_deleted = SwitchedSignal("item_deleted", providing_args=["usage_key", "user_id"])
+    pre_publish = SwitchedSignal("pre_publish")
+    course_published = SwitchedSignal("course_published")
+    course_deleted = SwitchedSignal("course_deleted")
+    library_updated = SwitchedSignal("library_updated")
+    item_deleted = SwitchedSignal("item_deleted")
 
     _mapping = {
         signal.name: signal

@@ -200,6 +200,7 @@ class ProgramDetailsView extends Backbone.View {
         ));
         const programPurchasedWithoutSubscription = (
             this.subscriptionModel.get('subscriptionState') !== 'active'
+            && this.subscriptionModel.get('subscriptionState') !== 'inactive'
             && !isSomeCoursePurchasable
             && this.remainingCourseCollection.length === 0
         );
@@ -217,10 +218,7 @@ class ProgramDetailsView extends Backbone.View {
             trialEndingAlerts: [],
         };
         if (this.subscriptionModel.get('subscriptionState') === 'active') {
-            if (
-                this.courseData.get('in_progress').length === 0 &&
-                this.courseData.get('not_started').length >= 1
-            ) {
+            if (this.courseData.get('all_unenrolled')) {
                 alerts.enrollmentAlerts.push({
                     title: this.programModel.get('title'),
                 });

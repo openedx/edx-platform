@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-17 08:57+0000\n"
+"POT-Creation-Date: 2023-06-04 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>, 2019\n"
 "Language-Team: Basque (Spain) (https://app.transifex.com/open-edx/teams/6205/eu_ES/)\n"
@@ -74,6 +74,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Unit"
+msgstr "Unitatea"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr "Ariketa"
 
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
@@ -94,12 +106,6 @@ msgid "Discussion"
 msgstr "Eztabaida"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/helpers.py
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Problem"
-msgstr "Ariketa"
-
-#: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 #: lms/templates/video.html
 msgid "Video"
@@ -118,17 +124,6 @@ msgstr "Aurreratua"
 #: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "Sarrera-azterketa"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
-msgid "Unit"
-msgstr "Unitatea"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_block.py
-msgid "Empty"
-msgstr "Hutsik"
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: xmodule/video_block/video_handlers.py
@@ -185,6 +180,11 @@ msgstr "Bideoaren IDa"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "Zain"
+
+#: cms/djangoapps/contentstore/xblock_services/create_xblock.py
+#: xmodule/library_content_block.py
+msgid "Empty"
+msgstr "Hutsik"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -2066,7 +2066,7 @@ msgid "Cookie Policy"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Information"
+msgid "Your Privacy Choices"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -6928,6 +6928,30 @@ msgstr "{country} zerrenda beltza {course}-rako"
 msgid "Learner Pathways"
 msgstr ""
 
+#: openedx/core/djangoapps/notifications/views.py
+msgid "The notification preference config version is not up to date."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app name."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked as seen."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notification marked read."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked read."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app_name or notification_id."
+msgstr ""
+
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
 "Comma-separated list of scopes that this application will be allowed to "
@@ -11784,6 +11808,19 @@ msgstr ""
 msgid "Missing branch on fresh clone"
 msgstr ""
 
+#: cms/djangoapps/contentstore/helpers.py
+msgid "Vertical"
+msgstr "Bertikala"
+
+#: cms/djangoapps/contentstore/helpers.py cms/templates/course_outline.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Section"
+msgstr "Atala"
+
+#: cms/djangoapps/contentstore/helpers.py lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr "Azpiatala"
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -11867,13 +11904,19 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
+msgstr ""
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
 msgstr ""
 
 #: cms/djangoapps/contentstore/video_utils.py
@@ -11932,85 +11975,6 @@ msgstr "Igoera osatu da"
 msgid ""
 "File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
 msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Invalid data"
-msgstr "Datu baliogabea"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Datu baliogabea ({details})"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "There was a problem pasting your component."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Your clipboard is empty or invalid."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Item is already present in target location."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into itself."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into it's child."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item directly into content experiment."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr ""
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/block.py
-msgid "%"
-msgstr "%"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr " {section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -12101,10 +12065,6 @@ msgid ""
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
 msgstr ""
 
@@ -12131,21 +12091,6 @@ msgstr "Osatutako ikastaroko sarrera-azterketa"
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "Ikastaroa ondo esportatu da git bilregira"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Vertical"
-msgstr "Bertikala"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_block.html
-msgid "Section"
-msgstr "Atala"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
-msgstr "Azpiatala"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Some chunks missed during file upload. Please try again"
@@ -12389,6 +12334,82 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "A non zero positive integer is expected"
 msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Invalid data"
+msgstr "Datu baliogabea"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "Datu baliogabea ({details})"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "Item is already present in target location."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item into itself."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item into it's child."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "You can not move an item directly into content experiment."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+msgid "%"
+msgstr "%"
+
+#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr " {section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
@@ -13288,6 +13309,10 @@ msgid "Learn more about this course"
 msgstr ""
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr ""
 
@@ -13662,7 +13687,11 @@ msgid "Downloads and transcripts"
 msgstr "Deskargak eta transkripzioak"
 
 #: lms/templates/video.html
-msgid "Share on:"
+msgid "Download video file"
+msgstr "Deskargatu bideoaren fitxategia"
+
+#: lms/templates/video.html
+msgid "Share this video"
 msgstr ""
 
 #: lms/templates/video.html
@@ -13670,8 +13699,8 @@ msgid "Share on {site}"
 msgstr ""
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Deskargatu bideoaren fitxategia"
+msgid "Copy"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -21758,7 +21787,7 @@ msgid "Set Access"
 msgstr "Ezarri sarbidea"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
+msgid "Copy to Clipboard"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html

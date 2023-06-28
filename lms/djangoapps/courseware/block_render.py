@@ -53,7 +53,6 @@ from xmodule.util.sandboxing import SandboxService
 from xmodule.services import EventPublishingService, RebindUserService, SettingsService, TeamsConfigurationService
 from common.djangoapps.static_replace.services import ReplaceURLService
 from common.djangoapps.static_replace.wrapper import replace_urls_wrapper
-from xmodule.capa.xqueue_interface import XQueueService  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.access import get_user_role, has_access
 from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
 from lms.djangoapps.courseware.masquerade import (
@@ -439,44 +438,12 @@ def prepare_runtime_for_user(
         KvsFieldData:  student_data bound to, primarily, the user and block
     """
 
-    def make_xqueue_callback(dispatch='score_update'):
-        """
-        Returns fully qualified callback URL for external queueing system
-        """
-        relative_xqueue_callback_url = reverse(
-            'xqueue_callback',
-            kwargs=dict(
-                course_id=str(course_id),
-                userid=str(user.id),
-                mod_id=str(block.location),
-                dispatch=dispatch
-            ),
-        )
-        xqueue_callback_url_prefix = settings.XQUEUE_INTERFACE.get('callback_url', settings.LMS_ROOT_URL)
-        return xqueue_callback_url_prefix + relative_xqueue_callback_url
-
-    # Default queuename is course-specific and is derived from the course that
-    #   contains the current block.
-    # TODO: Queuename should be derived from 'course_settings.json' of each course
-    xqueue_default_queuename = block.location.org + '-' + block.location.course
-
-    xqueue_service = XQueueService(
-        construct_callback=make_xqueue_callback,
-        default_queuename=xqueue_default_queuename,
-        url=settings.XQUEUE_INTERFACE['url'],
-        django_auth=settings.XQUEUE_INTERFACE['django_auth'],
-        basic_auth=settings.XQUEUE_INTERFACE.get('basic_auth'),
-        waittime=settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS,
-    )
-
     def inner_get_block(block):
         """
         Delegate to get_block_for_descriptor_internal() with all values except `block` set.
 
         Because it does an access check, it may return None.
         """
-        # TODO: fix this so that make_xqueue_callback uses the block passed into
-        # inner_get_block, not the parent's callback.  Add it as an argument....
         return get_block_for_descriptor_internal(
             user=user,
             block=block,
@@ -492,32 +459,6 @@ def prepare_runtime_for_user(
             course=course,
             will_recheck_access=will_recheck_access,
         )
-
-    user_is_staff = bool(has_access(user, 'staff', block.location, course_id))
-    user_service = DjangoXBlockUserService(
-        user,
-        user_is_staff=user_is_staff,
-        user_role=get_user_role(user, course_id),
-        anonymous_user_id=anonymous_id_for_user(user, course_id),
-        # See the docstring of `DjangoXBlockUserService`.
-        deprecated_anonymous_user_id=anonymous_id_for_user(user, None),
-        request_country_code=user_location,
-    )
-
-    # Rebind module service to deal with noauth modules getting attached to users
-    rebind_user_service = RebindUserService(
-        user,
-        course_id,
-        prepare_runtime_for_user,
-        track_function=track_function,
-        position=position,
-        wrap_xblock_display=wrap_xblock_display,
-        grade_bucket_type=grade_bucket_type,
-        static_asset_path=static_asset_path,
-        user_location=user_location,
-        request_token=request_token,
-        will_recheck_access=will_recheck_access,
-    )
 
     # Build a list of wrapping functions that will be applied in order
     # to the Fragment content coming out of the xblocks that are about to be rendered.
@@ -541,11 +482,20 @@ def prepare_runtime_for_user(
             request_token=request_token,
         ))
 
-    replace_url_service = ReplaceURLService(
-        data_directory=getattr(block, 'data_dir', None),
-        course_id=course_id,
-        static_asset_path=static_asset_path or block.static_asset_path,
-        jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''})
+    # HACK: The following test fails when we do not access this attribute.
+    #  lms/djangoapps/courseware/tests/test_views.py::TestRenderXBlock::test_success_enrolled_staff
+    #  This happens because accessing `field_data` caches the XBlock's parents through the inheritance mixin.
+    #  If we do this operation before assigning `inner_get_block` to the `get_block_for_descriptor` attribute, these
+    #  parents will be initialized without binding the user data (that's how the `get_block` works in `x_module.py`).
+    #  If we retrieve the parents after this operation (e.g., in the `enclosing_sequence_for_gating_checks` function),
+    #  they will have their runtimes initialized, which can lead to an altered behavior of the XBlock-specific
+    #  parts of other runtimes. We will keep this workaround until we remove all XBlock-specific code from here.
+    block.static_asset_path  # pylint: disable=pointless-statement
+
+    replace_url_service = partial(
+        ReplaceURLService,
+        static_asset_path=static_asset_path,
+        jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': str(course_id), 'module_id': ''}),
     )
 
     # Rewrite static urls with course-specific absolute urls
@@ -554,6 +504,8 @@ def prepare_runtime_for_user(
     block_wrappers.append(partial(display_access_messages, user))
     block_wrappers.append(partial(course_expiration_wrapper, user))
     block_wrappers.append(partial(offer_banner_wrapper, user))
+
+    user_is_staff = bool(has_access(user, 'staff', course_id))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if is_masquerading_as_specific_student(user, course_id):
@@ -568,7 +520,7 @@ def prepare_runtime_for_user(
             del user.real_user.masquerade_settings
             user.real_user.masquerade_settings = masquerade_settings
         else:
-            staff_access = has_access(user, 'staff', block, course_id)
+            staff_access = user_is_staff
         if staff_access:
             block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
@@ -581,7 +533,17 @@ def prepare_runtime_for_user(
         'fs': FSService(),
         'field-data': field_data,
         'mako': mako_service,
-        'user': user_service,
+        'user': DjangoXBlockUserService(
+            user,
+            user_is_beta_tester=CourseBetaTesterRole(course_id).has_user(user),
+            user_is_staff=user_is_staff,
+            user_is_global_staff=bool(has_access(user, 'staff', 'global')),
+            user_role=get_user_role(user, course_id),
+            anonymous_user_id=anonymous_id_for_user(user, course_id),
+            # See the docstring of `DjangoXBlockUserService`.
+            deprecated_anonymous_user_id=anonymous_id_for_user(user, None),
+            request_country_code=user_location,
+        ),
         'verification': XBlockVerificationService(),
         'proctoring': ProctoringService(),
         'milestones': milestones_helpers.get_service(),
@@ -593,12 +555,22 @@ def prepare_runtime_for_user(
         'content_type_gating': ContentTypeGatingService(),
         'cache': CacheService(cache),
         'sandbox': SandboxService(contentstore=contentstore, course_id=course_id),
-        'xqueue': xqueue_service,
         'replace_urls': replace_url_service,
-        'rebind_user': rebind_user_service,
-        'completion': CompletionService(user=user, context_key=course_id)
-        if user and user.is_authenticated
-        else None,
+        # Rebind module service to deal with noauth modules getting attached to users.
+        'rebind_user': RebindUserService(
+            user,
+            course_id,
+            prepare_runtime_for_user,
+            track_function=track_function,
+            position=position,
+            wrap_xblock_display=wrap_xblock_display,
+            grade_bucket_type=grade_bucket_type,
+            static_asset_path=static_asset_path,
+            user_location=user_location,
+            request_token=request_token,
+            will_recheck_access=will_recheck_access,
+        ),
+        'completion': CompletionService(user=user, context_key=course_id) if user and user.is_authenticated else None,
         'i18n': XBlockI18nService,
         'library_tools': LibraryToolsService(store, user_id=user.id if user else None),
         'partitions': PartitionService(course_id=course_id, cache=DEFAULT_REQUEST_CACHE.data),
@@ -628,11 +600,6 @@ def prepare_runtime_for_user(
             position = None
 
     block.runtime.set('position', position)
-
-    block.runtime.set('user_is_staff', user_is_staff)
-    block.runtime.set('user_is_admin', bool(has_access(user, 'staff', 'global')))
-    block.runtime.set('user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
-    block.runtime.set('days_early_for_beta', block.days_early_for_beta)
 
     return field_data
 

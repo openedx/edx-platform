@@ -1,7 +1,7 @@
 # /usr/bin/env python
 """
-This module has utility functions for gathering up the static content
-that is defined by XModules and XModuleDescriptors (javascript and css)
+This module has utility functions for gathering up the javascript
+that is defined by XModules and XModuleDescriptors
 """
 
 
@@ -47,24 +47,12 @@ class VideoBlock(HTMLSnippet):  # lint-amnesty, pylint: disable=abstract-method
         ],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
-    preview_view_css = {
-        'scss': [
-            resource_filename(__name__, 'css/video/display.scss'),
-            resource_filename(__name__, 'css/video/accessible_menu.scss'),
-        ],
-    }
 
     studio_view_js = {
         'js': [
             resource_filename(__name__, 'js/src/tabs/tabs-aggregator.js'),
         ],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
-    studio_view_css = {
-        'scss': [
-            resource_filename(__name__, 'css/tabs/tabs.scss'),
-        ]
     }
 
 
@@ -89,19 +77,9 @@ XBLOCK_CLASSES = [
 ]
 
 
-def write_module_styles(output_root):
-    """Write all registered XModule css, sass, and scss files to output root."""
-    return _write_styles('.xmodule_display', output_root, XBLOCK_CLASSES, 'get_preview_view_css', 'Preview')
-
-
 def write_module_js(output_root):
     """Write all registered XModule js and coffee files to output root."""
     return _write_js(output_root, XBLOCK_CLASSES, 'get_preview_view_js')
-
-
-def write_descriptor_styles(output_root):
-    """Write all registered XModuleDescriptor css, sass, and scss files to output root."""
-    return _write_styles('.xmodule_edit', output_root, XBLOCK_CLASSES, 'get_studio_view_css', 'Studio')
 
 
 def write_descriptor_js(output_root):
@@ -118,42 +96,6 @@ def _ensure_dir(directory):
             pass
         else:
             raise
-
-
-def _write_styles(selector, output_root, classes, css_attribute, suffix):
-    """
-    Write the css fragments from all XModules in `classes`
-    into `output_root` as individual files
-    """
-    contents = {}
-
-    for class_ in classes:
-        class_css = getattr(class_, css_attribute)()
-        fragment_paths = class_css.get('scss', [])
-        if not fragment_paths:
-            continue
-        fragment_names = []
-        for fragment_path in fragment_paths:
-            with open(fragment_path, 'rb') as fragment_file:
-                fragment = fragment_file.read()
-            fragment_name = "{hash}.{type}".format(
-                hash=hashlib.md5(fragment).hexdigest(),
-                type='scss')
-            # Prepend _ so that sass just includes the files into a single file
-            filename = '_' + fragment_name
-            contents[filename] = fragment
-            fragment_names.append(fragment_name)
-
-        module_styles_lines = []
-        module_styles_lines.append("""{selector}.xmodule_{class_.__name__} {{""".format(
-            class_=class_, selector=selector
-        ))
-        module_styles_lines.extend(f'  @import "{name}";' for name in fragment_names)
-        module_styles_lines.append('}')
-
-        contents[f"{class_.__name__}{suffix}.scss"] = '\n'.join(module_styles_lines)
-
-    _write_files(output_root, contents)
 
 
 def _write_js(output_root, classes, js_attribute):
@@ -303,9 +245,7 @@ def main():
     root = path(args['<output_root>'])
 
     descriptor_files = write_descriptor_js(root / 'descriptors/js')
-    write_descriptor_styles(root / 'descriptors/scss')
     module_files = write_module_js(root / 'modules/js')
-    write_module_styles(root / 'modules/scss')
     write_webpack(root / 'webpack.xmodule.config.js', module_files, descriptor_files)
 
 
