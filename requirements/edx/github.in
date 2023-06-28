@@ -80,7 +80,7 @@
 
 # ... add dependencies here
 # FIXME JV - move to base.in once pypi package created
-git+https://github.com/open-craft/openedx-learning.git@jill/taxonomy-api#egg=openedx-learning==0.1
+git+https://github.com/open-craft/openedx-learning.git@jill/taxonomy-inheritance-fix#egg=openedx-learning==0.1
 
 
 ##############################################################################

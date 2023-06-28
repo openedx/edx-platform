@@ -2,14 +2,13 @@
 Content Tagging models
 """
 from django.db import models
-from model_utils.managers import InheritanceManager
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from openedx_tagging.core.tagging.models import Taxonomy
+from openedx_tagging.core.tagging.models import Taxonomy, TaxonomyManager
 from organizations.models import Organization
 
 
-class ContentTaxonomyManager(InheritanceManager):
+class ContentTaxonomyManager(TaxonomyManager):
     """
     Manages ContentTaxonomy objects, providing custom utility methods.
 

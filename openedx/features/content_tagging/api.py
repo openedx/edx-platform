@@ -53,12 +53,15 @@ def set_taxonomy_org_owners(
     return taxonomy
 
 
-def get_taxonomies(org_owner: Organization = None, enabled=True) -> QuerySet:
+def get_taxonomies_for_org(org_owner: Organization = None, enabled=True) -> QuerySet:
     """
-    Returns a queryset containing the enabled taxonomies owned by the given org, sorted by name.
+    Returns a queryset containing the enabled ContentTaxonomies owned by the given org, sorted by name.
 
-    If you want the disabled taxonomies, pass enabled=False.
-    If you want all taxonomies (both enabled and disabled), pass enabled=None.
+    If you want all Taxonomies, not just ContentTaxonomies, use the get_taxonomies API method, and use `enabled_for_org`
+    on any returned ContentTaxonomies to filter out by org ownership.
+
+    If you want the disabled ContentTaxonomies, pass enabled=False.
+    If you want all ContentTaxonomies (both enabled and disabled), pass enabled=None.
     """
     return (
         ContentTaxonomy.objects.filter_enabled(
@@ -72,6 +75,8 @@ def get_taxonomies(org_owner: Organization = None, enabled=True) -> QuerySet:
 
 # Expose the oel_tagging APIs that we haven't overridden here:
 
+get_taxonomies = oel_tagging.get_taxonomies
+get_taxonomy = oel_tagging.get_taxonomy
 get_tags = oel_tagging.get_tags
 resync_object_tags = oel_tagging.resync_object_tags
 get_object_tags = oel_tagging.get_object_tags
