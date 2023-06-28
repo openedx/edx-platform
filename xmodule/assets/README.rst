@@ -1,7 +1,7 @@
 xmodule/assets: edx-platform XBlock resources
 #############################################
 
-This folder exists to contain resources (ie, static assets) for the XBlocks
+This folder exists to contain resources (i.e., static assets) for the XBlocks
 defined in edx-platform.
 
 Concepts
