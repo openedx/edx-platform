@@ -1758,12 +1758,13 @@ INSTALLED_APPS = [
 
     # Tagging
     'openedx_tagging.core.tagging.apps.TaggingConfig',
+    'openedx.features.content_tagging',
 
+    # Features
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
-    'openedx.features.content_tagging',
     'lms.djangoapps.experiments',
 
     'openedx.core.djangoapps.external_user_ids',

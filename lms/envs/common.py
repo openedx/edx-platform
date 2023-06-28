@@ -3218,6 +3218,7 @@ INSTALLED_APPS = [
 
     # Tagging
     'openedx_tagging.core.tagging.apps.TaggingConfig',
+    'openedx.features.content_tagging',
 
     # Features
     'openedx.features.calendar_sync',
@@ -3230,7 +3231,6 @@ INSTALLED_APPS = [
     'openedx.features.discounts',
     'openedx.features.effort_estimation',
     'openedx.features.name_affirmation_api.apps.NameAffirmationApiConfig',
-    'openedx.features.content_tagging',
 
     'lms.djangoapps.experiments',
 
