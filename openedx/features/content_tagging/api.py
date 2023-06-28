@@ -5,7 +5,6 @@ from typing import List
 
 import openedx_tagging.core.tagging.api as oel_tagging
 from django.db.models import QuerySet
-from openedx_tagging.core.tagging.models import ObjectTag, Tag, Taxonomy
 from organizations.models import Organization
 
 from .models import ContentTaxonomy

@@ -62,14 +62,7 @@ class ContentTaxonomy(Taxonomy):
         * object_tag.object_id is a valid UsageKey or CourseKey, and
         * object_tag.object_id's "org" is enabled for this taxonomy.
         """
-        valid = super().validate_object_tag(
-            object_tag,
-            check_taxonomy=check_taxonomy,
-            check_tag=check_tag,
-            check_object=check_object,
-        )
-
-        if valid and check_object:
+        if check_object:
             # ContentTaxonomies require object_id to be a valid CourseKey or UsageKey
             try:
                 object_key = UsageKey.from_string(object_tag.object_id)
@@ -83,7 +76,12 @@ class ContentTaxonomy(Taxonomy):
             if not self.enabled_for_org(object_key.org):
                 return False
 
-        return valid
+        return super().validate_object_tag(
+            object_tag,
+            check_taxonomy=check_taxonomy,
+            check_tag=check_tag,
+            check_object=check_object,
+        )
 
     def enabled_for_org(self, org_short_name: str) -> bool:
         """
