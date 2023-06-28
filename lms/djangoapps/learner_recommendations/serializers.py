@@ -74,8 +74,6 @@ class LearnerDashboardProductRecommendationsSerializer(serializers.Serializer):
         return active_course_run_key if active_course_run_key else instance.get('course_runs')[0]['key']
 
 
-
-
 class AboutPageRecommendationsSerializer(serializers.Serializer):
     """Recommended courses for course about page"""
 

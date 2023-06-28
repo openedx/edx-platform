@@ -390,9 +390,9 @@ class TestProductRecommendationsView(APITestCase):
                 "course_type": "executive-education",
                 "owners": [
                     {
-                            "key": "org-1",
-                            "name": "org 1",
-                            "logo_image_url": "https://discovery.com/organization/logos/org-1.png",
+                        "key": "org-1",
+                        "name": "org 1",
+                        "logo_image_url": "https://discovery.com/organization/logos/org-1.png",
                     },
                 ],
                 "course_runs": [
