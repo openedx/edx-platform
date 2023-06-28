@@ -18,15 +18,15 @@ class ContentTaxonomyManager(InheritanceManager):
 
     def filter_enabled(self, org: Organization = None, enabled=True) -> models.QuerySet:
         """
-        Returns a query set filtered to return the ContentTaxonomy objects enabled for the given org.
+        Returns a query set filtered to return the enabled ContentTaxonomy objects owned by the given org.
         """
         queryset = self
         if enabled is not None:
             queryset = queryset.filter(enabled=enabled)
-            org_filter = models.Q(org_owners=None)
-            if org:
-                org_filter |= models.Q(org_owners=org)
-            queryset = queryset.filter(org_filter)
+        org_filter = models.Q(org_owners=None)
+        if org:
+            org_filter |= models.Q(org_owners=org)
+        queryset = queryset.filter(org_filter)
         return queryset
 
 
