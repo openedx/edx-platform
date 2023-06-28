@@ -130,9 +130,9 @@ def get_general_recommendations():
         "logo_image_url": "https://discovery.com/organization/logos/org-1.png",
         "marketing_url": "https://www.marketing_url.com",
         "course_runs": [
-          {
-            "key": "course-v1:MITx+6.00.1x+2T2023",
-          }
+            {
+                "key": "course-v1:MITx+6.00.1x+2T2023",
+            }
         ],
         "owners": [
             {
