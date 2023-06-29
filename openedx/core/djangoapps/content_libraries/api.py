@@ -70,7 +70,13 @@ from django.utils.translation import gettext as _
 from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from lxml import etree
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
-from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryLocatorV2, LibraryUsageLocatorV2, LibraryLocator as LibraryLocatorV1
+from opaque_keys.edx.locator import (
+    BundleDefinitionLocator,
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+    LibraryLocator as LibraryLocatorV1
+)
+
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
