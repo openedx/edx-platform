@@ -6,10 +6,12 @@ define(['jquery', 'underscore', 'backbone', 'gettext', 'js/views/pages/base_page
     'common/js/components/utils/view_utils', 'js/views/container', 'js/views/xblock',
     'js/views/components/add_xblock', 'js/views/modals/edit_xblock', 'js/views/modals/move_xblock_modal',
     'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/xblock_access_editor',
-    'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils'],
+    'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils',
+    'common/js/components/views/feedback_notification', 'common/js/components/views/feedback_prompt',
+],
 function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
     EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, XBlockAccessEditor,
-    ContainerSubviews, UnitOutlineView, XBlockUtils) {
+    ContainerSubviews, UnitOutlineView, XBlockUtils, NotificationView, PromptView) {
     'use strict';
 
     var XBlockContainerPage = BasePage.extend({
@@ -255,10 +257,60 @@ function($, _, Backbone, gettext, BasePage, ViewUtils, ContainerView, XBlockView
                     staged_content: "clipboard",
                 }).then((data) => {
                     this.onNewXBlock(placeholderElement, scrollOffset, false, data);
+                    return data;
                 }).fail(() => {
                     // Remove the placeholder if the paste failed
                     placeholderElement.remove();
                 });
+            }).done((data) => {
+                const {
+                    conflicting_files: conflictingFiles,
+                    error_files: errorFiles,
+                    new_files: newFiles,
+                } = data.static_file_notices;
+
+                const notices = [];
+                if (errorFiles.length) {
+                    notices.push((next) => new PromptView.Error({
+                        title: gettext("Some errors occurred"),
+                        message: (
+                            gettext("The following required files could not be added to the course:") +
+                            " " + errorFiles.join(", ")
+                        ),
+                        actions: {primary: {text: gettext("OK"), click: (x) => { x.hide(); next(); }}},
+                    }));
+                }
+                if (conflictingFiles.length) {
+                    notices.push((next) => new PromptView.Warning({
+                        title: gettext("You may need to update a file(s) manually"),
+                        message: (
+                            gettext(
+                                "The following files already exist in this course but don't match the " +
+                                "version used by the component you pasted:"
+                            ) + " " + conflictingFiles.join(", ")
+                        ),
+                        actions: {primary: {text: gettext("OK"), click: (x) => { x.hide(); next(); }}},
+                    }));
+                }
+                if (newFiles.length) {
+                    notices.push(() => new NotificationView.Confirmation({
+                        title: gettext("New files were added to this course's Files & Uploads"),
+                        message: (
+                            gettext("The following required files were imported to this course:") +
+                            " "  + newFiles.join(", ")
+                        ),
+                        closeIcon: true,
+                    }));
+                }
+                if (notices.length) {
+                    // Show the notices, one at a time:
+                    const showNext = () => {
+                        const view = notices.shift()(showNext);
+                        view.show();
+                    }
+                    // Delay to avoid conflict with the "Pasting..." notification.
+                    setTimeout(showNext, 1250);
+                }
             });
         },
 
