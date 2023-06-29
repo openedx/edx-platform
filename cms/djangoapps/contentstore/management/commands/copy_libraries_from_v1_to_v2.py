@@ -27,6 +27,7 @@ log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
 
+
     """
     Copy or uncopy V1 Content Libraries (default all) entires to be stored as v2 content libraries.
     First Specify the uuid for the collection to store the content libraries in.
@@ -47,9 +48,11 @@ class Command(BaseCommand):
     CONFIRMATION_PROMPT = "Reindexing all libraries might be a time consuming operation. Do you want to continue?"
 
     def add_arguments(self, parser):
-        parser.add_argument('collection_uuid', nargs=1,
+        parser.add_argument(
+            'collection_uuid',
+            nargs=1,
             help='uuid for the collection to create the content library in.'
-            )
+        )
 
         parser.add_argument('library_ids', nargs='*', help='v1 library ids to copy')
         parser.add_argument(
@@ -58,9 +61,10 @@ class Command(BaseCommand):
             dest='all',
             help='Reindex all libraries'
         )
-        parser.add_argument('output_csv', nargs=
-        '?',
-        default=None,
+        parser.add_argument(
+            'output_csv',
+            nargs='?',
+            default=None,
             help='a file path to write the tasks output to. Without this the result is simply logged.'
         )
 
@@ -98,11 +102,11 @@ class Command(BaseCommand):
                 )
                 for v1_library_key in v1_library_keys
             ]
-            )
+        )
         group_result = create_library_task_group.apply_async().get()
         if options['output_csv']:
             with open(options['output_csv'][0], 'w', encoding='utf-8', newline='') as output_writer:
-                output_writer.writerow("v1_library_id","v2_library_id","status","error_msg")
+                output_writer.writerow("v1_library_id", "v2_library_id", "status", "error_msg")
                 for result in group_result:
                     output_writer.write(result.keys())
         log.info(group_result)

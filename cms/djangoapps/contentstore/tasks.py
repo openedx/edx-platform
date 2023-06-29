@@ -876,8 +876,6 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     write the metadata, permissions, and content of a v1 library into a v2 library in the given collection.
     """
 
-    from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
-
     v1_library_key= CourseKey.from_string(v1_library_key_string)
 
     LOGGER.info(f"Copy Library task created for library: {v1_library_key}")
@@ -887,16 +885,16 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     v1_library = store.get_library(v1_library_key)
 
     collection = get_collection(collection_uuid).uuid
-    library_type= COMPLEX # To make it easy, all converted libs are complex, meaning they can contain problems, videos, and text
+    library_type= 'complex' # To make it easy, all converted libs are complex, meaning they can contain problems, videos, and text
     org = _parse_organization(v1_library.location.library_key.org)
     slug = v1_library.location.library_key.library
     title = v1_library.display_name
-    #V1 libraries do not have descriptions.
+    #  V1 libraries do not have descriptions.
     description=''
-    #permssions & license are most restrictive.
+    #  permssions & license are most restrictive.
     allow_public_learning = False
     allow_public_read = False
-    library_license = ALL_RIGHTS_RESERVED
+    library_license = '' #  '' = ALL_RIGHTS_RESERVED
 
     try:
         with atomic():
