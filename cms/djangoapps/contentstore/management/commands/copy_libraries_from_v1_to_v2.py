@@ -25,9 +25,8 @@ from .prompt import query_yes_no
 
 log = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
-
-
     """
     Copy or uncopy V1 Content Libraries (default all) entires to be stored as v2 content libraries.
     First Specify the uuid for the collection to store the content libraries in.

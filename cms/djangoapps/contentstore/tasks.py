@@ -75,9 +75,6 @@ from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
 
-
-
-
 User = get_user_model()
 
 LOGGER = get_task_logger(__name__)
@@ -799,7 +796,6 @@ def log_errors_to_artifact(errorstore, status):
 def handle_course_import_exception(courselike_key, exception, status, known=True):
     """
     Handle course import exception and fail task status.
-
     Arguments:
         courselike_key: A locator identifies a course resource.
         exception: Exception object
@@ -818,15 +814,16 @@ def handle_course_import_exception(courselike_key, exception, status, known=True
     if status.state != UserTaskStatus.FAILED:
         status.fail(task_fail_message)
 
+
 def _parse_organization(org_name):
-        """Find a matching organization name, if one does not exist, specify that this is the *unspecfied* organization"""
-        try:
-            ensure_organization(org_name)
-        except InvalidOrganizationException:
-            #TODO: Org not found strategy.
-            print(f"Could not find a matching organization for: {org_name}.")
-            return 'Steven'
-        return Organization.objects.get(short_name=org_name)
+    """Find a matching organization name, if one does not exist, specify that this is the *unspecfied* organization"""
+    try:
+        ensure_organization(org_name)
+    except InvalidOrganizationException:
+        #TODO: Org not found strategy.
+        print(f"Could not find a matching organization for: {org_name}.")
+        return 'Steven'
+    return Organization.objects.get(short_name=org_name)
 
 
 def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
@@ -834,7 +831,6 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
     write the access and edit permissions of a v1 library into a v2 library.
     """
     from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
-
 
     def _get_users_by_access_level(v1_library_key):
         """
@@ -857,18 +853,20 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
         for user in permissions[access_level]:
             v2contentlib_api.set_library_user_permissions(v2_library_key, user, access_level)
 
+
 def uncopy_content():
     """
     #TODO: add uncopy task
     """
     return
 
+
 def create_copy_content_task(v2_library_key, v1_library_key):
-        """
-        spin up a celery task to import the V1 Library's content into the V2 library.
-        This utalizes the fact that course and v1 library content is stored almost identically.
-        """
-        return v2contentlib_api.import_blocks_create_task(v2_library_key, v1_library_key)
+    """
+    spin up a celery task to import the V1 Library's content into the V2 library.
+    This utalizes the fact that course and v1 library content is stored almost identically.
+    """
+    return v2contentlib_api.import_blocks_create_task(v2_library_key, v1_library_key)
 
 @shared_task(time_limit=30)
 @set_code_owner_attribute
@@ -881,10 +879,8 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
 
     LOGGER.info(f"Copy Library task created for library: {v1_library_key}")
 
-
     store = modulestore()
     v1_library = store.get_library(v1_library_key)
-
     collection = get_collection(collection_uuid).uuid
     library_type= 'complex' # To make it easy, all converted libs are complex, meaning they can contain problems, videos, and text
     org = _parse_organization(v1_library.location.library_key.org)
@@ -912,7 +908,7 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     except v2contentlib_api.LibraryAlreadyExists:
         return {
         "v1_library_id": v1_library_key_string,
-        "v2_library_id" : None,
+        "v2_library_id": None,
         "status": "FAILED",
         "msg": f"Exception: LibraryAlreadyExists {v1_library_key_string} aleady exists"
         }
@@ -922,28 +918,27 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     except Exception as error:
          return {
         "v1_library_id": v1_library_key_string,
-        "v2_library_id" : str(v2_library_metadata.key),
+        "v2_library_id": str(v2_library_metadata.key),
         "status": "FAILED",
         "msg": f"Could not import content from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
         }
 
     try:
         copy_v1_user_roles_into_v2_library(v2_library_metadata.key, v1_library.location.library_key)
-    except Exception as e:
+    except Exception as error:
         return {
         "v1_library_id": v1_library_key_string,
-        "v2_library_id" : str(v2_library_metadata.key),
+        "v2_library_id": str(v2_library_metadata.key),
         "status": "FAILED",
-        "msg": f"Could not copy permissions from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(e)}"
+        "msg": f"Could not copy permissions from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
         }
 
     #TODO: REMOVE THIS WHEN COMPLETE WITH TESTING!
-    #v2contentlib_api.delete_library(v2_library_metadata.key)
+    v2contentlib_api.delete_library(v2_library_metadata.key)
 
-    #TODO: add the cleanup steps and error reporting
     return {
         "v1_library_id": v1_library_key_string,
-        "v2_library_id" : str(v2_library_metadata.key),
+        "v2_library_id": str(v2_library_metadata.key),
         "status": "SUCCESS",
         "msg": None
         }
