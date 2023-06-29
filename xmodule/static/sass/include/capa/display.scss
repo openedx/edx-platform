@@ -879,7 +879,7 @@ div.problem {
 // ====================
 .problem {
   .inputtype.option-input {
-    margin: (-$baseline/2) 0 $baseline;
+    margin: 0 0 0 0 !important;
 
     .indicator-container {
       display: inline-block;
