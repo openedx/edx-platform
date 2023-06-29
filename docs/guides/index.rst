@@ -61,9 +61,27 @@ locations.
          :outline:
          :expand:
 
+   .. grid-item-card:: Concepts
+      :class-card: sd-shadow-md sd-p-2
+      :class-footer: sd-border-0
+
+      * :doc:`concepts/extension_points`
+      * :doc:`concepts/testing/testing`
+      * :doc:`concepts/frontend/javascript`
+      +++
+      .. button-ref:: concepts/index
+         :color: primary
+         :outline:
+         :expand:
+
 
 Change History
 **************
+
+* Jun 30, 2023
+
+  * Added API, Feature Toggle and Settings docs.
+  * Re-organized how the docs are laid out.
 
 * December, 2020: Added documentation about new protocols for writing celery tasks.
 
