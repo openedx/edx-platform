@@ -835,6 +835,7 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
     """
     from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 
+
     def _get_users_by_access_level(v1_library_key):
         """
         Get a permissions object for a library which contains a list of user IDs for every V2 permissions level,
@@ -852,9 +853,9 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
         return permissions
 
     permissions = _get_users_by_access_level(v1_library_key)
-
-    for permission in permissions.items():
-        v2contentlib_api.set_library_user_permissions(v2_library_key, permission[1], permission[0])
+    for access_level in permissions.keys():
+        for user in permissions[access_level]:
+            v2contentlib_api.set_library_user_permissions(v2_library_key, user, access_level)
 
 def uncopy_content():
     """
