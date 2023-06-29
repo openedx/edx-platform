@@ -49,13 +49,17 @@ from cms.djangoapps.contentstore.courseware_index import (
 from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+
 from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from common.djangoapps.util.monitoring import monitor_import_failure
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
+from openedx.core.djangoapps.content_libraries import api as v2contentlib_api
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
+from openedx.core.lib.blockstore_api import get_collection
 from openedx.core.lib.extract_tar import safetar_extractall
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_block import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
@@ -72,12 +76,7 @@ from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
 
 
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 
-from openedx.core.lib.blockstore_api import get_collection
-from openedx.core.djangoapps.content_libraries import api as v2contentlib_api
-from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
-from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 
 User = get_user_model()
 
@@ -834,6 +833,8 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
     """
     write the access and edit permissions of a v1 library into a v2 library.
     """
+    from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
+
     def _get_users_by_access_level(v1_library_key):
         """
         Get a permissions object for a library which contains a list of user IDs for every V2 permissions level,
@@ -855,7 +856,10 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
     for permission in permissions.items():
         v2contentlib_api.set_library_user_permissions(v2_library_key, permission[1], permission[0])
 
-def uncopy_content(v1_library_keys):
+def uncopy_content():
+    """
+    #TODO: add uncopy task
+    """
     return
 
 def create_copy_content_task(v2_library_key, v1_library_key):
@@ -871,8 +875,8 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     """
     write the metadata, permissions, and content of a v1 library into a v2 library in the given collection.
     """
-    # get the V1 Library
 
+    from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
 
     v1_library_key= CourseKey.from_string(v1_library_key_string)
 

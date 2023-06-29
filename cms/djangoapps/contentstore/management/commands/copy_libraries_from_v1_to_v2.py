@@ -18,9 +18,6 @@ from celery import group
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 
 from openedx.core.lib.blockstore_api import get_collection
-from openedx.core.djangoapps.content_libraries import api as v2contentlib_api
-from openedx.core.djangoapps.content_libraries.constants import COMPLEX, ALL_RIGHTS_RESERVED
-from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 
 from cms.djangoapps.contentstore.tasks import create_v2_library_from_v1_library
 
