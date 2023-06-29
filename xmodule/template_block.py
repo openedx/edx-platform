@@ -69,15 +69,9 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
         'js': [],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
-    preview_view_css = {
-        'scss': [],
-    }
     studio_view_js = {
         'js': [resource_filename(__name__, 'js/src/raw/edit/xml.js')],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [resource_filename(__name__, 'css/codemirror/codemirror.scss')],
     }
 
     def studio_view(self, _context):

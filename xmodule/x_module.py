@@ -43,6 +43,8 @@ from common.djangoapps.xblock_django.constants import (
     ATTR_KEY_ANONYMOUS_USER_ID,
     ATTR_KEY_REQUEST_COUNTRY_CODE,
     ATTR_KEY_USER_ID,
+    ATTR_KEY_USER_IS_BETA_TESTER,
+    ATTR_KEY_USER_IS_GLOBAL_STAFF,
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ROLE,
 )
@@ -213,9 +215,6 @@ class HTMLSnippet:
     preview_view_js = {}
     studio_view_js = {}
 
-    preview_view_css = {}
-    studio_view_css = {}
-
     @classmethod
     def get_preview_view_js(cls):
         return cls.preview_view_js
@@ -231,14 +230,6 @@ class HTMLSnippet:
     @classmethod
     def get_studio_view_js_bundle_name(cls):
         return cls.__name__ + 'Studio'
-
-    @classmethod
-    def get_preview_view_css(cls):
-        return cls.preview_view_css
-
-    @classmethod
-    def get_studio_view_css(cls):
-        return cls.studio_view_css
 
     def get_html(self):
         """
@@ -1191,6 +1182,36 @@ class ModuleSystemShim:
             return partial(user_service.get_current_user().opt_attrs.get, ATTR_KEY_USER_ROLE)
 
     @property
+    def user_is_beta_tester(self):
+        """
+        Returns whether the current user is enrolled in the course as a beta tester.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.user_is_beta_tester is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=2,
+        )
+        user_service = self._runtime_services.get('user') or self._services.get('user')
+        if user_service:
+            return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_BETA_TESTER)
+
+    @property
+    def user_is_admin(self):
+        """
+        Returns whether the current user has global staff permissions.
+
+        Deprecated in favor of the user service.
+        """
+        warnings.warn(
+            'runtime.user_is_admin is deprecated. Please use the user service instead.',
+            DeprecationWarning, stacklevel=2,
+        )
+        user_service = self._runtime_services.get('user') or self._services.get('user')
+        if user_service:
+            return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_GLOBAL_STAFF)
+
+    @property
     def render_template(self):
         """
         Returns a function that takes (template_file, context), and returns rendered html.
@@ -1217,31 +1238,6 @@ class ModuleSystemShim:
         Using this is deprecated in favor of the mako service.
         """
         self._deprecated_render_template = render_template
-
-    @property
-    def xqueue(self):
-        """
-        Returns a dict containing the XQueueInterface object, as well as parameters for the specific StudentModule:
-        * interface: XQueueInterface object
-        * construct_callback: function to construct the fully-qualified LMS callback URL.
-        * default_queuename: default queue name for the course in XQueue
-        * waittime: number of seconds to wait in between calls to XQueue
-
-        Deprecated in favor of the xqueue service.
-        """
-        warnings.warn(
-            'runtime.xqueue is deprecated. Please use the xqueue service instead.',
-            DeprecationWarning, stacklevel=3,
-        )
-        xqueue_service = self._runtime_services.get('xqueue') or self._services.get('xqueue')
-        if xqueue_service:
-            return {
-                'interface': xqueue_service.interface,
-                'construct_callback': xqueue_service.construct_callback,
-                'default_queuename': xqueue_service.default_queuename,
-                'waittime': xqueue_service.waittime,
-            }
-        return None
 
     @property
     def can_execute_unsafe_code(self):
@@ -1295,51 +1291,6 @@ class ModuleSystemShim:
             DeprecationWarning, stacklevel=2,
         )
         return self._runtime_services.get('cache') or self._services.get('cache') or DoNothingCache()
-
-    @property
-    def replace_urls(self):
-        """
-        Returns a function to replace static urls with course specific urls.
-
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'runtime.replace_urls is deprecated. Please use the replace_urls service instead.',
-            DeprecationWarning, stacklevel=2,
-        )
-        replace_urls_service = self._runtime_services.get('replace_urls') or self._services.get('replace_urls')
-        if replace_urls_service:
-            return partial(replace_urls_service.replace_urls, static_replace_only=True)
-
-    @property
-    def replace_course_urls(self):
-        """
-        Returns a function to replace static urls with course specific urls.
-
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'runtime.replace_course_urls is deprecated. Please use the replace_urls service instead.',
-            DeprecationWarning, stacklevel=2,
-        )
-        replace_urls_service = self._runtime_services.get('replace_urls') or self._services.get('replace_urls')
-        if replace_urls_service:
-            return partial(replace_urls_service.replace_urls)
-
-    @property
-    def replace_jump_to_id_urls(self):
-        """
-        Returns a function to replace static urls with course specific urls.
-
-        Deprecated in favor of the replace_urls service.
-        """
-        warnings.warn(
-            'runtime.replace_jump_to_id_urls is deprecated. Please use the replace_urls service instead.',
-            DeprecationWarning, stacklevel=2,
-        )
-        replace_urls_service = self._runtime_services.get('replace_urls') or self._services.get('replace_urls')
-        if replace_urls_service:
-            return partial(replace_urls_service.replace_urls)
 
     @property
     def filestore(self):

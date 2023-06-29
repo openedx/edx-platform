@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-12 15:12+0000\n"
-"PO-Revision-Date: 2023-06-12 15:12:29.628242\n"
+"POT-Creation-Date: 2023-06-25 20:36+0000\n"
+"PO-Revision-Date: 2023-06-25 20:36:15.550879\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -8777,8 +8777,29 @@ msgstr "Ȼønƃɹɐʇnlɐʇᴉøns!"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"You have successfully completed all the requirements for the %(title)s "
+"%(type)s."
+msgstr ""
+"Ɏøn ɥɐʌǝ snɔɔǝssɟnllʎ ɔøɯdlǝʇǝd ɐll ʇɥǝ ɹǝbnᴉɹǝɯǝnʇs ɟøɹ ʇɥǝ %(title)s "
+"%(type)s."
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr "Ɏønɹ Ᵽɹøƃɹɐɯ Ɉønɹnǝʎ"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s course(s) in this "
+"program. To complete the program, you must earn a verified certificate for "
+"each course."
+msgstr ""
+"Ŧɹɐɔʞ ɐnd dlɐn ʎønɹ dɹøƃɹǝss ʇɥɹønƃɥ ʇɥǝ %(count)s ɔønɹsǝ(s) ᴉn ʇɥᴉs "
+"dɹøƃɹɐɯ. Ŧø ɔøɯdlǝʇǝ ʇɥǝ dɹøƃɹɐɯ, ʎøn ɯnsʇ ǝɐɹn ɐ ʌǝɹᴉɟᴉǝd ɔǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ "
+"ǝɐɔɥ ɔønɹsǝ."
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -8856,6 +8877,33 @@ msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"
 msgstr ""
 "Ȼøɯdlǝʇǝ ɔønɹsǝs øn ʎønɹ sɔɥǝdnlǝ ʇø ǝnsnɹǝ ʎøn sʇɐnd ønʇ ᴉn ʎønɹ ɟᴉǝld!"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid "Transform your %(org)s %(type)s into a full master’s degree"
+msgstr "Ŧɹɐnsɟøɹɯ ʎønɹ %(org)s %(type)s ᴉnʇø ɐ ɟnll ɯɐsʇǝɹ’s dǝƃɹǝǝ"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Successful completion of %(org)s %(program)s credential can be applied "
+"towards flexible, rigorous, and affordable masters degrees from the world’s "
+"leading universities."
+msgstr ""
+"Snɔɔǝssɟnl ɔøɯdlǝʇᴉøn øɟ %(org)s %(program)s ɔɹǝdǝnʇᴉɐl ɔɐn bǝ ɐddlᴉǝd "
+"ʇøʍɐɹds ɟlǝxᴉblǝ, ɹᴉƃøɹøns, ɐnd ɐɟɟøɹdɐblǝ ɯɐsʇǝɹs dǝƃɹǝǝs ɟɹøɯ ʇɥǝ ʍøɹld’s "
+"lǝɐdᴉnƃ nnᴉʌǝɹsᴉʇᴉǝs."
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s courses in this program. "
+"To complete the program, you must earn a verified certificate for each "
+"course."
+msgstr ""
+"Ŧɹɐɔʞ ɐnd dlɐn ʎønɹ dɹøƃɹǝss ʇɥɹønƃɥ ʇɥǝ %(count)s ɔønɹsǝs ᴉn ʇɥᴉs dɹøƃɹɐɯ. "
+"Ŧø ɔøɯdlǝʇǝ ʇɥǝ dɹøƃɹɐɯ, ʎøn ɯnsʇ ǝɐɹn ɐ ʌǝɹᴉɟᴉǝd ɔǝɹʇᴉɟᴉɔɐʇǝ ɟøɹ ǝɐɔɥ "
+"ɔønɹsǝ."
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"

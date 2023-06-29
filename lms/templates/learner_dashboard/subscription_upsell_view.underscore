@@ -11,7 +11,7 @@
         { minSubscriptionPrice, trialLength }
     ) %>
 </p>
-<a href="" class="js-subscription-upsell-cta btn-brand btn cta-primary view-button align-self-stretch">
+<a href="<%- subscriptionsMarketingUrl %>" class="js-subscription-upsell-cta btn-brand btn cta-primary view-button align-self-stretch">
     <span class="icon fa fa-search" aria-hidden="true"></span>
     <span><%- gettext('Explore subscription options') %></span>
 </a>

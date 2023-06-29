@@ -82,22 +82,12 @@ class AnnotatableBlock(
         ],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
-    preview_view_css = {
-        'scss': [
-            resource_filename(__name__, 'css/annotatable/display.scss'),
-        ],
-    }
 
     studio_view_js = {
         'js': [
             resource_filename(__name__, 'js/src/raw/edit/xml.js'),
         ],
         'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [
-            resource_filename(__name__, 'css/codemirror/codemirror.scss'),
-        ],
     }
     studio_js_module_name = "XMLEditingDescriptor"
     mako_template = "widgets/raw-edit.html"

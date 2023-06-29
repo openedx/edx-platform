@@ -129,7 +129,6 @@ class NotificationSerializer(serializers.ModelSerializer):
     """
     Serializer for the Notification model.
     """
-
     class Meta:
         model = Notification
         fields = (
@@ -137,6 +136,7 @@ class NotificationSerializer(serializers.ModelSerializer):
             'app_name',
             'notification_type',
             'content_context',
+            'content',
             'content_url',
             'last_read',
             'last_seen',

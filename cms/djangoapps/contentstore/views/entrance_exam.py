@@ -23,8 +23,9 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
-from .helpers import create_xblock, remove_entrance_exam_graders
-from .block import delete_item
+from ..helpers import remove_entrance_exam_graders
+from ..xblock_services.create_xblock import create_xblock
+from cms.djangoapps.contentstore.xblock_services.xblock_service import delete_item
 
 __all__ = ['entrance_exam', ]
 

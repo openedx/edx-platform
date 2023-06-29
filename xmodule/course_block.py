@@ -978,6 +978,13 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
         ]
     )
 
+    force_on_flexible_peer_openassessments = Boolean(
+        display_name=_("Force Flexible Grading for Peer ORAs"),
+        help=_("Setting this flag will force on the flexible grading option for all peer-graded ORAs in this course."),
+        scope=Scope.settings,
+        default=False,
+    )
+
     """
     instructor_info dict structure:
     {

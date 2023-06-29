@@ -15,7 +15,7 @@
 
 click                                   # Used for perf_tests utilities in modulestore
 django-debug-toolbar                    # A set of panels that display debug information about the current request/response
-edx-sphinx-theme                        # Documentation theme
+sphinx-book-theme                       # Documentation theme
 mypy                                    # static type checking
 pywatchman                              # More efficient checking for runserver reload trigger events
 sphinxcontrib-openapi[markdown]         # OpenAPI (fka Swagger) spec renderer for Sphinx
