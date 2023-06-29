@@ -3,7 +3,6 @@ Declaration of CourseOverview model
 """
 
 
-from email.policy import default
 import json
 import logging
 from datetime import datetime
