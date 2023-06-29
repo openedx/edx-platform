@@ -888,11 +888,11 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     slug = v1_library.location.library_key.library
     title = v1_library.display_name
     #  V1 libraries do not have descriptions.
-    description=''
+    description = ''
     #  permssions & license are most restrictive.
     allow_public_learning = False
     allow_public_read = False
-    library_license = '' # '' = ALL_RIGHTS_RESERVED
+    library_license = ''  # '' = ALL_RIGHTS_RESERVED
 
     try:
         with atomic():
@@ -943,4 +943,4 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
         "v2_library_id": str(v2_library_metadata.key),
         "status": "SUCCESS",
         "msg": None
-        }
+    }
