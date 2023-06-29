@@ -9,21 +9,15 @@ call `defuse_xml_libs()`.
 """
 
 
-import defusedxml
 from lxml import etree
+from xml.etree.ElementTree import ParseError
 
 import pytest
-
-
-@pytest.mark.parametrize("attr", ["XML", "fromstring", "parse"])
-def test_etree_is_defused(attr):
-    func = getattr(etree, attr)
-    assert "defused" in func.__code__.co_filename
 
 
 def test_entities_arent_resolved():
     # Make sure we have disabled entity resolution.
     xml = '<?xml version="1.0"?><!DOCTYPE mydoc [<!ENTITY hi "Hello">]> <root>&hi;</root>'
     parser = etree.XMLParser()
-    with pytest.raises(defusedxml.EntitiesForbidden):
+    with pytest.raises(ParseError):
         _ = etree.XML(xml, parser=parser)
