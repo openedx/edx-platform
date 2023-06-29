@@ -868,6 +868,7 @@ def create_copy_content_task(v2_library_key, v1_library_key):
     """
     return v2contentlib_api.import_blocks_create_task(v2_library_key, v1_library_key)
 
+
 @shared_task(time_limit=30)
 @set_code_owner_attribute
 def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
@@ -875,14 +876,14 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     write the metadata, permissions, and content of a v1 library into a v2 library in the given collection.
     """
 
-    v1_library_key= CourseKey.from_string(v1_library_key_string)
+    v1_library_key = CourseKey.from_string(v1_library_key_string)
 
     LOGGER.info(f"Copy Library task created for library: {v1_library_key}")
 
     store = modulestore()
     v1_library = store.get_library(v1_library_key)
     collection = get_collection(collection_uuid).uuid
-    library_type= 'complex' # To make it easy, all converted libs are complex, meaning they can contain problems, videos, and text
+    library_type = 'complex'  # To make it easy, all converted libs are complex, meaning they can contain problems, videos, and text
     org = _parse_organization(v1_library.location.library_key.org)
     slug = v1_library.location.library_key.library
     title = v1_library.display_name
@@ -891,7 +892,7 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     #  permssions & license are most restrictive.
     allow_public_learning = False
     allow_public_read = False
-    library_license = '' #  '' = ALL_RIGHTS_RESERVED
+    library_license = '' # '' = ALL_RIGHTS_RESERVED
 
     try:
         with atomic():
@@ -903,34 +904,35 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
                 title,
                 description,
                 allow_public_learning,
-                allow_public_read,library_license
+                allow_public_read,
+                library_license
             )
     except v2contentlib_api.LibraryAlreadyExists:
         return {
-        "v1_library_id": v1_library_key_string,
-        "v2_library_id": None,
-        "status": "FAILED",
-        "msg": f"Exception: LibraryAlreadyExists {v1_library_key_string} aleady exists"
+            "v1_library_id": v1_library_key_string,
+            "v2_library_id": None,
+            "status": "FAILED",
+            "msg": f"Exception: LibraryAlreadyExists {v1_library_key_string} aleady exists"
         }
 
     try:
         create_copy_content_task(v2_library_metadata.key, v1_library.location.library_key)
     except Exception as error:
-         return {
-        "v1_library_id": v1_library_key_string,
-        "v2_library_id": str(v2_library_metadata.key),
-        "status": "FAILED",
-        "msg": f"Could not import content from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
+        return {
+            "v1_library_id": v1_library_key_string,
+            "v2_library_id": str(v2_library_metadata.key),
+            "status": "FAILED",
+            "msg": f"Could not import content from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
         }
 
     try:
         copy_v1_user_roles_into_v2_library(v2_library_metadata.key, v1_library.location.library_key)
     except Exception as error:
         return {
-        "v1_library_id": v1_library_key_string,
-        "v2_library_id": str(v2_library_metadata.key),
-        "status": "FAILED",
-        "msg": f"Could not copy permissions from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
+            "v1_library_id": v1_library_key_string,
+            "v2_library_id": str(v2_library_metadata.key),
+            "status": "FAILED",
+            "msg": f"Could not copy permissions from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
         }
 
     #TODO: REMOVE THIS WHEN COMPLETE WITH TESTING!
