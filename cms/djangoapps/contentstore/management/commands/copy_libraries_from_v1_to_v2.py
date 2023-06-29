@@ -15,10 +15,6 @@ from xmodule.modulestore.django import modulestore
 
 from celery import group
 
-from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
-
-from openedx.core.lib.blockstore_api import get_collection
-
 from cms.djangoapps.contentstore.tasks import create_v2_library_from_v1_library
 
 from .prompt import query_yes_no
