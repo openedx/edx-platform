@@ -51,7 +51,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
         # Drop any fields that are not specified in the `fields` argument.
         required_fields = set(fields)
 
-        if 'request' in kwargs['context'] and is_schema_request(kwargs['context']['request']):
+        if 'context' in kwargs and 'request' in kwargs['context'] and is_schema_request(kwargs['context']['request']):
             # We are serving the schema: include everything
             required_fields.update(OPTIONAL_FIELDS)
 
