@@ -23,7 +23,7 @@ clean: ## archive and delete most git-ignored files
 	tar xf $(PRIVATE_FILES)
 	rm $(PRIVATE_FILES)
 
-SWAGGER = docs/swagger.yaml
+SWAGGER = docs/lms-openapi.yaml
 
 docs: guides technical-docs ## build all the developer documentation for this repository
 
