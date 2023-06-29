@@ -4,7 +4,6 @@ import logging
 from textwrap import dedent
 
 from django.core.management import BaseCommand, CommandError
-from django.db.transaction import atomic
 
 
 from opaque_keys.edx.keys import CourseKey
@@ -31,9 +30,14 @@ class Command(BaseCommand):
 
     Example usage:
         $ ./manage.py cms copy_libraries_from_v1_to_v2 '11111111-2111-4111-8111-111111111111' --all
-        $ ./manage.py cms copy_libraries_from_v1_to_v2 '11111111-2111-4111-8111-111111111111' library-v1:edX+DemoX+Demo_Library' 'library-v1:edX+DemoX+Better_Library'
+        $ ./manage.py cms copy_libraries_from_v1_to_v2
+            '11111111-2111-4111-8111-111111111111'
+            library-v1:edX+DemoX+Demo_Library'
+            'library-v1:edX+DemoX+Better_Library'
         $ ./manage.py cms copy_libraries_from_v1_to_v2 --uncopy
-        $ ./manage.py cms copy_libraries_from_v1_to_v2 '11111111-2111-4111-8111-111111111111' './list_of--library-locators- --file
+        $ ./manage.py cms copy_libraries_from_v1_to_v2
+            '11111111-2111-4111-8111-111111111111'
+            './list_of--library-locators- --file
 
     Note:
         This Command Also produces an "output file" which contains the mapping of locators and the status of the copy.
@@ -72,7 +76,7 @@ class Command(BaseCommand):
 
         return result
 
-    def handle(self, **options):
+    def handle(self, *args, **options): # lint-amnesty, pylint: disable=unused-argument
         """Parse args and generate tasks for copying content."""
 
         if (not options['library_ids'] and not options['all']) or (options['library_ids'] and options['all']):
@@ -84,7 +88,9 @@ class Command(BaseCommand):
         if options['all']:
             store = modulestore()
             if query_yes_no(self.CONFIRMATION_PROMPT, default="no"):
-                v1_library_keys = [library.location.library_key.replace(branch=None) for library in store.get_libraries()]
+                v1_library_keys = [
+                    library.location.library_key.replace(branch=None) for library in store.get_libraries()
+                    ]
             else:
                 return
         else:

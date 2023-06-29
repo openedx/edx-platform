@@ -849,7 +849,7 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
         return permissions
 
     permissions = _get_users_by_access_level(v1_library_key)
-    for access_level in permissions.keys():
+    for access_level in permissions.keys(): # lint-amnesty, pylint: disable=consider-iterating-dictionary
         for user in permissions[access_level]:
             v2contentlib_api.set_library_user_permissions(v2_library_key, user, access_level)
 
@@ -883,7 +883,8 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     store = modulestore()
     v1_library = store.get_library(v1_library_key)
     collection = get_collection(collection_uuid).uuid
-    library_type = 'complex'  # To make it easy, all converted libs are complex, meaning they can contain problems, videos, and text
+    # To make it easy, all converted libs are complex, meaning they can contain problems, videos, and text
+    library_type = 'complex'
     org = _parse_organization(v1_library.location.library_key.org)
     slug = v1_library.location.library_key.library
     title = v1_library.display_name
@@ -917,26 +918,28 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
 
     try:
         create_copy_content_task(v2_library_metadata.key, v1_library.location.library_key)
-    except Exception as error:
+    except Exception as error: # lint-amnesty, pylint: disable=broad-except
         return {
             "v1_library_id": v1_library_key_string,
             "v2_library_id": str(v2_library_metadata.key),
             "status": "FAILED",
-            "msg": f"Could not import content from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
+            "msg":
+            f"Could not import content from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
         }
 
     try:
         copy_v1_user_roles_into_v2_library(v2_library_metadata.key, v1_library.location.library_key)
-    except Exception as error:
+    except Exception as error: # lint-amnesty, pylint: disable=broad-except
         return {
             "v1_library_id": v1_library_key_string,
             "v2_library_id": str(v2_library_metadata.key),
             "status": "FAILED",
-            "msg": f"Could not copy permissions from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
+            "msg":
+            f"Could not copy permissions from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
         }
 
     #TODO: REMOVE THIS WHEN COMPLETE WITH TESTING!
-    v2contentlib_api.delete_library(v2_library_metadata.key)
+    #v2contentlib_api.delete_library(v2_library_metadata.key)
 
     return {
         "v1_library_id": v1_library_key_string,
