@@ -12,6 +12,10 @@ on:
          description: 'Name of package to upgrade'
          required: true
          type: string
+       version:
+          description: 'Version number to upgrade to - required if version is pinned'
+          default: ''
+          type: string
        change_desc:
          description: |
            Description of change, for commit message and PR. (What does the new version add or fix?)
@@ -36,6 +40,13 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.8"
+
+      - name: Update any pinned dependencies
+        env:
+          NEW_VERSION: "${{ inputs.version }}"
+          PACKAGE: "${{ inputs.package }}"
+        run: |
+          sed 's/^\('$PACKAGE'[^#]*\)==[^ #]\+/\1=='$NEW_VERSION'/' -i requirements/constraints.txt
 
       - name: Run make upgrade-package
         env:
