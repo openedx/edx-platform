@@ -76,7 +76,7 @@ class Command(BaseCommand):
 
         return result
 
-    def handle(self, *args, **options): # lint-amnesty, pylint: disable=unused-argument
+    def handle(self, *args, **options):  # lint-amnesty, pylint: disable=unused-argument
         """Parse args and generate tasks for copying content."""
 
         if (not options['library_ids'] and not options['all']) or (options['library_ids'] and options['all']):
@@ -90,7 +90,7 @@ class Command(BaseCommand):
             if query_yes_no(self.CONFIRMATION_PROMPT, default="no"):
                 v1_library_keys = [
                     library.location.library_key.replace(branch=None) for library in store.get_libraries()
-                    ]
+                ]
             else:
                 return
         else:

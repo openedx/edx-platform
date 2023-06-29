@@ -849,7 +849,7 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
         return permissions
 
     permissions = _get_users_by_access_level(v1_library_key)
-    for access_level in permissions.keys(): # lint-amnesty, pylint: disable=consider-iterating-dictionary
+    for access_level in permissions.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
         for user in permissions[access_level]:
             v2contentlib_api.set_library_user_permissions(v2_library_key, user, access_level)
 
@@ -918,7 +918,7 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
 
     try:
         create_copy_content_task(v2_library_metadata.key, v1_library.location.library_key)
-    except Exception as error: # lint-amnesty, pylint: disable=broad-except
+    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
         return {
             "v1_library_id": v1_library_key_string,
             "v2_library_id": str(v2_library_metadata.key),
@@ -929,7 +929,7 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
 
     try:
         copy_v1_user_roles_into_v2_library(v2_library_metadata.key, v1_library.location.library_key)
-    except Exception as error: # lint-amnesty, pylint: disable=broad-except
+    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
         return {
             "v1_library_id": v1_library_key_string,
             "v2_library_id": str(v2_library_metadata.key),
