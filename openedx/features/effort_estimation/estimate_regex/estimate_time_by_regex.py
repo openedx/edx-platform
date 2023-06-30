@@ -88,10 +88,13 @@ def estimate_time_by_regex(text):
 	# Case 1: only one result => it is hours
 	if len(regex_result) == 1:
 		time_by_regex = float(regex_result[-1]) * 60
-	# Case 2: two result => it is hours and minutes
+		# Case 2: two result => it is hours and minutes
 	elif len(regex_result) >= 2:
-		time_by_regex = float(regex_result[-2]) * 60
-		time_by_regex += float(regex_result[-1])
+		try : 
+			time_by_regex = float(regex_result[-2]) * 60
+			time_by_regex += float(regex_result[-1])
+		except ValueError :
+			time_by_regex = None
 	# Case 3: no result => return None
 	else:
 		time_by_regex = None
