@@ -68,13 +68,8 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         self.test_language = 'dummy language'
         self.request = mock.Mock()
         self.course = CourseFactory.create()
-        self.field_data = mock.Mock()
         self.block = BlockFactory(category="pure", parent=self.course)
-        _prepare_runtime_for_preview(
-            self.request,
-            self.block,
-            self.field_data,
-        )
+        _prepare_runtime_for_preview(self.request, self.block)
         self.addCleanup(translation.deactivate)
 
     def get_block_i18n_service(self, block):

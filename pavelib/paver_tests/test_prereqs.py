@@ -87,7 +87,7 @@ class TestPaverNodeInstall(PaverTestCase):
 
     def test_npm_install_with_subprocess_error(self):
         """
-        Test an error in 'npm install' execution
+        Test an error in 'npm ci' execution
         """
         with patch('subprocess.Popen') as _mock_popen:
             _mock_subprocess = mock.Mock()
@@ -97,21 +97,21 @@ class TestPaverNodeInstall(PaverTestCase):
             with pytest.raises(Exception):
                 pavelib.prereqs.node_prereqs_installation()
 
-        # npm install will be called twice
+        # npm ci will be called twice
         assert _mock_popen.call_count == 2
 
     def test_npm_install_called_once_when_successful(self):
         """
-        Vanilla npm install should only be calling npm install one time
+        Vanilla npm ci should only be calling npm ci one time
         """
         with patch('subprocess.Popen') as _mock_popen:
             pavelib.prereqs.node_prereqs_installation()
-        # when there's no failure, npm install is only called once
+        # when there's no failure, npm ci is only called once
         assert _mock_popen.call_count == 1
 
     def test_npm_install_with_unexpected_subprocess_error(self):
         """
-        If there's some other error, only call npm install once, and raise a failure
+        If there's some other error, only call npm ci once, and raise a failure
         """
         with patch('subprocess.Popen') as _mock_popen:
             _mock_popen.side_effect = unexpected_fail_on_npm_install
