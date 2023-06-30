@@ -6,3 +6,4 @@ References
     :glob:
 
     *
+    docstrings/index
