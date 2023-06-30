@@ -211,8 +211,6 @@ code-annotations==1.3.0
     #   edx-toggles
 codejail-includes==1.0.0
     # via -r requirements/edx/testing.txt
-contextlib2==21.6.0
-    # via -r requirements/edx/testing.txt
 coreapi==2.3.3
     # via
     #   -r requirements/edx/testing.txt
@@ -527,8 +525,6 @@ djfernet==0.8.1
     # via
     #   -r requirements/edx/testing.txt
     #   edxval
-docopt==0.6.2
-    # via -r requirements/edx/testing.txt
 docutils==0.19
     # via
     #   -c requirements/edx/../constraints.txt
@@ -913,10 +909,6 @@ lazy-object-proxy==1.9.0
     #   astroid
 learner-pathway-progress==1.3.4
     # via -r requirements/edx/testing.txt
-levenshtein==0.21.1
-    # via
-    #   -r requirements/edx/testing.txt
-    #   python-levenshtein
 libsass==0.10.0
     # via
     #   -r requirements/edx/testing.txt
@@ -1316,8 +1308,6 @@ python-dateutil==2.8.2
     #   olxcleaner
     #   ora2
     #   xblock
-python-levenshtein==0.21.1
-    # via -r requirements/edx/testing.txt
 python-memcached==1.59
     # via -r requirements/edx/testing.txt
 python-slugify==8.0.1
@@ -1375,10 +1365,6 @@ pyyaml==6.0
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/testing.txt
-rapidfuzz==3.1.1
-    # via
-    #   -r requirements/edx/testing.txt
-    #   levenshtein
 recommender-xblock==2.0.1
     # via -r requirements/edx/testing.txt
 redis==4.5.5
