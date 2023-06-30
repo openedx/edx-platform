@@ -213,10 +213,11 @@ class ProductRecommendationsView(APIView):
         "title",
         "owners",
         "image",
-        "url_slug",
         "course_type",
         "course_runs",
         "location_restriction",
+        "marketing_url",
+        "advertised_course_run_uuid",
     ]
 
     def _get_amplitude_recommendations(self, user, user_country_code):
@@ -262,6 +263,9 @@ class ProductRecommendationsView(APIView):
                 and course.get("course_runs", [])
                 and not _has_country_restrictions(course, user_country_code)
             ):
+                active_course_run = get_active_course_run(course)
+                if active_course_run:
+                    course.update({"active_course_run_key": active_course_run.get("key")})
 
                 filtered_cross_product_courses.append(course)
 
