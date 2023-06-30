@@ -29,6 +29,9 @@
 %if mathjax_mode is not Undefined and mathjax_mode == 'wiki':
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
+    styles: {
+      '.MathJax_SVG>svg': { 'max-width': '100%', },
+    },
     CommonHTML: { linebreaks: { automatic: true } },
     SVG: { linebreaks: { automatic: true } },
     "HTML-CSS": { linebreaks: { automatic: true } },
