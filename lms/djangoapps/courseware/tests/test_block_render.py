@@ -105,7 +105,6 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
 @XBlock.needs('fs')
-@XBlock.needs('field-data')
 @XBlock.needs('mako')
 @XBlock.needs('user')
 @XBlock.needs('verification')
@@ -2283,7 +2282,7 @@ class LMSXBlockServiceMixin(SharedModuleStoreTestCase):
         """
         Instantiate the runtem.
         """
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.block,
@@ -2654,7 +2653,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         self.track_function = Mock()
         self.request_token = Mock()
         self.contentstore = contentstore()
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.block,
@@ -2682,7 +2681,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         if is_staff:
             self.user = StaffFactory(course_key=self.course.id)
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.block,
@@ -2704,7 +2703,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         if is_global_staff:
             self.user = GlobalStaffFactory.create()
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.block,
@@ -2724,7 +2723,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         if is_beta_tester:
             self.user = BetaTesterFactory(course_key=self.course.id)
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.block,
@@ -2745,7 +2744,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         if is_instructor:
             self.user = InstructorFactory(course_key=self.course.id)
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.block,
@@ -2774,7 +2773,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         anonymous_student_id value.
         """
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.problem_block,
@@ -2788,7 +2787,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
         ) == anonymous_id_for_user(self.user, None)
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.block,
@@ -2808,7 +2807,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         ) == anonymous_id_for_user(self.user, None)
 
     def test_user_service_with_anonymous_user(self):
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             AnonymousUser(),
             self.student_data,
             self.block,
@@ -2837,7 +2836,7 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
 
         Newer code should use the user service, which gets tested in test_user_service.py
         """
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
             self.block,

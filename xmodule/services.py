@@ -201,7 +201,7 @@ class RebindUserService(Service):
         with modulestore().bulk_operations(self.course_id):
             course = modulestore().get_course(course_key=self.course_id)
 
-        inner_student_data = self._ref["prepare_runtime_for_user"](
+        self._ref["prepare_runtime_for_user"](
             user=real_user,
             student_data=student_data_real_user,  # These have implicit user bindings, rest of args considered not to
             block=block,
@@ -215,11 +215,9 @@ class RebindUserService(Service):
             [
                 partial(DateLookupFieldData, course_id=self.course_id, user=self.user),
                 partial(OverrideFieldData.wrap, real_user, course),
-                partial(LmsFieldData, student_data=inner_student_data),
+                partial(LmsFieldData, student_data=student_data_real_user),
             ],
         )
-
-        block.scope_ids = block.scope_ids._replace(user_id=real_user.id)
 
 
 class EventPublishingService(Service):
