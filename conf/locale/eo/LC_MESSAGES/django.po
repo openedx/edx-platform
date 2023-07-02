@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-25 20:36+0000\n"
-"PO-Revision-Date: 2023-06-25 20:36:15.566083\n"
+"POT-Creation-Date: 2023-07-02 20:36+0000\n"
+"PO-Revision-Date: 2023-07-02 20:36:06.206807\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -12944,6 +12944,20 @@ msgstr ""
 "¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
 " єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυη#"
+
+#: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr ""
+"Förçé Fléxïßlé Grädïng för Péér ÖRÀs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
+msgstr ""
+"Séttïng thïs fläg wïll förçé ön thé fléxïßlé grädïng öptïön för äll péér-"
+"grädéd ÖRÀs ïn thïs çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: xmodule/course_block.py
 msgid "Course Instructor"
@@ -28308,6 +28322,10 @@ msgstr "Çöürsé Nävïgätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Öütlïné Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/widgets/header.html
+msgid "Files & Media"
+msgstr "Fïlés & Médïä Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
