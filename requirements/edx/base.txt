@@ -174,7 +174,7 @@ defusedxml==0.7.1
     #   social-auth-core
 deprecated==1.2.14
     # via jwcrypto
-django==3.2.19
+django==3.2.20
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/kernel.in
@@ -290,7 +290,7 @@ django-ipware==4.0.2
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-proctoring
-django-js-asset==2.0.0
+django-js-asset==2.1.0
     # via django-mptt
 django-method-override==1.0.4
     # via -r requirements/edx/kernel.in
@@ -323,7 +323,7 @@ django-multi-email-field==0.6.2
     # via edx-enterprise
 django-mysql==4.10.0
     # via -r requirements/edx/kernel.in
-django-oauth-toolkit==1.3.2
+django-oauth-toolkit==2.3.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -530,7 +530,7 @@ edx-rest-api-client==5.5.2
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-proctoring
-edx-search==3.5.0
+edx-search==3.6.0
     # via -r requirements/edx/kernel.in
 edx-sga==0.22.0
     # via -r requirements/edx/bundled.in
@@ -555,7 +555,7 @@ edx-token-utils==0.2.1
     # via -r requirements/edx/kernel.in
 edx-user-state-client==1.3.2
     # via -r requirements/edx/kernel.in
-edx-when==2.3.0
+edx-when==2.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring
@@ -637,7 +637,7 @@ jmespath==0.10.0
     # via
     #   boto3
     #   botocore
-joblib==1.2.0
+joblib==1.3.1
     # via nltk
 jsondiff==2.0.0
     # via edx-enterprise
@@ -655,7 +655,9 @@ jsonfield==3.1.0
 jsonschema==4.17.3
     # via optimizely-sdk
 jwcrypto==1.5.0
-    # via pylti1p3
+    # via
+    #   django-oauth-toolkit
+    #   pylti1p3
 kombu==5.2.4
     # via
     #   -c requirements/edx/../constraints.txt
@@ -677,7 +679,7 @@ libsass==0.10.0
     #   ora2
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==9.5.3
+lti-consumer-xblock==9.5.4
     # via -r requirements/edx/kernel.in
 lxml==4.9.2
     # via
@@ -715,7 +717,7 @@ markupsafe==2.1.3
     #   mako
     #   openedx-calc
     #   xblock
-maxminddb==2.3.0
+maxminddb==2.4.0
     # via geoip2
 mock==5.0.2
     # via -r requirements/edx/paver.txt
@@ -731,11 +733,11 @@ multidict==6.0.4
     # via
     #   aiohttp
     #   yarl
-mysqlclient==2.1.1
+mysqlclient==2.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
-newrelic==8.8.0
+newrelic==8.8.1
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
@@ -749,7 +751,7 @@ numpy==1.22.4
     #   openedx-calc
     #   scipy
     #   shapely
-oauthlib==3.0.1
+oauthlib==3.2.2
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
@@ -769,7 +771,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/kernel.in
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/kernel.in
-openedx-events==8.0.1
+openedx-events==8.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-event-bus-kafka
@@ -818,7 +820,7 @@ pgpy==0.6.0
     # via edx-enterprise
 piexif==1.1.3
     # via -r requirements/edx/kernel.in
-pillow==9.5.0
+pillow==10.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
@@ -970,7 +972,7 @@ random2==1.0.1
     # via -r requirements/edx/kernel.in
 recommender-xblock==2.0.1
     # via -r requirements/edx/bundled.in
-redis==4.5.5
+redis==4.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
@@ -1121,7 +1123,7 @@ tinycss2==1.1.1
     # via bleach
 tqdm==4.65.0
     # via nltk
-typing-extensions==4.6.3
+typing-extensions==4.7.1
     # via
     #   asgiref
     #   django-countries
