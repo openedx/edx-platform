@@ -74,17 +74,17 @@ def delete_expired_notifications():
 
 @shared_task
 @set_code_owner_attribute
-def send_notifications(user_ids, app_name, notification_type, context, content_url):
+def send_notifications(user_ids, course_key, app_name, notification_type, context, content_url):
     """
     Send notifications to the users.
     """
     from .models import Notification
     user_ids = list(set(user_ids))
-    course_id = context.get('course_id', None)
+
     # check if what is preferences of user and make decision to send notification or not
     preferences = CourseNotificationPreference.objects.filter(
         user_id__in=user_ids,
-        course_id=course_id,
+        course_id=course_key,
     )
     notifications = []
     for preference in preferences:
@@ -95,7 +95,7 @@ def send_notifications(user_ids, app_name, notification_type, context, content_u
                 notification_type=notification_type,
                 content_context=context,
                 content_url=content_url,
-                course_id=course_id,
+                course_id=course_key,
             ))
     # send notification to users but use bulk_create
     Notification.objects.bulk_create(notifications)

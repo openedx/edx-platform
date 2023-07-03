@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 
 @receiver(COURSE_ENROLLMENT_CREATED)
-def course_enrollment_post_save(signal, sender, enrollment, metadata):
+def course_enrollment_post_save(signal, sender, enrollment, metadata, **kwargs):
     """
     Watches for post_save signal for creates on the CourseEnrollment table.
     Generate a CourseNotificationPreference if new Enrollment is created
@@ -55,4 +55,6 @@ def generate_user_notifications(signal, sender, notification_data, metadata, **k
     Watches for USER_NOTIFICATION_REQUESTED signal and calls  send_web_notifications task
     """
     from openedx.core.djangoapps.notifications.tasks import send_notifications
+    notification_data = notification_data.__dict__
+    notification_data['course_key'] = str(notification_data['course_key'])
     send_notifications.delay(**notification_data)

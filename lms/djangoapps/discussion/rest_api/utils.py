@@ -381,7 +381,7 @@ def send_response_notifications(thread, course, creator, parent_id=None):
             notification_type=notification_type,
             content_url=thread.url_with_id(params={'id': thread.id}),
             app_name="discussion",
-            course_id=str(course.id),
+            course_key=course.id,
         )
         USER_NOTIFICATION_REQUESTED.send_event(notification_data=notification_data)
 

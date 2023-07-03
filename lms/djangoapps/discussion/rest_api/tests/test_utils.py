@@ -10,7 +10,7 @@ from pytz import UTC
 import unittest
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
-from lms.djangoapps.discussion.rest_api.tests.utils import CommentsServiceMockMixin
+from lms.djangoapps.discussion.rest_api.tests.utils import CommentsServiceMockMixin, ThreadMock
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -21,7 +21,9 @@ from lms.djangoapps.discussion.rest_api.utils import (
     get_course_ta_users_list,
     get_course_staff_users_list,
     get_moderator_users_list,
-    get_archived_topics, remove_empty_sequentials, send_response_notifications
+    get_archived_topics,
+    remove_empty_sequentials,
+    send_response_notifications
 )
 from openedx_events.learning.signals import USER_NOTIFICATION_REQUESTED
 
@@ -159,6 +161,9 @@ class TestRemoveEmptySequentials(unittest.TestCase):
 
 
 class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin, ModuleStoreTestCase):
+    """
+    Test for the send_response_notifications function
+    """
     def setUp(self):
         super().setUp()
         httpretty.reset()
@@ -249,4 +254,3 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         USER_NOTIFICATION_REQUESTED.connect(handler)
         send_response_notifications(self.thread, self.course, self.user_1, parent_id=None)
         self.assertEqual(handler.call_count, 0)
-
