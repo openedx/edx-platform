@@ -121,8 +121,8 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
                                   'status': course_statuses,
                                   'username': self.user.username}
         mock_get_api_client.return_value.post.return_value = Response()
-        course_run_ids = [course_status['course_run']['uuid'] for course_status in course_statuses]
-        api_response = get_course_completion_status(self.user.id, course_run_ids)
+        course_run_keys = [course_status['course_run']['key'] for course_status in course_statuses]
+        api_response = get_course_completion_status(self.user.id, course_run_keys)
         assert api_response == course_statuses
 
     @mock.patch('requests.Response.raise_for_status')
@@ -130,4 +130,17 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         mock_raise.return_value = HTTPError('An Error occured')
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
         api_response = get_course_completion_status(self.user.id, ['fake1', 'fake2', 'fake3'])
+        assert api_response == []
+
+    @mock.patch(UTILS_MODULE + '.get_credentials_api_client')
+    def test_404_results_in_empty_response(self, mock_get_api_client):
+        """
+        If the API returns a 404, we should return an empty list.
+        """
+        UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
+        course_statuses = factories.UserCredentialsCourseRunStatus.create_batch(3)
+        course_run_keys = [course_status['course_run']['key'] for course_status in course_statuses]
+        # Simulate 404 response from the API
+        mock_get_api_client.return_value.post.return_value.status_code = 404
+        api_response = get_course_completion_status(self.user.id, course_run_keys)
         assert api_response == []
