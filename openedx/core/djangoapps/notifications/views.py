@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
-    get_course_notification_preference_config_version,
+    get_course_notification_preference_config_version
 )
 
 from .base_notification import COURSE_NOTIFICATION_APPS
@@ -29,6 +29,7 @@ from .serializers import (
     UserCourseNotificationPreferenceSerializer,
     UserNotificationPreferenceUpdateSerializer
 )
+from .utils import get_notifications_app_names_list
 
 
 class CourseEnrollmentListView(generics.ListAPIView):
@@ -291,12 +292,17 @@ class NotificationCountView(APIView):
         count_total = 0
         count_by_app_name_dict = {}
         show_notifications_tray_enabled = False
+        notification_apps = get_notifications_app_names_list(COURSE_NOTIFICATION_APPS)
 
         for item in count_by_app_name:
             app_name = item['app_name']
             count = item['count']
             count_total += count
             count_by_app_name_dict[app_name] = count
+
+        for app_name in notification_apps:
+            if app_name not in count_by_app_name_dict:
+                count_by_app_name_dict[app_name] = 0
 
         learner_enrollments_course_ids = CourseEnrollment.objects.filter(
             user=request.user,
