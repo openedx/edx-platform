@@ -22,6 +22,7 @@ from openedx.core.djangoapps.notifications.models import (
 
 from .base_notification import COURSE_NOTIFICATION_APPS
 from .config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
+from .events import notification_preferences_viewed_event, notification_read_event, notification_preference_update_event
 from .models import Notification
 from .serializers import (
     NotificationCourseEnrollmentSerializer,
@@ -163,6 +164,7 @@ class UserNotificationPreferenceView(APIView):
         course_id = CourseKey.from_string(course_key_string)
         user_preference = CourseNotificationPreference.get_updated_user_course_preferences(request.user, course_id)
         serializer = UserCourseNotificationPreferenceSerializer(user_preference)
+        notification_preferences_viewed_event(request, course_id)
         return Response(serializer.data)
 
     def patch(self, request, course_key_string):
@@ -191,11 +193,12 @@ class UserNotificationPreferenceView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
-        preference_update_serializer = UserNotificationPreferenceUpdateSerializer(
+        preference_update = UserNotificationPreferenceUpdateSerializer(
             user_course_notification_preference, data=request.data, partial=True
         )
-        preference_update_serializer.is_valid(raise_exception=True)
-        updated_notification_preferences = preference_update_serializer.save()
+        preference_update.is_valid(raise_exception=True)
+        updated_notification_preferences = preference_update.save()
+        notification_preference_update_event(request.user, course_id, preference_update.validated_data)
         serializer = UserCourseNotificationPreferenceSerializer(updated_notification_preferences)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -384,6 +387,7 @@ class NotificationReadAPIView(APIView):
             notification = get_object_or_404(Notification, pk=notification_id, user=request.user)
             notification.last_read = read_at
             notification.save()
+            notification_read_event(request.user, notification)
             return Response({'message': _('Notification marked read.')}, status=status.HTTP_200_OK)
 
         app_name = request.data.get('app_name', '')
