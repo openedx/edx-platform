@@ -1308,7 +1308,6 @@ python-dateutil==2.8.2
     #   olxcleaner
     #   ora2
     #   xblock
-python-memcached==1.59
     # via -r requirements/edx/testing.txt
 python-slugify==8.0.1
     # via

@@ -1,2 +1,3 @@
 -r kernel.in        # Core dependencies required for the platform to run.
 -r bundled.in       # Additional packages usually bundled with the platform
+pymemcache
