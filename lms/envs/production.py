@@ -1015,3 +1015,6 @@ if ACTIVE_DJANGO_DEBUG_TOOLBAR:
 # BADGR SETTINGS - set badgr configurations from lms yaml file (/edx/etc/lms.yml)
 BADGR_TOKENS_CACHE_KEY = ENV_TOKENS.get('BADGR_TOKENS_CACHE_KEY', 'edly-badgr-cache')
 BADGR_BASE_URL = ENV_TOKENS.get('BADGR_BASE_URL', 'https://api.badgr.io')
+
+DEFAULT_SITE_CREATION_COURSE_ID = ENV_TOKENS.get('DEFAULT_SITE_CREATION_COURSE_ID', None)
+
