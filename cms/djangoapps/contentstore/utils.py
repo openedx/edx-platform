@@ -70,6 +70,7 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_unit_page,
     use_new_updates_page,
     use_new_video_uploads_page,
+    use_new_custom_pages,
 )
 from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_video_editor
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
@@ -402,18 +403,29 @@ def get_course_outline_url(course_locator) -> str:
     return course_outline_url
 
 
-def get_unit_url(course_locator) -> str:
+def get_unit_url(course_locator, unit_locator) -> str:
     """
     Gets course authoring microfrontend URL for unit page view.
     """
     unit_url = None
     if use_new_unit_page(course_locator):
         mfe_base_url = get_course_authoring_url(course_locator)
-        course_mfe_url = f'{mfe_base_url}/container/'
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/container/{unit_locator}'
         if mfe_base_url:
             unit_url = course_mfe_url
     return unit_url
 
+def get_custom_pages_url(course_locator) -> str:
+    """
+    Gets course authoring microfrontend URL for custom pages view.
+    """
+    custom_pages_url = None
+    if use_new_custom_pages(course_locator):
+        mfe_base_url = get_course_authoring_url(course_locator)
+        course_mfe_url = f'{mfe_base_url}/course/{course_locator}/custom-pages'
+        if mfe_base_url:
+            custom_pages_url = course_mfe_url
+    return custom_pages_url
 
 def course_import_olx_validation_is_enabled():
     """

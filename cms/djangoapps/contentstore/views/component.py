@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseBadRequest
+from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
@@ -34,8 +35,8 @@ except ImportError:
     content_staging_api = None
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-
-from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
+from ..toggles import use_new_unit_page
+from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url, get_unit_url
 from ..helpers import get_parent_xblock, is_unit, xblock_type_display_name
 from cms.djangoapps.contentstore.xblock_services.xblock_service import (
     add_container_page_publishing_info,
@@ -140,6 +141,9 @@ def container_handler(request, usage_key_string):
             is_unit_page = is_unit(xblock)
             unit = xblock if is_unit_page else None
 
+            if use_new_unit_page(usage_key.course_key):
+                return redirect(get_unit_url(usage_key.course_key, unit.location))
+
             is_first = True
             block = xblock
 
@@ -199,7 +203,6 @@ def container_handler(request, usage_key_string):
                 user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
             else:
                 user_clipboard = {"content": None}
-
             return render_to_response('container.html', {
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
