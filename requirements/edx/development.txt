@@ -342,7 +342,7 @@ django==3.2.20
     #   openedx-filters
     #   ora2
     #   outcome-surveys
-    #   skill-taggingX
+    #   skill-tagging
     #   super-csv
     #   xss-utils
 django-appconf==1.0.5
