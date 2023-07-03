@@ -2245,7 +2245,7 @@ class CreateCommentTest(
         assert urlparse(httpretty.last_request().path).path == expected_url  # lint-amnesty, pylint: disable=no-member
 
         data = httpretty.latest_requests()
-        assert parsed_body(data[len(data)-2]) == {
+        assert parsed_body(data[len(data) - 2]) == {
             'course_id': [str(self.course.id)],
             'body': ['Test body'],
             'user_id': [str(self.user.id)],
@@ -2344,7 +2344,7 @@ class CreateCommentTest(
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # pylint: disable=no-member
         data = httpretty.latest_requests()
-        assert parsed_body(data[len(data)-2]) == {
+        assert parsed_body(data[len(data) - 2]) == {
             "course_id": [str(self.course.id)],
             "body": ["Test body"],
             "user_id": [str(self.user.id)],

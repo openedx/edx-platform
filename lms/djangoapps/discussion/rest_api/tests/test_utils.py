@@ -143,8 +143,7 @@ class TestRemoveEmptySequentials(unittest.TestCase):
             {"type": "chapter", "children": [
                 {"type": "sequential", "children": []},
                 {"type": "sequential", "children": []},
-            ]
-             }
+            ]}
         ]
         expected_output = [
             {"type": "chapter", "children": [
@@ -191,9 +190,9 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         self.assertEqual(args.user_ids, [self.user_1.id])
         self.assertEqual(args.notification_type, 'new_response')
         expected_context = {
-            'course_id': str(self.course.id),
             'replier_name': self.user_2.username,
-            'post_title': 'test thread'
+            'post_title': 'test thread',
+            'course_name': self.course.display_name,
         }
         self.assertDictEqual(args.context, expected_context)
         self.assertEqual(args.content_url, 'http://example.com/1')
@@ -224,10 +223,10 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         self.assertEqual(args_comment.user_ids, [self.user_1.id])
         self.assertEqual(args_comment.notification_type, 'new_comment')
         expected_context = {
-            'course_id': str(self.course.id),
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
-            'author_name': 'dummy'
+            'author_name': 'dummy',
+            'course_name': self.course.display_name,
         }
         self.assertDictEqual(args_comment.context, expected_context)
         self.assertEqual(args_comment.content_url, 'http://example.com/1')
@@ -237,9 +236,9 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         self.assertEqual(args_comment_on_response.user_ids, [self.user_2.id])
         self.assertEqual(args_comment_on_response.notification_type, 'new_comment_on_response')
         expected_context = {
-            'course_id': str(self.course.id),
             'replier_name': self.user_3.username,
             'post_title': self.thread.title,
+            'course_name': self.course.display_name,
         }
         self.assertDictEqual(args_comment_on_response.context, expected_context)
         self.assertEqual(args_comment_on_response.content_url, 'http://example.com/1')
