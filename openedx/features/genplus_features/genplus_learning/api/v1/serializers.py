@@ -121,6 +121,8 @@ class ProgramSerializer(serializers.ModelSerializer):
                 is_locked = True
                 if CourseEnrollment.is_enrolled(gen_user.user, course_key):
                     is_locked = unit.is_locked(enrollment.gen_class)
+                if is_locked and obj.is_past_program:
+                    is_locked = False
 
                 units_context[unit.pk] = {
                     'is_locked': is_locked,
