@@ -1,4 +1,5 @@
 import uuid
+from datetime import date
 
 from django.conf import settings
 from django.db import models
@@ -77,6 +78,10 @@ class Program(TimeStampedModel):
     @classmethod
     def get_active_programs(cls):
         return cls.objects.filter(status=ProgramStatuses.ACTIVE)
+
+    @property
+    def is_past_program(self):
+        return self.end_date < date.today()
 
     def __str__(self):
         return self.slug
