@@ -122,3 +122,7 @@ drf-yasg<1.21.6
 
 # incremental upgrade approach. After successfull deploy remove this pin and try latest version.
 djangorestframework<3.14.0
+
+
+# tests failing with greater version. Fix this in separate ticket.
+pillow==9.5.0
