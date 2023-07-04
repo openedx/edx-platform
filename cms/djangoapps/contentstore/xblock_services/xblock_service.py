@@ -13,6 +13,7 @@ import logging
 from datetime import datetime
 from uuid import uuid4
 
+from attrs import asdict
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import (User)  # lint-amnesty, pylint: disable=imported-auth-user
@@ -562,7 +563,7 @@ def _create_block(request):
     if request.json.get("staged_content") == "clipboard":
         # Paste from the user's clipboard (content_staging app clipboard, not browser clipboard) into 'usage_key':
         try:
-            created_xblock = import_staged_content_from_user_clipboard(
+            created_xblock, notices = import_staged_content_from_user_clipboard(
                 parent_key=usage_key, request=request
             )
         except Exception:  # pylint: disable=broad-except
@@ -576,12 +577,11 @@ def _create_block(request):
             return JsonResponse(
                 {"error": _("Your clipboard is empty or invalid.")}, status=400
             )
-        return JsonResponse(
-            {
-                "locator": str(created_xblock.location),
-                "courseKey": str(created_xblock.location.course_key),
-            }
-        )
+        return JsonResponse({
+            "locator": str(created_xblock.location),
+            "courseKey": str(created_xblock.location.course_key),
+            "static_file_notices": asdict(notices),
+        })
 
     category = request.json["category"]
     if isinstance(usage_key, LibraryUsageLocator):

@@ -2,7 +2,7 @@
 Block rendering
 """
 
-
+from __future__ import annotations
 import json
 import logging
 import textwrap
@@ -12,7 +12,7 @@ from functools import partial
 
 from completion.services import CompletionService
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import AnonymousUser, User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.cache import cache
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseForbidden
@@ -33,6 +33,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
+from typing import Callable, TYPE_CHECKING
 from web_fragments.fragment import Fragment
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
@@ -96,6 +97,13 @@ from common.djangoapps.util.json_request import JsonResponse
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core.lib.cache_utils import CacheService
+
+if TYPE_CHECKING:
+    from rest_framework.request import Request
+    from xblock.core import XBlock
+    from xblock.runtime import Runtime
+
+    from xmodule.course_block import CourseBlock
 
 log = logging.getLogger(__name__)
 
@@ -289,8 +297,9 @@ def get_block(user, request, usage_key, field_data_cache, position=None, log_if_
                                 and such works based on user.
       - usage_key             : A UsageKey object identifying the module to load
       - field_data_cache      : a FieldDataCache
-      - position              : extra information from URL for user-specified
-                                position within module
+      - position              : Extra information from URL for user-specified position within module.
+                                It is used to determine the active tab within the `SequenceBlock`/subsection.
+                                Once the legacy course experience is removed, it should be safe to remove this, too.
       - log_if_not_found      : If this is True, we log a debug message if we cannot find the requested xmodule.
       - wrap_xblock_display   : If this is True, wrap the output display in a single div to allow for the
                                 XModule javascript to be bound correctly
@@ -364,10 +373,24 @@ def display_access_messages(user, block, view, frag, context):  # pylint: disabl
 
 
 # pylint: disable=too-many-statements
-def get_block_for_descriptor(user, request, block, field_data_cache, course_key,
-                             position=None, wrap_xblock_display=True, grade_bucket_type=None,
-                             static_asset_path='', disable_staff_debug_info=False,
-                             course=None, will_recheck_access=False):
+def get_block_for_descriptor(
+    user: User | AnonymousUser,
+    request: Request | None,
+    block: XBlock,
+    field_data_cache: FieldDataCache | None,
+    course_key: CourseKey,
+    position: int | None = None,
+    wrap_xblock_display: bool = True,
+    grade_bucket_type: str | None = None,
+    static_asset_path: str = '',
+    disable_staff_debug_info: bool = False,
+    course: CourseBlock | None = None,
+    will_recheck_access: bool = False,
+    track_function: Callable[[str, dict], None] | None = None,
+    student_data: KvsFieldData | None = None,
+    request_token: str | None = None,
+    user_location: str | None = None,
+) -> XBlock | None:
     """
     Implements get_block, extracting out the request-specific functionality.
 
@@ -375,49 +398,107 @@ def get_block_for_descriptor(user, request, block, field_data_cache, course_key,
 
     See get_block() docstring for further details.
     """
-    track_function = make_track_function(request)
+    if request:
+        track_function = track_function or make_track_function(request)
+        user_location = user_location or getattr(request, 'session', {}).get('country_code')
+        request_token = request_token or xblock_request_token(request)
 
-    user_location = getattr(request, 'session', {}).get('country_code')
+    if not student_data:
+        student_kvs = DjangoKeyValueStore(field_data_cache)
+        if is_masquerading_as_specific_student(user, course_key):
+            student_kvs = MasqueradingKeyValueStore(student_kvs, request.session)
+        student_data = KvsFieldData(student_kvs)
 
-    student_kvs = DjangoKeyValueStore(field_data_cache)
-    if is_masquerading_as_specific_student(user, course_key):
-        student_kvs = MasqueradingKeyValueStore(student_kvs, request.session)
-    student_data = KvsFieldData(student_kvs)
+    # The runtime is already shared between XBlocks. If there are no wrappers, it is the first initialization.
+    should_recreate_runtime = not block.runtime.wrappers
 
-    return get_block_for_descriptor_internal(
-        user=user,
-        block=block,
-        student_data=student_data,
-        course_id=course_key,
-        track_function=track_function,
-        position=position,
-        wrap_xblock_display=wrap_xblock_display,
-        grade_bucket_type=grade_bucket_type,
-        static_asset_path=static_asset_path,
-        user_location=user_location,
-        request_token=xblock_request_token(request),
-        disable_staff_debug_info=disable_staff_debug_info,
-        course=course,
-        will_recheck_access=will_recheck_access,
+    # If the runtime was prepared for another user, it should be recreated.
+    # This part can be removed if we remove all user-specific handling from the runtime services and pull this
+    # information directly from XBlocks during the service initialization.
+    if not should_recreate_runtime:
+        # If the user service is absent (which should never happen), the runtime should be reinitialized.
+        # We retrieve this service directly to bypass service declaration checks.
+        if user_service := block.runtime._services.get('user'):  # pylint: disable=protected-access
+            # Check the user ID bound to the runtime. This operation can run often for complex course structures, so we
+            # are accessing the protected attribute of the user service to reduce the number of queries.
+            should_recreate_runtime = user.id != user_service._django_user.id  # pylint: disable=protected-access
+        else:
+            should_recreate_runtime = True
+
+    if should_recreate_runtime:
+        prepare_runtime_for_user(
+            user=user,
+            student_data=student_data,  # These have implicit user bindings, the rest of args are considered not to
+            runtime=block.runtime,
+            course_id=course_key,
+            track_function=track_function,
+            wrap_xblock_display=wrap_xblock_display,
+            grade_bucket_type=grade_bucket_type,
+            static_asset_path=static_asset_path,
+            user_location=user_location,
+            request_token=request_token,
+            disable_staff_debug_info=disable_staff_debug_info,
+            course=course,
+            will_recheck_access=will_recheck_access,
+        )
+
+    # Pass position specified in URL to runtime.
+    if position is not None:
+        try:
+            position = int(position)
+        except (ValueError, TypeError):
+            log.exception('Non-integer %r passed as position.', position)
+            position = None
+
+    block.runtime.set('position', position)
+
+    block.bind_for_student(
+        user.id,
+        [
+            partial(DateLookupFieldData, course_id=course_key, user=user),
+            partial(OverrideFieldData.wrap, user, course),
+            partial(LmsFieldData, student_data=student_data),
+        ],
     )
+
+    # Do not check access when it's a noauth request.
+    # Not that the access check needs to happen after the block is bound
+    # for the student, since there may be field override data for the student
+    # that affects xblock visibility.
+    user_needs_access_check = getattr(user, 'known', True) and not isinstance(user, SystemUser)
+    if user_needs_access_check:
+        access = has_access(user, 'load', block, course_key)
+        # A block should only be returned if either the user has access, or the user doesn't have access, but
+        # the failed access has a message for the user and the caller of this function specifies it will check access
+        # again. This allows blocks to show specific error message or upsells when access is denied.
+        caller_will_handle_access_error = (
+            not access
+            and will_recheck_access
+            and (access.user_message or access.user_fragment)
+        )
+        if access or caller_will_handle_access_error:
+            block.has_access_error = bool(caller_will_handle_access_error)
+            return block
+        return None
+    return block
 
 
 def prepare_runtime_for_user(
-        user,
-        student_data,  # TODO
+        user: User | AnonymousUser,
+        student_data: KvsFieldData,
         # Arguments preceding this comment have user binding, those following don't
-        block,
-        course_id,
-        track_function,
-        request_token,
-        position=None,
-        wrap_xblock_display=True,
-        grade_bucket_type=None,
-        static_asset_path='',
-        user_location=None,
-        disable_staff_debug_info=False,
-        course=None,
-        will_recheck_access=False,
+        runtime: Runtime,
+        course_id: CourseKey,
+        track_function: Callable[[str, dict], None],
+        request_token: str,
+        position: int | None = None,
+        wrap_xblock_display: bool = True,
+        grade_bucket_type: str | None = None,
+        static_asset_path: str = '',
+        user_location: str | None = None,
+        disable_staff_debug_info: bool = False,
+        course: CourseBlock | None = None,
+        will_recheck_access: bool = False,
 ):
     """
     Helper function that binds the given xblock to a user and student_data to a user and the block.
@@ -427,28 +508,26 @@ def prepare_runtime_for_user(
 
     The arguments fall into two categories: those that have explicit or implicit user binding, which are user
     and student_data, and those don't and are used to instantiate the service required in LMS, which
-    are all the other arguments.  Ultimately, this isn't too different than how get_block_for_descriptor_internal
-    was before refactoring.
+    are all the other arguments.
 
     Arguments:
         see arguments for get_block()
         request_token (str): A token unique to the request use by xblock initialization
-
-    Returns:
-        KvsFieldData:  student_data bound to, primarily, the user and block
     """
 
-    def inner_get_block(block):
+    def inner_get_block(block: XBlock) -> XBlock | None:
         """
-        Delegate to get_block_for_descriptor_internal() with all values except `block` set.
+        Delegate to get_block_for_descriptor() with all values except `block` set.
 
         Because it does an access check, it may return None.
         """
-        return get_block_for_descriptor_internal(
+        return get_block_for_descriptor(
             user=user,
+            request=None,
+            field_data_cache=None,
             block=block,
             student_data=student_data,
-            course_id=course_id,
+            course_key=course_id,
             track_function=track_function,
             request_token=request_token,
             position=position,
@@ -482,16 +561,6 @@ def prepare_runtime_for_user(
             request_token=request_token,
         ))
 
-    # HACK: The following test fails when we do not access this attribute.
-    #  lms/djangoapps/courseware/tests/test_views.py::TestRenderXBlock::test_success_enrolled_staff
-    #  This happens because accessing `field_data` caches the XBlock's parents through the inheritance mixin.
-    #  If we do this operation before assigning `inner_get_block` to the `get_block_for_descriptor` attribute, these
-    #  parents will be initialized without binding the user data (that's how the `get_block` works in `x_module.py`).
-    #  If we retrieve the parents after this operation (e.g., in the `enclosing_sequence_for_gating_checks` function),
-    #  they will have their runtimes initialized, which can lead to an altered behavior of the XBlock-specific
-    #  parts of other runtimes. We will keep this workaround until we remove all XBlock-specific code from here.
-    block.static_asset_path  # pylint: disable=pointless-statement
-
     replace_url_service = partial(
         ReplaceURLService,
         static_asset_path=static_asset_path,
@@ -508,30 +577,16 @@ def prepare_runtime_for_user(
     user_is_staff = bool(has_access(user, 'staff', course_id))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
-        if is_masquerading_as_specific_student(user, course_id):
+        if user_is_staff or is_masquerading_as_specific_student(user, course_id):
             # When masquerading as a specific student, we want to show the debug button
             # unconditionally to enable resetting the state of the student we are masquerading as.
             # We already know the user has staff access when masquerading is active.
-            staff_access = True
-            # To figure out whether the user has instructor access, we temporarily remove the
-            # masquerade_settings from the real_user.  With the masquerading settings in place,
-            # the result would always be "False".
-            masquerade_settings = user.real_user.masquerade_settings
-            del user.real_user.masquerade_settings
-            user.real_user.masquerade_settings = masquerade_settings
-        else:
-            staff_access = user_is_staff
-        if staff_access:
             block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
-
-    field_data = DateLookupFieldData(block._field_data, course_id, user)  # pylint: disable=protected-access
-    field_data = LmsFieldData(field_data, student_data)
 
     store = modulestore()
 
     services = {
         'fs': FSService(),
-        'field-data': field_data,
         'mako': mako_service,
         'user': DjangoXBlockUserService(
             user,
@@ -560,7 +615,6 @@ def prepare_runtime_for_user(
         'rebind_user': RebindUserService(
             user,
             course_id,
-            prepare_runtime_for_user,
             track_function=track_function,
             position=position,
             wrap_xblock_display=wrap_xblock_display,
@@ -583,90 +637,13 @@ def prepare_runtime_for_user(
         'publish': EventPublishingService(user, course_id, track_function),
     }
 
-    block.runtime.get_block_for_descriptor = inner_get_block
+    runtime.get_block_for_descriptor = inner_get_block
 
-    block.runtime.wrappers = block_wrappers
-    block.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
-    block.runtime.request_token = request_token
-    block.runtime.wrap_asides_override = lms_wrappers_aside
-    block.runtime.applicable_aside_types_override = lms_applicable_aside_types
-
-    # pass position specified in URL to runtime
-    if position is not None:
-        try:
-            position = int(position)
-        except (ValueError, TypeError):
-            log.exception('Non-integer %r passed as position.', position)
-            position = None
-
-    block.runtime.set('position', position)
-
-    return field_data
-
-
-# TODO: Find all the places that this method is called and figure out how to
-# get a loaded course passed into it
-def get_block_for_descriptor_internal(user, block, student_data, course_id, track_function, request_token,
-                                      position=None, wrap_xblock_display=True, grade_bucket_type=None,
-                                      static_asset_path='', user_location=None, disable_staff_debug_info=False,
-                                      course=None, will_recheck_access=False):
-    """
-    Actually implement get_block, without requiring a request.
-
-    See get_block() docstring for further details.
-
-    Arguments:
-        request_token (str): A unique token for this request, used to isolate xblock rendering
-    """
-
-    student_data = prepare_runtime_for_user(
-        user=user,
-        student_data=student_data,  # These have implicit user bindings, the rest of args are considered not to
-        block=block,
-        course_id=course_id,
-        track_function=track_function,
-        position=position,
-        wrap_xblock_display=wrap_xblock_display,
-        grade_bucket_type=grade_bucket_type,
-        static_asset_path=static_asset_path,
-        user_location=user_location,
-        request_token=request_token,
-        disable_staff_debug_info=disable_staff_debug_info,
-        course=course,
-        will_recheck_access=will_recheck_access,
-    )
-
-    block.bind_for_student(
-        user.id,
-        [
-            partial(DateLookupFieldData, course_id=course_id, user=user),
-            partial(OverrideFieldData.wrap, user, course),
-            partial(LmsFieldData, student_data=student_data),
-        ],
-    )
-
-    block.scope_ids = block.scope_ids._replace(user_id=user.id)
-
-    # Do not check access when it's a noauth request.
-    # Not that the access check needs to happen after the block is bound
-    # for the student, since there may be field override data for the student
-    # that affects xblock visibility.
-    user_needs_access_check = getattr(user, 'known', True) and not isinstance(user, SystemUser)
-    if user_needs_access_check:
-        access = has_access(user, 'load', block, course_id)
-        # A block should only be returned if either the user has access, or the user doesn't have access, but
-        # the failed access has a message for the user and the caller of this function specifies it will check access
-        # again. This allows blocks to show specific error message or upsells when access is denied.
-        caller_will_handle_access_error = (
-            not access
-            and will_recheck_access
-            and (access.user_message or access.user_fragment)
-        )
-        if access or caller_will_handle_access_error:
-            block.has_access_error = bool(caller_will_handle_access_error)
-            return block
-        return None
-    return block
+    runtime.wrappers = block_wrappers
+    runtime._services.update(services)  # lint-amnesty, pylint: disable=protected-access
+    runtime.request_token = request_token
+    runtime.wrap_asides_override = lms_wrappers_aside
+    runtime.applicable_aside_types_override = lms_applicable_aside_types
 
 
 def load_single_xblock(request, user_id, course_id, usage_key_string, course=None, will_recheck_access=False):

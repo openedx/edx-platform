@@ -182,12 +182,13 @@ def get_transcript_link_from_youtube(youtube_id):
     try:
         youtube_html = requests.get(f"{youtube_url_base}{youtube_id}")
         caption_re = settings.YOUTUBE['TRANSCRIPTS']['CAPTION_TRACKS_REGEX']
+        allowed_language_codes = settings.YOUTUBE['TRANSCRIPTS']['ALLOWED_LANGUAGE_CODES']
         caption_matched = re.search(caption_re, youtube_html.content.decode("utf-8"))
         if caption_matched:
             caption_tracks = json.loads(f'[{caption_matched.group("caption_tracks")}]')
             for caption in caption_tracks:
-                if "languageCode" in caption.keys() and caption["languageCode"] == "en":
-                    return caption["baseUrl"]
+                if "languageCode" in caption.keys() and caption["languageCode"] in allowed_language_codes:
+                    return caption.get("baseUrl")
         return None
     except ConnectionError:
         return None

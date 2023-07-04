@@ -3,11 +3,13 @@ Test the OLX serialization utils
 """
 import unittest
 
+import ddt
 from opaque_keys.edx.keys import CourseKey
 
 from . import utils
 
 
+@ddt.ddt
 class TestUtils(unittest.TestCase):
     """
     Test the OLX serialization utils
@@ -47,3 +49,17 @@ class TestUtils(unittest.TestCase):
         """
         olx_out = utils.rewrite_absolute_static_urls(olx_in, course_id)
         assert olx_out == olx_expected
+
+    @ddt.unpack
+    @ddt.data(
+        ('''<problem>\n<script>ambiguous script\n</script></problem>''', False),
+        ('''<problem>\n<script type="text/python">\npython\nscript\n</script></problem>''', True),
+        ('''<problem>\n<script type='text/python'>\npython\nscript\n</script></problem>''', True),
+        ('''<problem>\n<script type="loncapa/python">\npython\nscript\n</script></problem>''', True),
+        ('''<problem>\n<script type='loncapa/python'>\npython\nscript\n</script></problem>''', True),
+    )
+    def test_has_python_script(self, olx: str, has_script: bool):
+        """
+        Test the _has_python_script() helper
+        """
+        assert utils._has_python_script(olx) == has_script  # pylint: disable=protected-access
