@@ -63,8 +63,9 @@ class SchoolTypes:
     """
     RM_UNIFY = 'RmUnify'
     PRIVATE = 'Private'
+    XPORTER = 'Xporter'
 
-    __ALL__ = (RM_UNIFY, PRIVATE)
+    __ALL__ = (RM_UNIFY, PRIVATE, XPORTER)
     __MODEL_CHOICES__ = (
         (school_type, school_type) for school_type in __ALL__
     )

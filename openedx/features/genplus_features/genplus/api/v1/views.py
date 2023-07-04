@@ -1,30 +1,26 @@
-from django.middleware import csrf
-from django.http import Http404
+import logging
 from django.utils.decorators import method_decorator
-from django.db import IntegrityError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.conf import settings
+from rest_framework.parsers import FormParser
 
 from rest_framework import generics, status, views, viewsets
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework import filters
-from rest_framework import mixins
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from drf_multiple_model.mixins import FlatMultipleModelMixin
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import (
-    GenUser, Character, Class, Teacher, Student, JournalPost, Skill
+    GenUser, Character, Class, Teacher, Student, JournalPost, Skill, School, XporterDetail
 )
-from openedx.features.genplus_features.genplus.constants import JournalTypes, EmailTypes
+from openedx.features.genplus_features.genplus.exceptions import XporterException
+from openedx.features.genplus_features.genplus.constants import JournalTypes, EmailTypes, SchoolTypes
 from openedx.features.genplus_features.common.display_messages import SuccessMessages, ErrorMessages
 from openedx.features.genplus_features.genplus_badges.api.v1.serializers import JournalBoosterBadgeSerializer
 from openedx.features.genplus_features.genplus_badges.models import BoosterBadgeAward
@@ -46,6 +42,9 @@ from .serializers import (
 from .permissions import IsStudent, IsTeacher, IsStudentOrTeacher, IsGenUser, FromPrivateSchool
 from .mixins import GenzMixin
 from .pagination import JournalListPagination
+from rest_framework.views import APIView
+
+logger = logging.getLogger(__name__)
 
 
 sensitive_post_parameters_m = method_decorator(
@@ -430,3 +429,34 @@ class ChangePasswordView(GenzMixin, generics.GenericAPIView):
             return Response({"message": "New password has been saved."})
         else:
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class XporterAuth(APIView):
+    parser_classes = [FormParser, ]
+
+    def post(self, request):
+        try:
+            school_id = request.data.get('schoolId')
+            school_name = request.data.get('schoolName')
+            secret = request.data.get('schoolSecret')
+            school_email = request.data.get('schoolEmail')
+            partner_id = request.data.get('partnerId')
+            school, _ = School.objects.update_or_create(
+                guid=school_id,
+                defaults={
+                    'name': school_name,
+                    'type': SchoolTypes.XPORTER
+                }
+            )
+            XporterDetail.objects.update_or_create(
+                school_id=school_id,
+                defaults={
+                    'secret': secret,
+                    'school_email': school_email,
+                    'partner_id': partner_id
+                }
+            )
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except XporterException as e:
+            logger.exception(str(e))
+            return Response(status=status.HTTP_400_BAD_REQUEST)

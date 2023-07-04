@@ -1,5 +1,6 @@
 import os
 import uuid
+from django.core import signing
 from django.conf import settings
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
@@ -27,6 +28,36 @@ class School(TimeStampedModel):
             self.guid = f'private-{str(uuid.uuid4())[0:10]}'
             self.external_id = f'private-{str(uuid.uuid4())[0:10]}'
         super(School, self).save(*args, **kwargs)
+
+
+class XporterDetail(TimeStampedModel):
+    school = models.OneToOneField(School, on_delete=models.CASCADE, null=True, blank=True,
+                                  related_name='xporter_detail')
+    _secret = models.CharField(max_length=1024, null=True, blank=True)
+    school_email = models.EmailField(null=True, blank=True)
+    partner_id = models.CharField(max_length=1024, null=True, blank=True)
+    _token = models.TextField(null=True, blank=True)
+    token_expiry = models.DateTimeField(null=True, blank=True)
+    last_exception_message = models.TextField(null=True, blank=True)
+
+    # setter and getter of the encrypted fields
+    @property
+    def secret(self):
+        # decrypt the encrypted value
+        return signing.loads(self._secret)
+
+    @secret.setter
+    def secret(self, value):
+        # Picks the `SECRET_KEY` provided in settings.py and encrypt it
+        self._secret = signing.dumps(value)
+
+    @property
+    def token(self):
+        return signing.loads(self._token)
+
+    @token.setter
+    def token(self, value):
+        self._token = signing.dumps(value)
 
 
 class Skill(models.Model):
