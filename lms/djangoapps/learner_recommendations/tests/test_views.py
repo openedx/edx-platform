@@ -157,7 +157,6 @@ class TestAboutPageRecommendationsView(TestRecommendationsBase):
         assert segment_mock.call_args[0][1] == "edx.bi.user.recommendations.viewed"
 
 
-@ddt.ddt
 class TestRecommendationsContextView(APITestCase):
     """Unit tests for the Recommendations Context View"""
 
