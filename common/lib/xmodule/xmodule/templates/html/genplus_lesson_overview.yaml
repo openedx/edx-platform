@@ -98,10 +98,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -126,10 +126,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 30 second-story activity
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -154,10 +154,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 30 second-story activity
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -182,10 +182,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -210,10 +210,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -238,10 +238,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -266,10 +266,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -294,10 +294,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -322,10 +322,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -350,10 +350,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -378,10 +378,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -406,10 +406,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -434,10 +434,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -462,10 +462,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -490,10 +490,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>
@@ -518,10 +518,10 @@ data: |
               </button>
             </div>
             <div class="text-block">
-              <span class="opener collapsed">
+              <button class="opener collapsed">
                 <span class="fa fa-chevron-right" aria-hidden="true"></span>
                 Communication video
-              </span>
+              </button>
               <div class="slide">
                 <ul>
                   <li>Exploring key concepts</li>

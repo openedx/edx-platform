@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 %>
 
-<div class="bookmark-button-wrapper">
+<div class="bookmark-button-wrapper" aria-hidden="true" hidden>
   <button class="btn btn-link bookmark-button ${"bookmarked" if is_bookmarked else ""}"
     aria-pressed="${"true" if is_bookmarked else "false"}"
     data-bookmark-id="${bookmark_id}"

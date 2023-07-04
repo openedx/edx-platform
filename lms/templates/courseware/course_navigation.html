@@ -68,7 +68,7 @@ masquerading_as_student = is_masquerading_as_student(request.user, course.id)
             </ul>
         </nav>
     % else:
-        <nav class="${active_page} wrapper-course-material" aria-label="${_('Course Material')}">
+        <nav class="${active_page} wrapper-course-material" aria-label="${_('Course Material')}" aria-hidden="true" hidden>
             <div class="course-material">
                 <%
                 tabs_tmpl = static.get_template_path('/courseware/tabs.html')
