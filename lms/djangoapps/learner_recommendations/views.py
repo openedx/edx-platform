@@ -37,6 +37,7 @@ from lms.djangoapps.learner_recommendations.utils import (
 from lms.djangoapps.learner_recommendations.serializers import (
     AboutPageRecommendationsSerializer,
     DashboardRecommendationsSerializer,
+    RecommendationsContextSerializer,
     CrossProductAndAmplitudeRecommendationsSerializer,
     CrossProductRecommendationsSerializer,
     AmplitudeRecommendationsSerializer,
@@ -192,6 +193,37 @@ class CrossProductRecommendationsView(APIView):
                     "courses": unrestricted_courses
                 }).data,
             status=200
+        )
+
+
+class RecommendationsContextView(APIView):
+    """
+    *Example Request*
+
+    GET /api/learner_recommendations/recommendations_context/
+    """
+
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated, NotJwtRestrictedApplication)
+
+    def get(self, request):
+        """
+        Returns the context needed for the recommendations experiment:
+        - Country Code
+        """
+        ip_address = get_client_ip(request)[0]
+        country_code = country_code_from_ip(ip_address)
+
+        return Response(
+            RecommendationsContextSerializer(
+                {
+                    "countryCode": country_code,
+                }
+            ).data,
+            status=200,
         )
 
 
