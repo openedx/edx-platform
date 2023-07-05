@@ -274,7 +274,7 @@ distlib==0.3.6
     # via
     #   -r requirements/edx/testing.txt
     #   virtualenv
-django==3.2.19
+django==3.2.20
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/testing.txt
@@ -613,7 +613,7 @@ edx-drf-extensions==8.8.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.67.7
+edx-enterprise==3.68.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt

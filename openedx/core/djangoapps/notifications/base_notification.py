@@ -1,6 +1,8 @@
 """
 Base setup for Notification Apps and Types.
 """
+from django.utils.translation import gettext_lazy as _
+
 from .utils import (
     find_app_in_normalized_apps,
     find_pref_in_normalized_prefs,
@@ -13,8 +15,8 @@ COURSE_NOTIFICATION_TYPES = {
         'name': 'new_comment_on_response',
         'is_core': True,
         'info': 'Comment on response',
-        'content_template': '<p><strong>{replier_name}</strong> replied on your response in '
-                            '<strong>{post_title}</strong></p>',
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> replied on your response in '
+                              '<{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'replier_name': 'replier name',
@@ -30,8 +32,8 @@ COURSE_NOTIFICATION_TYPES = {
         'push': True,
         'info': 'Comment on post',
         'non-editable': ['web', 'email'],
-        'content_template': '<p><strong>{replier_name}</strong> replied on <strong>{author_name}</strong> response '
-                            'to your post <strong>{post_title}</strong></p>',
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> replied on <{strong}>{author_name}'
+                              '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'author_name': 'author name',
@@ -48,8 +50,8 @@ COURSE_NOTIFICATION_TYPES = {
         'push': True,
         'info': 'Response on post',
         'non-editable': [],
-        'content_template': '<p><strong>{replier_name}</strong> responded to your '
-                            'post <strong>{post_title}</strong></p>',
+        'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to your '
+                              'post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
             'post_title': 'Post title',
             'replier_name': 'replier name',
@@ -282,9 +284,13 @@ def get_notification_content(notification_type, context):
     """
     Returns notification content for the given notification type with provided context.
     """
+    html_tags_context = {
+        'strong': 'strong',
+        'p': 'p',
+    }
     notification_type = NotificationTypeManager().notification_types.get(notification_type, None)
     if notification_type:
         notification_type_content_template = notification_type.get('content_template', None)
         if notification_type_content_template:
-            return notification_type_content_template.format(**context)
+            return notification_type_content_template.format(**context, **html_tags_context)
     return ''
