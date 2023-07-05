@@ -141,7 +141,7 @@ def container_handler(request, usage_key_string):
             is_unit_page = is_unit(xblock)
             unit = xblock if is_unit_page else None
 
-            if use_new_unit_page(usage_key.course_key):
+            if is_unit_page and use_new_unit_page(usage_key.course_key):
                 return redirect(get_unit_url(usage_key.course_key, unit.location))
 
             is_first = True
