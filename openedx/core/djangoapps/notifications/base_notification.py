@@ -1,7 +1,10 @@
 """
 Base setup for Notification Apps and Types.
 """
-from .utils import find_app_in_normalized_apps, find_pref_in_normalized_prefs
+from .utils import (
+    find_app_in_normalized_apps,
+    find_pref_in_normalized_prefs,
+)
 
 COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
