@@ -547,10 +547,9 @@ def course_listing(request):
     """
     List all courses and libraries available to the logged in user
     """
-
     if use_new_home_page():
         return redirect(get_studio_home_url())
-    
+
     optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
 
     org = request.GET.get('org', '') if optimization_enabled else None

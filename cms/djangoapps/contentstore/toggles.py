@@ -418,7 +418,7 @@ def use_new_video_uploads_page(course_key):
     return ENABLE_NEW_STUDIO_VIDEO_UPLOADS_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_course_outline_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_course_outline_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio course outline page mfe

@@ -415,6 +415,7 @@ def get_unit_url(course_locator, unit_locator) -> str:
             unit_url = course_mfe_url
     return unit_url
 
+
 def get_custom_pages_url(course_locator) -> str:
     """
     Gets course authoring microfrontend URL for custom pages view.
@@ -426,6 +427,7 @@ def get_custom_pages_url(course_locator) -> str:
         if mfe_base_url:
             custom_pages_url = course_mfe_url
     return custom_pages_url
+
 
 def course_import_olx_validation_is_enabled():
     """
