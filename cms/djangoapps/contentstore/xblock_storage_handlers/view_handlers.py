@@ -116,15 +116,6 @@ CREATE_IF_NOT_FOUND = ["course_info"]
 NEVER = lambda x: False
 ALWAYS = lambda x: True
 
-__all__ = [
-    "handle_xblock",
-    "create_xblock_info",
-    "load_services_for_studio",
-    "get_block_info",
-    "get_xblock",
-    "delete_orphans",
-]
-
 
 def _filter_entrance_exam_grader(graders):
     """

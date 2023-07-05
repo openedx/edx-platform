@@ -27,7 +27,7 @@ from ..entrance_exam import (
     update_entrance_exam
 )
 from cms.djangoapps.contentstore.helpers import GRADER_TYPES
-from cms.djangoapps.contentstore.xblock_services.create_xblock import create_xblock
+from cms.djangoapps.contentstore.xblock_storage_handlers.create_xblock import create_xblock
 
 
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
