@@ -97,4 +97,4 @@ class ProfileImageUrlTestCase(TestCase):
         for details https://github.com/jschneier/django-storages/blob/1.10.1/storages/backends/s3boto3.py#L293
         """
         storage = get_profile_image_storage()
-        self.assertEquals(s3boto3.S3Boto3Storage().__class__, storage.__class__)
+        assert s3boto3.S3Boto3Storage().__class__ == storage.__class__
