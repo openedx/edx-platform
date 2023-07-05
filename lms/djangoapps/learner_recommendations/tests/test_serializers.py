@@ -6,6 +6,7 @@ from django.test import TestCase
 
 from lms.djangoapps.learner_recommendations.serializers import (
     DashboardRecommendationsSerializer,
+    RecommendationsContextSerializer,
     CrossProductRecommendationsSerializer,
     CrossProductAndAmplitudeRecommendationsSerializer,
     AmplitudeRecommendationsSerializer
@@ -87,6 +88,42 @@ class TestDashboardRecommendationsSerializer(TestCase):
                     },
                 ],
                 "isControl": False,
+            },
+        )
+
+
+class TestRecommendationsContextSerializer(TestCase):
+    """Tests for RecommendationsContextSerializer"""
+
+    def test_successful_serialization(self):
+        """Test that context data serializes correctly"""
+
+        serialized_data = RecommendationsContextSerializer(
+            {
+                "countryCode": "US",
+            }
+        ).data
+
+        self.assertDictEqual(
+            serialized_data,
+            {
+                "countryCode": "US",
+            },
+        )
+
+    def test_empty_response_serialization(self):
+        """Test that an empty response serializes correctly"""
+
+        serialized_data = RecommendationsContextSerializer(
+            {
+                "countryCode": "",
+            }
+        ).data
+
+        self.assertDictEqual(
+            serialized_data,
+            {
+                "countryCode": "",
             },
         )
 
