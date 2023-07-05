@@ -360,7 +360,26 @@ def send_response_notifications(thread, course, creator, parent_id=None):
     """
     Send notifications to users who are subscribed to the thread.
     """
-    def send_notification(user_ids, notification_type, extra_context=None):
+    notification_sender = DiscussionNotificationSender(thread, course, creator, parent_id)
+    notification_sender.send_new_comment_notification()
+    notification_sender.send_new_response_notification()
+    notification_sender.send_new_comment_on_response_notification()
+
+
+class DiscussionNotificationSender:
+    """
+    Class to send notifications to users who are subscribed to the thread.
+    """
+
+    def __init__(self, thread, course, creator, parent_id=None):
+        self.thread = thread
+        self.course = course
+        self.creator = creator
+        self.parent_id = parent_id
+        self.parent_response = None
+        self._get_parent_response()
+
+    def _send_notification(self, user_ids, notification_type, extra_context=None):
         """
         Send notification to users
         """
@@ -373,32 +392,48 @@ def send_response_notifications(thread, course, creator, parent_id=None):
         notification_data = UserNotificationData(
             user_ids=user_ids,
             context={
-                "replier_name": creator.username,
-                "post_title": thread.title,
-                "course_name": course.display_name,
+                "replier_name": self.creator.username,
+                "post_title": self.thread.title,
+                "course_name": self.course.display_name,
                 **extra_context,
             },
             notification_type=notification_type,
-            content_url=thread.url_with_id(params={'id': thread.id}),
+            content_url=self.thread.url_with_id(params={'id': self.thread.id}),
             app_name="discussion",
-            course_key=course.id,
+            course_key=self.course.id,
         )
         USER_NOTIFICATION_REQUESTED.send_event(notification_data=notification_data)
 
-    if not parent_id:
-        # Send notification on main thread/post i.e. there is a response to the main thread
-        if creator.id != thread.user_id:
-            send_notification([thread.user_id], "new_response")
-        return
+    def _get_parent_response(self):
+        """
+        Get parent response object
+        """
+        if self.parent_id and not self.parent_response:
+            self.parent_response = Comment(id=self.parent_id).retrieve()
 
-    parent_response = Comment(id=parent_id).retrieve()
-    # send notification to parent thread creator i.e. comment on the response
-    if creator.id != int(thread.user_id):
-        context = {
-            "author_name": parent_response.username,
-        }
-        send_notification([thread.user_id], "new_comment", extra_context=context)
+        return self.parent_response
 
-    # send notification to parent response creator i.e. comment on the response
-    if creator.id != int(parent_response['user_id']):
-        send_notification([parent_response.user_id], "new_comment_on_response")
+    def send_new_response_notification(self):
+        """
+        Send notification to users who are subscribed to the main thread/post i.e.
+        there is a response to the main thread.
+        """
+        if not self.parent_id and self.creator.id != self.thread.user_id:
+            self._send_notification([self.thread.user_id], "new_response")
+
+    def send_new_comment_notification(self):
+        """
+        Send notification to parent thread creator i.e. comment on the response.
+        """
+        if self.parent_response and self.creator.id != int(self.thread.user_id):
+            context = {
+                "author_name": self.parent_response.username,
+            }
+            self._send_notification([self.thread.user_id], "new_comment", extra_context=context)
+
+    def send_new_comment_on_response_notification(self):
+        """
+        Send notification to parent response creator i.e. comment on the response.
+        """
+        if self.parent_response and self.creator.id != int(self.parent_response.user_id):
+            self._send_notification([self.parent_response.user_id], "new_comment_on_response")

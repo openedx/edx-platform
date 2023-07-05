@@ -78,7 +78,6 @@ def send_notifications(user_ids, course_key, app_name, notification_type, contex
     """
     Send notifications to the users.
     """
-    from .models import Notification
     user_ids = list(set(user_ids))
 
     # check if what is preferences of user and make decision to send notification or not

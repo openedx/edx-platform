@@ -116,7 +116,6 @@ class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
             is_active=True,
             mode='audit'
         )
-        # self.post_save_signal = Signal()
 
     def test_course_enrollment_post_save(self):
         """
