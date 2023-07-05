@@ -132,7 +132,7 @@ def container_handler(request, usage_key_string):
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
             except ItemNotFoundError:
                 return HttpResponseBadRequest()
-
+            print('THIS IS A COURSE KEY', usage_key.course_key)
             component_templates = get_component_templates(course)
             ancestor_xblocks = []
             parent = get_parent_xblock(xblock)
@@ -141,7 +141,7 @@ def container_handler(request, usage_key_string):
             is_unit_page = is_unit(xblock)
             unit = xblock if is_unit_page else None
 
-            if is_unit_page and use_new_unit_page(usage_key.course_key):
+            if is_unit_page and usage_key.course_key and use_new_unit_page(usage_key.course_key):
                 return redirect(get_unit_url(usage_key.course_key, unit.location))
 
             is_first = True
