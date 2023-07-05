@@ -997,7 +997,8 @@ def create_new_course(user, org, number, run, fields):
     update_course_discussions_settings(new_course.id)
 
     # Enable certain fields rolling forward, where configured
-    new_course.force_on_flexible_peer_openassessments = default_enable_flexible_peer_openassessments(new_course.id)
+    if default_enable_flexible_peer_openassessments(new_course.id):
+        new_course.force_on_flexible_peer_openassessments = True
     modulestore().update_item(new_course, new_course.published_by)
 
     return new_course
@@ -1064,7 +1065,8 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     fields['video_upload_pipeline'] = {}
 
     # Enable certain fields rolling forward, where configured
-    fields['force_on_flexible_peer_openassessments'] = default_enable_flexible_peer_openassessments(source_course_key)
+    if default_enable_flexible_peer_openassessments(source_course_key):
+        fields['force_on_flexible_peer_openassessments'] = True
 
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     args = [str(source_course_key), str(destination_course_key), user.id, json_fields]
