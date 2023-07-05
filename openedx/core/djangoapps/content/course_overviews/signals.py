@@ -17,13 +17,9 @@ from .models import CourseOverview
 
 LOG = logging.getLogger(__name__)
 
-# providing_args=["updated_course_overview", "previous_start_date"]
 COURSE_START_DATE_CHANGED = Signal()
-# providing_args=["updated_course_overview", "previous_self_paced"]
 COURSE_PACING_CHANGED = Signal()
-# providing_args=["courserun_key"]
 IMPORT_COURSE_DETAILS = Signal()
-# providing_args=["courserun_key"]
 DELETE_COURSE_DETAILS = Signal()
 
 

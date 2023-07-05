@@ -12,15 +12,12 @@ from django.utils.translation import gettext_lazy as _
 from organizations.models import Organization
 
 # A signal that will be sent when users should be added or removed from the creator group
-# providing_args=["caller", "user", "state", "organizations"]
 update_creator_state = Signal()
 
 # A signal that will be sent when admin should be notified of a pending user request
-# providing_args=["user"]
 send_admin_notification = Signal()
 
 # A signal that will be sent when user should be notified of change in course creator privileges
-# providing_args=["user", "state"]
 send_user_notification = Signal()
 
 

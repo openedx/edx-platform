@@ -104,7 +104,6 @@ REGISTRATION_UTM_PARAMETERS = {
 REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
 IS_MARKETABLE = 'is_marketable'
 # used to announce a registration
-# providing_args=["user", "registration"]
 REGISTER_USER = Signal()
 
 

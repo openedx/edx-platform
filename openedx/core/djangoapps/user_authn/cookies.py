@@ -28,7 +28,6 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
 
 log = logging.getLogger(__name__)
 
-# providing_args=['user', 'response']
 CREATE_LOGON_COOKIE = Signal()
 
 

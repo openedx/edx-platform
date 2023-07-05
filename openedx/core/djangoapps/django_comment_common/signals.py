@@ -4,7 +4,6 @@
 
 from django.dispatch import Signal
 
-# Same providing_args=['user', 'post'] for all following signals.
 thread_created = Signal()
 thread_edited = Signal()
 thread_voted = Signal()

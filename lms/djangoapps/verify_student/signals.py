@@ -18,7 +18,6 @@ log = logging.getLogger(__name__)
 
 
 # Signal for emitting IDV submission and review updates
-# providing_args = ["attempt_id", "user_id", "status", "full_name", "profile_name"]
 idv_update_signal = Signal()
 
 
