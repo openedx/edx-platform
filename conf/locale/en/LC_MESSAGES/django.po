@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-25 20:36+0000\n"
-"PO-Revision-Date: 2023-06-25 20:36:15.566083\n"
+"POT-Creation-Date: 2023-07-02 20:36+0000\n"
+"PO-Revision-Date: 2023-07-02 20:36:06.206807\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -10067,6 +10067,16 @@ msgid ""
 "Specify the video sharing options for the course. This can be set to one of "
 "three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
 "default."
+msgstr ""
+
+#: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
 msgstr ""
 
 #: xmodule/course_block.py
@@ -21748,6 +21758,10 @@ msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Outline"
+msgstr ""
+
+#: cms/templates/widgets/header.html
+msgid "Files & Media"
 msgstr ""
 
 #: cms/templates/widgets/header.html
