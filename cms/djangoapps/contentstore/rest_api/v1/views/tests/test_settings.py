@@ -53,6 +53,7 @@ class CourseSettingsViewTest(CourseTestCase, PermissionAccessMixin):
             "sidebar_html_enabled": False,
             "show_min_grade_warning": False,
             "upgrade_deadline": None,
+            "licensing_enabled": False,
             "use_v2_cert_display_settings": False,
         }
 
