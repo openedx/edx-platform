@@ -37,6 +37,7 @@ from lms.djangoapps.learner_recommendations.utils import (
 from lms.djangoapps.learner_recommendations.serializers import (
     AboutPageRecommendationsSerializer,
     DashboardRecommendationsSerializer,
+    RecommendationsContextSerializer,
     CrossProductAndAmplitudeRecommendationsSerializer,
     CrossProductRecommendationsSerializer,
     AmplitudeRecommendationsSerializer,
@@ -195,6 +196,37 @@ class CrossProductRecommendationsView(APIView):
         )
 
 
+class RecommendationsContextView(APIView):
+    """
+    *Example Request*
+
+    GET /api/learner_recommendations/recommendations_context/
+    """
+
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+    permission_classes = (IsAuthenticated, NotJwtRestrictedApplication)
+
+    def get(self, request):
+        """
+        Returns the context needed for the recommendations experiment:
+        - Country Code
+        """
+        ip_address = get_client_ip(request)[0]
+        country_code = country_code_from_ip(ip_address)
+
+        return Response(
+            RecommendationsContextSerializer(
+                {
+                    "countryCode": country_code,
+                }
+            ).data,
+            status=200,
+        )
+
+
 class ProductRecommendationsView(APIView):
     """
     **Example Request**
@@ -213,10 +245,11 @@ class ProductRecommendationsView(APIView):
         "title",
         "owners",
         "image",
-        "url_slug",
         "course_type",
         "course_runs",
         "location_restriction",
+        "marketing_url",
+        "advertised_course_run_uuid",
     ]
 
     def _get_amplitude_recommendations(self, user, user_country_code):
@@ -262,6 +295,9 @@ class ProductRecommendationsView(APIView):
                 and course.get("course_runs", [])
                 and not _has_country_restrictions(course, user_country_code)
             ):
+                active_course_run = get_active_course_run(course)
+                if active_course_run:
+                    course.update({"active_course_run_key": active_course_run.get("key")})
 
                 filtered_cross_product_courses.append(course)
 
@@ -272,6 +308,18 @@ class ProductRecommendationsView(APIView):
         Helper for collecting and forming a response for
         cross product and Amplitude recommendations
         """
+
+        if is_user_enrolled_in_ut_austin_masters_program(user):
+            return Response(
+                CrossProductAndAmplitudeRecommendationsSerializer(
+                    {
+                        "crossProductCourses": [],
+                        "amplitudeCourses": []
+                    }
+                ).data,
+                status=200
+            )
+
         amplitude_recommendations = self._get_amplitude_recommendations(user, user_country_code)
         cross_product_recommendations = self._get_cross_product_recommendations(course_key, user_country_code)
 
@@ -289,6 +337,15 @@ class ProductRecommendationsView(APIView):
         """
         Helper for collecting and forming a response for Amplitude recommendations only
         """
+
+        if is_user_enrolled_in_ut_austin_masters_program(user):
+            return Response(
+                AmplitudeRecommendationsSerializer({
+                    "amplitudeCourses": []
+                }).data,
+                status=200
+            )
+
         amplitude_recommendations = self._get_amplitude_recommendations(user, user_country_code)
 
         return Response(

@@ -10,5 +10,5 @@ wheel==0.40.0
 # The following packages are considered to be unsafe in a requirements file:
 pip==23.1.2
     # via -r requirements/pip.in
-setuptools==67.8.0
+setuptools==68.0.0
     # via -r requirements/pip.in

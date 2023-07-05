@@ -4,8 +4,10 @@ Public python API for content staging
 from __future__ import annotations
 
 from django.http import HttpRequest
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import AssetKey, UsageKey
 
-from .data import StagedContentData, StagedContentStatus, UserClipboardData
+from .data import StagedContentData, StagedContentFileData, StagedContentStatus, UserClipboardData
 from .models import UserClipboard as _UserClipboard, StagedContent as _StagedContent
 from .serializers import UserClipboardSerializer as _UserClipboardSerializer
 
@@ -75,3 +77,45 @@ def get_staged_content_olx(staged_content_id: int) -> str | None:
         return sc.olx
     except _StagedContent.DoesNotExist:
         return None
+
+
+def get_staged_content_static_files(staged_content_id: int) -> list[StagedContentFileData]:
+    """
+    Get the filenames and metadata for any static files used by the given staged content.
+
+    Does not check permissions!
+    """
+    sc = _StagedContent.objects.get(pk=staged_content_id)
+
+    def str_to_key(source_key_str: str):
+        if not str:
+            return None
+        try:
+            return AssetKey.from_string(source_key_str)
+        except InvalidKeyError:
+            return UsageKey.from_string(source_key_str)
+
+    return [
+        StagedContentFileData(
+            filename=f.filename,
+            # For performance, we don't load data unless it's needed, so there's
+            # a separate API call for that.
+            data=None,
+            source_key=str_to_key(f.source_key_str),
+            md5_hash=f.md5_hash,
+        )
+        for f in sc.files.all()
+    ]
+
+
+def get_staged_content_static_file_data(staged_content_id: int, filename: str) -> bytes | None:
+    """
+    Get the data for the static asset associated with the given staged content.
+
+    Does not check permissions!
+    """
+    sc = _StagedContent.objects.get(pk=staged_content_id)
+    file_data_obj = sc.files.filter(filename=filename).first()
+    if file_data_obj:
+        return file_data_obj.data_file.open().read()
+    return None

@@ -64,7 +64,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 18
+    VERSION = 19
 
     # Cache entry versioning.
     version = models.IntegerField()
@@ -143,6 +143,9 @@ class CourseOverview(TimeStampedModel):
     entrance_exam_enabled = models.BooleanField(default=False)
     entrance_exam_id = models.CharField(max_length=255, blank=True)
     entrance_exam_minimum_score_pct = models.FloatField(default=0.65)
+
+    # Open Response Assessment configuration
+    force_on_flexible_peer_openassessments = models.BooleanField(default=False)
 
     external_id = models.CharField(max_length=128, null=True, blank=True)
 
@@ -267,6 +270,8 @@ class CourseOverview(TimeStampedModel):
             course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct / 100
         else:
             course_overview.entrance_exam_minimum_score_pct = course.entrance_exam_minimum_score_pct
+
+        course_overview.force_on_flexible_peer_openassessments = course.force_on_flexible_peer_openassessments
 
         if not CatalogIntegration.is_enabled():
             course_overview.language = course.language

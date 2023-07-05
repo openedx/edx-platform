@@ -5,9 +5,9 @@ APIs.
 """
 from opaque_keys.edx.keys import UsageKey
 from rest_framework.test import APIClient
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import ToyCourseFactory
+from xmodule.modulestore.django import contentstore, modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, upload_file_to_course
+from xmodule.modulestore.tests.factories import BlockFactory, CourseFactory, ToyCourseFactory
 
 CLIPBOARD_ENDPOINT = "/api/content-staging/v1/clipboard/"
 XBLOCK_ENDPOINT = "/xblock/"
@@ -60,3 +60,72 @@ class ClipboardPasteTestCase(ModuleStoreTestCase):
         assert new_video.youtube_id_1_0 == orig_video.youtube_id_1_0
         # The new block should store a reference to where it was copied from
         assert new_video.copied_from_block == str(video_key)
+
+    def test_paste_with_assets(self):
+        """
+        When pasting into a different course, any required static assets should
+        be pasted too, unless they already exist in the destination course.
+        """
+        dest_course_key, client = self._setup_course()
+        # Make sure some files exist in the source course to be copied:
+        source_course = CourseFactory.create()
+        upload_file_to_course(
+            course_key=source_course.id,
+            contentstore=contentstore(),
+            source_file='./common/test/data/static/picture1.jpg',
+            target_filename="picture1.jpg",
+        )
+        upload_file_to_course(
+            course_key=source_course.id,
+            contentstore=contentstore(),
+            source_file='./common/test/data/static/picture2.jpg',
+            target_filename="picture2.jpg",
+        )
+        source_html = BlockFactory.create(
+            parent_location=source_course.location,
+            category="html",
+            display_name="Some HTML",
+            data="""
+            <p>
+                <a href="/static/picture1.jpg">Picture 1</a>
+                <a href="/static/picture2.jpg">Picture 2</a>
+            </p>
+            """,
+        )
+
+        # Now, to test conflict handling, we also upload a CONFLICTING image to
+        # the destination course under the same filename.
+        upload_file_to_course(
+            course_key=dest_course_key,
+            contentstore=contentstore(),
+            # Note this is picture 3, not picture 2, but we save it as picture 2:
+            source_file='./common/test/data/static/picture3.jpg',
+            target_filename="picture2.jpg",
+        )
+
+        # Now copy the HTML block from the source cost and paste it into the destination:
+        copy_response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(source_html.location)}, format="json")
+        assert copy_response.status_code == 200
+
+        # Paste the video
+        dest_parent_key = dest_course_key.make_usage_key("vertical", "vertical_test")
+        paste_response = client.post(XBLOCK_ENDPOINT, {
+            "parent_locator": str(dest_parent_key),
+            "staged_content": "clipboard",
+        }, format="json")
+        assert paste_response.status_code == 200
+        static_file_notices = paste_response.json()["static_file_notices"]
+        assert static_file_notices == {
+            "error_files": [],
+            "new_files": ["picture1.jpg"],
+            # The new course already had a file named "picture2.jpg" with different md5 hash, so it's a conflict:
+            "conflicting_files": ["picture2.jpg"],
+        }
+
+        # Check that the files are as we expect:
+        source_pic1_hash = contentstore().find(source_course.id.make_asset_key("asset", "picture1.jpg")).content_digest
+        dest_pic1_hash = contentstore().find(dest_course_key.make_asset_key("asset", "picture1.jpg")).content_digest
+        assert source_pic1_hash == dest_pic1_hash
+        source_pic2_hash = contentstore().find(source_course.id.make_asset_key("asset", "picture2.jpg")).content_digest
+        dest_pic2_hash = contentstore().find(dest_course_key.make_asset_key("asset", "picture2.jpg")).content_digest
+        assert source_pic2_hash != dest_pic2_hash  # Because there was a conflict, this file was unchanged.

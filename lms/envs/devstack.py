@@ -382,6 +382,7 @@ ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
+EXAMS_DATE_MICROFRONTEND_URL = 'http://localhost:2020'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
@@ -430,6 +431,7 @@ MKTG_URLS = {
     'TOS': '/edx-terms-service',
     'TOS_AND_HONOR': '/edx-terms-service',
     'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
+    'PROGRAM_SUBSCRIPTIONS': '/program-subscriptions',
 }
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
