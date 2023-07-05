@@ -8,12 +8,14 @@ import hashlib
 from unittest.mock import patch
 
 from django.test import TestCase
+from django.test.utils import override_settings
 from pytz import UTC
+from storages.backends import s3boto3
 
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from common.djangoapps.student.tests.factories import UserFactory
 
-from ..image_helpers import get_profile_image_urls_for_user
+from ..image_helpers import get_profile_image_urls_for_user, get_profile_image_storage
 
 TEST_SIZES = {'full': 50, 'small': 10}
 TEST_PROFILE_IMAGE_UPLOAD_DT = datetime.datetime(2002, 1, 9, 15, 43, 1, tzinfo=UTC)
@@ -74,3 +76,25 @@ class ProfileImageUrlTestCase(TestCase):
         self.user.profile.profile_image_uploaded_at = None
         self.user.profile.save()  # lint-amnesty, pylint: disable=no-member
         self.verify_urls(get_profile_image_urls_for_user(self.user), 'default', is_default=True)
+
+    @override_settings(
+        PROFILE_IMAGE_BACKEND={
+            'class': 'storages.backends.s3boto3.S3Boto3Storage',
+            'options': {
+                'bucket_name': 'sandbox-edx-edxapp-video-images',
+                'custom_domain': 'test.net',
+                'default_acl': 'public-read', 'headers': {'Cache-Control': 'max-age-31536000'},
+                'location': 'LINTING'
+            }
+        }
+
+    )
+    def test_get_profile_image_storage(self):
+        """
+        Purpose of this test is to make sure it returns valid storage `s3boto3` class.
+        In 1.10.1 it is verifying settings variables and headers is not part of that. So when django-storages
+        will upgrade to 1.10.1, it will require changes for headers settings.
+        for details https://github.com/jschneier/django-storages/blob/1.10.1/storages/backends/s3boto3.py#L293
+        """
+        storage = get_profile_image_storage()
+        self.assertEquals(s3boto3.S3Boto3Storage().__class__, storage.__class__)
