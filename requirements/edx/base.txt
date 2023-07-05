@@ -8,7 +8,6 @@
 -e common/lib/capa  # via -r requirements/edx/local.in
 -e git+https://github.com/edx/codejail.git@4127fc4bd5775cc72aee8d7f0a70e31405e22439#egg=codejail  # via -r requirements/edx/github.in
 -e git+https://github.com/edx/django-ratelimit-backend.git@v2.0.1a5#egg=django-ratelimit-backend==2.0.1a5  # via -r requirements/edx/github.in
-# TODO: need to verify its version with koa
 -e git+https://github.com/edly-io/django-wiki.git@edly-1.0.0#egg=django-wiki  # via -r requirements/edx/github.in
 -e git+https://github.com/edx/DoneXBlock.git@2.0.3#egg=done-xblock  # via -r requirements/edx/github.in
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme  # via -r requirements/edx/github.in
@@ -268,7 +267,7 @@ zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requi
 -e git+https://github.com/edly-io/xblock-officevideo.git@develop-juniper#egg=officevideo==develop-juniper
 -e git+https://github.com/edly-io/xblock-poll.git@edly-1.0.0#egg=xblock-poll==edly-1.0.0
 -e git+https://github.com/pmitros/FeedbackXBlock.git#egg=rate==0.0
--e git+https://github.com/edly-io/kwl-xblock.git@release-v0.1.0#egg=kwl
+-e git+ssh://git@github.com/edly-io/kwl-xblock.git@v1.0.0#egg=kwl-xblock
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
