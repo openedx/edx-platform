@@ -116,6 +116,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         """
         UserFactory.create(username=settings.CREDENTIALS_SERVICE_USERNAME)
         course_statuses = factories.UserCredentialsCourseRunStatus.create_batch(3)
+        response_data = [course_status['course_run']['key'] for course_status in course_statuses]
         mock_raise.return_value = None
         mock_json.return_value = {'lms_user_id': self.user.id,
                                   'status': course_statuses,
@@ -123,7 +124,7 @@ class TestGetCredentials(CredentialsApiConfigMixin, CacheIsolationTestCase):
         mock_get_api_client.return_value.post.return_value = Response()
         course_run_keys = [course_status['course_run']['key'] for course_status in course_statuses]
         api_response = get_course_completion_status(self.user.id, course_run_keys)
-        assert api_response == course_statuses
+        assert api_response == response_data
 
     @mock.patch('requests.Response.raise_for_status')
     def test_get_course_completion_status_api_error(self, mock_raise):

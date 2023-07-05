@@ -161,7 +161,7 @@ def get_course_completion_status(lms_user_id, course_run_ids):
         # Yes, This is course_credentials_data. The key is named status but
         # it contains all the courses data from credentials.
         course_credentials_data = course_completion_response.get('status')
-        filtered_records = [course_data for course_data in course_credentials_data if
+        filtered_records = [course_data['course_run']['key'] for course_data in course_credentials_data if
                             course_data['course_run']['key'] in course_run_ids and
                             course_data['status'] == 'awarded']
         return filtered_records
