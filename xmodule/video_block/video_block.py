@@ -276,7 +276,7 @@ class VideoBlock(
             return self.student_view(context)
 
         fragment = Fragment(self.get_html(view=PUBLIC_VIEW, context=context))
-        add_webpack_js_to_fragment(fragment, 'VideoBlockPreview')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
         return fragment
 
