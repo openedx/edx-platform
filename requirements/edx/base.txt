@@ -254,13 +254,13 @@ zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requi
 # edly forked apps
 -e git+https://github.com/edly-io/figures.git@edly-3.0.1#egg=figures==edly-3.0.1
 -e git+https://github.com/edly-io/edx-sga.git@v0.11.0-gptz-0.1.2#egg=edx-sga==v0.11.0-gptz-0.1.2
--e git+https://github.com/edly-io/edx_xblock_scorm.git@v1.1.1#egg=edx_xblock_scorm==v1.1.1
+-e git+https://github.com/edly-io/edx_xblock_scorm.git@v1.1.1#egg=scormxblock-xblock==v1.1.1
 -e git+https://github.com/edly-io/xblock-pdf.git@edly-1.0.1#egg=xblock-pdf
 -e git+https://github.com/edly-io/xblock-video.git@dev#egg=video_xblock
--e git+https://github.com/edly-io/xblock-onedrive.git@develop-juniper#egg=onedrive==develop-juniper
--e git+https://github.com/edly-io/xblock-officevideo.git@develop-juniper#egg=officevideo==develop-juniper
+-e git+https://github.com/edly-io/xblock-onedrive.git@develop-juniper#egg=xblock-onedrive
+-e git+https://github.com/edly-io/xblock-officevideo.git@develop-juniper#egg=xblock-officevideo
 -e git+https://github.com/edly-io/xblock-poll.git@edly-1.0.0#egg=xblock-poll==edly-1.0.0
--e git+https://github.com/pmitros/FeedbackXBlock.git#egg=rate==0.0
+-e git+https://github.com/pmitros/FeedbackXBlock.git#egg=feedback-xblock
 -e git+https://github.com/edly-io/kwl-xblock.git@v1.0.0#egg=kwl-xblock
 
 # The following packages are considered to be unsafe in a requirements file:
