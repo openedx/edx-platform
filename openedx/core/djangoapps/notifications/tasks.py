@@ -11,7 +11,8 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
-from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification, \
+    get_course_notification_preference_config_version
 
 logger = get_task_logger(__name__)
 
@@ -85,8 +86,10 @@ def send_notifications(user_ids, course_key, app_name, notification_type, contex
         user_id__in=user_ids,
         course_id=course_key,
     )
+    preferences = create_notification_pref_if_not_exists(user_ids, preferences)
     notifications = []
     for preference in preferences:
+        preference = update_user_preference(preference, preference.user, course_key)
         if preference and preference.get_web_config(app_name, notification_type):
             notifications.append(Notification(
                 user_id=preference.user_id,
@@ -98,3 +101,31 @@ def send_notifications(user_ids, course_key, app_name, notification_type, contex
             ))
     # send notification to users but use bulk_create
     Notification.objects.bulk_create(notifications)
+
+
+def update_user_preference(preference: CourseNotificationPreference, user, course_id):
+    """
+    Update user preference if config version is changed.
+    """
+    ver = get_course_notification_preference_config_version()
+    if preference.config_version != ver:
+        return preference.get_updated_user_course_preferences(user, course_id)
+    return preference
+
+
+def create_notification_pref_if_not_exists(user_ids, preferences):
+    """
+    Create notification preference if not exist.
+    """
+    for user_id in user_ids:
+        for preference in preferences:
+            if preference.user_id == user_id:
+                break
+        else:
+            preferences.append(CourseNotificationPreference.objects.create(
+                user_id=user_id,
+                course_id=preferences[0].course_id,
+
+            ))
+            logger.info('Creating new notification preference for user because it does not exist.')
+    return preferences
