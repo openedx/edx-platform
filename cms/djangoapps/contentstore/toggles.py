@@ -495,7 +495,7 @@ DEFAULT_ENABLE_FLEXIBLE_PEER_OPENASSESSMENTS = CourseWaffleFlag(
 def default_enable_flexible_peer_openassessments(course_key):
     """
     Returns a boolean if ORA flexible peer grading should be toggled on for a
-    course rerun. We expect this to be set at the organization level to opt 
+    course rerun. We expect this to be set at the organization level to opt
     in/out of rolling forward this feature.
     """
     return DEFAULT_ENABLE_FLEXIBLE_PEER_OPENASSESSMENTS.is_enabled(course_key)
