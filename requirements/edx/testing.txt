@@ -241,7 +241,6 @@ defusedxml==0.7.1
     #   djangorestframework-xml
     #   ora2
     #   python3-openid
-    #   python3-saml
     #   social-auth-core
 deprecated==1.2.14
     # via
@@ -472,7 +471,7 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-djangorestframework==3.13.1
+djangorestframework==3.14.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -880,6 +879,7 @@ lxml==4.9.2
     #   openedx-calc
     #   ora2
     #   pyquery
+    #   python3-saml
     #   xblock
     #   xmlsec
 mailsnake==1.6.4
@@ -978,7 +978,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.txt
-openedx-events==8.0.1
+openedx-events==8.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
@@ -1240,10 +1240,8 @@ python3-openid==3.2.0 ; python_version >= "3"
     # via
     #   -r requirements/edx/base.txt
     #   social-auth-core
-python3-saml==1.9.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
+python3-saml==1.15.0
+    # via -r requirements/edx/base.txt
 pytz==2022.7.1
     # via
     #   -c requirements/edx/../constraints.txt

@@ -49,6 +49,11 @@ LMS_ROOT_URL = f'http://{LMS_BASE}'
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
+
+################################## Video Pipeline Settings #########################
+
+FEATURES['ENABLE_VIDEO_UPLOAD_PIPELINE'] = True
+
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development

@@ -31,10 +31,7 @@ class ProgramCardView extends Backbone.View {
         }
         this.isSubscribed = (
             context.isUserB2CSubscriptionsEnabled &&
-            context.subscriptionCollection?.some({
-                resource_id: this.model.get('uuid'),
-                subscription_state: 'active',
-            })
+            this.model.get('subscriptionIndex') > -1
         ) ?? false;
         this.render();
     }
