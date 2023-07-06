@@ -109,7 +109,9 @@
                 closeButton = $link.data('modalCloseButtonSelector') || '.close-modal',
                 embed;
 
-            $link.leanModal({top: 120, overlay: 1, closeButton: closeButton, position: 'absolute'});
+            $link.leanModal({
+                top: 120, overlay: 1, closeButton: closeButton, position: 'absolute'
+            });
             embed = $($link.attr('href')).find('iframe');
             if (embed.length > 0 && embed.attr('src')) {
                 var sep = (embed.attr('src').indexOf('?') > 0) ? '&' : '?';

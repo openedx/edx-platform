@@ -514,36 +514,78 @@
 }
 
 // AU 972 Social Video Sharing Page
-.public-video-share-cta {
-  position: relative;
-  float: right;
-  z-index: 1;
+.public-video-page {
 
-  .btn-learn-more{
-    @extend %btn-shims;
-    color: #00262B;
-    background: #FFFFFF;
-    border-color: #F2F0EF;
-    &:hover,
-    &:active,
-    &:focus {
-      background: darken(#FFFFFF, 7%);
-      border-color: darken(#F2F0EF, 7%);
+  .tc-wrapper{
+    margin: auto;
+    // The edX video player only sets size by width. We want to make sure the video is fully on the page
+    // on-load, so we need to control height via width. This sets the width to either 90% of the horizontal
+    // space (when that's the limiter) or 70% of the vertical space times an approximate aspect ratio.
+    // Assuming the aspect ratio is even close to constistent, this sets the width to what it would need
+    // to be to make the height 70% of the vertical space on the screen
+    width: \min(90vw, 70vh * 1.6739);
+  }
+
+  .public-video-share-cta {
+    display: flex;
+    padding: $baseline;
+    justify-content: flex-end;
+    flex-direction: row;
+    margin: 0 -12px;
+    text-align: center;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
+
+    .org-logo{
+      height: 80px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .btn-learn-more{
+      @extend %btn-shims;
+      color: #00262B;
+      background: #FFFFFF;
+      border-color: #F2F0EF;
+      &:hover,
+      &:active,
+      &:focus {
+        background: darken(#FFFFFF, 7%);
+        border-color: darken(#F2F0EF, 7%);
+      }
+    }
+
+    .btn-enroll,
+    .btn-go-to-course{
+      @extend %btn-shims;
+      color: #FFFFFF;
+      background: #D23228;
+      border-color: #D23228;
+
+      &:hover,
+      &:active,
+      &:focus {
+        color: darken(#FFFFFF, 7%);
+        background: darken(#D23228, 7%);
+        border-color: darken(#D23228, 7%);
+      }
     }
   }
 
-  .btn-enroll{
-    @extend %btn-shims;
-    color: #FFFFFF;
-    background: #D23228;
-    border-color: #D23228;
+  @include media-breakpoint-down(sm) {
+    .public-video-share-cta {
+      flex-direction: column;
 
-    &:hover,
-    &:active,
-    &:focus {
-      color: darken(#FFFFFF, 7%);
-      background: darken(#D23228, 7%);
-      border-color: darken(#D23228, 7%);
+      .nav-links {
+        flex-direction: column;
+      }
     }
   }
 }

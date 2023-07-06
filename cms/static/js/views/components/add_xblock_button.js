@@ -1,6 +1,7 @@
 define(['js/views/baseview', 'edx-ui-toolkit/js/utils/html-utils'],
     function(BaseView, HtmlUtils) {
         'use strict';
+
         return BaseView.extend({
             tagName: 'li',
             initialize: function() {

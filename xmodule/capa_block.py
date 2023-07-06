@@ -19,7 +19,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_str
 from django.utils.functional import cached_property
 from lxml import etree
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -47,11 +47,12 @@ from xmodule.x_module import (
 )
 from xmodule.xml_block import XmlMixin
 from common.djangoapps.xblock_django.constants import (
-    ATTR_KEY_ANONYMOUS_USER_ID,
+    ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID,
     ATTR_KEY_USER_IS_STAFF,
     ATTR_KEY_USER_ID,
 )
 from openedx.core.djangolib.markup import HTML, Text
+from .capa.xqueue_interface import XQueueService
 
 from .fields import Date, ScoreField, Timedelta
 from .progress import Progress
@@ -123,8 +124,6 @@ class Randomization(String):
 @XBlock.needs('cache')
 @XBlock.needs('sandbox')
 @XBlock.needs('replace_urls')
-# Studio doesn't provide XQueueService, but the LMS does.
-@XBlock.wants('xqueue')
 @XBlock.wants('call_to_action')
 class ProblemBlock(
     ScorableXBlockMixin,
@@ -165,37 +164,23 @@ class ProblemBlock(
     icon_class = 'problem'
 
     uses_xmodule_styles_setup = True
-    requires_per_student_anonymous_id = True
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/capa/display.js'),
-            resource_string(__name__, 'js/src/collapsible.js'),
-            resource_string(__name__, 'js/src/capa/imageinput.js'),
-            resource_string(__name__, 'js/src/capa/schematic.js'),
+            resource_filename(__name__, 'js/src/javascript_loader.js'),
+            resource_filename(__name__, 'js/src/capa/display.js'),
+            resource_filename(__name__, 'js/src/collapsible.js'),
+            resource_filename(__name__, 'js/src/capa/imageinput.js'),
+            resource_filename(__name__, 'js/src/capa/schematic.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
-    }
-
-    preview_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/capa/display.scss'),
-        ],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
 
     studio_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/problem/edit.js'),
+            resource_filename(__name__, 'js/src/problem/edit.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-
-    studio_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/editor/edit.scss'),
-            resource_string(__name__, 'css/problem/edit.scss'),
-        ]
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     display_name = String(
@@ -822,11 +807,13 @@ class ProblemBlock(
             text = self.data
 
         user_service = self.runtime.service(self, 'user')
-        anonymous_student_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
+        anonymous_student_id = user_service.get_current_user().opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
         seed = user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID) or 0
 
         sandbox_service = self.runtime.service(self, 'sandbox')
         cache_service = self.runtime.service(self, 'cache')
+
+        is_studio = getattr(self.runtime, 'is_author_mode', False)
 
         capa_system = LoncapaSystem(
             ajax_url=self.ajax_url,
@@ -839,7 +826,7 @@ class ProblemBlock(
             render_template=self.runtime.service(self, 'mako').render_template,
             resources_fs=self.runtime.resources_fs,
             seed=seed,  # Why do we do this if we have self.seed?
-            xqueue=self.runtime.service(self, 'xqueue'),
+            xqueue=None if is_studio else XQueueService(self),
             matlab_api_key=self.matlab_api_key
         )
 
@@ -1750,7 +1737,7 @@ class ProblemBlock(
         if self.lcp.is_queued():
             prev_submit_time = self.lcp.get_recentmost_queuetime()
 
-            xqueue_service = self.runtime.service(self, 'xqueue')
+            xqueue_service = self.lcp.capa_system.xqueue
             waittime_between_requests = xqueue_service.waittime if xqueue_service else 0
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = _("You must wait at least {wait} seconds between submissions.").format(

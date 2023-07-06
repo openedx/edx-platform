@@ -18,6 +18,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
     'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'],
 function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldEditor, StringUtils, HtmlUtils) {
     'use strict';
+
     var XBlockOutlineView = BaseView.extend({
         // takes XBlockInfo as a model
 

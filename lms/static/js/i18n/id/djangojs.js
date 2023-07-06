@@ -553,7 +553,6 @@
     "Expand All": "Buka Semua",
     "Expand Instructions": "Buka Panduan",
     "Explanation": "Penjelasan ",
-    "Explore New Programs": "Telusuri Program Baru",
     "Explore Programs": "Telusuri Program",
     "Explore your course!": "Jelajahi kursus anda",
     "Failed Proctoring": "Gagal dalam proses proktoring",

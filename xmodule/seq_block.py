@@ -14,7 +14,7 @@ from django.conf import settings
 
 from lxml import etree
 from opaque_keys.edx.keys import UsageKey
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from pytz import UTC
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
@@ -273,26 +273,16 @@ class SequenceBlock(
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/sequence/display.js'),
+            resource_filename(__name__, 'js/src/sequence/display.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
-    }
-
-    preview_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/sequence/display.scss'),
-        ],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
 
     # There is no studio_view() for this XBlock but this is needed to make the
     # the static_content command happy.
     studio_view_js = {
         'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
-    }
-
-    studio_view_css = {
-        'scss': []
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
 
     def __init__(self, *args, **kwargs):
@@ -300,11 +290,11 @@ class SequenceBlock(
 
         self.gated_sequence_paywall = None
 
-    def bind_for_student(self, xmodule_runtime, user_id, wrappers=None):
+    def bind_for_student(self, user_id, wrappers=None):
         # The position of the child XBlock to select can also be passed in via the URL.
-        # In such cases the value is set on the ModuleSystem in get_module_system_for_user()
-        # and needs to be read here after the ModuleSystem has been set on the XBlock.
-        super().bind_for_student(xmodule_runtime, user_id, wrappers)
+        # In such cases the value is set in the runtime inside prepare_runtime_for_user()
+        # and needs to be read here after the value has been set.
+        super().bind_for_student(user_id, wrappers)
         # If position is specified in system, then use that instead.
         position = getattr(self.runtime, 'position', None)
         if position is not None:

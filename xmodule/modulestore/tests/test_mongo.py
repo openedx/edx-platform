@@ -10,6 +10,7 @@ from tempfile import mkdtemp
 from unittest.mock import patch
 from uuid import uuid4
 
+import ddt
 import pymongo
 import pytest
 
@@ -751,6 +752,7 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):  # lint-a
         pytest.raises(ItemNotFoundError, (lambda: self.draft_store.get_all_asset_metadata(course_key, 'asset')[:1]))
 
 
+@ddt.ddt
 class TestMongoKeyValueStore(TestCase):
     """
     Tests for MongoKeyValueStore.
@@ -786,11 +788,15 @@ class TestMongoKeyValueStore(TestCase):
         self.kvs.set(key, value)
         assert self.kvs.get(key) == value
 
-    def test_write(self):
-        yield (self._check_write, KeyValueStore.Key(Scope.content, None, None, 'foo'), 'new_data')
-        yield (self._check_write, KeyValueStore.Key(Scope.children, None, None, 'children'), [])
-        yield (self._check_write, KeyValueStore.Key(Scope.children, None, None, 'parent'), None)
-        yield (self._check_write, KeyValueStore.Key(Scope.settings, None, None, 'meta'), 'new_settings')
+    @ddt.data(
+        (Scope.content, "foo", "new_data"),
+        (Scope.children, "children", []),
+        (Scope.children, "parent", None),
+        (Scope.settings, "meta", "new_settings"),
+    )
+    @ddt.unpack
+    def test_write(self, scope, key, expected):
+        self._check_write(KeyValueStore.Key(scope, None, None, key), expected)
 
     def test_write_non_dict_data(self):
         self.kvs = MongoKeyValueStore('xml_data', self.parent, self.children, self.metadata)
@@ -801,21 +807,23 @@ class TestMongoKeyValueStore(TestCase):
             with pytest.raises(InvalidScopeError):
                 self.kvs.set(KeyValueStore.Key(scope, None, None, 'foo'), 'new_value')
 
-    def _check_delete_default(self, key, default_value):
-        self.kvs.delete(key)
-        assert self.kvs.get(key) == default_value
-        assert self.kvs.has(key)
-
-    def _check_delete_key_error(self, key):
+    @ddt.data(
+        (Scope.content, "foo"),
+        (Scope.settings, "meta"),
+    )
+    @ddt.unpack
+    def test_delete_key_error(self, scope, expected):
+        key = KeyValueStore.Key(scope, None, None, expected)
         self.kvs.delete(key)
         with pytest.raises(KeyError):
             self.kvs.get(key)
         assert not self.kvs.has(key)
 
-    def test_delete(self):
-        yield (self._check_delete_key_error, KeyValueStore.Key(Scope.content, None, None, 'foo'))
-        yield (self._check_delete_default, KeyValueStore.Key(Scope.children, None, None, 'children'), [])
-        yield (self._check_delete_key_error, KeyValueStore.Key(Scope.settings, None, None, 'meta'))
+    def test_delete_key_default(self):
+        key = KeyValueStore.Key(Scope.children, None, None, "children")
+        self.kvs.delete(key)
+        assert self.kvs.get(key) == []
+        assert self.kvs.has(key)
 
     def test_delete_invalid_scope(self):
         for scope in (Scope.preferences, Scope.user_info, Scope.user_state, Scope.parent):

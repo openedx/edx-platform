@@ -2,6 +2,7 @@
 
 (function(sandbox) {
     'use strict';
+
     require(['jquery', 'backbone', 'cms/js/main', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'jquery.cookie'],
         function($, Backbone, main, AjaxHelpers) {
             describe('CMS', function() {

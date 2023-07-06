@@ -23,8 +23,9 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
-from .helpers import create_xblock, remove_entrance_exam_graders
-from .block import delete_item
+from ..helpers import remove_entrance_exam_graders
+from cms.djangoapps.contentstore.xblock_storage_handlers.create_xblock import create_xblock
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import delete_item
 
 __all__ = ['entrance_exam', ]
 
@@ -176,9 +177,9 @@ def _get_entrance_exam(request, course_key):
     except InvalidKeyError:
         return HttpResponse(status=404)
     try:
-        exam_descriptor = modulestore().get_item(exam_key)
+        exam_block = modulestore().get_item(exam_key)
         return HttpResponse(  # lint-amnesty, pylint: disable=http-response-with-content-type-json
-            dump_js_escaped_json({'locator': str(exam_descriptor.location)}),
+            dump_js_escaped_json({'locator': str(exam_block.location)}),
             status=200, content_type='application/json')
     except ItemNotFoundError:
         return HttpResponse(status=404)

@@ -1,6 +1,10 @@
 # Do things in edx-platform
-.PHONY: clean extract_translations help pull pull_translations push_translations requirements shell upgrade
-.PHONY: api-docs docs guides swagger
+.PHONY: base-requirements check-types clean \
+  compile-requirements detect_changed_source_translations dev-requirements \
+  docker_auth docker_build docker_push docker_tag docs extract_translations \
+  guides help lint-imports local-requirements pre-requirements pull \
+  pull_translations push_translations requirements shell swagger \
+  technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
 PRIVATE_FILES := $(shell mktemp -u /tmp/private_files.XXXXXX)
@@ -19,24 +23,17 @@ clean: ## archive and delete most git-ignored files
 	tar xf $(PRIVATE_FILES)
 	rm $(PRIVATE_FILES)
 
-SWAGGER = docs/swagger.yaml
+SWAGGER = docs/lms-openapi.yaml
 
-docs: api-docs guides technical-docs ## build all the developer documentation for this repository
+docs: guides technical-docs ## build all the developer documentation for this repository
 
 swagger: ## generate the swagger.yaml file
 	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=edx_api_doc_tools.ApiSchemaGenerator -o $(SWAGGER)
 
-api-docs-sphinx: swagger	## generate the sphinx source files for api-docs
-	rm -f docs/api/gen/*
-	python docs/sw2sphinxopenapi.py $(SWAGGER) docs/api/gen
-
-api-docs: api-docs-sphinx	## build the REST api docs
-	cd docs/api; make html
-
 technical-docs:  ## build the technical docs
 	$(MAKE) -C docs/technical html
 
-guides:	## build the developer guide docs
+guides:	swagger ## build the developer guide docs
 	cd docs/guides; make clean html
 
 extract_translations: ## extract localizable strings from sources
@@ -64,8 +61,8 @@ pull: ## update the Docker image used by "make shell"
 	docker pull edxops/edxapp:latest
 
 pre-requirements: ## install Python requirements for running pip-tools
-	pip install -qr requirements/pip.txt
-	pip install -qr requirements/edx/pip-tools.txt
+	pip install -r requirements/pip.txt
+	pip install -r requirements/pip-tools.txt
 
 local-requirements:
 # 	edx-platform installs some Python projects from within the edx-platform repo itself.
@@ -74,7 +71,7 @@ local-requirements:
 dev-requirements: pre-requirements
 	@# The "$(wildcard..)" is to include private.txt if it exists, and make no mention
 	@# of it if it does not.  Shell wildcarding can't do that with default options.
-	pip-sync -q requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
+	pip-sync requirements/edx/development.txt $(wildcard requirements/edx/private.txt)
 	make local-requirements
 
 base-requirements: pre-requirements
@@ -96,7 +93,6 @@ shell: ## launch a bash shell in a Docker container with all edx-platform depend
 
 # Order is very important in this list: files must appear after everything they include!
 REQ_FILES = \
-	requirements/edx/pip-tools \
 	requirements/edx/coverage \
 	requirements/edx/doc \
 	requirements/edx/paver \
@@ -114,27 +110,34 @@ COMMON_CONSTRAINTS_TXT=requirements/common_constraints.txt
 .PHONY: $(COMMON_CONSTRAINTS_TXT)
 $(COMMON_CONSTRAINTS_TXT):
 	wget -O "$(@)" https://raw.githubusercontent.com/edx/edx-lint/master/edx_lint/files/common_constraints.txt || touch "$(@)"
-	echo "$(COMMON_CONSTRAINTS_TEMP_COMMENT)" | cat - $(@) > temp && mv temp $(@)
+	printf "$(COMMON_CONSTRAINTS_TEMP_COMMENT)" | cat - $(@) > temp && mv temp $(@)
 
 compile-requirements: export CUSTOM_COMPILE_COMMAND=make upgrade
-compile-requirements: $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
-	pip install -q pip-tools
-	pip-compile --allow-unsafe --upgrade -o requirements/edx/pip.txt requirements/edx/pip.in
+compile-requirements: pre-requirements $(COMMON_CONSTRAINTS_TXT) ## Re-compile *.in requirements to *.txt
+	@# Bootstrapping: Rebuild pip and pip-tools first, and then install them
+	@# so that if there are any failures we'll know now, rather than the next
+	@# time someone tries to use the outputs.
+	pip-compile -v --allow-unsafe ${COMPILE_OPTS} -o requirements/pip.txt requirements/pip.in
+	pip install -r requirements/pip.txt
+
+	pip-compile -v ${COMPILE_OPTS} -o requirements/pip-tools.txt requirements/pip-tools.in
+	pip install -r requirements/pip-tools.txt
 
 	@ export REBUILD='--rebuild'; \
 	for f in $(REQ_FILES); do \
 		echo ; \
 		echo "== $$f ===============================" ; \
-		echo "pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in"; \
-		pip-compile -v --no-emit-trusted-host --no-emit-index-url $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
+		echo "pip-compile -v $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in"; \
+		pip-compile -v $$REBUILD ${COMPILE_OPTS} -o $$f.txt $$f.in || exit 1; \
 		export REBUILD=''; \
 	done
 
-	pip install -qr requirements/edx/pip.txt
-	pip install -qr requirements/edx/pip-tools.txt
-
-upgrade: pre-requirements  ## update the pip requirements files to use the latest releases satisfying our constraints
+upgrade:  ## update the pip requirements files to use the latest releases satisfying our constraints
 	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade"
+
+upgrade-package: ## update just one package to the latest usable release
+	@test -n "$(package)" || { echo "\nUsage: make upgrade_package package=...\n"; exit 1; }
+	$(MAKE) compile-requirements COMPILE_OPTS="--upgrade-package $(package)"
 
 check-types: ## run static type-checking tests
 	mypy

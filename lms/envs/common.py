@@ -54,6 +54,7 @@ from enterprise.constants import (
     ENTERPRISE_CATALOG_ADMIN_ROLE,
     ENTERPRISE_DASHBOARD_ADMIN_ROLE,
     ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
+    ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
     ENTERPRISE_OPERATOR_ROLE
 )
@@ -1215,6 +1216,18 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 TPA_PROVIDER_BURST_THROTTLE = '10/min'
 TPA_PROVIDER_SUSTAINED_THROTTLE = '50/hr'
 
+# .. toggle_name: TPA_AUTOMATIC_LOGOUT_ENABLED
+# .. toggle_implementation: DjangoSetting
+# .. toggle_default: False
+# .. toggle_description: Redirect the user to the TPA logout URL if this flag is enabled, the
+#   TPA logout URL is configured, and the user logs in through TPA.
+# .. toggle_use_cases: opt_in
+# .. toggle_warning: Enabling this toggle skips rendering logout.html, which is used to log the user out
+#   from the different IDAs. To ensure the user is logged out of all the IDAs be sure to redirect
+#   back to <LMS>/logout after logging out of the TPA.
+# .. toggle_creation_date: 2023-05-07
+TPA_AUTOMATIC_LOGOUT_ENABLED = False
+
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
 import tempfile  # pylint: disable=wrong-import-position,wrong-import-order
@@ -1349,6 +1362,11 @@ ELASTIC_SEARCH_CONFIG = [
         'port': 9200
     }
 ]
+
+# .. setting_name: ELASTIC_SEARCH_INDEX_PREFIX
+# .. setting_default: ''
+# .. setting_description: Specifies the prefix used when namixng elasticsearch indexes related to edx-search.
+ELASTICSEARCH_INDEX_PREFIX = ""
 
 VIDEO_CDN_URL = {
     'EXAMPLE_COUNTRY_CODE': "http://example.com/edx/video?s3_url="
@@ -1515,6 +1533,7 @@ GOOGLE_ANALYTICS_ACCOUNT = None
 GOOGLE_SITE_VERIFICATION_ID = ''
 GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
 GOOGLE_ANALYTICS_TRACKING_ID = None
+GOOGLE_ANALYTICS_4_ID = None
 
 ######################## BRANCH.IO ###########################
 BRANCH_IO_KEY = ''
@@ -1612,7 +1631,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': DATA_DIR,
+                        'fs_root': lambda settings: settings.DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
@@ -1622,7 +1641,7 @@ MODULESTORE = {
                     'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_block.HiddenBlock',
-                        'fs_root': DATA_DIR,
+                        'fs_root': lambda settings: settings.DATA_DIR,
                         'render_template': 'common.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 }
@@ -1630,6 +1649,7 @@ MODULESTORE = {
         }
     }
 }
+
 
 DATABASES = {
     # edxapp's edxapp-migrate scripts and the edxapp_migrate play
@@ -1639,7 +1659,7 @@ DATABASES = {
         'ATOMIC_REQUESTS': True,
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'NAME': 'edxapp',
         'OPTIONS': {},
         'PASSWORD': 'password',
@@ -1649,7 +1669,7 @@ DATABASES = {
     'read_replica': {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'NAME': 'edxapp',
         'OPTIONS': {},
         'PASSWORD': 'password',
@@ -1659,7 +1679,7 @@ DATABASES = {
     'student_module_history': {
         'CONN_MAX_AGE': 0,
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'NAME': 'edxapp_csmh',
         'OPTIONS': {},
         'PASSWORD': 'password',
@@ -1764,7 +1784,6 @@ SITE_NAME = "localhost"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
-
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
@@ -2117,6 +2136,8 @@ CREDIT_NOTIFICATION_CACHE_TIMEOUT = 5 * 60 * 60
 
 MIDDLEWARE = [
     'openedx.core.lib.x_forwarded_for.middleware.XForwardedForMiddleware',
+    'edx_django_utils.security.csp.middleware.content_security_policy_middleware',
+
     'crum.CurrentRequestUserMiddleware',
 
     # Resets the request cache.
@@ -2693,7 +2714,8 @@ REQUIRE_JS_PATH_OVERRIDES = {
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json')
+        'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json'),
+        'LOADER_CLASS': 'xmodule.util.xmodule_django.XModuleWebpackLoader',
     },
     'WORKERS': {
         'BUNDLE_DIR_NAME': 'bundles/',
@@ -2927,6 +2949,7 @@ YOUTUBE = {
     'TRANSCRIPTS': {
         'CAPTION_TRACKS_REGEX': r"captionTracks\"\:\[(?P<caption_tracks>[^\]]+)",
         'YOUTUBE_URL_BASE': 'https://www.youtube.com/watch?v=',
+        'ALLOWED_LANGUAGE_CODES': ["en", "en-US", "en-GB"],
     },
 
     'IMAGE_API': 'http://img.youtube.com/vi/{youtube_id}/0.jpg',  # /maxresdefault.jpg for 1920*1080
@@ -2952,7 +2975,10 @@ INSTALLED_APPS = [
     'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'django.contrib.staticfiles',
+
+    # Tweaked version of django.contrib.staticfiles
+    'openedx.core.djangoapps.staticfiles.apps.EdxPlatformStaticFilesConfig',
+
     'django_celery_results',
 
     # Common Initialization
@@ -3262,6 +3288,9 @@ INSTALLED_APPS = [
 
     # MFE API
     'lms.djangoapps.mfe_config_api',
+
+    # Notifications
+    'openedx.core.djangoapps.notifications',
 ]
 
 ######################### CSRF #########################################
@@ -3289,6 +3318,7 @@ REST_FRAMEWORK = {
         'user': '60/minute',
         'service_user': '800/minute',
         'registration_validation': '30/minute',
+        'high_service_user': '2000/minute',
     },
 }
 
@@ -4215,7 +4245,7 @@ ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
 ECOMMERCE_API_SIGNING_KEY = 'SET-ME-PLEASE'
 
 # Exam Service
-EXAMS_SERVICE_URL = 'http://localhost:8740/api/v1'
+EXAMS_SERVICE_URL = 'http://localhost:18740/api/v1'
 
 TOKEN_SIGNING = {
     'JWT_ISSUER': 'http://127.0.0.1:8740',
@@ -4572,6 +4602,9 @@ ENTERPRISE_ALL_SERVICE_USERNAMES = [
     'license_manager_worker',
     'enterprise_catalog_worker',
     'enterprise_channel_worker',
+    'enterprise_access_worker',
+    'enterprise_subsidy_worker',
+    'subscriptions_worker'
 ]
 
 
@@ -4621,6 +4654,7 @@ SYSTEM_TO_FEATURE_ROLE_MAPPING = {
         ENTERPRISE_CATALOG_ADMIN_ROLE,
         ENTERPRISE_ENROLLMENT_API_ADMIN_ROLE,
         ENTERPRISE_REPORTING_CONFIG_ADMIN_ROLE,
+        ENTERPRISE_FULFILLMENT_OPERATOR_ROLE,
     ],
 }
 
@@ -4786,6 +4820,9 @@ GENERAL_RECOMMENDATION = {}
 
 GENERAL_RECOMMENDATIONS = []
 
+### DEFAULT KEY DICTIONARY FOR CROSS_PRODUCT_RECOMMENDATIONS ###
+CROSS_PRODUCT_RECOMMENDATIONS_KEYS = {}
+
 ############### Settings for Retirement #####################
 # .. setting_name: RETIRED_USERNAME_PREFIX
 # .. setting_default: retired__user_
@@ -4926,6 +4963,10 @@ DISCUSSIONS_MICROFRONTEND_URL = None
 # .. setting_default: None
 # .. setting_description: Base URL of the discussions micro-frontend google form based feedback.
 DISCUSSIONS_MFE_FEEDBACK_URL = None
+# .. setting_name: EXAMS_DASHBOARD_MICROFRONTEND_URL
+# .. setting_default: None
+# .. setting_description: Base URL of the exams dashboard micro-frontend for instructors.
+EXAMS_DASHBOARD_MICROFRONTEND_URL = None
 # .. toggle_name: ENABLE_AUTHN_RESET_PASSWORD_HIBP_POLICY
 # .. toggle_implementation: DjangoSetting
 # .. toggle_default: False
@@ -5285,6 +5326,8 @@ URLS_2U_LOBS = {
     'boot_camps': 'https://www.edx.org/boot-camps',
 }
 
+############ Settings for externally hosted executive education courses ############
+EXEC_ED_LANDING_PAGE = "https://www.getsmarter.com/account"
 
 ############## PLOTLY ##############
 
@@ -5295,3 +5338,16 @@ ENTERPRISE_PLOTLY_SECRET = "I am a secret"
 ENTERPRISE_MANUAL_REPORTING_CUSTOMER_UUIDS = []
 
 AVAILABLE_DISCUSSION_TOURS = []
+
+######################## Subscriptions API SETTINGS ########################
+SUBSCRIPTIONS_ROOT_URL = ""
+SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
+
+SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
+SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
+SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
+SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
+
+############## NOTIFICATIONS EXPIRY ##############
+NOTIFICATIONS_EXPIRY = 60
+EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000

@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'utility',
@@ -116,7 +117,7 @@
                             mode: this.activeForm
                         })
                     )
-                )
+                );
                 this.postRender();
 
                 return this;
@@ -146,8 +147,8 @@
                         method: data.method,
                         url: data.submit_url
                     });
-                    var isTpaSaml = this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl ?
-                        this.thirdPartyAuth.finishAuthUrl.indexOf('tpa-saml') >= 0 : false;
+                    var isTpaSaml = this.thirdPartyAuth && this.thirdPartyAuth.finishAuthUrl
+                        ? this.thirdPartyAuth.finishAuthUrl.indexOf('tpa-saml') >= 0 : false;
 
                     this.subview.login = new LoginView({
                         fields: data.fields,
@@ -271,7 +272,6 @@
 
                 // Load the form. Institution login is always refreshed since it changes based on the previous form.
                 if (!this.form.isLoaded($form) || type == 'institution_login') {
-
                     // We need a special case for loading reset form as there is mismatch of form id
                     // value ie 'password-reset' vs load function name ie 'reset'
                     if (type === 'password-reset') {

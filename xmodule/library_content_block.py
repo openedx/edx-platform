@@ -17,7 +17,7 @@ from lazy import lazy
 from lxml import etree
 from lxml.etree import XMLSyntaxError
 from opaque_keys.edx.locator import LibraryLocator
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.completable import XBlockCompletionMode
@@ -97,22 +97,16 @@ class LibraryContentBlock(
 
     preview_view_js = {
         'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = "VerticalDescriptor"
     studio_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/vertical/edit.js'),
+            resource_filename(__name__, 'js/src/vertical/edit.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     show_in_read_only_mode = True
@@ -468,7 +462,7 @@ class LibraryContentBlock(
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 
-    def get_child_descriptors(self):
+    def get_child_blocks(self):
         """
         Return only the subset of our children relevant to the current student.
         """
@@ -701,7 +695,7 @@ class LibraryContentBlock(
     def has_dynamic_children(self):
         """
         Inform the runtime that our children vary per-user.
-        See get_child_descriptors() above
+        See get_child_blocks() above
         """
         return True
 
@@ -714,7 +708,7 @@ class LibraryContentBlock(
         This overwrites the get_content_titles method included in x_module by default.
         """
         titles = []
-        for child in self.get_child_descriptors():
+        for child in self.get_child_blocks():
             titles.extend(child.get_content_titles())
         return titles
 

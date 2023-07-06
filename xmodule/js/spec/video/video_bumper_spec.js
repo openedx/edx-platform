@@ -1,5 +1,6 @@
 (function(WAIT_TIMEOUT) {
     'use strict';
+
     describe('VideoBumper', function() {
         var state, oldOTBD, waitForPlaying;
 
@@ -68,8 +69,7 @@
             state.bumperState.videoSaveStatePlugin.saveState = saveState;
             state.el.trigger('ended');
             jasmine.clock().tick(20);
-            expect(saveState).toHaveBeenCalledWith(true, {
-                bumper_last_view_date: true});
+            expect(saveState).toHaveBeenCalledWith(true, {bumper_last_view_date: true});
         });
 
         it('can save appropriate states correctly on skip', function() {
@@ -78,8 +78,7 @@
             state.bumperState.videoBumper.skip();
             expect(state.storage.getItem('isBumperShown')).toBeTruthy();
             jasmine.clock().tick(20);
-            expect(saveState).toHaveBeenCalledWith(true, {
-                bumper_last_view_date: true});
+            expect(saveState).toHaveBeenCalledWith(true, {bumper_last_view_date: true});
         });
 
         it('can save appropriate states correctly on error', function() {
@@ -88,8 +87,7 @@
             state.el.triggerHandler('error');
             expect(state.storage.getItem('isBumperShown')).toBeTruthy();
             jasmine.clock().tick(20);
-            expect(saveState).toHaveBeenCalledWith(true, {
-                bumper_last_view_date: true});
+            expect(saveState).toHaveBeenCalledWith(true, {bumper_last_view_date: true});
         });
 
         it('can save appropriate states correctly on skip and do not show again', function() {
@@ -98,8 +96,7 @@
             state.bumperState.videoBumper.skipAndDoNotShowAgain();
             expect(state.storage.getItem('isBumperShown')).toBeTruthy();
             jasmine.clock().tick(20);
-            expect(saveState).toHaveBeenCalledWith(true, {
-                bumper_last_view_date: true, bumper_do_not_show_again: true});
+            expect(saveState).toHaveBeenCalledWith(true, {bumper_last_view_date: true, bumper_do_not_show_again: true});
         });
 
         it('can destroy itself', function() {

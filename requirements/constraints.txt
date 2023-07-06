@@ -14,18 +14,25 @@
 
 # As it is not clarified what exact breaking changes will be introduced as per
 # the next major release, ensure the installed version is within boundaries.
-celery>=5.2.2,<6.0.0
+# celery>=5.2.2,<6.0.0
+
+# 5.3.0 versions breaking timezone related tests. Adding pin for time being to clear upgrade pipeline. Unpin above
+# after fixing these failures.
+celery<5.3.0
+kombu<5.3.0
+
 
 # required for celery>=5.2.0;<5.3.0
 click>=8.0,<9.0
 
 # django-storages version 1.9 drops support for boto storage backend.
-django-storages<1.9
+# 1.9 gives an error for details https://github.com/jschneier/django-storages/issues/831
+django-storages==1.9.1
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.61.4
+edx-enterprise==3.68.1
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -39,9 +46,6 @@ matplotlib<3.4.0
 # constrained in opaque_keys. migration guide here: https://pymongo.readthedocs.io/en/4.0/migrate-to-pymongo4.html
 # Major upgrade will be done in separate ticket.
 pymongo<4.0.0
-
-# python3-saml==1.10.0 version started breaking a11y tests
-python3-saml<1.10.0
 
 # greater version has breaking changes and requires some migration steps.
 django-webpack-loader==0.7.0
@@ -73,7 +77,40 @@ pycodestyle<2.9.0
 # and snowflake-connector-python>2.8.0 is released.
 pyopenssl==22.0.0
 
-
 cryptography==38.0.4 # greater version has some issues with openssl.
 
 pylint<2.16.0 # greater version failing quality test. Fix them in seperate ticket.
+
+
+# Deprecated version of the AWS SDK;
+# we should stop using this
+boto==2.39.0
+boto3==1.7.0                       # Amazon Web Services SDK for Python
+botocore==1.10.84                  # via boto3, s3transfer
+
+# adding these constraints to minimize boto3 and botocore changeset
+social-auth-core==4.3.0
+babel==2.11.0
+social-auth-app-django==5.0.0
+algoliasearch==2.6.3
+django-ipware==4.0.2
+
+# pytz>2022 has major changes which are causing test failures.
+# Pinning this version for now so this could be fixed in a separate PR later on
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/32093
+pytz<2023
+
+# urllib3>=2.0.0 conflicts with elastic search && snowflake-connector-python packages
+# which require urllib3<2 for now.
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222
+urllib3<2.0.0
+
+# Sphinx==5.3.0 requires docutils<0.20
+# Issue to unpin Sphinx to resolve this constraint: https://github.com/openedx/edx-lint/issues/338
+docutils<0.20
+
+# greater version has dropped few dependencies. Fix this in other ticket.
+drf-yasg<1.21.6
+
+# incremental upgrade approach. After successfull deploy remove this pin and try latest version.
+djangorestframework<3.14.0

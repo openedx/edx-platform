@@ -4,6 +4,7 @@
         [],
         function() {
             'use strict';
+
             /**
  * Provides convenient way to process big amount of data without UI blocking.
  *
@@ -56,4 +57,3 @@
             return AsyncProcess;
         });
 }(RequireJS.define));
-

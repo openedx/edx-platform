@@ -1,6 +1,6 @@
 /* globals Logger */
 
-export class CourseSock {  // eslint-disable-line import/prefer-default-export
+export class CourseSock { // eslint-disable-line import/prefer-default-export
     constructor() {
         const $toggleActionButton = $('.action-toggle-verification-sock');
         const $verificationSock = $('.verification-sock .verification-main-panel');
@@ -11,7 +11,7 @@ export class CourseSock {  // eslint-disable-line import/prefer-default-export
 
         // Behavior to fix button to bottom of screen on scroll
         const fixUpgradeButton = () => {
-            if (!$upgradeToVerifiedButton.is(':visible')) return;
+            if (!$upgradeToVerifiedButton.is(':visible')) { return; }
 
             // Grab the current scroll location
             const documentBottom = $(window).scrollTop() + $(window).height();

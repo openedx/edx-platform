@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/utils/utils', 'edx-ui-toolkit/js/utils/html-utils'
     ], function($, _, Annotator, Utils, HtmlUtils) {
@@ -18,21 +19,21 @@
         /**
      * Modifies Annotator.Plugin.Auth.haveValidToken to make it work with a new
      * token format.
-     **/
+     * */
         Annotator.Plugin.Auth.prototype.haveValidToken = function() {
             return (
-                this._unsafeToken &&
-            this._unsafeToken.sub &&
-            this._unsafeToken.exp &&
-            this._unsafeToken.iat &&
-            this.timeToExpiry() > 0
+                this._unsafeToken
+            && this._unsafeToken.sub
+            && this._unsafeToken.exp
+            && this._unsafeToken.iat
+            && this.timeToExpiry() > 0
             );
         };
 
         /**
      * Modifies Annotator.Plugin.Auth.timeToExpiry to make it work with a new
      * token format.
-     **/
+     * */
         Annotator.Plugin.Auth.prototype.timeToExpiry = function() {
             var now = new Date().getTime() / 1000,
                 expiry = this._unsafeToken.exp,
@@ -40,7 +41,6 @@
 
             return (timeToExpiry > 0) ? timeToExpiry : 0;
         };
-
 
         Annotator.Plugin.Tags.prototype.updateField = _.compose(
             function() {
@@ -80,7 +80,7 @@
      * attributes to the <span class="annotator-hl"> markup that encloses the
      * note. These are then focusable via the TAB key and are accessible to
      * screen readers.
-     **/
+     * */
         Annotator.prototype.highlightRange = _.compose(
             function(results) {
                 $('.annotator-hl', this.wrapper).attr({
@@ -95,7 +95,7 @@
         /**
      * Modifies Annotator.destroy to unbind click.edxnotes:freeze from the
      * document and reset isFrozen to default value, false.
-     **/
+     * */
         Annotator.prototype.destroy = _.compose(
             Annotator.prototype.destroy,
             function() {
@@ -121,7 +121,7 @@
         /**
      * Modifies Annotator.Viewer.html template to make viewer div focusable.
      * Also adds a close button and necessary i18n attributes to all buttons.
-    **/
+    * */
         Annotator.Viewer.prototype.html = {
             element: [
                 '<div class="annotator-outer annotator-viewer">',
@@ -154,7 +154,7 @@
         /**
      * Overrides Annotator._setupViewer to add a "click" event on viewer and to
      * improve line breaks.
-     **/
+     * */
         Annotator.prototype._setupViewer = function() {
             var self = this;
             this.viewer = new Annotator.Viewer({readOnly: this.options.readOnly});
@@ -185,7 +185,7 @@
         /**
      * Modifies Annotator.Editor.html template to add tabindex = -1 to
      * form.annotator-widget and reverse order of Save and Cancel buttons.
-     **/
+     * */
         Annotator.Editor.prototype.html = [
             '<div class="annotator-outer annotator-editor">',
             '<form class="annotator-widget" tabindex="-1">',
@@ -204,13 +204,12 @@
             '</div>'
         ].join('');
 
-
         /**
      * Modifies Annotator.Editor.show, in the case of a keydown event, to remove
      * focus from Save button and put it on form.annotator-widget instead.
      *
      * Also add a sr label for note textarea.
-     **/
+     * */
         Annotator.Editor.prototype.show = _.compose(
             function(event) {
             // Add screen reader label for the note area. Note that the id of the tags element will not always be "0".
@@ -240,13 +239,13 @@
      * Removes the textarea keydown event handler as it triggers 'processKeypress'
      * which hides the viewer on ESC and saves on ENTER. We will define different
      * behaviors for these in /plugins/accessibility.js
-     **/
+     * */
         delete Annotator.Editor.prototype.events['textarea keydown'];
 
         /**
      * Modifies Annotator.onHighlightMouseover to avoid showing the viewer if the
      * editor is opened.
-     **/
+     * */
         // xss-lint: disable=javascript-jquery-insertion
         Annotator.prototype.onHighlightMouseover = _.wrap(
             Annotator.prototype.onHighlightMouseover,
@@ -262,7 +261,7 @@
 
         /**
      * Modifies Annotator._setupWrapper to add a "click" event on '.annotator-hl'.
-     **/
+     * */
         Annotator.prototype._setupWrapper = _.compose(
             function() {
                 this.element.on('click', '.annotator-hl', _.bind(this.onHighlightClick, this));

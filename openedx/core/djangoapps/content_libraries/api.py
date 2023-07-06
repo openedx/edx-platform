@@ -92,10 +92,13 @@ from openedx.core.djangoapps.content_libraries.signals import (
     LIBRARY_BLOCK_UPDATED,
     LIBRARY_BLOCK_DELETED,
 )
-from openedx.core.djangoapps.olx_rest_api.block_serializer import XBlockSerializer
-from openedx.core.djangoapps.xblock.api import get_block_display_name, load_block
-from openedx.core.djangoapps.xblock.learning_context.manager import get_learning_context_impl
-from openedx.core.djangoapps.xblock.runtime.olx_parsing import XBlockInclude
+from openedx.core.djangoapps.xblock.api import (
+    get_block_display_name,
+    get_learning_context_impl,
+    load_block,
+    XBlockInclude,
+)
+from openedx.core.lib.xblock_serializer.api import serialize_modulestore_block_for_blockstore
 from openedx.core.lib.blockstore_api import (
     get_bundle,
     get_bundles,
@@ -961,7 +964,7 @@ def get_allowed_block_types(library_key):  # pylint: disable=unused-argument
     # This import breaks in the LMS so keep it here. The LMS doesn't generally
     # use content libraries APIs directly but some tests may want to use them to
     # create libraries and then test library learning or course-library integration.
-    from cms.djangoapps.contentstore.views.helpers import xblock_type_display_name
+    from cms.djangoapps.contentstore.helpers import xblock_type_display_name
     # TODO: return support status and template options
     # See cms/djangoapps/contentstore/views/component.py
     block_types = sorted(name for name, class_ in XBlock.load_classes())
@@ -1258,7 +1261,7 @@ class EdxModulestoreImportClient(BaseEdxImportClient):
         Get block OLX by serializing it from modulestore directly.
         """
         block = self.modulestore.get_item(block_key)
-        data = XBlockSerializer(block)
+        data = serialize_modulestore_block_for_blockstore(block)
         return {'olx': data.olx_str,
                 'static_files': {s.name: s for s in data.static_files}}
 

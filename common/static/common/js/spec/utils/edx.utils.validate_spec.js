@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['jquery', 'common/js/utils/edx.utils.validate'],
         function($, EdxUtilsValidate) {
             describe('EdxUtilsValidate', function() {

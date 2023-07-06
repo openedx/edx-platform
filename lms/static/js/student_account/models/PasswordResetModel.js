@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['jquery', 'backbone'],
         function($, Backbone) {
             return Backbone.Model.extend({

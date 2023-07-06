@@ -307,7 +307,7 @@ def add_staff_markup(user, disable_staff_debug_info, block, view, frag, context)
     source_file = block.source_file  # source used to generate the problem XML, eg latex or word
 
     # Useful to indicate to staff if problem has been released or not.
-    # TODO (ichuang): use _has_access_descriptor.can_load in lms.courseware.access,
+    # TODO (ichuang): use _has_access_block.can_load in lms.courseware.access,
     # instead of now>mstart comparison here.
     now = datetime.datetime.now(UTC)
     is_released = "unknown"

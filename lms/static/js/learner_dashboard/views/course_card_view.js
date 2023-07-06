@@ -9,6 +9,8 @@ import ExpiredNotificationView from './expired_notification_view';
 import CourseEnrollView from './course_enroll_view';
 import EntitlementView from './course_entitlement_view';
 
+import SubscriptionModel from '../models/program_subscription_model';
+
 import pageTpl from '../../../templates/learner_dashboard/course_card.underscore';
 
 class CourseCardView extends Backbone.View {
@@ -24,6 +26,9 @@ class CourseCardView extends Backbone.View {
         this.enrollModel = new EnrollModel();
         if (options.context) {
             this.urlModel = new Backbone.Model(options.context.urls);
+            this.subscriptionModel = new SubscriptionModel({
+                context: options.context,
+            });
             this.enrollModel.urlRoot = this.urlModel.get('commerce_api_url');
         }
         this.context = options.context || {};
@@ -86,6 +91,8 @@ class CourseCardView extends Backbone.View {
             this.upgradeMessage = new UpgradeMessageView({
                 $el: $upgradeMessage,
                 model: this.model,
+                subscriptionModel: this.subscriptionModel,
+                isSubscriptionEligible: this.context.isSubscriptionEligible,
             });
 
             $certStatus.remove();

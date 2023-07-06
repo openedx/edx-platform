@@ -22,6 +22,8 @@ from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: di
 from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+# noinspection PyUnresolvedReferences
+from xmodule.tests.helpers import override_descriptor_system  # pylint: disable=unused-import
 from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: disable=wrong-import-order
     Transcript,
@@ -29,7 +31,7 @@ from xmodule.video_block.transcripts_utils import (  # lint-amnesty, pylint: dis
     get_transcript,
     subs_filename,
 )
-from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.x_module import STUDENT_VIEW
 
 from .helpers import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
@@ -131,6 +133,7 @@ def attach_bumper_transcript(item, filename, lang="en"):
     item.video_bumper["transcripts"][lang] = filename
 
 
+@pytest.mark.usefixtures("override_descriptor_system")
 class BaseTestVideoXBlock(BaseTestXmodule):
     """Base class for VideoXBlock tests."""
 
@@ -169,12 +172,12 @@ class TestVideo(BaseTestVideoXBlock):
         assert status_codes.pop() == 404
 
     def test_handle_ajax_for_speed_with_nan(self):
-        self.item_descriptor.handle_ajax('save_user_state', {'speed': json.dumps(1.0)})
-        assert self.item_descriptor.speed == 1.0
-        assert self.item_descriptor.global_speed == 1.0
+        self.block.handle_ajax('save_user_state', {'speed': json.dumps(1.0)})
+        assert self.block.speed == 1.0
+        assert self.block.global_speed == 1.0
 
         # try to set NaN value for speed.
-        response = self.item_descriptor.handle_ajax(
+        response = self.block.handle_ajax(
             'save_user_state', {'speed': json.dumps(float('NaN'))}
         )
 
@@ -183,8 +186,8 @@ class TestVideo(BaseTestVideoXBlock):
         assert json.loads(response)['error'] == expected_error
 
         # verify that the speed and global speed are still 1.0
-        assert self.item_descriptor.speed == 1.0
-        assert self.item_descriptor.global_speed == 1.0
+        assert self.block.speed == 1.0
+        assert self.block.global_speed == 1.0
 
     def test_handle_ajax(self):
 
@@ -203,41 +206,41 @@ class TestVideo(BaseTestVideoXBlock):
                 HTTP_X_REQUESTED_WITH='XMLHttpRequest')
             assert response.status_code == 200
 
-        assert self.item_descriptor.speed is None
-        self.item_descriptor.handle_ajax('save_user_state', {'speed': json.dumps(2.0)})
-        assert self.item_descriptor.speed == 2.0
-        assert self.item_descriptor.global_speed == 2.0
+        assert self.block.speed is None
+        self.block.handle_ajax('save_user_state', {'speed': json.dumps(2.0)})
+        assert self.block.speed == 2.0
+        assert self.block.global_speed == 2.0
 
-        assert self.item_descriptor.saved_video_position == timedelta(0)
-        self.item_descriptor.handle_ajax('save_user_state', {'saved_video_position': "00:00:10"})
-        assert self.item_descriptor.saved_video_position == timedelta(0, 10)
+        assert self.block.saved_video_position == timedelta(0)
+        self.block.handle_ajax('save_user_state', {'saved_video_position': "00:00:10"})
+        assert self.block.saved_video_position == timedelta(0, 10)
 
-        assert self.item_descriptor.transcript_language == 'en'
-        self.item_descriptor.handle_ajax('save_user_state', {'transcript_language': "uk"})
-        assert self.item_descriptor.transcript_language == 'uk'
+        assert self.block.transcript_language == 'en'
+        self.block.handle_ajax('save_user_state', {'transcript_language': "uk"})
+        assert self.block.transcript_language == 'uk'
 
-        assert self.item_descriptor.bumper_do_not_show_again is False
-        self.item_descriptor.handle_ajax('save_user_state', {'bumper_do_not_show_again': True})
-        assert self.item_descriptor.bumper_do_not_show_again is True
+        assert self.block.bumper_do_not_show_again is False
+        self.block.handle_ajax('save_user_state', {'bumper_do_not_show_again': True})
+        assert self.block.bumper_do_not_show_again is True
 
         with freezegun.freeze_time(now()):
-            assert self.item_descriptor.bumper_last_view_date is None
-            self.item_descriptor.handle_ajax('save_user_state', {'bumper_last_view_date': True})
-            assert self.item_descriptor.bumper_last_view_date == now()
+            assert self.block.bumper_last_view_date is None
+            self.block.handle_ajax('save_user_state', {'bumper_last_view_date': True})
+            assert self.block.bumper_last_view_date == now()
 
-        response = self.item_descriptor.handle_ajax('save_user_state', {'demoo�': "sample"})
+        response = self.block.handle_ajax('save_user_state', {'demoo�': "sample"})
         assert json.loads(response)['success'] is True
 
     def get_handler_url(self, handler, suffix):
         """
-        Return the URL for the specified handler on self.item_descriptor.
+        Return the URL for the specified handler on self.block.
         """
-        return self.item_descriptor.xmodule_runtime.handler_url(
-            self.item_descriptor, handler, suffix
+        return self.block.runtime.handler_url(
+            self.block, handler, suffix
         ).rstrip('/?')
 
     def tearDown(self):
-        _clear_assets(self.item_descriptor.location)
+        _clear_assets(self.block.location)
         super().tearDown()
 
 
@@ -265,24 +268,23 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, p
 
     def setUp(self):
         super().setUp()
-        self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor
+        self.block.render(STUDENT_VIEW)
         self.subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 
     def test_available_translation_en(self):
         good_sjson = _create_file(json.dumps(self.subs))
-        _upload_sjson_file(good_sjson, self.item_descriptor.location)
-        self.item.sub = _get_subs_id(good_sjson.name)
+        _upload_sjson_file(good_sjson, self.block.location)
+        self.block.sub = _get_subs_id(good_sjson.name)
 
         request = Request.blank('/available_translations')
-        response = self.item.transcript(request=request, dispatch='available_translations')
+        response = self.block.transcript(request=request, dispatch='available_translations')
         assert json.loads(response.body.decode('utf-8')) == ['en']
 
     def test_available_translation_non_en(self):
-        _upload_file(_create_srt_file(), self.item_descriptor.location, os.path.split(self.srt_file.name)[1])
+        _upload_file(_create_srt_file(), self.block.location, os.path.split(self.srt_file.name)[1])
 
         request = Request.blank('/available_translations')
-        response = self.item.transcript(request=request, dispatch='available_translations')
+        response = self.block.transcript(request=request, dispatch='available_translations')
         assert json.loads(response.body.decode('utf-8')) == ['uk']
 
     @patch('xmodule.video_block.transcripts_utils.get_video_transcript_content')
@@ -299,16 +301,16 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, p
         good_sjson = _create_file(json.dumps(self.subs))
 
         # Upload english transcript.
-        _upload_sjson_file(good_sjson, self.item_descriptor.location)
+        _upload_sjson_file(good_sjson, self.block.location)
 
         # Upload non-english transcript.
-        _upload_file(self.srt_file, self.item_descriptor.location, os.path.split(self.srt_file.name)[1])
+        _upload_file(self.srt_file, self.block.location, os.path.split(self.srt_file.name)[1])
 
-        self.item.sub = _get_subs_id(good_sjson.name)
-        self.item.edx_video_id = 'an-edx-video-id'
+        self.block.sub = _get_subs_id(good_sjson.name)
+        self.block.edx_video_id = 'an-edx-video-id'
 
         request = Request.blank('/available_translations')
-        response = self.item.transcript(request=request, dispatch='available_translations')
+        response = self.block.transcript(request=request, dispatch='available_translations')
         assert sorted(json.loads(response.body.decode('utf-8'))) == sorted(['en', 'uk'])
 
     @patch('xmodule.video_block.transcripts_utils.get_video_transcript_content')
@@ -362,13 +364,13 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, p
         for lang_code, in_content_store in dict(transcripts).items():
             if in_content_store:
                 file_name, __ = os.path.split(self.srt_file.name)
-                _upload_file(self.srt_file, self.item_descriptor.location, file_name)
+                _upload_file(self.srt_file, self.block.location, file_name)
                 transcripts[lang_code] = file_name
             else:
                 transcripts[lang_code] = 'non_existent.srt.sjson'
         if sub:
             sjson_transcript = _create_file(json.dumps(self.subs))
-            _upload_sjson_file(sjson_transcript, self.item_descriptor.location)
+            _upload_sjson_file(sjson_transcript, self.block.location)
             sub = _get_subs_id(sjson_transcript.name)
 
         mock_get_video_transcript_content.return_value = {
@@ -380,12 +382,12 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, p
             'file_name': 'edx.sjson'
         }
         mock_get_transcript_languages.return_value = val_transcripts
-        self.item.transcripts = transcripts
-        self.item.sub = sub
-        self.item.edx_video_id = 'an-edx-video-id'
+        self.block.transcripts = transcripts
+        self.block.sub = sub
+        self.block.edx_video_id = 'an-edx-video-id'
         # Make request to available translations dispatch.
         request = Request.blank('/available_translations')
-        response = self.item.transcript(request=request, dispatch='available_translations')
+        response = self.block.transcript(request=request, dispatch='available_translations')
         self.assertCountEqual(json.loads(response.body.decode('utf-8')), result)
 
     @patch('xmodule.video_block.transcripts_utils.edxval_api.get_available_transcript_languages')
@@ -395,7 +397,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):  # lint-amnesty, p
         """
         mock_get_available_transcript_languages.return_value = ['en', 'de', 'ro']
         request = Request.blank('/available_translations')
-        response = self.item.transcript(request=request, dispatch='available_translations')
+        response = self.block.transcript(request=request, dispatch='available_translations')
         assert response.status_code == 404
 
 
@@ -423,19 +425,18 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):  # lint-amne
 
     def setUp(self):
         super().setUp()
-        self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor
+        self.block.render(STUDENT_VIEW)
         self.dispatch = "available_translations/?is_bumper=1"
-        self.item.video_bumper = {"transcripts": {"en": ""}}
+        self.block.video_bumper = {"transcripts": {"en": ""}}
 
     @ddt.data("en", "uk")
     def test_available_translation_en_and_non_en(self, lang):
         filename = os.path.split(self.srt_file.name)[1]
-        _upload_file(self.srt_file, self.item_descriptor.location, filename)
-        self.item.video_bumper["transcripts"][lang] = filename
+        _upload_file(self.srt_file, self.block.location, filename)
+        self.block.video_bumper["transcripts"][lang] = filename
 
         request = Request.blank('/' + self.dispatch)
-        response = self.item.transcript(request=request, dispatch=self.dispatch)
+        response = self.block.transcript(request=request, dispatch=self.dispatch)
         assert json.loads(response.body.decode('utf-8')) == [lang]
 
     @patch('xmodule.video_block.transcripts_utils.get_available_transcript_languages')
@@ -450,16 +451,16 @@ class TestTranscriptAvailableTranslationsBumperDispatch(TestVideo):  # lint-amne
         en_translation_filename = os.path.split(en_translation.name)[1]
         uk_translation_filename = os.path.split(self.srt_file.name)[1]
         # Upload english transcript.
-        _upload_file(en_translation, self.item_descriptor.location, en_translation_filename)
+        _upload_file(en_translation, self.block.location, en_translation_filename)
 
         # Upload non-english transcript.
-        _upload_file(self.srt_file, self.item_descriptor.location, uk_translation_filename)
+        _upload_file(self.srt_file, self.block.location, uk_translation_filename)
 
-        self.item.video_bumper["transcripts"]["en"] = en_translation_filename
-        self.item.video_bumper["transcripts"]["uk"] = uk_translation_filename
+        self.block.video_bumper["transcripts"]["en"] = en_translation_filename
+        self.block.video_bumper["transcripts"]["uk"] = uk_translation_filename
 
         request = Request.blank('/' + self.dispatch)
-        response = self.item.transcript(request=request, dispatch=self.dispatch)
+        response = self.block.transcript(request=request, dispatch=self.dispatch)
         # Assert that bumper only get its own translations.
         assert sorted(json.loads(response.body.decode('utf-8'))) == sorted(['en', 'uk'])
 
@@ -489,12 +490,11 @@ class TestTranscriptDownloadDispatch(TestVideo):  # lint-amnesty, pylint: disabl
 
     def setUp(self):
         super().setUp()
-        self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor
+        self.block.render(STUDENT_VIEW)
 
     def test_download_transcript_not_exist(self):
         request = Request.blank('/download')
-        response = self.item.transcript(request=request, dispatch='download')
+        response = self.block.transcript(request=request, dispatch='download')
         assert response.status == '404 Not Found'
 
     @patch(
@@ -503,7 +503,7 @@ class TestTranscriptDownloadDispatch(TestVideo):  # lint-amnesty, pylint: disabl
     )
     def test_download_srt_exist(self, __):
         request = Request.blank('/download')
-        response = self.item.transcript(request=request, dispatch='download')
+        response = self.block.transcript(request=request, dispatch='download')
         assert response.body.decode('utf-8') == 'Subs!'
         assert response.headers['Content-Type'] == 'application/x-subrip; charset=utf-8'
         assert response.headers['Content-Language'] == 'en'
@@ -513,19 +513,19 @@ class TestTranscriptDownloadDispatch(TestVideo):  # lint-amnesty, pylint: disabl
         return_value=('Subs!', 'txt', 'text/plain; charset=utf-8')
     )
     def test_download_txt_exist(self, __):
-        self.item.transcript_format = 'txt'
+        self.block.transcript_format = 'txt'
         request = Request.blank('/download')
-        response = self.item.transcript(request=request, dispatch='download')
+        response = self.block.transcript(request=request, dispatch='download')
         assert response.body.decode('utf-8') == 'Subs!'
         assert response.headers['Content-Type'] == 'text/plain; charset=utf-8'
         assert response.headers['Content-Language'] == 'en'
 
     def test_download_en_no_sub(self):
         request = Request.blank('/download')
-        response = self.item.transcript(request=request, dispatch='download')
+        response = self.block.transcript(request=request, dispatch='download')
         assert response.status == '404 Not Found'
         with pytest.raises(NotFoundError):
-            get_transcript(self.item)
+            get_transcript(self.block)
 
     @patch(
         'xmodule.video_block.transcripts_utils.get_transcript_for_video',
@@ -533,7 +533,7 @@ class TestTranscriptDownloadDispatch(TestVideo):  # lint-amnesty, pylint: disabl
     )
     def test_download_non_en_non_ascii_filename(self, __):
         request = Request.blank('/download')
-        response = self.item.transcript(request=request, dispatch='download')
+        response = self.block.transcript(request=request, dispatch='download')
         assert response.body.decode('utf-8') == 'Subs!'
         assert response.headers['Content-Type'] == 'application/x-subrip; charset=utf-8'
         assert response.headers['Content-Disposition'] == 'attachment; filename="en_塞.srt"'
@@ -555,7 +555,7 @@ class TestTranscriptDownloadDispatch(TestVideo):  # lint-amnesty, pylint: disabl
 
         # Make request to XModule transcript handler
         request = Request.blank('/download')
-        response = self.item.transcript(request=request, dispatch='download')
+        response = self.block.transcript(request=request, dispatch='download')
 
         # Expected response
         expected_content = '0\n00:00:00,010 --> 00:00:00,100\nHi, welcome to Edx.\n\n'
@@ -599,9 +599,8 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
 
     def setUp(self):
         super().setUp()
-        self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor
-        self.item.video_bumper = {"transcripts": {"en": ""}}
+        self.block.render(STUDENT_VIEW)
+        self.block.video_bumper = {"transcripts": {"en": ""}}
 
     @ddt.data(
         # No language
@@ -620,7 +619,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
     @ddt.unpack
     def test_translation_fails(self, url, dispatch, status_code):
         request = Request.blank(url)
-        response = self.item.transcript(request=request, dispatch=dispatch)
+        response = self.block.transcript(request=request, dispatch=dispatch)
         assert response.status == status_code
 
     @ddt.data(
@@ -630,12 +629,12 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
     def test_translaton_en_youtube_success(self, url, dispatch, attach):
         subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
         good_sjson = _create_file(json.dumps(subs))
-        _upload_sjson_file(good_sjson, self.item_descriptor.location)
+        _upload_sjson_file(good_sjson, self.block.location)
         subs_id = _get_subs_id(good_sjson.name)
 
-        attach(self.item, subs_id)
+        attach(self.block, subs_id)
         request = Request.blank(url.format(subs_id))
-        response = self.item.transcript(request=request, dispatch=dispatch)
+        response = self.block.transcript(request=request, dispatch=dispatch)
         self.assertDictEqual(json.loads(response.body.decode('utf-8')), subs)
 
     def test_translation_non_en_youtube_success(self):
@@ -647,20 +646,20 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
             ]
         }
         self.srt_file.seek(0)
-        _upload_file(self.srt_file, self.item_descriptor.location, os.path.split(self.srt_file.name)[1])
+        _upload_file(self.srt_file, self.block.location, os.path.split(self.srt_file.name)[1])
         subs_id = _get_subs_id(self.srt_file.name)
 
         # youtube 1_0 request, will generate for all speeds for existing ids
-        self.item.youtube_id_1_0 = subs_id
-        self.item.youtube_id_0_75 = '0_75'
-        self.store.update_item(self.item, self.user.id)
+        self.block.youtube_id_1_0 = subs_id
+        self.block.youtube_id_0_75 = '0_75'
+        self.store.update_item(self.block, self.user.id)
         request = Request.blank(f'/translation/uk?videoId={subs_id}')
-        response = self.item.transcript(request=request, dispatch='translation/uk')
+        response = self.block.transcript(request=request, dispatch='translation/uk')
         self.assertDictEqual(json.loads(response.body.decode('utf-8')), subs)
 
         # 0_75 subs are exist
         request = Request.blank('/translation/uk?videoId={}'.format('0_75'))
-        response = self.item.transcript(request=request, dispatch='translation/uk')
+        response = self.block.transcript(request=request, dispatch='translation/uk')
         calculated_0_75 = {
             'end': [75],
             'start': [9],
@@ -671,10 +670,10 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
 
         self.assertDictEqual(json.loads(response.body.decode('utf-8')), calculated_0_75)
         # 1_5 will be generated from 1_0
-        self.item.youtube_id_1_5 = '1_5'
-        self.store.update_item(self.item, self.user.id)
+        self.block.youtube_id_1_5 = '1_5'
+        self.store.update_item(self.block, self.user.id)
         request = Request.blank('/translation/uk?videoId={}'.format('1_5'))
-        response = self.item.transcript(request=request, dispatch='translation/uk')
+        response = self.block.transcript(request=request, dispatch='translation/uk')
         calculated_1_5 = {
             'end': [150],
             'start': [18],
@@ -690,13 +689,13 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
     @ddt.unpack
     def test_translaton_en_html5_success(self, url, dispatch, attach):
         good_sjson = _create_file(json.dumps(TRANSCRIPT))
-        _upload_sjson_file(good_sjson, self.item_descriptor.location)
+        _upload_sjson_file(good_sjson, self.block.location)
         subs_id = _get_subs_id(good_sjson.name)
 
-        attach(self.item, subs_id)
-        self.store.update_item(self.item, self.user.id)
+        attach(self.block, subs_id)
+        self.store.update_item(self.block, self.user.id)
         request = Request.blank(url)
-        response = self.item.transcript(request=request, dispatch=dispatch)
+        response = self.block.transcript(request=request, dispatch=dispatch)
         self.assertDictEqual(json.loads(response.body.decode('utf-8')), TRANSCRIPT)
 
     def test_translaton_non_en_html5_success(self):
@@ -708,12 +707,12 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
             ]
         }
         self.srt_file.seek(0)
-        _upload_file(self.srt_file, self.item_descriptor.location, os.path.split(self.srt_file.name)[1])
+        _upload_file(self.srt_file, self.block.location, os.path.split(self.srt_file.name)[1])
 
         # manually clean youtube_id_1_0, as it has default value
-        self.item.youtube_id_1_0 = ""
+        self.block.youtube_id_1_0 = ""
         request = Request.blank('/translation/uk')
-        response = self.item.transcript(request=request, dispatch='translation/uk')
+        response = self.block.transcript(request=request, dispatch='translation/uk')
         self.assertDictEqual(json.loads(response.body.decode('utf-8')), subs)
 
     def test_translation_static_transcript_xml_with_data_dirc(self):
@@ -727,25 +726,25 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         test_modulestore = MagicMock()
         attrs = {'get_course.return_value': Mock(data_dir='dummy/static', static_asset_path='')}
         test_modulestore.configure_mock(**attrs)
-        self.item_descriptor.runtime.modulestore = test_modulestore
+        self.block.runtime.modulestore = test_modulestore
 
         # Test youtube style en
         request = Request.blank('/translation/en?videoId=12345')
-        response = self.item.transcript(request=request, dispatch='translation/en')
+        response = self.block.transcript(request=request, dispatch='translation/en')
         assert response.status == '307 Temporary Redirect'
         assert ('Location', '/static/dummy/static/subs_12345.srt.sjson') in response.headerlist
 
         # Test HTML5 video style
-        self.item.sub = 'OEoXaMPEzfM'
+        self.block.sub = 'OEoXaMPEzfM'
         request = Request.blank('/translation/en')
-        response = self.item.transcript(request=request, dispatch='translation/en')
+        response = self.block.transcript(request=request, dispatch='translation/en')
         assert response.status == '307 Temporary Redirect'
         assert ('Location', '/static/dummy/static/subs_OEoXaMPEzfM.srt.sjson') in response.headerlist
 
         # Test different language to ensure we are just ignoring it since we can't
         # translate with static fallback
         request = Request.blank('/translation/uk')
-        response = self.item.transcript(request=request, dispatch='translation/uk')
+        response = self.block.transcript(request=request, dispatch='translation/uk')
         assert response.status == '404 Not Found'
 
     @ddt.data(
@@ -771,9 +770,9 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         self._set_static_asset_path()
 
         if attach:
-            attach(self.item, sub)
+            attach(self.block, sub)
         request = Request.blank(url)
-        response = self.item.transcript(request=request, dispatch=dispatch)
+        response = self.block.transcript(request=request, dispatch=dispatch)
         assert response.status == status_code
         if sub:
             assert ('Location', f'/static/dummy/static/subs_{sub}.srt.sjson') in response.headerlist
@@ -788,7 +787,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
 
         # When course_id is not mocked out, these values would result in 307, as tested above.
         request = Request.blank('/translation/en?videoId=12345')
-        response = self.item.transcript(request=request, dispatch='translation/en')
+        response = self.block.transcript(request=request, dispatch='translation/en')
         assert response.status == '404 Not Found'
 
     def _set_static_asset_path(self):
@@ -818,7 +817,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         mock_get_video_transcript_data.return_value = transcript
 
         # Make request to XModule transcript handler
-        response = self.item.transcript(request=Request.blank('/translation/en'), dispatch='translation/en')
+        response = self.block.transcript(request=Request.blank('/translation/en'), dispatch='translation/en')
 
         # Expected headers
         expected_headers = {
@@ -839,7 +838,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, pylint: 
         Verify that val transcript is not returned when its feature is disabled.
         """
         # Make request to XModule transcript handler
-        response = self.item.transcript(request=Request.blank('/translation/en'), dispatch='translation/en')
+        response = self.block.transcript(request=Request.blank('/translation/en'), dispatch='translation/en')
         # Assert the actual response
         assert response.status_code == 404
 
@@ -867,20 +866,20 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, py
     def test_translation_fails(self):
         # No language
         request = Request.blank("")
-        response = self.item_descriptor.studio_transcript(request=request, dispatch="translation")
+        response = self.block.studio_transcript(request=request, dispatch="translation")
         assert response.status == '400 Bad Request'
 
         # No language_code param in request.GET
         request = Request.blank("")
-        response = self.item_descriptor.studio_transcript(request=request, dispatch="translation")
+        response = self.block.studio_transcript(request=request, dispatch="translation")
         assert response.status == '400 Bad Request'
         assert response.json['error'] == 'Language is required.'
 
         # Correct case:
         filename = os.path.split(self.srt_file.name)[1]
-        _upload_file(self.srt_file, self.item_descriptor.location, filename)
+        _upload_file(self.srt_file, self.block.location, filename)
         request = Request.blank("translation?language_code=uk")
-        response = self.item_descriptor.studio_transcript(request=request, dispatch="translation?language_code=uk")
+        response = self.block.studio_transcript(request=request, dispatch="translation?language_code=uk")
         self.srt_file.seek(0)
         assert response.body == self.srt_file.read()
         assert response.headers['Content-Type'] == 'application/x-subrip; charset=utf-8'
@@ -889,9 +888,9 @@ class TestStudioTranscriptTranslationGetDispatch(TestVideo):  # lint-amnesty, py
 
         # Non ascii file name download:
         self.srt_file.seek(0)
-        _upload_file(self.srt_file, self.item_descriptor.location, "塞.srt")
+        _upload_file(self.srt_file, self.block.location, "塞.srt")
         request = Request.blank("translation?language_code=zh")
-        response = self.item_descriptor.studio_transcript(request=request, dispatch="translation?language_code=zh")
+        response = self.block.studio_transcript(request=request, dispatch="translation?language_code=zh")
         self.srt_file.seek(0)
         assert response.body == self.srt_file.read()
         assert response.headers['Content-Type'] == 'application/x-subrip; charset=utf-8'
@@ -942,9 +941,9 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):  # lint-amnesty, p
         Verify that POST request validations works as expected.
         """
         # mock available_translations method
-        self.item_descriptor.available_translations = lambda transcripts, verify_assets: ['ur']
+        self.block.available_translations = lambda transcripts, verify_assets: ['ur']
         request = Request.blank('/translation', POST=post_data)
-        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        response = self.block.studio_transcript(request=request, dispatch='translation')
         assert response.json['error'] == error_message
 
     @ddt.data(
@@ -978,11 +977,11 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):  # lint-amnesty, p
             })
 
         request = Request.blank('/translation', POST=post_data)
-        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        response = self.block.studio_transcript(request=request, dispatch='translation')
         assert response.status == '201 Created'
         response = json.loads(response.text)
         assert response['language_code'], 'uk'
-        self.assertDictEqual(self.item_descriptor.transcripts, {})
+        self.assertDictEqual(self.block.transcripts, {'uk': f'{response["edx_video_id"]}-uk.srt'})
         assert edxval_api.get_video_transcript_data(video_id=response['edx_video_id'], language_code='uk')
 
     def test_studio_transcript_post_bad_content(self):
@@ -997,9 +996,11 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):  # lint-amnesty, p
         }
 
         request = Request.blank("/translation", POST=post_data)
-        response = self.item_descriptor.studio_transcript(request=request, dispatch="translation")
+        response = self.block.studio_transcript(request=request, dispatch="translation")
         assert response.status_code == 400
         assert response.json['error'] == 'There is a problem with this transcript file. Try to upload a different file.'
+        # transcripts fields should not be updated
+        self.assertDictEqual(self.block.transcripts, {})
 
 
 @ddt.ddt
@@ -1030,7 +1031,7 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):  # lint-amnesty,
         Verify that DELETE dispatch works as expected when required args are missing from request
         """
         request = Request(self.REQUEST_META, body=json.dumps(params).encode('utf-8'))
-        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        response = self.block.studio_transcript(request=request, dispatch='translation')
         assert response.status_code == 400
 
     def test_translation_delete_w_edx_video_id(self):
@@ -1057,8 +1058,8 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):  # lint-amnesty,
         assert api.get_video_transcript_data(video_id=self.EDX_VIDEO_ID, language_code=self.LANGUAGE_CODE_UK)
 
         request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
-        self.item_descriptor.edx_video_id = self.EDX_VIDEO_ID
-        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        self.block.edx_video_id = self.EDX_VIDEO_ID
+        response = self.block.studio_transcript(request=request, dispatch='translation')
         assert response.status_code == 200
 
         # verify that a video transcript dose not exist for expected data
@@ -1073,20 +1074,20 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):  # lint-amnesty,
         request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
 
         # upload and verify that srt file exists in assets
-        _upload_file(self.SRT_FILE, self.item_descriptor.location, srt_file_name_uk)
-        assert _check_asset(self.item_descriptor.location, srt_file_name_uk)
+        _upload_file(self.SRT_FILE, self.block.location, srt_file_name_uk)
+        assert _check_asset(self.block.location, srt_file_name_uk)
 
         # verify transcripts field
-        assert self.item_descriptor.transcripts != {}
-        assert self.LANGUAGE_CODE_UK in self.item_descriptor.transcripts
+        assert self.block.transcripts != {}
+        assert self.LANGUAGE_CODE_UK in self.block.transcripts
 
         # make request and verify response
-        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        response = self.block.studio_transcript(request=request, dispatch='translation')
         assert response.status_code == 200
 
         # verify that srt file is deleted
-        assert self.item_descriptor.transcripts == {}
-        assert not _check_asset(self.item_descriptor.location, srt_file_name_uk)
+        assert self.block.transcripts == {}
+        assert not _check_asset(self.block.location, srt_file_name_uk)
 
     def test_translation_delete_w_english_lang(self):
         """
@@ -1094,45 +1095,45 @@ class TestStudioTranscriptTranslationDeleteDispatch(TestVideo):  # lint-amnesty,
         """
         request_body = json.dumps({'lang': self.LANGUAGE_CODE_EN, 'edx_video_id': ''})
         srt_file_name_en = subs_filename('english_translation.srt', lang=self.LANGUAGE_CODE_EN)
-        self.item_descriptor.transcripts['en'] = 'english_translation.srt'
+        self.block.transcripts['en'] = 'english_translation.srt'
         request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
 
         # upload and verify that srt file exists in assets
-        _upload_file(self.SRT_FILE, self.item_descriptor.location, srt_file_name_en)
-        assert _check_asset(self.item_descriptor.location, srt_file_name_en)
+        _upload_file(self.SRT_FILE, self.block.location, srt_file_name_en)
+        assert _check_asset(self.block.location, srt_file_name_en)
 
         # make request and verify response
-        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        response = self.block.studio_transcript(request=request, dispatch='translation')
         assert response.status_code == 200
 
         # verify that srt file is deleted
-        assert self.LANGUAGE_CODE_EN not in self.item_descriptor.transcripts
-        assert not _check_asset(self.item_descriptor.location, srt_file_name_en)
+        assert self.LANGUAGE_CODE_EN not in self.block.transcripts
+        assert not _check_asset(self.block.location, srt_file_name_en)
 
     def test_translation_delete_w_sub(self):
         """
         Verify that DELETE dispatch works as expected when translation is present against `sub` field
         """
         request_body = json.dumps({'lang': self.LANGUAGE_CODE_EN, 'edx_video_id': ''})
-        sub_file_name = subs_filename(self.item_descriptor.sub, lang=self.LANGUAGE_CODE_EN)
+        sub_file_name = subs_filename(self.block.sub, lang=self.LANGUAGE_CODE_EN)
         request = Request(self.REQUEST_META, body=request_body.encode('utf-8'))
 
         # sub should not be empy
-        assert not self.item_descriptor.sub == ''
+        assert not self.block.sub == ''
         # lint-amnesty, pylint: disable=wrong-assert-type
 
         # upload and verify that srt file exists in assets
-        _upload_file(self.SRT_FILE, self.item_descriptor.location, sub_file_name)
-        assert _check_asset(self.item_descriptor.location, sub_file_name)
+        _upload_file(self.SRT_FILE, self.block.location, sub_file_name)
+        assert _check_asset(self.block.location, sub_file_name)
 
         # make request and verify response
-        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
+        response = self.block.studio_transcript(request=request, dispatch='translation')
         assert response.status_code == 200
 
         # verify that sub is empty and transcript is deleted also
-        assert self.item_descriptor.sub == ''
+        assert self.block.sub == ''
         # lint-amnesty, pylint: disable=wrong-assert-type
-        assert not _check_asset(self.item_descriptor.location, sub_file_name)
+        assert not _check_asset(self.block.location, sub_file_name)
 
 
 class TestGetTranscript(TestVideo):  # lint-amnesty, pylint: disable=test-inherits-tests
@@ -1158,8 +1159,7 @@ class TestGetTranscript(TestVideo):  # lint-amnesty, pylint: disable=test-inheri
 
     def setUp(self):
         super().setUp()
-        self.item_descriptor.render(STUDENT_VIEW)
-        self.item = self.item_descriptor
+        self.block.render(STUDENT_VIEW)
 
     def test_good_transcript(self):
         """
@@ -1182,10 +1182,10 @@ class TestGetTranscript(TestVideo):  # lint-amnesty, pylint: disable=test-inheri
                 }
             """))
 
-        _upload_sjson_file(good_sjson, self.item.location)
-        self.item.sub = _get_subs_id(good_sjson.name)
+        _upload_sjson_file(good_sjson, self.block.location)
+        self.block.sub = _get_subs_id(good_sjson.name)
 
-        text, filename, mime_type = get_transcript(self.item)
+        text, filename, mime_type = get_transcript(self.block)
 
         expected_text = textwrap.dedent("""\
             0
@@ -1199,7 +1199,7 @@ class TestGetTranscript(TestVideo):  # lint-amnesty, pylint: disable=test-inheri
             """)
 
         assert text == expected_text
-        assert filename[:(- 4)] == ('en_' + self.item.sub)
+        assert filename[:(- 4)] == ('en_' + self.block.sub)
         assert mime_type == 'application/x-subrip; charset=utf-8'
 
     def test_good_txt_transcript(self):
@@ -1220,29 +1220,29 @@ class TestGetTranscript(TestVideo):  # lint-amnesty, pylint: disable=test-inheri
                 }
             """))
 
-        _upload_sjson_file(good_sjson, self.item.location)
-        self.item.sub = _get_subs_id(good_sjson.name)
-        text, filename, mime_type = get_transcript(self.item, output_format=Transcript.TXT)
+        _upload_sjson_file(good_sjson, self.block.location)
+        self.block.sub = _get_subs_id(good_sjson.name)
+        text, filename, mime_type = get_transcript(self.block, output_format=Transcript.TXT)
         expected_text = textwrap.dedent("""\
             Hi, welcome to Edx.
             Let's start with what is on your screen right now.""")
 
         assert text == expected_text
-        assert filename == (('en_' + self.item.sub) + '.txt')
+        assert filename == (('en_' + self.block.sub) + '.txt')
         assert mime_type == 'text/plain; charset=utf-8'
 
     def test_en_with_empty_sub(self):
 
-        self.item.sub = ""
-        self.item.transcripts = None
+        self.block.sub = ""
+        self.block.transcripts = None
         # no self.sub, self.youttube_1_0 exist, but no file in assets
         with pytest.raises(NotFoundError):
-            get_transcript(self.item)
+            get_transcript(self.block)
 
         # no self.sub and no self.youtube_1_0, no non-en transcritps
-        self.item.youtube_id_1_0 = None
+        self.block.youtube_id_1_0 = None
         with pytest.raises(NotFoundError):
-            get_transcript(self.item)
+            get_transcript(self.block)
 
         # no self.sub but youtube_1_0 exists with file in assets
         good_sjson = _create_file(content=textwrap.dedent("""\
@@ -1261,10 +1261,10 @@ class TestGetTranscript(TestVideo):  # lint-amnesty, pylint: disable=test-inheri
                   ]
                 }
             """))
-        _upload_sjson_file(good_sjson, self.item.location)
-        self.item.youtube_id_1_0 = _get_subs_id(good_sjson.name)
+        _upload_sjson_file(good_sjson, self.block.location)
+        self.block.youtube_id_1_0 = _get_subs_id(good_sjson.name)
 
-        text, filename, mime_type = get_transcript(self.item)
+        text, filename, mime_type = get_transcript(self.block)
         expected_text = textwrap.dedent("""\
             0
             00:00:00,270 --> 00:00:02,720
@@ -1277,16 +1277,16 @@ class TestGetTranscript(TestVideo):  # lint-amnesty, pylint: disable=test-inheri
             """)
 
         assert text == expected_text
-        assert filename == (('en_' + self.item.youtube_id_1_0) + '.srt')
+        assert filename == (('en_' + self.block.youtube_id_1_0) + '.srt')
         assert mime_type == 'application/x-subrip; charset=utf-8'
 
     def test_non_en_with_non_ascii_filename(self):
-        self.item.transcript_language = 'zh'
+        self.block.transcript_language = 'zh'
         self.srt_file.seek(0)
-        _upload_file(self.srt_file, self.item_descriptor.location, "塞.srt")
+        _upload_file(self.srt_file, self.block.location, "塞.srt")
 
-        transcripts = self.item.get_transcripts_info()  # lint-amnesty, pylint: disable=unused-variable
-        text, filename, mime_type = get_transcript(self.item)
+        transcripts = self.block.get_transcripts_info()  # lint-amnesty, pylint: disable=unused-variable
+        text, filename, mime_type = get_transcript(self.block)
         expected_text = textwrap.dedent("""
         0
         00:00:00,12 --> 00:00:00,100
@@ -1299,12 +1299,12 @@ class TestGetTranscript(TestVideo):  # lint-amnesty, pylint: disable=test-inheri
     def test_value_error_handled(self):
         good_sjson = _create_file(content='bad content')
 
-        _upload_sjson_file(good_sjson, self.item.location)
-        self.item.sub = _get_subs_id(good_sjson.name)
+        _upload_sjson_file(good_sjson, self.block.location)
+        self.block.sub = _get_subs_id(good_sjson.name)
 
-        transcripts = self.item.get_transcripts_info()  # lint-amnesty, pylint: disable=unused-variable
+        transcripts = self.block.get_transcripts_info()  # lint-amnesty, pylint: disable=unused-variable
         error_transcript = {"start": [], "end": [], "text": ["An error occured obtaining the transcript."]}
-        content, _, _ = get_transcript(self.item)
+        content, _, _ = get_transcript(self.block)
         assert error_transcript["text"][0] in content
 
     def test_key_error(self):
@@ -1321,9 +1321,9 @@ class TestGetTranscript(TestVideo):  # lint-amnesty, pylint: disable=test-inheri
                 }
             """)
 
-        _upload_sjson_file(good_sjson, self.item.location)
-        self.item.sub = _get_subs_id(good_sjson.name)
+        _upload_sjson_file(good_sjson, self.block.location)
+        self.block.sub = _get_subs_id(good_sjson.name)
 
-        transcripts = self.item.get_transcripts_info()  # lint-amnesty, pylint: disable=unused-variable
+        transcripts = self.block.get_transcripts_info()  # lint-amnesty, pylint: disable=unused-variable
         with pytest.raises(KeyError):
-            get_transcript(self.item)
+            get_transcript(self.block)

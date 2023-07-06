@@ -151,7 +151,7 @@ var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
     // see http://accessibility.oit.ncsu.edu/blog/2013/09/13/the-incredible-accessible-modal-dialog/
     // for more information on managing modals
     //
-    var initialFocus
+    var initialFocus;
     $(trigger).click(function() {
         $focusedElementBeforeModal = $(trigger);
 

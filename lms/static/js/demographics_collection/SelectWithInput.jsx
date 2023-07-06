@@ -31,20 +31,21 @@ export const SelectWithInput = (props) => {
             >
                 {options}
             </select>
-            {showInput &&
-        <input
-            className="form-control"
-            aria-label={`${selectName} description field`}
-            type={inputType}
-            name={inputName}
-            id={inputId}
-            onChange={inputOnChange}
-            onBlur={inputOnBlur}
-            value={inputValue}
-            disabled={disabled}
-            maxLength={255}
-        />
-            }
+            {showInput
+        && (
+            <input
+                className="form-control"
+                aria-label={`${selectName} description field`}
+                type={inputType}
+                name={inputName}
+                id={inputId}
+                onChange={inputOnChange}
+                onBlur={inputOnBlur}
+                value={inputValue}
+                disabled={disabled}
+                maxLength={255}
+            />
+        )}
         </div>
-    )
-}
+    );
+};

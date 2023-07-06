@@ -13,7 +13,7 @@ import logging
 from collections import OrderedDict
 from copy import deepcopy
 
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 
 from lxml import etree
@@ -86,27 +86,18 @@ class PollBlock(
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/poll/poll.js'),
-            resource_string(__name__, 'js/src/poll/poll_main.js')
+            resource_filename(__name__, 'js/src/javascript_loader.js'),
+            resource_filename(__name__, 'js/src/poll/poll.js'),
+            resource_filename(__name__, 'js/src/poll/poll_main.js')
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/poll/display.scss')
-        ],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     # There is no studio_view() for this XBlock but this is needed to make the
     # the static_content command happy.
     studio_view_js = {
         'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js')
-    }
-
-    studio_view_css = {
-        'scss': []
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
     }
 
     def handle_ajax(self, dispatch, data):  # lint-amnesty, pylint: disable=unused-argument

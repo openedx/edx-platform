@@ -13,7 +13,7 @@ from openedx.core.djangoapps.content_libraries.library_bundle import (
     usage_for_child_include,
 )
 from openedx.core.djangoapps.content_libraries.models import ContentLibrary
-from openedx.core.djangoapps.xblock.learning_context import LearningContext
+from openedx.core.djangoapps.xblock.api import LearningContext
 
 log = logging.getLogger(__name__)
 

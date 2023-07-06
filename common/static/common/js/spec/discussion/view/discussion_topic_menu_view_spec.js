@@ -1,6 +1,7 @@
 /* globals DiscussionTopicMenuView, DiscussionSpecHelper, DiscussionCourseSettings, _ */
 (function() {
     'use strict';
+
     describe('DiscussionTopicMenuView', function() {
         var ExpectedDiscussionId;
         beforeEach(function() {

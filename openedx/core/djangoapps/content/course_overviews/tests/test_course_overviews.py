@@ -1064,7 +1064,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         assert image_urls['small'].endswith('src_course_image-png-{}x{}.jpg'.format(*config.small))
         assert image_urls['large'].endswith('src_course_image-png-{}x{}.jpg'.format(*config.large))
 
-        # Update course image on the course descriptor This fires a
+        # Update course image on the course block. This fires a
         # course_published signal, this will be caught in signals.py,
         # which should in turn load CourseOverview from modulestore.
         course.course_image = 'src_course_image1.png'
@@ -1126,7 +1126,7 @@ class CourseOverviewTabTestCase(ModuleStoreTestCase):
         ) as course_overview_tabs_bulk_create:
             course_overview_tabs_bulk_create.side_effect = IntegrityError
 
-            # Update display name on the course descriptor
+            # Update display name on the course block
             # This fires a course_published signal, which should be caught in signals.py,
             # which should in turn load CourseOverview from modulestore.
             course.display_name = 'Updated display name'
