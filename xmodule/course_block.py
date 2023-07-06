@@ -37,6 +37,7 @@ _ = lambda text: text
 
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
 CATALOG_VISIBILITY_ABOUT = "about"
+CATALOG_VISIBILITY_CATALOG = "catalog"
 CATALOG_VISIBILITY_NONE = "none"
 
 DEFAULT_COURSE_VISIBILITY_IN_CATALOG = getattr(
@@ -759,17 +760,19 @@ class CourseFields:  # lint-amnesty, pylint: disable=missing-class-docstring
     catalog_visibility = String(
         display_name=_("Course Visibility In Catalog"),
         help=_(
-            # Translators: the quoted words 'both', 'about', and 'none' must be
+            # Translators: the quoted words 'both', 'about', 'catalog' and 'none' must be
             # left untranslated.  Leave them as English words.
             "Defines the access permissions for showing the course in the course catalog. This can be set to one "
-            "of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access "
-            "to about page), 'none' (do not show in catalog and do not allow access to an about page)."
+            "of four values: 'both' (show in catalog and allow access to about page), 'about' (only allow access "
+            "to about page), 'catalog' (show in Discovery API but do not allow public access to about page), "
+            "'none' (do not show in catalog and do not allow access to an about page)."
         ),
         default=DEFAULT_COURSE_VISIBILITY_IN_CATALOG,
         scope=Scope.settings,
         values=[
             {"display_name": "Both", "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
             {"display_name": "About", "value": CATALOG_VISIBILITY_ABOUT},
+            {"display_name": "Catalog", "value": CATALOG_VISIBILITY_CATALOG},
             {"display_name": "None", "value": CATALOG_VISIBILITY_NONE},
         ],
     )

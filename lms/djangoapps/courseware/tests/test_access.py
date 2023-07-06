@@ -47,6 +47,7 @@ from common.djangoapps.util.milestones_helpers import fulfill_course_milestone, 
 from xmodule.course_block import (  # lint-amnesty, pylint: disable=wrong-import-order
     CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+    CATALOG_VISIBILITY_CATALOG,
     CATALOG_VISIBILITY_NONE
 )
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -589,7 +590,7 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
 
     def test__catalog_visibility(self):
         """
-        Tests the catalog visibility tri-states
+        Tests the catalog visibility 4-states
         """
         user = UserFactory.create()
         course_id = CourseLocator('edX', 'test', '2012_Fall')
@@ -611,6 +612,17 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
         )
         assert not access._has_access_course(user, 'see_in_catalog', course)
         assert access._has_access_course(user, 'see_about_page', course)
+        assert access._has_access_course(staff, 'see_in_catalog', course)
+        assert access._has_access_course(staff, 'see_about_page', course)
+
+        # Now set visibility to just catalog, which means it should be included in the
+        # discovery API but the about page is not public, hence not appear in the catalog
+        course = Mock(
+            id=CourseLocator('edX', 'test', '2012_Fall'),
+            catalog_visibility=CATALOG_VISIBILITY_CATALOG
+        )
+        assert not access._has_access_course(user, 'see_in_catalog', course)
+        assert not access._has_access_course(user, 'see_about_page', course)
         assert access._has_access_course(staff, 'see_in_catalog', course)
         assert access._has_access_course(staff, 'see_about_page', course)
 
