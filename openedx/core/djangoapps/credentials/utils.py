@@ -110,7 +110,7 @@ def get_credentials(user, program_uuid=None, credential_type=None):
     )
 
 
-def get_course_completion_status(lms_user_id, course_run_ids):
+def get_courses_completion_status(lms_user_id, course_run_ids):
     """
     Given the lms_user_id and course run ids, checks for course completion status
     Arguments:
@@ -118,11 +118,12 @@ def get_course_completion_status(lms_user_id, course_run_ids):
         course_run_ids(List): list of course run ids for which we need to check the completion status
     Returns:
         list of course_run_ids for which user has completed the course
+        Boolean: True if an exception occurred while calling the api, False otherwise
     """
     credential_configuration = CredentialsApiConfig.current()
     if not credential_configuration.enabled:
         log.warning('%s configuration is disabled.', credential_configuration.API_NAME)
-        return []
+        return [], False
 
     base_api_url = get_credentials_api_base_url()
     completion_status_url = f'{base_api_url}/api/credentials/learner_cert_status'
@@ -137,16 +138,6 @@ def get_course_completion_status(lms_user_id, course_run_ids):
                 'course_runs': course_run_ids,
             }
         )
-        # TODO: will be fixed in https://2u-internal.atlassian.net/browse/APER-2425
-        # We will deal all 404s as valid response for now and return empty response in that case.
-        # which means user has not completed any course.
-        if api_response.status_code == 404:
-            log.info("Encountered a 404 while reqeusting course completion statuses "
-                     "for lms_user_id [%s] for course_run_ids [%s]",
-                     lms_user_id,
-                     course_run_ids,
-                     )
-            return []
         api_response.raise_for_status()
         course_completion_response = api_response.json()
     except Exception as exc:  # pylint: disable=broad-except
@@ -156,13 +147,13 @@ def get_course_completion_status(lms_user_id, course_run_ids):
                       course_run_ids,
                       exc
                       )
-        return []
-    if course_completion_response is not None:
-        # Yes, This is course_credentials_data. The key is named status but
-        # it contains all the courses data from credentials.
-        course_credentials_data = course_completion_response.get('status')
+        return [], True
+    # Yes, This is course_credentials_data. The key is named status but
+    # it contains all the courses data from credentials.
+    course_credentials_data = course_completion_response.get('status', [])
+    if course_credentials_data is not None:
         filtered_records = [course_data['course_run']['key'] for course_data in course_credentials_data if
                             course_data['course_run']['key'] in course_run_ids and
-                            course_data['status'] == 'awarded']
-        return filtered_records
-    return []
+                            course_data['status'] == settings.CREDENTIALS_COURSE_COMPLETION_STATE]
+        return filtered_records, False
+    return [], False
