@@ -81,7 +81,8 @@ class EffortEstimationTransformer(BlockStructureTransformer):
             for block_key in block_structure.topological_traversal():
                 xblock = block_structure.get_xblock(block_key)
 
-                if xblock.category in collections:
+                # if xblock.category in collections:
+                if xblock.category == 'html' :
                     collections[xblock.category](block_structure, block_key, xblock, collection_cache)
 
         except cls.MissingEstimationData:

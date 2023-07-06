@@ -103,7 +103,7 @@ def estimate_time_by_regex(text):
 	if time_by_regex is not None:
 		if 'gio' in last_line or 'phut' in last_line:
 			time_by_regex = math.ceil(time_by_regex / 5) * 5
-		else:
-			return None
+		if 'phut' in last_line and 'gio' not in last_line:
+			time_by_regex = time_by_regex / 60
 
 	return time_by_regex
