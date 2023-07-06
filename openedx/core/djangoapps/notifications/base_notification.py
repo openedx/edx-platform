@@ -8,7 +8,6 @@ from .utils import (
     find_pref_in_normalized_prefs,
 )
 
-
 COURSE_NOTIFICATION_TYPES = {
     'new_comment_on_response': {
         'notification_app': 'discussion',

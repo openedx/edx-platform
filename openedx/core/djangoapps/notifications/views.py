@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
-    get_course_notification_preference_config_version,
+    get_course_notification_preference_config_version
 )
 
 from .base_notification import COURSE_NOTIFICATION_APPS

@@ -2,11 +2,10 @@
 Tests for base_notification
 """
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.notifications import base_notification
-from openedx.core.djangoapps.notifications import models
+from openedx.core.djangoapps.notifications import base_notification, models
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
-    get_course_notification_preference_config_version,
+    get_course_notification_preference_config_version
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
