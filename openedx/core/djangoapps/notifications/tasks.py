@@ -70,3 +70,31 @@ def delete_expired_notifications():
         logger.info(f'{delete_count} Notifications deleted in current batch in {time_elapsed} seconds.')
     time_elapsed = datetime.now() - start_time
     logger.info(f'{total_deleted} Notifications deleted in {time_elapsed} seconds.')
+
+
+@shared_task
+@set_code_owner_attribute
+def send_notifications(user_ids, course_key, app_name, notification_type, context, content_url):
+    """
+    Send notifications to the users.
+    """
+    user_ids = list(set(user_ids))
+
+    # check if what is preferences of user and make decision to send notification or not
+    preferences = CourseNotificationPreference.objects.filter(
+        user_id__in=user_ids,
+        course_id=course_key,
+    )
+    notifications = []
+    for preference in preferences:
+        if preference and preference.get_web_config(app_name, notification_type):
+            notifications.append(Notification(
+                user_id=preference.user_id,
+                app_name=app_name,
+                notification_type=notification_type,
+                content_context=context,
+                content_url=content_url,
+                course_id=course_key,
+            ))
+    # send notification to users but use bulk_create
+    Notification.objects.bulk_create(notifications)

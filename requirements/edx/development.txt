@@ -258,7 +258,6 @@ defusedxml==0.7.1
     #   djangorestframework-xml
     #   ora2
     #   python3-openid
-    #   python3-saml
     #   social-auth-core
 deprecated==1.2.14
     # via
@@ -928,6 +927,7 @@ lxml==4.9.2
     #   openedx-calc
     #   ora2
     #   pyquery
+    #   python3-saml
     #   xblock
     #   xmlsec
 mailsnake==1.6.4
@@ -1033,7 +1033,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/testing.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/testing.txt
-openedx-events==8.0.1
+openedx-events==8.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
@@ -1322,10 +1322,8 @@ python3-openid==3.2.0 ; python_version >= "3"
     # via
     #   -r requirements/edx/testing.txt
     #   social-auth-core
-python3-saml==1.9.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/testing.txt
+python3-saml==1.15.0
+    # via -r requirements/edx/testing.txt
 pytz==2022.7.1
     # via
     #   -c requirements/edx/../constraints.txt
