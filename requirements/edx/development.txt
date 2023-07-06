@@ -402,6 +402,7 @@ django==3.2.20
     #   openedx-django-wiki
     #   openedx-events
     #   openedx-filters
+    #   openedx-learning
     #   ora2
     #   skill-tagging
     #   super-csv
@@ -619,6 +620,7 @@ djangorestframework==3.14.0
     #   edx-proctoring
     #   edx-submissions
     #   openedx-blockstore
+    #   openedx-learning
     #   ora2
     #   super-csv
 djangorestframework-stubs==3.14.0
@@ -1300,6 +1302,10 @@ openedx-filters==1.4.0
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
     #   skill-tagging
+openedx-learning==0.1.0
+    # via
+    #   -r requirements/edx/doc.txt
+    #   -r requirements/edx/testing.txt
 openedx-mongodbproxy==0.2.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1762,6 +1768,7 @@ rules==3.3
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-proctoring
+    #   openedx-learning
 s3transfer==0.1.13
     # via
     #   -r requirements/edx/doc.txt

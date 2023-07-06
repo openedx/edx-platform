@@ -3198,6 +3198,10 @@ INSTALLED_APPS = [
     # Course Goals
     'lms.djangoapps.course_goals.apps.CourseGoalsConfig',
 
+    # Tagging
+    'openedx_tagging.core.tagging.apps.TaggingConfig',
+    'openedx.features.content_tagging',
+
     # Features
     'openedx.features.calendar_sync',
     'openedx.features.course_bookmarks',

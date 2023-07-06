@@ -1748,6 +1748,10 @@ INSTALLED_APPS = [
     # API Documentation
     'drf_yasg',
 
+    # Tagging
+    'openedx_tagging.core.tagging.apps.TaggingConfig',
+    'openedx.features.content_tagging',
+
     'openedx.features.course_duration_limits',
     'openedx.features.content_type_gating',
     'openedx.features.discounts',
