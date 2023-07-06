@@ -1,20 +1,25 @@
 """
 This file contains celery tasks for entitlements-related functionality.
 """
+import logging
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings  # lint-amnesty, pylint: disable=unused-import
+from django.contrib.auth import get_user_model
 from edx_django_utils.monitoring import set_code_owner_attribute
 
 from common.djangoapps.entitlements.models import CourseEntitlement, CourseEntitlementSupportDetail
 
 LOGGER = get_task_logger(__name__)
+log = logging.getLogger(__name__)
 
 # Maximum number of retries before giving up on awarding credentials.
 # For reference, 11 retries with exponential backoff yields a maximum waiting
 # time of 2047 seconds (about 30 minutes). Setting this to None could yield
 # unwanted behavior: infinite retries.
 MAX_RETRIES = 11
+
+User = get_user_model()
 
 
 @shared_task(bind=True, ignore_result=True)
@@ -62,9 +67,9 @@ def expire_old_entitlements(self, start, end, logid='...'):
     LOGGER.info('Successfully completed the task expire_old_entitlements after examining %d entries [%s]', entitlements.count(), logid)  # lint-amnesty, pylint: disable=line-too-long
 
 
-@shared_task(bind=True, ignore_result=True)
+@shared_task(bind=True)
 @set_code_owner_attribute
-def expire_and_create_entitlements(self, entitlements, support_user):
+def expire_and_create_entitlements(self, entitlement_ids, support_username):
     """
     Expire entitlements older than one year.
 
@@ -75,31 +80,39 @@ def expire_and_create_entitlements(self, entitlements, support_user):
     / 18 months.
 
     Args:
-        entitlements (QuerySet): A QuerySet with the entitlements to expire.
-        support_user (django.contrib.auth.models.user): The username to attribute
-        the entitlement expiration and recreation to.
+        entitlement_ids (List<int>): A list of entitlement ids to expire.
+        support_username (str): The username to attribute the entitlement
+            expiration and recreation to.
 
     Returns:
         None
 
     """
-    first_entitlement_id = entitlements[0].id
-    last_entitlement_id = entitlements[-1].id
+    support_user = User.objects.get(username=support_username)
 
-    LOGGER.info(
-        'Running task expire_and_create_entitlements over %d entitlements from id %d to id %d',
-        len(entitlements),
+    first_entitlement_id = entitlement_ids[0]
+    last_entitlement_id = entitlement_ids[-1]
+
+    log.info(
+        'Running task expire_and_create_entitlements over %d entitlements from id %d to id %d, task id :%s',
+        len(entitlement_ids),
         first_entitlement_id,
         last_entitlement_id,
+        self.request.id
     )
 
     try:
-        for entitlement in entitlements:
-            LOGGER.info('Started expiring entitlement with id %d', entitlement.id)
+        for entitlement_id in entitlement_ids:
+            entitlement = CourseEntitlement.objects.get(id=entitlement_id)
+            log.info('Started expiring entitlement with id %d, task id :%s',
+                     entitlement.id,
+                     self.request.id)
             entitlement.expire_entitlement()
-            LOGGER.info('Expired entitlement with id %d as expiration period has reached', entitlement.id)
+            log.info('Expired entitlement with id %d as expiration period has reached, task id :%s',
+                     entitlement.id,
+                     self.request.id)
             support_detail = {
-                'action': 'EXPIRED',
+                'action': 'EXPIRE',
                 'comments': 'REV-3574',
                 'entitlement': entitlement,
                 'support_user': support_user,
@@ -121,13 +134,19 @@ def expire_and_create_entitlements(self, entitlements, support_user):
                 'support_user': support_user,
             }
             CourseEntitlementSupportDetail.objects.create(**support_detail)
-            LOGGER.info(
-                'created new entitlement with id %d corresponding to above expired entitlement with id %d',
+            log.info(
+                'created new entitlement with id %d corresponding to above expired entitlement'
+                'with id %d, task id :%s ',
                 new_entitlement.id,
                 entitlement.id,
+                self.request.id
             )
 
     except Exception as exc:  # pylint: disable=broad-except
-        LOGGER.exception('Failed to expire entitlements that reached their expiration period')
+        log.exception('Failed to expire entitlements that reached their expiration period, task id :%s',
+                      self.request.id)
 
-    LOGGER.info('Successfully completed the task expire_and_create_entitlements after examining %d entries', entitlements.count())  # lint-amnesty, pylint: disable=line-too-long
+    log.info('Successfully completed the task expire_and_create_entitlements after examining'
+             '%d entries, task id :%s',
+             len(entitlement_ids),
+             self.request.id)

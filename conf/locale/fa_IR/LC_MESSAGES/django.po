@@ -247,7 +247,7 @@ msgstr "شناسه ویدیو"
 msgid "Pending"
 msgstr "در حال انتظار"
 
-#: cms/djangoapps/contentstore/xblock_services/create_xblock.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/create_xblock.py
 #: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "خالی"
@@ -2279,7 +2279,7 @@ msgid "Cookie Policy"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Information"
+msgid "Your Privacy Choices"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -7543,6 +7543,30 @@ msgstr "فهرست سیاه {country}  برای {course}"
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
 msgstr "مسیرهای یادگیرنده"
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "The notification preference config version is not up to date."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app name."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked as seen."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notification marked read."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked read."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app_name or notification_id."
+msgstr ""
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -13035,13 +13059,13 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}، {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "کپی{0}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "کپی '{0}' "
@@ -13488,55 +13512,55 @@ msgstr "{course}_آدرس_فیلم"
 msgid "A non zero positive integer is expected"
 msgstr "عددی صحیح به غیر از صفر مجاز است."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr "کتابخانه‌ها نمی‌توانند بیش از {limit} مؤلفه داشته باشند"
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Invalid data"
 msgstr "داده معتبر نیست"
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Invalid data ({details})"
 msgstr "داده معتبر ({details}) نیست"
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "There was a problem pasting your component."
 msgstr ""
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Your clipboard is empty or invalid."
 msgstr ""
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "نمی‌توانید {source_type} را به {target_parent_type} منتقل کنید."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Item is already present in target location."
 msgstr "الان این محصول در محل مورد نظر است."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item into itself."
 msgstr "نمی‌توانید موردی را به خود منتقل کنید."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item into it's child."
 msgstr "شما نمی‌توانید این مورد را به زیر مجموعه‌اش بیفزایید."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item directly into content experiment."
 msgstr "نمی‌‌توانید موردی را مستقیماً به تجربه محتوا منتقل کنید."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "{source_usage_key} not found in {parent_usage_key}."
 msgstr "{source_usage_key} در {parent_usage_key} پیدا نشد."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid ""
 "You can not move {source_usage_key} at an invalid index ({target_index})."
@@ -13544,13 +13568,13 @@ msgstr ""
 "نمی‌توانید {source_usage_key} را در یک نمایۀ نامعتبر به ({target_index}) "
 "منتقل کنید. "
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr ""
 "شما باید target_index ({target_index}) را به‌عنوان یک عدد صحیح ارائه دهید."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
@@ -13560,11 +13584,11 @@ msgstr ""
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "%"
 msgstr "درصد"
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\""

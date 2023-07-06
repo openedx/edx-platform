@@ -4,7 +4,7 @@ Django Admin for Notifications
 
 from django.contrib import admin
 
-from .models import Notification, CourseNotificationPreference
+from .models import CourseNotificationPreference, Notification
 
 
 class NotificationAdmin(admin.ModelAdmin):

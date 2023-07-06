@@ -25,4 +25,7 @@ urlpatterns = [
     re_path(r"^courses/$",
             views.DashboardRecommendationsApiView.as_view(),
             name="courses"),
+    re_path(r'^recommendations_context/$',
+            views.RecommendationsContextView.as_view(),
+            name='recommendations_context'),
 ]
