@@ -11,8 +11,11 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
-from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification, \
+from openedx.core.djangoapps.notifications.models import (
+    CourseNotificationPreference,
+    Notification,
     get_course_notification_preference_config_version
+)
 
 logger = get_task_logger(__name__)
 
