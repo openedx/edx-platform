@@ -13,7 +13,7 @@ on:
          required: true
          type: string
        version:
-          description: 'Version number to upgrade to - required if version is pinned'
+          description: 'Version number to upgrade to in constraints.txt (only needed if pinned)'
           default: ''
           type: string
        change_desc:
