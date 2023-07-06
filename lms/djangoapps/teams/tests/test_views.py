@@ -188,49 +188,6 @@ class TestDashboard(SharedModuleStoreTestCase):
         response = self.client.get(bad_team_url)
         assert 404 == response.status_code
 
-    def get_user_course_specific_teams_list(self):
-        """Gets the list of user course specific teams."""
-
-        # Create a course two
-        course_two = CourseFactory.create(
-            teams_configuration=TeamsConfig({
-                "max_team_size": 1,
-                "topics": [
-                    {
-                        "name": "Test topic for course two",
-                        "id": 1,
-                        "description": "Description for test topic for course two."
-                    }
-                ]
-            })
-        )
-
-        # Login and enroll user in both course course
-        self.client.login(username=self.user.username, password=self.test_password)
-        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
-        CourseEnrollmentFactory.create(user=self.user, course_id=course_two.id)
-
-        # Create teams in both courses
-        course_one_team = CourseTeamFactory.create(name="Course one team", course_id=self.course.id, topic_id=1)
-        course_two_team = CourseTeamFactory.create(  # pylint: disable=unused-variable
-            name="Course two team", course_id=course_two.id, topic_id=1,
-        )
-
-        # Check that initially list of user teams in course one is empty
-        course_one_teams_url = reverse('teams_dashboard', args=[self.course.id])
-        response = self.client.get(course_one_teams_url)
-        self.assertContains(response, '"teams": {"count": 0')
-        # Add user to a course one team
-        course_one_team.add_user(self.user)
-
-        # Check that list of user teams in course one is not empty, it is one now
-        response = self.client.get(course_one_teams_url)
-        self.assertContains(response, '"teams": {"count": 1')
-        # Check that list of user teams in course two is still empty
-        course_two_teams_url = reverse('teams_dashboard', args=[course_two.id])
-        response = self.client.get(course_two_teams_url)
-        self.assertContains(response, '"teams": {"count": 0')
-
     @ddt.unpack
     @ddt.data(
         (True, False, False),
@@ -672,32 +629,6 @@ class TeamAPITestCase(APITestCase, SharedModuleStoreTestCase):
         if 'course_id' not in data and not no_course_id:
             data.update({'course_id': str(self.test_course_1.id)})
         return self.make_call(reverse('teams_list'), expected_status, 'get', data, **kwargs)
-
-    def get_user_course_specific_teams_list(self):
-        """Gets the list of user course specific teams."""
-
-        # Create and enroll user in both courses
-        user = self.create_and_enroll_student(
-            courses=[self.test_course_1, self.test_course_2],
-            username='test_user_enrolled_both_courses'
-        )
-        course_one_data = {'course_id': str(self.test_course_1.id), 'username': user}
-        course_two_data = {'course_id': str(self.test_course_2.id), 'username': user}
-
-        # Check that initially list of user teams in course one is empty
-        team_list = self.get_teams_list(user=user, expected_status=200, data=course_one_data)
-        assert team_list['count'] == 0
-
-        # Add user to a course one team
-        self.solar_team.add_user(self.users[user])
-
-        # Check that list of user teams in course one is not empty now
-        team_list = self.get_teams_list(user=user, expected_status=200, data=course_one_data)
-        assert team_list['count'] == 1
-
-        # Check that list of user teams in course two is still empty
-        team_list = self.get_teams_list(user=user, expected_status=200, data=course_two_data)
-        assert team_list['count'] == 0
 
     def build_team_data(
         self,

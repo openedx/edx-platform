@@ -1,24 +1,23 @@
 """
 Code for serializing a modulestore XBlock to OLX.
 """
+from __future__ import annotations
 import logging
 import os
-from collections import namedtuple
 
 from lxml import etree
 
+from .data import StaticFile
 from . import utils
 
 log = logging.getLogger(__name__)
-
-# A static file required by an XBlock
-StaticFile = namedtuple('StaticFile', ['name', 'url', 'data'])
 
 
 class XBlockSerializer:
     """
     A class that can serialize an XBlock to OLX.
     """
+    static_files: list[StaticFile]
 
     def __init__(self, block):
         """
@@ -38,6 +37,11 @@ class XBlockSerializer:
             path = asset['path']
             if path not in [sf.name for sf in self.static_files]:
                 self.static_files.append(StaticFile(name=path, url=asset['url'], data=None))
+
+        if block.scope_ids.usage_id.block_type == 'problem':
+            py_lib_zip_file = utils.get_python_lib_zip_if_using(self.olx_str, course_key)
+            if py_lib_zip_file:
+                self.static_files.append(py_lib_zip_file)
 
     def _serialize_block(self, block) -> etree.Element:
         """ Serialize an XBlock to OLX/XML. """
@@ -100,6 +104,10 @@ class XBlockSerializer:
         olx_node.attrib["url_name"] = block.scope_ids.usage_id.block_id
         if block.display_name:
             olx_node.attrib["display_name"] = block.display_name
+        if block.fields["editor"].is_set_on(block):
+            olx_node.attrib["editor"] = block.editor
+        if block.use_latex_compiler:
+            olx_node.attrib["use_latex_compiler"] = "true"
         olx_node.text = etree.CDATA("\n" + block.data + "\n")
         return olx_node
 

@@ -76,9 +76,12 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data['results']
         enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
         expected_data = NotificationCourseEnrollmentSerializer(enrollments, many=True).data
-        self.assertEqual(response.data, expected_data)
+
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data, expected_data)
 
     def test_course_enrollment_api_permission(self):
         """

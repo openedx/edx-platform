@@ -12,7 +12,6 @@ from lms.djangoapps.learner_dashboard.config.waffle import (
     ENABLE_PROGRAM_TAB_VIEW
 )
 from lms.djangoapps.program_enrollments.api import get_program_enrollment
-from openedx.features.enterprise_support.utils import is_enterprise_learner
 
 FAKE_COURSE_KEY = CourseKey.from_string('course-v1:fake+course+run')
 
@@ -60,10 +59,10 @@ def b2c_subscriptions_is_enabled() -> bool:
     return ENABLE_B2C_SUBSCRIPTIONS.is_enabled()
 
 
-def user_b2c_subscriptions_enabled(user, is_mobile=False) -> bool:
+def b2c_subscriptions_enabled(is_mobile=False) -> bool:
     """
-    Check if user is eligible to see B2C subscriptions.
+    Check whether B2C Subscriptions pages should be shown to user.
     """
-    if not is_mobile and not is_enterprise_learner(user) and b2c_subscriptions_is_enabled():
+    if not is_mobile and b2c_subscriptions_is_enabled():
         return True
     return False

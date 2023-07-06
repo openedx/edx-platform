@@ -201,7 +201,7 @@ def get_theme_sass_dirs(system, theme_dir):
 
         dirs.append({
             "sass_source_dir": xmodule_sass_dir,
-            "css_destination_dir": path("xmodule") / "static" / "css",
+            "css_destination_dir": path("common") / "static" / "css" / "xmodule",
             "lookup_paths": [
                 xmodule_lookup_dir,
                 *dependencies,
@@ -252,7 +252,7 @@ def get_system_sass_dirs(system):
 
     dirs.append({
         "sass_source_dir": xmodule_sass_dir,
-        "css_destination_dir": path("xmodule") / "static" / "css",
+        "css_destination_dir": path("common") / "static" / "css" / "xmodule",
         "lookup_paths": [
             xmodule_lookup_dir,
             *dependencies,

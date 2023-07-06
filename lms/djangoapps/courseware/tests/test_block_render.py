@@ -41,7 +41,6 @@ from xblock.runtime import DictKeyValueStore, KvsFieldData  # lint-amnesty, pyli
 from xblock.test.tools import TestRuntime  # lint-amnesty, pylint: disable=wrong-import-order
 
 from xmodule.capa.tests.response_xml_factory import OptionResponseXMLFactory  # lint-amnesty, pylint: disable=reimported
-from xmodule.capa.xqueue_interface import XQueueInterface
 from xmodule.capa_block import ProblemBlock
 from xmodule.contentstore.django import contentstore
 from xmodule.html_block import AboutBlock, CourseInfoBlock, HtmlBlock, StaticTabBlock
@@ -59,7 +58,6 @@ from xmodule.modulestore.tests.test_asides import AsideTestType  # lint-amnesty,
 from xmodule.services import RebindUserServiceError
 from xmodule.video_block import VideoBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW, DescriptorSystem  # lint-amnesty, pylint: disable=wrong-import-order
-from common.djangoapps import static_replace
 from common.djangoapps.course_modes.models import CourseMode  # lint-amnesty, pylint: disable=reimported
 from common.djangoapps.student.tests.factories import (
     BetaTesterFactory,
@@ -107,7 +105,6 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
 @XBlock.needs('fs')
-@XBlock.needs('field-data')
 @XBlock.needs('mako')
 @XBlock.needs('user')
 @XBlock.needs('verification')
@@ -121,7 +118,6 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 @XBlock.needs('content_type_gating')
 @XBlock.needs('cache')
 @XBlock.needs('sandbox')
-@XBlock.needs('xqueue')
 @XBlock.needs('replace_urls')
 @XBlock.needs('rebind_user')
 @XBlock.needs('completion')
@@ -953,7 +949,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         request.user = self.mock_user
 
         render.handle_xblock_callback(request, str(course.id), usage_id, handler)
-        assert mock_get_block.call_count == 1
+        assert mock_get_block.call_count == 2
         assert mock_get_block.call_args[1]['will_recheck_access'] == will_recheck_access
 
 
@@ -1926,14 +1922,16 @@ class TestAnonymousStudentId(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         if hasattr(xblock_class, 'module_class'):
             block.module_class = xblock_class.module_class
 
-        rendered_block = render.get_block_for_descriptor_internal(
+        rendered_block = render.get_block_for_descriptor(
             user=self.user,
             block=block,
             student_data=Mock(spec=FieldData, name='student_data'),
-            course_id=course_id,
+            course_key=course_id,
             track_function=Mock(name='track_function'),  # Track Function
             request_token='request_token',
             course=self.course,
+            request=None,
+            field_data_cache=None,
         )
         current_user = rendered_block.runtime.service(rendered_block, 'user').get_current_user()
 
@@ -2286,10 +2284,10 @@ class LMSXBlockServiceMixin(SharedModuleStoreTestCase):
         """
         Instantiate the runtem.
         """
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.block,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2333,7 +2331,6 @@ class LMSXBlockServiceBindingTest(LMSXBlockServiceMixin):
         'content_type_gating',
         'cache',
         'sandbox',
-        'xqueue',
         'replace_urls',
         'rebind_user',
         'completion',
@@ -2444,7 +2441,6 @@ class TestI18nService(LMSXBlockServiceMixin):
         Test: NoSuchServiceError should be raised if i18n service is none.
         """
         i18nService = self.block.runtime._services['i18n']  # pylint: disable=protected-access
-        self.block.runtime._runtime_services['i18n'] = None  # pylint: disable=protected-access
         self.block.runtime._services['i18n'] = None  # pylint: disable=protected-access
         with pytest.raises(NoSuchServiceError):
             self.block.runtime.service(self.block, 'i18n')
@@ -2658,10 +2654,10 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         self.track_function = Mock()
         self.request_token = Mock()
         self.contentstore = contentstore()
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.block,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2686,10 +2682,10 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         if is_staff:
             self.user = StaffFactory(course_key=self.course.id)
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.block,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2708,10 +2704,10 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         if is_global_staff:
             self.user = GlobalStaffFactory.create()
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.block,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2728,10 +2724,10 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         if is_beta_tester:
             self.user = BetaTesterFactory(course_key=self.course.id)
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.block,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2749,10 +2745,10 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         if is_instructor:
             self.user = InstructorFactory(course_key=self.course.id)
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.block,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2778,10 +2774,10 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         anonymous_student_id value.
         """
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.problem_block,
+            self.problem_block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2792,10 +2788,10 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
             ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID
         ) == anonymous_id_for_user(self.user, None)
 
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.block,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2812,10 +2808,10 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
         ) == anonymous_id_for_user(self.user, None)
 
     def test_user_service_with_anonymous_user(self):
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             AnonymousUser(),
             self.student_data,
-            self.block,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2841,10 +2837,10 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
 
         Newer code should use the user service, which gets tested in test_user_service.py
         """
-        _ = render.prepare_runtime_for_user(
+        render.prepare_runtime_for_user(
             self.user,
             self.student_data,
-            self.block,
+            self.block.runtime,
             self.course.id,
             self.track_function,
             self.request_token,
@@ -2864,47 +2860,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     def test_render_template(self):
         rendered = self.block.runtime.render_template('templates/edxmako.html', {'element_id': 'hi'})  # pylint: disable=not-callable
         assert rendered == '<div id="hi" ns="main">Testing the MakoService</div>\n'
-
-    def test_xqueue(self):
-        xqueue = self.block.runtime.xqueue
-        assert isinstance(xqueue['interface'], XQueueInterface)
-        assert xqueue['interface'].url == 'http://sandbox-xqueue.edx.org'
-        assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
-        assert xqueue['waittime'] == 5
-        callback_url = f'http://localhost:8000/courses/{self.course.id}/xqueue/232/{self.block.location}'
-        assert xqueue['construct_callback']() == f'{callback_url}/score_update'
-        assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'
-
-    @override_settings(
-        XQUEUE_INTERFACE={
-            'callback_url': 'http://alt.url',
-            'url': 'http://xqueue.url',
-            'django_auth': {
-                'username': 'user',
-                'password': 'password',
-            },
-            'basic_auth': ('basic', 'auth'),
-        },
-        XQUEUE_WAITTIME_BETWEEN_REQUESTS=15,
-    )
-    def test_xqueue_settings(self):
-        _ = render.prepare_runtime_for_user(
-            self.user,
-            self.student_data,
-            self.block,
-            self.course.id,
-            self.track_function,
-            self.request_token,
-            course=self.course,
-        )
-        xqueue = self.block.runtime.xqueue
-        assert isinstance(xqueue['interface'], XQueueInterface)
-        assert xqueue['interface'].url == 'http://xqueue.url'
-        assert xqueue['default_queuename'] == 'edX-LmsModuleShimTest'
-        assert xqueue['waittime'] == 15
-        callback_url = f'http://alt.url/courses/{self.course.id}/xqueue/232/{self.block.location}'
-        assert xqueue['construct_callback']() == f'{callback_url}/score_update'
-        assert xqueue['construct_callback']('mock_dispatch') == f'{callback_url}/mock_dispatch'
 
     @override_settings(COURSES_WITH_UNSAFE_CODE=[r'course-v1:edX\+LmsModuleShimTest\+2021_Fall'])
     def test_can_execute_unsafe_code_when_allowed(self):
@@ -2939,22 +2894,6 @@ class LmsModuleSystemShimTest(SharedModuleStoreTestCase):
     def test_cache(self):
         assert hasattr(self.block.runtime.cache, 'get')
         assert hasattr(self.block.runtime.cache, 'set')
-
-    def test_replace_urls(self):
-        html = '<a href="/static/id">'
-        assert self.block.runtime.replace_urls(html) == \
-            static_replace.replace_static_urls(html, course_id=self.course.id)
-
-    def test_replace_course_urls(self):
-        html = '<a href="/course/id">'
-        assert self.block.runtime.replace_course_urls(html) == \
-            static_replace.replace_course_urls(html, course_key=self.course.id)
-
-    def test_replace_jump_to_id_urls(self):
-        html = '<a href="/jump_to_id/id">'
-        jump_to_id_base_url = reverse('jump_to_id', kwargs={'course_id': str(self.course.id), 'module_id': ''})
-        assert self.block.runtime.replace_jump_to_id_urls(html) == \
-            static_replace.replace_jump_to_id_urls(html, self.course.id, jump_to_id_base_url)
 
     @XBlock.register_temp_plugin(PureXBlock, 'pure')
     @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')

@@ -125,9 +125,16 @@
                     <a href="${get_pages_and_resources_url(course_key)}">${_("Pages & Resources")}</a>
                   </li>
                   % endif
+                  %if not files_uploads_mfe_enabled:
                   <li class="nav-item nav-course-courseware-uploads">
                     <a href="${assets_url}">${_("Files & Uploads")}</a>
                   </li>
+                  %endif
+                  %if files_uploads_mfe_enabled:
+                  <li class="nav-item nav-course-courseware-uploads">
+                    <a href="${get_files_uploads_url(course_key)}">${_("Files & Media")}</a>
+                  </li>
+                  %endif
                   % if not pages_and_resources_mfe_enabled:
                   <li class="nav-item nav-course-courseware-textbooks">
                     <a href="${textbooks_url}">${_("Textbooks")}</a>
@@ -199,7 +206,7 @@
                   % endif
                   % if has_studio_advanced_settings_access(request.user) and advanced_settings_mfe_enabled:
                   <li class="nav-item nav-course-settings-advanced">
-                    <a href="${get_advanced_settings_url}">${_("Advanced Settings")}</a>
+                    <a href="${get_advanced_settings_url(course_key)}">${_("Advanced Settings")}</a>
                   </li>
                   % endif
                   % if certificates_url:
@@ -222,12 +229,26 @@
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
+                  % if not import_mfe_enabled:
                   <li class="nav-item nav-course-tools-import">
                     <a href="${import_url}">${_("Import")}</a>
                   </li>
+                  % endif
+                  % if import_mfe_enabled:
+                  <li class="nav-item nav-course-tools-import">
+                    <a href="${get_import_url(course_key)}">${_("Import")}</a>
+                  </li>
+                  % endif
+                  % if not export_mfe_enabled:
                   <li class="nav-item nav-course-tools-export">
                     <a href="${export_url}">${_("Export")}</a>
                   </li>
+                  % endif
+                  % if export_mfe_enabled:
+                  <li class="nav-item nav-course-tools-import">
+                    <a href="${get_export_url(course_key)}">${_("Import")}</a>
+                  </li>
+                  % endif
                   % if toggles.EXPORT_GIT.is_enabled() and context_course.giturl:
                   <li class="nav-item nav-course-tools-export-git">
                     <a href="${reverse('export_git', kwargs=dict(course_key_string=six.text_type(course_key)))}">${_("Export to Git")}</a>
