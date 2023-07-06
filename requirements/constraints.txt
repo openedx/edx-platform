@@ -112,5 +112,5 @@ docutils<0.20
 # greater version has dropped few dependencies. Fix this in other ticket.
 drf-yasg<1.21.6
 
-# Adding pin to avoid any major upgrade
-djangorestframework<3.15.0
+# incremental upgrade approach. After successfull deploy remove this pin and try latest version.
+djangorestframework<3.14.0
