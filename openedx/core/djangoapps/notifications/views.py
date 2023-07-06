@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
-    get_course_notification_preference_config_version,
+    get_course_notification_preference_config_version
 )
 
 from .base_notification import COURSE_NOTIFICATION_APPS
@@ -36,23 +36,31 @@ class CourseEnrollmentListView(generics.ListAPIView):
     API endpoint to get active CourseEnrollments for requester.
 
     **Permissions**: User must be authenticated.
+    **Response Format** (paginated):
 
-    **Response Format**:
-        [
-            {
-                "course": {
-                    "id": (int) course_id,
-                    "display_name": (str) course_display_name
+        {
+            "next": (str) url_to_next_page_of_courses,
+            "previous": (str) url_to_previous_page_of_courses,
+            "count": (int) total_number_of_courses,
+            "num_pages": (int) total_number_of_pages,
+            "current_page": (int) current_page_number,
+            "start": (int) index_of_first_course_on_page,
+            "results" : [
+                {
+                    "course": {
+                        "id": (int) course_id,
+                        "display_name": (str) course_display_name
+                    },
                 },
-            },
-            ...
-        ]
-    **Response Error Codes**:
-            - 403: The requester cannot access resource.
+                ...
+            ],
+        }
+
+    Response Error Codes:
+    - 403: The requester cannot access resource.
     """
     serializer_class = NotificationCourseEnrollmentSerializer
     permission_classes = [permissions.IsAuthenticated]
-    pagination_class = None
 
     def get_queryset(self):
         user = self.request.user
@@ -63,14 +71,20 @@ class CourseEnrollmentListView(generics.ListAPIView):
         Returns the list of active course enrollments for which ENABLE_NOTIFICATIONS
         Waffle flag is enabled
         """
-        enrollment_queryset = self.get_queryset().select_related('course')
-        enrollments = [
-            enrollment
-            for enrollment in enrollment_queryset
-            if ENABLE_NOTIFICATIONS.is_enabled(enrollment.course.id)
-        ]
-        serializer = self.get_serializer(enrollments, many=True)
-        return Response(serializer.data)
+        queryset = self.filter_queryset(self.get_queryset())
+        course_ids = queryset.values_list('course_id', flat=True)
+
+        for course_id in course_ids:
+            if not ENABLE_NOTIFICATIONS.is_enabled(course_id):
+                queryset = queryset.exclude(course_id=course_id)
+
+        queryset = queryset.select_related('course').order_by('-id')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(self.get_serializer(queryset, many=True).data)
 
 
 class UserNotificationPreferenceView(APIView):

@@ -24,6 +24,7 @@ locations.
 .. toctree::
     :maxdepth: 2
 
+    lms_apis
     guides
     docstrings/docstrings
     celery
