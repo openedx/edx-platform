@@ -1,0 +1,39 @@
+---
+metadata:
+    display_name: 2023 Freehand Text
+    markdown: !!null
+data: |
+    <div class="journals-xblock freehand-text theme-dark">
+      <problem class="short_answers">
+        <div class="journals-xblock-wapper">
+          <div class="asn-icon top-left">
+            <img src="/static/images/asset-logo-pink.svg" alt="Logo Left" />
+          </div>
+          <div class="asn-icon top-right">
+            <img src="/static/images/read-alt.png" width="50" alt="Icon Read" />
+          </div>
+          <div class="journals-info">
+            <h2>SCENARIO</h2>
+            <p>You are going to exam. Even though you have revised, you are feeling really nervous. Which technique would help you the most?</p>
+            <img width="240" src="/static/images/trophy.png" alt="Your Turn" />
+          </div>
+          <div class="journals-form">
+            <div class="freehand-xblock-wapper">
+              <div class="freehand-form">
+                <div class="wrapper-problem-response">
+                  <stringresponse answer="\w" type="regexp ci">
+                  <span class="question-text-wrapper">
+                    <label class="question-text">The technique from my strong plan I will to help me just before I go into an exam will be...</label>
+                  </span>
+                  <additional_answer answer="Please type a response"/>
+                  <div class="text-wrapper">
+                    <textline multiline="true" size="20" placeholder="Type in your answer here..." />
+                  </div>
+                  </stringresponse>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </problem>
+    </div>
