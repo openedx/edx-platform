@@ -153,7 +153,7 @@ docker_build:
 docker_tag: docker_build
 # docker tag openedx/lms     openedx/lms:${GITHUB_SHA}
 # docker tag openedx/lms-dev openedx/lms-dev:${GITHUB_SHA}
-	
+	docker images --all
 	docker tag openedx/lms-dev openedx/lms-dev:test
 # docker tag openedx/cms     openedx/cms:${GITHUB_SHA}
 # docker tag openedx/cms-dev openedx/cms-dev:${GITHUB_SHA}
@@ -162,7 +162,7 @@ docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
 
 docker_push: docker_tag docker_auth ## push to docker hub
-	docker push "openedx/lms:latest"
+# docker push "openedx/lms:latest"
 # docker push "openedx/lms:${GITHUB_SHA}"
 	docker push "openedx/lms-dev:test"
 # docker push "openedx/lms-dev:${GITHUB_SHA}"
