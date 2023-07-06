@@ -196,8 +196,6 @@ code-annotations==1.3.0
     #   edx-toggles
 codejail-includes==1.0.0
     # via -r requirements/edx/base.txt
-contextlib2==21.6.0
-    # via -r requirements/edx/base.txt
 coreapi==2.3.3
     # via
     #   -r requirements/edx/base.txt
@@ -243,7 +241,6 @@ defusedxml==0.7.1
     #   djangorestframework-xml
     #   ora2
     #   python3-openid
-    #   python3-saml
     #   social-auth-core
 deprecated==1.2.14
     # via
@@ -255,7 +252,7 @@ dill==0.3.6
     # via pylint
 distlib==0.3.6
     # via virtualenv
-django==3.2.19
+django==3.2.20
     # via
     #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
@@ -503,8 +500,6 @@ djfernet==0.8.1
     # via
     #   -r requirements/edx/base.txt
     #   edxval
-docopt==0.6.2
-    # via -r requirements/edx/base.txt
 docutils==0.19
     # via
     #   -c requirements/edx/../constraints.txt
@@ -590,7 +585,7 @@ edx-drf-extensions==8.8.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.67.2
+edx-enterprise==3.68.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -865,10 +860,6 @@ lazy-object-proxy==1.9.0
     # via astroid
 learner-pathway-progress==1.3.4
     # via -r requirements/edx/base.txt
-levenshtein==0.21.1
-    # via
-    #   -r requirements/edx/base.txt
-    #   python-levenshtein
 libsass==0.10.0
     # via
     #   -r requirements/edx/base.txt
@@ -888,6 +879,7 @@ lxml==4.9.2
     #   openedx-calc
     #   ora2
     #   pyquery
+    #   python3-saml
     #   xblock
     #   xmlsec
 mailsnake==1.6.4
@@ -986,7 +978,7 @@ openedx-django-require==2.0.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.txt
-openedx-events==8.0.1
+openedx-events==8.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
@@ -1234,8 +1226,6 @@ python-dateutil==2.8.2
     #   olxcleaner
     #   ora2
     #   xblock
-python-levenshtein==0.21.1
-    # via -r requirements/edx/base.txt
 python-memcached==1.59
     # via -r requirements/edx/base.txt
 python-slugify==8.0.1
@@ -1250,10 +1240,8 @@ python3-openid==3.2.0 ; python_version >= "3"
     # via
     #   -r requirements/edx/base.txt
     #   social-auth-core
-python3-saml==1.9.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
+python3-saml==1.15.0
+    # via -r requirements/edx/base.txt
 pytz==2022.7.1
     # via
     #   -c requirements/edx/../constraints.txt
@@ -1290,10 +1278,6 @@ pyyaml==6.0
     #   xblock
 random2==1.0.1
     # via -r requirements/edx/base.txt
-rapidfuzz==3.1.1
-    # via
-    #   -r requirements/edx/base.txt
-    #   levenshtein
 recommender-xblock==2.0.1
     # via -r requirements/edx/base.txt
 redis==4.5.5

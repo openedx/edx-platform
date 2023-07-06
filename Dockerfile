@@ -119,7 +119,7 @@ RUN nodeenv /edx/app/edxapp/nodeenv --node=16.14.0 --prebuilt
 RUN npm install -g npm@8.5.x
 COPY package.json package.json
 COPY package-lock.json package-lock.json
-RUN npm set progress=false && npm install
+RUN npm set progress=false && npm ci
 
 # The builder-development stage is a temporary stage that installs python modules required for development purposes
 # The built artifacts from this stage are then copied to the development stage.

@@ -94,8 +94,8 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
         self._set_up_module_system(block)
 
-        block.runtime._runtime_services['bookmarks'] = Mock()  # pylint: disable=protected-access
-        block.runtime._runtime_services['user'] = StubUserService(user=Mock())  # pylint: disable=protected-access
+        block.runtime._services['bookmarks'] = Mock()  # pylint: disable=protected-access
+        block.runtime._services['user'] = StubUserService(user=Mock())  # pylint: disable=protected-access
         block.parent = parent.location
         return block
 
@@ -368,7 +368,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     def test_xblock_handler_get_completion_success(self):
         """Test that the completion data is returned successfully on targeted vertical through ajax call"""
-        self.sequence_3_1.runtime._runtime_services['completion'] = Mock(  # pylint: disable=protected-access
+        self.sequence_3_1.runtime._services['completion'] = Mock(  # pylint: disable=protected-access
             return_value=Mock(vertical_is_complete=Mock(return_value=True))
         )
         for child in self.sequence_3_1.get_children():
@@ -380,7 +380,7 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
             )
             completion_return = self.sequence_3_1.handle('get_completion', request)
             assert completion_return.json == {'complete': True}
-        self.sequence_3_1.runtime._runtime_services['completion'] = None  # pylint: disable=protected-access
+        self.sequence_3_1.runtime._services['completion'] = None  # pylint: disable=protected-access
 
     def test_xblock_handler_get_completion_bad_key(self):
         """Test that the completion data is returned as False when usage key is None through ajax call"""
@@ -394,14 +394,14 @@ class SequenceBlockTestCase(XModuleXmlImportTest):
 
     def test_handle_ajax_get_completion_success(self):
         """Test that the old-style ajax handler for completion still works"""
-        self.sequence_3_1.runtime._runtime_services['completion'] = Mock(  # pylint: disable=protected-access
+        self.sequence_3_1.runtime._services['completion'] = Mock(  # pylint: disable=protected-access
             return_value=Mock(vertical_is_complete=Mock(return_value=True))
         )
         for child in self.sequence_3_1.get_children():
             usage_key = str(child.location)
             completion_return = self.sequence_3_1.handle_ajax('get_completion', {'usage_key': usage_key})
             assert json.loads(completion_return) == {'complete': True}
-        self.sequence_3_1.runtime._runtime_services['completion'] = None  # pylint: disable=protected-access
+        self.sequence_3_1.runtime._services['completion'] = None  # pylint: disable=protected-access
 
     def test_xblock_handler_goto_position_success(self):
         """Test that we can set position through ajax call"""

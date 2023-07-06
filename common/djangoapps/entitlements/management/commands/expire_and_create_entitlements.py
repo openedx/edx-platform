@@ -9,14 +9,11 @@ from math import ceil
 from textwrap import dedent
 
 from django.core.management import BaseCommand
-from django.contrib.auth import get_user_model
 
 from common.djangoapps.entitlements.tasks import expire_and_create_entitlements
 from common.djangoapps.entitlements.models import CourseEntitlement
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
-
-User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -69,7 +66,7 @@ class Command(BaseCommand):
 
         logger.info('Looking for entitlements which may be expirable.')
 
-        support_user = User.objects.get(username=options.get('username'))
+        support_username = options.get('username')
         current_date = date.today()
         exceptional_courses = options.get('exceptional_course_uuids')
 
@@ -88,7 +85,7 @@ class Command(BaseCommand):
         entitlements_count = entitlements.count()
         logger.info('Total entitlements that have reached expiration period are %d ', entitlements_count)
 
-        entitlements_to_expire = max(1, options.get('count'))
+        entitlements_to_expire = min(max(1, options.get('count')), entitlements_count)
         batch_size = max(1, options.get('batch_size'))
         num_batches = ceil(entitlements_to_expire / batch_size) if entitlements else 0
 
@@ -103,7 +100,8 @@ class Command(BaseCommand):
 
         for batch_num in range(num_batches):
             start = batch_num * batch_size
-            end = min(start + batch_size, entitlements_to_expire, entitlements_count)
-            expire_and_create_entitlements.delay(entitlements[start:end], support_user)
+            end = min(start + batch_size, entitlements_to_expire)
+            entitlement_ids = [entitlement.id for entitlement in entitlements[start:end]]
+            expire_and_create_entitlements.delay(entitlement_ids, support_username)
 
         logger.info('Done. Successfully enqueued %d tasks.', num_batches)

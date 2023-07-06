@@ -656,3 +656,19 @@ def querystring(request):
     # This could just be HTTPrettyRequest.querystring, but that method double-decodes '%2B' -> '+' -> ' '.
     # You can just remove this method when this issue is fixed: https://github.com/gabrielfalcao/HTTPretty/issues/240
     return parse_qs(request.path.split('?', 1)[-1])
+
+
+class ThreadMock(object):
+    """
+    A mock thread object
+    """
+
+    def __init__(self, thread_id, creator, title, parent_id=None):
+        self.id = thread_id
+        self.user_id = creator.id
+        self.username = creator.username
+        self.title = title
+        self.parent_id = parent_id
+
+    def url_with_id(self, params):
+        return f"http://example.com/{params['id']}"

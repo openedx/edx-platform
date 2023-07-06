@@ -32,7 +32,6 @@ from common.djangoapps.track import contexts as track_contexts
 from common.djangoapps.track import views as track_views
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
-from lms.djangoapps.courseware import block_render
 from lms.djangoapps.grades.api import signals as grades_signals
 from openedx.core.djangoapps.xblock.apps import get_xblock_app_config
 from openedx.core.djangoapps.xblock.runtime.blockstore_field_data import BlockstoreChildrenData, BlockstoreFieldData
@@ -270,7 +269,6 @@ class XBlockRuntime(RuntimeShim, Runtime):
             return RebindUserService(
                 self.user,
                 context_key,
-                block_render.prepare_runtime_for_user,
                 track_function=make_track_function(),
                 request_token=request_token(crum.get_current_request()),
             )

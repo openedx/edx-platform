@@ -1,8 +1,11 @@
 """
 REST API views for content staging
 """
+from __future__ import annotations
+import hashlib
 import logging
 
+from django.core.files.base import ContentFile
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -17,13 +20,16 @@ from rest_framework.views import APIView
 from common.djangoapps.student.auth import has_studio_read_access
 
 from openedx.core.lib.api.view_utils import view_auth_classes
-from openedx.core.lib.xblock_serializer.api import serialize_xblock_to_olx
+from openedx.core.lib.xblock_serializer.api import serialize_xblock_to_olx, StaticFile
 from xmodule import block_metadata_utils
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from .data import CLIPBOARD_PURPOSE, StagedContentStatus
-from .models import StagedContent, UserClipboard
+from .data import CLIPBOARD_PURPOSE, StagedContentFileData, StagedContentStatus
+from .filters import StagingStaticAssetFilter
+from .models import StagedContent, StagedContentFile, UserClipboard
 from .serializers import UserClipboardSerializer, PostToClipboardSerializer
 from .tasks import delete_expired_clipboards
 
@@ -149,10 +155,76 @@ class ClipboardEndpoint(APIView):
             serializer = UserClipboardSerializer(clipboard, context={"request": request})
             # Log an event so we can analyze how this feature is used:
             log.info(f"Copied {usage_key.block_type} component \"{usage_key}\" to their clipboard.")
+
+        # Try to copy the static files. If this fails, we still consider the overall copy attempt to have succeeded,
+        # because intra-course pasting will still work fine, and in any case users can manually resolve the file issue.
+        try:
+            self._save_static_assets_to_clipboard(block_data.static_files, usage_key, staged_content)
+        except Exception:  # pylint: disable=broad-except
+            # Regardless of what happened, with get_asset_key_from_path or contentstore or run_filter, we don't want the
+            # whole "copy to clipboard" operation to fail, which would be a bad user experience. For copying and pasting
+            # within a single course, static assets don't even matter. So any such errors become warnings here.
+            log.exception(f"Unable to copy static files to clipboard for component {usage_key}")
+
         # Enqueue a (potentially slow) task to delete the old staged content
         try:
             delete_expired_clipboards.delay(expired_ids)
-        except Exception as err:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             log.exception(f"Unable to enqueue cleanup task for StagedContents: {','.join(str(x) for x in expired_ids)}")
         # Return the response:
         return Response(serializer.data)
+
+    @staticmethod
+    def _save_static_assets_to_clipboard(
+        static_files: list[StaticFile], usage_key: UsageKey, staged_content: StagedContent
+    ):
+        """
+        Helper method for "post to clipboard" API endpoint. This deals with copying static files into the clipboard.
+        """
+        files_to_save: list[StagedContentFileData] = []
+        for f in static_files:
+            source_key = (
+                StaticContent.get_asset_key_from_path(usage_key.context_key, f.url)
+                if (f.url and f.url.startswith('/')) else None
+            )
+            # Compute the MD5 hash and get the content:
+            content: bytes | None = f.data
+            md5_hash = ""  # Unknown
+            if content:
+                md5_hash = hashlib.md5(f.data).hexdigest()
+                # This asset came from the XBlock's filesystem, e.g. a video block's transcript file
+                source_key = usage_key
+            # Check if the asset file exists. It can be absent if an XBlock contains an invalid link.
+            elif source_key and (sc := contentstore().find(source_key, throw_on_not_found=False)):
+                md5_hash = sc.content_digest
+                content = sc.data
+            else:
+                continue  # Skip this file - we don't need a reference to a non-existent file.
+
+            # Load the data:
+            entry = StagedContentFileData(
+                filename=f.name,
+                data=content,
+                source_key=source_key,
+                md5_hash=md5_hash,
+            )
+            files_to_save.append(entry)
+
+        # run filters on files_to_save. e.g. remove large files
+        files_to_save = StagingStaticAssetFilter.run_filter(staged_content=staged_content, file_datas=files_to_save)
+
+        for f in files_to_save:
+            try:
+                StagedContentFile.objects.create(
+                    for_content=staged_content,
+                    filename=f.filename,
+                    # In some cases (e.g. really large files), we don't store the data here but we still keep track of
+                    # the metadata. You can still use the metadata to determine if the file is already present or not,
+                    # and then either inform the user or find another way to import the file (e.g. if the file still
+                    # exists in the "Files & Uploads" contentstore of the source course, based on source_key_str).
+                    data_file=ContentFile(content=f.data, name=f.filename) if f.data else None,
+                    source_key_str=str(f.source_key) if f.source_key else "",
+                    md5_hash=f.md5_hash or "",
+                )
+            except Exception:  # pylint: disable=broad-except
+                log.exception(f"Unable to copy static file {f.filename} to clipboard for component {usage_key}")
