@@ -114,7 +114,7 @@ olxcleaner
 openedx-calc                        # Library supporting mathematical calculations for Open edX
 openedx-django-require
 # openedx-events 3.1.0 introduces producer API
-openedx-events>=3.1.0               # Open edX Events from Hooks Extension Framework (OEP-50)
+openedx-events>=8.2.0               # Open edX Events from Hooks Extension Framework (OEP-50)
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
 openedx-mongodbproxy
 openedx-django-wiki

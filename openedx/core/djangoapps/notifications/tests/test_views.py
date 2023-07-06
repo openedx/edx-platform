@@ -6,9 +6,10 @@ from datetime import datetime, timedelta
 
 import ddt
 from django.conf import settings
-from django.dispatch import Signal
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
+from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
+from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
@@ -17,10 +18,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
-from openedx.core.djangoapps.notifications.models import (
-    Notification,
-    CourseNotificationPreference,
-)
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -76,9 +74,12 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data['results']
         enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
         expected_data = NotificationCourseEnrollmentSerializer(enrollments, many=True).data
-        self.assertEqual(response.data, expected_data)
+
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data, expected_data)
 
     def test_course_enrollment_api_permission(self):
         """
@@ -115,18 +116,32 @@ class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
             is_active=True,
             mode='audit'
         )
-        self.post_save_signal = Signal()
 
     def test_course_enrollment_post_save(self):
         """
         Test the post_save signal for CourseEnrollment.
         """
         # Emit post_save signal
-
-        self.post_save_signal.send(
-            sender=self.course_enrollment.__class__,
-            instance=self.course_enrollment,
-            created=True
+        enrollment_data = CourseEnrollmentData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.profile.name,
+                ),
+                id=self.user.id,
+                is_active=self.user.is_active,
+            ),
+            course=CourseData(
+                course_key=self.course.id,
+                display_name=self.course.display_name,
+            ),
+            mode=self.course_enrollment.mode,
+            is_active=self.course_enrollment.is_active,
+            creation_date=self.course_enrollment.created,
+        )
+        COURSE_ENROLLMENT_CREATED.send_event(
+            enrollment=enrollment_data
         )
 
         # Assert that CourseNotificationPreference object was created with correct attributes
@@ -159,13 +174,29 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             is_active=True,
             mode='audit'
         )
-        self.post_save_signal = Signal()
         self.client = APIClient()
         self.path = reverse('notification-preferences', kwargs={'course_key_string': self.course.id})
-        self.post_save_signal.send(
-            sender=self.course_enrollment.__class__,
-            instance=self.course_enrollment,
-            created=True
+
+        enrollment_data = CourseEnrollmentData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.profile.name,
+                ),
+                id=self.user.id,
+                is_active=self.user.is_active,
+            ),
+            course=CourseData(
+                course_key=self.course.id,
+                display_name=self.course.display_name,
+            ),
+            mode=self.course_enrollment.mode,
+            is_active=self.course_enrollment.is_active,
+            creation_date=self.course_enrollment.created,
+        )
+        COURSE_ENROLLMENT_CREATED.send_event(
+            enrollment=enrollment_data
         )
 
     def _expected_api_response(self):
