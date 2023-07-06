@@ -250,3 +250,60 @@ class NotificationPreferenceSyncManagerTest(ModuleStoreTestCase):
         preferences = new_config.notification_preference_config
         core_notifications = preferences[self.default_app_name]['core_notification_types']
         assert self.default_type_name not in core_notifications
+
+
+class NotificationPreferenceValidationTest(ModuleStoreTestCase):
+    """
+    Tests to validate if notification preference constants are valid
+    """
+
+    def test_validate_notification_apps(self):
+        """
+        Tests if COURSE_NOTIFICATION_APPS constant has all required keys with valid
+        data type for new notification app
+        """
+        bool_keys = ['enabled', 'core_web', 'core_push', 'core_email']
+        notification_apps = base_notification.COURSE_NOTIFICATION_APPS
+        assert "" not in notification_apps.keys()
+        for app_data in notification_apps.values():
+            assert isinstance(app_data['core_info'], str)
+            assert isinstance(app_data['non_editable'], list)
+            for key in bool_keys:
+                assert isinstance(app_data[key], bool)
+
+    def test_validate_core_notification_types(self):
+        """
+        Tests if COURSE_NOTIFICATION_TYPES constant has all required keys with valid
+        data type for core notification type
+        """
+        str_keys = ['notification_app', 'name', 'info', 'email_template']
+        notification_types = base_notification.COURSE_NOTIFICATION_TYPES
+        assert "" not in notification_types.keys()
+        for notification_type in notification_types.values():
+            if not notification_type['is_core']:
+                continue
+            assert isinstance(notification_type['is_core'], bool)
+            assert isinstance(notification_type['content_context'], dict)
+            assert 'content_template' in notification_type.keys()
+            for key in str_keys:
+                assert isinstance(notification_type[key], str)
+
+    def test_validate_non_core_notification_types(self):
+        """
+        Tests if COURSE_NOTIFICATION_TYPES constant has all required keys with valid
+        data type for non-core notification type
+        """
+        str_keys = ['notification_app', 'name', 'info', 'email_template']
+        bool_keys = ['is_core', 'web', 'email', 'push']
+        notification_types = base_notification.COURSE_NOTIFICATION_TYPES
+        assert "" not in notification_types.keys()
+        for notification_type in notification_types.values():
+            if notification_type['is_core']:
+                continue
+            assert 'content_template' in notification_type.keys()
+            assert isinstance(notification_type['content_context'], dict)
+            assert isinstance(notification_type['non_editable'], list)
+            for key in str_keys:
+                assert isinstance(notification_type[key], str)
+            for key in bool_keys:
+                assert isinstance(notification_type[key], bool)
