@@ -31,7 +31,7 @@ COURSE_NOTIFICATION_TYPES = {
         'email': True,
         'push': True,
         'info': 'Comment on post',
-        'non-editable': ['web', 'email'],
+        'non_editable': ['web', 'email'],
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> replied on <{strong}>{author_name}'
                               '</{strong}> response to your post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -49,7 +49,7 @@ COURSE_NOTIFICATION_TYPES = {
         'email': True,
         'push': True,
         'info': 'Response on post',
-        'non-editable': [],
+        'non_editable': [],
         'content_template': _('<{p}><{strong}>{replier_name}</{strong}> responded to your '
                               'post <{strong}>{post_title}</{strong}></{p}>'),
         'content_context': {
@@ -206,13 +206,13 @@ class NotificationTypeManager:
     @staticmethod
     def get_non_editable_notification_channels(notification_types):
         """
-        Returns non-editable notification channels for the given notification types.
+        Returns non_editable notification channels for the given notification types.
         """
         non_editable_notification_channels = {}
         for notification_type in notification_types:
-            if notification_type.get('non-editable', None):
+            if notification_type.get('non_editable', None):
                 non_editable_notification_channels[notification_type.get('name')] = \
-                    notification_type.get('non-editable')
+                    notification_type.get('non_editable')
         return non_editable_notification_channels
 
     @staticmethod
