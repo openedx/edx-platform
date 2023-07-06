@@ -820,9 +820,7 @@ def _parse_organization(org_name):
     try:
         ensure_organization(org_name)
     except InvalidOrganizationException:
-        #TODO: Org not found strategy.
-        print(f"Could not find a matching organization for: {org_name}.")
-        return 'Steven'
+        return 'None'
     return Organization.objects.get(short_name=org_name)
 
 
@@ -830,7 +828,6 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
     """
     write the access and edit permissions of a v1 library into a v2 library.
     """
-    from openedx.core.djangoapps.content_libraries.models import ContentLibraryPermission
 
     def _get_users_by_access_level(v1_library_key):
         """
@@ -843,9 +840,11 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
         CourseInstructorRole -> ADMIN_LEVEL
         """
         permissions = {}
-        permissions[ContentLibraryPermission.READ_LEVEL] = list(LibraryUserRole(v1_library_key).users_with_role())
-        permissions[ContentLibraryPermission.AUTHOR_LEVEL] = list(CourseStaffRole(v1_library_key).users_with_role())
-        permissions[ContentLibraryPermission.ADMIN_LEVEL] = list(CourseInstructorRole(v1_library_key).users_with_role())
+        permissions[v2contentlib_api.AccessLevel.READ_LEVEL] = list(LibraryUserRole(v1_library_key).users_with_role())
+        permissions[v2contentlib_api.AccessLevel.AUTHOR_LEVEL] = list(CourseStaffRole(v1_library_key).users_with_role())
+        permissions[v2contentlib_api.AccessLevel.ADMIN_LEVEL] = list(
+            CourseInstructorRole(v1_library_key).users_with_role()
+            )
         return permissions
 
     permissions = _get_users_by_access_level(v1_library_key)
@@ -854,14 +853,7 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
             v2contentlib_api.set_library_user_permissions(v2_library_key, user, access_level)
 
 
-def uncopy_content():
-    """
-    #TODO: add uncopy task
-    """
-    return
-
-
-def create_copy_content_task(v2_library_key, v1_library_key):
+def _create_copy_content_task(v2_library_key, v1_library_key):
     """
     spin up a celery task to import the V1 Library's content into the V2 library.
     This utalizes the fact that course and v1 library content is stored almost identically.
@@ -869,16 +861,8 @@ def create_copy_content_task(v2_library_key, v1_library_key):
     return v2contentlib_api.import_blocks_create_task(v2_library_key, v1_library_key)
 
 
-@shared_task(time_limit=30)
-@set_code_owner_attribute
-def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
-    """
-    write the metadata, permissions, and content of a v1 library into a v2 library in the given collection.
-    """
-
-    v1_library_key = CourseKey.from_string(v1_library_key_string)
-
-    LOGGER.info(f"Copy Library task created for library: {v1_library_key}")
+def _create_metadata(v1_library_key, collection_uuid):
+    """instansiate an index for the V2 lib in the collection"""
 
     store = modulestore()
     v1_library = store.get_library(v1_library_key)
@@ -894,20 +878,64 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     allow_public_learning = False
     allow_public_read = False
     library_license = ''  # '' = ALL_RIGHTS_RESERVED
+    with atomic():
+        return v2contentlib_api.create_library(
+            collection,
+            library_type,
+            org,
+            slug,
+            title,
+            description,
+            allow_public_learning,
+            allow_public_read,
+            library_license
+        )
+
+@shared_task(time_limit=30)
+@set_code_owner_attribute
+def delete_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
+    """
+    For a V1 Library, delete the matching v2 library, where the library is the result of the copy operation
+    This method relys on _create_metadata failling for LibraryAlreadyExists in order to obtain the v2 slug.
+    """
+    v1_library_key = CourseKey.from_string(v1_library_key_string)
+    try:
+        # we expect this to fail, because the V2 lib already exists.
+        _create_metadata(v1_library_key, collection_uuid)
+
+    except v2contentlib_api.LibraryAlreadyExists as expected_error:
+        print(expected_error)
+        matching_key = _parse_organization(v1_library_key.org) + next(iter(expected_error), None)[0]
+        v2contentlib_api.delete_library(matching_key)
+        return {
+            "v1_library_id": v1_library_key_string,
+            "v2_library_id": str(expected_error),
+            "status": "SUCCESS",
+            "msg": None
+        }
+
+    return {
+            "v1_library_id": v1_library_key_string,
+            "v2_library_id": None,
+            "status": "FAILED",
+            "msg": f"Exception: V2 Library corresponding to {v1_library_key_string} does not exist."
+        }
+
+
+@shared_task(time_limit=30)
+@set_code_owner_attribute
+def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
+    """
+    write the metadata, permissions, and content of a v1 library into a v2 library in the given collection.
+    """
+
+    v1_library_key = CourseKey.from_string(v1_library_key_string)
+
+    LOGGER.info(f"Copy Library task created for library: {v1_library_key}")
 
     try:
-        with atomic():
-            v2_library_metadata = v2contentlib_api.create_library(
-                collection,
-                library_type,
-                org,
-                slug,
-                title,
-                description,
-                allow_public_learning,
-                allow_public_read,
-                library_license
-            )
+        v2_library_metadata = _create_metadata(v1_library_key, collection_uuid)
+
     except v2contentlib_api.LibraryAlreadyExists:
         return {
             "v1_library_id": v1_library_key_string,
@@ -917,7 +945,7 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
         }
 
     try:
-        create_copy_content_task(v2_library_metadata.key, v1_library.location.library_key)
+        _create_copy_content_task(v2_library_metadata.key, v1_library_key)
     except Exception as error:  # lint-amnesty, pylint: disable=broad-except
         return {
             "v1_library_id": v1_library_key_string,
@@ -928,7 +956,7 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
         }
 
     try:
-        copy_v1_user_roles_into_v2_library(v2_library_metadata.key, v1_library.location.library_key)
+        copy_v1_user_roles_into_v2_library(v2_library_metadata.key, v1_library_key)
     except Exception as error:  # lint-amnesty, pylint: disable=broad-except
         return {
             "v1_library_id": v1_library_key_string,
@@ -937,9 +965,6 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
             "msg":
             f"Could not copy permissions from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
         }
-
-    #TODO: REMOVE THIS WHEN COMPLETE WITH TESTING!
-    #v2contentlib_api.delete_library(v2_library_metadata.key)
 
     return {
         "v1_library_id": v1_library_key_string,

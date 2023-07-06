@@ -5,7 +5,6 @@ from textwrap import dedent
 
 from django.core.management import BaseCommand, CommandError
 
-
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 
@@ -14,7 +13,7 @@ from xmodule.modulestore.django import modulestore
 
 from celery import group
 
-from cms.djangoapps.contentstore.tasks import create_v2_library_from_v1_library
+from cms.djangoapps.contentstore.tasks import create_v2_library_from_v1_library, delete_v2_library_from_v1_library
 
 from .prompt import query_yes_no
 
@@ -29,37 +28,51 @@ class Command(BaseCommand):
     and -- file followed by the path for a list of libraries from a file.
 
     Example usage:
-        $ ./manage.py cms copy_libraries_from_v1_to_v2 '11111111-2111-4111-8111-111111111111' --all
+
+        $ ./manage.py cms copy_libraries_from_v1_to_v2 'collection_uuid' --all
         $ ./manage.py cms copy_libraries_from_v1_to_v2
-            '11111111-2111-4111-8111-111111111111'
-            library-v1:edX+DemoX+Demo_Library'
-            'library-v1:edX+DemoX+Better_Library'
-        $ ./manage.py cms copy_libraries_from_v1_to_v2 --uncopy
+            library-v1:edX+DemoX+Demo_Library'  'library-v1:edX+DemoX+Better_Library' -c 'collection_uuid'
+        $ ./manage.py cms copy_libraries_from_v1_to_v2 --all --uncopy
+        $ ./manage.py cms copy_libraries_from_v1_to_v2 'library-v1:edX+DemoX+Better_Library' --uncopy
         $ ./manage.py cms copy_libraries_from_v1_to_v2
             '11111111-2111-4111-8111-111111111111'
             './list_of--library-locators- --file
 
     Note:
-        This Command Also produces an "output file" which contains the mapping of locators and the status of the copy.
+       This Command Also produces an "output file" which contains the mapping of locators and the status of the copy.
     """
 
     help = dedent(__doc__)
     CONFIRMATION_PROMPT = "Reindexing all libraries might be a time consuming operation. Do you want to continue?"
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            'collection_uuid',
-            nargs=1,
-            help='uuid for the collection to create the content library in.'
-        )
+        """arguements for command"""
 
-        parser.add_argument('library_ids', nargs='*', help='v1 library ids to copy')
+        parser.add_argument(
+            '-collection_uuid',
+            '-c',
+            nargs=1,
+            type=str,
+            help='the uuid for the collection to create the content library in.'
+        )
+        parser.add_argument(
+            'library_ids',
+            nargs='*',
+            help='a space-seperated list of v1 library ids to copy'
+        )
         parser.add_argument(
             '--all',
             action='store_true',
             dest='all',
-            help='Reindex all libraries'
+            help='Copy all libraries'
         )
+        parser.add_argument(
+            '--uncopy',
+            action='store_true',
+            dest='all',
+            help='Delete libraries specified'
+        )
+
         parser.add_argument(
             'output_csv',
             nargs='?',
@@ -75,6 +88,7 @@ class Command(BaseCommand):
             raise CommandError(f"Argument {raw_value} is not a library key")
 
         return result
+
 
     def handle(self, *args, **options):  # lint-amnesty, pylint: disable=unused-argument
         """Parse args and generate tasks for copying content."""
@@ -96,14 +110,13 @@ class Command(BaseCommand):
         else:
             v1_library_keys = list(map(self._parse_library_key, options['library_ids']))
 
-        create_library_task_group = group(
-            [
-                create_v2_library_from_v1_library.s(
-                    str(v1_library_key), options['collection_uuid'][0]
-                )
-                for v1_library_key in v1_library_keys
-            ]
-        )
+        create_library_task_group = group([
+            create_v2_library_from_v1_library.s(str(v1_library_key), options['collection_uuid'][0])
+            if not options['uncopy']
+            else delete_v2_library_from_v1_library.s(str(v1_library_key), options['collection_uuid'][0])
+            for v1_library_key in v1_library_keys
+        ])
+
         group_result = create_library_task_group.apply_async().get()
         if options['output_csv']:
             with open(options['output_csv'][0], 'w', encoding='utf-8', newline='') as output_writer:
