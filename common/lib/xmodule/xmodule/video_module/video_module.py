@@ -63,6 +63,8 @@ from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 from .video_utils import create_youtube_string, format_xml_exception_message, get_poster, rewrite_video_url
 from .video_xfields import VideoFields
 
+from openedx.core.djangoapps.appsembler.sites import utils as appsembler_site_utils
+
 # The following import/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
 #
@@ -393,6 +395,10 @@ class VideoBlock(
         # it anymore; therefore we force-disable it in this case (when controls aren't visible).
         autoadvance_this_video = self.auto_advance and autoadvance_enabled
 
+        scheme = "https" if settings.HTTPS == "on" else "http"
+        lms_base_url = appsembler_site_utils.get_lms_link_from_course_key(settings.LMS_ROOT_URL, self.course_id)
+        lms_root_url = "{}://{}".format(scheme, lms_base_url) if "http" not in lms_base_url else lms_base_url
+
         metadata = {
             'saveStateEnabled': view != PUBLIC_VIEW,
             'saveStateUrl': self.ajax_url + '/save_user_state',
@@ -418,7 +424,7 @@ class VideoBlock(
             'transcriptLanguages': sorted_languages,
             'ytTestTimeout': settings.YOUTUBE['TEST_TIMEOUT'],
             'ytApiUrl': settings.YOUTUBE['API'],
-            'lmsRootURL': settings.LMS_ROOT_URL,
+            'lmsRootURL': lms_root_url,
             'ytMetadataEndpoint': (
                 # In the new runtime, get YouTube metadata via a handler. The handler supports anonymous users and
                 # can work in sandboxed iframes. In the old runtime, the JS will call the LMS's yt_video_metadata
