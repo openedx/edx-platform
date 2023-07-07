@@ -142,9 +142,12 @@ upgrade-package: ## update just one package to the latest usable release
 check-types: ## run static type-checking tests
 	mypy
 
-docker_build:
+docker_auth:
+	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
+
+docker_build: docker_auth
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
-	docker buildx build -t openedx/lms-dev --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --cache-from type=registry,ref=openedx/lms-dev:cache --cache-to type=registry,ref=penedx/lms-dev:cache,mode=max --push .
+	docker buildx build -t openedx/lms-dev:test --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
 
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production -t openedx/lms
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development -t openedx/cms-dev
@@ -154,17 +157,18 @@ docker_tag: docker_build
 # docker tag openedx/lms     openedx/lms:${GITHUB_SHA}
 # docker tag openedx/lms-dev openedx/lms-dev:${GITHUB_SHA}
 	docker images --all
-	docker tag openedx/lms-dev openedx/lms-dev:test
+# docker tag openedx/lms-dev openedx/lms-dev:test
 # docker tag openedx/cms     openedx/cms:${GITHUB_SHA}
 # docker tag openedx/cms-dev openedx/cms-dev:${GITHUB_SHA}
 
-docker_auth:
-	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
+
 
 docker_push: docker_tag docker_auth ## push to docker hub
 # docker push "openedx/lms:latest"
 # docker push "openedx/lms:${GITHUB_SHA}"
-	docker push "openedx/lms-dev:test"
+# docker push "openedx/lms-dev:test"
+
+
 # docker push "openedx/lms-dev:${GITHUB_SHA}"
 # docker push "openedx/cms:latest"
 # docker push "openedx/cms:${GITHUB_SHA}"
