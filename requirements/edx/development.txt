@@ -131,7 +131,7 @@ build==0.10.0
     # via
     #   -r requirements/edx/../pip-tools.txt
     #   pip-tools
-celery==5.3.0
+celery==5.3.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -889,7 +889,7 @@ jwcrypto==1.5.0
     # via
     #   -r requirements/edx/testing.txt
     #   pylti1p3
-kombu==5.3.0
+kombu==5.3.1
     # via
     #   -r requirements/edx/testing.txt
     #   celery
