@@ -86,9 +86,7 @@ class Command(BaseCommand):
 
         if not isinstance(result, LibraryLocator):
             raise CommandError(f"Argument {raw_value} is not a library key")
-
         return result
-
 
     def handle(self, *args, **options):  # lint-amnesty, pylint: disable=unused-argument
         """Parse args and generate tasks for copying content."""

@@ -843,7 +843,7 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
         permissions[v2contentlib_api.AccessLevel.READ_LEVEL] = list(LibraryUserRole(v1_library_key).users_with_role())
         permissions[v2contentlib_api.AccessLevel.AUTHOR_LEVEL] = list(CourseStaffRole(v1_library_key).users_with_role())
         permissions[v2contentlib_api.AccessLevel.ADMIN_LEVEL] = list(
-            CourseInstructorRole(v1_library_key).users_with_role()
+                CourseInstructorRole(v1_library_key).users_with_role()
             )
         return permissions
 
@@ -891,6 +891,7 @@ def _create_metadata(v1_library_key, collection_uuid):
             library_license
         )
 
+
 @shared_task(time_limit=30)
 @set_code_owner_attribute
 def delete_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
@@ -915,11 +916,11 @@ def delete_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
         }
 
     return {
-            "v1_library_id": v1_library_key_string,
-            "v2_library_id": None,
-            "status": "FAILED",
-            "msg": f"Exception: V2 Library corresponding to {v1_library_key_string} does not exist."
-        }
+        "v1_library_id": v1_library_key_string,
+        "v2_library_id": None,
+        "status": "FAILED",
+        "msg": f"Exception: V2 Library corresponding to {v1_library_key_string} does not exist."
+    }
 
 
 @shared_task(time_limit=30)
