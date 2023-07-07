@@ -79,7 +79,6 @@ soupsieve==2.4.1
     # via beautifulsoup4
 sphinx==5.3.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/doc.in
     #   pydata-sphinx-theme
     #   sphinx-book-theme
