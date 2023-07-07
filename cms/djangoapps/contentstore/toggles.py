@@ -476,3 +476,26 @@ def use_new_course_team_page(course_key):
     Returns a boolean if new studio course team mfe is enabled
     """
     return ENABLE_NEW_STUDIO_COURSE_TEAM_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: contentstore.default_enable_flexible_peer_openassessments
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag turns on the force_on_flexible_peer_openassessments
+#      setting for course reruns or new courses, where enabled.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-06-27
+# .. toggle_target_removal_date: 2024-01-27
+# .. toggle_tickets: AU-1289
+# .. toggle_warning:
+DEFAULT_ENABLE_FLEXIBLE_PEER_OPENASSESSMENTS = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.default_enable_flexible_peer_openassessments', __name__)
+
+
+def default_enable_flexible_peer_openassessments(course_key):
+    """
+    Returns a boolean if ORA flexible peer grading should be toggled on for a
+    course rerun or new course. We expect this to be set at the organization
+    level to opt in/out of rolling forward this feature.
+    """
+    return DEFAULT_ENABLE_FLEXIBLE_PEER_OPENASSESSMENTS.is_enabled(course_key)
