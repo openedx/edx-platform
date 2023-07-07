@@ -146,9 +146,28 @@ docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
 
 docker_build: docker_auth
-# DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
-	docker buildx build -t openedx/lms-dev:test-docker --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+	docker buildx build -t openedx/lms-dev:test1 --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+	docker buildx build -t openedx/lms-dev:test2 --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+	docker buildx build -t openedx/lms:test3 --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+	docker buildx build -t openedx/lms:test4 --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+	docker buildx build -t openedx/cms-dev:test5 --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+	docker buildx build -t openedx/cms-dev:test6 --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+	docker buildx build -t openedx/cms:test7 --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+	docker buildx build -t openedx/cms:test8 --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
 
+# docker buildx build -t openedx/lms-dev:latest --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+# docker buildx build -t openedx/lms-dev:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+
+# docker buildx build -t openedx/lms:latest --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+# docker buildx build -t openedx/lms:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+
+# docker buildx build -t openedx/cms-dev:latest --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+# docker buildx build -t openedx/cms-dev:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+
+# docker buildx build -t openedx/cms:latest --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+# docker buildx build -t openedx/cms:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
+
+# DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production -t openedx/lms
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development -t openedx/cms-dev
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target production -t openedx/cms
@@ -156,15 +175,13 @@ docker_build: docker_auth
 docker_tag: docker_build
 # docker tag openedx/lms     openedx/lms:${GITHUB_SHA}
 # docker tag openedx/lms-dev openedx/lms-dev:${GITHUB_SHA}
-# docker tag openedx/lms-dev:test openedx/lms-dev:test-docker
 # docker tag openedx/cms     openedx/cms:${GITHUB_SHA}
 # docker tag openedx/cms-dev openedx/cms-dev:${GITHUB_SHA}
 
 
 
 docker_push: docker_tag docker_auth ## push to docker hub
- docker push openedx/lms-dev:test-docker
-
+#  docker push openedx/lms-dev:test-docker
 # docker push "openedx/lms:latest"
 # docker push "openedx/lms:${GITHUB_SHA}"
 # docker push "openedx/lms-dev:${GITHUB_SHA}"
