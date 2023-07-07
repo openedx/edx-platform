@@ -20,6 +20,8 @@ from cms.djangoapps.contentstore.asset_storage_handlers import (
     update_course_run_asset as update_course_run_asset_source_method,
     get_file_size as get_file_size_source_method,
     delete_asset as delete_asset_source_method,
+    get_asset_json as get_asset_json_source_method,
+    update_asset as update_asset_source_method,
 )
 from opaque_keys.edx.keys import AssetKey, CourseKey
 from pymongo import ASCENDING, DESCENDING
@@ -76,7 +78,7 @@ def assets_handler(request, course_key_string=None, asset_key_string=None):
     DELETE
         json: delete an asset
     '''
-    handle_assets(request, course_key_string, asset_key_string)
+    return handle_assets(request, course_key_string, asset_key_string)
 
 
 def update_course_run_asset(course_key, upload_file):
@@ -92,3 +94,17 @@ def get_file_size(upload_file):
 def delete_asset(course_key, asset_key):
     """Exposes service method in asset_storage_handlers without breaking existing bindings/dependencies"""
     return delete_asset_source_method(course_key, asset_key)
+
+def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key):
+    return get_asset_json_source_method(
+        display_name,
+        content_type,
+        date,
+        location,
+        thumbnail_location,
+        locked,
+        course_key,
+    )
+
+def _update_asset(request, course_key, asset_key):
+    return update_asset_source_method(request, course_key, asset_key)

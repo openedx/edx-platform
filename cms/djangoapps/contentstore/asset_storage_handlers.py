@@ -77,7 +77,7 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
             return _assets_json(request, course_key)
 
         asset_key = AssetKey.from_string(asset_key_string) if asset_key_string else None
-        return _update_asset(request, course_key, asset_key)
+        return update_asset(request, course_key, asset_key)
 
     elif request.method == 'GET':  # assume html
         return _asset_index(request, course_key)
@@ -347,7 +347,7 @@ def _get_assets_in_json_format(assets, course_key):
         thumbnail_asset_key = _get_thumbnail_asset_key(asset, course_key)
         asset_is_locked = asset.get('locked', False)
 
-        asset_in_json = _get_asset_json(
+        asset_in_json = get_asset_json(
             asset['displayname'],
             asset['contentType'],
             asset['uploadDate'],
@@ -421,7 +421,7 @@ def _upload_asset(request, course_key):
     readback = contentstore().find(content.location)
     locked = getattr(content, 'locked', False)
     return JsonResponse({
-        'asset': _get_asset_json(
+        'asset': get_asset_json(
             content.name,
             content.content_type,
             readback.last_modified_at,
@@ -521,7 +521,7 @@ def _get_thumbnail_asset_key(asset, course_key):
 @require_http_methods(('DELETE', 'POST', 'PUT'))
 @login_required
 @ensure_csrf_cookie
-def _update_asset(request, course_key, asset_key):
+def update_asset(request, course_key, asset_key):
     """
     restful CRUD operations for a course asset.
     Currently only DELETE, POST, and PUT methods are implemented.
@@ -590,7 +590,7 @@ def _delete_thumbnail(thumbnail_location, course_key, asset_key):  # lint-amnest
             logging.warning('Could not delete thumbnail: %s', thumbnail_location)
 
 
-def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key):
+def get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key):
     '''
     Helper method for formatting the asset information to send to client.
     '''

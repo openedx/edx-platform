@@ -17,7 +17,6 @@ from opaque_keys.edx.locator import CourseLocator
 from PIL import Image
 from pytz import UTC
 
-from cms.djangoapps.contentstore import asset_storage_handlers
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.utils import reverse_course_url
 from cms.djangoapps.contentstore.views import assets
@@ -367,7 +366,7 @@ class UploadTestCase(AssetsTestCase):
         (MAX_FILE_SIZE, "justequals.file.test", 200),
         (MAX_FILE_SIZE + 90, "large.file.test", 413),
     )
-    @mock.patch('cms.djangoapps.contentstore.views.assets.get_file_size')
+    @mock.patch('cms.djangoapps.contentstore.asset_storage_handlers.get_file_size')
     def test_file_size(self, case, get_file_size):
         max_file_size, name, status_code = case
 
@@ -428,7 +427,7 @@ class AssetToJsonTestCase(AssetsTestCase):
         thumbnail_location = course_key.make_asset_key('thumbnail', 'my_file_name_thumb.jpg')
 
         # pylint: disable=protected-access
-        output = asset_storage_handlers._get_asset_json("my_file", content_type, upload_date, location,
+        output = assets._get_asset_json("my_file", content_type, upload_date, location,
                                         thumbnail_location, True, course_key)
 
         self.assertEqual(output["display_name"], "my_file")
@@ -443,7 +442,7 @@ class AssetToJsonTestCase(AssetsTestCase):
         self.assertEqual(output['locked'], True)
         self.assertEqual(output['static_full_url'], '/asset-v1:org+class+run+type@asset+block@my_file_name.jpg')
 
-        output = asset_storage_handlers._get_asset_json("name", content_type, upload_date, location, None, False, course_key)
+        output = assets._get_asset_json("name", content_type, upload_date, location, None, False, course_key)
         self.assertIsNone(output["thumbnail"])
 
 
@@ -476,7 +475,7 @@ class LockAssetTestCase(AssetsTestCase):
             resp = self.client.post(
                 url,
                 # pylint: disable=protected-access
-                json.dumps(asset_storage_handlers._get_asset_json(
+                json.dumps(assets._get_asset_json(
                     "sample_static.html", content_type, upload_date, asset_location, None, lock, course_key)),
                 "application/json"
             )
