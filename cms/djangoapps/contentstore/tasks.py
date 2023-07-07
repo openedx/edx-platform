@@ -31,7 +31,7 @@ from edx_django_utils.monitoring import (
 from olxcleaner.exceptions import ErrorLevel
 from olxcleaner.reporting import report_error_summary, report_errors
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from organizations.api import add_organization_course, ensure_organization
 from organizations.exceptions import InvalidOrganizationException
 from organizations.models import Organization, OrganizationCourse
@@ -900,27 +900,23 @@ def delete_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     This method relys on _create_metadata failling for LibraryAlreadyExists in order to obtain the v2 slug.
     """
     v1_library_key = CourseKey.from_string(v1_library_key_string)
-    try:
-        # we expect this to fail, because the V2 lib already exists.
-        _create_metadata(v1_library_key, collection_uuid)
+    v2_library_key = LibraryLocatorV2.from_string('lib:' + v1_library_key.org +':'+ v1_library_key.course)
 
-    except v2contentlib_api.LibraryAlreadyExists as expected_error:
-        print(expected_error)
-        matching_key = _parse_organization(v1_library_key.org) + next(iter(expected_error), None)[0]
-        v2contentlib_api.delete_library(matching_key)
+    try:
+        v2contentlib_api.delete_library(v2_library_key)
         return {
             "v1_library_id": v1_library_key_string,
-            "v2_library_id": str(expected_error),
+            "v2_library_id": v2_library_key,
             "status": "SUCCESS",
             "msg": None
         }
-
-    return {
-        "v1_library_id": v1_library_key_string,
-        "v2_library_id": None,
-        "status": "FAILED",
-        "msg": f"Exception: V2 Library corresponding to {v1_library_key_string} does not exist."
-    }
+    except Exception as error: # lint-amnesty, pylint: disable=broad-except
+        return {
+            "v1_library_id": v1_library_key_string,
+            "v2_library_id": v2_library_key,
+            "status": "FAILED",
+            "msg": f"Exception: {v2_library_key} did not delete: {error}"
+        }
 
 
 @shared_task(time_limit=30)

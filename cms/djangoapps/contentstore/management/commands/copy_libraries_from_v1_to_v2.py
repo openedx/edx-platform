@@ -69,7 +69,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--uncopy',
             action='store_true',
-            dest='all',
+            dest='uncopy',
             help='Delete libraries specified'
         )
 
@@ -90,6 +90,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):  # lint-amnesty, pylint: disable=unused-argument
         """Parse args and generate tasks for copying content."""
+        print(options)
 
         if (not options['library_ids'] and not options['all']) or (options['library_ids'] and options['all']):
             raise CommandError("copy_libraries_from_v1_to_v2 requires one or more <library_id>s or the --all flag.")
@@ -109,9 +110,9 @@ class Command(BaseCommand):
             v1_library_keys = list(map(self._parse_library_key, options['library_ids']))
 
         create_library_task_group = group([
-            create_v2_library_from_v1_library.s(str(v1_library_key), options['collection_uuid'][0])
-            if not options['uncopy']
-            else delete_v2_library_from_v1_library.s(str(v1_library_key), options['collection_uuid'][0])
+            delete_v2_library_from_v1_library.s(str(v1_library_key), options['collection_uuid'][0])
+            if options['uncopy']
+            else create_v2_library_from_v1_library.s(str(v1_library_key), options['collection_uuid'][0])
             for v1_library_key in v1_library_keys
         ])
 
