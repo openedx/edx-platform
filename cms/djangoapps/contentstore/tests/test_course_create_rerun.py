@@ -361,7 +361,7 @@ class TestCourseListing(ModuleStoreTestCase):
         dest_course = self.store.get_course(dest_course_key)
 
         # ... and our setting got enabled appropriately on our new course
-        if (mock_toggle_state):
+        if mock_toggle_state:
             self.assertTrue(dest_course.force_on_flexible_peer_openassessments)
         # ... or preserved if the default enable setting is not on
         else:
