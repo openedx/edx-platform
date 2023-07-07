@@ -146,11 +146,6 @@ docker_build:
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
 	docker buildx build -t openedx/lms-dev --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --cache-from type=registry,ref=openedx/lms-dev:cache --cache-to type=registry,ref=penedx/lms-dev:cache,mode=max --push .
 
-docker buildx build -t devopps/hello-world-multi-arch:v1 \
---push=true \
---cache-from type=registry,ref=devopps/hello-world-multi-arch:cache \
---cache-to type=registry,ref=devopps/hello-world-multi-arch:cache,mode=max \
---platform linux/amd64,linux/arm64 .
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production -t openedx/lms
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development -t openedx/cms-dev
 # DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target production -t openedx/cms
