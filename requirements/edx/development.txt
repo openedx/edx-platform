@@ -440,7 +440,7 @@ django-multi-email-field==0.6.2
     #   edx-enterprise
 django-mysql==4.10.0
     # via -r requirements/edx/testing.txt
-django-oauth-toolkit==1.3.2
+django-oauth-toolkit==1.6.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
@@ -887,6 +887,7 @@ jsonschema==4.17.3
 jwcrypto==1.5.0
     # via
     #   -r requirements/edx/testing.txt
+    #   django-oauth-toolkit
     #   pylti1p3
 kombu==5.2.4
     # via
@@ -1011,9 +1012,8 @@ numpy==1.22.4
     #   openedx-calc
     #   scipy
     #   shapely
-oauthlib==3.0.1
+oauthlib==3.2.2
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   django-oauth-toolkit
     #   lti-consumer-xblock
