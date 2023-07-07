@@ -1,7 +1,7 @@
 # Do things in edx-platform
 .PHONY: base-requirements check-types clean \
   compile-requirements detect_changed_source_translations dev-requirements \
-  docker_auth docker_build docker_push docker_tag docs extract_translations \
+  docker_auth docker_build docs extract_translations \
   guides help lint-imports local-requirements pre-requirements pull \
   pull_translations push_translations requirements shell swagger \
   technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
@@ -142,6 +142,9 @@ upgrade-package: ## update just one package to the latest usable release
 check-types: ## run static type-checking tests
 	mypy
 
+docker_auth:
+	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
+
 docker_build: docker_auth
 	docker buildx build -t openedx/lms-dev:latest --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
 	docker buildx build -t openedx/lms-dev:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
@@ -151,26 +154,6 @@ docker_build: docker_auth
 	docker buildx build -t openedx/cms-dev:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
 	docker buildx build -t openedx/cms:latest --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production --push .
 	docker buildx build -t openedx/cms:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production --push .
-
-
-docker_tag: docker_build
-	docker tag openedx/lms     openedx/lms:${GITHUB_SHA}
-	docker tag openedx/lms-dev openedx/lms-dev:${GITHUB_SHA}
-	docker tag openedx/cms     openedx/cms:${GITHUB_SHA}
-	docker tag openedx/cms-dev openedx/cms-dev:${GITHUB_SHA}
-
-docker_auth:
-	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
-
-docker_push: docker_tag docker_auth ## push to docker hub
-	docker push "openedx/lms:latest"
-	docker push "openedx/lms:${GITHUB_SHA}"
-	docker push "openedx/lms-dev:latest"
-	docker push "openedx/lms-dev:${GITHUB_SHA}"
-	docker push "openedx/cms:latest"
-	docker push "openedx/cms:${GITHUB_SHA}"
-	docker push "openedx/cms-dev:latest"
-	docker push "openedx/cms-dev:${GITHUB_SHA}"
 
 lint-imports:
 	lint-imports
