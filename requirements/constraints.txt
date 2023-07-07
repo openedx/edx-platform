@@ -34,8 +34,6 @@ django-storages==1.9.1
 # for them.
 edx-enterprise==3.68.1
 
-django-oauth-toolkit<=1.6.1
-
 # Will be updated once we update python-dateutil package
 matplotlib<3.4.0
 
