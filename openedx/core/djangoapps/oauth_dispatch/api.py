@@ -33,7 +33,9 @@ def create_dot_access_token(request, user, client, expires_in=None, scopes=None)
         request_validator=dot_settings.OAUTH2_VALIDATOR_CLASS(),
     )
     _populate_create_access_token_request(request, user, client, scopes)
-    return token_generator.create_token(request, refresh_token=True)
+    token = token_generator.create_token(request, refresh_token=True)
+    token_generator.request_validator.save_token(token, request)
+    return token
 
 
 def _get_expires_in_value(expires_in):
