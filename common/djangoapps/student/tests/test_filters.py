@@ -123,7 +123,10 @@ class TestCourseEnrollmentsPipelineStep(PipelineStep):
     def run_filter(self, enrollments):  # pylint: disable=arguments-differ
         """Pipeline steps that modifies course enrollments when make a queryset request."""
 
-        return enrollments
+        enrollments = [enrollment for enrollment in enrollments if enrollment.course_id.org == "demo"]
+        return {
+            "enrollments": enrollments,
+        }
 
 
 @skip_unless_lms
@@ -140,12 +143,16 @@ class EnrollmentFiltersTest(ModuleStoreTestCase):
     def setUp(self):  # pylint: disable=arguments-differ
         super().setUp()
         self.course = CourseFactory.create()
+        demo_course = CourseFactory.create(org='demo')
+        test_course = CourseFactory.create(org='test')
         self.user = UserFactory.create(
             username="test",
             email="test@example.com",
             password="password",
         )
         self.user_profile = UserProfileFactory.create(user=self.user, name="Test Example")
+        CourseEnrollment.enroll(self.user, demo_course.id, mode='audit')
+        CourseEnrollment.enroll(self.user, test_course.id, mode='audit')
         self.enrollment = get_course_enrollments(self.user)
 
     @override_settings(
@@ -218,7 +225,7 @@ class EnrollmentFiltersTest(ModuleStoreTestCase):
         """
         enrollments = get_course_enrollments(self.user)
 
-        self.assertEqual(self.enrollment, enrollments)
+        self.assertListEqual(self.enrollment, enrollments)
 
     @override_settings(
         OPEN_EDX_FILTERS_CONFIG={
@@ -238,9 +245,14 @@ class EnrollmentFiltersTest(ModuleStoreTestCase):
             - CourseEnrollmentQuerysetRequested is triggered and executes TestCourseEnrollmentsPipelineStep.
             - The result is a list of course enrollments queryset filter by org
         """
-        enrollments = get_course_enrollments(self.user)
+        expected_enrollment = self.enrollment
+        expected_enrollment = expected_enrollment[0]['course_details']['course_id']
 
-        self.assertEqual(self.enrollment, enrollments)
+        enrollments = get_course_enrollments(self.user)
+        enrollments = enrollments[0]['course_details']['course_id']
+
+        self.assertEqual(expected_enrollment, enrollments)
+        self.assertAlmostEqual(len(enrollments), len(expected_enrollment), 1)
 
 
 @skip_unless_lms
