@@ -1,136 +1,136 @@
 module.exports = {
     "entry": {
         "AboutBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js",
-            "./xmodule/js/src/html/imageModal.js",
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/html/display.js",
+            "./xmodule/assets/javascript_loader.js",
+            "./xmodule/assets/collapsible.js",
+            "./xmodule/assets/html/imageModal.js",
             "./xmodule/js/common_static/js/vendor/draggabilly.js"
         ],
         "AboutBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/edit.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/html/edit.js"
         ],
         "AnnotatableBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/display.js",
-            "./xmodule/js/src/annotatable/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/html/display.js",
+            "./xmodule/assets/annotatable/display.js",
+            "./xmodule/assets/javascript_loader.js",
+            "./xmodule/assets/collapsible.js"
         ],
         "AnnotatableBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/raw/edit/xml.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/raw/edit/xml.js"
         ],
         "ConditionalBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/conditional/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/conditional/display.js",
+            "./xmodule/assets/javascript_loader.js",
+            "./xmodule/assets/collapsible.js"
         ],
         "ConditionalBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/sequence/edit.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/sequence/edit.js"
         ],
         "CourseInfoBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js",
-            "./xmodule/js/src/html/imageModal.js",
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/html/display.js",
+            "./xmodule/assets/javascript_loader.js",
+            "./xmodule/assets/collapsible.js",
+            "./xmodule/assets/html/imageModal.js",
             "./xmodule/js/common_static/js/vendor/draggabilly.js"
         ],
         "CourseInfoBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/edit.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/html/edit.js"
         ],
-        "CustomTagBlockDisplay": "./xmodule/js/src/xmodule.js",
+        "CustomTagBlockDisplay": "./xmodule/assets/xmodule.js",
         "CustomTagBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/raw/edit/xml.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/raw/edit/xml.js"
         ],
         "HtmlBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js",
-            "./xmodule/js/src/html/imageModal.js",
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/html/display.js",
+            "./xmodule/assets/javascript_loader.js",
+            "./xmodule/assets/collapsible.js",
+            "./xmodule/assets/html/imageModal.js",
             "./xmodule/js/common_static/js/vendor/draggabilly.js"
         ],
         "HtmlBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/edit.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/html/edit.js"
         ],
         "LTIBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/lti/lti.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/lti/lti.js"
         ],
         "LTIBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/raw/edit/metadata-only.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/raw/edit/metadata-only.js"
         ],
-        "LibraryContentBlockDisplay": "./xmodule/js/src/xmodule.js",
+        "LibraryContentBlockDisplay": "./xmodule/assets/xmodule.js",
         "LibraryContentBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/vertical/edit.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/vertical/edit.js"
         ],
         "PollBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/poll/poll.js",
-            "./xmodule/js/src/poll/poll_main.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/javascript_loader.js",
+            "./xmodule/assets/poll/poll.js",
+            "./xmodule/assets/poll/poll_main.js"
         ],
-        "PollBlockEditor": "./xmodule/js/src/xmodule.js",
+        "PollBlockEditor": "./xmodule/assets/xmodule.js",
         "ProblemBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/capa/display.js",
-            "./xmodule/js/src/collapsible.js",
-            "./xmodule/js/src/capa/imageinput.js",
-            "./xmodule/js/src/capa/schematic.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/javascript_loader.js",
+            "./xmodule/assets/capa/display.js",
+            "./xmodule/assets/collapsible.js",
+            "./xmodule/assets/capa/imageinput.js",
+            "./xmodule/assets/capa/schematic.js"
         ],
         "ProblemBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/problem/edit.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/problem/edit.js"
         ],
         "SequenceBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/sequence/display.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/sequence/display.js"
         ],
-        "SequenceBlockEditor": "./xmodule/js/src/xmodule.js",
-        "SplitTestBlockDisplay": "./xmodule/js/src/xmodule.js",
+        "SequenceBlockEditor": "./xmodule/assets/xmodule.js",
+        "SplitTestBlockDisplay": "./xmodule/assets/xmodule.js",
         "SplitTestBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/sequence/edit.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/sequence/edit.js"
         ],
         "StaticTabBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/display.js",
-            "./xmodule/js/src/javascript_loader.js",
-            "./xmodule/js/src/collapsible.js",
-            "./xmodule/js/src/html/imageModal.js",
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/html/display.js",
+            "./xmodule/assets/javascript_loader.js",
+            "./xmodule/assets/collapsible.js",
+            "./xmodule/assets/html/imageModal.js",
             "./xmodule/js/common_static/js/vendor/draggabilly.js"
         ],
         "StaticTabBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/html/edit.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/html/edit.js"
         ],
         "VideoBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/video/10_main.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/video/10_main.js"
         ],
         "VideoBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/tabs/tabs-aggregator.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/tabs/tabs-aggregator.js"
         ],
         "WordCloudBlockDisplay": [
-            "./xmodule/js/src/xmodule.js",
+            "./xmodule/assets/xmodule.js",
             "./xmodule/assets/word_cloud/src/js/word_cloud.js"
         ],
         "WordCloudBlockEditor": [
-            "./xmodule/js/src/xmodule.js",
-            "./xmodule/js/src/raw/edit/metadata-only.js"
+            "./xmodule/assets/xmodule.js",
+            "./xmodule/assets/raw/edit/metadata-only.js"
         ]
     }
 };
