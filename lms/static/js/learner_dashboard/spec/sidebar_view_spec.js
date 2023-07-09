@@ -6,6 +6,7 @@ describe('Sidebar View', () => {
     let view = null;
     const context = {
         marketingUrl: 'https://www.example.org/programs',
+        subscriptionsMarketingUrl: 'https://www.example.org/program-subscriptions',
         isUserB2CSubscriptionsEnabled: true,
     };
 
@@ -53,8 +54,7 @@ describe('Sidebar View', () => {
         expect(view.$('.js-subscription-upsell a span:last').html().trim())
             .toEqual('Explore subscription options');
         expect(view.$('.js-subscription-upsell a').attr('href'))
-            .not
-            .toEqual(context.marketingUrl);
+            .toEqual('https://www.example.org/program-subscriptions');
     });
 
     it('should load the exploration panel given a marketing URL', () => {
@@ -72,6 +72,7 @@ describe('Sidebar View', () => {
             el: '.sidebar',
             context: {
                 isUserB2CSubscriptionsEnabled: true,
+                subscriptionsMarketingUrl: '',
             },
         });
         view.render();

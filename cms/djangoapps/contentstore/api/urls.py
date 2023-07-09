@@ -8,7 +8,6 @@ from cms.djangoapps.contentstore.api.views import course_import, course_quality,
 
 
 app_name = 'contentstore'
-helper = "{0,1}"
 
 urlpatterns = [
     re_path(fr'^v0/import/{settings.COURSE_ID_PATTERN}/$',

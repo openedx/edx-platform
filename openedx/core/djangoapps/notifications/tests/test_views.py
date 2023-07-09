@@ -6,9 +6,10 @@ from datetime import datetime, timedelta
 
 import ddt
 from django.conf import settings
-from django.dispatch import Signal
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
+from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
+from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
@@ -17,13 +18,12 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
-from openedx.core.djangoapps.notifications.models import (
-    Notification,
-    CourseNotificationPreference,
-)
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from ..base_notification import COURSE_NOTIFICATION_APPS
 
 
 class CourseEnrollmentListViewTest(ModuleStoreTestCase):
@@ -74,9 +74,12 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data['results']
         enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
         expected_data = NotificationCourseEnrollmentSerializer(enrollments, many=True).data
-        self.assertEqual(response.data, expected_data)
+
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data, expected_data)
 
     def test_course_enrollment_api_permission(self):
         """
@@ -113,18 +116,32 @@ class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
             is_active=True,
             mode='audit'
         )
-        self.post_save_signal = Signal()
 
     def test_course_enrollment_post_save(self):
         """
         Test the post_save signal for CourseEnrollment.
         """
         # Emit post_save signal
-
-        self.post_save_signal.send(
-            sender=self.course_enrollment.__class__,
-            instance=self.course_enrollment,
-            created=True
+        enrollment_data = CourseEnrollmentData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.profile.name,
+                ),
+                id=self.user.id,
+                is_active=self.user.is_active,
+            ),
+            course=CourseData(
+                course_key=self.course.id,
+                display_name=self.course.display_name,
+            ),
+            mode=self.course_enrollment.mode,
+            is_active=self.course_enrollment.is_active,
+            creation_date=self.course_enrollment.created,
+        )
+        COURSE_ENROLLMENT_CREATED.send_event(
+            enrollment=enrollment_data
         )
 
         # Assert that CourseNotificationPreference object was created with correct attributes
@@ -157,13 +174,29 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             is_active=True,
             mode='audit'
         )
-        self.post_save_signal = Signal()
         self.client = APIClient()
         self.path = reverse('notification-preferences', kwargs={'course_key_string': self.course.id})
-        self.post_save_signal.send(
-            sender=self.course_enrollment.__class__,
-            instance=self.course_enrollment,
-            created=True
+
+        enrollment_data = CourseEnrollmentData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.profile.name,
+                ),
+                id=self.user.id,
+                is_active=self.user.is_active,
+            ),
+            course=CourseData(
+                course_key=self.course.id,
+                display_name=self.course.display_name,
+            ),
+            mode=self.course_enrollment.mode,
+            is_active=self.course_enrollment.is_active,
+            creation_date=self.course_enrollment.created,
+        )
+        COURSE_ENROLLMENT_CREATED.send_event(
+            enrollment=enrollment_data
         )
 
     def _expected_api_response(self):
@@ -283,8 +316,12 @@ class NotificationListAPIViewTest(APITestCase):
         # Create a notification for the user.
         Notification.objects.create(
             user=self.user,
-            app_name='app1',
-            notification_type='info',
+            app_name='discussion',
+            notification_type='new_response',
+            content_context={
+                'replier_name': 'test_user',
+                'post_title': 'This is a test post.',
+            }
         )
         self.client.login(username=self.user.username, password='test')
 
@@ -297,8 +334,12 @@ class NotificationListAPIViewTest(APITestCase):
         data = response.data['results']
         # Assert that the response contains the notification.
         self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]['app_name'], 'app1')
-        self.assertEqual(data[0]['notification_type'], 'info')
+        self.assertEqual(data[0]['app_name'], 'discussion')
+        self.assertEqual(data[0]['notification_type'], 'new_response')
+        self.assertEqual(
+            data[0]['content'],
+            '<p><strong>test_user</strong> responded to your post <strong>This is a test post.</strong></p>'
+        )
 
     def test_list_notifications_with_app_name_filter(self):
         """
@@ -307,8 +348,12 @@ class NotificationListAPIViewTest(APITestCase):
         # Create two notifications for the user, one for each app name.
         Notification.objects.create(
             user=self.user,
-            app_name='app1',
-            notification_type='info',
+            app_name='discussion',
+            notification_type='new_response',
+            content_context={
+                'replier_name': 'test_user',
+                'post_title': 'This is a test post.',
+            }
         )
         Notification.objects.create(
             user=self.user,
@@ -318,7 +363,7 @@ class NotificationListAPIViewTest(APITestCase):
         self.client.login(username=self.user.username, password='test')
 
         # Make a request to the view with the app_name query parameter set to 'app1'.
-        response = self.client.get(self.url + "?app_name=app1")
+        response = self.client.get(self.url + "?app_name=discussion")
 
         # Assert that the response is successful.
         self.assertEqual(response.status_code, 200)
@@ -326,8 +371,12 @@ class NotificationListAPIViewTest(APITestCase):
         # Assert that the response contains only the notification for app1.
         data = response.data['results']
         self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]['app_name'], 'app1')
-        self.assertEqual(data[0]['notification_type'], 'info')
+        self.assertEqual(data[0]['app_name'], 'discussion')
+        self.assertEqual(data[0]['notification_type'], 'new_response')
+        self.assertEqual(
+            data[0]['content'],
+            '<p><strong>test_user</strong> responded to your post <strong>This is a test post.</strong></p>'
+        )
 
     def test_list_notifications_without_authentication(self):
         """
@@ -471,7 +520,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
         self.assertEqual(response.data['count_by_app_name'], {})
 
 
-class MarkNotificationsUnseenAPIViewTestCase(APITestCase):
+class MarkNotificationsSeenAPIViewTestCase(APITestCase):
     """
     Tests for the MarkNotificationsUnseenAPIView.
     """
@@ -485,19 +534,119 @@ class MarkNotificationsUnseenAPIViewTestCase(APITestCase):
         Notification.objects.create(user=self.user, app_name='App Name 2', notification_type='Type A')
         Notification.objects.create(user=self.user, app_name='App Name 3', notification_type='Type C')
 
-    def test_mark_notifications_unseen(self):
-        # Create a POST request to mark notifications as unseen for 'App Name 1'
+    def test_mark_notifications_seen(self):
+        # Create a POST request to mark notifications as seen for 'App Name 1'
         app_name = 'App Name 1'
-        url = reverse('mark-notifications-unseen', kwargs={'app_name': app_name})
+        url = reverse('mark-notifications-seen', kwargs={'app_name': app_name})
         self.client.login(username=self.user.username, password='test')
         response = self.client.put(url)
         # Assert the response status code is 200 (OK)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Assert the response data contains the expected message
-        expected_data = {'message': 'Notifications marked unseen.'}
+        expected_data = {'message': 'Notifications marked as seen.'}
         self.assertEqual(response.data, expected_data)
 
-        # Assert the notifications for 'App Name 1' are marked as unseen for the user
+        # Assert the notifications for 'App Name 1' are marked as seen for the user
         notifications = Notification.objects.filter(user=self.user, app_name=app_name, last_seen__isnull=False)
         self.assertEqual(notifications.count(), 2)
+
+
+class NotificationReadAPIViewTestCase(APITestCase):
+    """
+    Tests for the NotificationReadAPIView.
+    """
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.url = reverse('notifications-read')
+        self.client.login(username=self.user.username, password='test')
+
+        # Create some sample notifications for the user with already existing apps and with invalid app name
+        Notification.objects.create(user=self.user, app_name='app_name_2', notification_type='Type A')
+        for app_name in COURSE_NOTIFICATION_APPS:
+            Notification.objects.create(user=self.user, app_name=app_name, notification_type='Type A')
+            Notification.objects.create(user=self.user, app_name=app_name, notification_type='Type B')
+
+    def test_mark_all_notifications_read_with_app_name(self):
+        # Create a PATCH request to mark all notifications as read for already existing app e.g 'discussion'
+        app_name = next(iter(COURSE_NOTIFICATION_APPS))
+        data = {'app_name': app_name}
+
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'message': 'Notifications marked read.'})
+        notifications = Notification.objects.filter(user=self.user, app_name=app_name, last_read__isnull=False)
+        self.assertEqual(notifications.count(), 2)
+
+    def test_mark_all_notifications_read_with_invalid_app_name(self):
+        # Create a PATCH request to mark all notifications as read for 'app_name_1'
+        app_name = 'app_name_1'
+        data = {'app_name': app_name}
+
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'Invalid app_name or notification_id.'})
+
+    def test_mark_notification_read_with_notification_id(self):
+        # Create a PATCH request to mark notification as read for notification_id: 2
+        notification_id = 2
+        data = {'notification_id': notification_id}
+
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'message': 'Notification marked read.'})
+        notifications = Notification.objects.filter(user=self.user, id=notification_id, last_read__isnull=False)
+        self.assertEqual(notifications.count(), 1)
+
+    def test_mark_notification_read_with_other_user_notification_id(self):
+        # Create a PATCH request to mark notification as read for notification_id: 2 through a different user
+        self.client.logout()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password='test')
+
+        notification_id = 2
+        data = {'notification_id': notification_id}
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        notifications = Notification.objects.filter(user=self.user, id=notification_id, last_read__isnull=False)
+        self.assertEqual(notifications.count(), 0)
+
+    def test_mark_notification_read_with_invalid_notification_id(self):
+        # Create a PATCH request to mark notification as read for notification_id: 23345
+        notification_id = 23345
+        data = {'notification_id': notification_id}
+
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data["detail"], 'Not found.')
+
+    def test_mark_notification_read_with_app_name_and_notification_id(self):
+        # Create a PATCH request to mark notification as read for existing app e.g 'discussion' and notification_id: 2
+        # notification_id has higher priority than app_name in this case app_name is ignored
+        app_name = next(iter(COURSE_NOTIFICATION_APPS))
+        notification_id = 2
+        data = {'app_name': app_name, 'notification_id': notification_id}
+
+        response = self.client.patch(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {'message': 'Notification marked read.'})
+        notifications = Notification.objects.filter(
+            user=self.user,
+            id=notification_id,
+            last_read__isnull=False
+        )
+        self.assertEqual(notifications.count(), 1)
+
+    def test_mark_notification_read_without_app_name_and_notification_id(self):
+        # Create a PATCH request to mark notification as read without app_name and notification_id
+        response = self.client.patch(self.url, {})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data, {'error': 'Invalid app_name or notification_id.'})

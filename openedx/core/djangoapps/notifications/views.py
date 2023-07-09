@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import Count
+from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import generics, permissions, status
@@ -18,6 +20,7 @@ from openedx.core.djangoapps.notifications.models import (
     get_course_notification_preference_config_version
 )
 
+from .base_notification import COURSE_NOTIFICATION_APPS
 from .config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
 from .models import Notification
 from .serializers import (
@@ -33,23 +36,31 @@ class CourseEnrollmentListView(generics.ListAPIView):
     API endpoint to get active CourseEnrollments for requester.
 
     **Permissions**: User must be authenticated.
+    **Response Format** (paginated):
 
-    **Response Format**:
-        [
-            {
-                "course": {
-                    "id": (int) course_id,
-                    "display_name": (str) course_display_name
+        {
+            "next": (str) url_to_next_page_of_courses,
+            "previous": (str) url_to_previous_page_of_courses,
+            "count": (int) total_number_of_courses,
+            "num_pages": (int) total_number_of_pages,
+            "current_page": (int) current_page_number,
+            "start": (int) index_of_first_course_on_page,
+            "results" : [
+                {
+                    "course": {
+                        "id": (int) course_id,
+                        "display_name": (str) course_display_name
+                    },
                 },
-            },
-            ...
-        ]
-    **Response Error Codes**:
-            - 403: The requester cannot access resource.
+                ...
+            ],
+        }
+
+    Response Error Codes:
+    - 403: The requester cannot access resource.
     """
     serializer_class = NotificationCourseEnrollmentSerializer
     permission_classes = [permissions.IsAuthenticated]
-    pagination_class = None
 
     def get_queryset(self):
         user = self.request.user
@@ -60,14 +71,20 @@ class CourseEnrollmentListView(generics.ListAPIView):
         Returns the list of active course enrollments for which ENABLE_NOTIFICATIONS
         Waffle flag is enabled
         """
-        enrollment_queryset = self.get_queryset().select_related('course')
-        enrollments = [
-            enrollment
-            for enrollment in enrollment_queryset
-            if ENABLE_NOTIFICATIONS.is_enabled(enrollment.course.id)
-        ]
-        serializer = self.get_serializer(enrollments, many=True)
-        return Response(serializer.data)
+        queryset = self.filter_queryset(self.get_queryset())
+        course_ids = queryset.values_list('course_id', flat=True)
+
+        for course_id in course_ids:
+            if not ENABLE_NOTIFICATIONS.is_enabled(course_id):
+                queryset = queryset.exclude(course_id=course_id)
+
+        queryset = queryset.select_related('course').order_by('-id')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response(self.get_serializer(queryset, many=True).data)
 
 
 class UserNotificationPreferenceView(APIView):
@@ -144,12 +161,8 @@ class UserNotificationPreferenceView(APIView):
             }
          """
         course_id = CourseKey.from_string(course_key_string)
-        user_notification_preference, _ = CourseNotificationPreference.objects.get_or_create(
-            user=request.user,
-            course_id=course_id,
-            is_active=True,
-        )
-        serializer = UserCourseNotificationPreferenceSerializer(user_notification_preference)
+        user_preference = CourseNotificationPreference.get_updated_user_course_preferences(request.user, course_id)
+        serializer = UserCourseNotificationPreferenceSerializer(user_preference)
         return Response(serializer.data)
 
     def patch(self, request, course_key_string):
@@ -174,7 +187,7 @@ class UserNotificationPreferenceView(APIView):
         )
         if user_course_notification_preference.config_version != get_course_notification_preference_config_version():
             return Response(
-                {'error': 'The notification preference config version is not up to date.'},
+                {'error': _('The notification preference config version is not up to date.')},
                 status=status.HTTP_409_CONFLICT,
             )
 
@@ -302,28 +315,28 @@ class NotificationCountView(APIView):
         })
 
 
-class MarkNotificationsUnseenAPIView(UpdateAPIView):
+class MarkNotificationsSeenAPIView(UpdateAPIView):
     """
-    API view for marking user's all notifications unseen for a provided app_name.
+    API view for marking user's all notifications seen for a provided app_name.
     """
 
     permission_classes = (permissions.IsAuthenticated,)
 
     def update(self, request, *args, **kwargs):
         """
-        Marks all notifications for the given app name unseen for the authenticated user.
+        Marks all notifications for the given app name seen for the authenticated user.
 
         **Args:**
-            app_name: The name of the app to mark notifications unseen for.
+            app_name: The name of the app to mark notifications seen for.
         **Response Format:**
-            A `Response` object with a 200 OK status code if the notifications were successfully marked unseen.
+            A `Response` object with a 200 OK status code if the notifications were successfully marked seen.
         **Response Error Codes**:
         - 400: Bad Request status code if the app name is invalid.
         """
         app_name = self.kwargs.get('app_name')
 
         if not app_name:
-            return Response({'message': 'Invalid app name.'}, status=400)
+            return Response({'error': _('Invalid app name.')}, status=400)
 
         notifications = Notification.objects.filter(
             user=request.user,
@@ -333,4 +346,55 @@ class MarkNotificationsUnseenAPIView(UpdateAPIView):
 
         notifications.update(last_seen=datetime.now())
 
-        return Response({'message': 'Notifications marked unseen.'}, status=200)
+        return Response({'message': _('Notifications marked as seen.')}, status=200)
+
+
+class NotificationReadAPIView(APIView):
+    """
+    API view for marking user notifications as read, either all notifications or a single notification
+    """
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def patch(self, request, *args, **kwargs):
+        """
+        Marks all notifications or single notification read for the given
+        app name or notification id for the authenticated user.
+
+        Requests:
+        PATCH /api/notifications/read/
+
+        Parameters:
+            request (Request): The request object containing the app name or notification id.
+                {
+                    "app_name": (str) app_name,
+                    "notification_id": (int) notification_id
+                }
+
+        Returns:
+        - 200: OK status code if the notification or notifications were successfully marked read.
+        - 400: Bad Request status code if the app name is invalid.
+        - 403: Forbidden status code if the user is not authenticated.
+        - 404: Not Found status code if the notification was not found.
+        """
+        notification_id = request.data.get('notification_id', None)
+        read_at = datetime.now(UTC)
+
+        if notification_id:
+            notification = get_object_or_404(Notification, pk=notification_id, user=request.user)
+            notification.last_read = read_at
+            notification.save()
+            return Response({'message': _('Notification marked read.')}, status=status.HTTP_200_OK)
+
+        app_name = request.data.get('app_name', '')
+
+        if app_name and app_name in COURSE_NOTIFICATION_APPS:
+            notifications = Notification.objects.filter(
+                user=request.user,
+                app_name=app_name,
+                last_read__isnull=True,
+            )
+            notifications.update(last_read=read_at)
+            return Response({'message': _('Notifications marked read.')}, status=status.HTTP_200_OK)
+
+        return Response({'error': _('Invalid app_name or notification_id.')}, status=status.HTTP_400_BAD_REQUEST)

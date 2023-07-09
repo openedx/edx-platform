@@ -22,7 +22,7 @@ from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.progress import Progress
 from xmodule.seq_block import ProctoringFields, SequenceMixin
 from xmodule.studio_editable import StudioEditableBlock
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
@@ -362,7 +362,7 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'SplitTestBlockStudio')
+        add_webpack_js_to_fragment(fragment, 'SplitTestBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 
