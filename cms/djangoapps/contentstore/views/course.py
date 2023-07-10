@@ -104,6 +104,7 @@ from ..tasks import rerun_course as rerun_course_task
 from ..toggles import split_library_view_on_dashboard
 from ..utils import (
     add_instructor,
+    get_course_grading,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
     initialize_permissions,
@@ -1354,19 +1355,12 @@ def grading_handler(request, course_key_string, grader_index=None):
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_block = get_course_and_check_access(course_key, request.user)
+        if not has_studio_read_access(request.user, course_key):
+            raise PermissionDenied()
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
-            course_details = CourseGradingModel.fetch(course_key)
-            return render_to_response('settings_graders.html', {
-                'context_course': course_block,
-                'course_locator': course_key,
-                'course_details': course_details,
-                'grading_url': reverse_course_url('grading_handler', course_key),
-                'is_credit_course': is_credit_course(course_key),
-                'mfe_proctored_exam_settings_url': get_proctored_exam_settings_url(course_block.id),
-                'default_grade_designations': settings.DEFAULT_GRADE_DESIGNATIONS
-            })
+            grading_context = get_course_grading(course_key)
+            return render_to_response('settings_graders.html', grading_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
                 if grader_index is None:

@@ -14,4 +14,9 @@ urlpatterns = [
         views.ProctoredExamSettingsView.as_view(),
         name="proctored_exam_settings"
     ),
+    re_path(
+        fr'^course_grading/{COURSE_ID_PATTERN}$',
+        views.CourseGradingView.as_view(),
+        name="course_grading"
+    ),
 ]
