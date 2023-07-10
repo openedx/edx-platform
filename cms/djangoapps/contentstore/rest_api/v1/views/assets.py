@@ -9,21 +9,19 @@ from common.djangoapps.util.json_request import expect_json_in_class_view
 
 from ....api import course_author_access_required
 
-from cms.djangoapps.contentstore.xblock_storage_handlers import view_handlers
+from cms.djangoapps.contentstore.asset_storage_handlers import handle_assets
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
 log = logging.getLogger(__name__)
 toggles = contentstore_toggles
-handle_xblock = view_handlers.handle_xblock
 
 
 @view_auth_classes()
-class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAPIView):
+class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAPIView):
     """
     public rest API endpoint for the Studio Content API.
-    course_key: required argument, needed to authorize course authors.
-    usage_key_string (optional):
-    xblock identifier, for example in the form of "block-v1:<course id>+type@<type>+block@<block id>"
+    course_key_string: required argument, needed to authorize course authors.
+    asset_key_string: required argument, needed to identify the asset.
     """
 
     def dispatch(self, request, *args, **kwargs):
@@ -33,33 +31,29 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
         and calls other methods to handle specific HTTP methods.
         We use this to raise a 404 if the content api is disabled.
         """
+        import pdb; pdb.set_trace()
         if not toggles.use_studio_content_api():
             raise Http404
         return super().dispatch(request, *args, **kwargs)
 
-    # pylint: disable=arguments-differ
     @course_author_access_required
     @expect_json_in_class_view
     def retrieve(self, request, *args, **kwargs):
-        return handle_xblock(request, kwargs['usage_key_string'])
+        import pdb; pdb.set_trace()
+        return handle_assets(request, kwargs['course_id'], kwargs['asset_key_string'])
 
     @course_author_access_required
     @expect_json_in_class_view
-    def update(self, request, course_key, usage_key_string=None):
-        return handle_xblock(request, usage_key_string)
+    def update(self, request, course_id, asset_key_string):
+        return handle_assets(request, course_id, asset_key_string)
 
     @course_author_access_required
     @expect_json_in_class_view
-    def partial_update(self, request, course_key, usage_key_string=None):
-        return handle_xblock(request, usage_key_string)
-
-    @course_author_access_required
-    @expect_json_in_class_view
-    def destroy(self, request, course_key, usage_key_string=None):
-        return handle_xblock(request, usage_key_string)
+    def destroy(self, request, course_id, asset_key_string):
+        return handle_assets(request, course_id, asset_key_string)
 
     @csrf_exempt
     @course_author_access_required
     @expect_json_in_class_view
-    def create(self, request, course_key, usage_key_string=None):
-        return handle_xblock(request, usage_key_string)
+    def create(self, request, course_id, asset_key_string):
+        return handle_assets(request, course_id, asset_key_string)

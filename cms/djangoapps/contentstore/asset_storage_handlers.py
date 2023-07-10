@@ -67,6 +67,7 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
     DELETE
         json: delete an asset
     '''
+    import pdb; pdb.set_trace()
     course_key = CourseKey.from_string(course_key_string)
     if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
