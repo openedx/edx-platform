@@ -6800,7 +6800,7 @@ msgstr "正在加载"
 
 #: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
-msgstr ""
+msgstr "已到期"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Staged Content"
@@ -7245,6 +7245,28 @@ msgstr "课程{course}的黑名单国家： {country}"
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
 msgstr "学习者路径"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on "
+"<{strong}>{author_name}</{strong}> response to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
@@ -10574,6 +10596,16 @@ msgid ""
 "Specify the video sharing options for the course. This can be set to one of "
 "three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
 "default."
+msgstr ""
+
+#: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
 msgstr ""
 
 #: xmodule/course_block.py
@@ -22480,6 +22512,10 @@ msgstr "课程导航"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "大纲"
+
+#: cms/templates/widgets/header.html
+msgid "Files & Media"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

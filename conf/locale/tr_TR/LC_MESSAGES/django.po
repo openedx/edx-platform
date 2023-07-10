@@ -7649,6 +7649,28 @@ msgstr "{course} dersi için {country} kara listede"
 msgid "Learner Pathways"
 msgstr "Öğrenci Patikaları"
 
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on "
+"<{strong}>{author_name}</{strong}> response to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
 msgstr ""
@@ -11372,6 +11394,16 @@ msgstr ""
 "Ders için video paylaşım seçeneklerini belirtin. Bu, üç değerden birine "
 "ayarlanabilir: \"tümü açık\", \"tümü kapalı\" ve \"video başına\". "
 "Varsayılan değer \"video başına\"."
+
+#: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
+msgstr ""
 
 #: xmodule/course_block.py
 msgid "Course Instructor"
@@ -24665,6 +24697,10 @@ msgstr "Ders Navigasyonu"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Taslak"
+
+#: cms/templates/widgets/header.html
+msgid "Files & Media"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"
