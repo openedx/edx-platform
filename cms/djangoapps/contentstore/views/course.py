@@ -690,7 +690,7 @@ def course_index(request, course_key):
             raise Http404
         lms_link = get_lms_link_for_item(course_module.location)
         reindex_link = None
-        if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
+        if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', True):
             if GlobalStaff().has_user(request.user):
                 reindex_link = f"/course/{str(course_key)}/search_reindex"
         sections = course_module.get_children()
