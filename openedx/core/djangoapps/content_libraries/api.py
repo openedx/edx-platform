@@ -234,7 +234,7 @@ class LibraryXBlockStaticFile:
     # File path e.g. "diagram.png"
     # In some rare cases it might contain a folder part, e.g. "en/track1.srt"
     path = attr.ib("")
-    # Publicly accessible URL where the file d be downloaded
+    # Publicly accessible URL where the file can be downloaded
     url = attr.ib("")
     # Size in bytes
     size = attr.ib(0)
