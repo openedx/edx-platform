@@ -12,6 +12,7 @@ from django.core.files.storage import get_storage_class
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from common.djangoapps.student.models import UserProfile
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from ..errors import UserNotFound
 
@@ -20,14 +21,24 @@ PROFILE_IMAGE_FILE_EXTENSION = 'jpg'   # All processed profile images are conver
 _PROFILE_IMAGE_SIZES = list(settings.PROFILE_IMAGE_SIZES_MAP.values())
 
 
+class ProfileImageS3Storage(S3Boto3Storage):  # pylint: disable=abstract-method
+    """
+    S3 backend profile-images
+    """
+    def get_object_parameters(self, name):
+        s3_object_params = {
+            'CacheControl': 'max-age=2592000'
+        }
+        return {**s3_object_params}
+
+
 def get_profile_image_storage():
     """
     Configures and returns a django Storage instance that can be used
     to physically locate, read and write profile images.
     """
     config = settings.PROFILE_IMAGE_BACKEND
-    storage_class = get_storage_class(config['class'])
-    return storage_class(**config['options'])
+    return ProfileImageS3Storage(**config['options'])
 
 
 def _make_profile_image_name(username):
