@@ -843,8 +843,8 @@ def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
         permissions[v2contentlib_api.AccessLevel.READ_LEVEL] = list(LibraryUserRole(v1_library_key).users_with_role())
         permissions[v2contentlib_api.AccessLevel.AUTHOR_LEVEL] = list(CourseStaffRole(v1_library_key).users_with_role())
         permissions[v2contentlib_api.AccessLevel.ADMIN_LEVEL] = list(
-                CourseInstructorRole(v1_library_key).users_with_role()
-            )
+            CourseInstructorRole(v1_library_key).users_with_role()
+        )
         return permissions
 
     permissions = _get_users_by_access_level(v1_library_key)
@@ -900,7 +900,7 @@ def delete_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
     This method relys on _create_metadata failling for LibraryAlreadyExists in order to obtain the v2 slug.
     """
     v1_library_key = CourseKey.from_string(v1_library_key_string)
-    v2_library_key = LibraryLocatorV2.from_string('lib:' + v1_library_key.org +':'+ v1_library_key.course)
+    v2_library_key = LibraryLocatorV2.from_string('lib:' + v1_library_key.org + ':' + v1_library_key.course)
 
     try:
         v2contentlib_api.delete_library(v2_library_key)
@@ -910,7 +910,7 @@ def delete_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
             "status": "SUCCESS",
             "msg": None
         }
-    except Exception as error: # lint-amnesty, pylint: disable=broad-except
+    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
         return {
             "v1_library_id": v1_library_key_string,
             "v2_library_id": v2_library_key,
