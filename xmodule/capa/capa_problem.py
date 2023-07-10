@@ -36,7 +36,6 @@ from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.safe_exec import safe_exec
 from xmodule.capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_block
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.edx_six import get_gettext
 from xmodule.stringify import stringify_children
 
 # extra things displayed after "show answers" is pressed
@@ -483,7 +482,7 @@ class LoncapaProblem(object):
             # an earlier submission, so for now skip these entirely.
             # TODO: figure out where to get file submissions when rescoring.
             if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
-                _ = get_gettext(self.capa_system.i18n)
+                _ = self.capa_system.i18n.gettext
                 raise Exception(_("Cannot rescore problems with possible file submissions"))
 
             # use 'student_answers' only if it is provided, and if it might contain a file
@@ -580,7 +579,7 @@ class LoncapaProblem(object):
             question_nr = int(answer_id.split('_')[-2]) - 1
             return _("Question {}").format(question_nr)
 
-        _ = get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         # Some questions define a prompt with this format:   >>This is a prompt<<
         try:
             prompt = self.problem_data[answer_id].get('label')
@@ -693,7 +692,7 @@ class LoncapaProblem(object):
         choice-level explanations shown to a student after submission.
         Does nothing if there is no targeted-feedback attribute.
         """
-        _ = get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         # Note that the modifications has been done, avoiding problems if called twice.
         if hasattr(self, 'has_targeted'):
             return
