@@ -13,14 +13,6 @@ def find_app_in_normalized_apps(app_name, apps_list):
     return None
 
 
-def get_notifications_app_names_list(course_notificaton_apps):
-    """
-    Returns list of course notification app names
-    """
-    app_names = list(course_notificaton_apps.keys())
-    return app_names
-
-
 def find_pref_in_normalized_prefs(pref_name, app_name, prefs_list):
     """
     Returns preference based on preference_name and app_name
