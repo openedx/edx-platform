@@ -207,7 +207,6 @@ class NotificationPreferenceSyncManagerTest(ModuleStoreTestCase):
         Tests if non_editable updates on existing preferences of core notification
         """
         current_config_version = get_course_notification_preference_config_version()
-        breakpoint()
         base_notification.COURSE_NOTIFICATION_APPS[self.default_app_name]['non_editable'] = ['web']
         self._set_notification_config_version(current_config_version + 1)
         new_config = CourseNotificationPreference.get_updated_user_course_preferences(self.user, self.course.id)
