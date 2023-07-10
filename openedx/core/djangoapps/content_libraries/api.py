@@ -70,7 +70,13 @@ from django.utils.translation import gettext as _
 from elasticsearch.exceptions import ConnectionError as ElasticConnectionError
 from lxml import etree
 from opaque_keys.edx.keys import LearningContextKey, UsageKey
-from opaque_keys.edx.locator import BundleDefinitionLocator, LibraryLocatorV2, LibraryUsageLocatorV2
+from opaque_keys.edx.locator import (
+    BundleDefinitionLocator,
+    LibraryLocatorV2,
+    LibraryUsageLocatorV2,
+    LibraryLocator as LibraryLocatorV1
+)
+
 from organizations.models import Organization
 from xblock.core import XBlock
 from xblock.exceptions import XBlockNotFoundError
@@ -1160,7 +1166,6 @@ class BaseEdxImportClient(abc.ABC):
         """
         Import a single modulestore block.
         """
-
         block_data = self.get_block_data(modulestore_key)
 
         # Get or create the block in the library.
@@ -1270,6 +1275,8 @@ class EdxModulestoreImportClient(BaseEdxImportClient):
         Retrieve the course from modulestore and traverse its content tree.
         """
         course = self.modulestore.get_course(course_key)
+        if isinstance(course_key, LibraryLocatorV1):
+            course = self.modulestore.get_library(course_key)
         export_keys = set()
         blocks_q = collections.deque(course.get_children())
         while blocks_q:
