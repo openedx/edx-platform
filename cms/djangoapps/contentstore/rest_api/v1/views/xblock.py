@@ -40,8 +40,8 @@ class XblockView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     # pylint: disable=arguments-differ
     @course_author_access_required
     @expect_json_in_class_view
-    def retrieve(self, request, *args, **kwargs):
-        return handle_xblock(request, kwargs['usage_key_string'])
+    def retrieve(self, request, course_key, usage_key_string=None):
+        return handle_xblock(request, usage_key_string)
 
     @course_author_access_required
     @expect_json_in_class_view

@@ -49,6 +49,6 @@ urlpatterns = [
     ),
     re_path(
         fr'^file_asset/{settings.COURSE_ID_PATTERN}/{settings.ASSET_KEY_PATTERN}$',
-        assets.AssetsView.as_view(), name='studio_content'
+        assets.AssetsView.as_view(), name='studio_content_assets'
     ),
 ]

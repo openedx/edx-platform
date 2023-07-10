@@ -31,29 +31,27 @@ class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
         and calls other methods to handle specific HTTP methods.
         We use this to raise a 404 if the content api is disabled.
         """
-        import pdb; pdb.set_trace()
         if not toggles.use_studio_content_api():
             raise Http404
         return super().dispatch(request, *args, **kwargs)
 
     @course_author_access_required
     @expect_json_in_class_view
-    def retrieve(self, request, *args, **kwargs):
-        import pdb; pdb.set_trace()
-        return handle_assets(request, kwargs['course_id'], kwargs['asset_key_string'])
+    def retrieve(self, request, course_key, asset_key_string):
+        return handle_assets(request, course_key.html_id(), asset_key_string)
 
     @course_author_access_required
     @expect_json_in_class_view
-    def update(self, request, course_id, asset_key_string):
-        return handle_assets(request, course_id, asset_key_string)
+    def update(self, request, course_key, asset_key_string):
+        return handle_assets(request, course_key.html_id(), asset_key_string)
 
     @course_author_access_required
     @expect_json_in_class_view
-    def destroy(self, request, course_id, asset_key_string):
-        return handle_assets(request, course_id, asset_key_string)
+    def destroy(self, request, course_key, asset_key_string):
+        return handle_assets(request, course_key.html_id(), asset_key_string)
 
     @csrf_exempt
     @course_author_access_required
     @expect_json_in_class_view
-    def create(self, request, course_id, asset_key_string):
-        return handle_assets(request, course_id, asset_key_string)
+    def create(self, request, course_key, asset_key_string):
+        return handle_assets(request, course_key.html_id(), asset_key_string)
