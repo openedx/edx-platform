@@ -6,7 +6,6 @@ Used by capa_problem.py
 """
 # standard library imports
 import abc
-# TODO: Refactor this code and fix this issue.
 import inspect
 import json
 import logging
