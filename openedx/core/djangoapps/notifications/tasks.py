@@ -11,6 +11,7 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
     Notification,
@@ -82,6 +83,8 @@ def send_notifications(user_ids, course_key, app_name, notification_type, contex
     """
     Send notifications to the users.
     """
+    if not ENABLE_NOTIFICATIONS.is_enabled():
+        return
     user_ids = list(set(user_ids))
 
     # check if what is preferences of user and make decision to send notification or not
@@ -120,15 +123,16 @@ def create_notification_pref_if_not_exists(user_ids, preferences):
     """
     Create notification preference if not exist.
     """
+    new_preferences = []
+
     for user_id in user_ids:
-        for preference in preferences:
-            if preference.user_id == user_id:
-                break
-        else:
-            preferences.append(CourseNotificationPreference.objects.create(
+        if not any(preference.user_id == user_id for preference in preferences):
+            new_preferences.append(CourseNotificationPreference(
                 user_id=user_id,
                 course_id=preferences[0].course_id,
-
             ))
             logger.info('Creating new notification preference for user because it does not exist.')
+    if new_preferences:
+        CourseNotificationPreference.objects.bulk_create(new_preferences, ignore_conflicts=True)
+        preferences = preferences + new_preferences
     return preferences

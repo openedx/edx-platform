@@ -3,9 +3,12 @@ Tests for notifications tasks.
 """
 from unittest.mock import patch
 
+from edx_toggles.toggles.testutils import override_waffle_flag
+
 from common.djangoapps.student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from ..config.waffle import ENABLE_NOTIFICATIONS
 
 from ..models import CourseNotificationPreference
 from ..tasks import create_notification_pref_if_not_exists, update_user_preference
@@ -59,6 +62,7 @@ class TestNotificationsTasks(ModuleStoreTestCase):
         updated_preference = update_user_preference(self.preference_v2, self.user, self.course_2.id)
         self.assertEqual(updated_preference.config_version, 1)
 
+    @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
     def test_create_notification_pref_if_not_exists(self):
         """
         Test whether create_notification_pref_if_not_exists creates a new preference if it doesn't exist.
