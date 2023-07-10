@@ -195,8 +195,8 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         entry = InstructorTask.objects.get(id=task_entry.id)
         assert entry.task_state == FAILURE
         output = json.loads(entry.task_output)
-        assert output['exception'] == 'ExceptionWithTraceback'
-        assert expected_message in output['message']
+        assert output['exception'] == 'TestTaskFailure'
+        assert output['message'] == expected_message
 
     def _test_run_with_long_error_msg(self, task_class):
         """
@@ -213,10 +213,8 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         assert entry.task_state == FAILURE
         assert 1023 > len(entry.task_output)
         output = json.loads(entry.task_output)
-        assert output['exception'] == 'ExceptionWithTraceback'
-        assert (
-            expected_message[:(len(output['message']) - 7)] + '\n"""...'
-        ) == output['message']
+        assert output['exception'] == 'TestTaskFailure'
+        assert output['message'] == (expected_message[:(len(output['message']) - 3)] + '...')
         assert 'traceback' not in output
 
     def _test_run_with_short_error_msg(self, task_class):
@@ -235,9 +233,9 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         assert entry.task_state == FAILURE
         assert 1023 > len(entry.task_output)
         output = json.loads(entry.task_output)
-        assert output['exception'] == 'ExceptionWithTraceback'
-        assert (expected_message[:(len(output['message']) - 7)] + '\n"""...') == output['message']
-        assert output['message'][(- 3):] == '...'
+        assert output['exception'] == 'TestTaskFailure'
+        assert output['message'] == expected_message
+        assert output['traceback'][(- 3):] == '...'
 
 
 class TestOverrideScoreInstructorTask(TestInstructorTasks):
@@ -302,8 +300,9 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         # check values stored in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
-        assert output['exception'] == 'ExceptionWithTraceback'
-        assert 'Scores cannot be overridden for this problem type.' in output['message']
+        assert output['exception'] == 'UpdateProblemModuleStateError'
+        assert output['message'] == 'Scores cannot be overridden for this problem type.'
+        assert len(output['traceback']) > 0
 
     def test_overriding_unaccessable(self):
         """
@@ -433,11 +432,12 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         # check values stored in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
-        assert output['exception'] == 'ExceptionWithTraceback'
-        assert 'Specified module {} of type {} does not support rescoring.'.format(
+        assert output['exception'] == 'UpdateProblemModuleStateError'
+        assert output['message'] == 'Specified module {} of type {} does not support rescoring.'.format(
             self.location,
             mock_instance.__class__,
-        ) in output['message']
+        )
+        assert len(output['traceback']) > 0
 
     def test_rescoring_unaccessable(self):
         """

@@ -74,18 +74,16 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
-backports-zoneinfo[tzdata]==0.2.1
+backports-zoneinfo==0.2.1
     # via
     #   -r requirements/edx/base.txt
-    #   celery
     #   icalendar
-    #   kombu
 beautifulsoup4==4.12.2
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
     #   pynliner
-billiard==4.1.0
+billiard==3.6.4.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -119,7 +117,7 @@ botocore==1.10.84
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/base.txt
-celery==5.3.1
+celery==5.2.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -843,8 +841,9 @@ jwcrypto==1.5.0
     # via
     #   -r requirements/edx/base.txt
     #   pylti1p3
-kombu==5.3.1
+kombu==5.2.4
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   celery
 laboratory==1.0.2
@@ -1217,7 +1216,6 @@ python-dateutil==2.8.2
     #   -r requirements/edx/base.txt
     #   analytics-python
     #   botocore
-    #   celery
     #   edx-ace
     #   edx-drf-extensions
     #   edx-enterprise
@@ -1249,6 +1247,7 @@ pytz==2022.7.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   babel
+    #   celery
     #   django
     #   django-ses
     #   djangorestframework
@@ -1504,17 +1503,11 @@ typing-extensions==4.6.3
     #   django-countries
     #   grimp
     #   import-linter
-    #   kombu
     #   pydantic
     #   pylint
     #   pylti1p3
     #   snowflake-connector-python
     #   starlette
-tzdata==2023.3
-    # via
-    #   -r requirements/edx/base.txt
-    #   backports-zoneinfo
-    #   celery
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.txt
