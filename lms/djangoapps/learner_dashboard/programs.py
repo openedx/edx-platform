@@ -78,7 +78,8 @@ class ProgramsFragmentView(EdxFragmentView):
             'progress': meter.progress(),
             'programs_subscription_data': programs_subscription_data,
             'user_preferences': get_user_preferences(user),
-            'is_user_b2c_subscriptions_enabled': is_user_b2c_subscriptions_enabled
+            'is_user_b2c_subscriptions_enabled': is_user_b2c_subscriptions_enabled,
+            'mobile_only': bool(mobile_only)
         }
         html = render_to_string('learner_dashboard/programs_fragment.html', context)
         programs_fragment = Fragment(html)
