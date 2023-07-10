@@ -81,12 +81,6 @@
   <!-- Configure and load MathJax -->
   <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
-      styles: {
-        '.MathJax_SVG>svg': { 'max-width': '100%' },
-      },
-      CommonHTML: { linebreaks: { automatic: true } },
-      SVG: { linebreaks: { automatic: true } },
-      "HTML-CSS": { linebreaks: { automatic: true } },
       tex2jax: {
         inlineMath: [
           ["\\(","\\)"],
@@ -98,18 +92,6 @@
         ]
       }
     });
-    window.addEventListener('resize', MJrenderer);
-    let 1 = -1;
-    let delay = 1000;
-    function MJrenderer() {
-      if (t >= 0) {
-        window.clearTimeout(t);
-      }
-      t = window.setTimeout(function() {
-        MathJax.Hub.Queue(["Rerenderer", MathJax.Hub]);
-        t = -1;
-      }, delay);
-    };
   </script>
   <script type="text/x-mathjax-config">
     MathJax.Hub.signal.Interest(function(message) {
