@@ -12,7 +12,6 @@ from uuid import uuid4
 
 from django.utils.functional import cached_property
 from lxml import etree
-from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from webob import Response
 from xblock.core import XBlock
@@ -26,7 +25,6 @@ from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     STUDENT_VIEW,
@@ -132,7 +130,6 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
@@ -158,17 +155,8 @@ class SplitTestBlock(  # lint-amnesty, pylint: disable=abstract-method
 
     show_in_read_only_mode = True
 
-    preview_view_js = {
-        'js': [],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
     mako_template = "widgets/metadata-only-edit.html"
     studio_js_module_name = 'SequenceDescriptor'
-    studio_view_js = {
-        'js': [resource_filename(__name__, 'js/src/sequence/edit.js')],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     @cached_property
     def child_block(self):

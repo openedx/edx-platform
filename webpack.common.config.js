@@ -9,7 +9,7 @@ var StringReplace = require('string-replace-webpack-plugin');
 var Merge = require('webpack-merge');
 
 var files = require('./webpack-config/file-lists.js');
-var xmoduleJS = require('./common/static/xmodule/webpack.xmodule.config.js');
+var xmoduleJS = require('./webpack.xmodule.config.js');
 
 var filesWithRequireJSBlocks = [
     path.resolve(__dirname, 'common/static/common/js/components/utils/view_utils.js'),

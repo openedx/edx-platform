@@ -52,7 +52,7 @@ from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_
 from xmodule.video_block import manage_video_subtitles_save
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
-    HTMLSnippet, ResourceTemplates, shim_xmodule_js,
+    ResourceTemplates, shim_xmodule_js,
     XModuleMixin, XModuleToXBlockMixin,
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
@@ -121,7 +121,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 @XBlock.needs('mako', 'user')
 class VideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
-        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin, HTMLSnippet,
+        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
         ResourceTemplates, XModuleMixin, LicenseMixin):
     """
     XML source example:
@@ -282,6 +282,9 @@ class VideoBlock(
         return fragment
 
     def get_html(self, view=STUDENT_VIEW, context=None):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements
+        """
+        Return html for a given view of this block.
+        """
         context = context or {}
         track_status = (self.download_track and self.track)
         transcript_download_format = self.transcript_download_format if not track_status else None
