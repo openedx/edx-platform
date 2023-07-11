@@ -20,7 +20,7 @@ toggles = contentstore_toggles
 class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAPIView):
     """
     public rest API endpoint for the Studio Content API.
-    course_key_string: required argument, needed to authorize course authors.
+    course_key: required argument, needed to authorize course authors and identify the asset.
     asset_key_string: required argument, needed to identify the asset.
     """
 
@@ -37,8 +37,13 @@ class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
 
     @course_author_access_required
     @expect_json_in_class_view
-    def retrieve(self, request, course_key, asset_key_string):
-        return handle_assets(request, course_key.html_id(), asset_key_string)
+    def retrieve(self, request, course_key):
+        return handle_assets(request, course_key.html_id())
+
+    @csrf_exempt
+    @course_author_access_required
+    def create(self, request, course_key):
+        return handle_assets(request, course_key.html_id())
 
     @course_author_access_required
     @expect_json_in_class_view
@@ -48,10 +53,4 @@ class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
     @course_author_access_required
     @expect_json_in_class_view
     def destroy(self, request, course_key, asset_key_string):
-        return handle_assets(request, course_key.html_id(), asset_key_string)
-
-    @csrf_exempt
-    @course_author_access_required
-    @expect_json_in_class_view
-    def create(self, request, course_key, asset_key_string):
         return handle_assets(request, course_key.html_id(), asset_key_string)

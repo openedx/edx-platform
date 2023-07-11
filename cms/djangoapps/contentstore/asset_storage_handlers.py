@@ -76,6 +76,7 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
         if request.method == 'GET':
             return _assets_json(request, course_key)
 
+        # POST, PUT, DELETE typically invoke this
         asset_key = AssetKey.from_string(asset_key_string) if asset_key_string else None
         return update_asset(request, course_key, asset_key)
 
