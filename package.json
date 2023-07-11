@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "repository": "https://github.com/openedx/edx-platform",
   "scripts": {
-    "postinstall": "scripts/copy-node-modules.sh"
+    "postinstall": "scripts/copy-node-modules.sh",
+    "webpack": "NODE_ENV=${NODE_ENV:-production} \"$(npm bin)/webpack\" --config=${WEBPACK_CONFIG_PATH:-webpack.prod.config.js}",
+    "webpack-dev": "NODE_ENV=development \"$(npm bin)/webpack\" --config=webpack.dev.config.js"
   },
   "dependencies": {
     "@babel/core": "7.19.0",
