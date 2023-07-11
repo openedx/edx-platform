@@ -22,9 +22,11 @@ function ProgramListFactory(options) {
     }
 
     if (options.programsData.length) {
-        new HeaderView({
-            context: options,
-        }).render();
+        if (!options.mobileOnly) {
+            new HeaderView({
+                context: options,
+            }).render();
+        }
 
         const activeSubscriptions = options.programsSubscriptionData
             .filter(({ subscription_state }) => subscription_state === 'active')
