@@ -29,11 +29,10 @@ django-storages==1.9.1
 # for them.
 edx-enterprise==4.0.11
 
-# oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
-oauthlib==3.0.1
-
-# django-auth-toolkit==1.3.3 requires oauthlib>=3.1.0 which is pinned because of test failures
-django-oauth-toolkit<=1.3.2
+# greater version has breaking changes and requires some migration steps.
+# In 2.x.x releases the client_secret is being saved as a hash instead of plain text.
+# https://django-oauth-toolkit.readthedocs.io/en/latest/changelog.html#id12
+django-oauth-toolkit<=1.7.1
 
 # Will be updated once we update python-dateutil package
 matplotlib<3.4.0
