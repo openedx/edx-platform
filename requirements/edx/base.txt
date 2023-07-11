@@ -923,8 +923,6 @@ python-dateutil==2.8.2
     #   olxcleaner
     #   ora2
     #   xblock
-python-memcached==1.59
-    # via -r requirements/edx/paver.txt
 python-slugify==8.0.1
     # via code-annotations
 python-swiftclient==4.3.0
