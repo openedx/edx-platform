@@ -128,9 +128,11 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        A Python-defined task that calls out to each build stage.
 
-     - ``scripts/build-assets.sh``
+     - ``npm clean-install && npm run build``
 
-       A Bash script that contains all build stages, with subcommands available for running each stage separately. Its command-line interface inspired by Tutor's ``openedx-assets`` script. The script will be runnable on any POSIX system, including macOS and Ubuntu and it will linted for common shell scripting mistakes using `shellcheck <https://www.shellcheck.net>`_.
+       Simple NPM wrappers around the build stages. The wrappers will be written in Bash and tested on both GNU+Linux and macOS.
+
+       These commands are a "one stop shop" for building assets, but more efficiency-oriented users may choose to run build stages individually.
 
    * - + **Build stage 1: Copy npm-installed assets** from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
 
@@ -174,27 +176,25 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Note: libsass is pinned to a 2015 version with a non-trivial upgrade path. Installing it requires compiling a large C extension, noticeably affecting Docker image build time.
 
-     - ``scripts/build-assets.sh css``
+     - ``scripts/compile_sass``
 
-       Bash reimplementation, calling ``node-sass`` and ``rtlcss``.
+       TODO describe
 
-       The initial implementation of build-assets.sh may use ``sassc``, a CLI provided by libsass, instead of node-sass. Then, ``sassc`` can be replaced by ``node-sass`` as part of a subsequent `edx-platform frontend framework upgrade effort <https://github.com/openedx/edx-platform/issues/31616>`_.
+       TODO mention `edx-platform frontend framework upgrade effort <https://github.com/openedx/edx-platform/issues/31616>`_.
 
    * - + **Build stage 5: Compile themes' SCSS** into CSS for legacy LMS/CMS frontends. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
 
      - ``./manage.py [lms|cms] compile_sass``, or
 
-       ``paver compile_sass --theme-dirs ...``
+       ``paver compile_sass --theme-dirs X Y --themes A B``
 
        The management command is a wrapper around the paver task. The former looks up the list of theme search directories from Django settings and site configuration; the latter requires them to be supplied as arguments.
 
      - ``./manage.py [lms|cms] compile_sass``, or
 
-       ``scripts/build-assets.sh themes --theme-dirs ...``
+     - ``scripts/compile_sass --theme-dir X --theme-dir  Y --theme A --theme B``
 
-       The management command will remain available, but it will need to be updated to point at the Bash script, which will replace the paver task (see build stage 4 for details).
-
-       The overall asset *build* action will use the Bash script; this means that list of theme directories will need to be provided as arguments, but it ensures that the build can remain Python-free.
+       The management command will remain available, but it will need to be updated to point at ``compile_sass``, which will replace the paver task (see build stage 4 for details).
 
    * - **Collect** the built static assets from edx-platform to another location (the ``STATIC_ROOT``) so that they can be efficiently served *without* Django's webserver. This step, by nature, requires Python and Django in order to find and organize the assets, which may come from edx-platform itself or from its many installed Python and NPM packages. This is only needed for **production** environments, where it is usually desirable to serve assets with something efficient like NGINX.
 
@@ -313,9 +313,9 @@ Either way, the migration path is straightforward:
    * - ``openedx-assets xmodule``
      - (no longer needed)
    * - ``openedx-assets common``
-     - ``scripts/build-assets.sh css``
+     - ``compile_sass --skip-themes``
    * - ``openedx-assets themes``
-     - ``scripts/build-assets.sh themes``
+     - ``compile_sass --skip-default``
    * - ``openedx-assets webpack [--env=dev]``
      - ``npm run webpack[-dev]``
    * - ``openedx-assets collect``

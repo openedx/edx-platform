@@ -108,7 +108,6 @@ mako                                # Primary template language used for server-
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
 mongoengine                         # Object-document mapper for MongoDB, used in the LMS dashboard
 mysqlclient                         # Driver for the default production relational database
-nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 olxcleaner
 openedx-calc                        # Library supporting mathematical calculations for Open edX
