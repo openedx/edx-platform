@@ -160,11 +160,11 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        Python wrapper around a call to webpack. Invokes the ``./manage.py [lms|cms] print_setting`` multiple times in order to determine Django settings, adding which can add 20+ seconds to the build.
 
-     - ``scripts/build-assets.sh webpack --static-root "$(./manage.py lms print_setting STATIC_ROOT)"``.
+     - ``npm run webpack`` or ``npm run webpack-dev``
 
-       Bash wrapper around a call to webpack. The script will accept parameters rather than looking up Django settings itself.
+       Simple shell script defined in package.json to invoke Webpack in prod or dev mode. The script will look for several environment variables, with a default defined for each one. See **Build Configuration** for details. The script will NOT invoke ``print_setting``; we leave to distributions the tasking of setting environment variables appropriately.
 
-       The print_setting command will still be available for distributions to use to extract ``STATIC_ROOT`` from Django settings, but it will only need to be run once. As described in **Build Configuration** below, unnecessary Django settings will be removed. Some distributions may not even need to look up ``STATIC_ROOT``; Tutor, for example, will probably render ``STATIC_ROOT`` directly into the environment variable ``OPENEDX_BUILD_ASSETS_OPTS`` variable, described in the **Build Configuration**.
+       To continue using ``print_setting``, one could run: ``STATIC_ROOT_LMS="$(./manage.py lms print_setting STATIC_ROOT_LMS)" npm run webpack``
 
    * - + **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
 
@@ -261,6 +261,18 @@ Furthermore, to facilitate a Python-free build reimplementation, we will remove 
          OPENEDX_BUILD_ASSETS_OPTS=\
          '--webpack-config path/to/webpack.my.config.js'
 
+   * - STATIC_ROOT_LMS
+
+     - TODO
+
+     - TODO
+
+   * - STATIC_ROOT_CMS
+
+     - TODO
+
+     - TODO
+
    * - JS_ENV_EXTRA_CONFIG
 
      - Global configuration object available to edx-platform JS modules. Defaults empty. Only known use is to add configuration and plugins for the TinyMCE editor.
@@ -304,6 +316,8 @@ Either way, the migration path is straightforward:
      - ``scripts/build-assets.sh css``
    * - ``openedx-assets themes``
      - ``scripts/build-assets.sh themes``
+   * - ``openedx-assets webpack [--env=dev]``
+     - ``npm run webpack[-dev]``
    * - ``openedx-assets collect``
      - ``./manage.py [lms|cms] collectstatic --noinput``
    * - ``openedx-assets watch-themes``

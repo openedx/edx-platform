@@ -2,6 +2,10 @@
   "name": "edx",
   "version": "0.1.0",
   "repository": "https://github.com/openedx/edx-platform",
+  "scripts": {
+    "webpack": "NODE_ENV=production webpack --progress --config=${WEBPACK_CONFIG_PATH:-webpack.prod.config.js}",
+    "webpack-dev": "NODE_ENV=development webpack --progress --config=${WEBPACK_CONFIG_PATH:-webpack.dev.config.js}"
+  },
   "dependencies": {
     "@babel/core": "7.19.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.18.9",
