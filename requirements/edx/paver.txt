@@ -22,7 +22,7 @@ markupsafe==2.1.3
     # via -r requirements/edx/paver.in
 mock==5.0.2
     # via -r requirements/edx/paver.in
-path==16.6.0
+path==16.7.1
     # via -r requirements/edx/paver.in
 paver==1.3.4
     # via -r requirements/edx/paver.in

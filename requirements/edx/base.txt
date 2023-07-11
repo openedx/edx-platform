@@ -43,6 +43,7 @@ attrs==23.1.0
     #   lti-consumer-xblock
     #   openedx-blockstore
     #   openedx-events
+    #   referencing
 babel==2.11.0
     # via
     #   -c requirements/edx/../constraints.txt
@@ -120,7 +121,7 @@ charset-normalizer==2.0.12
     #   snowflake-connector-python
 chem==1.2.0
     # via -r requirements/edx/kernel.in
-click==8.1.3
+click==8.1.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   celery
@@ -260,7 +261,7 @@ django-config-models==2.3.0
     #   edx-enterprise
     #   edx-name-affirmation
     #   lti-consumer-xblock
-django-cors-headers==4.1.0
+django-cors-headers==4.2.0
     # via -r requirements/edx/kernel.in
 django-countries==7.5.1
     # via
@@ -321,9 +322,9 @@ django-mptt==0.14.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-django-wiki
-django-multi-email-field==0.6.2
+django-multi-email-field==0.7.0
     # via edx-enterprise
-django-mysql==4.10.0
+django-mysql==4.11.0
     # via -r requirements/edx/kernel.in
 django-oauth-toolkit==1.3.2
     # via
@@ -492,7 +493,7 @@ edx-event-bus-kafka==5.1.0
     # via -r requirements/edx/kernel.in
 edx-event-bus-redis==0.3.1
     # via -r requirements/edx/kernel.in
-edx-i18n-tools==0.9.2
+edx-i18n-tools==1.0.0
     # via ora2
 edx-milestones==0.4.0
     # via -r requirements/edx/kernel.in
@@ -576,7 +577,7 @@ event-tracking==2.1.0
     #   -r requirements/edx/kernel.in
     #   edx-proctoring
     #   edx-search
-fastavro==1.7.4
+fastavro==1.8.0
     # via openedx-events
 filelock==3.12.2
     # via snowflake-connector-python
@@ -617,10 +618,12 @@ idna==3.4
     #   requests
     #   snowflake-connector-python
     #   yarl
-importlib-metadata==6.7.0
+importlib-metadata==6.8.0
     # via markdown
-importlib-resources==5.12.0
-    # via jsonschema
+importlib-resources==6.0.0
+    # via
+    #   jsonschema
+    #   jsonschema-specifications
 inflection==0.5.1
     # via drf-yasg
 interchange==2021.0.4
@@ -654,8 +657,10 @@ jsonfield==3.1.0
     #   lti-consumer-xblock
     #   ora2
     #   outcome-surveys
-jsonschema==4.17.3
+jsonschema==4.18.0
     # via optimizely-sdk
+jsonschema-specifications==2023.6.1
+    # via jsonschema
 jwcrypto==1.5.0
     # via pylti1p3
 kombu==5.3.1
@@ -679,7 +684,7 @@ loremipsum==1.0.5
     # via ora2
 lti-consumer-xblock==9.5.4
     # via -r requirements/edx/kernel.in
-lxml==4.9.2
+lxml==4.9.3
     # via
     #   -r requirements/edx/kernel.in
     #   edxval
@@ -785,7 +790,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==5.0.3
+ora2==5.1.0
     # via -r requirements/edx/bundled.in
 oscrypto==1.3.0
     # via snowflake-connector-python
@@ -798,7 +803,7 @@ packaging==23.1
     #   snowflake-connector-python
 pansi==2020.7.3
     # via py2neo
-path==16.6.0
+path==16.7.1
     # via
     #   -r requirements/edx/kernel.in
     #   -r requirements/edx/paver.txt
@@ -830,7 +835,7 @@ pkgutil-resolve-name==1.3.10
     # via jsonschema
 polib==1.2.0
     # via edx-i18n-tools
-prompt-toolkit==3.0.38
+prompt-toolkit==3.0.39
     # via click-repl
 psutil==5.9.5
     # via
@@ -900,9 +905,7 @@ pyparsing==3.1.0
     #   chem
     #   openedx-calc
 pyrsistent==0.19.3
-    # via
-    #   jsonschema
-    #   optimizely-sdk
+    # via optimizely-sdk
 pysrt==1.1.2
     # via
     #   -r requirements/edx/kernel.in
@@ -974,6 +977,10 @@ redis==4.6.0
     # via
     #   -r requirements/edx/kernel.in
     #   walrus
+referencing==0.29.1
+    # via
+    #   jsonschema
+    #   jsonschema-specifications
 regex==2023.6.3
     # via nltk
 requests==2.31.0
@@ -1004,6 +1011,10 @@ requests-oauthlib==1.3.1
     # via
     #   -r requirements/edx/kernel.in
     #   social-auth-core
+rpds-py==0.8.10
+    # via
+    #   jsonschema
+    #   referencing
 ruamel-yaml==0.17.32
     # via drf-yasg
 ruamel-yaml-clib==0.2.7
@@ -1220,7 +1231,7 @@ xss-utils==0.4.0
     # via -r requirements/edx/kernel.in
 yarl==1.9.2
     # via aiohttp
-zipp==3.15.0
+zipp==3.16.0
     # via
     #   importlib-metadata
     #   importlib-resources
