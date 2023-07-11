@@ -3,8 +3,12 @@
   "version": "0.1.0",
   "repository": "https://github.com/openedx/edx-platform",
   "scripts": {
+    "build": "npm run webpack && npm run compile-sass",
+    "build-dev": "npm run webpack-dev && npm run compile-sass-dev",
     "webpack": "NODE_ENV=production webpack --progress --config=${WEBPACK_CONFIG_PATH:-webpack.prod.config.js}",
-    "webpack-dev": "NODE_ENV=development webpack --progress --config=${WEBPACK_CONFIG_PATH:-webpack.dev.config.js}"
+    "webpack-dev": "NODE_ENV=development webpack --progress --config=${WEBPACK_CONFIG_PATH:-webpack.dev.config.js}",
+    "compile-sass": "compile_sass.py",
+    "compile-sass-dev": "NODE_ENV=development compile_sass.py"
   },
   "dependencies": {
     "@babel/core": "7.19.0",

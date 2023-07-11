@@ -109,3 +109,9 @@ drf-yasg<1.21.6
 
 # Adding pin to avoid any major upgrade
 djangorestframework<3.15.0
+
+# Our legacy Sass code is incompatible with anything except this ancient libsass version.
+# Here is a ticket to upgrade, but it's of debatable importance given that we are rapidly moving
+# away from legacy LMS/CMS frontends:
+# https://github.com/openedx/edx-platform/issues/31616
+libsass==0.10.0
