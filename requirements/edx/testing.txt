@@ -1041,6 +1041,7 @@ piexif==1.1.3
     # via -r requirements/edx/base.txt
 pillow==9.5.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-organizations
@@ -1148,6 +1149,8 @@ pylint-plugin-utils==0.8.2
 pylint-pytest==0.3.0
     # via -r requirements/edx/testing.in
 pylti1p3==2.0.0
+    # via -r requirements/edx/base.txt
+pymemcache==4.0.0
     # via -r requirements/edx/base.txt
 pymongo==3.13.0
     # via

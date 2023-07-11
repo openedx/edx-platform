@@ -821,6 +821,7 @@ piexif==1.1.3
     # via -r requirements/edx/kernel.in
 pillow==9.5.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-organizations
@@ -876,6 +877,8 @@ pylatexenc==2.10
     # via olxcleaner
 pylti1p3==2.0.0
     # via -r requirements/edx/kernel.in
+pymemcache==4.0.0
+    # via -r requirements/edx/base.in
 pymongo==3.13.0
     # via
     #   -c requirements/edx/../constraints.txt
