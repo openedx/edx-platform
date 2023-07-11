@@ -86,13 +86,14 @@ from ..course_info_model import delete_course_update, get_course_updates, update
 from ..courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from ..tasks import rerun_course as rerun_course_task
 from ..toggles import (
+    default_enable_flexible_peer_openassessments,
     split_library_view_on_dashboard,
     use_new_course_outline_page,
     use_new_home_page,
     use_new_updates_page,
     use_new_advanced_settings_page,
     use_new_grading_page,
-    use_new_schedule_details_page,
+    use_new_schedule_details_page
 )
 from ..utils import (
     add_instructor,
@@ -993,6 +994,12 @@ def create_new_course(user, org, number, run, fields):
     new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields)
     add_organization_course(org_data, new_course.id)
     update_course_discussions_settings(new_course.id)
+
+    # Enable certain fields rolling forward, where configured
+    if default_enable_flexible_peer_openassessments(new_course.id):
+        new_course.force_on_flexible_peer_openassessments = True
+    modulestore().update_item(new_course, new_course.published_by)
+
     return new_course
 
 
@@ -1055,6 +1062,10 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     fields['enrollment_start'] = None
     fields['enrollment_end'] = None
     fields['video_upload_pipeline'] = {}
+
+    # Enable certain fields rolling forward, where configured
+    if default_enable_flexible_peer_openassessments(source_course_key):
+        fields['force_on_flexible_peer_openassessments'] = True
 
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     args = [str(source_course_key), str(destination_course_key), user.id, json_fields]

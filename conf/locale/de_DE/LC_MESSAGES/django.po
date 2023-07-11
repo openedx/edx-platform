@@ -7576,6 +7576,28 @@ msgstr "Blacklist {country} für {course}"
 msgid "Learner Pathways"
 msgstr ""
 
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on "
+"<{strong}>{author_name}</{strong}> response to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
 msgstr ""
@@ -11318,6 +11340,16 @@ msgid ""
 "Specify the video sharing options for the course. This can be set to one of "
 "three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
 "default."
+msgstr ""
+
+#: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
 msgstr ""
 
 #: xmodule/course_block.py
@@ -24893,6 +24925,10 @@ msgstr "Kursnavigation"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Übersicht"
+
+#: cms/templates/widgets/header.html
+msgid "Files & Media"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

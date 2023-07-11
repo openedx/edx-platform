@@ -66,6 +66,7 @@ COURSE_NOTIFICATION_APPS = {
         'core_web': True,
         'core_email': True,
         'core_push': True,
+        'non_editable': []
     }
 }
 
@@ -260,6 +261,13 @@ class NotificationAppManager:
             'info': notification_app_attrs.get('core_info', ''),
         }
 
+    def add_core_notification_non_editable(self, notification_app_attrs, non_editable_channels):
+        """
+        Adds non_editable for core notification.
+        """
+        if notification_app_attrs.get('non_editable', None):
+            non_editable_channels['core'] = notification_app_attrs.get('non_editable')
+
     def get_notification_app_preferences(self):
         """
         Returns notification app preferences for the given name.
@@ -270,6 +278,7 @@ class NotificationAppManager:
             notification_types, core_notifications, \
                 non_editable_channels = NotificationTypeManager().get_notification_app_preference(notification_app_key)
             self.add_core_notification_preference(notification_app_attrs, notification_types)
+            self.add_core_notification_non_editable(notification_app_attrs, non_editable_channels)
 
             notification_app_preferences['enabled'] = notification_app_attrs.get('enabled', False)
             notification_app_preferences['core_notification_types'] = core_notifications
