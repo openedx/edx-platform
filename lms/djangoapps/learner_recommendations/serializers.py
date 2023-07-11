@@ -86,6 +86,12 @@ class AboutPageRecommendationsSerializer(serializers.Serializer):
     )
 
 
+class RecommendationsContextSerializer(serializers.Serializer):
+    """Serializer for recommendations context"""
+
+    countryCode = serializers.CharField(allow_blank=True)
+
+
 class CrossProductRecommendationsSerializer(serializers.Serializer):
     """
     Cross product recommendation courses for course about page

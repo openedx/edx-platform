@@ -25,3 +25,15 @@ class UserCredential(DictFactoryBase):
     uuid = factory.Faker('uuid4')
     certificate_url = factory.Faker('url')
     credential = ProgramCredential()
+
+
+class UserCredentialsCourseRunStatus(DictFactoryBase):
+    course_uuid = str(factory.Faker('uuid4'))
+    course_run = {
+        "uuid": str(factory.Faker('uuid4')),
+        "key": factory.LazyFunction(generate_course_run_key)
+    }
+    status = 'awarded'
+    type = 'verified'
+    certificate_available_date = factory.Faker('date')
+    grade = None
