@@ -131,17 +131,17 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
      - ``scripts/build-assets.sh``
 
        A Bash script that contains all build stages, with subcommands available for running each stage separately. Its command-line interface inspired by Tutor's ``openedx-assets`` script. The script will be runnable on any POSIX system, including macOS and Ubuntu and it will linted for common shell scripting mistakes using `shellcheck <https://www.shellcheck.net>`_.
-     
+
    * - + **Build stage 1: Copy npm-installed assets** from node_modules to other folders in edx-platform. They are used by certain especially-old legacy LMS & CMS frontends that are not set up to work with npm directly.
 
      - ``paver update_assets --skip-collect``
 
        Implemented in Python within update_assets. There is no standalone command for it.
 
-     - ``scripts/build-assets.sh npm``
+     - ``npm install``
 
-       Pure Bash reimplementation. See *Rejected Alternatives* for a note about this.
- 
+       An NPM post-install hook will automatically call scripts/copy-node-modules.sh, a pure Bash reimplementation of the node_modules asset copying, whenever ``npm install`` is invoked.
+
    * - + **Build stage 2: Copy XModule fragments** from the xmodule source tree over to input directories for Webpack and SCSS compilation. This is required for a hard-coded list of old XModule-style XBlocks. This is not required for new pure XBlocks, which include (or pip-install) their assets into edx-platform as ready-to-serve JS/CSS/etc fragments.
 
      - ``paver process_xmodule_assets``, or
@@ -156,7 +156,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
        + `Reimplement this step in Bash <https://github.com/openedx/edx-platform/issues/31611>`_.
        + `Remove the need for this step entirely <https://github.com/openedx/edx-platform/issues/31624>`_.
-   
+
    * - + **Build stage 3: Run Webpack** in order to to shim, minify, otherwise process, and bundle JS modules. This requires a call to the npm-installed ``webpack`` binary.
 
      - ``paver webpack``
@@ -168,7 +168,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
        Bash wrapper around a call to webpack. The script will accept parameters rather than looking up Django settings itself.
 
        The print_setting command will still be available for distributions to use to extract ``STATIC_ROOT`` from Django settings, but it will only need to be run once. As described in **Build Configuration** below, unnecessary Django settings will be removed. Some distributions may not even need to look up ``STATIC_ROOT``; Tutor, for example, will probably render ``STATIC_ROOT`` directly into the environment variable ``OPENEDX_BUILD_ASSETS_OPTS`` variable, described in the **Build Configuration**.
-   
+
    * - + **Build stage 4: Compile default SCSS** into CSS for legacy LMS/CMS frontends.
 
      - ``paver compile_sass``
@@ -180,7 +180,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
      - ``scripts/build-assets.sh css``
 
        Bash reimplementation, calling ``node-sass`` and ``rtlcss``.
-   
+
        The initial implementation of build-assets.sh may use ``sassc``, a CLI provided by libsass, instead of node-sass. Then, ``sassc`` can be replaced by ``node-sass`` as part of a subsequent `edx-platform frontend framework upgrade effort <https://github.com/openedx/edx-platform/issues/31616>`_.
 
    * - + **Build stage 5: Compile themes' SCSS** into CSS for legacy LMS/CMS frontends. The default SCSS is used as a base, and theme-provided SCSS files are used as overrides. Themes are searched for from some number of operator-specified theme directories.
@@ -198,7 +198,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
        The management command will remain available, but it will need to be updated to point at the Bash script, which will replace the paver task (see build stage 4 for details).
 
        The overall asset *build* action will use the Bash script; this means that list of theme directories will need to be provided as arguments, but it ensures that the build can remain Python-free.
-   
+
    * - **Collect** the built static assets from edx-platform to another location (the ``STATIC_ROOT``) so that they can be efficiently served *without* Django's webserver. This step, by nature, requires Python and Django in order to find and organize the assets, which may come from edx-platform itself or from its many installed Python and NPM packages. This is only needed for **production** environments, where it is usually desirable to serve assets with something efficient like NGINX.
 
      - ``paver update_assets``
@@ -210,7 +210,7 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
      - ``./manage.py lms collectstatic --noinput && ./manage.py cms collectstatic --noinput``
 
        The standard Django interface will be used without a wrapper. The ignore patterns will be added to edx-platform's `staticfiles app configuration <https://docs.djangoproject.com/en/4.1/ref/contrib/staticfiles/#customizing-the-ignored-pattern-list>`_ so that they do not need to be supplied as part of the command.
-   
+
    * - **Watch** static assets for changes in the background. When a change occurs, rebuild them automatically, so that the Django webserver picks up the changes. This is only necessary in **development** environments. A few different sets of assets may be watched: XModule fragments, Webpack assets, default SCSS, and theme SCSS.
 
      - ``paver watch_assets``
@@ -300,7 +300,7 @@ Either way, the migration path is straightforward:
    * - ``openedx-assets build``
      - ``scripts/build-assets.sh``
    * - ``openedx-assets npm``
-     - ``scripts/build-assets.sh npm``
+     - ``scripts/copy-node-modules.sh  # (automatically invoked by 'npm install'!)
    * - ``openedx-assets xmodule``
      - ``scripts/build-assets.sh xmodule``
    * - ``openedx-assets common``
@@ -327,13 +327,6 @@ OpenCraft has also performed a discovery on a `modernized system for static asse
 
 Rejected Alternatives
 *********************
-
-Copy node_modules via npm post-install
-======================================
-
-It was noted that `npm supports lifecycle scripts <https://docs.npmjs.com/cli/v6/using-npm/scripts#pre--post-scripts>`_ in package.json, including ``postinstall``. We could use a post-install script to copy assets out of node_modules; this would occurr automatically after ``npm install``. Arguably, this would be more idiomatic than this ADR's proposal of ``scripts/build-assets.sh npm``.
-
-For now, we decided against this. While it seems like a good potential future improvement, we are currently unsure how it would interact with `moving node_modules out of edx-platform in Tutor <https://github.com/openedx/wg-developer-experience/issues/150>`_, which is a motivation behind this ADR. For example, if node_modules could be located anywhere on the image, then we are not sure how the post-install script could know its target directory without us hard-coding Tutor's directory structure into the script.
 
 Live with the problem
 ======================
