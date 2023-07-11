@@ -109,3 +109,7 @@ drf-yasg<1.21.6
 
 # Adding pin to avoid any major upgrade
 djangorestframework<3.15.0
+
+
+# tests failing with greater version. Fix this in separate ticket.
+pillow<10.0.0
