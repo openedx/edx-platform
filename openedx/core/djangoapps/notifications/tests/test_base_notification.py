@@ -2,11 +2,10 @@
 Tests for base_notification
 """
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.djangoapps.notifications import base_notification
-from openedx.core.djangoapps.notifications import models
+from openedx.core.djangoapps.notifications import base_notification, models
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
-    get_course_notification_preference_config_version,
+    get_course_notification_preference_config_version
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -106,7 +105,7 @@ class NotificationPreferenceSyncManagerTest(ModuleStoreTestCase):
             'email': True,
             'push': True,
             'info': '',
-            'non-editable': [],
+            'non_editable': [],
             'content_template': '',
             'content_context': {},
             'email_template': '',
@@ -187,20 +186,38 @@ class NotificationPreferenceSyncManagerTest(ModuleStoreTestCase):
 
     def test_non_editable_addition_and_removal(self):
         """
-        Tests if non-editable updates on existing preferences
+        Tests if non_editable updates on existing preferences
         """
         current_config_version = get_course_notification_preference_config_version()
-        base_notification.COURSE_NOTIFICATION_TYPES[self.default_type_name]['non-editable'] = ['web']
+        base_notification.COURSE_NOTIFICATION_TYPES[self.default_type_name]['non_editable'] = ['web']
         self._set_notification_config_version(current_config_version + 1)
         new_config = CourseNotificationPreference.get_updated_user_course_preferences(self.user, self.course.id)
         preferences = new_config.notification_preference_config
         preference_non_editable = preferences[self.default_app_name]['non_editable'][self.default_type_name]
         assert 'web' in preference_non_editable
-        base_notification.COURSE_NOTIFICATION_TYPES[self.default_type_name]['non-editable'] = []
+        base_notification.COURSE_NOTIFICATION_TYPES[self.default_type_name]['non_editable'] = []
         self._set_notification_config_version(current_config_version + 2)
         new_config = CourseNotificationPreference.get_updated_user_course_preferences(self.user, self.course.id)
         preferences = new_config.notification_preference_config
         preference_non_editable = preferences[self.default_app_name]['non_editable'].get(self.default_type_name, [])
+        assert preference_non_editable == []
+
+    def test_non_editable_addition_and_removal_for_core_notification(self):
+        """
+        Tests if non_editable updates on existing preferences of core notification
+        """
+        current_config_version = get_course_notification_preference_config_version()
+        base_notification.COURSE_NOTIFICATION_APPS[self.default_app_name]['non_editable'] = ['web']
+        self._set_notification_config_version(current_config_version + 1)
+        new_config = CourseNotificationPreference.get_updated_user_course_preferences(self.user, self.course.id)
+        preferences = new_config.notification_preference_config
+        preference_non_editable = preferences[self.default_app_name]['non_editable']['core']
+        assert 'web' in preference_non_editable
+        base_notification.COURSE_NOTIFICATION_APPS[self.default_app_name]['non_editable'] = []
+        self._set_notification_config_version(current_config_version + 2)
+        new_config = CourseNotificationPreference.get_updated_user_course_preferences(self.user, self.course.id)
+        preferences = new_config.notification_preference_config
+        preference_non_editable = preferences[self.default_app_name]['non_editable'].get('core', [])
         assert preference_non_editable == []
 
     def test_notification_type_info_updates(self):

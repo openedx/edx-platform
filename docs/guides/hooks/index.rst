@@ -1,5 +1,5 @@
-Openedx Hooks Extension Framework
-=================================
+Open edX Hooks Extension Framework
+==================================
 
 To sustain the growth of the Open edX ecosystem, the business rules of the
 platform must be open for extension following the open-closed principle. This
@@ -22,8 +22,8 @@ before this data is put back in the original application flow. In order to allow
 extension developers to use the Events and Filters definitions on their plugins,
 both kinds of hooks are defined in lightweight external libraries.
 
-* `openedx-filters`_
-* `openedx-events`_
+* openedx-filters (`guide <./filters.rst>`_, `source code <https://github.com/openedx/openedx-filters>`_)
+* openedx-events (`guide <./events.rst>`_, `source code <https://github.com/openedx/openedx-events>`_)
 
 Hooks are designed with stability in mind. The main goal is that developers can
 use them to change the functionality of the platform as needed and still be able
@@ -36,8 +36,6 @@ A longer description of the framework and it's history can be found in `OEP 50`_
 .. _OEP 50: https://open-edx-proposals.readthedocs.io/en/latest/oep-0050-hooks-extension-framework.html
 .. _versioning ADR: https://github.com/eduNEXT/openedx-events/blob/main/docs/decisions/0002-events-naming-and-versioning.rst
 .. _payload ADR: https://github.com/eduNEXT/openedx-events/blob/main/docs/decisions/0003-events-payload.rst
-.. _openedx-filters: https://github.com/eduNEXT/openedx-filters
-.. _openedx-events: https://github.com/eduNEXT/openedx-events
 
 On the technical side events are implemented through django signals which makes
 them run in the same python process as the lms or cms. Furthermore, events block

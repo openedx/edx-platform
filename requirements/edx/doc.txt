@@ -77,7 +77,7 @@ snowballstemmer==2.2.0
     # via sphinx
 soupsieve==2.4.1
     # via beautifulsoup4
-sphinx==5.3.0
+sphinx==6.2.1
     # via
     #   -r requirements/edx/doc.in
     #   pydata-sphinx-theme

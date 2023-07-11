@@ -79,7 +79,9 @@ class ProgramSubscriptionModel extends Backbone.Model {
             return ['', ''];
         }
 
-        const userTimezone = userPreferences.time_zone || 'UTC';
+        const userTimezone = (
+            userPreferences.time_zone || moment.tz.guess() || 'UTC'
+        );
         const userLanguage = userPreferences['pref-lang'] || 'en';
         const context = {
             datetime: date,
@@ -102,18 +104,23 @@ class ProgramSubscriptionModel extends Backbone.Model {
             return 0;
         }
 
-        const userTimezone = userPreferences.time_zone || 'UTC';
+        const userTimezone = (
+            userPreferences.time_zone || moment.tz.guess() || 'UTC'
+        );
         const trialEndTime = DateUtils.localizeTime(
             DateUtils.stringToMoment(trialEndDate),
             userTimezone
-        ).startOf('day');
+        );
         const currentTime = DateUtils.localizeTime(
             moment.utc(),
             userTimezone
-        ).startOf('day');
+        );
 
-        return trialEndTime.diff(currentTime, 'days');
-
+        return trialEndTime.diff(currentTime, 'days') < 1
+            ? // 0 if trial end time is less than 24 hrs
+              0
+            : // else return actual difference in days
+              trialEndTime.startOf('day').diff(currentTime.startOf('day'), 'days');
     }
 }
 

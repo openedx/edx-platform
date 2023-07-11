@@ -22,11 +22,14 @@ locations.
 .. _Open edX ReadTheDocs: http://docs.edx.org/
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
+    lms_apis
     guides
     docstrings/docstrings
     celery
+    settings
+    featuretoggles
 
 
 Change History

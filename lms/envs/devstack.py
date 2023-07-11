@@ -98,7 +98,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.history.HistoryPanel',
     # ProfilingPanel has been intentionally removed for default devstack.py
     # runtimes for performance reasons. If you wish to re-enable it in your
@@ -382,6 +381,7 @@ ACCOUNT_MICROFRONTEND_URL = 'http://localhost:1997'
 COMMUNICATIONS_MICROFRONTEND_URL = 'http://localhost:1984'
 AUTHN_MICROFRONTEND_URL = 'http://localhost:1999'
 AUTHN_MICROFRONTEND_DOMAIN = 'localhost:1999'
+EXAMS_DATE_MICROFRONTEND_URL = 'http://localhost:2020'
 
 ################### FRONTEND APPLICATION DISCUSSIONS ###################
 DISCUSSIONS_MICROFRONTEND_URL = 'http://localhost:2002'
@@ -430,6 +430,7 @@ MKTG_URLS = {
     'TOS': '/edx-terms-service',
     'TOS_AND_HONOR': '/edx-terms-service',
     'WHAT_IS_VERIFIED_CERT': '/verified-certificate',
+    'PROGRAM_SUBSCRIPTIONS': '/program-subscriptions',
 }
 
 ENTERPRISE_MARKETING_FOOTER_QUERY_PARAMS = {}
