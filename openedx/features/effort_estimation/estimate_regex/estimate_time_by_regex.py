@@ -87,10 +87,8 @@ def estimate_time_by_regex(text):
 
 	# Case 1: only one result => it is hours
 	if len(regex_result) == 1:
-		if 'gio' in last_line and 'phut' not in last_line:
-			time_by_regex = float(regex_result[-1]) * 60
-		else :
-			time_by_regex = float(regex_result[-1])
+
+		time_by_regex = float(regex_result[-1])
 		# Case 2: two result => it is hours and minutes
 	elif len(regex_result) >= 2:
 		try : 
@@ -103,10 +101,9 @@ def estimate_time_by_regex(text):
 		time_by_regex = None
 
 	# if time is not None than round it to 5 min
-	# if time_by_regex is not None:
-	# 	if 'gio' in last_line or 'phut' in last_line:
-	# 		time_by_regex = math.ceil(time_by_regex / 5) * 5
-	# 	if 'phut' in last_line and 'gio' not in last_line:
-	# 		time_by_regex = time_by_regex / 60
+	if time_by_regex is not None:
+		if 'gio' in last_line or 'phut' in last_line:
+			time_by_regex = math.ceil(time_by_regex / 5) * 5
+	
 
 	return time_by_regex
