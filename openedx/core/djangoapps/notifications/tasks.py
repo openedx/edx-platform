@@ -11,7 +11,12 @@ from edx_django_utils.monitoring import set_code_owner_attribute
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
-from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
+from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS
+from openedx.core.djangoapps.notifications.models import (
+    CourseNotificationPreference,
+    Notification,
+    get_course_notification_preference_config_version
+)
 
 logger = get_task_logger(__name__)
 
@@ -78,6 +83,8 @@ def send_notifications(user_ids, course_key, app_name, notification_type, contex
     """
     Send notifications to the users.
     """
+    if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
+        return
     user_ids = list(set(user_ids))
 
     # check if what is preferences of user and make decision to send notification or not
@@ -85,8 +92,10 @@ def send_notifications(user_ids, course_key, app_name, notification_type, contex
         user_id__in=user_ids,
         course_id=course_key,
     )
+    preferences = create_notification_pref_if_not_exists(user_ids, preferences, course_key)
     notifications = []
     for preference in preferences:
+        preference = update_user_preference(preference, preference.user, course_key)
         if preference and preference.get_web_config(app_name, notification_type):
             notifications.append(Notification(
                 user_id=preference.user_id,
@@ -98,3 +107,34 @@ def send_notifications(user_ids, course_key, app_name, notification_type, contex
             ))
     # send notification to users but use bulk_create
     Notification.objects.bulk_create(notifications)
+
+
+def update_user_preference(preference: CourseNotificationPreference, user, course_id):
+    """
+    Update user preference if config version is changed.
+    """
+    current_version = get_course_notification_preference_config_version()
+    if preference.config_version != current_version:
+        return preference.get_updated_user_course_preferences(user, course_id)
+    return preference
+
+
+def create_notification_pref_if_not_exists(user_ids, preferences, course_id):
+    """
+    Create notification preference if not exist.
+    """
+    new_preferences = []
+
+    for user_id in user_ids:
+        if not any(preference.user_id == user_id for preference in preferences):
+            new_preferences.append(CourseNotificationPreference(
+                user_id=user_id,
+                course_id=course_id,
+            ))
+            logger.info('Creating new notification preference for user because it does not exist.')
+    if new_preferences:
+        # ignoring conflicts because it is possible that preference is already created by another process
+        # conflicts may arise because of constraint on user_id and course_id fields in model
+        CourseNotificationPreference.objects.bulk_create(new_preferences, ignore_conflicts=True)
+        preferences = preferences + new_preferences
+    return preferences
