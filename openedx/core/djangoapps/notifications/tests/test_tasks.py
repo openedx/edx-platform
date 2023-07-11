@@ -111,7 +111,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
         ('discussion', 'new_response'),  # non core notification
     )
     @ddt.unpack
-    def test_send_notifications_core(self, app_name, notification_type):
+    def test_send_notifications(self, app_name, notification_type):
         """
         Test whether send_notifications creates a new notification.
         """
