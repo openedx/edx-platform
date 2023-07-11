@@ -1,7 +1,7 @@
 # Do things in edx-platform
 .PHONY: base-requirements check-types clean \
   compile-requirements detect_changed_source_translations dev-requirements \
-  docker_auth docker_build docs extract_translations \
+  docker_auth docker_tag_build_push docs extract_translations \
   guides help lint-imports local-requirements pre-requirements pull \
   pull_translations push_translations requirements shell swagger \
   technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
@@ -145,7 +145,7 @@ check-types: ## run static type-checking tests
 docker_auth:
 	echo "$$DOCKERHUB_PASSWORD" | docker login -u "$$DOCKERHUB_USERNAME" --password-stdin
 
-docker_build: docker_auth
+docker_tag_build_push: docker_auth
 	docker buildx build -t openedx/lms-dev:latest --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
 	docker buildx build -t openedx/lms-dev:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development --push .
 	docker buildx build -t openedx/lms:latest --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production --push .

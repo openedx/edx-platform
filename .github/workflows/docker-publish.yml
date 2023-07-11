@@ -31,6 +31,6 @@ jobs:
         env:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}                
-        run : make docker_build    
+        run : make docker_tag_build_push    
         
 
