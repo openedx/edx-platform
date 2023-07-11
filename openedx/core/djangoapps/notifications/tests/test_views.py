@@ -582,7 +582,8 @@ class NotificationReadAPIViewTestCase(APITestCase):
             Notification.objects.create(user=self.user, app_name=app_name, notification_type='Type A')
             Notification.objects.create(user=self.user, app_name=app_name, notification_type='Type B')
 
-    def test_mark_all_notifications_read_with_app_name(self):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_mark_all_notifications_read_with_app_name(self, mock_emit):
         # Create a PATCH request to mark all notifications as read for already existing app e.g 'discussion'
         app_name = next(iter(COURSE_NOTIFICATION_APPS))
         data = {'app_name': app_name}
@@ -593,6 +594,9 @@ class NotificationReadAPIViewTestCase(APITestCase):
         self.assertEqual(response.data, {'message': 'Notifications marked read.'})
         notifications = Notification.objects.filter(user=self.user, app_name=app_name, last_read__isnull=False)
         self.assertEqual(notifications.count(), 2)
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.notifications.read')
+        self.assertEqual(event_data['notification_app'], 'discussion')
 
     def test_mark_all_notifications_read_with_invalid_app_name(self):
         # Create a PATCH request to mark all notifications as read for 'app_name_1'
@@ -617,7 +621,7 @@ class NotificationReadAPIViewTestCase(APITestCase):
         notifications = Notification.objects.filter(user=self.user, id=notification_id, last_read__isnull=False)
         self.assertEqual(notifications.count(), 1)
         event_name, event_data = mock_emit.call_args[0]
-        self.assertEqual(event_name, 'edx.notifications.read')
+        self.assertEqual(event_name, 'edx.notification.read')
         self.assertEqual(event_data.get('notification_metadata').get('notification_id'), notification_id)
         self.assertEqual(event_data['notification_app'], 'discussion')
         self.assertEqual(event_data['notification_type'], 'Type A')
