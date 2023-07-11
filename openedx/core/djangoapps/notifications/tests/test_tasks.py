@@ -70,9 +70,9 @@ class TestNotificationsTasks(ModuleStoreTestCase):
         # Test whether create_notification_pref_if_not_exists creates a new preference if it doesn't exist
         user_ids = [self.user.id, self.user_1.id, self.user_2.id]
         preferences = [self.preference_v2]
-        updated_preferences = create_notification_pref_if_not_exists(user_ids, preferences)
+        updated_preferences = create_notification_pref_if_not_exists(user_ids, preferences, self.course_2.id)
         self.assertEqual(len(updated_preferences), 3)  # Should have created two new preferences
 
         # Test whether create_notification_pref_if_not_exists doesn't create a new preference if it already exists
-        updated_preferences = create_notification_pref_if_not_exists(user_ids, preferences)
+        updated_preferences = create_notification_pref_if_not_exists(user_ids, preferences, self.course_2.id)
         self.assertEqual(len(updated_preferences), 3)  # No new preferences should be created this time
