@@ -53,7 +53,9 @@ numpy==1.22.4
 openedx-calc==3.0.1
     # via -r requirements/edx-sandbox/py38.in
 pillow==9.5.0
-    # via matplotlib
+    # via
+    #   -c requirements/edx-sandbox/../constraints.txt
+    #   matplotlib
 pycparser==2.21
     # via cffi
 pyparsing==3.1.0

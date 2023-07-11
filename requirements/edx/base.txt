@@ -821,6 +821,7 @@ piexif==1.1.3
     # via -r requirements/edx/kernel.in
 pillow==9.5.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-organizations
