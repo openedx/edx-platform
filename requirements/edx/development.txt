@@ -214,6 +214,7 @@ click==8.1.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/../pip-tools.txt
+    #   -r requirements/edx/assets.txt
     #   -r requirements/edx/development.in
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1123,6 +1124,8 @@ lazy-object-proxy==1.9.0
     #   astroid
 libsass==0.10.0
     # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/assets.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 loremipsum==1.0.5
@@ -1243,6 +1246,7 @@ nltk==3.8.1
     #   chem
 nodeenv==1.8.0
     # via
+    #   -r requirements/edx/assets.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 numpy==1.22.4
@@ -1803,6 +1807,7 @@ singledispatch==4.0.0
     # via -r requirements/edx/testing.txt
 six==1.16.0
     # via
+    #   -r requirements/edx/assets.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   analytics-python
