@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
-    get_course_notification_preference_config_version,
+    get_course_notification_preference_config_version
 )
 
 from .base_notification import COURSE_NOTIFICATION_APPS
@@ -289,8 +289,11 @@ class NotificationCountView(APIView):
             .annotate(count=Count('*'))
         )
         count_total = 0
-        count_by_app_name_dict = {}
         show_notifications_tray_enabled = False
+        count_by_app_name_dict = {
+            app_name: 0
+            for app_name in COURSE_NOTIFICATION_APPS
+        }
 
         for item in count_by_app_name:
             app_name = item['app_name']

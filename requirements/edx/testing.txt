@@ -74,16 +74,18 @@ backoff==1.10.0
     # via
     #   -r requirements/edx/base.txt
     #   analytics-python
-backports-zoneinfo==0.2.1
+backports-zoneinfo[tzdata]==0.2.1
     # via
     #   -r requirements/edx/base.txt
+    #   celery
     #   icalendar
+    #   kombu
 beautifulsoup4==4.12.2
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/testing.in
     #   pynliner
-billiard==3.6.4.0
+billiard==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
@@ -117,7 +119,7 @@ botocore==1.10.84
     #   s3transfer
 bridgekeeper==0.9
     # via -r requirements/edx/base.txt
-celery==5.2.7
+celery==5.3.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -241,7 +243,6 @@ defusedxml==0.7.1
     #   djangorestframework-xml
     #   ora2
     #   python3-openid
-    #   python3-saml
     #   social-auth-core
 deprecated==1.2.14
     # via
@@ -472,7 +473,7 @@ django-webpack-loader==0.7.0
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-proctoring
-djangorestframework==3.13.1
+djangorestframework==3.14.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -586,7 +587,7 @@ edx-drf-extensions==8.8.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==3.67.7
+edx-enterprise==3.69.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -842,9 +843,8 @@ jwcrypto==1.5.0
     # via
     #   -r requirements/edx/base.txt
     #   pylti1p3
-kombu==5.2.4
+kombu==5.3.1
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   celery
 laboratory==1.0.2
@@ -880,6 +880,7 @@ lxml==4.9.2
     #   openedx-calc
     #   ora2
     #   pyquery
+    #   python3-saml
     #   xblock
     #   xmlsec
 mailsnake==1.6.4
@@ -1217,6 +1218,7 @@ python-dateutil==2.8.2
     #   -r requirements/edx/base.txt
     #   analytics-python
     #   botocore
+    #   celery
     #   edx-ace
     #   edx-drf-extensions
     #   edx-enterprise
@@ -1241,16 +1243,13 @@ python3-openid==3.2.0 ; python_version >= "3"
     # via
     #   -r requirements/edx/base.txt
     #   social-auth-core
-python3-saml==1.9.0
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
+python3-saml==1.15.0
+    # via -r requirements/edx/base.txt
 pytz==2022.7.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   babel
-    #   celery
     #   django
     #   django-ses
     #   djangorestframework
@@ -1507,11 +1506,17 @@ typing-extensions==4.7.1
     #   fastapi
     #   grimp
     #   import-linter
+    #   kombu
     #   pydantic
     #   pylint
     #   pylti1p3
     #   snowflake-connector-python
     #   starlette
+tzdata==2023.3
+    # via
+    #   -r requirements/edx/base.txt
+    #   backports-zoneinfo
+    #   celery
 unicodecsv==0.14.1
     # via
     #   -r requirements/edx/base.txt

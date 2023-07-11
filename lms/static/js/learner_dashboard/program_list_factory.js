@@ -25,6 +25,37 @@ function ProgramListFactory(options) {
         new HeaderView({
             context: options,
         }).render();
+
+        const activeSubscriptions = options.programsSubscriptionData
+            .filter(({ subscription_state }) => subscription_state === 'active')
+            .sort((a, b) => new Date(b.created) - new Date(a.created));
+
+        // Sort programs so programs with active subscriptions are at the top
+        if (activeSubscriptions.length) {
+            options.programsData = options.programsData
+                .map((programsData) => ({
+                    ...programsData,
+                    subscriptionIndex: activeSubscriptions.findIndex(
+                        ({ resource_id }) => resource_id === programsData.uuid,
+                    ),
+                }))
+                .sort(({ subscriptionIndex: indexA }, { subscriptionIndex: indexB }) => {
+                    switch (true) {
+                        case indexA === -1 && indexB === -1:
+                            // Maintain the original order for non-subscription programs
+                            return 0;
+                        case indexA === -1:
+                            // Move non-subscription program to the end
+                            return 1;
+                        case indexB === -1:
+                            // Keep non-subscription program to the end
+                            return -1;
+                        default:
+                            // Sort by subscriptionIndex in ascending order
+                            return indexA - indexB;
+                    }
+                });
+        }
     }
 
     new CollectionListView({

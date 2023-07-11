@@ -41,7 +41,7 @@ from lms.djangoapps.courseware.masquerade import (
 )
 from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
 from lms.djangoapps.courseware.block_render import get_block_by_usage_id
-from lms.djangoapps.courseware.toggles import course_exit_page_is_active
+from lms.djangoapps.courseware.toggles import course_exit_page_is_active, learning_assistant_is_active
 from lms.djangoapps.courseware.views.views import get_cert_data
 from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam_usage_key
 from lms.djangoapps.grades.api import CourseGradeFactory
@@ -359,6 +359,15 @@ class CoursewareMeta:
             enrollment_active = self.enrollment['is_active']
             return enrollment_active and CourseMode.is_eligible_for_certificate(enrollment_mode)
 
+    @property
+    def learning_assistant_launch_url(self):
+        """
+        Returns a URL for the learning assistant LTI launch if applicable, otherwise None
+        """
+        if learning_assistant_is_active(self.course_key):
+            return ""  # TODO: replace empty string with LTI launch URL as part of MST-1975
+        return None
+
 
 class CoursewareInformation(RetrieveAPIView):
     """
@@ -448,6 +457,7 @@ class CoursewareInformation(RetrieveAPIView):
             verified mode. Will update to reverify URL if necessary.
         * linkedin_add_to_profile_url: URL to add the effective user's certificate to a LinkedIn Profile.
         * user_needs_integrity_signature: Whether the user needs to sign the integrity agreement for the course
+        * learning_assistant_launch_url: URL for the LTI launch of a learning assistant
 
     **Parameters:**
 
