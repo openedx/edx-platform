@@ -3,7 +3,7 @@ Test credentials tasks
 """
 
 from unittest import mock
-from datetime import datetime
+from datetime import datetime, timezone
 
 import ddt
 import pytest
@@ -77,7 +77,7 @@ class TestSendGradeToCredentialTask(TestCase):
             'letter_grade': 'A',
             'percent_grade': 1.0,
             'verified': True,
-            'lms_last_updated_at': last_updated.isoformat(),
+            'lms_last_updated_at': last_updated,
         })
 
     def test_retry(self, mock_get_api_client):
@@ -263,15 +263,15 @@ class TestHandleNotifyCredentialsTask(TestCase):
 
     @mock.patch(TASKS_MODULE + '.send_notifications')
     def test_date_args(self, mock_send):
-        self.options['start_date'] = '2017-01-31T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 31, 0, 0, tzinfo=timezone.utc)
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2, self.cert4, self.cert3])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2, self.grade4, self.grade3])
         mock_send.reset_mock()
 
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
-        self.options['end_date'] = '2017-02-02T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2, self.cert4])
@@ -279,15 +279,15 @@ class TestHandleNotifyCredentialsTask(TestCase):
         mock_send.reset_mock()
 
         self.options['start_date'] = None
-        self.options['end_date'] = '2017-02-02T00:00:00Z'
+        self.options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2, self.cert4])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2, self.grade4])
         mock_send.reset_mock()
 
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
-        self.options['end_date'] = '2017-02-01T04:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.options['end_date'] = datetime(2017, 2, 1, 4, 0, tzinfo=timezone.utc)
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2])
@@ -295,8 +295,8 @@ class TestHandleNotifyCredentialsTask(TestCase):
 
     @mock.patch(TASKS_MODULE + '.send_notifications')
     def test_username_arg(self, mock_send):
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
-        self.options['end_date'] = '2017-02-02T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         self.options['user_ids'] = [str(self.user2.id)]
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
@@ -313,8 +313,8 @@ class TestHandleNotifyCredentialsTask(TestCase):
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade4])
         mock_send.reset_mock()
 
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
-        self.options['end_date'] = '2017-02-02T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         self.options['user_ids'] = [str(self.user.id)]
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
@@ -342,7 +342,7 @@ class TestHandleNotifyCredentialsTask(TestCase):
 
     @mock.patch(TASKS_MODULE + '.send_notifications')
     def test_dry_run(self, mock_send):
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.options['dry_run'] = True
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert not mock_send.called
@@ -351,7 +351,7 @@ class TestHandleNotifyCredentialsTask(TestCase):
     @mock.patch(TASKS_MODULE + '.send_grade_if_interesting')
     @mock.patch(TASKS_MODULE + '.handle_course_cert_changed')
     def test_hand_off(self, mock_grade_interesting, mock_program_changed, mock_program_awarded):
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_grade_interesting.call_count == 3
         assert mock_program_changed.call_count == 3
@@ -360,7 +360,7 @@ class TestHandleNotifyCredentialsTask(TestCase):
         mock_program_changed.reset_mock()
         mock_program_awarded.reset_mock()
 
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.options['notify_programs'] = True
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_grade_interesting.call_count == 3
@@ -369,13 +369,13 @@ class TestHandleNotifyCredentialsTask(TestCase):
 
     @mock.patch(TASKS_MODULE + '.time')
     def test_delay(self, mock_time):
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.options['page_size'] = 2
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_time.sleep.call_count == 0
         mock_time.sleep.reset_mock()
 
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.options['page_size'] = 2
         self.options['delay'] = 0.2
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
@@ -385,19 +385,19 @@ class TestHandleNotifyCredentialsTask(TestCase):
 
     @override_settings(DEBUG=True)
     def test_page_size(self):
-        self.options['start_date'] = '2017-01-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 1, 0, 0, tzinfo=timezone.utc)
         reset_queries()
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         baseline = len(connection.queries)
 
-        self.options['start_date'] = '2017-01-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 1, 0, 0, tzinfo=timezone.utc)
         self.options['page_size'] = 1
         reset_queries()
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert len(connection.queries) == (baseline + 6)
         # two extra page queries each for certs & grades
 
-        self.options['start_date'] = '2017-01-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 1, 0, 0, tzinfo=timezone.utc)
         self.options['page_size'] = 2
         reset_queries()
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
@@ -410,21 +410,21 @@ class TestHandleNotifyCredentialsTask(TestCase):
             site_values={'course_org_filter': ['testX']}
         )
 
-        self.options['start_date'] = '2017-01-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 1, 0, 0, tzinfo=timezone.utc)
         self.options['site'] = site_config.site.domain
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_grade_interesting.call_count == 1
 
     @mock.patch(TASKS_MODULE + '.send_notifications')
     def test_send_notifications_failure(self, mock_send):
-        self.options['start_date'] = '2017-01-31T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 31, 0, 0, tzinfo=timezone.utc)
         mock_send.side_effect = boom
         with pytest.raises(Exception):
             tasks.handle_notify_credentials(options=self.options, course_keys=[])
 
     @mock.patch(TASKS_MODULE + '.send_grade_if_interesting')
     def test_send_grade_failure(self, mock_send_grade):
-        self.options['start_date'] = '2017-01-31T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 31, 0, 0, tzinfo=timezone.utc)
         mock_send_grade.side_effect = boom
         with pytest.raises(Exception):
             tasks.handle_notify_credentials(options=self.options, course_keys=[])

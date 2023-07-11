@@ -59,7 +59,6 @@ from six import text_type
 
 from xmodule.capa.xqueue_interface import XQUEUE_TIMEOUT
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib import edx_six
 from xmodule.stringify import stringify_children
 
 from . import xqueue_interface
@@ -327,7 +326,7 @@ class InputTypeBase(object):
         context = {
             'id': self.input_id,
             'value': self.value,
-            'status': Status(self.status, edx_six.get_gettext(self.capa_system.i18n)),
+            'status': Status(self.status, self.capa_system.i18n.gettext),
             'msg': self.msg,
             'response_data': self.response_data,
             'STATIC_URL': self.capa_system.STATIC_URL,
@@ -459,7 +458,7 @@ class OptionInput(InputTypeBase):
         """
         Return extra context.
         """
-        _ = edx_six.get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         return {'default_option_text': _('Select an option')}
 
 #-----------------------------------------------------------------------------
@@ -507,7 +506,7 @@ class ChoiceGroup(InputTypeBase):
             self.html_input_type = "checkbox"
             self.suffix = '[]'
         else:
-            _ = edx_six.get_gettext(i18n)
+            _ = i18n.gettext
             # Translators: 'ChoiceGroup' is an input type and should not be translated.
             msg = _("ChoiceGroup: unexpected tag {tag_name}").format(tag_name=self.tag)
             raise Exception(msg)
@@ -543,7 +542,7 @@ class ChoiceGroup(InputTypeBase):
         """
 
         choices = []
-        _ = edx_six.get_gettext(i18n)
+        _ = i18n.gettext
 
         for choice in element:
             if choice.tag == 'choice':
@@ -740,7 +739,7 @@ class FileSubmission(InputTypeBase):
         Do some magic to handle queueing status (render as "queued" instead of "incomplete"),
         pull queue_len from the msg field.  (TODO: get rid of the queue_len hack).
         """
-        _ = edx_six.get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         submitted_msg = _("Your files have been submitted. As soon as your submission is"
                           " graded, this message will be replaced with the grader's feedback.")
         self.submitted_msg = submitted_msg
@@ -812,7 +811,7 @@ class CodeInput(InputTypeBase):
 
     def setup(self):
         """ setup this input type """
-        _ = edx_six.get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         submitted_msg = _("Your answer has been submitted. As soon as your submission is"
                           " graded, this message will be replaced with the grader's feedback.")
         self.submitted_msg = submitted_msg
@@ -823,7 +822,7 @@ class CodeInput(InputTypeBase):
         """
         Define queue_len, arial_label and code mirror exit message context variables
         """
-        _ = edx_six.get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         return {
             'queue_len': self.queue_len,
             'aria_label': _('{programming_language} editor').format(
@@ -853,7 +852,7 @@ class MatlabInput(CodeInput):
         """
         Handle matlab-specific parsing
         """
-        _ = edx_six.get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
 
         submitted_msg = _("Submitted. As soon as a response is returned, "
                           "this message will be replaced by that feedback.")
@@ -936,7 +935,7 @@ class MatlabInput(CodeInput):
     def _extra_context(self):
         """ Set up additional context variables"""
 
-        _ = edx_six.get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
 
         queue_msg = self.queue_msg
         if len(self.queue_msg) > 0:  # An empty string cannot be parsed as XML but is okay to include in the template.
@@ -985,7 +984,7 @@ class MatlabInput(CodeInput):
             dict - 'success' - whether or not we successfully queued this submission
                  - 'message' - message to be rendered in case of error
         """
-        _ = edx_six.get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         # only send data if xqueue exists
         if self.capa_system.xqueue is None:
             return {'success': False, 'message': _('Cannot connect to the queue')}
@@ -1212,7 +1211,7 @@ class ChemicalEquationInput(InputTypeBase):
         }
         """
 
-        _ = edx_six.get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         result = {'preview': '',
                   'error': ''}
         try:
@@ -1296,7 +1295,7 @@ class FormulaEquationInput(InputTypeBase):
            'request_start' : <time sent with request>
         }
         """
-        _ = edx_six.get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         result = {'preview': '',
                   'error': ''}
 
@@ -1681,7 +1680,7 @@ class ChoiceTextGroup(InputTypeBase):
         elif self.tag == 'checkboxtextgroup':
             self.html_input_type = "checkbox"
         else:
-            _ = edx_six.get_gettext(self.capa_system.i18n)
+            _ = self.capa_system.i18n.gettext
             msg = _("{input_type}: unexpected tag {tag_name}").format(
                 input_type="ChoiceTextGroup", tag_name=self.tag
             )
@@ -1760,7 +1759,7 @@ class ChoiceTextGroup(InputTypeBase):
         ]
         """
 
-        _ = edx_six.get_gettext(i18n)
+        _ = i18n.gettext
         choices = []
 
         for choice in element:
