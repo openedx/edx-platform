@@ -100,7 +100,15 @@ class ProgramSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Program
-        fields = ('program_name', 'year_group_name', 'intro_unit', 'units', 'outro_unit')
+        fields = (
+            'program_name',
+            'year_group_name',
+            'intro_unit',
+            'units',
+            'outro_unit',
+            'banner_image',
+            'status',
+        )
 
     def get_units(self, obj):
         gen_user = self.context.get('gen_user')
