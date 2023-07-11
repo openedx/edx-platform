@@ -158,6 +158,7 @@
             var controls = this.el.find('.video-controls'),
                 slider = this.videoFullScreen.sliderEl;
             this.videoFullScreen.height = getControlsHeight(controls, slider);
+
             return this.videoFullScreen.height;
         }
 
