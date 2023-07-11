@@ -3,7 +3,6 @@
 from io import StringIO
 
 import ddt
-import unittest
 from django.core.management import call_command
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import TestCase, TransactionTestCase
@@ -121,7 +120,6 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
 
-    @unittest.skip("Migration will delete several models. Need to skip not referencing it first.")
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """
