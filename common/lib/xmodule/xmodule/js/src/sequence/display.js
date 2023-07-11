@@ -293,6 +293,9 @@
                 sequenceLinks.click(this.goto);
 
                 this.sr_container.focus();
+                if (!this.$("span.status").hasClass('unanswered')) {
+                  this.$('input').prop('disabled', true);
+                }
             }
         };
 
