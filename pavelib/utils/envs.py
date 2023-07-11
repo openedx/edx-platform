@@ -7,7 +7,7 @@ import os
 import sys
 from time import sleep
 
-import memcache
+from pymemcache.client.hash import HashClient
 from lazy import lazy
 from path import Path as path
 from paver.easy import BuildFailure, sh
@@ -169,7 +169,7 @@ class Env:
     MONGO_HOST = 'edx.devstack.mongo' if USING_DOCKER else 'localhost'
     BOK_CHOY_MONGO_DATABASE = "test"
     BOK_CHOY_CACHE_HOST = 'edx.devstack.memcached' if USING_DOCKER else '0.0.0.0'
-    BOK_CHOY_CACHE = memcache.Client([f'{BOK_CHOY_CACHE_HOST}:11211'], debug=0)
+    BOK_CHOY_CACHE = HashClient([f'{BOK_CHOY_CACHE_HOST}:11211'])
 
     # Test Ids Directory
     TEST_DIR = REPO_ROOT / ".testids"
