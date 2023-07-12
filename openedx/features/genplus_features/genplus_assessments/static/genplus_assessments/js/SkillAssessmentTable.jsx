@@ -24,17 +24,20 @@ class SkillAssessmentTable extends React.Component {
       this.handleFormSubmit = this.handleFormSubmit.bind(this);
       this.handleSelectProgram = this.handleSelectProgram.bind(this);
       this.handleSelectSkill = this.handleSelectSkill.bind(this);
+      this.isSubmitting = this.isSubmitting.bind(this);
       this.state = {
-        selectedProgram: ''
+        selectedProgram: '',
+        isSubmitting: false
       };
     }
 
     addTableRows(){
         const rowsInput={
-            start_unit:'',
-            end_unit:'',
-            start_unit_location:'',
-            end_unit_location:'',
+            question_number: this.props.mappingData.length + 1,
+            start_unit: '',
+            end_unit: '',
+            start_unit_location: '',
+            end_unit_location: '',
             skill: '',
             showIntroDropdown: false,
             showOutroDropdown: false
@@ -45,7 +48,17 @@ class SkillAssessmentTable extends React.Component {
     deleteTableRows(index){
         const rows = [...this.props.mappingData];
         rows.splice(index, 1);
+        rows.forEach((row, index) => {
+          row.question_number = index + 1;
+        })
         this.props.updateMappingData(rows);
+    }
+
+    isSubmitting(status) {
+      this.setState((prevState) => ({
+        ...prevState,
+        isSubmitting: status
+      }));
     }
 
     handleIntroToggleDropdown(index) {
@@ -120,8 +133,9 @@ class SkillAssessmentTable extends React.Component {
 
     handleFormSubmit(event){
         event.preventDefault();
+        this.isSubmitting(true);
         const rowsInput = this.props.mappingData.map(({ showIntroDropdown, showOutroDropdown,...rest}) => ({...rest}));
-        this.props.addProgramSkillAssessmentMapping(this.state.selectedProgram, rowsInput);
+        this.props.addProgramSkillAssessmentMapping(this.state.selectedProgram, rowsInput, this.isSubmitting);
     };
 
     handleSelectProgram(event){
@@ -150,10 +164,18 @@ class SkillAssessmentTable extends React.Component {
                     </select>
                 </div>
                 {
-                    this.state.selectedProgram !== "" &&
+                  this.state.selectedProgram !== "" &&
+                  <div className="skill-assessments">
+                    {
+                      this.state.isSubmitting &&
+                      <div className="overlay-loader">
+                        <span className="fa fa-refresh fa-spin"></span>
+                      </div>
+                    }
                     <table className="table table table-striped">
                         <thead>
                         <tr>
+                            <th className="count">#</th>
                             <th className="intro">Intro</th>
                             <th className="outro">Outro</th>
                             <th className="skill">Skill</th>
@@ -181,6 +203,7 @@ class SkillAssessmentTable extends React.Component {
                             />
                         </tbody>
                     </table>
+                  </div>
                 }
                 {
                     this.state.selectedProgram !== "" &&
@@ -188,8 +211,13 @@ class SkillAssessmentTable extends React.Component {
                         <button
                             type="submit"
                             className="btn btn-primary"
+                            disabled={this.state.isSubmitting}
                         >
-                            Submit
+                          {
+                            this.state.isSubmitting ?
+                            <span>Submitting... <span className="fa fa-refresh fa-spin"></span></span> :
+                            "Submit"
+                          }
                         </button>
                     </form>
                 }
@@ -219,7 +247,7 @@ const mapDispatchToProps = dispatch => ({
         (baseUrl, courseId, excludeBlockTypes) =>
         dispatch(fetchCourseBlocks(baseUrl, courseId, excludeBlockTypes)),
     fetchProgramSkillAssessmentMapping: (programSlug) => dispatch(fetchProgramSkillAssessmentMapping(programSlug)),
-    addProgramSkillAssessmentMapping: (programSlug, mappingData) => dispatch(addProgramSkillAssessmentMapping(programSlug, mappingData)),
+    addProgramSkillAssessmentMapping: (programSlug, mappingData, isSubmitting) => dispatch(addProgramSkillAssessmentMapping(programSlug, mappingData, isSubmitting)),
     updateMappingData: (mappingData) => dispatch(updateMappingData(mappingData)),
 });
 

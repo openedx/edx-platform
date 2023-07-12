@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: 2023 Rating
+    display_name: 2023 Likert
     markdown: !!null
 data: |
     <div class="choices-xblock choices-listed choices-rating theme-dark">

@@ -37,7 +37,7 @@ const fetchProgramSkillAssessmentMapping = (programSlug) => dispatch => {
   )
 }
 
-const addProgramSkillAssessmentMapping = (programSlug, mappingData) => dispatch => {
+const addProgramSkillAssessmentMapping = (programSlug, mappingData, isSubmitting) => dispatch => {
   addProgramQuestionsMapping(programSlug, mappingData)
   .then((response)=>{
     if (response.ok) {
@@ -51,7 +51,9 @@ const addProgramSkillAssessmentMapping = (programSlug, mappingData) => dispatch 
       payload: json
     }),
     error => console.log(error)
-)
+  ).finally(() => {
+    isSubmitting(false);
+  })
 }
 
 const updateMappingData = (mappingData) => dispatch => {

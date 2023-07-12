@@ -23,6 +23,7 @@ function SkillAssessmentTableRows(props) {
                 skill,
                 start_unit,
                 end_unit,
+                question_number,
                 start_unit_location,
                 end_unit_location,
                 showIntroDropdown,
@@ -30,6 +31,7 @@ function SkillAssessmentTableRows(props) {
             } = data;
             return (
               <tr key={index}>
+                <td>{question_number}</td>
                 <td>
                     <select
                     value={start_unit}

@@ -475,8 +475,8 @@ class SkillAssessmentAdminViewSet(viewsets.ViewSet):
                 program=program,
                 start_unit_location=value['start_unit_location'],
                 end_unit_location=value['end_unit_location'],
-                defaults={
-                    'question_number': index+1,
+                defaults= {
+                    'question_number': value['question_number'],
                     'skill': skills.get(value['skill']),
                     'start_unit': value['start_unit'],
                     'end_unit': value['end_unit']
