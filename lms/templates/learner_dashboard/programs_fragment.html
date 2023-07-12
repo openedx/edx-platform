@@ -9,15 +9,22 @@ from openedx.core.djangolib.js_utils import (
 )
 %>
 
+% if mobile_only:
+<div class="program-list-wrapper grid-container py-0">
+    <div class="program-list-container col-12 col-md-9">
+        <div class="program-cards-container col pt-4"></div>
+    </div>
+    <div class="sidebar col-12 col-md-3"></div>
+</div>
+% else:
 <div class="program-list-wrapper grid-container">
     <div class="program-list-container col-12 col-md-9">
-        % if not mobile_only:
-            <div class="js-program-list-header"></div>
-        % endif
+        <div class="js-program-list-header"></div>
         <div class="program-cards-container col"></div>
     </div>
     <div class="sidebar col-12 col-md-3"></div>
 </div>
+% endif
 
 <%block name="js_extra">
 <%static:webpack entry="ProgramListFactory">
