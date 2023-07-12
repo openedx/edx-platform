@@ -2,12 +2,14 @@
 This file contains celery tasks for notifications.
 """
 from datetime import datetime, timedelta
+from typing import List
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.db import transaction
 from edx_django_utils.monitoring import set_code_owner_attribute
+from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 
 from common.djangoapps.student.models import CourseEnrollment
@@ -79,10 +81,11 @@ def delete_expired_notifications():
 
 @shared_task
 @set_code_owner_attribute
-def send_notifications(user_ids, course_key, app_name, notification_type, context, content_url):
+def send_notifications(user_ids, course_key: str, app_name, notification_type, context, content_url):
     """
     Send notifications to the users.
     """
+    course_key = CourseKey.from_string(course_key)
     if not ENABLE_NOTIFICATIONS.is_enabled(course_key):
         return
     user_ids = list(set(user_ids))
@@ -92,7 +95,7 @@ def send_notifications(user_ids, course_key, app_name, notification_type, contex
         user_id__in=user_ids,
         course_id=course_key,
     )
-    preferences = create_notification_pref_if_not_exists(user_ids, preferences, course_key)
+    preferences = create_notification_pref_if_not_exists(user_ids, list(preferences), course_key)
     notifications = []
     for preference in preferences:
         preference = update_user_preference(preference, preference.user, course_key)
@@ -119,7 +122,7 @@ def update_user_preference(preference: CourseNotificationPreference, user, cours
     return preference
 
 
-def create_notification_pref_if_not_exists(user_ids, preferences, course_id):
+def create_notification_pref_if_not_exists(user_ids: List, preferences: List, course_id: CourseKey):
     """
     Create notification preference if not exist.
     """
