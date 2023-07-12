@@ -97,6 +97,15 @@ class ProgramSerializer(serializers.ModelSerializer):
     outro_unit = AssessmentUnitSerializer(many=False, read_only=True)
     year_group_name = serializers.CharField(source='year_group.name')
     program_name = serializers.CharField(source='year_group.program_name')
+    is_currently_active_program = serializers.SerializerMethodField()
+
+    def get_is_currently_active_program(self, obj):
+        gen_user = self.context.get("gen_user")
+        student = gen_user.student
+        if student and student.active_class:
+            return student.active_class.program.id == obj.id
+        return False
+
 
     class Meta:
         model = Program
@@ -108,6 +117,9 @@ class ProgramSerializer(serializers.ModelSerializer):
             'outro_unit',
             'banner_image',
             'status',
+            'start_date',
+            'end_date',
+            'is_currently_active_program',
         )
 
     def get_units(self, obj):
