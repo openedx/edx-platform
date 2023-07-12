@@ -15,13 +15,13 @@ class ProblemTypes:
     SINGLE_CHOICE  = 'single_choice'
     MULTIPLE_CHOICE = 'multiple_choice'
     SHORT_ANSWER = 'short_answers'
-    RATING = 'rating'
+    LIKERT = 'likert'
 
     __ALL__ = (JOURNAL, SINGLE_CHOICE, MULTIPLE_CHOICE, SHORT_ANSWER,)
     STRING_TYPE_PROBLEMS = (JOURNAL, SHORT_ANSWER,)
     CHOICE_TYPE_PROBLEMS = (SINGLE_CHOICE, MULTIPLE_CHOICE,)
 
-    SKILL_ASSESSMENT_PROBLEMS = (SINGLE_CHOICE, MULTIPLE_CHOICE, RATING,)
+    SKILL_ASSESSMENT_PROBLEMS = (LIKERT,)
     STUDENT_ANSWER_PROBLEMS = (SINGLE_CHOICE, MULTIPLE_CHOICE, SHORT_ANSWER,)
     JOURNAL_PROBLEMS = (SINGLE_CHOICE, MULTIPLE_CHOICE, SHORT_ANSWER,)
     PDF_PROBLEMS = (SHORT_ANSWER,)
@@ -32,11 +32,9 @@ class SkillAssessmentTypes:
     """
     Skill Assessment choices for the classes
     """
-    SINGLE_CHOICE = 'single_choice'
-    MULTIPLE_CHOICE = 'multiple_choice'
-    RATING = 'rating'
+    LIKERT = 'likert'
 
-    __ALL__ = (SINGLE_CHOICE, MULTIPLE_CHOICE, RATING)
+    __ALL__ = (LIKERT,)
     __MODEL_CHOICES__ = (
         (skill_assessment_type, skill_assessment_type) for skill_assessment_type in __ALL__
     )

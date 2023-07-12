@@ -27,8 +27,8 @@ class SkillAssessmentQuestionAdmin(admin.ModelAdmin):
 
 @admin.register(SkillAssessmentResponse)
 class SkillAssessmentResponseAdmin(admin.ModelAdmin):
-    list_display = ('user', 'get_program', 'get_question_number', 'skill_assessment_type', 'response_time', 'earned_score', 'total_score',)
-    readonly_fields = ('user', 'question', 'earned_score', 'total_score', 'response_time', 'skill_assessment_type', 'question_response')
+    list_display = ('user', 'get_program', 'get_question_number', 'skill_assessment_type', 'response_time', 'earned_score', 'total_score', 'created', 'modified',)
+    readonly_fields = ('user', 'question', 'earned_score', 'total_score', 'response_time', 'skill_assessment_type', 'question_response', 'created', 'modified',)
     search_fields = ('user__email',)
 
     def get_program(self, obj):

@@ -4,7 +4,7 @@ metadata:
     markdown: !!null
 data: |
     <div class="choices-xblock choices-listed choices-rating theme-dark">
-      <problem class="skill_rating">
+      <problem class="likert">
         <div class="asn-icon top-left">
           <img src="/static/images/asset-logo-pink.svg" alt="Logo Left" />
         </div>

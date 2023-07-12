@@ -189,62 +189,50 @@ class StudentResponse:
         score to a problem weight value, the response time as determined earlier, and the question data to the
         parsed problem block data. It then saves the created SkillAssessmentResponse instance to the database.
         """
-        student_response = kwargs.get('student_response')
+        user_response = kwargs.get('student_response')
         problem_block = kwargs.get('problem_block')
         problem_type = kwargs.get('problem_type')
         user_id = getattr(problem_block.scope_ids, 'user_id')
         user = get_user_model().objects.get(pk=user_id)
         course_key = problem_block.scope_ids.usage_id.course_key
         problem_key = problem_block.scope_ids.usage_id
-        total_score = int(problem_block.weight) if problem_block.weight else 0
+        total_score = problem_block.weight if problem_block.weight else 0
 
         problem_html = problem_block.data
         # Parse the HTML
-        parser = etree.XMLParser(recover=True)
-        problem_xml = etree.fromstring(problem_html, parser=parser)
-
-        # Extract the question
-        question_text = problem_xml.find('.//*[@class="question-text"]').text
-
-        # Extract the choices and whether they are correct
-        choices = {
-            choice.attrib['class']: {
-                'text': choice.text,
-                'correct': choice.attrib['correct'] == 'true'
-            }
-            for choice in problem_xml.xpath('.//choice')
-        }
+        _, question_text, choices = self.extract_question_choices(problem_html)
 
         # Combine the question and choices into a single dictionary
         question_responses_dict = {'question': question_text, 'choices': choices}
 
-        # Initialize an empty list to store multiple responses
-        student_responses = []
+        # Initialize an empty list to store response
+        student_response = {}
 
         # Iterate over items in the MultiDict
-        for _, value in student_response.items():
+        for _, value in user_response.items():
             # Each 'value' corresponds to a choice like 'choice_0'
 
-            # Get corresponding choice text and correctness
+            # Get corresponding choice text and point
             response_text = question_responses_dict['choices'][value]['text']
-            response_correct = question_responses_dict['choices'][value]['correct']
+            response_point = question_responses_dict['choices'][value]['points']
 
             # Store this information in the student_responses list
-            student_responses.append({
+            student_response = {
                 'response_value': value,
                 'response_text': response_text,
-                'correct': response_correct
-            })
+                'points': response_point
+            }
 
-        # Update the dictionary with the student's responses
-        question_responses_dict['student_responses'] = student_responses
+            # only need to process one response, break the loop after the first iteration
+            break
+
+        # Update the dictionary with the student's response
+        question_responses_dict['student_response'] = student_response
         earned_score = self._calculate_earned_score(question_responses_dict, total_score)
         response_time, question = self._get_assessment_time(course_key, problem_key)
 
-        if problem_type == SkillAssessmentTypes.SINGLE_CHOICE:
-            skill_assessment_type = SkillAssessmentTypes.SINGLE_CHOICE
-        elif problem_type == SkillAssessmentTypes.MULTIPLE_CHOICE:
-            skill_assessment_type = SkillAssessmentTypes.MULTIPLE_CHOICE
+        if problem_type == SkillAssessmentTypes.LIKERT:
+            skill_assessment_type = SkillAssessmentTypes.LIKERT
 
         # update and create SkillAssessmentResponse object
         if response_time and question:
@@ -259,48 +247,6 @@ class StudentResponse:
                     'question_response': question_responses_dict,
                 }
             )
-
-    def create_assessment_response_from_rating(self, data):
-        """
-        Creates or updates a SkillAssessmentResponse object based on the provided rating data.
-
-        Args:
-            data (dict): The rating data containing user_id, course_id, problem_id, earned_score,
-                        total_score, and question_response.
-
-        Returns:
-            bool: True if the SkillAssessmentResponse object was created or updated successfully,
-                False otherwise.
-
-        """
-        user_id = data.get('user_id')
-        course_id = data.get('course_id')
-        problem_id = data.get('usage_id')
-        earned_score = data.get('earned_score')
-        total_score = data.get('total_score')
-        question_response_dict = data.get('question_response')
-
-        course_key = CourseKey.from_string(course_id)
-        problem_key = UsageKey.from_string(problem_id).map_into_course(course_key)
-        user = get_user_model().objects.get(pk=user_id)
-        response_time, question = self._get_assessment_time(course_key, problem_key)
-
-        # Update and create SkillAssessmentResponse object
-        if response_time and question:
-            SkillAssessmentResponse.objects.update_or_create(
-                user=user,
-                question=question,
-                response_time=response_time,
-                defaults={
-                    'earned_score': earned_score,
-                    'total_score': total_score,
-                    'skill_assessment_type': SkillAssessmentTypes.RATING,
-                    'question_response': question_response_dict,
-                }
-            )
-            return True
-
-        return False
 
     def _get_assessment_time(self, course_key, problem_key):
         try:
@@ -319,30 +265,54 @@ class StudentResponse:
 
         return SkillAssessmentResponseTime.END_OF_YEAR, question
 
+    def extract_question_choices(self, problem_html):
+        # Parse the HTML
+        parser = etree.XMLParser(recover=True)
+        problem_xml = etree.fromstring(problem_html, parser=parser)
+
+        # Extract the problem type
+        problem_type = problem_xml.find('.//problem').attrib.get('class')
+
+        # Extract the question
+        question_text = problem_xml.find('.//*[@class="question-text"]').text
+
+        # Extract the choices, whether they are correct, and the points associated
+        choices = {
+            choice.attrib['class']: {
+                'text': choice.text,
+                'points': int(choice.attrib['point'])
+            }
+            for choice in problem_xml.xpath('.//choice')
+        }
+
+        return problem_type, question_text, choices
+
     def _calculate_earned_score(self, question_responses_dict, total_score):
         """
         Calculates the score a student earned based on their responses to a question.
 
-        The score is calculated based on the number of correct responses a student
-        provided, with a variable base score depending on the total number of correct
-        choices available for the question.
-
         Parameters:
         question_responses_dict (dict): A dictionary containing question, available
-                                            choices, and the student's responses. Each
-                                            choice and response includes a boolean
-                                            indicating if it is correct or not.
+                                        choices, and the student's response. Each
+                                        choice and response includes points indicating
+                                        its score value.
         total_score (int): Max possible score for a problem
 
         Returns:
         score (int): The total score the student earned for the question.
         """
-        num_correct_choices = sum(1 for choice in question_responses_dict['choices'].values() if choice['correct'])
-        num_correct_responses = sum(
-            1 for response in question_responses_dict['student_responses'] if response['correct'])
+        # Get the points associated with the student's response
+        points = question_responses_dict['student_response']['points']
 
-        base_score = float(total_score / num_correct_choices)
-        score = base_score * num_correct_responses
+        # Calculate the total number of choices available for this question
+        total_choices = len(question_responses_dict['choices'].values())
+
+        # Compute the base score per choice, assuming equal distribution of total score among all choices
+        base_score = total_score / total_choices
+
+        # Calculate the score as the product of base score and points associated with the student's response
+        # Round the score to the nearest integer for simplicity
+        score = round(base_score * points)
 
         return score
 
