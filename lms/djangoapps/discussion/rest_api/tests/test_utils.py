@@ -5,6 +5,7 @@ Tests for Discussion REST API utils.
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
+from django.conf import settings
 from httpretty import httpretty
 from pytz import UTC
 import unittest
@@ -195,7 +196,10 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
             'course_name': self.course.display_name,
         }
         self.assertDictEqual(args.context, expected_context)
-        self.assertEqual(args.content_url, 'http://example.com/1')
+        self.assertEqual(
+            args.content_url,
+            self._get_mfe_url(self.course.id, self.thread.id)
+        )
         self.assertEqual(args.app_name, 'discussion')
 
     def test_send_notification_to_parent_threads(self):
@@ -229,7 +233,10 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
             'course_name': self.course.display_name,
         }
         self.assertDictEqual(args_comment.context, expected_context)
-        self.assertEqual(args_comment.content_url, 'http://example.com/1')
+        self.assertEqual(
+            args_comment.content_url,
+            self._get_mfe_url(self.course.id, self.thread.id)
+        )
         self.assertEqual(args_comment.app_name, 'discussion')
 
         # check if the notification is sent to the parent response creator
@@ -241,7 +248,10 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
             'course_name': self.course.display_name,
         }
         self.assertDictEqual(args_comment_on_response.context, expected_context)
-        self.assertEqual(args_comment_on_response.content_url, 'http://example.com/1')
+        self.assertEqual(
+            args_comment_on_response.content_url,
+            self._get_mfe_url(self.course.id, self.thread.id)
+        )
         self.assertEqual(args_comment_on_response.app_name, 'discussion')
 
     def test_no_signal_on_creators_own_thread(self):
@@ -253,3 +263,6 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         USER_NOTIFICATION_REQUESTED.connect(handler)
         send_response_notifications(self.thread, self.course, self.user_1, parent_id=None)
         self.assertEqual(handler.call_count, 0)
+
+    def _get_mfe_url(self, course_id, post_id):
+        return f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(course_id)}/posts/{post_id}"
