@@ -219,4 +219,4 @@ class CourseNotificationPreference(TimeStampedModel):
             'info': 'comment on post and response on comment'
         }
         """
-        return self.get_app_config(app_name).get('notification_types', {}).get('core', {})
+        return self.get_notification_types(app_name).get('core', {})
