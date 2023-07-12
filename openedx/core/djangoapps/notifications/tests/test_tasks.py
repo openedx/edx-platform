@@ -122,7 +122,7 @@ class SendNotificationsTest(ModuleStoreTestCase):
         content_url = 'https://example.com/'
 
         # Call the `send_notifications` function.
-        send_notifications([self.user.id], self.course_1.id, app_name, notification_type, context, content_url)
+        send_notifications([self.user.id], str(self.course_1.id), app_name, notification_type, context, content_url)
 
         # Assert that `Notification` objects have been created for the users.
         notification = Notification.objects.filter(user_id=self.user.id).first()
