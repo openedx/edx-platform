@@ -888,6 +888,8 @@ pymongo==3.13.0
     #   event-tracking
     #   mongoengine
     #   openedx-mongodbproxy
+python-memcached==1.59
+    # via -r requirements/edx/paver.txt
 pynacl==1.5.0
     # via edx-django-utils
 pynliner==0.8.0

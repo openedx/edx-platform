@@ -1228,6 +1228,8 @@ pylint-pytest==0.3.0
     # via -r requirements/edx/testing.txt
 pylti1p3==2.0.0
     # via -r requirements/edx/testing.txt
+python-memcached==1.59
+    # via -r requirements/edx/paver.txt
 pymemcache==4.0.0
     # via -r requirements/edx/testing.txt
 pymongo==3.13.0
