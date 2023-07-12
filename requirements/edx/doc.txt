@@ -82,7 +82,10 @@ sphinx==6.2.1
     #   -r requirements/edx/doc.in
     #   pydata-sphinx-theme
     #   sphinx-book-theme
+    #   sphinx-design
 sphinx-book-theme==1.0.1
+    # via -r requirements/edx/doc.in
+sphinx-design==0.4.1
     # via -r requirements/edx/doc.in
 sphinxcontrib-applehelp==1.0.4
     # via sphinx
