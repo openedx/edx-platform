@@ -2633,6 +2633,10 @@ paths:
                 date are returned. This is different from search_term because this filtering is done on
                 CourseOverview and not ElasticSearch.
 
+            course_keys (optional):
+                If specified, it filters visible `CourseOverview` objects by
+                the course keys (ids) provided
+
         **Returns**
 
             * 200 on success, with a list of course discovery objects as returned
