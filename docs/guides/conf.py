@@ -62,10 +62,15 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinxcontrib.openapi',
+    'sphinxext.rediraffe',
     'sphinx_design',
     'code_annotations.contrib.sphinx.extensions.featuretoggles',
     'code_annotations.contrib.sphinx.extensions.settings',
 ]
+
+# Rediraffe related settings.
+rediraffe_redirects = "redirects.txt"
+rediraffe_branch = 'origin/master'
 
 # code_annotations.(featuretoggles|settings) related settings.
 edxplatform_repo_url = "https://github.com/openedx/edx-platform"
