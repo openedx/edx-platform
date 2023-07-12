@@ -110,14 +110,17 @@ class ProgramSubscriptionModel extends Backbone.Model {
         const trialEndTime = DateUtils.localizeTime(
             DateUtils.stringToMoment(trialEndDate),
             userTimezone
-        ).startOf('day');
+        );
         const currentTime = DateUtils.localizeTime(
             moment.utc(),
             userTimezone
-        ).startOf('day');
+        );
 
-        return trialEndTime.diff(currentTime, 'days');
-
+        return trialEndTime.diff(currentTime, 'days') < 1
+            ? // 0 if trial end time is less than 24 hrs
+              0
+            : // else return actual difference in days
+              trialEndTime.startOf('day').diff(currentTime.startOf('day'), 'days');
     }
 }
 

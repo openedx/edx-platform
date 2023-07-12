@@ -36,7 +36,7 @@ from xblock.runtime import IdGenerator, IdReader, Runtime
 from xmodule import block_metadata_utils
 from xmodule.fields import RelativeTime
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from openedx.core.djangolib.markup import HTML
 
 from common.djangoapps.xblock_django.constants import (
@@ -221,7 +221,7 @@ class HTMLSnippet:
 
     @classmethod
     def get_preview_view_js_bundle_name(cls):
-        return cls.__name__ + 'Preview'
+        return cls.__name__ + 'Display'
 
     @classmethod
     def get_studio_view_js(cls):
@@ -229,7 +229,7 @@ class HTMLSnippet:
 
     @classmethod
     def get_studio_view_js_bundle_name(cls):
-        return cls.__name__ + 'Studio'
+        return cls.__name__ + 'Editor'
 
     def get_html(self):
         """
@@ -252,7 +252,7 @@ def shim_xmodule_js(fragment, js_module_name):
         fragment.initialize_js('XBlockToXModuleShim')
         fragment.json_init_args = {'xmodule-type': js_module_name}
 
-        add_webpack_to_fragment(fragment, 'XModuleShim')
+        add_webpack_js_to_fragment(fragment, 'XModuleShim')
 
 
 class XModuleFields:

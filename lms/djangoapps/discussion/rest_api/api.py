@@ -128,7 +128,7 @@ from .utils import (
     discussion_open_for_user,
     get_usernames_for_course,
     get_usernames_from_search_string,
-    set_attribute
+    set_attribute, send_response_notifications
 )
 
 
@@ -1532,7 +1532,8 @@ def create_comment(request, comment_data):
 
     track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
                                 from_mfe_sidebar=from_mfe_sidebar)
-
+    send_response_notifications(thread=cc_thread, course=course, creator=request.user,
+                                parent_id=comment_data.get("parent_id"))
     return api_comment
 
 

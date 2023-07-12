@@ -1,20 +1,9 @@
 """Views for assets"""
 
 
-import json
-import logging
-import math
-import re
-from functools import partial
-from urllib.parse import urljoin
-
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_http_methods, require_POST
 from cms.djangoapps.contentstore.asset_storage_handlers import (
     handle_assets,
     update_course_run_asset as update_course_run_asset_source_method,
@@ -23,23 +12,6 @@ from cms.djangoapps.contentstore.asset_storage_handlers import (
     get_asset_json as get_asset_json_source_method,
     update_asset as update_asset_source_method,
 )
-from opaque_keys.edx.keys import AssetKey, CourseKey
-from pymongo import ASCENDING, DESCENDING
-
-from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.student.auth import has_course_author_access
-from common.djangoapps.util.date_utils import get_default_time_display
-from common.djangoapps.util.json_request import JsonResponse
-from openedx.core.djangoapps.contentserver.caching import del_cached_content
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from xmodule.contentstore.content import StaticContent  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.exceptions import NotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
-from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-
-from ..exceptions import AssetNotFoundException, AssetSizeTooLargeException
-from ..utils import reverse_course_url
 
 __all__ = ['assets_handler']
 

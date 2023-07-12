@@ -22,7 +22,7 @@ from xblock.fields import Boolean, Dict, List, Scope, String  # lint-amnesty, py
 from openedx.core.djangolib.markup import Text, HTML
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.stringify import stringify_children
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
     ResourceTemplates,
@@ -155,7 +155,8 @@ class PollBlock(
             'configuration_json': self.dump_poll(),
         }
         fragment.add_content(self.runtime.service(self, 'mako').render_template('poll.html', params))
-        add_webpack_to_fragment(fragment, 'PollBlockPreview')
+        add_sass_to_fragment(fragment, 'PollBlockDisplay.scss')
+        add_webpack_js_to_fragment(fragment, 'PollBlockDisplay')
         shim_xmodule_js(fragment, 'Poll')
         return fragment
 

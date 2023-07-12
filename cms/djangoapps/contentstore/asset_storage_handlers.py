@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
+from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
@@ -31,7 +32,8 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .exceptions import AssetNotFoundException, AssetSizeTooLargeException
-from .utils import reverse_course_url
+from .utils import reverse_course_url, get_files_uploads_url
+from .toggles import use_new_files_uploads_page
 
 
 REQUEST_DEFAULTS = {
@@ -101,6 +103,9 @@ def _asset_index(request, course_key):
     Supports start (0-based index into the list of assets) and max query parameters.
     '''
     course_block = modulestore().get_course(course_key)
+
+    if use_new_files_uploads_page(course_key):
+        return redirect(get_files_uploads_url(course_key))
 
     return render_to_response('asset_index.html', {
         'language_code': request.LANGUAGE_CODE,

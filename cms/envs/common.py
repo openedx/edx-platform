@@ -1440,7 +1440,6 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json'),
-        'LOADER_CLASS': 'xmodule.util.xmodule_django.XModuleWebpackLoader',
     },
     'WORKERS': {
         'BUNDLE_DIR_NAME': 'bundles/',
@@ -2729,11 +2728,3 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
 DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
 DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
-
-OPEN_EDX_FILTERS_CONFIG = {
-    "org.openedx.content_authoring.staged_content.static_filter_source.v1": {
-        "pipeline": [
-            "openedx.core.djangoapps.content_staging.filters.IgnoreLargeFiles",
-        ]
-    }
-}
