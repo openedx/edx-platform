@@ -524,9 +524,9 @@ def _get_thumbnail_asset_key(asset, course_key):
     return thumbnail_asset_key
 
 
-# TODO: this method needs improvement. These view decorators should be at the top in an actual view method, but this is just a method
-# called by the asset_handler. The asset_handler used by the public studio content API just ignores all of this stuff, but I'm not removing
-# them, because I don't want to risk breaking anything right now.
+# TODO: this method needs improvement. These view decorators should be at the top in an actual view method,
+#  but this is just a method called by the asset_handler. The asset_handler used by the public studio content API
+# just ignores all of this stuff.
 @require_http_methods(('DELETE', 'POST', 'PUT'))
 @login_required
 @ensure_csrf_cookie

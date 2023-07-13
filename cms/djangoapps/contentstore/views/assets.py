@@ -2,7 +2,6 @@
 
 
 from django.contrib.auth.decorators import login_required
-from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from cms.djangoapps.contentstore.asset_storage_handlers import (
     handle_assets,

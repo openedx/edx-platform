@@ -37,20 +37,20 @@ class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAP
 
     @course_author_access_required
     @expect_json_in_class_view
-    def retrieve(self, request, course_key):
+    def retrieve(self, request, course_key): # pylint: disable=arguments-differ
         return handle_assets(request, course_key.html_id())
 
     @csrf_exempt
     @course_author_access_required
-    def create(self, request, course_key):
+    def create(self, request, course_key): # pylint: disable=arguments-differ
         return handle_assets(request, course_key.html_id())
 
     @course_author_access_required
     @expect_json_in_class_view
-    def update(self, request, course_key, asset_key_string):
+    def update(self, request, course_key, asset_key_string): # pylint: disable=arguments-differ
         return handle_assets(request, course_key.html_id(), asset_key_string)
 
     @course_author_access_required
     @expect_json_in_class_view
-    def destroy(self, request, course_key, asset_key_string):
+    def destroy(self, request, course_key, asset_key_string): # pylint: disable=arguments-differ
         return handle_assets(request, course_key.html_id(), asset_key_string)
