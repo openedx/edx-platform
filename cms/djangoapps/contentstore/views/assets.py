@@ -67,6 +67,7 @@ def delete_asset(course_key, asset_key):
     """Exposes service method in asset_storage_handlers without breaking existing bindings/dependencies"""
     return delete_asset_source_method(course_key, asset_key)
 
+
 def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key):
     return get_asset_json_source_method(
         display_name,
@@ -77,6 +78,7 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
         locked,
         course_key,
     )
+
 
 def _update_asset(request, course_key, asset_key):
     return update_asset_source_method(request, course_key, asset_key)
