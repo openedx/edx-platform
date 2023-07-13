@@ -133,7 +133,7 @@ def get_courses_completion_status(lms_user_id, course_run_ids):
         )
         api_response = api_client.post(
             completion_status_url,
-            data={
+            json={
                 'lms_user_id': lms_user_id,
                 'course_runs': course_run_ids,
             }
