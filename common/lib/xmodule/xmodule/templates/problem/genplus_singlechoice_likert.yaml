@@ -14,6 +14,8 @@ data: |
         </div>
         <div class="choices-xblock-wapper">
           <div class="column">
+            <h2>SCENARIO</h2>
+            <p>You are going to exam. Even though you have revised, you are feeling really nervous. Which technique would help you the most?</p>
             <img width="300" class="align-center" src="/static/images/img-opinion.png" alt="Your Opinion Matters" />
           </div>
           <div class="choices-form column">
