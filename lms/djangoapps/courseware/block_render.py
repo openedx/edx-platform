@@ -515,6 +515,7 @@ def prepare_runtime_for_user(
 
     services = {
         'fs': FSService(),
+        'field-data': student_data,
         'mako': mako_service,
         'user': DjangoXBlockUserService(
             user,

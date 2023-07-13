@@ -105,6 +105,7 @@ TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
 @XBlock.needs('fs')
+@XBlock.needs('field-data')
 @XBlock.needs('mako')
 @XBlock.needs('user')
 @XBlock.needs('verification')
