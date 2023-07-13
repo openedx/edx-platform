@@ -220,7 +220,7 @@ def _prepare_runtime_for_preview(request, block):
     # Set up functions to modify the fragment produced by student_view
     block.runtime.wrappers = wrappers
     block.runtime.wrappers_asides = wrappers_asides
-    block.runtime._services.update(services)  # pylint: disable=protected-access
+    block.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
 
     # xmodules can check for this attribute during rendering to determine if
     # they are being rendered for preview (i.e. in Studio)
