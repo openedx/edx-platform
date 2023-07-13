@@ -14,12 +14,7 @@
 
 # As it is not clarified what exact breaking changes will be introduced as per
 # the next major release, ensure the installed version is within boundaries.
-# celery>=5.2.2,<6.0.0
-
-# 5.3.0 versions breaking timezone related tests. Adding pin for time being to clear upgrade pipeline. Unpin above
-# after fixing these failures.
-celery<5.3.0
-kombu<5.3.0
+celery>=5.2.2,<6.0.0
 
 
 # required for celery>=5.2.0;<5.3.0
@@ -32,7 +27,7 @@ django-storages==1.9.1
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.68.1
+edx-enterprise==3.69.0
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -114,3 +109,7 @@ drf-yasg<1.21.6
 
 # Adding pin to avoid any major upgrade
 djangorestframework<3.15.0
+
+
+# tests failing with greater version. Fix this in separate ticket.
+pillow<10.0.0

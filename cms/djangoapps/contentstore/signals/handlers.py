@@ -177,8 +177,9 @@ def listen_for_xblock_published(sender, signal, **kwargs):
     Publish XBLOCK_PUBLISHED signals onto the event bus.
     """
     if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
+        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
         get_producer().send(
-            signal=XBLOCK_PUBLISHED, topic='xblock-published',
+            signal=XBLOCK_PUBLISHED, topic=topic,
             event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
             event_metadata=kwargs['metadata'],
         )
@@ -190,8 +191,9 @@ def listen_for_xblock_deleted(sender, signal, **kwargs):
     Publish XBLOCK_DELETED signals onto the event bus.
     """
     if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
+        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
         get_producer().send(
-            signal=XBLOCK_DELETED, topic='xblock-deleted',
+            signal=XBLOCK_DELETED, topic=topic,
             event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
             event_metadata=kwargs['metadata'],
         )
@@ -203,8 +205,9 @@ def listen_for_xblock_duplicated(sender, signal, **kwargs):
     Publish XBLOCK_DUPLICATED signals onto the event bus.
     """
     if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
+        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
         get_producer().send(
-            signal=XBLOCK_DUPLICATED, topic='xblock-duplicated',
+            signal=XBLOCK_DUPLICATED, topic=topic,
             event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
             event_metadata=kwargs['metadata'],
         )

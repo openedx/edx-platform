@@ -1,5 +1,5 @@
-Guides
-******
+Concepts and Guides
+###################
 
 .. toctree::
     :maxdepth: 2

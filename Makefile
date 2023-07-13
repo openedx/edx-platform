@@ -2,8 +2,8 @@
 .PHONY: base-requirements check-types clean \
   compile-requirements detect_changed_source_translations dev-requirements \
   docker_auth docker_tag_build_push docs extract_translations \
-  guides help lint-imports local-requirements pre-requirements pull \
-  pull_translations push_translations requirements shell swagger \
+  guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
+  pre-requirements pull pull_translations push_translations requirements shell swagger \
   technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
@@ -155,8 +155,24 @@ docker_tag_build_push: docker_auth
 	docker buildx build -t openedx/cms:latest --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production --push .
 	docker buildx build -t openedx/cms:${GITHUB_SHA} --platform linux/amd64,linux/arm64 --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production --push .
 
+# 	These commads can be use to build the single arch image locally 	
+# 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target development -t openedx/lms-dev
+# 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=lms --build-arg SERVICE_PORT=8000 --target production -t openedx/lms
+# 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target development -t openedx/cms-dev
+# 	DOCKER_BUILDKIT=1 docker build . --build-arg SERVICE_VARIANT=cms --build-arg SERVICE_PORT=8010 --target production -t openedx/cms
+
 lint-imports:
 	lint-imports
+
+migrate-lms:
+	python manage.py lms showmigrations --database default --traceback --pythonpath=.
+	python manage.py lms migrate --database default --traceback --pythonpath=.
+
+migrate-cms:
+	python manage.py cms showmigrations --database default --traceback --pythonpath=.
+	python manage.py cms migrate --database default --noinput --traceback --pythonpath=.
+
+migrate: migrate-lms migrate-cms
 
 # WARNING (EXPERIMENTAL):
 # This installs the Ubuntu requirements necessary to make `pip install` and some other basic

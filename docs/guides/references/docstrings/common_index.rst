@@ -10,5 +10,4 @@ package.
 .. toctree::
     :maxdepth: 2
 
-    common_djangoapps
-    common_lib
+    common/common
