@@ -1077,7 +1077,7 @@ class ModuleSystemShim:
             'runtime.anonymous_student_id is deprecated. Please use the user service instead.',
             DeprecationWarning, stacklevel=3,
         )
-        user_service = self._runtime_services.get('user') or self._services.get('user')
+        user_service = self._services.get('user')
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)
         return None
@@ -1107,7 +1107,7 @@ class ModuleSystemShim:
             'runtime.user_id is deprecated. Use block.scope_ids.user_id or the user service instead.',
             DeprecationWarning, stacklevel=2,
         )
-        user_service = self._runtime_services.get('user') or self._services.get('user')
+        user_service = self._services.get('user')
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_ID)
         return None
@@ -1123,7 +1123,7 @@ class ModuleSystemShim:
             'runtime.user_is_staff is deprecated. Please use the user service instead.',
             DeprecationWarning, stacklevel=2,
         )
-        user_service = self._runtime_services.get('user') or self._services.get('user')
+        user_service = self._services.get('user')
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF)
         return None
@@ -1139,7 +1139,7 @@ class ModuleSystemShim:
             'runtime.user_location is deprecated. Please use the user service instead.',
             DeprecationWarning, stacklevel=2,
         )
-        user_service = self._runtime_services.get('user') or self._services.get('user')
+        user_service = self._services.get('user')
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_REQUEST_COUNTRY_CODE)
         return None
@@ -1159,7 +1159,7 @@ class ModuleSystemShim:
             'runtime.get_real_user is deprecated. Please use the user service instead.',
             DeprecationWarning, stacklevel=2,
         )
-        user_service = self._runtime_services.get('user') or self._services.get('user')
+        user_service = self._services.get('user')
         if user_service:
             return user_service.get_user_by_anonymous_id
         return None
@@ -1177,7 +1177,7 @@ class ModuleSystemShim:
             'runtime.get_user_role is deprecated. Please use the user service instead.',
             DeprecationWarning, stacklevel=2,
         )
-        user_service = self._runtime_services.get('user') or self._services.get('user')
+        user_service = self._services.get('user')
         if user_service:
             return partial(user_service.get_current_user().opt_attrs.get, ATTR_KEY_USER_ROLE)
 
@@ -1192,7 +1192,7 @@ class ModuleSystemShim:
             'runtime.user_is_beta_tester is deprecated. Please use the user service instead.',
             DeprecationWarning, stacklevel=2,
         )
-        user_service = self._runtime_services.get('user') or self._services.get('user')
+        user_service = self._services.get('user')
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_BETA_TESTER)
 
@@ -1207,7 +1207,7 @@ class ModuleSystemShim:
             'runtime.user_is_admin is deprecated. Please use the user service instead.',
             DeprecationWarning, stacklevel=2,
         )
-        user_service = self._runtime_services.get('user') or self._services.get('user')
+        user_service = self._services.get('user')
         if user_service:
             return user_service.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_GLOBAL_STAFF)
 
@@ -1225,7 +1225,7 @@ class ModuleSystemShim:
         )
         if hasattr(self, '_deprecated_render_template'):
             return self._deprecated_render_template
-        render_service = self._runtime_services.get('mako') or self._services.get('mako')
+        render_service = self._services.get('mako')
         if render_service:
             return render_service.render_template
         return None
@@ -1251,7 +1251,7 @@ class ModuleSystemShim:
             'runtime.can_execute_unsafe_code is deprecated. Please use the sandbox service instead.',
             DeprecationWarning, stacklevel=2,
         )
-        sandbox_service = self._runtime_services.get('sandbox') or self._services.get('sandbox')
+        sandbox_service = self._services.get('sandbox')
         if sandbox_service:
             return sandbox_service.can_execute_unsafe_code
         # Default to saying "no unsafe code".
@@ -1271,7 +1271,7 @@ class ModuleSystemShim:
             'runtime.get_python_lib_zip is deprecated. Please use the sandbox service instead.',
             DeprecationWarning, stacklevel=2,
         )
-        sandbox_service = self._runtime_services.get('sandbox') or self._services.get('sandbox')
+        sandbox_service = self._services.get('sandbox')
         if sandbox_service:
             return sandbox_service.get_python_lib_zip
         # Default to saying "no lib data"
@@ -1290,7 +1290,7 @@ class ModuleSystemShim:
             'runtime.cache is deprecated. Please use the cache service instead.',
             DeprecationWarning, stacklevel=2,
         )
-        return self._runtime_services.get('cache') or self._services.get('cache') or DoNothingCache()
+        return self._services.get('cache') or DoNothingCache()
 
     @property
     def filestore(self):
@@ -1341,7 +1341,7 @@ class ModuleSystemShim:
             "rebind_noauth_module_to_user is deprecated. Please use the 'rebind_user' service instead.",
             DeprecationWarning, stacklevel=2,
         )
-        rebind_user_service = self._runtime_services.get('rebind_user') or self._services.get('rebind_user')
+        rebind_user_service = self._services.get('rebind_user')
         if rebind_user_service:
             return partial(rebind_user_service.rebind_noauth_module_to_user)
 
@@ -1421,7 +1421,6 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
             self.get_policy = lambda u: {}
 
         self.disabled_xblock_types = disabled_xblock_types
-        self._runtime_services = {}
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""
@@ -1519,7 +1518,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
         Publish events through the `EventPublishingService`.
         This ensures that the correct track method is used for Instructor tasks.
         """
-        if publish_service := self._runtime_services.get('publish') or self._services.get('publish'):
+        if publish_service := self._services.get('publish'):
             publish_service.publish(block, event_type, event)
 
     def service(self, block, service_name):
@@ -1536,11 +1535,8 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, ModuleSystemSh
         Returns:
             An object implementing the requested service, or None.
         """
-        declaration = block.service_declaration(service_name)
-        service = self._runtime_services.get(service_name)
-        if declaration is None or service is None:
-            # getting the service from parent module. making sure of block service declarations.
-            service = super().service(block=block, service_name=service_name)
+        # Getting the service from parent module. making sure of block service declarations.
+        service = super().service(block=block, service_name=service_name)
         # Passing the block to service if it is callable e.g. XBlockI18nService. It is the responsibility of calling
         # service to handle the passing argument.
         if callable(service):
