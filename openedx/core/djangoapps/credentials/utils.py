@@ -125,8 +125,8 @@ def get_courses_completion_status(lms_user_id, course_run_ids):
         log.warning('%s configuration is disabled.', credential_configuration.API_NAME)
         return [], False
 
-    base_api_url = get_credentials_api_base_url()
-    completion_status_url = f'{base_api_url}/api/credentials/learner_cert_status'
+    completion_status_url = (f'{settings.CREDENTIALS_INTERNAL_SERVICE_URL}/api'
+                             '/credentials/v1/learner_cert_status/')
     try:
         api_client = get_credentials_api_client(
             User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)
