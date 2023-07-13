@@ -64,12 +64,12 @@ class CourseEnrollmentListView(generics.ListAPIView):
     serializer_class = NotificationCourseEnrollmentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_paginated_response(self, show_preferences, data):
+    def get_paginated_response(self, data):
         """
         Return a response given serialized page data with show_preferences flag.
         """
         response = super().get_paginated_response(data)
-        response.data["show_preferences"] = show_preferences
+        response.data["show_preferences"] = get_show_notifications_tray(self.request.user)
         return response
 
     def get_queryset(self):
@@ -81,7 +81,6 @@ class CourseEnrollmentListView(generics.ListAPIView):
         Returns the list of active course enrollments for which ENABLE_NOTIFICATIONS
         Waffle flag is enabled
         """
-        show_preferences = get_show_notifications_tray(request.user)
         queryset = self.filter_queryset(self.get_queryset())
         course_ids = queryset.values_list('course_id', flat=True)
 
@@ -93,10 +92,10 @@ class CourseEnrollmentListView(generics.ListAPIView):
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(show_preferences, serializer.data)
+            return self.get_paginated_response(serializer.data)
 
         return Response({
-            "show_preferences": show_preferences,
+            "show_preferences": get_show_notifications_tray(request.user),
             "results": self.get_serializer(queryset, many=True).data
         })
 
