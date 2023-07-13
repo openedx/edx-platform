@@ -1615,6 +1615,7 @@ sphinx==6.2.1
     #   sphinx-design
     #   sphinxcontrib-httpdomain
     #   sphinxcontrib-openapi
+    #   sphinxext-rediraffe
 sphinx-book-theme==1.0.1
     # via -r requirements/edx/doc.txt
 sphinx-design==0.4.1
@@ -1653,6 +1654,8 @@ sphinxcontrib-serializinghtml==1.1.5
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx
+sphinxext-rediraffe==0.2.7
+    # via -r requirements/edx/doc.txt
 sqlparse==0.4.4
     # via
     #   -r requirements/edx/testing.txt

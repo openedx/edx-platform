@@ -119,6 +119,7 @@ sphinx==6.2.1
     #   sphinx-design
     #   sphinxcontrib-httpdomain
     #   sphinxcontrib-openapi
+    #   sphinxext-rediraffe
 sphinx-book-theme==1.0.1
     # via -r requirements/edx/doc.in
 sphinx-design==0.4.1
@@ -141,6 +142,8 @@ sphinxcontrib-qthelp==1.0.3
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
+sphinxext-rediraffe==0.2.7
+    # via -r requirements/edx/doc.in
 stevedore==5.1.0
     # via code-annotations
 text-unidecode==1.3
