@@ -433,6 +433,9 @@ def prepare_runtime_for_user(
     Arguments:
         see arguments for get_block()
         request_token (str): A token unique to the request use by xblock initialization
+
+    Returns:
+        KvsFieldData:  student_data bound to, primarily, the user and block
     """
 
     def inner_get_block(block):
@@ -511,10 +514,14 @@ def prepare_runtime_for_user(
             # We already know the user has staff access when masquerading is active.
             block_wrappers.append(partial(add_staff_markup, user, disable_staff_debug_info))
 
+    field_data = DateLookupFieldData(block._field_data, course_id, user)  # pylint: disable=protected-access
+    field_data = LmsFieldData(field_data, student_data)
+
     store = modulestore()
 
     services = {
         'fs': FSService(),
+        'field-data': field_data,
         'mako': mako_service,
         'user': DjangoXBlockUserService(
             user,
@@ -584,6 +591,8 @@ def prepare_runtime_for_user(
 
     block.runtime.set('position', position)
 
+    return field_data
+
 
 # TODO: Find all the places that this method is called and figure out how to
 # get a loaded course passed into it
@@ -600,7 +609,7 @@ def get_block_for_descriptor_internal(user, block, student_data, course_id, trac
         request_token (str): A unique token for this request, used to isolate xblock rendering
     """
 
-    prepare_runtime_for_user(
+    student_data = prepare_runtime_for_user(
         user=user,
         student_data=student_data,  # These have implicit user bindings, the rest of args are considered not to
         block=block,
@@ -625,6 +634,8 @@ def get_block_for_descriptor_internal(user, block, student_data, course_id, trac
             partial(LmsFieldData, student_data=student_data),
         ],
     )
+
+    block.scope_ids = block.scope_ids._replace(user_id=user.id)
 
     # Do not check access when it's a noauth request.
     # Not that the access check needs to happen after the block is bound
