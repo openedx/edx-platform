@@ -24,16 +24,64 @@ locations.
 .. toctree::
     :maxdepth: 1
 
-    lms_apis
-    guides
     docstrings/docstrings
-    celery
-    settings
-    featuretoggles
+
+.. toctree::
+    :hidden:
+
+    how-tos/index
+    references/index
+    concepts/index
+
+.. grid:: 1 2 2 2
+   :gutter: 3
+   :padding: 0
+
+   .. grid-item-card:: How-tos
+      :class-card: sd-shadow-md sd-p-2
+      :class-footer: sd-border-0
+
+      * :doc:`how-tos/celery`
+      +++
+      .. button-ref:: how-tos/index
+         :color: primary
+         :outline:
+         :expand:
+
+   .. grid-item-card:: Referencs
+      :class-card: sd-shadow-md sd-p-2
+      :class-footer: sd-border-0
+
+      * :doc:`references/lms_apis`
+      * :doc:`references/settings`
+      * :doc:`references/featuretoggles`
+      +++
+      .. button-ref:: references/index
+         :color: primary
+         :outline:
+         :expand:
+
+   .. grid-item-card:: Concepts
+      :class-card: sd-shadow-md sd-p-2
+      :class-footer: sd-border-0
+
+      * :doc:`concepts/extension_points`
+      * :doc:`concepts/testing/testing`
+      * :doc:`concepts/frontend/javascript`
+      +++
+      .. button-ref:: concepts/index
+         :color: primary
+         :outline:
+         :expand:
 
 
 Change History
 **************
+
+* Jun 30, 2023
+
+  * Added API, Feature Toggle and Settings docs.
+  * Re-organized how the docs are laid out.
 
 * December, 2020: Added documentation about new protocols for writing celery tasks.
 

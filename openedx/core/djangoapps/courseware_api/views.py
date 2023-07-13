@@ -47,7 +47,7 @@ from lms.djangoapps.gating.api import get_entrance_exam_score, get_entrance_exam
 from lms.djangoapps.grades.api import CourseGradeFactory
 from lms.djangoapps.verify_student.services import IDVerificationService
 from openedx.core.djangoapps.agreements.api import get_integrity_signature
-from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict
+from openedx.core.djangoapps.courseware_api.utils import get_celebrations_dict, get_learning_assistant_launch_url
 from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin
@@ -365,7 +365,13 @@ class CoursewareMeta:
         Returns a URL for the learning assistant LTI launch if applicable, otherwise None
         """
         if learning_assistant_is_active(self.course_key):
-            return ""  # TODO: replace empty string with LTI launch URL as part of MST-1975
+            lti_url = get_learning_assistant_launch_url(
+                self.effective_user,
+                self.course_key,
+                self.enrollment_object,
+                self.overview,
+            )
+            return lti_url
         return None
 
 

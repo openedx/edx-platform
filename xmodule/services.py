@@ -157,13 +157,19 @@ class RebindUserService(Service):
         user (User) - A Django User object
         course_id (str) - Course ID
         course (Course) - Course Object
+        prepare_runtime_for_user (function) - The helper function that will be called to create a module system
+            for a specfic user. This is the parent function from which this service was reactored out.
+            `lms.djangoapps.courseware.block_render.prepare_runtime_for_user`
         kwargs (dict) - all the keyword arguments that need to be passed to the `prepare_runtime_for_user`
             function when it is called during rebinding
     """
-    def __init__(self, user, course_id, **kwargs):
+    def __init__(self, user, course_id, prepare_runtime_for_user, **kwargs):
         super().__init__(**kwargs)
         self.user = user
         self.course_id = course_id
+        self._ref = {
+            "prepare_runtime_for_user": prepare_runtime_for_user
+        }
         self._kwargs = kwargs
 
     def rebind_noauth_module_to_user(self, block, real_user):
@@ -195,11 +201,10 @@ class RebindUserService(Service):
         with modulestore().bulk_operations(self.course_id):
             course = modulestore().get_course(course_key=self.course_id)
 
-        from lms.djangoapps.courseware.block_render import prepare_runtime_for_user
-        prepare_runtime_for_user(
+        inner_student_data = self._ref["prepare_runtime_for_user"](
             user=real_user,
             student_data=student_data_real_user,  # These have implicit user bindings, rest of args considered not to
-            runtime=block.runtime,
+            block=block,
             course_id=self.course_id,
             course=course,
             **self._kwargs
@@ -210,9 +215,11 @@ class RebindUserService(Service):
             [
                 partial(DateLookupFieldData, course_id=self.course_id, user=self.user),
                 partial(OverrideFieldData.wrap, real_user, course),
-                partial(LmsFieldData, student_data=student_data_real_user),
+                partial(LmsFieldData, student_data=inner_student_data),
             ],
         )
+
+        block.scope_ids = block.scope_ids._replace(user_id=real_user.id)
 
 
 class EventPublishingService(Service):

@@ -12,11 +12,10 @@
 
 -r ../pip-tools.txt                     # pip-tools and its dependencies, for managing requirements files
 -r testing.txt                          # Dependencies for running the various test suites
+-r doc.txt                              # Dependencies for building the documentation locally.
 
 click                                   # Used for perf_tests utilities in modulestore
 django-debug-toolbar                    # A set of panels that display debug information about the current request/response
-sphinx-book-theme                       # Documentation theme
 mypy                                    # static type checking
 pywatchman                              # More efficient checking for runserver reload trigger events
-sphinxcontrib-openapi[markdown]         # OpenAPI (fka Swagger) spec renderer for Sphinx
 vulture                                 # Detects possible dead/unused code, used in scripts/find-dead-code.sh

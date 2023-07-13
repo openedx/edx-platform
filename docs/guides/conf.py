@@ -62,9 +62,15 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinxcontrib.openapi',
+    'sphinxext.rediraffe',
+    'sphinx_design',
     'code_annotations.contrib.sphinx.extensions.featuretoggles',
     'code_annotations.contrib.sphinx.extensions.settings',
 ]
+
+# Rediraffe related settings.
+rediraffe_redirects = "redirects.txt"
+rediraffe_branch = 'origin/master'
 
 # code_annotations.(featuretoggles|settings) related settings.
 edxplatform_repo_url = "https://github.com/openedx/edx-platform"
@@ -272,10 +278,11 @@ autodoc_mock_imports = [
 # run sphinx-apidoc against and the directories under "docs" in which to store
 # the generated *.rst files
 modules = {
-    'cms': 'cms',
-    'lms': 'lms',
-    'openedx': 'openedx',
-    'xmodule': 'xmodule',
+    'cms': 'references/docstrings/cms',
+    'lms': 'references/docstrings/lms',
+    'openedx': 'references/docstrings/openedx',
+    'common': 'references/docstrings/common',
+    'xmodule': 'references/docstrings/xmodule',
 }
 
 

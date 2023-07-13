@@ -2,8 +2,8 @@
 .PHONY: base-requirements check-types clean \
   compile-requirements detect_changed_source_translations dev-requirements \
   docker_auth docker_build docker_push docker_tag docs extract_translations \
-  guides help lint-imports local-requirements pre-requirements pull \
-  pull_translations push_translations requirements shell swagger \
+  guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
+  pre-requirements pull pull_translations push_translations requirements shell swagger \
   technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
@@ -169,6 +169,16 @@ docker_push: docker_tag docker_auth ## push to docker hub
 
 lint-imports:
 	lint-imports
+
+migrate-lms:
+	python manage.py lms showmigrations --database default --traceback --pythonpath=.
+	python manage.py lms migrate --database default --traceback --pythonpath=.
+
+migrate-cms:
+	python manage.py cms showmigrations --database default --traceback --pythonpath=.
+	python manage.py cms migrate --database default --noinput --traceback --pythonpath=.
+
+migrate: migrate-lms migrate-cms
 
 # WARNING (EXPERIMENTAL):
 # This installs the Ubuntu requirements necessary to make `pip install` and some other basic
