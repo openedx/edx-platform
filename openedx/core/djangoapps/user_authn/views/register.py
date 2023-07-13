@@ -758,7 +758,6 @@ class RegistrationValidationView(APIView):
             "country": "PK"
         }
         ```
-
         where each key is the appropriate form field name and the value is
         user input. One may enter individual inputs if needed. Some inputs
         can get extra verification checks if entered along with others,
