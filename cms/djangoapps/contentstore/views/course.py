@@ -1114,7 +1114,7 @@ def settings_handler(request, course_key_string):
                 'upgrade_deadline': upgrade_deadline,
             }
             if is_prerequisite_courses_enabled():
-                courses, in_process_course_actions = get_courses_accessible_to_user(request)
+                courses, in_process_course_actions = get_courses_accessible_to_user(request, course_module.location.org)
                 # exclude current course from the list of available courses
                 courses = (course for course in courses if course.id != course_key)
                 if courses:
