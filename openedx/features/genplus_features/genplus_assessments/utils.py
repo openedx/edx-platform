@@ -411,8 +411,13 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
                         # For each response in the block, aggregate the result for the problem, and add in the responses
                         if responses['problem_type'] in ProblemTypes.CHOICE_TYPE_PROBLEMS:
                             if filter_type == "aggregate_response":
-                                aggregate_result.update(students_aggregate_result(
-                                    user_states, aggregate_result))
+                                aggregate_result.update(
+                                    students_aggregate_result(
+                                        user_states,
+                                        aggregate_result,
+                                        responses['problem_choices'],
+                                    )
+                                )
                             elif filter_type == "individual_response":
                                 responses['results'].append(
                                     students_multiple_choice_response(user_states, user))
@@ -457,7 +462,7 @@ def build_students_result(user_id, course_key, usage_key_str, student_list, filt
     return student_data
 
 
-def students_aggregate_result(user_states, aggregate_result):
+def students_aggregate_result(user_states, aggregate_result, problem_choices):
     """
     Generate aggregate response for problem(Multiple Choices and Single Choices) as per the user state  under the
     ``problem_location`` root.
@@ -468,16 +473,26 @@ def students_aggregate_result(user_states, aggregate_result):
             [Dict]: Returns a dictionaries
             containing the students aggregate result data.
     """
+    for key in problem_choices.keys():
+        choice = problem_choices[key]
+        aggregate_result[choice['statement']] = {
+            'count': 0,
+            'is_correct': choice['correct'] == 'true'
+        }
+
     for user_state in user_states:
         user_answer = user_state['Answer']
         correct_answer = user_state['Correct Answer']
-        if user_answer not in aggregate_result:
-            aggregate_result[user_answer] = {
-                'count': 1,
-                'is_correct': correct_answer == user_answer
-            }
-        else:
-            aggregate_result[user_answer]['count'] += 1
+        keys = user_answer.split(',')
+        for k in keys:
+            k = k.strip()
+            if k not in aggregate_result:
+                aggregate_result[k] = {
+                    'count': 1,
+                    'is_correct': k in correct_answer
+                }
+            else:
+                aggregate_result[k]['count'] += 1
 
     return aggregate_result
 
