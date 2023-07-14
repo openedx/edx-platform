@@ -69,9 +69,10 @@ def revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, user
     """
 
     log.info('B2C_SUBSCRIPTIONS: Starting revoke_entitlements_and_downgrade_courses_to_audit for '
-             'user: %s and course_entitlements_uuids: %s',
+             'user: %s, course_entitlements_uuids: %s, awarded_cert_course_ids: %s',
              user_id,
-             revocable_entitlement_uuids)
+             revocable_entitlement_uuids,
+             awarded_cert_course_ids)
     for course_entitlement in course_entitlements:
         if course_entitlement.enrollment_course_run is None:
             if course_entitlement.expired_at is None:
@@ -89,7 +90,8 @@ def revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, user
                 log.warning('B2C_SUBSCRIPTIONS: Enrollment mode mismatch for user_id: %s and course_id: %s',
                             user_id,
                             course_id)
-    log.info('B2C_SUBSCRIPTIONS: Completed revoke_entitlements_and_downgrade_courses_to_audit for '
-             'user: %s and course_entitlements_uuids %s',
+    log.info('B2C_SUBSCRIPTIONS: Starting revoke_entitlements_and_downgrade_courses_to_audit for '
+             'user: %s, course_entitlements_uuids: %s, awarded_cert_course_ids: %s',
              user_id,
-             revocable_entitlement_uuids)
+             revocable_entitlement_uuids,
+             awarded_cert_course_ids)
