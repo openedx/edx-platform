@@ -35,6 +35,17 @@ class ThemeFilesystemLoader(FilesystemLoader):
             self.dirs = theme_dirs + self.dirs
         super().__init__(engine, self.dirs)
 
+    def get_dirs(self):
+        """
+        Override get_dirs method.
+        Make the theme templates a priority, avoiding cashing templates for django ones.
+        """
+        self.dirs = self.engine.dirs
+        theme_dirs = self.get_theme_template_sources()
+        if isinstance(theme_dirs, list):
+            self.dirs = theme_dirs + self.dirs
+        return self.dirs
+
     @staticmethod
     def get_theme_template_sources():
         """
