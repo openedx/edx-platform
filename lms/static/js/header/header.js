@@ -8,8 +8,8 @@ function createMobileMenu() {
      * Dynamically create a mobile menu from all specified mobile links
      * on the page.
      */
-    
-'use strict';
+
+    'use strict';
 
     $('.mobile-nav-item').each(function() {
         var mobileNavItem = $(this).clone().addClass('mobile-nav-link');

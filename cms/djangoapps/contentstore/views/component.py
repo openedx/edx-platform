@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseBadRequest
+from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET
 from opaque_keys import InvalidKeyError
@@ -34,10 +35,14 @@ except ImportError:
     content_staging_api = None
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
-
-from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url
-from .helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from .block import add_container_page_publishing_info, create_xblock_info, load_services_for_studio
+from ..toggles import use_new_unit_page
+from ..utils import get_lms_link_for_item, get_sibling_urls, reverse_course_url, get_unit_url
+from ..helpers import get_parent_xblock, is_unit, xblock_type_display_name
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
+    add_container_page_publishing_info,
+    create_xblock_info,
+    load_services_for_studio,
+)
 
 __all__ = [
     'container_handler',
@@ -127,7 +132,6 @@ def container_handler(request, usage_key_string):
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
             except ItemNotFoundError:
                 return HttpResponseBadRequest()
-
             component_templates = get_component_templates(course)
             ancestor_xblocks = []
             parent = get_parent_xblock(xblock)
@@ -135,6 +139,9 @@ def container_handler(request, usage_key_string):
 
             is_unit_page = is_unit(xblock)
             unit = xblock if is_unit_page else None
+
+            if is_unit_page and use_new_unit_page(course.id):
+                return redirect(get_unit_url(course.id, unit.location))
 
             is_first = True
             block = xblock
@@ -195,7 +202,6 @@ def container_handler(request, usage_key_string):
                 user_clipboard = content_staging_api.get_user_clipboard_json(request.user.id, request)
             else:
                 user_clipboard = {"content": None}
-
             return render_to_response('container.html', {
                 'language_code': request.LANGUAGE_CODE,
                 'context_course': course,  # Needed only for display of menus at top of page.
@@ -305,8 +311,8 @@ def get_component_templates(courselike, library=False):  # lint-amnesty, pylint:
     # by the components in the order listed in COMPONENT_TYPES.
     component_types = COMPONENT_TYPES[:]
 
-    # Libraries do not support discussions and openassessment and other libraries
-    component_not_supported_by_library = ['discussion', 'library', 'openassessment']
+    # Libraries do not support discussions, drag-and-drop, and openassessment and other libraries
+    component_not_supported_by_library = ['discussion', 'library', 'openassessment', 'drag-and-drop-v2']
     if library:
         component_types = [component for component in component_types
                            if component not in set(component_not_supported_by_library)]

@@ -229,13 +229,18 @@ def username_suffix_generator(suffix_length=4):
     Generates a random, alternating number and letter string for the purpose of
     appending to non-unique usernames. Alternating is less likey to produce
     a significant/meaningful substring like an offensive word.
+    Whether the suffix starts with a letter or number is also randomized.
     """
+    # pick from letters, or numbers
+    choice_collections = [string.ascii_lowercase, string.digits]
+    # randomize which collection to pick from first
+    random.shuffle(choice_collections)
     output = ''
     for i in range(suffix_length):
         if (i % 2) == 0:
-            output += random.choice(string.ascii_lowercase)
+            output += random.choice(choice_collections[0])
         else:
-            output += random.choice(string.digits)
+            output += random.choice(choice_collections[1])
     return output
 
 

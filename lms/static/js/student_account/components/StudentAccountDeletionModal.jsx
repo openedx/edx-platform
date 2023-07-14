@@ -136,23 +136,24 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                     body={(
                         <div>
                             {responseError
-                && <StatusAlert
-                    dialog={(
-                        <div className="modal-alert">
-                            <div className="icon-wrapper">
-                                <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
+                && (
+                    <StatusAlert
+                        dialog={(
+                            <div className="modal-alert">
+                                <div className="icon-wrapper">
+                                    <Icon id="delete-confirmation-body-error-icon" className={['fa', 'fa-exclamation-circle']} />
+                                </div>
+                                <div className="alert-content">
+                                    <h3 className="alert-title">{ validationMessage }</h3>
+                                    <p>{ validationErrorDetails }</p>
+                                </div>
                             </div>
-                            <div className="alert-content">
-                                <h3 className="alert-title">{ validationMessage }</h3>
-                                <p>{ validationErrorDetails }</p>
-                            </div>
-                        </div>
-                    )}
-                    alertType="danger"
-                    dismissible={false}
-                    open
-                />
-                            }
+                        )}
+                        alertType="danger"
+                        dismissible={false}
+                        open
+                    />
+                )}
 
                             <StatusAlert
                                 dialog={(

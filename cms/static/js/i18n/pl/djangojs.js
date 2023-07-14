@@ -537,7 +537,6 @@
     "Exception Granted": "Wyj\u0105tek przyznany",
     "Expand All": "Rozwi\u0144 wszystko",
     "Explain if other.": "Inny? Jaki?",
-    "Explore New Programs": "Odkryj nowe programy",
     "Explore Programs": "Przegl\u0105daj programy",
     "Explore your course!": "Przejrzyj sw\u00f3j kurs!",
     "Failed to delete student state for user.": "Nie uda\u0142o si\u0119 usun\u0105\u0107 stanu studenta dla u\u017cytkownika.",

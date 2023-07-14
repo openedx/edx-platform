@@ -6,11 +6,11 @@ from string import Template
 from xblock.core import XBlock
 
 from lxml import etree
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import RawMixin
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
     HTMLSnippet,
     ResourceTemplates,
@@ -67,17 +67,11 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
 
     preview_view_js = {
         'js': [],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     studio_view_js = {
-        'js': [resource_string(__name__, 'js/src/raw/edit/xml.js')],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [resource_string(__name__, 'css/codemirror/codemirror.scss')],
+        'js': [resource_filename(__name__, 'js/src/raw/edit/xml.js')],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     def studio_view(self, _context):
@@ -87,7 +81,8 @@ class CustomTagBlock(CustomTagTemplateBlock):  # pylint: disable=abstract-method
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'CustomTagBlockStudio')
+        add_sass_to_fragment(fragment, 'CustomTagBlockEditor.scss')
+        add_webpack_js_to_fragment(fragment, 'CustomTagBlockEditor')
         shim_xmodule_js(fragment, 'XMLEditingDescriptor')
         return fragment
 

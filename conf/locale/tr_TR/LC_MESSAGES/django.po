@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-04-16 20:42+0000\n"
+"POT-Creation-Date: 2023-06-23 10:50+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2021\n"
 "Language-Team: Turkish (Turkey) (https://app.transifex.com/open-edx/teams/6205/tr_TR/)\n"
@@ -142,6 +142,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Unit"
+msgstr "Ünite"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr "Problem"
 
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
@@ -163,14 +175,13 @@ msgstr "Tartışma"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Problem"
-msgstr "Problem"
-
-#: cms/djangoapps/contentstore/views/component.py
-#: openedx/core/djangoapps/content_libraries/constants.py
 #: lms/templates/video.html
 msgid "Video"
 msgstr "Video"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "Boş Gelişmiş Problem"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -181,17 +192,6 @@ msgstr "Gelişmiş"
 #: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "Giriş Sınavı"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
-msgid "Unit"
-msgstr "Ünite"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_block.py
-msgid "Empty"
-msgstr "Boş"
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: xmodule/video_block/video_handlers.py
@@ -246,6 +246,11 @@ msgstr "Video No"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "Beklemede"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/create_xblock.py
+#: xmodule/library_content_block.py
+msgid "Empty"
+msgstr "Boş"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -2309,8 +2314,8 @@ msgid "Cookie Policy"
 msgstr "Çerez Politikası"
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Information"
-msgstr "Kişisel Bilgilerimi Satmayın"
+msgid "Your Privacy Choices"
+msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -3107,6 +3112,10 @@ msgid ""
 "However, you are currently logged in as a '{active_enterprise_name}' user. "
 "Please log in with '{enrollment_enterprise_name}' to access this course."
 msgstr ""
+"Bu derse \"{enrollment_enterprise_name}\" ile kaydoldunuz. Ancak, şu anda "
+"bir '{active_enterprise_name}' kullanıcısı olarak oturum açmış durumdasınız."
+" Bu derse erişmek için lütfen '{enrollment_enterprise_name}' ile giriş "
+"yapın."
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You must give Data Sharing Consent for the course"
@@ -4018,10 +4027,6 @@ msgstr "Dil"
 msgid "Location"
 msgstr "Yer"
 
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "Doğum Yılı"
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
 #. the user's gender.
@@ -4207,6 +4212,9 @@ msgid ""
 "depend on the kind of task being performed. For instanceit may contain the "
 "problem locations for a problem resources task."
 msgstr ""
+"Görev için giriş parametreleri. Bu verilerin formatı ve içeriği, "
+"gerçekleştirilen görevin türüne bağlı olacaktır. Örneğin, problem kaynakları"
+" görevi için problem konumlarını içerebilir."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The username of the user who initiated this task."
@@ -5044,7 +5052,7 @@ msgstr ""
 
 #: lms/djangoapps/program_enrollments/models.py
 msgid "One of user or external_user_key must not be null."
-msgstr ""
+msgstr "Kullanıcı veya harici_kullanıcı_anahtarından biri boş olmamalıdır."
 
 #: lms/djangoapps/support/views/index.py
 msgid "View and regenerate certificates."
@@ -5200,11 +5208,11 @@ msgstr "Bu takım yapılandırmasında zaten bir takıma ait görünüyorsunuz."
 
 #: lms/djangoapps/teams/views.py
 msgid "teamset_id and team_id are mutually exclusive options."
-msgstr ""
+msgstr "teamset_id ve team_id birbirini dışlayan seçeneklerdir."
 
 #: lms/djangoapps/teams/views.py
 msgid "teamset_id requires course_id to also be provided."
-msgstr ""
+msgstr "teamset_id, course_id'nin de sağlanmasını gerektirir."
 
 #: lms/djangoapps/teams/views.py
 msgid "No teamset found in given course with given id"
@@ -5842,6 +5850,8 @@ msgid ""
 "{start_anchor}%(tpa_logout_url)s{middle_anchor}Click here{end_anchor} to "
 "delete your single signed on (SSO) session."
 msgstr ""
+"Single Sign-On (SSO) oturumunuzu silmek için "
+"{start_anchor}%(tpa_logout_url)s{middle_anchor}buraya{end_anchor} tıklayın."
 
 #: lms/templates/logout.html
 msgid "We are signing you in."
@@ -7120,6 +7130,8 @@ msgstr "Bu kaynak için LTI platform açıklayıcı başlığı"
 #: openedx/core/djangoapps/content_libraries/models.py
 msgid "If AGS was enabled during launch, this should hold the lineitem ID."
 msgstr ""
+"Başlatma sırasında AGS etkinleştirildiyse, bu, lineitem kimliğini "
+"tutmalıdır."
 
 #: openedx/core/djangoapps/content_libraries/views.py
 msgid "We could not find a user with that email address."
@@ -7460,6 +7472,12 @@ msgstr ""
 "devre dışı bırakılır. "
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr "Bu bağlam/sağlayıcı için LTI yapılandırma verisi."
 
@@ -7525,10 +7543,12 @@ msgid ""
 "Discussion context ID in external forum provider. e.g. commentable_id for "
 "cs_comments_service."
 msgstr ""
+"Harici forum sağlayıcısı için tartışma bağlamı kimliği. Örn. commentable_id "
+"için cs_comments_service."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Whether this topic should be shown in-context in the course."
-msgstr ""
+msgstr "Bu konunun derste bağlam içinde gösterilip gösterilmeyeceği."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "Ordering of this topic in its learning context"
@@ -7628,6 +7648,52 @@ msgstr "{course} dersi için {country} kara listede"
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
 msgstr "Öğrenci Patikaları"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on "
+"<{strong}>{author_name}</{strong}> response to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "The notification preference config version is not up to date."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app name."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked as seen."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notification marked read."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked read."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app_name or notification_id."
+msgstr ""
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -8463,6 +8529,8 @@ msgid ""
 "Value '{preference_value}' not valid for preference '{preference_key}': Not "
 "in timezone set."
 msgstr ""
+"'{preference_value}' değeri '{preference_key}' tercihi için geçerli değil: "
+"Ayarlanan saat diliminde değil."
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -9311,6 +9379,9 @@ msgid ""
 " access the courses available to you through {enterprise_name}, "
 "{link_start}visit the {enterprise_name} dashboard{link_end}."
 msgstr ""
+"{bold_start}{enterprise_name}{bold_end} ana paneline erişiminiz var. "
+"{enterprise_name} aracılığıyla size sunulan derslere erişmek için "
+"{link_start}{enterprise_name} ana panelini ziyaret edin{link_end}."
 
 #: openedx/features/enterprise_support/api.py
 #, python-brace-format
@@ -9889,10 +9960,6 @@ msgstr "Codejail API Servisi geçersiz cevap."
 #: xmodule/capa/safe_exec/remote_exec.py
 msgid "Invalid JSON response received from codejail api service."
 msgstr "Codejail api servisinden geçersiz JSON cevabı alındı."
-
-#: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "Boş Gelişmiş Problem"
 
 #: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
@@ -11156,6 +11223,12 @@ msgid ""
 "staff/en/latest/course_features/teams/teams_setup.html#enable-and-configure-"
 "teams\">teams configuration documentation</a> for help and examples."
 msgstr ""
+"JSON kullanarak takım kümelerini yapılandırın, takım boyutlarını sınırlayın "
+"ve görünürlük ayarlarını belirleyin. Yardım ve örnekler için <a "
+"target=\"&#95;blank\" href=\"https://edx.readthedocs.io/projects/edx-"
+"partner-course-"
+"staff/en/latest/course_features/teams/teams_setup.html#enable-and-configure-"
+"teams\">teams yapılandırma belgelerine</a> bakın."
 
 #: xmodule/course_block.py
 msgid "Enable Proctored Exams"
@@ -11307,6 +11380,30 @@ msgstr ""
 "öğrenciler için izin verilir), 'public_outline' (ders ana hatlarına erişime "
 "izin verir) ve 'public' (hem anahatlara hem de ders içeriğine erişime izin "
 "verilir). "
+
+#: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr "Video Paylaşma Ayarları"
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+"Ders için video paylaşım seçeneklerini belirtin. Bu, üç değerden birine "
+"ayarlanabilir: \"tümü açık\", \"tümü kapalı\" ve \"video başına\". "
+"Varsayılan değer \"video başına\"."
+
+#: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
+msgstr ""
 
 #: xmodule/course_block.py
 msgid "Course Instructor"
@@ -11556,6 +11653,8 @@ msgid ""
 "Enter the number of components to display to each student. Set it to -1 to "
 "display all components."
 msgstr ""
+"Her öğrenciye gösterilecek bileşen sayısını girin. Tüm bileşenleri göstermek"
+" için -1 olarak ayarlayın."
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -12410,6 +12509,42 @@ msgstr "Ünite için bağlam içi tartışmaları etkinleştirin"
 msgid "Add discussion for the Unit."
 msgstr "Üniteye tartışma ekle."
 
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
+"\n"
+msgstr ""
+"İşte {organization_name} kuruluşundan {social_account_handle} için aldığım dersten eğlenceli bir klip.\n"
+"\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+"İşte {social_account_handle} için aldığım dersten eğlenceli bir klip.\n"
+"\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+"İşte {organization_name} kuruluşundan aldığım dersten eğlenceli bir klip.\n"
+"\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
+"\n"
+msgstr ""
+"İşte {platform_name} platformundan aldığım dersten eğlenceli bir klip.\n"
+"\n"
+
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
@@ -13032,6 +13167,19 @@ msgstr "Kötü ders yeri verildi"
 msgid "Missing branch on fresh clone"
 msgstr "Temiz kopyada olmayan geliştirme dalı"
 
+#: cms/djangoapps/contentstore/helpers.py
+msgid "Vertical"
+msgstr "Dikey"
+
+#: cms/djangoapps/contentstore/helpers.py cms/templates/course_outline.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Section"
+msgstr "Bölüm"
+
+#: cms/djangoapps/contentstore/helpers.py lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr "Altbölüm"
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -13116,6 +13264,22 @@ msgstr "Silinmiş Grup"
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "{0}'ın kopyası"
+
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "'{0}'ın tekrarı"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "Geçersiz ders anahtar koşulu."
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "Görsel bir isme, içerik türüne ve boyut bilgisine sahip olmalı."
@@ -13184,99 +13348,6 @@ msgid ""
 msgstr ""
 "{filename} dosyası izin verilen maksimum {maximum_size_in_megabytes} MB "
 "dosya boyutunu aşıyor."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr "Kütüphaneler {limit} bileşenden daha fazlasına sahip olamaz"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Invalid data"
-msgstr "Geçersiz veri"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Geçersiz veri ({details})"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "There was a problem pasting your component."
-msgstr "Bileşeninizi yapıştırırken bir hata gerçekleşti."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Your clipboard is empty or invalid."
-msgstr "Panonuz boş veya geçersiz."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr "{source_type} verisini {target_parent_type} üzerine taşıyamazsınız."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Item is already present in target location."
-msgstr "Nesne hedef konumda zaten mevcut."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into itself."
-msgstr "Bir nesneyi zaten bulunduğu konuma taşıyamazsınız."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into it's child."
-msgstr "Bir nesneyi kendi altına taşıyamazsınız."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item directly into content experiment."
-msgstr "Bir nesneyi doğrudan içerik denemesine taşıyamazsınız."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr "{source_usage_key} anahtarı {parent_usage_key} içinde bulunamadı."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-"{source_usage_key} anahtarını geçersiz bir ({target_index}) indeksine "
-"taşıyamazsınız."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr "({target_index}) target_index bir tamsayı olarak girilmeli."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "{0}'ın kopyası"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "'{0}'ın tekrarı"
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-"Öğrenciler ders materyallerine erişebilmek için {score}{pct_sign} ya da daha"
-" yüksek puan almalıdır."
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/block.py
-msgid "%"
-msgstr "%"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -13374,10 +13445,6 @@ msgstr ""
 "organizasyon sistemde mevcut değil, organizasyonu sisteme eklemeniz gerekir"
 
 #: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "Geçersiz ders anahtar koşulu."
-
-#: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
 msgstr "Sekmelerinizi kaydetmeyi denerken bir hata oluştu."
 
@@ -13404,21 +13471,6 @@ msgstr "Bitirilmiş Ders Giriş sınavı"
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "Ders git deposuna başarıyla aktarıldı"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Vertical"
-msgstr "Dikey"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_block.html
-msgid "Section"
-msgstr "Bölüm"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
-msgstr "Altbölüm"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Some chunks missed during file upload. Please try again"
@@ -13668,6 +13720,86 @@ msgstr "{course}_video_urls"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "A non zero positive integer is expected"
 msgstr "Sıfır olmayan bir pozitif tamsayı bekleniyor"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr "Kütüphaneler {limit} bileşenden daha fazlasına sahip olamaz"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "Invalid data"
+msgstr "Geçersiz veri"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "Geçersiz veri ({details})"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "There was a problem pasting your component."
+msgstr "Bileşeninizi yapıştırırken bir hata gerçekleşti."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "Your clipboard is empty or invalid."
+msgstr "Panonuz boş veya geçersiz."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr "{source_type} verisini {target_parent_type} üzerine taşıyamazsınız."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "Item is already present in target location."
+msgstr "Nesne hedef konumda zaten mevcut."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item into itself."
+msgstr "Bir nesneyi zaten bulunduğu konuma taşıyamazsınız."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item into it's child."
+msgstr "Bir nesneyi kendi altına taşıyamazsınız."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item directly into content experiment."
+msgstr "Bir nesneyi doğrudan içerik denemesine taşıyamazsınız."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr "{source_usage_key} anahtarı {parent_usage_key} içinde bulunamadı."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+"{source_usage_key} anahtarını geçersiz bir ({target_index}) indeksine "
+"taşıyamazsınız."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr "({target_index}) target_index bir tamsayı olarak girilmeli."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+"Öğrenciler ders materyallerine erişebilmek için {score}{pct_sign} ya da daha"
+" yüksek puan almalıdır."
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "%"
+msgstr "%"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
@@ -14611,6 +14743,10 @@ msgid "Learn more about this course"
 msgstr "Bu ders hakkında daha fazla bilgi"
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr "Bu derse kaydol"
 
@@ -14872,6 +15008,14 @@ msgstr "Sonraki sayfa"
 msgid "Paste Component"
 msgstr "Bileşeni Yapıştır"
 
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr "Gönderen:"
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr "Panomda ne var?"
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "İzleme geçmişi"
@@ -14997,28 +15141,20 @@ msgid "Downloads and transcripts"
 msgstr "İndirmeler ve altyazılar"
 
 #: lms/templates/video.html
-msgid "Share on:"
-msgstr "Şurada paylaş:"
-
-#: lms/templates/certificates/_accomplishment-banner.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/video.html
-msgid "Share on Twitter"
-msgstr "Twitter'da paylaş"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/video.html
-msgid "Share on Facebook"
-msgstr "Facebook'ta Paylaş"
-
-#: lms/templates/dashboard/_dashboard_certificate_information.html
-#: lms/templates/video.html
-msgid "Share on LinkedIn"
-msgstr "LinkedIn'de Paylaş"
-
-#: lms/templates/video.html
 msgid "Download video file"
 msgstr "Video dosyasını indir"
+
+#: lms/templates/video.html
+msgid "Share this video"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Share on {site}"
+msgstr "{site} sitesinde paylaş"
+
+#: lms/templates/video.html
+msgid "Copy"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -15221,6 +15357,16 @@ msgid ""
 "provide you with instructions for obtaining your API shared secret and "
 "client ID."
 msgstr ""
+"API'lere erişmek için, uygulamanız için bir {platform_name} kullanıcı hesabı"
+" oluşturmanız gerekir (kişisel kullanım için değil). Bu hesap, {request_url}"
+" adresindeki API istek sayfamıza erişmenizi sağlayacaktır. Bu sayfada, "
+"API'ler için önerdiğiniz kullanımların açıklamasını içeren API istek formunu"
+" doldurmanız gerekir. {platform_name} platformuna sağladığınız herhangi bir "
+"hesap ve kayıt bilgisi doğru ve güncel olmalıdır ve herhangi bir değişikliği"
+" derhal bize bildirmeyi kabul edersiniz. {platform_name_capitalized}, API "
+"talep formunuzu inceleyecek ve tamamen {platform_name}'ın takdirine bağlı "
+"olarak onaylandıktan sonra, API shared secret ve müşteri kimliğinizi almanız"
+" için size yönergeleri sağlayacaktır."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Permissible Use"
@@ -15242,6 +15388,19 @@ msgid ""
 "credentials anywhere other than on the {platform_name} website at "
 "{platform_url}."
 msgstr ""
+"API'leri yalnızca API'ler aracılığıyla erişilen içeriği (\"API İçeriği\") "
+"kendi web sitenize, mobil sitenize, uygulamanıza, blogunuza, e-posta dağıtım"
+" listenize veya sosyal medya mülkünüze (\"Uygulamanız\") teslim etmek "
+"amacıyla kullanmayı kabul edersiniz. \") veya erişim talebinizde "
+"tanımladığınız ve {platform_name} tarafından duruma göre onaylanan başka bir"
+" ticari kullanım için. {platform_name_capitalized}, API'leri kullanımınızı "
+"Şartlar'a uygunluk açısından izleyebilir ve {platform_name} tarafından "
+"belirlenen gereksinimleri ve sınırlamaları aşmaya veya aşmaya çalışırsanız "
+"erişiminizi reddedebilir veya entegrasyonunuzu kapatabilir. Uygulamanız veya"
+" API'nin veya API İçeriğinin diğer onaylı kullanımı, son kullanıcılarınızdan"
+" {platform_name} kullanıcı adını, parolasını veya diğer {platform_name} "
+"kullanıcı kimlik bilgilerini {platform_url} adresindeki {platform_name} web "
+"sitesi dışında herhangi bir yerde vermelerini istememelidir."
 
 #: lms/templates/api_admin/terms_of_service.html
 msgid "Prohibited Uses and Activities"
@@ -16228,6 +16387,11 @@ msgstr "Sertifikanızı görmek için bağlantıya tıklayın."
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Post on Facebook"
 msgstr "Facebook'ta paylaş"
+
+#: lms/templates/certificates/_accomplishment-banner.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Twitter"
+msgstr "Twitter'da paylaş"
 
 #: lms/templates/certificates/_accomplishment-banner.html
 msgid "Tweet this Accomplishment. Pop up window."
@@ -17253,6 +17417,10 @@ msgid "Add Certificate to LinkedIn Profile"
 msgstr "Sertifikanı Linkedln Profiline Ekle"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Share on LinkedIn"
+msgstr "LinkedIn'de Paylaş"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "You are not yet eligible for a certificate."
 msgstr "Bir sertifika için uygun değilsiniz."
 
@@ -17332,6 +17500,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Share {course_name} on Facebook"
 msgstr "{course_name} dersini Facebook'ta paylaş"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Share on Facebook"
+msgstr "Facebook'ta Paylaş"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "I'm taking {course_name} online with {twitter_brand}. Check it out!"
@@ -24160,8 +24332,8 @@ msgid "Set Access"
 msgstr "Erişim Ver"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
-msgstr "Kopyala"
+msgid "Copy to Clipboard"
+msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
@@ -24525,6 +24697,10 @@ msgstr "Ders Navigasyonu"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Taslak"
+
+#: cms/templates/widgets/header.html
+msgid "Files & Media"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

@@ -16,16 +16,18 @@
 # the next major release, ensure the installed version is within boundaries.
 celery>=5.2.2,<6.0.0
 
+
 # required for celery>=5.2.0;<5.3.0
 click>=8.0,<9.0
 
 # django-storages version 1.9 drops support for boto storage backend.
-django-storages<1.9
+# 1.9 gives an error for details https://github.com/jschneier/django-storages/issues/831
+django-storages==1.9.1
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
 # for them.
-edx-enterprise==3.62.6
+edx-enterprise==4.0.0
 
 # oauthlib>3.0.1 causes test failures ( also remove the django-oauth-toolkit constraint when this is fixed )
 oauthlib==3.0.1
@@ -92,3 +94,22 @@ django-ipware==4.0.2
 # Pinning this version for now so this could be fixed in a separate PR later on
 # Issue for unpinning: https://github.com/openedx/edx-platform/issues/32093
 pytz<2023
+
+# urllib3>=2.0.0 conflicts with elastic search && snowflake-connector-python packages
+# which require urllib3<2 for now.
+# Issue for unpinning: https://github.com/openedx/edx-platform/issues/32222
+urllib3<2.0.0
+
+# Sphinx==5.3.0 requires docutils<0.20
+# Issue to unpin Sphinx to resolve this constraint: https://github.com/openedx/edx-lint/issues/338
+docutils<0.20
+
+# greater version has dropped few dependencies. Fix this in other ticket.
+drf-yasg<1.21.6
+
+# Adding pin to avoid any major upgrade
+djangorestframework<3.15.0
+
+
+# tests failing with greater version. Fix this in separate ticket.
+pillow<10.0.0

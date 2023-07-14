@@ -11,37 +11,34 @@
 <% if (isSubscriptionEligible) { %>
 <aside class="aside js-subscription-info subscription-info">
     <h2 class="divider-heading">
-        <%- gettext(
-            hasActiveTrial
-            ? 'Trial subscription'
+        <%- hasActiveTrial
+            ? gettext('Trial subscription')
             : subscriptionState === 'active'
-            ? 'Active subscription'
-            : 'Inactive subscription'
-        ) %>
+            ? gettext('Active subscription')
+            : gettext('Inactive subscription')
+        %>
     </h2>
     <div class="sidebar-section">
         <div class="subscription-section">
             <p class="my-0">
                 <%= HtmlUtils.interpolateHtml(
-                    gettext(
+                    (
                         subscriptionState === 'active'
-                        ? 'View your receipts or modify your subscription on the {a_start}Orders and subscriptions{a_end} page'
+                        ? gettext('View your receipts or modify your subscription on the {a_start}Orders and subscriptions{a_end} page')
                         : subscriptionState === 'inactive'
-                        ? 'Restart your subscription for {subscriptionPrice}/month. Your payment history is still available on the {a_start}Orders and subscriptions{a_end} page'
-                        : 'If you had a subscription previously, your payment history is still available on the {a_start}Orders and subscriptions{a_end} page'
+                        ? gettext('Restart your subscription for {subscriptionPrice}. Your payment history is still available on the {a_start}Orders and subscriptions{a_end} page')
+                        : gettext('If you had a subscription previously, your payment history is still available on the {a_start}Orders and subscriptions{a_end} page')
                     ),
                     {
                         subscriptionPrice,
-                        a_start: HtmlUtils.HTML(`<a class="subscription-link" href="${manage_subscription_url}">`),
+                        a_start: HtmlUtils.HTML(`<a class="subscription-link" href="${orders_and_subscriptions_url}">`),
                         a_end: HtmlUtils.HTML('</a>'),
                     }
                 ) %>
             </p>
             <p class="my-0">
                 <%= HtmlUtils.interpolateHtml(
-                    gettext(
-                        'Need help? Check out the {a_start}Learner Help Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact support '
-                    ),
+                    gettext('Need help? Check out the {a_start}Learner Help Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact support'),
                     {
                         a_start: HtmlUtils.HTML(`<a class="subscription-link" href="${subscriptions_learner_help_center_url}" target="_blank" rel="noopener noreferrer">`),
                         a_end: HtmlUtils.HTML('</a>'),

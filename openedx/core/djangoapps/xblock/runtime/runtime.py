@@ -336,7 +336,7 @@ class XBlockRuntime(RuntimeShim, Runtime):
             raise PermissionDenied
 
         # We also need to override this method because some XBlocks in the
-        # edx-platform codebase use methods like add_webpack_to_fragment()
+        # edx-platform codebase use methods from builtin_assets.py,
         # which create relative URLs (/static/studio/bundles/webpack-foo.js).
         # We want all resource URLs to be absolute, such as is done when
         # local_resource_url() is used.

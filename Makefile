@@ -1,9 +1,9 @@
 # Do things in edx-platform
-.PHONY: api-docs-sphinx api-docs base-requirements check-types clean \
+.PHONY: base-requirements check-types clean \
   compile-requirements detect_changed_source_translations dev-requirements \
   docker_auth docker_build docker_push docker_tag docs extract_translations \
-  guides help lint-imports local-requirements pre-requirements pull \
-  pull_translations push_translations requirements shell swagger \
+  guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
+  pre-requirements pull pull_translations push_translations requirements shell swagger \
   technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
 
 # Careful with mktemp syntax: it has to work on Mac and Ubuntu, which have differences.
@@ -23,24 +23,17 @@ clean: ## archive and delete most git-ignored files
 	tar xf $(PRIVATE_FILES)
 	rm $(PRIVATE_FILES)
 
-SWAGGER = docs/swagger.yaml
+SWAGGER = docs/lms-openapi.yaml
 
-docs: api-docs guides technical-docs ## build all the developer documentation for this repository
+docs: guides technical-docs ## build all the developer documentation for this repository
 
 swagger: ## generate the swagger.yaml file
 	DJANGO_SETTINGS_MODULE=docs.docs_settings python manage.py lms generate_swagger --generator-class=edx_api_doc_tools.ApiSchemaGenerator -o $(SWAGGER)
 
-api-docs-sphinx: swagger	## generate the sphinx source files for api-docs
-	rm -f docs/api/gen/*
-	python docs/sw2sphinxopenapi.py $(SWAGGER) docs/api/gen
-
-api-docs: api-docs-sphinx	## build the REST api docs
-	cd docs/api; make html
-
 technical-docs:  ## build the technical docs
 	$(MAKE) -C docs/technical html
 
-guides:	## build the developer guide docs
+guides:	swagger ## build the developer guide docs
 	cd docs/guides; make clean html
 
 extract_translations: ## extract localizable strings from sources
@@ -176,6 +169,16 @@ docker_push: docker_tag docker_auth ## push to docker hub
 
 lint-imports:
 	lint-imports
+
+migrate-lms:
+	python manage.py lms showmigrations --database default --traceback --pythonpath=.
+	python manage.py lms migrate --database default --traceback --pythonpath=.
+
+migrate-cms:
+	python manage.py cms showmigrations --database default --traceback --pythonpath=.
+	python manage.py cms migrate --database default --noinput --traceback --pythonpath=.
+
+migrate: migrate-lms migrate-cms
 
 # WARNING (EXPERIMENTAL):
 # This installs the Ubuntu requirements necessary to make `pip install` and some other basic

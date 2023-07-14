@@ -6,6 +6,7 @@ from django.urls import re_path
 
 from cms.djangoapps.contentstore.api.views import course_import, course_quality, course_validation
 
+
 app_name = 'contentstore'
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
             course_validation.CourseValidationView.as_view(), name='course_validation'),
     re_path(fr'^v1/quality/{settings.COURSE_ID_PATTERN}/$',
             course_quality.CourseQualityView.as_view(), name='course_quality'),
+
 ]

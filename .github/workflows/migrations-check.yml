@@ -1,4 +1,4 @@
-name: Migrations check on MySql 57
+name: Check Django Migrations
 
 on:
   workflow_dispatch:
@@ -15,20 +15,66 @@ jobs:
       matrix:
         os: [ ubuntu-20.04 ]
         python-version: [ 3.8 ]
-
+        mongo-version: ["4"]
+        mysql-version: ["5.7", "8"]
+    services:
+      mongo:
+        image: mongo:${{ matrix.mongo-version }}
+        ports:
+          - 27017:27017
+        # Note: Calling mongo here only works with mongo 4, in newer versions of mongo
+        # we'll have to use `mongosh`
+        options: >-
+          --health-cmd "mongo --quiet --eval 'db.runCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+      mysql:
+        image: mysql:${{ matrix.mysql-version }}
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_DATABASE: "edxapp"
+          MYSQL_USER: "edxapp001"
+          MYSQL_PASSWORD: "password"
+          MYSQL_RANDOM_ROOT_PASSWORD: true
+        options: >-
+          --health-cmd "mysqladmin ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
     steps:
+    - name: Setup mongodb user
+      run: |
+        mongosh edxapp --eval '
+          db.createUser(
+            {
+              user: "edxapp",
+              pwd:  "password",
+              roles: [
+                   { role: "readWrite", db: "edxapp" },
+              ]
+            }
+          );
+        '
+
+    - name: Verify mongo and mysql db credentials
+      run: |
+        mysql -h 127.0.0.1 -uedxapp001 -ppassword -e "select 1;" edxapp
+        mongosh --host 127.0.0.1 --username edxapp --password password --eval 'use edxapp; db.adminCommand("ping");' edxapp
+
     - name: Checkout repo
       uses: actions/checkout@v2
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install system Packages
       run: |
         sudo apt-get update
-        sudo apt-get install -y libxmlsec1-dev
+        make ubuntu-requirements
 
     - name: Get pip cache dir
       id: pip-cache-dir
@@ -37,57 +83,23 @@ jobs:
 
     - name: Cache pip dependencies
       id: cache-dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ steps.pip-cache-dir.outputs.dir }}
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements/edx/development.txt') }}
         restore-keys: ${{ runner.os }}-pip-
 
-    - name: Install MySQL 5.7
-      run: |
-        mkdir ${RUNNER_WORKSPACE}/mysql_packages && cd ${RUNNER_WORKSPACE}/mysql_packages
-        sudo apt-get remove --purge *mysql* -y
-        sudo rm -rvf /etc/init.d/mysql* /etc/mysql* /var/lib/mysql*
-        sudo apt-get install libaio1 libnuma1 libtinfo5 -y
-        wget https://cdn.mysql.com/archives/mysql-5.7/mysql-server_5.7.35-1ubuntu18.04_amd64.deb-bundle.tar
-        tar -xf mysql-server_5.7*.tar
-        sudo DEBIAN_FRONTEND=noninteractive dpkg --install mysql-common_5.7*.deb libmysqlclient*.deb mysql-server_5.7*.deb mysql-client_5.7*.deb mysql-community-server_5.7*.deb mysql-community-client_5.7*.deb
-
-    - name: Ubuntu and sql Versions
-      run: |
-        lsb_release -a
-        mysql -V
-
     - name: Install Python dependencies
       run: |
         make dev-requirements
 
-    - name: Initiate Services
-      run: |
-        sudo systemctl start mongod
-        sudo /etc/init.d/mysql start
-
-    - name: Reset mysql password
-      run: |
-        cat <<EOF | sudo mysql -u root
-          UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE user = 'root';
-          UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
-          FLUSH PRIVILEGES;
-        EOF
-    
-    - name: Install mysqlclient-dev binary
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libmysqlclient-dev
-
     - name: Run Tests
       env:
-        LMS_CFG: lms/envs/bok_choy.yml
+        LMS_CFG: lms/envs/minimal.yml
+        # This is from the LMS dir on purpose since we don't need anything different for the CMS yet.
+        STUDIO_CFG: lms/envs/minimal.yml
       run: |
-        echo "CREATE DATABASE IF NOT EXISTS edxtest;" | sudo mysql -u root
-        echo "CREATE DATABASE IF NOT EXISTS student_module_history_test;" | sudo mysql -u root
-
         echo "Running the LMS migrations."
-        ./manage.py lms --settings bok_choy migrate
+        ./manage.py lms migrate
         echo "Running the CMS migrations."
-        ./manage.py cms --settings bok_choy migrate
+        ./manage.py cms migrate

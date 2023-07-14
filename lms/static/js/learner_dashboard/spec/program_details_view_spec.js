@@ -471,7 +471,7 @@ describe('Program Details View', () => {
         subscriptionData: [
             {
                 trial_end: '1970-01-01T03:25:45Z',
-                next_payment_date: '1970-06-03T07:12:04Z',
+                current_period_end: '1970-06-03T07:12:04Z',
                 price: '100.00',
                 currency: 'USD',
                 subscription_state: 'pre',
@@ -485,6 +485,7 @@ describe('Program Details View', () => {
             buy_subscription_url: '/subscriptions',
             manage_subscription_url: '/orders',
             subscriptions_learner_help_center_url: '/learner',
+            orders_and_subscriptions_url: '/orders',
         },
         userPreferences: {
             'pref-lang': 'en',
@@ -523,7 +524,7 @@ describe('Program Details View', () => {
         };
         if (trial) {
             subscriptionData.trial_end = moment().add(3, 'days').utc().format(
-                'YYYY-MM-DDTHH:mm:ss[Z]'
+                'YYYY-MM-DDTHH:mm:ss[Z]',
             );
         }
         view = initView({
@@ -579,9 +580,9 @@ describe('Program Details View', () => {
         expect(view.$('.program-heading-title').text()).toEqual('Your Program Journey');
         expect(view.$('.program-heading-message').text().trim()
             .replace(/\s+/g, ' ')).toEqual(
-                'Track and plan your progress through the 3 courses in this program. '
+            'Track and plan your progress through the 3 courses in this program. '
                 + 'To complete the program, you must earn a verified certificate for each course.',
-            );
+        );
     });
 
     it('should render the program heading congratulations message if all courses completed', () => {
@@ -597,8 +598,8 @@ describe('Program Details View', () => {
         expect(view.$('.program-heading-title').text()).toEqual('Congratulations!');
         expect(view.$('.program-heading-message').text().trim()
             .replace(/\s+/g, ' ')).toEqual(
-                'You have successfully completed all the requirements for the Test Course Title Test.',
-            );
+            'You have successfully completed all the requirements for the Test Course Title Test.',
+        );
     });
 
     it('should render the course list headings', () => {
@@ -693,8 +694,8 @@ describe('Program Details View', () => {
     it('should render the get subscription link if program is subscription eligible', () => {
         testSubscriptionState(
             'pre',
-            'Start 7-Day free trial',
-            '$100/month subscription after trial ends. Cancel anytime.'
+            'Start 7-day free trial',
+            '$100/month USD subscription after trial ends. Cancel anytime.',
         );
     });
 
@@ -702,8 +703,8 @@ describe('Program Details View', () => {
         testSubscriptionState(
             'active',
             'Manage my subscription',
-            'Active trial ends',
-            true
+            'Trial ends',
+            true,
         );
     });
 
@@ -711,7 +712,7 @@ describe('Program Details View', () => {
         testSubscriptionState(
             'active',
             'Manage my subscription',
-            'Your next billing date is'
+            'Your next billing date is',
         );
     });
 
@@ -719,7 +720,7 @@ describe('Program Details View', () => {
         testSubscriptionState(
             'inactive',
             'Restart my subscription',
-            'Unlock verified access to all courses for $100/month. Cancel anytime.'
+            '$100/month USD subscription. Cancel anytime.',
         );
     });
 });

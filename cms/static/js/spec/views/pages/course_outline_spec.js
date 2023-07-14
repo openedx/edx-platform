@@ -14,7 +14,7 @@ describe('CourseOutlinePage', function() {
         selectVisibilitySettings, selectDiscussionSettings, selectAdvancedSettings, createMockCourseJSON, createMockSectionJSON,
         createMockSubsectionJSON, verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, setSelfPaced, setSelfPacedCustomPLS,
         mockSingleSectionCourseJSON, createMockVerticalJSON, createMockIndexJSON, mockCourseEntranceExamJSON,
-        selectOnboardingExam, createMockCourseJSONWithReviewRules,mockCourseJSONWithReviewRules,
+        selectOnboardingExam, createMockCourseJSONWithReviewRules, mockCourseJSONWithReviewRules,
         mockOutlinePage = readFixtures('templates/mock/mock-course-outline-page.underscore'),
         mockRerunNotification = readFixtures('templates/mock/mock-course-rerun-notification.underscore');
 
@@ -210,7 +210,7 @@ describe('CourseOutlinePage', function() {
     setSelfPacedCustomPLS = function() {
         setSelfPaced();
         course.set('is_custom_relative_dates_active', true);
-    }
+    };
 
     createCourseOutlinePage = function(test, courseJSON, createOnly) {
         requests = AjaxHelpers.requests(test);
@@ -883,6 +883,24 @@ describe('CourseOutlinePage', function() {
             expect($('div.course-video-sharing')).not.toExist();
             expect(selectedOption()).not.toExist();
         });
+
+        it('tracks changes to video sharing option', function() {
+            createCourse({
+                video_sharing_enabled: true,
+                video_sharing_options: 'all-on',
+                video_sharing_doc_url: 'http://rick.roll'
+            });
+
+            selectedOption().val('per-video').trigger('change');
+
+            expect(window.analytics.track).toHaveBeenCalledWith(
+                'edx.social.video_sharing_options.changed',
+                {
+                    course_id: 'mock-course',
+                    video_sharing_options: 'per-video'
+                }
+            );
+        });
     });
 
     describe('Section', function() {
@@ -1440,7 +1458,7 @@ describe('CourseOutlinePage', function() {
             $('.wrapper-modal-window .action-save').click();
         });
 
-        it('can select the onboarding exam when a course supports onboarding', function () {
+        it('can select the onboarding exam when a course supports onboarding', function() {
             var mockCourseWithSpecialExamJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({
                     has_changes: true,
@@ -2173,7 +2191,7 @@ describe('CourseOutlinePage', function() {
             expect($modalWindow.find('.outline-subsection')).not.toExist();
         });
 
-        describe('Self Paced with Custom Personalized Learner Schedules (PLS)', function () {
+        describe('Self Paced with Custom Personalized Learner Schedules (PLS)', function() {
             beforeEach(function() {
                 var mockCourseJSON = createMockCourseJSON({}, [
                     createMockSectionJSON({}, [
@@ -2192,7 +2210,7 @@ describe('CourseOutlinePage', function() {
 
             selectRelativeWeeksSubsection = function(weeks) {
                 $('#due_in').val(weeks).trigger('keyup');
-            }
+            };
 
             mockCustomPacingServerValuesJson = createMockSectionJSON({
                 release_date: 'Jan 01, 2970 at 05:00 UTC'
@@ -2217,7 +2235,7 @@ describe('CourseOutlinePage', function() {
                 ])
             ]);
 
-            it('can show correct editors for self_paced course with custom pacing', function (){
+            it('can show correct editors for self_paced course with custom pacing', function() {
                 outlinePage.$('.outline-subsection .configure-button').click();
                 expect($('.edit-settings-release').length).toBe(0);
                 // Due date input exists for custom pacing self paced courses
@@ -2277,7 +2295,7 @@ describe('CourseOutlinePage', function() {
                 expectShowCorrectness('never');
             });
 
-            it ('does not show relative date input when assignment is not graded', function() {
+            it('does not show relative date input when assignment is not graded', function() {
                 outlinePage.$('.outline-subsection .configure-button').click();
                 $('#grading_type').val('Lab').trigger('change');
                 $('#due_in').val('').trigger('change');
@@ -2286,7 +2304,7 @@ describe('CourseOutlinePage', function() {
                 $('#grading_type').val('notgraded').trigger('change');
                 $('#due_in').val('').trigger('change');
                 expect($('#relative_date_input').css('display')).toBe('none');
-            })
+            });
 
             it('shows validation error on relative date', function() {
                 outlinePage.$('.outline-subsection .configure-button').click();
@@ -2353,7 +2371,7 @@ describe('CourseOutlinePage', function() {
                     'Contains staff only content'
                 );
             });
-        })
+        });
     });
 
     // Note: most tests for units can be found in Bok Choy
@@ -2452,13 +2470,12 @@ describe('CourseOutlinePage', function() {
             expect(messages).toContainText('Contains staff only content');
         });
 
-        describe('discussion settings', function () {
+        describe('discussion settings', function() {
             it('hides discussion settings if unit level discussions are disabled', function() {
                 getUnitStatus({}, {unit_level_discussions: false});
                 outlinePage.$('.outline-unit .configure-button').click();
                 expect($('.modal-section .edit-discussion')).not.toExist();
             });
-
         });
 
         verifyTypePublishable('unit', function(options) {

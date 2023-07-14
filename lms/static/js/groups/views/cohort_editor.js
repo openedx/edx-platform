@@ -181,7 +181,7 @@
                     _.each(modifiedUsers.changed, function(changedInfo) {
                         oldCohort = changedInfo.previous_cohort;
                         if (oldCohort in movedByCohort) {
-                            movedByCohort[oldCohort] = movedByCohort[oldCohort] + 1;
+                            movedByCohort[oldCohort] += 1;
                         } else {
                             movedByCohort[oldCohort] = 1;
                         }

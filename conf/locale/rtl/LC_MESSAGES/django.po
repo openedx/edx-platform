@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-07 20:35+0000\n"
-"PO-Revision-Date: 2023-05-07 20:35:59.234017\n"
+"POT-Creation-Date: 2023-07-10 21:36+0000\n"
+"PO-Revision-Date: 2023-07-10 21:36:30.462694\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -48,6 +48,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Unit"
+msgstr "Ʉnᴉʇ"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr "Ᵽɹøblǝɯ"
 
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
@@ -68,12 +80,6 @@ msgid "Discussion"
 msgstr "Đᴉsɔnssᴉøn"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/helpers.py
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Problem"
-msgstr "Ᵽɹøblǝɯ"
-
-#: cms/djangoapps/contentstore/views/component.py
 #: openedx/core/djangoapps/content_libraries/constants.py
 #: lms/templates/video.html
 msgid "Video"
@@ -92,17 +98,6 @@ msgstr "Ⱥdʌɐnɔǝd"
 #: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "Ɇnʇɹɐnɔǝ Ɇxɐɯ"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
-msgid "Unit"
-msgstr "Ʉnᴉʇ"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_block.py
-msgid "Empty"
-msgstr "Ɇɯdʇʎ"
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: xmodule/video_block/video_handlers.py
@@ -158,6 +153,11 @@ msgstr "Vᴉdǝø ƗĐ"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "Ᵽǝndᴉnƃ"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/create_xblock.py
+#: xmodule/library_content_block.py
+msgid "Empty"
+msgstr "Ɇɯdʇʎ"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -2214,8 +2214,8 @@ msgid "Cookie Policy"
 msgstr "Ȼøøʞᴉǝ Ᵽølᴉɔʎ"
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Information"
-msgstr "Đø Nøʇ Sǝll Mʎ Ᵽǝɹsønɐl Ɨnɟøɹɯɐʇᴉøn"
+msgid "Your Privacy Choices"
+msgstr "Ɏønɹ Ᵽɹᴉʌɐɔʎ Ȼɥøᴉɔǝs"
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -3910,10 +3910,6 @@ msgstr "Łɐnƃnɐƃǝ"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
 msgstr "Łøɔɐʇᴉøn"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "Ƀᴉɹʇɥ Ɏǝɐɹ"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
@@ -7327,6 +7323,14 @@ msgstr ""
 "bǝ dᴉsɐblǝd."
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+"Ŧɥǝ Ᵽøsʇᴉnƃ ɐʌɐᴉlɐbᴉlʇʎ ᴉn dᴉsɔnssᴉøns ʍɥǝʇɥǝɹ ᴉʇ ʍᴉll bǝ ǝnɐblǝd, sɔɥǝdnlǝd"
+" øɹ ᴉndǝɟᴉnᴉʇǝlʎ dᴉsɐblǝd."
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr "Ŧɥǝ ŁŦƗ ɔønɟᴉƃnɹɐʇᴉøn dɐʇɐ ɟøɹ ʇɥᴉs ɔønʇǝxʇ/dɹøʌᴉdǝɹ."
 
@@ -7495,6 +7499,59 @@ msgstr "Ƀlɐɔʞlᴉsʇ {country} ɟøɹ {course}"
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
 msgstr "Łǝɐɹnǝɹ Ᵽɐʇɥʍɐʎs"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> ɹǝdlᴉǝd øn ʎønɹ ɹǝsdønsǝ ᴉn "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on "
+"<{strong}>{author_name}</{strong}> response to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> ɹǝdlᴉǝd øn "
+"<{strong}>{author_name}</{strong}> ɹǝsdønsǝ ʇø ʎønɹ døsʇ "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> ɹǝsdøndǝd ʇø ʎønɹ døsʇ "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "The notification preference config version is not up to date."
+msgstr "Ŧɥǝ nøʇᴉɟᴉɔɐʇᴉøn dɹǝɟǝɹǝnɔǝ ɔønɟᴉƃ ʌǝɹsᴉøn ᴉs nøʇ nd ʇø dɐʇǝ."
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app name."
+msgstr "Ɨnʌɐlᴉd ɐdd nɐɯǝ."
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked as seen."
+msgstr "Nøʇᴉɟᴉɔɐʇᴉøns ɯɐɹʞǝd ɐs sǝǝn."
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notification marked read."
+msgstr "Nøʇᴉɟᴉɔɐʇᴉøn ɯɐɹʞǝd ɹǝɐd."
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked read."
+msgstr "Nøʇᴉɟᴉɔɐʇᴉøns ɯɐɹʞǝd ɹǝɐd."
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app_name or notification_id."
+msgstr "Ɨnʌɐlᴉd ɐdd_nɐɯǝ øɹ nøʇᴉɟᴉɔɐʇᴉøn_ᴉd."
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -11138,6 +11195,18 @@ msgstr ""
 "dǝɟɐnlʇ."
 
 #: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr "Føɹɔǝ Flǝxᴉblǝ Ǥɹɐdᴉnƃ ɟøɹ Ᵽǝǝɹ ØɌȺs"
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
+msgstr ""
+"Sǝʇʇᴉnƃ ʇɥᴉs ɟlɐƃ ʍᴉll ɟøɹɔǝ øn ʇɥǝ ɟlǝxᴉblǝ ƃɹɐdᴉnƃ ødʇᴉøn ɟøɹ ɐll dǝǝɹ-"
+"ƃɹɐdǝd ØɌȺs ᴉn ʇɥᴉs ɔønɹsǝ."
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "Ȼønɹsǝ Ɨnsʇɹnɔʇøɹ"
 
@@ -12228,11 +12297,39 @@ msgid "Add discussion for the Unit."
 msgstr "Ⱥdd dᴉsɔnssᴉøn ɟøɹ ʇɥǝ Ʉnᴉʇ."
 
 #: xmodule/video_block/sharing_sites.py
+#, python-brace-format
 msgid ""
-"Here's a fun clip from a class I'm taking on @edXonline.\n"
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
 "\n"
 msgstr ""
-"Ħǝɹǝ's ɐ ɟnn ɔlᴉd ɟɹøɯ ɐ ɔlɐss Ɨ'ɯ ʇɐʞᴉnƃ øn @ǝdXønlᴉnǝ.\n"
+"Ħǝɹǝ's ɐ ɟnn ɔlᴉd ɟɹøɯ ɐ ɔlɐss Ɨ'ɯ ʇɐʞᴉnƃ øn {social_account_handle} ɟɹøɯ {organization_name}.\n"
+"\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+"Ħǝɹǝ's ɐ ɟnn ɔlᴉd ɟɹøɯ ɐ ɔlɐss Ɨ'ɯ ʇɐʞᴉnƃ øn {social_account_handle}.\n"
+"\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+"Ħǝɹǝ's ɐ ɟnn ɔlᴉd ɟɹøɯ ɐ ɔlɐss Ɨ'ɯ ʇɐʞᴉnƃ ɟɹøɯ {organization_name}.\n"
+"\n"
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
+"\n"
+msgstr ""
+"Ħǝɹǝ's ɐ ɟnn ɔlᴉd ɟɹøɯ ɐ ɔlɐss Ɨ'ɯ ʇɐʞᴉnƃ øn {platform_name}.\n"
 "\n"
 
 #: xmodule/video_block/transcripts_utils.py
@@ -12844,6 +12941,19 @@ msgstr "Ƀɐd ɔønɹsǝ løɔɐʇᴉøn dɹøʌᴉdǝd"
 msgid "Missing branch on fresh clone"
 msgstr "Mᴉssᴉnƃ bɹɐnɔɥ øn ɟɹǝsɥ ɔlønǝ"
 
+#: cms/djangoapps/contentstore/helpers.py
+msgid "Vertical"
+msgstr "Vǝɹʇᴉɔɐl"
+
+#: cms/djangoapps/contentstore/helpers.py cms/templates/course_outline.html
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Section"
+msgstr "Sǝɔʇᴉøn"
+
+#: cms/djangoapps/contentstore/helpers.py lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr "Snbsǝɔʇᴉøn"
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -12928,6 +13038,22 @@ msgstr "Đǝlǝʇǝd Ǥɹønd"
 msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
+
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "Ɨnʌɐlᴉd dɹǝɹǝbnᴉsᴉʇǝ ɔønɹsǝ ʞǝʎ"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr "Ŧɥǝ ᴉɯɐƃǝ ɯnsʇ ɥɐʌǝ nɐɯǝ, ɔønʇǝnʇ ʇʎdǝ, ɐnd sᴉzǝ ᴉnɟøɹɯɐʇᴉøn."
@@ -12995,97 +13121,6 @@ msgid ""
 "File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
 msgstr ""
 "Fᴉlǝ {filename} ǝxɔǝǝds ɯɐxᴉɯnɯ sᴉzǝ øɟ {maximum_size_in_megabytes} MɃ."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr "Łᴉbɹɐɹᴉǝs ɔɐnnøʇ ɥɐʌǝ ɯøɹǝ ʇɥɐn {limit} ɔøɯdønǝnʇs"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Invalid data"
-msgstr "Ɨnʌɐlᴉd dɐʇɐ"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "There was a problem pasting your component."
-msgstr "Ŧɥǝɹǝ ʍɐs ɐ dɹøblǝɯ dɐsʇᴉnƃ ʎønɹ ɔøɯdønǝnʇ."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Your clipboard is empty or invalid."
-msgstr "Ɏønɹ ɔlᴉdbøɐɹd ᴉs ǝɯdʇʎ øɹ ᴉnʌɐlᴉd."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ {source_type} ᴉnʇø {target_parent_type}."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Item is already present in target location."
-msgstr "Ɨʇǝɯ ᴉs ɐlɹǝɐdʎ dɹǝsǝnʇ ᴉn ʇɐɹƃǝʇ løɔɐʇᴉøn."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into itself."
-msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇsǝlɟ."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into it's child."
-msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇ's ɔɥᴉld."
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item directly into content experiment."
-msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ dᴉɹǝɔʇlʎ ᴉnʇø ɔønʇǝnʇ ǝxdǝɹᴉɯǝnʇ."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr "{source_usage_key} nøʇ ɟønnd ᴉn {parent_usage_key}."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-"Ɏøn ɔɐn nøʇ ɯøʌǝ {source_usage_key} ɐʇ ɐn ᴉnʌɐlᴉd ᴉndǝx ({target_index})."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr "Ɏøn ɯnsʇ dɹøʌᴉdǝ ʇɐɹƃǝʇ_ᴉndǝx ({target_index}) ɐs ɐn ᴉnʇǝƃǝɹ."
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-"Sʇndǝnʇs ɯnsʇ sɔøɹǝ {score}{pct_sign} øɹ ɥᴉƃɥǝɹ ʇø ɐɔɔǝss ɔønɹsǝ ɯɐʇǝɹᴉɐls."
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/block.py
-msgid "%"
-msgstr "%"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -13186,10 +13221,6 @@ msgstr ""
 " ᴉʇ ʇø ʇɥǝ sʎsʇǝɯ"
 
 #: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "Ɨnʌɐlᴉd dɹǝɹǝbnᴉsᴉʇǝ ɔønɹsǝ ʞǝʎ"
-
-#: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
 msgstr "Ⱥn ǝɹɹøɹ øɔɔnɹɹǝd ʍɥᴉlǝ ʇɹʎᴉnƃ ʇø sɐʌǝ ʎønɹ ʇɐbs"
 
@@ -13216,21 +13247,6 @@ msgstr "Ȼøɯdlǝʇǝd Ȼønɹsǝ Ɇnʇɹɐnɔǝ Ɇxɐɯ"
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "Ȼønɹsǝ snɔɔǝssɟnllʎ ǝxdøɹʇǝd ʇø ƃᴉʇ ɹǝdøsᴉʇøɹʎ"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Vertical"
-msgstr "Vǝɹʇᴉɔɐl"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_block.html
-msgid "Section"
-msgstr "Sǝɔʇᴉøn"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
-msgstr "Snbsǝɔʇᴉøn"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Some chunks missed during file upload. Please try again"
@@ -13481,6 +13497,84 @@ msgstr "{course}_ʌᴉdǝø_nɹls"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "A non zero positive integer is expected"
 msgstr "Ⱥ nøn zǝɹø døsᴉʇᴉʌǝ ᴉnʇǝƃǝɹ ᴉs ǝxdǝɔʇǝd"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr "Łᴉbɹɐɹᴉǝs ɔɐnnøʇ ɥɐʌǝ ɯøɹǝ ʇɥɐn {limit} ɔøɯdønǝnʇs"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "Invalid data"
+msgstr "Ɨnʌɐlᴉd dɐʇɐ"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "There was a problem pasting your component."
+msgstr "Ŧɥǝɹǝ ʍɐs ɐ dɹøblǝɯ dɐsʇᴉnƃ ʎønɹ ɔøɯdønǝnʇ."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "Your clipboard is empty or invalid."
+msgstr "Ɏønɹ ɔlᴉdbøɐɹd ᴉs ǝɯdʇʎ øɹ ᴉnʌɐlᴉd."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ {source_type} ᴉnʇø {target_parent_type}."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "Item is already present in target location."
+msgstr "Ɨʇǝɯ ᴉs ɐlɹǝɐdʎ dɹǝsǝnʇ ᴉn ʇɐɹƃǝʇ løɔɐʇᴉøn."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item into itself."
+msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇsǝlɟ."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item into it's child."
+msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇ's ɔɥᴉld."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item directly into content experiment."
+msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ dᴉɹǝɔʇlʎ ᴉnʇø ɔønʇǝnʇ ǝxdǝɹᴉɯǝnʇ."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr "{source_usage_key} nøʇ ɟønnd ᴉn {parent_usage_key}."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+"Ɏøn ɔɐn nøʇ ɯøʌǝ {source_usage_key} ɐʇ ɐn ᴉnʌɐlᴉd ᴉndǝx ({target_index})."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr "Ɏøn ɯnsʇ dɹøʌᴉdǝ ʇɐɹƃǝʇ_ᴉndǝx ({target_index}) ɐs ɐn ᴉnʇǝƃǝɹ."
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+"Sʇndǝnʇs ɯnsʇ sɔøɹǝ {score}{pct_sign} øɹ ɥᴉƃɥǝɹ ʇø ɐɔɔǝss ɔønɹsǝ ɯɐʇǝɹᴉɐls."
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "%"
+msgstr "%"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
@@ -14424,6 +14518,10 @@ msgid "Learn more about this course"
 msgstr "Łǝɐɹn ɯøɹǝ ɐbønʇ ʇɥᴉs ɔønɹsǝ"
 
 #: lms/templates/public_video.html
+msgid "Go to course"
+msgstr "Ǥø ʇø ɔønɹsǝ"
+
+#: lms/templates/public_video.html
 msgid "Enroll in this course"
 msgstr "Ɇnɹøll ᴉn ʇɥᴉs ɔønɹsǝ"
 
@@ -14817,16 +14915,20 @@ msgid "Downloads and transcripts"
 msgstr "Đøʍnløɐds ɐnd ʇɹɐnsɔɹᴉdʇs"
 
 #: lms/templates/video.html
-msgid "Share on:"
-msgstr "Sɥɐɹǝ øn:"
+msgid "Download video file"
+msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
+
+#: lms/templates/video.html
+msgid "Share this video"
+msgstr "Sɥɐɹǝ ʇɥᴉs ʌᴉdǝø"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
 msgstr "Sɥɐɹǝ øn {site}"
 
 #: lms/templates/video.html
-msgid "Download video file"
-msgstr "Đøʍnløɐd ʌᴉdǝø ɟᴉlǝ"
+msgid "Copy"
+msgstr "Ȼødʎ"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -24070,8 +24172,8 @@ msgid "Set Access"
 msgstr "Sǝʇ Ⱥɔɔǝss"
 
 #: cms/templates/studio_xblock_wrapper.html
-msgid "Copy"
-msgstr "Ȼødʎ"
+msgid "Copy to Clipboard"
+msgstr "Ȼødʎ ʇø Ȼlᴉdbøɐɹd"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
@@ -24428,6 +24530,10 @@ msgstr "Ȼønɹsǝ Nɐʌᴉƃɐʇᴉøn"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "Ønʇlᴉnǝ"
+
+#: cms/templates/widgets/header.html
+msgid "Files & Media"
+msgstr "Fᴉlǝs & Mǝdᴉɐ"
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

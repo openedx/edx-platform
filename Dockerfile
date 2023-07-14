@@ -57,6 +57,7 @@ RUN apt-get update && \
         libpython3.8 \
         libpython3.8-stdlib \
         libmysqlclient21 \
+        pkg-config \
         libssl1.1 \
         libxmlsec1-openssl \
         # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
@@ -119,7 +120,7 @@ RUN nodeenv /edx/app/edxapp/nodeenv --node=16.14.0 --prebuilt
 RUN npm install -g npm@8.5.x
 COPY package.json package.json
 COPY package-lock.json package-lock.json
-RUN npm set progress=false && npm install
+RUN npm set progress=false && npm ci
 
 # The builder-development stage is a temporary stage that installs python modules required for development purposes
 # The built artifacts from this stage are then copied to the development stage.

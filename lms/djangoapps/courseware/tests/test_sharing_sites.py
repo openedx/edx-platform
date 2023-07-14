@@ -67,7 +67,7 @@ class TestSharingSites(TestCase):
             TEST_SHARING_SITE_CONFIG_WITH_ADDITIONAL_PARAMS,
         ]
         with patch('xmodule.video_block.sharing_sites.ALL_SHARING_SITES', new=sharing_site_configs):
-            sharing_sites_info = sharing_sites_info_for_video(TEST_PUBLIC_URL)
+            sharing_sites_info = sharing_sites_info_for_video(TEST_PUBLIC_URL, organization=None)
             for expected_config, actual_info in zip(sharing_site_configs, sharing_sites_info):
                 self.assertDictEqual(
                     actual_info,

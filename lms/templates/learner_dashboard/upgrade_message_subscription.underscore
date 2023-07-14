@@ -9,10 +9,10 @@
         </a>
         <span class="subscription-info-upsell">
             <%- StringUtils.interpolate(
-                gettext(
+                (
                     subscriptionState === 'inactive'
-                    ? 'Pay {subscriptionPrice}/month for all courses in this program'
-                    : 'Pay {subscriptionPrice}/month after {trialLength}-day free trial'
+                    ? gettext('Pay {subscriptionPrice} for all courses in this program')
+                    : gettext('Pay {subscriptionPrice} after {trialLength}-day free trial')
                 ),
                 { subscriptionPrice, trialLength },
             ) %>

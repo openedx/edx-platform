@@ -74,6 +74,7 @@ class EnrollStatusChange:
     # complete a paid course purchase
     paid_complete = 'paid_complete'
 
+
 UNENROLLED_TO_ALLOWEDTOENROLL = 'from unenrolled to allowed to enroll'
 ALLOWEDTOENROLL_TO_ENROLLED = 'from allowed to enroll to enrolled'
 ENROLLED_TO_ENROLLED = 'from enrolled to enrolled'
@@ -94,7 +95,6 @@ TRANSITION_STATES = (
     (UNENROLLED_TO_UNENROLLED, UNENROLLED_TO_UNENROLLED),
     (DEFAULT_TRANSITION_STATE, DEFAULT_TRANSITION_STATE)
 )
-
 
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
@@ -292,7 +292,7 @@ class CourseEnrollment(models.Model):
     MODE_CACHE_NAMESPACE = 'CourseEnrollment.mode_and_active'
 
     class Meta:
-        unique_together = (('user', 'course'), )
+        unique_together = (('user', 'course'),)
         indexes = [Index(fields=['user', '-created'])]
         ordering = ('user', 'course')
 
@@ -590,7 +590,7 @@ class CourseEnrollment(models.Model):
             segment_traits['email'] = self.user.email
 
             if event_name == EVENT_NAME_ENROLLMENT_ACTIVATED:
-                if should_send_enrollment_email():
+                if should_send_enrollment_email() and self.course_id:
                     course_pacing_type = 'self-paced' if self.course_overview.self_paced else 'instructor-paced'
                     send_course_enrollment_email.apply_async((self.user.id, str(self.course_id),
                                                               self.course_overview.display_name,

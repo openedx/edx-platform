@@ -12,6 +12,8 @@ from datetime import datetime
 from subprocess import check_call
 
 import django
+import git
+
 from path import Path
 
 root = Path('../..').abspath()
@@ -59,7 +61,34 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
+    'sphinxcontrib.openapi',
+    'sphinxext.rediraffe',
+    'sphinx_design',
+    'code_annotations.contrib.sphinx.extensions.featuretoggles',
+    'code_annotations.contrib.sphinx.extensions.settings',
 ]
+
+# Rediraffe related settings.
+rediraffe_redirects = "redirects.txt"
+rediraffe_branch = 'origin/master'
+
+# code_annotations.(featuretoggles|settings) related settings.
+edxplatform_repo_url = "https://github.com/openedx/edx-platform"
+edxplatform_source_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..")
+)
+try:
+    edx_platform_version = git.Repo(search_parent_directories=True).head.object.hexsha
+except git.InvalidGitRepositoryError:
+    edx_platform_version = "master"
+
+featuretoggles_source_path = edxplatform_source_path
+featuretoggles_repo_url = edxplatform_repo_url
+featuretoggles_repo_version = edx_platform_version
+
+settings_source_path = edxplatform_source_path
+settings_repo_url = edxplatform_repo_url
+settings_repo_version = edx_platform_version
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -249,10 +278,11 @@ autodoc_mock_imports = [
 # run sphinx-apidoc against and the directories under "docs" in which to store
 # the generated *.rst files
 modules = {
-    'cms': 'cms',
-    'lms': 'lms',
-    'openedx': 'openedx',
-    'xmodule': 'xmodule',
+    'cms': 'references/docstrings/cms',
+    'lms': 'references/docstrings/lms',
+    'openedx': 'references/docstrings/openedx',
+    'common': 'references/docstrings/common',
+    'xmodule': 'references/docstrings/xmodule',
 }
 
 

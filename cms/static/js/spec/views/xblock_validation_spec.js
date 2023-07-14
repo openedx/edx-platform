@@ -110,8 +110,8 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
             it('renders action info', function() {
                 expect(view.$('a.edit-button .action-button-text').text()).toContain('Summary Action');
 
-                expect(view.$('a.notification-action-button .action-button-text').text()).
-                    toContain('First Message Action');
+                expect(view.$('a.notification-action-button .action-button-text').text())
+                    .toContain('First Message Action');
                 expect(view.$('a.notification-action-button').data('notification-action')).toBe('fix-up');
             });
 

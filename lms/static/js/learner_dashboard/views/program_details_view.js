@@ -9,9 +9,11 @@ import CourseCardCollection from '../collections/course_card_collection';
 import CourseCardView from './course_card_view';
 import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
+import AlertListView from './program_alert_list_view';
 
 import SubscriptionModel from '../models/program_subscription_model';
 
+import launchIcon from '../../../images/launch-icon.svg';
 import restartIcon from '../../../images/restart-icon.svg';
 import pageTpl from '../../../templates/learner_dashboard/program_details_view.underscore';
 import tabPageTpl from '../../../templates/learner_dashboard/program_details_tab_view.underscore';
@@ -23,6 +25,7 @@ class ProgramDetailsView extends Backbone.View {
             el: '.js-program-details-wrapper',
             events: {
                 'click .complete-program': 'trackPurchase',
+                'click .js-subscription-cta': 'trackSubscriptionCTA',
             },
         };
         super(Object.assign({}, defaults, options));
@@ -35,14 +38,10 @@ class ProgramDetailsView extends Backbone.View {
         } else {
             this.tpl = HtmlUtils.template(pageTpl);
         }
-        this.options.isSubscriptionEligible = (
-            this.options.isUserB2CSubscriptionsEnabled
-            && this.options.programData.subscription_eligible
-        );
         this.programModel = new Backbone.Model(this.options.programData);
         this.courseData = new Backbone.Model(this.options.courseData);
         this.certificateCollection = new Backbone.Collection(
-            this.options.certificateData
+            this.options.certificateData,
         );
         this.subscriptionModel = new SubscriptionModel({
             context: this.options,
@@ -59,6 +58,11 @@ class ProgramDetailsView extends Backbone.View {
             this.courseData.get('not_started') || [],
             this.options.userPreferences,
         );
+        this.subscriptionEventParams = {
+            label: this.options.programData.title,
+            program_uuid: this.options.programData.uuid,
+        };
+        this.options.isSubscriptionEligible = this.getIsSubscriptionEligible();
 
         this.render();
 
@@ -68,6 +72,7 @@ class ProgramDetailsView extends Backbone.View {
             pageName: 'program_dashboard',
             linkCategory: 'green_upgrade',
         });
+        this.trackSubscriptionEligibleProgramView();
     }
 
     static getUrl(base, programData) {
@@ -84,7 +89,7 @@ class ProgramDetailsView extends Backbone.View {
         const totalCount = completedCount + inProgressCount + remainingCount;
         const buyButtonUrl = ProgramDetailsView.getUrl(
             this.options.urls.buy_button_url,
-            this.options.programData
+            this.options.programData,
         );
 
         let data = {
@@ -99,6 +104,7 @@ class ProgramDetailsView extends Backbone.View {
             discussionFragment: this.options.discussionFragment,
             live_fragment: this.options.live_fragment,
             isSubscriptionEligible: this.options.isSubscriptionEligible,
+            launchIcon,
             restartIcon,
         };
         data = $.extend(
@@ -114,6 +120,20 @@ class ProgramDetailsView extends Backbone.View {
         this.headerView = new HeaderView({
             model: new Backbone.Model(this.options),
         });
+
+        if (this.options.isSubscriptionEligible) {
+            const { enrollmentAlerts, trialEndingAlerts } = this.getAlerts();
+
+            if (enrollmentAlerts.length || trialEndingAlerts.length) {
+                this.alertListView = new AlertListView({
+                    context: {
+                        enrollmentAlerts,
+                        trialEndingAlerts,
+                        pageType: 'programDetails',
+                    },
+                });
+            }
+        }
 
         if (this.remainingCourseCollection.length > 0) {
             new CollectionListView({
@@ -167,6 +187,55 @@ class ProgramDetailsView extends Backbone.View {
         }).bind(this);
     }
 
+    getIsSubscriptionEligible() {
+        const courseCollections = [
+            this.completedCourseCollection,
+            this.inProgressCourseCollection,
+        ];
+        const isSomeCoursePurchasable = courseCollections.some((collection) => (
+            collection.some((course) => (
+                course.get('upgrade_url') &&
+                !(course.get('expired') === true)
+            ))
+        ));
+        const programPurchasedWithoutSubscription = (
+            this.subscriptionModel.get('subscriptionState') !== 'active'
+            && this.subscriptionModel.get('subscriptionState') !== 'inactive'
+            && !isSomeCoursePurchasable
+            && this.remainingCourseCollection.length === 0
+        );
+
+        return (
+            this.options.isUserB2CSubscriptionsEnabled
+            && this.options.programData.subscription_eligible
+            && !programPurchasedWithoutSubscription
+        );
+    }
+
+    getAlerts() {
+        const alerts = {
+            enrollmentAlerts: [],
+            trialEndingAlerts: [],
+        };
+        if (this.subscriptionModel.get('subscriptionState') === 'active') {
+            if (this.courseData.get('all_unenrolled')) {
+                alerts.enrollmentAlerts.push({
+                    title: this.programModel.get('title'),
+                });
+            }
+            if (
+                this.subscriptionModel.get('remainingDays') <= 7 &&
+                this.subscriptionModel.get('hasActiveTrial')
+            ) {
+                alerts.trialEndingAlerts.push({
+                    title: this.programModel.get('title'),
+                    ...this.subscriptionModel.toJSON(),
+                });
+            }
+        }
+        return alerts;
+    }
+
     trackPurchase() {
         const data = this.options.programData;
         window.analytics.track('edx.bi.user.dashboard.program.purchase', {
@@ -174,6 +243,37 @@ class ProgramDetailsView extends Backbone.View {
             label: data.title,
             uuid: data.uuid,
         });
+    }
+
+    trackSubscriptionCTA() {
+        const state = this.subscriptionModel.get('subscriptionState');
+
+        if (state === 'active') {
+            window.analytics.track(
+                'edx.bi.user.subscription.program-detail-page.manage.clicked',
+                this.subscriptionEventParams
+            );
+        } else {
+            const isNewSubscription = state !== 'inactive';
+            window.analytics.track(
+                'edx.bi.user.subscription.program-detail-page.subscribe.clicked',
+                {
+                    category: `${this.options.programData.variant} bundle`,
+                    is_new_subscription: isNewSubscription,
+                    is_trial_eligible: isNewSubscription,
+                    ...this.subscriptionEventParams,
+                }
+            );
+        }
+    }
+
+    trackSubscriptionEligibleProgramView() {
+        if (this.options.isSubscriptionEligible) {
+            window.analytics.track(
+                'edx.bi.user.subscription.program-detail-page.viewed',
+                this.subscriptionEventParams
+            );
+        }
     }
 }
 

@@ -31,6 +31,8 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 from openedx.core.lib.edx_api_utils import get_api_data
 
+from edx_rest_api_client.client import USER_AGENT
+
 logger = logging.getLogger(__name__)
 
 missing_details_msg_tpl = 'Failed to get details for program {uuid} from the cache.'
@@ -52,6 +54,7 @@ def get_catalog_api_client(user):
     """
     jwt = create_jwt_for_user(user)
     client = requests.Session()
+    client.headers.update({'User-Agent': USER_AGENT})
     client.auth = SuppliedJwtAuth(jwt)
 
     return client
@@ -445,6 +448,8 @@ def get_course_runs():
 
 
 def get_course_runs_for_course(course_uuid):  # lint-amnesty, pylint: disable=missing-function-docstring
+    if course_uuid is None:
+        raise ValueError('missing course_uuid')
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course runs')
     if user:
         cache_key = f"{catalog_integration.CACHE_KEY}.course.{course_uuid}.course_runs"
@@ -464,7 +469,16 @@ def get_course_runs_for_course(course_uuid):  # lint-amnesty, pylint: disable=mi
         return []
 
 
-def get_owners_for_course(course_uuid):  # lint-amnesty, pylint: disable=missing-function-docstring
+def get_owners_for_course(course_uuid):
+    """
+    Retrieves the course owner given a course uuid.
+
+    Arguments
+        course_uuid (string): Course UUID
+    """
+    if course_uuid is None:
+        return []
+
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Owners')
     if user:
         cache_key = f"{catalog_integration.CACHE_KEY}.course.{course_uuid}.course_runs"
@@ -476,6 +490,7 @@ def get_owners_for_course(course_uuid):  # lint-amnesty, pylint: disable=missing
             api_client=get_catalog_api_client(user),
             base_api_url=get_catalog_api_base_url(),
             cache_key=cache_key if catalog_integration.is_cache_enabled else None,
+            traverse_pagination=False,
             long_term_cache=True,
             many=False
         )
@@ -495,6 +510,9 @@ def get_course_uuid_for_course(course_run_key):
     Returns:
         UUID: Course UUID and None if it was not retrieved.
     """
+    if course_run_key is None:
+        return None
+
     user, catalog_integration = check_catalog_integration_and_get_user(error_message_field='Course UUID')
     if user:
         api_client = get_catalog_api_client(user)
@@ -511,6 +529,7 @@ def get_course_uuid_for_course(course_run_key):
             cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
             long_term_cache=True,
             many=False,
+            traverse_pagination=False,
         )
 
         course_key_str = course_run_data.get('course', None)
@@ -527,6 +546,7 @@ def get_course_uuid_for_course(course_run_key):
                 cache_key=run_cache_key if catalog_integration.is_cache_enabled else None,
                 long_term_cache=True,
                 many=False,
+                traverse_pagination=False,
             )
             uuid_str = data.get('uuid', None)
             if uuid_str:
@@ -609,6 +629,9 @@ def get_course_run_details(course_run_key, fields):
         dict with language, start date, end date, and max_effort details about specified course run
     """
     course_run_details = {}
+    if course_run_key is None:
+        return course_run_details
+
     user, catalog_integration = check_catalog_integration_and_get_user(
         error_message_field=f'Data for course_run {course_run_key}'
     )

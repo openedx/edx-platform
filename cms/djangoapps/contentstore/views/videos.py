@@ -11,12 +11,13 @@ import logging
 from contextlib import closing
 from datetime import datetime, timedelta
 from uuid import uuid4
-
+from boto.s3.connection import S3Connection
 from boto import s3
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import FileResponse, HttpResponseNotFound
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_noop
@@ -29,6 +30,7 @@ from edxval.api import (
     create_video,
     get_3rd_party_transcription_plans,
     get_available_transcript_languages,
+    get_video_transcript_url,
     get_transcript_credentials_state_for_org,
     get_transcript_preferences,
     get_videos_for_course,
@@ -56,7 +58,8 @@ from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..models import VideoUploadConfig
-from ..utils import reverse_course_url
+from ..toggles import use_new_video_uploads_page
+from ..utils import reverse_course_url, get_video_uploads_url
 from ..video_utils import validate_video_image
 from .course import get_course_and_check_access
 
@@ -574,6 +577,12 @@ def _get_videos(course, pagination_conf=None):
         video['transcription_status'] = (
             StatusDisplayStrings.get(video['status']) if is_video_encodes_ready else ''
         )
+        video['transcript_urls'] = {}
+        for language_code in video['transcripts']:
+            video['transcript_urls'][language_code] = get_video_transcript_url(
+                video_id=video['edx_video_id'],
+                language_code=language_code,
+            )
         # Convert the video status.
         video['status'] = convert_video_status(video, is_video_encodes_ready)
 
@@ -595,7 +604,7 @@ def _get_index_videos(course, pagination_conf=None):
     attrs = [
         'edx_video_id', 'client_video_id', 'created', 'duration',
         'status', 'courses', 'transcripts', 'transcription_status',
-        'error_description'
+        'transcript_urls', 'error_description'
     ]
 
     def _get_values(video):
@@ -693,7 +702,8 @@ def videos_index_html(course, pagination_conf=None):
         context['active_transcript_preferences'] = get_transcript_preferences(str(course.id))
         # Cached state for transcript providers' credentials (org-specific)
         context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
-
+    if use_new_video_uploads_page(course.id):
+        return redirect(get_video_uploads_url(course.id))
     return render_to_response('videos_index.html', context)
 
 
@@ -827,7 +837,7 @@ def storage_service_bucket():
             'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY
         }
 
-    conn = s3.connection.S3Connection(**params)
+    conn = S3Connection(**params)
 
     # We don't need to validate our bucket, it requires a very permissive IAM permission
     # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
