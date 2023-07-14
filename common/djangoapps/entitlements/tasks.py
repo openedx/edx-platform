@@ -177,6 +177,7 @@ def retry_revoke_subscriptions_verified_access(self, revocable_entitlement_uuids
                     user_id,
                     revocable_entitlement_uuids
                 )
+                return
         log.info('B2C_SUBSCRIPTIONS: Starting revoke_entitlements_and_downgrade_courses_to_audit for user %s and '
                  'awarded_cert_course_ids %s and revocable_entitlement_uuids %s from retry task',
                  user_id,
