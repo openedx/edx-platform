@@ -77,7 +77,7 @@ def revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, user
         if course_entitlement.enrollment_course_run is None:
             if course_entitlement.expired_at is None:
                 course_entitlement.expire_entitlement()
-        elif course_entitlement.enrollment_course_run.course_id not in awarded_cert_course_ids:
+        elif str(course_entitlement.enrollment_course_run.course_id) not in awarded_cert_course_ids:
             course_id = course_entitlement.enrollment_course_run.course_id
             enrollment_mode = course_entitlement.enrollment_course_run.mode
             username = course_entitlement.enrollment_course_run.user.username
