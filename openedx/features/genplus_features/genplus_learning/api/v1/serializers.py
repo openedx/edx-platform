@@ -101,6 +101,9 @@ class ProgramSerializer(serializers.ModelSerializer):
 
     def get_is_currently_active_program(self, obj):
         gen_user = self.context.get("gen_user")
+        if not gen_user.is_student:
+            return False
+
         student = gen_user.student
         if student and student.active_class:
             return student.active_class.program.id == obj.id
