@@ -89,3 +89,6 @@ def plugin_settings(settings):
 
     # Off by default. See the `site_configuration.tahoe_organization_helpers.py` module.
     settings.FEATURES['TAHOE_SITE_CONFIG_CLIENT_ORGANIZATIONS_SUPPORT'] = False
+
+    # Give a little more time for YT API to load in video_module (default was 1500 ms)
+    settings.YOUTUBE['TEST_TIMEOUT'] = 2500
