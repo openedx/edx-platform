@@ -51,6 +51,8 @@ from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.ace_common.template_context import get_base_template_context
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
@@ -503,6 +505,15 @@ def send_mail_to_student(student, param_dict, language=None):
     lms_user_id = 0
     if 'user_id' in param_dict and param_dict['user_id'] is not None and param_dict['user_id'] > 0:
         lms_user_id = param_dict['user_id']
+
+    # Get required context
+    site = theming_helpers.get_current_site()
+    message_context = get_base_template_context(site)
+    param_dict['logo_url'] = message_context.get("logo_url")
+    param_dict['homepage_url'] = message_context.get("homepage_url")
+    param_dict['dashboard_url'] = message_context.get("dashboard_url")
+    param_dict['platform_name'] = message_context.get("platform_name")
+    param_dict['contact_email'] = message_context.get("contact_email")
 
     # see if there is an activation email template definition available as configuration,
     # if so, then render that
