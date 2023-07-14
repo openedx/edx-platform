@@ -278,11 +278,14 @@ autodoc_mock_imports = [
 # run sphinx-apidoc against and the directories under "docs" in which to store
 # the generated *.rst files
 modules = {
-    'cms': 'references/docstrings/cms',
     'lms': 'references/docstrings/lms',
     'openedx': 'references/docstrings/openedx',
-    'common': 'references/docstrings/common',
-    'xmodule': 'references/docstrings/xmodule',
+    # Commenting this out for now because they blow up the build
+    # time and memory limits for RTD.  We can come back to these
+    # later once we get parallel builds working hopefully.
+    # 'cms': 'references/docstrings/cms',
+    # 'common': 'references/docstrings/common',
+    # 'xmodule': 'references/docstrings/xmodule',
 }
 
 
