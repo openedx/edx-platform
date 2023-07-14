@@ -556,7 +556,15 @@ class SubscriptionsRevokeVerifiedAccessView(APIView):
             if course_entitlement.enrollment_course_run is not None:
                 entitled_course_ids.append(str(course_entitlement.enrollment_course_run.course_id))
 
+        log.info('B2C_SUBSCRIPTIONS: Getting course completion status for user %s and entitled_course_ids %s',
+                 user_id,
+                 entitled_course_ids)
         awarded_cert_course_ids, is_exception = get_courses_completion_status(user_id, entitled_course_ids)
+
+        log.info('B2C_SUBSCRIPTIONS: Got course completion response %s for user %s and entitled_course_ids %s',
+                 awarded_cert_course_ids,
+                 user_id,
+                 entitled_course_ids)
 
         if is_exception:
             # Trigger the retry task asynchronously
@@ -568,6 +576,11 @@ class SubscriptionsRevokeVerifiedAccessView(APIView):
                                                                          entitled_course_ids,
                                                                          user_id))
             return
+        log.info('B2C_SUBSCRIPTIONS: Starting revoke_entitlements_and_downgrade_courses_to_audit for user %s and '
+                 'awarded_cert_course_ids %s and revocable_entitlement_uuids %s',
+                 user_id,
+                 awarded_cert_course_ids,
+                 revocable_entitlement_uuids)
         revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, user_id, awarded_cert_course_ids,
                                                            revocable_entitlement_uuids)
 
