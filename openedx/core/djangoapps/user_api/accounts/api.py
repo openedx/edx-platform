@@ -425,28 +425,31 @@ def get_country_validation_error(country):
     return _validate(_validate_country, errors.AccountCountryInvalid, country)
 
 
-def get_username_existence_validation_error(username):
+def get_username_existence_validation_error(username, edly_sub_org):
     """Get the built-in validation error message for when
     the username has an existence conflict.
 
     :param username: The proposed username (unicode).
+    :param edly_sub_org: The current edly sub organization.
     :param default: The message to default to in case of no error.
     :return: Validation error message.
 
     """
-    return _validate(_validate_username_doesnt_exist, errors.AccountUsernameAlreadyExists, username)
+    return _validate(_validate_username_doesnt_exist, errors.AccountUsernameAlreadyExists,
+                     username, edly_sub_org)
 
 
-def get_email_existence_validation_error(email):
+def get_email_existence_validation_error(email, edly_sub_org):
     """Get the built-in validation error message for when
     the email has an existence conflict.
 
     :param email: The proposed email (unicode).
+    :param edly_sub_org: The current edly sub organization.
     :param default: The message to default to in case of no error.
     :return: Validation error message.
 
     """
-    return _validate(_validate_email_doesnt_exist, errors.AccountEmailAlreadyExists, email)
+    return _validate(_validate_email_doesnt_exist, errors.AccountEmailAlreadyExists, email, edly_sub_org)
 
 
 def _get_user_and_profile(username):
@@ -590,25 +593,25 @@ def _validate_country(country):
         raise errors.AccountCountryInvalid(accounts.REQUIRED_FIELD_COUNTRY_MSG)
 
 
-def _validate_username_doesnt_exist(username):
+def _validate_username_doesnt_exist(username, edly_sub_org):
     """Validate that the username is not associated with an existing user.
 
     :param username: The proposed username (unicode).
     :return: None
     :raises: errors.AccountUsernameAlreadyExists
     """
-    if username is not None and username_exists_or_retired(username):
+    if username is not None and username_exists_or_retired(username, edly_sub_org):
         raise errors.AccountUsernameAlreadyExists(_(accounts.USERNAME_CONFLICT_MSG).format(username=username))
 
 
-def _validate_email_doesnt_exist(email):
+def _validate_email_doesnt_exist(email, edly_sub_org):
     """Validate that the email is not associated with an existing user.
 
     :param email: The proposed email (unicode).
     :return: None
     :raises: errors.AccountEmailAlreadyExists
     """
-    if email is not None and email_exists_or_retired(email):
+    if email is not None and email_exists_or_retired(email, edly_sub_org):
         raise errors.AccountEmailAlreadyExists(_(accounts.EMAIL_CONFLICT_MSG).format(email_address=email))
 
 

@@ -63,6 +63,7 @@ from openedx.features.edly.utils import (
     create_edly_access_role,
     create_learner_link_with_permission_groups,
     is_config_enabled,
+    get_edly_sub_org_from_request,
 )
 from student.helpers import (
     authenticate_new_user,
@@ -701,8 +702,9 @@ class RegistrationValidationView(APIView):
     def username_handler(self, request):
         """ Validates whether the username is valid. """
         username = request.data.get('username')
+        edly_sub_org = get_edly_sub_org_from_request(request)
         invalid_username_error = get_username_validation_error(username)
-        username_exists_error = get_username_existence_validation_error(username)
+        username_exists_error = get_username_existence_validation_error(username, edly_sub_org)
         # We prefer seeing for invalidity first.
         # Some invalid usernames (like for superusers) may exist.
         return invalid_username_error or username_exists_error
@@ -710,8 +712,9 @@ class RegistrationValidationView(APIView):
     def email_handler(self, request):
         """ Validates whether the email address is valid. """
         email = request.data.get('email')
+        edly_sub_org = get_edly_sub_org_from_request(request)
         invalid_email_error = get_email_validation_error(email)
-        email_exists_error = get_email_existence_validation_error(email)
+        email_exists_error = get_email_existence_validation_error(email, edly_sub_org)
         # We prefer seeing for invalidity first.
         # Some invalid emails (like a blank one for superusers) may exist.
         return invalid_email_error or email_exists_error
