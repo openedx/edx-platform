@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import get_storage_class
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from common.djangoapps.student.models import UserProfile
@@ -20,14 +21,28 @@ PROFILE_IMAGE_FILE_EXTENSION = 'jpg'   # All processed profile images are conver
 _PROFILE_IMAGE_SIZES = list(settings.PROFILE_IMAGE_SIZES_MAP.values())
 
 
+class ProfileS3Boto3Storage(S3Boto3Storage):
+    """
+    custom storage for profile image
+    """
+    def __init__(self, **kwargs):
+        self._headers = kwargs.pop('headers', {})
+        super().__init__(**kwargs)
+
+    def get_object_parameters(self, name):  # pylint: disable=unused-argument
+        return {**self._headers}
+
+
 def get_profile_image_storage():
     """
     Configures and returns a django Storage instance that can be used
     to physically locate, read and write profile images.
     """
     config = settings.PROFILE_IMAGE_BACKEND
-    storage_class = get_storage_class(config['class'])
-    return storage_class(**config['options'])
+    if config['class'] == 'storages.backends.s3boto3.S3Boto3Storage':
+        return get_storage_class('openedx.core.djangoapps.user_api.accounts.image_helpers.ProfileS3Boto3Storage')(**settings.PROFILE_IMAGE_BACKEND['options'])
+    else:
+        return get_storage_class(settings.PROFILE_IMAGE_BACKEND['class'])(**settings.PROFILE_IMAGE_BACKEND['options'])
 
 
 def _make_profile_image_name(username):
