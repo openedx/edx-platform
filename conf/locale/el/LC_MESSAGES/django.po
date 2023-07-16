@@ -78,6 +78,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Angelos Chraniotis, 2023
 # Dimitris Agelakis <minoan07@gmail.com>, 2016,2019
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
 # Katerina Ligkovanli <kaligova@gmail.com>, 2016,2019
