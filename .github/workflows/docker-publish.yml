@@ -1,15 +1,15 @@
 name: Push Docker Images
 
 on:
+  pull_request:
   push:
     branches:
       - master
 jobs:
-  # Push image to GitHub Packages.
-  # See also https://docs.docker.com/docker-hub/builds/
-  push:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+  # Setup checkout, buildx, QEMU and docker hub for all jobs.
+  setup:
+      runs-on: ubuntu-latest
+      # if: github.event_name == 'push'
 
     steps:
       - name: Checkout
@@ -27,10 +27,54 @@ jobs:
            username: ${{ secrets.DOCKERHUB_USERNAME }}
            password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build and Push docker image
+      - name: Build and push lms base docker image
         env:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}                
-        run : make docker_tag_build_push    
-        
+        run : make docker_tag_build_push_lms             
 
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  # push_lms:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'push'
+  #   needs: setup
+  #   steps:
+  #     - name: Build and push lms base docker image
+  #       env:
+  #         DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+  #         DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}                
+  #       run : make docker_tag_build_push_lms             
+        
+  push_lms_dev:
+    runs-on: ubuntu-latest
+    # if: github.event_name == 'push'
+    needs: setup
+    steps:
+      - name: Build and push lms dev docker image
+        env:
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}                
+        run : make docker_tag_build_push_lms_dev    
+
+  # push_cms:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'push'
+  #   needs: setup
+  #   steps:
+  #     - name: Build and push cms base docker image
+  #       env:
+  #         DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+  #         DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}                
+  #       run : make docker_tag_build_push_cms
+
+  push_cms_dev:
+    runs-on: ubuntu-latest
+    # if: github.event_name == 'push'
+    needs: setup
+    steps:
+      - name: Build and push cms dev docker image
+        env:
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}                
+        run : make docker_tag_build_push_cms_dev
