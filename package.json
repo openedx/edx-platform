@@ -2,6 +2,9 @@
   "name": "edx",
   "version": "0.1.0",
   "repository": "https://github.com/openedx/edx-platform",
+  "scripts": {
+    "postinstall": "scripts/copy-node-modules.sh"
+  },
   "dependencies": {
     "@babel/core": "7.19.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.18.9",
