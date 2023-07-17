@@ -2,7 +2,6 @@
 
 <%!
 import datetime
-import six
 
 from django.conf import settings
 from django.utils.http import urlencode, urlquote_plus
@@ -174,7 +173,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                             % endif
                         </span>
                     % else:
-                        % if isinstance(course_date, six.string_types):
+                        % if isinstance(course_date, str):
                             <span class="info-date-block">${container_string.format(date=course_date)}</span>
                         % elif course_date is not None:
                             <span class="info-date-block localized-datetime" data-language="${user_language}" data-timezone="${user_timezone}" data-datetime="${course_date.strftime('%Y-%m-%dT%H:%M:%S%z')}" data-format=${format} data-string="${container_string}"></span>
@@ -272,7 +271,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                         <ul class="actions-dropdown-list" id="actions-dropdown-list-${dashboard_index}" aria-label="${_('Available Actions')}" role="menu">
                           % if can_unenroll:
                             <li class="actions-item" id="actions-item-unenroll-${dashboard_index}" role="menuitem">
-                              <% course_refund_url = reverse('course_run_refund_status', args=[six.text_type(course_overview.id)]) %>
+                              <% course_refund_url = reverse('course_run_refund_status', args=[str(course_overview.id)]) %>
                                   <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal"
                                     data-course-id="${course_overview.id}"
                                     data-course-number="${course_overview.number}"
@@ -419,7 +418,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
 
         % if course_requirements:
         ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
-        <% prc_target = reverse('about_course', args=[six.text_type(course_requirements['courses'][0]['key'])]) %>
+        <% prc_target = reverse('about_course', args=[str(course_requirements['courses'][0]['key'])]) %>
         <div class="prerequisites">
           <p class="tip">
             ${Text(_("You must successfully complete {link_start}{prc_display}{link_end} before you begin this course.")).format(
