@@ -1,7 +1,8 @@
 # Do things in edx-platform
 .PHONY: base-requirements check-types clean \
   compile-requirements detect_changed_source_translations dev-requirements \
-  docker_auth docker_tag_build_push docs extract_translations \
+  docker_auth docker_build docker_tag_build_push_lms docker_tag_build_push_lms_dev \
+  docker_tag_build_push_cms docker_tag_build_push_cms_dev docs extract_translations \
   guides help lint-imports local-requirements migrate migrate-lms migrate-cms \
   pre-requirements pull pull_translations push_translations requirements shell swagger \
   technical-docs test-requirements ubuntu-requirements upgrade-package upgrade
