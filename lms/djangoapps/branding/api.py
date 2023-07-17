@@ -465,7 +465,6 @@ def _footer_logo_img(is_secure):
     """
     default_local_path = 'images/logo.png'
     brand_footer_logo_url = settings.LOGO_TRADEMARK_URL
-    
     # `logo_name` is looked up from the configuration,
     # which falls back on the Django settings, which loads it from
     # `lms.yml`, which is created and managed by Ansible. Because of
