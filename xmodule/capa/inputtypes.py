@@ -55,7 +55,6 @@ from calc.preview import latex_preview
 from chem import chemcalc
 
 from lxml import etree
-from six import text_type
 
 from xmodule.capa.xqueue_interface import XQUEUE_TIMEOUT
 from openedx.core.djangolib.markup import HTML, Text
@@ -85,7 +84,7 @@ class Status(object):
     }
     __slots__ = ('classname', '_status', 'display_name', 'display_tooltip')
 
-    def __init__(self, status, gettext_func=six.text_type):
+    def __init__(self, status, gettext_func=str):
         self.classname = self.css_classes.get(status, status)
         _ = gettext_func
         names = {
@@ -110,7 +109,7 @@ class Status(object):
                 ['incomplete', 'unanswered', 'unsubmitted'], _('Not yet answered.')
             )
         )
-        self.display_name = names.get(status, six.text_type(status))
+        self.display_name = names.get(status, str(status))
         self.display_tooltip = tooltips.get(status, '')
         self._status = status or ''
 
@@ -255,7 +254,7 @@ class InputTypeBase(object):
         except Exception as err:  # lint-amnesty, pylint: disable=broad-except
             # Something went wrong: add xml to message, but keep the traceback
             msg = "Error in xml '{x}': {err} ".format(
-                x=etree.tostring(xml), err=text_type(err))
+                x=etree.tostring(xml), err=str(err))
             six.reraise(Exception, Exception(msg), sys.exc_info()[2])
 
     @classmethod
@@ -427,10 +426,7 @@ class OptionInput(InputTypeBase):
         options = re.sub(r"([a-zA-Z])('|\\')([a-zA-Z])", r"\1&#39;\3", options)
         options = re.sub(r"\\'", r"&#39;", options)  # replace already escaped single quotes
         # parse the set of possible options
-        if six.PY3:
-            lexer = shlex.shlex(options[1:-1])
-        else:
-            lexer = shlex.shlex(options[1:-1].encode('utf-8'))
+        lexer = shlex.shlex(options[1:-1])
 
         lexer.quotes = "'"
         # Allow options to be separated by whitespace as well as commas
@@ -438,10 +434,7 @@ class OptionInput(InputTypeBase):
 
         # remove quotes
         # convert escaped single quotes (html encoded string) back to single quotes
-        if six.PY3:
-            tokens = [x[1:-1].replace("&#39;", "'") for x in lexer]
-        else:
-            tokens = [x[1:-1].decode('utf-8').replace("&#39;", "'") for x in lexer]
+        tokens = [x[1:-1].replace("&#39;", "'") for x in lexer]
 
         # make list of (option_id, option_description), with description=id
         return [(t, t) for t in tokens]
@@ -564,7 +557,7 @@ class ChoiceGroup(InputTypeBase):
         return choices
 
     def get_user_visible_answer(self, internal_answer):
-        if isinstance(internal_answer, six.string_types):
+        if isinstance(internal_answer, str):
             return self._choices_map[internal_answer]
 
         return [self._choices_map[i] for i in internal_answer]
@@ -1571,7 +1564,7 @@ class AnnotationInput(InputTypeBase):
             d = {}
 
         comment_value = d.get('comment', '')
-        if not isinstance(comment_value, six.string_types):
+        if not isinstance(comment_value, str):
             comment_value = ''
 
         options_value = d.get('options', [])

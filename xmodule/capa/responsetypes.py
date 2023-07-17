@@ -33,7 +33,6 @@ from lxml.html.soupparser import fromstring as fromstring_bs  # uses Beautiful S
 from pyparsing import ParseException
 from pytz import UTC
 from shapely.geometry import MultiPoint, Point
-from six import text_type
 from six.moves import map, range, zip
 
 import xmodule.capa.safe_exec as safe_exec
@@ -177,14 +176,14 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         for abox in inputfields:
             if abox.tag not in self.allowed_inputfields:
                 msg = "%s: cannot have input field %s" % (
-                    six.text_type(self), abox.tag)
+                    str(self), abox.tag)
                 msg += "\nSee XML source line %s" % getattr(
                     xml, 'sourceline', '[unavailable]')
                 raise LoncapaProblemError(msg)
 
         if self.max_inputfields and len(inputfields) > self.max_inputfields:
             msg = "%s: cannot have more than %s input fields" % (
-                six.text_type(self), self.max_inputfields)
+                str(self), self.max_inputfields)
             msg += "\nSee XML source line %s" % getattr(
                 xml, 'sourceline', '[unavailable]')
             raise LoncapaProblemError(msg)
@@ -192,7 +191,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
         for prop in self.required_attributes:
             if not xml.get(prop):
                 msg = "Error in problem specification: %s missing required attribute %s" % (
-                    six.text_type(self), prop)
+                    str(self), prop)
                 msg += "\nSee XML source line %s" % getattr(
                     xml, 'sourceline', '[unavailable]')
                 raise LoncapaProblemError(msg)
@@ -365,7 +364,7 @@ class LoncapaResponse(six.with_metaclass(abc.ABCMeta, object)):
 
         # This is the "feedback hint" event
         event_info = {}
-        event_info['module_id'] = text_type(self.capa_block.location)
+        event_info['module_id'] = str(self.capa_block.location)
         event_info['problem_part_id'] = self.id
         event_info['trigger_type'] = 'single'  # maybe be overwritten by log_extra
         event_info['hint_label'] = label
@@ -1458,7 +1457,7 @@ class OptionResponse(LoncapaResponse):
             for key, val in six.iteritems(self.context):
                 # convert val into unicode because student answer always be a unicode string
                 # even it is a list, dict etc.
-                if six.text_type(val) == student_answers[aid]:
+                if str(val) == student_answers[aid]:
                     return '$' + key
         return None
 
@@ -1606,10 +1605,10 @@ class NumericalResponse(LoncapaResponse):
                 err.args[0]
             )
         except ValueError as val_err:
-            if 'factorial' in text_type(val_err):  # lint-amnesty, pylint: disable=no-else-raise
+            if 'factorial' in str(val_err):  # lint-amnesty, pylint: disable=no-else-raise
                 # This is thrown when fact() or factorial() is used in an answer
                 #   that evaluates on negative and/or non-integer inputs
-                # text_type(ve) will be: `factorial() only accepts integral values` or
+                # str(ve) will be: `factorial() only accepts integral values` or
                 # `factorial() not defined for negative values`
                 raise StudentInputError(  # lint-amnesty, pylint: disable=raise-missing-from
                     _("Factorial function evaluated outside its domain:"
@@ -2039,7 +2038,7 @@ class StringResponse(LoncapaResponse):
             except Exception as err:
                 msg = '[courseware.capa.responsetypes.stringresponse] {error}: {message}'.format(
                     error=_('error'),
-                    message=text_type(err)
+                    message=str(err)
                 )
                 log.error(msg, exc_info=True)
                 raise ResponseError(msg)  # lint-amnesty, pylint: disable=raise-missing-from
@@ -2170,7 +2169,7 @@ class CustomResponse(LoncapaResponse):
         """
         _ = self.capa_system.i18n.gettext
 
-        log.debug('%s: student_answers=%s', six.text_type(self), student_answers)
+        log.debug('%s: student_answers=%s', str(self), student_answers)
 
         # ordered list of answer id's
         # sort the responses on the bases of the problem's position number
@@ -2284,7 +2283,7 @@ class CustomResponse(LoncapaResponse):
 
     def execute_check_function(self, idset, submission):  # lint-amnesty, pylint: disable=missing-function-docstring, too-many-statements
         # exec the check function
-        if isinstance(self.code, six.string_types):  # lint-amnesty, pylint: disable=too-many-nested-blocks
+        if isinstance(self.code, str):  # lint-amnesty, pylint: disable=too-many-nested-blocks
             try:
                 safe_exec.safe_exec(
                     self.code,
@@ -2512,7 +2511,7 @@ class CustomResponse(LoncapaResponse):
 
         # Notify student with a student input error
         _, _, traceback_obj = sys.exc_info()
-        raise ResponseError(text_type(err), traceback_obj)
+        raise ResponseError(str(err), traceback_obj)
 
 #-----------------------------------------------------------------------------
 
@@ -2897,7 +2896,7 @@ class ExternalResponse(LoncapaResponse):
             # no <answer> stanza; get code from <script>
             self.code = self.context['script_code']
             if not self.code:
-                msg = '%s: Missing answer script code for externalresponse' % six.text_type(
+                msg = '%s: Missing answer script code for externalresponse' % str(
                     self)
                 msg += "\nSee XML source line %s" % getattr(
                     self.xml, 'sourceline', '[unavailable]')
@@ -3111,10 +3110,10 @@ class FormulaResponse(LoncapaResponse):
                     err.args[0]
                 )
             except ValueError as err:
-                if 'factorial' in text_type(err):
+                if 'factorial' in str(err):
                     # This is thrown when fact() or factorial() is used in a formularesponse answer
                     #   that tests on negative and/or non-integer inputs
-                    # text_type(err) will be: `factorial() only accepts integral values` or
+                    # str(err) will be: `factorial() only accepts integral values` or
                     # `factorial() not defined for negative values`
                     log.debug(
                         ('formularesponse: factorial function used in response '
@@ -3540,7 +3539,7 @@ class AnnotationResponse(LoncapaResponse):
             json_d = {}
 
         comment_value = json_d.get('comment', '')
-        if not isinstance(json_d, six.string_types):
+        if not isinstance(json_d, str):
             comment_value = ''
 
         options_value = json_d.get('options', [])
