@@ -955,7 +955,7 @@ grimp==2.5
     # via
     #   -r requirements/edx/testing.txt
     #   import-linter
-gunicorn==20.1.0
+gunicorn==21.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1331,6 +1331,7 @@ packaging==23.1
     #   -r requirements/edx/testing.txt
     #   build
     #   drf-yasg
+    #   gunicorn
     #   py2neo
     #   pydata-sphinx-theme
     #   pytest
@@ -1908,6 +1909,7 @@ sphinx==6.2.1
     #   pydata-sphinx-theme
     #   sphinx-book-theme
     #   sphinx-design
+    #   sphinx-reredirects
     #   sphinxcontrib-httpdomain
     #   sphinxcontrib-openapi
     #   sphinxext-rediraffe
@@ -1919,6 +1921,8 @@ sphinx-mdinclude==0.5.3
     # via
     #   -r requirements/edx/doc.txt
     #   sphinxcontrib-openapi
+sphinx-reredirects==0.1.2
+    # via -r requirements/edx/doc.txt
 sphinxcontrib-applehelp==1.0.4
     # via
     #   -r requirements/edx/doc.txt

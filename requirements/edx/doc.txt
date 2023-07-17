@@ -697,7 +697,7 @@ gitpython==3.1.32
     # via -r requirements/edx/doc.in
 glob2==0.7
     # via -r requirements/edx/base.txt
-gunicorn==20.1.0
+gunicorn==21.0.0
     # via -r requirements/edx/base.txt
 help-tokens==2.2.0
     # via -r requirements/edx/base.txt
@@ -945,6 +945,7 @@ packaging==23.1
     # via
     #   -r requirements/edx/base.txt
     #   drf-yasg
+    #   gunicorn
     #   py2neo
     #   pydata-sphinx-theme
     #   snowflake-connector-python
@@ -1319,6 +1320,7 @@ sphinx==6.2.1
     #   pydata-sphinx-theme
     #   sphinx-book-theme
     #   sphinx-design
+    #   sphinx-reredirects
     #   sphinxcontrib-httpdomain
     #   sphinxcontrib-openapi
     #   sphinxext-rediraffe
@@ -1328,6 +1330,8 @@ sphinx-design==0.4.1
     # via -r requirements/edx/doc.in
 sphinx-mdinclude==0.5.3
     # via sphinxcontrib-openapi
+sphinx-reredirects==0.1.2
+    # via -r requirements/edx/doc.in
 sphinxcontrib-applehelp==1.0.4
     # via sphinx
 sphinxcontrib-devhelp==1.0.2

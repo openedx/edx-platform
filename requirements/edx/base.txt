@@ -601,7 +601,7 @@ geoip2==4.7.0
     # via -r requirements/edx/kernel.in
 glob2==0.7
     # via -r requirements/edx/kernel.in
-gunicorn==20.1.0
+gunicorn==21.0.0
     # via -r requirements/edx/kernel.in
 help-tokens==2.2.0
     # via -r requirements/edx/kernel.in
@@ -799,6 +799,7 @@ outcome-surveys==2.4.0
 packaging==23.1
     # via
     #   drf-yasg
+    #   gunicorn
     #   py2neo
     #   snowflake-connector-python
 pansi==2020.7.3
