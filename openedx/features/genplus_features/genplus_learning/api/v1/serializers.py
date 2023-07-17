@@ -123,6 +123,8 @@ class ProgramSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date',
             'is_currently_active_program',
+            'staff_browsable',
+            'student_browsable',
         )
 
     def get_units(self, obj):

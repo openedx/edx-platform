@@ -48,6 +48,8 @@ class ProgramAdmin(admin.ModelAdmin):
         'start_date',
         'end_date',
         'status',
+        'staff_browsable',
+        'student_browsable',
     )
     readonly_fields = ('slug', 'uuid',)
 

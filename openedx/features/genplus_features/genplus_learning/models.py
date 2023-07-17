@@ -44,6 +44,8 @@ class Program(TimeStampedModel):
     banner_image = models.ImageField(upload_to="program_banner_images", default="")
     intro_unit = models.OneToOneField(CourseOverview, on_delete=models.SET_NULL, null=True, blank=True, related_name='intro_unit_program')
     outro_unit = models.OneToOneField(CourseOverview, on_delete=models.SET_NULL, null=True, blank=True, related_name='outro_unit_program')
+    staff_browsable = models.BooleanField(null=True, blank=True)
+    student_browsable = models.BooleanField(null=True, blank=True)
     history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
