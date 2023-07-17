@@ -1281,6 +1281,8 @@ pylint-pytest==0.3.0
     # via -r requirements/edx/testing.txt
 pylti1p3==2.0.0
     # via -r requirements/edx/testing.txt
+pymemcache==4.0.0
+    # via -r requirements/edx/testing.txt
 pymongo==3.13.0
     # via
     #   -c requirements/edx/../constraints.txt

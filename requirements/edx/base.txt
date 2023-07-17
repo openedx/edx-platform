@@ -882,6 +882,8 @@ pylatexenc==2.10
     # via olxcleaner
 pylti1p3==2.0.0
     # via -r requirements/edx/kernel.in
+pymemcache==4.0.0
+    # via -r requirements/edx/paver.txt
 pymongo==3.13.0
     # via
     #   -c requirements/edx/../constraints.txt
