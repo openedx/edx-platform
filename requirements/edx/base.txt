@@ -1132,7 +1132,7 @@ tinycss2==1.1.1
     # via bleach
 tqdm==4.65.0
     # via nltk
-typing-extensions==4.7.1
+typing-extensions==4.6.3
     # via
     #   asgiref
     #   django-countries

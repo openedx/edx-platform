@@ -1728,7 +1728,7 @@ tqdm==4.65.0
     # via
     #   -r requirements/edx/testing.txt
     #   nltk
-typing-extensions==4.7.1
+typing-extensions==4.6.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
