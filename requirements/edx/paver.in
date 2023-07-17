@@ -20,6 +20,7 @@ paver                               # Build, distribution and deployment scripti
 psutil                              # Library for retrieving information on running processes and system utilization
 pymongo                             # via edx-opaque-keys
 python-memcached                    # Python interface to the memcached memory cache daemon
+pymemcache                          # Python interface to the memcached memory cache daemon
 requests                            # Simple interface for making HTTP requests
 stevedore                           # Support for runtime plugins, used for XBlocks and edx-platform Django app plugins
 watchdog                            # Used in paver watch_assets
