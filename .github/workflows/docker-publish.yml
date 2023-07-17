@@ -6,7 +6,6 @@ on:
     branches:
       - master
 jobs:
-  # Setup checkout, buildx, QEMU and docker hub for all jobs.
   setup:
       runs-on: ubuntu-latest
       # if: github.event_name == 'push'
