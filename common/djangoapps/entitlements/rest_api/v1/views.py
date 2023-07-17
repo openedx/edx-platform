@@ -4,6 +4,7 @@ Views for the Entitlements v1 API.
 
 import logging
 
+from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.http import HttpResponseBadRequest
@@ -42,6 +43,7 @@ from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticati
 from openedx.core.djangoapps.credentials.utils import get_courses_completion_status
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 
+User = get_user_model()
 log = logging.getLogger(__name__)
 
 
@@ -552,36 +554,38 @@ class SubscriptionsRevokeVerifiedAccessView(APIView):
         course completion status.
         """
         entitled_course_ids = []
+        user = User.objects.get(id=user_id)
+        username = user.username
         for course_entitlement in course_entitlements:
             if course_entitlement.enrollment_course_run is not None:
                 entitled_course_ids.append(str(course_entitlement.enrollment_course_run.course_id))
 
-        log.info('B2C_SUBSCRIPTIONS: Getting course completion status for user %s and entitled_course_ids %s',
-                 user_id,
+        log.info('B2C_SUBSCRIPTIONS: Getting course completion status for user [%s] and entitled_course_ids %s',
+                 username,
                  entitled_course_ids)
-        awarded_cert_course_ids, is_exception = get_courses_completion_status(user_id, entitled_course_ids)
+        awarded_cert_course_ids, is_exception = get_courses_completion_status(username, entitled_course_ids)
 
-        log.info('B2C_SUBSCRIPTIONS: Got course completion response %s for user %s and entitled_course_ids %s',
+        log.info('B2C_SUBSCRIPTIONS: Got course completion response %s for user [%s] and entitled_course_ids %s',
                  awarded_cert_course_ids,
-                 user_id,
+                 username,
                  entitled_course_ids)
 
         if is_exception:
             # Trigger the retry task asynchronously
             log.exception('B2C_SUBSCRIPTIONS: Exception occurred while getting course completion status for user %s '
                           'and entitled_course_ids %s',
-                          user_id,
+                          username,
                           entitled_course_ids)
             retry_revoke_subscriptions_verified_access.apply_async(args=(revocable_entitlement_uuids,
                                                                          entitled_course_ids,
-                                                                         user_id))
+                                                                         username))
             return
-        log.info('B2C_SUBSCRIPTIONS: Starting revoke_entitlements_and_downgrade_courses_to_audit for user %s and '
+        log.info('B2C_SUBSCRIPTIONS: Starting revoke_entitlements_and_downgrade_courses_to_audit for user [%s] and '
                  'awarded_cert_course_ids %s and revocable_entitlement_uuids %s',
-                 user_id,
+                 username,
                  awarded_cert_course_ids,
                  revocable_entitlement_uuids)
-        revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, user_id, awarded_cert_course_ids,
+        revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, username, awarded_cert_course_ids,
                                                            revocable_entitlement_uuids)
 
     def post(self, request):
