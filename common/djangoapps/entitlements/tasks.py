@@ -157,7 +157,7 @@ def expire_and_create_entitlements(self, entitlement_ids, support_username):
 
 
 @shared_task(bind=True)
-def retry_revoke_subscriptions_verified_access(self, revocable_entitlement_uuids, entitled_course_ids, user_id):
+def retry_revoke_subscriptions_verified_access(self, revocable_entitlement_uuids, entitled_course_ids, username):
     """
     Task to process course access revoke and move to audit.
     This is called only if call to get_courses_completion_status fails due to any exception.
@@ -165,7 +165,7 @@ def retry_revoke_subscriptions_verified_access(self, revocable_entitlement_uuids
     course_entitlements = CourseEntitlement.objects.filter(uuid__in=revocable_entitlement_uuids)
     course_entitlements = course_entitlements.select_related('user').select_related('enrollment_course_run')
     if course_entitlements.exists():
-        awarded_cert_course_ids, is_exception = get_courses_completion_status(user_id, entitled_course_ids)
+        awarded_cert_course_ids, is_exception = get_courses_completion_status(username, entitled_course_ids)
         if is_exception:
             try:
                 countdown = 2 ** self.request.retries
@@ -173,20 +173,20 @@ def retry_revoke_subscriptions_verified_access(self, revocable_entitlement_uuids
             except MaxRetriesExceededError:
                 log.exception(
                     'B2C_SUBSCRIPTIONS: Failed to process retry_revoke_subscriptions_verified_access '
-                    'for user_id %s and entitlement_uuids %s',
-                    user_id,
+                    'for user [%s] and entitlement_uuids %s',
+                    username,
                     revocable_entitlement_uuids
                 )
                 return
-        log.info('B2C_SUBSCRIPTIONS: Starting revoke_entitlements_and_downgrade_courses_to_audit for user %s and '
+        log.info('B2C_SUBSCRIPTIONS: Starting revoke_entitlements_and_downgrade_courses_to_audit for user [%s] and '
                  'awarded_cert_course_ids %s and revocable_entitlement_uuids %s from retry task',
-                 user_id,
+                 username,
                  awarded_cert_course_ids,
                  revocable_entitlement_uuids)
-        revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, user_id, awarded_cert_course_ids,
+        revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, username, awarded_cert_course_ids,
                                                            revocable_entitlement_uuids)
     else:
         log.info('B2C_SUBSCRIPTIONS: Entitlements not found for the provided entitlements uuids %s '
-                 'for user_id %s duing the retry_revoke_subscriptions_verified_access task',
+                 'for user [%s] duing the retry_revoke_subscriptions_verified_access task',
                  revocable_entitlement_uuids,
-                 user_id)
+                 username)
