@@ -3,12 +3,14 @@ Tests for the views in the notifications app.
 """
 import json
 from datetime import datetime, timedelta
+from unittest import mock
 
 import ddt
 from django.conf import settings
-from django.dispatch import Signal
 from django.urls import reverse
 from edx_toggles.toggles.testutils import override_waffle_flag
+from openedx_events.learning.data import CourseData, CourseEnrollmentData, UserData, UserPersonalData
+from openedx_events.learning.signals import COURSE_ENROLLMENT_CREATED
 from pytz import UTC
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
@@ -17,10 +19,7 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import UserFactory
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
 from openedx.core.djangoapps.notifications.config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
-from openedx.core.djangoapps.notifications.models import (
-    Notification,
-    CourseNotificationPreference,
-)
+from openedx.core.djangoapps.notifications.models import CourseNotificationPreference, Notification
 from openedx.core.djangoapps.notifications.serializers import NotificationCourseEnrollmentSerializer
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -28,6 +27,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..base_notification import COURSE_NOTIFICATION_APPS
 
 
+@ddt.ddt
 class CourseEnrollmentListViewTest(ModuleStoreTestCase):
     """
     Tests for the CourseEnrollmentListView.
@@ -67,21 +67,26 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
         )
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
-    def test_course_enrollment_list_view(self):
+    @ddt.data((False,), (True,))
+    @ddt.unpack
+    def test_course_enrollment_list_view(self, show_notifications_tray):
         """
         Test the CourseEnrollmentListView.
         """
         self.client.login(username=self.user.username, password='test')
-        url = reverse('enrollment-list')
-        response = self.client.get(url)
+        # Enable or disable the waffle flag based on the test case data
+        with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notifications_tray):
+            url = reverse('enrollment-list')
+            response = self.client.get(url)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.data['results']
-        enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
-        expected_data = NotificationCourseEnrollmentSerializer(enrollments, many=True).data
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            data = response.data['results']
+            enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
+            expected_data = NotificationCourseEnrollmentSerializer(enrollments, many=True).data
 
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data, expected_data)
+            self.assertEqual(len(data), 1)
+            self.assertEqual(data, expected_data)
+            self.assertEqual(response.data['show_preferences'], show_notifications_tray)
 
     def test_course_enrollment_api_permission(self):
         """
@@ -118,18 +123,32 @@ class CourseEnrollmentPostSaveTest(ModuleStoreTestCase):
             is_active=True,
             mode='audit'
         )
-        self.post_save_signal = Signal()
 
     def test_course_enrollment_post_save(self):
         """
         Test the post_save signal for CourseEnrollment.
         """
         # Emit post_save signal
-
-        self.post_save_signal.send(
-            sender=self.course_enrollment.__class__,
-            instance=self.course_enrollment,
-            created=True
+        enrollment_data = CourseEnrollmentData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.profile.name,
+                ),
+                id=self.user.id,
+                is_active=self.user.is_active,
+            ),
+            course=CourseData(
+                course_key=self.course.id,
+                display_name=self.course.display_name,
+            ),
+            mode=self.course_enrollment.mode,
+            is_active=self.course_enrollment.is_active,
+            creation_date=self.course_enrollment.created,
+        )
+        COURSE_ENROLLMENT_CREATED.send_event(
+            enrollment=enrollment_data
         )
 
         # Assert that CourseNotificationPreference object was created with correct attributes
@@ -162,13 +181,29 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             is_active=True,
             mode='audit'
         )
-        self.post_save_signal = Signal()
         self.client = APIClient()
         self.path = reverse('notification-preferences', kwargs={'course_key_string': self.course.id})
-        self.post_save_signal.send(
-            sender=self.course_enrollment.__class__,
-            instance=self.course_enrollment,
-            created=True
+
+        enrollment_data = CourseEnrollmentData(
+            user=UserData(
+                pii=UserPersonalData(
+                    username=self.user.username,
+                    email=self.user.email,
+                    name=self.user.profile.name,
+                ),
+                id=self.user.id,
+                is_active=self.user.is_active,
+            ),
+            course=CourseData(
+                course_key=self.course.id,
+                display_name=self.course.display_name,
+            ),
+            mode=self.course_enrollment.mode,
+            is_active=self.course_enrollment.is_active,
+            creation_date=self.course_enrollment.created,
+        )
+        COURSE_ENROLLMENT_CREATED.send_event(
+            enrollment=enrollment_data
         )
 
     def _expected_api_response(self):
@@ -217,7 +252,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_get_user_notification_preference(self):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_get_user_notification_preference(self, mock_emit):
         """
         Test get user notification preference.
         """
@@ -225,6 +261,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, self._expected_api_response())
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
 
     @ddt.data(
         ('discussion', None, None, True, status.HTTP_200_OK, 'app_update'),
@@ -241,8 +279,9 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         ('discussion', 'new_comment', 'invalid_notification_channel', False, status.HTTP_400_BAD_REQUEST, None),
     )
     @ddt.unpack
+    @mock.patch("eventtracking.tracker.emit")
     def test_patch_user_notification_preference(
-        self, notification_app, notification_type, notification_channel, value, expected_status, update_type,
+        self, notification_app, notification_type, notification_channel, value, expected_status, update_type, mock_emit,
     ):
         """
         Test update of user notification preference.
@@ -270,6 +309,14 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             expected_data['notification_preference_config'][notification_app][
                 'notification_types'][notification_type][notification_channel] = value
             self.assertEqual(response.data, expected_data)
+
+        if expected_status == status.HTTP_200_OK:
+            event_name, event_data = mock_emit.call_args[0]
+            self.assertEqual(event_name, 'edx.notifications.preferences.updated')
+            self.assertEqual(event_data['notification_app'], notification_app)
+            self.assertEqual(event_data['notification_type'], notification_type or '')
+            self.assertEqual(event_data['notification_channel'], notification_channel or '')
+            self.assertEqual(event_data['value'], value)
 
 
 class NotificationListAPIViewTest(APITestCase):
@@ -468,7 +515,8 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
 
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data['count'], 4)
-            self.assertEqual(response.data['count_by_app_name'], {'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1})
+            self.assertEqual(response.data['count_by_app_name'], {
+                'App Name 1': 2, 'App Name 2': 1, 'App Name 3': 1, 'discussion': 0})
             self.assertEqual(response.data['show_notifications_tray'], show_notifications_tray_enabled)
 
     def test_get_unseen_notifications_count_for_unauthenticated_user(self):
@@ -489,7 +537,7 @@ class NotificationCountViewSetTestCase(ModuleStoreTestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
-        self.assertEqual(response.data['count_by_app_name'], {})
+        self.assertEqual(response.data['count_by_app_name'], {'discussion': 0})
 
 
 class MarkNotificationsSeenAPIViewTestCase(APITestCase):
@@ -562,7 +610,8 @@ class NotificationReadAPIViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Invalid app_name or notification_id.'})
 
-    def test_mark_notification_read_with_notification_id(self):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_mark_notification_read_with_notification_id(self, mock_emit):
         # Create a PATCH request to mark notification as read for notification_id: 2
         notification_id = 2
         data = {'notification_id': notification_id}
@@ -573,6 +622,11 @@ class NotificationReadAPIViewTestCase(APITestCase):
         self.assertEqual(response.data, {'message': 'Notification marked read.'})
         notifications = Notification.objects.filter(user=self.user, id=notification_id, last_read__isnull=False)
         self.assertEqual(notifications.count(), 1)
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.notifications.read')
+        self.assertEqual(event_data.get('notification_metadata').get('notification_id'), notification_id)
+        self.assertEqual(event_data['notification_app'], 'discussion')
+        self.assertEqual(event_data['notification_type'], 'Type A')
 
     def test_mark_notification_read_with_other_user_notification_id(self):
         # Create a PATCH request to mark notification as read for notification_id: 2 through a different user

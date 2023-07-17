@@ -1437,7 +1437,6 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json'),
-        'LOADER_CLASS': 'xmodule.util.xmodule_django.XModuleWebpackLoader',
     },
     'WORKERS': {
         'BUNDLE_DIR_NAME': 'bundles/',
@@ -2704,6 +2703,7 @@ TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
 COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_assets/course_live.html"
+ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/ora_settings.html"
 
 # keys for  big blue button live provider
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}
@@ -2726,11 +2726,3 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
 DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
 DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
-
-OPEN_EDX_FILTERS_CONFIG = {
-    "org.openedx.content_authoring.staged_content.static_filter_source.v1": {
-        "pipeline": [
-            "openedx.core.djangoapps.content_staging.filters.IgnoreLargeFiles",
-        ]
-    }
-}

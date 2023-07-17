@@ -2715,7 +2715,6 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': os.path.join(STATIC_ROOT, 'webpack-stats.json'),
-        'LOADER_CLASS': 'xmodule.util.xmodule_django.XModuleWebpackLoader',
     },
     'WORKERS': {
         'BUNDLE_DIR_NAME': 'bundles/',
@@ -4462,6 +4461,7 @@ STUDENTMODULEHISTORYEXTENDED_OFFSET = 10000
 
 CREDENTIALS_SERVICE_USERNAME = 'credentials_service_user'
 CREDENTIALS_GENERATION_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+CREDENTIALS_COURSE_COMPLETION_STATE = 'awarded'
 
 # Queue to use for award program certificates
 PROGRAM_CERTIFICATES_ROUTING_KEY = 'edx.lms.core.default'
@@ -5196,6 +5196,7 @@ TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
 COURSE_BULK_EMAIL_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_live_course/bulk_email.html"
+ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/ora_settings.html"
 
 ################# Bulk Course Email Settings #################
 # If set, recipients of bulk course email messages will be filtered based on the last_login date of their User account.

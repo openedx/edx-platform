@@ -195,8 +195,8 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         entry = InstructorTask.objects.get(id=task_entry.id)
         assert entry.task_state == FAILURE
         output = json.loads(entry.task_output)
-        assert output['exception'] == 'TestTaskFailure'
-        assert output['message'] == expected_message
+        assert output['exception'] == 'ExceptionWithTraceback'
+        assert expected_message in output['message']
 
     def _test_run_with_long_error_msg(self, task_class):
         """
@@ -213,8 +213,10 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         assert entry.task_state == FAILURE
         assert 1023 > len(entry.task_output)
         output = json.loads(entry.task_output)
-        assert output['exception'] == 'TestTaskFailure'
-        assert output['message'] == (expected_message[:(len(output['message']) - 3)] + '...')
+        assert output['exception'] == 'ExceptionWithTraceback'
+        assert (
+            expected_message[:(len(output['message']) - 7)] + '\n"""...'
+        ) == output['message']
         assert 'traceback' not in output
 
     def _test_run_with_short_error_msg(self, task_class):
@@ -233,9 +235,9 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         assert entry.task_state == FAILURE
         assert 1023 > len(entry.task_output)
         output = json.loads(entry.task_output)
-        assert output['exception'] == 'TestTaskFailure'
-        assert output['message'] == expected_message
-        assert output['traceback'][(- 3):] == '...'
+        assert output['exception'] == 'ExceptionWithTraceback'
+        assert (expected_message[:(len(output['message']) - 7)] + '\n"""...') == output['message']
+        assert output['message'][(- 3):] == '...'
 
 
 class TestOverrideScoreInstructorTask(TestInstructorTasks):
@@ -292,7 +294,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         mock_instance = MagicMock()
         del mock_instance.set_score
         with patch(
-                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor'
+                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal'
         ) as mock_get_block:
             mock_get_block.return_value = mock_instance
             with pytest.raises(UpdateProblemModuleStateError):
@@ -300,9 +302,8 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         # check values stored in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
-        assert output['exception'] == 'UpdateProblemModuleStateError'
-        assert output['message'] == 'Scores cannot be overridden for this problem type.'
-        assert len(output['traceback']) > 0
+        assert output['exception'] == 'ExceptionWithTraceback'
+        assert 'Scores cannot be overridden for this problem type.' in output['message']
 
     def test_overriding_unaccessable(self):
         """
@@ -313,7 +314,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         num_students = 1
         self._create_students_with_state(num_students, input_state)
         task_entry = self._create_input_entry(score=0)
-        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor',
+        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal',
                    return_value=None):
             self._run_task_with_mock_celery(override_problem_score, task_entry.id, task_entry.task_id)
 
@@ -338,7 +339,7 @@ class TestOverrideScoreInstructorTask(TestInstructorTasks):
         self._create_students_with_state(num_students)
         task_entry = self._create_input_entry(score=0)
         with patch(
-                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor'
+                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal'
         ) as mock_get_block:
             mock_get_block.return_value = mock_instance
             mock_instance.max_score = MagicMock(return_value=99999.0)
@@ -425,19 +426,18 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         mock_instance = MagicMock()
         del mock_instance.rescore_problem
         del mock_instance.rescore
-        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor') as mock_get_block:  # lint-amnesty, pylint: disable=line-too-long
+        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal') as mock_get_block:  # lint-amnesty, pylint: disable=line-too-long
             mock_get_block.return_value = mock_instance
             with pytest.raises(UpdateProblemModuleStateError):
                 self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
         # check values stored in table:
         entry = InstructorTask.objects.get(id=task_entry.id)
         output = json.loads(entry.task_output)
-        assert output['exception'] == 'UpdateProblemModuleStateError'
-        assert output['message'] == 'Specified module {} of type {} does not support rescoring.'.format(
+        assert output['exception'] == 'ExceptionWithTraceback'
+        assert 'Specified module {} of type {} does not support rescoring.'.format(
             self.location,
             mock_instance.__class__,
-        )
-        assert len(output['traceback']) > 0
+        ) in output['message']
 
     def test_rescoring_unaccessable(self):
         """
@@ -448,7 +448,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         num_students = 1
         self._create_students_with_state(num_students, input_state)
         task_entry = self._create_input_entry()
-        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor', return_value=None):  # lint-amnesty, pylint: disable=line-too-long
+        with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal', return_value=None):  # lint-amnesty, pylint: disable=line-too-long
             self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
 
         self.assert_task_output(
@@ -474,7 +474,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         self._create_students_with_state(num_students)
         task_entry = self._create_input_entry()
         with patch(
-                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor'
+                'lms.djangoapps.instructor_task.tasks_helper.module_state.get_block_for_descriptor_internal'
         ) as mock_get_block:
             mock_get_block.return_value = mock_instance
             self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)

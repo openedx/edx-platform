@@ -49,6 +49,11 @@ LMS_ROOT_URL = f'http://{LMS_BASE}'
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 FRONTEND_REGISTER_URL = LMS_ROOT_URL + '/register'
+
+################################## Video Pipeline Settings #########################
+
+FEATURES['ENABLE_VIDEO_UPLOAD_PIPELINE'] = True
+
 ########################### PIPELINE #################################
 
 # Skip packaging and optimization in development
@@ -99,7 +104,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.profiling.ProfilingPanel',
     'debug_toolbar.panels.history.HistoryPanel',
 )
@@ -300,6 +304,7 @@ EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
 EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
 EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
+EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC = 'course-authoring-xblock-lifecycle'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################

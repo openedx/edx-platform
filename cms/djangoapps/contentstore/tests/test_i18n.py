@@ -1,8 +1,6 @@
 """
 Tests for validate Internationalization and XBlock i18n service.
 """
-
-
 import gettext
 from unittest import mock, skip
 
@@ -17,7 +15,6 @@ from xmodule.tests.test_export import PureXBlock
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient
 from cms.djangoapps.contentstore.views.preview import _prepare_runtime_for_preview
 from common.djangoapps.student.tests.factories import UserFactory
-from openedx.core.lib.edx_six import get_gettext
 
 
 class FakeTranslations(XBlockI18nService):
@@ -68,8 +65,13 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         self.test_language = 'dummy language'
         self.request = mock.Mock()
         self.course = CourseFactory.create()
+        self.field_data = mock.Mock()
         self.block = BlockFactory(category="pure", parent=self.course)
-        _prepare_runtime_for_preview(self.request, self.block)
+        _prepare_runtime_for_preview(
+            self.request,
+            self.block,
+            self.field_data,
+        )
         self.addCleanup(translation.deactivate)
 
     def get_block_i18n_service(self, block):
@@ -94,7 +96,7 @@ class TestXBlockI18nService(ModuleStoreTestCase):
 
             def __init__(self, module):
                 self.module = module
-                self.old_ugettext = get_gettext(module)
+                self.old_ugettext = module.gettext
 
             def __enter__(self):
                 def new_ugettext(*args, **kwargs):
@@ -152,9 +154,9 @@ class TestXBlockI18nService(ModuleStoreTestCase):
         with mock.patch('gettext.translation', return_value=_translator(domain='text', localedir=localedir,
                                                                         languages=[get_language()])):
             i18n_service = self.get_block_i18n_service(self.block)
-            self.assertEqual(get_gettext(i18n_service)('Hello'), 'Hello')
-            self.assertNotEqual(get_gettext(i18n_service)('Hello'), 'fr-hello-world')
-            self.assertNotEqual(get_gettext(i18n_service)('Hello'), 'es-hello-world')
+            self.assertEqual(i18n_service.gettext('Hello'), 'Hello')
+            self.assertNotEqual(i18n_service.gettext('Hello'), 'fr-hello-world')
+            self.assertNotEqual(i18n_service.gettext('Hello'), 'es-hello-world')
 
         translation.activate("fr")
         with mock.patch('gettext.translation', return_value=_translator(domain='text', localedir=localedir,
