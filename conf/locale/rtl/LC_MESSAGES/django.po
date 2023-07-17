@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-10 21:36+0000\n"
-"PO-Revision-Date: 2023-07-10 21:36:30.462694\n"
+"POT-Creation-Date: 2023-07-17 15:05+0000\n"
+"PO-Revision-Date: 2023-07-17 15:05:56.595859\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -3303,6 +3303,14 @@ msgstr "Ȼnsʇøɯ dɐƃǝs"
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide additional course content and resources with custom pages"
 msgstr "Ᵽɹøʌᴉdǝ ɐddᴉʇᴉønɐl ɔønɹsǝ ɔønʇǝnʇ ɐnd ɹǝsønɹɔǝs ʍᴉʇɥ ɔnsʇøɯ dɐƃǝs"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Open Response Assessment Settings"
+msgstr "Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ Sǝʇʇᴉnƃs"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Course level settings for Open Response Assessment."
+msgstr "Ȼønɹsǝ lǝʌǝl sǝʇʇᴉnƃs ɟøɹ Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ."
 
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
