@@ -611,8 +611,7 @@ def process_npm_assets():
     """
     Process vendor libraries installed via NPM.
     """
-    print("\t\tProcessing NPM assets is now done automatically in an npm post-install hook.")
-    print("\t\tThis function is now a no-op.")
+    sh('scripts/copy-node-modules.sh')
 
 
 @task
