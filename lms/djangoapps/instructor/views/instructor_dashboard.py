@@ -37,6 +37,7 @@ from common.djangoapps.student.roles import (
     CourseSalesAdminRole,
     CourseStaffRole
 )
+from common.djangoapps.student.role_helpers import has_role_access
 from common.djangoapps.util.json_request import JsonResponse
 from lms.djangoapps.bulk_email.api import is_bulk_email_feature_enabled
 from lms.djangoapps.bulk_email.models_api import is_bulk_email_disabled_for_course
@@ -193,10 +194,13 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
     # Gate access to Special Exam tab depending if either timed exams or proctored exams
     # are enabled in the course
 
+    roles = [
+        CourseStaffRole(course_key),
+        CourseInstructorRole(course_key),
+    ]
     user_has_access = any([
         request.user.is_staff,
-        CourseStaffRole(course_key).has_user(request.user),
-        CourseInstructorRole(course_key).has_user(request.user)
+        *has_role_access(request.user, roles, course_key),
     ])
     course_has_special_exams = course.enable_proctored_exams or course.enable_timed_exams
     can_see_special_exams = course_has_special_exams and user_has_access and settings.FEATURES.get(

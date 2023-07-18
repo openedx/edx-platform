@@ -20,6 +20,13 @@ from common.djangoapps.student.roles import (
     OrgStaffRole
 )
 
+from openedx_filters.learning.filters import (
+    AccessRoleCheckRequested,
+    AccessRoleAdditionRequested,
+    AccessRoleRemovalRequested,
+    UsersWithRolesRequested
+)
+
 
 @request_cached()
 def has_staff_roles(user, course_key):
@@ -40,3 +47,56 @@ def has_staff_roles(user, course_key):
             is_org_instructor, is_global_staff, has_forum_role]):
         return True
     return False
+
+
+def has_role_access(user, roles: list, course_key):
+    """
+    Return true if a user has the given role in the given course.
+    """
+    user, roles, course_key = AccessRoleCheckRequested.run_filter(
+        user=user,
+        roles=roles,
+        course_key=course_key,
+    )
+    return [role.has_user(user) for role in roles]
+
+
+def add_role_access(user, roles: list, course_key):
+    """
+    Add the given role to the user in the given course.
+    """
+    user, roles, course_key = AccessRoleAdditionRequested.run_filter(
+        user=user,
+        roles=roles,
+        course_key=course_key,
+    )
+    for role in roles:
+        role.add_users(user)
+
+
+def remove_role_access(user, role):
+    """
+    Remove the given role from the user in the given course.
+    """
+    user, roles, course_key = AccessRoleRemovalRequested.run_filter(
+        user=user,
+        roles=roles,
+        course_key=course_key,
+    )
+    for role in roles:
+        role.remove_users(user)
+
+
+def get_users_with_role(role):
+    """
+    Return a list of users who have the given role in the given course.
+    """
+    user, roles, course_key = UsersWithRolesRequested.run_filter(
+        user=user,
+        roles=roles,
+        course_key=course_key,
+    )
+    users_with_roles = [
+        role.users_with_role() for role in roles
+    ]
+    return users_with_roles
