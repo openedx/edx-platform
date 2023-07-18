@@ -76,7 +76,7 @@ describe('Sidebar View', () => {
             el: '.sidebar',
             context: {
                 isUserB2CSubscriptionsEnabled: true,
-                subscriptionUpsellData: {},
+                subscriptionUpsellData: context.subscriptionUpsellData,
             },
         });
         view.render();
