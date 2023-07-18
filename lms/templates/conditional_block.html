@@ -3,14 +3,13 @@
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML, Text
-from six import text_type
 %>
 
 <%
 def _message(reqm, message):
     return Text(message).format(link=HTML("<a href={url}>{url_name}</a>").format(
-        url = reverse('jump_to', kwargs=dict(course_id=text_type(reqm.course_id),
-                        location=text_type(reqm.location))),
+        url = reverse('jump_to', kwargs=dict(course_id=str(reqm.course_id),
+                        location=str(reqm.location))),
         url_name = reqm.display_name_with_default))
 %>
 % if message:

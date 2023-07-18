@@ -1632,7 +1632,6 @@ class TestStatus(unittest.TestCase):
         """
         statobj = inputtypes.Status('test')
         assert str(statobj) == 'test'
-        assert six.text_type(statobj) == 'test'
 
     def test_classes(self):
         """

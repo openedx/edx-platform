@@ -202,7 +202,7 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
         if content is not None:
-            if not six.PY2 and isinstance(content, str):
+            if isinstance(content, str):
                 content = content.encode('utf-8')
             self.wfile.write(content)
 

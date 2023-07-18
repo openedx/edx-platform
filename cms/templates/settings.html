@@ -14,7 +14,6 @@
       dump_js_escaped_json, js_escaped_string
   )
   from openedx.core.djangolib.markup import HTML, Text
-  import six
   from six.moves.urllib.parse import quote
   from six.moves.urllib import parse as urllib
 %>
@@ -711,7 +710,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
      <div class="bit">
      % if context_course:
           <%
-            url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='')
+            url_encoded_course_id = quote(str(context_course.id).encode('utf-8'), safe='')
             course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
             grading_config_url = utils.reverse_course_url('grading_handler', context_course.id)
             advanced_config_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
