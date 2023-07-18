@@ -501,6 +501,10 @@ class RegistrationView(APIView):
             response = self._create_response(request, errors, status_code=403)
             return response
 
+        response = self._is_user_exist_in_multisite(request, data)
+        if response:
+            return response
+
         response = self._handle_duplicate_email_username(request, data)
         if response:
             return response
@@ -512,6 +516,24 @@ class RegistrationView(APIView):
         response = self._create_response(request, {}, status_code=200)
         set_logged_in_cookies(request, response, user)
         return response
+
+    def _is_user_exist_in_multisite(self, request, data):
+        email = data.get('email')
+        username = data.get('username')
+        if User.objects.filter(email=email, username=username).exists():
+            user = User.objects.get(email=email, username=username)
+            edly_access_user = create_edly_access_role(request, user)
+            create_learner_link_with_permission_groups(edly_access_user)
+
+            return self._create_response(request, {}, status_code=200)
+
+        elif User.objects.filter(email=email).exists():
+            return self._create_response(request, {'user_message': "Use existing username for email: {}.".format(email)},
+                                         status_code=400)
+
+        elif User.objects.filter(username=username).exists():
+            return self._create_response(request, {'user_message': "Username '{}' already exists.".format(username)},
+                                         status_code=400)
 
     def _handle_duplicate_email_username(self, request, data):
         # pylint: disable=no-member
