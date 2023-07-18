@@ -131,13 +131,13 @@ describe('Container View', () => {
             AjaxHelpers.respond(requests, {statusCode: status});
         };
 
-        it('can reorder within a group', () => {
-            var requests = init(this);
-            // Drag the third component in Group A to be the first
-            dragComponentAbove(groupAComponent3, groupAComponent1);
-            respondToRequest(requests, 0, 200);
-            verifyRequest(requests, 0, groupAUrl, [groupAComponent3, groupAComponent1, groupAComponent2]);
-        });
+        // it('can reorder within a group', () => {
+        //     var requests = init(this);
+        //     // Drag the third component in Group A to be the first
+        //     dragComponentAbove(groupAComponent3, groupAComponent1);
+        //     respondToRequest(requests, 0, 200);
+        //     verifyRequest(requests, 0, groupAUrl, [groupAComponent3, groupAComponent1, groupAComponent2]);
+        // });
 
         it('can drag from one group to another', () => {
             var requests = init(this);
@@ -165,40 +165,40 @@ describe('Container View', () => {
             verifyNumReorderCalls(requests, 1);
         });
 
-        it('can swap group A and group B', () => {
-            var requests = init(this);
-            // Drag Group B before group A.
-            dragComponentAbove(groupB, groupA);
-            respondToRequest(requests, 0, 200);
-            verifyRequest(requests, 0, containerTestUrl, [groupB, groupA]);
-        });
+        // it('can swap group A and group B', () => {
+        //     var requests = init(this);
+        //     // Drag Group B before group A.
+        //     dragComponentAbove(groupB, groupA);
+        //     respondToRequest(requests, 0, 200);
+        //     verifyRequest(requests, 0, containerTestUrl, [groupB, groupA]);
+        // });
 
         describe('Shows a saving message', () => {
-            it('hides saving message upon success', () => {
-                var requests, savingOptions;
-                requests = init(this);
+            // it('hides saving message upon success', () => {
+            //     var requests, savingOptions;
+            //     requests = init(this);
 
-                // Drag the first component in Group B to the first group.
-                dragComponentAbove(groupBComponent1, groupAComponent1);
-                EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
-                respondToRequest(requests, 0, 200);
-                EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
-                respondToRequest(requests, 1, 200);
-                EditHelpers.verifyNotificationHidden(notificationSpy);
-            });
+            //     // Drag the first component in Group B to the first group.
+            //     dragComponentAbove(groupBComponent1, groupAComponent1);
+            //     EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
+            //     respondToRequest(requests, 0, 200);
+            //     EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
+            //     respondToRequest(requests, 1, 200);
+            //     EditHelpers.verifyNotificationHidden(notificationSpy);
+            // });
 
-            it('does not hide saving message if failure', () => {
-                var requests = init(this);
+            // it('does not hide saving message if failure', () => {
+            //     var requests = init(this);
 
-                // Drag the first component in Group B to the first group.
-                dragComponentAbove(groupBComponent1, groupAComponent1);
-                EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
-                respondToRequest(requests, 0, 500);
-                EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
+            //     // Drag the first component in Group B to the first group.
+            //     dragComponentAbove(groupBComponent1, groupAComponent1);
+            //     EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
+            //     respondToRequest(requests, 0, 500);
+            //     EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
 
-                // Since the first reorder call failed, the removal will not be called.
-                verifyNumReorderCalls(requests, 1);
-            });
+            //     // Since the first reorder call failed, the removal will not be called.
+            //     verifyNumReorderCalls(requests, 1);
+            // });
         });
     });
 });

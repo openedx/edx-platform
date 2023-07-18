@@ -10,14 +10,14 @@ var _ = require('underscore');
 var commonConfig = require('./webpack.common.config.js');
 
 var optimizedConfig = Merge.smart(commonConfig, {
-    optimization: {
-        splitChunks: {
-            chunks: 'all'
-        },
-        runtimeChunk: true,
-    },
-    mode: 'production',
     web: {
+        // optimization: {
+        //     splitChunks: {
+        //         chunks: 'all'
+        //     },
+        //     runtimeChunk: true,
+        // },
+        mode: 'production',
         output: {
             filename: '[name].[chunkhash].js'
         },
