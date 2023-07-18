@@ -3,6 +3,7 @@ Tests for the views in the notifications app.
 """
 import json
 from datetime import datetime, timedelta
+from unittest import mock
 
 import ddt
 from django.conf import settings
@@ -26,6 +27,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from ..base_notification import COURSE_NOTIFICATION_APPS
 
 
+@ddt.ddt
 class CourseEnrollmentListViewTest(ModuleStoreTestCase):
     """
     Tests for the CourseEnrollmentListView.
@@ -65,21 +67,26 @@ class CourseEnrollmentListViewTest(ModuleStoreTestCase):
         )
 
     @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
-    def test_course_enrollment_list_view(self):
+    @ddt.data((False,), (True,))
+    @ddt.unpack
+    def test_course_enrollment_list_view(self, show_notifications_tray):
         """
         Test the CourseEnrollmentListView.
         """
         self.client.login(username=self.user.username, password='test')
-        url = reverse('enrollment-list')
-        response = self.client.get(url)
+        # Enable or disable the waffle flag based on the test case data
+        with override_waffle_flag(SHOW_NOTIFICATIONS_TRAY, active=show_notifications_tray):
+            url = reverse('enrollment-list')
+            response = self.client.get(url)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.data['results']
-        enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
-        expected_data = NotificationCourseEnrollmentSerializer(enrollments, many=True).data
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            data = response.data['results']
+            enrollments = CourseEnrollment.objects.filter(user=self.user, is_active=True)
+            expected_data = NotificationCourseEnrollmentSerializer(enrollments, many=True).data
 
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data, expected_data)
+            self.assertEqual(len(data), 1)
+            self.assertEqual(data, expected_data)
+            self.assertEqual(response.data['show_preferences'], show_notifications_tray)
 
     def test_course_enrollment_api_permission(self):
         """
@@ -245,7 +252,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_get_user_notification_preference(self):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_get_user_notification_preference(self, mock_emit):
         """
         Test get user notification preference.
         """
@@ -253,6 +261,8 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, self._expected_api_response())
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.notifications.preferences.viewed')
 
     @ddt.data(
         ('discussion', None, None, True, status.HTTP_200_OK, 'app_update'),
@@ -269,8 +279,9 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
         ('discussion', 'new_comment', 'invalid_notification_channel', False, status.HTTP_400_BAD_REQUEST, None),
     )
     @ddt.unpack
+    @mock.patch("eventtracking.tracker.emit")
     def test_patch_user_notification_preference(
-        self, notification_app, notification_type, notification_channel, value, expected_status, update_type,
+        self, notification_app, notification_type, notification_channel, value, expected_status, update_type, mock_emit,
     ):
         """
         Test update of user notification preference.
@@ -298,6 +309,14 @@ class UserNotificationPreferenceAPITest(ModuleStoreTestCase):
             expected_data['notification_preference_config'][notification_app][
                 'notification_types'][notification_type][notification_channel] = value
             self.assertEqual(response.data, expected_data)
+
+        if expected_status == status.HTTP_200_OK:
+            event_name, event_data = mock_emit.call_args[0]
+            self.assertEqual(event_name, 'edx.notifications.preferences.updated')
+            self.assertEqual(event_data['notification_app'], notification_app)
+            self.assertEqual(event_data['notification_type'], notification_type or '')
+            self.assertEqual(event_data['notification_channel'], notification_channel or '')
+            self.assertEqual(event_data['value'], value)
 
 
 class NotificationListAPIViewTest(APITestCase):
@@ -591,7 +610,8 @@ class NotificationReadAPIViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, {'error': 'Invalid app_name or notification_id.'})
 
-    def test_mark_notification_read_with_notification_id(self):
+    @mock.patch("eventtracking.tracker.emit")
+    def test_mark_notification_read_with_notification_id(self, mock_emit):
         # Create a PATCH request to mark notification as read for notification_id: 2
         notification_id = 2
         data = {'notification_id': notification_id}
@@ -602,6 +622,11 @@ class NotificationReadAPIViewTestCase(APITestCase):
         self.assertEqual(response.data, {'message': 'Notification marked read.'})
         notifications = Notification.objects.filter(user=self.user, id=notification_id, last_read__isnull=False)
         self.assertEqual(notifications.count(), 1)
+        event_name, event_data = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.notifications.read')
+        self.assertEqual(event_data.get('notification_metadata').get('notification_id'), notification_id)
+        self.assertEqual(event_data['notification_app'], 'discussion')
+        self.assertEqual(event_data['notification_type'], 'Type A')
 
     def test_mark_notification_read_with_other_user_notification_id(self):
         # Create a PATCH request to mark notification as read for notification_id: 2 through a different user

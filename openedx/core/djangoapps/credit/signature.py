@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 def _encode_secret(secret, provider_id):
     """
-    Helper function for encoding text_type secrets into ascii.
+    Helper function for encoding string secrets into ascii.
     """
     try:
         secret.encode('ascii')

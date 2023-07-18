@@ -1299,7 +1299,7 @@ class RevokeSubscriptionsVerifiedAccessViewTest(ModuleStoreTestCase):
             is_active=True,
             mode=CourseMode.VERIFIED
         )
-        mock_get_courses_completion_status.return_value = ([enrollment.course_id], False)
+        mock_get_courses_completion_status.return_value = ([str(enrollment.course_id)], False)
         course_entitlement = CourseEntitlementFactory.create(user=self.user, enrollment_course_run=enrollment)
         url = reverse(self.REVOKE_VERIFIED_ACCESS_PATH)
 
@@ -1392,4 +1392,4 @@ class RevokeSubscriptionsVerifiedAccessViewTest(ModuleStoreTestCase):
         assert response.status_code == 204
         mock_task.assert_called_once_with(args=([str(course_entitlement.uuid)],
                                                 [str(enrollment.course_id)],
-                                                self.user.id))
+                                                self.user.username))

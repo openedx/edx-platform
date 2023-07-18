@@ -3,6 +3,7 @@ Utils for discussion API.
 """
 from typing import List, Dict
 
+from django.conf import settings
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.paginator import Paginator
 from django.db.models.functions import Length
@@ -398,7 +399,7 @@ class DiscussionNotificationSender:
                 **extra_context,
             },
             notification_type=notification_type,
-            content_url=self.thread.url_with_id(params={'id': self.thread.id}),
+            content_url=f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(self.course.id)}/posts/{self.thread.id}",
             app_name="discussion",
             course_key=self.course.id,
         )

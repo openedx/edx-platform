@@ -110,11 +110,11 @@ def get_credentials(user, program_uuid=None, credential_type=None):
     )
 
 
-def get_courses_completion_status(lms_user_id, course_run_ids):
+def get_courses_completion_status(username, course_run_ids):
     """
-    Given the lms_user_id and course run ids, checks for course completion status
+    Given the username and course run ids, checks for course completion status
     Arguments:
-        lms_user_id (User): The user to authenticate as when requesting credentials.
+        username (User): Username of the user whose credentials are being requested.
         course_run_ids(List): list of course run ids for which we need to check the completion status
     Returns:
         list of course_run_ids for which user has completed the course
@@ -133,8 +133,8 @@ def get_courses_completion_status(lms_user_id, course_run_ids):
         )
         api_response = api_client.post(
             completion_status_url,
-            data={
-                'lms_user_id': lms_user_id,
+            json={
+                'username': username,
                 'course_runs': course_run_ids,
             }
         )
@@ -142,18 +142,26 @@ def get_courses_completion_status(lms_user_id, course_run_ids):
         course_completion_response = api_response.json()
     except Exception as exc:  # pylint: disable=broad-except
         log.exception("An unexpected error occurred while reqeusting course completion statuses "
-                      "for lms_user_id [%s] for course_run_ids [%s] with exc [%s]:",
-                      lms_user_id,
+                      "for user [%s] for course_run_ids [%s] with exc [%s]:",
+                      username,
                       course_run_ids,
                       exc
                       )
         return [], True
     # Yes, This is course_credentials_data. The key is named status but
     # it contains all the courses data from credentials.
+    log.info("Course completion status response for user [%s] for course_run_ids [%s] is [%s]",
+             username,
+             course_run_ids,
+             course_completion_response)
     course_credentials_data = course_completion_response.get('status', [])
     if course_credentials_data is not None:
         filtered_records = [course_data['course_run']['key'] for course_data in course_credentials_data if
                             course_data['course_run']['key'] in course_run_ids and
                             course_data['status'] == settings.CREDENTIALS_COURSE_COMPLETION_STATE]
+        log.info("Filtered course completion status response for user [%s] for course_run_ids [%s] is [%s]",
+                 username,
+                 course_run_ids,
+                 filtered_records)
         return filtered_records, False
     return [], False

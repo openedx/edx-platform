@@ -19,6 +19,7 @@ from openedx.core.djangoapps.notifications.models import (
     Notification,
     get_course_notification_preference_config_version
 )
+from openedx.core.djangoapps.notifications.events import notification_generated_event
 
 logger = get_task_logger(__name__)
 
@@ -100,14 +101,16 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     for preference in preferences:
         preference = update_user_preference(preference, preference.user, course_key)
         if preference and preference.get_web_config(app_name, notification_type):
-            notifications.append(Notification(
+            notification = Notification(
                 user_id=preference.user_id,
                 app_name=app_name,
                 notification_type=notification_type,
                 content_context=context,
                 content_url=content_url,
                 course_id=course_key,
-            ))
+            )
+            notifications.append(notification)
+            notification_generated_event(preference.user, notification)
     # send notification to users but use bulk_create
     Notification.objects.bulk_create(notifications)
 
@@ -129,7 +132,7 @@ def create_notification_pref_if_not_exists(user_ids: List, preferences: List, co
     new_preferences = []
 
     for user_id in user_ids:
-        if not any(preference.user_id == user_id for preference in preferences):
+        if not any(preference.user_id == int(user_id) for preference in preferences):
             new_preferences.append(CourseNotificationPreference(
                 user_id=user_id,
                 course_id=course_id,

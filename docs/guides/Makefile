@@ -20,3 +20,11 @@ clean:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+update_redirects:
+	# This updates redirects.txt, creating redirects for any files that have moved (relative to master).
+	sphinx-build -b rediraffewritediff "$(SOURCEDIR)" "$(BUILDDIR)"
+
+check_redirects:
+	# Check to make sure that any files that got moved have a redirect in redirects.txt
+	sphinx-build -b rediraffecheckdiff "$(SOURCEDIR)" "$(BUILDDIR)"
