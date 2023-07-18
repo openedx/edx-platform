@@ -1383,6 +1383,15 @@ PIPELINE['JAVASCRIPT'] = {
         'source_filenames': base_vendor_js,
         'output_filename': 'js/cms-base-vendor.js',
     },
+    'module-js': {
+        'source_filenames': (
+            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
+            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/modules/js/*.js') +
+            rooted_glob(COMMON_ROOT / 'static/', 'common/js/discussion/*.js')
+        ),
+        'output_filename': 'js/cms-modules.js',
+        'test_order': 1
+    },
 }
 
 STATICFILES_IGNORE_PATTERNS = (

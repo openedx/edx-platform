@@ -2580,6 +2580,14 @@ PIPELINE['JAVASCRIPT'] = {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
     },
+    'module-descriptor-js': {
+        'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
+        'output_filename': 'js/lms-module-descriptors.js',
+    },
+    'module-js': {
+        'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
+        'output_filename': 'js/lms-modules.js',
+    },
     'discussion': {
         'source_filenames': discussion_js,
         'output_filename': 'js/discussion.js',
