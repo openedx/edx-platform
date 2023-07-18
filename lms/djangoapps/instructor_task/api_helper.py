@@ -149,14 +149,14 @@ def _get_xblock_instance_args(request, task_id):
     return xblock_instance_args
 
 
-def _supports_rescore(descriptor):
+def _supports_rescore(block):
     """
     Helper method to determine whether a given item supports rescoring.
     In order to accommodate both XModules and XBlocks, we have to check
-    the descriptor itself then fall back on its module class.
+    the block itself then fall back on its module class.
     """
-    return hasattr(descriptor, 'rescore') or (
-        hasattr(descriptor, 'module_class') and hasattr(descriptor.module_class, 'rescore')
+    return hasattr(block, 'rescore') or (
+        hasattr(block, 'module_class') and hasattr(block.module_class, 'rescore')
     )
 
 
@@ -343,49 +343,49 @@ def get_status_from_instructor_task(instructor_task):
 
 def check_arguments_for_rescoring(usage_key):
     """
-    Do simple checks on the descriptor to confirm that it supports rescoring.
+    Do simple checks on the block to confirm that it supports rescoring.
 
     Confirms first that the usage_key is defined (since that's currently typed
     in).  An ItemNotFoundException is raised if the corresponding module
-    descriptor doesn't exist.  NotImplementedError is raised if the
+    block doesn't exist.  NotImplementedError is raised if the
     corresponding module doesn't support rescoring calls.
 
     Note: the string returned here is surfaced as the error
     message on the instructor dashboard when a rescore is
     submitted for a non-rescorable block.
     """
-    descriptor = modulestore().get_item(usage_key)
-    if not _supports_rescore(descriptor):
+    block = modulestore().get_item(usage_key)
+    if not _supports_rescore(block):
         msg = _("This component cannot be rescored.")
         raise NotImplementedError(msg)
 
 
 def check_arguments_for_overriding(usage_key, score):
     """
-    Do simple checks on the descriptor to confirm that it supports overriding
+    Do simple checks on the block to confirm that it supports overriding
     the problem score and the score passed in is not greater than the value of
     the problem or less than 0.
     """
-    descriptor = modulestore().get_item(usage_key)
+    block = modulestore().get_item(usage_key)
     score = float(score)
 
-    # some weirdness around initializing the descriptor requires this
-    if not hasattr(descriptor.__class__, 'set_score'):
+    # some weirdness around initializing the block requires this
+    if not hasattr(block.__class__, 'set_score'):
         msg = _("This component does not support score override.")
         raise NotImplementedError(msg)
 
-    if score < 0 or score > descriptor.max_score():
+    if score < 0 or score > block.max_score():
         msg = _("Scores must be between 0 and the value of the problem.")
         raise ValueError(msg)
 
 
 def check_entrance_exam_problems_for_rescoring(exam_key):  # pylint: disable=invalid-name
     """
-    Grabs all problem descriptors in exam and checks each descriptor to
+    Grabs all problem blocks in exam and checks each block to
     confirm that it supports re-scoring.
 
     An ItemNotFoundException is raised if the corresponding module
-    descriptor doesn't exist for exam_key. NotImplementedError is raised if
+    block doesn't exist for exam_key. NotImplementedError is raised if
     any of the problem in entrance exam doesn't support re-scoring calls.
     """
     problems = list(get_problems_in_section(exam_key).values())

@@ -1,15 +1,15 @@
 import { errorActions, entitlementActions } from '../constants/actionTypes';
 
 const error = (state = '', action) => {
-  switch (action.type) {
+    switch (action.type) {
     case errorActions.DISPLAY_ERROR:
-      return action.error;
+        return action.error;
     case errorActions.DISMISS_ERROR:
     case entitlementActions.fetch.SUCCESS:
-      return '';
+        return '';
     default:
-      return state;
-  }
+        return state;
+    }
 };
 
 export default error;

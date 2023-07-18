@@ -4,12 +4,13 @@
     waitForProtex();
 
     function waitForProtex() {
-        if (typeof(protex) !== 'undefined' && protex) {
+        if (typeof protex !== 'undefined' && protex) {
             protex.onInjectionDone('protex');
+        // eslint-disable-next-line brace-style
         }
         /* if (typeof(protex) !== "undefined") {
             //initializeProtex();
-        }*/
+        } */
         else {
             setTimeout(function() { waitForProtex(); }, timeout);
         }
@@ -27,7 +28,7 @@
         var input_field = problem.find('input[type=hidden]');
         var protex_answer = protexCheckAnswer();
         var value = {protex_answer: protex_answer};
-            // console.log(JSON.stringify(value));
+        // console.log(JSON.stringify(value));
         input_field.val(JSON.stringify(value));
     }
 
@@ -49,7 +50,6 @@
         });
         updateProtexField();
     };
-
 
     /* function initializeProtex() {
         //Check to see if the two exported GWT functions protexSetTargetShape
@@ -81,5 +81,5 @@
         else {
             setTimeout(function() {initializeProtex(); }, timeout);
         }
-    }*/
+    } */
 }).call(this);

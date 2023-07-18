@@ -1,5 +1,6 @@
 (function(requirejs, define) {
     'use strict';
+
     // We do not wish to bundle common libraries (that may also be used by non-RequireJS code on the page
     // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
     // Note that when the optimizer executes this code, window will not be defined.

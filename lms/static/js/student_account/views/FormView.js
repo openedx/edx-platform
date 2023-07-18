@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -64,7 +65,7 @@
                             HtmlUtils: HtmlUtils
                         })
                     )
-                )
+                );
                 this.postRender();
 
                 return this;
@@ -163,8 +164,8 @@
                     $label = $form.find('label[for=' + $el.attr('id') + ']');
                     key = $el.attr('name') || false;
 
-                        // Due to a bug in firefox, whitespaces in email type field are not removed.
-                        // TODO: Remove this code once firefox bug is resolved.
+                    // Due to a bug in firefox, whitespaces in email type field are not removed.
+                    // TODO: Remove this code once firefox bug is resolved.
                     if (key === 'email') {
                         $el.val($el.val().trim());
                     }
@@ -236,10 +237,10 @@
             saveError: function(error) {
                 this.errors = [
                     StringUtils.interpolate(
-                            '<li>{error}</li>', {
-                                error: error.responseText
-                            }
-                        )
+                        '<li>{error}</li>', {
+                            error: error.responseText
+                        }
+                    )
                 ];
                 this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                 this.scrollToFormFeedback();

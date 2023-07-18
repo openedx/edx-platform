@@ -214,10 +214,12 @@ urlpatterns = [
     ),
     path('api/discounts/', include(('openedx.features.discounts.urls', 'openedx.features.discounts'),
                                    namespace='api_discounts')),
-    path('403', handler403),
-    path('404', handler404),
-    path('429', handler429),
-    path('500', handler500),
+
+    # Provide URLs where we can see the rendered error pages without having to force an error.
+    path('403', handler403, name='render_403'),
+    path('404', handler404, name='render_404'),
+    path('429', handler429, name='render_429'),
+    path('500', handler500, name='render_500'),
 ]
 
 if settings.FEATURES.get('ENABLE_MOBILE_REST_API'):
@@ -327,14 +329,14 @@ urlpatterns += [
         name=RENDER_XBLOCK_NAME,
     ),
     re_path(
-        fr'^videos/{settings.USAGE_KEY_PATTERN}$',
-        courseware_views.render_public_video_xblock,
-        name=RENDER_VIDEO_XBLOCK_NAME,
+        fr'^videos/embed/{settings.USAGE_KEY_PATTERN}$',
+        courseware_views.PublicVideoXBlockEmbedView.as_view(),
+        name=RENDER_VIDEO_XBLOCK_EMBED_NAME,
     ),
     re_path(
-        fr'^videos/{settings.USAGE_KEY_PATTERN}/embed$',
-        courseware_views.render_public_video_xblock_embed,
-        name=RENDER_VIDEO_XBLOCK_EMBED_NAME,
+        fr'^videos/{settings.USAGE_KEY_PATTERN}$',
+        courseware_views.PublicVideoXBlockView.as_view(),
+        name=RENDER_VIDEO_XBLOCK_NAME,
     ),
 
 
@@ -1029,12 +1031,6 @@ if getattr(settings, 'PROVIDER_STATES_URL', None):
         )
     ]
 
-# save_for_later API urls
-if settings.ENABLE_SAVE_FOR_LATER:
-    urlpatterns += [
-        path('', include('lms.djangoapps.save_for_later.urls')),
-    ]
-
 # Enhanced Staff Grader (ESG) URLs
 urlpatterns += [
     path('api/ora_staff_grader/', include('lms.djangoapps.ora_staff_grader.urls', 'ora-staff-grader')),
@@ -1048,4 +1044,8 @@ urlpatterns += [
 # MFE API urls
 urlpatterns += [
     path('api/mfe_config/v1', include(('lms.djangoapps.mfe_config_api.urls', 'lms.djangoapps.mfe_config_api'), namespace='mfe_config_api'))
+]
+
+urlpatterns += [
+    path('api/notifications/', include('openedx.core.djangoapps.notifications.urls')),
 ]

@@ -1,21 +1,21 @@
 import { entitlementActions } from '../constants/actionTypes';
 
 const entitlements = (state = [], action) => {
-  switch (action.type) {
+    switch (action.type) {
     case entitlementActions.fetch.SUCCESS:
-      return action.entitlements;
+        return action.entitlements;
     case entitlementActions.create.SUCCESS:
-      return [...state, action.entitlement];
+        return [...state, action.entitlement];
     case entitlementActions.reissue.SUCCESS:
-      return state.map((entitlement) => {
-        if (entitlement.uuid === action.entitlement.uuid) {
-          return action.entitlement;
-        }
-        return entitlement;
-      });
+        return state.map((entitlement) => {
+            if (entitlement.uuid === action.entitlement.uuid) {
+                return action.entitlement;
+            }
+            return entitlement;
+        });
     default:
-      return state;
-  }
+        return state;
+    }
 };
 
 export default entitlements;

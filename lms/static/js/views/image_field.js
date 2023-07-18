@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define([
         'gettext', 'jquery', 'underscore', 'backbone',
         'edx-ui-toolkit/js/utils/html-utils', 'js/views/fields',
@@ -41,7 +42,7 @@
                 this.options = _.extend({}, options);
                 this._super(options);
                 _.bindAll(this, 'render', 'imageChangeSucceeded', 'imageChangeFailed', 'fileSelected',
-                          'watchForPageUnload', 'onBeforeUnload');
+                    'watchForPageUnload', 'onBeforeUnload');
             },
 
             render: function() {

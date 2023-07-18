@@ -5,11 +5,11 @@ Helper function used to require files serially instead of concurrently.
     'use strict';
 
     var requireModules = function(paths, callback, modules) {
-      // If all the modules have been loaded, call the callback.
+        // If all the modules have been loaded, call the callback.
         if (paths.length === 0) {
             return callback.apply(null, modules);
         }
-      // Otherwise load the next one.
+        // Otherwise load the next one.
         require([paths.shift()], function(module) {
             modules.push(module);
             requireModules(paths, callback, modules);

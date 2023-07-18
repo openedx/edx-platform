@@ -128,10 +128,10 @@ var trapFocusForAccessibleModal = function(
     // to ensure that the correct elements are accessible.
     var focusableItems, $last;
     focusableItems = reassignTabIndexesAndAriaHidden(
-      focusableElementsFilterString,
-      closeButtonId,
-      modalId,
-      mainPageId
+        focusableElementsFilterString,
+        closeButtonId,
+        modalId,
+        mainPageId
     );
     $last = trapTabFocus(focusableItems, closeButtonId);
     trapShiftTabFocus($last, closeButtonId);
@@ -140,18 +140,18 @@ var trapFocusForAccessibleModal = function(
 };
 
 var accessible_modal = function(trigger, closeButtonId, modalId, mainPageId) {
-  // Modifies a lean modal to optimize focus management.
-  // "trigger" is the selector for the link element that triggers the modal.
-  // "closeButtonId" is the selector for the button that closes out the modal.
-  // "modalId" is the selector for the modal being managed
-  // "mainPageId" is the selector for the main part of the page
-  //
-  // based on http://accessibility.oit.ncsu.edu/training/aria/modal-window/modal-window.js
-  //
-  // see http://accessibility.oit.ncsu.edu/blog/2013/09/13/the-incredible-accessible-modal-dialog/
-  // for more information on managing modals
-  //
-    var initialFocus
+    // Modifies a lean modal to optimize focus management.
+    // "trigger" is the selector for the link element that triggers the modal.
+    // "closeButtonId" is the selector for the button that closes out the modal.
+    // "modalId" is the selector for the modal being managed
+    // "mainPageId" is the selector for the main part of the page
+    //
+    // based on http://accessibility.oit.ncsu.edu/training/aria/modal-window/modal-window.js
+    //
+    // see http://accessibility.oit.ncsu.edu/blog/2013/09/13/the-incredible-accessible-modal-dialog/
+    // for more information on managing modals
+    //
+    var initialFocus;
     $(trigger).click(function() {
         $focusedElementBeforeModal = $(trigger);
 

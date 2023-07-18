@@ -15,8 +15,8 @@ from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
 from xmodule.x_module import STUDIO_VIEW
 
 from cms.djangoapps.contentstore.tests.utils import AjaxEnabledTestClient, parse_json
-from cms.djangoapps.contentstore.utils import reverse_library_url, reverse_url, reverse_usage_url
-from cms.djangoapps.contentstore.views.block import _duplicate_block
+from cms.djangoapps.contentstore.utils import reverse_library_url, reverse_url, \
+    reverse_usage_url, duplicate_block
 from cms.djangoapps.contentstore.views.preview import _load_preview_block
 from cms.djangoapps.contentstore.views.tests.test_library import LIBRARY_REST_URL
 from cms.djangoapps.course_creators.views import add_user_with_status_granted
@@ -114,7 +114,7 @@ class LibraryTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, status_code_expected)
         return modulestore().get_item(lib_content_block.location)
 
-    def _bind_block(self, descriptor, user=None):
+    def _bind_block(self, block, user=None):
         """
         Helper to use the CMS's module system so we can access student-specific fields.
         """
@@ -123,7 +123,7 @@ class LibraryTestCase(ModuleStoreTestCase):
         if user not in self.session_data:
             self.session_data[user] = {}
         request = Mock(user=user, session=self.session_data[user])
-        _load_preview_block(request, descriptor)
+        _load_preview_block(request, block)
 
     def _update_block(self, usage_key, metadata):
         """
@@ -174,13 +174,13 @@ class TestLibraries(LibraryTestCase):
         lc_block = self._refresh_children(lc_block)
 
         # Now, we want to make sure that .children has the total # of potential
-        # children, and that get_child_descriptors() returns the actual children
+        # children, and that get_child_blocks() returns the actual children
         # chosen for a given student.
-        # In order to be able to call get_child_descriptors(), we must first
+        # In order to be able to call get_child_blocks(), we must first
         # call bind_for_student:
         self._bind_block(lc_block)
         self.assertEqual(len(lc_block.children), num_to_create)
-        self.assertEqual(len(lc_block.get_child_descriptors()), num_expected)
+        self.assertEqual(len(lc_block.get_child_blocks()), num_expected)
 
     def test_consistent_children(self):
         """
@@ -204,7 +204,7 @@ class TestLibraries(LibraryTestCase):
             """
             Fetch the child shown to the current user.
             """
-            children = block.get_child_descriptors()
+            children = block.get_child_blocks()
             self.assertEqual(len(children), 1)
             return children[0]
 
@@ -947,7 +947,7 @@ class TestOverrides(LibraryTestCase):
         if duplicate:
             # Check that this also works when the RCB is duplicated.
             self.lc_block = modulestore().get_item(
-                _duplicate_block(self.course.location, self.lc_block.location, self.user)
+                duplicate_block(self.course.location, self.lc_block.location, self.user)
             )
             self.problem_in_course = modulestore().get_item(self.lc_block.children[0])
         else:
@@ -1006,7 +1006,7 @@ class TestOverrides(LibraryTestCase):
 
         # Duplicate self.lc_block:
         duplicate = store.get_item(
-            _duplicate_block(self.course.location, self.lc_block.location, self.user)
+            duplicate_block(self.course.location, self.lc_block.location, self.user)
         )
         # The duplicate should have identical children to the original:
         self.assertEqual(len(duplicate.children), 1)

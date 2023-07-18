@@ -13,7 +13,7 @@ define(
         'js/views/message_banner'
     ],
     function(Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
-             UserAccountModel, UserPreferencesModel, LearnerProfileView, LearnerProfileFields, LearnerProfilePage) {
+        UserAccountModel, UserPreferencesModel, LearnerProfileView, LearnerProfileFields, LearnerProfilePage) {
         'use strict';
 
         describe('edx.user.LearnerProfileFactory', function() {
@@ -209,7 +209,6 @@ define(
                 AjaxHelpers.respondWithJson(requests, LearnerProfileHelpers.firstPageBadges);
                 LearnerProfileHelpers.expectPage(learnerProfileView, LearnerProfileHelpers.firstPageBadges);
             });
-
 
             it('renders the limited profile for under 13 users', function() {
                 var context = createProfilePage(

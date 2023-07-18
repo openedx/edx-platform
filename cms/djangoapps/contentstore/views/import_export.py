@@ -19,6 +19,7 @@ from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 from django.db import transaction
 from django.http import Http404, HttpResponse, HttpResponseNotFound, StreamingHttpResponse
+from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -27,7 +28,6 @@ from edx_django_utils.monitoring import set_custom_attribute, set_custom_attribu
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
 from path import Path as path
-from storages.backends.s3boto import S3BotoStorage
 from storages.backends.s3boto3 import S3Boto3Storage
 from user_tasks.conf import settings as user_tasks_settings
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
@@ -41,7 +41,8 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 
 from ..storage import course_import_export_storage
 from ..tasks import CourseExportTask, CourseImportTask, export_olx, import_olx
-from ..utils import reverse_course_url, reverse_library_url
+from ..toggles import use_new_export_page, use_new_import_page
+from ..utils import reverse_course_url, reverse_library_url, get_export_url, get_import_url
 
 __all__ = [
     'import_handler', 'import_status_handler',
@@ -90,6 +91,8 @@ def import_handler(request, course_key_string):
         else:
             return _write_chunk(request, courselike_key)
     elif request.method == 'GET':  # assume html
+        if use_new_import_page(courselike_key):
+            return redirect(get_import_url(courselike_key))
         status_url = reverse_course_url(
             "import_status_handler", courselike_key, kwargs={'filename': "fillerName"}
         )
@@ -337,6 +340,8 @@ def export_handler(request, course_key_string):
         export_olx.delay(request.user.id, course_key_string, request.LANGUAGE_CODE)
         return JsonResponse({'ExportStatus': 1})
     elif 'text/html' in requested_format:
+        if use_new_export_page(course_key):
+            return redirect(get_export_url(course_key))
         return render_to_response('export.html', context)
     else:
         # Only HTML request format is supported (no JSON).
@@ -381,14 +386,6 @@ def export_status_handler(request, course_key_string):
         artifact = UserTaskArtifact.objects.get(status=task_status, name='Output')
         if isinstance(artifact.file.storage, FileSystemStorage):
             output_url = reverse_course_url('export_output_handler', course_key)
-        elif isinstance(artifact.file.storage, S3BotoStorage):
-            filename = os.path.basename(artifact.file.name)
-            disposition = f'attachment; filename="{filename}"'
-            output_url = artifact.file.storage.url(artifact.file.name, response_headers={
-                'response-content-disposition': disposition,
-                'response-content-encoding': 'application/octet-stream',
-                'response-content-type': 'application/x-tgz'
-            })
         elif isinstance(artifact.file.storage, S3Boto3Storage):
             filename = os.path.basename(artifact.file.name)
             disposition = f'attachment; filename="{filename}"'

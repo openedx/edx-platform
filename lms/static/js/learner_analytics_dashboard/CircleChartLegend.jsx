@@ -3,52 +3,53 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 class CircleChartLegend extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-  
-  getList() {
-    const {data} = this.props;
+    constructor(props) {
+        super(props);
+    }
 
-    return data.map(({ value, label, sliceIndex }, index) => {
-      const swatchClass = `swatch-${sliceIndex}`;
-      return (
-        <li className="legend-item" key={index}>
-          <div className={classNames('color-swatch', swatchClass)}
-               aria-hidden="true"></div>
-          <span className="label">{label}</span>
-          <span className="percentage">{this.getPercentage(value)}</span>
-        </li>
-      );
-    });
-  }
+    getList() {
+        const {data} = this.props;
 
-  getPercentage(value) {
-    const num = value * 100;
+        return data.map(({value, label, sliceIndex}, index) => {
+            const swatchClass = `swatch-${sliceIndex}`;
+            return (
+                <li className="legend-item" key={index}>
+                    <div
+                        className={classNames('color-swatch', swatchClass)}
+                        aria-hidden="true"
+                    />
+                    <span className="label">{label}</span>
+                    <span className="percentage">{this.getPercentage(value)}</span>
+                </li>
+            );
+        });
+    }
 
-    return `${num}%`;
-  }
+    getPercentage(value) {
+        const num = value * 100;
 
-  renderList() {
-    return (
-      <ul className="legend-list">
-        {this.getList()}
-      </ul>
-    );
-  }
+        return `${num}%`;
+    }
 
-  render() {
-    return (
-      <div className="legend">
-        {this.renderList()}
-      </div>
-    );
-  }
+    renderList() {
+        return (
+            <ul className="legend-list">
+                {this.getList()}
+            </ul>
+        );
+    }
+
+    render() {
+        return (
+            <div className="legend">
+                {this.renderList()}
+            </div>
+        );
+    }
 }
-
 
 CircleChartLegend.propTypes = {
-  data: PropTypes.array.isRequired
-}
+    data: PropTypes.array.isRequired
+};
 
 export default CircleChartLegend;

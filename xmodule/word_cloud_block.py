@@ -10,14 +10,14 @@ If student have answered - words he entered and cloud.
 import json
 import logging
 
-from pkg_resources import resource_string
+from pkg_resources import resource_filename
 
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Integer, List, Scope, String
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import EmptyDataRawMixin
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
     HTMLSnippet,
@@ -114,24 +114,16 @@ class WordCloudBlock(  # pylint: disable=abstract-method
 
     preview_view_js = {
         'js': [
-            resource_string(__name__, 'assets/word_cloud/src/js/word_cloud.js'),
+            resource_filename(__name__, 'assets/word_cloud/src/js/word_cloud.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    preview_view_css = {
-        'scss': [
-            resource_string(__name__, 'css/word_cloud/display.scss'),
-        ],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
 
     studio_view_js = {
         'js': [
-            resource_string(__name__, 'js/src/raw/edit/metadata-only.js'),
+            resource_filename(__name__, 'js/src/raw/edit/metadata-only.js'),
         ],
-        'xmodule_js': resource_string(__name__, 'js/src/xmodule.js'),
-    }
-    studio_view_css = {
-        'scss': [],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
     }
     studio_js_module_name = "MetadataOnlyEditingDescriptor"
     mako_template = "widgets/metadata-only-edit.html"
@@ -287,7 +279,8 @@ class WordCloudBlock(  # pylint: disable=abstract-method
             'num_inputs': self.num_inputs,
             'submitted': self.submitted,
         }))
-        add_webpack_to_fragment(fragment, 'WordCloudBlockPreview')
+        add_sass_to_fragment(fragment, 'WordCloudBlockDisplay.scss')
+        add_webpack_js_to_fragment(fragment, 'WordCloudBlockDisplay')
         shim_xmodule_js(fragment, 'WordCloud')
 
         return fragment
@@ -305,7 +298,7 @@ class WordCloudBlock(  # pylint: disable=abstract-method
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'WordCloudBlockStudio')
+        add_webpack_js_to_fragment(fragment, 'WordCloudBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 

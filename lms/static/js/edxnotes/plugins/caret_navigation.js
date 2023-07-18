@@ -1,11 +1,12 @@
 (function(define, undefined) {
     'use strict';
+
     define(['jquery', 'underscore', 'annotator_1.2.9'], function($, _, Annotator) {
     /**
      * The CaretNavigation Plugin which allows notes creation when users use
      * caret navigation to select the text.
      * Use `Ctrl + SPACE` or `Ctrl + ENTER` to open the editor.
-     **/
+     * */
         Annotator.Plugin.CaretNavigation = function() {
         // Call the Annotator.Plugin constructor this sets up the element and
         // options properties.
@@ -50,13 +51,13 @@
                     self = this,
                     isAnnotator, annotation, highlights, position, save, cancel, cleanup;
 
-            // Do nothing if not a shortcut.
+                // Do nothing if not a shortcut.
                 if (!this.isShortcut(event)) {
                     return true;
                 }
-            // Get the currently selected ranges.
+                // Get the currently selected ranges.
                 annotator.selectedRanges = annotator.getSelectedRanges();
-            // Do nothing if there is no selection
+                // Do nothing if there is no selection
                 if (!this.hasSelection(annotator.selectedRanges)) {
                     return true;
                 }
@@ -65,12 +66,12 @@
                     return annotator.isAnnotator(range.commonAncestor);
                 });
 
-            // Do nothing if we are in Annotator.
+                // Do nothing if we are in Annotator.
                 if (isAnnotator) {
                     return true;
                 }
-            // Show a temporary highlight so the user can see what they selected
-            // Also extract the quotation and serialize the ranges
+                // Show a temporary highlight so the user can see what they selected
+                // Also extract the quotation and serialize the ranges
                 annotation = annotator.setupAnnotation(annotator.createAnnotation());
                 highlights = $(annotation.highlights).addClass('annotator-hl-temporary');
 
@@ -81,23 +82,23 @@
                     position = highlights.last().position();
                 }
 
-            // Subscribe to the editor events
-            // Make the highlights permanent if the annotation is saved
+                // Subscribe to the editor events
+                // Make the highlights permanent if the annotation is saved
                 save = function() {
                     cleanup();
                     highlights.removeClass('annotator-hl-temporary');
-                // Fire annotationCreated events so that plugins can react to them
+                    // Fire annotationCreated events so that plugins can react to them
                     annotator.publish('annotationCreated', [annotation]);
                 };
 
-            // Remove the highlights if the edit is cancelled
+                // Remove the highlights if the edit is cancelled
                 cancel = function() {
                     self.restoreSelection();
                     cleanup();
                     annotator.deleteAnnotation(annotation);
                 };
 
-            // Don't leak handlers at the end
+                // Don't leak handlers at the end
                 cleanup = function() {
                     annotator.unsubscribe('annotationEditorHidden', cancel);
                     annotator.unsubscribe('annotationEditorSubmit', save);
@@ -108,7 +109,7 @@
                 annotator.subscribe('annotationEditorSubmit', save);
 
                 this.saveSelection();
-            // Display the editor.
+                // Display the editor.
                 annotator.showEditor(annotation, position);
                 event.preventDefault();
             }

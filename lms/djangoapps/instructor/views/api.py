@@ -129,6 +129,7 @@ from .tools import (
     find_unit,
     get_student_from_identifier,
     handle_dashboard_error,
+    keep_field_private,
     parse_datetime,
     require_student_from_identifier,
     set_due_date_extension,
@@ -339,7 +340,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
         try:
             upload_file = request.FILES.get('students_list')
             if upload_file.name.endswith('.csv'):
-                students = list(csv.reader(upload_file.read().decode('utf-8').splitlines()))
+                students = list(csv.reader(upload_file.read().decode('utf-8-sig').splitlines()))
                 course = get_course_by_id(course_id)
             else:
                 general_errors.append({
@@ -1430,6 +1431,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
             'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
             'goals', 'enrollment_mode', 'last_login', 'date_joined', 'external_user_key'
         ]
+    keep_field_private(query_features, 'year_of_birth')  # protected information
 
     # Provide human-friendly and translatable names for these features. These names
     # will be displayed in the table generated in data_download.js. It is not (yet)
@@ -1441,7 +1443,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         'email': _('Email'),
         'language': _('Language'),
         'location': _('Location'),
-        'year_of_birth': _('Birth Year'),
+        #  'year_of_birth': _('Birth Year'),  treated as privileged information as of TNL-10683, not to go in reports
         'gender': _('Gender'),
         'level_of_education': _('Level of Education'),
         'mailing_address': _('Mailing Address'),
@@ -1519,7 +1521,7 @@ def _cohorts_csv_validator(file_storage, file_to_validate):
     Verifies that the expected columns are present in the CSV used to add users to cohorts.
     """
     with file_storage.open(file_to_validate) as f:
-        reader = csv.reader(f.read().decode('utf-8').splitlines())
+        reader = csv.reader(f.read().decode('utf-8-sig').splitlines())
 
         try:
             fieldnames = next(reader)
@@ -3332,7 +3334,7 @@ def generate_bulk_certificate_exceptions(request, course_id):
         try:
             upload_file = request.FILES.get('students_list')
             if upload_file.name.endswith('.csv'):
-                students = list(csv.reader(upload_file.read().decode('utf-8').splitlines()))
+                students = list(csv.reader(upload_file.read().decode('utf-8-sig').splitlines()))
             else:
                 general_errors.append(_('Make sure that the file you upload is in CSV format with no '
                                         'extraneous characters or rows.'))

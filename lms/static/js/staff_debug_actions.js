@@ -42,21 +42,21 @@ var StaffDebug = (function() {
             data: pdata,
             success: function(data) {
                 var text = _.template(action.success_msg, {interpolate: /\{(.+?)\}/g})(
-                {user: user}
-            );
+                    {user: user}
+                );
                 var html = _.template('<p id="idash_msg" class="success">{text}</p>', {interpolate: /\{(.+?)\}/g})(
-                {text: text}
-            );
+                    {text: text}
+                );
                 edx.HtmlUtils.setHtml(
-                  $('#result_' + sanitizeString(action.locationName)),
-                  edx.HtmlUtils.HTML(html)
+                    $('#result_' + sanitizeString(action.locationName)),
+                    edx.HtmlUtils.HTML(html)
                 );
             },
             error: function(request, status, error) {
                 var responseJSON;
                 var errorMsg = _.template(action.error_msg, {interpolate: /\{(.+?)\}/g})(
-                {user: user}
-            );
+                    {user: user}
+                );
                 try {
                     responseJSON = $.parseJSON(request.responseText).error;
                 } catch (e) {
@@ -67,13 +67,13 @@ var StaffDebug = (function() {
                         error_msg: errorMsg,
                         error: gettext(responseJSON)
                     }
-            );
+                );
                 var html = _.template('<p id="idash_msg" class="error">{text}</p>', {interpolate: /\{(.+?)\}/g})(
-                {text: text}
-            );
+                    {text: text}
+                );
                 edx.HtmlUtils.setHtml(
-                  $('#result_' + sanitizeString(action.locationName)),
-                  edx.HtmlUtils.HTML(html)
+                    $('#result_' + sanitizeString(action.locationName)),
+                    edx.HtmlUtils.HTML(html)
                 );
             },
             dataType: 'json'
@@ -158,7 +158,6 @@ var StaffDebug = (function() {
 
 // Register click handlers
 $(document).ready(function() {
-
     var $mainContainer = $('#main');
     $mainContainer.on('click', '.staff-debug-reset', function() {
         StaffDebug.reset(

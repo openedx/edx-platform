@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/).
+# edX community translations have been downloaded from Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -13,7 +13,7 @@
 # samdon <chdono@netravisi.com>, 2014
 # cholif yulian <cholifyulian123@gmail.com>, 2015
 # Dean Jay Mathew <djaymathew@gmail.com>, 2015
-# Faizar Septiawan <faizarsangster@gmail.com>, 2022
+# Faizar Septiawan <faizarsangster@gmail.com>, 2022-2023
 # Fazhar Restu <budaknewbie@gmail.com>, 2016
 # fizdoonk, 2013
 # hafizhuddin amin, 2013
@@ -32,7 +32,7 @@
 # stefanny tan <stefannysik@me.com>, 2016
 # Waheed Ahmed <waheed@edx.org>, 2019
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/).
+# edX community translations have been downloaded from Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -41,10 +41,10 @@
 # Firdaus x, 2014
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
 # Ahmad Sofyan <asofyan@niskala.net>, 2013
-# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2021
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2021,2023
 # fizdoonk, 2013
 # #-#-#-#-#  djangojs-account-settings-view.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (https://www.transifex.com/open-edx/teams/6205/id/).
+# edX community translations have been downloaded from Indonesian (https://app.transifex.com/open-edx/teams/6205/id/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -54,7 +54,7 @@
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
 #
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
+# edX community translations have been downloaded from Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -64,12 +64,12 @@
 # cholif yulian <cholifyulian123@gmail.com>, 2015
 # Eka Y Saputra <ekajogja@ymail.com>, 2014
 # erdi tama <erditama@gmail.com>, 2016
-# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2021
+# Faizar Septiawan <faizarsangster@gmail.com>, 2020-2021,2023
 # Lucki Haryadi <suryaharyadi@gmail.com>, 2016
 # Stefania Trabucchi <stefania.trabucchi@abstract-technology.de>, 2019
 # Zainab Amir <zamir@edx.org>, 2019
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)
+# edX community translations have been downloaded from Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -77,16 +77,17 @@
 # Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019
 # cholif yulian <cholifyulian123@gmail.com>, 2015
 # Dean Jay Mathew <djaymathew@gmail.com>, 2015
+# Faizar Septiawan <faizarsangster@gmail.com>, 2023
 # Mardiyanto Saahi, 2016
 # Ni'mah Hanfiah <hanifah.nimah@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-29 20:42+0000\n"
+"POT-Creation-Date: 2023-07-02 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Aprisa Chrysantina <aprisa.chrysantina@gmail.com>, 2019\n"
-"Language-Team: Indonesian (http://www.transifex.com/open-edx/edx-platform/language/id/)\n"
+"Last-Translator: Faizar Septiawan <faizarsangster@gmail.com>, 2023\n"
+"Language-Team: Indonesian (http://app.transifex.com/open-edx/edx-platform/language/id/)\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -199,7 +200,8 @@ msgstr "Pilih Berkas"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
+#: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
 #: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
@@ -1784,25 +1786,27 @@ msgid ""
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
+msgid "Select military status"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
+msgid "Select level of education"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
+msgid "Select guardian education"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
+msgid "Select current industry"
 msgstr ""
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
+msgid "Select prospective industry"
+msgstr ""
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
 msgstr ""
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
@@ -2971,6 +2975,10 @@ msgstr "Telah dimulai {start}"
 msgid "Ends {end}"
 msgstr "Berakhir {end}"
 
+#: lms/static/js/learner_dashboard/models/program_subscription_model.js
+msgid "${price}/month {currency}"
+msgstr ""
+
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
 msgstr "Anda harus memilih sesi untuk mengakses kursus."
@@ -3023,6 +3031,54 @@ msgid ""
 msgstr ""
 "Anda yakin ingin keluar dari {courseName} ({courseNumber})? Jumlah uang yang"
 " telah Anda bayarkan akan dikembalikan."
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "View program"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Enroll in a {programName}'s course"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"You have an active subscription to the {programName} program but are not "
+"enrolled in any courses. Enroll in a remaining course and enjoy verified "
+"access."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"According to our records, you are not enrolled in any courses included in "
+"your {programName} program subscription. Enroll in a course from the "
+"{i_start}Program Details{i_end} page."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Subscription trial expires in less than 24 hours"
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Subscription trial expires in {remainingDays} day"
+msgid_plural "Subscription trial expires in {remainingDays} days"
+msgstr[0] ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and"
+" the card on file will be charged {subscriptionPrice}."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"Your {programName} trial will expire in {remainingDays} day at "
+"{trialEndTime} on {trialEndDate} and the card on file will be charged "
+"{subscriptionPrice}."
+msgid_plural ""
+"Your {programName} trial will expire in {remainingDays} days at "
+"{trialEndTime} on {trialEndDate} and the card on file will be charged "
+"{subscriptionPrice}."
+msgstr[0] ""
 
 #: lms/static/js/learner_dashboard/views/program_details_sidebar_view.js
 msgid "{type} Progress"
@@ -5945,7 +6001,7 @@ msgid "Please enter non-negative integer."
 msgstr "Mohon masukkan angka integer non-negatif."
 
 #: cms/static/js/models/settings/course_grader.js
-msgid "Cannot drop more <%- types %> assignments than are assigned."
+msgid "You must have at least one undroppable <%- types %> assignment."
 msgstr ""
 
 #: cms/static/js/models/settings/course_grading_policy.js
@@ -6497,10 +6553,44 @@ msgstr "Garis Besar Kursus"
 msgid "Date added"
 msgstr ""
 
+#: cms/static/js/views/pages/container.js
+msgid "Pasting"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "Some errors occurred"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "The following required files could not be added to the course:"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "You may need to update a file(s) manually"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid ""
+"The following files already exist in this course but don't match the version"
+" used by the component you pasted:"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "New files were added to this course's Files & Uploads"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "The following required files were imported to this course:"
+msgstr ""
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
 msgid "Editing access for: {title}"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "Copying"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -8286,6 +8376,7 @@ msgstr "Valid"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Certificate Status:"
 msgstr "Status Sertifikat:"
 
@@ -8387,8 +8478,8 @@ msgstr ""
 "Anda."
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New Programs"
-msgstr "Telusuri Program Baru"
+msgid "Explore new programs"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
@@ -8409,6 +8500,11 @@ msgstr "Tersisa"
 msgid "%(programName)s Home Page."
 msgstr "%(programName)s Beranda."
 
+#: lms/templates/learner_dashboard/program_card.underscore
+#: lms/templates/learner_dashboard/program_header_view.underscore
+msgid "Subscribed"
+msgstr ""
+
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Your {program} Certificate"
 msgstr "Sertifikat {program} Anda"
@@ -8417,6 +8513,43 @@ msgstr "Sertifikat {program} Anda"
 #, python-format
 msgid "Open the certificate you earned for the %(title)s program."
 msgstr "Buka sertifikat yang Anda terima untuk program %(title)s."
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Trial subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Active subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid "Inactive subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"View your receipts or modify your subscription on the {a_start}Orders and "
+"subscriptions{a_end} page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Restart your subscription for {subscriptionPrice}. Your payment history is "
+"still available on the {a_start}Orders and subscriptions{a_end} page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"If you had a subscription previously, your payment history is still "
+"available on the {a_start}Orders and subscriptions{a_end} page"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_sidebar.underscore
+msgid ""
+"Need help? Check out the {a_start}Learner Help "
+"Center{span_start}{icon}{span_end}{a_end} to troubleshoot issues or contact "
+"support"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid "Program Record"
@@ -8461,8 +8594,59 @@ msgstr "Selamat!"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"You have successfully completed all the requirements for the %(title)s "
+"%(type)s."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr "Perjalanan Program Anda"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s course(s) in this "
+"program. To complete the program, you must earn a verified certificate for "
+"each course."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Manage my subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Restart my subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Start {trialLength}-day free trial"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Trial ends {trialEndDate} at {trialEndTime}"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "Your next billing date is {currentPeriodEnd}"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "{subscriptionPrice} subscription. Cancel anytime."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
+msgid "{subscriptionPrice} subscription after trial ends. Cancel anytime."
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -8507,17 +8691,75 @@ msgstr ""
 "Selesaikan kursus dalam jadwal Anda untuk memastikan Anda menonjol di bidang"
 " Anda!"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid "Transform your %(org)s %(type)s into a full master’s degree"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Successful completion of %(org)s %(program)s credential can be applied "
+"towards flexible, rigorous, and affordable masters degrees from the world’s "
+"leading universities."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s courses in this program. "
+"To complete the program, you must earn a verified certificate for each "
+"course."
+msgstr ""
+
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
 msgstr "logo {organization}"
 
+#: lms/templates/learner_dashboard/program_list_header_view.underscore
+msgid "My programs"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "New"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "Monthly program subscriptions {emDash} more flexible, more affordable"
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid ""
+"Now available for many popular programs, affordable monthly subscription "
+"pricing can help you manage your budget more effectively. Subscriptions "
+"start at {minSubscriptionPrice}/month USD per program, after a 7-day full "
+"access free trial. Cancel at any time."
+msgstr ""
+
+#: lms/templates/learner_dashboard/subscription_upsell_view.underscore
+msgid "Explore subscription options"
+msgstr ""
+
 #: lms/templates/learner_dashboard/upgrade_message.underscore
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
 msgid "Needs verified certificate "
 msgstr "Memerlukan sertifikat terverifikasi"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade to Verified"
 msgstr "Tingkatkan ke Terverifikasi"
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Upgrade with a subscription"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Pay {subscriptionPrice} for all courses in this program"
+msgstr ""
+
+#: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
+msgid "Pay {subscriptionPrice} after {trialLength}-day free trial"
+msgstr ""
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -9960,6 +10202,14 @@ msgstr "Tekan tutup untuk menyembunyikan pengaturan video kursus"
 msgid "Course Video Settings"
 msgstr "Pengaturan Video Kursus"
 
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Video Sharing"
+msgstr ""
+
+#: cms/templates/js/course-video-sharing-enable.underscore
+msgid "Learn more"
+msgstr ""
+
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
 msgstr "Turnaround Transkrip "
@@ -10062,6 +10312,30 @@ msgstr ""
 "Jumlah tugas jenis ini yang akan dimasukkan. Tugas nilai terendah yang "
 "dimasukkan pertama."
 
+#: cms/templates/js/course_grade_policy.underscore
+msgid "Warning: "
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments defined here does not match the current "
+"number of {type} assignments in the course:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "There are no assignments of this type in the course."
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid "{assignment_count} {type} assignment(s) found:"
+msgstr ""
+
+#: cms/templates/js/course_grade_policy.underscore
+msgid ""
+"The number of {type} assignments in the course matches the number defined "
+"here."
+msgstr ""
+
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
 msgstr "Makalah Kursus"
@@ -10088,6 +10362,14 @@ msgstr "Posting"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Enable discussion"
+msgstr ""
+
+#: cms/templates/js/discussion-editor.underscore
+msgid "Topics for unpublished units would not be created"
+msgstr ""
+
+#: cms/templates/js/discussion-editor.underscore
+msgid "Please enable discussions for graded units from course authoring app"
 msgstr ""
 
 #: cms/templates/js/due-date-editor.underscore
@@ -10522,12 +10804,6 @@ msgstr ""
 msgid ""
 "If a learner starts on {startDate}, this subsection will be due on "
 "{projectedDueIn}."
-msgstr ""
-
-#: cms/templates/js/self-paced-due-date-editor.underscore
-msgid ""
-"The maximum number of weeks this subsection can be due in is 18 weeks from "
-"the learner enrollment date."
 msgstr ""
 
 #: cms/templates/js/self-paced-due-date-editor.underscore

@@ -38,11 +38,11 @@
                     lastFGEl = state.el.find('.focus_grabber.last'),
                     tcWrapperEl = state.el.find('.tc-wrapper');
 
-            // Existence check.
+                // Existence check.
                 expect(firstFGEl.length).toBe(1);
                 expect(lastFGEl.length).toBe(1);
 
-            // Position check.
+                // Position check.
                 expect(firstFGEl.index() + 1).toBe(tcWrapperEl.index());
                 expect(lastFGEl.index() - 1).toBe(tcWrapperEl.index());
             });
@@ -53,8 +53,8 @@
         });
 
         it(
-            'when first focus grabber is focused "mousemove" event is ' +
-            'triggered, grabbers are disabled',
+            'when first focus grabber is focused "mousemove" event is '
+            + 'triggered, grabbers are disabled',
             function() {
                 state.focusGrabber.elFirst.triggerHandler('focus');
 
@@ -63,8 +63,8 @@
             });
 
         it(
-            'when last focus grabber is focused "mousemove" event is ' +
-            'triggered, grabbers are disabled',
+            'when last focus grabber is focused "mousemove" event is '
+            + 'triggered, grabbers are disabled',
             function() {
                 state.focusGrabber.elLast.triggerHandler('focus');
 

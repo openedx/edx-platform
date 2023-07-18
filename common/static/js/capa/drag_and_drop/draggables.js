@@ -17,14 +17,14 @@
         function makeDraggableCopy(callbackFunc) {
             var draggableObj, property;
 
-        // Make a full proper copy of the draggable object, with some modifications.
+            // Make a full proper copy of the draggable object, with some modifications.
             draggableObj = {};
             for (property in this) {
                 if (this.hasOwnProperty(property) === true) {
                     draggableObj[property] = this[property];
                 }
             }
-        // The modifications to the draggable copy.
+            // The modifications to the draggable copy.
             draggableObj.isOriginal = false; // This new draggable is a copy.
             draggableObj.uniqueId = draggableObj.state.getUniqueId(); // Is newly set.
             draggableObj.stateDraggablesIndex = null; // Will be set.
@@ -34,7 +34,7 @@
             draggableObj.labelEl = null; // Will be created.
             draggableObj.targetField = []; // Will be populated.
 
-        // Create DOM elements and attach events.
+            // Create DOM elements and attach events.
             if (draggableObj.originalConfigObj.icon.length > 0) {
                 draggableObj.iconEl = $('<div></div>');
                 draggableObj.iconImgEl = $('<img />');
@@ -63,7 +63,7 @@
                             ),
                             draggableObj.originalConfigObj.label,
                             HtmlUtils.HTML('</div>')
-                    ).toString());
+                        ).toString());
                         draggableObj.labelEl.css({
                             left: 50 - draggableObj.labelWidth * 0.5,
                             top: 5 + draggableObj.iconHeightSmall + 5
@@ -80,15 +80,13 @@
                         callbackFunc(draggableObj);
                     }, 0);
                 });
-
-                return;
             } else {
                 if (draggableObj.originalConfigObj.label.length > 0) {
                     draggableObj.iconEl = $(HtmlUtils.joinHtml(
                         HtmlUtils.HTML('<div style=" position: absolute; color: black; font-size: 0.95em; " >'),
                         draggableObj.originalConfigObj.label,
                         HtmlUtils.HTML('</div>')
-                ).toString());
+                    ).toString());
                     draggableObj.iconEl.css({
                         left: 50 - draggableObj.iconWidthSmall * 0.5,
                         top: 50 - draggableObj.iconHeightSmall * 0.5
@@ -101,8 +99,6 @@
                     setTimeout(function() {
                         callbackFunc(draggableObj);
                     }, 0);
-
-                    return;
                 }
             }
         }
@@ -164,7 +160,7 @@
                 HtmlUtils.HTML('<div style=" width: 100px; height: 100px; display: inline-block; overflow: hidden; '),
                 HtmlUtils.HTML('border-left: 1px solid #CCC; border-right: 1px solid #CCC; text-align: center; '),
                 HtmlUtils.HTML('position: relative; cursor: move; " role="listitem"></div>')
-        ).toString());
+            ).toString());
 
             draggableObj.containerEl.appendTo(state.sliderEl);
 
@@ -196,9 +192,9 @@
                         height: draggableObj.iconHeightSmall,
                         left: 50 - draggableObj.iconWidthSmall * 0.5,
 
-                    // Before:
-                    // 'top': ((obj.label.length > 0) ? (100 - draggableObj.iconHeightSmall - 25) * 0.5 : 50 - draggableObj.iconHeightSmall * 0.5)
-                    // After:
+                        // Before:
+                        // 'top': ((obj.label.length > 0) ? (100 - draggableObj.iconHeightSmall - 25) * 0.5 : 50 - draggableObj.iconHeightSmall * 0.5)
+                        // After:
                         top: ((obj.label.length > 0) ? 37.5 : 50.0) - 0.5 * draggableObj.iconHeightSmall
                     });
                     draggableObj.iconImgEl.css({
@@ -218,16 +214,16 @@
                             ),
                             obj.label,
                             HtmlUtils.HTML('</div>')
-                    ).toString());
+                        ).toString());
 
                         draggableObj.labelEl.appendTo(draggableObj.containerEl);
                         draggableObj.labelWidth = draggableObj.labelEl.width();
                         draggableObj.labelEl.css({
                             left: 50 - draggableObj.labelWidth * 0.5,
 
-                        // Before:
-                        // 'top': (100 - this.iconHeightSmall - 25) * 0.5 + this.iconHeightSmall + 5
-                        // After:
+                            // Before:
+                            // 'top': (100 - this.iconHeightSmall - 25) * 0.5 + this.iconHeightSmall + 5
+                            // After:
                             top: 42.5 + 0.5 * draggableObj.iconHeightSmall
                         });
 
@@ -254,7 +250,7 @@
                         HtmlUtils.HTML('tabindex="0" aria-grabbed="false" role="listitem">'),
                         obj.label,
                         HtmlUtils.HTML('</div>')
-                ).toString());
+                    ).toString());
 
                     draggableObj.iconEl.appendTo(draggableObj.containerEl);
 

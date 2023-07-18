@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define(['jquery', 'common/js/utils/edx.utils.validate'],
         function($, EdxUtilsValidate) {
             describe('EdxUtilsValidate', function() {
@@ -59,10 +60,10 @@
                 it('fails if a field is provided a value below its minimum character limit', function() {
                     createFixture('text', 'username', false, MIN_LENGTH, MAX_LENGTH, SHORT_STRING);
 
-                // Verify optional field behavior
+                    // Verify optional field behavior
                     expectInvalid(MIN_ERROR_FRAGMENT);
 
-                // Verify required field behavior
+                    // Verify required field behavior
                     field.prop('required', true);
                     expectInvalid(MIN_ERROR_FRAGMENT);
                 });
@@ -70,10 +71,10 @@
                 it('succeeds if a field with no minimum character limit is provided a value below its maximum character limit', function() {
                     createFixture('text', 'username', false, null, MAX_LENGTH, SHORT_STRING);
 
-                // Verify optional field behavior
+                    // Verify optional field behavior
                     expectValid();
 
-                // Verify required field behavior
+                    // Verify required field behavior
                     field.prop('required', true);
                     expectValid();
                 });
@@ -86,10 +87,10 @@
                 it('fails if a field is provided a value above its maximum character limit', function() {
                     createFixture('text', 'username', false, MIN_LENGTH, MAX_LENGTH, LONG_STRING);
 
-                // Verify optional field behavior
+                    // Verify optional field behavior
                     expectInvalid(MAX_ERROR_FRAGMENT);
 
-                // Verify required field behavior
+                    // Verify required field behavior
                     field.prop('required', true);
                     expectInvalid(MAX_ERROR_FRAGMENT);
                 });
@@ -97,10 +98,10 @@
                 it('succeeds if a field with no maximum character limit is provided a value above its minimum character limit', function() {
                     createFixture('text', 'username', false, MIN_LENGTH, null, LONG_STRING);
 
-                // Verify optional field behavior
+                    // Verify optional field behavior
                     expectValid();
 
-                // Verify required field behavior
+                    // Verify required field behavior
                     field.prop('required', true);
                     expectValid();
                 });
@@ -108,10 +109,10 @@
                 it('succeeds if a field with no character limits is provided a value', function() {
                     createFixture('text', 'username', false, null, null, VALID_STRING);
 
-                // Verify optional field behavior
+                    // Verify optional field behavior
                     expectValid();
 
-                // Verify required field behavior
+                    // Verify required field behavior
                     field.prop('required', true);
                     expectValid();
                 });
@@ -119,10 +120,10 @@
                 it('fails if an email field is provided an invalid address', function() {
                     createFixture('email', 'email', false, MIN_LENGTH, MAX_LENGTH, 'localpart');
 
-                // Verify optional field behavior
+                    // Verify optional field behavior
                     expectInvalid(EMAIL_ERROR_FRAGMENT);
 
-                // Verify required field behavior
+                    // Verify required field behavior
                     field.prop('required', false);
                     expectInvalid(EMAIL_ERROR_FRAGMENT);
                 });
@@ -130,10 +131,10 @@
                 it('succeeds if an email field is provided a valid address', function() {
                     createFixture('email', 'email', false, MIN_LENGTH, MAX_LENGTH, 'localpart@label.tld');
 
-                // Verify optional field behavior
+                    // Verify optional field behavior
                     expectValid();
 
-                // Verify required field behavior
+                    // Verify required field behavior
                     field.prop('required', true);
                     expectValid();
                 });
@@ -141,18 +142,18 @@
                 it('succeeds if a checkbox is optional, or required and checked, but fails if a required checkbox is unchecked', function() {
                     createFixture('checkbox', 'checkbox', false, null, null, 'value');
 
-                // Optional, unchecked
+                    // Optional, unchecked
                     expectValid();
 
-                // Optional, checked
+                    // Optional, checked
                     field.prop('checked', true);
                     expectValid();
 
-                // Required, checked
+                    // Required, checked
                     field.prop('required', true);
                     expectValid();
 
-                // Required, unchecked
+                    // Required, unchecked
                     field.prop('checked', false);
                     expectInvalid(REQUIRED_ERROR_FRAGMENT);
                 });
@@ -170,14 +171,14 @@
 
                     field = $('#dropdown');
 
-                // Optional
+                    // Optional
                     expectValid();
 
-                // Required, default text selected
+                    // Required, default text selected
                     field.attr('required', true);
                     expectInvalid(REQUIRED_ERROR_FRAGMENT);
 
-                // Required, country selected
+                    // Required, country selected
                     field.val('BE');
                     expectValid();
                 });
@@ -186,7 +187,7 @@
                 // Create a blank required field
                     createFixture('text', 'username', true, MIN_LENGTH, MAX_LENGTH, '');
 
-                // Attach a custom error message to the field
+                    // Attach a custom error message to the field
                     field.data('errormsg-required', CUSTOM_MESSAGE);
 
                     expectInvalid(CUSTOM_MESSAGE);

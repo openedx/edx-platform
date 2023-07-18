@@ -96,16 +96,18 @@ COURSEWARE_OPTIMIZED_RENDER_XBLOCK = CourseWaffleFlag(
 # .. toggle_status: unsupported
 COURSES_INVITE_ONLY = SettingToggle('COURSES_INVITE_ONLY', default=False)
 
-# .. toggle_name: courseware.public_video_share
+# .. toggle_name: courseware.learning_assistant
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
-# .. toggle_description: Enables public viewing / sharing of all course videos.
+# .. toggle_description: This flag enables an the visibility of an LTI-based learning assistant
 # .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2023-02-02
+# .. toggle_creation_date: 2023-07-05
 # .. toggle_target_removal_date: None
-PUBLIC_VIDEO_SHARE = CourseWaffleFlag(
-    f'{WAFFLE_FLAG_NAMESPACE}.public_video_share', __name__
+# .. toggle_tickets: MST-1977
+COURSEWARE_LEARNING_ASSISTANT = CourseWaffleFlag(
+    f'{WAFFLE_FLAG_NAMESPACE}.learning_assistant', __name__
 )
+
 
 ENABLE_OPTIMIZELY_IN_COURSEWARE = WaffleSwitch(  # lint-amnesty, pylint: disable=toggle-missing-annotation
     'RET.enable_optimizely_in_courseware', __name__
@@ -147,3 +149,7 @@ def course_is_invitation_only(courselike) -> bool:
     """Returns whether the course is invitation only or not."""
     # We also mark Old Mongo courses (deprecated keys) as invitation only to cut off enrollment
     return COURSES_INVITE_ONLY.is_enabled() or courselike.invitation_only or courselike.id.deprecated
+
+
+def learning_assistant_is_active(course_key):
+    return COURSEWARE_LEARNING_ASSISTANT.is_enabled(course_key)

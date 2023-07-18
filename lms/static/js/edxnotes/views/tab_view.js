@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'jquery',
         'underscore',
@@ -27,7 +28,7 @@
                 }
             },
 
-        /**
+            /**
          * Creates a tab for the view.
          */
             createTab: function() {
@@ -49,12 +50,12 @@
                 });
             },
 
-        /**
+            /**
          * Renders content for the view.
          */
             render: function() {
                 this.hideErrorMessage().showLoadingIndicator();
-            // If the view is already rendered, destroy it.
+                // If the view is already rendered, destroy it.
                 this.destroySubView();
                 this.renderContent().always(this.hideLoadingIndicator);
                 this.$('.sr-is-focusable.sr-tab-panel').focus();
@@ -75,7 +76,7 @@
                         scrollToTag: this.options.scrollToTag,
                         createHeaderFooter: this.options.createHeaderFooter
                     }
-            );
+                );
             },
 
             destroySubView: function() {
@@ -85,7 +86,7 @@
                 }
             },
 
-        /**
+            /**
          * Returns collection for the view.
          * @return {Backbone.Collection}
          */
@@ -93,19 +94,19 @@
                 return this.collection;
             },
 
-        /**
+            /**
          * Callback that is called on closing the tab.
          */
             onClose: function() { },
 
-        /**
+            /**
          * Returns the page's loading indicator.
          */
             getLoadingIndicator: function() {
                 return this.$('.ui-loading');
             },
 
-        /**
+            /**
          * Shows the page's loading indicator.
          */
             showLoadingIndicator: function() {
@@ -113,7 +114,7 @@
                 return this;
             },
 
-        /**
+            /**
          * Hides the page's loading indicator.
          */
             hideLoadingIndicator: function() {
@@ -121,8 +122,7 @@
                 return this;
             },
 
-
-        /**
+            /**
          * Shows error message.
          */
             showErrorMessageHtml: function(htmlMessage) {
@@ -133,13 +133,13 @@
                 return this;
             },
 
-        /**
+            /**
          * Hides error message.
          */
             hideErrorMessage: function() {
                 this.$('.wrapper-msg')
-                .addClass('is-hidden')
-                .find('.msg-content .copy').html('');
+                    .addClass('is-hidden')
+                    .find('.msg-content .copy').html('');
 
                 return this;
             }

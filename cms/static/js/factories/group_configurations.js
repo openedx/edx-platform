@@ -2,11 +2,12 @@ define([
     'js/collections/group_configuration', 'js/models/group_configuration', 'js/views/pages/group_configurations'
 ], function(GroupConfigurationCollection, GroupConfigurationModel, GroupConfigurationsPage) {
     'use strict';
+
     return function(experimentsEnabled,
-                    experimentGroupConfigurationsJson,
-                    allGroupConfigurationJson,
-                    groupConfigurationUrl,
-                    courseOutlineUrl) {
+        experimentGroupConfigurationsJson,
+        allGroupConfigurationJson,
+        groupConfigurationUrl,
+        courseOutlineUrl) {
         var experimentGroupConfigurations = new GroupConfigurationCollection(
                 experimentGroupConfigurationsJson, {parse: true}
             ),

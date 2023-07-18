@@ -15,7 +15,7 @@
             'discussion/js/views/discussion_board_view'
         ],
         function($, Backbone, Content, Discussion, DiscussionUtil, DiscussionCourseSettings, DiscussionUser,
-                 NewPostView, DiscussionRouter, DiscussionBoardView) {
+            NewPostView, DiscussionRouter, DiscussionBoardView) {
             return function(options) {
                 var userInfo = options.userInfo,
                     sortPreference = options.sortPreference,
@@ -43,8 +43,11 @@
                 Content.loadContentInfos(contentInfo);
 
                 // Create a discussion model
-                discussion = new Discussion(threads, {pages: threadPages, sort: sortPreference,
-                    is_commentable_divided: isCommentableDivided});
+                discussion = new Discussion(threads, {
+                    pages: threadPages,
+                    sort: sortPreference,
+                    is_commentable_divided: isCommentableDivided
+                });
                 courseSettings = new DiscussionCourseSettings(options.courseSettings);
 
                 // Create the discussion board view

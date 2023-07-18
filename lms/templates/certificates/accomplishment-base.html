@@ -19,6 +19,19 @@ course_mode_class = course_mode if course_mode else ''
     <title>${document_title}</title>
 
     <%static:css group='style-certificates'/>
+
+
+    <% ga_4_id = static.get_value("GOOGLE_ANALYTICS_4_ID", settings.GOOGLE_ANALYTICS_4_ID) %>
+    % if ga_4_id:
+        <script async src="https://www.googletagmanager.com/gtag/js?id=${ga_4_id}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '${ga_4_id | n, js_escaped_string}');
+        </script>
+    % endif
 </head>
 
 <body class="layout-accomplishment view-valid-accomplishment ${dir_rtl} certificate certificate-${course_mode_class}" data-view="valid-accomplishment">

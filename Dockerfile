@@ -57,11 +57,14 @@ RUN apt-get update && \
         libpython3.8 \
         libpython3.8-stdlib \
         libmysqlclient21 \
+        pkg-config \
         libssl1.1 \
         libxmlsec1-openssl \
         # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16
         lynx \
         ntp \
+        git \
+        build-essential \
         gettext \
         gfortran \
         graphviz \
@@ -83,10 +86,7 @@ FROM minimal-system as builder-production
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
         curl \
-        git \
-        git-core \
         pkg-config \
-        build-essential \
         libmysqlclient-dev \
         libssl-dev \
         libxml2-dev \
@@ -120,7 +120,7 @@ RUN nodeenv /edx/app/edxapp/nodeenv --node=16.14.0 --prebuilt
 RUN npm install -g npm@8.5.x
 COPY package.json package.json
 COPY package-lock.json package-lock.json
-RUN npm set progress=false && npm install
+RUN npm set progress=false && npm ci
 
 # The builder-development stage is a temporary stage that installs python modules required for development purposes
 # The built artifacts from this stage are then copied to the development stage.
@@ -176,6 +176,5 @@ RUN touch ../edxapp_env
 
 ENV EDX_PLATFORM_SETTINGS='devstack_docker'
 ENV SERVICE_VARIANT "${SERVICE_VARIANT}"
-ENV DJANGO_SETTINGS_MODULE="${SERVICE_VARIANT}.envs.$EDX_PLATFORM_SETTINGS"
 EXPOSE ${SERVICE_PORT}
 CMD ./manage.py ${SERVICE_VARIANT} runserver 0.0.0.0:${SERVICE_PORT}

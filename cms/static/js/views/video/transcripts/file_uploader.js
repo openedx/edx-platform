@@ -4,77 +4,78 @@ define(
         'js/views/video/transcripts/utils',
         'edx-ui-toolkit/js/utils/html-utils'
     ],
-function($, Backbone, _, TranscriptUtils, HtmlUtils) {
-    'use strict';
-    var FileUploader = Backbone.View.extend({
-        invisibleClass: 'is-invisible',
+    function($, Backbone, _, TranscriptUtils, HtmlUtils) {
+        'use strict';
 
-        // Pre-defined list of supported file formats.
-        validFileExtensions: ['srt'],
+        var FileUploader = Backbone.View.extend({
+            invisibleClass: 'is-invisible',
 
-        events: {
-            'change .file-input': 'changeHandler',
-            'click .setting-upload': 'clickHandler'
-        },
+            // Pre-defined list of supported file formats.
+            validFileExtensions: ['srt'],
 
-        uploadTpl: '#file-upload',
+            events: {
+                'change .file-input': 'changeHandler',
+                'click .setting-upload': 'clickHandler'
+            },
 
-        initialize: function(options) {
-            _.bindAll(this,
-                'changeHandler', 'clickHandler', 'xhrResetProgressBar', 'xhrProgressHandler', 'xhrCompleteHandler',
-                'render'
-            );
-            this.options = _.extend({}, options);
-            this.file = false;
-            this.render();
-        },
+            uploadTpl: '#file-upload',
 
-        render: function() {
-            var tpl = $(this.uploadTpl).text(),
-                tplContainer = this.$el.find('.transcripts-file-uploader');
+            initialize: function(options) {
+                _.bindAll(this,
+                    'changeHandler', 'clickHandler', 'xhrResetProgressBar', 'xhrProgressHandler', 'xhrCompleteHandler',
+                    'render'
+                );
+                this.options = _.extend({}, options);
+                this.file = false;
+                this.render();
+            },
 
-            if (tplContainer.length) {
-                if (!tpl) {
-                    console.error('Couldn\'t load Transcripts File Upload template');
+            render: function() {
+                var tpl = $(this.uploadTpl).text(),
+                    tplContainer = this.$el.find('.transcripts-file-uploader');
 
-                    return;
+                if (tplContainer.length) {
+                    if (!tpl) {
+                        console.error('Couldn\'t load Transcripts File Upload template');
+
+                        return;
+                    }
+                    this.template = HtmlUtils.template(tpl);
+                    HtmlUtils.setHtml(tplContainer, this.template({
+                        ext: this.validFileExtensions,
+                        component_locator: this.options.component_locator
+                    }));
+
+                    this.$form = this.$el.find('.file-chooser');
+                    this.$input = this.$form.find('.file-input');
+                    this.$progress = this.$el.find('.progress-fill');
                 }
-                this.template = HtmlUtils.template(tpl);
-                HtmlUtils.setHtml(tplContainer, this.template({
-                    ext: this.validFileExtensions,
-                    component_locator: this.options.component_locator
-                }));
+            },
 
-                this.$form = this.$el.find('.file-chooser');
-                this.$input = this.$form.find('.file-input');
-                this.$progress = this.$el.find('.progress-fill');
-            }
-        },
-
-        /**
+            /**
         * @function
         *
         * Uploads file to the server. Get file from the `file` property.
         *
         */
-        upload: function() {
-            var data = {
-                edx_video_id: TranscriptUtils.Storage.get('edx_video_id') || ''
-            };
+            upload: function() {
+                var data = {
+                    edx_video_id: TranscriptUtils.Storage.get('edx_video_id') || ''
+                };
 
-            if (!this.file) {
-                return;
-            }
+                if (!this.file) {
+                    return;
+                }
 
-            this.$form.ajaxSubmit({
-                beforeSend: this.xhrResetProgressBar,
-                uploadProgress: this.xhrProgressHandler,
-                complete: this.xhrCompleteHandler,
-                data: data
-            });
-        },
+                this.$form.ajaxSubmit({
+                    beforeSend: this.xhrResetProgressBar,
+                    uploadProgress: this.xhrProgressHandler,
+                    complete: this.xhrCompleteHandler,
+                    data: data
+                });
+            },
 
-        /**
+            /**
         * @function
         *
         * Handle click event on `upload` button.
@@ -82,16 +83,16 @@ function($, Backbone, _, TranscriptUtils, HtmlUtils) {
         * @param {object} event Event object.
         *
         */
-        clickHandler: function(event) {
-            event.preventDefault();
+            clickHandler: function(event) {
+                event.preventDefault();
 
-            this.$input
-                .val(null)
+                this.$input
+                    .val(null)
                 // Show system upload window
-                .trigger('click');
-        },
+                    .trigger('click');
+            },
 
-        /**
+            /**
         * @function
         *
         * Handle change event.
@@ -99,23 +100,23 @@ function($, Backbone, _, TranscriptUtils, HtmlUtils) {
         * @param {object} event Event object.
         *
         */
-        changeHandler: function(event) {
-            event.preventDefault();
+            changeHandler: function(event) {
+                event.preventDefault();
 
-            this.options.messenger.hideError();
-            this.file = this.$input.get(0).files[0];
+                this.options.messenger.hideError();
+                this.file = this.$input.get(0).files[0];
 
-            // if file has valid file extension, than upload file.
-            // Otherwise, show error message.
-            if (this.checkExtValidity(this.file)) {
-                this.upload();
-            } else {
-                this.options.messenger
-                    .showError(gettext('Please select a file in .srt format.'));
-            }
-        },
+                // if file has valid file extension, than upload file.
+                // Otherwise, show error message.
+                if (this.checkExtValidity(this.file)) {
+                    this.upload();
+                } else {
+                    this.options.messenger
+                        .showError(gettext('Please select a file in .srt format.'));
+                }
+            },
 
-        /**
+            /**
         * @function
         *
         * Checks that file has supported extension.
@@ -126,40 +127,40 @@ function($, Backbone, _, TranscriptUtils, HtmlUtils) {
         *                    extension.
         *
         */
-        checkExtValidity: function(file) {
-            var fileExtension;
-            if (!file.name) {
-                return void(0);
-            }
+            checkExtValidity: function(file) {
+                var fileExtension;
+                if (!file.name) {
+                    return void 0;
+                }
 
-            fileExtension = file.name
-                                    .split('.')
-                                    .pop()
-                                    .toLowerCase();
+                fileExtension = file.name
+                    .split('.')
+                    .pop()
+                    .toLowerCase();
 
-            if ($.inArray(fileExtension, this.validFileExtensions) !== -1) {
-                return true;
-            }
+                if ($.inArray(fileExtension, this.validFileExtensions) !== -1) {
+                    return true;
+                }
 
-            return false;
-        },
+                return false;
+            },
 
-        /**
+            /**
         * @function
         *
         * Resets progress bar.
         *
         */
-        xhrResetProgressBar: function() {
-            var percentVal = '0%';
+            xhrResetProgressBar: function() {
+                var percentVal = '0%';
 
-            this.$progress
-                .width(percentVal)
-                .text(percentVal)
-                .removeClass(this.invisibleClass);
-        },
+                this.$progress
+                    .width(percentVal)
+                    .text(percentVal)
+                    .removeClass(this.invisibleClass);
+            },
 
-        /**
+            /**
         * @function
         *
         * Callback function to be invoked with upload progress information
@@ -174,36 +175,36 @@ function($, Backbone, _, TranscriptUtils, HtmlUtils) {
         * @param {integer} percentComplete Object with information about file.
         *
         */
-        xhrProgressHandler: function(event, position, total, percentComplete) {
-            var percentVal = percentComplete + '%';
+            xhrProgressHandler: function(event, position, total, percentComplete) {
+                var percentVal = percentComplete + '%';
 
-            this.$progress
-                .width(percentVal)
-                .text(percentVal);
-        },
+                this.$progress
+                    .width(percentVal)
+                    .text(percentVal);
+            },
 
-        /**
+            /**
         * @function
         *
         * Handle complete uploading.
         *
         */
-        xhrCompleteHandler: function(xhr) {
-            var resp = JSON.parse(xhr.responseText),
-                err = resp.status || gettext('Error: Uploading failed.'),
-                edxVideoId = resp.edx_video_id;
+            xhrCompleteHandler: function(xhr) {
+                var resp = JSON.parse(xhr.responseText),
+                    err = resp.status || gettext('Error: Uploading failed.'),
+                    edxVideoId = resp.edx_video_id;
 
-            this.$progress
-                .addClass(this.invisibleClass);
+                this.$progress
+                    .addClass(this.invisibleClass);
 
-            if (xhr.status === 200) {
-                this.options.messenger.render('uploaded', resp);
-                Backbone.trigger('transcripts:basicTabUpdateEdxVideoId', edxVideoId);
-            } else {
-                this.options.messenger.showError(err);
+                if (xhr.status === 200) {
+                    this.options.messenger.render('uploaded', resp);
+                    Backbone.trigger('transcripts:basicTabUpdateEdxVideoId', edxVideoId);
+                } else {
+                    this.options.messenger.showError(err);
+                }
             }
-        }
-    });
+        });
 
-    return FileUploader;
-});
+        return FileUploader;
+    });

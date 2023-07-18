@@ -1,10 +1,11 @@
 (function(define, undefined) {
     'use strict';
+
     define(['jquery', 'underscore', 'annotator_1.2.9'], function($, _, Annotator) {
     /**
      * Adds the Scroller Plugin which scrolls to a note with a certain id and
      * opens it.
-     **/
+     * */
         Annotator.Plugin.Scroller = function() {
         // Call the Annotator.Plugin constructor this sets up the element and
         // options properties.
@@ -18,9 +19,9 @@
 
             pluginInit: function() {
                 _.bindAll(this, 'onNotesLoaded');
-            // If the page URL contains a hash, we could be coming from a click
-            // on an anchor in the notes page. In that case, the hash is the id
-            // of the note that has to be scrolled to and opened.
+                // If the page URL contains a hash, we could be coming from a click
+                // on an anchor in the notes page. In that case, the hash is the id
+                // of the note that has to be scrolled to and opened.
                 if (this.getIdFromLocationHash()) {
                     this.annotator.subscribe('annotationsLoaded', this.onNotesLoaded);
                 }
@@ -46,14 +47,14 @@
                         window.location.hash = '';
                         $highlight = $(note.highlights[0]);
                         offset = $highlight.position();
-                    // Open the note
+                        // Open the note
                         this.annotator.showFrozenViewer([note], {
                             top: offset.top + 0.5 * $highlight.height(),
                             left: offset.left + 0.5 * $highlight.width()
                         });
-                    // Freeze the viewer
+                        // Freeze the viewer
                         this.annotator.freezeAll();
-                    // Scroll to highlight
+                        // Scroll to highlight
                         this.scrollIntoView($highlight);
                     }
                 }, this);

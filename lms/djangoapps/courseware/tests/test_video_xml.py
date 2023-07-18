@@ -32,6 +32,21 @@ SOURCE_XML = """
     </video>
 """
 
+PUBLIC_SOURCE_XML = """
+    <video show_captions="true"
+    display_name="A Name"
+    youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
+    sub="a_sub_file.srt.sjson"
+    download_video="true"
+    public_access="true"
+    start_time="3603.0" end_time="3610.0"
+    >
+        <source src="example.mp4"/>
+        <source src="example.webm"/>
+        <transcript language="uk" src="ukrainian_translation.srt" />
+    </video>
+"""
+
 
 class VideoBlockLogicTest(TestCase):
     """Tests for logic of VideoBlock."""

@@ -349,8 +349,8 @@ def _get_user_certificate(request, user, course_key, course_overview, preview_mo
     Returns None if there is no certificate generated for given user
     otherwise returns `GeneratedCertificate` instance.
 
-    We use the course_overview instead of the course descriptor here, so we get the certificate_available_date and
-    certificates_display_behavior validation logic, rather than the raw data from the course descriptor.
+    We use the course_overview instead of the course block here, so we get the certificate_available_date and
+    certificates_display_behavior validation logic, rather than the raw data from the course block.
     """
     user_certificate = None
     if preview_mode:

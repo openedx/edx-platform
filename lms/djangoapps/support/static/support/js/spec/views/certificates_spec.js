@@ -71,7 +71,7 @@ define([
                 }
                 view.triggerSearch();
 
-            // Simulate a response from the server
+                // Simulate a response from the server
                 AjaxHelpers.expectJsonRequest(requests, 'GET', url);
                 AjaxHelpers.respondWithJson(requests, response);
             },
@@ -123,7 +123,6 @@ define([
             expect(results[1][2]).toEqual(REGENERATE_SEARCH_RESULTS[1].status);
             expect(results[1][3]).toEqual(REGENERATE_SEARCH_RESULTS[1].grade);
             expect(results[1][4]).toEqual(REGENERATE_SEARCH_RESULTS[1].modified);
-
 
             searchFor('student@example.com', 'edx/test1/2016', requests, GENERATE_SEARCH_RESULTS);
             results = getSearchResults();

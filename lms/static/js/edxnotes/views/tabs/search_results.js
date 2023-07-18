@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'jquery', 'underscore', 'gettext', 'js/edxnotes/views/tab_panel', 'js/edxnotes/views/tab_view',
         'js/edxnotes/views/search_box', 'edx-ui-toolkit/js/utils/html-utils', 'edx-ui-toolkit/js/utils/string-utils'
@@ -114,11 +115,11 @@
                 this.searchPromise = this.searchDeferred.promise();
                 this.hideErrorMessage();
                 this.searchResults = null;
-            // If tab doesn't exist, creates it.
+                // If tab doesn't exist, creates it.
                 if (!this.tabModel) {
                     this.createTab();
                 }
-            // If tab is not already active, makes it active
+                // If tab is not already active, makes it active
                 if (!this.tabModel.isActive()) {
                     this.tabModel.activate();
                 } else {

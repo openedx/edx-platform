@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/).
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -11,7 +11,7 @@
 # Salome Gegeshidze <geges0@bp.com>, 2016
 # Simon Janashia <sjanashia@aat.ge>, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/).
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/).
 # Copyright (C) 2023 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -20,7 +20,7 @@
 # Giorgi Goderdzishvili <biggeorgian@gmail.com>, 2016
 # Lasha Kokilashvili, 2018
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -30,7 +30,7 @@
 # Lasha Kokilashvili, 2016-2018
 # Nino Asatiani <niasatiani110@gmail.com>, 2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -40,7 +40,7 @@
 # Lasha Kokilashvili, 2018
 # Salome Gegeshidze <geges0@bp.com>, 2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (http://www.transifex.com/open-edx/edx-platform/language/ka/)
+# edX community translations have been downloaded from Georgian (http://app.transifex.com/open-edx/edx-platform/language/ka/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
@@ -48,7 +48,7 @@
 # Giorgi Goderdzishvili <biggeorgian@gmail.com>, 2016
 # Salome Gegeshidze <geges0@bp.com>, 2016
 # #-#-#-#-#  edx_proctoring_proctortrack.po (0.1a)  #-#-#-#-#
-# edX community translations have been downloaded from Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)
+# edX community translations have been downloaded from Georgian (https://app.transifex.com/open-edx/teams/6205/ka/)
 # Copyright (C) 2023 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2023.
@@ -60,16 +60,28 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-01-29 20:42+0000\n"
+"POT-Creation-Date: 2023-06-25 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
-"Language-Team: Georgian (https://www.transifex.com/open-edx/teams/6205/ka/)\n"
+"Language-Team: Georgian (https://app.transifex.com/open-edx/teams/6205/ka/)\n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
 "Generated-By: Babel 2.8.0\n"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
+#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
+msgid "Unit"
+msgstr "ერთეული"
+
+#: cms/djangoapps/contentstore/helpers.py
+#: cms/djangoapps/contentstore/views/component.py
+#: openedx/core/djangoapps/content_libraries/constants.py
+msgid "Problem"
+msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
@@ -89,14 +101,13 @@ msgstr "ტექსტი"
 msgid "Discussion"
 msgstr "დისკუსია"
 
-#: cms/djangoapps/contentstore/views/component.py
-#: openedx/core/djangoapps/content_libraries/constants.py
-msgid "Problem"
-msgstr ""
-
 #: lms/templates/video.html
 msgid "Video"
 msgstr "ვიდეო"
+
+#: cms/djangoapps/contentstore/views/component.py xmodule/capa_block.py
+msgid "Blank Advanced Problem"
+msgstr "ცარიელი დამატებითი პამოცანა"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: xmodule/video_block/video_block.py
@@ -107,17 +118,6 @@ msgstr "განვითარებული დონე"
 #: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "მისაღები გამოცდა"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py xmodule/unit_block.py
-#: lms/templates/ccx/schedule.html lms/templates/seq_block.html
-msgid "Unit"
-msgstr "ერთეული"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-#: xmodule/library_content_block.py
-msgid "Empty"
-msgstr "ცარიელი"
 
 #: cms/djangoapps/contentstore/views/transcript_settings.py
 #: xmodule/video_block/video_handlers.py
@@ -145,6 +145,13 @@ msgstr ""
 msgid "A transcript file is required."
 msgstr ""
 
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -164,6 +171,11 @@ msgstr "ვიდეოს ID"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "მომლოდინე"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/create_xblock.py
+#: xmodule/library_content_block.py
+msgid "Empty"
+msgstr "ცარიელი"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -267,6 +279,17 @@ msgstr ""
 "ნებაყოფლობითია: მოცემული თარიღის/დროის შემდეგ, მომხმარებელი ვერ შეძლებს "
 "დარეგისტრირდებას. დატოვეთ ველი ცარიელი რათა მომხმარებელმა კურსზე "
 "რეგისტრაციის დასრულებამდე შეძლოს დარეგისტრირება."
+
+#: common/djangoapps/course_modes/models.py
+msgid "Lock upgrade deadline date"
+msgstr ""
+
+#: common/djangoapps/course_modes/models.py
+msgid ""
+"OPTIONAL: Set to True to lock in the explicitly defined upgrade deadline "
+"date. Set to False if there is no upgrade deadline or to use the default "
+"upgrade deadline."
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -2057,7 +2080,7 @@ msgid "Cookie Policy"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-msgid "Do Not Sell My Personal Information"
+msgid "Your Privacy Choices"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -3633,10 +3656,6 @@ msgstr "ენა"
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
 msgstr "მდებარეობა"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Birth Year"
-msgstr "დაბადების წელი"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu used to select
@@ -5429,6 +5448,7 @@ msgid "Allow"
 msgstr "დაშვება"
 
 #: lms/templates/oauth2_provider/authorize.html
+#: openedx/core/djangoapps/content_staging/data.py
 #: lms/templates/ccx/schedule.html
 msgid "Error"
 msgstr "შეცდომა"
@@ -6532,6 +6552,37 @@ msgstr ""
 msgid "This user already has access to this library."
 msgstr ""
 
+#: cms/templates/certificates.html cms/templates/container.html
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/library.html cms/templates/manage_users.html
+#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
+#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
+msgid "Loading"
+msgstr "მიმდინარეობს ჩატვირთვა"
+
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Expired"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Staged Content"
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid ""
+"\n"
+"            What type of content is staged. Only OLX content is supported, and\n"
+"            this field must be the same as the root tag of the OLX.\n"
+"            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
+"        "
+msgstr ""
+
+#: openedx/core/djangoapps/content_staging/models.py
+msgid "Original usage key/ID of the thing that is in the clipboard."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -6825,6 +6876,12 @@ msgid ""
 msgstr ""
 
 #: openedx/core/djangoapps/discussions/models.py
+msgid ""
+"The Posting availabilty in discussions whether it will be enabled, scheduled"
+" or indefinitely disabled."
+msgstr ""
+
+#: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
 msgstr ""
 
@@ -6984,6 +7041,52 @@ msgstr "დაემატოს \"{country}\" {course} კურსის შ�
 
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on "
+"<{strong}>{author_name}</{strong}> response to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "The notification preference config version is not up to date."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app name."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked as seen."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notification marked read."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Notifications marked read."
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/views.py
+msgid "Invalid app_name or notification_id."
 msgstr ""
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
@@ -7693,9 +7796,16 @@ msgstr ""
 msgid "Success"
 msgstr "წარმატება"
 
+#: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/staff_problem_info.html
 msgid "Actions"
 msgstr "მოქმედებები"
+
+#: openedx/core/djangoapps/user_api/models.py
+msgid ""
+"Comma separated file that have username and user_email of the users that "
+"needs to be retired"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -9028,10 +9138,6 @@ msgstr ""
 #: xmodule/capa/safe_exec/remote_exec.py
 msgid "Invalid JSON response received from codejail api service."
 msgstr ""
-
-#: xmodule/capa_block.py
-msgid "Blank Advanced Problem"
-msgstr "ცარიელი დამატებითი პამოცანა"
 
 #: xmodule/capa_block.py
 msgid "Number of attempts taken by the student on this problem"
@@ -10398,6 +10504,27 @@ msgid ""
 msgstr ""
 
 #: xmodule/course_block.py
+msgid "Video Sharing Options"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Specify the video sharing options for the course. This can be set to one of "
+"three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
+"default."
+msgstr ""
+
+#: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "კურსის ინსტრუქტორი"
 
@@ -10627,8 +10754,10 @@ msgid "Count"
 msgstr "დათვლა"
 
 #: xmodule/library_content_block.py
-msgid "Enter the number of components to display to each student."
-msgstr "შეიყვანეთ კომპონენტების რაოდენობა, რომ ყოველმა სტუდენტმა ნახოს."
+msgid ""
+"Enter the number of components to display to each student. Set it to -1 to "
+"display all components."
+msgstr ""
 
 #: xmodule/library_content_block.py
 msgid "Problem Type"
@@ -11454,6 +11583,34 @@ msgstr ""
 msgid "Add discussion for the Unit."
 msgstr ""
 
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking from {organization_name}.\n"
+"\n"
+msgstr ""
+
+#: xmodule/video_block/sharing_sites.py
+#, python-brace-format
+msgid ""
+"Here's a fun clip from a class I'm taking on {platform_name}.\n"
+"\n"
+msgstr ""
+
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
 msgid "Can't get transcript link from Youtube for {youtube_id}."
@@ -12063,6 +12220,19 @@ msgstr "მითითებულია კურსის არასწო�
 msgid "Missing branch on fresh clone"
 msgstr "ახალ კლონში განშტოება არ არის"
 
+#: cms/djangoapps/contentstore/helpers.py
+msgid "Vertical"
+msgstr "ვერტიკალური"
+
+#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
+#: lms/templates/seq_block.html
+msgid "Section"
+msgstr "განყოფილება"
+
+#: lms/templates/ccx/schedule.html
+msgid "Subsection"
+msgstr "ქვეგანყოფილება"
+
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -12147,6 +12317,22 @@ msgstr ""
 msgid "{previous_groups}, {current_group}"
 msgstr ""
 
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Duplicate of {0}"
+msgstr "{0}-ის ასლი"
+
+#: cms/djangoapps/contentstore/utils.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Duplicate of '{0}'"
+msgstr "'{0}'-ის ასლი"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Invalid prerequisite course key"
+msgstr "სავალდებულო კურსის არასწორი გასაღები"
+
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
 msgstr ""
@@ -12204,89 +12390,6 @@ msgid ""
 "File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Libraries cannot have more than {limit} components"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Invalid data"
-msgstr "არასწორი მონაცემები"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "არასწორი მონაცემები ({details})"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You can not move {source_type} into {target_parent_type}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "Item is already present in target location."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into itself."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item into it's child."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-msgid "You can not move an item directly into content experiment."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{source_usage_key} not found in {parent_usage_key}."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"You can not move {source_usage_key} at an invalid index ({target_index})."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "You must provide target_index ({target_index}) as an integer."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of {0}"
-msgstr "{0}-ის ასლი"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "Duplicate of '{0}'"
-msgstr "'{0}'-ის ასლი"
-
-#. Translators: The {pct_sign} here represents the percent sign, i.e., '%'
-#. in many languages. This is used to avoid Transifex's misinterpreting of
-#. '% o'. The percent sign is also translatable as a standalone string.
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid ""
-"Students must score {score}{pct_sign} or higher to access course materials."
-msgstr ""
-"კურსის მასალასთან წვდომის მისაღებად, სტუდენტმა უნდა მოიპოვოს "
-"{score}{pct_sign} და მეტი ქულა."
-
-#. Translators: This is the percent sign. It will be used to represent
-#. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/views/block.py
-msgid "%"
-msgstr "%"
-
-#: cms/djangoapps/contentstore/views/block.py
-#, python-brace-format
-msgid "{section_or_subsection} \"{display_name}\""
-msgstr "{section_or_subsection} \"{display_name}\""
-
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
 msgstr "აუცილებელის სერტიფიკატის სახელის მითითება"
@@ -12312,6 +12415,10 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Library Content"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
+msgid "Drag and Drop"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
@@ -12381,10 +12488,6 @@ msgstr ""
 "დაგჭირდებათ."
 
 #: cms/djangoapps/contentstore/views/course.py
-msgid "Invalid prerequisite course key"
-msgstr "სავალდებულო კურსის არასწორი გასაღები"
-
-#: cms/djangoapps/contentstore/views/course.py
 msgid "An error occurred while trying to save your tabs"
 msgstr "თქვენი ჩანართების შენახვის მცდელობისას წარმოიშვა შეცდომა"
 
@@ -12412,19 +12515,6 @@ msgstr "დასრულებული მისაღები გამო�
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "კურსი წარმატებით დაექსპორტდა git რეპოზიტორიუმში"
-
-#: cms/djangoapps/contentstore/views/helpers.py
-msgid "Vertical"
-msgstr "ვერტიკალური"
-
-#: cms/templates/course_outline.html lms/templates/ccx/schedule.html
-#: lms/templates/seq_block.html
-msgid "Section"
-msgstr "განყოფილება"
-
-#: lms/templates/ccx/schedule.html
-msgid "Subsection"
-msgstr "ქვეგანყოფილება"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Some chunks missed during file upload. Please try again"
@@ -12571,12 +12661,6 @@ msgstr "ატვირთვა"
 msgid "In Progress"
 msgstr "მიმდინარეობს"
 
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Ready"
-msgstr "მზადაა"
-
 #. Translators: This is the status for a video that is uploaded completely
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Uploaded"
@@ -12680,6 +12764,84 @@ msgstr "{course}_video_urls"
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "A non zero positive integer is expected"
 msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Libraries cannot have more than {limit} components"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "Invalid data"
+msgstr "არასწორი მონაცემები"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "არასწორი მონაცემები ({details})"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "There was a problem pasting your component."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "Your clipboard is empty or invalid."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "You can not move {source_type} into {target_parent_type}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "Item is already present in target location."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item into itself."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item into it's child."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "You can not move an item directly into content experiment."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "{source_usage_key} not found in {parent_usage_key}."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid ""
+"You can not move {source_usage_key} at an invalid index ({target_index})."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "You must provide target_index ({target_index}) as an integer."
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid ""
+"Students must score {score}{pct_sign} or higher to access course materials."
+msgstr ""
+"კურსის მასალასთან წვდომის მისაღებად, სტუდენტმა უნდა მოიპოვოს "
+"{score}{pct_sign} და მეტი ქულა."
+
+#. Translators: This is the percent sign. It will be used to represent
+#. a percent value out of 100, e.g. "58%" means "58/100".
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+msgid "%"
+msgstr "%"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#, python-brace-format
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
@@ -12834,16 +12996,6 @@ msgstr "შინაარსი"
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Settings"
 msgstr "პარამეტრები"
-
-#: cms/templates/certificates.html cms/templates/container.html
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/library.html cms/templates/manage_users.html
-#: cms/templates/manage_users_lib.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
-#: lms/templates/instructor/instructor_dashboard_2/certificates.html
-#: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
-msgid "Loading"
-msgstr "მიმდინარეობს ჩატვირთვა"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: lms/templates/support/feature_based_enrollments.html
@@ -13606,6 +13758,18 @@ msgstr "ელფოსტა"
 msgid "Return To %s"
 msgstr "%s -ზე დაბრუნება"
 
+#: lms/templates/public_video.html
+msgid "Learn more about this course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Go to course"
+msgstr ""
+
+#: lms/templates/public_video.html
+msgid "Enroll in this course"
+msgstr ""
+
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
 #: lms/templates/public_video_share_embed.html
@@ -13858,6 +14022,18 @@ msgstr "წინა გვერდი"
 msgid "Next page"
 msgstr "მომდევნო გვერდი"
 
+#: lms/templates/studio_render_children_view.html
+msgid "Paste Component"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "From:"
+msgstr ""
+
+#: lms/templates/studio_render_children_view.html
+msgid "What's in my clipboard?"
+msgstr ""
+
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
 msgstr "აღრიცხვის ჟურნალი"
@@ -13983,6 +14159,18 @@ msgstr "გადმოწერები და სუბტიტრები"
 #: lms/templates/video.html
 msgid "Download video file"
 msgstr "ვიდეო ფაილის გადმოწერა"
+
+#: lms/templates/video.html
+msgid "Share this video"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Share on {site}"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Copy"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -17132,10 +17320,6 @@ msgid "Register for free"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
-msgid "Resume your last course"
-msgstr ""
-
-#: lms/templates/header/user_dropdown.html
 msgid "Profile"
 msgstr "პროფილი"
 
@@ -19977,7 +20161,7 @@ msgstr "ადგილმდებარეობის ID"
 #: cms/templates/container.html
 msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
-"\"/jump_to_id/<location ID>\" as the URL value."
+"{unit_link} as the URL value."
 msgstr ""
 
 #: cms/templates/course-create-rerun.html
@@ -20167,8 +20351,9 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid ""
-"This course run is using an upgraded version of edx discussion forum. "
-"Discussion xblocks will no longer work."
+"This course run is using an upgraded version of edx discussion forum. In "
+"order to display the discussions sidebar, discussions xBlocks will no longer"
+" be visible to learners."
 msgstr ""
 
 #: cms/templates/course_outline.html
@@ -22813,6 +22998,14 @@ msgid "Set Access"
 msgstr ""
 
 #: cms/templates/studio_xblock_wrapper.html
+msgid "Copy to Clipboard"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
+msgid "Manage Access"
+msgstr ""
+
+#: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
 msgstr "ეს ბლოკი მრავალ კომპონენტს შეიცავს."
 
@@ -23141,6 +23334,10 @@ msgstr "კურსის ნავიგაცია"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "სტრუქტურა"
+
+#: cms/templates/widgets/header.html
+msgid "Files & Media"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

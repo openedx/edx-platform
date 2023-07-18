@@ -22,6 +22,7 @@ from social_django.models import UserSocialAuth
 from testfixtures import LogCapture
 
 from common.djangoapps.third_party_auth import pipeline
+from common.djangoapps.third_party_auth.exceptions import IncorrectConfigurationException
 from common.djangoapps.third_party_auth.saml import SapSuccessFactorsIdentityProvider
 from common.djangoapps.third_party_auth.saml import log as saml_log
 from common.djangoapps.third_party_auth.tasks import fetch_saml_metadata
@@ -139,6 +140,82 @@ class SamlIntegrationTestUtilities:
             content_type='application/x-www-form-urlencoded',
             data=utils.prepare_saml_response_from_xml(saml_response_xml),
         )
+
+
+@ddt.ddt
+@utils.skip_unless_thirdpartyauth()
+class TestIndexExceptionTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
+    """
+    To test SAML error handling when presented with an empty-list attribute value
+    """
+
+    TOKEN_RESPONSE_DATA = {
+        'access_token': 'access_token_value',
+        'expires_in': 'expires_in_value',
+    }
+    USER_RESPONSE_DATA = {
+        'lastName': 'lastName_value',
+        'id': 'id_value',
+        'firstName': 'firstName_value',
+        'idp_name': 'testshib',
+        'attributes': {'urn:oid:0.9.2342.19200300.100.1.1': [], 'name_id': '1'},
+        'session_index': '1',
+    }
+
+    def test_index_error_from_empty_list_saml_attribute(self):
+        """
+        The `urn:oid:0.9.2342.19200300.100.1.1` attribute is an empty list,
+        should throw a specific exception NOT an IndexException
+        """
+        self.provider = self._configure_testshib_provider()
+        request, strategy = self.get_request_and_strategy(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
+        with self.assertRaises(IncorrectConfigurationException):
+            request.backend.auth_complete = MagicMock(return_value=self.fake_auth_complete(strategy))
+
+    def get_response_data(self):
+        """Gets dict (string -> object) of merged data about the user."""
+        response_data = dict(self.TOKEN_RESPONSE_DATA)
+        response_data.update(self.USER_RESPONSE_DATA)
+        return response_data
+
+
+@ddt.ddt
+@utils.skip_unless_thirdpartyauth()
+class TestKeyExceptionTest(SamlIntegrationTestUtilities, IntegrationTestMixin, testutil.SAMLTestCase):
+    """
+    To test SAML error handling when presented with missing attributes
+    """
+
+    TOKEN_RESPONSE_DATA = {
+        'access_token': 'access_token_value',
+        'expires_in': 'expires_in_value',
+    }
+    USER_RESPONSE_DATA = {
+        'lastName': 'lastName_value',
+        'id': 'id_value',
+        'firstName': 'firstName_value',
+        'idp_name': 'testshib',
+        'attributes': {'name_id': '1'},
+        'session_index': '1',
+    }
+
+    def test_key_error_from_missing_saml_attributes(self):
+        """
+        The `urn:oid:0.9.2342.19200300.100.1.1` attribute is missing,
+        should throw a specific exception NOT a Key Error
+        """
+        self.provider = self._configure_testshib_provider()
+        request, strategy = self.get_request_and_strategy(
+            auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
+        with self.assertRaises(IncorrectConfigurationException):
+            request.backend.auth_complete = MagicMock(return_value=self.fake_auth_complete(strategy))
+
+    def get_response_data(self):
+        """Gets dict (string -> object) of merged data about the user."""
+        response_data = dict(self.TOKEN_RESPONSE_DATA)
+        response_data.update(self.USER_RESPONSE_DATA)
+        return response_data
 
 
 @ddt.ddt
@@ -457,7 +534,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
                         'lastName': 'Smith',
                         'defaultFullName': 'John Smith',
                         'email': 'john@smith.com',
-                        'country': 'Australia',
+                        'country': 'United States',
                     }
                 })
             )
@@ -512,7 +589,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         what we're looking for, and when an empty override is provided (expected behavior is that
         existing value maps will be left alone).
         """
-        expected_country = 'AU'
+        expected_country = 'US'
         provider_settings = {
             'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
             'sapsf_private_key': 'fake_private_key_here',
@@ -555,7 +632,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
                         'firstName': 'John',
                         'lastName': 'Smith',
                         'defaultFullName': 'John Smith',
-                        'country': 'Australia'
+                        'country': 'United States'
                     }
                 })
             )
@@ -589,7 +666,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         what we're looking for, and when an empty override is provided (expected behavior is that
         existing value maps will be left alone).
         """
-        value_map = {'country': {'Australia': 'NZ'}}
+        value_map = {'country': {'United States': 'NZ'}}
         expected_country = 'NZ'
         provider_settings = {
             'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
@@ -618,8 +695,8 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         what we're looking for, and when an empty override is provided (expected behavior is that
         existing value maps will be left alone).
         """
-        value_map = {'country': {'United States': 'blahfake'}}
-        expected_country = 'AU'
+        value_map = {'country': {'Australia': 'blahfake'}}
+        expected_country = 'US'
         provider_settings = {
             'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
             'sapsf_private_key': 'fake_private_key_here',
@@ -649,7 +726,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         """
 
         value_map = {'country': {}}
-        expected_country = 'AU'
+        expected_country = 'US'
         provider_settings = {
             'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
             'sapsf_private_key': 'fake_private_key_here',

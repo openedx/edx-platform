@@ -8,3 +8,5 @@ build:
 python:
   install:
   - requirements: "requirements/edx/doc.txt"
+  - method: pip
+    path: .

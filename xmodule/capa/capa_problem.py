@@ -22,7 +22,6 @@ from copy import deepcopy
 from datetime import datetime
 from xml.sax.saxutils import unescape
 
-import six
 from django.conf import settings
 
 from lxml import etree
@@ -36,7 +35,6 @@ from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.safe_exec import safe_exec
 from xmodule.capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_block
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.edx_six import get_gettext
 from xmodule.stringify import stringify_children
 
 # extra things displayed after "show answers" is pressed
@@ -93,7 +91,7 @@ class LoncapaSystem(object):
         i18n: an object implementing the `gettext.Translations` interface so
             that we can use `.ugettext` to localize strings.
 
-    See :class:`ModuleSystem` for documentation of other attributes.
+    See :class:`DescriptorSystem` for documentation of other attributes.
 
     """
     def __init__(
@@ -182,7 +180,7 @@ class LoncapaProblem(object):
         self.problem_text = problem_text
 
         # parse problem XML file into an element tree
-        if isinstance(problem_text, six.text_type):
+        if isinstance(problem_text, str):
             # etree chokes on Unicode XML with an encoding declaration
             problem_text = problem_text.encode('utf-8')
         self.tree = etree.XML(problem_text)
@@ -483,7 +481,7 @@ class LoncapaProblem(object):
             # an earlier submission, so for now skip these entirely.
             # TODO: figure out where to get file submissions when rescoring.
             if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
-                _ = get_gettext(self.capa_system.i18n)
+                _ = self.capa_system.i18n.gettext
                 raise Exception(_("Cannot rescore problems with possible file submissions"))
 
             # use 'student_answers' only if it is provided, and if it might contain a file
@@ -580,7 +578,7 @@ class LoncapaProblem(object):
             question_nr = int(answer_id.split('_')[-2]) - 1
             return _("Question {}").format(question_nr)
 
-        _ = get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         # Some questions define a prompt with this format:   >>This is a prompt<<
         try:
             prompt = self.problem_data[answer_id].get('label')
@@ -659,7 +657,7 @@ class LoncapaProblem(object):
                 self.find_answer_text(answer_id, answer) for answer in current_answer
             )
 
-        elif isinstance(current_answer, six.string_types) and current_answer.startswith('choice_'):
+        elif isinstance(current_answer, str) and current_answer.startswith('choice_'):
             # Many problem (e.g. checkbox) report "choice_0" "choice_1" etc.
             # Here we transform it
             elems = self.tree.xpath('//*[@id="{answer_id}"]//*[@name="{choice_number}"]'.format(
@@ -678,7 +676,7 @@ class LoncapaProblem(object):
                 log.warning("Multiple answers found for answer id: %s and choice number: %s", answer_id, current_answer)
                 answer_text = "Multiple answers found"
 
-        elif isinstance(current_answer, six.string_types):
+        elif isinstance(current_answer, str):
             # Already a string with the answer
             answer_text = current_answer
 
@@ -693,7 +691,7 @@ class LoncapaProblem(object):
         choice-level explanations shown to a student after submission.
         Does nothing if there is no targeted-feedback attribute.
         """
-        _ = get_gettext(self.capa_system.i18n)
+        _ = self.capa_system.i18n.gettext
         # Note that the modifications has been done, avoiding problems if called twice.
         if hasattr(self, 'has_targeted'):
             return
@@ -809,7 +807,7 @@ class LoncapaProblem(object):
         """
         includes = self.tree.findall('.//include')
         for inc in includes:
-            filename = inc.get('file') if six.PY3 else inc.get('file').decode('utf-8')
+            filename = inc.get('file')
             if filename is not None:
                 try:
                     # open using LoncapaSystem OSFS filesystem
@@ -962,7 +960,7 @@ class LoncapaProblem(object):
 
         Used by get_html.
         """
-        if not isinstance(problemtree.tag, six.string_types):
+        if not isinstance(problemtree.tag, str):
             # Comment and ProcessingInstruction nodes are not Elements,
             # and we're ok leaving those behind.
             # BTW: etree gives us no good way to distinguish these things

@@ -40,7 +40,12 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from lms.djangoapps.discussion.views import is_privileged_user
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.models import (
+    DiscussionsConfiguration,
+    DiscussionTopicLink,
+    Provider,
+    PostingRestriction
+)
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
@@ -123,7 +128,7 @@ from .utils import (
     discussion_open_for_user,
     get_usernames_for_course,
     get_usernames_from_search_string,
-    set_attribute
+    set_attribute, send_response_notifications
 )
 
 
@@ -166,7 +171,7 @@ class DiscussionEntity(Enum):
 
 def _get_course(course_key: CourseKey, user: User, check_tab: bool = True) -> CourseBlock:
     """
-    Get the course descriptor, raising CourseNotFoundError if the course is not found or
+    Get the course block, raising CourseNotFoundError if the course is not found or
     the user cannot access forums for the course, and DiscussionDisabledError if the
     discussion tab is disabled for the course.
 
@@ -319,14 +324,38 @@ def get_course(request, course_key):
         """
         return dt.isoformat().replace('+00:00', 'Z')
 
+    def is_posting_allowed(posting_restrictions, blackout_schedules):
+        """
+        Check if posting is allowed based on the given posting restrictions and blackout schedules.
+
+        Args:
+            posting_restrictions (str): Values would be  "disabled", "scheduled" or "enabled".
+            blackout_schedules (List[Dict[str, datetime]]): The list of blackout schedules
+
+        Returns:
+            bool: True if posting is allowed, False otherwise.
+        """
+        now = datetime.now(UTC)
+        if posting_restrictions == PostingRestriction.DISABLED:
+            return True
+        elif posting_restrictions == PostingRestriction.SCHEDULED:
+            return not any(schedule["start"] <= now <= schedule["end"] for schedule in blackout_schedules)
+        else:
+            return False
+
     course = _get_course(course_key, request.user)
     user_roles = get_user_role_names(request.user, course_key)
     course_config = DiscussionsConfiguration.get(course_key)
     EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
     CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
+    is_posting_enabled = is_posting_allowed(
+        course_config.posting_restrictions,
+        course.get_discussion_blackout_datetimes()
+    )
 
     return {
         "id": str(course_key),
+        "is_posting_enabled": is_posting_enabled,
         "blackouts": [
             {
                 "start": _format_datetime(blackout["start"]),
@@ -1191,6 +1220,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
     """
     response_skip = page_size * (page - 1)
     reverse_order = request.GET.get('reverse_order', False)
+    from_mfe_sidebar = request.GET.get("enable_in_context_sidebar", False)
     cc_thread, context = _get_thread_and_context(
         request,
         thread_id,
@@ -1237,7 +1267,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, flagged=Fals
     results = _serialize_discussion_entities(request, context, responses, requested_fields, DiscussionEntity.comment)
 
     paginator = DiscussionAPIPagination(request, page, num_pages, resp_total)
-    track_thread_viewed_event(request, context["course"], cc_thread)
+    track_thread_viewed_event(request, context["course"], cc_thread, from_mfe_sidebar)
     return paginator.get_paginated_response(results)
 
 
@@ -1421,6 +1451,7 @@ def create_thread(request, thread_data):
         detail.
     """
     course_id = thread_data.get("course_id")
+    from_mfe_sidebar = thread_data.pop("enable_in_context_sidebar", False)
     user = request.user
     if not course_id:
         raise ValidationError({"course_id": ["This field is required."]})
@@ -1452,7 +1483,8 @@ def create_thread(request, thread_data):
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, list(thread_data.keys()), actions_form, context, request)
 
-    track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"])
+    track_thread_created_event(request, course, cc_thread, actions_form.cleaned_data["following"],
+                               from_mfe_sidebar)
 
     return api_thread
 
@@ -1474,6 +1506,7 @@ def create_comment(request, comment_data):
         detail.
     """
     thread_id = comment_data.get("thread_id")
+    from_mfe_sidebar = comment_data.pop("enable_in_context_sidebar", False)
     if not thread_id:
         raise ValidationError({"thread_id": ["This field is required."]})
     cc_thread, context = _get_thread_and_context(request, thread_id)
@@ -1497,8 +1530,10 @@ def create_comment(request, comment_data):
     api_comment = serializer.data
     _do_extra_actions(api_comment, cc_comment, list(comment_data.keys()), actions_form, context, request)
 
-    track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False)
-
+    track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
+                                from_mfe_sidebar=from_mfe_sidebar)
+    send_response_notifications(thread=cc_thread, course=course, creator=request.user,
+                                parent_id=comment_data.get("parent_id"))
     return api_comment
 
 
@@ -1641,12 +1676,14 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
     """
     try:
         cc_comment = Comment(id=comment_id).retrieve()
+        reverse_order = request.GET.get('reverse_order', False)
         cc_thread, context = _get_thread_and_context(
             request,
             cc_comment["thread_id"],
             retrieve_kwargs={
                 "with_responses": True,
                 "recursive": True,
+                "reverse_order": reverse_order,
             }
         )
         if cc_thread["thread_type"] == "question":

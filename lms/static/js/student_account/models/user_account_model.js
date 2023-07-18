@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'gettext', 'underscore', 'backbone'
     ], function(gettext, _, Backbone) {
@@ -61,9 +62,9 @@
                     minimumAllowedAge = this.get('parental_consent_age_limit'),
                     enableCoppaCompliance = this.get('enable_coppa_compliance');
 
-                if(enableCoppaCompliance){
+                if (enableCoppaCompliance) {
                     var currentYear = new Date().getFullYear(),
-                    isOlderThanMinimum = (currentYear - yearOfBirth) >= minimumAllowedAge;
+                        isOlderThanMinimum = (currentYear - yearOfBirth) >= minimumAllowedAge;
                     return isBirthDefined && isOlderThanMinimum && !(this.get('requires_parental_consent'));
                 }
                 return isBirthDefined && !(this.get('requires_parental_consent'));

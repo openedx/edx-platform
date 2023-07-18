@@ -81,6 +81,12 @@
   <!-- Configure and load MathJax -->
   <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
+      styles: {
+        '.MathJax_SVG>svg': { 'max-width': '100%' },
+      },
+      CommonHTML: { linebreaks: { automatic: true } },
+      SVG: { linebreaks: { automatic: true } },
+      "HTML-CSS": { linebreaks: { automatic: true } },
       tex2jax: {
         inlineMath: [
           ["\\(","\\)"],
@@ -92,6 +98,31 @@
         ]
       }
     });
+    window.addEventListener('resize', MJrenderer);
+
+    let t = -1;
+    let delay = 1000;
+    let oldWidth = document.documentElement.scrollWidth;
+    function MJrenderer() {
+      // don't rerender if the window is the same size as before
+      if (t >= 0) {
+        window.clearTimeout(t);
+      }
+      if (oldWidth !== document.documentElement.scrollWidth) {
+        t = window.setTimeout(function() {
+          oldWidth = document.documentElement.scrollWidth;
+          MathJax.Hub.Queue(["Rerender", MathJax.Hub]);
+          t = -1;
+        }, delay);
+      }
+
+      // this is added to compensate for custom css that accidentally hide mathjax
+      $('.MathJax_SVG>svg').toArray().forEach(el => {
+        if ($(el).width() === 0) {
+          $(el).css('max-width', 'inherit');
+        }
+      });
+    };
   </script>
   <script type="text/x-mathjax-config">
     MathJax.Hub.signal.Interest(function(message) {

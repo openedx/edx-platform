@@ -19,6 +19,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import SuspiciousOperation
 from django.core.files import File
+from django.db.transaction import atomic
 from django.test import RequestFactory
 from django.utils.text import get_valid_filename
 from edx_django_utils.monitoring import (
@@ -30,9 +31,10 @@ from edx_django_utils.monitoring import (
 from olxcleaner.exceptions import ErrorLevel
 from olxcleaner.reporting import report_error_summary, report_errors
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator, LibraryLocatorV2
 from organizations.api import add_organization_course, ensure_organization
-from organizations.models import OrganizationCourse
+from organizations.exceptions import InvalidOrganizationException
+from organizations.models import Organization, OrganizationCourse
 from path import Path as path
 from pytz import UTC
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
@@ -47,13 +49,17 @@ from cms.djangoapps.contentstore.courseware_index import (
 from cms.djangoapps.contentstore.storage import course_import_export_storage
 from cms.djangoapps.contentstore.utils import initialize_permissions, reverse_usage_url, translation_language
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
+
 from common.djangoapps.course_action_state.models import CourseRerunState
 from common.djangoapps.student.auth import has_course_author_access
+from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from common.djangoapps.util.monitoring import monitor_import_failure
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
+from openedx.core.djangoapps.content_libraries import api as v2contentlib_api
 from openedx.core.djangoapps.course_apps.toggles import exams_ida_enabled
 from openedx.core.djangoapps.discussions.tasks import update_unit_discussion_state_from_discussion_blocks
 from openedx.core.djangoapps.embargo.models import CountryAccessRule, RestrictedCourse
+from openedx.core.lib.blockstore_api import get_collection
 from openedx.core.lib.extract_tar import safetar_extractall
 from xmodule.contentstore.django import contentstore  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.course_block import CourseFields  # lint-amnesty, pylint: disable=wrong-import-order
@@ -121,6 +127,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         store = modulestore()
         with store.default_store('split'):
             store.clone_course(source_course_key, destination_course_key, user_id, fields=fields)
+
         update_unit_discussion_state_from_discussion_blocks(destination_course_key, user_id)
 
         # set initial permissions for the user to access the course.
@@ -289,7 +296,7 @@ class CourseExportTask(UserTask):  # pylint: disable=abstract-method
             arguments_dict (dict): The arguments given to the task function
 
         Returns:
-            text_type: The generated name
+            str: The generated name
         """
         key = arguments_dict['course_key_string']
         return f'Export of {key}'
@@ -342,7 +349,8 @@ def create_export_tarball(course_block, course_key, context, status=None):
     Updates the context with any error information if applicable.
     """
     name = course_block.url_name
-    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")  # lint-amnesty, pylint: disable=consider-using-with
+    export_file = NamedTemporaryFile(prefix=name + '.',
+                                     suffix=".tar.gz")  # lint-amnesty, pylint: disable=consider-using-with
     root_dir = path(mkdtemp())
 
     try:
@@ -423,7 +431,7 @@ class CourseImportTask(UserTask):  # pylint: disable=abstract-method
             arguments_dict (dict): The arguments given to the task function
 
         Returns:
-            text_type: The generated name
+            str: The generated name
         """
         key = arguments_dict['course_key_string']
         filename = arguments_dict['archive_name']
@@ -788,7 +796,6 @@ def log_errors_to_artifact(errorstore, status):
 def handle_course_import_exception(courselike_key, exception, status, known=True):
     """
     Handle course import exception and fail task status.
-
     Arguments:
         courselike_key: A locator identifies a course resource.
         exception: Exception object
@@ -806,3 +813,159 @@ def handle_course_import_exception(courselike_key, exception, status, known=True
 
     if status.state != UserTaskStatus.FAILED:
         status.fail(task_fail_message)
+
+
+def _parse_organization(org_name):
+    """Find a matching organization name, if one does not exist, specify that this is the *unspecfied* organization"""
+    try:
+        ensure_organization(org_name)
+    except InvalidOrganizationException:
+        return 'None'
+    return Organization.objects.get(short_name=org_name)
+
+
+def copy_v1_user_roles_into_v2_library(v2_library_key, v1_library_key):
+    """
+    write the access and edit permissions of a v1 library into a v2 library.
+    """
+
+    def _get_users_by_access_level(v1_library_key):
+        """
+        Get a permissions object for a library which contains a list of user IDs for every V2 permissions level,
+        based on V1 library roles.
+        The following mapping exists for a library:
+        V1 Library Role -> V2 Permission Level
+        LibraryUserRole -> READ_LEVEL
+        CourseStaffRole -> AUTHOR_LEVEL
+        CourseInstructorRole -> ADMIN_LEVEL
+        """
+        permissions = {}
+        permissions[v2contentlib_api.AccessLevel.READ_LEVEL] = list(LibraryUserRole(v1_library_key).users_with_role())
+        permissions[v2contentlib_api.AccessLevel.AUTHOR_LEVEL] = list(CourseStaffRole(v1_library_key).users_with_role())
+        permissions[v2contentlib_api.AccessLevel.ADMIN_LEVEL] = list(
+            CourseInstructorRole(v1_library_key).users_with_role()
+        )
+        return permissions
+
+    permissions = _get_users_by_access_level(v1_library_key)
+    for access_level in permissions.keys():  # lint-amnesty, pylint: disable=consider-iterating-dictionary
+        for user in permissions[access_level]:
+            v2contentlib_api.set_library_user_permissions(v2_library_key, user, access_level)
+
+
+def _create_copy_content_task(v2_library_key, v1_library_key):
+    """
+    spin up a celery task to import the V1 Library's content into the V2 library.
+    This utalizes the fact that course and v1 library content is stored almost identically.
+    """
+    return v2contentlib_api.import_blocks_create_task(v2_library_key, v1_library_key)
+
+
+def _create_metadata(v1_library_key, collection_uuid):
+    """instansiate an index for the V2 lib in the collection"""
+
+    store = modulestore()
+    v1_library = store.get_library(v1_library_key)
+    collection = get_collection(collection_uuid).uuid
+    # To make it easy, all converted libs are complex, meaning they can contain problems, videos, and text
+    library_type = 'complex'
+    org = _parse_organization(v1_library.location.library_key.org)
+    slug = v1_library.location.library_key.library
+    title = v1_library.display_name
+    #  V1 libraries do not have descriptions.
+    description = ''
+    #  permssions & license are most restrictive.
+    allow_public_learning = False
+    allow_public_read = False
+    library_license = ''  # '' = ALL_RIGHTS_RESERVED
+    with atomic():
+        return v2contentlib_api.create_library(
+            collection,
+            library_type,
+            org,
+            slug,
+            title,
+            description,
+            allow_public_learning,
+            allow_public_read,
+            library_license
+        )
+
+
+@shared_task(time_limit=30)
+@set_code_owner_attribute
+def delete_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
+    """
+    For a V1 Library, delete the matching v2 library, where the library is the result of the copy operation
+    This method relys on _create_metadata failling for LibraryAlreadyExists in order to obtain the v2 slug.
+    """
+    v1_library_key = CourseKey.from_string(v1_library_key_string)
+    v2_library_key = LibraryLocatorV2.from_string('lib:' + v1_library_key.org + ':' + v1_library_key.course)
+
+    try:
+        v2contentlib_api.delete_library(v2_library_key)
+        return {
+            "v1_library_id": v1_library_key_string,
+            "v2_library_id": v2_library_key,
+            "status": "SUCCESS",
+            "msg": None
+        }
+    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
+        return {
+            "v1_library_id": v1_library_key_string,
+            "v2_library_id": v2_library_key,
+            "status": "FAILED",
+            "msg": f"Exception: {v2_library_key} did not delete: {error}"
+        }
+
+
+@shared_task(time_limit=30)
+@set_code_owner_attribute
+def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
+    """
+    write the metadata, permissions, and content of a v1 library into a v2 library in the given collection.
+    """
+
+    v1_library_key = CourseKey.from_string(v1_library_key_string)
+
+    LOGGER.info(f"Copy Library task created for library: {v1_library_key}")
+
+    try:
+        v2_library_metadata = _create_metadata(v1_library_key, collection_uuid)
+
+    except v2contentlib_api.LibraryAlreadyExists:
+        return {
+            "v1_library_id": v1_library_key_string,
+            "v2_library_id": None,
+            "status": "FAILED",
+            "msg": f"Exception: LibraryAlreadyExists {v1_library_key_string} aleady exists"
+        }
+
+    try:
+        _create_copy_content_task(v2_library_metadata.key, v1_library_key)
+    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
+        return {
+            "v1_library_id": v1_library_key_string,
+            "v2_library_id": str(v2_library_metadata.key),
+            "status": "FAILED",
+            "msg":
+            f"Could not import content from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
+        }
+
+    try:
+        copy_v1_user_roles_into_v2_library(v2_library_metadata.key, v1_library_key)
+    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
+        return {
+            "v1_library_id": v1_library_key_string,
+            "v2_library_id": str(v2_library_metadata.key),
+            "status": "FAILED",
+            "msg":
+            f"Could not copy permissions from {v1_library_key_string} into {str(v2_library_metadata.key)}: {str(error)}"
+        }
+
+    return {
+        "v1_library_id": v1_library_key_string,
+        "v2_library_id": str(v2_library_metadata.key),
+        "status": "SUCCESS",
+        "msg": None
+    }

@@ -54,12 +54,12 @@ function parameterized_suite(label, globalPageOptions) {
                 category: 'vertical'
             });
             window.course = new Course({
-                id: "5",
-                name: "Course Name",
-                url_name: "course_name",
-                org: "course_org",
-                num: "course_num",
-                revision: "course_rev"
+                id: '5',
+                name: 'Course Name',
+                url_name: 'course_name',
+                org: 'course_org',
+                num: 'course_num',
+                revision: 'course_rev'
             });
         });
 
@@ -81,8 +81,8 @@ function parameterized_suite(label, globalPageOptions) {
         getContainerPage = function(options, componentTemplates) {
             var default_options = {
                 model: model,
-                templates: componentTemplates === undefined ?
-                    EditHelpers.mockComponentTemplates : componentTemplates,
+                templates: componentTemplates === undefined
+                    ? EditHelpers.mockComponentTemplates : componentTemplates,
                 el: $('#content')
             };
             return new PageClass(_.extend(options || {}, globalPageOptions, default_options));
@@ -359,7 +359,6 @@ function parameterized_suite(label, globalPageOptions) {
                 beforeEach(function() {
                     promptSpy = EditHelpers.createPromptSpy();
                 });
-
 
                 clickDelete = function(componentIndex, clickNo) {
                     // find all delete buttons for the given group
@@ -696,28 +695,28 @@ function parameterized_suite(label, globalPageOptions) {
 
                     it('does show the support legend if show_legend is true', function() {
                         var templates = new ComponentTemplates([
-                            {
-                                templates: [
-                                    {
-                                        category: 'html',
-                                        boilerplate_name: null,
-                                        display_name: 'Text'
-                                    }, {
-                                        category: 'html',
-                                        boilerplate_name: 'announcement.yaml',
-                                        display_name: 'Announcement'
-                                    }, {
-                                        category: 'html',
-                                        boilerplate_name: 'raw.yaml',
-                                        display_name: 'Raw HTML'
-                                    }],
-                                type: 'html',
-                                support_legend: {
-                                    show_legend: true,
-                                    documentation_label: 'Documentation Label:',
-                                    allow_unsupported_xblocks: false
-                                }
-                            }],
+                                {
+                                    templates: [
+                                        {
+                                            category: 'html',
+                                            boilerplate_name: null,
+                                            display_name: 'Text'
+                                        }, {
+                                            category: 'html',
+                                            boilerplate_name: 'announcement.yaml',
+                                            display_name: 'Announcement'
+                                        }, {
+                                            category: 'html',
+                                            boilerplate_name: 'raw.yaml',
+                                            display_name: 'Raw HTML'
+                                        }],
+                                    type: 'html',
+                                    support_legend: {
+                                        show_legend: true,
+                                        documentation_label: 'Documentation Label:',
+                                        allow_unsupported_xblocks: false
+                                    }
+                                }],
                             {
                                 parse: true
                             }),
@@ -738,28 +737,28 @@ function parameterized_suite(label, globalPageOptions) {
 
                     it('does show unsupported level if enabled', function() {
                         var templates = new ComponentTemplates([
-                            {
-                                templates: [
-                                    {
-                                        category: 'html',
-                                        boilerplate_name: null,
-                                        display_name: 'Text'
-                                    }, {
-                                        category: 'html',
-                                        boilerplate_name: 'announcement.yaml',
-                                        display_name: 'Announcement'
-                                    }, {
-                                        category: 'html',
-                                        boilerplate_name: 'raw.yaml',
-                                        display_name: 'Raw HTML'
-                                    }],
-                                type: 'html',
-                                support_legend: {
-                                    show_legend: true,
-                                    documentation_label: 'Documentation Label:',
-                                    allow_unsupported_xblocks: true
-                                }
-                            }],
+                                {
+                                    templates: [
+                                        {
+                                            category: 'html',
+                                            boilerplate_name: null,
+                                            display_name: 'Text'
+                                        }, {
+                                            category: 'html',
+                                            boilerplate_name: 'announcement.yaml',
+                                            display_name: 'Announcement'
+                                        }, {
+                                            category: 'html',
+                                            boilerplate_name: 'raw.yaml',
+                                            display_name: 'Raw HTML'
+                                        }],
+                                    type: 'html',
+                                    support_legend: {
+                                        show_legend: true,
+                                        documentation_label: 'Documentation Label:',
+                                        allow_unsupported_xblocks: true
+                                    }
+                                }],
                             {
                                 parse: true
                             }),
@@ -777,31 +776,31 @@ function parameterized_suite(label, globalPageOptions) {
 
                     it('does render support level indicators if present in JSON', function() {
                         var templates = new ComponentTemplates([
-                            {
-                                templates: [
-                                    {
-                                        category: 'html',
-                                        boilerplate_name: null,
-                                        display_name: 'Text',
-                                        support_level: 'fs'
-                                    }, {
-                                        category: 'html',
-                                        boilerplate_name: 'announcement.yaml',
-                                        display_name: 'Announcement',
-                                        support_level: 'ps'
-                                    }, {
-                                        category: 'html',
-                                        boilerplate_name: 'raw.yaml',
-                                        display_name: 'Raw HTML',
-                                        support_level: 'us'
-                                    }],
-                                type: 'html',
-                                support_legend: {
-                                    show_legend: true,
-                                    documentation_label: 'Documentation Label:',
-                                    allow_unsupported_xblocks: true
-                                }
-                            }],
+                                {
+                                    templates: [
+                                        {
+                                            category: 'html',
+                                            boilerplate_name: null,
+                                            display_name: 'Text',
+                                            support_level: 'fs'
+                                        }, {
+                                            category: 'html',
+                                            boilerplate_name: 'announcement.yaml',
+                                            display_name: 'Announcement',
+                                            support_level: 'ps'
+                                        }, {
+                                            category: 'html',
+                                            boilerplate_name: 'raw.yaml',
+                                            display_name: 'Raw HTML',
+                                            support_level: 'us'
+                                        }],
+                                    type: 'html',
+                                    support_legend: {
+                                        show_legend: true,
+                                        documentation_label: 'Documentation Label:',
+                                        allow_unsupported_xblocks: true
+                                    }
+                                }],
                             {
                                 parse: true
                             }),

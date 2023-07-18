@@ -1,5 +1,6 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'gettext', 'jquery', 'underscore', 'js/edxnotes/views/note_group', 'js/edxnotes/views/tab_panel',
         'js/edxnotes/views/tab_view', 'edx-ui-toolkit/js/utils/html-utils'
@@ -14,13 +15,13 @@
 
                 displayedTitle = this.contentView.titleMap[tagName.toLowerCase()];
                 titleElement = this.$el.find('.tags-title').filter(
-                function() { return $(this).text() === displayedTitle; }
-            );
+                    function() { return $(this).text() === displayedTitle; }
+                );
                 $('html,body').animate(
-                {scrollTop: titleElement.offset().top - 10},
-                'slow',
-                function() { titleElement.focus(); }
-            );
+                    {scrollTop: titleElement.offset().top - 10},
+                    'slow',
+                    function() { titleElement.focus(); }
+                );
             },
 
             initialize: function(options) {
@@ -33,9 +34,9 @@
             PanelConstructor: TabPanelView.extend({
                 id: 'tags-panel',
                 title: view,
-            // Translators: this is a title shown before all Notes that have no associated tags. It is put within
-            // brackets to differentiate it from user-defined tags, but it should still be translated.
-                noTags: gettext('[no tags]'),  // User-defined tags cannot have spaces, so no risk of a collision.
+                // Translators: this is a title shown before all Notes that have no associated tags. It is put within
+                // brackets to differentiate it from user-defined tags, but it should still be translated.
+                noTags: gettext('[no tags]'), // User-defined tags cannot have spaces, so no risk of a collision.
 
                 renderContent: function() {
                     var notesByTag = {},
@@ -43,17 +44,17 @@
                         addNoteForTag, noteList, tags, i,
                         sortedTagNames, container, group, noteGroup, tagTitle, titleMap;
 
-                // Iterate through all the notes and build up a dictionary structure by tag.
-                // Note that the collection will be in most-recently updated order already.
+                    // Iterate through all the notes and build up a dictionary structure by tag.
+                    // Note that the collection will be in most-recently updated order already.
                     addNoteForTag = function(note, tag) {
                         noteList = notesByTag[tag.toLowerCase()];
                         if (noteList === undefined) {
                             noteList = [];
                             notesByTag[tag.toLowerCase()] = noteList;
                         }
-                    // If a note was tagged with the same tag more than once, don't add again.
-                    // We can assume it would be the last element of the list because we iterate through
-                    // all tags on a given note before moving on to the text note.
+                        // If a note was tagged with the same tag more than once, don't add again.
+                        // We can assume it would be the last element of the list because we iterate through
+                        // all tags on a given note before moving on to the text note.
                         if (noteList.length === 0 || noteList[noteList.length - 1] !== note) {
                             noteList.push(note);
                         }
@@ -87,16 +88,16 @@
 
                     container = document.createDocumentFragment();
 
-                // Store map of titles for scrollToTag functionality.
+                    // Store map of titles for scrollToTag functionality.
                     this.titleMap = {};
                     titleMap = this.titleMap;
 
                     _.each(sortedTagNames, function(tagName) {
                         noteGroup = notesByTag[tagName];
                         var tagTitle = interpolate_text(
-                        '{tagName} ({numberOfNotesWithTag})',
-                        {tagName: tagName, numberOfNotesWithTag: noteGroup.length}
-                    );
+                            '{tagName} ({numberOfNotesWithTag})',
+                            {tagName: tagName, numberOfNotesWithTag: noteGroup.length}
+                        );
                         group = this.getGroup(tagTitle);
                         titleMap[tagName] = tagTitle;
 

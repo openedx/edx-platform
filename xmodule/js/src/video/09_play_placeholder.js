@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/09_play_placeholder.js', [], function() {
     /**
      * Play placeholder control module.
@@ -35,7 +36,7 @@
                 delete this.state.videoPlayPlaceholder;
             },
 
-        /**
+            /**
          * Indicates whether the placeholder should be shown. We display it
          * for html5 videos on iPad and Android devices.
          * @return {Boolean}
@@ -44,7 +45,7 @@
                 return /iPad|Android/i.test(this.state.isTouch[0]) && !this.state.isYoutubeType();
             },
 
-        /** Initializes the module. */
+            /** Initializes the module. */
             initialize: function() {
                 if (!this.shouldBeShown()) {
                     return false;
@@ -55,7 +56,7 @@
                 this.show();
             },
 
-        /** Bind any necessary function callbacks to DOM events. */
+            /** Bind any necessary function callbacks to DOM events. */
             bindHandlers: function() {
                 this.el.on('click', this.onClick);
                 this.state.el.on({
@@ -71,14 +72,14 @@
 
             hide: function() {
                 this.el
-                .addClass('is-hidden')
-                .attr({'aria-hidden': 'true', tabindex: -1});
+                    .addClass('is-hidden')
+                    .attr({'aria-hidden': 'true', tabindex: -1});
             },
 
             show: function() {
                 this.el
-                .removeClass('is-hidden')
-                .attr({'aria-hidden': 'false', tabindex: 0});
+                    .removeClass('is-hidden')
+                    .attr({'aria-hidden': 'false', tabindex: 0});
             }
         };
 

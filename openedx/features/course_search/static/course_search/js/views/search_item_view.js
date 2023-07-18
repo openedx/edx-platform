@@ -61,7 +61,7 @@
                 return this;
             },
 
-        /**
+            /**
          * Redirect to a URL.  Mainly useful for mocking out in tests.
          * @param  {string} url The URL to redirect to.
          */

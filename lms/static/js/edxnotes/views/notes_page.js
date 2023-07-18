@@ -1,13 +1,14 @@
 (function(define, undefined) {
     'use strict';
+
     define([
         'backbone', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs_list',
         'js/edxnotes/views/tabs/recent_activity', 'js/edxnotes/views/tabs/course_structure',
         'js/edxnotes/views/tabs/search_results', 'js/edxnotes/views/tabs/tags'
     ], function(
-    Backbone, TabsCollection, TabsListView, RecentActivityView, CourseStructureView,
-    SearchResultsView, TagsView
-) {
+        Backbone, TabsCollection, TabsListView, RecentActivityView, CourseStructureView,
+        SearchResultsView, TagsView
+    ) {
         var NotesPageView = Backbone.View.extend({
             initialize: function(options) {
                 var scrollToTag, tagsModel;
@@ -25,7 +26,7 @@
 
                     scrollToTag = this.tagsView.scrollToTag;
 
-                // Remove the Tags model from the tabs collection because it should not appear first.
+                    // Remove the Tags model from the tabs collection because it should not appear first.
                     tagsModel = this.tabsCollection.shift();
                 }
 
@@ -61,8 +62,8 @@
 
                 this.tabsView = new TabsListView({collection: this.tabsCollection});
                 this.$('.tab-list')
-                .append(this.tabsView.render().$el)
-                .removeClass('is-hidden');
+                    .append(this.tabsView.render().$el)
+                    .removeClass('is-hidden');
             }
         });
 

@@ -327,13 +327,11 @@ JWT_AUTH:
     JWT_AUDIENCE: lms-key
     JWT_AUTH_COOKIE_HEADER_PAYLOAD: edx-jwt-cookie-header-payload
     JWT_AUTH_COOKIE_SIGNATURE: edx-jwt-cookie-signature
-    JWT_AUTH_REFRESH_COOKIE: edx-jwt-refresh-cookie
     JWT_ISSUER: http://edx.devstack.lms:18000/oauth2
     JWT_ISSUERS:
     -   AUDIENCE: lms-key
         ISSUER: http://edx.devstack.lms:18000/oauth2
         SECRET_KEY: lms-secret
-    JWT_PRIVATE_SIGNING_JWK: None
     JWT_PUBLIC_SIGNING_JWK_SET: ''
     JWT_SECRET_KEY: lms-secret
     JWT_SIGNING_ALGORITHM: null

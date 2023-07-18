@@ -517,6 +517,7 @@ class CourseViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             200,
             {
                 "id": str(self.course.id),
+                "is_posting_enabled": True,
                 "blackouts": [],
                 "thread_list_url": "http://testserver/api/discussion/v1/threads/?course_id=course-v1%3Ax%2By%2Bz",
                 "following_thread_list_url": (
@@ -1709,6 +1710,8 @@ class LearnerThreadViewAPITest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "votes": {"up_count": 4},
                 "comments_count": 5,
                 "unread_comments_count": 3,
+                "closed_by_label": None,
+                "edit_by_label": None,
             })],
             "page": 1,
             "num_pages": 1,
@@ -1968,6 +1971,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         response_data.update(overrides or {})
         return response_data
@@ -2392,6 +2396,7 @@ class CommentViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         response = self.client.post(
             self.url,
@@ -2483,6 +2488,7 @@ class CommentViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTes
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         response_data.update(overrides or {})
         return response_data
@@ -2672,6 +2678,7 @@ class CommentViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
 
         response = self.client.get(self.url)

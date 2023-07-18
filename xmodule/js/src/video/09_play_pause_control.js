@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/09_play_pause_control.js', [], function() {
     /**
      * Play/pause control module.
@@ -38,14 +39,14 @@
                 delete this.state.videoPlayPauseControl;
             },
 
-        /** Initializes the module. */
+            /** Initializes the module. */
             initialize: function() {
                 this.el = $(this.template);
                 this.render();
                 this.bindHandlers();
             },
 
-        /**
+            /**
          * Creates any necessary DOM elements, attach them, and set their,
          * initial configuration.
          */
@@ -53,7 +54,7 @@
                 this.state.el.find('.vcr').prepend(this.el);
             },
 
-        /** Bind any necessary function callbacks to DOM events. */
+            /** Bind any necessary function callbacks to DOM events. */
             bindHandlers: function() {
                 this.el.on({
                     click: this.onClick
@@ -72,20 +73,20 @@
 
             play: function() {
                 this.el
-                .addClass('pause')
-                .removeClass('play')
-                .attr({title: gettext('Pause'), 'aria-label': gettext('Pause')})
-                .find('.icon')
+                    .addClass('pause')
+                    .removeClass('play')
+                    .attr({title: gettext('Pause'), 'aria-label': gettext('Pause')})
+                    .find('.icon')
                     .removeClass('fa-play')
                     .addClass('fa-pause');
             },
 
             pause: function() {
                 this.el
-                .removeClass('pause')
-                .addClass('play')
-                .attr({title: gettext('Play'), 'aria-label': gettext('Play')})
-                .find('.icon')
+                    .removeClass('pause')
+                    .addClass('play')
+                    .attr({title: gettext('Play'), 'aria-label': gettext('Play')})
+                    .find('.icon')
                     .removeClass('fa-pause')
                     .addClass('fa-play');
             }

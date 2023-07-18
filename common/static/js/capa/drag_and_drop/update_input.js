@@ -64,8 +64,8 @@
             }
         }
 
-    // Check if input has an answer from server. If yes, then position
-    // all draggables according to answer.
+        // Check if input has an answer from server. If yes, then position
+        // all draggables according to answer.
         function check(state) {
             var inputElVal;
 
@@ -109,7 +109,7 @@
 
             baseDraggableId = Object.keys(chain)[0];
 
-        // This is a hack. For now we will work with depths 1 and 3.
+            // This is a hack. For now we will work with depths 1 and 3.
             if (depth === 1) {
                 baseTargetId = chain[baseDraggableId];
 
@@ -188,10 +188,10 @@
             if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                 if (reportError !== false) {
                     console.log(
-                    'ERROR: In answer there exists a ' +
-                    'draggable ID "' + draggableId + '". No ' +
-                    'draggable with this ID could be found.'
-                );
+                        'ERROR: In answer there exists a '
+                    + 'draggable ID "' + draggableId + '". No '
+                    + 'draggable with this ID could be found.'
+                    );
                 }
 
                 return false;
@@ -200,10 +200,10 @@
             if ((target = getById(state, 'targets', targetId)) === null) {
                 if (reportError !== false) {
                     console.log(
-                    'ERROR: In answer there exists a target ' +
-                    'ID "' + targetId + '". No target with this ' +
-                    'ID could be found.'
-                );
+                        'ERROR: In answer there exists a target '
+                    + 'ID "' + targetId + '". No target with this '
+                    + 'ID could be found.'
+                    );
                 }
 
                 return false;
@@ -226,10 +226,10 @@
 
                         if ((draggable = getById(state, 'draggables', draggableId)) === null) {
                             console.log(
-                            'ERROR: In answer there exists a ' +
-                            'draggable ID "' + draggableId + '". No ' +
-                            'draggable with this ID could be found.'
-                        );
+                                'ERROR: In answer there exists a '
+                            + 'draggable ID "' + draggableId + '". No '
+                            + 'draggable with this ID could be found.'
+                            );
 
                             continue;
                         }
@@ -277,7 +277,7 @@
                 return;
             }
 
-        // For now we support only one case.
+            // For now we support only one case.
             if ((minDepth < 1) || (maxDepth > 3)) {
                 return;
             }
@@ -313,21 +313,21 @@
                     if (type === 'draggables') {
                         if ((targetId !== undefined) && (inContainer === false) && (baseDraggableId !== undefined) && (baseTargetId !== undefined)) {
                             if (
-                            (state[type][c1].id === id) &&
-                            (state[type][c1].inContainer === false) &&
-                            (state[type][c1].onTarget.id === targetId) &&
-                            (state[type][c1].onTarget.type === 'on_drag') &&
-                            (state[type][c1].onTarget.draggableObj.id === baseDraggableId) &&
-                            (state[type][c1].onTarget.draggableObj.onTarget.id === baseTargetId)
-                        ) {
+                                (state[type][c1].id === id)
+                            && (state[type][c1].inContainer === false)
+                            && (state[type][c1].onTarget.id === targetId)
+                            && (state[type][c1].onTarget.type === 'on_drag')
+                            && (state[type][c1].onTarget.draggableObj.id === baseDraggableId)
+                            && (state[type][c1].onTarget.draggableObj.onTarget.id === baseTargetId)
+                            ) {
                                 return state[type][c1];
                             }
                         } else if ((targetId !== undefined) && (inContainer === false)) {
                             if (
-                            (state[type][c1].id === id) &&
-                            (state[type][c1].inContainer === false) &&
-                            (state[type][c1].onTarget.id === targetId)
-                        ) {
+                                (state[type][c1].id === id)
+                            && (state[type][c1].inContainer === false)
+                            && (state[type][c1].onTarget.id === targetId)
+                            ) {
                                 return state[type][c1];
                             }
                         } else {

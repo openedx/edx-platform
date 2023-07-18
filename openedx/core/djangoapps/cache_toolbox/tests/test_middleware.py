@@ -2,11 +2,15 @@
 from unittest.mock import patch
 
 from django.conf import settings
-from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.contrib.auth.models import User, AnonymousUser  # lint-amnesty, pylint: disable=imported-auth-user
 from django.urls import reverse
 from django.test import TestCase
+from django.contrib.auth import SESSION_KEY
+from django.http import HttpResponse, SimpleCookie
 
-from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
+from openedx.core.djangoapps.cache_toolbox.middleware import CacheBackedAuthenticationMiddleware
+from openedx.core.djangoapps.safe_sessions.middleware import SafeCookieData, SafeSessionMiddleware
+from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms, get_mock_request
 from common.djangoapps.student.tests.factories import UserFactory
 
 
@@ -18,6 +22,9 @@ class CachedAuthMiddlewareTestCase(TestCase):
         password = 'test-password'
         self.user = UserFactory(password=password)
         self.client.login(username=self.user.username, password=password)
+        self.request = get_mock_request(self.user)
+        self.client.response = HttpResponse()
+        self.client.response.cookies = SimpleCookie()  # preparing cookies
 
     def _test_change_session_hash(self, test_url, redirect_url, target_status_code=200):
         """
@@ -45,3 +52,36 @@ class CachedAuthMiddlewareTestCase(TestCase):
         home_url = reverse('home')
         # Studio login redirects to LMS login
         self._test_change_session_hash(home_url, settings.LOGIN_URL + '?next=' + home_url, target_status_code=302)
+
+    def test_user_logout_on_session_hash_change(self):
+        """
+        Verify that if a user's session auth hash and the request's hash
+        differ, the user is logged out:
+         - session is flushed
+         - request user is changed to Anonymous user
+         - logged in cookies are deleted
+        """
+        # preparing session and setting cookies
+        session_id = self.client.session.session_key
+        safe_cookie_data = SafeCookieData.create(session_id, self.user.id)
+        self.request.COOKIES[settings.SESSION_COOKIE_NAME] = str(safe_cookie_data)
+        self.client.response.cookies[settings.SESSION_COOKIE_NAME] = session_id
+        self.client.response.cookies['edx-jwt-cookie-header-payload'] = 'test-jwt-payload'
+        SafeSessionMiddleware().process_request(self.request)
+
+        # asserts that user, session, and JWT cookies exist
+        assert self.request.session.get(SESSION_KEY) is not None
+        assert self.request.user != AnonymousUser()
+        assert self.client.response.cookies.get(settings.SESSION_COOKIE_NAME).value == session_id
+        assert self.client.response.cookies.get('edx-jwt-cookie-header-payload').value == 'test-jwt-payload'
+
+        with patch.object(User, 'get_session_auth_hash', return_value='abc123'):
+            CacheBackedAuthenticationMiddleware().process_request(self.request)
+            SafeSessionMiddleware().process_response(self.request, self.client.response)
+
+        # asserts that user, session, and JWT cookies do not exist
+        assert self.request.session.get(SESSION_KEY) is None
+        assert self.request.user == AnonymousUser()
+        assert self.client.response.cookies.get(settings.SESSION_COOKIE_NAME).value != session_id
+        assert self.client.response.cookies.get(settings.SESSION_COOKIE_NAME).value == ""
+        assert self.client.response.cookies.get('edx-jwt-cookie-header-payload').value == ""

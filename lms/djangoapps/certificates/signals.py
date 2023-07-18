@@ -6,10 +6,12 @@ import logging
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from openedx_events.event_bus import get_producer
 
 from common.djangoapps.course_modes import api as modes_api
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.signals import ENROLLMENT_TRACK_UPDATED
+from lms.djangoapps.certificates.config import SEND_CERTIFICATE_CREATED_SIGNAL
 from lms.djangoapps.certificates.generation_handler import (
     CertificateGenerationNotAllowed,
     generate_allowlist_certificate_task,
@@ -30,6 +32,7 @@ from openedx.core.djangoapps.signals.signals import (
     COURSE_GRADE_NOW_PASSED,
     LEARNER_NOW_VERIFIED
 )
+from openedx_events.learning.signals import CERTIFICATE_CREATED
 
 log = logging.getLogger(__name__)
 
@@ -156,3 +159,18 @@ def _listen_for_enrollment_mode_change(sender, user, course_key, mode, **kwargs)
                 course_key,
             )
             return False
+
+
+@receiver(CERTIFICATE_CREATED)
+def listen_for_certificate_created_event(sender, signal, **kwargs):
+    """
+    Publish `CERTIFICATE_CREATED` events to the event bus.
+    """
+    if SEND_CERTIFICATE_CREATED_SIGNAL.is_enabled():
+        get_producer().send(
+            signal=CERTIFICATE_CREATED,
+            topic='learning-certificate-lifecycle',
+            event_key_field='certificate.course.course_key',
+            event_data={'certificate': kwargs['certificate']},
+            event_metadata=kwargs['metadata']
+        )

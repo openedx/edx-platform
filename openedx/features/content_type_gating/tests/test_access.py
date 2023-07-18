@@ -61,7 +61,7 @@ def _get_content_from_fragment(_store, block, user_id, course, request_factory, 
     """
     Returns the content from the rendered fragment of a block
     Arguments:
-        block: some sort of xblock descriptor, must implement .scope_ids.usage_id
+        block: some sort of XBlock, must implement .scope_ids.usage_id
         user_id (int): id of user
         course_id (CourseLocator): id of course
     """
@@ -86,7 +86,7 @@ def _get_content_from_lms_index(store, block, user_id, _course, _request_factory
     """
     Returns the content from the lms index view of the block
     Arguments:
-        block: some sort of xblock descriptor, must implement .scope_ids.usage_id
+        block: some sort of XBlock, must implement .scope_ids.usage_id
         user_id (int): id of user
     """
     client = Client()
@@ -109,7 +109,7 @@ def _assert_block_is_gated(store, block, is_gated, user, course, request_factory
     """
     Asserts that a block in a specific course is gated for a specific user
     Arguments:
-        block: some sort of xblock descriptor, must implement .scope_ids.usage_id
+        block: some sort of XBlock, must implement .scope_ids.usage_id
         is_gated (bool): if True, this user is expected to be gated from this block
         user (int): user
         course_id (CourseLocator): id of course
@@ -151,7 +151,7 @@ def _assert_block_is_empty(store, block, user_id, course, request_factory):
     """
     Asserts that a block in a specific course is empty for a specific user
     Arguments:
-        block: some sort of xblock descriptor, must implement .scope_ids.usage_id
+        block: some sort of XBlock, must implement .scope_ids.usage_id
         is_gated (bool): if True, this user is expected to be gated from this block
         user_id (int): id of user
         course_id (CourseLocator): id of course

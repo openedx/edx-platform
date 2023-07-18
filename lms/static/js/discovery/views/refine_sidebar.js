@@ -28,9 +28,9 @@
             },
 
             termName: function(facetKey, termKey) {
-                return this.meanings[facetKey] &&
-                this.meanings[facetKey].terms &&
-                this.meanings[facetKey].terms[termKey] || termKey;
+                return this.meanings[facetKey]
+                && this.meanings[facetKey].terms
+                && this.meanings[facetKey].terms[termKey] || termKey;
             },
 
             renderOptions: function(options) {
@@ -53,12 +53,12 @@
             render: function() {
                 var grouped = this.collection.groupBy('facet');
                 var htmlSnippet = HtmlUtils.joinHtml.apply(
-                this, _.map(grouped, function(options, facetKey) {
-                    if (options.length > 0) {
-                        return this.renderFacet(facetKey, options);
-                    }
-                }, this)
-            );
+                    this, _.map(grouped, function(options, facetKey) {
+                        if (options.length > 0) {
+                            return this.renderFacet(facetKey, options);
+                        }
+                    }, this)
+                );
                 HtmlUtils.setHtml(this.$container, htmlSnippet);
                 return this;
             },
@@ -85,11 +85,11 @@
             selectOption: function(event) {
                 var $target = $(event.currentTarget);
                 this.trigger(
-                'selectOption',
-                $target.data('facet'),
-                $target.data('value'),
-                $target.data('text')
-            );
+                    'selectOption',
+                    $target.data('facet'),
+                    $target.data('value'),
+                    $target.data('text')
+                );
             }
 
         });

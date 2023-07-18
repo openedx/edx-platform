@@ -1,7 +1,8 @@
-import '../helper.js'
+import '../helper.js';
 
 (function(undefined) {
     'use strict';
+
     var describeInfo, state, oldOTBD;
 
     describeInfo = new jasmine.DescribeInfo('', function() {

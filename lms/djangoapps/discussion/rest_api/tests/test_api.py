@@ -190,6 +190,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
     def test_basic(self):
         assert get_course(self.request, self.course.id) == {
             'id': str(self.course.id),
+            'is_posting_enabled': True,
             'blackouts': [],
             'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=course-v1%3Ax%2By%2Bz',
             'following_thread_list_url':
@@ -1472,6 +1473,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous": False,
                 "anonymous_to_peers": False,
                 "last_edit": None,
+                "edit_by_label": None,
             },
             {
                 "id": "test_comment_2",
@@ -1498,6 +1500,7 @@ class GetCommentListTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModu
                 "anonymous": True,
                 "anonymous_to_peers": False,
                 "last_edit": None,
+                "edit_by_label": None,
             },
         ]
         actual_comments = self.get_comment_list(
@@ -1888,7 +1891,8 @@ class CreateThreadTest(
             'body': 'Test body',
             'url': '',
             'user_forums_roles': [FORUM_ROLE_STUDENT],
-            'user_course_roles': []
+            'user_course_roles': [],
+            'from_mfe_sidebar': False,
         }
 
     def test_basic_in_blackout_period(self):
@@ -1975,6 +1979,7 @@ class CreateThreadTest(
                 "url": "",
                 "user_forums_roles": [FORUM_ROLE_STUDENT, FORUM_ROLE_MODERATOR],
                 "user_course_roles": [],
+                "from_mfe_sidebar": False,
             }
         )
 
@@ -2007,7 +2012,8 @@ class CreateThreadTest(
             'body': 'Test body',
             'url': '',
             'user_forums_roles': [FORUM_ROLE_STUDENT],
-            'user_course_roles': []
+            'user_course_roles': [],
+            'from_mfe_sidebar': False,
         }
 
     @ddt.data(
@@ -2229,6 +2235,7 @@ class CreateCommentTest(
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         expected_url = (
@@ -2236,13 +2243,16 @@ class CreateCommentTest(
             "/api/v1/threads/test_thread/comments"
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # lint-amnesty, pylint: disable=no-member
-        assert parsed_body(httpretty.last_request()) == {
+
+        data = httpretty.latest_requests()
+        assert parsed_body(data[len(data) - 2]) == {
             'course_id': [str(self.course.id)],
             'body': ['Test body'],
             'user_id': [str(self.user.id)],
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],
         }
+
         expected_event_name = (
             "edx.forum.comment.created" if parent_id else
             "edx.forum.response.created"
@@ -2257,6 +2267,7 @@ class CreateCommentTest(
             "url": "",
             "user_forums_roles": [FORUM_ROLE_STUDENT],
             "user_course_roles": [],
+            "from_mfe_sidebar": False,
         }
         if parent_id:
             expected_event_data["response"] = {"id": parent_id}
@@ -2324,6 +2335,7 @@ class CreateCommentTest(
             "anonymous": False,
             "anonymous_to_peers": False,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         expected_url = (
@@ -2331,7 +2343,8 @@ class CreateCommentTest(
             "/api/v1/threads/test_thread/comments"
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # pylint: disable=no-member
-        assert parsed_body(httpretty.last_request()) == {
+        data = httpretty.latest_requests()
+        assert parsed_body(data[len(data) - 2]) == {
             "course_id": [str(self.course.id)],
             "body": ["Test body"],
             "user_id": [str(self.user.id)],
@@ -2353,6 +2366,7 @@ class CreateCommentTest(
             "url": "",
             "user_forums_roles": [FORUM_ROLE_STUDENT, FORUM_ROLE_MODERATOR],
             "user_course_roles": [],
+            "from_mfe_sidebar": False,
         }
         if parent_id:
             expected_event_data["response"] = {"id": parent_id}
@@ -3149,6 +3163,7 @@ class UpdateCommentTest(
             "child_count": 0,
             "can_delete": True,
             "last_edit": None,
+            "edit_by_label": None,
         }
         assert actual == expected
         assert parsed_body(httpretty.last_request()) == {

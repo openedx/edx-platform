@@ -170,6 +170,7 @@ def get_theme_sass_dirs(system, theme_dir):
     css_dir = theme_dir / system / "static" / "css"
     certs_sass_dir = theme_dir / system / "static" / "certificates" / "sass"
     certs_css_dir = theme_dir / system / "static" / "certificates" / "css"
+    builtin_xblock_sass = path("xmodule") / "assets"
 
     dependencies = SASS_LOOKUP_DEPENDENCIES.get(system, [])
     if sass_dir.isdir():
@@ -208,6 +209,28 @@ def get_theme_sass_dirs(system, theme_dir):
                 ],
             })
 
+    # Now, finally, compile builtin XBlocks' Sass. Themes cannot override these
+    # Sass files directly, but they *can* modify Sass variables which will affect
+    # the output here. We compile all builtin XBlocks' Sass both for LMS and CMS,
+    # not because we expect the output to be different between LMS and CMS, but
+    # because only LMS/CMS-compiled Sass can be themed; common sass is not themed.
+    dirs.append({
+        "sass_source_dir": builtin_xblock_sass,
+        "css_destination_dir": css_dir,
+        "lookup_paths": [
+            # XBlock editor views may need both LMS and CMS partials.
+            # XBlock display views should only need LMS patials.
+            # In order to keep this build script simpler, though, we just
+            # include everything and compile everything at once.
+            theme_dir / "lms" / "static" / "sass" / "partials",
+            theme_dir / "cms" / "static" / "sass" / "partials",
+            path("lms") / "static" / "sass" / "partials",
+            path("cms") / "static" / "sass" / "partials",
+            path("lms") / "static" / "sass",
+            path("cms") / "static" / "sass",
+        ],
+    })
+
     return dirs
 
 
@@ -223,6 +246,7 @@ def get_system_sass_dirs(system):
     dirs = []
     sass_dir = path(system) / "static" / "sass"
     css_dir = path(system) / "static" / "css"
+    builtin_xblock_sass = path("xmodule") / "assets"
 
     dependencies = SASS_LOOKUP_DEPENDENCIES.get(system, [])
     dirs.append({
@@ -243,6 +267,18 @@ def get_system_sass_dirs(system):
                 sass_dir
             ],
         })
+
+    # See builtin_xblock_sass compilation in get_theme_sass_dirs for details.
+    dirs.append({
+        "sass_source_dir": builtin_xblock_sass,
+        "css_destination_dir": css_dir,
+        "lookup_paths": dependencies + [
+            path("lms") / "static" / "sass" / "partials",
+            path("cms") / "static" / "sass" / "partials",
+            path("lms") / "static" / "sass",
+            path("cms") / "static" / "sass",
+        ],
+    })
 
     return dirs
 
@@ -550,6 +586,10 @@ def _compile_sass(system, theme, debug, force, timing_info):
             else:
                 sh(f"rm -rf {css_dir}/*.css")
 
+        all_lookup_paths = COMMON_LOOKUP_PATHS + lookup_paths
+        print(f"Compiling Sass: {sass_source_dir} -> {css_dir}")
+        for lookup_path in all_lookup_paths:
+            print(f"    with Sass lookup path: {lookup_path}")
         if dry_run:
             tasks.environment.info("libsass {sass_dir}".format(
                 sass_dir=sass_source_dir,
@@ -557,7 +597,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
         else:
             sass.compile(
                 dirname=(sass_source_dir, css_dir),
-                include_paths=COMMON_LOOKUP_PATHS + lookup_paths,
+                include_paths=all_lookup_paths,
                 source_comments=source_comments,
                 output_style=output_style,
             )
@@ -692,30 +732,9 @@ def collect_assets(systems, settings, **kwargs):
     `settings` is the Django settings module to use.
     `**kwargs` include arguments for using a log directory for collectstatic output. Defaults to /dev/null.
     """
-    ignore_patterns = [
-        # Karma test related files...
-        "fixtures",
-        "karma_*.js",
-        "spec",
-        "spec_helpers",
-        "spec-helpers",
-        "xmodule_js",  # symlink for tests
-
-        # Geo-IP data, only accessed in Python
-        "geoip",
-
-        # We compile these out, don't need the source files in staticfiles
-        "sass",
-    ]
-
-    ignore_args = " ".join(
-        f'--ignore "{pattern}"' for pattern in ignore_patterns
-    )
-
     for sys in systems:
         collectstatic_stdout_str = _collect_assets_cmd(sys, **kwargs)
-        sh(django_cmd(sys, settings, "collectstatic {ignore_args} --noinput {logfile_str}".format(
-            ignore_args=ignore_args,
+        sh(django_cmd(sys, settings, "collectstatic --noinput {logfile_str}".format(
             logfile_str=collectstatic_stdout_str
         )))
         print(f"\t\tFinished collecting {sys} assets.")

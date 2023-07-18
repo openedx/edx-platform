@@ -28,7 +28,7 @@ from cms.djangoapps.contentstore.courseware_index import (
     LibrarySearchIndexer,
 )
 from common.djangoapps.track.event_transaction_utils import get_event_transaction_id, get_event_transaction_type
-from common.djangoapps.util.block_utils import yield_dynamic_descriptor_descendants
+from common.djangoapps.util.block_utils import yield_dynamic_block_descendants
 from lms.djangoapps.grades.api import task_compute_all_grades_for_course
 from openedx.core.djangoapps.content.learning_sequences.api import key_supports_outlines
 from openedx.core.djangoapps.discussions.tasks import update_discussions_settings_from_course_task
@@ -177,8 +177,9 @@ def listen_for_xblock_published(sender, signal, **kwargs):
     Publish XBLOCK_PUBLISHED signals onto the event bus.
     """
     if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
+        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
         get_producer().send(
-            signal=XBLOCK_PUBLISHED, topic='xblock-published',
+            signal=XBLOCK_PUBLISHED, topic=topic,
             event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
             event_metadata=kwargs['metadata'],
         )
@@ -190,8 +191,9 @@ def listen_for_xblock_deleted(sender, signal, **kwargs):
     Publish XBLOCK_DELETED signals onto the event bus.
     """
     if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
+        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
         get_producer().send(
-            signal=XBLOCK_DELETED, topic='xblock-deleted',
+            signal=XBLOCK_DELETED, topic=topic,
             event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
             event_metadata=kwargs['metadata'],
         )
@@ -203,8 +205,9 @@ def listen_for_xblock_duplicated(sender, signal, **kwargs):
     Publish XBLOCK_DUPLICATED signals onto the event bus.
     """
     if settings.FEATURES.get("ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS"):
+        topic = getattr(settings, "EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC", "course-authoring-xblock-lifecycle")
         get_producer().send(
-            signal=XBLOCK_DUPLICATED, topic='xblock-duplicated',
+            signal=XBLOCK_DUPLICATED, topic=topic,
             event_key_field='xblock_info.usage_key', event_data={'xblock_info': kwargs['xblock_info']},
             event_metadata=kwargs['metadata'],
         )
@@ -252,7 +255,7 @@ def handle_item_deleted(**kwargs):
         usage_key = usage_key.for_branch(None)
         course_key = usage_key.course_key
         deleted_block = modulestore().get_item(usage_key)
-        for block in yield_dynamic_descriptor_descendants(deleted_block, kwargs.get('user_id')):
+        for block in yield_dynamic_block_descendants(deleted_block, kwargs.get('user_id')):
             # Remove prerequisite milestone data
             gating_api.remove_prerequisite(block.location)
             # Remove any 'requires' course content milestone relationships

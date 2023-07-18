@@ -1,5 +1,6 @@
 (function(undefined) {
     'use strict';
+
     describe('VideoPlayer Events Bumper plugin', function() {
         var Logger = window.Logger;
         var state, oldOTBD;

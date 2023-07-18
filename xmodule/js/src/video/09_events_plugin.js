@@ -1,5 +1,6 @@
 (function(define) {
     'use strict';
+
     define('video/09_events_plugin.js', [], function() {
     /**
      * Events module.
@@ -16,9 +17,9 @@
             }
 
             _.bindAll(this, 'onReady', 'onPlay', 'onPause', 'onComplete', 'onEnded', 'onSeek',
-            'onSpeedChange', 'onAutoAdvanceChange', 'onShowLanguageMenu', 'onHideLanguageMenu',
-            'onSkip', 'onShowTranscript', 'onHideTranscript', 'onShowCaptions', 'onHideCaptions',
-            'destroy');
+                'onSpeedChange', 'onAutoAdvanceChange', 'onShowLanguageMenu', 'onHideLanguageMenu',
+                'onSkip', 'onShowTranscript', 'onHideTranscript', 'onShowCaptions', 'onHideCaptions',
+                'destroy');
 
             this.state = state;
             this.options = _.extend({}, options);

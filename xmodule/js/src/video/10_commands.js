@@ -1,9 +1,10 @@
 (function(define) {
     'use strict';
+
     define('video/10_commands.js', [], function() {
         var VideoCommands, Command, playCommand, pauseCommand, togglePlaybackCommand,
             toggleMuteCommand, toggleFullScreenCommand, setSpeedCommand, skipCommand;
-    /**
+        /**
      * Video commands module.
      * @exports video/10_commands.js
      * @constructor
@@ -32,7 +33,7 @@
                 delete this.state.videoCommands;
             },
 
-        /** Initializes the module. */
+            /** Initializes the module. */
             initialize: function() {
                 this.commands = this.getCommands();
                 this.state.el.on('destroy', this.destroy);

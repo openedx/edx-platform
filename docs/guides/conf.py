@@ -8,10 +8,12 @@
 
 import os
 import sys
+from datetime import datetime
 from subprocess import check_call
 
 import django
-import edx_theme
+import git
+
 from path import Path
 
 root = Path('../..').abspath()
@@ -33,8 +35,8 @@ django.setup()
 # -- Project information -----------------------------------------------------
 
 project = 'edx-platform'
-copyright = edx_theme.COPYRIGHT  # lint-amnesty, pylint: disable=redefined-builtin
-author = edx_theme.AUTHOR
+copyright = f'{datetime.now().year}, Axim Collaborative, Inc'  # pylint: disable=redefined-builtin
+author = 'Axim Collaborative, Inc'
 
 # The short X.Y version
 version = ''
@@ -59,7 +61,34 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
+    'sphinxcontrib.openapi',
+    'sphinxext.rediraffe',
+    'sphinx_design',
+    'code_annotations.contrib.sphinx.extensions.featuretoggles',
+    'code_annotations.contrib.sphinx.extensions.settings',
 ]
+
+# Rediraffe related settings.
+rediraffe_redirects = "redirects.txt"
+rediraffe_branch = 'origin/master'
+
+# code_annotations.(featuretoggles|settings) related settings.
+edxplatform_repo_url = "https://github.com/openedx/edx-platform"
+edxplatform_source_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..")
+)
+try:
+    edx_platform_version = git.Repo(search_parent_directories=True).head.object.hexsha
+except git.InvalidGitRepositoryError:
+    edx_platform_version = "master"
+
+featuretoggles_source_path = edxplatform_source_path
+featuretoggles_repo_url = edxplatform_repo_url
+featuretoggles_repo_version = edx_platform_version
+
+settings_source_path = edxplatform_source_path
+settings_repo_url = edxplatform_repo_url
+settings_repo_version = edx_platform_version
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -93,19 +122,49 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'edx_theme'
+html_theme = 'sphinx_book_theme'
 
-html_theme_path = [edx_theme.get_html_theme_path()]
+# html_theme_path = []
 
-html_theme_options = {'navigation_depth': 3}
-
-html_favicon = os.path.join(edx_theme.get_html_theme_path(), 'edx_theme', 'static', 'css', 'favicon.ico')
+html_logo = "https://logos.openedx.org/open-edx-logo-color.png"
+html_favicon = "https://logos.openedx.org/open-edx-favicon.ico"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "repository_url": "https://github.com/openedx/edx-platform",
+    "repository_branch": "master",
+    "path_to_docs": "docs/guides",
+    "home_page_in_toc": True,
+    "use_repository_button": True,
+    "use_issues_button": True,
+    "use_edit_page_button": True,
+    "navigation_depth": 3,
+    # Please don't change unless you know what you're doing.
+    "extra_footer": """
+        <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
+            <img
+                alt="Creative Commons License"
+                style="border-width:0"
+                src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"/>
+        </a>
+        <br>
+        These works by
+            <a
+                xmlns:cc="https://creativecommons.org/ns#"
+                href="https://openedx.org"
+                property="cc:attributionName"
+                rel="cc:attributionURL"
+            >Axim Collaborative, Inc</a>
+        are licensed under a
+            <a
+                rel="license"
+                href="https://creativecommons.org/licenses/by-sa/4.0/"
+            >Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    """
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -219,10 +278,14 @@ autodoc_mock_imports = [
 # run sphinx-apidoc against and the directories under "docs" in which to store
 # the generated *.rst files
 modules = {
-    'cms': 'cms',
-    'lms': 'lms',
-    'openedx': 'openedx',
-    'xmodule': 'xmodule',
+    'lms': 'references/docstrings/lms',
+    'openedx': 'references/docstrings/openedx',
+    # Commenting this out for now because they blow up the build
+    # time and memory limits for RTD.  We can come back to these
+    # later once we get parallel builds working hopefully.
+    # 'cms': 'references/docstrings/cms',
+    # 'common': 'references/docstrings/common',
+    # 'xmodule': 'references/docstrings/xmodule',
 }
 
 
