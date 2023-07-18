@@ -270,7 +270,7 @@ def instructor_dashboard_2(request, course_id):  # lint-amnesty, pylint: disable
             context=context, template_name=instructor_template,
         )
     except InstructorDashboardRenderStarted.RenderInvalidDashboard as exc:
-        response = render_to_response(exc.dashboard_template, exc.template_context)
+        response = render_to_response(exc.instructor_template, exc.template_context)
     except InstructorDashboardRenderStarted.RedirectToPage as exc:
         response = HttpResponseRedirect(exc.redirect_to)
     except InstructorDashboardRenderStarted.RenderCustomResponse as exc:
