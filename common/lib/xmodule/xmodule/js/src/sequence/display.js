@@ -295,6 +295,7 @@
                 this.sr_container.focus();
                 if (!this.$("span.status").hasClass('unanswered')) {
                   this.$('input').prop('disabled', true);
+                  this.$('button.submit.btn-brand').prop('disabled', true);
                 }
             }
         };
