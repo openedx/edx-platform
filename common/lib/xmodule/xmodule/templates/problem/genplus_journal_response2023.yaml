@@ -15,12 +15,15 @@ data: |
           <div class="journals-form">
             <div class="col">
               <div class="journals-info">
-                <h2>YOUR JOURNAL</h2>
+                <div class="journals-info-header">
+                  <img src="/static/images/reflection-badge.svg" width="120" alt="Badge opportunity - Great Reflection" />
+                  <h2>YOUR JOURNAL</h2>
+                </div>
                 <div class="img-block">
                   <img src="/static/images/icon-think.svg" width="25" alt="Info" />
                   <span>Type your answer in the journal.</span>
                 </div>
-                <img src="/static/images/reflection-badge.svg" class="align-center" alt="Badge opportunity - Great Reflection" />
+                <p>I can use BFG to help me communicate a message more effectively than just using words alone. For example when ...</p>
               </div>
             </div>
             <div class="col">
