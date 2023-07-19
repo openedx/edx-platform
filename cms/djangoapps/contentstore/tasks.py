@@ -76,7 +76,7 @@ from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
 
 
-from cms.djangoapps.contentstore.utils import delete_course # lint-amnesty, pylint: disable=wrong-import-order
+from cms.djangoapps.contentstore.utils import delete_course  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
 
 User = get_user_model()
@@ -973,6 +973,7 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
         "status": "SUCCESS",
         "msg": None
     }
+
 
 @shared_task(time_limit=30)
 @set_code_owner_attribute

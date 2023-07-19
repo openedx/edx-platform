@@ -82,7 +82,6 @@ class Command(BaseCommand):
         else:
             v1_library_keys = list(map(self._parse_library_key, options['library_ids']))
 
-
         delete_libary_task_group = group([
             delete_v1_library.s(str(v1_library_key)) for v1_library_key in v1_library_keys
         ])
