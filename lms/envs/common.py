@@ -2098,10 +2098,6 @@ FOOTER_OPENEDX_URL = "https://open.edx.org"
 # * https://logos.openedx.org/open-edx-logo-tag-dark.png
 FOOTER_OPENEDX_LOGO_IMAGE = "https://logos.openedx.org/open-edx-logo-tag.png"
 
-# This is just a placeholder image.
-# Site operators can customize this with their organization's image.
-FOOTER_ORGANIZATION_IMAGE = "images/logo.png"
-
 # These are referred to both by the Django asset pipeline
 # AND by the branding footer API, which needs to decide which
 # version of the CSS to serve.

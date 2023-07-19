@@ -303,7 +303,6 @@ FINANCIAL_REPORTS:
     BUCKET: null
     ROOT_PATH: sandbox
     STORAGE_TYPE: localfs
-FOOTER_ORGANIZATION_IMAGE: images/logo.png
 GITHUB_REPO_ROOT: /edx/var/edxapp/data
 GIT_REPO_EXPORT_DIR: /edx/var/edxapp/export_course_repos
 GOOGLE_ANALYTICS_ACCOUNT: null

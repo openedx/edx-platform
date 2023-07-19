@@ -465,29 +465,18 @@ def _footer_logo_img(is_secure):
     """
     default_local_path = 'images/logo.png'
     brand_footer_logo_url = settings.LOGO_TRADEMARK_URL
-    footer_url_from_site_config = configuration_helpers.get_value(
-        'FOOTER_ORGANIZATION_IMAGE',
-        settings.FOOTER_ORGANIZATION_IMAGE
-    )
-
     # `logo_name` is looked up from the configuration,
     # which falls back on the Django settings, which loads it from
     # `lms.yml`, which is created and managed by Ansible. Because of
     # this runaround, we lose a lot of the flexibility that Django's
     # staticfiles system provides, and we end up having to hardcode the path
     # to the footer logo rather than use the comprehensive theming system.
-    # EdX needs the FOOTER_ORGANIZATION_IMAGE value to point to edX's
     # logo by default, so that it can display properly on edx.org -- both
     # within the LMS, and on the Drupal marketing site, which uses this API.
-    if footer_url_from_site_config:
-        return _absolute_url_staticfile(is_secure, footer_url_from_site_config)
-
     if brand_footer_logo_url:
         return brand_footer_logo_url
 
     log.info(
-        "Failed to find footer logo at '%s', using '%s' instead",
-        footer_url_from_site_config,
         default_local_path,
     )
 
