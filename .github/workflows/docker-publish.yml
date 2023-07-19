@@ -1,7 +1,6 @@
 name: Push Docker Images
 
 on:
-  pull_request:
   push:
     branches:
       - master
@@ -10,12 +9,15 @@ jobs:
   # See also https://docs.docker.com/docker-hub/builds/
   push:
     runs-on: ubuntu-latest
-      # if: github.event_name == 'push'     
+    if: github.event_name == 'push'     
+    
     strategy:
       matrix:
         variant:
           - "lms_dev"
           - "cms_dev"
+          - "cms"
+          - "lms"
 
     steps:
       - name: Checkout
