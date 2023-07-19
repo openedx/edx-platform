@@ -3,7 +3,6 @@
 from tempfile import NamedTemporaryFile
 
 import pytest
-import six
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -50,7 +49,7 @@ class BulkChangeEnrollmentCSVTests(SharedModuleStoreTestCase):
         """Write a test csv file with the lines provided"""
         csv.write(b"course_id,user,mode,\n")
         for line in lines:
-            csv.write(six.b(line))
+            csv.write(line.encode())
         csv.seek(0)
         return csv
 

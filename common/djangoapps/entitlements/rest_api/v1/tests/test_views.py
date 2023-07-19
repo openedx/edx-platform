@@ -1392,4 +1392,4 @@ class RevokeSubscriptionsVerifiedAccessViewTest(ModuleStoreTestCase):
         assert response.status_code == 204
         mock_task.assert_called_once_with(args=([str(course_entitlement.uuid)],
                                                 [str(enrollment.course_id)],
-                                                self.user.id))
+                                                self.user.username))

@@ -61,7 +61,7 @@ def is_course_run_entitlement_fulfillable(
     return course_overview.start and can_upgrade and (is_enrolled or can_enroll)
 
 
-def revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, user_id, awarded_cert_course_ids,
+def revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, username, awarded_cert_course_ids,
                                                        revocable_entitlement_uuids):
     """
     This method expires the entitlements for provided course_entitlements and also moves the enrollments
@@ -69,8 +69,8 @@ def revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, user
     """
 
     log.info('B2C_SUBSCRIPTIONS: Starting revoke_entitlements_and_downgrade_courses_to_audit for '
-             'user: %s, course_entitlements_uuids: %s, awarded_cert_course_ids: %s',
-             user_id,
+             'user: [%s], course_entitlements_uuids: %s, awarded_cert_course_ids: %s',
+             username,
              revocable_entitlement_uuids,
              awarded_cert_course_ids)
     for course_entitlement in course_entitlements:
@@ -87,11 +87,11 @@ def revoke_entitlements_and_downgrade_courses_to_audit(course_entitlements, user
                     course_entitlement.expire_entitlement()
                 update_enrollment(username, str(course_id), CourseMode.AUDIT, include_expired=True)
             else:
-                log.warning('B2C_SUBSCRIPTIONS: Enrollment mode mismatch for user_id: %s and course_id: %s',
-                            user_id,
+                log.warning('B2C_SUBSCRIPTIONS: Enrollment mode mismatch for user: %s and course_id: %s',
+                            username,
                             course_id)
     log.info('B2C_SUBSCRIPTIONS: Completed revoke_entitlements_and_downgrade_courses_to_audit for '
-             'user: %s, course_entitlements_uuids: %s, awarded_cert_course_ids: %s',
-             user_id,
+             'user: [%s], course_entitlements_uuids: %s, awarded_cert_course_ids: %s',
+             username,
              revocable_entitlement_uuids,
              awarded_cert_course_ids)

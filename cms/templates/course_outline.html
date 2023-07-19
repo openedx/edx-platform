@@ -3,7 +3,6 @@
 <%def name="online_help_token()"><% return "develop_course" %></%def>
 <%!
 import logging
-import six
 from six.moves.urllib.parse import quote
 
 from cms.djangoapps.contentstore.config.waffle_utils import should_show_checklists_quality
@@ -160,7 +159,7 @@ from django.urls import reverse
           <h2 class="title title-3">${_("This course has proctored exam settings that are incomplete or invalid.")}</h2>
           <p>
             % if mfe_proctored_exam_settings_url:
-              <% url_encoded_course_id = quote(six.text_type(context_course.id).encode('utf-8'), safe='') %>
+              <% url_encoded_course_id = quote(str(context_course.id).encode('utf-8'), safe='') %>
               ${Text(_("To update these settings go to the {link_start}Proctored Exam Settings page{link_end}.")).format(
                 link_start=HTML('<a href="${mfe_proctored_exam_settings_url}">').format(
                         mfe_proctored_exam_settings_url=mfe_proctored_exam_settings_url
@@ -263,7 +262,7 @@ from django.urls import reverse
                             },
                             "enable_quality": ${should_show_checklists_quality(context_course.id) | n, dump_js_escaped_json},
                             "links": {
-                                "settings": ${reverse('settings_handler', kwargs={'course_key_string': six.text_type(course_key)})| n, dump_js_escaped_json}
+                                "settings": ${reverse('settings_handler', kwargs={'course_key_string': str(course_key)})| n, dump_js_escaped_json}
                             }
                         }
                     </%static:studiofrontend>

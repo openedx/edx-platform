@@ -96,7 +96,7 @@ class TestModelStrings(SharedModuleStoreTestCase):
             "<CourseTeamMembership id=1 user_id=1 team_id=1>"
         )
 
-    def test_team_membership_text_type(self):
+    def test_team_membership_str(self):
         assert str(self.team_membership) == (
             "the-user is member of The Team in edx/the-course/1"
         )
