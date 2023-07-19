@@ -133,3 +133,29 @@ class SendNotificationsTest(ModuleStoreTestCase):
         self.assertEqual(notification.content_context, context)
         self.assertEqual(notification.content_url, content_url)
         self.assertEqual(notification.course_id, self.course_1.id)
+
+    @override_waffle_flag(ENABLE_NOTIFICATIONS, active=True)
+    @ddt.data(
+        ('discussion', 'new_comment_on_response'),  # core notification
+        ('discussion', 'new_response'),  # non core notification
+    )
+    @ddt.unpack
+    def test_send_with_app_disabled_notifications(self, app_name, notification_type):
+        """
+        Test send_notifications does not create a new notification if the app is disabled.
+        """
+        self.preference_v1.notification_preference_config['discussion']['enabled'] = False
+        self.preference_v1.save()
+
+        context = {
+            'post_title': 'Post title',
+            'replier_name': 'replier name',
+        }
+        content_url = 'https://example.com/'
+
+        # Call the `send_notifications` function.
+        send_notifications([self.user.id], str(self.course_1.id), app_name, notification_type, context, content_url)
+
+        # Assert that `Notification` objects are not created for the users.
+        notification = Notification.objects.filter(user_id=self.user.id).first()
+        self.assertIsNone(notification)
