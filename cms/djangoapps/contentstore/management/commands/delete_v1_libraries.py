@@ -1,4 +1,4 @@
-"""A Command to  Copy or uncopy V1 Content Libraries entires to be stored as v2 content libraries."""
+"""A Command to  delete V1 Content Libraries index entires."""
 
 import logging
 from textwrap import dedent
@@ -21,28 +21,20 @@ log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
-    Copy or uncopy V1 Content Libraries (default all) entires to be stored as v2 content libraries.
-    First Specify the uuid for the collection to store the content libraries in.
-    Specfiy --all for all libraries, library ids for specific libraries,
-    and -- file followed by the path for a list of libraries from a file.
+    Delete V1 Content Libraries (default all) index entires.
+    Specfiy --all for all libraries, or space-seperated library ids for specific libraries.
+    Note this will leave orphans behind in mongo. use mongo prune to clean them up.
 
     Example usage:
-
-        $ ./manage.py cms copy_libraries_from_v1_to_v2 'collection_uuid' --all
-        $ ./manage.py cms copy_libraries_from_v1_to_v2
-            library-v1:edX+DemoX+Demo_Library'  'library-v1:edX+DemoX+Better_Library' -c 'collection_uuid'
-        $ ./manage.py cms copy_libraries_from_v1_to_v2 --all --uncopy
-        $ ./manage.py cms copy_libraries_from_v1_to_v2 'library-v1:edX+DemoX+Better_Library' --uncopy
-        $ ./manage.py cms copy_libraries_from_v1_to_v2
-            '11111111-2111-4111-8111-111111111111'
-            './list_of--library-locators- --file
+        ./manage.py cms delete_v1_libraries 'library-v1:edx+eaa'
+        ./manage.py cms delete_v1_libraries --all
 
     Note:
-       This Command Also produces an "output file" which contains the mapping of locators and the status of the copy.
+       This Command also produces an "output file" which contains the mapping of locators and the status of the copy.
     """
 
     help = dedent(__doc__)
-    CONFIRMATION_PROMPT = "Reindexing all libraries might be a time consuming operation. Do you want to continue?"
+    CONFIRMATION_PROMPT = "Deleting all libraries might be a time consuming operation. Do you want to continue?"
 
     def add_arguments(self, parser):
         """arguements for command"""
@@ -50,13 +42,13 @@ class Command(BaseCommand):
         parser.add_argument(
             'library_ids',
             nargs='*',
-            help='a space-seperated list of v1 library ids to copy'
+            help='A space-seperated list of v1 library ids to delete'
         )
         parser.add_argument(
             '--all',
             action='store_true',
             dest='all',
-            help='Copy all libraries'
+            help='Delete all libraries'
         )
         parser.add_argument(
             'output_csv',
@@ -74,8 +66,7 @@ class Command(BaseCommand):
         return result
 
     def handle(self, *args, **options):  # lint-amnesty, pylint: disable=unused-argument
-        """Parse args and generate tasks for copying content."""
-        print(options)
+        """Parse args and generate tasks for deleting content."""
 
         if (not options['library_ids'] and not options['all']) or (options['library_ids'] and options['all']):
             raise CommandError("delete_v1_libraries requires one or more <library_id>s or the --all flag.")
@@ -97,10 +88,9 @@ class Command(BaseCommand):
         ])
 
         group_result = delete_libary_task_group.apply_async().get()
+        log.info(group_result)
         if options['output_csv']:
             with open(options['output_csv'][0], 'w', encoding='utf-8', newline='') as output_writer:
                 output_writer.writerow("v1_library_id", "v2_library_id", "status", "error_msg")
                 for result in group_result:
                     output_writer.write(result.keys())
-        log.info(group_result)
-
