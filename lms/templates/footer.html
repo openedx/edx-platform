@@ -37,7 +37,6 @@
               </a>
             </p>
           </div>  
-            
           ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
           <p class="copyright">${footer['copyright']}
                % if icp_license_info.get('icp_license'):
@@ -103,7 +102,6 @@
         % if context.get('include_language_selector', footer_language_selector_is_enabled()):
             <%include file="${static.get_template_path('widgets/footer-language-selector.html')}"/>
         % endif
-                
         <div class="wrapper-logo">
           <p>
             <a href="/">
@@ -116,7 +114,6 @@
             </a>
           </p>
         </div>
-                
         ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
           <p class="copyright">${footer['copyright']}
               % if icp_license_info.get('icp_license'):
