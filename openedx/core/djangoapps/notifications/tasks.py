@@ -132,7 +132,7 @@ def create_notification_pref_if_not_exists(user_ids: List, preferences: List, co
     new_preferences = []
 
     for user_id in user_ids:
-        if not any(preference.user_id == user_id for preference in preferences):
+        if not any(preference.user_id == int(user_id) for preference in preferences):
             new_preferences.append(CourseNotificationPreference(
                 user_id=user_id,
                 course_id=course_id,

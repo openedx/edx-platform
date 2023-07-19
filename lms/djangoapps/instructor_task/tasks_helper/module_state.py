@@ -9,6 +9,7 @@ from time import time
 
 from django.utils.translation import gettext_noop
 from opaque_keys.edx.keys import UsageKey
+from xblock.runtime import KvsFieldData
 from xblock.scorable import Score
 
 from xmodule.capa.responsetypes import LoncapaProblemError, ResponseError, StudentInputError
@@ -17,9 +18,9 @@ from common.djangoapps.track.event_transaction_utils import create_new_event_tra
 from common.djangoapps.track.views import task_track
 from common.djangoapps.util.db import outer_atomic
 from lms.djangoapps.courseware.courses import get_problems_in_section
-from lms.djangoapps.courseware.model_data import FieldDataCache
+from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from lms.djangoapps.courseware.models import StudentModule
-from lms.djangoapps.courseware.block_render import get_block_for_descriptor
+from lms.djangoapps.courseware.block_render import get_block_for_descriptor_internal
 from lms.djangoapps.grades.api import events as grades_events
 from openedx.core.lib.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
@@ -333,10 +334,16 @@ def _get_module_instance_for_task(course_id, student, block, xblock_instance_arg
     """
     Fetches a StudentModule instance for a given `course_id`, `student` object, and `block`.
 
-    `xblock_instance_args` is used to provide information for creating a track function.
-    It is passed, along with `grade_bucket_type`, to get_block_for_descriptor.
+    `xblock_instance_args` is used to provide information for creating a track function and an XQueue callback.
+    These are passed, along with `grade_bucket_type`, to get_block_for_descriptor_internal, which sidesteps
+    the need for a Request object when instantiating an xblock instance.
     """
-    # get request-related tracking information from args passthrough, and supplement with task-specific information:
+    # reconstitute the problem's corresponding XBlock:
+    field_data_cache = FieldDataCache.cache_for_block_descendents(course_id, student, block)
+    student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
+
+    # get request-related tracking information from args passthrough, and supplement with task-specific
+    # information:
     request_info = xblock_instance_args.get('request_info', {}) if xblock_instance_args is not None else {}
     task_info = {"student": student.username, "task_id": _get_task_id_from_xblock_args(xblock_instance_args)}
 
@@ -350,12 +357,11 @@ def _get_module_instance_for_task(course_id, student, block, xblock_instance_arg
         '''
         return lambda event_type, event: task_track(request_info, task_info, event_type, event, page='x_module_task')
 
-    return get_block_for_descriptor(
+    return get_block_for_descriptor_internal(
         user=student,
-        request=None,
         block=block,
-        field_data_cache=FieldDataCache.cache_for_block_descendents(course_id, student, block),
-        course_key=course_id,
+        student_data=student_data,
+        course_id=course_id,
         track_function=make_track_function(),
         grade_bucket_type=grade_bucket_type,
         # This module isn't being used for front-end rendering

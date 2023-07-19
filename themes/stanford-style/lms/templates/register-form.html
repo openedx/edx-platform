@@ -1,7 +1,6 @@
 ## xss-lint: disable=mako-missing-default
 <%!
 from common.djangoapps import third_party_auth
-import six
 from common.djangoapps.third_party_auth import pipeline, provider
 from django.utils.translation import ugettext as _
 from django_countries import countries
@@ -169,7 +168,7 @@ from common.djangoapps.student.models import UserProfile
         <select id="country" name="country" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['country'] == 'required' else ''}>
           <option value="">--</option>
           %for code, country_name in countries:
-          <option value="${code}">${ six.text_type(country_name) }</option>
+          <option value="${code}">${ str(country_name) }</option>
           %endfor
         </select>
       </div>

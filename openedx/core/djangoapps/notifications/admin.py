@@ -8,7 +8,10 @@ from .models import CourseNotificationPreference, Notification
 
 
 class NotificationAdmin(admin.ModelAdmin):
-    pass
+    """
+    Admin for Notifications
+    """
+    raw_id_fields = ('user',)
 
 
 class CourseNotificationPreferenceAdmin(admin.ModelAdmin):
@@ -16,6 +19,7 @@ class CourseNotificationPreferenceAdmin(admin.ModelAdmin):
     Admin for Course Notification Preferences
     """
     model = CourseNotificationPreference
+    raw_id_fields = ('user',)
     list_display = ['get_username', 'course_id', 'notification_preference_config']
 
     @admin.display(description='Username', ordering='user__username')

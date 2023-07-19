@@ -57,6 +57,7 @@ RUN apt-get update && \
         libpython3.8 \
         libpython3.8-stdlib \
         libmysqlclient21 \
+        pkg-config \
         libssl1.1 \
         libxmlsec1-openssl \
         # lynx: Required by https://github.com/openedx/edx-platform/blob/b489a4ecb122/openedx/core/lib/html_to_text.py#L16

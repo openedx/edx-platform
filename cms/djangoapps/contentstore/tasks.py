@@ -296,7 +296,7 @@ class CourseExportTask(UserTask):  # pylint: disable=abstract-method
             arguments_dict (dict): The arguments given to the task function
 
         Returns:
-            text_type: The generated name
+            str: The generated name
         """
         key = arguments_dict['course_key_string']
         return f'Export of {key}'
@@ -431,7 +431,7 @@ class CourseImportTask(UserTask):  # pylint: disable=abstract-method
             arguments_dict (dict): The arguments given to the task function
 
         Returns:
-            text_type: The generated name
+            str: The generated name
         """
         key = arguments_dict['course_key_string']
         filename = arguments_dict['archive_name']

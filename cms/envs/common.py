@@ -1383,15 +1383,6 @@ PIPELINE['JAVASCRIPT'] = {
         'source_filenames': base_vendor_js,
         'output_filename': 'js/cms-base-vendor.js',
     },
-    'module-js': {
-        'source_filenames': (
-            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
-            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/modules/js/*.js') +
-            rooted_glob(COMMON_ROOT / 'static/', 'common/js/discussion/*.js')
-        ),
-        'output_filename': 'js/cms-modules.js',
-        'test_order': 1
-    },
 }
 
 STATICFILES_IGNORE_PATTERNS = (
@@ -2706,6 +2697,7 @@ TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
 COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_assets/course_live.html"
+ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/ora_settings.html"
 
 # keys for  big blue button live provider
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}

@@ -9,13 +9,22 @@ import git
 # -- Project information -----------------------------------------------------
 
 project = "edx-platform Technical Reference"
-copyright = f'{datetime.now().year}, Axim Collaborative, Inc'  # pylint: disable=redefined-builtin
-author = 'Axim Collaborative, Inc'
+copyright = f"{datetime.now().year}, Axim Collaborative, Inc"  # pylint: disable=redefined-builtin
+author = "Axim Collaborative, Inc"
 release = ""
 
 # -- General configuration ---------------------------------------------------
 
-extensions = ["code_annotations.contrib.sphinx.extensions.featuretoggles", "code_annotations.contrib.sphinx.extensions.settings"]
+extensions = [
+    "code_annotations.contrib.sphinx.extensions.featuretoggles",
+    "code_annotations.contrib.sphinx.extensions.settings",
+    "sphinx_reredirects",
+]
+
+redirects = {
+    "*": "https://docs.openedx.org/projects/edx-platform/en/latest/$source.html",
+}
+
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
@@ -38,7 +47,7 @@ settings_repo_version = edx_platform_version
 
 # -- Options for HTML output -------------------------------------------------
 
-html_theme = 'sphinx_book_theme'
+html_theme = "sphinx_book_theme"
 html_static_path = ["_static"]
 html_favicon = "https://logos.openedx.org/open-edx-favicon.ico"
 html_logo = "https://logos.openedx.org/open-edx-logo-color.png"
@@ -72,5 +81,5 @@ html_theme_options = {
                 rel="license"
                 href="https://creativecommons.org/licenses/by-sa/4.0/"
             >Creative Commons Attribution-ShareAlike 4.0 International License</a>.
-    """
+    """,
 }

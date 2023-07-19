@@ -63,7 +63,14 @@ define(
                         t = -1;
                       }, delay);
                     }
-                  };
+
+                    // this is added to compensate for custom css that accidentally hide mathjax
+                    $('.MathJax_SVG>svg').toArray().forEach(el => {
+                        if ($(el).width() === 0) {
+                        $(el).css('max-width', 'inherit');
+                        }
+                    });
+                };
             }
         );
         window.CodeMirror = CodeMirror;

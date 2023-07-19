@@ -1,8 +1,6 @@
 ## xss-lint: disable=mako-missing-default
 <%inherit file="base.html" />
 <%!
-import six
-
 from django.utils.translation import gettext as _
 from django.urls import reverse
 
@@ -125,7 +123,7 @@ from openedx.core.djangolib.js_utils import (
         "${context_course.display_name_with_default | h}",
         ${users | n, dump_js_escaped_json},
         // xss-lint: disable=mako-invalid-js-filter
-        "${reverse('course_team_handler', kwargs={'course_key_string': six.text_type(context_course.id), 'email': '@@EMAIL@@'}) | n, js_escaped_string}",
+        "${reverse('course_team_handler', kwargs={'course_key_string': str(context_course.id), 'email': '@@EMAIL@@'}) | n, js_escaped_string}",
         ${request.user.id | n, dump_js_escaped_json},
         ${allow_actions | n, dump_js_escaped_json}
       );
