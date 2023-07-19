@@ -54,7 +54,8 @@ from openedx.core.djangolib.markup import HTML
   <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery.qubit.js')}"></script>
-  <%static:js group='module-descriptor-js'/>
+  <%static:webpack entry='HtmlBlockEditor'/>
+  <link rel="stylesheet" href="${static.url('css/HtmlBlockEditor.css')}">
   <%static:js group='instructor_dash'/>
   <%static:js group='application'/>
 

@@ -2576,14 +2576,6 @@ PIPELINE['JAVASCRIPT'] = {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
     },
-    'module-descriptor-js': {
-        'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
-        'output_filename': 'js/lms-module-descriptors.js',
-    },
-    'module-js': {
-        'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
-        'output_filename': 'js/lms-modules.js',
-    },
     'discussion': {
         'source_filenames': discussion_js,
         'output_filename': 'js/discussion.js',
@@ -5334,6 +5326,8 @@ SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
 SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
 SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
 SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
+SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
+SUBSCRIPTIONS_TRIAL_LENGTH = 7
 SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 
 ############## NOTIFICATIONS EXPIRY ##############
