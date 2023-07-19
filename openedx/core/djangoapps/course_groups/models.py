@@ -63,7 +63,8 @@ class CourseUserGroup(models.Model):
     # For now, only have group type 'cohort', but adding a type field to support
     # things like 'question_discussion', 'friends', 'off-line-class', etc
     COHORT = 'cohort'  # If changing this string, update it in migration 0006.forwards() as well
-    GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'),)
+    GROUPS = 'groups'
+    GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'), (GROUPS, 'Groups'),)
     group_type = models.CharField(max_length=20, choices=GROUP_TYPE_CHOICES)
 
     @classmethod
@@ -188,6 +189,37 @@ class CohortMembership(models.Model):
             using=using,
             update_fields=update_fields
         )
+
+
+class GroupMembership(models.Model):
+    """
+    Used internally to enforce particular conditions.
+
+    .. no_pii:
+    """
+    course_user_group = models.ForeignKey(CourseUserGroup, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course_id = CourseKeyField(max_length=255)
+
+    def clean_fields(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
+        if self.course_id is None:
+            self.course_id = self.course_user_group.course_id
+        super().clean_fields(*args, **kwargs)
+
+    @classmethod
+    def assign(cls, group, user):
+        with transaction.atomic():
+            membership, created = cls.objects.select_for_update().get_or_create(
+                user__id=user.id,
+                course_id=group.course_id,
+                defaults={
+                    'course_user_group': group,
+                    'user': user
+                })
+
+            if created:
+                membership.course_user_group.users.add(user)
+        return membership
 
 
 # Needs to exist outside class definition in order to use 'sender=CohortMembership'
