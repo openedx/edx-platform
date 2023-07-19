@@ -1,7 +1,6 @@
 # lint-amnesty, pylint: disable=missing-module-docstring
-import datetime
-
 import copy
+import datetime
 import json
 import logging
 import os
@@ -286,7 +285,7 @@ class XmlMixin:
                 metadata[attr] = value
 
     @classmethod
-    def parse_xml(cls, node, runtime, _keys, id_generator):
+    def parse_xml(cls, node, runtime, keys, id_generator):  # pylint: disable=too-many-statements
         """
         Use `node` to construct a new block.
 
@@ -295,8 +294,8 @@ class XmlMixin:
 
             runtime (:class:`.Runtime`): The runtime to use while parsing.
 
-            _keys (:class:`.ScopeIds`): The keys identifying where this block
-                will store its data. Not used by this implementation.
+            keys (:class:`.ScopeIds`): The keys identifying where this block
+                will store its data.
 
             id_generator (:class:`.IdGenerator`): An object that will allow the
                 runtime to generate correct definition and usage ids for
@@ -305,9 +304,13 @@ class XmlMixin:
         Returns (XBlock): The newly parsed XBlock
 
         """
-        url_name = node.get('url_name')
-        def_id = id_generator.create_definition(node.tag, url_name)
-        usage_id = id_generator.create_usage(def_id)
+        from xmodule.modulestore.xml import ImportSystem  # done here to avoid circular import
+        if id_generator is None:
+            id_generator = runtime.id_generator
+        if keys is None:
+            # Passing keys=None is against the XBlock API but some platform tests do it.
+            def_id = id_generator.create_definition(node.tag, node.get('url_name'))
+            keys = ScopeIds(None, node.tag, def_id, id_generator.create_usage(def_id))
         aside_children = []
 
         # VS[compat]
@@ -320,14 +323,14 @@ class XmlMixin:
         if is_pointer_tag(node):
             # new style:
             # read the actual definition file--named using url_name.replace(':','/')
-            definition_xml, filepath = cls.load_definition_xml(node, runtime, def_id)
-            aside_children = runtime.parse_asides(definition_xml, def_id, usage_id, id_generator)
+            definition_xml, filepath = cls.load_definition_xml(node, runtime, keys.def_id)
+            aside_children = runtime.parse_asides(definition_xml, keys.def_id, keys.usage_id, id_generator)
         else:
             filepath = None
             definition_xml = node
 
         # Note: removes metadata.
-        definition, children = cls.load_definition(definition_xml, runtime, def_id, id_generator)
+        definition, children = cls.load_definition(definition_xml, runtime, keys.def_id, id_generator)
 
         # VS[compat]
         # Make Ike's github preview links work in both old and new file layouts.
@@ -352,26 +355,31 @@ class XmlMixin:
             aside_children.extend(definition_aside_children)
 
         # Set/override any metadata specified by policy
-        cls.apply_policy(metadata, runtime.get_policy(usage_id))
+        cls.apply_policy(metadata, runtime.get_policy(keys.usage_id))
 
-        field_data = {}
-        field_data.update(metadata)
-        field_data.update(definition)
-        field_data['children'] = children
-
+        field_data = {**metadata, **definition, "children": children}
         field_data['xml_attributes']['filename'] = definition.get('filename', ['', None])  # for git link
-        # TODO: we shouldn't be instantiating our own field data instance here, but rather just call to
-        # runtime.construct_xblock_from_class() and then set fields on the returned block.
-        # See the base XBlock class (XmlSerializationMixin.parse_xml) for how it should be done.
-        kvs = InheritanceKeyValueStore(initial_values=field_data)
-        field_data = KvsFieldData(kvs)
+        if "filename" in field_data:
+            del field_data["filename"]  # filename should only be in xml_attributes.
 
-        xblock = runtime.construct_xblock_from_class(
-            cls,
-            # We're loading a block, so student_id is meaningless
-            ScopeIds(None, node.tag, def_id, usage_id),
-            field_data,
-        )
+        if isinstance(runtime, ImportSystem):
+            # we shouldn't be instantiating our own field data instance here, but there are complex inter-depenencies
+            # between this mixin and ImportSystem that currently seem to require it for proper metadata inheritance.
+            kvs = InheritanceKeyValueStore(initial_values=field_data)
+            field_data = KvsFieldData(kvs)
+            xblock = runtime.construct_xblock_from_class(cls, keys, field_data)
+        else:
+            # The "normal" / new way to set field data:
+            xblock = runtime.construct_xblock_from_class(cls, keys)
+            for (key, value_jsonish) in field_data.items():
+                if key in cls.fields:
+                    setattr(xblock, key, cls.fields[key].from_json(value_jsonish))
+                elif key == 'children':
+                    xblock.children = value_jsonish
+                else:
+                    log.warning(
+                        "Imported %s XBlock does not have field %s found in XML.", xblock.scope_ids.block_type, key,
+                    )
 
         if aside_children:
             asides_tags = [x.tag for x in aside_children]
@@ -447,7 +455,7 @@ class XmlMixin:
             if (attr not in self.metadata_to_strip
                     and attr not in self.metadata_to_export_to_policy
                     and attr not in not_to_clean_fields):
-                val = serialize_field(self._field_data.get(self, attr))
+                val = serialize_field(self.fields[attr].to_json(getattr(self, attr)))
                 try:
                     xml_object.set(attr, val)
                 except Exception:  # lint-amnesty, pylint: disable=broad-except
