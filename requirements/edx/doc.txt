@@ -561,7 +561,7 @@ edx-drf-extensions==8.8.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==4.0.0
+edx-enterprise==4.0.1
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -803,9 +803,7 @@ lazy==1.5
 learner-pathway-progress==1.3.4
     # via -r requirements/edx/base.txt
 libsass==0.10.0
-    # via
-    #   -r requirements/edx/base.txt
-    #   ora2
+    # via -r requirements/edx/base.txt
 loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
@@ -933,7 +931,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==5.1.1
+ora2==5.2.1
     # via -r requirements/edx/base.txt
 oscrypto==1.3.0
     # via

@@ -1143,7 +1143,6 @@ libsass==0.10.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   ora2
 loremipsum==1.0.5
     # via
     #   -r requirements/edx/doc.txt
@@ -1327,7 +1326,7 @@ optimizely-sdk==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==5.1.1
+ora2==5.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2053,6 +2052,16 @@ tqdm==4.65.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   nltk
+types-pytz==2023.3.0.0
+    # via django-stubs
+types-pyyaml==6.0.12.10
+    # via
+    #   django-stubs
+    #   djangorestframework-stubs
+types-requests==2.31.0.1
+    # via djangorestframework-stubs
+types-urllib3==1.26.25.13
+    # via types-requests
 typing-extensions==4.7.1
     # via
     #   -r requirements/edx/doc.txt

@@ -677,9 +677,7 @@ lazy==1.5
 learner-pathway-progress==1.3.4
     # via -r requirements/edx/bundled.in
 libsass==0.10.0
-    # via
-    #   -r requirements/edx/paver.txt
-    #   ora2
+    # via -r requirements/edx/paver.txt
 loremipsum==1.0.5
     # via ora2
 lti-consumer-xblock==9.5.5
@@ -790,7 +788,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==5.1.1
+ora2==5.2.1
     # via -r requirements/edx/bundled.in
 oscrypto==1.3.0
     # via snowflake-connector-python
