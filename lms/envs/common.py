@@ -1080,12 +1080,6 @@ MARKETING_EMAILS_OPT_IN = False
 # .. toggle_tickets: 'https://openedx.atlassian.net/browse/VAN-622'
 ENABLE_COPPA_COMPLIANCE = False
 
-# VAN-741 - save for later api put behind a flag to make it only available for edX
-ENABLE_SAVE_FOR_LATER = False
-
-# VAN-887 - save for later reminder emails threshold days
-SAVE_FOR_LATER_REMINDER_EMAIL_THRESHOLD = 15
-
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
@@ -2585,14 +2579,6 @@ PIPELINE['JAVASCRIPT'] = {
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
-    },
-    'module-descriptor-js': {
-        'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
-        'output_filename': 'js/lms-module-descriptors.js',
-    },
-    'module-js': {
-        'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
-        'output_filename': 'js/lms-modules.js',
     },
     'discussion': {
         'source_filenames': discussion_js,
@@ -4800,10 +4786,6 @@ OPTIONAL_FIELD_API_RATELIMIT = '10/h'
 PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
 
-#### SAVE FOR LATER EMAIL RATE LIMIT SETTINGS ####
-SAVE_FOR_LATER_IP_RATE_LIMIT = '100/d'
-SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/h'
-
 
 #### BRAZE API SETTINGS ####
 
@@ -5348,6 +5330,8 @@ SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
 SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
 SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
 SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
+SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
+SUBSCRIPTIONS_TRIAL_LENGTH = 7
 SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 
 ############## NOTIFICATIONS EXPIRY ##############

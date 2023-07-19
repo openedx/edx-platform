@@ -15,6 +15,7 @@ class ProgramSubscriptionModel extends Backbone.Model {
             programData: { subscription_prices },
             urls = {},
             userPreferences = {},
+            subscriptionsTrialLength: trialLength = 7,
         } = context;
 
         const priceInUSD = subscription_prices?.find(({ currency }) => currency === 'USD');
@@ -55,8 +56,6 @@ class ProgramSubscriptionModel extends Backbone.Model {
             data.trial_end,
             userPreferences
         );
-
-        const trialLength = 7;
 
         super(
             {

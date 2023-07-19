@@ -94,10 +94,10 @@ shell: ## launch a bash shell in a Docker container with all edx-platform depend
 # Order is very important in this list: files must appear after everything they include!
 REQ_FILES = \
 	requirements/edx/coverage \
-	requirements/edx/doc \
 	requirements/edx/paver \
 	requirements/edx-sandbox/py38 \
 	requirements/edx/base \
+	requirements/edx/doc \
 	requirements/edx/testing \
 	requirements/edx/development \
 	scripts/xblock/requirements
