@@ -475,10 +475,11 @@ def students_aggregate_result(user_states, aggregate_result, problem_choices):
     """
     for key in problem_choices.keys():
         choice = problem_choices[key]
-        aggregate_result[choice['statement']] = {
-            'count': 0,
-            'is_correct': choice['correct'] == 'true'
-        }
+        if choice['statement'] not in aggregate_result:
+            aggregate_result[choice['statement']] = {
+                'count': 0,
+                'is_correct': choice['correct'] == 'true'
+            }
 
     for user_state in user_states:
         user_answer = user_state['Answer']
