@@ -167,6 +167,78 @@ class ClipboardTestCase(ModuleStoreTestCase):
         # Now if we GET the clipboard again, the GET response should exactly equal the last POST response:
         self.assertEqual(client.get(CLIPBOARD_ENDPOINT).json(), response_data)
 
+    def test_copy_unit(self):
+        """
+        Test copying a unit (vertical block) from the course
+        """
+        course_key, client = self._setup_course()
+
+        # Copy the HTML
+        unit_key = course_key.make_usage_key("vertical", "vertical_test")
+        response = client.post(CLIPBOARD_ENDPOINT, {"usage_key": str(unit_key)}, format="json")
+
+        # Validate the response:
+        assert response.status_code == 200
+        response_data = response.json()
+        assert response_data["source_usage_key"] == str(unit_key)
+        assert response_data["source_context_title"] == "Toy Course"
+        assert response_data["content"] == {**response_data["content"], **{
+            "block_type": "vertical",
+            # To ensure API stability, we are hard-coding these expected values:
+            "purpose": "clipboard",
+            "status": "ready",
+            "display_name": "vertical test",  # Has no display_name set so display_name_with_default falls back to this
+        }}
+        # Test the actual OLX in the clipboard:
+        olx_url = response_data["content"]["olx_url"]
+        olx_response = client.get(olx_url)
+        assert olx_response.status_code == 200
+        assert olx_response.get("Content-Type") == "application/vnd.openedx.xblock.v1.vertical+xml"
+        self.assertXmlEqual(olx_response.content.decode(), """
+            <vertical url_name="vertical_test">
+                <video
+                    url_name="sample_video"
+                    display_name="default"
+                    youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
+                    youtube_id_0_75="JMD_ifUUfsU"
+                    youtube_id_1_0="OEoXaMPEzfM"
+                    youtube_id_1_25="AKqURZnYqpk"
+                    youtube_id_1_5="DYpADpL7jAY"
+                />
+                <video
+                    url_name="separate_file_video"
+                    display_name="default"
+                    youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
+                    youtube_id_0_75="JMD_ifUUfsU"
+                    youtube_id_1_0="OEoXaMPEzfM"
+                    youtube_id_1_25="AKqURZnYqpk"
+                    youtube_id_1_5="DYpADpL7jAY"
+                />
+                <video
+                    url_name="video_with_end_time"
+                    display_name="default"
+                    youtube="0.75:JMD_ifUUfsU,1.00:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"
+                    end_time="00:00:10"
+                    youtube_id_0_75="JMD_ifUUfsU"
+                    youtube_id_1_0="OEoXaMPEzfM"
+                    youtube_id_1_25="AKqURZnYqpk"
+                    youtube_id_1_5="DYpADpL7jAY"
+                />
+                <poll_question
+                    url_name="T1_changemind_poll_foo_2"
+                    display_name="Change your answer"
+                    reset="false"
+                >
+                    &lt;p&gt;Have you changed your mind?&lt;/p&gt;
+                    <answer id="yes">Yes</answer>
+                    <answer id="no">No</answer>
+                </poll_question>
+            </vertical>
+        """)
+
+        # Now if we GET the clipboard again, the GET response should exactly equal the last POST response:
+        assert client.get(CLIPBOARD_ENDPOINT).json() == response_data
+
     def test_copy_several_things(self):
         """
         Test that the clipboard only holds one thing at a time.
