@@ -78,6 +78,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# Angelos Chraniotis, 2023
 # Dimitris Agelakis <minoan07@gmail.com>, 2016,2019
 # Dimosthenis Karakatsoulis <karakatsou@gmail.com>, 2015
 # Katerina Ligkovanli <kaligova@gmail.com>, 2016,2019
@@ -3111,6 +3112,14 @@ msgstr ""
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide additional course content and resources with custom pages"
+msgstr ""
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Open Response Assessment Settings"
+msgstr ""
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Course level settings for Open Response Assessment."
 msgstr ""
 
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
