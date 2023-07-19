@@ -188,7 +188,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         send_response_notifications(self.thread, self.course, self.user_2, parent_id=None)
         self.assertEqual(handler.call_count, 1)
         args = handler.call_args[1]['notification_data']
-        self.assertEqual(args.user_ids, [self.user_1.id])
+        self.assertEqual([int(user_id) for user_id in args.user_ids], [self.user_1.id])
         self.assertEqual(args.notification_type, 'new_response')
         expected_context = {
             'replier_name': self.user_2.username,
@@ -224,7 +224,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         # check if the notification is sent to the thread creator
         args_comment = handler.call_args_list[0][1]['notification_data']
         args_comment_on_response = handler.call_args_list[1][1]['notification_data']
-        self.assertEqual(args_comment.user_ids, [self.user_1.id])
+        self.assertEqual([int(user_id) for user_id in args_comment.user_ids], [self.user_1.id])
         self.assertEqual(args_comment.notification_type, 'new_comment')
         expected_context = {
             'replier_name': self.user_3.username,
@@ -240,7 +240,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         self.assertEqual(args_comment.app_name, 'discussion')
 
         # check if the notification is sent to the parent response creator
-        self.assertEqual(args_comment_on_response.user_ids, [self.user_2.id])
+        self.assertEqual([int(user_id) for user_id in args_comment_on_response.user_ids], [self.user_2.id])
         self.assertEqual(args_comment_on_response.notification_type, 'new_comment_on_response')
         expected_context = {
             'replier_name': self.user_3.username,

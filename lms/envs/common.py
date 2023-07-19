@@ -3262,9 +3262,6 @@ INSTALLED_APPS = [
     # For edx ace template tags
     'edx_ace',
 
-    # For save for later
-    'lms.djangoapps.save_for_later',
-
     # Blockstore
     'blockstore.apps.bundles',
 
