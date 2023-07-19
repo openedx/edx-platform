@@ -1102,6 +1102,7 @@ piexif==1.1.3
     # via -r requirements/edx/testing.txt
 pillow==9.5.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
     #   edx-organizations
@@ -1532,7 +1533,8 @@ soupsieve==2.4.1
     #   beautifulsoup4
 sphinx==6.2.1
     # via
-    #   edx-sphinx-theme
+    #   pydata-sphinx-theme
+    #   sphinx-book-theme
     #   sphinxcontrib-httpdomain
     #   sphinxcontrib-openapi
 sphinx-book-theme==1.0.1
