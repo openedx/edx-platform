@@ -1,2 +1,0 @@
-"featuretoggles.rst" "references/featuretoggles.rst"
-"settings.rst" "references/settings.rst"

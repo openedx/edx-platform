@@ -100,11 +100,7 @@ def send_notifications(user_ids, course_key: str, app_name, notification_type, c
     notifications = []
     for preference in preferences:
         preference = update_user_preference(preference, preference.user, course_key)
-        if (
-            preference and
-            preference.get_web_config(app_name, notification_type) and
-            preference.get_app_config(app_name).get('enabled', False)
-        ):
+        if preference and preference.get_web_config(app_name, notification_type):
             notification = Notification(
                 user_id=preference.user_id,
                 app_name=app_name,
