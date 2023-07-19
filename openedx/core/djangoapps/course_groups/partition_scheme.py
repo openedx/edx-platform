@@ -13,6 +13,7 @@ from lms.djangoapps.courseware.masquerade import (
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .cohorts import get_cohort, get_group_info_for_cohort
+from .api import get_team, get_group_info_for_team
 
 log = logging.getLogger(__name__)
 
@@ -99,7 +100,57 @@ def get_cohorted_user_partition(course):
     one cohorted user partition.
     """
     for user_partition in course.user_partitions:
-        if user_partition.scheme == CohortPartitionScheme:
+        if user_partition.scheme == CohortPartitionScheme:  # Deberíamos poder añadir el otro chequeo acá
             return user_partition
 
     return None
+
+
+def get_teamed_user_partition(course):
+    """
+    Returns the first user partition from the specified course which uses the CohortPartitionScheme,
+    or None if one is not found. Note that it is currently recommended that each course have only
+    one cohorted user partition.
+    """
+    for user_partition in course.user_partitions:
+        if user_partition.scheme == TeamPartitionScheme:
+            return user_partition
+
+    return None
+
+
+class TeamPartitionScheme:
+
+    @classmethod
+    def get_teamed_user_partition(cls, course):
+        for user_partition in course.user_partitions:
+            if user_partition.scheme == cls:
+                return user_partition
+
+        return None
+
+    @classmethod
+    def get_group_for_user(cls, course_key, user, user_partition):
+        """
+        Returns the (Content) Group from the specified user partition to which the user
+        is assigned, via their group-type membership and any mappings from groups
+        to partitions / (content) groups that might exist.
+
+        If the user has no group-type mapping, or there is no (valid) group ->
+        partition group mapping found, the function returns None.
+        """
+        team = get_team(user, course_key)
+        if team is None:
+            return None
+
+        team_id, partition_id = get_group_info_for_team(team)
+        if partition_id is None:
+            return None
+
+        if partition_id != user_partition.id:
+            return None
+
+        try:
+            return user_partition.get_group(team_id)
+        except NoSuchUserPartitionGroupError:
+            return None

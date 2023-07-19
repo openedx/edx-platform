@@ -71,6 +71,8 @@ from .serializers import (
 from .toggles import are_team_submissions_enabled
 from .utils import emit_team_event
 
+from openedx.core.djangoapps.course_groups.api import *
+
 TEAM_MEMBERSHIPS_PER_PAGE = 5
 TOPICS_PER_PAGE = 12
 MAXIMUM_SEARCH_SIZE = 10000
@@ -637,6 +639,13 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
                 )
 
             data = CourseTeamSerializer(team, context={"request": request}).data
+            group = add_team_to_course(
+                team.name,
+                course_key,
+            )
+            if request.data.get("user_partition_id") and request.data.get("content_group"):
+                link_team_to_partition_group(group, request.data["user_partition_id"], request.data["content_group"])
+
             return Response(data)
 
     def get_page(self):
@@ -837,6 +846,27 @@ class TeamsDetailView(ExpandableFieldViewMixin, RetrievePatchAPIView):
                 'user_id': member.user_id
             })
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def patch(self, request, team_id):
+        course_team = get_object_or_404(CourseTeam, team_id=team_id)
+        data = request.data
+
+        content_group_id = data["content_group"]
+        if not content_group_id:
+            return super().patch(request, team_id)
+
+        group = get_course_team_qs(course_team.course_id).filter(name=course_team.name).first()
+        partitioned_group_info = get_group_info_for_team(group)
+        if not partitioned_group_info:
+            link_team_to_partition_group(group, data["user_partition_id"], data["content_group"])
+            return super().patch(request, team_id)
+
+        existing_content_group_id, existing_partition_id = get_group_info_for_team(group)
+        if content_group_id != existing_content_group_id or data["user_partition_id"] != existing_partition_id:
+            unlink_team_partition_group(group)
+            link_team_to_partition_group(group, data["user_partition_id"], data["content_group"])
+
+        return super().patch(request, team_id)
 
 
 class TeamsAssignmentsView(GenericAPIView):
@@ -1479,6 +1509,8 @@ class MembershipListView(ExpandableFieldViewMixin, GenericAPIView):
 
         try:
             membership = team.add_user(user)
+            group = get_course_team_qs(team.course_id).get(name=team.name)
+            add_user_to_team(group, user.username)
             emit_team_event(
                 'edx.team.learner_added',
                 team.course_id,

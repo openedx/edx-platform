@@ -763,6 +763,7 @@ def get_visibility_partition_info(xblock, course=None):
     selectable_partitions = []
     # We wish to display enrollment partitions before cohort partitions.
     enrollment_user_partitions = get_user_partition_info(xblock, schemes=["enrollment_track"], course=course)
+    team_partitions = get_user_partition_info(xblock, schemes=["team"], course=course)
 
     # For enrollment partitions, we only show them if there is a selected group or
     # or if the number of groups > 1.
@@ -776,7 +777,7 @@ def get_visibility_partition_info(xblock, course=None):
         selectable_partitions += get_user_partition_info(xblock, schemes=[CONTENT_TYPE_GATING_SCHEME], course=course)
 
     # Now add the cohort user partitions.
-    selectable_partitions = selectable_partitions + get_user_partition_info(xblock, schemes=["cohort"], course=course)
+    selectable_partitions = selectable_partitions + get_user_partition_info(xblock, schemes=["cohort"], course=course) + team_partitions
 
     # Find the first partition with a selected group. That will be the one initially enabled in the dialog
     # (if the course has only been added in Studio, only one partition should have a selected group).

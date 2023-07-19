@@ -1,11 +1,16 @@
 """
 course_groups API
 """
-
-
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.http import Http404
 
-from openedx.core.djangoapps.course_groups.models import CohortMembership
+from common.djangoapps.student.models import get_user_by_username_or_email
+from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseUserGroup, TeamMembership
+from openedx.core.lib.courses import get_course_by_id
+
+from .models import CourseUserGroupPartitionGroup, CourseTeamGroup
 
 
 def remove_user_from_cohort(course_key, username, cohort_id=None):
@@ -27,3 +32,132 @@ def remove_user_from_cohort(course_key, username, cohort_id=None):
             pass
         else:
             membership.delete()
+
+def get_assignment_type(user_group):
+    """
+    Get assignment type for cohort.
+    """
+    course_cohort = user_group.cohort
+    return course_cohort.assignment_type
+
+
+def get_team(user, course_key, assign=True, use_cached=False):
+    if user is None or user.is_anonymous:
+        return None
+
+    try:
+        membership = TeamMembership.objects.get(
+            course_id=course_key,
+            user_id=user.id,
+        )
+        return membership.course_user_group
+    except TeamMembership.DoesNotExist:
+        if not assign:
+            return None
+
+def get_team_by_id(course_key, group_id):
+    """
+    Return the CourseUserGroup object for the given cohort.  Raises DoesNotExist
+    it isn't present.  Uses the course_key for extra validation.
+    """
+    return CourseUserGroup.objects.get(
+        course_id=course_key,
+        group_type=CourseUserGroup.TEAM,
+        id=group_id
+    )
+
+
+def link_team_to_partition_group(group, partition_id, group_id):
+    """
+    Create group to partition_id/group_id link.
+    """
+    CourseUserGroupPartitionGroup(
+        course_user_group=group,
+        partition_id=partition_id,
+        group_id=group_id,
+    ).save()
+
+
+def unlink_team_partition_group(group):
+    """
+    Remove any existing group to partition_id/group_id link.
+    """
+    CourseUserGroupPartitionGroup.objects.filter(course_user_group=group).delete()
+
+
+def get_course_teams(course_id=None):
+    query_set = CourseUserGroup.objects.filter(
+        course_id=course_id,
+        group_type=CourseUserGroup.TEAM,
+    )
+    return list(query_set)
+
+def get_course_team_qs(course_id=None):
+    query_set = CourseUserGroup.objects.filter(
+        course_id=course_id,
+        group_type=CourseUserGroup.TEAM,
+    )
+    return query_set
+
+def is_team_exists(course_key, name):
+    """
+    Check if a group already exists.
+    """
+    return CourseUserGroup.objects.filter(course_id=course_key, group_type=CourseUserGroup.TEAM, name=name).exists()
+
+
+def add_team_to_course(name, course_key, professor=None):
+    """
+    Adds a group to a course.
+    """
+    if is_team_exists(course_key, name):
+        raise ValueError("You cannot create two groups with the same name")
+
+    try:
+        course = get_course_by_id(course_key)
+    except Http404:
+        raise ValueError("Invalid course_key")  # lint-amnesty, pylint: disable=raise-missing-from
+
+    return CourseTeamGroup.create(
+        group_name=name,
+        course_id=course.id,
+        professor=professor,
+    ).course_user_group
+
+
+def add_user_to_team(group, username_or_email_or_user):
+    try:
+        if hasattr(username_or_email_or_user, 'email'):
+            user = username_or_email_or_user
+        else:
+            user = get_user_by_username_or_email(username_or_email_or_user)
+
+        return TeamMembership.assign(group, user)
+    except User.DoesNotExist as ex:  # Note to self: TOO COHORT SPECIFIC!
+        # If username_or_email is an email address, store in database.
+        try:
+            return (None, None, True)
+        except ValidationError as invalid:
+            if "@" in username_or_email_or_user:  # lint-amnesty, pylint: disable=no-else-raise
+                raise invalid
+            else:
+                raise ex  # lint-amnesty, pylint: disable=raise-missing-from
+
+
+def get_group_info_for_team(team):
+    """
+    Get the ids of the group and partition to which this cohort has been linked
+    as a tuple of (int, int).
+
+    If the cohort has not been linked to any group/partition, both values in the
+    tuple will be None.
+
+    The partition group info is cached for the duration of a request. Pass
+    use_cached=True to use the cached value instead of fetching from the
+    database.
+    """
+    try:
+        partition_group = CourseUserGroupPartitionGroup.objects.get(course_user_group=team)
+        return partition_group.group_id, partition_group.partition_id
+    except CourseUserGroupPartitionGroup.DoesNotExist:
+        pass

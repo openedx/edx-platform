@@ -63,7 +63,8 @@ class CourseUserGroup(models.Model):
     # For now, only have group type 'cohort', but adding a type field to support
     # things like 'question_discussion', 'friends', 'off-line-class', etc
     COHORT = 'cohort'  # If changing this string, update it in migration 0006.forwards() as well
-    GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'),)
+    TEAM = 'team'
+    GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'), (TEAM, 'Team'),)
     group_type = models.CharField(max_length=20, choices=GROUP_TYPE_CHOICES)
 
     @classmethod
@@ -190,6 +191,33 @@ class CohortMembership(models.Model):
         )
 
 
+class TeamMembership(models.Model):
+    """
+    Used internally to enforce particular conditions.
+
+    .. no_pii:
+    """
+    course_user_group = models.ForeignKey(CourseUserGroup, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course_id = CourseKeyField(max_length=255)
+
+    def clean_fields(self, *args, **kwargs):  # lint-amnesty, pylint: disable=signature-differs
+        if self.course_id is None:
+            self.course_id = self.course_user_group.course_id
+        super().clean_fields(*args, **kwargs)
+
+    @classmethod
+    def assign(cls, group, user):
+        with transaction.atomic():
+            membership, created = cls.objects.select_for_update().get_or_create(
+                user=user,
+                course_id=group.course_id,
+                course_user_group=group,
+            )
+            membership.course_user_group.users.add(user)
+        return membership
+
+
 # Needs to exist outside class definition in order to use 'sender=CohortMembership'
 @receiver(pre_delete, sender=CohortMembership)
 def remove_user_from_cohort(sender, instance, **kwargs):  # pylint: disable=unused-argument
@@ -294,6 +322,34 @@ class CourseCohort(models.Model):
 
         return course_cohort
 
+
+class CourseTeamGroup(models.Model):
+    """
+    This model represents the new group-type related info.
+
+    .. no_pii:
+    """
+    course_user_group = models.OneToOneField(
+        CourseUserGroup,
+        unique=True,
+        related_name='group',
+        on_delete=models.CASCADE,
+    )
+
+    @classmethod
+    def create(cls, group_name=None, course_id=None, course_user_group=None, professor=None):
+        if course_user_group is None:
+            course_user_group, __ = CourseUserGroup.create(
+                group_name,
+                course_id,
+                group_type=CourseUserGroup.TEAM,
+            )
+
+        course_group, __ = cls.objects.get_or_create(
+            course_user_group=course_user_group,
+        )
+
+        return course_group
 
 class UnregisteredLearnerCohortAssignments(DeletableByUserValue, models.Model):
     """

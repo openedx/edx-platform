@@ -27,6 +27,9 @@
                 this.topic = options.topic;
                 this.collection = options.collection;
                 this.action = options.action;
+                this.contentGroupsNameMap = _.map(this.context.contentGroups, function(group) {
+                    return [group.id, group.name]
+                });
 
                 if (this.action === 'create') {
                     this.teamModel = new TeamModel({});
@@ -55,6 +58,17 @@
                     helpMessage: gettext(
                         'A short description of the team to help other learners understand the '
                           + 'goals or direction of the team (maximum 300 characters).')
+                });
+
+                this.teamContentGroupsField = new FieldViews.DropdownFieldView({
+                    model: this.teamModel,
+                    title: gettext('Content Groups'),
+                    valueAttribute: 'content_group',
+                    required: false,
+                    showMessages: false,
+                    options: this.contentGroupsNameMap,
+                    helpMessage: gettext(
+                        'The content groups that the team is associated with.')
                 });
 
                 this.teamLanguageField = new FieldViews.DropdownFieldView({
@@ -92,6 +106,7 @@
                 );
                 this.set(this.teamNameField, '.team-required-fields');
                 this.set(this.teamDescriptionField, '.team-required-fields');
+                this.set(this.teamContentGroupsField, '.team-optional-fields');
                 this.set(this.teamLanguageField, '.team-optional-fields');
                 this.set(this.teamCountryField, '.team-optional-fields');
                 return this;
@@ -105,17 +120,19 @@
                     this.$(selector).append(view.render().$el);
                 }
             },
-
             createOrUpdateTeam: function(event) {
                 event.preventDefault();
                 var view = this, // eslint-disable-line vars-on-top
                     teamLanguage = this.teamLanguageField.fieldValue(),
                     teamCountry = this.teamCountryField.fieldValue(),
+                    teamContentGroup = this.teamContentGroupsField.fieldValue(),
                     data = {
                         name: this.teamNameField.fieldValue(),
                         description: this.teamDescriptionField.fieldValue(),
                         language: _.isNull(teamLanguage) ? '' : teamLanguage,
-                        country: _.isNull(teamCountry) ? '' : teamCountry
+                        country: _.isNull(teamCountry) ? '' : teamCountry,
+                        content_group: _.isNull(teamContentGroup) ? '' : teamContentGroup,
+                        user_partition_id: this.context.partitionID
                     },
                     saveOptions = {
                         wait: true
