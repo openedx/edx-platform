@@ -92,10 +92,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn" data-title="Teacher">
+              <span class="btn" data-title="Teacher">
                 <span class="icon ico-teacher"></span>
                 <span class="text">Teacher</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -120,10 +120,10 @@ data: |
               <span class="time">8 min</span>
             </div>
             <div class="actions">
-              <button class="btn" data-title="Individual">
+              <span class="btn" data-title="Individual">
                 <span class="icon ico-single"></span>
                 <span class="text">Individual</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -148,10 +148,10 @@ data: |
               <span class="time">8 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-single"></span>
                 <span class="text">Solo</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -176,10 +176,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-group"></span>
                 <span class="text">Group</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -204,10 +204,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -232,10 +232,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -260,10 +260,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -288,10 +288,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -316,10 +316,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -344,10 +344,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -372,10 +372,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -400,10 +400,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -428,10 +428,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -456,10 +456,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -484,10 +484,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
@@ -512,10 +512,10 @@ data: |
               <span class="time">3 min</span>
             </div>
             <div class="actions">
-              <button class="btn">
+              <span class="btn">
                 <span class="icon ico-pairs"></span>
                 <span class="text">Pairs</span>
-              </button>
+              </span>
             </div>
             <div class="text-block">
               <button class="opener collapsed">
