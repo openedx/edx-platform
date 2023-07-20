@@ -6,57 +6,11 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.http import Http404
 
-from openedx_filters.exceptions import OpenEdxFilterException
-from openedx_filters.tooling import OpenEdxPublicFilter
-
 from common.djangoapps.student.models import get_user_by_username_or_email
-from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseUserGroup
+from openedx.core.djangoapps.course_groups.models import CohortMembership, CourseUserGroup, CourseGroupsSettings, GroupMembership
 from openedx.core.lib.courses import get_course_by_id
 
-
-class GroupMembershipException(Exception):
-    pass
-
-
-class GroupAssignmentNotAllowed(GroupMembershipException):
-    pass
-
-
-
-class GroupAssignmentRequested(OpenEdxPublicFilter):
-
-    filter_type = "org.openedx.learning.group.assignment.requested.v1"
-
-    class GroupAssignmentNotAllowed(OpenEdxFilterException):
-        pass
-
-    @classmethod
-    def run_filter(cls, user, target_group):
-        data = super().run_pipeline(user=user, target_group=target_group)
-        return data.get("user"), data.get("target_group")
-
-
-class GroupAdditionRequested(OpenEdxPublicFilter):
-
-    filter_type = "org.openedx.learning.group.addition.requested.v1"
-
-    class GroupAdditionNotAllowed(OpenEdxFilterException):
-        pass
-
-    @classmethod
-    def run_filter(cls, group_class, name, course_key):
-        data = super().run_pipeline(group_class=group_class, name=name, course_key=course_key)
-        return data.get("group_class"), data.get("name"), data.get("course_key")
-
-
-class GroupExistenceRequested(OpenEdxPublicFilter):
-
-    filter_type = "org.openedx.learning.group.existence.requested.v1"
-
-    @classmethod
-    def run_filter(cls, group_class, name, course_key):
-        data = super().run_pipeline(group_class=group_class, name=name, course_key=course_key)
-        return data.get("group_class"), data.get("name"), data.get("course_key")
+from .models import CourseUserGroupPartitionGroup, CourseGroup
 
 
 def remove_user_from_cohort(course_key, username, cohort_id=None):
@@ -79,51 +33,101 @@ def remove_user_from_cohort(course_key, username, cohort_id=None):
         else:
             membership.delete()
 
+def get_assignment_type(user_group):
+    """
+    Get assignment type for cohort.
+    """
+    course_cohort = user_group.cohort
+    return course_cohort.assignment_type
 
-def is_group_exists(course_key, group_class, name):
+
+def _get_course_group_settings(course_key):
+    return CourseGroupsSettings.objects.get(course_id=course_key)
+
+
+def is_course_grouped(course_key):
+    return _get_course_group_settings(course_key).is_cohorted
+
+
+def get_group(user, course_key, assign=True, use_cached=False):
+    if user is None or user.is_anonymous:
+        return None
+
+    if not is_course_grouped(course_key):
+        return None
+
+    try:
+        membership = GroupMembership.objects.get(
+            course_id=course_key,
+            user_id=user.id,
+        )
+        return membership.course_user_group
+    except GroupMembership.DoesNotExist:
+        if not assign:
+            return None
+
+def get_group_by_id(course_key, group_id):
+    """
+    Return the CourseUserGroup object for the given cohort.  Raises DoesNotExist
+    it isn't present.  Uses the course_key for extra validation.
+    """
+    return CourseUserGroup.objects.get(
+        course_id=course_key,
+        group_type=CourseUserGroup.GROUPS,
+        id=group_id
+    )
+
+
+def link_group_to_partition_group(group, partition_id, group_id):
+    """
+    Create group to partition_id/group_id link.
+    """
+    CourseUserGroupPartitionGroup(
+        course_user_group=group,
+        partition_id=partition_id,
+        group_id=group_id,
+    ).save()
+
+
+def unlink_group_partition_group(group):
+    """
+    Remove any existing group to partition_id/group_id link.
+    """
+    CourseUserGroupPartitionGroup.objects.filter(course_user_group=group).delete()
+
+
+def get_course_group(course_id=None):
+    query_set = CourseUserGroup.objects.filter(
+        course_id=course_id,
+        group_type=CourseUserGroup.GROUPS,
+    )
+    return list(query_set)
+
+
+def is_group_exists(course_key, name):
     """
     Check if a group already exists.
     """
-    # .. filter_implemented_name: GroupExistenceRequested
-    # .. filter_type: org.openedx.learning.group.existence.requested.v1
-    group_class, name, course_key = GroupExistenceRequested.run_filter(
-        group_class=group_class,
-        name=name,
-        course_key=course_key,
-    )
-    return CourseUserGroup.objects.filter(course_id=course_key, group_type=group_class.type, name=name).exists()
+    return CourseUserGroup.objects.filter(course_id=course_key, group_type=CourseUserGroup.GROUPS, name=name).exists()
 
 
-def add_group_to_course(group_class, name, course_key):
+def add_group_to_course(name, course_key, professor=None):
     """
     Adds a group to a course.
     """
-    try:
-        # .. filter_implemented_name: GroupAdditionRequested
-        # .. filter_type: org.openedx.learning.group.assignment.requested.v1
-        group_class, name, course_key = GroupAdditionRequested.run_filter(
-            group_class=group_class,
-            name=name,
-            course_key=course_key,
-        )
-    except GroupAdditionRequested.GroupAdditionNotAllowed as exc:
-        raise GroupAssignmentNotAllowed(str(exc)) from exc
-
     if is_group_exists(course_key, name):
-        raise ValueError(_("You cannot create two cohorts with the same name"))
+        raise ValueError("You cannot create two groups with the same name")
 
     try:
         course = get_course_by_id(course_key)
     except Http404:
         raise ValueError("Invalid course_key")  # lint-amnesty, pylint: disable=raise-missing-from
 
-    group = group_class.create(
-        cohort_name=name,
+    return CourseGroup.create(
+        group_name=name,
         course_id=course.id,
-        assignment_type=group_class.type
+        professor=professor,
     ).course_user_group
-
-    return group
 
 
 def add_user_to_group(group, username_or_email_or_user):
@@ -133,32 +137,32 @@ def add_user_to_group(group, username_or_email_or_user):
         else:
             user = get_user_by_username_or_email(username_or_email_or_user)
 
-        try:
-            # .. filter_implemented_name: GroupAssignmentRequested
-            # .. filter_type: org.openedx.learning.group.assignment.requested.v1
-            user, group = GroupAssignmentRequested.run_filter(user=user, target_group=group)
-        except GroupAssignmentRequested.PreventGroupAssignment as exc:
-            raise GroupAssignmentNotAllowed(str(exc)) from exc
-
         membership, previous_cohort = group.assign(group, user)
         return user, getattr(previous_cohort, 'name', None), False
     except User.DoesNotExist as ex:  # Note to self: TOO COHORT SPECIFIC!
         # If username_or_email is an email address, store in database.
         try:
-            validate_email(username_or_email_or_user)
-            try:
-                assignment = UnregisteredLearnerCohortAssignments.objects.get(
-                    email=username_or_email_or_user, course_id=cohort.course_id
-                )
-                assignment.course_user_group = cohort
-                assignment.save()
-            except UnregisteredLearnerCohortAssignments.DoesNotExist:
-                assignment = UnregisteredLearnerCohortAssignments.objects.create(
-                    course_user_group=cohort, email=username_or_email_or_user, course_id=cohort.course_id
-                )
             return (None, None, True)
         except ValidationError as invalid:
             if "@" in username_or_email_or_user:  # lint-amnesty, pylint: disable=no-else-raise
                 raise invalid
             else:
                 raise ex  # lint-amnesty, pylint: disable=raise-missing-from
+
+
+def get_group_info_for_group(group):
+    """
+    Get the ids of the group and partition to which this cohort has been linked
+    as a tuple of (int, int).
+
+    If the cohort has not been linked to any group/partition, both values in the
+    tuple will be None.
+
+    The partition group info is cached for the duration of a request. Pass
+    use_cached=True to use the cached value instead of fetching from the
+    database.
+    """
+    try:
+        return CourseUserGroupPartitionGroup.objects.get(course_user_group=group)
+    except CourseUserGroupPartitionGroup.DoesNotExist:
+        pass
