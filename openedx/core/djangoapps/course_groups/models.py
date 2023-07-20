@@ -210,15 +210,11 @@ class GroupMembership(models.Model):
     def assign(cls, group, user):
         with transaction.atomic():
             membership, created = cls.objects.select_for_update().get_or_create(
-                user__id=user.id,
+                user=user,
                 course_id=group.course_id,
-                defaults={
-                    'course_user_group': group,
-                    'user': user
-                })
-
-            if created:
-                membership.course_user_group.users.add(user)
+                course_user_group=group,
+            )
+            membership.course_user_group.users.add(user)
         return membership
 
 

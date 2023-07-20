@@ -12,7 +12,7 @@ from django.utils.translation import gettext as _
 from cms.djangoapps.contentstore.utils import reverse_usage_url
 from common.djangoapps.util.db import MYSQL_MAX_INT, generate_int_id
 from lms.lib.utils import get_parent_unit
-from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
+from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition, get_grouped_user_partition  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions import MINIMUM_STATIC_PARTITION_ID, ReadOnlyUserPartitionError, UserPartition  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.partitions.partitions_service import get_all_partitions_for_course  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.split_test_block import get_split_user_partitions  # lint-amnesty, pylint: disable=wrong-import-order
@@ -22,6 +22,7 @@ MINIMUM_GROUP_ID = MINIMUM_STATIC_PARTITION_ID
 RANDOM_SCHEME = "random"
 COHORT_SCHEME = "cohort"
 ENROLLMENT_SCHEME = "enrollment_track"
+GROUP_SCHEME = "group"
 
 CONTENT_GROUP_CONFIGURATION_DESCRIPTION = _(
     'The groups in this configuration can be mapped to cohorts in the Instructor Dashboard.'
@@ -347,7 +348,7 @@ class GroupConfiguration:
         return partition_configuration
 
     @staticmethod
-    def get_or_create_content_group(store, course):
+    def get_or_create_content_group(store, course, scheme_name):
         """
         Returns the first user partition from the course which uses the
         CohortPartitionScheme, or generates one if no such partition is
@@ -355,14 +356,17 @@ class GroupConfiguration:
         the client explicitly creates a group within the partition and
         POSTs back.
         """
-        content_group_configuration = get_cohorted_user_partition(course)
+        if scheme_name == COHORT_SCHEME:
+            content_group_configuration = get_cohorted_user_partition(course)
+        elif scheme_name == GROUP_SCHEME:
+            content_group_configuration = get_grouped_user_partition(course)
         if content_group_configuration is None:
             content_group_configuration = UserPartition(
                 id=generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, GroupConfiguration.get_used_ids(course)),
                 name=CONTENT_GROUP_CONFIGURATION_NAME,
                 description=CONTENT_GROUP_CONFIGURATION_DESCRIPTION,
                 groups=[],
-                scheme_id=COHORT_SCHEME
+                scheme_id=scheme_name,
             )
             return content_group_configuration.to_json()
 

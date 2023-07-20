@@ -53,9 +53,6 @@ def get_group(user, course_key, assign=True, use_cached=False):
     if user is None or user.is_anonymous:
         return None
 
-    if not is_course_grouped(course_key):
-        return None
-
     try:
         membership = GroupMembership.objects.get(
             course_id=course_key,
@@ -96,7 +93,7 @@ def unlink_group_partition_group(group):
     CourseUserGroupPartitionGroup.objects.filter(course_user_group=group).delete()
 
 
-def get_course_group(course_id=None):
+def get_course_groups(course_id=None):
     query_set = CourseUserGroup.objects.filter(
         course_id=course_id,
         group_type=CourseUserGroup.GROUPS,
@@ -137,8 +134,7 @@ def add_user_to_group(group, username_or_email_or_user):
         else:
             user = get_user_by_username_or_email(username_or_email_or_user)
 
-        membership, previous_cohort = group.assign(group, user)
-        return user, getattr(previous_cohort, 'name', None), False
+        return GroupMembership.assign(group, user)
     except User.DoesNotExist as ex:  # Note to self: TOO COHORT SPECIFIC!
         # If username_or_email is an email address, store in database.
         try:
@@ -163,6 +159,7 @@ def get_group_info_for_group(group):
     database.
     """
     try:
-        return CourseUserGroupPartitionGroup.objects.get(course_user_group=group)
+        partition_group = CourseUserGroupPartitionGroup.objects.get(course_user_group=group)
+        return partition_group.group_id, partition_group.partition_id
     except CourseUserGroupPartitionGroup.DoesNotExist:
         pass
