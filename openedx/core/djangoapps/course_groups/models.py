@@ -327,6 +327,51 @@ class CourseCohort(models.Model):
         return course_cohort
 
 
+class CourseGroup(models.Model):
+    """
+    This model represents cohort related info.
+
+    .. no_pii:
+    """
+    course_user_group = models.OneToOneField(CourseUserGroup, unique=True, related_name='group',
+                                             on_delete=models.CASCADE)
+
+    professors = models.ManyToManyField(User, db_index=True, related_name='course_groups_professors', blank=True)
+
+    @classmethod
+    def create(cls, group_name=None, course_id=None, course_user_group=None, professor=None):
+        if course_user_group is None:
+            course_user_group, __ = CourseUserGroup.create(
+                group_name,
+                course_id,
+                group_type=CourseUserGroup.GROUPS,
+            )
+
+        course_group, __ = cls.objects.get_or_create(
+            course_user_group=course_user_group,
+        )
+        if professor:
+            course_group.professors.add(professor)
+
+        return course_group
+
+
+class CourseGroupsSettings(models.Model):
+    """
+    This model represents cohort settings for courses.
+    The only non-deprecated fields are `is_grouped` and `course_id`.
+
+    .. no_pii:
+    """
+    is_grouped = models.BooleanField(default=False)
+
+    course_id = CourseKeyField(
+        unique=True,
+        max_length=255,
+        db_index=True,
+        help_text="Which course are these settings associated with?",
+    )
+
 class UnregisteredLearnerCohortAssignments(DeletableByUserValue, models.Model):
     """
     Tracks the assignment of an unregistered learner to a course's cohort.
