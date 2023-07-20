@@ -45,15 +45,6 @@ from rest_framework import status as rest_status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from cms.djangoapps.contentstore.video_storage_handlers import (
-    handle_videos,
-    handle_generate_video_upload_link,
-    handle_video_images,
-    check_video_images_upload_enabled,
-    enabled_video_features,
-    handle_transcript_preferences,
-    get_video_encodings_download,
-)
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
@@ -66,21 +57,11 @@ from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
-from ..models import VideoUploadConfig
-from ..toggles import use_new_video_uploads_page
-from ..utils import reverse_course_url, get_video_uploads_url
-from ..video_utils import validate_video_image
-from .course import get_course_and_check_access
-
-__all__ = [
-    'videos_handler',
-    'video_encodings_download',
-    'video_images_handler',
-    'video_images_upload_enabled',
-    'get_video_features',
-    'transcript_preferences_handler',
-    'generate_video_upload_link_handler',
-]
+from .models import VideoUploadConfig
+from .toggles import use_new_video_uploads_page
+from .utils import reverse_course_url, get_video_uploads_url
+from .video_utils import validate_video_image
+from .views.course import get_course_and_check_access
 
 LOGGER = logging.getLogger(__name__)
 
@@ -193,12 +174,9 @@ class StatusDisplayStrings:
         return _(StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN))
 
 
-@expect_json
-@login_required
-@require_http_methods(("GET", "POST", "DELETE"))
-def videos_handler(request, course_key_string, edx_video_id=None):
+def handle_videos(request, course_key_string, edx_video_id=None):
     """
-    The restful handler for video uploads.
+    Restful handler for video uploads.
 
     GET
         html: return an HTML page to display previous video uploads and allow
@@ -212,40 +190,83 @@ def videos_handler(request, course_key_string, edx_video_id=None):
     DELETE
         soft deletes a video for particular course
     """
-    return handle_videos(request, course_key_string, edx_video_id)
+    course = _get_and_validate_course(course_key_string, request.user)
+
+    if not course:
+        return HttpResponseNotFound()
+
+    if request.method == "GET":
+        if "application/json" in request.META.get("HTTP_ACCEPT", ""):
+            return videos_index_json(course)
+        pagination_conf = _generate_pagination_configuration(course_key_string, request)
+        return videos_index_html(course, pagination_conf)
+    elif request.method == "DELETE":
+        remove_video_for_course(course_key_string, edx_video_id)
+        return JsonResponse()
+    else:
+        if is_status_update_request(request.json):
+            return send_video_status_update(request.json)
+        elif _is_pagination_context_update_request(request):
+            return _update_pagination_context(request)
+
+        data, status = videos_post(course, request)
+        return JsonResponse(data, status=status)
 
 
-@api_view(['POST'])
-@view_auth_classes()
-@expect_json
-def generate_video_upload_link_handler(request, course_key_string):
+def handle_generate_video_upload_link(request, course_key_string):
     """
     API for creating a video upload.  Returns an edx_video_id and a presigned URL that can be used
     to upload the video to AWS S3.
     """
-    return handle_generate_video_upload_link(request, course_key_string)
+    course = _get_and_validate_course(course_key_string, request.user)
+    if not course:
+        return Response(data='Course Not Found', status=rest_status.HTTP_400_BAD_REQUEST)
+
+    data, status = videos_post(course, request)
+    return Response(data, status=status)
 
 
-@expect_json
-@login_required
-@require_POST
-def video_images_handler(request, course_key_string, edx_video_id=None):
+def handle_video_images(request, course_key_string, edx_video_id=None):
     """Function to handle image files"""
-    return handle_video_images(request, course_key_string, edx_video_id)
+
+    # respond with a 404 if image upload is not enabled.
+    if not VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled():
+        return HttpResponseNotFound()
+
+    if 'file' not in request.FILES:
+        return JsonResponse({'error': _('An image file is required.')}, status=400)
+
+    image_file = request.FILES['file']
+    error = validate_video_image(image_file)
+    if error:
+        return JsonResponse({'error': error}, status=400)
+
+    with closing(image_file):
+        image_url = update_video_image(edx_video_id, course_key_string, image_file, image_file.name)
+        LOGGER.info(
+            'VIDEOS: Video image uploaded for edx_video_id [%s] in course [%s]', edx_video_id, course_key_string
+        )
+
+    return JsonResponse({'image_url': image_url})
 
 
-@login_required
-@require_GET
-def video_images_upload_enabled(request):
+def check_video_images_upload_enabled(request):
     """Function to check if images can be uploaded"""
-    return check_video_images_upload_enabled(request)
+    # respond with a false if image upload is not enabled.
+    if not VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled():
+        return JsonResponse({'allowThumbnailUpload': False})
+
+    return JsonResponse({'allowThumbnailUpload': True})
 
 
-@login_required
-@require_GET
-def get_video_features(request):
+def enabled_video_features(request):
     """ Return a dict with info about which video features are enabled """
-    return enabled_video_features(request)
+
+    features = {
+        'allowThumbnailUpload': VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled(),
+        'videoSharingEnabled': PUBLIC_VIDEO_SHARE.is_enabled(),
+    }
+    return JsonResponse(features)
 
 
 def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnaround,
@@ -330,10 +351,7 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
     return error, preferences
 
 
-@expect_json
-@login_required
-@require_http_methods(('POST', 'DELETE'))
-def transcript_preferences_handler(request, course_key_string):
+def handle_transcript_preferences(request, course_key_string):
     """
     JSON view handler to post the transcript preferences.
 
@@ -343,12 +361,35 @@ def transcript_preferences_handler(request, course_key_string):
 
     Returns: valid json response or 400 with error message
     """
-    return handle_transcript_preferences(request, course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
+    is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course_key)
+    if not is_video_transcript_enabled:
+        return HttpResponseNotFound()
+    if request.method == 'POST':
+        data = request.json
+        provider = data.get('provider')
+        error, preferences = validate_transcript_preferences(
+            provider=provider,
+            cielo24_fidelity=data.get('cielo24_fidelity', ''),
+            cielo24_turnaround=data.get('cielo24_turnaround', ''),
+            three_play_turnaround=data.get('three_play_turnaround', ''),
+            video_source_language=data.get('video_source_language'),
+            preferred_languages=list(map(str, data.get('preferred_languages', [])))
+        )
+        if error:
+            response = JsonResponse({'error': error}, status=400)
+        else:
+            preferences.update({'provider': provider})
+            transcript_preferences = create_or_update_transcript_preferences(course_key_string, **preferences)
+            response = JsonResponse({'transcript_preferences': transcript_preferences}, status=200)
+
+        return response
+    elif request.method == 'DELETE':
+        remove_transcript_preferences(course_key_string)
+        return JsonResponse()
 
 
-@login_required
-@require_GET
-def video_encodings_download(request, course_key_string):
+def get_video_encodings_download(request, course_key_string):
     """
     Returns a CSV report containing the encoded video URLs for video uploads
     in the following format:
@@ -356,7 +397,73 @@ def video_encodings_download(request, course_key_string):
     Video ID,Name,Status,Profile1 URL,Profile2 URL
     aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa,video.mp4,Complete,http://example.com/prof1.mp4,http://example.com/prof2.mp4
     """
-    return get_video_encodings_download(request, course_key_string)
+    course = _get_and_validate_course(course_key_string, request.user)
+
+    if not course:
+        return HttpResponseNotFound()
+
+    def get_profile_header(profile):
+        """Returns the column header string for the given profile's URLs"""
+        # Translators: This is the header for a CSV file column
+        # containing URLs for video encodings for the named profile
+        # (e.g. desktop, mobile high quality, mobile low quality)
+        return _("{profile_name} URL").format(profile_name=profile)
+
+    profile_whitelist = VideoUploadConfig.get_profile_whitelist()
+    videos, __ = _get_videos(course)
+    videos = list(videos)
+    name_col = _("Name")
+    duration_col = _("Duration")
+    added_col = _("Date Added")
+    video_id_col = _("Video ID")
+    status_col = _("Status")
+    profile_cols = [get_profile_header(profile) for profile in profile_whitelist]
+
+    def make_csv_dict(video):
+        """
+        Makes a dictionary suitable for writing CSV output. This involves
+        extracting the required items from the original video dict and
+        converting all keys and values to UTF-8 encoded string objects,
+        because the CSV module doesn't play well with unicode objects.
+        """
+        # Translators: This is listed as the duration for a video that has not
+        # yet reached the point in its processing by the servers where its
+        # duration is determined.
+        duration_val = str(video["duration"]) if video["duration"] > 0 else _("Pending")
+        ret = dict(
+            [
+                (name_col, video["client_video_id"]),
+                (duration_col, duration_val),
+                (added_col, video["created"].isoformat()),
+                (video_id_col, video["edx_video_id"]),
+                (status_col, video["status"]),
+            ] +
+            [
+                (get_profile_header(encoded_video["profile"]), encoded_video["url"])
+                for encoded_video in video["encoded_videos"]
+                if encoded_video["profile"] in profile_whitelist
+            ]
+        )
+        return dict(ret.items())
+
+    # Write csv to bytes-like object. We need a separate writer and buffer as the csv
+    # writer writes str and the FileResponse expects a bytes files.
+    buffer = io.BytesIO()
+    buffer_writer = codecs.getwriter("utf-8")(buffer)
+    writer = csv.DictWriter(
+        buffer_writer,
+        [name_col, duration_col, added_col, video_id_col, status_col] + profile_cols,
+        dialect=csv.excel
+    )
+    writer.writeheader()
+    for video in videos:
+        writer.writerow(make_csv_dict(video))
+    buffer.seek(0)
+
+    # Translators: This is the suggested filename when downloading the URL
+    # listing for videos uploaded through Studio
+    filename = _("{course}_video_urls").format(course=course.id.course) + ".csv"
+    return FileResponse(buffer, as_attachment=True, filename=filename, content_type="text/csv")
 
 
 def _get_and_validate_course(course_key_string, user):
