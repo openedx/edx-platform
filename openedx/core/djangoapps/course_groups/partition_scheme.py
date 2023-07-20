@@ -13,6 +13,7 @@ from lms.djangoapps.courseware.masquerade import (
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .cohorts import get_cohort, get_group_info_for_cohort
+from .api import get_group, get_group_info_for_group
 
 log = logging.getLogger(__name__)
 
@@ -99,7 +100,46 @@ def get_cohorted_user_partition(course):
     one cohorted user partition.
     """
     for user_partition in course.user_partitions:
-        if user_partition.scheme == CohortPartitionScheme:
+        if user_partition.scheme == CohortPartitionScheme:  # Deberíamos poder añadir el otro chequeo acá
             return user_partition
 
     return None
+
+
+def get_grouped_user_partition(course):
+    """
+    Returns the first user partition from the specified course which uses the CohortPartitionScheme,
+    or None if one is not found. Note that it is currently recommended that each course have only
+    one cohorted user partition.
+    """
+    for user_partition in course.user_partitions:
+        if user_partition.scheme == GroupPartitionScheme:
+            return user_partition
+
+    return None
+
+
+class GroupPartitionScheme:
+    """
+    This scheme uses lms cohorts (CourseUserGroups) and cohort-partition
+    mappings (CourseUserGroupPartitionGroup) to map lms users into Partition
+    Groups.
+    """
+
+    @classmethod
+    def get_group_for_user(cls, course_key, user, user_partition, use_cached=True):
+        group = get_group(user, course_key, use_cached=use_cached)
+        if group is None:
+            return None
+
+        group_id, partition_id = get_group_info_for_group(group, use_cached=use_cached)
+        if partition_id is None:
+            return None
+
+        if partition_id != user_partition.id:
+            return None
+
+        try:
+            return user_partition.get_group(group_id)
+        except NoSuchUserPartitionGroupError:
+            return None

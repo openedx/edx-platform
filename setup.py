@@ -104,6 +104,7 @@ setup(
         "openedx.user_partition_scheme": [
             "random = openedx.core.djangoapps.user_api.partition_schemes:RandomUserPartitionScheme",
             "cohort = openedx.core.djangoapps.course_groups.partition_scheme:CohortPartitionScheme",
+            "groups = openedx.core.djangoapps.course_groups.partition_scheme:GroupPartitionScheme", # Add in plugin!!
             "verification = openedx.core.djangoapps.user_api.partition_schemes:ReturnGroup1PartitionScheme",
             "enrollment_track = openedx.core.djangoapps.verified_track_content.partition_scheme:EnrollmentTrackPartitionScheme",  # lint-amnesty, pylint: disable=line-too-long
             "content_type_gate = openedx.features.content_type_gating.partitions:ContentTypeGatingPartitionScheme",
