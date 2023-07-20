@@ -53,6 +53,8 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
     enabled_video_features,
     handle_transcript_preferences,
     get_video_encodings_download,
+    _get_index_videos,
+    _get_default_video_image_url,
 )
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.json_request import JsonResponse, expect_json
@@ -359,28 +361,6 @@ def video_encodings_download(request, course_key_string):
     return get_video_encodings_download(request, course_key_string)
 
 
-def _get_and_validate_course(course_key_string, user):
-    """
-    Given a course key, return the course if it exists, the given user has
-    access to it, and it is properly configured for video uploads
-    """
-    course_key = CourseKey.from_string(course_key_string)
-
-    # For now, assume all studio users that have access to the course can upload videos.
-    # In the future, we plan to add a new org-level role for video uploaders.
-    course = get_course_and_check_access(course_key, user)
-
-    if (
-        settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] and
-        getattr(settings, "VIDEO_UPLOAD_PIPELINE", None) and
-        course and
-        course.video_pipeline_configured
-    ):
-        return course
-    else:
-        return None
-
-
 def convert_video_status(video, is_video_encodes_ready=False):
     """
     Convert status of a video. Status can be converted to one of the following:
@@ -412,82 +392,6 @@ def convert_video_status(video, is_video_encodes_ready=False):
         status = StatusDisplayStrings.get(video['status'])
 
     return status
-
-
-def _get_videos(course, pagination_conf=None):
-    """
-    Retrieves the list of videos from VAL corresponding to this course.
-    """
-    videos, pagination_context = get_videos_for_course(
-        str(course.id),
-        VideoSortField.created,
-        SortDirection.desc,
-        pagination_conf
-    )
-    videos = list(videos)
-
-    # This is required to see if edx video pipeline is enabled while converting the video status.
-    course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
-    transcription_statuses = ['transcription_in_progress', 'transcript_ready', 'partial_failure', 'transcript_failed']
-
-    # convert VAL's status to studio's Video Upload feature status.
-    for video in videos:
-        # If we are using "new video workflow" and status is in `transcription_statuses` then video encodes are ready.
-        # This is because Transcription starts once all the encodes are complete except for YT, but according to
-        # "new video workflow" YT is disabled as well as deprecated. So, Its precise to say that the Transcription
-        # starts once all the encodings are complete *for the new video workflow*.
-        is_video_encodes_ready = not course_video_upload_token and (video['status'] in transcription_statuses)
-        # Update with transcript languages
-        video['transcripts'] = get_available_transcript_languages(video_id=video['edx_video_id'])
-        video['transcription_status'] = (
-            StatusDisplayStrings.get(video['status']) if is_video_encodes_ready else ''
-        )
-        video['transcript_urls'] = {}
-        for language_code in video['transcripts']:
-            video['transcript_urls'][language_code] = get_video_transcript_url(
-                video_id=video['edx_video_id'],
-                language_code=language_code,
-            )
-        # Convert the video status.
-        video['status'] = convert_video_status(video, is_video_encodes_ready)
-
-    return videos, pagination_context
-
-
-def _get_default_video_image_url():
-    """
-    Returns default video image url
-    """
-    return staticfiles_storage.url(settings.VIDEO_IMAGE_DEFAULT_FILENAME)
-
-
-def _get_index_videos(course, pagination_conf=None):
-    """
-    Returns the information about each video upload required for the video list
-    """
-    course_id = str(course.id)
-    attrs = [
-        'edx_video_id', 'client_video_id', 'created', 'duration',
-        'status', 'courses', 'transcripts', 'transcription_status',
-        'transcript_urls', 'error_description'
-    ]
-
-    def _get_values(video):
-        """
-        Get data for predefined video attributes.
-        """
-        values = {}
-        for attr in attrs:
-            if attr == 'courses':
-                course = [c for c in video['courses'] if course_id in c]
-                (__, values['course_video_image_url']), = list(course[0].items())
-            else:
-                values[attr] = video[attr]
-
-        return values
-
-    videos, pagination_context = _get_videos(course, pagination_conf)
-    return [_get_values(video) for video in videos], pagination_context
 
 
 def get_all_transcript_languages():
@@ -743,39 +647,3 @@ def is_status_update_request(request_data):
     Returns True if `request_data` contains status update else False.
     """
     return any('status' in update for update in request_data)
-
-
-def _generate_pagination_configuration(course_key_string, request):
-    """
-    Returns pagination configuration
-    """
-    course_key = CourseKey.from_string(course_key_string)
-    if not ENABLE_VIDEO_UPLOAD_PAGINATION.is_enabled(course_key):
-        return None
-    return {
-        'page_number': request.GET.get('page', 1),
-        'videos_per_page': request.session.get("VIDEOS_PER_PAGE", VIDEOS_PER_PAGE)
-    }
-
-
-def _is_pagination_context_update_request(request):
-    """
-    Checks if request contains `videos_per_page`
-    """
-    return request.POST.get('id', '') == "videos_per_page"
-
-
-def _update_pagination_context(request):
-    """
-    Updates session with posted value
-    """
-    error_msg = _('A non zero positive integer is expected')
-    try:
-        videos_per_page = int(request.POST.get('value'))
-        if videos_per_page <= 0:
-            return JsonResponse({'error': error_msg}, status=500)
-    except ValueError:
-        return JsonResponse({'error': error_msg}, status=500)
-
-    request.session['VIDEOS_PER_PAGE'] = videos_per_page
-    return JsonResponse()
