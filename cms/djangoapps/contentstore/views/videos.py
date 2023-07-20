@@ -46,6 +46,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from cms.djangoapps.contentstore.video_storage_handlers import (
+    TranscriptProvider,
+    StatusDisplayStrings,
     handle_videos,
     handle_generate_video_upload_link,
     handle_video_images,
@@ -53,8 +55,16 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
     enabled_video_features,
     handle_transcript_preferences,
     get_video_encodings_download,
-    _get_index_videos,
-    _get_default_video_image_url,
+    validate_transcript_preferences as validate_transcript_preferences_source_function,
+    convert_video_status as convert_video_status_source_function,
+    get_all_transcript_languages as get_all_transcript_languages_source_function,
+    videos_index_html as videos_index_html_source_function,
+    videos_index_json as videos_index_json_source_function,
+    videos_post as videos_post_source_function,
+    storage_service_bucket as storage_service_bucket_source_function,
+    storage_service_key as storage_service_key_source_function,
+    send_video_status_update as send_video_status_update_source_function,
+    is_status_update_request as is_status_update_request_source_function,
 )
 from common.djangoapps.edxmako.shortcuts import render_to_response
 from common.djangoapps.util.json_request import JsonResponse, expect_json
@@ -116,84 +126,6 @@ MAX_UPLOAD_HOURS = 24
 VIDEOS_PER_PAGE = 100
 
 
-class TranscriptProvider:
-    """
-    Transcription Provider Enumeration
-    """
-    CIELO24 = 'Cielo24'
-    THREE_PLAY_MEDIA = '3PlayMedia'
-    CUSTOM = 'Custom'
-
-
-class StatusDisplayStrings:
-    """
-    A class to map status strings as stored in VAL to display strings for the
-    video upload page
-    """
-
-    # Translators: This is the status of an active video upload
-    _UPLOADING = gettext_noop("Uploading")
-    # Translators: This is the status for a video that the servers are currently processing
-    _IN_PROGRESS = gettext_noop("In Progress")
-    # Translators: This is the status for a video that the servers have successfully processed
-    _COMPLETE = gettext_noop("Ready")
-    # Translators: This is the status for a video that is uploaded completely
-    _UPLOAD_COMPLETED = gettext_noop("Uploaded")
-    # Translators: This is the status for a video that the servers have failed to process
-    _FAILED = gettext_noop("Failed")
-    # Translators: This is the status for a video that is cancelled during upload by user
-    _CANCELLED = gettext_noop("Cancelled")
-    # Translators: This is the status for a video which has failed
-    # due to being flagged as a duplicate by an external or internal CMS
-    _DUPLICATE = gettext_noop("Failed Duplicate")
-    # Translators: This is the status for a video which has duplicate token for youtube
-    _YOUTUBE_DUPLICATE = gettext_noop("YouTube Duplicate")
-    # Translators: This is the status for a video for which an invalid
-    # processing token was provided in the course settings
-    _INVALID_TOKEN = gettext_noop("Invalid Token")
-    # Translators: This is the status for a video that was included in a course import
-    _IMPORTED = gettext_noop("Imported")
-    # Translators: This is the status for a video that is in an unknown state
-    _UNKNOWN = gettext_noop("Unknown")
-    # Translators: This is the status for a video that is having its transcription in progress on servers
-    _TRANSCRIPTION_IN_PROGRESS = gettext_noop("Transcription in Progress")
-    # Translators: This is the status for a video whose transcription is complete
-    _TRANSCRIPT_READY = gettext_noop("Transcript Ready")
-    # Translators: This is the status for a video whose transcription job was failed for some languages
-    _PARTIAL_FAILURE = gettext_noop("Partial Failure")
-    # Translators: This is the status for a video whose transcription job has failed altogether
-    _TRANSCRIPT_FAILED = gettext_noop("Transcript Failed")
-
-    _STATUS_MAP = {
-        "upload": _UPLOADING,
-        "ingest": _IN_PROGRESS,
-        "transcode_queue": _IN_PROGRESS,
-        "transcode_active": _IN_PROGRESS,
-        "file_delivered": _COMPLETE,
-        "file_complete": _COMPLETE,
-        "upload_completed": _UPLOAD_COMPLETED,
-        "file_corrupt": _FAILED,
-        "pipeline_error": _FAILED,
-        "upload_failed": _FAILED,
-        "s3_upload_failed": _FAILED,
-        "upload_cancelled": _CANCELLED,
-        "duplicate": _DUPLICATE,
-        "youtube_duplicate": _YOUTUBE_DUPLICATE,
-        "invalid_token": _INVALID_TOKEN,
-        "imported": _IMPORTED,
-        "transcription_in_progress": _TRANSCRIPTION_IN_PROGRESS,
-        "transcript_ready": _TRANSCRIPT_READY,
-        "partial_failure": _PARTIAL_FAILURE,
-        # TODO: Add a related unit tests when the VAL update is part of platform
-        "transcript_failed": _TRANSCRIPT_FAILED,
-    }
-
-    @staticmethod
-    def get(val_status):
-        """Map a VAL status string to a localized display string"""
-        # pylint: disable=translation-of-non-string
-        return _(StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN))
-
 
 @expect_json
 @login_required
@@ -253,83 +185,11 @@ def get_video_features(request):
 def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnaround,
                                     three_play_turnaround, video_source_language, preferred_languages):
     """
-    Validate 3rd Party Transcription Preferences.
-
-    Arguments:
-        provider: Transcription provider
-        cielo24_fidelity:  Cielo24 transcription fidelity.
-        cielo24_turnaround: Cielo24 transcription turnaround.
-        three_play_turnaround: 3PlayMedia transcription turnaround.
-        video_source_language: Source/Speech language of the videos that are going to be submitted to the Providers.
-        preferred_languages: list of language codes.
-
-    Returns:
-        validated preferences or a validation error.
+    Exposes helper method without breaking existing bindings/dependencies
     """
-    error, preferences = None, {}
-
-    # validate transcription providers
-    transcription_plans = get_3rd_party_transcription_plans()
-    if provider in list(transcription_plans.keys()):   # lint-amnesty, pylint: disable=consider-iterating-dictionary
-
-        # Further validations for providers
-        if provider == TranscriptProvider.CIELO24:
-
-            # Validate transcription fidelity
-            if cielo24_fidelity in transcription_plans[provider]['fidelity']:
-
-                # Validate transcription turnaround
-                if cielo24_turnaround not in transcription_plans[provider]['turnaround']:
-                    error = f'Invalid cielo24 turnaround {cielo24_turnaround}.'
-                    return error, preferences
-
-                # Validate transcription languages
-                supported_languages = transcription_plans[provider]['fidelity'][cielo24_fidelity]['languages']
-                if video_source_language not in supported_languages:
-                    error = f'Unsupported source language {video_source_language}.'
-                    return error, preferences
-
-                if not preferred_languages or not set(preferred_languages) <= set(supported_languages.keys()):
-                    error = f'Invalid languages {preferred_languages}.'
-                    return error, preferences
-
-                # Validated Cielo24 preferences
-                preferences = {
-                    'video_source_language': video_source_language,
-                    'cielo24_fidelity': cielo24_fidelity,
-                    'cielo24_turnaround': cielo24_turnaround,
-                    'preferred_languages': preferred_languages,
-                }
-            else:
-                error = f'Invalid cielo24 fidelity {cielo24_fidelity}.'
-        elif provider == TranscriptProvider.THREE_PLAY_MEDIA:
-
-            # Validate transcription turnaround
-            if three_play_turnaround not in transcription_plans[provider]['turnaround']:
-                error = f'Invalid 3play turnaround {three_play_turnaround}.'
-                return error, preferences
-
-            # Validate transcription languages
-            valid_translations_map = transcription_plans[provider]['translations']
-            if video_source_language not in list(valid_translations_map.keys()):
-                error = f'Unsupported source language {video_source_language}.'
-                return error, preferences
-
-            valid_target_languages = valid_translations_map[video_source_language]
-            if not preferred_languages or not set(preferred_languages) <= set(valid_target_languages):
-                error = f'Invalid languages {preferred_languages}.'
-                return error, preferences
-
-            # Validated 3PlayMedia preferences
-            preferences = {
-                'three_play_turnaround': three_play_turnaround,
-                'video_source_language': video_source_language,
-                'preferred_languages': preferred_languages,
-            }
-    else:
-        error = f'Invalid provider {provider}.'
-
-    return error, preferences
+    return validate_transcript_preferences_source_function(provider, cielo24_fidelity, cielo24_turnaround,
+                                                              three_play_turnaround, video_source_language,
+                                                              preferred_languages)
 
 
 @expect_json
@@ -363,287 +223,62 @@ def video_encodings_download(request, course_key_string):
 
 def convert_video_status(video, is_video_encodes_ready=False):
     """
-    Convert status of a video. Status can be converted to one of the following:
-
-        *   FAILED if video is in `upload` state for more than 24 hours
-        *   `YouTube Duplicate` if status is `invalid_token`
-        *   user-friendly video status
+    Exposes helper method without breaking existing bindings/dependencies
     """
-    now = datetime.now(video.get('created', datetime.now().replace(tzinfo=UTC)).tzinfo)
-
-    if video['status'] == 'upload' and (now - video['created']) > timedelta(hours=MAX_UPLOAD_HOURS):
-        new_status = 'upload_failed'
-        status = StatusDisplayStrings.get(new_status)
-        message = 'Video with id [{}] is still in upload after [{}] hours, setting status to [{}]'.format(
-            video['edx_video_id'], MAX_UPLOAD_HOURS, new_status
-        )
-        send_video_status_update([
-            {
-                'edxVideoId': video['edx_video_id'],
-                'status': new_status,
-                'message': message
-            }
-        ])
-    elif video['status'] == 'invalid_token':
-        status = StatusDisplayStrings.get('youtube_duplicate')
-    elif is_video_encodes_ready:
-        status = StatusDisplayStrings.get('file_complete')
-    else:
-        status = StatusDisplayStrings.get(video['status'])
-
-    return status
+    return convert_video_status_source_function(video, is_video_encodes_ready)
 
 
 def get_all_transcript_languages():
     """
-    Returns all possible languages for transcript.
+    Exposes helper method without breaking existing bindings/dependencies
     """
-    third_party_transcription_languages = {}
-    transcription_plans = get_3rd_party_transcription_plans()
-    cielo_fidelity = transcription_plans[TranscriptProvider.CIELO24]['fidelity']
-
-    # Get third party transcription languages.
-    third_party_transcription_languages.update(transcription_plans[TranscriptProvider.THREE_PLAY_MEDIA]['languages'])
-    third_party_transcription_languages.update(cielo_fidelity['MECHANICAL']['languages'])
-    third_party_transcription_languages.update(cielo_fidelity['PREMIUM']['languages'])
-    third_party_transcription_languages.update(cielo_fidelity['PROFESSIONAL']['languages'])
-
-    all_languages_dict = dict(settings.ALL_LANGUAGES, **third_party_transcription_languages)
-    # Return combined system settings and 3rd party transcript languages.
-    all_languages = []
-    for key, value in sorted(all_languages_dict.items(), key=lambda k_v: k_v[1]):
-        all_languages.append({
-            'language_code': key,
-            'language_text': value
-        })
-    return all_languages
+    return get_all_transcript_languages_source_function()
 
 
 def videos_index_html(course, pagination_conf=None):
     """
-    Returns an HTML page to display previous video uploads and allow new ones
+    Exposes helper method without breaking existing bindings/dependencies
     """
-    is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
-    previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
-    context = {
-        'context_course': course,
-        'image_upload_url': reverse_course_url('video_images_handler', str(course.id)),
-        'video_handler_url': reverse_course_url('videos_handler', str(course.id)),
-        'encodings_download_url': reverse_course_url('video_encodings_download', str(course.id)),
-        'default_video_image_url': _get_default_video_image_url(),
-        'previous_uploads': previous_uploads,
-        'concurrent_upload_limit': settings.VIDEO_UPLOAD_PIPELINE.get('CONCURRENT_UPLOAD_LIMIT', 0),
-        'video_supported_file_formats': list(VIDEO_SUPPORTED_FILE_FORMATS.keys()),
-        'video_upload_max_file_size': VIDEO_UPLOAD_MAX_FILE_SIZE_GB,
-        'video_image_settings': {
-            'video_image_upload_enabled': VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled(),
-            'max_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MAX_BYTES'],
-            'min_size': settings.VIDEO_IMAGE_SETTINGS['VIDEO_IMAGE_MIN_BYTES'],
-            'max_width': settings.VIDEO_IMAGE_MAX_WIDTH,
-            'max_height': settings.VIDEO_IMAGE_MAX_HEIGHT,
-            'supported_file_formats': settings.VIDEO_IMAGE_SUPPORTED_FILE_FORMATS
-        },
-        'is_video_transcript_enabled': is_video_transcript_enabled,
-        'active_transcript_preferences': None,
-        'transcript_credentials': None,
-        'transcript_available_languages': get_all_transcript_languages(),
-        'video_transcript_settings': {
-            'transcript_download_handler_url': reverse('transcript_download_handler'),
-            'transcript_upload_handler_url': reverse('transcript_upload_handler'),
-            'transcript_delete_handler_url': reverse_course_url('transcript_delete_handler', str(course.id)),
-            'trancript_download_file_format': Transcript.SRT
-        },
-        'pagination_context': pagination_context
-    }
-
-    if is_video_transcript_enabled:
-        context['video_transcript_settings'].update({
-            'transcript_preferences_handler_url': reverse_course_url(
-                'transcript_preferences_handler',
-                str(course.id)
-            ),
-            'transcript_credentials_handler_url': reverse_course_url(
-                'transcript_credentials_handler',
-                str(course.id)
-            ),
-            'transcription_plans': get_3rd_party_transcription_plans(),
-        })
-        context['active_transcript_preferences'] = get_transcript_preferences(str(course.id))
-        # Cached state for transcript providers' credentials (org-specific)
-        context['transcript_credentials'] = get_transcript_credentials_state_for_org(course.id.org)
-    if use_new_video_uploads_page(course.id):
-        return redirect(get_video_uploads_url(course.id))
-    return render_to_response('videos_index.html', context)
+    return videos_index_html_source_function(course, pagination_conf)
 
 
 def videos_index_json(course):
     """
-    Returns JSON in the following format:
-    {
-        'videos': [{
-            'edx_video_id': 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',
-            'client_video_id': 'video.mp4',
-            'created': '1970-01-01T00:00:00Z',
-            'duration': 42.5,
-            'status': 'upload',
-            'course_video_image_url': 'https://video/images/1234.jpg'
-        }]
-    }
+    Exposes helper method without breaking existing bindings/dependencies
     """
-    index_videos, __ = _get_index_videos(course)
-    return JsonResponse({"videos": index_videos}, status=200)
+    return videos_index_json_source_function(course)
 
 
 def videos_post(course, request):
     """
-    Input (JSON):
-    {
-        "files": [{
-            "file_name": "video.mp4",
-            "content_type": "video/mp4"
-        }]
-    }
-
-    Returns (JSON):
-    {
-        "files": [{
-            "file_name": "video.mp4",
-            "upload_url": "http://example.com/put_video"
-        }]
-    }
-
-    The returned array corresponds exactly to the input array.
+    Exposes helper method without breaking existing bindings/dependencies
     """
-    error = None
-    data = request.json
-    if 'files' not in data:
-        error = "Request object is not JSON or does not contain 'files'"
-    elif any(
-        'file_name' not in file or 'content_type' not in file
-        for file in data['files']
-    ):
-        error = "Request 'files' entry does not contain 'file_name' and 'content_type'"
-    elif any(
-        file['content_type'] not in list(VIDEO_SUPPORTED_FILE_FORMATS.values())
-        for file in data['files']
-    ):
-        error = "Request 'files' entry contain unsupported content_type"
-
-    if error:
-        return {'error': error}, 400
-
-    bucket = storage_service_bucket()
-    req_files = data['files']
-    resp_files = []
-
-    for req_file in req_files:
-        file_name = req_file['file_name']
-
-        try:
-            file_name.encode('ascii')
-        except UnicodeEncodeError:
-            error_msg = 'The file name for %s must contain only ASCII characters.' % file_name
-            return {'error': error_msg}, 400
-
-        edx_video_id = str(uuid4())
-        key = storage_service_key(bucket, file_name=edx_video_id)
-
-        metadata_list = [
-            ('client_video_id', file_name),
-            ('course_key', str(course.id)),
-        ]
-
-        course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
-
-        # Only include `course_video_upload_token` if youtube has not been deprecated
-        # for this course.
-        if not DEPRECATE_YOUTUBE.is_enabled(course.id) and course_video_upload_token:
-            metadata_list.append(('course_video_upload_token', course_video_upload_token))
-
-        is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
-        if is_video_transcript_enabled:
-            transcript_preferences = get_transcript_preferences(str(course.id))
-            if transcript_preferences is not None:
-                metadata_list.append(('transcript_preferences', json.dumps(transcript_preferences)))
-
-        for metadata_name, value in metadata_list:
-            key.set_metadata(metadata_name, value)
-        upload_url = key.generate_url(
-            KEY_EXPIRATION_IN_SECONDS,
-            'PUT',
-            headers={'Content-Type': req_file['content_type']}
-        )
-
-        # persist edx_video_id in VAL
-        create_video({
-            'edx_video_id': edx_video_id,
-            'status': 'upload',
-            'client_video_id': file_name,
-            'duration': 0,
-            'encoded_videos': [],
-            'courses': [str(course.id)]
-        })
-
-        resp_files.append({'file_name': file_name, 'upload_url': upload_url, 'edx_video_id': edx_video_id})
-
-    return {'files': resp_files}, 200
+    return videos_post_source_function(course, request)
 
 
 def storage_service_bucket():
     """
-    Returns an S3 bucket for video upload.
+    Exposes helper method without breaking existing bindings/dependencies
     """
-    if ENABLE_DEVSTACK_VIDEO_UPLOADS.is_enabled():
-        params = {
-            'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
-            'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY,
-            'security_token': settings.AWS_SECURITY_TOKEN
-
-        }
-    else:
-        params = {
-            'aws_access_key_id': settings.AWS_ACCESS_KEY_ID,
-            'aws_secret_access_key': settings.AWS_SECRET_ACCESS_KEY
-        }
-
-    conn = S3Connection(**params)
-
-    # We don't need to validate our bucket, it requires a very permissive IAM permission
-    # set since behind the scenes it fires a HEAD request that is equivalent to get_all_keys()
-    # meaning it would need ListObjects on the whole bucket, not just the path used in each
-    # environment (since we share a single bucket for multiple deployments in some configurations)
-    return conn.get_bucket(settings.VIDEO_UPLOAD_PIPELINE['VEM_S3_BUCKET'], validate=False)
+    return storage_service_bucket_source_function()
 
 
 def storage_service_key(bucket, file_name):
     """
-    Returns an S3 key to the given file in the given bucket.
+    Exposes helper method without breaking existing bindings/dependencies
     """
-    key_name = "{}/{}".format(
-        settings.VIDEO_UPLOAD_PIPELINE.get("ROOT_PATH", ""),
-        file_name
-    )
-    return s3.key.Key(bucket, key_name)
+    return storage_service_key_source_function(bucket, file_name)
 
 
 def send_video_status_update(updates):
     """
-    Update video status in edx-val.
+    Exposes helper method without breaking existing bindings/dependencies
     """
-    for update in updates:
-        update_video_status(update.get('edxVideoId'), update.get('status'))
-        LOGGER.info(
-            'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
-            update.get('edxVideoId'),
-            update.get('status'),
-            update.get('message')
-        )
-
-    return JsonResponse()
+    return send_video_status_update_source_function(updates)
 
 
 def is_status_update_request(request_data):
     """
-    Returns True if `request_data` contains status update else False.
+    Exposes helper method without breaking existing bindings/dependencies
     """
-    return any('status' in update for update in request_data)
+    return is_status_update_request_source_function(request_data)
