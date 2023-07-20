@@ -12,6 +12,7 @@ from milestones.tests.utils import MilestonesTestCaseMixin
 from cms.djangoapps.contentstore.tests.utils import CourseTestCase
 from cms.djangoapps.contentstore.toggles import ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE
 
+
 @override_waffle_flag(ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE, active=True)
 @ddt.ddt
 class CourseAdvanceSettingViewTest(CourseTestCase, MilestonesTestCaseMixin):
