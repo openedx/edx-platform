@@ -1,7 +1,9 @@
+
+
 """
 Tests for the xblock view of the Studio Content API. This tests only the view itself,
 not the underlying Xblock service.
-It checks that the xblock_handler method of the Xblock service is called with the expected parameters.
+It checks that the assets_handler method of the Xblock service is called with the expected parameters.
 """
 from unittest.mock import patch
 from django.http import JsonResponse
@@ -14,13 +16,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from cms.djangoapps.contentstore.tests.test_utils import AuthorizeStaffTestCase
 
 
-TEST_LOCATOR = "block-v1:dede+aba+weagi+type@problem+block@ba6327f840da49289fb27a9243913478"
+ASSET_KEY_STRING = "asset-v1:dede+aba+weagi+type@asset+block@_0e37192a-42c4-441e-a3e1-8e40ec304e2e.jpg"
 
 
-class XBlockViewTestCase(AuthorizeStaffTestCase):
+class AssetsViewTestCase(AuthorizeStaffTestCase):
     """
     This base class supports tests with the various HTTP methods (GET, POST, PUT, PATCH, and DELETE).
-    Tests for each such message are organized by classes that derive from this one (e.g., XBlockViewGetTest).
+    Tests for each such message are organized by classes that derive from this one (e.g., XblockViewGetTest).
     Each derived class supplies get_test_data() to govern what goes into the body of the HTTP request.
     Each derived class optionally overrides get_url_params() to govern request parameter values.
     Additionally, each derived class supplies send_request() to bring it all together when making a request.
@@ -34,11 +36,11 @@ class XBlockViewTestCase(AuthorizeStaffTestCase):
         Returns a dictionary of parameters to be used in the url that includes course_id and usage_key_string.
         Override this method if you don't want to use the default values.
         """
-        return {"course_id": self.get_course_key_string(), "usage_key_string": TEST_LOCATOR}
+        return {"course_id": self.get_course_key_string(), "usage_key_string": ASSET_KEY_STRING}
 
     def get_url(self, _course_id=None):
         return reverse(
-            "cms.djangoapps.contentstore:v1:studio_content",
+            "cms.djangoapps.contentstore:v1:studio_content_assets",
             kwargs=self.get_url_params(),
         )
 
@@ -46,10 +48,10 @@ class XBlockViewTestCase(AuthorizeStaffTestCase):
         raise NotImplementedError("send_request must be implemented by subclasses")
 
     @patch(
-        "cms.djangoapps.contentstore.rest_api.v1.views.xblock.handle_xblock",
+        "cms.djangoapps.contentstore.rest_api.v1.views.assets.handle_assets",
         return_value=JsonResponse(
             {
-                "locator": TEST_LOCATOR,
+                "locator": ASSET_KEY_STRING,
                 "courseKey": AuthorizeStaffTestCase.get_course_key_string(),
             }
         ),
@@ -61,14 +63,14 @@ class XBlockViewTestCase(AuthorizeStaffTestCase):
     def make_request(
         self,
         mock_use_studio_content_api,
-        mock_handle_xblock,
+        mock_handle_assets,
         run_assertions=None,
         course_id=None,
         data=None,
     ):
         """
-        Note that the actual xblock handler is mocked out and not used here. Patches used with this method serve to
-        test that routing of HTTP requests to the xblock handler is correct, that the intended HTTP method has been
+        Note that the actual assets handler is mocked out and not used here. Patches used with this method serve to
+        test that routing of HTTP requests to the assets handler is correct, that the intended HTTP method has been
         used, that data fed into the handler is as expected, and that data returned by the handler is as expected.
         Inputs and outputs are handled through send_request() polymorphism, to cover all the HTTP methods in a
         common fashion here.
@@ -82,27 +84,30 @@ class XBlockViewTestCase(AuthorizeStaffTestCase):
         # run optional callback method with additional assertions
         if run_assertions:
             run_assertions(
-                response=response, mock_handle_xblock=mock_handle_xblock
+                response=response, mock_handle_assets=mock_handle_assets
             )
 
         return response
 
 
-class XBlockViewGetTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
+class AssetsViewGetTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test GET operation on xblocks
     """
 
+    def get_url_params(self):
+        return {"course_id": self.get_course_key_string()}
+
     def get_test_data(self):
         return None
 
-    def assert_xblock_handler_called(self, *, mock_handle_xblock, response):
+    def assert_assets_handler_called(self, *, mock_handle_assets, response):
         """
         This defines a callback method that is called after the request is made
-        and runs additional assertions on the response and mock_handle_xblock.
+        and runs additional assertions on the response and mock_handle_assets.
         """
-        mock_handle_xblock.assert_called_once()
-        passed_args = mock_handle_xblock.call_args[0][0]
+        mock_handle_assets.assert_called_once()
+        passed_args = mock_handle_assets.call_args[0][0]
 
         assert passed_args.method == "GET"
         assert passed_args.path == self.get_url()
@@ -117,21 +122,21 @@ class XBlockViewGetTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_xblock_handler_called_with_correct_arguments(self):
+    def test_assets_handler_called_with_correct_arguments(self):
         self.client.login(
             username=self.course_instructor.username, password=self.password
         )
         response = self.make_request(  # pylint: disable=no-value-for-parameter
-            run_assertions=self.assert_xblock_handler_called,
+            run_assertions=self.assert_assets_handler_called,
         )
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
-        assert data["locator"] == TEST_LOCATOR
+        assert data["locator"] == ASSET_KEY_STRING
         assert data["courseKey"] == self.get_course_key_string()
 
 
-class XBlockViewPostTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
+class AssetsViewPostTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test POST operation on xblocks - Create a new xblock for a parent xblock
     """
@@ -139,36 +144,27 @@ class XBlockViewPostTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
     def get_url_params(self):
         return {"course_id": self.get_course_key_string()}
 
-    def get_url(self, _course_id=None):
-        return reverse(
-            "cms.djangoapps.contentstore:v1:studio_content",
-            kwargs=self.get_url_params(),
-        )
-
     def get_test_data(self):
-        course_id = self.get_course_key_string()
         return {
-            "parent_locator": course_id,
-            "category": "html",
-            "courseKey": course_id,
+            "file": ASSET_KEY_STRING,
         }
 
-    def assert_xblock_handler_called(self, *, mock_handle_xblock, response):
+    def assert_assets_handler_called(self, *, mock_handle_assets, response):
         """
         This defines a callback method that is called after the request is made
-        and runs additional assertions on the response and mock_handle_xblock.
+        and runs additional assertions on the response and mock_handle_assets.
         """
-        mock_handle_xblock.assert_called_once()
-        passed_args = mock_handle_xblock.call_args[0][0]
+        mock_handle_assets.assert_called_once()
+        passed_args = mock_handle_assets.call_args[0][0]
 
         course_id = self.get_course_key_string()
 
-        assert passed_args.data.get("courseKey") == course_id
+        assert passed_args.data.get("file") == ASSET_KEY_STRING
         assert passed_args.method == "POST"
         assert passed_args.path == self.get_url()
 
     def send_request(self, url, data):
-        return self.client.post(url, data=data, format="json")
+        return self.client.post(url, data=data, format="multipart")
 
     def test_api_behind_feature_flag(self):
         # should return 404 if the feature flag is not enabled
@@ -177,50 +173,43 @@ class XBlockViewPostTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_xblock_handler_called_with_correct_arguments(self):
+    def test_assets_handler_called_with_correct_arguments(self):
         self.client.login(
             username=self.course_instructor.username, password=self.password
         )
         response = self.make_request(  # pylint: disable=no-value-for-parameter
-            run_assertions=self.assert_xblock_handler_called,
+            run_assertions=self.assert_assets_handler_called,
         )
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
-        assert data["locator"] == TEST_LOCATOR
+        assert data["locator"] == ASSET_KEY_STRING
         assert data["courseKey"] == self.get_course_key_string()
 
 
-class XBlockViewPutTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
+class AssetsViewPutTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     """
-    Test PUT operation on xblocks - update an xblock
+    Test PUT operation on assets - update an asset's locked state
     """
+
+    def get_url_params(self):
+        return {"course_id": self.get_course_key_string(), "asset_key_string": ASSET_KEY_STRING}
 
     def get_test_data(self):
-        course_id = self.get_course_key_string()
         return {
-            "category": "html",
-            "courseKey": course_id,
-            "data": "<p>Updated block!</p>",
-            "has_changes": True,
-            "id": TEST_LOCATOR,
-            "metadata": {
-                "display_name": "Text"
-            }
+            "locked": True,
         }
 
-    def assert_xblock_handler_called(self, *, mock_handle_xblock, response):
+    def assert_assets_handler_called(self, *, mock_handle_assets, response):
         """
         This defines a callback method that is called after the request is made
-        and runs additional assertions on the response and mock_handle_xblock.
+        and runs additional assertions on the response and mock_handle_assets.
         """
-        mock_handle_xblock.assert_called_once()
-        passed_args = mock_handle_xblock.call_args[0][0]
+        mock_handle_assets.assert_called_once()
+        passed_args = mock_handle_assets.call_args[0][0]
 
         course_id = self.get_course_key_string()
 
-        assert passed_args.data.get("courseKey") == course_id
-        assert passed_args.data.get("data") == "<p>Updated block!</p>"
-        assert passed_args.data.get("id") == TEST_LOCATOR
+        assert passed_args.data.get("locked") is True
         assert passed_args.method == "PUT"
         assert passed_args.path == self.get_url()
 
@@ -234,91 +223,37 @@ class XBlockViewPutTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
         response = self.client.put(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_xblock_handler_called_with_correct_arguments(self):
+    def test_assets_handler_called_with_correct_arguments(self):
         self.client.login(
             username=self.course_instructor.username, password=self.password
         )
         response = self.make_request(  # pylint: disable=no-value-for-parameter
-            run_assertions=self.assert_xblock_handler_called,
+            run_assertions=self.assert_assets_handler_called,
         )
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
-        assert data["locator"] == TEST_LOCATOR
+        assert data["locator"] == ASSET_KEY_STRING
         assert data["courseKey"] == self.get_course_key_string()
 
 
-class XBlockViewPatchTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
+class AssetsViewDeleteTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     """
-    Test PATCH operation on xblocks - update an xblock
+    Test DELETE asset
     """
 
-    def get_test_data(self):
-        course_id = self.get_course_key_string()
-        return {
-            "category": "html",
-            "courseKey": course_id,
-            "data": "<p>Patched block!</p>",
-            "has_changes": True,
-            "id": TEST_LOCATOR,
-            "metadata": {
-                "display_name": "Text"
-            }
-        }
-
-    def assert_xblock_handler_called(self, *, mock_handle_xblock, response):
-        """
-        This defines a callback method that is called after the request is made
-        and runs additional assertions on the response and mock_handle_xblock.
-        """
-        mock_handle_xblock.assert_called_once()
-        passed_args = mock_handle_xblock.call_args[0][0]
-
-        course_id = self.get_course_key_string()
-
-        assert passed_args.data.get("courseKey") == course_id
-        assert passed_args.data.get("data") == "<p>Patched block!</p>"
-        assert passed_args.data.get("id") == TEST_LOCATOR
-        assert passed_args.method == "PATCH"
-        assert passed_args.path == self.get_url()
-
-    def send_request(self, url, data):
-        return self.client.patch(url, data=data, format="json")
-
-    def test_api_behind_feature_flag(self):
-        # should return 404 if the feature flag is not enabled
-        url = self.get_url()
-
-        response = self.client.patch(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_xblock_handler_called_with_correct_arguments(self):
-        self.client.login(
-            username=self.course_instructor.username, password=self.password
-        )
-        response = self.make_request(  # pylint: disable=no-value-for-parameter
-            run_assertions=self.assert_xblock_handler_called,
-        )
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data["locator"] == TEST_LOCATOR
-        assert data["courseKey"] == self.get_course_key_string()
-
-
-class XBlockViewDeleteTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase):
-    """
-    Test DELETE operation on xblocks - delete an xblock
-    """
+    def get_url_params(self):
+        return {"course_id": self.get_course_key_string(), "asset_key_string": ASSET_KEY_STRING}
 
     def get_test_data(self):
         return None
 
-    def assert_xblock_handler_called(self, *, mock_handle_xblock, response):
+    def assert_assets_handler_called(self, *, mock_handle_assets, response):
         """
         This defines a callback method that is called after the request is made
-        and runs additional assertions on the response and mock_handle_xblock.
+        and runs additional assertions on the response and mock_handle_assets.
         """
-        mock_handle_xblock.assert_called_once()
-        passed_args = mock_handle_xblock.call_args[0][0]
+        mock_handle_assets.assert_called_once()
+        passed_args = mock_handle_assets.call_args[0][0]
 
         assert passed_args.method == "DELETE"
         assert passed_args.path == self.get_url()
@@ -333,14 +268,14 @@ class XBlockViewDeleteTest(XBlockViewTestCase, ModuleStoreTestCase, APITestCase)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_xblock_handler_called_with_correct_arguments(self):
+    def test_assets_handler_called_with_correct_arguments(self):
         self.client.login(
             username=self.course_instructor.username, password=self.password
         )
         response = self.make_request(  # pylint: disable=no-value-for-parameter
-            run_assertions=self.assert_xblock_handler_called,
+            run_assertions=self.assert_assets_handler_called,
         )
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
-        assert data["locator"] == TEST_LOCATOR
+        assert data["locator"] == ASSET_KEY_STRING
         assert data["courseKey"] == self.get_course_key_string()
