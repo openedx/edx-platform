@@ -5,11 +5,11 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from cms.djangoapps.contentstore.asset_storage_handlers import (
     handle_assets,
-    update_course_run_asset as update_course_run_asset_source_method,
-    get_file_size as get_file_size_source_method,
-    delete_asset as delete_asset_source_method,
-    get_asset_json as get_asset_json_source_method,
-    update_asset as update_asset_source_method,
+    update_course_run_asset as update_course_run_asset_source_function,
+    get_file_size as get_file_size_source_function,
+    delete_asset as delete_asset_source_function,
+    get_asset_json as get_asset_json_source_function,
+    update_asset as update_asset_source_function,
 )
 
 __all__ = ['assets_handler']
@@ -43,9 +43,9 @@ def assets_handler(request, course_key_string=None, asset_key_string=None):
             asset_type: the file type to filter items to (defaults to All)
             text_search: string to filter results by file name (defaults to '')
     POST
-        json: create (or update?) an asset. The only updating that can be done is changing the lock state.
+        json: create or update an asset. The only updating that can be done is changing the lock state.
     PUT
-        json: update the locked state of an asset
+        json: create or update an asset. The only updating that can be done is changing the lock state.
     DELETE
         json: delete an asset
     '''
@@ -54,21 +54,21 @@ def assets_handler(request, course_key_string=None, asset_key_string=None):
 
 def update_course_run_asset(course_key, upload_file):
     """Exposes service method in asset_storage_handlers without breaking existing bindings/dependencies"""
-    return update_course_run_asset_source_method(course_key, upload_file)
+    return update_course_run_asset_source_function(course_key, upload_file)
 
 
 def get_file_size(upload_file):
     """Exposes service method in asset_storage_handlers without breaking existing bindings/dependencies"""
-    return get_file_size_source_method(upload_file)
+    return get_file_size_source_function(upload_file)
 
 
 def delete_asset(course_key, asset_key):
     """Exposes service method in asset_storage_handlers without breaking existing bindings/dependencies"""
-    return delete_asset_source_method(course_key, asset_key)
+    return delete_asset_source_function(course_key, asset_key)
 
 
 def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked, course_key):
-    return get_asset_json_source_method(
+    return get_asset_json_source_function(
         display_name,
         content_type,
         date,
@@ -80,4 +80,4 @@ def _get_asset_json(display_name, content_type, date, location, thumbnail_locati
 
 
 def _update_asset(request, course_key, asset_key):
-    return update_asset_source_method(request, course_key, asset_key)
+    return update_asset_source_function(request, course_key, asset_key)

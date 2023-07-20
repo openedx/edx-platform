@@ -63,9 +63,9 @@ def handle_assets(request, course_key_string=None, asset_key_string=None):
             asset_type: the file type to filter items to (defaults to All)
             text_search: string to filter results by file name (defaults to '')
     POST
-        json: create (or update?) an asset. The only updating that can be done is changing the lock state.
+        json: create or update an asset. The only updating that can be done is changing the lock state.
     PUT
-        json: update the locked state of an asset
+        json: create or update an asset. The only updating that can be done is changing the lock state.
     DELETE
         json: delete an asset
     '''

@@ -90,7 +90,7 @@ class AssetsViewTestCase(AuthorizeStaffTestCase):
         return response
 
 
-class XblockViewGetTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
+class AssetsViewGetTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test GET operation on xblocks
     """
@@ -136,7 +136,7 @@ class XblockViewGetTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
         assert data["courseKey"] == self.get_course_key_string()
 
 
-class XblockViewPostTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
+class AssetsViewPostTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test POST operation on xblocks - Create a new xblock for a parent xblock
     """
@@ -186,7 +186,7 @@ class XblockViewPostTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
         assert data["courseKey"] == self.get_course_key_string()
 
 
-class XblockViewPutTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
+class AssetsViewPutTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test PUT operation on assets - update an asset's locked state
     """
@@ -236,7 +236,7 @@ class XblockViewPutTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
         assert data["courseKey"] == self.get_course_key_string()
 
 
-class XblockViewDeleteTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
+class AssetsViewDeleteTest(AssetsViewTestCase, ModuleStoreTestCase, APITestCase):
     """
     Test DELETE asset
     """
