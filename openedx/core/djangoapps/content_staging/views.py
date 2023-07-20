@@ -189,7 +189,7 @@ class ClipboardEndpoint(APIView):
             content: bytes | None = f.data
             md5_hash = ""  # Unknown
             if content:
-                md5_hash = hashlib.md5(f.data).hexdigest()
+                md5_hash = hashlib.md5(content).hexdigest()
                 # This asset came from the XBlock's filesystem, e.g. a video block's transcript file
                 source_key = usage_key
             # Check if the asset file exists. It can be absent if an XBlock contains an invalid link.

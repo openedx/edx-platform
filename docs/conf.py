@@ -16,12 +16,12 @@ import git
 
 from path import Path
 
-root = Path('../..').abspath()
+root = Path('..').abspath()
 
 # Hack the PYTHONPATH to match what LMS and Studio use so all the code
 # can be successfully imported
 sys.path.insert(0, root)
-sys.path.append(root / "docs/guides")
+sys.path.append(root / "docs")
 
 
 # Use a settings module that allows all LMS and Studio code to be imported
@@ -74,9 +74,8 @@ rediraffe_branch = 'origin/master'
 
 # code_annotations.(featuretoggles|settings) related settings.
 edxplatform_repo_url = "https://github.com/openedx/edx-platform"
-edxplatform_source_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..")
-)
+edxplatform_source_path = root
+
 try:
     edx_platform_version = git.Repo(search_parent_directories=True).head.object.hexsha
 except git.InvalidGitRepositoryError:
@@ -136,7 +135,7 @@ html_favicon = "https://logos.openedx.org/open-edx-favicon.ico"
 html_theme_options = {
     "repository_url": "https://github.com/openedx/edx-platform",
     "repository_branch": "master",
-    "path_to_docs": "docs/guides",
+    "path_to_docs": "docs",
     "home_page_in_toc": True,
     "use_repository_button": True,
     "use_issues_button": True,
@@ -278,11 +277,14 @@ autodoc_mock_imports = [
 # run sphinx-apidoc against and the directories under "docs" in which to store
 # the generated *.rst files
 modules = {
-    'cms': 'references/docstrings/cms',
     'lms': 'references/docstrings/lms',
     'openedx': 'references/docstrings/openedx',
-    'common': 'references/docstrings/common',
-    'xmodule': 'references/docstrings/xmodule',
+    # Commenting this out for now because they blow up the build
+    # time and memory limits for RTD.  We can come back to these
+    # later once we get parallel builds working hopefully.
+    # 'cms': 'references/docstrings/cms',
+    # 'common': 'references/docstrings/common',
+    # 'xmodule': 'references/docstrings/xmodule',
 }
 
 
@@ -305,7 +307,7 @@ def on_init(app):  # lint-amnesty, pylint: disable=redefined-outer-name, unused-
     Read the Docs won't run tox or custom shell commands, so we need this to
     avoid checking in the generated reStructuredText files.
     """
-    docs_path = root / 'docs' / 'guides'
+    docs_path = root / 'docs'
     apidoc_path = 'sphinx-apidoc'
     if hasattr(sys, 'real_prefix'):  # Check to see if we are in a virtualenv
         # If we are, assemble the path manually

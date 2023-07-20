@@ -6,6 +6,7 @@ import json
 from abc import ABC, abstractmethod
 from urllib.parse import quote
 
+from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import Http404
 from django.template.loader import render_to_string
@@ -65,18 +66,22 @@ class ProgramsFragmentView(EdxFragmentView):
             if is_user_b2c_subscriptions_enabled
             else []
         )
-        subscriptions_marketing_url = (
-            get_program_subscriptions_marketing_url()
+        subscription_upsell_data = (
+            {
+                'marketing_url': get_program_subscriptions_marketing_url(),
+                'minimum_price': settings.SUBSCRIPTIONS_MINIMUM_PRICE,
+                'trial_length': settings.SUBSCRIPTIONS_TRIAL_LENGTH,
+            }
             if is_user_b2c_subscriptions_enabled
-            else ''
+            else {}
         )
 
         context = {
             'marketing_url': get_program_marketing_url(programs_config, mobile_only),
-            'subscriptions_marketing_url': subscriptions_marketing_url,
             'programs': meter.engaged_programs,
             'progress': meter.progress(),
             'programs_subscription_data': programs_subscription_data,
+            'subscription_upsell_data': subscription_upsell_data,
             'user_preferences': get_user_preferences(user),
             'is_user_b2c_subscriptions_enabled': is_user_b2c_subscriptions_enabled,
             'mobile_only': bool(mobile_only)
@@ -152,12 +157,13 @@ class ProgramDetailsFragmentView(EdxFragmentView):
             'user_preferences': get_user_preferences(user),
             'program_data': program_data,
             'program_subscription_data': program_subscription_data,
-            'is_user_b2c_subscriptions_enabled': is_user_b2c_subscriptions_enabled,
             'course_data': course_data,
             'certificate_data': certificate_data,
             'industry_pathways': industry_pathways,
             'credit_pathways': credit_pathways,
             'program_tab_view_enabled': program_tab_view_enabled(),
+            'is_user_b2c_subscriptions_enabled': is_user_b2c_subscriptions_enabled,
+            'subscriptions_trial_length': settings.SUBSCRIPTIONS_TRIAL_LENGTH,
             'discussion_fragment': {
                 'configured': program_discussion_lti.is_configured,
                 'iframe': program_discussion_lti.render_iframe()

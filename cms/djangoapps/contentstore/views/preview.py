@@ -149,14 +149,13 @@ def preview_layout_asides(block, context, frag, view_name, aside_frag_fns, wrap_
     return result
 
 
-def _prepare_runtime_for_preview(request, block, field_data):
+def _prepare_runtime_for_preview(request, block):
     """
     Sets properties in the runtime of the specified block that is
     required for rendering block previews.
 
     request: The active django request
     block: An XBlock
-    field_data: Wrapped field data for previews
     """
 
     course_id = block.location.course_key
@@ -199,7 +198,6 @@ def _prepare_runtime_for_preview(request, block, field_data):
         deprecated_anonymous_user_id = anonymous_id_for_user(request.user, None)
 
     services = {
-        "field-data": field_data,
         "i18n": XBlockI18nService,
         'mako': mako_service,
         "settings": SettingsService(),
@@ -222,7 +220,7 @@ def _prepare_runtime_for_preview(request, block, field_data):
     # Set up functions to modify the fragment produced by student_view
     block.runtime.wrappers = wrappers
     block.runtime.wrappers_asides = wrappers_asides
-    block.runtime._runtime_services.update(services)  # lint-amnesty, pylint: disable=protected-access
+    block.runtime._services.update(services)  # pylint: disable=protected-access
 
     # xmodules can check for this attribute during rendering to determine if
     # they are being rendered for preview (i.e. in Studio)
@@ -266,9 +264,7 @@ def _load_preview_block(request: Request, block: XModuleMixin):
     else:
         wrapper = partial(LmsFieldData, student_data=student_data)
 
-    # wrap the _field_data upfront to pass to _prepare_runtime_for_preview
-    wrapped_field_data = wrapper(block._field_data)  # pylint: disable=protected-access
-    _prepare_runtime_for_preview(request, block, wrapped_field_data)
+    _prepare_runtime_for_preview(request, block)
 
     block.bind_for_student(
         request.user.id,

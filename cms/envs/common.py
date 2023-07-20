@@ -616,10 +616,6 @@ SOCIAL_SHARING_SETTINGS = {
     'DASHBOARD_TWITTER': False
 }
 
-# This is just a placeholder image.
-# Site operators can customize this with their organization's image.
-FOOTER_ORGANIZATION_IMAGE = "images/logo.png"
-
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
@@ -1382,15 +1378,6 @@ PIPELINE['JAVASCRIPT'] = {
     'base_vendor': {
         'source_filenames': base_vendor_js,
         'output_filename': 'js/cms-base-vendor.js',
-    },
-    'module-js': {
-        'source_filenames': (
-            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
-            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/modules/js/*.js') +
-            rooted_glob(COMMON_ROOT / 'static/', 'common/js/discussion/*.js')
-        ),
-        'output_filename': 'js/cms-modules.js',
-        'test_order': 1
     },
 }
 
@@ -2706,7 +2693,7 @@ TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
 COURSE_LIVE_HELP_URL = "https://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/course_assets/course_live.html"
-ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/ora_settings.html"
+ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#configuring-course-level-open-response-assessment-settings"
 
 # keys for  big blue button live provider
 COURSE_LIVE_GLOBAL_CREDENTIALS = {}

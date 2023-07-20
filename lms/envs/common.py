@@ -1080,12 +1080,6 @@ MARKETING_EMAILS_OPT_IN = False
 # .. toggle_tickets: 'https://openedx.atlassian.net/browse/VAN-622'
 ENABLE_COPPA_COMPLIANCE = False
 
-# VAN-741 - save for later api put behind a flag to make it only available for edX
-ENABLE_SAVE_FOR_LATER = False
-
-# VAN-887 - save for later reminder emails threshold days
-SAVE_FOR_LATER_REMINDER_EMAIL_THRESHOLD = 15
-
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
@@ -2104,10 +2098,6 @@ FOOTER_OPENEDX_URL = "https://open.edx.org"
 # * https://logos.openedx.org/open-edx-logo-tag-dark.png
 FOOTER_OPENEDX_LOGO_IMAGE = "https://logos.openedx.org/open-edx-logo-tag.png"
 
-# This is just a placeholder image.
-# Site operators can customize this with their organization's image.
-FOOTER_ORGANIZATION_IMAGE = "images/logo.png"
-
 # These are referred to both by the Django asset pipeline
 # AND by the branding footer API, which needs to decide which
 # version of the CSS to serve.
@@ -2585,14 +2575,6 @@ PIPELINE['JAVASCRIPT'] = {
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
-    },
-    'module-descriptor-js': {
-        'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
-        'output_filename': 'js/lms-module-descriptors.js',
-    },
-    'module-js': {
-        'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
-        'output_filename': 'js/lms-modules.js',
     },
     'discussion': {
         'source_filenames': discussion_js,
@@ -3279,9 +3261,6 @@ INSTALLED_APPS = [
 
     # For edx ace template tags
     'edx_ace',
-
-    # For save for later
-    'lms.djangoapps.save_for_later',
 
     # Blockstore
     'blockstore.apps.bundles',
@@ -4800,10 +4779,6 @@ OPTIONAL_FIELD_API_RATELIMIT = '10/h'
 PASSWORD_RESET_IP_RATE = '1/m'
 PASSWORD_RESET_EMAIL_RATE = '2/h'
 
-#### SAVE FOR LATER EMAIL RATE LIMIT SETTINGS ####
-SAVE_FOR_LATER_IP_RATE_LIMIT = '100/d'
-SAVE_FOR_LATER_EMAIL_RATE_LIMIT = '5/h'
-
 
 #### BRAZE API SETTINGS ####
 
@@ -5212,7 +5187,7 @@ TEXTBOOKS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-
 WIKI_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/course_wiki.html"
 CUSTOM_PAGES_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#adding-custom-pages"
 COURSE_BULK_EMAIL_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_live_course/bulk_email.html"
-ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/ora_settings.html"
+ORA_SETTINGS_HELP_URL = "https://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_assets/pages.html#configuring-course-level-open-response-assessment-settings"
 
 ################# Bulk Course Email Settings #################
 # If set, recipients of bulk course email messages will be filtered based on the last_login date of their User account.
@@ -5348,6 +5323,8 @@ SUBSCRIPTIONS_API_PATH = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscription/"
 SUBSCRIPTIONS_LEARNER_HELP_CENTER_URL = None
 SUBSCRIPTIONS_BUY_SUBSCRIPTION_URL = f"{SUBSCRIPTIONS_ROOT_URL}/api/v1/stripe-subscribe/"
 SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_URL = None
+SUBSCRIPTIONS_MINIMUM_PRICE = '$39'
+SUBSCRIPTIONS_TRIAL_LENGTH = 7
 SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 
 ############## NOTIFICATIONS EXPIRY ##############
