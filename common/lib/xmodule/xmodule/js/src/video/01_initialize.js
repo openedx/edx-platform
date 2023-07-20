@@ -184,6 +184,7 @@ function(VideoPlayer, i18n, moment, _) {
                         window.onYouTubeIframeAPIReady.resolve = _youtubeApiDeferred.resolve;
                     } catch (e) {
                         console.error('Error while trying to resolve the Deferred object responsible for calling OnYouTubeIframeAPIReady callbacks.');
+                        console.error('window.onYouTubeIframeAPIReady is ' + window.onYouTubeIframeAPIReady);
                         console.error(e);
                         if (e instanceof TypeError) {
                             setupOnYouTubeIframeAPIReady(); // Try again up to defined max calls.
