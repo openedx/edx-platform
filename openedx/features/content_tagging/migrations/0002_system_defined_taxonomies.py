@@ -9,7 +9,6 @@ def load_system_defined_taxonomies(apps, schema_editor):
     """ 
 
     # Create system defined taxonomy instances
-    call_command('loaddata', '--app=oel_tagging', 'system_defined.yaml')
     call_command('loaddata', '--app=content_tagging', 'system_defined.yaml')
 
     # Loads language tags
@@ -21,11 +20,7 @@ def revert_system_defined_taxonomies(apps, schema_editor):
     Deletes all system defined taxonomies
     """
     Taxonomy = apps.get_model('oel_tagging', 'Taxonomy')
-    Tag = apps.get_model('oel_tagging', 'Tag')
-
-    # For some reason the tags are not deleted when deleting the taxonomy
-    Tag.objects.filter(taxonomy__system_defined=True).delete()
-    Taxonomy.objects.filter(system_defined=True).delete()
+    Taxonomy.objects.filter(id__lt=0).delete()
 
 
 class Migration(migrations.Migration):

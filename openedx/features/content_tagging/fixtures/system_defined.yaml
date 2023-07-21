@@ -7,8 +7,8 @@
     required: true
     allow_multiple: false
     allow_free_text: false
-    system_defined: true
     visible_to_authors: true
+    _taxonomy_class: openedx.features.content_tagging.models.ContentLanguageTaxonomy
 - model: oel_tagging.taxonomy
   pk: -2
   fields:
@@ -17,9 +17,9 @@
     enabled: true
     required: true
     allow_multiple: false
-    allow_free_text: true
-    system_defined: true
+    allow_free_text: false
     visible_to_authors: false
+    _taxonomy_class: openedx.features.content_tagging.models.ContentAuthorTaxonomy
 - model: oel_tagging.taxonomy
   pk: -3
   fields:
@@ -28,6 +28,6 @@
     enabled: true
     required: true
     allow_multiple: false
-    allow_free_text: true
-    system_defined: true
+    allow_free_text: false
     visible_to_authors: false
+    _taxonomy_class: openedx.features.content_tagging.models.ContentOrganizationTaxonomy
