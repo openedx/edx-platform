@@ -7,7 +7,7 @@ from openedx_tagging.core.tagging.models import (
     ObjectTag,
     Tag,
     UserSystemDefinedTaxonomy,
-) 
+)
 from organizations.models import Organization
 
 from common.djangoapps.student.auth import add_users, update_org_role
