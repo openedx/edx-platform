@@ -7,6 +7,7 @@ from urllib.parse import urlencode, urljoin
 
 import requests
 import waffle  # lint-amnesty, pylint: disable=invalid-django-waffle-import
+from crum import get_current_request
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -22,6 +23,7 @@ from openedx.core.djangoapps.commerce.utils import (
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
+from .constants import COORDINATOR_ORDER_CREATE_PATH, ENABLE_COORDINATOR_ORDER_CREATE
 from .models import CommerceConfiguration
 
 log = logging.getLogger(__name__)
@@ -50,6 +52,24 @@ class EcommerceService:
     def ecommerce_url_root(self):
         """ Retrieve Ecommerce service public url root. """
         return configuration_helpers.get_value('ECOMMERCE_PUBLIC_URL_ROOT', settings.ECOMMERCE_PUBLIC_URL_ROOT)
+
+    @property
+    def commerce_coordinator_url_root(self):
+        """ Retrieve Commerce Coordinator service public url root. """
+        return configuration_helpers.get_value(
+            'COMMERCE_COORDINATOR_PUBLIC_URL_ROOT', settings.COMMERCE_COORDINATOR_PUBLIC_URL_ROOT
+        )
+
+    def get_absolute_commerce_coordinator_url(self, coordinator_page_url):
+        """ Return the absolute URL to the commerce coordinator page.
+
+        Args:
+            coordinator_page_url (str): Relative path to the commerce coordinator page.
+
+        Returns:
+            Absolute path to the ecommerce page.
+        """
+        return urljoin(self.commerce_coordinator_url_root, coordinator_page_url)
 
     def get_absolute_ecommerce_url(self, ecommerce_page_url):
         """ Return the absolute URL to the ecommerce page.
@@ -95,12 +115,16 @@ class EcommerceService:
         allow_user = user_is_active or user.is_anonymous
         return allow_user and self.config.checkout_on_ecommerce_service
 
-    def payment_page_url(self):
+    def payment_page_url(self, is_program=False):
         """ Return the URL for the checkout page.
 
         Example:
             http://localhost:8002/basket/add/
         """
+        if not is_program:
+            request = get_current_request()
+            if waffle.flag_is_active(request, ENABLE_COORDINATOR_ORDER_CREATE):
+                return self.get_absolute_commerce_coordinator_url(COORDINATOR_ORDER_CREATE_PATH)
         return self.get_absolute_ecommerce_url(self.config.basket_checkout_page)
 
     def get_checkout_page_url(self, *skus, **kwargs):
@@ -122,16 +146,15 @@ class EcommerceService:
         query_params = {'sku': skus}
         if enterprise_catalog_uuid:
             query_params.update({'catalog': enterprise_catalog_uuid})
+        is_program = False
+        if program_uuid:
+            query_params.update({'bundle': program_uuid})
+            is_program = True
 
         url = '{checkout_page_path}?{query_params}'.format(
-            checkout_page_path=self.get_absolute_ecommerce_url(self.config.basket_checkout_page),
+            checkout_page_path=self.payment_page_url(is_program=is_program),
             query_params=urlencode(query_params, doseq=True),
         )
-        if program_uuid:
-            url = '{url}&bundle={program_uuid}'.format(
-                url=url,
-                program_uuid=program_uuid
-            )
         return url
 
     def upgrade_url(self, user, course_key):

@@ -12,17 +12,19 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from opaque_keys.edx.locator import CourseLocator
-from waffle.testutils import override_switch
+from waffle.testutils import override_flag, override_switch
 
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.course_modes.tests.factories import CourseModeFactory
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import TEST_PASSWORD, UserFactory
+from lms.djangoapps.commerce.constants import ENABLE_COORDINATOR_ORDER_CREATE
 from lms.djangoapps.commerce.models import CommerceConfiguration
 from lms.djangoapps.commerce.utils import EcommerceService, refund_entitlement, refund_seat
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from openedx.core.lib.log_utils import audit_log
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore.tests.django_utils import \
+    ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.modulestore.tests.factories import CourseFactory  # lint-amnesty, pylint: disable=wrong-import-order
 
 # Entitlements is not in CMS' INSTALLED_APPS so these imports will error during test collection
@@ -119,9 +121,14 @@ class EcommerceServiceTests(TestCase):
         assert url == expected_url
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')
+    @override_settings(COMMERCE_COORDINATOR_PUBLIC_URL_ROOT='http://ecommerce-coordinator_url')
     @ddt.data(
         {
             'skus': ['TESTSKU']
+        },
+        {
+            'skus': ['TESTSKU'],
+            'coordinator_flag_active': True,
         },
         {
             'skus': ['TESTSKU1', 'TESTSKU2', 'TESTSKU3']
@@ -131,24 +138,42 @@ class EcommerceServiceTests(TestCase):
             'program_uuid': '12345678-9012-3456-7890-123456789012'
         },
         {
+            'skus': ['TESTSKU'],
+            'program_uuid': '12345678-9012-3456-7890-123456789012',
+            'coordinator_flag_active': True,
+        },
+        {
             'skus': ['TESTSKU1', 'TESTSKU2', 'TESTSKU3'],
             'program_uuid': '12345678-9012-3456-7890-123456789012'
         }
     )
-    def test_get_checkout_page_url(self, skus, program_uuid=None):
+    @ddt.unpack
+    def test_get_checkout_page_url(self, skus, program_uuid=None, coordinator_flag_active=False):
         """ Verify the checkout page URL is properly constructed and returned. """
-        url = EcommerceService().get_checkout_page_url(*skus, program_uuid=program_uuid)
+        with override_flag(ENABLE_COORDINATOR_ORDER_CREATE, active=coordinator_flag_active):
+            url = EcommerceService().get_checkout_page_url(*skus, program_uuid=program_uuid)
         config = CommerceConfiguration.current()
-        expected_url = '{root}{basket_url}?{skus}'.format(
-            basket_url=config.basket_checkout_page,
-            root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
-            skus=urlencode({'sku': skus}, doseq=True),
-        )
+
         if program_uuid:
-            expected_url = '{expected_url}&basket={program_uuid}'.format(
-                expected_url=expected_url,
-                program_uuid=program_uuid
+            expected_url = '{root}{basket_url}?{skus}&bundle={program_uuid}'.format(
+                basket_url=config.basket_checkout_page,
+                root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
+                skus=urlencode({'sku': skus}, doseq=True),
+                program_uuid=program_uuid,
             )
+        elif coordinator_flag_active:
+            expected_url = '{root}{basket_url}?{skus}'.format(
+                root=settings.COMMERCE_COORDINATOR_PUBLIC_URL_ROOT,
+                basket_url='/lms/order',
+                skus=urlencode({'sku': skus}, doseq=True),
+            )
+        else:
+            expected_url = '{root}{basket_url}?{skus}'.format(
+                root=settings.ECOMMERCE_PUBLIC_URL_ROOT,
+                basket_url=config.basket_checkout_page,
+                skus=urlencode({'sku': skus}, doseq=True),
+            )
+
         assert url == expected_url
 
     @override_settings(ECOMMERCE_PUBLIC_URL_ROOT='http://ecommerce_url')

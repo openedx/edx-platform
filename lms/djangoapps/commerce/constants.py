@@ -1,6 +1,18 @@
 """ Constants for this app as well as the external API. """
 
 
+# .. toggle_name: transition_to_coordinator.order_create
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: Allows to post order to Commerce Coordinator API
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-07-18
+# .. toggle_tickets: THES-68
+# .. toggle_status: supported
+ENABLE_COORDINATOR_ORDER_CREATE = 'transition_to_coordinator.order_create'
+COORDINATOR_ORDER_CREATE_PATH = '/lms/order'
+
+
 class OrderStatus:
     """Constants representing all known order statuses. """
     OPEN = 'Open'
