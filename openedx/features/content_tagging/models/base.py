@@ -10,6 +10,12 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import LearningContextKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
+
+from openedx_tagging.core.tagging.models import (
+    ObjectTag,
+    Taxonomy,
+)
+
 from organizations.models import Organization
 
 
