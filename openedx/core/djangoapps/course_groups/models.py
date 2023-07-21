@@ -325,7 +325,7 @@ class CourseCohort(models.Model):
 
 class CourseGroup(models.Model):
     """
-    This model represents cohort related info.
+    This model represents the new group-type related info.
 
     .. no_pii:
     """

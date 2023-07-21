@@ -41,14 +41,6 @@ def get_assignment_type(user_group):
     return course_cohort.assignment_type
 
 
-def _get_course_group_settings(course_key):
-    return CourseGroupsSettings.objects.get(course_id=course_key)
-
-
-def is_course_grouped(course_key):
-    return _get_course_group_settings(course_key).is_cohorted
-
-
 def get_group(user, course_key, assign=True, use_cached=False):
     if user is None or user.is_anonymous:
         return None
