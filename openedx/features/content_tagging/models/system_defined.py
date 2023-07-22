@@ -54,55 +54,61 @@ class OrganizarionSystemDefinedTaxonomy(ModelSystemDefinedTaxonomy):
         return OrganizationModelObjectTag
 
 
-class ContentLanguageTaxonomy(
-    ContentTaxonomy,
-    LanguageTaxonomy
-):
+class ContentLanguageTaxonomy(LanguageTaxonomy):
     """
     Language system-defined taxonomy that accepts ContentTags
 
-    Inherit `_check_object` and `_check_taxonomy` from ContentTaxonomy
-    and inherit `_check_tag` from LanguageTaxonomy
+    Inherit `_check_tag` from LanguageTaxonomy and uses
+    `_check_object` and `_check_taxonomy` from ContentTaxonomy
     """
 
     class Meta:
         proxy = True
 
-    def _check_tag(self, object_tag: ObjectTag) -> bool:
-        return super(LanguageTaxonomy, self)._check_tag(object_tag)
+    def _check_object(self, object_tag: ObjectTag) -> bool:
+        taxonomy = ContentTaxonomy().copy(self)
+        return taxonomy._check_object(object_tag)  # pylint: disable=protected-access
+
+    def _check_taxonomy(self, object_tag: ObjectTag) -> bool:
+        taxonomy = ContentTaxonomy().copy(self)
+        return taxonomy._check_taxonomy(object_tag)  # pylint: disable=protected-access
 
 
-class ContentAuthorTaxonomy(
-    ContentTaxonomy,
-    UserSystemDefinedTaxonomy
-):
+class ContentAuthorTaxonomy(UserSystemDefinedTaxonomy):
     """
     Author system-defined taxonomy that accepts Content Tags
 
-    Inherit `_check_object` and `_check_taxonomy` from ContentTaxonomy
-    and inherit `_check_tag` from UserSystemDefinedTaxonomy
+    Inherit `_check_tag` from UserSystemDefinedTaxonomy and uses
+    `_check_object` and `_check_taxonomy` from ContentTaxonomy
     """
 
     class Meta:
         proxy = True
 
-    def _check_tag(self, object_tag: ObjectTag) -> bool:
-        return super(UserSystemDefinedTaxonomy, self)._check_tag(object_tag)
+    def _check_object(self, object_tag: ObjectTag) -> bool:
+        taxonomy = ContentTaxonomy().copy(self)
+        return taxonomy._check_object(object_tag)  # pylint: disable=protected-access
+
+    def _check_taxonomy(self, object_tag: ObjectTag) -> bool:
+        taxonomy = ContentTaxonomy().copy(self)
+        return taxonomy._check_taxonomy(object_tag)  # pylint: disable=protected-access
 
 
-class ContentOrganizationTaxonomy(
-    ContentTaxonomy,
-    OrganizarionSystemDefinedTaxonomy
-):
+class ContentOrganizationTaxonomy(OrganizarionSystemDefinedTaxonomy):
     """
     Organization system-defined taxonomy that accepts Content Tags
 
-    Inherit `_check_object` and `_check_taxonomy` from ContentTaxonomy
-    and inherit `_check_tag` from OrganizarionSystemDefinedTaxonomy
+    Inherit `_check_tag` from OrganizarionSystemDefinedTaxonomy and uses
+    `_check_object` and `_check_taxonomy` from ContentTaxonomy
     """
 
     class Meta:
         proxy = True
 
-    def _check_tag(self, object_tag: ObjectTag) -> bool:
-        return super(OrganizarionSystemDefinedTaxonomy, self)._check_tag(object_tag)
+    def _check_object(self, object_tag: ObjectTag) -> bool:
+        taxonomy = ContentTaxonomy().copy(self)
+        return taxonomy._check_object(object_tag)  # pylint: disable=protected-access
+
+    def _check_taxonomy(self, object_tag: ObjectTag) -> bool:
+        taxonomy = ContentTaxonomy().copy(self)
+        return taxonomy._check_taxonomy(object_tag)  # pylint: disable=protected-access
