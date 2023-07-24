@@ -26,8 +26,8 @@ class CourseRerunViewTest(CourseTestCase, PermissionAccessMixin):
         expected_response = {
             "allow_unicode_course_id": False,
             "course_creator_status": "granted",
-            "course_number": self.course.id.course,
             "display_name": self.course.display_name,
+            "number": self.course.id.course,
             "org": self.course.id.org,
             "run": self.course.id.run,
         }

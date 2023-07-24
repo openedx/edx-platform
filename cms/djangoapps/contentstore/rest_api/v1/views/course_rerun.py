@@ -52,8 +52,8 @@ class CourseRerunView(DeveloperErrorViewMixin, APIView):
         {
             "allow_unicode_course_id": False,
             "course_creator_status": "granted",
-            "course_number": "101",
             "display_name": "new edx course",
+            "number": "101",
             "org": "edx",
             "run": "2023",
         }
@@ -69,7 +69,7 @@ class CourseRerunView(DeveloperErrorViewMixin, APIView):
             course_rerun_context = get_course_rerun_context(course_key, course_block, request.user)
             course_rerun_context.update({
                 'org': course_key.org,
-                'course_number': course_key.course,
+                'number': course_key.course,
                 'run': course_key.run,
             })
             serializer = CourseRerunSerializer(course_rerun_context)
