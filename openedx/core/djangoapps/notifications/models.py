@@ -127,7 +127,7 @@ class CourseNotificationPreference(TimeStampedModel):
         unique_together = ('user', 'course_id')
 
     def __str__(self):
-        return f'{self.user.username} - {self.course_id} - {self.notification_preference_config}'
+        return f'{self.user.username} - {self.course_id}'
 
     @staticmethod
     def get_updated_user_course_preferences(user, course_id):
