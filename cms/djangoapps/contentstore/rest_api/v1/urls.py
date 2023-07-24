@@ -18,6 +18,8 @@ from .views import (
 
 app_name = 'v1'
 
+VIDEO_ID_PATTERN = r'(?:/(?P<edx_video_id>[-\w]+))'
+
 urlpatterns = [
     re_path(
         fr'^proctored_exam_settings/{COURSE_ID_PATTERN}$',
@@ -51,5 +53,25 @@ urlpatterns = [
     re_path(
         fr'^file_assets/{settings.COURSE_ID_PATTERN}/{settings.ASSET_KEY_PATTERN}?$',
         assets.AssetsView.as_view(), name='studio_content_assets'
+    ),
+    re_path(
+        fr'^videos/uploads/{settings.COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}?$',
+        videos.VideosView.as_view(), name='studio_content_videos'
+    ),
+    re_path(
+        fr'^videos/images/{settings.COURSE_ID_PATTERN}$',
+        videos.VideosView.as_view(), name='studio_content_videos'
+    ),
+    re_path(
+        fr'^videos/encodings/{settings.COURSE_ID_PATTERN}$',
+        videos.VideosView.as_view(), name='studio_content_videos'
+    ),
+    re_path(
+        r'^videos/features/$',
+        videos.VideosView.as_view(), name='studio_content_videos'
+    ),
+    re_path(
+        fr'^videos/upload_link/{settings.COURSE_ID_PATTERN}$',
+        videos.VideosView.as_view(), name='studio_content_videos'
     ),
 ]
