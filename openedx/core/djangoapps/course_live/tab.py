@@ -18,6 +18,7 @@ from xmodule.course_block import CourseBlock
 from xmodule.tabs import TabFragmentViewMixin
 
 
+@request_cached()
 def provider_is_zoom(course: CourseBlock) -> bool:
     """
     Check if the provider exists and is Zoom.
