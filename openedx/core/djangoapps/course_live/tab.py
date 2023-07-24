@@ -18,6 +18,23 @@ from xmodule.course_block import CourseBlock
 from xmodule.tabs import TabFragmentViewMixin
 
 
+def provider_is_zoom(course: CourseBlock) -> bool:
+    """
+    Check if the provider exists and is Zoom.
+    """
+    course_live_configurations = CourseLiveConfiguration.get(course.id)
+    if not course_live_configurations:
+        return False
+    return course_live_configurations.provider_type == "zoom"
+
+
+def user_is_staff_or_instructor(user: AbstractBaseUser, course: CourseBlock) -> bool:
+    """
+    Check if the user is a staff or instructor for the course.
+    """
+    return CourseStaffRole(course.id).has_user(user) or CourseInstructorRole(course.id).has_user(user)
+
+
 class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
     """
     Course tab that loads the associated LTI-based live provider in a tab.
@@ -75,20 +92,8 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
 
     def _get_pii_lti_parameters(self, course, request):
         pii_config = super()._get_pii_lti_parameters(course, request)
-        provider_type = ''
-
-        course_live_configurations = CourseLiveConfiguration.get(course.id)
-        if course_live_configurations:
-            provider_type = course_live_configurations.provider_type
-        if (
-            provider_type == 'zoom' and
-            (
-                CourseStaffRole(course.id).has_user(request.user) or
-                CourseInstructorRole(course.id).has_user(request.user)
-            )
-        ):
+        if provider_is_zoom(course) and user_is_staff_or_instructor(request.user, course):
             pii_config['person_contact_email_primary'] = request.user.email
-
         return pii_config
 
     def _get_lti_roles(self, user: AbstractBaseUser, course_key: CourseKey) -> str:
@@ -96,8 +101,6 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
         Get LTI roles for the user and course.
         If the user is a global staff member, return the student role.
         """
-        course_live_configurations = CourseLiveConfiguration.get(course_key)
-        provider_type = course_live_configurations.provider_type
-        if provider_type == "zoom" and GlobalStaff().has_user(user):
+        if provider_is_zoom and GlobalStaff().has_user(user):
             return self.ROLE_MAP.get('student')
         return super()._get_lti_roles(user, course_key)
