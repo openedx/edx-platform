@@ -23,6 +23,7 @@ from pytz import UTC
 from xblock.fields import Scope
 
 from cms.djangoapps.contentstore.toggles import exam_setting_view_enabled
+from common.djangoapps.course_action_state.models import CourseRerunUIStateManager
 from common.djangoapps.course_modes.models import CourseMode
 from common.djangoapps.edxmako.services import MakoService
 from common.djangoapps.student import auth
@@ -58,6 +59,7 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.content_type_gating.partitions import CONTENT_TYPE_GATING_SCHEME
 from openedx.features.course_experience.waffle import ENABLE_COURSE_ABOUT_SIDEBAR_HTML
 from cms.djangoapps.contentstore.toggles import (
+    split_library_view_on_dashboard,
     use_new_advanced_settings_page,
     use_new_course_outline_page,
     use_new_export_page,
@@ -67,12 +69,13 @@ from cms.djangoapps.contentstore.toggles import (
     use_new_home_page,
     use_new_import_page,
     use_new_schedule_details_page,
+    use_new_text_editor,
     use_new_unit_page,
     use_new_updates_page,
+    use_new_video_editor,
     use_new_video_uploads_page,
     use_new_custom_pages,
 )
-from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_video_editor
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
@@ -1373,6 +1376,90 @@ def get_course_grading(course_key):
     }
 
     return grading_context
+
+
+def get_home_context(request):
+    """
+    Utils is used to get context of course grading.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.course import (
+        get_allowed_organizations,
+        get_courses_accessible_to_user,
+        user_can_create_organizations,
+        _accessible_libraries_iter,
+        _get_course_creator_status,
+        _format_library_for_view,
+        _process_courses_list,
+        ENABLE_GLOBAL_STAFF_OPTIMIZATION,
+    )
+    from cms.djangoapps.contentstore.views.library import (
+        LIBRARY_AUTHORING_MICROFRONTEND_URL,
+        LIBRARIES_ENABLED,
+        should_redirect_to_library_authoring_mfe,
+        user_can_create_library,
+    )
+
+    user = request.user
+    optimization_enabled = GlobalStaff().has_user(user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
+
+    org = request.GET.get('org', '') if optimization_enabled else None
+    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
+    libraries = []
+
+    if not split_library_view_on_dashboard() and LIBRARIES_ENABLED:
+        libraries = _accessible_libraries_iter(user)
+
+    def format_in_process_course_view(uca):
+        """
+        Return a dict of the data which the view requires for each unsucceeded course
+        """
+        return {
+            'display_name': uca.display_name,
+            'course_key': str(uca.course_key),
+            'org': uca.course_key.org,
+            'number': uca.course_key.course,
+            'run': uca.course_key.run,
+            'is_failed': uca.state == CourseRerunUIStateManager.State.FAILED,
+            'is_in_progress': uca.state == CourseRerunUIStateManager.State.IN_PROGRESS,
+            'dismiss_link': reverse_course_url(
+                'course_notifications_handler',
+                uca.course_key,
+                kwargs={
+                    'action_state_id': uca.id,
+                },
+            ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
+        }
+
+    split_archived = settings.FEATURES.get('ENABLE_SEPARATE_ARCHIVED_COURSES', False)
+
+    active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
+    in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
+
+    home_context = {
+        'courses': active_courses,
+        'split_studio_home': split_library_view_on_dashboard(),
+        'archived_courses': archived_courses,
+        'in_process_course_actions': in_process_course_actions,
+        'libraries_enabled': LIBRARIES_ENABLED,
+        'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
+        'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
+        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
+        'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
+        'user': user,
+        'request_course_creator_url': reverse('request_course_creator'),
+        'course_creator_status': _get_course_creator_status(user),
+        'rerun_creator_status': GlobalStaff().has_user(user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+        'optimization_enabled': optimization_enabled,
+        'active_tab': 'courses',
+        'allowed_organizations': get_allowed_organizations(user),
+        'can_create_organizations': user_can_create_organizations(user),
+    }
+
+    return home_context
 
 
 class StudioPermissionsService:

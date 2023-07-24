@@ -99,6 +99,7 @@ from ..utils import (
     add_instructor,
     get_course_settings,
     get_course_grading,
+    get_home_context,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
     get_course_outline_url,
@@ -121,12 +122,7 @@ from ..helpers import is_content_creator
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     create_xblock_info,
 )
-from .library import (
-    LIBRARIES_ENABLED,
-    LIBRARY_AUTHORING_MICROFRONTEND_URL,
-    user_can_create_library,
-    should_redirect_to_library_authoring_mfe
-)
+from .library import LIBRARIES_ENABLED
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -551,61 +547,8 @@ def course_listing(request):
     if use_new_home_page():
         return redirect(get_studio_home_url())
 
-    optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
-
-    org = request.GET.get('org', '') if optimization_enabled else None
-    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
-    user = request.user
-    libraries = []
-    if not split_library_view_on_dashboard() and LIBRARIES_ENABLED:
-        libraries = _accessible_libraries_iter(request.user)
-
-    def format_in_process_course_view(uca):
-        """
-        Return a dict of the data which the view requires for each unsucceeded course
-        """
-        return {
-            'display_name': uca.display_name,
-            'course_key': str(uca.course_key),
-            'org': uca.course_key.org,
-            'number': uca.course_key.course,
-            'run': uca.course_key.run,
-            'is_failed': uca.state == CourseRerunUIStateManager.State.FAILED,
-            'is_in_progress': uca.state == CourseRerunUIStateManager.State.IN_PROGRESS,
-            'dismiss_link': reverse_course_url(
-                'course_notifications_handler',
-                uca.course_key,
-                kwargs={
-                    'action_state_id': uca.id,
-                },
-            ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
-        }
-
-    split_archived = settings.FEATURES.get('ENABLE_SEPARATE_ARCHIVED_COURSES', False)
-    active_courses, archived_courses = _process_courses_list(courses_iter, in_process_course_actions, split_archived)
-    in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
-
-    return render_to_response('index.html', {
-        'courses': active_courses,
-        'split_studio_home': split_library_view_on_dashboard(),
-        'archived_courses': archived_courses,
-        'in_process_course_actions': in_process_course_actions,
-        'libraries_enabled': LIBRARIES_ENABLED,
-        'redirect_to_library_authoring_mfe': should_redirect_to_library_authoring_mfe(),
-        'library_authoring_mfe_url': LIBRARY_AUTHORING_MICROFRONTEND_URL,
-        'libraries': [_format_library_for_view(lib, request) for lib in libraries],
-        'show_new_library_button': user_can_create_library(user) and not should_redirect_to_library_authoring_mfe(),
-        'user': user,
-        'request_course_creator_url': reverse('request_course_creator'),
-        'course_creator_status': _get_course_creator_status(user),
-        'rerun_creator_status': GlobalStaff().has_user(user),
-        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
-        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
-        'optimization_enabled': optimization_enabled,
-        'active_tab': 'courses',
-        'allowed_organizations': get_allowed_organizations(user),
-        'can_create_organizations': user_can_create_organizations(user),
-    })
+    home_context = get_home_context(request)
+    return render_to_response('index.html', home_context)
 
 
 @login_required

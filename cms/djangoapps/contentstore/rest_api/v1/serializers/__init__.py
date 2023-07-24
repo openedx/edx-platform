@@ -1,6 +1,7 @@
 """
 Serializers for v1 contentstore API.
 """
+from .home import CourseHomeSerializer
 from .course_details import CourseDetailsSerializer
 from .course_team import CourseTeamSerializer
 from .grading import CourseGradingModelSerializer, CourseGradingSerializer

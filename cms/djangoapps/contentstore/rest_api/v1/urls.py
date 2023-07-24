@@ -1,6 +1,6 @@
 """ Contenstore API v1 URLs. """
 
-from django.urls import re_path
+from django.urls import re_path, path
 from django.conf import settings
 
 from openedx.core.constants import COURSE_ID_PATTERN
@@ -10,6 +10,7 @@ from .views import (
     CourseTeamView,
     CourseGradingView,
     CourseSettingsView,
+    HomePageView,
     ProctoredExamSettingsView,
     ProctoringErrorsView,
     xblock
@@ -18,6 +19,11 @@ from .views import (
 app_name = 'v1'
 
 urlpatterns = [
+    path(
+        'home',
+        HomePageView.as_view(),
+        name="home"
+    ),
     re_path(
         fr'^proctored_exam_settings/{COURSE_ID_PATTERN}$',
         ProctoredExamSettingsView.as_view(),
