@@ -251,7 +251,7 @@ def _security_url():
 def _footer_connect_links(language=settings.LANGUAGE_CODE):
     """Return the connect links to display in the footer. """
     links = [
-        ("blog", (marketing_link("BLOG"), _("Blog"))),
+        ("blog", (marketing_link("BLOG"), _("Idea Hub"))),
         ("contact", (_build_support_form_url(full_path=True), _("Contact Us"))),
         ("help-center", (_build_help_center_url(language), _("Help Center"))),
         ("security", (_security_url(), _("Security"))),
