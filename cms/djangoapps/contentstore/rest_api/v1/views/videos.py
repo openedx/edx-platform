@@ -55,7 +55,7 @@ class VideosView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, Destro
 
     @course_author_access_required
     @expect_json_in_class_view
-    def retrieve(self, request, course_key, edx_video_id):  # pylint: disable=arguments-differ
+    def retrieve(self, request, course_key, edx_video_id=None):  # pylint: disable=arguments-differ
         return handle_videos(request, course_key.html_id(), edx_video_id)
 
 
@@ -86,8 +86,8 @@ class VideoImagesView(DeveloperErrorViewMixin, CreateAPIView):
 
     @csrf_exempt
     @course_author_access_required
-    def create(self, request, course_key):  # pylint: disable=arguments-differ
-        return handle_video_images(request, course_key.html_id())
+    def create(self, request, course_key, edx_video_id=None):  # pylint: disable=arguments-differ
+        return handle_video_images(request, course_key.html_id(), edx_video_id)
 
 
 @view_auth_classes()
