@@ -225,7 +225,7 @@ msgstr "نیاز به پرونده زیرنویس است."
 #: cms/djangoapps/contentstore/views/videos.py
 #: openedx/core/djangoapps/content_staging/data.py
 msgid "Ready"
-msgstr ""
+msgstr "آماده"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -2187,7 +2187,7 @@ msgstr "مرکز پشتيباني"
 
 #: lms/djangoapps/branding/api.py
 msgid "Security"
-msgstr ""
+msgstr "امنیت"
 
 #: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
@@ -7054,6 +7054,7 @@ msgstr "ما نتوانستیم کاربری با آدرس  رایانامه م�
 msgid "This user already has access to this library."
 msgstr "این کاربر از قبل به این کتابخانه دسترسی داشته‌است."
 
+#: openedx/core/djangoapps/content_staging/data.py
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -7062,11 +7063,11 @@ msgstr "این کاربر از قبل به این کتابخانه دسترسی 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "Loading"
-msgstr "در حال بارگذاری"
+msgstr "در حال بارگیری"
 
 #: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
-msgstr ""
+msgstr "منقضی‌شده"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Staged Content"
@@ -8737,6 +8738,8 @@ msgid ""
 "An error has occurred. Try refreshing the page, or check your internet "
 "connection."
 msgstr ""
+"خطایی رخ داده است. صفحه را دوباره بارگیری کنید یا اتصال اینترنت خود را بررسی"
+" کنید."
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
