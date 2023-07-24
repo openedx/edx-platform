@@ -62,7 +62,6 @@ class ContentLanguageTaxonomy(ContentTaxonomyMixin, LanguageTaxonomy):
         proxy = True
 
 
-
 class ContentAuthorTaxonomy(ContentTaxonomyMixin, UserSystemDefinedTaxonomy):
     """
     Author system-defined taxonomy that accepts Content Tags
@@ -72,7 +71,6 @@ class ContentAuthorTaxonomy(ContentTaxonomyMixin, UserSystemDefinedTaxonomy):
         proxy = True
 
 
-
 class ContentOrganizationTaxonomy(ContentTaxonomyMixin, OrganizationSystemDefinedTaxonomy):
     """
     Organization system-defined taxonomy that accepts Content Tags
@@ -80,4 +78,3 @@ class ContentOrganizationTaxonomy(ContentTaxonomyMixin, OrganizationSystemDefine
 
     class Meta:
         proxy = True
-

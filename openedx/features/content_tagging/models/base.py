@@ -1,7 +1,7 @@
 """
 Content Tagging models
 """
-from typing import List, Union, Type
+from typing import List, Union
 
 from django.db import models
 from django.db.models import Exists, OuterRef, Q, QuerySet
@@ -10,13 +10,6 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import LearningContextKey
 from opaque_keys.edx.locator import BlockUsageLocator
 from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
-
-from openedx_tagging.core.tagging.models import (
-    ObjectTag,
-    
-    Taxonomy,
-)
-
 from organizations.models import Organization
 
 
@@ -118,15 +111,6 @@ class ContentTaxonomyMixin:
     Also ensures a valid TaxonomyOrg owner relationship with the content object.
     """
 
-    @property
-    def object_tag_class(self) -> Type:
-        """
-        Returns the ObjectTag subclass associated with this taxonomy, which is ObjectTag by default.
-
-        Taxonomy subclasses may override this method to use different subclasses of ObjectTag.
-        """
-        return ContentObjectTag
-
     @classmethod
     def taxonomies_for_org(
         cls,
@@ -135,6 +119,7 @@ class ContentTaxonomyMixin:
     ) -> QuerySet:
         """
         Filters the given QuerySet to those ContentTaxonomies which are available for the given organization.
+
         If no `org` is provided, then only ContentTaxonomies available to all organizations are returned.
         If `org` is provided, then ContentTaxonomies available to this organizations are also returned.
         """

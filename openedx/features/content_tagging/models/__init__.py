@@ -3,7 +3,7 @@ Content Tagging and System defined models
 """
 from .base import (
     TaxonomyOrg,
-    ContentTag,
+    ContentObjectTag,
     ContentTaxonomy,
 )
 from .system_defined import (
