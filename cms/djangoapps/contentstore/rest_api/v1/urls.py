@@ -13,6 +13,7 @@ from .views import (
     ProctoringErrorsView,
     xblock,
     assets,
+    videos,
 )
 
 app_name = 'v1'
