@@ -1,4 +1,6 @@
-# lint-amnesty, pylint: disable=missing-module-docstring
+"""
+Public rest API endpoints for the Studio Content API Assets.
+"""
 import logging
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
 from django.views.decorators.csrf import csrf_exempt
@@ -19,7 +21,7 @@ toggles = contentstore_toggles
 @view_auth_classes()
 class AssetsView(DeveloperErrorViewMixin, RetrieveUpdateDestroyAPIView, CreateAPIView):
     """
-    public rest API endpoint for the Studio Content API.
+    public rest API endpoints for the Studio Content API Assets.
     course_key: required argument, needed to authorize course authors and identify the asset.
     asset_key_string: required argument, needed to identify the asset.
     """
