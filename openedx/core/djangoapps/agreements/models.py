@@ -23,6 +23,7 @@ class IntegritySignature(TimeStampedModel):
         app_label = 'agreements'
         unique_together = ('user', 'course_key')
 
+
 class LTIPIITool(models.Model):
     """
     This model stores the relationship between a course and the LTI tools in the course that share PII.
