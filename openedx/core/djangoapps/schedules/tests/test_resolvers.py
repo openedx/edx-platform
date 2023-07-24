@@ -8,11 +8,12 @@ from unittest.mock import Mock
 
 import crum
 import ddt
+import pytest
 import pytz
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edx_toggles.toggles.testutils import override_waffle_switch
+from edx_toggles.toggles.testutils import override_waffle_flag, override_waffle_switch
 from testfixtures import LogCapture
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, BlockFactory
@@ -21,15 +22,19 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.tests.factories import CourseEnrollmentFactory, UserFactory
 from lms.djangoapps.experiments.testutils import override_experiment_waffle_flag
 from openedx.core.djangoapps.content.course_overviews.tests.factories import CourseOverviewFactory
+from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
+from openedx.core.djangoapps.course_date_signals.waffle import CUSTOM_RELATIVE_DATES
 from openedx.core.djangoapps.schedules.config import (
     _EXTERNAL_COURSE_UPDATES_FLAG,
     COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH,
 )
+from openedx.core.djangoapps.schedules.content_highlights import DUE_DATE_FORMAT
 from openedx.core.djangoapps.schedules.models import Schedule
 from openedx.core.djangoapps.schedules.resolvers import (
     LOG,
     BinnedSchedulesBaseResolver,
     CourseNextSectionUpdate,
+    CourseSectionDueDateReminder,
     CourseUpdateResolver,
 )
 from openedx.core.djangoapps.schedules.tests.factories import ScheduleConfigFactory
@@ -235,7 +240,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
 
     def setUp(self):
         super().setUp()
-        self.today = datetime.datetime.utcnow()
+        self.today = datetime.datetime.now(pytz.UTC)
         self.yesterday = self.today - datetime.timedelta(days=1)
         self.course = CourseFactory.create(
             highlights_enabled_for_messaging=True, self_paced=True,
@@ -265,6 +270,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         return CourseNextSectionUpdate(
             async_send_task=Mock(name='async_send_task'),
             site=self.site_config.site,
+            effective_datetime=self.yesterday,
             target_datetime=self.yesterday,
             course_id=self.course.id,
         )
@@ -275,7 +281,7 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         resolver = self.create_resolver()
         # using this to make sure the select_related stays intact
         with self.assertNumQueries(30):
-            sc = resolver.get_schedules()
+            sc = resolver.get_context()
             schedules = list(sc)
         apple_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/store_apple_229x78.jpg'
         google_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/store_google_253x78.jpg'
@@ -323,13 +329,13 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
     @override_waffle_switch(COURSE_UPDATE_SHOW_UNSUBSCRIBE_WAFFLE_SWITCH, True)
     def test_schedule_context_show_unsubscribe(self):
         resolver = self.create_resolver()
-        schedules = list(resolver.get_schedules())
+        schedules = list(resolver.get_context())
         assert 'optout' in schedules[0][2]['unsubscribe_url']
 
     def test_schedule_context_error(self):
         resolver = self.create_resolver(user_start_date_offset=29)
         with LogCapture(LOG.name) as log_capture:
-            list(resolver.get_schedules())
+            list(resolver.get_context())
             log_message = ('Next Section Course Update: Last section was reached. '
                            'There are no more highlights for {}'.format(self.course.id))
             log_capture.check_present((LOG.name, 'WARNING', log_message))
@@ -338,5 +344,155 @@ class TestCourseNextSectionUpdateResolver(SchedulesResolverTestMixin, ModuleStor
         self.course.end = self.yesterday
         self.course = self.update_course(self.course, self.user.id)
         resolver = self.create_resolver()
-        schedules = list(resolver.get_schedules())
+        schedules = list(resolver.get_context())
         self.assertListEqual(schedules, [])
+
+
+@skip_unless_lms
+class TestCourseDueDateReminders(SchedulesResolverTestMixin, ModuleStoreTestCase):
+    """
+    Tests ScheduleCourseDueDateReminders resolver.
+    """
+    ENABLED_SIGNALS = ['course_published']
+
+    def setUp(self):
+        super().setUp()
+        self.today = datetime.datetime.now(pytz.UTC)
+        self.target_datetime = self.today + datetime.timedelta(days=7)
+        SelfPacedRelativeDatesConfig.objects.create(enabled=True)
+        self.course = CourseFactory.create(
+            self_paced=True,
+            # putting it in the past so the schedule can be later than the start
+            start=self.today - datetime.timedelta(days=30)
+        )
+
+        for chapter_num in range(4):
+            with self.store.bulk_operations(self.course.id):
+                chapter = BlockFactory.create(
+                    parent=self.course,
+                    category='chapter',
+                    display_name=f"section_{chapter_num}"
+                )
+                BlockFactory.create(
+                    parent_location=chapter.location,
+                    category='sequential',
+                    display_name=f"sub_section_{chapter_num}1",
+                )
+                BlockFactory.create(
+                    parent_location=chapter.location,
+                    category='sequential',
+                    display_name=f"sub_section_{chapter_num}2",
+                    relative_weeks_due=4 if chapter_num == 3 else None
+                )
+
+    def create_resolver(self, user_start_date_offset=8):
+        """
+        Creates a ScheduleCourseDueDateReminders with an enrollment to schedule.
+        """
+        CourseEnrollmentFactory(course_id=self.course.id, user=self.user, mode='audit')
+
+        # Need to update the user's schedule so the due date for the chapter we want
+        # matches with the user's schedule and the target date. The numbers are based on the
+        # course having the default course duration of 28 days.
+        user_schedule = Schedule.objects.first()
+        user_schedule.start_date = self.today - datetime.timedelta(days=user_start_date_offset)
+        user_schedule.save()
+
+        return CourseSectionDueDateReminder(
+            async_send_task=Mock(name='async_send_task'),
+            site=self.site_config.site,
+            effective_datetime=self.today,
+            target_datetime=self.target_datetime,
+            course_id=str(self.course.id),
+        )
+
+    @override_settings(CONTACT_MAILING_ADDRESS='123 Sesame Street')
+    @override_settings(LOGO_URL_PNG='https://www.logo.png')
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
+    def test_reminder_schedule_context(self):
+        resolver = self.create_resolver(7)
+        # using this to make sure the select_related stays intact
+        sc = resolver.get_context()
+        schedules = list(sc)
+        apple_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/store_apple_229x78.jpg'
+        google_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/store_google_253x78.jpg'
+        apple_store_url = 'https://itunes.apple.com/us/app/edx/id945480667?mt=8'
+        google_store_url = 'https://play.google.com/store/apps/details?id=org.edx.mobile'
+        facebook_url = 'http://www.facebook.com/EdxOnline'
+        linkedin_url = 'http://www.linkedin.com/company/edx'
+        twitter_url = 'https://twitter.com/edXOnline'
+        reddit_url = 'http://www.reddit.com/r/edx'
+        facebook_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_1_fb.png'
+        linkedin_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_3_linkedin.png'
+        twitter_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_2_twitter.png'
+        reddit_logo_url = 'http://email-media.s3.amazonaws.com/edX/2021/social_5_reddit.png'
+        due_date = (self.today + datetime.timedelta(weeks=1)).strftime(DUE_DATE_FORMAT)
+        expected_context = {
+            'contact_email': 'info@example.com',
+            'contact_mailing_address': '123 Sesame Street',
+            'course_ids': [str(self.course.id)],
+            'course_name': self.course.display_name,
+            'course_url': f'http://learning-mfe/course/{self.course.id}/home',
+            'dashboard_url': '/dashboard',
+            'homepage_url': '/',
+            'mobile_store_logo_urls': {'apple': apple_logo_url,
+                                       'google': google_logo_url},
+            'mobile_store_urls': {'apple': apple_store_url,
+                                  'google': google_store_url},
+            'logo_url': 'https://www.logo.png',
+            'platform_name': '\xe9dX',
+            'show_upsell': False,
+            'site_configuration_values': {},
+            'social_media_logo_urls': {'facebook': facebook_logo_url,
+                                       'linkedin': linkedin_logo_url,
+                                       'reddit': reddit_logo_url,
+                                       'twitter': twitter_logo_url},
+            'social_media_urls': {'facebook': facebook_url,
+                                  'linkedin': linkedin_url,
+                                  'reddit': reddit_url,
+                                  'twitter': twitter_url},
+            'template_revision': 'release',
+            'unsubscribe_url': None,
+            'date_items': [
+                ('sub_section_01', self.today.strftime(DUE_DATE_FORMAT)),
+                ('sub_section_02', self.today.strftime(DUE_DATE_FORMAT)),
+                ('sub_section_11', due_date),
+                ('sub_section_12', due_date)
+            ]
+        }
+        assert schedules == [(self.user, None, expected_context)]
+
+    def test_reminder_no_due_dates_if_course_ended(self):
+        self.course.end = self.today - datetime.timedelta(days=1)
+        self.course = self.update_course(self.course, self.user.id)
+        resolver = self.create_resolver()
+        schedules = list(resolver.get_context())
+        self.assertListEqual(schedules, [])
+
+    def test_course_not_found_error(self):
+        with pytest.raises(StopIteration) as cm:
+            resolver = CourseSectionDueDateReminder(
+                async_send_task=Mock(name='async_send_task'),
+                site=self.site_config.site,
+                effective_datetime=self.today,
+                target_datetime=self.target_datetime,
+                course_id="course-v1:edX+DemoX+Demo_Course",
+            )
+            next(resolver.get_context())
+
+    @override_waffle_flag(CUSTOM_RELATIVE_DATES, active=True)
+    def test_reminder_course_duration_based_on_relative_dates(self):
+        with self.store.bulk_operations(self.course.id):
+            chapter = BlockFactory.create(
+                parent=self.course,
+                category='chapter',
+                display_name="section_4"
+            )
+            BlockFactory.create(
+                parent_location=chapter.location,
+                category='sequential',
+                display_name="sub_section_41",
+                relative_weeks_due=5,
+            )
+        resolver = self.create_resolver()
+        self.assertEqual(resolver.get_expected_course_duration(), datetime.timedelta(weeks=5))

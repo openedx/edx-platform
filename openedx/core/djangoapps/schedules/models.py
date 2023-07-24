@@ -54,12 +54,38 @@ class ScheduleConfig(ConfigurationModel):
     KEY_FIELDS = ('site',)
 
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
-    enqueue_recurring_nudge = models.BooleanField(default=False)
-    deliver_recurring_nudge = models.BooleanField(default=False)
-    enqueue_upgrade_reminder = models.BooleanField(default=False)
-    deliver_upgrade_reminder = models.BooleanField(default=False)
-    enqueue_course_update = models.BooleanField(default=False)
-    deliver_course_update = models.BooleanField(default=False)
+    enqueue_recurring_nudge = models.BooleanField(
+        default=False,
+        help_text=_('Enable message queuing process for recurring nudge schedule.'),
+    )
+    deliver_recurring_nudge = models.BooleanField(
+        default=False,
+        help_text=_('Enable sending emails for recurring nudge schedule.'),
+    )
+    enqueue_upgrade_reminder = models.BooleanField(
+        default=False,
+        help_text=_('Enable message queuing process for upgrade reminder schedule.'),
+    )
+    deliver_upgrade_reminder = models.BooleanField(
+        default=False,
+        help_text=_('Enable sending emails for upgrade reminder schedule.'),
+    )
+    enqueue_course_update = models.BooleanField(
+        default=False,
+        help_text=_('Enable message queuing process for course update schedule.'),
+    )
+    deliver_course_update = models.BooleanField(
+        default=False,
+        help_text=_('Enable sending emails for course update schedule.'),
+    )
+    enqueue_course_due_date_reminder = models.BooleanField(
+        default=False,
+        help_text=_('Enable message queuing process for due date reminder schedule.'),
+    )
+    deliver_course_due_date_reminder = models.BooleanField(
+        default=False,
+        help_text=_('Enable sending emails for due date reminder schedule.'),
+    )
 
 
 class ScheduleExperience(models.Model):

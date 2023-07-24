@@ -176,5 +176,6 @@ class ScheduleConfigAdmin(admin.ModelAdmin):  # lint-amnesty, pylint: disable=mi
         'enqueue_recurring_nudge', 'deliver_recurring_nudge',
         'enqueue_upgrade_reminder', 'deliver_upgrade_reminder',
         'enqueue_course_update', 'deliver_course_update',
+        'enqueue_course_due_date_reminder', 'deliver_course_due_date_reminder',
     )
     form = ScheduleConfigAdminForm

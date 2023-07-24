@@ -1,0 +1,5 @@
+{% autoescape off %}
+{% load i18n %}
+
+{% blocktrans trimmed %}Important course due dates coming up{% endblocktrans %}
+{% endautoescape %}

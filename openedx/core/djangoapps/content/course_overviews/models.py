@@ -2,10 +2,12 @@
 Declaration of CourseOverview model
 """
 
+from __future__ import annotations
 
 import json
 import logging
 from datetime import datetime
+from typing import List
 from urllib.parse import urlparse, urlunparse
 
 import pytz
@@ -17,6 +19,7 @@ from django.db.models import Q
 from django.db.models.signals import post_save, post_delete
 from django.db.utils import IntegrityError
 from django.template import defaultfilters
+from opaque_keys.edx.keys import CourseKey
 
 from django.utils.functional import cached_property
 from model_utils.models import TimeStampedModel
@@ -702,10 +705,16 @@ class CourseOverview(TimeStampedModel):
         return course_overviews
 
     @classmethod
-    def get_all_course_keys(cls):
+    def get_all_course_keys(cls, self_paced: bool | None = None) -> List[CourseKey]:
         """
-        Returns all course keys from course overviews.
+        Returns all course keys from course overviews, optionally filter by pacing.
+        The filter is only used when a boolean is passed as argument and it is disabled when this value is `None`.
+
+        Args:
+            self_paced: Optionally filter by pacing
         """
+        if self_paced is not None:
+            return CourseOverview.objects.filter(self_paced=self_paced).values_list('id', flat=True)
         return CourseOverview.objects.values_list('id', flat=True)
 
     def is_discussion_tab_enabled(self):

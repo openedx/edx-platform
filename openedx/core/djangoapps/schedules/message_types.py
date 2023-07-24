@@ -29,5 +29,9 @@ class CourseUpdate(ScheduleMessageType):
     pass
 
 
+class CourseDueDatesReminder(ScheduleMessageType):
+    pass
+
+
 class InstructorLedCourseUpdate(ScheduleMessageType):
     pass

@@ -1,0 +1,16 @@
+{% autoescape off %}
+{% load i18n %}
+
+{% blocktrans trimmed %}
+Hi there! We wanted to remind you of some important due dates coming up for your course, {{ course_name }}, that you need to be aware of. The due dates are coming up in the following subsections:
+{% endblocktrans %}
+
+{% for subsection_name, date_item in date_items %}
+  * {{ subsection_name }} ({{ date_item }})
+{% endfor %}
+
+{% blocktrans trimmed %}
+Happy learning!
+{% endblocktrans %}
+{% include "ace_common/edx_ace/common/upsell_cta.txt"%}
+{% endautoescape %}

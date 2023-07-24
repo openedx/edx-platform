@@ -2,6 +2,7 @@
 
 import datetime
 import logging
+from typing import Tuple
 
 from celery import shared_task, current_app
 from celery_utils.logged_task import LoggedTask
@@ -23,6 +24,7 @@ from eventtracking import tracker
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.course_date_signals.models import SelfPacedRelativeDatesConfig
 from openedx.core.djangoapps.schedules import message_types, resolvers
 from openedx.core.djangoapps.schedules.models import Schedule, ScheduleConfig
 from openedx.core.lib.celery.task_utils import emulate_http_request
@@ -42,6 +44,7 @@ RECURRING_NUDGE_LOG_PREFIX = 'Recurring Nudge'
 UPGRADE_REMINDER_LOG_PREFIX = 'Upgrade Reminder'
 COURSE_UPDATE_LOG_PREFIX = 'Course Update'
 COURSE_NEXT_SECTION_UPDATE_LOG_PREFIX = 'Course Next Section Update'
+COURSE_DUE_DATE_REMINDER_LOG_PREFIX = 'Course Subsection Due Date Reminder'
 
 
 @shared_task(base=LoggedPersistOnFailureTask, bind=True, default_retry_delay=30)
@@ -181,6 +184,17 @@ def _course_update_schedule_send(site_id, msg_str):
     )
 
 
+@shared_task(base=LoggedTask, ignore_result=True)
+@set_code_owner_attribute
+def _course_due_date_reminder_schedule_send(site_id, msg_str):
+    _schedule_send(
+        msg_str,
+        site_id,
+        'deliver_course_due_date_reminder',
+        COURSE_DUE_DATE_REMINDER_LOG_PREFIX,
+    )
+
+
 class ScheduleRecurringNudge(BinnedScheduleMessageBaseTask):  # lint-amnesty, pylint: disable=missing-class-docstring
     num_bins = resolvers.RECURRING_NUDGE_NUM_BINS
     enqueue_config_var = 'enqueue_recurring_nudge'
@@ -223,51 +237,135 @@ ScheduleCourseUpdate.task_instance = current_app.register_task(ScheduleCourseUpd
 ScheduleCourseUpdate = ScheduleCourseUpdate.task_instance
 
 
-class ScheduleCourseNextSectionUpdate(ScheduleMessageBaseTask):  # lint-amnesty, pylint: disable=missing-class-docstring
-    enqueue_config_var = 'enqueue_course_update'
-    log_prefix = COURSE_NEXT_SECTION_UPDATE_LOG_PREFIX
-    resolver = resolvers.CourseNextSectionUpdate
-    async_send_task = _course_update_schedule_send
+class SelfPacedCourseMessageBaseTask(ScheduleMessageBaseTask):
+    """
+    Base class for self-paced course schedule tasks that create subtasks.
+    """
+    enqueue_config_var = ''
+    log_prefix = ''
+    resolver = None  # define in subclass
+    async_send_task = None
     task_instance = None
 
     @classmethod
-    def enqueue(cls, site, current_date, day_offset, override_recipient_email=None):  # lint-amnesty, pylint: disable=missing-function-docstring
+    def should_process_course(cls, course_key, site):  # pylint: disable=unused-argument
+        """
+        Check if course should be processed for scheduled messages.
+        Override in child class if this check is required.
+        """
+        return True
+
+    @classmethod
+    def calculate_dates(cls, effective_date, day_offset) -> Tuple[datetime.datetime, datetime.datetime]:  # pylint: disable=unused-argument
+        """
+        Get target and effective/current datetime for given effective_date and day_offset.
+        """
+        raise NotImplementedError
+
+    def make_message_type(self):
+        """ Make schedule message type. """
+        raise NotImplementedError
+
+    @classmethod
+    def enqueue(cls, site, effective_date, day_offset, override_recipient_email=None):
+        """ Enqueue this subtasks for getting section due dates and sending emails. """
         set_code_owner_attribute_from_module(__name__)
-        target_datetime = (current_date - datetime.timedelta(days=day_offset))
+        target_datetime, current_datetime = cls.calculate_dates(effective_date, day_offset)
 
         if not cls.is_enqueue_enabled(site):
             cls.log_info('Message queuing disabled for site %s', site.domain)
             return
 
         cls.log_info('Target date = %s', target_datetime.date().isoformat())
-        for course_key in CourseOverview.get_all_course_keys():
-            task_args = (
-                site.id,
-                serialize(target_datetime),  # Need to leave as a datetime for serialization purposes here
-                str(course_key),  # Needs to be a string for celery to properly process
-                override_recipient_email,
-            )
-            cls.log_info('Launching task with args = %r', task_args)
-            cls.task_instance.apply_async(
-                task_args,
-                retry=False,
-            )
+        for course_key in CourseOverview.get_all_course_keys(self_paced=True):
+            if cls.should_process_course(course_key, site):
+                task_args = (
+                    site.id,
+                    serialize(current_datetime),
+                    serialize(target_datetime),
+                    str(course_key),  # Needs to be a string for celery to properly process
+                    override_recipient_email,
+                )
+                cls.log_info('Launching task with args = %r', task_args)
+                cls.task_instance.apply_async(
+                    task_args,
+                    retry=False,
+                )
 
-    def run(self, site_id, target_day_str, course_key, override_recipient_email=None):  # lint-amnesty, pylint: disable=arguments-differ
+    def run(  # lint-amnesty, pylint: disable=arguments-differ
+        self, site_id, current_date_str, target_date_str, course_key, override_recipient_email=None
+    ):
+        """ Run method for celery which calls resolver to get due dates and send emails. """
         set_code_owner_attribute_from_module(__name__)
         site = Site.objects.select_related('configuration').get(id=site_id)
         with emulate_http_request(site=site):
-            _annotate_for_monitoring(message_types.CourseUpdate(), site, 0, target_day_str, -1)
+            _annotate_for_monitoring(self.make_message_type(), site, 0, target_date_str, -1)
             return self.resolver(
                 self.async_send_task,
                 site,
-                deserialize(target_day_str),
+                deserialize(current_date_str),
+                deserialize(target_date_str),
                 str(course_key),
                 override_recipient_email,
-            ).send()
+            ).send(self.make_message_type())
+
+
+class ScheduleCourseNextSectionUpdate(SelfPacedCourseMessageBaseTask):
+    """ Scheduler class for course updates which creates sub tasks. """
+    enqueue_config_var = 'enqueue_course_update'
+    log_prefix = COURSE_NEXT_SECTION_UPDATE_LOG_PREFIX
+    resolver = resolvers.CourseNextSectionUpdate
+    async_send_task = _course_update_schedule_send
+    task_instance = None
+
+    def make_message_type(self):
+        """ CourseUpdate message type """
+        return message_types.CourseUpdate()
+
+    @classmethod
+    def calculate_dates(cls, effective_date, day_offset):
+        """
+        Target datetime should be less number day_offset as we want to get the highlights for next section.
+        """
+        target_datetime = effective_date - datetime.timedelta(days=day_offset)
+        # effective_datetime/current_datetime and target_datetime should be same for this message.
+        return target_datetime, target_datetime
 # Save the task instance on the class object so that it's accessible via the cls argument to enqueue
 ScheduleCourseNextSectionUpdate.task_instance = current_app.register_task(ScheduleCourseNextSectionUpdate())
 ScheduleCourseNextSectionUpdate = ScheduleCourseNextSectionUpdate.task_instance
+
+
+class ScheduleCourseDueDateReminders(SelfPacedCourseMessageBaseTask):
+    """ Scheduler class for course due date reminders which creates sub tasks. """
+    enqueue_config_var = 'enqueue_course_due_date_reminder'
+    log_prefix = COURSE_DUE_DATE_REMINDER_LOG_PREFIX
+    resolver = resolvers.CourseSectionDueDateReminder
+    async_send_task = _course_due_date_reminder_schedule_send
+    task_instance = None
+
+    def make_message_type(self):
+        """ CourseDueDatesReminder message type. """
+        return message_types.CourseDueDatesReminder()
+
+    @classmethod
+    def calculate_dates(cls, effective_date, day_offset):
+        """
+        Target datetime should be plus day_offset as we want to get due dates for future sections.
+        """
+        return effective_date + datetime.timedelta(days=day_offset), effective_date
+
+    @classmethod
+    def should_process_course(cls, course_key, site):
+        """
+        Only process courses with relative due dates enabled.
+        """
+        enabled_at_course_level = SelfPacedRelativeDatesConfig.current(course_key=course_key).enabled
+        if enabled_at_course_level is not None:
+            return enabled_at_course_level
+        return SelfPacedRelativeDatesConfig.current(site=site).enabled
+# Save the task instance on the class object so that it's accessible via the cls argument to enqueue
+ScheduleCourseDueDateReminders.task_instance = current_app.register_task(ScheduleCourseDueDateReminders())
+ScheduleCourseDueDateReminders = ScheduleCourseDueDateReminders.task_instance
 
 
 def _schedule_send(msg_str, site_id, delivery_config_var, log_prefix):  # lint-amnesty, pylint: disable=missing-function-docstring

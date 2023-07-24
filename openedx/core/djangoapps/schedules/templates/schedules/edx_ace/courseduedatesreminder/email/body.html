@@ -1,0 +1,45 @@
+{% extends 'ace_common/edx_ace/common/base_body.html' %}
+{% load i18n %}
+{% load django_markup %}
+
+{% block preview_text %}
+    {% filter force_escape %}
+    {% blocktrans trimmed %}
+        Important course due dates coming up!
+    {% endblocktrans %}
+    {% endfilter %}
+{% endblock %}
+
+{% block content %}
+<table width="100%" align="left" border="0" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td>
+            <p>
+                {% blocktrans trimmed asvar tmsg %}
+                    Hi there! We wanted to remind you of some important due dates coming up for your course, {start_strong}{course_name}{end_strong}, that you need to be aware of. The due dates are coming up in the following subsections:
+                {% endblocktrans %}
+                {% interpolate_html tmsg start_strong='<strong>'|safe end_strong='</strong>'|safe course_name=course_name|force_escape|safe %}
+                <ul>
+                    {% for subsection_name, date_item in date_items %}
+                        <li>{{ subsection_name }} ({{ date_item }})</li>
+                    {% endfor %}
+                </ul>
+            </p>
+            <p>
+                {% filter force_escape %}
+                {% blocktrans trimmed %}
+                    Happy learning!
+                {% endblocktrans %}
+                {% endfilter %}
+            </p>
+
+            {% filter force_escape %}
+                {% blocktrans asvar course_cta_text %}Resume your course now{% endblocktrans %}
+            {% endfilter %}
+            {% include "ace_common/edx_ace/common/return_to_course_cta.html" with course_cta_text=course_cta_text%}
+
+            {% include "ace_common/edx_ace/common/upsell_cta.html"%}
+        </td>
+    </tr>
+</table>
+{% endblock %}

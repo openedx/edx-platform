@@ -1,17 +1,21 @@
 """
-Contains methods for accessing course highlights. Course highlights is a
-schedule experience built on the Schedules app.
+Contains methods for accessing course highlights and course due dates.
+Course highlights is a schedule experience built on the Schedules app.
 """
 
 
+from datetime import timedelta
 import logging
 
+from lms.djangoapps.courseware.courses import get_course
+from lms.djangoapps.courseware.exceptions import CourseRunNotFound
 from openedx.core.djangoapps.course_date_signals.utils import spaced_out_sections
+from openedx.core.djangoapps.course_date_signals.waffle import CUSTOM_RELATIVE_DATES
 from openedx.core.djangoapps.schedules.exceptions import CourseUpdateDoesNotExist
 from openedx.core.lib.request_utils import get_request_or_stub
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 log = logging.getLogger(__name__)
+DUE_DATE_FORMAT = "%b %d, %Y at %H:%M %Z"
 
 
 def get_all_course_highlights(course_key):
@@ -67,8 +71,8 @@ def course_has_highlights_from_store(course_key):
         course_key (CourseKey): course to lookup from the modulestore
     """
     try:
-        course = _get_course_descriptor(course_key)
-    except CourseUpdateDoesNotExist:
+        course = get_course(course_key, depth=1)
+    except CourseRunNotFound:
         return False
     return course_has_highlights(course)
 
@@ -93,7 +97,16 @@ def get_week_highlights(user, course_key, week_num):
     return highlights
 
 
-def get_next_section_highlights(user, course_key, start_date, target_date):
+def get_upcoming_subsection_due_dates(user, course_key, start_date, target_date, current_date, duration=None):
+    """
+    Get section due dates, based upon the current date.
+    """
+    course_descriptor = get_course(course_key, depth=2)
+    course_block = _get_course_block(course_descriptor, user)
+    return _get_upcoming_due_dates(course_block, start_date, target_date, current_date, duration)
+
+
+def get_next_section_highlights(user, course_key, start_date, target_date, duration=None):
     """
     Get highlights (list of unicode strings) for a week, based upon the current date.
 
@@ -102,28 +115,18 @@ def get_next_section_highlights(user, course_key, start_date, target_date):
     """
     course_descriptor = _get_course_with_highlights(course_key)
     course_block = _get_course_block(course_descriptor, user)
-    return _get_highlights_for_next_section(course_block, start_date, target_date)
+    return _get_highlights_for_next_section(course_block, start_date, target_date, duration)
 
 
 def _get_course_with_highlights(course_key):
     """ Gets Course descriptor if highlights are enabled for the course """
-    course_descriptor = _get_course_descriptor(course_key)
+    course_descriptor = get_course(course_key, depth=1)
     if not course_descriptor.highlights_enabled_for_messaging:
         raise CourseUpdateDoesNotExist(
             f'{course_key} Course Update Messages are disabled.'
         )
 
     return course_descriptor
-
-
-def _get_course_descriptor(course_key):
-    """ Gets course descriptor from modulestore """
-    descriptor = modulestore().get_course(course_key, depth=1)
-    if descriptor is None:
-        raise CourseUpdateDoesNotExist(
-            f'Course {course_key} not found.'
-        )
-    return descriptor
 
 
 def _get_course_block(course_descriptor, user):
@@ -146,7 +149,7 @@ def _get_course_block(course_descriptor, user):
         user, request, course_descriptor, field_data_cache, course_descriptor.id, course=course_descriptor,
     )
     if not course_block:
-        raise CourseUpdateDoesNotExist(f'Course block {course_descriptor.id} not found')
+        raise CourseRunNotFound(course_descriptor.id)
     return course_block
 
 
@@ -175,10 +178,10 @@ def _get_highlights_for_week(sections, week_num, course_key):
     return section.highlights
 
 
-def _get_highlights_for_next_section(course, start_date, target_date):
+def _get_highlights_for_next_section(course, start_date, target_date, duration=None):
     """ Using the target date, retrieves highlights for the next section. """
     use_next_sections_highlights = False
-    for index, section, weeks_to_complete in spaced_out_sections(course):
+    for index, section, weeks_to_complete in spaced_out_sections(course, duration):
         # We calculate section due date ourselves (rather than grabbing the due attribute),
         # since not every section has a real due date (i.e. not all are graded), but we still
         # want to know when this section should have been completed by the learner.
@@ -199,3 +202,26 @@ def _get_highlights_for_next_section(course, start_date, target_date):
         )
 
     return None, None
+
+
+def _get_upcoming_due_dates(course, start_date, target_date, current_date, duration=None):
+    """ Retrieves section names and due dates within the provided target_date. """
+    date_items = []
+    # Apply the same relative due date to all content inside a section,
+    # unless that item already has a relative date set
+    for _, section, days_to_complete in spaced_out_sections(course, duration):
+        # Default to Personalized Learner Schedules (PLS) logic for self paced courses.
+        section_due_date = start_date + days_to_complete
+        section_date_items = []
+
+        for subsection in section.get_children():
+            # Get custom due date for subsection if it is set
+            relative_weeks_due = subsection.fields['relative_weeks_due'].read_from(subsection)
+            if CUSTOM_RELATIVE_DATES.is_enabled(course.id) and relative_weeks_due:
+                section_due_date = start_date + timedelta(weeks=relative_weeks_due)
+
+            # If the section_due_date is within current date and the target date range, include it in reminder list.
+            if current_date <= section_due_date <= target_date:
+                section_date_items.append((subsection.display_name, section_due_date.strftime(DUE_DATE_FORMAT)))
+        date_items.extend(section_date_items)
+    return date_items
