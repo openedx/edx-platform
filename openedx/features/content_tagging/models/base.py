@@ -13,6 +13,7 @@ from openedx_tagging.core.tagging.models import ObjectTag, Taxonomy
 
 from openedx_tagging.core.tagging.models import (
     ObjectTag,
+    
     Taxonomy,
 )
 
@@ -110,15 +111,21 @@ class ContentObjectTag(ObjectTag):
             return BlockUsageLocator.from_string(str(self.object_id))
 
 
-class ContentTaxonomy(Taxonomy):
+class ContentTaxonomyMixin:
     """
     Taxonomy which can only tag Content objects (e.g. XBlocks or Courses) via ContentObjectTag.
 
     Also ensures a valid TaxonomyOrg owner relationship with the content object.
     """
 
-    class Meta:
-        proxy = True
+    @property
+    def object_tag_class(self) -> Type:
+        """
+        Returns the ObjectTag subclass associated with this taxonomy, which is ObjectTag by default.
+
+        Taxonomy subclasses may override this method to use different subclasses of ObjectTag.
+        """
+        return ContentObjectTag
 
     @classmethod
     def taxonomies_for_org(
@@ -128,7 +135,6 @@ class ContentTaxonomy(Taxonomy):
     ) -> QuerySet:
         """
         Filters the given QuerySet to those ContentTaxonomies which are available for the given organization.
-
         If no `org` is provided, then only ContentTaxonomies available to all organizations are returned.
         If `org` is provided, then ContentTaxonomies available to this organizations are also returned.
         """
@@ -170,3 +176,13 @@ class ContentTaxonomy(Taxonomy):
         ).exists():
             return False
         return super()._check_taxonomy(content_tag)
+
+
+class ContentTaxonomy(ContentTaxonomyMixin, Taxonomy):
+    """
+    Taxonomy that accepts ContentTags,
+    and ensures a valid TaxonomyOrg owner relationship with the content object.
+    """
+
+    class Meta:
+        proxy = True
