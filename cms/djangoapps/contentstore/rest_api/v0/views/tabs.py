@@ -79,6 +79,8 @@ class CourseTabListView(DeveloperErrorViewMixin, APIView):
         ```
         """
         course_key = CourseKey.from_string(course_id)
+        if not use_new_custom_pages(course_key):
+            return Response(status=status.HTTP_403_FORBIDDEN)
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
 
