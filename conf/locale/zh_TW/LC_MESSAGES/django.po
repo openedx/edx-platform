@@ -94,7 +94,7 @@
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014
 # 8cdb4758e2f8f89e1b6f455d24a57c7b_26aedc9 <d42fecad8431def0e25dc12221e713ed_169300>, 2014
 # MOH CHIN LAM <chinlam91@gmail.com>, 2014-2015
-# 區壬豪 <oldmon@livemail.tw>, 2014
+# Nicholas Ou <oldmon@livemail.tw>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # Shawn Li <tp9106@gmail.com>, 2017
 # Shung-Hsi Yu <shy.no.reply@gmail.com>, 2017
@@ -177,7 +177,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-25 20:42+0000\n"
+"POT-Creation-Date: 2023-07-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Chinese (Taiwan) (https://app.transifex.com/open-edx/teams/6205/zh_TW/)\n"
