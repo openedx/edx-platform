@@ -242,8 +242,13 @@ class CourseStructureCache:
 
             # 1 = Fastest (slightly larger results)
             compressed_pickled_data = zlib.compress(pickled_data, 1)
-            tagger.measure('compressed_size', len(compressed_pickled_data))
+            data_size = len(compressed_pickled_data)
+            tagger.measure('compressed_size', data_size)
 
+            total_bytes_in_one_mb = 1024 * 1024
+            # only print logs when data size is greater than or equal to 1MB
+            if data_size >= total_bytes_in_one_mb:
+                log.info('Data to be cached is: {:.2f} MB'.format(data_size / total_bytes_in_one_mb))
             # Stuctures are immutable, so we set a timeout of "never"
             self.cache.set(key, compressed_pickled_data, None)
 
