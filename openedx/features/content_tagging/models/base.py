@@ -1,7 +1,7 @@
 """
 Content Tagging models
 """
-from typing import List, Union
+from typing import List, Union, Type
 
 from django.db import models
 from django.db.models import Exists, OuterRef, Q, QuerySet
