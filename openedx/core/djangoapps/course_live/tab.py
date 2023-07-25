@@ -19,12 +19,10 @@ from xmodule.tabs import TabFragmentViewMixin
 
 
 @request_cached()
-def provider_is_zoom(course: CourseBlock, course_key=None) -> bool:
+def provider_is_zoom(course_key: CourseKey) -> bool:
     """
     Check if the provider exists and is Zoom.
     """
-    if not course_key:
-        course_key = course.id
     course_live_configurations = CourseLiveConfiguration.get(course_key)
 
     if not course_live_configurations:
@@ -96,7 +94,7 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
 
     def _get_pii_lti_parameters(self, course, request):
         pii_config = super()._get_pii_lti_parameters(course, request)
-        if provider_is_zoom(course) and user_is_staff_or_instructor(request.user, course):
+        if provider_is_zoom(course.id) and user_is_staff_or_instructor(request.user, course):
             pii_config['person_contact_email_primary'] = request.user.email
         return pii_config
 
@@ -105,6 +103,6 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
         Get LTI roles for the user and course.
         If the user is a global staff member, return the student role.
         """
-        if provider_is_zoom(course_key=course_key) and GlobalStaff().has_user(user):
+        if provider_is_zoom(course_key) and GlobalStaff().has_user(user):
             return self.ROLE_MAP.get('student')
         return super()._get_lti_roles(user, course_key)
