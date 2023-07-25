@@ -8,7 +8,7 @@ accessible-pygments==0.0.4
     # via pydata-sphinx-theme
 acid-xblock==0.2.1
     # via -r requirements/edx/base.txt
-aiohttp==3.8.4
+aiohttp==3.8.5
     # via
     #   -r requirements/edx/base.txt
     #   geoip2
@@ -125,7 +125,7 @@ celery==5.3.1
     #   edx-celeryutils
     #   edx-enterprise
     #   event-tracking
-certifi==2023.5.7
+certifi==2023.7.22
     # via
     #   -r requirements/edx/base.txt
     #   elasticsearch
@@ -151,7 +151,7 @@ charset-normalizer==2.0.12
     #   snowflake-connector-python
 chem==1.2.0
     # via -r requirements/edx/base.txt
-click==8.1.5
+click==8.1.6
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -175,7 +175,7 @@ click-repl==0.3.0
     # via
     #   -r requirements/edx/base.txt
     #   celery
-code-annotations==1.3.0
+code-annotations==1.5.0
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/doc.in
@@ -250,6 +250,7 @@ django==3.2.20
     #   django-storages
     #   django-user-tasks
     #   djangorestframework
+    #   done-xblock
     #   drf-jwt
     #   drf-nested-routers
     #   drf-yasg
@@ -309,7 +310,7 @@ django-classy-tags==4.0.0
     # via
     #   -r requirements/edx/base.txt
     #   django-sekizai
-django-config-models==2.3.0
+django-config-models==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -398,7 +399,7 @@ django-object-actions==4.1.0
     #   edx-enterprise
 django-pipeline==2.1.0
     # via -r requirements/edx/base.txt
-django-ratelimit==4.0.0
+django-ratelimit==4.1.0
     # via -r requirements/edx/base.txt
 django-sekizai==4.1.0
     # via
@@ -428,7 +429,7 @@ django-storages==1.9.1
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
     #   edxval
-django-user-tasks==3.0.0
+django-user-tasks==3.1.0
     # via -r requirements/edx/base.txt
 django-waffle==3.0.0
     # via
@@ -481,7 +482,7 @@ docutils==0.19
     #   pydata-sphinx-theme
     #   sphinx
     #   sphinx-mdinclude
-done-xblock==2.0.5
+done-xblock==2.1.0
     # via -r requirements/edx/base.txt
 drf-jwt==1.19.2
     # via
@@ -495,10 +496,11 @@ drf-yasg==1.21.5
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
+    #   django-user-tasks
     #   edx-api-doc-tools
-edx-ace==1.6.1
+edx-ace==1.7.0
     # via -r requirements/edx/base.txt
-edx-api-doc-tools==1.6.0
+edx-api-doc-tools==1.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-name-affirmation
@@ -531,7 +533,7 @@ edx-django-release-util==1.2.0
     #   openedx-blockstore
 edx-django-sites-extensions==4.0.0
     # via -r requirements/edx/base.txt
-edx-django-utils==5.5.0
+edx-django-utils==5.6.0
     # via
     #   -r requirements/edx/base.txt
     #   django-config-models
@@ -561,7 +563,7 @@ edx-drf-extensions==8.8.0
     #   edx-when
     #   edxval
     #   learner-pathway-progress
-edx-enterprise==4.0.3
+edx-enterprise==4.0.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -574,7 +576,7 @@ edx-i18n-tools==1.0.0
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-edx-milestones==0.4.0
+edx-milestones==0.5.0
     # via -r requirements/edx/base.txt
 edx-name-affirmation==2.3.5
     # via -r requirements/edx/base.txt
@@ -596,7 +598,7 @@ edx-opaque-keys[django]==2.3.0
     #   openedx-events
     #   ora2
     #   outcome-surveys
-edx-organizations==6.11.1
+edx-organizations==6.12.0
     # via -r requirements/edx/base.txt
 edx-proctoring==4.16.0
     # via
@@ -662,7 +664,7 @@ event-tracking==2.1.0
     #   -r requirements/edx/base.txt
     #   edx-proctoring
     #   edx-search
-fastavro==1.8.0
+fastavro==1.8.2
     # via
     #   -r requirements/edx/base.txt
     #   openedx-events
@@ -697,7 +699,7 @@ gitpython==3.1.32
     # via -r requirements/edx/doc.in
 glob2==0.7
     # via -r requirements/edx/base.txt
-gunicorn==21.0.0
+gunicorn==21.2.0
     # via -r requirements/edx/base.txt
 help-tokens==2.2.0
     # via -r requirements/edx/base.txt
@@ -774,12 +776,12 @@ jsonfield==3.1.0
     #   lti-consumer-xblock
     #   ora2
     #   outcome-surveys
-jsonschema==4.18.3
+jsonschema==4.18.4
     # via
     #   -r requirements/edx/base.txt
     #   optimizely-sdk
     #   sphinxcontrib-openapi
-jsonschema-specifications==2023.6.1
+jsonschema-specifications==2023.7.1
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -912,17 +914,17 @@ openedx-django-pyfs==3.4.0
     # via
     #   -r requirements/edx/base.txt
     #   xblock
-openedx-django-require==2.0.0
+openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.txt
-openedx-events==8.2.0
+openedx-events==8.3.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
     #   skill-tagging
-openedx-filters==1.3.0
+openedx-filters==1.4.0
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
@@ -1036,7 +1038,7 @@ pyjwkest==1.4.2
     #   -r requirements/edx/base.txt
     #   edx-token-utils
     #   lti-consumer-xblock
-pyjwt[crypto]==2.7.0
+pyjwt[crypto]==2.8.0
     # via
     #   -r requirements/edx/base.txt
     #   drf-jwt
@@ -1144,7 +1146,7 @@ pytz==2022.7.1
     #   xblock
 pyuca==1.2
     # via -r requirements/edx/base.txt
-pyyaml==6.0
+pyyaml==6.0.1
     # via
     #   -r requirements/edx/base.txt
     #   code-annotations
@@ -1160,7 +1162,7 @@ redis==4.6.0
     # via
     #   -r requirements/edx/base.txt
     #   walrus
-referencing==0.29.1
+referencing==0.30.0
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1198,7 +1200,7 @@ requests-oauthlib==1.3.1
     # via
     #   -r requirements/edx/base.txt
     #   social-auth-core
-rpds-py==0.8.11
+rpds-py==0.9.2
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
@@ -1487,6 +1489,7 @@ xblock-poll==1.13.0
 xblock-utils==3.2.0
     # via
     #   -r requirements/edx/base.txt
+    #   done-xblock
     #   edx-sga
     #   lti-consumer-xblock
     #   staff-graded-xblock
