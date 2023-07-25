@@ -126,7 +126,7 @@ class TestFooter(TestCase):
 
             ],
             'connect_links': [
-                {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Blog'},
+                {'url': 'https://edx.org/edx-blog', 'name': 'blog', 'title': 'Idea Hub'},
                 # pylint: disable=line-too-long
                 {'url': f'{settings.LMS_ROOT_URL}/support/contact_us', 'name': 'contact', 'title': 'Contact Us'},
                 {'url': 'https://example.support.edx.org/hc/en-us', 'name': 'help-center', 'title': 'Help Center'},
