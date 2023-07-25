@@ -1132,6 +1132,7 @@ class TestEnterpriseDashboardSerializer(TestCase):
             "slug": str(uuid4()),
             "enable_learner_portal": True,
             "uuid": str(uuid4()),
+            "auth_org_id": str(uuid4()),
         }
 
     def test_structure(self):
@@ -1140,7 +1141,7 @@ class TestEnterpriseDashboardSerializer(TestCase):
 
         output_data = EnterpriseDashboardSerializer(input_data).data
 
-        expected_keys = ["label", "url", "uuid", "isLearnerPortalEnabled"]
+        expected_keys = ["label", "url", "uuid", "isLearnerPortalEnabled", "authOrgId"]
         self.assertEqual(output_data.keys(), set(expected_keys))
 
     def test_happy_path(self):
@@ -1159,6 +1160,7 @@ class TestEnterpriseDashboardSerializer(TestCase):
                 + input_data["slug"],
                 "uuid": input_data["uuid"],
                 "isLearnerPortalEnabled": input_data["enable_learner_portal"],
+                "authOrgId": input_data["auth_org_id"],
             },
         )
 

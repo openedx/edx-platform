@@ -200,6 +200,7 @@ class EnrollmentSerializer(serializers.Serializer):
     hasOptedOutOfEmail = serializers.SerializerMethodField()
     lastEnrolled = serializers.DateTimeField(source="created")
     isEnrolled = serializers.BooleanField(source="is_active")
+    mode = serializers.CharField()
 
     def get_accessExpirationDate(self, instance):
         return self.context.get("audit_access_deadlines", {}).get(instance.course_id)
@@ -495,6 +496,7 @@ class UnfulfilledEntitlementSerializer(serializers.Serializer):
         "hasOptedOutOfEmail": False,
         "lastEnrolled": None,
         "isEnrolled": False,
+        "mode": None,
     }
 
     # These fields contain all real data and will be serialized
@@ -561,6 +563,7 @@ class EnterpriseDashboardSerializer(serializers.Serializer):
     label = serializers.CharField(source="name")
     url = serializers.SerializerMethodField()
     uuid = serializers.UUIDField()
+    authOrgId = serializers.CharField(source="auth_org_id")
     isLearnerPortalEnabled = serializers.BooleanField(source="enable_learner_portal")
 
     def get_url(self, instance):

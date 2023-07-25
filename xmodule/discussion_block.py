@@ -163,6 +163,9 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlMixin):  # lint-amn
         """
         Renders student view for LMS.
         """
+        # to prevent a circular import issue
+        import lms.djangoapps.discussion.django_comment_client.utils as utils
+
         fragment = Fragment()
 
         if not self.is_visible:
@@ -188,22 +191,23 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlMixin):  # lint-amn
                     url='{}?{}'.format(reverse('register_user'), qs),
                 ),
             )
+        if utils.is_discussion_enabled(self.course_key):
+            context = {
+                'discussion_id': self.discussion_id,
+                'display_name': self.display_name if self.display_name else _("Discussion"),
+                'user': self.django_user,
+                'course_id': self.course_key,
+                'discussion_category': self.discussion_category,
+                'discussion_target': self.discussion_target,
+                'can_create_thread': self.has_permission("create_thread"),
+                'can_create_comment': self.has_permission("create_comment"),
+                'can_create_subcomment': self.has_permission("create_sub_comment"),
+                'login_msg': login_msg,
+            }
+            fragment.add_content(
+                self.runtime.service(self, 'mako').render_template('discussion/_discussion_inline.html', context)
+            )
 
-        context = {
-            'discussion_id': self.discussion_id,
-            'display_name': self.display_name if self.display_name else _("Discussion"),
-            'user': self.django_user,
-            'course_id': self.course_key,
-            'discussion_category': self.discussion_category,
-            'discussion_target': self.discussion_target,
-            'can_create_thread': self.has_permission("create_thread"),
-            'can_create_comment': self.has_permission("create_comment"),
-            'can_create_subcomment': self.has_permission("create_sub_comment"),
-            'login_msg': login_msg,
-        }
-
-        fragment.add_content(self.runtime.service(self, 'mako').render_template('discussion/_discussion_inline.html',
-                                                                                context))
         fragment.initialize_js('DiscussionInlineBlock')
 
         return fragment
