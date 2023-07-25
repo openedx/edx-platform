@@ -18,7 +18,7 @@ from .views import (
 
 app_name = 'v1'
 
-VIDEO_ID_PATTERN = r'(?:/(?P<edx_video_id>[-\w]+))'
+VIDEO_ID_PATTERN = r'(?:(?P<edx_video_id>[-\w]+))'
 
 urlpatterns = [
     re_path(
