@@ -160,22 +160,6 @@ class TestPaverServerTasks(PaverTestCase):
         assert self.task_messages == [EXPECTED_CELERY_COMMAND.format(settings=settings)]
 
     @ddt.data(
-        [{}],
-        [{"settings": "aws"}],
-    )
-    @ddt.unpack
-    def test_update_db(self, options):
-        """
-        Test the "update_db" task.
-        """
-        settings = options.get("settings", Env.DEVSTACK_SETTINGS)
-        call_task("pavelib.servers.update_db", options=options)
-        # pylint: disable=line-too-long
-        db_command = "NO_EDXAPP_SUDO=1 EDX_PLATFORM_SETTINGS_OVERRIDE={settings} /edx/bin/edxapp-migrate-{server} --traceback --pythonpath=. "
-        assert self.task_messages == [db_command.format(server='lms', settings=settings),
-                                      db_command.format(server='cms', settings=settings)]
-
-    @ddt.data(
         ["lms", {}],
         ["lms", {"settings": "aws"}],
         ["cms", {}],
