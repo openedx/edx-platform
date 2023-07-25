@@ -174,15 +174,6 @@ class StatusDisplayStrings:
         return _(StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN))
 
 
-def _get_videos_post_method():
-    """
-    Return the appropriate method for creating a video upload
-    """
-    if use_mock_video_uploads():
-        return videos_post_mock
-    return videos_post
-
-
 def handle_videos(request, course_key_string, edx_video_id=None):
     """
     Restful handler for video uploads.
@@ -232,9 +223,7 @@ def handle_videos(request, course_key_string, edx_video_id=None):
         elif _is_pagination_context_update_request(request):
             return _update_pagination_context(request)
 
-        post_videos = _get_videos_post_method()
-
-        data, status = post_videos(course, request)
+        data, status = videos_post(course, request)
         return JsonResponse(data, status=status)
 
 
@@ -247,9 +236,7 @@ def handle_generate_video_upload_link(request, course_key_string):
     if not course:
         return Response(data='Course Not Found', status=rest_status.HTTP_400_BAD_REQUEST)
 
-    post_videos = _get_videos_post_method()
-
-    data, status = post_videos(course, request)
+    data, status = videos_post(course, request)
     return Response(data, status=status)
 
 
@@ -724,9 +711,6 @@ def videos_index_json(course):
     return JsonResponse({"videos": index_videos}, status=200)
 
 
-def videos_post_mock(_course, _request):
-    return {'files': [{'file_name': 'video.mp4', 'upload_url': 'http://example.com/put_video'}]}, 200
-
 def videos_post(course, request):
     """
     Input (JSON):
@@ -747,6 +731,10 @@ def videos_post(course, request):
 
     The returned array corresponds exactly to the input array.
     """
+
+    if (use_mock_video_uploads()):
+        return {'files': [{'file_name': 'video.mp4', 'upload_url': 'http://example.com/put_video'}]}, 200
+
     error = None
     data = request.json
     if 'files' not in data:
