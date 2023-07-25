@@ -44,7 +44,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.errortracker import make_error_tracker
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import ASSET_IGNORE_REGEX
+from xmodule.modulestore.django import ASSET_IGNORE_REGEX, SignalHandler
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore.store_utilities import draft_node_constructor, get_draft_subtree_roots
@@ -573,6 +573,11 @@ class ImportManager:
             with self.store.bulk_operations(dest_id):
                 # Import all draft items into the courselike.
                 courselike = self.import_drafts(courselike, courselike_key, data_path, dest_id)
+
+            # Hack to ensure course gets fully published; otherwise,
+            # we only get the top-level outline at first.
+            # See https://github.com/openedx/devstack/issues/1073
+            SignalHandler.course_published.send_robust(type(self.store), course_key=dest_id)
 
             yield courselike
 
