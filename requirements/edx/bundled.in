@@ -32,8 +32,6 @@ newrelic                            # New Relic agent for performance monitoring
 optimizely-sdk                      # Optimizely provides A/B testing and other features, used by edx.org
 
 ## Plugins used on edx.org
-learner-pathway-progress            # A plugin for lms to track learners progress in pathays
-outcome-surveys                     # plugin "to send follow up events for learners who have passed a course"
 skill-tagging                       # Library to support tagging of skills on edx.org in unit/video xblocks via forms
 
 ## XBLOCKS
