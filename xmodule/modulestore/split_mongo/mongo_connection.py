@@ -20,6 +20,7 @@ import pytz
 from mongodb_proxy import autoretry_read
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
+from edx_django_utils import monitoring
 from edx_django_utils.cache import RequestCache
 
 from common.djangoapps.split_modulestore_django.models import SplitModulestoreCourseIndex
@@ -245,12 +246,19 @@ class CourseStructureCache:
             data_size = len(compressed_pickled_data)
             tagger.measure('compressed_size', data_size)
 
-            total_bytes_in_one_mb = 1024 * 1024
-            # only print logs when data size is greater than or equal to 1MB
-            if data_size >= total_bytes_in_one_mb:
-                log.info('Data to be cached is: {:.2f} MB'.format(data_size / total_bytes_in_one_mb))
-            # Stuctures are immutable, so we set a timeout of "never"
-            self.cache.set(key, compressed_pickled_data, None)
+            # Structures are immutable, so we set a timeout of "never"
+            try:
+                self.cache.set(key, compressed_pickled_data, None)
+            except Exception:  # pylint: disable=broad-except
+                total_bytes_in_one_mb = 1024 * 1024
+                chunk_size_in_mbs = round(data_size / total_bytes_in_one_mb, 2)
+
+                # .. custom_attribute_name: split_mongo_compressed_size
+                # .. custom_attribute_description: contains the data chunk size in MBs. The size on which
+                #   the memcached client failed to store value in course structure cache.
+                monitoring.set_custom_attribute('split_mongo_compressed_size', chunk_size_in_mbs)
+                monitoring.record_exception()
+                log.info('Data caching (course structure) failed on chunk size: {} MB'.format(chunk_size_in_mbs))
 
 
 class MongoPersistenceBackend:
