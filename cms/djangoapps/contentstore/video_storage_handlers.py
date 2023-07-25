@@ -244,7 +244,7 @@ def handle_video_images(request, course_key_string, edx_video_id=None):
     """Function to handle image files"""
 
     # respond with a 404 if image upload is not enabled.
-    if not VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled():
+    if not VIDEO_IMAGE_UPLOAD_ENABLED.is_enabled() and not use_mock_video_uploads():
         return HttpResponseNotFound()
 
     if 'file' not in request.FILES:
