@@ -58,7 +58,7 @@ from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .models import VideoUploadConfig
-from .toggles import use_new_video_uploads_page
+from .toggles import use_new_video_uploads_page, use_mock_video_uploads
 from .utils import reverse_course_url, get_video_uploads_url
 from .video_utils import validate_video_image
 from .views.course import get_course_and_check_access
@@ -174,6 +174,15 @@ class StatusDisplayStrings:
         return _(StatusDisplayStrings._STATUS_MAP.get(val_status, StatusDisplayStrings._UNKNOWN))
 
 
+def _get_videos_post_method():
+    """
+    Return the appropriate method for creating a video upload
+    """
+    if use_mock_video_uploads():
+        return videos_post_mock
+    return videos_post
+
+
 def handle_videos(request, course_key_string, edx_video_id=None):
     """
     Restful handler for video uploads.
@@ -184,15 +193,29 @@ def handle_videos(request, course_key_string, edx_video_id=None):
         json: return json representing the videos that have been uploaded and
             their statuses
     POST
-        json: create a new video upload; the actual files should not be provided
-            to this endpoint but rather PUT to the respective upload_url values
-            contained in the response
+        json: generate new video upload urls, for example upload urls for S3 buckets. To upload the video, you should
+            make a PUT request to the returned upload_url values. This can happen on the frontend, MFE,
+            or client side - it is not implemented in the backend.
+            Example payload:
+                {
+                    "files": [{
+                        "file_name": "video.mp4",
+                        "content_type": "video/mp4"
+                    }]
+                }
+            Returns (JSON):
+                {
+                    "files": [{
+                        "file_name": "video.mp4",
+                        "upload_url": "http://example.com/put_video"
+                    }]
+                }
     DELETE
         soft deletes a video for particular course
     """
     course = _get_and_validate_course(course_key_string, request.user)
 
-    if not course:
+    if (not course and not use_mock_video_uploads()):
         return HttpResponseNotFound()
 
     if request.method == "GET":
@@ -209,7 +232,9 @@ def handle_videos(request, course_key_string, edx_video_id=None):
         elif _is_pagination_context_update_request(request):
             return _update_pagination_context(request)
 
-        data, status = videos_post(course, request)
+        post_videos = _get_videos_post_method()
+
+        data, status = post_videos(course, request)
         return JsonResponse(data, status=status)
 
 
@@ -222,7 +247,9 @@ def handle_generate_video_upload_link(request, course_key_string):
     if not course:
         return Response(data='Course Not Found', status=rest_status.HTTP_400_BAD_REQUEST)
 
-    data, status = videos_post(course, request)
+    post_videos = _get_videos_post_method()
+
+    data, status = post_videos(course, request)
     return Response(data, status=status)
 
 
@@ -696,6 +723,9 @@ def videos_index_json(course):
     index_videos, __ = _get_index_videos(course)
     return JsonResponse({"videos": index_videos}, status=200)
 
+
+def videos_post_mock(_course, _request):
+    return {'files': [{'file_name': 'video.mp4', 'upload_url': 'http://example.com/put_video'}]}, 200
 
 def videos_post(course, request):
     """

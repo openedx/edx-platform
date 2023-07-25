@@ -142,7 +142,13 @@ def videos_handler(request, course_key_string, edx_video_id=None):
     POST
         json: create a new video upload; the actual files should not be provided
             to this endpoint but rather PUT to the respective upload_url values
-            contained in the response
+            contained in the response. Example payload:
+                {
+                    "files": [{
+                        "file_name": "video.mp4",
+                        "content_type": "video/mp4"
+                    }]
+                }
     DELETE
         soft deletes a video for particular course
     """

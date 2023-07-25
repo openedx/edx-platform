@@ -478,6 +478,25 @@ def use_new_course_team_page(course_key):
     return ENABLE_NEW_STUDIO_COURSE_TEAM_PAGE.is_enabled(course_key)
 
 
+# .. toggle_name: contentstore.mock_video_uploads
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag mocks contentstore video uploads for local development, if you don't have access to AWS
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-7-25
+# .. toggle_tickets: TNL-10897
+# .. toggle_warning:
+MOCK_VIDEO_UPLOADS = WaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.mock_video_uploads', __name__)
+
+
+def use_mock_video_uploads():
+    """
+    Returns a boolean if video uploads should be mocked for local development
+    """
+    return MOCK_VIDEO_UPLOADS.is_enabled()
+
+
 # .. toggle_name: contentstore.default_enable_flexible_peer_openassessments
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
