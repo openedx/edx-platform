@@ -842,10 +842,13 @@ class TestCourseStructureCache(CacheIsolationMixin, SplitModuleTest):
         # now make sure that you get the same structure
         assert cached_structure == not_cached_structure
 
+    @patch('django.core.cache.cache.set')
     @patch('xmodule.modulestore.split_mongo.mongo_connection.get_cache')
-    def test_course_structure_cache_with_data_chunk_greater_than_one_mb(self, mock_get_cache):
+    def test_course_structure_cache_with_data_chunk_greater_than_one_mb(self, mock_get_cache, mock_set_cache):
         enabled_cache = caches['default']
         mock_get_cache.return_value = enabled_cache
+        mock_set_cache.side_effect = Exception
+
         course_cache = CourseStructureCache()
 
         size = 300000000
@@ -853,7 +856,7 @@ class TestCourseStructureCache(CacheIsolationMixin, SplitModuleTest):
         data_chunk = b'\x00' * size
 
         logger_name = 'xmodule.modulestore.split_mongo.mongo_connection'
-        expected_message = 'Data to be cached is: 1.25 MB'
+        expected_message = 'Data caching (course structure) failed on chunk size: 1.25 MB'
         with LogCapture(logger_name) as capture:
             course_cache.set('my_data_chunk', data_chunk)
 
