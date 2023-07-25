@@ -1163,6 +1163,13 @@ class TestEnterpriseDashboardSerializer(TestCase):
                 "authOrgId": input_data["auth_org_id"],
             },
         )
+    
+    def test_no_auth_org_id(self):
+        """ Test for missing auth_org_id """
+        input_data = self.generate_test_enterprise_customer()
+        del input_data['auth_org_id']
+        with self.assertRaises(KeyError):
+            EnterpriseDashboardSerializer(input_data).data
 
 
 class TestSocialMediaSettingsSiteSerializer(TestCase):
