@@ -10,7 +10,7 @@ jobs:
 
   lint-imports:
     name: Lint Python Imports
-    runs-on: ubuntu-20.04
+    runs-on: [self-hosted, linux]
 
     steps:
       - name: Check out branch

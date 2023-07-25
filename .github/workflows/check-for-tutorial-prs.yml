@@ -19,7 +19,7 @@ on:
 jobs:
   # Provide helpful bot comment
   comment:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     name: provide helpful bot comment
     steps:
       - name: Checkout

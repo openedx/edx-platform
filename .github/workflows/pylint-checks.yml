@@ -8,7 +8,7 @@ on:
 
 jobs:
   run-pylint:
-    runs-on: ubuntu-20.04
+    runs-on: [self-hosted, linux]
     strategy:
       fail-fast: false
       matrix:
@@ -75,7 +75,7 @@ jobs:
     if: always()
     needs:
       - run-pylint
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         # uses: re-actors/alls-green@v1.2.1
