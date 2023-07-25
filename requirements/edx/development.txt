@@ -396,7 +396,6 @@ django==3.2.20
     #   event-tracking
     #   help-tokens
     #   jsonfield
-    #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-blockstore
     #   openedx-django-pyfs
@@ -404,7 +403,6 @@ django==3.2.20
     #   openedx-events
     #   openedx-filters
     #   ora2
-    #   outcome-surveys
     #   skill-tagging
     #   super-csv
     #   xss-utils
@@ -470,7 +468,6 @@ django-filter==23.2
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-    #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-blockstore
 django-ipware==4.0.2
@@ -506,9 +503,7 @@ django-model-utils==4.3.1
     #   edx-submissions
     #   edx-when
     #   edxval
-    #   learner-pathway-progress
     #   ora2
-    #   outcome-surveys
     #   skill-tagging
     #   super-csv
 django-mptt==0.14.0
@@ -561,7 +556,6 @@ django-simple-history==3.0.0
     #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
-    #   learner-pathway-progress
     #   ora2
 django-splash==1.3.0
     # via
@@ -624,7 +618,6 @@ djangorestframework==3.14.0
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
-    #   learner-pathway-progress
     #   openedx-blockstore
     #   ora2
     #   super-csv
@@ -738,10 +731,8 @@ edx-django-utils==5.6.0
     #   edx-toggles
     #   edx-when
     #   event-tracking
-    #   learner-pathway-progress
     #   openedx-blockstore
     #   ora2
-    #   outcome-surveys
     #   super-csv
 edx-drf-extensions==8.8.0
     # via
@@ -755,13 +746,11 @@ edx-drf-extensions==8.8.0
     #   edx-rbac
     #   edx-when
     #   edxval
-    #   learner-pathway-progress
 edx-enterprise==4.0.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   learner-pathway-progress
 edx-event-bus-kafka==5.1.0
     # via
     #   -r requirements/edx/doc.txt
@@ -799,11 +788,9 @@ edx-opaque-keys[django]==2.3.0
     #   edx-proctoring
     #   edx-user-state-client
     #   edx-when
-    #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-events
     #   ora2
-    #   outcome-surveys
 edx-organizations==6.12.0
     # via
     #   -r requirements/edx/doc.txt
@@ -856,7 +843,6 @@ edx-toggles==5.0.0
     #   edx-name-affirmation
     #   edx-search
     #   edxval
-    #   learner-pathway-progress
     #   ora2
 edx-token-utils==0.2.1
     # via
@@ -1095,10 +1081,8 @@ jsonfield==3.1.0
     #   edx-enterprise
     #   edx-proctoring
     #   edx-submissions
-    #   learner-pathway-progress
     #   lti-consumer-xblock
     #   ora2
-    #   outcome-surveys
 jsonschema==4.18.4
     # via
     #   -r requirements/edx/doc.txt
@@ -1137,10 +1121,6 @@ lazy-object-proxy==1.9.0
     # via
     #   -r requirements/edx/testing.txt
     #   astroid
-learner-pathway-progress==1.3.4
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 libsass==0.10.0
     # via
     #   -r requirements/edx/doc.txt
@@ -1337,10 +1317,6 @@ oscrypto==1.3.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   snowflake-connector-python
-outcome-surveys==2.4.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 packaging==23.1
     # via
     #   -r requirements/edx/../pip-tools.txt
@@ -1685,7 +1661,6 @@ pytz==2022.7.1
     #   fs
     #   icalendar
     #   interchange
-    #   learner-pathway-progress
     #   olxcleaner
     #   openedx-blockstore
     #   ora2
@@ -1744,10 +1719,8 @@ requests==2.31.0
     #   edx-enterprise
     #   edx-rest-api-client
     #   geoip2
-    #   learner-pathway-progress
     #   mailsnake
     #   optimizely-sdk
-    #   outcome-surveys
     #   pact-python
     #   pyjwkest
     #   pylti1p3
@@ -2219,7 +2192,7 @@ xblock-poll==1.13.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-xblock-utils==3.2.0
+xblock-utils==3.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
