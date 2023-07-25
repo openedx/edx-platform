@@ -826,6 +826,69 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
                              'Provider ID: %s, Exception: %s', current_user.id, current_user.email,
                              current_provider.provider_id, ex)
 
+    def associate_by_email(backend, details, user):
+        """
+        We need to associate the SAML IDP account with an existing platform account
+        to prevent existing users from having to log into the platform to link their accounts.
+
+        We only link the SAML account to the platform account if:
+        - The platform user's email matches the SAML account email.
+        - There are not multiple platform accounts with the same email.
+        - The platform user is not staff or superuser.
+        - The platform user is active.
+
+        Part of this implementation is taken from:
+        https://github.com/python-social-auth/social-core/blob/4.3.0/social_core/pipeline/social_auth.py#L56
+
+        Args:
+            backend: Backend associated with the TPA auth request.
+            details: TPA pipeline details.
+            user: edX platform user.
+        Returns:
+            Dictionary containing the matched edX platform user.
+        Raises:
+            AuthException: If the SAML account cannot be associated with the platform account.
+        """
+        email = details.get('email')
+
+        if user or not email:
+            return None
+
+        users = list(backend.strategy.storage.user.get_users_by_email(email))
+
+        if not users:
+            return None
+
+        # Try to associate accounts registered with the same email address,
+        # only if it's a single object. AuthException is raised if multiple
+        # objects are returned.
+        if len(users) > 1:
+            raise AuthException(
+                backend,
+                f'The given email address {email} is associated with another account.',
+            )
+
+        matched_user = users[0]
+
+        # It is not allowed to be associated to a staff or superuser to prevent impersonation.
+        if matched_user.is_staff or matched_user.is_superuser:
+            raise AuthException(
+                backend,
+                f'It is not allowed to auto associate staff or superuser users {email}',
+            )
+
+        # It is not allowed to be associated to an inactive account to prevent impersonation.
+        if not matched_user.is_active:
+            raise AuthException(
+                backend,
+                f'Platform user account is not active: {email} {backend.name}',
+            )
+
+        return {
+            'user': matched_user,
+            'is_new': False,
+        }
+
     saml_provider, current_provider = is_saml_provider(strategy.request.backend.name, kwargs)
 
     if saml_provider:
@@ -836,6 +899,17 @@ def associate_by_email_if_saml(auth_entry, backend, details, user, strategy, *ar
         associate_response = associate_by_email_if_enterprise_user() if current_user else None
         if associate_response:
             return associate_response
+
+        if not configuration_helpers.get_value('ASSOCIATE_ACCOUNT_WITH_SAML_IDP_USER', False):
+            return None
+
+        try:
+            associate_by_email_response = associate_by_email(backend, details, user)
+        except AuthException as auth_exc:
+            logger.error(auth_exc)
+            return None
+
+        return associate_by_email_response
 
 
 def user_details_force_sync(auth_entry, strategy, details, user=None, *args, **kwargs):  # lint-amnesty, pylint: disable=keyword-arg-before-vararg
