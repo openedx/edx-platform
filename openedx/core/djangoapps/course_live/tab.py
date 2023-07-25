@@ -19,11 +19,14 @@ from xmodule.tabs import TabFragmentViewMixin
 
 
 @request_cached()
-def provider_is_zoom(course: CourseBlock) -> bool:
+def provider_is_zoom(course: CourseBlock, course_key=None) -> bool:
     """
     Check if the provider exists and is Zoom.
     """
-    course_live_configurations = CourseLiveConfiguration.get(course.id)
+    if not course_key:
+        course_key = course.id
+    course_live_configurations = CourseLiveConfiguration.get(course_key)
+
     if not course_live_configurations:
         return False
     return course_live_configurations.provider_type == "zoom"
@@ -102,6 +105,6 @@ class CourseLiveTab(LtiCourseLaunchMixin, TabFragmentViewMixin, EnrolledTab):
         Get LTI roles for the user and course.
         If the user is a global staff member, return the student role.
         """
-        if provider_is_zoom and GlobalStaff().has_user(user):
+        if provider_is_zoom(course_key=course_key) and GlobalStaff().has_user(user):
             return self.ROLE_MAP.get('student')
         return super()._get_lti_roles(user, course_key)
