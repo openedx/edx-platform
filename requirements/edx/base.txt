@@ -236,7 +236,6 @@ django==3.2.20
     #   event-tracking
     #   help-tokens
     #   jsonfield
-    #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-blockstore
     #   openedx-django-pyfs
@@ -244,7 +243,6 @@ django==3.2.20
     #   openedx-events
     #   openedx-filters
     #   ora2
-    #   outcome-surveys
     #   skill-tagging
     #   super-csv
     #   xss-utils
@@ -285,7 +283,6 @@ django-filter==23.2
     # via
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
-    #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-blockstore
 django-ipware==4.0.2
@@ -314,9 +311,7 @@ django-model-utils==4.3.1
     #   edx-submissions
     #   edx-when
     #   edxval
-    #   learner-pathway-progress
     #   ora2
-    #   outcome-surveys
     #   skill-tagging
     #   super-csv
 django-mptt==0.14.0
@@ -351,7 +346,6 @@ django-simple-history==3.0.0
     #   edx-name-affirmation
     #   edx-organizations
     #   edx-proctoring
-    #   learner-pathway-progress
     #   ora2
 django-splash==1.3.0
     # via -r requirements/edx/kernel.in
@@ -398,7 +392,6 @@ djangorestframework==3.14.0
     #   edx-organizations
     #   edx-proctoring
     #   edx-submissions
-    #   learner-pathway-progress
     #   openedx-blockstore
     #   ora2
     #   super-csv
@@ -469,10 +462,8 @@ edx-django-utils==5.6.0
     #   edx-toggles
     #   edx-when
     #   event-tracking
-    #   learner-pathway-progress
     #   openedx-blockstore
     #   ora2
-    #   outcome-surveys
     #   super-csv
 edx-drf-extensions==8.8.0
     # via
@@ -485,12 +476,10 @@ edx-drf-extensions==8.8.0
     #   edx-rbac
     #   edx-when
     #   edxval
-    #   learner-pathway-progress
 edx-enterprise==4.0.4
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
-    #   learner-pathway-progress
 edx-event-bus-kafka==5.1.0
     # via -r requirements/edx/kernel.in
 edx-event-bus-redis==0.3.1
@@ -515,11 +504,9 @@ edx-opaque-keys[django]==2.3.0
     #   edx-proctoring
     #   edx-user-state-client
     #   edx-when
-    #   learner-pathway-progress
     #   lti-consumer-xblock
     #   openedx-events
     #   ora2
-    #   outcome-surveys
 edx-organizations==6.12.0
     # via -r requirements/edx/kernel.in
 edx-proctoring==4.16.0
@@ -554,7 +541,6 @@ edx-toggles==5.0.0
     #   edx-name-affirmation
     #   edx-search
     #   edxval
-    #   learner-pathway-progress
     #   ora2
 edx-token-utils==0.2.1
     # via -r requirements/edx/kernel.in
@@ -655,10 +641,8 @@ jsonfield==3.1.0
     #   edx-enterprise
     #   edx-proctoring
     #   edx-submissions
-    #   learner-pathway-progress
     #   lti-consumer-xblock
     #   ora2
-    #   outcome-surveys
 jsonschema==4.18.4
     # via optimizely-sdk
 jsonschema-specifications==2023.7.1
@@ -676,8 +660,6 @@ lazy==1.5
     #   lti-consumer-xblock
     #   ora2
     #   xblock
-learner-pathway-progress==1.3.4
-    # via -r requirements/edx/bundled.in
 libsass==0.10.0
     # via -r requirements/edx/paver.txt
 loremipsum==1.0.5
@@ -794,8 +776,6 @@ ora2==5.2.1
     # via -r requirements/edx/bundled.in
 oscrypto==1.3.0
     # via snowflake-connector-python
-outcome-surveys==2.4.0
-    # via -r requirements/edx/bundled.in
 packaging==23.1
     # via
     #   drf-yasg
@@ -957,7 +937,6 @@ pytz==2022.7.1
     #   fs
     #   icalendar
     #   interchange
-    #   learner-pathway-progress
     #   olxcleaner
     #   openedx-blockstore
     #   ora2
@@ -998,10 +977,8 @@ requests==2.31.0
     #   edx-enterprise
     #   edx-rest-api-client
     #   geoip2
-    #   learner-pathway-progress
     #   mailsnake
     #   optimizely-sdk
-    #   outcome-surveys
     #   pyjwkest
     #   pylti1p3
     #   python-swiftclient
@@ -1220,7 +1197,7 @@ xblock-google-drive==0.3.0
     # via -r requirements/edx/bundled.in
 xblock-poll==1.13.0
     # via -r requirements/edx/bundled.in
-xblock-utils==3.2.0
+xblock-utils==3.3.0
     # via
     #   -r requirements/edx/kernel.in
     #   done-xblock
