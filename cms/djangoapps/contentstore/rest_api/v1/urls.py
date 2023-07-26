@@ -59,19 +59,19 @@ urlpatterns = [
         videos.VideosView.as_view(), name='studio_content_videos'
     ),
     re_path(
-        fr'^videos/images/{settings.COURSE_ID_PATTERN}$',
-        videos.VideosView.as_view(), name='studio_content_videos'
+        fr'^videos/images/{settings.COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}?$',
+        videos.VideoImagesView.as_view(), name='studio_content_videos'
     ),
     re_path(
         fr'^videos/encodings/{settings.COURSE_ID_PATTERN}$',
-        videos.VideosView.as_view(), name='studio_content_videos'
+        videos.VideoEncodingsDownloadView.as_view(), name='studio_content_videos'
     ),
     re_path(
         r'^videos/features/$',
-        videos.VideosView.as_view(), name='studio_content_videos'
+        videos.VideoFeaturesView.as_view(), name='studio_content_videos'
     ),
     re_path(
         fr'^videos/upload_link/{settings.COURSE_ID_PATTERN}$',
-        videos.VideosView.as_view(), name='studio_content_videos'
+        videos.UploadLinkView.as_view(), name='studio_content_videos'
     ),
 ]
