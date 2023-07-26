@@ -14,14 +14,12 @@ from uuid import uuid4
 from boto.s3.connection import S3Connection
 from boto import s3
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import FileResponse, HttpResponseNotFound
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_noop
-from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from edx_toggles.toggles import WaffleSwitch
 from edxval.api import (
     SortDirection,
@@ -42,11 +40,10 @@ from edxval.api import (
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
 from rest_framework import status as rest_status
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.util.json_request import JsonResponse, expect_json
+from common.djangoapps.util.json_request import JsonResponse
 from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.djangoapps.video_pipeline.config.waffle import (
@@ -54,7 +51,6 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
     ENABLE_DEVSTACK_VIDEO_UPLOADS,
 )
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
-from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
 
 from .models import VideoUploadConfig
@@ -732,7 +728,7 @@ def videos_post(course, request):
     The returned array corresponds exactly to the input array.
     """
 
-    if (use_mock_video_uploads()):
+    if use_mock_video_uploads():
         return {'files': [{'file_name': 'video.mp4', 'upload_url': 'http://example.com/put_video'}]}, 200
 
     error = None

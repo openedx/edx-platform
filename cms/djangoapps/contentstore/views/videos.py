@@ -3,51 +3,14 @@ Views related to the video upload feature
 """
 
 
-import codecs
-import csv
-import io
-import json
 import logging
-from contextlib import closing
-from datetime import datetime, timedelta
-from uuid import uuid4
-from boto.s3.connection import S3Connection
-from boto import s3
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.http import FileResponse, HttpResponseNotFound
-from django.shortcuts import redirect
-from django.urls import reverse
 from django.utils.translation import gettext as _
-from django.utils.translation import gettext_noop
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from edx_toggles.toggles import WaffleSwitch
-from edxval.api import (
-    SortDirection,
-    VideoSortField,
-    create_or_update_transcript_preferences,
-    create_video,
-    get_3rd_party_transcription_plans,
-    get_available_transcript_languages,
-    get_video_transcript_url,
-    get_transcript_credentials_state_for_org,
-    get_transcript_preferences,
-    get_videos_for_course,
-    remove_transcript_preferences,
-    remove_video_for_course,
-    update_video_image,
-    update_video_status
-)
-from opaque_keys.edx.keys import CourseKey
-from pytz import UTC
-from rest_framework import status as rest_status
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
 
 from cms.djangoapps.contentstore.video_storage_handlers import (
-    TranscriptProvider,
-    StatusDisplayStrings,
     handle_videos,
     handle_generate_video_upload_link,
     handle_video_images,
@@ -66,23 +29,10 @@ from cms.djangoapps.contentstore.video_storage_handlers import (
     send_video_status_update as send_video_status_update_source_function,
     is_status_update_request as is_status_update_request_source_function,
 )
-from common.djangoapps.edxmako.shortcuts import render_to_response
-from common.djangoapps.util.json_request import JsonResponse, expect_json
-from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
-from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
-from openedx.core.djangoapps.video_pipeline.config.waffle import (
-    DEPRECATE_YOUTUBE,
-    ENABLE_DEVSTACK_VIDEO_UPLOADS,
-)
+
+from common.djangoapps.util.json_request import expect_json
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.view_utils import view_auth_classes
-from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
-
-from ..models import VideoUploadConfig
-from ..toggles import use_new_video_uploads_page
-from ..utils import reverse_course_url, get_video_uploads_url
-from ..video_utils import validate_video_image
-from .course import get_course_and_check_access
 
 __all__ = [
     'videos_handler',

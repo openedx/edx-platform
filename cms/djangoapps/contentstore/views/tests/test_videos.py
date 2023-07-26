@@ -43,12 +43,16 @@ from ..videos import (
     ENABLE_VIDEO_UPLOAD_PAGINATION,
     KEY_EXPIRATION_IN_SECONDS,
     VIDEO_IMAGE_UPLOAD_ENABLED,
-    PUBLIC_VIDEO_SHARE,
-    StatusDisplayStrings,
-    TranscriptProvider,
-    convert_video_status, storage_service_bucket, storage_service_key
 )
-from cms.djangoapps.contentstore.video_storage_handlers import _get_default_video_image_url
+from cms.djangoapps.contentstore.video_storage_handlers import (
+    _get_default_video_image_url,
+    TranscriptProvider,
+    StatusDisplayStrings,
+    convert_video_status,
+    storage_service_bucket,
+    storage_service_key,
+    PUBLIC_VIDEO_SHARE
+)
 
 
 class VideoUploadTestBase:
