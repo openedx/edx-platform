@@ -257,7 +257,6 @@ class CourseStructureCache:
                 # .. custom_attribute_description: contains the data chunk size in MBs. The size on which
                 #   the memcached client failed to store value in course structure cache.
                 monitoring.set_custom_attribute('split_mongo_compressed_size', chunk_size_in_mbs)
-                monitoring.record_exception()
                 log.info('Data caching (course structure) failed on chunk size: {} MB'.format(chunk_size_in_mbs))
 
 
