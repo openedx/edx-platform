@@ -563,7 +563,7 @@ class EnterpriseDashboardSerializer(serializers.Serializer):
     label = serializers.CharField(source="name")
     url = serializers.SerializerMethodField()
     uuid = serializers.UUIDField()
-    authOrgId = serializers.CharField(source="auth_org_id")
+    authOrgId = serializers.CharField(source="auth_org_id", allow_null=True)
     isLearnerPortalEnabled = serializers.BooleanField(source="enable_learner_portal")
 
     def get_url(self, instance):
