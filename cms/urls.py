@@ -76,8 +76,8 @@ urlpatterns = oauth2_urlpatterns + [
     path('api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
     # Update session view
-    path('lang_pref/cookie_language', openedx.core.djangoapps.lang_pref.views.update_cookie_language,
-         name='cookie_language'
+    path('lang_pref/update_language', openedx.core.djangoapps.lang_pref.views.update_language,
+         name='update_language'
          ),
 
     # Darklang View to change the preview language (or dark language)

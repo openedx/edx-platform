@@ -164,7 +164,7 @@ urlpatterns = [
                              namespace='catalog')),
 
     # Update session view
-    path('lang_pref/cookie_language', lang_pref_views.update_cookie_language, name='cookie_language'),
+    path('lang_pref/update_language', lang_pref_views.update_language, name='update_language'),
 
     # Multiple course modes and identity verification
     path(
