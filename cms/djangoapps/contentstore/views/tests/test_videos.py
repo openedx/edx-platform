@@ -471,7 +471,7 @@ class VideosHandlerTestCase(
 
     @override_settings(AWS_ACCESS_KEY_ID="test_key_id", AWS_SECRET_ACCESS_KEY="test_secret")
     @patch("boto.s3.key.Key")
-    @patch("cms.djangoapps.contentstore.views.videos.S3Connection")
+    @patch("cms.djangoapps.contentstore.video_storage_handlers.S3Connection")
     @ddt.data(
         (
             [
@@ -533,7 +533,7 @@ class VideosHandlerTestCase(
             self.assertEqual(response['error'], "Request 'files' entry contain unsupported content_type")
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('cms.djangoapps.contentstore.video_storage_handlers.S3Connection')
     def test_upload_with_non_ascii_charaters(self, mock_conn):
         """
         Test that video uploads throws error message when file name contains special characters.
@@ -614,7 +614,7 @@ class VideosHandlerTestCase(
 
     @override_settings(AWS_ACCESS_KEY_ID='test_key_id', AWS_SECRET_ACCESS_KEY='test_secret')
     @patch('boto.s3.key.Key')
-    @patch('cms.djangoapps.contentstore.views.videos.S3Connection')
+    @patch('cms.djangoapps.contentstore.video_storage_handlers.S3Connection')
     @ddt.data(
         {
             'global_waffle': True,
