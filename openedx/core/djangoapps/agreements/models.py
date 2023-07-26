@@ -34,3 +34,16 @@ class LTIPIITool(models.Model):
 
     class Meta:
         app_label = 'agreements'
+
+
+class LTIPIISignature(models.Model):
+    """
+    This model stores a user's acknowledgement to share PII via LTI tools in a particular course.
+    """
+    course_key = CourseKeyField(max_length=255, db_index=True)
+    user_id = models.IntegerField()
+    lti_tools_hash = models.IntegerField()
+
+    class Meta:
+        app_label = 'agreements'
+        
