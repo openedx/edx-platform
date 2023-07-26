@@ -4132,3 +4132,5 @@ PLAN_FEATURES = {
 OPENAI_SECRET_KEY = 'set-secret-key'
 
 DEFAULT_SITE_CREATION_COURSE_ID = None
+
+PANEL_ADMIN_LOGOUT_REDIRECT_URL = 'http://panel.edx.devstack.lms:9999'
