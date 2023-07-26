@@ -5,7 +5,7 @@ Tests for AiAsideSummaryConfig class.
 
 import sys
 from unittest import TestCase
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
@@ -36,11 +36,21 @@ class AiAsideSummaryConfigTestCase(TestCase):
         Check the summary configuration value for a particular course and an optional unit using the ai_aside lib.
         """
         ai_aside_summary_config = AiAsideSummaryConfig(self.COURSE_KEY)
+        ai_aside.is_course_present.return_value = True
         ai_aside.is_summary_enabled.return_value = True
         self.assertTrue(ai_aside_summary_config.is_summary_enabled())
 
+        ai_aside.is_course_present.return_value = True
         ai_aside.is_summary_enabled.return_value = False
         self.assertFalse(ai_aside_summary_config.is_summary_enabled(self.UNIT_KEY))
+
+        ai_aside.is_course_present.return_value = False
+        ai_aside.is_summary_enabled.return_value = True
+        self.assertIsNone(ai_aside_summary_config.is_summary_enabled())
+
+        ai_aside.is_course_present.return_value = False
+        ai_aside.is_summary_enabled.return_value = False
+        self.assertIsNone(ai_aside_summary_config.is_summary_enabled(self.UNIT_KEY))
 
     def test_set_summary_settings(self):
         """

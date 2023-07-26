@@ -27,7 +27,7 @@ class AiAsideSummaryConfig:
         try:
             from ai_aside.config_api.api import is_summary_config_enabled
             return is_summary_config_enabled(self.course_key)
-        except (ImportError, ModuleNotFoundError):
+        except Exception:
             return False
 
     def is_summary_enabled(self, unit_key=None):
@@ -35,9 +35,11 @@ class AiAsideSummaryConfig:
         Define if the summary configuration is enabled in ai_aside
         """
         try:
-            from ai_aside.config_api.api import is_summary_enabled
+            from ai_aside.config_api.api import is_course_present, is_summary_enabled
+            if not is_course_present(self.course_key):
+                return None
             return is_summary_enabled(self.course_key, unit_key)
-        except (ImportError, ModuleNotFoundError):
+        except Exception:
             return None
 
     def set_summary_settings(self, unit_key, settings=None):
@@ -50,5 +52,5 @@ class AiAsideSummaryConfig:
         try:
             from ai_aside.config_api.api import set_unit_settings
             return set_unit_settings(self.course_key, unit_key, settings)
-        except (ImportError, ModuleNotFoundError):
+        except Exception:
             return None
