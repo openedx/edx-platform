@@ -26,6 +26,9 @@ var defineFooter = new RegExp('(' + defineCallFooter.source + ')|('
                              + defineDirectFooter.source + ')|('
                              + defineFancyFooter.source + ')', 'm');
 
+var staticRootLms = process.env.STATIC_ROOT_LMS || "./test_root/staticfiles";
+var staticRootCms = process.env.STATIC_ROOT_CMS || (staticRootLms + "/studio");
+
 var workerConfig = function() {
     try {
         return {
@@ -39,7 +42,7 @@ var workerConfig = function() {
                 },
                 plugins: [
                     new BundleTracker({
-                        path: process.env.STATIC_ROOT_LMS,
+                        path: staticRootLms,
                         filename: 'webpack-worker-stats.json'
                     }),
                     new webpack.DefinePlugin({
@@ -131,14 +134,15 @@ module.exports = Merge.smart({
         },
 
         plugins: [
+            new webpack.ProgressPlugin(),  // report progress during compilation
             new webpack.NoEmitOnErrorsPlugin(),
             new webpack.NamedModulesPlugin(),
             new BundleTracker({
-                path: process.env.STATIC_ROOT_CMS,
+                path: staticRootCms,
                 filename: 'webpack-stats.json'
             }),
             new BundleTracker({
-                path: process.env.STATIC_ROOT_LMS,
+                path: staticRootLms,
                 filename: 'webpack-stats.json'
             }),
             new webpack.ProvidePlugin({

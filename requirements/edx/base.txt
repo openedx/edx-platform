@@ -661,7 +661,9 @@ lazy==1.5
     #   ora2
     #   xblock
 libsass==0.10.0
-    # via -r requirements/edx/paver.txt
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/paver.txt
 loremipsum==1.0.5
     # via ora2
 lti-consumer-xblock==9.5.5

@@ -854,7 +854,9 @@ lazy==1.5
 lazy-object-proxy==1.9.0
     # via astroid
 libsass==0.10.0
-    # via -r requirements/edx/base.txt
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/base.txt
 loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
