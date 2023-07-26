@@ -13,7 +13,9 @@ var xmoduleJS = require('./common/static/xmodule/webpack.xmodule.config.js');
 
 var filesWithRequireJSBlocks = [
     path.resolve(__dirname, 'common/static/common/js/components/utils/view_utils.js'),
-    /xmodule\/js\/src/
+    /descriptors\/js/,
+    /modules\/js/,
+    /xmodule\/js\/src\//
 ];
 
 var defineHeader = /\(function ?\(((define|require|requirejs|\$)(, )?)+\) ?\{/;
@@ -309,124 +311,14 @@ module.exports = Merge.smart({
                     test: /xblock\/runtime.v1/,
                     loader: 'exports-loader?window.XBlock!imports-loader?XBlock=xblock/core,this=>window'
                 },
-                /*******************************************************************************************************
-                /* BUILT-IN XBLOCK ASSETS WITH GLOBAL DEFINITIONS:
-                 *
-                 * The monstrous list of globally-namespace modules below is the result of a JS build refactoring.
-                 * Originally, all of these modules were copied to common/static/xmodule/js/[module|descriptors]/, and
-                 * this file simply contained the lines:
-                 *
-                 *   {
-                 *       test: /descriptors\/js/,
-                 *       loader: 'imports-loader?this=>window'
-                 *   },
-                 *   {
-                 *       test: /modules\/js/,
-                 *       loader: 'imports-loader?this=>window'
-                 *   },
-                 *
-                 * We removed that asset copying because it added complexity to the build, but as a result, in order to
-                 * preserve exact parity with the preexisting global namespace, we had to enumerate all formely-copied
-                 * modules here. It is very likely that many of these modules do not need to be in this list. Future
-                 * refactorings are welcome to try to prune the list down to the minimal set of modules. As far as
-                 * we know, the only modules that absolutely need to be added to the global namespace are those
-                 * which define module types, for example "Problem" (in xmodule/js/src/capa/display.js).
-                 */
                 {
-                    test: /xmodule\/assets\/word_cloud\/src\/js\/word_cloud.js/,
+                    test: /descriptors\/js/,
                     loader: 'imports-loader?this=>window'
                 },
                 {
-                    test: /xmodule\/js\/common_static\/js\/vendor\/draggabilly.js/,
+                    test: /modules\/js/,
                     loader: 'imports-loader?this=>window'
                 },
-                {
-                    test: /xmodule\/js\/src\/annotatable\/display.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/capa\/display.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/capa\/imageinput.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/capa\/schematic.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/collapsible.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/conditional\/display.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/html\/display.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/html\/edit.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/html\/imageModal.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/javascript_loader.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/lti\/lti.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/poll\/poll.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/poll\/poll_main.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/problem\/edit.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/raw\/edit\/metadata-only.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/raw\/edit\/xml.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/sequence\/display.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/sequence\/edit.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/tabs\/tabs-aggregator.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/vertical\/edit.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                {
-                    test: /xmodule\/js\/src\/video\/10_main.js/,
-                    loader: 'imports-loader?this=>window'
-                },
-                /*
-                 * END BUILT-IN XBLOCK ASSETS WITH GLOBAL DEFINITIONS
-                 ******************************************************************************************************/
                 {
                     test: /codemirror/,
                     loader: 'exports-loader?window.CodeMirror'

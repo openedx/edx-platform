@@ -59,7 +59,8 @@ Currently, edx-platform XBlock JS is defined both here in `xmodule/assets`_ and 
 
 * For many older blocks, their JS is:
 
-  * bundled using a generated Webpack config at ``common/static/xmodule/webpack.xmodule.config.js``,
+  * copied to ``common/static/xmodule`` by `static_content.py`_ (aka ``xmodule_assets``),
+  * then bundled using a generated Webpack config at ``common/static/xmodule/webpack.xmodule.config.js``,
   * which is included into `webpack.common.config.js`_,
   * allowing it to be included into XBlock fragments using ``add_webpack_js_to_fragment`` from `builtin_assets.py`_.
 
@@ -76,6 +77,7 @@ Currently, edx-platform XBlock JS is defined both here in `xmodule/assets`_ and 
 
 As part of an `active build refactoring`_:
 
+* We update the older builtin XBlocks to reference their JS directly rather than using copies of it.
 * We will move ``webpack.xmodule.config.js`` here instead of generating it.
 * We will consolidate all edx-platform XBlock JS here in `xmodule/assets`_.
 * We will delete the ``xmodule_assets`` script.
