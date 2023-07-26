@@ -60,17 +60,3 @@ class TranscriptView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, De
         """
 
         return delete_video_transcript_or_404(request)
-
-
-@view_auth_classes()
-class TranscriptCredentialsView(DeveloperErrorViewMixin, CreateAPIView):
-    """
-    public rest API endpoints for the Studio Content API video transcript credentials.
-    Allows you to update transcript credentials.
-    course_key: required argument, needed to authorize course authors and identify the video.
-    """
-    @csrf_exempt
-    @course_author_access_required
-    @expect_json_in_class_view
-    def create(self, request, course_key_string):  # pylint: disable=arguments-differ
-        return handle_transcript_credentials(request, course_key_string)
