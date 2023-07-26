@@ -126,7 +126,6 @@ MAX_UPLOAD_HOURS = 24
 VIDEOS_PER_PAGE = 100
 
 
-
 @expect_json
 @login_required
 @require_http_methods(("GET", "POST", "DELETE"))
@@ -194,8 +193,8 @@ def validate_transcript_preferences(provider, cielo24_fidelity, cielo24_turnarou
     Exposes helper method without breaking existing bindings/dependencies
     """
     return validate_transcript_preferences_source_function(provider, cielo24_fidelity, cielo24_turnaround,
-                                                              three_play_turnaround, video_source_language,
-                                                              preferred_languages)
+                                                           three_play_turnaround, video_source_language,
+                                                           preferred_languages)
 
 
 @expect_json

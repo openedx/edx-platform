@@ -48,7 +48,7 @@ from ..videos import (
     TranscriptProvider,
     convert_video_status, storage_service_bucket, storage_service_key
 )
-from cms.djangoapps.contentstore.video_storage_handlers import  _get_default_video_image_url
+from cms.djangoapps.contentstore.video_storage_handlers import _get_default_video_image_url
 
 
 class VideoUploadTestBase:
