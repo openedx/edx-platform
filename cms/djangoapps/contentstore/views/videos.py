@@ -5,7 +5,6 @@ Views related to the video upload feature
 
 import logging
 from django.contrib.auth.decorators import login_required
-from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from edx_toggles.toggles import WaffleSwitch
 from rest_framework.decorators import api_view
