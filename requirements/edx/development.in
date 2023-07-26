@@ -22,3 +22,4 @@ djangorestframework-stubs               # Typing stubs for DRF
 mypy                                    # static type checking
 pywatchman                              # More efficient checking for runserver reload trigger events
 vulture                                 # Detects possible dead/unused code, used in scripts/find-dead-code.sh
+watchdog                                # Used by `npm run watch` to auto-recompile when assets are changed
