@@ -7,7 +7,6 @@ import logging
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseNotFound
-from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.decorators import api_view
