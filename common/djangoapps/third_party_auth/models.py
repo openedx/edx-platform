@@ -401,7 +401,7 @@ class OAuth2ProviderConfig(ProviderConfig):
         app_label = "third_party_auth"
         verbose_name = "Provider Configuration (OAuth)"
         verbose_name_plural = verbose_name
-    
+
     @classmethod
     def current(cls, *args):
         """
