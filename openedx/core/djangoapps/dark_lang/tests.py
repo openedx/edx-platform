@@ -59,7 +59,8 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         """
         meta = {}
         set_if_set(meta, 'HTTP_ACCEPT_LANGUAGE', accept)
-        self._set_client_cookie_language(cookie_language)
+        # Setting language cookie
+        set_if_set(self.client.cookies, settings.LANGUAGE_COOKIE_NAME, cookie_language)
 
         request = Mock(
             spec=HttpRequest,
@@ -242,7 +243,9 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         """
         Assert that the language set in cookies is equal to value
         """
-        assert value == self.client.cookies.get(settings.LANGUAGE_COOKIE_NAME).value
+        lang_cookie = self.client.cookies.get(settings.LANGUAGE_COOKIE_NAME)
+        lang_cookie = lang_cookie.value if lang_cookie is not None and lang_cookie.value != '' else UNSET
+        assert value == lang_cookie
 
     def _post_set_preview_lang(self, preview_language):
         """
@@ -257,15 +260,19 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         return self.client.post('/update_lang/', {'action': 'reset_preview_language'})
 
     def test_preview_lang_with_released_language(self):
-        self._set_client_cookie_language('rel')
         # Preview lang should always override selection
         self._post_set_preview_lang('rel')
         # Refresh the page with a get request to confirm the preview language was set
         self.client.get('/home')
         self.assert_cookie_lang_equals('rel')
 
+        # Set the session language and ensure that the preview language overrides
+        self._set_client_cookie_language('notrel')
+        self._post_set_preview_lang('rel')
+        self.client.get('/home')
+        self.assert_cookie_lang_equals('rel')
+
     def test_preview_lang_with_dark_language(self):
-        self._set_client_cookie_language('unrel')
         self._post_set_preview_lang('unrel')
         self.client.get('/home')
         self.assert_cookie_lang_equals('unrel')
@@ -282,6 +289,18 @@ class DarkLangMiddlewareTests(CacheIsolationTestCase):
         self._post_set_preview_lang(' ')
         self.client.get('/home')
         self.assert_cookie_lang_equals('rel')
+
+    def test_clear_lang(self):
+        # Clear a language when no language was set
+        self._post_clear_preview_lang()
+        self.client.get('/home')
+        self.assert_cookie_lang_equals(UNSET)
+
+        # Set a language and clear it to ensure the clear is working as expected
+        self._post_set_preview_lang('notclear')
+        self._post_clear_preview_lang()
+        self.client.get('/home')
+        self.assert_cookie_lang_equals(UNSET)
 
     def test_disabled(self):
         DarkLangConfig(enabled=False, changed_by=self.user).save()

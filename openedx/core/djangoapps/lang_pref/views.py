@@ -14,7 +14,7 @@ from openedx.core.djangoapps.lang_pref.helpers import get_language_cookie, set_l
 
 
 @ensure_csrf_cookie
-def update_cookie_language(request):
+def update_language(request):
     """
     Update the language cookie.
     """
