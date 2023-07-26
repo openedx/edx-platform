@@ -4,19 +4,11 @@ Views related to the transcript preferences feature
 
 
 import logging
-import os
 
 from django.contrib.auth.decorators import login_required
-from django.core.files.base import ContentFile
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponseNotFound
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
-from edxval.api import (
-    get_3rd_party_transcription_plans,
-    get_available_transcript_languages,
-    get_video_transcript_data,
-    update_transcript_credentials_state_for_org
-)
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.decorators import api_view
 
@@ -24,19 +16,12 @@ from cms.djangoapps.contentstore.transcript_storage_handlers import (
     validate_transcript_upload_data,
     upload_transcript,
     delete_video_transcript,
-    validate_transcript_credentials,
     handle_transcript_credentials,
     handle_transcript_download,
-    TranscriptionProviderErrorType,
 )
 from common.djangoapps.student.auth import has_studio_write_access
 from common.djangoapps.util.json_request import JsonResponse, expect_json
-from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFlag
-from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
 from openedx.core.lib.api.view_utils import view_auth_classes
-from xmodule.video_block.transcripts_utils import Transcript, TranscriptsGenerationException  # lint-amnesty, pylint: disable=wrong-import-order
-
-from .videos import TranscriptProvider
 
 __all__ = [
     'transcript_credentials_handler',
