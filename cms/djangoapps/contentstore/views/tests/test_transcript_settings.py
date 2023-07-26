@@ -307,7 +307,7 @@ class TranscriptUploadTest(CourseTestCase):
 
     @patch('cms.djangoapps.contentstore.transcript_storage_handlers.create_or_update_video_transcript')
     @patch(
-        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_available_transcript_languages',
         Mock(return_value=['en']),
     )
     def test_transcript_upload_handler(self, mock_create_or_update_video_transcript):
@@ -372,7 +372,7 @@ class TranscriptUploadTest(CourseTestCase):
     )
     @ddt.unpack
     @patch(
-        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_available_transcript_languages',
         Mock(return_value=['en']),
     )
     def test_transcript_upload_handler_missing_attrs(self, request_payload, expected_error_message):
@@ -657,7 +657,7 @@ class TranscriptUploadApiTest(CourseTestCase):
     )
     @ddt.unpack
     @patch(
-        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_available_transcript_languages',
         Mock(return_value=['en']),
     )
     def test_transcript_upload_handler_missing_attrs(self, request_payload, expected_error_message):
@@ -692,7 +692,7 @@ class TranscriptUploadApiTest(CourseTestCase):
         )
 
     @patch(
-        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_available_transcript_languages',
         Mock(return_value=['en']),
     )
     def test_transcript_upload_handler_with_image(self):
@@ -719,7 +719,7 @@ class TranscriptUploadApiTest(CourseTestCase):
             )
 
     @patch(
-        'cms.djangoapps.contentstore.views.transcript_settings.get_available_transcript_languages',
+        'cms.djangoapps.contentstore.transcript_storage_handlers.get_available_transcript_languages',
         Mock(return_value=['en']),
     )
     def test_transcript_upload_handler_with_invalid_transcript(self):
