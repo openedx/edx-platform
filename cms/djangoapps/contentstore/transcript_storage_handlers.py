@@ -229,5 +229,6 @@ def validate_transcript_upload_data(data, files):
 
     return error
 
+
 def delete_video_transcript(video_id=None, language_code=None):
     return delete_video_transcript_source_function(video_id=video_id, language_code=language_code)

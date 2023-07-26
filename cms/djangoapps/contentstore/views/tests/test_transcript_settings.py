@@ -22,7 +22,6 @@ from openedx.core.djangoapps.profile_images.tests.helpers import make_image_file
 from openedx.core.djangoapps.oauth_dispatch.jwt import create_jwt_for_user
 
 
-
 @ddt.ddt
 @patch(
     'openedx.core.djangoapps.video_config.models.VideoTranscriptEnabledFlag.feature_enabled',
