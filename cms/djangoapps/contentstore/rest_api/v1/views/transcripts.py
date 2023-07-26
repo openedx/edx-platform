@@ -17,7 +17,7 @@ from ....api import course_author_access_required
 
 from cms.djangoapps.contentstore.transcript_storage_handlers import (
     upload_transcript,
-    delete_video_transcript,
+    delete_video_transcript_or_404,
     handle_transcript_credentials,
     handle_transcript_download,
 )
@@ -31,8 +31,8 @@ class TranscriptView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, De
     """
     public rest API endpoints for the Studio Content API video transcripts.
     course_key: required argument, needed to authorize course authors and identify the video.
-    edx_video_id: optional argument, needed to identify the video.
-    language_code: optional argument.
+    edx_video_id: optional query parameter, needed to identify the transcript.
+    language_code: optional query parameter, needed to identify the transcript.
     """
 
     def dispatch(self, request, *args, **kwargs):
@@ -48,12 +48,18 @@ class TranscriptView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, De
 
     @course_author_access_required
     def retrieve(self, request, course_key_string):  # pylint: disable=arguments-differ
+        """
+        Get a video transcript. edx_video_id and language_code query parameters are required.
+        """
         return handle_transcript_download(request)
 
     @course_author_access_required
-    def destroy(self, request, course_key_string, edx_video_id, language_code):  # pylint: disable=arguments-differ
-        delete_video_transcript(edx_video_id, language_code)
-        return JsonResponse(status=200)
+    def destroy(self, request, course_key_string):  # pylint: disable=arguments-differ
+        """
+        Delete a video transcript. edx_video_id and language_code query parameters are required.
+        """
+
+        return delete_video_transcript_or_404(request)
 
 
 @view_auth_classes()

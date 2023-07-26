@@ -76,10 +76,6 @@ urlpatterns = [
         videos.UploadLinkView.as_view(), name='studio_content_videos_upload_link'
     ),
     re_path(
-        fr'^video_transcripts/{settings.COURSE_ID_PATTERN}/{VIDEO_ID_PATTERN}/language_code/(?:(?P<language_code>[-\w]+))?$',
-        transcripts.TranscriptView.as_view(), name='studio_content_video_transcripts'
-    ),
-    re_path(
         fr'^video_transcripts/{settings.COURSE_ID_PATTERN}$',
         transcripts.TranscriptView.as_view(), name='studio_content_video_transcripts'
     ),
