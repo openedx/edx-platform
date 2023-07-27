@@ -24,6 +24,7 @@ class SkillAssessmentTable extends React.Component {
       this.handleFormSubmit = this.handleFormSubmit.bind(this);
       this.handleSelectProgram = this.handleSelectProgram.bind(this);
       this.handleSelectSkill = this.handleSelectSkill.bind(this);
+      this.handleProblemType = this.handleProblemType.bind(this);
       this.isSubmitting = this.isSubmitting.bind(this);
       this.state = {
         selectedProgram: '',
@@ -39,6 +40,7 @@ class SkillAssessmentTable extends React.Component {
             start_unit_location: '',
             end_unit_location: '',
             skill: '',
+            problem_type: '',
             showIntroDropdown: false,
             showOutroDropdown: false
         }
@@ -119,6 +121,12 @@ class SkillAssessmentTable extends React.Component {
         this.props.updateMappingData(rowsInput);
     }
 
+    handleProblemType(index, event){
+        const rowsInput = [...this.props.mappingData];
+        rowsInput[index]["problem_type"] = event.target.value;
+        this.props.updateMappingData(rowsInput);
+    }
+
     handleSelectIntro(index, event){
         const rowsInput = [...this.props.mappingData];
         rowsInput[index]["start_unit"] = event.target.value;
@@ -146,7 +154,7 @@ class SkillAssessmentTable extends React.Component {
     };
 
     render(){
-        const { programsWithUnits, onSelectBlock, skills } = this.props;
+        const { programsWithUnits, onSelectBlock, skills, problem_types } = this.props;
         return(
             <div>
                 <div className="form-group">
@@ -178,6 +186,7 @@ class SkillAssessmentTable extends React.Component {
                             <th className="count">#</th>
                             <th className="intro">Intro</th>
                             <th className="outro">Outro</th>
+                            <th className="type">Type</th>
                             <th className="skill">Skill</th>
                             <th className="actions">
                               <button className="btn btn-outline-success" onClick={this.addTableRows}>
@@ -191,10 +200,12 @@ class SkillAssessmentTable extends React.Component {
                                 rowsData={this.props.mappingData}
                                 deleteTableRows={this.deleteTableRows}
                                 skills={skills}
+                                problem_types={problem_types}
                                 unitKeys={programsWithUnits[this.state.selectedProgram]}
                                 handleSelectIntro={this.handleSelectIntro}
                                 handleSelectOutro={this.handleSelectOutro}
                                 handleSelectSkill={this.handleSelectSkill}
+                                handleProblemType={this.handleProblemType}
                                 handleIntroToggleDropdown={this.handleIntroToggleDropdown}
                                 handleOutroToggleDropdown={this.handleOutroToggleDropdown}
                                 hideIntroDropdown={this.hideIntroDropdown}

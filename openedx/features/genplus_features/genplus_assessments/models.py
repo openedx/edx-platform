@@ -6,7 +6,11 @@ from django_extensions.db.models import TimeStampedModel
 
 from opaque_keys.edx.django.models import CourseKeyField, UsageKeyField  # pylint: disable=import-error
 
-from .constants import SkillAssessmentTypes, SkillAssessmentResponseTime
+from .constants import (
+    SkillAssessmentTypes,
+    SkillAssessmentResponseTime,
+    SkillReflectionQuestionType,
+)
 from openedx.features.genplus_features.genplus.models import Skill, Class
 from openedx.features.genplus_features.genplus_learning.models import Program
 
@@ -55,6 +59,7 @@ class SkillAssessmentQuestion(models.Model):
     end_unit = CourseKeyField(max_length=255, db_index=True)
     end_unit_location = UsageKeyField(max_length=255, db_index=True)
     skill = models.ForeignKey(Skill, null=True, on_delete=models.CASCADE)
+    problem_type = models.IntegerField(choices=SkillReflectionQuestionType.choices(), null=True)
 
 
 class SkillAssessmentResponse(TimeStampedModel):

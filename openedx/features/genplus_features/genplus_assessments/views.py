@@ -30,6 +30,7 @@ from openedx.features.course_experience.course_updates import (
 
 from opaque_keys.edx.keys import CourseKey
 from openedx.features.genplus_features.genplus_assessments.models import UserRating, UserResponse
+from .constants import SkillReflectionQuestionType
 from .utils import (
     build_course_report_for_students,
     get_absolute_url,
@@ -304,7 +305,8 @@ class SkillAssessmentAdminFragmentView(EdxFragmentView):
         context = {
             'api_base_url': settings.LMS_ROOT_URL,
             'programs_with_units': self._get_programs_and_units(),
-            'skills': list(Skill.objects.all().values_list('name', flat=True))
+            'skills': list(Skill.objects.all().values_list('name', flat=True)),
+            'problem_types': SkillReflectionQuestionType.to_list(),
         }
 
         html = render_to_string('genplus_assessments/skill-assessment-admin.html', context)

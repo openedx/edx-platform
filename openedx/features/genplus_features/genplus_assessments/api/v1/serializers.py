@@ -101,8 +101,15 @@ class SkillAssessmentQuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SkillAssessmentQuestion
-        fields = ('question_number', 'start_unit', 'start_unit_location', 'end_unit',
-                  'end_unit_location', 'skill')
+        fields = (
+            'question_number',
+            'start_unit',
+            'start_unit_location',
+            'end_unit',
+            'end_unit_location',
+            'skill',
+            'problem_type',
+        )
 
 class SkillAssessmentResponseSerializer(serializers.ModelSerializer):
     question = SkillAssessmentQuestionSerializer(many=False, read_only=True)

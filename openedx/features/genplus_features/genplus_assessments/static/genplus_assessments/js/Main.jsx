@@ -12,7 +12,7 @@ export default class Main extends React.Component {
     return (
       <div>
         <header className="mast">
-          <h1 className="page-header">{"Skill Assessment Admin"}</h1>
+          <h1 className="page-header">Skill Assessment Admin</h1>
         </header>
         <SkillAssessmentTable {...this.props}/>
       </div>

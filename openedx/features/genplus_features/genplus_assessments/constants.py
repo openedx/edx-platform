@@ -1,3 +1,5 @@
+from enum import Enum
+
 TOTAL_PROBLEM_SCORE = 5
 MAX_SKILLS_SCORE = 15
 INTRO_RATING_ASSESSMENT_RESPONSE = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0}
@@ -53,3 +55,17 @@ class SkillAssessmentResponseTime:
     )
 
 JOURNAL_STYLE = '''{{"blocks":[{{"key":"540nn","text":"{0}","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{{}}}}],"entityMap":{{}}}}'''
+
+
+class SkillReflectionQuestionType(Enum):
+    LIKERT = 2
+    NUANCE_INTERROGATION = 1
+
+    @classmethod
+    def choices(cls):
+        return tuple((i.name, i.value) for i in cls)
+    @classmethod
+    def to_list(cls):
+        return [
+            {"name": i.name, "value": i.value} for i in cls
+        ]

@@ -22,8 +22,11 @@ from .serializers import (
     SkillAssessmentQuestionSerializer
 )
 from openedx.features.genplus_features.genplus_assessments.constants import (
-    TOTAL_PROBLEM_SCORE, INTRO_RATING_ASSESSMENT_RESPONSE,
-    OUTRO_RATING_ASSESSMENT_RESPONSE, MAX_SKILLS_SCORE
+    TOTAL_PROBLEM_SCORE,
+    INTRO_RATING_ASSESSMENT_RESPONSE,
+    OUTRO_RATING_ASSESSMENT_RESPONSE,
+    MAX_SKILLS_SCORE,
+    SkillReflectionQuestionType,
 )
 from openedx.features.genplus_features.genplus_assessments.utils import (
     build_students_result,
@@ -471,15 +474,22 @@ class SkillAssessmentAdminViewSet(viewsets.ViewSet):
         SkillAssessmentQuestion.objects.filter(id__in=remove_questions_ids).delete()
 
         for index, (key, value) in enumerate(data.items()):
-            SkillAssessmentQuestion.objects.update_or_create(
+            filters = dict(
                 program=program,
                 start_unit_location=value['start_unit_location'],
-                end_unit_location=value['end_unit_location'],
-                defaults= {
+            )
+            if int(value['problem_type']) == SkillReflectionQuestionType.LIKERT.value:
+                filters.update(end_unit_location=value['end_unit_location'])
+            elif int(value['problem_type']) == SkillReflectionQuestionType.NUANCE_INTERROGATION.value:
+                filters.update(problem_type=value['problem_type'])
+            SkillAssessmentQuestion.objects.update_or_create(
+                **filters,
+                defaults={
                     'question_number': value['question_number'],
                     'skill': skills.get(value['skill']),
                     'start_unit': value['start_unit'],
-                    'end_unit': value['end_unit']
+                    'end_unit': value['end_unit'],
+                    'problem_type': value['problem_type'],
                 }
             )
 
