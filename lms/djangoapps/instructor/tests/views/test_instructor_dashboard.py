@@ -29,6 +29,7 @@ from lms.djangoapps.courseware.courses import get_studio_url
 from lms.djangoapps.courseware.tabs import get_course_tab_list
 from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
+from lms.djangoapps.discussion.django_comment_client.tests.factories import RoleFactory
 from lms.djangoapps.grades.config.waffle import WRITABLE_GRADEBOOK
 from lms.djangoapps.instructor.toggles import DATA_DOWNLOAD_V2
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
@@ -37,6 +38,7 @@ from openedx.core.djangoapps.discussions.config.waffle import (
     ENABLE_PAGES_AND_RESOURCES_MICROFRONTEND,
     OVERRIDE_DISCUSSION_LEGACY_SETTINGS_FLAG
 )
+from openedx.core.djangoapps.django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 
@@ -307,6 +309,56 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             self.assertContains(response, reason_field)
         else:
             self.assertNotContains(response, reason_field)
+
+    def test_membership_tab_for_eshe_instructor(self):
+        """
+        Verify that eSHE instructors don't have access to membership tab and
+        work correctly with other roles.
+        """
+
+        membership_section = (
+            '<li class="nav-item">'
+            '<button type="button" class="btn-link membership" data-section="membership">'
+            'Membership'
+            '</button>'
+            '</li>'
+        )
+        batch_enrollment = (
+            '<fieldset class="batch-enrollment membership-section">'
+        )
+
+        user = UserFactory.create()
+        self.client.login(username=user.username, password="test")
+
+        # eSHE instructors shouldn't have access to membership tab
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role='eshe_instructor',
+            org=self.course.id.org
+        )
+        response = self.client.get(self.url)
+        self.assertNotContains(response, membership_section)
+
+        # However if combined with forum_admin, they should have access to this
+        # tab, but not to batch enrollment
+        forum_admin_role = RoleFactory(name=FORUM_ROLE_ADMINISTRATOR, course_id=self.course.id)
+        forum_admin_role.users.add(user)
+        response = self.client.get(self.url)
+        self.assertContains(response, membership_section)
+        self.assertNotContains(response, batch_enrollment)
+
+        # Combined with course staff, should have union of all three roles
+        # permissions sets
+        CourseAccessRoleFactory(
+            course_id=self.course.id,
+            user=user,
+            role='staff',
+            org=self.course.id.org
+        )
+        response = self.client.get(self.url)
+        self.assertContains(response, membership_section)
+        self.assertContains(response, batch_enrollment)
 
     def test_student_admin_staff_instructor(self):
         """

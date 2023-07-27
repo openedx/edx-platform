@@ -5,6 +5,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import pgettext
 from openedx.core.djangolib.markup import HTML, Text
 %>
+% if not section_data['access']['eshe_instructor'] or section_data['access']['explicit_staff']:
 <fieldset class="batch-enrollment membership-section">
     <legend id="heading-batch-enrollment" class="hd hd-3">${_("Batch Enrollment")}</legend>
     <label>
@@ -90,6 +91,8 @@ from openedx.core.djangolib.markup import HTML, Text
     </form>
     <div class="results"></div>
 </div>
+%endif
+
 %endif
 
 <hr class="divider" />
@@ -190,6 +193,20 @@ from openedx.core.djangolib.markup import HTML, Text
       data-modify-endpoint="${ section_data['modify_access_url'] }"
       data-add-button-label="${_("Add Limited Staff")}"
     ></div>
+
+    %if settings.FEATURES.get('ENABLE_ESHE_INSTRUCTOR_ROLE', None):
+    <div class="auth-list-container"
+      data-rolename="eshe_instructor"
+      data-display-name="${_("eSHE Instructor")}"
+      data-info-text="
+        ${_("Course team members with the eSHE Instructor role help you manage your course. "
+        "eSHE Instructor permissions are similar to Staff, but they can't assign course team roles and "
+        "can't enroll and unenroll learners")}"
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="${_("Add eSHE Instructor")}"
+    ></div>
+    %endif
 
     ## Note that "Admin" is identified as "Instructor" in the Django admin panel.
     <div class="auth-list-container"

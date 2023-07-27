@@ -18,7 +18,7 @@ from xblock.core import XBlock
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.enrollments.api import is_enrollment_valid_for_proctoring
 from common.djangoapps.student.models import CourseAccessRole
-from common.djangoapps.student.roles import CourseRole, OrgRole
+from common.djangoapps.student.roles import CourseRole, OrgRole, strict_role_checking
 from xmodule.course_block import CourseBlock  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.error_block import ErrorBlock  # lint-amnesty, pylint: disable=wrong-import-order
 
@@ -47,10 +47,14 @@ class HasAccessRule(Rule):
     """
     A rule that calls `has_access` to determine whether it passes
     """
-    def __init__(self, action):
+    def __init__(self, action, strict=False):
         self.action = action
+        self.strict = strict
 
     def check(self, user, instance=None):
+        if self.strict:
+            with strict_role_checking():
+                return has_access(user, self.action, instance)
         return has_access(user, self.action, instance)
 
     def query(self, user):

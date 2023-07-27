@@ -44,7 +44,13 @@ perms[VIEW_ISSUED_CERTIFICATES] = HasAccessRule('staff') | HasRolesRule('data_re
 # only global staff or those with the data_researcher role can access the data download tab
 # HasAccessRule('staff') also includes course staff
 perms[CAN_RESEARCH] = is_staff | HasRolesRule('data_researcher')
-perms[CAN_ENROLL] = HasAccessRule('staff')
+# eshe_instructor implicitly gets staff access, but shouldn't be able to enroll
+perms[CAN_ENROLL] = (
+    # can enroll if a user is an eshe_instructor and has an explicit staff role
+    (HasRolesRule('eshe_instructor') & HasAccessRule('staff', strict=True)) |
+    # can enroll if a user is just staff
+    (~HasRolesRule('eshe_instructor') & HasAccessRule('staff'))
+)
 perms[CAN_BETATEST] = HasAccessRule('instructor')
 perms[ENROLLMENT_REPORT] = HasAccessRule('staff') | HasRolesRule('data_researcher')
 perms[VIEW_COUPONS] = HasAccessRule('staff') | HasRolesRule('data_researcher')
