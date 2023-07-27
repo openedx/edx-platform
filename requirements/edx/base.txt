@@ -436,7 +436,7 @@ edx-bulk-grades==1.0.2
     #   staff-graded-xblock
 edx-ccx-keys==1.2.1
     # via -r requirements/edx/kernel.in
-edx-celeryutils==1.2.3
+edx-celeryutils==1.2.2
     # via
     #   -r requirements/edx/kernel.in
     #   edx-name-affirmation
