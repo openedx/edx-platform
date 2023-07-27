@@ -11,20 +11,20 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import Http404
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
-from common.djangoapps.util.json_request import expect_json_in_class_view, JsonResponse
+from common.djangoapps.util.json_request import expect_json_in_class_view
 
 from ....api import course_author_access_required
 
 from cms.djangoapps.contentstore.transcript_storage_handlers import (
     upload_transcript,
     delete_video_transcript_or_404,
-    handle_transcript_credentials,
     handle_transcript_download,
 )
 import cms.djangoapps.contentstore.toggles as contentstore_toggles
 
 log = logging.getLogger(__name__)
 toggles = contentstore_toggles
+
 
 @view_auth_classes()
 class TranscriptView(DeveloperErrorViewMixin, CreateAPIView, RetrieveAPIView, DestroyAPIView):

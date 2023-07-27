@@ -166,6 +166,7 @@ def _create_or_update_video_transcript(**kwargs):
 
     return create_or_update_video_transcript(**kwargs)
 
+
 def upload_transcript(request):
     """
     Upload a transcript file
