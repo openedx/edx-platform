@@ -201,6 +201,7 @@ django==3.2.20
     #   django-statici18n
     #   django-storages
     #   django-user-tasks
+    #   django-waffle
     #   djangorestframework
     #   done-xblock
     #   drf-jwt
@@ -362,7 +363,7 @@ django-storages==1.9.1
     #   edxval
 django-user-tasks==3.1.0
     # via -r requirements/edx/kernel.in
-django-waffle==3.0.0
+django-waffle==4.0.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-django-utils
@@ -429,22 +430,22 @@ edx-auth-backends==4.1.0
     #   openedx-blockstore
 edx-braze-client==0.1.7
     # via -r requirements/edx/bundled.in
-edx-bulk-grades==1.0.1
+edx-bulk-grades==1.0.2
     # via
     #   -r requirements/edx/kernel.in
     #   staff-graded-xblock
 edx-ccx-keys==1.2.1
     # via -r requirements/edx/kernel.in
-edx-celeryutils==1.2.2
+edx-celeryutils==1.2.3
     # via
     #   -r requirements/edx/kernel.in
     #   edx-name-affirmation
     #   super-csv
 edx-codejail==3.3.3
     # via -r requirements/edx/kernel.in
-edx-completion==4.2.1
+edx-completion==4.3.0
     # via -r requirements/edx/kernel.in
-edx-django-release-util==1.2.0
+edx-django-release-util==1.3.0
     # via
     #   -r requirements/edx/kernel.in
     #   edxval

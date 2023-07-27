@@ -281,6 +281,7 @@ django==3.2.20
     #   django-statici18n
     #   django-storages
     #   django-user-tasks
+    #   django-waffle
     #   djangorestframework
     #   done-xblock
     #   drf-jwt
@@ -458,7 +459,7 @@ django-storages==1.9.1
     #   edxval
 django-user-tasks==3.1.0
     # via -r requirements/edx/base.txt
-django-waffle==3.0.0
+django-waffle==4.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -535,22 +536,22 @@ edx-auth-backends==4.1.0
     #   openedx-blockstore
 edx-braze-client==0.1.7
     # via -r requirements/edx/base.txt
-edx-bulk-grades==1.0.1
+edx-bulk-grades==1.0.2
     # via
     #   -r requirements/edx/base.txt
     #   staff-graded-xblock
 edx-ccx-keys==1.2.1
     # via -r requirements/edx/base.txt
-edx-celeryutils==1.2.2
+edx-celeryutils==1.2.3
     # via
     #   -r requirements/edx/base.txt
     #   edx-name-affirmation
     #   super-csv
 edx-codejail==3.3.3
     # via -r requirements/edx/base.txt
-edx-completion==4.2.1
+edx-completion==4.3.0
     # via -r requirements/edx/base.txt
-edx-django-release-util==1.2.0
+edx-django-release-util==1.3.0
     # via
     #   -r requirements/edx/base.txt
     #   edxval
@@ -1097,9 +1098,9 @@ pycryptodomex==3.18.0
     #   lti-consumer-xblock
     #   pyjwkest
     #   snowflake-connector-python
-pydantic==2.0.3
+pydantic==2.1.1
     # via fastapi
-pydantic-core==2.3.0
+pydantic-core==2.4.0
     # via pydantic
 pygments==2.15.1
     # via
@@ -1490,7 +1491,7 @@ tomli==2.0.1
     #   pylint
     #   pytest
     #   tox
-tomlkit==0.11.8
+tomlkit==0.12.0
     # via pylint
 tox==3.28.0
     # via
