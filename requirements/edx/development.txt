@@ -697,7 +697,7 @@ edx-ccx-keys==1.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-celeryutils==1.2.3
+edx-celeryutils==1.2.2
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
