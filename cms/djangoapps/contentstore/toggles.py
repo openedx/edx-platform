@@ -159,6 +159,25 @@ def use_new_problem_editor():
     return ENABLE_NEW_PROBLEM_EDITOR_FLAG.is_enabled()
 
 
+# .. toggle_name: new_editors.add_game_block_button
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the creation of the new games block
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-07-26
+# .. toggle_target_removal_date: 2023-09-31
+# .. toggle_tickets: TNL-10924
+# .. toggle_warning:
+ENABLE_ADD_GAME_BLOCK_FLAG = WaffleFlag('new_editors.add_game_block_button', __name__)
+
+
+def use_add_game_block():
+    """
+    Returns a boolean if add game block button is enabled
+    """
+    return ENABLE_ADD_GAME_BLOCK_FLAG.is_enabled()
+
+
 # .. toggle_name: contentstore.individualize_anonymous_user_id
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
