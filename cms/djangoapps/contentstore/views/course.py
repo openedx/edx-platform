@@ -996,7 +996,7 @@ def create_new_course(user, org, number, run, fields):
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
     new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields)
     add_organization_course(org_data, new_course.id)
-    update_course_discussions_settings(new_course.id)
+    update_course_discussions_settings(new_course)
 
     # Enable certain fields rolling forward, where configured
     if default_enable_flexible_peer_openassessments(new_course.id):
