@@ -221,7 +221,7 @@ class TestTemplates(TestDiscussionXBlock):
         """
         permission_canary = object()
         with mock.patch(
-            'lms.djangoapps.discussion.django_comment_client.permissions.has_permission',
+            'xmodule.discussion_block.has_permission',
             return_value=permission_canary,
         ) as has_perm:
             actual_permission = self.block.has_permission("test_permission")
