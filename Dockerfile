@@ -115,9 +115,16 @@ COPY requirements requirements
 RUN pip install -r requirements/pip.txt
 RUN pip install -r requirements/edx/base.txt
 
-# Install node and node modules
+# Install node and npm
 RUN nodeenv /edx/app/edxapp/nodeenv --node=16.14.0 --prebuilt
 RUN npm install -g npm@8.5.x
+
+# This script is used by an npm post-install hook.
+# We copy it into the image now so that it will be available when we run `npm install` in the next step.
+# The script itself will copy certain modules into some uber-legacy parts of edx-platform which still use RequireJS.
+COPY scripts/copy-node-modules.sh scripts/copy-node-modules.sh
+
+# Install node modules
 COPY package.json package.json
 COPY package-lock.json package-lock.json
 RUN npm set progress=false && npm ci

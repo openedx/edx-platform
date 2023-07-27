@@ -53,47 +53,47 @@ BULK_EMAIL_EMAILS_PER_TASK: 500
 BULK_EMAIL_LOG_SENT_EMAILS: false
 CACHES:
     celery:
-        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: celery
         LOCATION:
         - edx.devstack.memcached:11211
         TIMEOUT: '7200'
     configuration:
-        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 78f87108afce
         LOCATION:
         - edx.devstack.memcached:11211
     course_structure_cache:
-        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: course_structure
         LOCATION:
         - edx.devstack.memcached:11211
         TIMEOUT: '7200'
     default:
-        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: default
         LOCATION:
         - edx.devstack.memcached:11211
         VERSION: '1'
     general:
-        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: general
         LOCATION:
         - edx.devstack.memcached:11211
     mongo_metadata_inheritance:
-        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: mongo_metadata_inheritance
         LOCATION:
         - edx.devstack.memcached:11211
         TIMEOUT: 300
     staticfiles:
-        BACKEND: django.core.cache.backends.memcached.MemcachedCache
+        BACKEND: django.core.cache.backends.memcached.PyMemcacheCache
         KEY_FUNCTION: common.djangoapps.util.memcache.safe_key
         KEY_PREFIX: 78f87108afce_general
         LOCATION:
@@ -303,7 +303,6 @@ FINANCIAL_REPORTS:
     BUCKET: null
     ROOT_PATH: sandbox
     STORAGE_TYPE: localfs
-FOOTER_ORGANIZATION_IMAGE: images/logo.png
 GITHUB_REPO_ROOT: /edx/var/edxapp/data
 GIT_REPO_EXPORT_DIR: /edx/var/edxapp/export_course_repos
 GOOGLE_ANALYTICS_ACCOUNT: null

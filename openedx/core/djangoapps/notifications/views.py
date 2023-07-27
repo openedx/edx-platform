@@ -22,7 +22,12 @@ from openedx.core.djangoapps.notifications.models import (
 
 from .base_notification import COURSE_NOTIFICATION_APPS
 from .config.waffle import ENABLE_NOTIFICATIONS
-from .events import notification_preferences_viewed_event, notification_read_event, notification_preference_update_event
+from .events import (
+    notification_preference_update_event,
+    notification_preferences_viewed_event,
+    notification_read_event,
+    notifications_app_all_read_event,
+)
 from .models import Notification
 from .serializers import (
     NotificationCourseEnrollmentSerializer,
@@ -397,13 +402,14 @@ class NotificationReadAPIView(APIView):
 
         app_name = request.data.get('app_name', '')
 
-        if app_name and app_name in COURSE_NOTIFICATION_APPS:
+        if app_name in COURSE_NOTIFICATION_APPS:
             notifications = Notification.objects.filter(
                 user=request.user,
                 app_name=app_name,
                 last_read__isnull=True,
             )
             notifications.update(last_read=read_at)
+            notifications_app_all_read_event(request.user, app_name)
             return Response({'message': _('Notifications marked read.')}, status=status.HTTP_200_OK)
 
         return Response({'error': _('Invalid app_name or notification_id.')}, status=status.HTTP_400_BAD_REQUEST)

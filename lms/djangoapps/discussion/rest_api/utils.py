@@ -419,7 +419,7 @@ class DiscussionNotificationSender:
         Send notification to users who are subscribed to the main thread/post i.e.
         there is a response to the main thread.
         """
-        if not self.parent_id and self.creator.id != self.thread.user_id:
+        if not self.parent_id and self.creator.id != int(self.thread.user_id):
             self._send_notification([self.thread.user_id], "new_response")
 
     def send_new_comment_notification(self):

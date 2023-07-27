@@ -45,7 +45,8 @@ def rewrite_absolute_static_urls(text, course_id):
         /static/SCI_1.2_Image_.png
     format for consistency and portability.
     """
-    assert isinstance(course_id, CourseKey)
+    if not course_id.is_course:
+        return text  # We can't rewrite URLs for libraries, which don't have "Files & Uploads".
     asset_full_url_re = r'https?://[^/]+/(?P<maybe_asset_key>[^\s\'"&]+)'
 
     def check_asset_key(match_obj):
