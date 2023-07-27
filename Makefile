@@ -100,6 +100,7 @@ REQ_FILES = \
 	requirements/edx/doc \
 	requirements/edx/testing \
 	requirements/edx/development \
+	requirements/edx/assets \
 	scripts/xblock/requirements
 
 define COMMON_CONSTRAINTS_TEMP_COMMENT
