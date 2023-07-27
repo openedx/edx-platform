@@ -972,13 +972,12 @@ def get_subsections_by_assignment_type(course_key):
     return subsections_by_assignment_type
 
 
-def update_course_discussions_settings(course_key):
+def update_course_discussions_settings(course):
     """
     Updates course provider_type when new course is created
     """
-    provider = DiscussionsConfiguration.get(context_key=course_key).provider_type
+    provider = DiscussionsConfiguration.get(context_key=course.id).provider_type
     store = modulestore()
-    course = store.get_course(course_key)
     course.discussions_settings['provider_type'] = provider
     store.update_item(course, course.published_by)
 
