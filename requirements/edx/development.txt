@@ -697,7 +697,7 @@ edx-ccx-keys==1.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-celeryutils==1.2.2
+edx-celeryutils==1.2.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -711,7 +711,7 @@ edx-completion==4.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-django-release-util==1.3.0
+edx-django-release-util==1.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
