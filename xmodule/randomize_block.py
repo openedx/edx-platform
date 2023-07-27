@@ -11,6 +11,7 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.seq_block import SequenceMixin
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
+    HTMLSnippet,
     ResourceTemplates,
     STUDENT_VIEW,
     XModuleMixin,
@@ -25,6 +26,7 @@ class RandomizeBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
+    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):

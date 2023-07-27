@@ -26,6 +26,7 @@ __test__ = False  # do not collect
 @needs(
     'pavelib.prereqs.install_node_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
+    'pavelib.assets.process_xmodule_assets',
 )
 @cmdopts([
     ("suite=", "s", "Test suite to run"),

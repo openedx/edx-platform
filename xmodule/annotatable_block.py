@@ -4,6 +4,7 @@ import logging
 import textwrap
 
 from lxml import etree
+from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
@@ -14,6 +15,7 @@ from xmodule.raw_block import RawMixin
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
+    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
@@ -33,6 +35,7 @@ class AnnotatableBlock(
     XmlMixin,
     EditingMixin,
     XModuleToXBlockMixin,
+    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):
@@ -70,6 +73,22 @@ class AnnotatableBlock(
 
     uses_xmodule_styles_setup = True
 
+    preview_view_js = {
+        'js': [
+            resource_filename(__name__, 'js/src/html/display.js'),
+            resource_filename(__name__, 'js/src/annotatable/display.js'),
+            resource_filename(__name__, 'js/src/javascript_loader.js'),
+            resource_filename(__name__, 'js/src/collapsible.js'),
+        ],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
+    }
+
+    studio_view_js = {
+        'js': [
+            resource_filename(__name__, 'js/src/raw/edit/xml.js'),
+        ],
+        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
+    }
     studio_js_module_name = "XMLEditingDescriptor"
     mako_template = "widgets/raw-edit.html"
 

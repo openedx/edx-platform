@@ -15,12 +15,10 @@ from xblock.fields import UNIQUE_ID, Scope, String
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
-from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, Provider
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.lib.xblock_utils import get_css_dependencies, get_js_dependencies
 from xmodule.xml_block import XmlMixin
-
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
@@ -156,6 +154,9 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlMixin):  # lint-amn
         :param str permission: Permission
         :rtype: bool
         """
+        # normal import causes the xmodule_assets command to fail due to circular import - hence importing locally
+        from lms.djangoapps.discussion.django_comment_client.permissions import has_permission
+
         return has_permission(self.django_user, permission, self.course_key)
 
     def student_view(self, context=None):

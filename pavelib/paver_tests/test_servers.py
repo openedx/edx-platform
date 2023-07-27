@@ -214,6 +214,7 @@ class TestPaverServerTasks(PaverTestCase):
             expected_asset_settings = "test_static_optimized"
         expected_collect_static = not is_fast and expected_settings != Env.DEVSTACK_SETTINGS
         if not is_fast:
+            expected_messages.append("xmodule_assets common/static/xmodule")
             expected_messages.append("install npm_assets")
             expected_messages.extend(
                 [c.format(settings=expected_asset_settings,
@@ -258,6 +259,7 @@ class TestPaverServerTasks(PaverTestCase):
         expected_collect_static = not is_fast and expected_settings != Env.DEVSTACK_SETTINGS
         expected_messages = []
         if not is_fast:
+            expected_messages.append("xmodule_assets common/static/xmodule")
             expected_messages.append("install npm_assets")
             expected_messages.extend(
                 [c.format(settings=expected_asset_settings,
