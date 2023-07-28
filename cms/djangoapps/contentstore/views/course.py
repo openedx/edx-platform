@@ -53,7 +53,8 @@ from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
-    UserBasedRole
+    UserBasedRole,
+    OrgStaffRole
 )
 from common.djangoapps.util.course import get_link_for_about_page
 from common.djangoapps.util.date_utils import get_default_time_display
@@ -599,6 +600,7 @@ def course_listing(request):
         'optimization_enabled': optimization_enabled,
         'active_tab': 'courses',
         'allowed_organizations': get_allowed_organizations(user),
+        'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(user),
         'can_create_organizations': user_can_create_organizations(user),
     })
 
@@ -626,6 +628,7 @@ def library_listing(request):
         'split_studio_home': split_library_view_on_dashboard(),
         'active_tab': 'libraries',
         'allowed_organizations': get_allowed_organizations(request.user),
+        'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(request.user),
         'can_create_organizations': user_can_create_organizations(request.user),
     }
     return render_to_response('index.html', data)
@@ -1960,11 +1963,35 @@ def get_allowed_organizations(user):
         return []
 
 
+def get_allowed_organizations_for_libraries(user):
+    """
+    Helper method for returning the list of organizations for which the user is allowed to create libraries.
+    """
+    if settings.FEATURES.get('ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES', False):
+        return get_organizations_for_non_course_creators(user)
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        return get_organizations(user)
+    else:
+        return []
+
+
 def user_can_create_organizations(user):
     """
     Returns True if the user can create organizations.
     """
     return user.is_staff or not settings.FEATURES.get('ENABLE_CREATOR_GROUP', False)
+
+
+def get_organizations_for_non_course_creators(user):
+    """
+    Returns the list of organizations which the user is a staff member of, as a list of strings.
+    """
+    orgs_map = set()
+    orgs = OrgStaffRole().get_orgs_for_user(user)
+    # deduplicate
+    for org in orgs:
+        orgs_map.add(org)
+    return list(orgs_map)
 
 
 def get_organizations(user):
