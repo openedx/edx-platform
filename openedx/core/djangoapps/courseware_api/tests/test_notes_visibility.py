@@ -1,7 +1,4 @@
-"""
-Unit tests for courseware context_processor
-"""
-from unittest.mock import Mock, patch  # lint-amnesty, pylint: disable=wrong-import-order
+from unittest.mock import Mock  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.courseware.tests.factories import StudentInfoFactory
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase  # lint-amnesty, pylint: disable=wrong-import-order
