@@ -1789,6 +1789,9 @@ INSTALLED_APPS = [
 
     # Blockstore
     'blockstore.apps.bundles',
+
+    # Openedx events
+    'openedx_events',
 ]
 
 
@@ -2725,3 +2728,29 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
 DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
 DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
+
+######################## Event bus producer config ########################
+
+# .. setting_name: EVENT_BUS_PRODUCER_CONFIG
+# .. setting_default: {}
+# .. setting_description: Dictionary of event_types mapped to lists of dictionaries containing topic related configuration.
+#    Each topic configuration dictionary contains
+#    * a topic/stream name called `topic` where the event will be pushed to.
+#    * a flag called `enabled` denoting whether the event will be published to the topic.
+#    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
+#    Note: The topic names should not include environment prefix as it will be dynamically added based on
+#    EVENT_BUS_TOPIC_PREFIX setting.
+EVENT_BUS_PRODUCER_CONFIG = {
+    'org.openedx.content_authoring.course.catalog_info.changed.v1': [
+        {'topic': 'course-catalog-info-changed', 'event_key_field': 'catalog_info.course_key', 'enabled': True},
+    ],
+    'org.openedx.content_authoring.xblock.published.v1': [
+        {'topic': 'content-authoring-xblock-lifecycle', 'event_key_field': 'xblock_info.usage_key', 'enabled': True},
+    ],
+    'org.openedx.content_authoring.xblock.deleted.v1': [
+        {'topic': 'content-authoring-xblock-lifecycle', 'event_key_field': 'xblock_info.usage_key', 'enabled': True},
+    ],
+    'org.openedx.content_authoring.xblock.duplicated.v1': [
+        {'topic': 'content-authoring-xblock-lifecycle', 'event_key_field': 'xblock_info.usage_key', 'enabled': True},
+    ],
+}

@@ -3274,6 +3274,9 @@ INSTALLED_APPS = [
 
     # Notifications
     'openedx.core.djangoapps.notifications',
+
+    # Openedx events
+    'openedx_events',
 ]
 
 ######################### CSRF #########################################
@@ -5334,3 +5337,20 @@ SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 ############## NOTIFICATIONS EXPIRY ##############
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
+
+######################## Event bus producer config ########################
+
+# .. setting_name: EVENT_BUS_PRODUCER_CONFIG
+# .. setting_default: {}
+# .. setting_description: Dictionary of event_types mapped to lists of dictionaries containing topic related configuration.
+#    Each topic configuration dictionary contains
+#    * a topic/stream name called `topic` where the event will be pushed to.
+#    * a flag called `enabled` denoting whether the event will be published to the topic.
+#    * `event_key_field` which is a period-delimited string path to event data field to use as event key.
+#    Note: The topic names should not include environment prefix as it will be dynamically added based on
+#    EVENT_BUS_TOPIC_PREFIX setting.
+EVENT_BUS_PRODUCER_CONFIG = {
+    'org.openedx.learning.certificate.created.v1': [
+        {'topic': 'learning-certificate-lifecycle', 'event_key_field': 'certificate.course.course_key', 'enabled': True},
+    ],
+}

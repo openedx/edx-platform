@@ -556,7 +556,7 @@ edx-drf-extensions==8.8.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==4.0.6
+edx-enterprise==4.0.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -905,7 +905,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.txt
-openedx-events==8.3.0
+openedx-events @ git+https://github.com/open-craft/openedx-events@navin/configurable-handler
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka

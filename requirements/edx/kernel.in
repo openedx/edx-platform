@@ -113,7 +113,8 @@ oauthlib                            # OAuth specification support for authentica
 olxcleaner
 openedx-calc                        # Library supporting mathematical calculations for Open edX
 openedx-django-require
-openedx-events>=8.3.0               # Open edX Events from Hooks Extension Framework (OEP-50)
+# openedx-events>=8.3.0               # Open edX Events from Hooks Extension Framework (OEP-50)
+git+https://github.com/open-craft/openedx-events@navin/configurable-handler
 openedx-filters                     # Open edX Filters from Hooks Extension Framework (OEP-50)
 openedx-learning<=0.1
 openedx-mongodbproxy

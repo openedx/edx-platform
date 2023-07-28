@@ -974,7 +974,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.txt
-openedx-events==8.3.0
+openedx-events @ git+https://github.com/open-craft/openedx-events@navin/configurable-handler
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka

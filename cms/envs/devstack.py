@@ -293,21 +293,10 @@ CREDENTIALS_INTERNAL_SERVICE_URL = 'http://localhost:18150'
 CREDENTIALS_PUBLIC_SERVICE_URL = 'http://localhost:18150'
 
 #################### Event bus backend ########################
-# .. toggle_name: FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS']
-# .. toggle_implementation: DjangoSetting
-# .. toggle_default: False
-# .. toggle_description: Temporary configuration which enables sending xblock events over the event bus.
-# .. toggle_use_cases: open_edx
-# .. toggle_creation_date: 2023-02-21
-# .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
-#   in the LMS and CMS.
-# .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
-FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS'] = True
 EVENT_BUS_PRODUCER = 'edx_event_bus_redis.create_producer'
 EVENT_BUS_REDIS_CONNECTION_URL = 'redis://:password@edx.devstack.redis:6379/'
 EVENT_BUS_TOPIC_PREFIX = 'dev'
 EVENT_BUS_CONSUMER = 'edx_event_bus_redis.RedisEventConsumer'
-EVENT_BUS_XBLOCK_LIFECYCLE_TOPIC = 'course-authoring-xblock-lifecycle'
 
 ################# New settings must go ABOVE this line #################
 ########################################################################
