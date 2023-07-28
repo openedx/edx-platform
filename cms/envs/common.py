@@ -2721,3 +2721,7 @@ BRAZE_COURSE_ENROLLMENT_CANVAS_ID = ''
 
 DISCUSSIONS_INCONTEXT_FEEDBACK_URL = ''
 DISCUSSIONS_INCONTEXT_LEARNMORE_URL = ''
+
+#### django-simple-history##
+# disable indexing on date field via django-simple-history.
+SIMPLE_HISTORY_DATE_INDEX = False
