@@ -64,6 +64,7 @@ from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disa
 from xmodule.modulestore.exceptions import ItemNotFoundError  # lint-amnesty, pylint: disable=wrong-import-order
 from xmodule.x_module import STUDENT_VIEW  # lint-amnesty, pylint: disable=wrong-import-order
 from lms.djangoapps.course_api.blocks.transformers.block_completion import BlockCompletionTransformer
+from common.djangoapps.student.models import LastHistoryActivateDAO
 
 log = logging.getLogger(__name__)
 
@@ -113,6 +114,7 @@ def get_course_with_access(user, action, course_key, depth=0, check_if_enrolled=
       these special cases could not only be handled inside has_access, but could
       be plugged in as additional callback checks for different actions.
     """
+    LastHistoryActivateDAO.create_date_history(course_id=course_key, user_id=user.id)
     course = get_course_by_id(course_key, depth)
     check_course_access_with_redirect(course, user, action, check_if_enrolled, check_survey_complete, check_if_authenticated)  # lint-amnesty, pylint: disable=line-too-long
     return course

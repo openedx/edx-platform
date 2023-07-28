@@ -65,6 +65,7 @@ from common.djangoapps.student.models import (
 )
 from common.djangoapps.util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+from common.djangoapps.student.models import LastHistoryActivateDAO
 
 log = logging.getLogger("edx.student")
 
@@ -563,9 +564,14 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     # Record how many courses there are so that we can get a better
     # understanding of usage patterns on prod.
     monitoring_utils.accumulate('num_courses', len(course_enrollments))
-
+    for enrollment in course_enrollments:
+        last_history_activate = LastHistoryActivateDAO.get_date_history(course_id= enrollment.course_id, user_id = user.id)      
+        enrollment.last_history_activate = last_history_activate
+        if last_history_activate is None :
+            enrollment.last_history_activate = enrollment.created  
+            
     # Sort the enrollment pairs by the enrollment date
-    course_enrollments.sort(key=lambda x: x.created, reverse=True)
+    course_enrollments.sort(key=lambda x: x.last_history_activate, reverse=True)
 
     # Retrieve the course modes for each course
     enrolled_course_ids = [enrollment.course_id for enrollment in course_enrollments]
@@ -870,7 +876,7 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
             'use_ecommerce_payment_flow': True,
             'ecommerce_payment_page': ecommerce_service.payment_page_url(),
         })
-
+    course_enrollments.sort(key=lambda x: x.last_history_activate, reverse=True)
     # Gather urls for course card resume buttons.
     resume_button_urls = ['' for entitlement in course_entitlements]
     for url in get_resume_urls_for_enrollments(user, course_enrollments).values():

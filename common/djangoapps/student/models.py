@@ -1253,6 +1253,60 @@ class CourseEnrollmentManager(models.Manager):
 CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
 
 
+class LastHistoryActivate(models.Model):
+    last_history_activate = models.DateTimeField(null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(
+        CourseOverview,
+        db_constraint=False,
+        on_delete=models.DO_NOTHING,
+    )
+    
+    def __str__(self):
+        return "%s %s %s" % (self.user_id, self.course_id)
+class LastHistoryActivateDAO():
+    @classmethod
+    def create_date_history (self, course_id, user_id):
+        
+        date_now = datetime.now()
+        date_history = LastHistoryActivate.objects.filter(
+            user_id=user_id,
+            course_id=course_id
+        )
+        
+        if date_history.exists():
+            return  date_history.update(last_history_activate=date_now)
+        else:
+            return LastHistoryActivate.objects.create(
+                user_id=user_id,
+                course_id=course_id,
+                last_history_activate=date_now
+            )
+        
+    @classmethod
+    def get_date_history (self, course_id, user_id):
+        date_history_exists = LastHistoryActivate.objects.filter(
+            user_id=user_id,
+            course_id=course_id
+        ).exists()
+        
+        if date_history_exists : 
+            return LastHistoryActivate.objects.filter(course_id=course_id, user_id = user_id)[0].last_history_activate
+        else :
+            return None
+    @classmethod 
+    def unenroll (self, course_id, user_id):
+        
+        return LastHistoryActivate.objects.filter(user_id=user_id, course_id=course_id)[0].delete()
+    
+
+
+
+
+
+
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -1887,7 +1941,7 @@ class CourseEnrollment(models.Model):
 
         try:
             record = cls.objects.get(user=user, course_id=course_id)
-
+            LastHistoryActivateDAO.unenroll(user_id=user.id, course_id=course_id)
             try:
                 # .. filter_implemented_name: CourseUnenrollmentStarted
                 # .. filter_type: org.openedx.learning.course.unenrollment.started.v1
