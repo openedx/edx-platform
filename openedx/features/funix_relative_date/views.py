@@ -103,7 +103,8 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 			'user_timezone': user_timezone,
 			'goal_hours_per_day': goal.hours_per_day,
 			'goal_weekdays': [getattr(goal, f'weekday_{i}') for i in range(7)],
-			'username': user_data.username
+			'username': user_data.username,
+  			"enroll_course_date" : enroll_date
 		}
 		context = self.get_serializer_context()
 		context['learner_is_full_access'] = learner_is_full_access
