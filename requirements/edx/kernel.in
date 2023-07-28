@@ -162,7 +162,7 @@ git+https://github.com/openedx/edx-enterprise.git@upgrade-django-history#egg=edx
 git+https://github.com/openedx/edx-proctoring.git@update-django-history-version#egg=edx-proctoring
 git+https://github.com/openedx/edx-organizations.git@update-simple-history-package-version#egg=edx-organizations
 git+https://github.com/edx/edx-name-affirmation.git@upgrade-django-history#egg=edx-name-affirmation
-git+https://github.com/openedx/edx-ora2.git@update-simple-history-package-version#egg=edx-ora2
+git+https://github.com/openedx/edx-ora2.git@update-simple-history-package-version#egg=ora2
 
 
 
