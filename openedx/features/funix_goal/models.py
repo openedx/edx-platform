@@ -15,7 +15,7 @@ class LearnGoal(models.Model):
 	weekday_6 = models.BooleanField(default=False)
 
 	@classmethod
-	def set_goal(self, course_id, user, hours_per_day, week_days):
+	def set_goal(self, course_id, user, hours_per_day, week_days,selected_date):
 		user_id = str(user.id)
 		self.objects.filter(course_id=course_id, user_id=user_id).delete()
 
@@ -31,7 +31,7 @@ class LearnGoal(models.Model):
 
 		goal_obj.save()
 
-		return FunixRelativeDateModule.FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id))
+		return FunixRelativeDateModule.FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id), selected_date=selected_date)
 
 	@classmethod
 	def get_goal(self, course_id, user_id):

@@ -27,10 +27,10 @@ def set_goal(request):
 	hours_per_day = float(request.data.get('hours_per_day'))
 	week_days = list(request.data.get('week_days'))
 	target_user_id = request.data.get('target_user_id')
-
+	selected_date = request.data.get('selected_date')
 	target_user_id = int(target_user_id) if target_user_id is not None else None
 
 
-	LearnGoal.set_goal(course_id=course_id, user=_get_student(request, target_user_id), hours_per_day=hours_per_day, week_days=week_days)
+	LearnGoal.set_goal(course_id=course_id, user=_get_student(request, target_user_id), hours_per_day=hours_per_day, week_days=week_days, selected_date=selected_date)
 
 	return Response(status=202)

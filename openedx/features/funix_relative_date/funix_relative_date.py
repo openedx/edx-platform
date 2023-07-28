@@ -62,7 +62,7 @@ class FunixRelativeDateLibary():
 		return output
 
 	@classmethod
-	def get_schedule(self, user_name, course_id, assignment_blocks=None):
+	def get_schedule(self, user_name, course_id, assignment_blocks=None, selected_date=None):
 		def get_time(last_complete_date, goal, day=1):
 			last_complete_date += timedelta(days=day)
 			weekday = last_complete_date.weekday()
@@ -79,7 +79,9 @@ class FunixRelativeDateLibary():
 		if assignment_blocks is None:
 			assignment_blocks = courseware_courses.funix_get_assginment_date_blocks(course=course, user=user, request=None, include_past_dates=True)
 
-		last_complete_date = FunixRelativeDateDAO.get_enroll_date_by_id(user_id=user.id, course_id=course_id)
+		# last_complete_date = FunixRelativeDateDAO.get_enroll_date_by_id(user_id=user.id, course_id=course_id)
+		last_complete_date = datetime.strptime(selected_date, "%Y-%m-%d")
+    
 		if last_complete_date is None:
 			last_complete_date = date.today()
 

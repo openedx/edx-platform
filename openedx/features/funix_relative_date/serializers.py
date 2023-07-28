@@ -10,3 +10,4 @@ class FUNiXDatesTabSerializer(DatesTabSerializer):
 	goal_hours_per_day = serializers.FloatField()
 	username = serializers.CharField()
 	goal_weekdays = serializers.ListField(child=serializers.BooleanField())
+	enroll_course_date= serializers.DateField()

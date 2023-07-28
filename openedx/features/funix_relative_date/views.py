@@ -1,7 +1,7 @@
 """
 Dates Tab Views
 """
-
+from datetime import  date
 from django.http.response import Http404
 from edx_django_utils import monitoring as monitoring_utils
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -27,7 +27,7 @@ from openedx.features.content_type_gating.models import ContentTypeGatingConfig
 from openedx.features.funix_goal.models import LearnGoal
 from django.contrib.auth import get_user_model
 from openedx.core.djangoapps.safe_sessions.middleware import mark_user_change_as_expected
-
+from openedx.features.funix_relative_date.models import  FunixRelativeDateDAO
 User = get_user_model()
 
 
@@ -93,7 +93,9 @@ class FunixRelativeDatesTabView(RetrieveAPIView):
 
 		# Get goal
 		goal = LearnGoal.get_goal(course_id=course_key_string, user_id=str(user_data.id))
-
+		enroll_date = FunixRelativeDateDAO.get_start_date_by_course(user_id=user_data.id, course_id=course_key)
+		if enroll_date is None :
+			enroll_date = date.today()
 		data = {
 			'has_ended': course.has_ended(),
 			'course_date_blocks': [block for block in blocks if not isinstance(block, TodaysDate)],

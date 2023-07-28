@@ -59,3 +59,9 @@ class FunixRelativeDateDAO():
             course_id=course_id,
             type='start'
         )
+    @classmethod
+    def get_start_date_by_course(self,  user_id, course_id):
+
+        enrollment = FunixRelativeDate.objects.filter(course_id=course_id, user_id=user_id, index=1)[0]
+
+        return enrollment.date
