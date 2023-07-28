@@ -52,7 +52,7 @@ babel==2.11.0
     #   enmerkar-underscore
 backoff==1.10.0
     # via analytics-python
-backports-zoneinfo[tzdata]==0.2.1
+backports-zoneinfo[tzdata]==0.2.1;python_version<"3.9"
     # via
     #   celery
     #   icalendar
