@@ -361,6 +361,7 @@ django==3.2.20
     #   django-stubs
     #   django-stubs-ext
     #   django-user-tasks
+    #   django-waffle
     #   djangorestframework
     #   done-xblock
     #   drf-jwt
@@ -583,7 +584,7 @@ django-user-tasks==3.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-django-waffle==3.0.0
+django-waffle==4.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -692,7 +693,7 @@ edx-ccx-keys==1.2.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-celeryutils==1.2.2
+edx-celeryutils==1.2.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -702,7 +703,7 @@ edx-codejail==3.3.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-completion==4.2.1
+edx-completion==4.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -745,9 +746,8 @@ edx-drf-extensions==8.8.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==4.0.4
+edx-enterprise @ git+https://github.com/openedx/edx-enterprise.git@upgrade-django-history
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 edx-event-bus-kafka==5.1.0
@@ -769,7 +769,7 @@ edx-milestones==0.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-name-affirmation==2.3.5
+edx-name-affirmation @ git+https://github.com/edx/edx-name-affirmation.git@upgrade-django-history
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -790,11 +790,11 @@ edx-opaque-keys[django]==2.3.0
     #   lti-consumer-xblock
     #   openedx-events
     #   ora2
-edx-organizations==6.12.0
+edx-organizations @ git+https://github.com/openedx/edx-organizations.git@update-simple-history-package-version
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-proctoring==4.16.0
+edx-proctoring @ git+https://github.com/openedx/edx-proctoring.git@update-django-history-version
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -803,7 +803,7 @@ edx-proctoring-proctortrack==1.0.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-rbac==1.7.0
+edx-rbac==1.8.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -896,7 +896,7 @@ faker==19.2.0
     # via
     #   -r requirements/edx/testing.txt
     #   factory-boy
-fastapi==0.100.0
+fastapi==0.100.1
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
@@ -1129,7 +1129,7 @@ loremipsum==1.0.5
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==9.5.5
+lti-consumer-xblock==9.5.7
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1230,7 +1230,7 @@ mysqlclient==2.2.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-blockstore
-newrelic==8.8.1
+newrelic==8.9.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1307,7 +1307,7 @@ optimizely-sdk==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==5.2.1
+ora2 @ git+https://github.com/openedx/edx-ora2.git@update-simple-history-package-version
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1330,7 +1330,7 @@ packaging==23.1
     #   snowflake-connector-python
     #   sphinx
     #   tox
-pact-python==2.0.0
+pact-python==2.0.1
     # via -r requirements/edx/testing.txt
 pansi==2020.7.3
     # via
@@ -1450,7 +1450,7 @@ pycryptodomex==3.18.0
     #   lti-consumer-xblock
     #   pyjwkest
     #   snowflake-connector-python
-pydantic==2.1.0
+pydantic==2.1.1
     # via
     #   -r requirements/edx/testing.txt
     #   fastapi
@@ -1905,7 +1905,7 @@ sphinx==6.2.1
     #   sphinxext-rediraffe
 sphinx-book-theme==1.0.1
     # via -r requirements/edx/doc.txt
-sphinx-design==0.4.1
+sphinx-design==0.5.0
     # via -r requirements/edx/doc.txt
 sphinx-mdinclude==0.5.3
     # via
@@ -2010,7 +2010,7 @@ tomli==2.0.1
     #   pyproject-hooks
     #   pytest
     #   tox
-tomlkit==0.11.8
+tomlkit==0.12.1
     # via
     #   -r requirements/edx/testing.txt
     #   pylint
