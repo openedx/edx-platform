@@ -39,7 +39,7 @@ from lms.djangoapps.courseware.masquerade import (
     setup_masquerade,
     is_masquerading_as_non_audit_enrollment,
 )
-from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone
+from lms.djangoapps.courseware.models import LastSeenCoursewareTimezone, XModuleStudentInfoField
 from lms.djangoapps.courseware.block_render import get_block_by_usage_id
 from lms.djangoapps.courseware.toggles import course_exit_page_is_active, learning_assistant_is_active
 from lms.djangoapps.courseware.views.views import get_cert_data
@@ -136,9 +136,13 @@ class CoursewareMeta:
         """
         Return whether edxnotes is enabled and visible.
         """
+        visibility = XModuleStudentInfoField.objects\
+            .filter(student=self.effective_user, field_name="edxnotes_visibility").first()
+
+        user_preference = visibility.value.lower() == "true" if visibility is not None else True
         return {
             'enabled': is_feature_enabled(self.overview, self.effective_user),
-            'visible': self.overview.edxnotes_visibility,
+            'visible': self.overview.edxnotes_visibility and user_preference
         }
 
     @property
