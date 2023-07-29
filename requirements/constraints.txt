@@ -122,3 +122,7 @@ djangorestframework-stubs==3.14.0  # Pinned to match django-stubs. Remove this w
 # away from legacy LMS/CMS frontends:
 # https://github.com/openedx/edx-platform/issues/31616
 libsass==0.10.0
+
+# incremental upgrade plan.
+django-simple-history<=3.1.1
+
