@@ -35,6 +35,7 @@ from xmodule.capa.correctmap import CorrectMap
 from xmodule.capa.safe_exec import safe_exec
 from xmodule.capa.util import contextualize_text, convert_files_to_filenames, get_course_id_from_capa_block
 from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.lib.safe_lxml.xmlparser import XML
 from xmodule.stringify import stringify_children
 
 # extra things displayed after "show answers" is pressed
@@ -183,7 +184,7 @@ class LoncapaProblem(object):
         if isinstance(problem_text, str):
             # etree chokes on Unicode XML with an encoding declaration
             problem_text = problem_text.encode('utf-8')
-        self.tree = etree.XML(problem_text)
+        self.tree = XML(problem_text)
 
         try:
             self.make_xml_compatible(self.tree)

@@ -206,40 +206,6 @@ class AsideKeyGenerator(IdGenerator):
         raise NotImplementedError("Specific Modulestores must provide implementations of create_definition")
 
 
-class HTMLSnippet:
-    """
-    A base class defining an interface for an object that is able to present an
-    html snippet, along with associated javascript and css
-    """
-
-    preview_view_js = {}
-    studio_view_js = {}
-
-    @classmethod
-    def get_preview_view_js(cls):
-        return cls.preview_view_js
-
-    @classmethod
-    def get_preview_view_js_bundle_name(cls):
-        return cls.__name__ + 'Display'
-
-    @classmethod
-    def get_studio_view_js(cls):
-        return cls.studio_view_js
-
-    @classmethod
-    def get_studio_view_js_bundle_name(cls):
-        return cls.__name__ + 'Editor'
-
-    def get_html(self):
-        """
-        Return the html used to display this snippet
-        """
-        raise NotImplementedError(
-            "get_html() must be provided by specific modules - not present in {}"
-            .format(self.__class__))
-
-
 def shim_xmodule_js(fragment, js_module_name):
     """
     Set up the XBlock -> XModule shim on the supplied :class:`web_fragments.fragment.Fragment`

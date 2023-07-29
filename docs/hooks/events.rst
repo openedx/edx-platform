@@ -192,18 +192,55 @@ Content Authoring Events
      - *Type*
      - *Date added*
 
-   * - `COURSE_CATALOG_INFO_CHANGED <https://github.com/openedx/openedx-events/blob/main/openedx_events/content_authoring/signals.py#L23>`_
+   * - `COURSE_CATALOG_INFO_CHANGED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L25>`_
      - org.openedx.content_authoring.course.catalog_info.changed.v1
      - `2022-08-24 <https://github.com/openedx/edx-platform/blob/a8598fa1fac5e26ac212aa588e8527e727581742/cms/djangoapps/contentstore/signals/handlers.py#L111>`_
 
-   * - `XBLOCK_PUBLISHED <https://github.com/openedx/openedx-events/blob/main/openedx_events/content_authoring/signals.py#L30>`_
+   * - `XBLOCK_PUBLISHED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L63>`_
      - org.openedx.content_authoring.xblock.published.v1
      - `2022-12-06 <https://github.com/openedx/edx-platform/blob/master/xmodule/modulestore/mixed.py#L926>`_
 
-   * - `XBLOCK_DELETED <https://github.com/openedx/openedx-events/blob/main/openedx_events/content_authoring/signals.py#L42>`_
+   * - `XBLOCK_DELETED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L75>`_
      - org.openedx.content_authoring.xblock.deleted.v1
      - `2022-12-06 <https://github.com/openedx/edx-platform/blob/master/xmodule/modulestore/mixed.py#L804>`_
 
-   * - `XBLOCK_DUPLICATED <https://github.com/openedx/openedx-events/blob/main/openedx_events/content_authoring/signals.py#L54>`_
+   * - `XBLOCK_DUPLICATED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L87>`_
      - org.openedx.content_authoring.xblock.duplicated.v1
      - `2022-12-06 <https://github.com/openedx/edx-platform/blob/master/cms/djangoapps/contentstore/views/item.py#L965>`_
+
+   * - `XBLOCK_CREATED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L36>`_
+     - org.openedx.content_authoring.xblock.created.v1
+     - 2023-07-20
+
+   * - `XBLOCK_UPDATED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L47>`_
+     - org.openedx.content_authoring.xblock.updated.v1
+     - 2023-07-20
+
+   * - `COURSE_CREATED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L123>`_
+     - org.openedx.content_authoring.course.created.v1
+     - 2023-07-20
+
+   * - `CONTENT_LIBRARY_CREATED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L134>`_
+     - org.openedx.content_authoring.content_library.created.v1
+     - 2023-07-20
+
+   * - `CONTENT_LIBRARY_UPDATED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L145>`_
+     - org.openedx.content_authoring.content_library.updated.v1
+     - 2023-07-20
+
+   * - `CONTENT_LIBRARY_DELETED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L156>`_
+     - org.openedx.content_authoring.content_library.deleted.v1
+     - 2023-07-20
+
+   * - `LIBRARY_BLOCK_CREATED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L167>`_
+     - org.openedx.content_authoring.content_library.created.v1
+     - 2023-07-20
+
+   * - `LIBRARY_BLOCK_UPDATED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L178>`_
+     - org.openedx.content_authoring.content_library.updated.v1
+     - 2023-07-20
+
+   * - `LIBRARY_BLOCK_DELETED <https://github.com/openedx/openedx-events/blob/c0eb4ba1a3d7d066d58e5c87920b8ccb0645f769/openedx_events/content_authoring/signals.py#L189>`_
+     - org.openedx.content_authoring.content_library.deleted.v1
+     - 2023-07-20
+
