@@ -10,8 +10,6 @@ If student have answered - words he entered and cloud.
 import json
 import logging
 
-from pkg_resources import resource_filename
-
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Integer, List, Scope, String
@@ -20,7 +18,6 @@ from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
@@ -49,7 +46,6 @@ class WordCloudBlock(  # pylint: disable=abstract-method
     XmlMixin,
     EditingMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):
@@ -112,19 +108,6 @@ class WordCloudBlock(  # pylint: disable=abstract-method
     resources_dir = 'assets/word_cloud'
     template_dir_name = 'word_cloud'
 
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'assets/word_cloud/src/js/word_cloud.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
-    studio_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/raw/edit/metadata-only.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
     studio_js_module_name = "MetadataOnlyEditingDescriptor"
     mako_template = "widgets/metadata-only-edit.html"
 

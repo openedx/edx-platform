@@ -243,6 +243,7 @@ django==3.2.20
     #   openedx-django-wiki
     #   openedx-events
     #   openedx-filters
+    #   openedx-learning
     #   ora2
     #   skill-tagging
     #   super-csv
@@ -393,6 +394,7 @@ djangorestframework==3.14.0
     #   edx-proctoring
     #   edx-submissions
     #   openedx-blockstore
+    #   openedx-learning
     #   ora2
     #   super-csv
 djangorestframework-xml==2.0.0
@@ -659,7 +661,9 @@ lazy==1.5
     #   ora2
     #   xblock
 libsass==0.10.0
-    # via -r requirements/edx/paver.txt
+    # via
+    #   -c requirements/edx/../constraints.txt
+    #   -r requirements/edx/paver.txt
 loremipsum==1.0.5
     # via ora2
 lti-consumer-xblock==9.5.7
@@ -766,6 +770,8 @@ openedx-filters==1.4.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   skill-tagging
+openedx-learning==0.1.0
+    # via -r requirements/edx/kernel.in
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
@@ -1004,6 +1010,7 @@ rules==3.3
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-proctoring
+    #   openedx-learning
 s3transfer==0.1.13
     # via boto3
 sailthru-client==2.2.3

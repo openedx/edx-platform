@@ -45,7 +45,8 @@ from common.djangoapps.student.auth import (
     has_course_author_access,
     has_studio_read_access,
     has_studio_write_access,
-    has_studio_advanced_settings_access
+    has_studio_advanced_settings_access,
+    is_content_creator,
 )
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
@@ -118,7 +119,6 @@ from ..utils import (
     update_course_discussions_settings,
 )
 from .component import ADVANCED_COMPONENT_TYPES
-from ..helpers import is_content_creator
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     create_xblock_info,
 )
@@ -996,7 +996,7 @@ def create_new_course(user, org, number, run, fields):
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
     new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields)
     add_organization_course(org_data, new_course.id)
-    update_course_discussions_settings(new_course.id)
+    update_course_discussions_settings(new_course)
 
     # Enable certain fields rolling forward, where configured
     if default_enable_flexible_peer_openassessments(new_course.id):
