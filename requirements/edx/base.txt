@@ -254,7 +254,7 @@ django-cache-memoize==0.1.10
     # via edx-enterprise
 django-celery-results==2.5.1
     # via -r requirements/edx/kernel.in
-django-classy-tags==4.0.0
+django-classy-tags==4.1.0
     # via django-sekizai
 django-config-models==2.4.0
     # via
@@ -350,7 +350,7 @@ django-simple-history==3.3.0
     #   ora2
 django-splash==1.3.0
     # via -r requirements/edx/kernel.in
-django-statici18n==2.3.1
+django-statici18n==2.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
@@ -478,10 +478,8 @@ edx-drf-extensions==8.8.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==4.0.7
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/kernel.in
+edx-enterprise @ git+https://github.com/openedx/edx-enterprise.git@upgrade-django-history
+    # via -r requirements/edx/kernel.in
 edx-event-bus-kafka==5.1.0
     # via -r requirements/edx/kernel.in
 edx-event-bus-redis==0.3.1
@@ -490,7 +488,7 @@ edx-i18n-tools==1.0.0
     # via ora2
 edx-milestones==0.5.0
     # via -r requirements/edx/kernel.in
-edx-name-affirmation==2.3.5
+edx-name-affirmation @ git+https://github.com/edx/edx-name-affirmation.git@upgrade-django-history
     # via -r requirements/edx/kernel.in
 edx-opaque-keys[django]==2.3.0
     # via
@@ -509,15 +507,15 @@ edx-opaque-keys[django]==2.3.0
     #   lti-consumer-xblock
     #   openedx-events
     #   ora2
-edx-organizations==6.12.0
+edx-organizations @ git+https://github.com/openedx/edx-organizations.git@update-simple-history-package-version
     # via -r requirements/edx/kernel.in
-edx-proctoring==4.16.0
+edx-proctoring @ git+https://github.com/openedx/edx-proctoring.git@update-django-history-version
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring-proctortrack
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/kernel.in
-edx-rbac==1.7.0
+edx-rbac==1.8.0
     # via edx-enterprise
 edx-rest-api-client==5.5.2
     # via
@@ -668,7 +666,7 @@ libsass==0.10.0
     #   -r requirements/edx/paver.txt
 loremipsum==1.0.5
     # via ora2
-lti-consumer-xblock==9.5.5
+lti-consumer-xblock==9.5.7
     # via -r requirements/edx/kernel.in
 lxml==4.9.3
     # via
@@ -727,7 +725,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
-newrelic==8.8.1
+newrelic==8.9.0
     # via
     #   -r requirements/edx/bundled.in
     #   edx-django-utils
@@ -778,8 +776,10 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==5.2.1
-    # via -r requirements/edx/bundled.in
+ora2 @ git+https://github.com/openedx/edx-ora2.git@update-simple-history-package-version
+    # via
+    #   -r requirements/edx/bundled.in
+    #   -r requirements/edx/kernel.in
 oscrypto==1.3.0
     # via snowflake-connector-python
 packaging==23.1

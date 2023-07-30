@@ -338,7 +338,7 @@ django-cache-memoize==0.1.10
     #   edx-enterprise
 django-celery-results==2.5.1
     # via -r requirements/edx/base.txt
-django-classy-tags==4.0.0
+django-classy-tags==4.1.0
     # via
     #   -r requirements/edx/base.txt
     #   django-sekizai
@@ -436,9 +436,8 @@ django-sekizai==4.1.0
     #   openedx-django-wiki
 django-ses==3.5.0
     # via -r requirements/edx/base.txt
-django-simple-history==3.0.0
+django-simple-history==3.3.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-name-affirmation
@@ -447,7 +446,7 @@ django-simple-history==3.0.0
     #   ora2
 django-splash==1.3.0
     # via -r requirements/edx/base.txt
-django-statici18n==2.3.1
+django-statici18n==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
@@ -551,7 +550,7 @@ edx-codejail==3.3.3
     # via -r requirements/edx/base.txt
 edx-completion==4.3.0
     # via -r requirements/edx/base.txt
-edx-django-release-util==1.2.0
+edx-django-release-util==1.3.0
     # via
     #   -r requirements/edx/base.txt
     #   edxval
@@ -585,10 +584,8 @@ edx-drf-extensions==8.8.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==4.0.7
-    # via
-    #   -c requirements/edx/../constraints.txt
-    #   -r requirements/edx/base.txt
+edx-enterprise @ git+https://github.com/openedx/edx-enterprise.git@upgrade-django-history
+    # via -r requirements/edx/base.txt
 edx-event-bus-kafka==5.1.0
     # via -r requirements/edx/base.txt
 edx-event-bus-redis==0.3.1
@@ -602,7 +599,7 @@ edx-lint==5.3.4
     # via -r requirements/edx/testing.in
 edx-milestones==0.5.0
     # via -r requirements/edx/base.txt
-edx-name-affirmation==2.3.5
+edx-name-affirmation @ git+https://github.com/edx/edx-name-affirmation.git@upgrade-django-history
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.3.0
     # via
@@ -620,15 +617,15 @@ edx-opaque-keys[django]==2.3.0
     #   lti-consumer-xblock
     #   openedx-events
     #   ora2
-edx-organizations==6.12.0
+edx-organizations @ git+https://github.com/openedx/edx-organizations.git@update-simple-history-package-version
     # via -r requirements/edx/base.txt
-edx-proctoring==4.16.0
+edx-proctoring @ git+https://github.com/openedx/edx-proctoring.git@update-django-history-version
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
 edx-proctoring-proctortrack==1.0.5
     # via -r requirements/edx/base.txt
-edx-rbac==1.7.0
+edx-rbac==1.8.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -695,7 +692,7 @@ factory-boy==3.3.0
     # via -r requirements/edx/testing.in
 faker==19.2.0
     # via factory-boy
-fastapi==0.100.0
+fastapi==0.100.1
     # via pact-python
 fastavro==1.8.2
     # via
@@ -864,7 +861,7 @@ loremipsum==1.0.5
     # via
     #   -r requirements/edx/base.txt
     #   ora2
-lti-consumer-xblock==9.5.5
+lti-consumer-xblock==9.5.7
     # via -r requirements/edx/base.txt
 lxml==4.9.3
     # via
@@ -935,7 +932,7 @@ mysqlclient==2.2.0
     # via
     #   -r requirements/edx/base.txt
     #   openedx-blockstore
-newrelic==8.8.1
+newrelic==8.9.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-django-utils
@@ -991,7 +988,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==5.2.1
+ora2 @ git+https://github.com/openedx/edx-ora2.git@update-simple-history-package-version
     # via -r requirements/edx/base.txt
 oscrypto==1.3.0
     # via
@@ -1006,7 +1003,7 @@ packaging==23.1
     #   pytest
     #   snowflake-connector-python
     #   tox
-pact-python==2.0.0
+pact-python==2.0.1
     # via -r requirements/edx/testing.in
 pansi==2020.7.3
     # via
@@ -1046,7 +1043,7 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/edx/base.txt
     #   jsonschema
-platformdirs==3.9.1
+platformdirs==3.10.0
     # via
     #   pylint
     #   virtualenv
@@ -1491,7 +1488,7 @@ tomli==2.0.1
     #   pylint
     #   pytest
     #   tox
-tomlkit==0.12.0
+tomlkit==0.12.1
     # via pylint
 tox==3.28.0
     # via
