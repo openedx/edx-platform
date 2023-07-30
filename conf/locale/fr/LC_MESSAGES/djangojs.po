@@ -63,7 +63,7 @@
 # Régis Behmo <transifex.stuff@behmo.com>, 2016
 # Régis Millet <regmillet@ct2c.fr>, 2015
 # Richard Moch <richard.moch@gmail.com>, 2016-2017
-# Robert R <rraposa@edx.org>, 2019
+# Robert R <rraposa@2u.com>, 2019
 # said machwate <machwate@gmail.com>, 2018
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
@@ -220,7 +220,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-02 20:42+0000\n"
+"POT-Creation-Date: 2023-07-23 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Pierre Mailhot <pierre.mailhot@gmail.com>, 2023\n"
 "Language-Team: French (http://app.transifex.com/open-edx/edx-platform/language/fr/)\n"
