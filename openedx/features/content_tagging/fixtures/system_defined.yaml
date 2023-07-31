@@ -1,15 +1,4 @@
 - model: oel_tagging.taxonomy
-  pk: -1
-  fields:
-    name: Languages
-    description: ISO 639-1 Languages. Allows tags for any language configured for use on the instance
-    enabled: true
-    required: true
-    allow_multiple: false
-    allow_free_text: false
-    visible_to_authors: true
-    _taxonomy_class: openedx.features.content_tagging.models.ContentLanguageTaxonomy
-- model: oel_tagging.taxonomy
   pk: -2
   fields:
     name: Organizations
