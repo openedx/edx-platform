@@ -121,7 +121,7 @@ class MigrationTests(TestCase):
     Tests for migrations.
     """
 
-    @pytest.mark.skip(reason="Upgrading django-simple-history without adding migrations.")  # migrations will be added in followup prs.
+    @pytest.mark.skip(reason="Upgrading django-simple-history without adding migrations.")
     @override_settings(MIGRATION_MODULES={})
     def test_migrations_are_in_sync(self):
         """
