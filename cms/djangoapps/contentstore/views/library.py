@@ -35,15 +35,14 @@ from common.djangoapps.student.auth import (
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
-    LibraryUserRole,
-    OrgStaffRole,
-    UserBasedRole,
+    LibraryUserRole
 )
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
 
 from ..config.waffle import REDIRECT_TO_LIBRARY_AUTHORING_MICROFRONTEND
 from ..utils import add_instructor, reverse_library_url
 from .component import CONTAINER_TEMPLATES, get_component_templates
+from .helpers import is_content_creator
 from .block import create_xblock_info
 from .user import user_with_role
 
@@ -80,11 +79,10 @@ def user_can_create_library(user, org=None):
     elif user.is_staff:
         return True
     elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
-        is_course_creator = get_course_creator_status(user) == 'granted'
-        has_org_staff_role = OrgStaffRole().get_orgs_for_user(user).exists()
-        has_course_staff_role = UserBasedRole(user=user, role=CourseStaffRole.ROLE).courses_with_role().exists()
-
-        return is_course_creator or has_org_staff_role or has_course_staff_role
+        has_course_creator_role = True
+        if org:
+            has_course_creator_role = is_content_creator(user, org)
+        return get_course_creator_status(user) == 'granted' and has_course_creator_role
     else:
         # EDUCATOR-1924: DISABLE_LIBRARY_CREATION overrides DISABLE_COURSE_CREATION, if present.
         disable_library_creation = settings.FEATURES.get('DISABLE_LIBRARY_CREATION', None)
