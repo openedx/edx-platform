@@ -257,9 +257,9 @@ def delete_video_transcript_or_404(request):
     video_id = request.GET.get('edx_video_id')
     language_code = request.GET.get('language_code')
 
-    if not get_video_transcript(video_id, language_code):
+    if not get_video_transcript(video_id=video_id, language_code=language_code):
         return HttpResponseNotFound()
 
-    delete_video_transcript(video_id, language_code)
+    delete_video_transcript(video_id=video_id, language_code=language_code)
 
     return JsonResponse(status=200)
