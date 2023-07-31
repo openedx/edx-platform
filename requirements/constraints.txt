@@ -126,4 +126,4 @@ libsass==0.10.0
 
 
 # adding temp pin to investigate one issue on sandbox
-django-ratelimit==4.0.0
+django-ratelimit<4.1.0
