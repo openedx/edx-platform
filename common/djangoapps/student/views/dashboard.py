@@ -886,7 +886,8 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
     context.update({
         'resume_button_urls': resume_button_urls
     })
-
+    print('=================', resume_button_urls)
+   
     dashboard_template = 'dashboard.html'
     try:
         # .. filter_implemented_name: DashboardRenderStarted
