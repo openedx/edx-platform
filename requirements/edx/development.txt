@@ -552,6 +552,7 @@ django-ses==3.5.0
     #   -r requirements/edx/testing.txt
 django-simple-history==3.1.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -859,7 +860,7 @@ edx-when==2.4.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
-edxval==2.3.0
+edxval==2.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1562,7 +1563,7 @@ pyopenssl==22.0.0
     #   -r requirements/edx/testing.txt
     #   optimizely-sdk
     #   snowflake-connector-python
-pyparsing==3.1.0
+pyparsing==3.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1964,7 +1965,7 @@ sqlparse==0.4.4
     #   django
     #   django-debug-toolbar
     #   openedx-blockstore
-staff-graded-xblock==2.0.1
+staff-graded-xblock==2.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2107,7 +2108,7 @@ user-util==1.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-uvicorn==0.23.1
+uvicorn==0.23.2
     # via
     #   -r requirements/edx/testing.txt
     #   pact-python
