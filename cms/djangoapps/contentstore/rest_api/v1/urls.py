@@ -11,7 +11,8 @@ from .views import (
     CourseSettingsView,
     ProctoredExamSettingsView,
     ProctoringErrorsView,
-    xblock
+    xblock,
+    assets,
 )
 
 app_name = 'v1'
@@ -45,5 +46,9 @@ urlpatterns = [
     re_path(
         fr'^xblock/{settings.COURSE_ID_PATTERN}/{settings.USAGE_KEY_PATTERN}?$',
         xblock.XblockView.as_view(), name='studio_content'
+    ),
+    re_path(
+        fr'^file_assets/{settings.COURSE_ID_PATTERN}/{settings.ASSET_KEY_PATTERN}?$',
+        assets.AssetsView.as_view(), name='studio_content_assets'
     ),
 ]

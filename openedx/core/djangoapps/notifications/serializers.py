@@ -7,9 +7,9 @@ from rest_framework import serializers
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.notifications.models import (
-    get_notification_channels,
-    Notification,
     CourseNotificationPreference,
+    Notification,
+    get_notification_channels
 )
 
 

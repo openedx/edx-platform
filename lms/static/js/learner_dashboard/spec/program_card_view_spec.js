@@ -42,6 +42,7 @@ describe('Program card View', () => {
                 name: 'Wageningen University & Research',
             },
         ],
+        subscriptionIndex: 1,
     };
     const userProgress = [
         {
@@ -173,6 +174,6 @@ describe('Program card View', () => {
     });
 
     it('should render the subscription badge if subscription is active', () => {
-        expect(view.$('.subscription-badge .badge').html().trim()).toEqual('Subscribed');
+        expect(view.$('.subscription-badge .badge').html()?.trim()).toEqual('Subscribed');
     });
 });

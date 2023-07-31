@@ -31,7 +31,7 @@
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # smctech <tech@smallmedia.org.uk>, 2016
@@ -133,7 +133,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-15 09:23+0000\n"
+"POT-Creation-Date: 2023-07-23 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -225,7 +225,7 @@ msgstr "نیاز به پرونده زیرنویس است."
 #: cms/djangoapps/contentstore/views/videos.py
 #: openedx/core/djangoapps/content_staging/data.py
 msgid "Ready"
-msgstr ""
+msgstr "آماده"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -247,10 +247,21 @@ msgstr "شناسه ویدیو"
 msgid "Pending"
 msgstr "در حال انتظار"
 
-#: cms/djangoapps/contentstore/xblock_services/create_xblock.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/create_xblock.py
 #: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "خالی"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+msgid "Invalid data"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr ""
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -425,7 +436,6 @@ msgstr "{currency_symbol}{price}"
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "رایگان"
@@ -2187,7 +2197,7 @@ msgstr "مرکز پشتيباني"
 
 #: lms/djangoapps/branding/api.py
 msgid "Security"
-msgstr ""
+msgstr "امنیت"
 
 #: lms/djangoapps/branding/api.py
 #: lms/templates/static_templates/media-kit.html
@@ -3364,6 +3374,14 @@ msgstr "صفحات سفارشی"
 #: lms/djangoapps/courseware/plugins.py
 msgid "Provide additional course content and resources with custom pages"
 msgstr "محتوای دوره آموزشی و منابع اضافی را با صفحات سفارشی ارائه دهید"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Open Response Assessment Settings"
+msgstr ""
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Course level settings for Open Response Assessment."
+msgstr ""
 
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
@@ -5844,55 +5862,6 @@ msgstr "اجازه‌دادن"
 msgid "Error"
 msgstr "خطا"
 
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Check out this course on edx"
-msgstr "این دوره آموزشی را در edx بررسی کنید"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Enroll now"
-msgstr "الان ثبت‌نام کنید"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "View Course"
-msgstr "مشاهده دوره آموزشی"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Estimated 6 weeks"
-msgstr "تقریبا 6 هفته"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "4-6 hours per week"
-msgstr "4-6 ساعت در هفته"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Self-paced"
-msgstr "خودآموز"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Progress at your own speed"
-msgstr "با سرعت مورد نظر خودتان پیشرفت کنید"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Optional upgrade available"
-msgstr "امکان ارتقا اختیاری فراهم است"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "Check out this course on %(platform_name)s."
-msgstr "این دوره آموزشی را در %(platform_name)s بررسی کنید."
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "This email message was automatically sent by %(lms_url)s "
-msgstr "این رایانامه به‌طور خودکار توسط %(lms_url)s ارسال شد"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
-#, python-format
-msgid "%(display_name)s"
-msgstr "%(display_name)s"
-
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
 msgstr "هویت تأیید شد"
@@ -7046,6 +7015,7 @@ msgstr "ما نتوانستیم کاربری با آدرس  رایانامه م�
 msgid "This user already has access to this library."
 msgstr "این کاربر از قبل به این کتابخانه دسترسی داشته‌است."
 
+#: openedx/core/djangoapps/content_staging/data.py
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -7054,11 +7024,11 @@ msgstr "این کاربر از قبل به این کتابخانه دسترسی 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: openedx/features/learner_profile/templates/learner_profile/learner_profile.html
 msgid "Loading"
-msgstr "در حال بارگذاری"
+msgstr "در حال بارگیری"
 
 #: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
-msgstr ""
+msgstr "منقضی‌شده"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Staged Content"
@@ -7543,6 +7513,28 @@ msgstr "فهرست سیاه {country}  برای {course}"
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
 msgstr "مسیرهای یادگیرنده"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> replied on "
+"<{strong}>{author_name}</{strong}> response to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
@@ -8045,8 +8037,8 @@ msgid ""
 "Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores "
 "(_), and hyphens (-)."
 msgstr ""
-"نام‌های کاربری فقط می‌توانند شامل حروف (الف-ی)، اعداد (0-9) ، زیر خط (_) و "
-"خط تیره (-) باشند."
+"نام‌های کاربری فقط می‌توانند شامل حروف (A-Z, a-z)، اعداد (0-9) ، زیر خط (_) "
+"و خط تیره (-) باشند."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
@@ -8707,6 +8699,8 @@ msgid ""
 "An error has occurred. Try refreshing the page, or check your internet "
 "connection."
 msgstr ""
+"خطایی رخ داده است. صفحه را دوباره بارگیری کنید یا اتصال اینترنت خود را بررسی"
+" کنید."
 
 #: openedx/core/djangoapps/user_authn/views/register.py
 #, python-brace-format
@@ -11233,6 +11227,16 @@ msgid ""
 msgstr ""
 
 #: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "مربی دوره آموزشی"
 
@@ -12789,6 +12793,17 @@ msgstr "درخواست بازتولید همه طرح درس دوره‌های �
 msgid "Regenerate *all* course outlines"
 msgstr "بازتولید *همه* طرح‌ درس‌ها"
 
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+msgid "Upload completed"
+msgstr "بارگذاری کامل شد"
+
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+#, python-brace-format
+msgid ""
+"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
+msgstr ""
+"اندازۀ پروندۀ  {filename} بیش از{maximum_size_in_megabytes} مگابایت است"
+
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
 "The groups in this configuration can be mapped to cohorts in the Instructor "
@@ -13059,13 +13074,13 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}، {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "کپی{0}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "کپی '{0}' "
@@ -13126,17 +13141,6 @@ msgid ""
 "underscores (_)."
 msgstr ""
 "نام پروندۀ تصویری باید شامل حروف، اعداد، خط فاصله (-) و زیر خط (_) باشد."
-
-#: cms/djangoapps/contentstore/views/assets.py
-msgid "Upload completed"
-msgstr "بارگذاری کامل شد"
-
-#: cms/djangoapps/contentstore/views/assets.py
-#, python-brace-format
-msgid ""
-"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
-msgstr ""
-"اندازۀ پروندۀ  {filename} بیش از{maximum_size_in_megabytes} مگابایت است"
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -13512,55 +13516,46 @@ msgstr "{course}_آدرس_فیلم"
 msgid "A non zero positive integer is expected"
 msgstr "عددی صحیح به غیر از صفر مجاز است."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr "کتابخانه‌ها نمی‌توانند بیش از {limit} مؤلفه داشته باشند"
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
-msgid "Invalid data"
-msgstr "داده معتبر نیست"
-
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "داده معتبر ({details}) نیست"
-
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "There was a problem pasting your component."
 msgstr ""
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Your clipboard is empty or invalid."
 msgstr ""
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "نمی‌توانید {source_type} را به {target_parent_type} منتقل کنید."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Item is already present in target location."
 msgstr "الان این محصول در محل مورد نظر است."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item into itself."
 msgstr "نمی‌توانید موردی را به خود منتقل کنید."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item into it's child."
 msgstr "شما نمی‌توانید این مورد را به زیر مجموعه‌اش بیفزایید."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item directly into content experiment."
 msgstr "نمی‌‌توانید موردی را مستقیماً به تجربه محتوا منتقل کنید."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "{source_usage_key} not found in {parent_usage_key}."
 msgstr "{source_usage_key} در {parent_usage_key} پیدا نشد."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid ""
 "You can not move {source_usage_key} at an invalid index ({target_index})."
@@ -13568,13 +13563,13 @@ msgstr ""
 "نمی‌توانید {source_usage_key} را در یک نمایۀ نامعتبر به ({target_index}) "
 "منتقل کنید. "
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr ""
 "شما باید target_index ({target_index}) را به‌عنوان یک عدد صحیح ارائه دهید."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
@@ -13584,11 +13579,11 @@ msgstr ""
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "%"
 msgstr "درصد"
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\""
@@ -16702,6 +16697,11 @@ msgid "You are enrolled in this course"
 msgstr "شما در این دوره آموزشی ثبت‌نام کرده‌اید"
 
 #: lms/templates/courseware/course_about.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "View Course"
+msgstr "مشاهده دوره آموزشی"
+
+#: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr "ثبت‌نام در این کلاس فقط با دعوت مجاز است"
 
@@ -19290,6 +19290,22 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
 msgstr "افزودن همکار"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Limited Staff"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Course team members with the Limited Staff role help you manage your course."
+" Limited Staff can enroll and unenroll learners, as well as modify their "
+"grades and access all course data. Limited Staff don't have access to your "
+"course in Studio. You can only give course team roles to enrolled users."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Limited Staff"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
@@ -24553,6 +24569,10 @@ msgstr "پیمایش دوره آموزشی"
 #: cms/templates/widgets/header.html
 msgid "Outline"
 msgstr "طرح کلی"
+
+#: cms/templates/widgets/header.html
+msgid "Files & Media"
+msgstr ""
 
 #: cms/templates/widgets/header.html
 msgid "Publisher"

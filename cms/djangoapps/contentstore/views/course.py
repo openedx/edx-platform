@@ -45,13 +45,15 @@ from common.djangoapps.student.auth import (
     has_course_author_access,
     has_studio_read_access,
     has_studio_write_access,
-    has_studio_advanced_settings_access
+    has_studio_advanced_settings_access,
+    is_content_creator,
 )
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
-    UserBasedRole
+    UserBasedRole,
+    OrgStaffRole
 )
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
@@ -85,25 +87,39 @@ from ..course_group_config import (
 from ..course_info_model import delete_course_update, get_course_updates, update_course_updates
 from ..courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from ..tasks import rerun_course as rerun_course_task
-from ..toggles import split_library_view_on_dashboard
+from ..toggles import (
+    default_enable_flexible_peer_openassessments,
+    split_library_view_on_dashboard,
+    use_new_course_outline_page,
+    use_new_home_page,
+    use_new_updates_page,
+    use_new_advanced_settings_page,
+    use_new_grading_page,
+    use_new_schedule_details_page
+)
 from ..utils import (
     add_instructor,
     get_course_settings,
     get_course_grading,
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
+    get_course_outline_url,
+    get_studio_home_url,
+    get_updates_url,
+    get_advanced_settings_url,
+    get_grading_url,
+    get_schedule_details_url,
     initialize_permissions,
     remove_all_instructors,
     reverse_course_url,
     reverse_library_url,
     reverse_url,
     reverse_usage_url,
-    update_course_discussions_settings,
     update_course_details,
+    update_course_discussions_settings,
 )
 from .component import ADVANCED_COMPONENT_TYPES
-from ..helpers import is_content_creator
-from cms.djangoapps.contentstore.xblock_services.xblock_service import (
+from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     create_xblock_info,
 )
 from .library import (
@@ -533,6 +549,8 @@ def course_listing(request):
     """
     List all courses and libraries available to the logged in user
     """
+    if use_new_home_page():
+        return redirect(get_studio_home_url())
 
     optimization_enabled = GlobalStaff().has_user(request.user) and ENABLE_GLOBAL_STAFF_OPTIMIZATION.is_enabled()
 
@@ -587,6 +605,7 @@ def course_listing(request):
         'optimization_enabled': optimization_enabled,
         'active_tab': 'courses',
         'allowed_organizations': get_allowed_organizations(user),
+        'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(user),
         'can_create_organizations': user_can_create_organizations(user),
     })
 
@@ -614,6 +633,7 @@ def library_listing(request):
         'split_studio_home': split_library_view_on_dashboard(),
         'active_tab': 'libraries',
         'allowed_organizations': get_allowed_organizations(request.user),
+        'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(request.user),
         'can_create_organizations': user_can_create_organizations(request.user),
     }
     return render_to_response('index.html', data)
@@ -691,6 +711,8 @@ def course_index(request, course_key):
         course_block = get_course_and_check_access(course_key, request.user, depth=None)
         if not course_block:
             raise Http404
+        if use_new_course_outline_page(course_key):
+            return redirect(get_course_outline_url(course_key))
         lms_link = get_lms_link_for_item(course_block.location)
         reindex_link = None
         if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
@@ -974,7 +996,13 @@ def create_new_course(user, org, number, run, fields):
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
     new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields)
     add_organization_course(org_data, new_course.id)
-    update_course_discussions_settings(new_course.id)
+    update_course_discussions_settings(new_course)
+
+    # Enable certain fields rolling forward, where configured
+    if default_enable_flexible_peer_openassessments(new_course.id):
+        new_course.force_on_flexible_peer_openassessments = True
+    modulestore().update_item(new_course, new_course.published_by)
+
     return new_course
 
 
@@ -1038,6 +1066,10 @@ def rerun_course(user, source_course_key, org, number, run, fields, background=T
     fields['enrollment_end'] = None
     fields['video_upload_pipeline'] = {}
 
+    # Enable certain fields rolling forward, where configured
+    if default_enable_flexible_peer_openassessments(source_course_key):
+        fields['force_on_flexible_peer_openassessments'] = True
+
     json_fields = json.dumps(fields, cls=EdxJSONEncoder)
     args = [str(source_course_key), str(destination_course_key), user.id, json_fields]
 
@@ -1066,6 +1098,8 @@ def course_info_handler(request, course_key_string):
         course_block = get_course_and_check_access(course_key, request.user)
         if not course_block:
             raise Http404
+        if use_new_updates_page(course_key):
+            return redirect(get_updates_url(course_key))
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             return render_to_response(
                 'course_info.html',
@@ -1150,6 +1184,8 @@ def settings_handler(request, course_key_string):  # lint-amnesty, pylint: disab
     with modulestore().bulk_operations(course_key):
         course_block = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+            if use_new_schedule_details_page(course_key):
+                return redirect(get_schedule_details_url(course_key))
             settings_context = get_course_settings(request, course_key, course_block)
             return render_to_response('settings.html', settings_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):  # pylint: disable=too-many-nested-blocks
@@ -1191,6 +1227,8 @@ def grading_handler(request, course_key_string, grader_index=None):
             raise PermissionDenied()
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+            if use_new_grading_page(course_key):
+                return redirect(get_grading_url(course_key))
             grading_context = get_course_grading(course_key)
             return render_to_response('settings_graders.html', grading_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
@@ -1286,6 +1324,8 @@ def advanced_settings_handler(request, course_key_string):
             advanced_dict.get('mobile_available')['deprecated'] = True
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+            if use_new_advanced_settings_page(course_key):
+                return redirect(get_advanced_settings_url(course_key))
             publisher_enabled = configuration_helpers.get_value_for_org(
                 course_block.location.org,
                 'ENABLE_PUBLISHER',
@@ -1792,11 +1832,35 @@ def get_allowed_organizations(user):
         return []
 
 
+def get_allowed_organizations_for_libraries(user):
+    """
+    Helper method for returning the list of organizations for which the user is allowed to create libraries.
+    """
+    if settings.FEATURES.get('ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES', False):
+        return get_organizations_for_non_course_creators(user)
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        return get_organizations(user)
+    else:
+        return []
+
+
 def user_can_create_organizations(user):
     """
     Returns True if the user can create organizations.
     """
     return user.is_staff or not settings.FEATURES.get('ENABLE_CREATOR_GROUP', False)
+
+
+def get_organizations_for_non_course_creators(user):
+    """
+    Returns the list of organizations which the user is a staff member of, as a list of strings.
+    """
+    orgs_map = set()
+    orgs = OrgStaffRole().get_orgs_for_user(user)
+    # deduplicate
+    for org in orgs:
+        orgs_map.add(org)
+    return list(orgs_map)
 
 
 def get_organizations(user):

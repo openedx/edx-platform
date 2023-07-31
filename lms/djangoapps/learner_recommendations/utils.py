@@ -4,7 +4,10 @@ Additional utilities for Learner Recommendations.
 import logging
 import requests
 
-from algoliasearch.search_client import SearchClient
+try:
+    from algoliasearch.search_client import SearchClient
+except ImportError:
+    SearchClient = None
 from django.conf import settings
 
 from common.djangoapps.student.models import CourseEnrollment
@@ -31,6 +34,8 @@ class AlgoliaClient:
     @classmethod
     def get_algolia_client(cls):
         """ Get Algolia client instance. """
+        if not SearchClient:
+            return None
         if not cls.algolia_client:
             if not (cls.algolia_app_id and cls.algolia_search_api_key):
                 return None

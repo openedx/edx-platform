@@ -1,8 +1,5 @@
 ## xss-lint: disable=mako-missing-default
 <%namespace name='static' file='/static_content.html'/>
-<%!
-import six
-%>
 
 <script type="text/javascript" src="${static.url('js/vendor/jquery.leanModal.js')}"></script>
 <script type="text/javascript" src="${static.url('js/staff_debug_actions.js')}"></script>
@@ -28,7 +25,7 @@ function setup_debug(element_id, edit_link, staff_context){
             var username_or_email = $("#" + element_id + "_history_student_username").val();
             var location = $("#" + element_id + "_history_location").val();
             // xss-lint: disable=mako-invalid-js-filter
-            $("#" + element_id + "_history_text").load('/courses/' + "${six.text_type(getattr(course,'id','')) | u}" +
+            $("#" + element_id + "_history_text").load('/courses/' + "${str(getattr(course,'id','')) | u}" +
                 "/submission_history/" + encodeURIComponent(username_or_email) + "/" + location);
             return false;
         }

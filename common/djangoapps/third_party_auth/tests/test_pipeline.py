@@ -72,17 +72,26 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
         )
 
     @ddt.data(
-        ('S', 'S-9fe2', False),
-        ('S', 'S-9fe2', True),
-        ('S.K', 'S_K', False),
-        ('S.K.', 'S_K', False),
-        ('S.K.', 'S_K_-9fe2', True),
-        ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlengthofm', False),
-        ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlen-9fe2', True),
+        ('S', 'S-b', False, False, False),
+        ('S', 'S-3f', True, False, False),
+        ('S', 'S-9fe2', True, True, False),
+        ('S.K', 'S_K', False, True, True),
+        ('S.K.', 'S_K_-9fe2', True, True, True),
+        ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlengthofm', False, False, False),
+        ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlengtho-b', True, False, False),
+        ('usernamewithcharacterlengthofmorethan30chars', 'usernamewithcharacterlength-3f', True, True, False),
     )
     @ddt.unpack
     @mock.patch('common.djangoapps.third_party_auth.pipeline.user_exists')
-    def test_get_username_in_pipeline(self, idp_username, expected_username, already_exists, mock_user_exists):
+    def test_get_username_in_pipeline(
+        self,
+        idp_username,
+        expected_username,
+        already_exists_one,
+        already_exists_two,
+        already_exists_three,
+        mock_user_exists,
+    ):
         """
         Test get_username method of running pipeline
         """
@@ -90,9 +99,11 @@ class PipelineOverridesTest(SamlIntegrationTestUtilities, IntegrationTestMixin, 
             "username": idp_username,
             "email": "test@example.com"
         }
-        mock_user_exists.side_effect = [already_exists, False]
+        mock_user_exists.side_effect = [already_exists_one, already_exists_two, already_exists_three, False]
         __, strategy = self.get_request_and_strategy()
         with mock.patch('common.djangoapps.third_party_auth.pipeline.username_suffix_generator') as mock_suffix:
-            mock_suffix.return_value = '9fe2'
-            final_username = pipeline.get_username(strategy, details, self.provider.backend_class())
-            assert expected_username == final_username['username']
+            mock_suffix.side_effect = ['b', '3f', '9fe2']
+            with mock.patch('common.djangoapps.third_party_auth.pipeline.randint') as mock_randint:
+                mock_randint.side_effect = [1, 2, 4]
+                final_username = pipeline.get_username(strategy, details, self.provider.backend_class())
+                assert expected_username == final_username['username']

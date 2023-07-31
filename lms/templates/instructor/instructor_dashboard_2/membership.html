@@ -177,6 +177,19 @@ from openedx.core.djangolib.markup import HTML, Text
       data-add-button-label="${_("Add Staff")}"
     ></div>
 
+    <div class="auth-list-container"
+      data-rolename="limited_staff"
+      data-display-name="${_("Limited Staff")}"
+      data-info-text="
+        ${_("Course team members with the Limited Staff role help you manage your course. "
+        "Limited Staff can enroll and unenroll learners, as well as modify their grades and "
+        "access all course data. Limited Staff don't have access to your course in Studio. "
+        "You can only give course team roles to enrolled users.")}"
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="${_("Add Limited Staff")}"
+    ></div>
+
     ## Note that "Admin" is identified as "Instructor" in the Django admin panel.
     <div class="auth-list-container"
       data-rolename="instructor"

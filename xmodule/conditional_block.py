@@ -9,7 +9,6 @@ import logging
 from lazy import lazy
 from lxml import etree
 from opaque_keys.edx.locator import BlockUsageLocator
-from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import ReferenceList, Scope, String
@@ -19,11 +18,10 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.seq_block import SequenceMixin
 from xmodule.studio_editable import StudioEditableBlock
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     STUDENT_VIEW,
@@ -44,7 +42,6 @@ class ConditionalBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     StudioEditableBlock,
@@ -146,21 +143,8 @@ class ConditionalBlock(
 
     show_in_read_only_mode = True
 
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/conditional/display.js'),
-            resource_filename(__name__, 'js/src/javascript_loader.js'),
-            resource_filename(__name__, 'js/src/collapsible.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
     mako_template = 'widgets/metadata-edit.html'
     studio_js_module_name = 'SequenceDescriptor'
-    studio_view_js = {
-        'js': [resource_filename(__name__, 'js/src/sequence/edit.js')],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     # Map
     # key: <tag attribute in xml>
@@ -233,7 +217,7 @@ class ConditionalBlock(
         """
         fragment = Fragment()
         fragment.add_content(self.get_html())
-        add_webpack_to_fragment(fragment, 'ConditionalBlockPreview')
+        add_webpack_js_to_fragment(fragment, 'ConditionalBlockDisplay')
         shim_xmodule_js(fragment, 'Conditional')
         return fragment
 
@@ -267,7 +251,7 @@ class ConditionalBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'ConditionalBlockStudio')
+        add_webpack_js_to_fragment(fragment, 'ConditionalBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment
 

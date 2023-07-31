@@ -172,7 +172,6 @@ class GetPreviewHtmlTestCase(ModuleStoreTestCase):
         self.assertFalse(modulestore().has_changes(modulestore().get_item(block.location)))
 
 
-@XBlock.needs("field-data")
 @XBlock.needs("i18n")
 @XBlock.needs("mako")
 @XBlock.needs("replace_urls")
@@ -204,7 +203,6 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         self.user = UserFactory()
         self.course = CourseFactory.create()
         self.request = mock.Mock()
-        self.field_data = mock.Mock()
 
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
     @ddt.data("user", "i18n", "field-data", "teams_configuration", "replace_urls")
@@ -213,11 +211,7 @@ class StudioXBlockServiceBindingTest(ModuleStoreTestCase):
         Tests that the 'user' and 'i18n' services are provided by the Studio runtime.
         """
         block = BlockFactory(category="pure", parent=self.course)
-        _prepare_runtime_for_preview(
-            self.request,
-            block,
-            self.field_data,
-        )
+        _prepare_runtime_for_preview(self.request, block)
         service = block.runtime.service(block, expected_service)
         self.assertIsNotNone(service)
 
@@ -241,14 +235,9 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         self.request = RequestFactory().get('/dummy-url')
         self.request.user = self.user
         self.request.session = {}
-        self.field_data = mock.Mock()
         self.contentstore = contentstore()
         self.block = BlockFactory(category="problem", parent=course)
-        _prepare_runtime_for_preview(
-            self.request,
-            block=self.block,
-            field_data=mock.Mock(),
-        )
+        _prepare_runtime_for_preview(self.request, block=self.block)
         self.course = self.store.get_item(course.location)
 
     def test_get_user_role(self):
@@ -303,11 +292,7 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         """Test anonymous_user_id on a block which uses per-student anonymous IDs"""
         # Create the runtime with the flag turned on.
         block = BlockFactory(category="problem", parent=self.course)
-        _prepare_runtime_for_preview(
-            self.request,
-            block=block,
-            field_data=mock.Mock(),
-        )
+        _prepare_runtime_for_preview(self.request, block=block)
         deprecated_anonymous_user_id = (
             block.runtime.service(block, 'user').get_current_user().opt_attrs.get(ATTR_KEY_DEPRECATED_ANONYMOUS_USER_ID)
         )
@@ -318,11 +303,7 @@ class CmsModuleSystemShimTest(ModuleStoreTestCase):
         """Test anonymous_user_id on a block which uses per-course anonymous IDs"""
         # Create the runtime with the flag turned on.
         block = BlockFactory(category="lti", parent=self.course)
-        _prepare_runtime_for_preview(
-            self.request,
-            block=block,
-            field_data=mock.Mock(),
-        )
+        _prepare_runtime_for_preview(self.request, block=block)
 
         anonymous_user_id = (
             block.runtime.service(block, 'user').get_current_user().opt_attrs.get(ATTR_KEY_ANONYMOUS_USER_ID)

@@ -157,6 +157,36 @@ class TestAboutPageRecommendationsView(TestRecommendationsBase):
         assert segment_mock.call_args[0][1] == "edx.bi.user.recommendations.viewed"
 
 
+class TestRecommendationsContextView(APITestCase):
+    """Unit tests for the Recommendations Context View"""
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.password = "test"
+        self.url = reverse_lazy("learner_recommendations:recommendations_context")
+
+    @mock.patch("lms.djangoapps.learner_recommendations.views.country_code_from_ip")
+    def test_successful_response(self, country_code_from_ip_mock):
+        """Test that country code gets sent back when authenticated"""
+
+        country_code_from_ip_mock.return_value = "za"
+        self.client.login(username=self.user.username, password=self.password)
+
+        response = self.client.get(self.url)
+        response_data = json.loads(response.content)
+
+        self.assertEqual(response_data["countryCode"], "za")
+
+    def test_unauthenticated_response(self):
+        """
+        Test that a 401 is sent back if an anauthenticated user calls endpoint
+        """
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 401)
+
+
 class TestCrossProductRecommendationsView(APITestCase):
     """Unit tests for the Cross Product Recommendations View"""
 
@@ -387,13 +417,12 @@ class TestProductRecommendationsView(APITestCase):
                 "image": {
                     "src": "https://www.logo_image_url.com",
                 },
-                "url_slug": "https://www.marketing_url.com",
                 "course_type": "executive-education",
                 "owners": [
                     {
-                            "key": "org-1",
-                            "name": "org 1",
-                            "logo_image_url": "https://discovery.com/organization/logos/org-1.png",
+                        "key": "org-1",
+                        "name": "org 1",
+                        "logo_image_url": "https://discovery.com/organization/logos/org-1.png",
                     },
                 ],
                 "course_runs": [
@@ -405,6 +434,8 @@ class TestProductRecommendationsView(APITestCase):
                         "status": "published"
                     }
                 ],
+                "marketing_url": "https://www.marketing_url.com/course/some-course",
+                "advertised_course_run_uuid": f"course-v1:{key}+2023_T2",
             }
             if keys_with_restriction and key in keys_with_restriction:
                 course.update({

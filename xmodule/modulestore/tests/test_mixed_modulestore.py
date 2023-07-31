@@ -15,8 +15,14 @@ from uuid import uuid4
 from unittest.mock import Mock, call, patch
 
 import ddt
-from openedx_events.content_authoring.data import XBlockData
-from openedx_events.content_authoring.signals import XBLOCK_DELETED, XBLOCK_PUBLISHED
+from openedx_events.content_authoring.data import CourseData, XBlockData
+from openedx_events.content_authoring.signals import (
+    COURSE_CREATED,
+    XBLOCK_CREATED,
+    XBLOCK_DELETED,
+    XBLOCK_PUBLISHED,
+    XBLOCK_UPDATED
+)
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 import pymongo
 import pytest
@@ -113,6 +119,9 @@ class CommonMixedModuleStoreSetup(CourseComparisonTest, OpenEdxEventsTestMixin):
         'xblock_mixins': modulestore_options['xblock_mixins'],
     }
     ENABLED_OPENEDX_EVENTS = [
+        "org.openedx.content_authoring.course.created.v1",
+        "org.openedx.content_authoring.xblock.created.v1",
+        "org.openedx.content_authoring.xblock.updated.v1",
         "org.openedx.content_authoring.xblock.deleted.v1",
         "org.openedx.content_authoring.xblock.published.v1",
     ]
@@ -498,7 +507,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         assert {'course', 'about'}.issubset({item.location.block_type for item in items})  # pylint: disable=line-too-long
         # Assert that about is a detached category found in get_items
         assert [item.location.block_type for item in items if item.location.block_type == 'about'][0]\
-               in DETACHED_XBLOCK_TYPES
+            in DETACHED_XBLOCK_TYPES
         assert len(items) == 2
 
         # Check that orphans are not found
@@ -740,6 +749,79 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         # delete vertical and check sequential has no changes
         self.store.delete_item(vertical.location, self.user_id)
         assert not self._has_changes(sequential.location)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_course_create_event(self, default_ms):
+        """
+        Check that COURSE_CREATED event is sent when a course is created.
+        """
+        self.initdb(default_ms)
+
+        event_receiver = Mock()
+        COURSE_CREATED.connect(event_receiver)
+
+        test_course = self.store.create_course('test_org', 'test_course', 'test_run', self.user_id)
+
+        event_receiver.assert_called()
+
+        self.assertDictContainsSubset(
+            {
+                "signal": COURSE_CREATED,
+                "sender": None,
+                "course": CourseData(
+                    course_key=test_course.id,
+                ),
+            },
+            event_receiver.call_args.kwargs
+        )
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_xblock_create_event(self, default_ms):
+        """
+        Check that XBLOCK_CREATED event is sent when xblock is created.
+        """
+        self.initdb(default_ms)
+
+        event_receiver = Mock()
+        XBLOCK_CREATED.connect(event_receiver)
+
+        test_course = self.store.create_course('test_org', 'test_course', 'test_run', self.user_id)
+
+        # create sequential to test against
+        sequential = self.store.create_child(self.user_id, test_course.location, 'sequential', 'test_sequential')
+
+        event_receiver.assert_called()
+
+        assert event_receiver.call_args.kwargs['signal'] == XBLOCK_CREATED
+        assert event_receiver.call_args.kwargs['xblock_info'].usage_key == sequential.location
+        assert event_receiver.call_args.kwargs['xblock_info'].block_type == sequential.location.block_type
+        assert event_receiver.call_args.kwargs['xblock_info'].version.for_branch(None) == sequential.location
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_xblock_update_event(self, default_ms):
+        """
+        Check that XBLOCK_UPDATED event is sent when xblock is updated.
+        """
+        self.initdb(default_ms)
+
+        event_receiver = Mock()
+        XBLOCK_UPDATED.connect(event_receiver)
+
+        test_course = self.store.create_course('test_org', 'test_course', 'test_run', self.user_id)
+
+        # create sequential to test against
+        sequential = self.store.create_child(self.user_id, test_course.location, 'sequential', 'test_sequential')
+
+        # Change the xblock
+        sequential.display_name = 'Updated Display Name'
+        self.store.update_item(sequential, user_id=self.user_id)
+
+        event_receiver.assert_called()
+
+        assert event_receiver.call_args.kwargs['signal'] == XBLOCK_UPDATED
+        assert event_receiver.call_args.kwargs['xblock_info'].usage_key == sequential.location
+        assert event_receiver.call_args.kwargs['xblock_info'].block_type == sequential.location.block_type
+        assert event_receiver.call_args.kwargs['xblock_info'].version.for_branch(None) == sequential.location
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_xblock_publish_event(self, default_ms):
@@ -1217,7 +1299,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
         """
         for child_location, parent_location, revision in expected_results:
             assert parent_location.for_branch(None) if parent_location else parent_location == \
-                   self.store.get_parent_location(child_location, revision=revision)
+                self.store.get_parent_location(child_location, revision=revision)
 
     def verify_item_parent(self, item_location, expected_parent_location, old_parent_location, is_reverted=False):
         """
@@ -2461,7 +2543,7 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
             Asserts the number of problems with the given display name is the given expected number.
             """
             assert len(self.store.get_items(course_key.for_branch(None), settings={'display_name': display_name})) ==\
-                   expected_number
+                expected_number
 
         def assertProblemNameEquals(expected_display_name):
             """
@@ -3085,6 +3167,7 @@ class TestPublishOverExportImport(CommonMixedModuleStoreSetup):
     Tests which publish (or don't publish) items - and then export/import the course,
     checking the state of the imported items.
     """
+
     def setUp(self):
         """
         Set up the database for testing
@@ -3690,6 +3773,7 @@ class TestAsidesWithMixedModuleStore(CommonMixedModuleStoreSetup):
     """
     Tests of the MixedModulestore interface methods with XBlock asides.
     """
+
     def setUp(self):
         """
         Setup environment for testing
