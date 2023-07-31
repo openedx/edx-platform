@@ -126,9 +126,6 @@ def get_next_problem_block_helper(course_block, exclude_block_types):
             if block.get('type') == 'chapter' and block.get('is_locked'):
                 continue
 
-            if block.get('is_completion_tracked') == False:
-                continue
-
             next_block = next_block or get_next_problem_block_helper(block, exclude_block_types)
 
             if next_block and course_block.get('type') == 'chapter':
