@@ -15,7 +15,8 @@ from edxval.api import (
     get_3rd_party_transcription_plans,
     get_available_transcript_languages,
     get_video_transcript_data,
-    update_transcript_credentials_state_for_org
+    update_transcript_credentials_state_for_org,
+    get_video_transcript
 )
 from opaque_keys.edx.keys import CourseKey
 
@@ -24,6 +25,7 @@ from openedx.core.djangoapps.video_config.models import VideoTranscriptEnabledFl
 from openedx.core.djangoapps.video_pipeline.api import update_3rd_party_transcription_service_credentials
 from xmodule.video_block.transcripts_utils import Transcript, TranscriptsGenerationException  # lint-amnesty, pylint: disable=wrong-import-order
 
+from .toggles import use_mock_video_uploads
 from .video_storage_handlers import TranscriptProvider
 
 LOGGER = logging.getLogger(__name__)
@@ -158,6 +160,13 @@ def handle_transcript_download(request):
     return response
 
 
+def _create_or_update_video_transcript(**kwargs):
+    if use_mock_video_uploads():
+        return True
+
+    return create_or_update_video_transcript(**kwargs)
+
+
 def upload_transcript(request):
     """
     Upload a transcript file
@@ -179,7 +188,7 @@ def upload_transcript(request):
             input_format=Transcript.SRT,
             output_format=Transcript.SJSON
         ).encode()
-        create_or_update_video_transcript(
+        _create_or_update_video_transcript(
             video_id=edx_video_id,
             language_code=language_code,
             metadata={
@@ -232,3 +241,25 @@ def validate_transcript_upload_data(data, files):
 
 def delete_video_transcript(video_id=None, language_code=None):
     return delete_video_transcript_source_function(video_id=video_id, language_code=language_code)
+
+
+def delete_video_transcript_or_404(request):
+    """
+    Delete a video transcript or return 404 if it doesn't exist.
+    """
+    missing = [attr for attr in ['edx_video_id', 'language_code'] if attr not in request.GET]
+    if missing:
+        return JsonResponse(
+            {'error': _('The following parameters are required: {missing}.').format(missing=', '.join(missing))},
+            status=400
+        )
+
+    video_id = request.GET.get('edx_video_id')
+    language_code = request.GET.get('language_code')
+
+    if not get_video_transcript(video_id=video_id, language_code=language_code):
+        return HttpResponseNotFound()
+
+    delete_video_transcript(video_id=video_id, language_code=language_code)
+
+    return JsonResponse(status=200)
