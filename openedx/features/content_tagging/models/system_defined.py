@@ -37,9 +37,13 @@ class OrganizationModelObjectTag(ModelObjectTag):
         return "name"
 
 
-class OrganizationSystemDefinedTaxonomy(ModelSystemDefinedTaxonomy):
+class ContentOrganizationTaxonomy(ContentTaxonomyMixin, ModelSystemDefinedTaxonomy):
     """
-    Organization based system taxonomy class.
+    Organization system-defined taxonomy that accepts ContentTags
+
+    Side note: The organizatiob of an object is already encoded in its usage ID,
+    but a Taxonomy with Organization as Tags is being used so that the objects can be
+    indexed and can be filtered in the same tagging system, without any special casing.
     """
 
     class Meta:
@@ -64,16 +68,7 @@ class ContentLanguageTaxonomy(ContentTaxonomyMixin, LanguageTaxonomy):
 
 class ContentAuthorTaxonomy(ContentTaxonomyMixin, UserSystemDefinedTaxonomy):
     """
-    Author system-defined taxonomy that accepts Content Tags
-    """
-
-    class Meta:
-        proxy = True
-
-
-class ContentOrganizationTaxonomy(ContentTaxonomyMixin, OrganizationSystemDefinedTaxonomy):
-    """
-    Organization system-defined taxonomy that accepts Content Tags
+    Author system-defined taxonomy that accepts ContentTags
     """
 
     class Meta:
