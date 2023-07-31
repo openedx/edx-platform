@@ -342,6 +342,7 @@ django-ses==3.5.0
     # via -r requirements/edx/bundled.in
 django-simple-history==3.1.1
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/kernel.in
     #   edx-enterprise
     #   edx-name-affirmation
@@ -550,7 +551,7 @@ edx-when==2.4.0
     # via
     #   -r requirements/edx/kernel.in
     #   edx-proctoring
-edxval==2.3.0
+edxval==2.4.0
     # via -r requirements/edx/kernel.in
 elasticsearch==7.13.4
     # via
@@ -889,7 +890,7 @@ pyopenssl==22.0.0
     #   -c requirements/edx/../constraints.txt
     #   optimizely-sdk
     #   snowflake-connector-python
-pyparsing==3.1.0
+pyparsing==3.1.1
     # via
     #   chem
     #   openedx-calc
@@ -1096,7 +1097,7 @@ sqlparse==0.4.4
     #   -r requirements/edx/kernel.in
     #   django
     #   openedx-blockstore
-staff-graded-xblock==2.0.1
+staff-graded-xblock==2.1.1
     # via -r requirements/edx/bundled.in
 stevedore==5.1.0
     # via
