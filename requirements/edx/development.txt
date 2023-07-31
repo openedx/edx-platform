@@ -537,8 +537,9 @@ django-pipeline==2.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-django-ratelimit==4.1.0
+django-ratelimit==4.0.0
     # via
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 django-sekizai==4.1.0
@@ -2138,6 +2139,7 @@ walrus==0.9.3
     #   edx-event-bus-redis
 watchdog==3.0.0
     # via
+    #   -r requirements/edx/development.in
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 wcwidth==0.2.6
