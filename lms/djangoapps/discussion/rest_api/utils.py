@@ -391,7 +391,7 @@ class DiscussionNotificationSender:
             extra_context = {}
 
         notification_data = UserNotificationData(
-            user_ids=user_ids,
+            user_ids=[int(user_id) for user_id in user_ids],
             context={
                 "replier_name": self.creator.username,
                 "post_title": self.thread.title,
