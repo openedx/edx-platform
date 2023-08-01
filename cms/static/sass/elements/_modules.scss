@@ -320,7 +320,7 @@
     }
   }
 }
-// New "Paste component" menu, shown on the Unit page to users with a component in their clipboard
+// New "Paste component" menu, shown on the Unit and outline page to users with a component in their clipboard
 .paste-component {
   margin: $baseline ($baseline/2);
 
@@ -450,6 +450,18 @@ $outline-indent-width: $baseline;
 
         @include margin-right($baseline/2);
       }
+    }
+  }
+}
+
+// The "Paste new [Unit/Section/Subsection]" button on the course outline page, visible only when clipboard has the right thing in it
+.outline .paste-component {
+  margin: ($baseline/2) 0; // different margins for the "paste new unit/section/subsection" button on the outline vs. the unit page
+
+  .paste-component-button {
+    // Also there is a smaller font size for this button on the outline vs. the unit page:
+    &.button {
+      font-size: 1.2rem;
     }
   }
 }
