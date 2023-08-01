@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.utils.timezone import now
 from common.djangoapps.student.models import get_user_by_id
 from common.djangoapps.student.models import CourseEnrollment
-
+from datetime import date
 class FunixRelativeDate(models.Model):
     user_id = models.CharField(max_length=255)
     course_id = models.CharField(max_length=255)
@@ -61,7 +61,9 @@ class FunixRelativeDateDAO():
         )
     @classmethod
     def get_start_date_by_course(self,  user_id, course_id):
+        try:
+            enrollment = FunixRelativeDate.objects.get(course_id=course_id, user_id=user_id, index=1)
+            return enrollment.date
+        except :
 
-        enrollment = FunixRelativeDate.objects.filter(course_id=course_id, user_id=user_id, index=1)[0]
-
-        return enrollment.date
+             return date.today()
