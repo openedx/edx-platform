@@ -878,14 +878,14 @@ def student_dashboard(request):  # lint-amnesty, pylint: disable=too-many-statem
         })
     course_enrollments.sort(key=lambda x: x.last_history_activate, reverse=True)
     # Gather urls for course card resume buttons.
-    resume_button_urls = ['' for entitlement in course_entitlements]
-    for url in get_resume_urls_for_enrollments(user, course_enrollments).values():
-        resume_button_urls.append(url)
-    # There must be enough urls for dashboard.html. Template creates course
-    # cards for "enrollments + entitlements".
-    context.update({
-        'resume_button_urls': resume_button_urls
-    })
+    # resume_button_urls = ['' for entitlement in course_entitlements]
+    # for url in get_resume_urls_for_enrollments(user, course_enrollments).values():
+    #     resume_button_urls.append(url)
+    # # There must be enough urls for dashboard.html. Template creates course
+    # # cards for "enrollments + entitlements".
+    # context.update({
+    #     'resume_button_urls': resume_button_urls
+    # })
     
    
     dashboard_template = 'dashboard.html'
