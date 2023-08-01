@@ -80,9 +80,11 @@ class FunixRelativeDateLibary():
 			assignment_blocks = courseware_courses.funix_get_assginment_date_blocks(course=course, user=user, request=None, include_past_dates=True)
 
 		if selected_date is None :
-			selected_date = date.today()
+			last_complete_date = date.today()
+		else :
+			last_complete_date = datetime.strptime(selected_date, "%Y-%m-%d")
+   
 		# last_complete_date = FunixRelativeDateDAO.get_enroll_date_by_id(user_id=user.id, course_id=course_id)
-		last_complete_date = datetime.strptime(selected_date, "%Y-%m-%d")
     
 		# Delete all old date
 		FunixRelativeDateDAO.delete_all_date(user_id=user.id, course_id=course_id)
