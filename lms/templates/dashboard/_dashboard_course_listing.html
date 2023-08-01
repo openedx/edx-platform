@@ -307,6 +307,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
           </div>
 
           <div class="continue-button">
+             <!-- <div>
               % if (show_courseware_link or is_unfulfilled_entitlement) and not is_course_expired:
                 % if course_overview.has_ended():
                   % if not is_unfulfilled_entitlement:
@@ -317,6 +318,7 @@ from lms.djangoapps.experiments.utils import UPSELL_TRACKING_FLAG
                   <%include file="_dashboard_course_resume.html" args="resume_button_url=resume_button_url, course_overview=course_overview, enrollment=enrollment, is_unfulfilled_entitlement=is_unfulfilled_entitlement, course_target=course_target, related_programs=related_programs"/>
                 % endif
               % endif
+            </div>-->
           </div>
         </div>
       </div>

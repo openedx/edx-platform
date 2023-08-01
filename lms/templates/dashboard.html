@@ -226,6 +226,48 @@ from common.djangoapps.student.models import CourseEnrollment
               %>
               <%include file='dashboard/_dashboard_course_listing.html' args='course_overview=course_overview, course_card_index=dashboard_index, enrollment=enrollment, enrollments_fbe_is_on=enrollments_fbe_is_on, is_unfulfilled_entitlement=is_unfulfilled_entitlement, is_fulfilled_entitlement=is_fulfilled_entitlement, entitlement=entitlement, entitlement_session=entitlement_session, entitlement_available_sessions=entitlement_available_sessions, entitlement_expiration_date=entitlement_expiration_date, entitlement_expired_at=entitlement_expired_at, show_courseware_link=show_courseware_link, cert_status=cert_status, can_refund_entitlement=can_refund_entitlement, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, is_paid_course=is_paid_course, is_course_voucher_refundable=is_course_voucher_refundable, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs, display_course_modes_on_dashboard=display_course_modes_on_dashboard, show_consent_link=show_consent_link, enterprise_customer_name=enterprise_customer_name, resume_button_url=resume_button_url, partner_managed_enrollment=partner_managed_enrollment' />
             % endfor
+            
+            <script >
+              const course = document.querySelectorAll('.course');
+              
+              const fetchData = async()=>{
+                try {
+                  let res = await fetch('/api/resume-url')
+                  res = await res.json()
+                  return res
+                }
+                catch (error) {
+                  console.log('error', error)
+                }
+              }
+
+              
+
+              document.addEventListener('DOMContentLoaded', async()=>{
+                  const data =  await fetchData()
+                  
+                  course.forEach(e => {
+                    const course_id = e.getAttribute('aria-labelledby').replace("course-title-", "")
+                    const btn_resume = e.querySelector('.continue-button')
+                    const aElement = document.createElement('a')
+                    aElement.className = 'course-target-link enter-course'
+                    aElement.setAttribute('data-course-key', course_id)
+                    data.resume_button_url.forEach(d =>{
+                      if (d.course_id === course_id){
+                        aElement.href = d.url
+                        aElement.textContent = d.textContent
+                        const spanElement = document.createElement('span')
+                        spanElement.className = 'sr'
+                        spanElement.textContent = d.display_name
+                        aElement.appendChild(spanElement)
+                      }
+                     
+                    })
+                    btn_resume.appendChild(aElement)
+                  })
+              })
+            </script>       
+
             % if show_load_all_courses_link:
                 <br/>
                  ${len(course_enrollments)} ${_("results successfully populated,")}

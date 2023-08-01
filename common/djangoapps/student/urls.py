@@ -28,4 +28,6 @@ urlpatterns = [
         views.activate_secondary_email,
         name='activate_secondary_email'
     ),
+    
+    path('api/resume-url/', views.get_resume_button_urls, name='get_resume_button_urls')
 ]
