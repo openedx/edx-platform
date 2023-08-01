@@ -902,3 +902,22 @@ $outline-indent-width: $baseline;
     }
   }
 }
+
+// The "actions menu" for subsections, sections, and units on the Studio course outline page
+.outline .actions-list.nav-dd .wrapper-nav-sub {
+
+  @include text-align(left); // Undo the 'text-align: right' inherited from the parent
+
+  z-index: 10;  // stay in front of other components on the page.
+
+  .nav-item {
+    a {
+      // Match styling of ".wrapper-header nav .nav-item a" (dropdowns in Studio header)
+      color: $gray-d1;
+
+      &:hover {
+        color: $uxpl-blue-hover-active;
+      }
+    }
+  }
+}

@@ -216,6 +216,23 @@ function(
             }
         },
 
+        /**
+         * If the new "Actions" menu is enabled, most actions like Configure,
+         * Duplicate, Move, Delete, etc. are moved into this menu. For this
+         * event, we just toggle displaying the menu.
+         * @param {*} event 
+         */
+        showActionsMenu: function(event) {
+            const showActionsButton = event.currentTarget;
+            const subMenu = showActionsButton.parentElement.querySelector(".wrapper-nav-sub");
+            // Code in 'base.js' normally handles toggling these dropdowns but since this one is
+            // not present yet during the domReady event, we have to handle displaying it ourselves.
+            subMenu.classList.toggle("is-shown");
+            // if propagation is not stopped, the event will bubble up to the
+            // body element, which will close the dropdown.
+            event.stopPropagation();
+        },
+
         addButtonActions: function(element) {
             XBlockOutlineView.prototype.addButtonActions.apply(this, arguments);
             element.find('.configure-button').click(function(event) {
@@ -232,6 +249,9 @@ function(
                     this.highlightsXBlock();
                 }
             }.bind(this));
+            element.find('.action-actions-menu').click((event) => {
+                this.showActionsMenu(event);
+            });
         },
 
         makeContentDraggable: function(element) {
