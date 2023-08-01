@@ -202,6 +202,45 @@ function(
             }
         },
 
+        /** Copy a Unit to the clipboard */
+        copyXBlock() {
+            const clipboardEndpoint = "/api/content-staging/v1/clipboard/";
+            // Start showing a "Copying" notification:
+            ViewUtils.runOperationShowingMessage(gettext('Copying'), () => {
+                return $.postJSON(
+                    clipboardEndpoint,
+                    { usage_key: this.model.get('id') },
+                ).then((data) => {
+                    const status = data.content?.status;
+                    if (status === "ready") {
+                        // The Unit has been copied and is ready to use.
+                        return data;
+                    } else if (status === "loading") {
+                        // The clipboard is being loaded asynchonously.
+                        // Poll the endpoint until the copying process is complete:
+                        const deferred = $.Deferred();
+                        const checkStatus = () => {
+                            $.getJSON(clipboardEndpoint, (pollData) => {
+                                const newStatus = pollData.content?.status;
+                                if (newStatus === "ready") {
+                                    deferred.resolve(pollData);
+                                } else if (newStatus === "loading") {
+                                    setTimeout(checkStatus, 1_000);
+                                } else {
+                                    deferred.reject();
+                                    throw new Error(`Unexpected clipboard status "${newStatus}" in successful API response.`);
+                                }
+                            })
+                        }
+                        setTimeout(checkStatus, 1_000);
+                        return deferred;
+                    } else {
+                        throw new Error(`Unexpected clipboard status "${status}" in successful API response.`);
+                    }
+                });
+            });
+        },
+
         highlightsXBlock: function() {
             var modal = CourseOutlineModalsFactory.getModal('highlights', this.model, {
                 onSave: this.refresh.bind(this),
@@ -249,6 +288,10 @@ function(
                     this.highlightsXBlock();
                 }
             }.bind(this));
+            element.find('.copy-button').click((event) => {
+                event.preventDefault();
+                this.copyXBlock();
+            });
             element.find('.action-actions-menu').click((event) => {
                 this.showActionsMenu(event);
             });

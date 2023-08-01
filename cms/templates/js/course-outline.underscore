@@ -188,6 +188,11 @@ if (is_proctored_exam) {
                                             <a class="configure-button" href="#" role="button"><%- gettext('Configure') %></a>
                                         </li>
                                     <% } %>
+                                    <% if (xblockInfo.isVertical()) { %>
+                                        <li class="nav-item">
+                                            <a class="copy-button" href="#" role="button"><%- gettext('Copy to Clipboard') %></a>
+                                        </li>
+                                    <% } %>
                                     <% if (xblockInfo.isDuplicable()) { %>
                                         <li class="nav-item">
                                             <a class="duplicate-button" href="#" role="button"><%- gettext('Duplicate') %></a>
