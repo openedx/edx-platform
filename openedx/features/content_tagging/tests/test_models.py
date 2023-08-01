@@ -6,9 +6,9 @@ from django.test.testcases import TestCase
 
 from openedx_tagging.core.tagging.models import (
     ObjectTag,
-    Taxonomy,
     Tag,
 )
+from openedx_tagging.core.tagging.api import create_taxonomy
 from ..models import (
     ContentLanguageTaxonomy,
     ContentAuthorTaxonomy,
@@ -42,18 +42,18 @@ class TestSystemDefinedModels(TestCase):
         """
         Test that the respective validations are being called
         """
-        taxonomy = Taxonomy(
-            name='Test taxonomy'
+        taxonomy = create_taxonomy(
+            name='Test taxonomy',
+            taxonomy_class=taxonomy_cls,
         )
-        taxonomy.taxonomy_class = taxonomy_cls
-        taxonomy.save()
-        taxonomy = taxonomy.cast()
+
         tag = Tag(
             value="value",
             external_id="external_id",
+            taxonomy=taxonomy,
         )
-        tag.taxonomy = taxonomy
         tag.save()
+
         object_tag = ObjectTag(
             object_id='object_id',
             taxonomy=taxonomy,

@@ -41,7 +41,7 @@ class ContentOrganizationTaxonomy(ContentTaxonomyMixin, ModelSystemDefinedTaxono
     """
     Organization system-defined taxonomy that accepts ContentTags
 
-    Side note: The organizatiob of an object is already encoded in its usage ID,
+    Side note: The organization of an object is already encoded in its usage ID,
     but a Taxonomy with Organization as Tags is being used so that the objects can be
     indexed and can be filtered in the same tagging system, without any special casing.
     """
