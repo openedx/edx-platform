@@ -167,6 +167,7 @@ class StudentAccountDeletionConfirmationModal extends React.Component {
                                                 <span>{bodyDeletion} </span>
                                                 <span>{bodyDeletion2}</span>
                                             </p>
+                                            {/* eslint-disable-next-line react/no-danger */}
                                             <p dangerouslySetInnerHTML={{ __html: loseAccessText }} />
                                         </div>
                                     </div>

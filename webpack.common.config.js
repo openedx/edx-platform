@@ -24,8 +24,8 @@ var defineFooter = new RegExp('(' + defineCallFooter.source + ')|('
                              + defineDirectFooter.source + ')|('
                              + defineFancyFooter.source + ')', 'm');
 
-var staticRootLms = process.env.STATIC_ROOT_LMS || "./test_root/staticfiles";
-var staticRootCms = process.env.STATIC_ROOT_CMS || (staticRootLms + "/studio");
+var staticRootLms = process.env.STATIC_ROOT_LMS || './test_root/staticfiles';
+var staticRootCms = process.env.STATIC_ROOT_CMS || (staticRootLms + '/studio');
 
 var workerConfig = function() {
     try {
@@ -133,7 +133,7 @@ module.exports = Merge.smart({
         },
 
         plugins: [
-            new webpack.ProgressPlugin(),  // report progress during compilation
+            new webpack.ProgressPlugin(), // report progress during compilation
             new webpack.NoEmitOnErrorsPlugin(),
             new webpack.NamedModulesPlugin(),
             new BundleTracker({
@@ -310,7 +310,7 @@ module.exports = Merge.smart({
                     test: /xblock\/runtime.v1/,
                     loader: 'exports-loader?window.XBlock!imports-loader?XBlock=xblock/core,this=>window'
                 },
-                /*******************************************************************************************************
+                /** *****************************************************************************************************
                 /* BUILT-IN XBLOCK ASSETS WITH GLOBAL DEFINITIONS:
                  *
                  * The monstrous list of globally-namespace modules below is the result of a JS build refactoring.
@@ -427,7 +427,7 @@ module.exports = Merge.smart({
                 },
                 /*
                  * END BUILT-IN XBLOCK ASSETS WITH GLOBAL DEFINITIONS
-                 ******************************************************************************************************/
+                 ***************************************************************************************************** */
                 {
                     test: /codemirror/,
                     loader: 'exports-loader?window.CodeMirror'
