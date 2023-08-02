@@ -44,9 +44,9 @@ function getEmail() {
 (  function(w, d, s, u) {
 w.RocketChat = function(c) { w.RocketChat._.push(c) }; w.RocketChat._ = []; w.RocketChat.url = u;
 var h = d.getElementsByTagName(s)[0], j = d.createElement(s);
-j.async = true; j.src = 'http://52.76.240.188:3000/livechat/rocketchat-livechat.min.js?_=201903270000';
+j.async = true; j.src = 'https://test-xseries2.funix.edu.vn/livechat/rocketchat-livechat.min.js?_=201903270000';
 h.parentNode.insertBefore(j, h);
-})(window, document, 'script', 'http://52.76.240.188:3000/livechat');
+})(window, document, 'script', 'https://test-xseries2.funix.edu.vn/livechat');
 RocketChat(async function() {
 	const email = await getEmail()
 	this.registerGuest({
