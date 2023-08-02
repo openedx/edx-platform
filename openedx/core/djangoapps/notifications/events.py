@@ -1,12 +1,13 @@
 """ Events for notification app. """
 
 from eventtracking import tracker
-from common.djangoapps.track import contexts
 
+from common.djangoapps.track import contexts
 
 NOTIFICATION_PREFERENCES_VIEWED = 'edx.notifications.preferences.viewed'
 NOTIFICATION_GENERATED = 'edx.notifications.generated'
-NOTIFICATION_READ = 'edx.notifications.read'
+NOTIFICATION_READ = 'edx.notification.read'
+NOTIFICATION_APP_ALL_READ = 'edx.notifications.app_all_read'
 NOTIFICATION_PREFERENCES_UPDATED = 'edx.notifications.preferences.updated'
 
 
@@ -74,7 +75,7 @@ def notification_generated_event(user, notification):
 
 def notification_read_event(user, notification):
     """
-    Emit an event when a notification is read.
+    Emit an event when a notification app is marked read for a user.
     """
     context = contexts.course_context_from_course_id(notification.course_id)
     with tracker.get_tracker().context(NOTIFICATION_READ, context):
@@ -82,6 +83,19 @@ def notification_read_event(user, notification):
             NOTIFICATION_READ,
             notification_event_context(user, notification.course_id, notification)
         )
+
+
+def notifications_app_all_read_event(user, app_name):
+    """
+    Emit an event when a notification is read.
+    """
+    tracker.emit(
+        NOTIFICATION_APP_ALL_READ,
+        {
+            'user_id': str(user.id),
+            'notification_app': app_name,
+        }
+    )
 
 
 def notification_preference_update_event(user, course_id, updated_preference):

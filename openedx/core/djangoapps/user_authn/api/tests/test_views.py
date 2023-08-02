@@ -117,6 +117,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'autoSubmitRegForm': False,
                 'syncLearnerProfileData': False,
                 'countryCode': self.country_code,
+                'welcomePageRedirectUrl': None,
                 'pipelineUserDetails': self.pipeline_user_details,
             },
             'registrationFields': {},
@@ -391,16 +392,19 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
     @override_settings(
         ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
         REGISTRATION_EXTRA_FIELDS={'specialty': 'optional', 'goals': 'optional'},
+        LOGIN_REDIRECT_WHITELIST=['openedx.service'],
     )
     def test_welcome_page_context(self):
         """
         Test MFE Context API response for welcome page
         """
-        self.query_params.update({'is_welcome_page': True})
-        response = self.client.get(self.url, self.query_params)
+        redirect_url = 'https://openedx.service/coolpage'
+        self.query_params.update({'is_welcome_page': True, 'next': redirect_url})
+        response = self.client.get(self.url, self.query_params, HTTP_ACCEPT='*/*')
         assert response.status_code == status.HTTP_200_OK
         assert list(response.data['optionalFields']['fields'].keys()) == ['specialty', 'goals']
         assert list(response.data['optionalFields']['extended_profile']) == ['specialty']
+        assert response.data['contextData']['welcomePageRedirectUrl'] == redirect_url
 
 
 @skip_unless_lms

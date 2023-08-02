@@ -20,8 +20,6 @@ from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from common.djangoapps.student import auth
-from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
 import openedx.core.djangoapps.content_staging.api as content_staging_api
 
 from .utils import reverse_course_url, reverse_library_url, reverse_usage_url
@@ -377,15 +375,3 @@ def is_item_in_course_tree(item):
         ancestor = ancestor.get_parent()
 
     return ancestor is not None
-
-
-def is_content_creator(user, org):
-    """
-    Check if the user has the role to create content.
-
-    This function checks if the User has role to create content
-    or if the org is supplied, it checks for Org level course content
-    creator.
-    """
-    return (auth.user_has_role(user, CourseCreatorRole()) or
-            auth.user_has_role(user, OrgContentCreatorRole(org=org)))

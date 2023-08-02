@@ -2,6 +2,18 @@
   "name": "edx",
   "version": "0.1.0",
   "repository": "https://github.com/openedx/edx-platform",
+  "scripts": {
+    "postinstall": "scripts/copy-node-modules.sh",
+    "build": "echo 'WARNING: `npm run build` in edx-platform is experimental. Use at your own risk.' && npm run webpack && npm run compile-sass",
+    "build-dev": "echo 'WARNING: `npm run build-dev` in edx-platform is experimental. Use at your own risk.' && npm run webpack-dev && npm run compile-sass-dev",
+    "webpack": "NODE_ENV=${NODE_ENV:-production} \"$(npm bin)/webpack\" --config=${WEBPACK_CONFIG_PATH:-webpack.prod.config.js}",
+    "webpack-dev": "NODE_ENV=development \"$(npm bin)/webpack\" --config=webpack.dev.config.js",
+    "compile-sass": "scripts/compile_sass.py --env=${NODE_ENV:-production}",
+    "compile-sass-dev": "scripts/compile_sass.py --env=development",
+    "watch": "echo 'WARNING: `npm run watch` in edx-platform is experimental. Use at your own risk.' && { npm run watch-webpack& npm run watch-sass& } && sleep infinity",
+    "watch-webpack": "npm run webpack-dev -- --watch",
+    "watch-sass": "scripts/watch_sass.sh"
+  },
   "dependencies": {
     "@babel/core": "7.19.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.18.9",

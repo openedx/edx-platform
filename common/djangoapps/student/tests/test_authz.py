@@ -22,6 +22,7 @@ from common.djangoapps.student.auth import (
 from common.djangoapps.student.roles import (
     CourseCreatorRole,
     CourseInstructorRole,
+    CourseLimitedStaffRole,
     CourseStaffRole,
     OrgContentCreatorRole
 )
@@ -200,7 +201,7 @@ class CCXCourseGroupTest(TestCase):
 
 class CourseGroupTest(TestCase):
     """
-    Tests for instructor and staff groups for a particular course.
+    Tests for instructor, staff and limited staff groups for a particular course.
     """
 
     def setUp(self):
@@ -212,6 +213,9 @@ class CourseGroupTest(TestCase):
         )
         self.staff = UserFactory.create(
             username='teststaff', email='teststaff+courses@edx.org', password='foo',
+        )
+        self.limited_staff = UserFactory.create(
+            username='testlimitedstaff', email='testlimitedstaff+courses@edx.org', password='foo',
         )
         self.course_key = CourseLocator('mitX', '101', 'test')
 
@@ -229,6 +233,14 @@ class CourseGroupTest(TestCase):
         assert not user_has_role(self.staff, CourseStaffRole(self.course_key))
         add_users(self.creator, CourseStaffRole(self.course_key), self.staff)
         assert user_has_role(self.staff, CourseStaffRole(self.course_key))
+
+        # Add another user to the limited staff role.
+        assert not user_has_role(self.limited_staff, CourseLimitedStaffRole(self.course_key))
+        add_users(self.creator, CourseLimitedStaffRole(self.course_key), self.limited_staff)
+        assert user_has_role(self.limited_staff, CourseLimitedStaffRole(self.course_key))
+
+        # Verify that limited staff inherits from staff.
+        assert user_has_role(self.limited_staff, CourseStaffRole(self.course_key))
 
     def test_add_user_to_course_group_permission_denied(self):
         """
@@ -249,6 +261,12 @@ class CourseGroupTest(TestCase):
         add_users(self.creator, CourseStaffRole(self.course_key), self.staff)
         assert user_has_role(self.staff, CourseStaffRole(self.course_key))
 
+        add_users(self.creator, CourseLimitedStaffRole(self.course_key), self.limited_staff)
+        assert user_has_role(self.limited_staff, CourseLimitedStaffRole(self.course_key))
+
+        remove_users(self.creator, CourseLimitedStaffRole(self.course_key), self.limited_staff)
+        assert not user_has_role(self.limited_staff, CourseLimitedStaffRole(self.course_key))
+
         remove_users(self.creator, CourseStaffRole(self.course_key), self.staff)
         assert not user_has_role(self.staff, CourseStaffRole(self.course_key))
 
@@ -266,6 +284,15 @@ class CourseGroupTest(TestCase):
         add_users(self.global_admin, CourseStaffRole(self.course_key), self.creator, self.staff, another_staff)
         with pytest.raises(PermissionDenied):
             remove_users(self.staff, CourseStaffRole(self.course_key), another_staff)
+
+    def test_no_limited_staff_read_or_write_access(self):
+        """
+        Test that course limited staff have no read or write access.
+        """
+        add_users(self.global_admin, CourseLimitedStaffRole(self.course_key), self.limited_staff)
+
+        assert not has_studio_read_access(self.limited_staff, self.course_key)
+        assert not has_studio_write_access(self.limited_staff, self.course_key)
 
 
 class CourseOrgGroupTest(TestCase):

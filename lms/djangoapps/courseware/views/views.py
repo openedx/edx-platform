@@ -1521,7 +1521,7 @@ def _check_sequence_exam_access(request, location):
 @xframe_options_exempt
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
-def render_xblock(request, usage_key_string, check_if_enrolled=True):
+def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_staff_debug_info=False):
     """
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
@@ -1571,8 +1571,12 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         # get the block, which verifies whether the user has access to the block.
         recheck_access = request.GET.get('recheck_access') == '1'
         block, _ = get_block_by_usage_id(
-            request, str(course_key), str(usage_key), disable_staff_debug_info=True, course=course,
-            will_recheck_access=recheck_access
+            request,
+            str(course_key),
+            str(usage_key),
+            disable_staff_debug_info=disable_staff_debug_info,
+            course=course,
+            will_recheck_access=recheck_access,
         )
 
         student_view_context = request.GET.dict()

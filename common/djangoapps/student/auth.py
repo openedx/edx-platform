@@ -15,6 +15,7 @@ from common.djangoapps.student.roles import (
     CourseBetaTesterRole,
     CourseCreatorRole,
     CourseInstructorRole,
+    CourseLimitedStaffRole,
     CourseRole,
     CourseStaffRole,
     GlobalStaff,
@@ -92,6 +93,9 @@ def get_user_permissions(user, course_key, org=None):
         return all_perms
     if course_key and user_has_role(user, CourseInstructorRole(course_key)):
         return all_perms
+    # Limited Course Staff does not have access to Studio.
+    if course_key and user_has_role(user, CourseLimitedStaffRole(course_key)):
+        return STUDIO_NO_PERMISSIONS
     # Staff have all permissions except EDIT_ROLES:
     if OrgStaffRole(org=org).has_user(user) or (course_key and user_has_role(user, CourseStaffRole(course_key))):
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
@@ -148,6 +152,18 @@ def has_studio_read_access(user, course_key):
     there is read-only access to content libraries.
     """
     return bool(STUDIO_VIEW_CONTENT & get_user_permissions(user, course_key))
+
+
+def is_content_creator(user, org):
+    """
+    Check if the user has the role to create content.
+
+    This function checks if the User has role to create content
+    or if the org is supplied, it checks for Org level course content
+    creator.
+    """
+    return (user_has_role(user, CourseCreatorRole()) or
+            user_has_role(user, OrgContentCreatorRole(org=org)))
 
 
 def add_users(caller, role, *users):

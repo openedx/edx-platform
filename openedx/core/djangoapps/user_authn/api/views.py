@@ -81,10 +81,16 @@ class MFEContextView(APIView):
         if settings.ENABLE_DYNAMIC_REGISTRATION_FIELDS:
             if request_params.get('is_welcome_page'):
                 optional_fields = self._get_optional_fields_context()
+                context = {
+                    'context_data': {
+                        'welcomePageRedirectUrl': redirect_to if redirect_to == request_params.get('next') else None,
+                    },
+                    'optional_fields': optional_fields,
+                }
                 return Response(
                     status=status.HTTP_200_OK,
                     data=MFEContextSerializer(
-                        {'optional_fields': optional_fields} if optional_fields else {}
+                        context if optional_fields else {}
                     ).data
                 )
 

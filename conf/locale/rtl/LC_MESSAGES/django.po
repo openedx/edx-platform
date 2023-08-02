@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-10 21:36+0000\n"
-"PO-Revision-Date: 2023-07-10 21:36:30.462694\n"
+"POT-Creation-Date: 2023-07-30 20:35+0000\n"
+"PO-Revision-Date: 2023-07-30 20:35:57.446921\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -158,6 +158,17 @@ msgstr "Ᵽǝndᴉnƃ"
 #: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "Ɇɯdʇʎ"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+msgid "Invalid data"
+msgstr "Ɨnʌɐlᴉd dɐʇɐ"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -344,7 +355,6 @@ msgstr "{currency_symbol}{price}"
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "Fɹǝǝ"
@@ -3304,6 +3314,14 @@ msgstr "Ȼnsʇøɯ dɐƃǝs"
 msgid "Provide additional course content and resources with custom pages"
 msgstr "Ᵽɹøʌᴉdǝ ɐddᴉʇᴉønɐl ɔønɹsǝ ɔønʇǝnʇ ɐnd ɹǝsønɹɔǝs ʍᴉʇɥ ɔnsʇøɯ dɐƃǝs"
 
+#: lms/djangoapps/courseware/plugins.py
+msgid "Open Response Assessment Settings"
+msgstr "Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ Sǝʇʇᴉnƃs"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Course level settings for Open Response Assessment."
+msgstr "Ȼønɹsǝ lǝʌǝl sǝʇʇᴉnƃs ɟøɹ Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ."
+
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
 #: cms/templates/widgets/header.html
@@ -5788,55 +5806,6 @@ msgstr "Ⱥlløʍ"
 msgid "Error"
 msgstr "Ɇɹɹøɹ"
 
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Check out this course on edx"
-msgstr "Ȼɥǝɔʞ ønʇ ʇɥᴉs ɔønɹsǝ øn ǝdx"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Enroll now"
-msgstr "Ɇnɹøll nøʍ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "View Course"
-msgstr "Vᴉǝʍ Ȼønɹsǝ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Estimated 6 weeks"
-msgstr "Ɇsʇᴉɯɐʇǝd 6 ʍǝǝʞs"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "4-6 hours per week"
-msgstr "4-6 ɥønɹs dǝɹ ʍǝǝʞ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Self-paced"
-msgstr "Sǝlɟ-dɐɔǝd"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Progress at your own speed"
-msgstr "Ᵽɹøƃɹǝss ɐʇ ʎønɹ øʍn sdǝǝd"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Optional upgrade available"
-msgstr "Ødʇᴉønɐl ndƃɹɐdǝ ɐʌɐᴉlɐblǝ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "Check out this course on %(platform_name)s."
-msgstr "Ȼɥǝɔʞ ønʇ ʇɥᴉs ɔønɹsǝ øn %(platform_name)s."
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "This email message was automatically sent by %(lms_url)s "
-msgstr "Ŧɥᴉs ǝɯɐᴉl ɯǝssɐƃǝ ʍɐs ɐnʇøɯɐʇᴉɔɐllʎ sǝnʇ bʎ %(lms_url)s "
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
-#, python-format
-msgid "%(display_name)s"
-msgstr "%(display_name)s"
-
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
 msgstr "ƗĐ Vǝɹᴉɟᴉɔɐʇᴉøn Ⱥddɹøʌǝd"
@@ -7503,21 +7472,21 @@ msgstr "Łǝɐɹnǝɹ Ᵽɐʇɥʍɐʎs"
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
-"<{strong}>{post_title}</{strong}></{p}>"
+"<{p}><{strong}>{replier_name}</{strong}> commented on your response to the "
+"post <{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
-"<{p}><{strong}>{replier_name}</{strong}> ɹǝdlᴉǝd øn ʎønɹ ɹǝsdønsǝ ᴉn "
-"<{strong}>{post_title}</{strong}></{p}>"
+"<{p}><{strong}>{replier_name}</{strong}> ɔøɯɯǝnʇǝd øn ʎønɹ ɹǝsdønsǝ ʇø ʇɥǝ "
+"døsʇ <{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on "
-"<{strong}>{author_name}</{strong}> response to your post "
+"<{p}><{strong}>{replier_name}</{strong}> commented on "
+"<{strong}>{author_name}'s</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
-"<{p}><{strong}>{replier_name}</{strong}> ɹǝdlᴉǝd øn "
-"<{strong}>{author_name}</{strong}> ɹǝsdønsǝ ʇø ʎønɹ døsʇ "
+"<{p}><{strong}>{replier_name}</{strong}> ɔøɯɯǝnʇǝd øn "
+"<{strong}>{author_name}'s</{strong}> ɹǝsdønsǝ ʇø ʎønɹ døsʇ "
 "<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
@@ -9013,6 +8982,18 @@ msgid ""
 msgstr ""
 "Ɏøn ɥɐʌǝ snɔɔǝssɟnllʎ sɥᴉɟʇǝd ʎønɹ ɔønɹsǝ sɔɥǝdnlǝ ɐnd ʎønɹ ɔɐlǝndɐɹ ᴉs nd "
 "ʇø dɐʇǝ."
+
+#: openedx/features/content_tagging/models.py wiki/models/article.py
+msgid "owner"
+msgstr "øʍnǝɹ"
+
+#: openedx/features/content_tagging/models.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"Øɹƃɐnᴉzɐʇᴉøn ʇɥɐʇ ᴉs ɹǝlɐʇǝd ʇø ʇɥᴉs ʇɐxønøɯʎ.Ɨɟ Nønǝ, ʇɥǝn ʇɥᴉs ʇɐxønøɯʎ ᴉs"
+" ɹǝlɐʇǝd ʇø ɐll øɹƃɐnᴉzɐʇᴉøns."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -12771,6 +12752,17 @@ msgstr "Ⱥll ɔønɹsǝ ønʇlᴉnǝ ɹǝƃǝnǝɹɐʇᴉøns snɔɔǝssɟnllʎ 
 msgid "Regenerate *all* course outlines"
 msgstr "Ɍǝƃǝnǝɹɐʇǝ *ɐll* ɔønɹsǝ ønʇlᴉnǝs"
 
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+msgid "Upload completed"
+msgstr "Ʉdløɐd ɔøɯdlǝʇǝd"
+
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+#, python-brace-format
+msgid ""
+"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
+msgstr ""
+"Fᴉlǝ {filename} ǝxɔǝǝds ɯɐxᴉɯnɯ sᴉzǝ øɟ {maximum_size_in_megabytes} MɃ."
+
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
 "The groups in this configuration can be mapped to cohorts in the Instructor "
@@ -13110,17 +13102,6 @@ msgid ""
 msgstr ""
 "Ŧɥǝ ᴉɯɐƃǝ ɟᴉlǝ nɐɯǝ ɔɐn ønlʎ ɔønʇɐᴉn lǝʇʇǝɹs, nnɯbǝɹs, ɥʎdɥǝns (-), ɐnd "
 "nndǝɹsɔøɹǝs (_)."
-
-#: cms/djangoapps/contentstore/views/assets.py
-msgid "Upload completed"
-msgstr "Ʉdløɐd ɔøɯdlǝʇǝd"
-
-#: cms/djangoapps/contentstore/views/assets.py
-#, python-brace-format
-msgid ""
-"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
-msgstr ""
-"Fᴉlǝ {filename} ǝxɔǝǝds ɯɐxᴉɯnɯ sᴉzǝ øɟ {maximum_size_in_megabytes} MɃ."
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -13502,15 +13483,6 @@ msgstr "Ⱥ nøn zǝɹø døsᴉʇᴉʌǝ ᴉnʇǝƃǝɹ ᴉs ǝxdǝɔʇǝd"
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr "Łᴉbɹɐɹᴉǝs ɔɐnnøʇ ɥɐʌǝ ɯøɹǝ ʇɥɐn {limit} ɔøɯdønǝnʇs"
-
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
-msgid "Invalid data"
-msgstr "Ɨnʌɐlᴉd dɐʇɐ"
-
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "There was a problem pasting your component."
@@ -16701,6 +16673,11 @@ msgid "You are enrolled in this course"
 msgstr "Ɏøn ɐɹǝ ǝnɹøllǝd ᴉn ʇɥᴉs ɔønɹsǝ"
 
 #: lms/templates/courseware/course_about.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "View Course"
+msgstr "Vᴉǝʍ Ȼønɹsǝ"
+
+#: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr "Ɇnɹøllɯǝnʇ ᴉn ʇɥᴉs ɔønɹsǝ ᴉs bʎ ᴉnʌᴉʇɐʇᴉøn ønlʎ"
 
@@ -19265,6 +19242,26 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
 msgstr "Ⱥdd Sʇɐɟɟ"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Limited Staff"
+msgstr "Łᴉɯᴉʇǝd Sʇɐɟɟ"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Course team members with the Limited Staff role help you manage your course."
+" Limited Staff can enroll and unenroll learners, as well as modify their "
+"grades and access all course data. Limited Staff don't have access to your "
+"course in Studio. You can only give course team roles to enrolled users."
+msgstr ""
+"Ȼønɹsǝ ʇǝɐɯ ɯǝɯbǝɹs ʍᴉʇɥ ʇɥǝ Łᴉɯᴉʇǝd Sʇɐɟɟ ɹølǝ ɥǝld ʎøn ɯɐnɐƃǝ ʎønɹ ɔønɹsǝ."
+" Łᴉɯᴉʇǝd Sʇɐɟɟ ɔɐn ǝnɹøll ɐnd nnǝnɹøll lǝɐɹnǝɹs, ɐs ʍǝll ɐs ɯødᴉɟʎ ʇɥǝᴉɹ "
+"ƃɹɐdǝs ɐnd ɐɔɔǝss ɐll ɔønɹsǝ dɐʇɐ. Łᴉɯᴉʇǝd Sʇɐɟɟ døn'ʇ ɥɐʌǝ ɐɔɔǝss ʇø ʎønɹ "
+"ɔønɹsǝ ᴉn Sʇndᴉø. Ɏøn ɔɐn ønlʎ ƃᴉʌǝ ɔønɹsǝ ʇǝɐɯ ɹølǝs ʇø ǝnɹøllǝd nsǝɹs."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Limited Staff"
+msgstr "Ⱥdd Łᴉɯᴉʇǝd Sʇɐɟɟ"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
@@ -24884,10 +24881,6 @@ msgstr "ɯødᴉɟᴉǝd"
 #: wiki/models/article.py
 msgid "Article properties last modified"
 msgstr "Ⱥɹʇᴉɔlǝ dɹødǝɹʇᴉǝs lɐsʇ ɯødᴉɟᴉǝd"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "øʍnǝɹ"
 
 #: wiki/models/article.py
 msgid ""

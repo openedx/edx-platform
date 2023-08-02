@@ -18,7 +18,6 @@ from xblock.fields import Scope, ScopeIds, String
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     XModuleToXBlockMixin,
@@ -47,7 +46,6 @@ class ErrorFields:
 class ErrorBlock(
     ErrorFields,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):  # pylint: disable=abstract-method

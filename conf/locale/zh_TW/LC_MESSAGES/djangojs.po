@@ -23,7 +23,7 @@
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014-2015
 # 8cdb4758e2f8f89e1b6f455d24a57c7b_26aedc9 <d42fecad8431def0e25dc12221e713ed_169300>, 2014
 # MOH CHIN LAM <chinlam91@gmail.com>, 2015
-# 區壬豪 <oldmon@livemail.tw>, 2014
+# Nicholas Ou <oldmon@livemail.tw>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
 # Shawn Li <tp9106@gmail.com>, 2017
@@ -40,7 +40,7 @@
 # Zhen-Rong Chen <zhenrc@gmail.com>, 2014
 # Zhen-Rong Chen <zhenrc@gmail.com>, 2014-2015
 # Zhen-Rong Chen <zhenrc@gmail.com>, 2014
-# 區壬豪 <oldmon@livemail.tw>, 2020
+# Nicholas Ou <oldmon@livemail.tw>, 2020
 # KUN-MIN SYU <qwer20108@gmail.com>, 2014
 # 薛念林 <nlhsueh@mail.fcu.edu.tw>, 2016
 # 陳子琦 <christtabris@gmail.com>, 2014
@@ -132,7 +132,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-02 20:42+0000\n"
+"POT-Creation-Date: 2023-07-23 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Andrew Lau <alau52@yahoo.com>, 2017\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/open-edx/edx-platform/language/zh_TW/)\n"

@@ -75,6 +75,10 @@ from .outlines_regenerate import CourseOutlineRegenerate
 from .toggles import bypass_olx_failure_enabled
 from .utils import course_import_olx_validation_is_enabled
 
+
+from cms.djangoapps.contentstore.utils import delete_course  # lint-amnesty, pylint: disable=wrong-import-order
+from xmodule.modulestore import ModuleStoreEnum  # lint-amnesty, pylint: disable=wrong-import-order
+
 User = get_user_model()
 
 LOGGER = get_task_logger(__name__)
@@ -968,4 +972,31 @@ def create_v2_library_from_v1_library(v1_library_key_string, collection_uuid):
         "v2_library_id": str(v2_library_metadata.key),
         "status": "SUCCESS",
         "msg": None
+    }
+
+
+@shared_task(time_limit=30)
+@set_code_owner_attribute
+def delete_v1_library(v1_library_key_string):
+    """
+    Delete a v1 library index by key string.
+    """
+    v1_library_key = CourseKey.from_string(v1_library_key_string)
+    if not modulestore().get_library(v1_library_key):
+        raise KeyError(f"Library not found: {v1_library_key}")
+    try:
+        delete_course(v1_library_key, ModuleStoreEnum.UserID.mgmt_command, True)
+        LOGGER.info(f"Deleted course {v1_library_key}")
+    except Exception as error:  # lint-amnesty, pylint: disable=broad-except
+        return {
+            "v1_library_id": v1_library_key_string,
+            "status": "FAILED",
+            "msg":
+            f"Error occurred deleting library: {str(error)}"
+        }
+
+    return {
+        "v1_library_id": v1_library_key_string,
+        "status": "SUCCESS",
+        "msg": "SUCCESS"
     }

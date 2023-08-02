@@ -3,6 +3,7 @@
 from django import forms
 import edx_api_doc_tools as apidocs
 from opaque_keys.edx.keys import CourseKey
+from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -11,6 +12,7 @@ from xmodule.modulestore.django import modulestore
 
 from cms.djangoapps.models.settings.course_metadata import CourseMetadata
 from cms.djangoapps.contentstore.api.views.utils import get_bool_param
+from cms.djangoapps.contentstore.toggles import use_new_advanced_settings_page
 from common.djangoapps.student.auth import has_studio_read_access, has_studio_write_access
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, verify_course_exists, view_auth_classes
 from ..serializers import CourseAdvancedSettingsSerializer
@@ -115,6 +117,8 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
         if not filter_query_data.is_valid():
             raise ValidationError(filter_query_data.errors)
         course_key = CourseKey.from_string(course_id)
+        if not use_new_advanced_settings_page(course_key):
+            return Response(status=status.HTTP_403_FORBIDDEN)
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
         course_block = modulestore().get_course(course_key)

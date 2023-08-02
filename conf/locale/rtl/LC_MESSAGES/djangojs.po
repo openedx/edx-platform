@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-10 21:36+0000\n"
-"PO-Revision-Date: 2023-07-10 21:36:30.479010\n"
+"POT-Creation-Date: 2023-07-30 20:35+0000\n"
+"PO-Revision-Date: 2023-07-30 20:35:57.253778\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -2443,11 +2443,11 @@ msgstr "Snɔɔǝssɟnllʎ ǝnɹøllǝd ʇɥǝ ɟølløʍᴉnƃ nsǝɹs:"
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"Snɔɔǝssɟnllʎ sǝnʇ ǝnɹøllɯǝnʇ ǝɯɐᴉls ʇø ʇɥǝ ɟølløʍᴉnƃ nsǝɹs. Ŧɥǝʎ ʍᴉll bǝ "
-"ɐlløʍǝd ʇø ǝnɹøll ønɔǝ ʇɥǝʎ ɹǝƃᴉsʇǝɹ:"
+"Ɇɯɐᴉl ɔɐnnøʇ bǝ sǝnʇ ʇø ʇɥǝ ɟølløʍᴉnƃ nsǝɹs ʌᴉɐ bɐʇɔɥ ǝnɹøllɯǝnʇ. Ŧɥǝʎ ʍᴉll "
+"bǝ ɐlløʍǝd ʇø ǝnɹøll ønɔǝ ʇɥǝʎ ɹǝƃᴉsʇǝɹ:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2457,11 +2457,11 @@ msgstr "Ŧɥǝsǝ nsǝɹs ʍᴉll bǝ ɐlløʍǝd ʇø ǝnɹøll ønɔǝ ʇɥǝ�
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"Snɔɔǝssɟnllʎ sǝnʇ ǝnɹøllɯǝnʇ ǝɯɐᴉls ʇø ʇɥǝ ɟølløʍᴉnƃ nsǝɹs. Ŧɥǝʎ ʍᴉll bǝ "
-"ǝnɹøllǝd ønɔǝ ʇɥǝʎ ɹǝƃᴉsʇǝɹ:"
+"Ɇɯɐᴉl ɔɐnnøʇ bǝ sǝnʇ ʇø ʇɥǝ ɟølløʍᴉnƃ nsǝɹs ʌᴉɐ bɐʇɔɥ ǝnɹøllɯǝnʇ. Ŧɥǝʎ ʍᴉll "
+"bǝ ǝnɹøllǝd ønɔǝ ʇɥǝʎ ɹǝƃᴉsʇǝɹ:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -10455,6 +10455,15 @@ msgstr "Snbsǝɔʇᴉøn ᴉs ɥᴉddǝn ɐɟʇǝɹ ɔønɹsǝ ǝnd dɐʇǝ"
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
 msgstr "Snbsǝɔʇᴉøn ᴉs ɥᴉddǝn ɐɟʇǝɹ dnǝ dɐʇǝ"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
+"Ŧɥᴉs snbsǝɔʇᴉøn ᴉs ɔønɟᴉƃnɹǝd ɐs \\\"%(gradingType)s\\\", ʍɥᴉɔɥ døǝsn'ʇ "
+"ǝxᴉsʇ ᴉn ʇɥǝ ɔnɹɹǝnʇ ƃɹɐdᴉnƃ dølᴉɔʎ."
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
