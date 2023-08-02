@@ -50,9 +50,9 @@ h.parentNode.insertBefore(j, h);
 RocketChat(async function() {
 	const email = await getEmail()
 	this.registerGuest({
-	token: 'hienltmFX02923@funix.edu.vn', // The token field is not required. If it is not passed, a new token will be generated
-	name: 'dautay',
-	email: 'hienltmFX02923@funix.edu.vn',
+	token: email, // The token field is not required. If it is not passed, a new token will be generated
+	name: email,
+	email: email,
 	
 });
 });
