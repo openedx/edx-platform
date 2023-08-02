@@ -49,6 +49,7 @@ h.parentNode.insertBefore(j, h);
 })(window, document, 'script', 'https://test-xseries2.funix.edu.vn/livechat');
 RocketChat(async function() {
 	const email = await getEmail()
+	console.log('email',email)
 	this.registerGuest({
 	token: email, // The token field is not required. If it is not passed, a new token will be generated
 	name: email,
