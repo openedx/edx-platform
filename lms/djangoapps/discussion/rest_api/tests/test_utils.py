@@ -12,6 +12,7 @@ import unittest
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from lms.djangoapps.discussion.django_comment_client.tests.utils import ForumsEnableMixin
 from lms.djangoapps.discussion.rest_api.tests.utils import CommentsServiceMockMixin, ThreadMock
+from openedx.core.djangoapps.discussions.models import PostingRestriction
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -24,7 +25,7 @@ from lms.djangoapps.discussion.rest_api.utils import (
     get_moderator_users_list,
     get_archived_topics,
     remove_empty_sequentials,
-    send_response_notifications
+    send_response_notifications, is_posting_allowed
 )
 from openedx_events.learning.signals import USER_NOTIFICATION_REQUESTED
 
@@ -307,3 +308,99 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
             _get_mfe_url(self.course.id, self.thread.id)
         )
         self.assertEqual(args_comment.app_name, 'discussion')
+
+
+class TestBlackoutDates(ForumsEnableMixin, CommentsServiceMockMixin, ModuleStoreTestCase):
+    """
+    Test for the is_posting_allowed function
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.course = CourseFactory.create()
+
+    def _get_date_ranges(self):
+        """
+        Generate date ranges for testing purposes.
+        Returns:
+            list: List of date range tuples.
+        """
+        now = datetime.now(UTC)
+        date_ranges = [
+            (now - timedelta(days=14), now + timedelta(days=23)),
+        ]
+        return date_ranges
+
+    def _set_discussion_blackouts(self, date_ranges):
+        """
+        Set discussion blackouts for the given date ranges.
+        Args:
+            date_ranges (list): List of date range tuples.
+        """
+        self.course.discussion_blackouts = [
+            [start_date.isoformat(), end_date.isoformat()] for start_date, end_date in date_ranges
+        ]
+
+    def _check_posting_allowed(self, posting_restriction):
+        """
+        Check if posting is allowed for the given posting restriction.
+        Args:
+            posting_restriction (str): Posting restriction type.
+        Returns:
+            bool: True if posting is allowed, False otherwise.
+       """
+        return is_posting_allowed(
+            posting_restriction,
+            self.course.get_discussion_blackout_datetimes()
+        )
+
+    def test_posting_disabled(self):
+        """
+        Test posting when the posting restriction is disabled.
+        Assertion:
+           Posting should be allowed.
+        """
+        date_ranges = self._get_date_ranges()
+        self._set_discussion_blackouts(date_ranges)
+
+        posting_allowed = self._check_posting_allowed(PostingRestriction.DISABLED)
+        self.assertTrue(posting_allowed)
+
+    def test_posting_enabled(self):
+        """
+        Test posting when the posting restriction is enabled.
+        Assertion:
+            Posting should not be allowed.
+        """
+        date_ranges = self._get_date_ranges()
+        self._set_discussion_blackouts(date_ranges)
+
+        posting_allowed = self._check_posting_allowed(PostingRestriction.ENABLED)
+        self.assertFalse(posting_allowed)
+
+    def test_posting_scheduled(self):
+        """
+        Test posting when the posting restriction is scheduled.
+        Assertion:
+            Posting should not be allowed.
+        """
+        date_ranges = self._get_date_ranges()
+        self._set_discussion_blackouts(date_ranges)
+
+        posting_allowed = self._check_posting_allowed(PostingRestriction.SCHEDULED)
+        self.assertFalse(posting_allowed)
+
+    def test_posting_scheduled_future(self):
+        """
+        Test posting when the posting restriction is scheduled in the future.
+        Assertion:
+            Posting should be allowed.
+        """
+        now = datetime.now(UTC)
+        date_ranges = [
+            (now + timedelta(days=6), now + timedelta(days=23)),
+        ]
+        self._set_discussion_blackouts(date_ranges)
+
+        posting_allowed = self._check_posting_allowed(PostingRestriction.SCHEDULED)
+        self.assertTrue(posting_allowed)
