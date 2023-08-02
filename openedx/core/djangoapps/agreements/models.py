@@ -40,9 +40,12 @@ class LTIPIISignature(models.Model):
     """
     This model stores a user's acknowledgement to share PII via LTI tools in a particular course.
     """
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)
-    user_id = models.IntegerField()
-    lti_tools_hash = models.IntegerField()
+    lti_tools = models.JSONField()
 
-    class Meta:
-        app_label = 'agreements'
+    # lti_tools_hash represents the hash of the list of LTI tools receiving
+    # PII acknowledged by the user. The hash is used to compare user
+    # acknowledgments - which reduces response time and decreases any impact
+    # on unit rendering time.
+    lti_tools_hash = models.IntegerField()
