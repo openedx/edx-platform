@@ -1307,7 +1307,7 @@ openedx-filters==1.4.0
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
     #   skill-tagging
-openedx-learning @ git+https://github.com/open-craft/openedx-learning.git@chris/system-defined-taxonomies
+openedx-learning==0.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -2138,6 +2138,7 @@ walrus==0.9.3
     #   edx-event-bus-redis
 watchdog==3.0.0
     # via
+    #   -r requirements/edx/development.in
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 wcwidth==0.2.6

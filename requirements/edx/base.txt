@@ -773,7 +773,7 @@ openedx-filters==1.4.0
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
     #   skill-tagging
-openedx-learning @ git+https://github.com/open-craft/openedx-learning.git@chris/system-defined-taxonomies
+openedx-learning==0.1.1
     # via -r requirements/edx/kernel.in
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
