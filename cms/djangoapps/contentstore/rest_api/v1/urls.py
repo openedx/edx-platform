@@ -1,6 +1,6 @@
 """ Contenstore API v1 URLs. """
 
-from django.urls import re_path
+from django.urls import re_path, path
 from django.conf import settings
 
 from openedx.core.constants import COURSE_ID_PATTERN
@@ -14,6 +14,7 @@ from .views import (
     xblock,
     assets,
 )
+from .views.course_videos import CourseVideosView
 
 app_name = 'v1'
 
@@ -50,5 +51,10 @@ urlpatterns = [
     re_path(
         fr'^file_assets/{settings.COURSE_ID_PATTERN}/{settings.ASSET_KEY_PATTERN}?$',
         assets.AssetsView.as_view(), name='studio_content_assets'
+    ),
+    re_path(
+        fr'^videos/{COURSE_ID_PATTERN}(?:/(?P<edx_video_id>[-\w]+))?$',
+        CourseVideosView.as_view(),
+        name="course_videos"
     ),
 ]

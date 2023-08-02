@@ -11,8 +11,9 @@ import logging
 from contextlib import closing
 from datetime import datetime, timedelta
 from uuid import uuid4
-from boto.s3.connection import S3Connection
+
 from boto import s3
+from boto.s3.connection import S3Connection
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -37,7 +38,8 @@ from edxval.api import (
     remove_transcript_preferences,
     remove_video_for_course,
     update_video_image,
-    update_video_status
+    update_video_status,
+    get_videos_for_ids,
 )
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
@@ -56,12 +58,11 @@ from openedx.core.djangoapps.video_pipeline.config.waffle import (
 from openedx.core.djangoapps.waffle_utils import CourseWaffleFlag
 from openedx.core.lib.api.view_utils import view_auth_classes
 from xmodule.video_block.transcripts_utils import Transcript  # lint-amnesty, pylint: disable=wrong-import-order
-
+from .course import get_course_and_check_access
 from ..models import VideoUploadConfig
 from ..toggles import use_new_video_uploads_page
 from ..utils import reverse_course_url, get_video_uploads_url
 from ..video_utils import validate_video_image
-from .course import get_course_and_check_access
 
 __all__ = [
     'videos_handler',
@@ -69,8 +70,11 @@ __all__ = [
     'video_images_handler',
     'video_images_upload_enabled',
     'get_video_features',
+    'get_index_videos',
     'transcript_preferences_handler',
     'generate_video_upload_link_handler',
+    'get_and_validate_course',
+    'get_video',
 ]
 
 LOGGER = logging.getLogger(__name__)
@@ -203,7 +207,7 @@ def videos_handler(request, course_key_string, edx_video_id=None):
     DELETE
         soft deletes a video for particular course
     """
-    course = _get_and_validate_course(course_key_string, request.user)
+    course = get_and_validate_course(course_key_string, request.user)
 
     if not course:
         return HttpResponseNotFound()
@@ -234,7 +238,7 @@ def generate_video_upload_link_handler(request, course_key_string):
     API for creating a video upload.  Returns an edx_video_id and a presigned URL that can be used
     to upload the video to AWS S3.
     """
-    course = _get_and_validate_course(course_key_string, request.user)
+    course = get_and_validate_course(course_key_string, request.user)
     if not course:
         return Response(data='Course Not Found', status=rest_status.HTTP_400_BAD_REQUEST)
 
@@ -425,7 +429,7 @@ def video_encodings_download(request, course_key_string):
     Video ID,Name,Status,Profile1 URL,Profile2 URL
     aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa,video.mp4,Complete,http://example.com/prof1.mp4,http://example.com/prof2.mp4
     """
-    course = _get_and_validate_course(course_key_string, request.user)
+    course = get_and_validate_course(course_key_string, request.user)
 
     if not course:
         return HttpResponseNotFound()
@@ -494,7 +498,7 @@ def video_encodings_download(request, course_key_string):
     return FileResponse(buffer, as_attachment=True, filename=filename, content_type="text/csv")
 
 
-def _get_and_validate_course(course_key_string, user):
+def get_and_validate_course(course_key_string, user):
     """
     Given a course key, return the course if it exists, the given user has
     access to it, and it is properly configured for video uploads
@@ -549,42 +553,56 @@ def convert_video_status(video, is_video_encodes_ready=False):
     return status
 
 
-def _get_videos(course, pagination_conf=None):
+def _add_video_transcript_data(video, is_new_workflow):
+    transcription_statuses = ['transcription_in_progress', 'transcript_ready', 'partial_failure', 'transcript_failed']
+    # If we are using "new video workflow" and status is in `transcription_statuses` then video encodes are ready.
+    # This is because Transcription starts once all the encodes are complete except for YT, but according to
+    # "new video workflow" YT is disabled as well as deprecated. So, Its precise to say that the Transcription
+    # starts once all the encodings are complete *for the new video workflow*.
+    is_video_encodes_ready = is_new_workflow and (video['status'] in transcription_statuses)
+    # Update with transcript languages
+    video['transcripts'] = get_available_transcript_languages(video_id=video['edx_video_id'])
+    video['transcription_status'] = (
+        StatusDisplayStrings.get(video['status']) if is_video_encodes_ready else ''
+    )
+    video['transcript_urls'] = {}
+    for language_code in video['transcripts']:
+        video['transcript_urls'][language_code] = get_video_transcript_url(
+            video_id=video['edx_video_id'],
+            language_code=language_code,
+        )
+    # Convert the video status.
+    video['status'] = convert_video_status(video, is_video_encodes_ready)
+
+
+def _get_video(course, edx_video_id: str):
+    video = next(get_videos_for_ids([edx_video_id]), None)
+    is_new_workflow = not course.video_upload_pipeline.get('course_video_upload_token')
+    if video is not None:
+        _add_video_transcript_data(video, is_new_workflow)
+    return video
+
+
+def _get_videos(course, pagination_conf=None, sort_field=None, sort_direction=None):
     """
     Retrieves the list of videos from VAL corresponding to this course.
     """
+    sort_field = sort_field or VideoSortField.created
+    sort_direction = sort_direction or SortDirection.desc
     videos, pagination_context = get_videos_for_course(
         str(course.id),
-        VideoSortField.created,
-        SortDirection.desc,
+        sort_field,
+        sort_direction,
         pagination_conf
     )
     videos = list(videos)
 
     # This is required to see if edx video pipeline is enabled while converting the video status.
-    course_video_upload_token = course.video_upload_pipeline.get('course_video_upload_token')
-    transcription_statuses = ['transcription_in_progress', 'transcript_ready', 'partial_failure', 'transcript_failed']
+    is_new_workflow = not course.video_upload_pipeline.get('course_video_upload_token')
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
-        # If we are using "new video workflow" and status is in `transcription_statuses` then video encodes are ready.
-        # This is because Transcription starts once all the encodes are complete except for YT, but according to
-        # "new video workflow" YT is disabled as well as deprecated. So, Its precise to say that the Transcription
-        # starts once all the encodings are complete *for the new video workflow*.
-        is_video_encodes_ready = not course_video_upload_token and (video['status'] in transcription_statuses)
-        # Update with transcript languages
-        video['transcripts'] = get_available_transcript_languages(video_id=video['edx_video_id'])
-        video['transcription_status'] = (
-            StatusDisplayStrings.get(video['status']) if is_video_encodes_ready else ''
-        )
-        video['transcript_urls'] = {}
-        for language_code in video['transcripts']:
-            video['transcript_urls'][language_code] = get_video_transcript_url(
-                video_id=video['edx_video_id'],
-                language_code=language_code,
-            )
-        # Convert the video status.
-        video['status'] = convert_video_status(video, is_video_encodes_ready)
+        _add_video_transcript_data(video, is_new_workflow)
 
     return videos, pagination_context
 
@@ -596,33 +614,40 @@ def _get_default_video_image_url():
     return staticfiles_storage.url(settings.VIDEO_IMAGE_DEFAULT_FILENAME)
 
 
-def _get_index_videos(course, pagination_conf=None):
+def _get_video_values(video, course_id):
     """
-    Returns the information about each video upload required for the video list
+    Get data for predefined video attributes.
     """
-    course_id = str(course.id)
     attrs = [
         'edx_video_id', 'client_video_id', 'created', 'duration',
         'status', 'courses', 'transcripts', 'transcription_status',
         'transcript_urls', 'error_description'
     ]
 
-    def _get_values(video):
-        """
-        Get data for predefined video attributes.
-        """
-        values = {}
-        for attr in attrs:
-            if attr == 'courses':
-                course = [c for c in video['courses'] if course_id in c]
-                (__, values['course_video_image_url']), = list(course[0].items())
-            else:
-                values[attr] = video[attr]
+    values = {}
+    for attr in attrs:
+        if attr == 'courses':
+            course = [c for c in video['courses'] if course_id in c]
+            (__, values['course_video_image_url']), = list(course[0].items())
+        else:
+            values[attr] = video[attr]
 
-        return values
+    return values
 
-    videos, pagination_context = _get_videos(course, pagination_conf)
-    return [_get_values(video) for video in videos], pagination_context
+
+def get_video(course, edx_video_id: str):
+    video = _get_video(course, edx_video_id)
+    if video is not None:
+        return _get_video_values(video, str(course.id))
+
+
+def get_index_videos(course, pagination_conf=None, sort_field=None, sort_direction=None):
+    """
+    Returns the information about each video upload required for the video list
+    """
+    course_id = str(course.id)
+    videos, pagination_context = _get_videos(course, pagination_conf, sort_field, sort_direction)
+    return [_get_video_values(video, course_id) for video in videos], pagination_context
 
 
 def get_all_transcript_languages():
@@ -655,7 +680,7 @@ def videos_index_html(course, pagination_conf=None):
     Returns an HTML page to display previous video uploads and allow new ones
     """
     is_video_transcript_enabled = VideoTranscriptEnabledFlag.feature_enabled(course.id)
-    previous_uploads, pagination_context = _get_index_videos(course, pagination_conf)
+    previous_uploads, pagination_context = get_index_videos(course, pagination_conf)
     context = {
         'context_course': course,
         'image_upload_url': reverse_course_url('video_images_handler', str(course.id)),
@@ -721,7 +746,7 @@ def videos_index_json(course):
         }]
     }
     """
-    index_videos, __ = _get_index_videos(course)
+    index_videos, __ = get_index_videos(course)
     return JsonResponse({"videos": index_videos}, status=200)
 
 
