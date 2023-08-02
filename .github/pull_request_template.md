@@ -1,13 +1,10 @@
 <!--
 
 🌴🌴
-🌴🌴🌴🌴         🌴 Note: the Palm master branch has been created. Please consider whether your change
-    🌴🌴🌴🌴     should also be applied to Palm. If so, make another pull request against the
-🌴🌴🌴🌴         open-release/palm.master branch, or ask in the #wg-build-test-release Slack channel
-🌴🌴             if you have any questions or need help.
-
-🫒🫒🫒🫒🫒🫒     🫒 Note: the Olive release is still supported.
-                Please consider whether your change should be applied to Olive as well.
+🌴🌴🌴🌴         🌴 Note: Palm is in support. Fixes you make on master may still be needed on Palm.
+    🌴🌴🌴🌴     If so, make another pull request against the open-release/palm.master branch,
+🌴🌴🌴🌴         or ask in the #wg-build-test-release Slack channel if you have any questions or need help.
+🌴🌴
 
 Please give your pull request a short but descriptive title.
 Use conventional commits to separate and summarize commits logically:

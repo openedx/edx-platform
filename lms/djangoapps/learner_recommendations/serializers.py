@@ -39,8 +39,8 @@ class RecommendedCourseSerializer(serializers.Serializer):
         return f"course/{url_slug}"
 
 
-class CrossProductCourseSerializer(serializers.Serializer):
-    """Serializer for a cross product recommended course"""
+class AboutPageProductRecommendationsSerializer(serializers.Serializer):
+    """Serializer for a cross product recommended course for the course about page"""
     key = serializers.CharField()
     uuid = serializers.UUIDField()
     title = serializers.CharField()
@@ -57,6 +57,23 @@ class CrossProductCourseSerializer(serializers.Serializer):
         return f"course/{url_slug}"
 
 
+class LearnerDashboardProductRecommendationsSerializer(serializers.Serializer):
+    """Serializer for product recommendations for the Learner Dashboard"""
+    title = serializers.CharField()
+    courseRunKey = serializers.SerializerMethodField()
+    marketingUrl = serializers.URLField(source="marketing_url")
+    courseType = serializers.CharField(source="course_type")
+    image = CourseImageSerializer()
+    owners = serializers.ListField(
+        child=CourseOwnersSerializer(), allow_empty=True
+    )
+
+    def get_courseRunKey(self, instance):
+        active_course_run_key = instance.get('active_course_run_key')
+
+        return active_course_run_key if active_course_run_key else instance.get('course_runs')[0]['key']
+
+
 class AboutPageRecommendationsSerializer(serializers.Serializer):
     """Recommended courses for course about page"""
 
@@ -69,10 +86,38 @@ class AboutPageRecommendationsSerializer(serializers.Serializer):
     )
 
 
+class RecommendationsContextSerializer(serializers.Serializer):
+    """Serializer for recommendations context"""
+
+    countryCode = serializers.CharField(allow_blank=True)
+
+
 class CrossProductRecommendationsSerializer(serializers.Serializer):
-    """Cross product recommendation courses for course about page"""
+    """
+    Cross product recommendation courses for course about page
+    """
     courses = serializers.ListField(
-        child=CrossProductCourseSerializer(), allow_empty=True
+        child=AboutPageProductRecommendationsSerializer(), allow_empty=True
+    )
+
+
+class AmplitudeRecommendationsSerializer(serializers.Serializer):
+    """Serializer for Amplitude recommendations for Learner Dashboard"""
+    amplitudeCourses = serializers.ListField(
+        child=LearnerDashboardProductRecommendationsSerializer(), allow_empty=True
+    )
+
+
+class CrossProductAndAmplitudeRecommendationsSerializer(serializers.Serializer):
+    """
+    Cross product recommendation courses and
+    Amplitude recommendations for Learner Dashboard
+    """
+    crossProductCourses = serializers.ListField(
+        child=LearnerDashboardProductRecommendationsSerializer(), allow_empty=True
+    )
+    amplitudeCourses = serializers.ListField(
+        child=LearnerDashboardProductRecommendationsSerializer(), allow_empty=True
     )
 
 

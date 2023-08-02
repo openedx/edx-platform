@@ -1,11 +1,18 @@
 """
 URLs for the notifications API.
 """
-from django.urls import path
-from django.urls import re_path
 from django.conf import settings
+from django.urls import path, re_path
 from rest_framework import routers
-from .views import CourseEnrollmentListView, UserNotificationPreferenceView
+
+from .views import (
+    CourseEnrollmentListView,
+    MarkNotificationsSeenAPIView,
+    NotificationCountView,
+    NotificationListAPIView,
+    NotificationReadAPIView,
+    UserNotificationPreferenceView
+)
 
 router = routers.DefaultRouter()
 
@@ -17,6 +24,15 @@ urlpatterns = [
         UserNotificationPreferenceView.as_view(),
         name='notification-preferences'
     ),
+    path('', NotificationListAPIView.as_view(), name='notifications-list'),
+    path('count/', NotificationCountView.as_view(), name='notifications-count'),
+    path(
+        'mark-seen/<app_name>/',
+        MarkNotificationsSeenAPIView.as_view(),
+        name='mark-notifications-seen'
+    ),
+    path('read/', NotificationReadAPIView.as_view(), name='notifications-read'),
+
 ]
 
 urlpatterns += router.urls

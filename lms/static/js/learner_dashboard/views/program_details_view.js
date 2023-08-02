@@ -7,10 +7,12 @@ import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
 import CollectionListView from './collection_list_view';
 import CourseCardCollection from '../collections/course_card_collection';
 import CourseCardView from './course_card_view';
+// eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import HeaderView from './program_header_view';
 import SidebarView from './program_details_sidebar_view';
 import AlertListView from './program_alert_list_view';
 
+// eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import SubscriptionModel from '../models/program_subscription_model';
 
 import launchIcon from '../../../images/launch-icon.svg';
@@ -39,10 +41,6 @@ class ProgramDetailsView extends Backbone.View {
         } else {
             this.tpl = HtmlUtils.template(pageTpl);
         }
-        this.options.isSubscriptionEligible = (
-            this.options.isUserB2CSubscriptionsEnabled
-            && this.options.programData.subscription_eligible
-        );
         this.programModel = new Backbone.Model(this.options.programData);
         this.courseData = new Backbone.Model(this.options.courseData);
         this.certificateCollection = new Backbone.Collection(
@@ -67,6 +65,7 @@ class ProgramDetailsView extends Backbone.View {
             label: this.options.programData.title,
             program_uuid: this.options.programData.uuid,
         };
+        this.options.isSubscriptionEligible = this.getIsSubscriptionEligible();
 
         this.render();
 
@@ -198,16 +197,38 @@ class ProgramDetailsView extends Backbone.View {
         }).bind(this);
     }
 
+    getIsSubscriptionEligible() {
+        const courseCollections = [
+            this.completedCourseCollection,
+            this.inProgressCourseCollection,
+        ];
+        const isSomeCoursePurchasable = courseCollections.some((collection) => (
+            collection.some((course) => (
+                course.get('upgrade_url')
+                && !(course.get('expired') === true)
+            ))
+        ));
+        const programPurchasedWithoutSubscription = (
+            this.subscriptionModel.get('subscriptionState') !== 'active'
+            && this.subscriptionModel.get('subscriptionState') !== 'inactive'
+            && !isSomeCoursePurchasable
+            && this.remainingCourseCollection.length === 0
+        );
+
+        return (
+            this.options.isUserB2CSubscriptionsEnabled
+            && this.options.programData.subscription_eligible
+            && !programPurchasedWithoutSubscription
+        );
+    }
+
     getAlerts() {
         const alerts = {
             enrollmentAlerts: [],
             trialEndingAlerts: [],
         };
         if (this.subscriptionModel.get('subscriptionState') === 'active') {
-            if (
-                this.courseData.get('in_progress').length === 0
-                && this.courseData.get('not_started').length >= 1
-            ) {
+            if (this.courseData.get('all_unenrolled')) {
                 alerts.enrollmentAlerts.push({
                     title: this.programModel.get('title'),
                 });

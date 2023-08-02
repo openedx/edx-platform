@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User  # lint-amnesty, pylint: disable=imported-auth-user
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound
+from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_POST
@@ -19,6 +20,9 @@ from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
+
+from ..toggles import use_new_course_team_page
+from ..utils import get_course_team_url
 
 __all__ = ['request_course_creator', 'course_team_handler']
 
@@ -55,6 +59,8 @@ def course_team_handler(request, course_key_string=None, email=None):
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         return _course_team_user(request, course_key, email)
     elif request.method == 'GET':  # assume html
+        if use_new_course_team_page(course_key):
+            return redirect(get_course_team_url(course_key))
         return _manage_users(request, course_key)
     else:
         return HttpResponseNotFound()

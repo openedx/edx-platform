@@ -2,10 +2,17 @@
 Helper Methods
 """
 
-from braze.client import BrazeClient
+try:
+    from braze.client import BrazeClient
+except ImportError:
+    BrazeClient = None
 from django.conf import settings
-from optimizely import optimizely
-from optimizely.config_manager import PollingConfigManager
+try:
+    from optimizely import optimizely
+    from optimizely.config_manager import PollingConfigManager
+except ImportError:
+    optimizely = None
+    PollingConfigManager = None
 
 
 def _get_key(key_or_id, key_cls):
@@ -22,6 +29,9 @@ def _get_key(key_or_id, key_cls):
 
 def get_braze_client():
     """ Returns a Braze client. """
+    if not BrazeClient:
+        return None
+
     braze_api_key = settings.EDX_BRAZE_API_KEY
     braze_api_url = settings.EDX_BRAZE_API_SERVER
 
@@ -41,6 +51,8 @@ class OptimizelyClient:
 
     @classmethod
     def get_optimizely_client(cls):
+        if not optimizely:
+            return None
         if not cls.optimizely_client:
             optimizely_sdk_key = settings.OPTIMIZELY_FULLSTACK_SDK_KEY
             if not optimizely_sdk_key:

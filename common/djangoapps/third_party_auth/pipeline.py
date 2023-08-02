@@ -66,6 +66,7 @@ from collections import OrderedDict
 from logging import getLogger
 from smtplib import SMTPException
 from uuid import uuid4
+from random import randint
 
 import six
 import social_django
@@ -997,22 +998,30 @@ def get_username(strategy, details, backend, user=None, *args, **kwargs):  # lin
         else:
             username = uuid4().hex
 
-        short_username = (username[:max_length - uuid_length]
-                          if max_length is not None
-                          else username)
+        input_username = username
         final_username = slug_func(clean_func(username[:max_length]))
 
         # Generate a unique username for current user using username
         # as base but adding a unique hash at the end. Original
         # username is cut to avoid any field max_length.
-        # The final_username may be empty and will skip the loop.
         # We are using our own version of user_exists to avoid possible case sensitivity issues.
-        while not final_username or len(final_username) < min_length or user_exists({'username': final_username}):
+        # We will attempt different length random suffixes
+        while len(final_username) < min_length or user_exists({'username': final_username}):
+            # try to use at least 3 characters to avoid weird '-1' '-a' etc
+            # use less than 3 if that is whats being asked for
+            this_uuid_length = randint(min(uuid_length, 3), uuid_length)
+            short_username = (input_username[:max_length - (this_uuid_length + 1)]  # +1 for the '-'
+                              if max_length is not None
+                              else username)
             # adding a dash between user-supplied and system-generated values to avoid weird combinations
-            username = short_username + '-' + username_suffix_generator(uuid_length)
+            username = short_username + '-' + username_suffix_generator(this_uuid_length)
             final_username = slug_func(clean_func(username[:max_length]))
-            logger.info('[THIRD_PARTY_AUTH] New username generated. Username: {username}'.format(
-                username=final_username))
+            logger.info(
+                '[THIRD_PARTY_AUTH] New username candidnate generated: '
+                f'input_username={input_username}, '
+                f'suffix_length={this_uuid_length}, '
+                f'final_username={final_username}'
+            )
     else:
         final_username = storage.user.get_username(user)
     return {'username': final_username}

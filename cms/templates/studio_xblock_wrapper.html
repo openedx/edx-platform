@@ -1,7 +1,7 @@
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import gettext as _
-from cms.djangoapps.contentstore.views.helpers import xblock_studio_url
+from cms.djangoapps.contentstore.helpers import xblock_studio_url
 from cms.djangoapps.contentstore.utils import is_visible_to_specific_partition_groups, get_editor_page_base_url, determine_label
 from lms.lib.utils import is_unit
 from openedx.core.djangolib.js_utils import (
@@ -147,7 +147,7 @@ block_is_unit = is_unit(xblock)
                                       <ul>
                                         % if not show_inline:
                                             <li class="nav-item">
-                                                <a class="copy-button" href="#" role="button">${_("Copy")}</a>
+                                                <a class="copy-button" href="#" role="button">${_("Copy to Clipboard")}</a>
                                             </li>
                                             % if can_add:
                                                 <li class="nav-item">

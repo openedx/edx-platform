@@ -16,7 +16,7 @@ services:
       retries: 10
   edxapp:
     image: edxops/edxapp:latest
-    command: bash -c 'source /edx/app/edxapp/edxapp_env && cd /edx/app/edxapp/edx-platform/ && paver update_db'
+    command: bash -c 'source /edx/app/edxapp/edxapp_env && cd /edx/app/edxapp/edx-platform/ && make migrate'
     volumes:
        - ../../:/edx/app/edxapp/edx-platform
     depends_on:

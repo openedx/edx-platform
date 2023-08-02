@@ -3,20 +3,23 @@ Test credentials tasks
 """
 
 from unittest import mock
-from datetime import datetime
+from datetime import datetime, timezone
 
 import ddt
 import pytest
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import connection, reset_queries
 from django.test import TestCase, override_settings
 from freezegun import freeze_time
 from opaque_keys.edx.keys import CourseKey
 
 from common.djangoapps.student.tests.factories import UserFactory
+from lms.djangoapps.certificates.api import get_recently_modified_certificates
 from lms.djangoapps.certificates.data import CertificateStatuses
 from lms.djangoapps.certificates.models import GeneratedCertificate
 from lms.djangoapps.grades.models import PersistentCourseGrade
+from lms.djangoapps.grades.models_api import get_recently_modified_grades
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
 from lms.djangoapps.certificates.tests.factories import CertificateDateOverrideFactory, GeneratedCertificateFactory
 from openedx.core.djangoapps.catalog.tests.factories import CourseFactory, CourseRunFactory, ProgramFactory
@@ -26,6 +29,8 @@ from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 from openedx.core.djangoapps.credentials.tasks.v1 import tasks
 
+
+User = get_user_model()
 TASKS_MODULE = 'openedx.core.djangoapps.credentials.tasks.v1.tasks'
 
 
@@ -72,7 +77,7 @@ class TestSendGradeToCredentialTask(TestCase):
             'letter_grade': 'A',
             'percent_grade': 1.0,
             'verified': True,
-            'lms_last_updated_at': last_updated.isoformat(),
+            'lms_last_updated_at': last_updated,
         })
 
     def test_retry(self, mock_get_api_client):
@@ -87,6 +92,7 @@ class TestSendGradeToCredentialTask(TestCase):
         assert mock_get_api_client.call_count == (tasks.MAX_RETRIES + 1)
 
 
+@ddt.ddt
 @skip_unless_lms
 class TestHandleNotifyCredentialsTask(TestCase):
     """
@@ -107,8 +113,6 @@ class TestHandleNotifyCredentialsTask(TestCase):
             self.cert4 = GeneratedCertificateFactory(
                 user=self.user2, course_id='course-v1:edX+Test+4', status=CertificateStatuses.downloadable
             )
-        print(('self.cert1.modified_date', self.cert1.modified_date))
-
         # No factory for these
         with freeze_time(datetime(2017, 1, 1)):
             self.grade1 = PersistentCourseGrade.objects.create(user_id=self.user.id, course_id='course-v1:edX+Test+1',
@@ -122,8 +126,6 @@ class TestHandleNotifyCredentialsTask(TestCase):
         with freeze_time(datetime(2017, 2, 1, 5)):
             self.grade4 = PersistentCourseGrade.objects.create(user_id=self.user2.id, course_id='course-v1:edX+Test+4',
                                                                percent_grade=1)
-        print(('self.grade1.modified', self.grade1.modified))
-
         self.options = {
             'args_from_database': False,
             'auto': False,
@@ -144,6 +146,7 @@ class TestHandleNotifyCredentialsTask(TestCase):
             'verbose': False,
             'verbosity': 1,
             'skip_checks': True,
+            'revoke_program_certs': False,
         }
 
     @mock.patch(TASKS_MODULE + '.send_notifications')
@@ -260,15 +263,15 @@ class TestHandleNotifyCredentialsTask(TestCase):
 
     @mock.patch(TASKS_MODULE + '.send_notifications')
     def test_date_args(self, mock_send):
-        self.options['start_date'] = '2017-01-31T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 31, 0, 0, tzinfo=timezone.utc)
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2, self.cert4, self.cert3])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade2, self.grade4, self.grade3])
         mock_send.reset_mock()
 
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
-        self.options['end_date'] = '2017-02-02T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2, self.cert4])
@@ -276,15 +279,15 @@ class TestHandleNotifyCredentialsTask(TestCase):
         mock_send.reset_mock()
 
         self.options['start_date'] = None
-        self.options['end_date'] = '2017-02-02T00:00:00Z'
+        self.options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert1, self.cert2, self.cert4])
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade1, self.grade2, self.grade4])
         mock_send.reset_mock()
 
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
-        self.options['end_date'] = '2017-02-01T04:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.options['end_date'] = datetime(2017, 2, 1, 4, 0, tzinfo=timezone.utc)
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
         self.assertListEqual(list(mock_send.call_args[0][0]), [self.cert2])
@@ -292,8 +295,8 @@ class TestHandleNotifyCredentialsTask(TestCase):
 
     @mock.patch(TASKS_MODULE + '.send_notifications')
     def test_username_arg(self, mock_send):
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
-        self.options['end_date'] = '2017-02-02T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         self.options['user_ids'] = [str(self.user2.id)]
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
@@ -310,8 +313,8 @@ class TestHandleNotifyCredentialsTask(TestCase):
         self.assertListEqual(list(mock_send.call_args[0][1]), [self.grade4])
         mock_send.reset_mock()
 
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
-        self.options['end_date'] = '2017-02-02T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
+        self.options['end_date'] = datetime(2017, 2, 2, 0, 0, tzinfo=timezone.utc)
         self.options['user_ids'] = [str(self.user.id)]
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_send.called
@@ -339,7 +342,7 @@ class TestHandleNotifyCredentialsTask(TestCase):
 
     @mock.patch(TASKS_MODULE + '.send_notifications')
     def test_dry_run(self, mock_send):
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.options['dry_run'] = True
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert not mock_send.called
@@ -348,7 +351,7 @@ class TestHandleNotifyCredentialsTask(TestCase):
     @mock.patch(TASKS_MODULE + '.send_grade_if_interesting')
     @mock.patch(TASKS_MODULE + '.handle_course_cert_changed')
     def test_hand_off(self, mock_grade_interesting, mock_program_changed, mock_program_awarded):
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_grade_interesting.call_count == 3
         assert mock_program_changed.call_count == 3
@@ -357,7 +360,7 @@ class TestHandleNotifyCredentialsTask(TestCase):
         mock_program_changed.reset_mock()
         mock_program_awarded.reset_mock()
 
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.options['notify_programs'] = True
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_grade_interesting.call_count == 3
@@ -366,13 +369,13 @@ class TestHandleNotifyCredentialsTask(TestCase):
 
     @mock.patch(TASKS_MODULE + '.time')
     def test_delay(self, mock_time):
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.options['page_size'] = 2
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_time.sleep.call_count == 0
         mock_time.sleep.reset_mock()
 
-        self.options['start_date'] = '2017-02-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 2, 1, 0, 0, tzinfo=timezone.utc)
         self.options['page_size'] = 2
         self.options['delay'] = 0.2
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
@@ -382,19 +385,19 @@ class TestHandleNotifyCredentialsTask(TestCase):
 
     @override_settings(DEBUG=True)
     def test_page_size(self):
-        self.options['start_date'] = '2017-01-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 1, 0, 0, tzinfo=timezone.utc)
         reset_queries()
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         baseline = len(connection.queries)
 
-        self.options['start_date'] = '2017-01-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 1, 0, 0, tzinfo=timezone.utc)
         self.options['page_size'] = 1
         reset_queries()
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert len(connection.queries) == (baseline + 6)
         # two extra page queries each for certs & grades
 
-        self.options['start_date'] = '2017-01-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 1, 0, 0, tzinfo=timezone.utc)
         self.options['page_size'] = 2
         reset_queries()
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
@@ -407,24 +410,37 @@ class TestHandleNotifyCredentialsTask(TestCase):
             site_values={'course_org_filter': ['testX']}
         )
 
-        self.options['start_date'] = '2017-01-01T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 1, 0, 0, tzinfo=timezone.utc)
         self.options['site'] = site_config.site.domain
         tasks.handle_notify_credentials(options=self.options, course_keys=[])
         assert mock_grade_interesting.call_count == 1
 
     @mock.patch(TASKS_MODULE + '.send_notifications')
     def test_send_notifications_failure(self, mock_send):
-        self.options['start_date'] = '2017-01-31T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 31, 0, 0, tzinfo=timezone.utc)
         mock_send.side_effect = boom
         with pytest.raises(Exception):
             tasks.handle_notify_credentials(options=self.options, course_keys=[])
 
     @mock.patch(TASKS_MODULE + '.send_grade_if_interesting')
     def test_send_grade_failure(self, mock_send_grade):
-        self.options['start_date'] = '2017-01-31T00:00:00Z'
+        self.options['start_date'] = datetime(2017, 1, 31, 0, 0, tzinfo=timezone.utc)
         mock_send_grade.side_effect = boom
         with pytest.raises(Exception):
             tasks.handle_notify_credentials(options=self.options, course_keys=[])
+
+    @ddt.data([True], [False])
+    @ddt.unpack
+    @mock.patch(TASKS_MODULE + '.send_notifications')
+    def test_revoke_program_certs(self, revoke_program_certs, mock_send_notifications):
+        """
+        This test verifies that the `revoke_program_certs` option is forwarded as expected when included in the options.
+        """
+        self.options['revoke_program_certs'] = revoke_program_certs
+        tasks.handle_notify_credentials(options=self.options, course_keys=[])
+        assert mock_send_notifications.called
+        mock_call_args = mock_send_notifications.call_args_list[0]
+        assert mock_call_args.kwargs['revoke_program_certs'] == revoke_program_certs
 
 
 @ddt.ddt
@@ -557,3 +573,187 @@ class TestIsCourseRunInAProgramUtil(TestCase):
         mock_get_programs.return_value = self.data
         course_run2 = CourseRunFactory()
         assert not tasks.is_course_run_in_a_program(course_run2['key'])
+
+
+@ddt.ddt
+@skip_unless_lms
+@mock.patch('openedx.core.djangoapps.credentials.tasks.v1.tasks.handle_course_cert_changed')
+@mock.patch('openedx.core.djangoapps.credentials.tasks.v1.tasks.handle_course_cert_awarded')
+@mock.patch('openedx.core.djangoapps.credentials.tasks.v1.tasks.handle_course_cert_revoked')
+@mock.patch('openedx.core.djangoapps.credentials.tasks.v1.tasks.send_grade_if_interesting')
+class TestSendNotifications(TestCase):
+    """
+    Unit Tests for the `send_notifications` function in the `tasks.py` file.
+    """
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        self.course_run = CourseRunFactory()
+        self.course_key = CourseKey.from_string(self.course_run['key'])
+        self.course = CourseFactory(course_runs=[self.course_run])
+        self.site = SiteConfigurationFactory.create(
+            site_values={'course_org_filter': [self.course_key.org]},
+        )
+        self.certificate = GeneratedCertificateFactory(
+            user=self.user,
+            course_id=self.course_run['key'],
+            status=CertificateStatuses.downloadable
+        )
+        self.grade = PersistentCourseGrade.objects.create(
+            user_id=self.user.id,
+            course_id=self.course_run['key'],
+            percent_grade=1.0
+        )
+
+    def _get_certs_qs(self):
+        """
+        The function under test expects a QuerySet containing certificate information, this retrieves the data needed
+        to invoke the `send_notifications` function in the form that is expected. We leverage a utility function that
+        the product code uses.
+        """
+        return get_recently_modified_certificates([self.course_run['key']], None, None, [self.user.id])
+
+    def _get_grades_qs(self):
+        """
+        The function under test expects a QuerySet containing grade information, this retrieves the data needed
+        to invoke the `send_notifications` function in the form that is expected.  We leverage a utility function that
+        the product code uses.
+        """
+        users = User.objects.filter(id__in=[self.user.id])
+        return get_recently_modified_grades([self.course_run['key']], None, None, users)
+
+    def _build_expected_signal_args(self):
+        return {
+            'sender': None,
+            'user': self.user,
+            'course_key': self.certificate.course_id,
+            'mode': self.certificate.mode,
+            'status': self.certificate.status,
+            'verbose': False
+        }
+
+    def test_send_notifications(self, mock_interesting, mock_revoked, mock_awarded, mock_changed):
+        """
+        A test case that verifies the `send_notifications` functions behavior when the `notify_programs` flag is False.
+        """
+        certs = self._get_certs_qs()
+        grades = self._get_grades_qs()
+
+        tasks.send_notifications(
+            certs,
+            grades,
+            self.site
+        )
+
+        expected_signal_args = self._build_expected_signal_args()
+        mock_changed.assert_called_once_with(**expected_signal_args)
+        mock_interesting.assert_called_once_with(
+            self.user,
+            self.grade.course_id,
+            self.certificate.mode,
+            self.certificate.status,
+            self.grade.letter_grade,
+            self.grade.percent_grade,
+            grade_last_updated=self.grade.modified,
+            verbose=False
+        )
+        mock_revoked.assert_not_called()
+        mock_awarded.assert_not_called()
+
+    @ddt.data(
+        ['downloadable', True],
+        ['unavailable', False]
+    )
+    @ddt.unpack
+    def test_send_notifications_notify_programs(
+        self,
+        cert_status,
+        award_expected,
+        mock_interesting,
+        mock_revoked,
+        mock_awarded,
+        mock_changed
+    ):
+        """
+        Test cases that verify the `send_notifications` functions behavior when the `notify_programs` flag is True.
+        """
+        certs = self._get_certs_qs()
+        grades = self._get_grades_qs()
+
+        self.certificate.status = cert_status
+        self.certificate.save()
+
+        tasks.send_notifications(
+            certs,
+            grades,
+            self.site,
+            notify_programs=True
+        )
+
+        expected_signal_args = self._build_expected_signal_args()
+        mock_changed.assert_called_once_with(**expected_signal_args)
+        mock_interesting.assert_called_once_with(
+            self.user,
+            self.grade.course_id,
+            self.certificate.mode,
+            self.certificate.status,
+            self.grade.letter_grade,
+            self.grade.percent_grade,
+            grade_last_updated=self.grade.modified,
+            verbose=False
+        )
+        mock_revoked.assert_not_called()
+        if award_expected:
+            mock_awarded.assert_called_once_with(**expected_signal_args)
+        else:
+            mock_awarded.assert_not_called()
+
+    @ddt.data(
+        ['downloadable', False],
+        ['unavailable', True]
+    )
+    @ddt.unpack
+    def test_send_notifications_revoke_programs(
+        self,
+        cert_status,
+        revoke_expected,
+        mock_interesting,
+        mock_revoked,
+        mock_awarded,
+        mock_changed
+    ):
+        """
+        Test cases that verify the `send_notifications` functions behavior when the `revoke_program_certs` flag is True.
+        """
+        certs = self._get_certs_qs()
+        grades = self._get_grades_qs()
+
+        self.certificate.status = cert_status
+        self.certificate.save()
+
+        tasks.send_notifications(
+            certs,
+            grades,
+            self.site,
+            notify_programs=True,
+            revoke_program_certs=True
+        )
+
+        expected_signal_args = self._build_expected_signal_args()
+        mock_changed.assert_called_once_with(**expected_signal_args)
+        mock_interesting.assert_called_once_with(
+            self.user,
+            self.grade.course_id,
+            self.certificate.mode,
+            self.certificate.status,
+            self.grade.letter_grade,
+            self.grade.percent_grade,
+            grade_last_updated=self.grade.modified,
+            verbose=False
+        )
+        if revoke_expected:
+            mock_revoked.assert_called_once_with(**expected_signal_args)
+            mock_awarded.mock_not_called()
+        else:
+            mock_revoked.assert_not_called()
+            mock_awarded.assert_called_once_with(**expected_signal_args)

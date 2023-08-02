@@ -1521,7 +1521,7 @@ def _check_sequence_exam_access(request, location):
 @xframe_options_exempt
 @transaction.non_atomic_requests
 @ensure_csrf_cookie
-def render_xblock(request, usage_key_string, check_if_enrolled=True):
+def render_xblock(request, usage_key_string, check_if_enrolled=True, disable_staff_debug_info=False):
     """
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
@@ -1571,8 +1571,12 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
         # get the block, which verifies whether the user has access to the block.
         recheck_access = request.GET.get('recheck_access') == '1'
         block, _ = get_block_by_usage_id(
-            request, str(course_key), str(usage_key), disable_staff_debug_info=True, course=course,
-            will_recheck_access=recheck_access
+            request,
+            str(course_key),
+            str(usage_key),
+            disable_staff_debug_info=disable_staff_debug_info,
+            course=course,
+            will_recheck_access=recheck_access,
         )
 
         student_view_context = request.GET.dict()
@@ -1792,7 +1796,8 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             'public_video_embed': False,
         })
         catalog_course_data = self.get_catalog_course_data(course)
-        learn_more_url, enroll_url = self.get_public_video_cta_button_urls(course, catalog_course_data)
+        learn_more_url, enroll_url, go_to_course_url = \
+            self.get_public_video_cta_button_urls(course, catalog_course_data)
         social_sharing_metadata = self.get_social_sharing_metadata(course, video_block)
         context = {
             'fragment': fragment,
@@ -1801,14 +1806,23 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             'social_sharing_metadata': social_sharing_metadata,
             'learn_more_url': learn_more_url,
             'enroll_url': enroll_url,
+            'go_to_course_url': go_to_course_url,
             'allow_iframing': True,
             'disable_window_wrap': True,
             'disable_register_button': True,
             'edx_notes_enabled': False,
             'is_learning_mfe': True,
             'is_mobile_app': False,
+            'is_enrolled_in_course': self.get_is_enrolled_in_course(course),
         }
         return 'public_video.html', context
+
+    def get_is_enrolled_in_course(self, course):
+        """
+        Returns whether the user is enrolled in the course
+        """
+        user = self.request.user
+        return user and registered_for_course(course, user)
 
     def get_catalog_course_data(self, course):
         """
@@ -1896,7 +1910,9 @@ class PublicVideoXBlockView(BasePublicVideoXBlockView):
             },
             utm_params
         )
-        return learn_more_url, enroll_url
+        go_to_course_url = get_learning_mfe_home_url(course_key=course.id,
+                                                     url_fragment='home')
+        return learn_more_url, enroll_url, go_to_course_url
 
     def get_utm_params(self):
         """

@@ -1,23 +1,22 @@
 """
 Logistration API View Tests
 """
-import socket
-from unittest.mock import patch
-from urllib.parse import urlencode
-
 import ddt
+import socket
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from unittest.mock import patch
+from urllib.parse import urlencode
 
 from common.djangoapps.student.models import Registration
 from common.djangoapps.student.tests.factories import UserFactory
 from common.djangoapps.third_party_auth import pipeline
 from common.djangoapps.third_party_auth.tests.testutil import ThirdPartyAuthTestMixin, simulate_running_pipeline
-from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.geoinfo.api import country_code_from_ip
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 
@@ -118,6 +117,7 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
                 'autoSubmitRegForm': False,
                 'syncLearnerProfileData': False,
                 'countryCode': self.country_code,
+                'welcomePageRedirectUrl': None,
                 'pipelineUserDetails': self.pipeline_user_details,
             },
             'registrationFields': {},
@@ -350,6 +350,61 @@ class MFEContextViewTest(ThirdPartyAuthTestMixin, APITestCase):
         """
         response = self.client.get(self.url, self.query_params)
         assert response.data == self.get_context()
+
+    def test_mfe_context_api_serialized_response(self):
+        """
+        Test MFE Context API serialized response
+        """
+        response = self.client.get(self.url, self.query_params)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        params = {
+            'next': self.query_params['next']
+        }
+
+        self.assertEqual(
+            response.data,
+            self.get_context(params)
+        )
+
+    def test_mfe_context_api_response_keys(self):
+        """
+        Test MFE Context API response keys
+        """
+        response = self.client.get(self.url, self.query_params)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response_keys = set(response.data.keys())
+        self.assertSetEqual(
+            response_keys,
+            {
+                'contextData',
+                'registrationFields',
+                'optionalFields'
+            }
+        )
+
+    @with_site_configuration(
+        configuration={
+            'extended_profile_fields': ['specialty']
+        }
+    )
+    @override_settings(
+        ENABLE_DYNAMIC_REGISTRATION_FIELDS=True,
+        REGISTRATION_EXTRA_FIELDS={'specialty': 'optional', 'goals': 'optional'},
+        LOGIN_REDIRECT_WHITELIST=['openedx.service'],
+    )
+    def test_welcome_page_context(self):
+        """
+        Test MFE Context API response for welcome page
+        """
+        redirect_url = 'https://openedx.service/coolpage'
+        self.query_params.update({'is_welcome_page': True, 'next': redirect_url})
+        response = self.client.get(self.url, self.query_params, HTTP_ACCEPT='*/*')
+        assert response.status_code == status.HTTP_200_OK
+        assert list(response.data['optionalFields']['fields'].keys()) == ['specialty', 'goals']
+        assert list(response.data['optionalFields']['extended_profile']) == ['specialty']
+        assert response.data['contextData']['welcomePageRedirectUrl'] == redirect_url
 
 
 @skip_unless_lms

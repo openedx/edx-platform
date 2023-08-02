@@ -1,7 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies, import/no-duplicates,
- import/order, import/no-self-import, import/no-cycle, import/no-useless-path-segments,
-  import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member */
-// eslint-disable-next-line import/no-extraneous-dependencies
 import Backbone from 'backbone';
 
 import HtmlUtils from 'edx-ui-toolkit/js/utils/html-utils';
@@ -43,7 +39,7 @@ class ProgramAlertListView extends Backbone.View {
                 urlText: gettext('View program'),
                 title: StringUtils.interpolate(
                     // eslint-disable-next-line no-undef
-                    gettext('Enroll in a {programName} course'),
+                    gettext('Enroll in a {programName}\'s course'),
                     { programName },
                 ),
                 message: this.pageType === 'programDetails'
@@ -66,13 +62,19 @@ class ProgramAlertListView extends Backbone.View {
         return alertList.concat(this.trialEndingAlerts.map(
             ({ title: programName, remainingDays, ...data }) => ({
                 title: StringUtils.interpolate(
-                    // eslint-disable-next-line no-undef
-                    ngettext('Subscription trial expires in {remainingDays} day', 'Subscription trial expires in {remainingDays} days', remainingDays),
+                    remainingDays < 1
+                        // eslint-disable-next-line no-undef
+                        ? gettext('Subscription trial expires in less than 24 hours')
+                        // eslint-disable-next-line no-undef
+                        : ngettext('Subscription trial expires in {remainingDays} day', 'Subscription trial expires in {remainingDays} days', remainingDays),
                     { remainingDays },
                 ),
                 message: StringUtils.interpolate(
-                    // eslint-disable-next-line no-undef
-                    ngettext('Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}/month.', 'Your {programName} trial will expire in {remainingDays} days at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}/month.', remainingDays),
+                    remainingDays < 1
+                        // eslint-disable-next-line no-undef
+                        ? gettext('Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.')
+                        // eslint-disable-next-line no-undef
+                        : ngettext('Your {programName} trial will expire in {remainingDays} day at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.', 'Your {programName} trial will expire in {remainingDays} days at {trialEndTime} on {trialEndDate} and the card on file will be charged {subscriptionPrice}.', remainingDays),
                     {
                         programName,
                         remainingDays,

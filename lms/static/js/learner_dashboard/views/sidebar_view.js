@@ -32,7 +32,7 @@ class SidebarView extends Backbone.View {
     postRender() {
         if (this.context.isUserB2CSubscriptionsEnabled) {
             this.subscriptionUpsellView = new SubscriptionUpsellView({
-                context: this.context,
+                subscriptionUpsellData: this.context.subscriptionUpsellData,
             });
         }
 

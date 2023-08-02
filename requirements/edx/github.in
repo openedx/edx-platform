@@ -1,5 +1,5 @@
 # This file holds all GitHub-hosted edx-platform Python dependencies.
-# Such dependencies should be added here, not to base.in.
+# Such dependencies should be added here, not to kernel.in.
 # That being said....
 #
 # ---->>> DON'T JUST ADD NEW DEPENDENCIES!!! <<<----
@@ -15,7 +15,7 @@
 # * Go to https://github.com/openedx/<YOUR_REPO>/actions/new
 # * Find "Publish Python Package"
 # * Merge the generated PR and push package.
-# * You're done! Add your dependency to base.in, and the requirements
+# * You're done! Add your dependency to kernel.in, and the requirements
 #   bot will automatically keep it fresh in edx-platform.
 #
 # If you think you must add a URL to this file, read this section of OEP-18 first:
@@ -86,11 +86,3 @@
 ##############################################################################
 
 # ... add dependencies here
-
-
-##############################################################################
-# Legacy URL dependencies. To be removed. Don't add new URLs here!
-##############################################################################
-
-# https://github.com/openedx/MongoDBProxy/issues/18
-git+https://github.com/openedx/MongoDBProxy.git@d92bafe9888d2940f647a7b2b2383b29c752f35a#egg=MongoDBProxy==0.1.0+edx.2
