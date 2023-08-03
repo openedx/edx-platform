@@ -868,6 +868,8 @@ def _create_copy_content_task(v2_library_key, v1_library_key):
 def _create_metadata(v1_library_key, collection_uuid):
     """instansiate an index for the V2 lib in the collection"""
 
+    print(collection_uuid)
+
     store = modulestore()
     v1_library = store.get_library(v1_library_key)
     collection = get_collection(collection_uuid).uuid
@@ -1000,3 +1002,31 @@ def delete_v1_library(v1_library_key_string):
         "status": "SUCCESS",
         "msg": "SUCCESS"
     }
+
+@shared_task(time_limit=30)
+@set_code_owner_attribute
+def replace_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):
+    """Search a Modulestore for all library source blocks in a course by querying mongo.
+        replace all source_library_ids with the corresponding v2 value from the map
+    """
+    store = modulestore()
+    with store.bulk_operations(course.id):
+        blocks = store.get_items(
+            course.id.for_branch(ModuleStoreEnum.BranchName.draft),
+            settings={'source_library_id': {'$exists': True}}
+        )
+        for xblock in blocks:
+            print(xblock.__dict__)
+            try:
+                xblock.source_library_id = v1_to_v2_lib_map[xblock.source_library_id]
+                store.update_item(xblock, None)
+            except KeyError:
+                #skip invalid keys
+                LOGGER.error(
+                    'Key %s not found in mapping. Skipping block for course %s',
+                    str({xblock.source_library_id}),
+                    str(course.id)
+                )
+    # return sucess
+    return None
+
