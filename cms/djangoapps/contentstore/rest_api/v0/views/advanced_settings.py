@@ -117,8 +117,6 @@ class AdvancedCourseSettingsView(DeveloperErrorViewMixin, APIView):
         if not filter_query_data.is_valid():
             raise ValidationError(filter_query_data.errors)
         course_key = CourseKey.from_string(course_id)
-        if not use_new_advanced_settings_page(course_key):
-            return Response(status=status.HTTP_403_FORBIDDEN)
         if not has_studio_read_access(request.user, course_key):
             self.permission_denied(request)
         course_block = modulestore().get_course(course_key)
