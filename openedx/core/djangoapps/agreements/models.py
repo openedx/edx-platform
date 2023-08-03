@@ -52,3 +52,15 @@ class LTIPIISignature(models.Model):
 
     class Meta:
         app_label = 'agreements'
+
+
+class ProctoringPIISignature(models.Model):
+    """
+    This model stores a user's acknowledgment to share PII via proctoring in a particular course.
+    """
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
+    course_key = CourseKeyField(max_length=255, db_index=True)
+    proctoring_provider = models.CharField(max_length=255)
+
+    class Meta:
+        app_label = 'agreements'
