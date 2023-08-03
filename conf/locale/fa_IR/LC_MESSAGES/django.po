@@ -31,7 +31,7 @@
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@tcril.org>, 2014
-# SeyedMahdi Saeid <saeid@edspirit.com>, 2022
+# SeyedMahdi Saeid <saeid@edspirit.com>, 2022-2023
 # Siavash Kavousi <siavash.kavousi.sk@gmail.com>, 2016
 # Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # smctech <tech@smallmedia.org.uk>, 2016
@@ -133,7 +133,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-02 20:42+0000\n"
+"POT-Creation-Date: 2023-07-23 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Somaye Joolaee, 2022\n"
 "Language-Team: Persian (Iran) (https://app.transifex.com/open-edx/teams/6205/fa_IR/)\n"
@@ -251,6 +251,17 @@ msgstr "در حال انتظار"
 #: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "خالی"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+msgid "Invalid data"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr ""
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -425,7 +436,6 @@ msgstr "{currency_symbol}{price}"
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "رایگان"
@@ -5852,55 +5862,6 @@ msgstr "اجازه‌دادن"
 msgid "Error"
 msgstr "خطا"
 
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Check out this course on edx"
-msgstr "این دوره آموزشی را در edx بررسی کنید"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Enroll now"
-msgstr "الان ثبت‌نام کنید"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "View Course"
-msgstr "مشاهده دوره آموزشی"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Estimated 6 weeks"
-msgstr "تقریبا 6 هفته"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "4-6 hours per week"
-msgstr "4-6 ساعت در هفته"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Self-paced"
-msgstr "خودآموز"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Progress at your own speed"
-msgstr "با سرعت مورد نظر خودتان پیشرفت کنید"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Optional upgrade available"
-msgstr "امکان ارتقا اختیاری فراهم است"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "Check out this course on %(platform_name)s."
-msgstr "این دوره آموزشی را در %(platform_name)s بررسی کنید."
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "This email message was automatically sent by %(lms_url)s "
-msgstr "این رایانامه به‌طور خودکار توسط %(lms_url)s ارسال شد"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
-#, python-format
-msgid "%(display_name)s"
-msgstr "%(display_name)s"
-
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
 msgstr "هویت تأیید شد"
@@ -8076,8 +8037,8 @@ msgid ""
 "Usernames can only contain letters (A-Z, a-z), numerals (0-9), underscores "
 "(_), and hyphens (-)."
 msgstr ""
-"نام‌های کاربری فقط می‌توانند شامل حروف (الف-ی)، اعداد (0-9) ، زیر خط (_) و "
-"خط تیره (-) باشند."
+"نام‌های کاربری فقط می‌توانند شامل حروف (A-Z, a-z)، اعداد (0-9) ، زیر خط (_) "
+"و خط تیره (-) باشند."
 
 #: openedx/core/djangoapps/user_api/accounts/__init__.py
 msgid ""
@@ -12832,6 +12793,17 @@ msgstr "درخواست بازتولید همه طرح درس دوره‌های �
 msgid "Regenerate *all* course outlines"
 msgstr "بازتولید *همه* طرح‌ درس‌ها"
 
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+msgid "Upload completed"
+msgstr "بارگذاری کامل شد"
+
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+#, python-brace-format
+msgid ""
+"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
+msgstr ""
+"اندازۀ پروندۀ  {filename} بیش از{maximum_size_in_megabytes} مگابایت است"
+
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
 "The groups in this configuration can be mapped to cohorts in the Instructor "
@@ -13169,17 +13141,6 @@ msgid ""
 "underscores (_)."
 msgstr ""
 "نام پروندۀ تصویری باید شامل حروف، اعداد، خط فاصله (-) و زیر خط (_) باشد."
-
-#: cms/djangoapps/contentstore/views/assets.py
-msgid "Upload completed"
-msgstr "بارگذاری کامل شد"
-
-#: cms/djangoapps/contentstore/views/assets.py
-#, python-brace-format
-msgid ""
-"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
-msgstr ""
-"اندازۀ پروندۀ  {filename} بیش از{maximum_size_in_megabytes} مگابایت است"
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -13559,15 +13520,6 @@ msgstr "عددی صحیح به غیر از صفر مجاز است."
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr "کتابخانه‌ها نمی‌توانند بیش از {limit} مؤلفه داشته باشند"
-
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
-msgid "Invalid data"
-msgstr "داده معتبر نیست"
-
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "داده معتبر ({details}) نیست"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "There was a problem pasting your component."
@@ -16745,6 +16697,11 @@ msgid "You are enrolled in this course"
 msgstr "شما در این دوره آموزشی ثبت‌نام کرده‌اید"
 
 #: lms/templates/courseware/course_about.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "View Course"
+msgstr "مشاهده دوره آموزشی"
+
+#: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr "ثبت‌نام در این کلاس فقط با دعوت مجاز است"
 
@@ -19333,6 +19290,22 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
 msgstr "افزودن همکار"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Limited Staff"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Course team members with the Limited Staff role help you manage your course."
+" Limited Staff can enroll and unenroll learners, as well as modify their "
+"grades and access all course data. Limited Staff don't have access to your "
+"course in Studio. You can only give course team roles to enrolled users."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Limited Staff"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"

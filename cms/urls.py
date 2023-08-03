@@ -328,7 +328,7 @@ from openedx.core.djangoapps.plugins.constants import ProjectType  # isort:skip
 
 urlpatterns.extend(get_plugin_url_patterns(ProjectType.CMS))
 
-# Contentstore
+# Contentstore REST APIs
 urlpatterns += [
     path('api/contentstore/', include('cms.djangoapps.contentstore.rest_api.urls'))
 ]

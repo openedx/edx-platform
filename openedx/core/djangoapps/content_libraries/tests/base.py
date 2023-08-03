@@ -331,7 +331,7 @@ class _ContentLibrariesRestApiTestMixin:
         assert response.status_code == expect_response,\
             'Unexpected response code {}:\n{}'.format(response.status_code, getattr(response, 'data', '(no data)'))
 
-    def _delete_library_block_asset(self, block_key, file_name, expect_response=200):
+    def _delete_library_block_asset(self, block_key, file_name, expect_response=204):
         """ Delete a static asset file. """
         url = URL_LIB_BLOCK_ASSET_FILE.format(block_key=block_key, file_name=file_name)
         return self._api('delete', url, None, expect_response)

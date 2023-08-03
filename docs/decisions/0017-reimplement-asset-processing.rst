@@ -218,7 +218,9 @@ The three top-level edx-platform asset processing actions are *build*, *collect*
 
      - ``npm run watch``
 
-       Bash wrappers around invocation(s) of `watchman <https://facebook.github.io/watchman/>`_, a popular file-watching library maintained by Meta. Watchman is already installed into edx-platform (and other services) via the pywatchman pip wrapper package.
+       Bash wrappers around invocations of the `watchdog library <https://pypi.org/project/watchdog/>`_ for themable/themed assets, and `webpack --watch <https://webpack.js.org/configuration/watch/>`_ for Webpack-managed assets. Both of these tools are available via dependencies that are already installed into edx-platform.
+
+       We considered using `watchman <https://facebook.github.io/watchman/>`_, a popular file-watching library maintained by Meta, but found that the Python release of the library is poorly maintained (latest release 2017) and the documentation is difficult to follow. `Django uses pywatchman but is planning to migrate off of it <https://code.djangoproject.com/ticket/34479>`_ and onto `watchfiles <https://pypi.org/project/watchfiles/>`_. We considered watchfiles, but decided against adding another developer dependency to edx-platform. Future developers could consider migrating to watchfiles if it seemed worthwile.
 
 
 Build Configuration

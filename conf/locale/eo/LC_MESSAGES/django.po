@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-23 20:36+0000\n"
-"PO-Revision-Date: 2023-07-23 20:36:06.015841\n"
+"POT-Creation-Date: 2023-07-30 20:35+0000\n"
+"PO-Revision-Date: 2023-07-30 20:35:57.446921\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -8634,24 +8634,24 @@ msgstr "Léärnér Päthwäýs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
-"<{strong}>{post_title}</{strong}></{p}>"
+"<{p}><{strong}>{replier_name}</{strong}> commented on your response to the "
+"post <{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
-"<{p}><{strong}>{replier_name}</{strong}> réplïéd ön ýöür réspönsé ïn "
-"<{strong}>{post_title}</{strong}></{p}> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"<{p}><{strong}>{replier_name}</{strong}> çömméntéd ön ýöür réspönsé tö thé "
+"pöst <{strong}>{post_title}</{strong}></{p}> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on "
-"<{strong}>{author_name}</{strong}> response to your post "
+"<{p}><{strong}>{replier_name}</{strong}> commented on "
+"<{strong}>{author_name}'s</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
-"<{p}><{strong}>{replier_name}</{strong}> réplïéd ön "
-"<{strong}>{author_name}</{strong}> réspönsé tö ýöür pöst "
+"<{p}><{strong}>{replier_name}</{strong}> çömméntéd ön "
+"<{strong}>{author_name}'s</{strong}> réspönsé tö ýöür pöst "
 "<{strong}>{post_title}</{strong}></{p}> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+"¢σηѕє¢тєтυя#"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
@@ -10383,6 +10383,18 @@ msgid ""
 msgstr ""
 "Ýöü hävé süççéssfüllý shïftéd ýöür çöürsé sçhédülé änd ýöür çäléndär ïs üp "
 "tö däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: openedx/features/content_tagging/models.py wiki/models/article.py
+msgid "owner"
+msgstr "öwnér Ⱡ'σяєм ιρѕ#"
+
+#: openedx/features/content_tagging/models.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"Örgänïzätïön thät ïs rélätéd tö thïs täxönömý.Ìf Nöné, thén thïs täxönömý ïs"
+" rélätéd tö äll örgänïzätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -28746,10 +28758,6 @@ msgstr "mödïfïéd Ⱡ'σяєм ιρѕυм ∂#"
 msgid "Article properties last modified"
 msgstr ""
 "Àrtïçlé pröpértïés läst mödïfïéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "öwnér Ⱡ'σяєм ιρѕ#"
 
 #: wiki/models/article.py
 msgid ""

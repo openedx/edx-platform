@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-23 20:36+0000\n"
-"PO-Revision-Date: 2023-07-23 20:36:06.015841\n"
+"POT-Creation-Date: 2023-07-30 20:35+0000\n"
+"PO-Revision-Date: 2023-07-30 20:35:57.446921\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -7472,21 +7472,21 @@ msgstr "Łǝɐɹnǝɹ Ᵽɐʇɥʍɐʎs"
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
-"<{strong}>{post_title}</{strong}></{p}>"
+"<{p}><{strong}>{replier_name}</{strong}> commented on your response to the "
+"post <{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
-"<{p}><{strong}>{replier_name}</{strong}> ɹǝdlᴉǝd øn ʎønɹ ɹǝsdønsǝ ᴉn "
-"<{strong}>{post_title}</{strong}></{p}>"
+"<{p}><{strong}>{replier_name}</{strong}> ɔøɯɯǝnʇǝd øn ʎønɹ ɹǝsdønsǝ ʇø ʇɥǝ "
+"døsʇ <{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on "
-"<{strong}>{author_name}</{strong}> response to your post "
+"<{p}><{strong}>{replier_name}</{strong}> commented on "
+"<{strong}>{author_name}'s</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
-"<{p}><{strong}>{replier_name}</{strong}> ɹǝdlᴉǝd øn "
-"<{strong}>{author_name}</{strong}> ɹǝsdønsǝ ʇø ʎønɹ døsʇ "
+"<{p}><{strong}>{replier_name}</{strong}> ɔøɯɯǝnʇǝd øn "
+"<{strong}>{author_name}'s</{strong}> ɹǝsdønsǝ ʇø ʎønɹ døsʇ "
 "<{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
@@ -8982,6 +8982,18 @@ msgid ""
 msgstr ""
 "Ɏøn ɥɐʌǝ snɔɔǝssɟnllʎ sɥᴉɟʇǝd ʎønɹ ɔønɹsǝ sɔɥǝdnlǝ ɐnd ʎønɹ ɔɐlǝndɐɹ ᴉs nd "
 "ʇø dɐʇǝ."
+
+#: openedx/features/content_tagging/models.py wiki/models/article.py
+msgid "owner"
+msgstr "øʍnǝɹ"
+
+#: openedx/features/content_tagging/models.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"Øɹƃɐnᴉzɐʇᴉøn ʇɥɐʇ ᴉs ɹǝlɐʇǝd ʇø ʇɥᴉs ʇɐxønøɯʎ.Ɨɟ Nønǝ, ʇɥǝn ʇɥᴉs ʇɐxønøɯʎ ᴉs"
+" ɹǝlɐʇǝd ʇø ɐll øɹƃɐnᴉzɐʇᴉøns."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -24869,10 +24881,6 @@ msgstr "ɯødᴉɟᴉǝd"
 #: wiki/models/article.py
 msgid "Article properties last modified"
 msgstr "Ⱥɹʇᴉɔlǝ dɹødǝɹʇᴉǝs lɐsʇ ɯødᴉɟᴉǝd"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "øʍnǝɹ"
 
 #: wiki/models/article.py
 msgid ""

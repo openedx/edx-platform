@@ -45,13 +45,15 @@ from common.djangoapps.student.auth import (
     has_course_author_access,
     has_studio_read_access,
     has_studio_write_access,
-    has_studio_advanced_settings_access
+    has_studio_advanced_settings_access,
+    is_content_creator,
 )
 from common.djangoapps.student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
-    UserBasedRole
+    UserBasedRole,
+    OrgStaffRole
 )
 from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
@@ -113,11 +115,10 @@ from ..utils import (
     reverse_library_url,
     reverse_url,
     reverse_usage_url,
-    update_course_discussions_settings,
     update_course_details,
+    update_course_discussions_settings,
 )
 from .component import ADVANCED_COMPONENT_TYPES
-from ..helpers import is_content_creator
 from cms.djangoapps.contentstore.xblock_storage_handlers.view_handlers import (
     create_xblock_info,
 )
@@ -604,6 +605,7 @@ def course_listing(request):
         'optimization_enabled': optimization_enabled,
         'active_tab': 'courses',
         'allowed_organizations': get_allowed_organizations(user),
+        'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(user),
         'can_create_organizations': user_can_create_organizations(user),
     })
 
@@ -631,6 +633,7 @@ def library_listing(request):
         'split_studio_home': split_library_view_on_dashboard(),
         'active_tab': 'libraries',
         'allowed_organizations': get_allowed_organizations(request.user),
+        'allowed_organizations_for_libraries': get_allowed_organizations_for_libraries(request.user),
         'can_create_organizations': user_can_create_organizations(request.user),
     }
     return render_to_response('index.html', data)
@@ -993,7 +996,7 @@ def create_new_course(user, org, number, run, fields):
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
     new_course = create_new_course_in_store(store_for_new_course, user, org, number, run, fields)
     add_organization_course(org_data, new_course.id)
-    update_course_discussions_settings(new_course.id)
+    update_course_discussions_settings(new_course)
 
     # Enable certain fields rolling forward, where configured
     if default_enable_flexible_peer_openassessments(new_course.id):
@@ -1829,11 +1832,35 @@ def get_allowed_organizations(user):
         return []
 
 
+def get_allowed_organizations_for_libraries(user):
+    """
+    Helper method for returning the list of organizations for which the user is allowed to create libraries.
+    """
+    if settings.FEATURES.get('ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES', False):
+        return get_organizations_for_non_course_creators(user)
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        return get_organizations(user)
+    else:
+        return []
+
+
 def user_can_create_organizations(user):
     """
     Returns True if the user can create organizations.
     """
     return user.is_staff or not settings.FEATURES.get('ENABLE_CREATOR_GROUP', False)
+
+
+def get_organizations_for_non_course_creators(user):
+    """
+    Returns the list of organizations which the user is a staff member of, as a list of strings.
+    """
+    orgs_map = set()
+    orgs = OrgStaffRole().get_orgs_for_user(user)
+    # deduplicate
+    for org in orgs:
+        orgs_map.add(org)
+    return list(orgs_map)
 
 
 def get_organizations(user):
