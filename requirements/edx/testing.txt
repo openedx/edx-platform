@@ -589,7 +589,7 @@ edx-enterprise==4.0.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-edx-event-bus-kafka==5.1.0
+edx-event-bus-kafka==5.2.0
     # via -r requirements/edx/base.txt
 edx-event-bus-redis==0.3.1
     # via -r requirements/edx/base.txt
