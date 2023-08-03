@@ -11,7 +11,7 @@ from django.views.generic import TemplateView
 from oauth2_provider.models import Application
 from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 
-from lms.envs.common import EDLY_PANEL_ADMIN_USERS_GROUP, PANEL_ADMIN_LOGOUT_REDIRECT_URL
+from lms.envs.common import EDLY_PANEL_ADMIN_USERS_GROUP
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from third_party_auth import pipeline as tpa_pipeline
@@ -80,7 +80,7 @@ class LogoutView(TemplateView):
             return target_url
 
         if self.is_user_panel_admin:
-            return PANEL_ADMIN_LOGOUT_REDIRECT_URL
+            return settings.PANEL_ADMIN_LOGOUT_REDIRECT_URL
 
         return self.default_target
 
