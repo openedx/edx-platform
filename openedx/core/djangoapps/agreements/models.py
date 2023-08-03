@@ -49,3 +49,6 @@ class LTIPIISignature(models.Model):
     # acknowledgments - which reduces response time and decreases any impact
     # on unit rendering time.
     lti_tools_hash = models.IntegerField()
+    
+    class Meta:
+        app_label = 'agreements'
