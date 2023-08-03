@@ -60,7 +60,7 @@ class ProctoringPIISignature(models.Model):
     """
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     course_key = CourseKeyField(max_length=255, db_index=True)
-    proctering_provider = models.CharField(max_length=255)
+    proctoring_provider = models.CharField(max_length=255)
 
     class Meta:
         app_label = 'agreements'
