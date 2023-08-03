@@ -61,8 +61,6 @@ class GenUserAdmin(admin.ModelAdmin):
                              'Force password updated successfully.')
 
 
-
-
 @admin.register(Skill)
 class SkillAdmin(admin.ModelAdmin):
     search_fields = ('name',)
@@ -172,8 +170,9 @@ class SchoolAdmin(admin.ModelAdmin):
                     self.message_user(request,
                                       'An Error occurred while parsing the csv. Please make sure that the csv is in the right format.',
                                       level=messages.ERROR)
-            self.message_user(request, 'Your csv file has been uploaded. {}'.format(str({'users_count': len(user_created),
-                                                                                         'users_emails': user_created})))
+            self.message_user(request,
+                              'Your csv file has been uploaded. {}'.format(str({'users_count': len(user_created),
+                                                                                'users_emails': user_created})))
             return redirect("..")
         form = CsvImportForm()
         payload = {"form": form}
@@ -357,8 +356,8 @@ class ClassAdmin(admin.ModelAdmin):
             func = func_maker(value)
             name = 'attach_{}'.format(value.slug.strip())
             actions['attach_{}'.format(value.slug.strip())] = (func, name,
-                                                                          'attach to Program: {}'.format(
-                                                                              value.slug))
+                                                               'attach to Program: {}'.format(
+                                                                   value.slug))
 
         return actions
 
@@ -421,32 +420,46 @@ class StudentAdmin(admin.ModelAdmin):
     def progress(self, obj):
         if obj.gen_user.user is None:
             return 'Not logged in yet.'
-        program_data = {}
+        program_data = ''
         for program in Program.get_active_programs():
             units = program.units.all()
             completions = UnitCompletion.objects.filter(
                 user=obj.gen_user.user,
                 course_key__in=units.values_list('course', flat=True)
             )
-            unit_data = {}
+            unit_data = ''
             for unit in units:
                 try:
                     obj.gen_user.student.program_enrollments.get(program=program)
                     completion = completions.filter(user=obj.gen_user.user, course_key=unit.course.id).first()
                     progress = completion.progress if completion else 0
-                    unit_data[unit.display_name] = f"{int(progress)}%"
+                    unit_html = f"""<tr>
+                                  <td>{unit.display_name}</td> <td style="background-color: #eee;">{progress}%</td>
+                                </tr>
+                              """
+                    unit_data += unit_html
                 except ProgramEnrollment.DoesNotExist:
                     continue
             if unit_data:
-                program_data[program.slug] = unit_data
-            else:
-                program_data[program.slug] = "Not enrolled yet"
+                program_html = f"""
+                                <table>
+                                <tr>
+                                <td><b>{program.slug}</b></td>
+                                <td>
+                                <table>
+                                {unit_data}
+                                </table>
+                                </td>
+                              </tr>
+                            </table>
+                             """
+                program_data += program_html
+        return mark_safe(program_data)
 
-        return str(program_data)
 
 @admin.register(GenLog)
 class GenLog(admin.ModelAdmin):
-    list_filter = ('gen_log_type', )
+    list_filter = ('gen_log_type',)
     search_fields = ('metadata', 'description')
     list_display = ('description', 'gen_log_type', 'metadata', 'created')
 

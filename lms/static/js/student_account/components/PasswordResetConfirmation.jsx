@@ -122,6 +122,7 @@ class PasswordResetConfirmation extends React.Component {
               type="submit"
               className={['action', 'action-primary', 'action-update', 'js-reset']}
               label={this.props.primaryActionButtonLabel}
+              disabled={!this.state.isValid || this.state.showMatchError}
             />
           </form>
         </div>
