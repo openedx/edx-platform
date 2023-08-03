@@ -768,7 +768,7 @@ openedx-events==8.3.0
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
     #   skill-tagging
-openedx-filters==1.4.0
+openedx-filters==1.5.0
     # via
     #   -r requirements/edx/kernel.in
     #   lti-consumer-xblock
