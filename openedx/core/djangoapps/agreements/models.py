@@ -54,7 +54,7 @@ class LTIPIISignature(models.Model):
         app_label = 'agreements'
 
 
-class ProctoringPIISignature():
+class ProctoringPIISignature(models.Model):
     """
     This model stores a user's acknowledgment to share PII via proctoring in a particular course.
     """
