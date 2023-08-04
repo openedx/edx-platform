@@ -1,6 +1,8 @@
 """
 Utils for discussion API.
 """
+from datetime import datetime
+from pytz import UTC
 from typing import List, Dict
 
 from django.conf import settings
@@ -10,6 +12,7 @@ from django.db.models.functions import Length
 
 from common.djangoapps.student.roles import CourseStaffRole, CourseInstructorRole
 from lms.djangoapps.discussion.django_comment_client.utils import has_discussion_privileges
+from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, PostingRestriction
 from openedx.core.djangoapps.django_comment_common.models import (
     Role,
     FORUM_ROLE_ADMINISTRATOR,
@@ -33,13 +36,18 @@ class AttributeDict(dict):
 
 def discussion_open_for_user(course, user):
     """
-    Check if course discussion are open or not for user.
+    Check if the course discussion are open or not for user.
 
     Arguments:
             course: Course to check discussions for
             user: User to check for privileges in course
     """
-    return course.forum_posts_allowed or has_discussion_privileges(user, course.id)
+    discussions_posting_restrictions = DiscussionsConfiguration.get(course.id).posting_restrictions
+    blackout_dates = course.get_discussion_blackout_datetimes()
+    return (
+        is_posting_allowed(discussions_posting_restrictions, blackout_dates) or
+        has_discussion_privileges(user, course.id)
+    )
 
 
 def set_attribute(threads, attribute, value):
@@ -455,3 +463,23 @@ class DiscussionNotificationSender:
             self._response_and_thread_has_same_creator()
         ):
             self._send_notification([self.parent_response.user_id], "new_comment_on_response")
+
+
+def is_posting_allowed(posting_restrictions: str, blackout_schedules: List):
+    """
+    Check if posting is allowed based on the given posting restrictions and blackout schedules.
+
+    Args:
+        posting_restrictions (str): Values would be  "disabled", "scheduled" or "enabled".
+        blackout_schedules (List[Dict[str, datetime]]): The list of blackout schedules
+
+    Returns:
+        bool: True if posting is allowed, False otherwise.
+    """
+    now = datetime.now(UTC)
+    if posting_restrictions == PostingRestriction.DISABLED:
+        return True
+    elif posting_restrictions == PostingRestriction.SCHEDULED:
+        return not any(schedule["start"] <= now <= schedule["end"] for schedule in blackout_schedules)
+    else:
+        return False
