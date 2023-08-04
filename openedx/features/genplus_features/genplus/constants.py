@@ -9,6 +9,7 @@ class GenUserRoles:
     TEACHING_STAFF = 'TeachingStaff'
     NON_TEACHING_STAFF = 'NonTeachingStaff'
 
+    TEACHING_ROLES = [TEACHING_STAFF, NON_TEACHING_STAFF]
     __ALL__ = (STUDENT, FACULTY, AFFILIATE, EMPLOYEE, TEACHING_STAFF, NON_TEACHING_STAFF)
     __MODEL_CHOICES__ = (
         (status, status) for status in __ALL__

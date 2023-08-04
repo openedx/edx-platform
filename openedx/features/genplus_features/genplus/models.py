@@ -127,7 +127,7 @@ class GenUser(models.Model):
 
     @property
     def is_teacher(self):
-        return self.role == GenUserRoles.TEACHING_STAFF
+        return self.role in GenUserRoles.TEACHING_ROLES
 
     @property
     def from_private_school(self):

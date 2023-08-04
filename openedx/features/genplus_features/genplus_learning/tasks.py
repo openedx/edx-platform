@@ -6,9 +6,6 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from celery import shared_task
 from edx_django_utils.monitoring import set_code_owner_attribute
-from celery_utils.logged_task import LoggedTask
-from celery_utils.persist_on_failure import LoggedPersistOnFailureTask
-
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from completion.models import BlockCompletion
 from completion.waffle import ENABLE_COMPLETION_TRACKING_SWITCH
@@ -135,7 +132,7 @@ def allow_program_access_to_class_teachers(self, class_id, program_id, class_tea
         log.info("Class or program id does not exist")
         return
 
-    users = User.objects.filter(gen_user__school=gen_class.school, gen_user__role=GenUserRoles.TEACHING_STAFF)
+    users = User.objects.filter(gen_user__school=gen_class.school, gen_user__role__in=GenUserRoles.TEACHING_ROLES)
     if class_teacher_ids:
         users = users.filter(gen_user__teacher__in=class_teacher_ids)
 
@@ -156,7 +153,7 @@ def revoke_program_access_for_class_teachers(self, class_id, program_id, class_t
         log.info("Class or program id does not exist")
         return
 
-    users = User.objects.filter(gen_user__school=gen_class.school, gen_user__role=GenUserRoles.TEACHING_STAFF)
+    users = User.objects.filter(gen_user__school=gen_class.school, gen_user__role__in=GenUserRoles.TEACHING_ROLES)
     if class_teacher_ids:
         users = users.filter(gen_user__teacher__in=class_teacher_ids)
 
