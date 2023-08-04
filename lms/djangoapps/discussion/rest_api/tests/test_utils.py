@@ -5,6 +5,7 @@ Tests for Discussion REST API utils.
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
+import ddt
 from django.conf import settings
 from httpretty import httpretty
 from pytz import UTC
@@ -310,6 +311,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         self.assertEqual(args_comment.app_name, 'discussion')
 
 
+@ddt.ddt
 class TestBlackoutDates(ForumsEnableMixin, CommentsServiceMockMixin, ModuleStoreTestCase):
     """
     Test for the is_posting_allowed function
@@ -354,41 +356,21 @@ class TestBlackoutDates(ForumsEnableMixin, CommentsServiceMockMixin, ModuleStore
             self.course.get_discussion_blackout_datetimes()
         )
 
-    def test_posting_disabled(self):
+    @ddt.data(
+        (PostingRestriction.DISABLED, True),
+        (PostingRestriction.ENABLED, False),
+        (PostingRestriction.SCHEDULED, False),
+    )
+    @ddt.unpack
+    def test_blackout_dates(self, restriction, state):
         """
-        Test posting when the posting restriction is disabled.
-        Assertion:
-           Posting should be allowed.
-        """
-        date_ranges = self._get_date_ranges()
-        self._set_discussion_blackouts(date_ranges)
-
-        posting_allowed = self._check_posting_allowed(PostingRestriction.DISABLED)
-        self.assertTrue(posting_allowed)
-
-    def test_posting_enabled(self):
-        """
-        Test posting when the posting restriction is enabled.
-        Assertion:
-            Posting should not be allowed.
+        Test is_posting_allowed function with the misc posting restriction
         """
         date_ranges = self._get_date_ranges()
         self._set_discussion_blackouts(date_ranges)
 
-        posting_allowed = self._check_posting_allowed(PostingRestriction.ENABLED)
-        self.assertFalse(posting_allowed)
-
-    def test_posting_scheduled(self):
-        """
-        Test posting when the posting restriction is scheduled.
-        Assertion:
-            Posting should not be allowed.
-        """
-        date_ranges = self._get_date_ranges()
-        self._set_discussion_blackouts(date_ranges)
-
-        posting_allowed = self._check_posting_allowed(PostingRestriction.SCHEDULED)
-        self.assertFalse(posting_allowed)
+        posting_allowed = self._check_posting_allowed(restriction)
+        self.assertEqual(state, posting_allowed)
 
     def test_posting_scheduled_future(self):
         """

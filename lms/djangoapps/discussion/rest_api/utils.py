@@ -42,9 +42,12 @@ def discussion_open_for_user(course, user):
             course: Course to check discussions for
             user: User to check for privileges in course
     """
-    discussions_config = DiscussionsConfiguration.get(course.id).posting_restrictions
+    discussions_posting_restrictions = DiscussionsConfiguration.get(course.id).posting_restrictions
     blackout_dates = course.get_discussion_blackout_datetimes()
-    return is_posting_allowed(discussions_config, blackout_dates) or has_discussion_privileges(user, course.id)
+    return (
+        is_posting_allowed(discussions_posting_restrictions, blackout_dates) or
+        has_discussion_privileges(user, course.id)
+    )
 
 
 def set_attribute(threads, attribute, value):
