@@ -262,7 +262,6 @@ class BlockStructureModel(TimeStampedModel):
             all_files_by_date = sorted(cls._get_all_files(data_usage_key))
             files_to_delete = all_files_by_date[:-num_to_keep] if num_to_keep > 0 else all_files_by_date  # lint-amnesty, pylint: disable=invalid-unary-operand-type
             cls._delete_files(files_to_delete)
-            
         except Exception:  # pylint: disable=broad-except
             log.exception('BlockStructure: Exception when deleting old files; data_usage_key: %s.', data_usage_key)
 
