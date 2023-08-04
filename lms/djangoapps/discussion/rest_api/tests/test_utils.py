@@ -160,10 +160,18 @@ class TestRemoveEmptySequentials(unittest.TestCase):
         self.assertEqual(result, expected_output)
 
 
+def _get_mfe_url(course_id, post_id):
+    """
+    get discussions mfe url to specific post.
+    """
+    return f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(course_id)}/posts/{post_id}"
+
+
 class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin, ModuleStoreTestCase):
     """
     Test for the send_response_notifications function
     """
+
     def setUp(self):
         super().setUp()
         httpretty.reset()
@@ -174,6 +182,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         self.user_3 = UserFactory.create()
         self.thread = ThreadMock(thread_id=1, creator=self.user_1, title='test thread')
         self.thread_2 = ThreadMock(thread_id=2, creator=self.user_2, title='test thread 2')
+        self.thread_3 = ThreadMock(thread_id=2, creator=self.user_1, title='test thread 3')
         self.course = CourseFactory.create()
 
     def test_send_notification_to_thread_creator(self):
@@ -198,7 +207,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         self.assertDictEqual(args.context, expected_context)
         self.assertEqual(
             args.content_url,
-            self._get_mfe_url(self.course.id, self.thread.id)
+            _get_mfe_url(self.course.id, self.thread.id)
         )
         self.assertEqual(args.app_name, 'discussion')
 
@@ -235,7 +244,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         self.assertDictEqual(args_comment.context, expected_context)
         self.assertEqual(
             args_comment.content_url,
-            self._get_mfe_url(self.course.id, self.thread.id)
+            _get_mfe_url(self.course.id, self.thread.id)
         )
         self.assertEqual(args_comment.app_name, 'discussion')
 
@@ -250,7 +259,7 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         self.assertDictEqual(args_comment_on_response.context, expected_context)
         self.assertEqual(
             args_comment_on_response.content_url,
-            self._get_mfe_url(self.course.id, self.thread.id)
+            _get_mfe_url(self.course.id, self.thread.id)
         )
         self.assertEqual(args_comment_on_response.app_name, 'discussion')
 
@@ -264,5 +273,37 @@ class TestSendResponseNotifications(ForumsEnableMixin, CommentsServiceMockMixin,
         send_response_notifications(self.thread, self.course, self.user_1, parent_id=None)
         self.assertEqual(handler.call_count, 0)
 
-    def _get_mfe_url(self, course_id, post_id):
-        return f"{settings.DISCUSSIONS_MICROFRONTEND_URL}/{str(course_id)}/posts/{post_id}"
+    def test_comment_creators_own_response(self):
+        """
+        Check incase post author and response auther is same only send
+        new comment signal , with your as author_name.
+        """
+        handler = Mock()
+        USER_NOTIFICATION_REQUESTED.connect(handler)
+
+        self.register_get_comment_response({
+            'id': self.thread_3.id,
+            'thread_id': self.thread.id,
+            'user_id': self.thread_3.user_id
+        })
+
+        send_response_notifications(self.thread, self.course, self.user_3, parent_id=self.thread_2.id)
+        # check if 1 call is made to the handler i.e. for the thread creator
+        self.assertEqual(handler.call_count, 1)
+
+        # check if the notification is sent to the thread creator
+        args_comment = handler.call_args_list[0][1]['notification_data']
+        self.assertEqual(args_comment.user_ids, [self.user_1.id])
+        self.assertEqual(args_comment.notification_type, 'new_comment')
+        expected_context = {
+            'replier_name': self.user_3.username,
+            'post_title': self.thread.title,
+            'author_name': 'your',
+            'course_name': self.course.display_name,
+        }
+        self.assertDictEqual(args_comment.context, expected_context)
+        self.assertEqual(
+            args_comment.content_url,
+            _get_mfe_url(self.course.id, self.thread.id)
+        )
+        self.assertEqual(args_comment.app_name, 'discussion')
