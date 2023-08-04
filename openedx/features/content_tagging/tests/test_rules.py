@@ -3,7 +3,11 @@
 import ddt
 from django.contrib.auth import get_user_model
 from django.test.testcases import TestCase, override_settings
-from openedx_tagging.core.tagging.models import ObjectTag, Tag
+from openedx_tagging.core.tagging.models import (
+    ObjectTag,
+    Tag,
+    UserSystemDefinedTaxonomy,
+)
 from organizations.models import Organization
 
 from common.djangoapps.student.auth import add_users, update_org_role
@@ -136,7 +140,8 @@ class TestRulesTaxonomy(TestTaxonomyMixin, TestCase):
         system_taxonomy = api.create_taxonomy(
             name="System Languages",
         )
-        system_taxonomy.system_defined = True
+        system_taxonomy.taxonomy_class = UserSystemDefinedTaxonomy
+        system_taxonomy = system_taxonomy.cast()
         assert self.superuser.has_perm(perm, system_taxonomy)
         assert not self.staff.has_perm(perm, system_taxonomy)
         assert not self.user_all_orgs.has_perm(perm, system_taxonomy)

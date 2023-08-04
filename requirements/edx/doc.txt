@@ -556,11 +556,11 @@ edx-drf-extensions==8.8.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==4.0.6
+edx-enterprise==4.0.7
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
-edx-event-bus-kafka==5.1.0
+edx-event-bus-kafka==5.2.0
     # via -r requirements/edx/base.txt
 edx-event-bus-redis==0.3.1
     # via -r requirements/edx/base.txt
@@ -911,12 +911,12 @@ openedx-events==8.3.0
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
     #   skill-tagging
-openedx-filters==1.4.0
+openedx-filters==1.5.0
     # via
     #   -r requirements/edx/base.txt
     #   lti-consumer-xblock
     #   skill-tagging
-openedx-learning==0.1.0
+openedx-learning==0.1.1
     # via -r requirements/edx/base.txt
 openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
