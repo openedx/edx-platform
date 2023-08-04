@@ -115,6 +115,7 @@ COPY requirements requirements
 RUN pip install -r requirements/pip.txt
 RUN pip install -r requirements/edx/base.txt
 
+FROM node:19.5.0-alpine
 # Install node and npm
 RUN nodeenv /edx/app/edxapp/nodeenv --node=16.14.0 --prebuilt
 RUN npm install -g npm@8.5.x
