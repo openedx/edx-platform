@@ -89,7 +89,8 @@
                         optionalStr: fields[i].name === 'marketing_emails_opt_in' ? '' : this.optionalStr,
                         supplementalText: fields[i].supplementalText || '',
                         supplementalLink: fields[i].supplementalLink || '',
-                    showRegisterLinks: this.showRegisterLinks})));
+                        showRegisterLinks: this.showRegisterLinks
+                    })));
                 }
                 html.push('</div>');
                 return html;

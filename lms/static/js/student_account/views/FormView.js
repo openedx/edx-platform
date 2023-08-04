@@ -32,10 +32,14 @@
             optionalStr: gettext('(optional)'),
             submitButton: '',
             isEnterpriseEnable: false,
+            showRegisterLinks: true,
 
             initialize: function(data) {
                 this.model = data.model;
-                this.showRegisterLinks = data.showRegisterLinks;
+                this.showRegisterLinks = (
+                    typeof data.showRegisterLinks !== 'undefined'
+                ) ? data.showRegisterLinks : this.showRegisterLinks;
+
                 this.preRender(data);
 
                 this.tpl = $(this.tpl).html();
