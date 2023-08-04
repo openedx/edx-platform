@@ -301,6 +301,7 @@ class CourseOverview(TimeStampedModel):
                         course_overview.save()
                         # Remove and recreate all the course tabs
                         CourseOverviewTab.objects.filter(course_overview=course_overview).delete()
+                        CourseOverviewTab.create_date_tab(course_overview=course_overview)
                         CourseOverviewTab.objects.bulk_create([
                             CourseOverviewTab(
                                 tab_id=tab.tab_id,
@@ -918,6 +919,9 @@ class CourseOverviewTab(models.Model):
 
     def __str__(self):
         return self.tab_id
+    @classmethod
+    def create_date_tab (cls,course_overview):
+        return CourseOverviewTab.objects.create(course_overview=course_overview, tab_id='dates' ,type='dates' ,name='Date', is_hidden='0' , course_staff_only='0')
 
 
 class CourseOverviewImageSet(TimeStampedModel):
