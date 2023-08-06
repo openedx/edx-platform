@@ -6787,15 +6787,15 @@ msgstr ""
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
-"<{strong}>{post_title}</{strong}></{p}>"
+"<{p}><{strong}>{replier_name}</{strong}> commented on your response to the "
+"post <{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on "
-"<{strong}>{author_name}</{strong}> response to your post "
+"<{p}><{strong}>{replier_name}</{strong}> commented on "
+"<{strong}>{author_name}'s</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
@@ -8113,6 +8113,16 @@ msgstr ""
 msgid ""
 "You have successfully shifted your course schedule and your calendar is up "
 "to date."
+msgstr ""
+
+#: wiki/models/article.py
+msgid "owner"
+msgstr "propietari"
+
+#: openedx/features/content_tagging/models.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
 msgstr ""
 
 #: openedx/features/content_type_gating/models.py
@@ -23475,10 +23485,6 @@ msgstr "modificat"
 #: wiki/models/article.py
 msgid "Article properties last modified"
 msgstr "Propietats de l'article darrerament modificades"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "propietari"
 
 #: wiki/models/article.py
 msgid ""
