@@ -1805,8 +1805,6 @@
     "Successfully rescored problem for user {user}": "Ricalcolo del punteggio del problema per l'utente {user} avvenuto con successo ",
     "Successfully rescored problem to improve score for user {user}": "Ricalcolo del punteggio del problema per migliorare il punteggio per l'utente {user} eseguito correttamente ",
     "Successfully reset the attempts for user {user}": "Resetta con successo i tentativi per l'utente {user}",
-    "Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:": "Email di iscrizione inviate con successo ai seguenti utenti. Gli utenti potranno iscriversi dopo essersi registrati:",
-    "Successfully sent enrollment emails to the following users. They will be enrolled once they register:": "Email di iscrizione inviate con successo ai seguenti utenti.  Gli utenti saranno iscritti dopo essersi registrati:",
     "Successfully started task to rescore problem '<%- problem_id %>' for all students. Click the 'Show Task Status' button to see the status of the task.": "Correttamente avviata attivit\u00e0 di ricalcolo del punteggio del problema '<%- problem_id %>' per tutti gli studenti. Fai clic sul pulsante 'Mostra stato attivit\u00e0' per visualizzare lo stato dell'attivit\u00e0. ",
     "Successfully started task to reset attempts for problem '<%- problem_id %>'. Click the 'Show Task Status' button to see the status of the task.": "Attivit\u00e0 per il ripristino dei tentativi per il problema '<%- problem_id %>' avviata correttamente. Fai clic sul pulsante 'Mostra stato attivit\u00e0' per visualizzare lo stato dell'attivit\u00e0. ",
     "Successfully unlinked.": "Scollegato con successo.",
