@@ -404,9 +404,9 @@ django-sekizai==4.1.0
     #   openedx-django-wiki
 django-ses==3.5.0
     # via -r requirements/edx/base.txt
-django-simple-history==3.1.1
+django-simple-history==3.0.0
     # via
-    #   -c requirements/edx/../constraints.txt
+    #   -c requirements/edx/../common_constraints.txt
     #   -r requirements/edx/base.txt
     #   edx-enterprise
     #   edx-name-affirmation
