@@ -14,6 +14,7 @@
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # 80dca42de6d6f19a9206ebd06d0c9cb9_4216643 <e5580e6e1f445efa0c4f3eb584b99765_116976>, 2013
+# ashed <craysy@gmail.com>, 2023
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # DariaTkacheva <d.i.tkacheva@gmail.com>, 2014
 # dfxedx <ah532@ya.ru>, 2014
@@ -82,7 +83,7 @@
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # AndyZ <Andrey.Zakhvatov@gmail.com>, 2014
 # 80dca42de6d6f19a9206ebd06d0c9cb9_4216643 <e5580e6e1f445efa0c4f3eb584b99765_116976>, 2013
-# ashed <craysy@gmail.com>, 2022
+# ashed <craysy@gmail.com>, 2022-2023
 # Danil Moskovoy <tenrius@gmail.com>, 2013
 # Dellon Zerus <dellonzerus@gmail.com>, 2020
 # Dmitri Polevoi <polevaiabrest@gmail.com>, 2014
@@ -192,7 +193,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-23 20:42+0000\n"
+"POT-Creation-Date: 2023-07-30 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: ashed <craysy@gmail.com>, 2022-2023\n"
 "Language-Team: Russian (http://app.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -2581,12 +2582,9 @@ msgstr "Следующие пользователи успешно записа�
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"Электронные сообщения о регистрации успешно отправлены следующим "
-"пользователям. Они смогут зарегистрироваться, как только создадут свои "
-"учётные записи:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2598,12 +2596,9 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"Электронные сообщения о регистрации успешно отправлены следующим "
-"пользователям. Они будут зарегистрированы, как только создадут свои учётные "
-"записи."
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -10431,6 +10426,13 @@ msgstr "Подраздел будет скрыт после окончания �
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
 msgstr "Подраздел будет скрыт по истечении срока сдачи"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore

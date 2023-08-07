@@ -294,7 +294,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-09 20:42+0000\n"
+"POT-Creation-Date: 2023-07-30 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://app.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -7949,17 +7949,17 @@ msgstr "Rutas de aprendizaje"
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
-"<{strong}>{post_title}</{strong}></{p}>"
+"<{p}><{strong}>{replier_name}</{strong}> commented on your response to the "
+"post <{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
-"<{p}><{strong}>{replier_name}</{strong}> respondió a su respuesta en "
-"<{strong}>{post_title}</{strong}></{p}>"
+"<{p}><{strong}>{replier_name}</{strong}> comentó en la respuesta de la "
+"publicación <{strong}>{post_title}</{strong}></{p}>"
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on "
-"<{strong}>{author_name}</{strong}> response to your post "
+"<{p}><{strong}>{replier_name}</{strong}> commented on "
+"<{strong}>{author_name}'s</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 "<{p}><{strong}>{replier_name}</{strong}> respondió el "
@@ -9503,6 +9503,18 @@ msgid ""
 msgstr ""
 "Has cambiado exitosamente el horario de tu curso y tu calendario está "
 "actualizado."
+
+#: openedx/features/content_tagging/models.py wiki/models/article.py
+msgid "owner"
+msgstr "propietario"
+
+#: openedx/features/content_tagging/models.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"Organización relacionada con esta taxonomía. Si no hay ninguna, esta "
+"taxonomía está relacionada con todas las organizaciones."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -25860,10 +25872,6 @@ msgstr "modificado"
 #: wiki/models/article.py
 msgid "Article properties last modified"
 msgstr "Última modificación a las propiedades del artículo"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "propietario"
 
 #: wiki/models/article.py
 msgid ""

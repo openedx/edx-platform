@@ -1810,8 +1810,6 @@
     "Successfully rescored problem for user {user}": "Reavaliado com sucesso o problema do utilizador {user}",
     "Successfully rescored problem to improve score for user {user}": "Reavaliado problema com sucesso para melhorar a pontua\u00e7\u00e3o do utilizador {user}",
     "Successfully reset the attempts for user {user}": "Reiniciadas tentativas com sucesso para o utilizador {user}",
-    "Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:": "Enviou corretamente emails de inscri\u00e7\u00e3o para os seguintes utilizadores. Eles ter\u00e3o permiss\u00e3o para se inscreverem depois de se registarem:",
-    "Successfully sent enrollment emails to the following users. They will be enrolled once they register:": "Enviou corretamente emails de inscri\u00e7\u00e3o para os seguintes utilizadores. Ser\u00e3o inscritos logo que se registem:",
     "Successfully started task to rescore problem '<%- problem_id %>' for all students. Click the 'Show Task Status' button to see the status of the task.": "Reiniciada com sucesso a tarefa de reavalia\u00e7\u00e3o do problema '<%- problem_id %>' para todos os estudantes. Clique em 'Mostrar estado da tarefa' para ver o estado da tarefa.",
     "Successfully started task to reset attempts for problem '<%- problem_id %>'. Click the 'Show Task Status' button to see the status of the task.": "Iniciada tarefa de tentativa de rein\u00edcio com sucesso para o problema '<%- problem_id %>'. Clique em 'Mostrar estado da tarefa' para ver o estado da tarefa.",
     "Successfully unlinked.": "Desvinculado com sucesso.",

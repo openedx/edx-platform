@@ -7517,15 +7517,15 @@ msgstr "مسیرهای یادگیرنده"
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on your response in "
-"<{strong}>{post_title}</{strong}></{p}>"
+"<{p}><{strong}>{replier_name}</{strong}> commented on your response to the "
+"post <{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
 #: openedx/core/djangoapps/notifications/base_notification.py
 #, python-brace-format
 msgid ""
-"<{p}><{strong}>{replier_name}</{strong}> replied on "
-"<{strong}>{author_name}</{strong}> response to your post "
+"<{p}><{strong}>{replier_name}</{strong}> commented on "
+"<{strong}>{author_name}'s</{strong}> response to your post "
 "<{strong}>{post_title}</{strong}></{p}>"
 msgstr ""
 
@@ -9029,6 +9029,16 @@ msgid ""
 "to date."
 msgstr ""
 "شما با موفقیت برنامۀ آموزشی خود را تغییر داده‌اید و تقویم شما روزآمد است."
+
+#: wiki/models/article.py
+msgid "owner"
+msgstr "مالک"
+
+#: openedx/features/content_tagging/models.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -24922,10 +24932,6 @@ msgstr "تغییریافته"
 #: wiki/models/article.py
 msgid "Article properties last modified"
 msgstr "آخرین تغییرات ویژگی‌های مقاله"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "مالک"
 
 #: wiki/models/article.py
 msgid ""
