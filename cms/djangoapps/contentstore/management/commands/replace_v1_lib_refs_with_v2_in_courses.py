@@ -57,20 +57,15 @@ class Command(BaseCommand):
 
                 for row in csv_reader:
                     if len(row) >= 2:
-                        print(row)
                         key = row[0].strip()
                         value = row[1].strip()
                         v1_to_v2_lib_map[key] = value
 
                 print("Data successfully imported as dictionary:")
-                print(v1_to_v2_lib_map)
 
         except FileNotFoundError:
             log.error("File not found at '%s'.", {file_path})
         except Exception as e:
             log.error("An error occurred: %s", {str(e)})
-
-        print("Cherry")
-        print(v1_to_v2_lib_map)
 
         self.replace_all_library_source_blocks_ids(v1_to_v2_lib_map)

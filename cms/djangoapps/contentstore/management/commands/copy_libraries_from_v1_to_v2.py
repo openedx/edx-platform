@@ -89,10 +89,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):  # lint-amnesty, pylint: disable=unused-argument
         """Parse args and generate tasks for copying content."""
-        print(options)
 
-        print(not options['all'])
-        print(not options['library_ids'])
         if (not options['library_ids'] and not options['all']) or (options['library_ids'] and options['all']):
             raise CommandError("copy_libraries_from_v1_to_v2 requires one or more <library_id>s or the --all flag.")
 

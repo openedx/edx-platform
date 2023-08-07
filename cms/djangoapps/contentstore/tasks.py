@@ -1018,7 +1018,6 @@ def replace_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):
                 settings={'source_library_id': {'$exists': True}}
             )
             for xblock in blocks:
-                print(xblock.__dict__)
                 try:
                     xblock.source_library_id = v1_to_v2_lib_map[xblock.source_library_id]
                     store.update_item(xblock, None)
