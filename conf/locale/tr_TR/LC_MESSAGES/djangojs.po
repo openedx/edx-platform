@@ -11,6 +11,7 @@
 # baris <brscvs@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
+# Diana Huang <dkh@edx.org>, 2023
 # Dilek E, 2022
 # Emrah Emirtekin <eemirtekin@gmail.com>, 2014-2015
 # emreusta <emreusta7@gmail.com>, 2014
@@ -36,11 +37,12 @@
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2017-2022
+# Ali Işıngör <ali@artistanbul.io>, 2017-2023
 # ali selek <aliselek01@gmail.com>, 2015
 # baris <brscvs@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
 # 49dc31887a52b8780c0b97908ac06b08_a94f546 <be8f4767fc88296c7f298e789367182b_193970>, 2014
+# Diana Huang <dkh@edx.org>, 2023
 # Emrah Emirtekin <eemirtekin@gmail.com>, 2015
 # Erdoğan Şahin, 2016
 # Fahrettin Perçin <fapercin90@gmail.com>, 2018
@@ -91,7 +93,7 @@
 #
 # Translators:
 # Adem Özgür <admozgur@gmail.com>, 2015
-# Ali Işıngör <ali@artistanbul.io>, 2018,2020-2021
+# Ali Işıngör <ali@artistanbul.io>, 2018,2020-2021,2023
 # ali selek <aliselek01@gmail.com>, 2015
 # Berfin Dilbazer <berfindilbazer@gmail.com>, 2016
 # Emrah Emirtekin <eemirtekin@gmail.com>, 2015
@@ -108,9 +110,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-05-07 20:42+0000\n"
+"POT-Creation-Date: 2023-07-30 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2018,2020-2021\n"
+"Last-Translator: Ali Işıngör <ali@artistanbul.io>, 2018,2020-2021,2023\n"
 "Language-Team: Turkish (Turkey) (http://app.transifex.com/open-edx/edx-platform/language/tr_TR/)\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
@@ -243,7 +245,8 @@ msgstr "Dosya Seç"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
+#: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
 #: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
@@ -1885,28 +1888,30 @@ msgstr ""
 "ettiniz mi?"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What is the highest level of education that you have achieved so far?"
-msgstr "Şimdiye kadar ulaştığınız en yüksek eğitim seviyesi nedir?"
+msgid "Select military status"
+msgstr "Askerlik durumu seçin"
 
 #: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid ""
-"What is the highest level of education that any of your parents or guardians"
-" have achieved?"
+msgid "Select level of education"
+msgstr "Eğitim seviyesi seçin"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select guardian education"
+msgstr "Velinizin eğitim seviyesini seçin"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select current industry"
+msgstr "Bir sektör seçin"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Select prospective industry"
+msgstr "Hedef sektörü seçin"
+
+#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
+msgid "Thank you! You’re helping make edX better for everyone."
 msgstr ""
-"Ebeveyn ya da velilerinizin şimdiye kadar ulaştığı en yüksek eğitim seviyesi"
-" nedir?"
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "Select employment status"
-msgstr "Meslek durumunu seçin"
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you currently work in?"
-msgstr "Şu anda hangi sektörde çalışıyorsunuz?"
-
-#: lms/static/js/demographics_collection/DemographicsCollectionModal.jsx
-msgid "What industry do you want to work in?"
-msgstr "Gelecekte hangi sektörde çalışmak istiyorsunuz?"
+"Teşekkürler! edX'i herkes için daha iyi bir hale getirmemize yardım "
+"ediyorsunuz."
 
 #: lms/static/js/demographics_collection/MultiselectDropdown.jsx
 msgid "Clear all"
@@ -2534,11 +2539,9 @@ msgstr "Aşağıdaki kullanıcılar başarıyla kaydedildi:"
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"Aşağıdaki kullanıcılara kayıt e-postaları başarıyla gönderildi. Kayıt "
-"bilgilerini girdikten sonra sonra kayıt yapmalarına izin verilecek:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2550,11 +2553,9 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"Aşağıdaki kullanıcılara kayıt e-postaları başarıyla gönderildi. Kayıt "
-"bilgilerini girdikten sonra sonra kayıtları yapılacaktır:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -3102,6 +3103,10 @@ msgstr "Başladı {start}"
 msgid "Ends {end}"
 msgstr "Bitti {end}"
 
+#: lms/static/js/learner_dashboard/models/program_subscription_model.js
+msgid "${price}/month {currency}"
+msgstr "${price}/ay {currency}"
+
 #: lms/static/js/learner_dashboard/views/course_entitlement_view.js
 msgid "You must select a session to access the course."
 msgstr "Derse erişmek için oturum seçmelisiniz."
@@ -3155,10 +3160,10 @@ msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "View program"
-msgstr ""
+msgstr "Programı göster"
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
-msgid "Enroll in a {programName} course"
+msgid "Enroll in a {programName}'s course"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
@@ -3167,6 +3172,9 @@ msgid ""
 "enrolled in any courses. Enroll in a remaining course and enjoy verified "
 "access."
 msgstr ""
+"{programName} programına etkin bir aboneliğiniz var ancak herhangi bir derse"
+" kayıtlı değilsiniz. Mevcut bir derse kaydolun ve doğrulanmış erişimin "
+"keyfini çıkarın."
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
@@ -3174,22 +3182,35 @@ msgid ""
 "your {programName} program subscription. Enroll in a course from the "
 "{i_start}Program Details{i_end} page."
 msgstr ""
+"Kayıtlarımıza göre, {programName} program aboneliğinize dahil olan hiçbir "
+"derse kayıtlı değilsiniz. {i_start}Program Ayrıntıları{i_end} sayfasından "
+"bir derse kaydolun."
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid "Subscription trial expires in less than 24 hours"
+msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid "Subscription trial expires in {remainingDays} day"
 msgid_plural "Subscription trial expires in {remainingDays} days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Abonelik deneme süresi {remainingDays} gün içinde sona eriyor"
+msgstr[1] "Abonelik deneme süresi {remainingDays} gün içinde sona eriyor"
+
+#: lms/static/js/learner_dashboard/views/program_alert_list_view.js
+msgid ""
+"Your {programName} trial will expire at {trialEndTime} on {trialEndDate} and"
+" the card on file will be charged {subscriptionPrice}."
+msgstr ""
 
 #: lms/static/js/learner_dashboard/views/program_alert_list_view.js
 msgid ""
 "Your {programName} trial will expire in {remainingDays} day at "
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
-"{subscriptionPrice}/month."
+"{subscriptionPrice}."
 msgid_plural ""
 "Your {programName} trial will expire in {remainingDays} days at "
 "{trialEndTime} on {trialEndDate} and the card on file will be charged "
-"{subscriptionPrice}/month."
+"{subscriptionPrice}."
 msgstr[0] ""
 msgstr[1] ""
 
@@ -6151,12 +6172,15 @@ msgstr "Sertifikanın yayın tarihi, dersin bitiş tarihinden sonra olmalıdır.
 #: cms/static/js/models/settings/course_details.js
 msgid "The certificate display behavior must be one of: {behavior_options}"
 msgstr ""
+"Sertifika görüntüleme davranışı şunlardan biri olmalıdır: {behavior_options}"
 
 #: cms/static/js/models/settings/course_details.js
 msgid ""
 "The certificates display behavior must be {valid_option} if certificate "
 "available date is set."
 msgstr ""
+"Sertifika kullanılabilirlik tarihi ayarlanmışsa, sertifikaların görüntülenme"
+" davranışı {valid_option} olmalıdır."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
@@ -6188,7 +6212,7 @@ msgstr "Lütfen negatif olmayan tamsayı giriniz."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "You must have at least one undroppable <%- types %> assignment."
-msgstr ""
+msgstr "En az bir adet bırakılamaz <%- types %> atamanız olmalıdır."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -6718,7 +6742,7 @@ msgstr "Bileşen"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Studio's having trouble parsing the problem component's content"
-msgstr ""
+msgstr "Studio, sorunlu bileşenin içeriğini ayrıştırmakta sorun yaşıyor"
 
 #: cms/static/js/views/modals/move_xblock_modal.js
 msgid "Move"
@@ -6781,6 +6805,32 @@ msgstr "Tarih eklendi"
 
 #: cms/static/js/views/pages/container.js
 msgid "Pasting"
+msgstr "Yapıştırıyor"
+
+#: cms/static/js/views/pages/container.js
+msgid "Some errors occurred"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "The following required files could not be added to the course:"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "You may need to update a file(s) manually"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid ""
+"The following files already exist in this course but don't match the version"
+" used by the component you pasted:"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "New files were added to this course's Files & Uploads"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "The following required files were imported to this course:"
 msgstr ""
 
 #. Translators: "title" is the name of the current component or unit being
@@ -6791,7 +6841,7 @@ msgstr "{title} için erişim düzenleniyor"
 
 #: cms/static/js/views/pages/container.js
 msgid "Copying"
-msgstr ""
+msgstr "Kopyalıyor"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
@@ -8811,9 +8861,8 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
 msgid ""
-"Restart your subscription for {subscriptionPrice}/month. Your payment "
-"history is still available on the {a_start}Orders and subscriptions{a_end} "
-"page"
+"Restart your subscription for {subscriptionPrice}. Your payment history is "
+"still available on the {a_start}Orders and subscriptions{a_end} page"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_sidebar.underscore
@@ -8871,8 +8920,24 @@ msgstr "Kutlarız!"
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"You have successfully completed all the requirements for the %(title)s "
+"%(type)s."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#: lms/templates/learner_dashboard/program_details_view.underscore
 msgid "Your Program Journey"
 msgstr "Program Yolculuğunuz"
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s course(s) in this "
+"program. To complete the program, you must earn a verified certificate for "
+"each course."
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
@@ -8891,25 +8956,22 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid "Active trial ends {trialEndDate} at {trialEndTime}"
+msgid "Trial ends {trialEndDate} at {trialEndTime}"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid "Your next billing date is {nextPaymentDate}"
+msgid "Your next billing date is {currentPeriodEnd}"
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"Unlock verified access to all courses for {subscriptionPrice}/month. Cancel "
-"anytime."
+msgid "{subscriptionPrice} subscription. Cancel anytime."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
 #: lms/templates/learner_dashboard/program_details_view.underscore
-msgid ""
-"{subscriptionPrice}/month subscription after trial ends. Cancel anytime."
+msgid "{subscriptionPrice} subscription after trial ends. Cancel anytime."
 msgstr ""
 
 #: lms/templates/learner_dashboard/program_details_tab_view.underscore
@@ -8953,6 +9015,27 @@ msgid ""
 "Complete courses on your schedule to ensure you stand out in your field!"
 msgstr "Alanınızda öne çıkmanızı sağlamak için derslerinizi tamamlayın!"
 
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid "Transform your %(org)s %(type)s into a full master’s degree"
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_tab_view.underscore
+#, python-format
+msgid ""
+"Successful completion of %(org)s %(program)s credential can be applied "
+"towards flexible, rigorous, and affordable masters degrees from the world’s "
+"leading universities."
+msgstr ""
+
+#: lms/templates/learner_dashboard/program_details_view.underscore
+#, python-format
+msgid ""
+"Track and plan your progress through the %(count)s courses in this program. "
+"To complete the program, you must earn a verified certificate for each "
+"course."
+msgstr ""
+
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
 msgstr "{organization} logosu"
@@ -8995,11 +9078,11 @@ msgid "Upgrade with a subscription"
 msgstr ""
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
-msgid "Pay {subscriptionPrice}/month for all courses in this program"
+msgid "Pay {subscriptionPrice} for all courses in this program"
 msgstr ""
 
 #: lms/templates/learner_dashboard/upgrade_message_subscription.underscore
-msgid "Pay {subscriptionPrice}/month after {trialLength}-day free trial"
+msgid "Pay {subscriptionPrice} after {trialLength}-day free trial"
 msgstr ""
 
 #: lms/templates/student_account/account.underscore
@@ -10272,6 +10355,8 @@ msgid ""
 "this subsection become available to learners unless they are explicitly "
 "hidden."
 msgstr ""
+"\"%(hide_label)s\" dışında bir seçenek belirlerseniz, bu alt bölümde "
+"yayınlanan üniteler, açıkça gizlenmedikçe öğrencilerin kullanımına açılır."
 
 #: cms/templates/js/copy-clipboard-button.underscore
 msgid "Copy Component Location"
@@ -10418,7 +10503,7 @@ msgstr "Görünen Ad"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Discussions enabled"
-msgstr ""
+msgstr "Tartışmalar etkinleştirildi"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Proctoring Settings"
@@ -10473,6 +10558,13 @@ msgid "Subsection is hidden after due date"
 msgstr "Altbölüm şu tarihten sonra gizlenecek"
 
 #: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "You haven't added any content to this course yet."
 msgstr "Henüz bir ders içeriği eklenmedi."
@@ -10524,11 +10616,11 @@ msgstr "Ders Video Ayarları"
 
 #: cms/templates/js/course-video-sharing-enable.underscore
 msgid "Video Sharing"
-msgstr ""
+msgstr "Video Paylaşma"
 
 #: cms/templates/js/course-video-sharing-enable.underscore
 msgid "Learn more"
-msgstr ""
+msgstr "Daha fazlasını öğren"
 
 #: cms/templates/js/course-video-transcript-preferences.underscore
 msgid "Transcript Turnaround"
@@ -10633,7 +10725,7 @@ msgstr ""
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid "Warning: "
-msgstr ""
+msgstr "Uyarı:"
 
 #: cms/templates/js/course_grade_policy.underscore
 msgid ""
@@ -10685,11 +10777,13 @@ msgstr "Tartışmayı genişlet"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Topics for unpublished units would not be created"
-msgstr ""
+msgstr "Yayımlanmamış üniteler için konular oluşturulmaz"
 
 #: cms/templates/js/discussion-editor.underscore
 msgid "Please enable discussions for graded units from course authoring app"
 msgstr ""
+"Lütfen ders oluşturma uygulamasından not verilen üniteler için tartışmaları "
+"etkinleştirin"
 
 #: cms/templates/js/due-date-editor.underscore
 msgid "Due Date:"
@@ -10968,6 +11062,8 @@ msgid ""
 "In the {linkStart}Course Outline{linkEnd}, use this group to control access "
 "to a component."
 msgstr ""
+"{linkStart}Ders Anahattı{linkEnd}'nda, bir bileşene erişimi kontrol etmek "
+"için bu grubu kullanın."
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"
@@ -11118,13 +11214,15 @@ msgstr "Tamamlanma:"
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid "weeks from learner enrollment date"
-msgstr ""
+msgstr "öğrencinin kayıtlanma tarihinden bu yana geçen hafta sayısı"
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
 "If a learner starts on {startDate}, this subsection will be due on "
 "{projectedDueIn}."
 msgstr ""
+"Bir öğrenci {startDate} tarihinde başlarsa, bu alt bölüm {projectedDueIn} "
+"tarihinde sona erecektir."
 
 #: cms/templates/js/self-paced-due-date-editor.underscore
 msgid ""
@@ -11370,6 +11468,11 @@ msgid ""
 "examination rules. Please note that setting this exam as proctored will "
 "change the visibility settings to \"Hide content after due date.\""
 msgstr ""
+"Gözetimli sınavlar sürelidir ve sınava giren her öğrencinin videosunu "
+"kaydederler. Ardından, öğrencilerin tüm sınav kurallarına uymasını sağlamak "
+"için videolar incelenir. Bu sınavı gözetimli olarak ayarlamanın, görünürlük "
+"ayarlarını \"Son kullanma tarihinden sonra içeriği gizle\" olarak "
+"değiştireceğini lütfen unutmayın."
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Onboarding"
@@ -11572,6 +11675,8 @@ msgid ""
 "The published branch version, {published}, was reset to the draft branch "
 "version, {draft}."
 msgstr ""
+"{published} adlı yayınlanan geliştirme dalı sürümü, {draft} olan taslak dal "
+"sürümüne döndürüldü."
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"

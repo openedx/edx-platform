@@ -26,7 +26,7 @@
                         subscriptionState === 'active'
                         ? gettext('View your receipts or modify your subscription on the {a_start}Orders and subscriptions{a_end} page')
                         : subscriptionState === 'inactive'
-                        ? gettext('Restart your subscription for {subscriptionPrice}/month. Your payment history is still available on the {a_start}Orders and subscriptions{a_end} page')
+                        ? gettext('Restart your subscription for {subscriptionPrice}. Your payment history is still available on the {a_start}Orders and subscriptions{a_end} page')
                         : gettext('If you had a subscription previously, your payment history is still available on the {a_start}Orders and subscriptions{a_end} page')
                     ),
                     {

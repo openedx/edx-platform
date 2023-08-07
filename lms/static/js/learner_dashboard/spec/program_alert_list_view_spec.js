@@ -9,9 +9,9 @@ describe('Program Alert List View', () => {
         trialEndingAlerts: [{
             title: 'Test Program',
             hasActiveTrial: true,
-            nextPaymentDate: 'May 8, 2023',
+            currentPeriodEnd: 'May 8, 2023',
             remainingDays: 2,
-            subscriptionPrice: '$100',
+            subscriptionPrice: '$100/month USD',
             subscriptionState: 'active',
             subscriptionUrl: null,
             trialEndDate: 'Apr 20, 2023',
@@ -40,7 +40,7 @@ describe('Program Alert List View', () => {
 
     it('should render no enrollement alert', () => {
         expect(view.$('.alert:first .alert-heading').text().trim()).toEqual(
-            'Enroll in a Test Program course'
+            'Enroll in a Test Program\'s course'
         );
         expect(view.$('.alert:first .alert-message').text().trim()).toEqual(
             'You have an active subscription to the Test Program program but are not enrolled in any courses. Enroll in a remaining course and enjoy verified access.'
@@ -52,7 +52,7 @@ describe('Program Alert List View', () => {
             'Subscription trial expires in 2 days'
         );
         expect(view.$('.alert:last .alert-message').text().trim()).toEqual(
-            'Your Test Program trial will expire in 2 days at 5:59 am on Apr 20, 2023 and the card on file will be charged $100/month.'
+            'Your Test Program trial will expire in 2 days at 5:59 am on Apr 20, 2023 and the card on file will be charged $100/month USD.'
         );
     });
 });

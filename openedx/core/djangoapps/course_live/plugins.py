@@ -44,7 +44,7 @@ class LiveCourseApp(CourseApp):
         return CourseLiveConfiguration.is_enabled(course_key)
 
     @classmethod
-    def set_enabled(cls, course_key: CourseKey, enabled: bool, user: 'User') -> bool:
+    def set_enabled(cls, course_key: CourseKey, enabled: bool, user: User) -> bool:
         """
         Set live enabled status in CourseLiveConfiguration model.
         """

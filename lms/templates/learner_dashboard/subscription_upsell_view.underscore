@@ -8,10 +8,13 @@
 <p class="advertise-message">
     <%- StringUtils.interpolate(
         gettext('Now available for many popular programs, affordable monthly subscription pricing can help you manage your budget more effectively. Subscriptions start at {minSubscriptionPrice}/month USD per program, after a 7-day full access free trial. Cancel at any time.'),
-        { minSubscriptionPrice, trialLength }
+        {
+            minSubscriptionPrice: minimum_price,
+            trialLength: trial_length,
+        }
     ) %>
 </p>
-<a href="" class="js-subscription-upsell-cta btn-brand btn cta-primary view-button align-self-stretch">
+<a href="<%- marketing_url %>" class="js-subscription-upsell-cta btn-brand btn cta-primary view-button align-self-stretch">
     <span class="icon fa fa-search" aria-hidden="true"></span>
     <span><%- gettext('Explore subscription options') %></span>
 </a>
