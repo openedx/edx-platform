@@ -68,6 +68,11 @@ from openedx.core.lib.derived import derived, derived_collection_entry
 from openedx.core.release import doc_version
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
+try:
+    from skill_tagging.skill_tagging_mixin import SkillTaggingMixin
+except ImportError:
+    SkillTaggingMixin = None
+
 ################################### FEATURES ###################################
 # .. setting_name: PLATFORM_NAME
 # .. setting_default: Your Platform Name Here
@@ -1029,6 +1034,17 @@ FEATURES = {
     # .. toggle_creation_date: 2022-06-06
     # .. toggle_tickets: 'https://github.com/edx/edx-platform/pull/29538'
     'DISABLE_ALLOWED_ENROLLMENT_IF_ENROLLMENT_CLOSED': False,
+
+    # .. toggle_name: FEATURES['ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS']
+    # .. toggle_implementation: DjangoSetting
+    # .. toggle_default: False
+    # .. toggle_description: Temporary configuration which enables sending xblock events over the event bus.
+    # .. toggle_use_cases: open_edx
+    # .. toggle_creation_date: 2023-02-21
+    # .. toggle_warning: For consistency in user experience, keep the value in sync with the setting of the same name
+    #   in the LMS and CMS.
+    # .. toggle_tickets: 'https://github.com/openedx/edx-platform/pull/31813'
+    'ENABLE_SEND_XBLOCK_EVENTS_OVER_BUS': True,
 }
 
 # Specifies extra XBlock fields that should available when requested via the Course Blocks API
@@ -1595,6 +1611,8 @@ from xmodule.x_module import XModuleMixin  # lint-amnesty, pylint: disable=wrong
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
+if SkillTaggingMixin:
+    XBLOCK_MIXINS += (SkillTaggingMixin,)
 XBLOCK_EXTRA_MIXINS = ()
 
 # .. setting_name: XBLOCK_FIELD_DATA_WRAPPERS
