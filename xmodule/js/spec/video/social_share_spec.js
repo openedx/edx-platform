@@ -1,4 +1,5 @@
 (function() {
+    // eslint-disable-next-line lines-around-directive
     'use strict';
 
     describe('VideoSocialSharingHandler', function() {
@@ -13,11 +14,15 @@
 
         describe('clicking social share fires an analytics event', function() {
             const testCases = [
-                {source: 'twitter'},
-                {source: 'facebook'},
-                {source: 'linkedin'},
+                // eslint-disable-next-line object-curly-spacing
+                { source: 'twitter' },
+                // eslint-disable-next-line object-curly-spacing
+                { source: 'facebook' },
+                // eslint-disable-next-line object-curly-spacing
+                { source: 'linkedin' },
             ];
-            _.each(testCases, ({source}) => {
+            // eslint-disable-next-line object-curly-spacing
+            _.each(testCases, ({ source }) => {
                 it(source, () => {
                     var siteShareButton = $(`.social-share-link[data-source="${source}"]`);
                     expect(siteShareButton.length).toEqual(1);

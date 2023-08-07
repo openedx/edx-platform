@@ -50,6 +50,7 @@
             },
 
             sendQuery: function(data) {
+                // eslint-disable-next-line no-unused-expressions
                 this.jqhxr && this.jqhxr.abort();
                 this.jqhxr = this.discovery.fetch({
                     type: 'POST',

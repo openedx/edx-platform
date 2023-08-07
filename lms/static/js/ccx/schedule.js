@@ -336,6 +336,7 @@ var edx = edx || {};
         },
 
         schedule_apply: function(nodes, f) {
+            // eslint-disable-next-line array-callback-return
             nodes.map(function(node) {
                 f(node);
                 if (node !== undefined && node.children !== undefined) {
@@ -460,15 +461,19 @@ var edx = edx || {};
                 modal.find('input[name=time]').val(time);
                 modal.find('form').off('submit').on('submit', function(event) {
                     event.preventDefault();
+                    // eslint-disable-next-line no-shadow
                     var date = $(this).find('input[name=date]').val(),
+                        // eslint-disable-next-line no-shadow
                         time = $(this).find('input[name=time]').val();
                     var valid_date = new Date(date);
                     if (isNaN(valid_date.valueOf())) {
+                        // eslint-disable-next-line no-alert
                         alert('Please enter a valid date');
                         return;
                     }
                     var valid_time = /^\d{1,2}:\d{2}?$/;
                     if (!time.match(valid_time)) {
+                        // eslint-disable-next-line no-alert
                         alert('Please enter a valid time');
                         return;
                     }
@@ -521,8 +526,10 @@ var edx = edx || {};
                 unit = find_in(tree, chapter);
             units[units.length] = unit;
             if (sequential) {
+                // eslint-disable-next-line no-multi-assign
                 units[units.length] = unit = find_in(unit.children, sequential);
                 if (vertical) {
+                    // eslint-disable-next-line no-multi-assign
                     units[units.length] = unit = find_in(unit.children, vertical);
                 }
             }
