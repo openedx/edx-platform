@@ -1,7 +1,6 @@
 import json
 import logging
 import copy
-from operator import itemgetter
 
 from django.db.models import Q
 from rest_framework import views, viewsets, status
@@ -12,8 +11,12 @@ from opaque_keys.edx.keys import UsageKey, CourseKey
 
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.features.genplus_features.genplus.models import Class, Skill
-from openedx.features.genplus_features.genplus_assessments.models import UserResponse, UserRating, SkillAssessmentQuestion
-from openedx.features.genplus_features.genplus_learning.models import Unit, Program
+from openedx.features.genplus_features.genplus_assessments.models import (
+    UserResponse,
+    UserRating,
+    SkillAssessmentQuestion,
+)
+from openedx.features.genplus_features.genplus_learning.models import Unit, Program, ProgramAccessRole
 from openedx.features.genplus_features.genplus.api.v1.permissions import IsTeacher, IsStudentOrTeacher, IsAdmin
 from .serializers import (
     ClassSerializer,
@@ -33,7 +36,8 @@ from openedx.features.genplus_features.genplus_assessments.utils import (
     get_assessment_problem_data,
     get_assessment_completion,
     get_user_assessment_result,
-    StudentResponse
+    StudentResponse,
+    skill_reflection_response,
 )
 
 logger = logging.getLogger(__name__)
@@ -509,3 +513,33 @@ class SaveRatingResponseApiView(views.APIView):
             return Response({'status': 'success', 'message': 'POST request was successful'}, status=200)
 
         return Response({'status': 'fail', 'error': 'POST request failed', 'message': 'POST request failed with status code'}, status=400)
+
+
+class SkillReflectionApiView(views.APIView):
+    def get_program_queryset(self):
+        qs = Program.get_active_programs()
+        program_ids = ProgramAccessRole.objects.filter(user=self.request.user).values_list('program',
+                                                                                           flat=True).distinct()
+        qs = qs.filter(id__in=program_ids)
+        return qs
+
+    def get(self, request, **kwargs):
+        skills = self.get_program_queryset().values_list('units__skill__name', flat=True).distinct().all()
+        courses = self.get_program_queryset().values_list('units__course', flat=True).all()
+        likert_questions = SkillAssessmentQuestion.objects.filter(
+            start_unit__in=courses,
+            problem_type=SkillReflectionQuestionType.LIKERT.value,
+        ).all()
+
+        nuance_interogation_questions = SkillAssessmentQuestion.objects.filter(
+            start_unit__in=courses,
+            problem_type=SkillReflectionQuestionType.NUANCE_INTERROGATION.value,
+        ).all()
+
+        response = skill_reflection_response(
+            skills,
+            likert_questions,
+            nuance_interogation_questions,
+        )
+
+        return Response(response)

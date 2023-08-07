@@ -69,9 +69,10 @@ class SkillAssessmentResponse(TimeStampedModel):
         unique_together = ('user', 'question', 'response_time')
 
     user = models.ForeignKey(USER_MODEL, on_delete=models.CASCADE)
-    question = models.ForeignKey(SkillAssessmentQuestion, on_delete=models.CASCADE)
+    question = models.ForeignKey(SkillAssessmentQuestion, on_delete=models.CASCADE, related_name='submissions')
     earned_score = models.FloatField(blank=True, null=True, default=0.0)
     total_score = models.FloatField(blank=True, null=True, default=6.0)
     response_time = models.CharField(max_length=32, null=True, choices=SKILL_ASSESSMENT_RESPONSE_TIME)
     skill_assessment_type = models.CharField(max_length=32, null=True, choices=SKILL_ASSESSMENT_TYPE_CHOICES)
     question_response = JSONField(blank=True, null=True)
+    problem_location = UsageKeyField(max_length=255, db_index=True, blank=True, null=True)

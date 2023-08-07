@@ -1,3 +1,4 @@
+import itertools
 import json
 from lxml import etree
 from django.test import RequestFactory
@@ -240,6 +241,7 @@ class StudentResponse:
                 user=user,
                 question=question,
                 response_time=response_time,
+                problem_location=problem_key,
                 defaults={
                     'earned_score': earned_score,
                     'total_score': total_score,
@@ -820,3 +822,40 @@ def get_user_assessment_result(user, raw_data, program):
                 aggregate_result[problem_id]['score_end_of_year'] = data['rating']
 
     return aggregate_result
+
+
+def skill_reflection_response(skills, likert_questions, nuance_interrogation_questions):
+    """
+    This is to prepare a response for skill reflection combined view
+    :param skills:
+    :param likert_questions:
+    :param nuance_interrogation_questions:
+    :return: {}
+    """
+    response = {
+        'skills': skills,
+        'intros': [],
+        'outros': [],
+        'nuance_interrogation': [],
+    }
+
+    def process_question_responses(questions, response_key, location_key):
+        for question in questions:
+            skill = question.skill.name
+            submissions = list(question.submissions.filter(problem_location=getattr(question, location_key)).all())
+            stats = defaultdict(int)
+
+            for submission in submissions:
+                question_response = submission.question_response
+                response_text = question_response['student_response']['response_text']
+                stats[response_text] += 1
+
+            if stats:
+                key = f'total_{response_key}_{skill.lower()}'
+                response[key] = response.get(key, 0) + len(submissions)
+                response[response_key].append({'skill': skill, **stats})
+
+    process_question_responses(likert_questions, 'intros', 'start_unit_location')
+    process_question_responses(likert_questions, 'outros', 'end_unit_location')
+    process_question_responses(nuance_interrogation_questions, 'nuance_interrogation', 'start_unit_location')
+    return response
