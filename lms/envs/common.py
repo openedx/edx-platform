@@ -5330,3 +5330,7 @@ SUBSCRIPTIONS_SERVICE_WORKER_USERNAME = 'subscriptions_worker'
 ############## NOTIFICATIONS EXPIRY ##############
 NOTIFICATIONS_EXPIRY = 60
 EXPIRED_NOTIFICATIONS_DELETE_BATCH_SIZE = 10000
+
+#### django-simple-history##
+# disable indexing on date field its coming from django-simple-history.
+SIMPLE_HISTORY_DATE_INDEX = False
