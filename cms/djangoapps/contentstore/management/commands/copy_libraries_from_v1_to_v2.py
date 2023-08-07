@@ -33,7 +33,9 @@ class Command(BaseCommand):
         $ ./manage.py cms copy_libraries_from_v1_to_v2 'collection_uuid' --all --uncopy
         $ ./manage.py cms copy_libraries_from_v1_to_v2 'collection_uuid 'library-v1:edX+DemoX+Better_Library'
         $ ./manage.py cms copy_libraries_from_v1_to_v2 'collection_uuid 'library-v1:edX+DemoX+Better_Library' --uncopy
-        $ ./manage.py cms copy_libraries_from_v1_to_v2 '11111111-2111-4111-8111-111111111111' './list_of--library-locators.csv --all
+        $ ./manage.py cms copy_libraries_from_v1_to_v2
+        '11111111-2111-4111-8111-111111111111'
+        './list_of--library-locators.csv --all
 
     Note:
        This Command Also produces an "output file" which contains the mapping of locators and the status of the copy.
