@@ -406,7 +406,6 @@ django==3.2.20
     #   openedx-filters
     #   openedx-learning
     #   ora2
-    #   skill-tagging
     #   super-csv
     #   xss-utils
 django-appconf==1.0.5
@@ -507,7 +506,6 @@ django-model-utils==4.3.1
     #   edx-when
     #   edxval
     #   ora2
-    #   skill-tagging
     #   super-csv
 django-mptt==0.14.0
     # via
@@ -1300,13 +1298,11 @@ openedx-events==8.3.0
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-    #   skill-tagging
 openedx-filters==1.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-    #   skill-tagging
 openedx-learning==0.1.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1849,10 +1845,6 @@ six==1.16.0
     #   python-memcached
     #   sphinxcontrib-httpdomain
     #   tox
-skill-tagging==0.1.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 slumber==0.7.1
     # via
     #   -r requirements/edx/doc.txt
