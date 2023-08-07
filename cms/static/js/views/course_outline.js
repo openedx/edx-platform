@@ -19,9 +19,16 @@ function(
 
         templateName: 'course-outline',
 
+        initialize: function() {
+            XBlockOutlineView.prototype.initialize.call(this);
+            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
+        },
+
         render: function() {
             var renderResult = XBlockOutlineView.prototype.render.call(this);
             this.makeContentDraggable(this.el);
+            // Show/hide the paste button
+            this.initializePasteButton(this.el);
             return renderResult;
         },
 
@@ -214,15 +221,19 @@ function(
                     const status = data.content?.status;
                     if (status === "ready") {
                         // The Unit has been copied and is ready to use.
+                        this.refreshPasteButton(data); // Update our UI
+                        this.clipboardBroadcastChannel.postMessage(data); // And notify any other open tabs
                         return data;
                     } else if (status === "loading") {
-                        // The clipboard is being loaded asynchonously.
+                        // The clipboard is being loaded asynchronously.
                         // Poll the endpoint until the copying process is complete:
                         const deferred = $.Deferred();
                         const checkStatus = () => {
                             $.getJSON(clipboardEndpoint, (pollData) => {
                                 const newStatus = pollData.content?.status;
                                 if (newStatus === "ready") {
+                                    this.refreshPasteButton(data);
+                                    this.clipboardBroadcastChannel.postMessage(pollData);
                                     deferred.resolve(pollData);
                                 } else if (newStatus === "loading") {
                                     setTimeout(checkStatus, 1_000);
@@ -238,6 +249,242 @@ function(
                         throw new Error(`Unexpected clipboard status "${status}" in successful API response.`);
                     }
                 });
+            });
+        },
+
+        initializePasteButton(element) {
+            if ($(element).hasClass('outline-subsection')) {
+                if (this.options.canEdit) {
+                    // We should have the user's clipboard status.
+                    const data = this.options.clipboardData;
+                    this.refreshPasteButton(data);
+                    // Refresh the status when something is copied on another tab:
+                    this.clipboardBroadcastChannel.onmessage = (event) => { this.refreshPasteButton(event.data); };
+                } else {
+                    this.$(".paste-component").hide();
+                }
+            }
+        },
+
+        /**
+         * Given the latest information about the user's clipboard, hide or show the Paste button as appropriate.
+         */
+        refreshPasteButton(data) {
+            // 'data' is the same data returned by the "get clipboard status" API endpoint
+            // i.e. /api/content-staging/v1/clipboard/
+            if (this.options.canEdit && data.content) {
+                if (data.content.status === "expired") {
+                    // This has expired and can no longer be pasted.
+                    this.$(".paste-component").hide();
+                } else if (data.content.block_type_display === 'Unit') {
+                    // This is suitable for pasting into a unit.
+                    const detailsPopupEl = this.$(".clipboard-details-popup")[0];
+                    // Only Units should have the paste button initialized
+                    if (detailsPopupEl !== undefined) {
+                        const detailsPopupEl = this.$(".clipboard-details-popup")[0];
+                        detailsPopupEl.querySelector(".detail-block-name").innerText = data.content.display_name;
+                        detailsPopupEl.querySelector(".detail-block-type").innerText = data.content.block_type_display;
+                        detailsPopupEl.querySelector(".detail-course-name").innerText = data.source_context_title;
+                        if (data.source_edit_url) {
+                            detailsPopupEl.setAttribute("href", data.source_edit_url);
+                            detailsPopupEl.classList.remove("no-edit-link");
+                        } else {
+                            detailsPopupEl.setAttribute("href", "#");
+                            detailsPopupEl.classList.add("no-edit-link");
+                        }
+                        this.$('.paste-component').show()
+                    }
+
+                } else {
+                    this.$('.paste-component').hide()
+                }
+
+            } else {
+                this.$('.paste-component').hide();
+            }
+        },
+
+        findXBlockElement: function(target) {
+            return $(target).closest('.outline-subsection');
+        },
+
+        createPlaceholderElement: function() {
+            return $('<li/>', {class: 'outline-item outline-unit has-warnings is-draggable'});
+        },
+
+        getURLRoot: function() {
+            return this.model.urlRoot;
+        },
+
+        /**
+         * Refreshes the specified xblock's display. If the xblock is an inline child of a
+         * reorderable container then the element will be refreshed inline. If not, then the
+         * parent container will be refreshed instead.
+         * @param element An element representing the xblock to be refreshed.
+         * @param block_added Flag to indicate that new block has been just added.
+         */
+        refreshXBlock: function(element, block_added, is_duplicate) {
+            var xblockElement = this.findXBlockElement(element),
+                parentElement = xblockElement.parent(),
+                rootLocator = this.model.id;
+
+            if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
+                this.render({refresh: true, block_added: block_added});
+            } else if (parentElement.hasClass('reorderable-container')) {
+                this.refreshChildXBlock(xblockElement, block_added, is_duplicate);
+            } else {
+                this.refreshXBlock(this.findXBlockElement(parentElement));
+            }
+        },
+
+        /**
+         * Refresh an xblock element inline on the page, using the specified xblockInfo.
+         * Note that the element is removed and replaced with the newly rendered xblock.
+         * @param xblockElement The xblock element to be refreshed.
+         * @param block_added Specifies if a block has been added, rather than just needs
+         * refreshing.
+         * @returns {jQuery promise} A promise representing the complete operation.
+         */
+        refreshChildXBlock: function(xblockElement, block_added, is_duplicate) {
+            var self = this,
+                xblockInfo,
+                TemporaryXBlockView,
+                temporaryView;
+            xblockInfo = new XBlockInfo({
+                id: xblockElement.data('locator')
+            });
+            // There is only one Backbone view created on the container page, which is
+            // for the container xblock itself. Any child xblocks rendered inside the
+            // container do not get a Backbone view. Thus, create a temporary view
+            // to render the content, and then replace the original element with the result.
+            TemporaryXBlockView = XBlockView.extend({
+                updateHtml: function(element, html) {
+                    // Replace the element with the new HTML content, rather than adding
+                    // it as child elements.
+                    this.$el = $(html).replaceAll(element); // xss-lint: disable=javascript-jquery-insertion
+                }
+            });
+            temporaryView = new TemporaryXBlockView({
+                model: xblockInfo,
+                view: self.xblockView.new_child_view,
+                el: xblockElement
+            });
+            return temporaryView.render({
+                success: function() {
+                    self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
+                    temporaryView.unbind(); // Remove the temporary view
+                },
+                initRuntimeData: this
+            });
+        },
+
+        onNewXBlock: function(xblockElement, scrollOffset, is_duplicate, data) {
+            var useNewTextEditor = this.$('.xblock-header-primary').attr('use-new-editor-text'),
+                useNewVideoEditor = this.$('.xblock-header-primary').attr('use-new-editor-video'),
+                useVideoGalleryFlow = this.$('.xblock-header-primary').attr("use-video-gallery-flow"),
+                useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
+
+            // find the block type in the locator if available
+            if(data.hasOwnProperty('locator')) {
+                var matchBlockTypeFromLocator = /\@(.*?)\+/;
+                var blockType = data.locator.match(matchBlockTypeFromLocator);
+            }
+            if((useNewTextEditor === 'True' && blockType.includes('html'))
+                    || (useNewVideoEditor === 'True' && blockType.includes('video'))
+                    || (useNewProblemEditor === 'True' && blockType.includes('problem'))
+            ){
+                var destinationUrl;
+                if (useVideoGalleryFlow === "True" && blockType.includes("video")) {
+                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/course-videos/' + encodeURI(data.locator);
+                }
+                else {
+                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
+                }
+                window.location.href = destinationUrl;
+                return;
+            }
+            // ViewUtils.setScrollOffset(xblockElement, scrollOffset);
+            xblockElement.data('locator', data.locator);
+            return this.refreshXBlock(xblockElement, true, is_duplicate);
+        },
+
+        /** The user has clicked on the "Paste Unit button" */
+        pasteUnit(event) {
+            // event.preventDefault();
+            // Get the ID of the container (usually a unit/vertical) that we're pasting into:
+            const parentElement = this.findXBlockElement(event.target);
+            const parentLocator = parentElement.data('locator');
+            // Create a placeholder XBlock while we're pasting:
+            const $placeholderEl = $(this.createPlaceholderElement());
+            const addComponentsPanel = $(event.target).closest('.paste-component').prev();
+
+            // const listPanel = addComponentsPanel.prev();
+            const listPanel = $(event.target).closest('.subsection-content').find('.list-units');
+
+            const scrollOffset = ViewUtils.getScrollOffset(addComponentsPanel);
+            const placeholderElement = $placeholderEl.appendTo(listPanel);
+
+            // Start showing a "Pasting" notification:
+            ViewUtils.runOperationShowingMessage(gettext('Pasting'), () => {
+                return $.postJSON(this.getURLRoot() + '/', {
+                    parent_locator: parentLocator,
+                    staged_content: "clipboard",
+                }).then((data) => {
+                    this.onNewXBlock(placeholderElement, scrollOffset, false, data);
+                    return data;
+                }).fail(() => {
+                    // Remove the placeholder if the paste failed
+                    placeholderElement.remove();
+                });
+            }).done((data) => {
+                const {
+                    conflicting_files: conflictingFiles,
+                    error_files: errorFiles,
+                    new_files: newFiles,
+                } = data.static_file_notices;
+
+                const notices = [];
+                if (errorFiles.length) {
+                    notices.push((next) => new PromptView.Error({
+                        title: gettext("Some errors occurred"),
+                        message: (
+                            gettext("The following required files could not be added to the course:") +
+                            " " + errorFiles.join(", ")
+                        ),
+                        actions: {primary: {text: gettext("OK"), click: (x) => { x.hide(); next(); }}},
+                    }));
+                }
+                if (conflictingFiles.length) {
+                    notices.push((next) => new PromptView.Warning({
+                        title: gettext("You may need to update a file(s) manually"),
+                        message: (
+                            gettext(
+                                "The following files already exist in this course but don't match the " +
+                                "version used by the component you pasted:"
+                            ) + " " + conflictingFiles.join(", ")
+                        ),
+                        actions: {primary: {text: gettext("OK"), click: (x) => { x.hide(); next(); }}},
+                    }));
+                }
+                if (newFiles.length) {
+                    notices.push(() => new NotificationView.Confirmation({
+                        title: gettext("New files were added to this course's Files & Uploads"),
+                        message: (
+                            gettext("The following required files were imported to this course:") +
+                            " "  + newFiles.join(", ")
+                        ),
+                        closeIcon: true,
+                    }));
+                }
+                if (notices.length) {
+                    // Show the notices, one at a time:
+                    const showNext = () => {
+                        const view = notices.shift()(showNext);
+                        view.show();
+                    }
+                    // Delay to avoid conflict with the "Pasting..." notification.
+                    setTimeout(showNext, 1250);
+                }
             });
         },
 
@@ -291,6 +538,10 @@ function(
             element.find('.copy-button').click((event) => {
                 event.preventDefault();
                 this.copyXBlock();
+            });
+            element.find('.paste-component-button').click((event) => {
+                event.preventDefault();
+                this.pasteUnit(event);
             });
             element.find('.action-actions-menu').click((event) => {
                 this.showActionsMenu(event);

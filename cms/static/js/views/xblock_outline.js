@@ -23,7 +23,9 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
         // takes XBlockInfo as a model
 
         options: {
-            collapsedClass: 'is-collapsed'
+            collapsedClass: 'is-collapsed',
+            canEdit: true, // If not specified, assume user has permission to make changes
+            clipboardData: { content: null },
         },
 
         templateName: 'xblock-outline',
