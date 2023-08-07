@@ -1012,21 +1012,22 @@ def replace_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):
     """
     store = modulestore()
     with store.bulk_operations(course.id):
-        blocks = store.get_items(
-            course.id.for_branch(ModuleStoreEnum.BranchName.draft),
-            settings={'source_library_id': {'$exists': True}}
-        )
-        for xblock in blocks:
-            print(xblock.__dict__)
-            try:
-                xblock.source_library_id = v1_to_v2_lib_map[xblock.source_library_id]
-                store.update_item(xblock, None)
-            except KeyError:
-                #skip invalid keys
-                LOGGER.error(
-                    'Key %s not found in mapping. Skipping block for course %s',
-                    str({xblock.source_library_id}),
-                    str(course.id)
-                )
+        for branch in [ModuleStoreEnum.BranchName.draft, ModuleStoreEnum.BranchName.published]:
+            blocks = store.get_items(
+                course.id.for_branch(branch),
+                settings={'source_library_id': {'$exists': True}}
+            )
+            for xblock in blocks:
+                print(xblock.__dict__)
+                try:
+                    xblock.source_library_id = v1_to_v2_lib_map[xblock.source_library_id]
+                    store.update_item(xblock, None)
+                except KeyError:
+                    #skip invalid keys
+                    LOGGER.error(
+                        'Key %s not found in mapping. Skipping block for course %s',
+                        str({xblock.source_library_id}),
+                        str(course.id)
+                    )
     # return sucess
     return None
