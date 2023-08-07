@@ -16,6 +16,7 @@ from cms.djangoapps.contentstore.tasks import replace_all_library_source_blocks_
 
 log = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
     """
     Example usage:
@@ -29,9 +30,9 @@ class Command(BaseCommand):
     def replace_all_library_source_blocks_ids(self, v1_to_v2_lib_map):
         """A method to replace 'source_library_id' in all relevant blocks."""
 
-        courses =  CourseOverview.get_all_courses()
-        # Use Celery to distribute the workload
+        courses = CourseOverview.get_all_courses()
 
+        # Use Celery to distribute the workload
         tasks = group(replace_all_library_source_blocks_ids_for_course.s(course, v1_to_v2_lib_map) for course in courses)
         results = tasks.apply_async()
 

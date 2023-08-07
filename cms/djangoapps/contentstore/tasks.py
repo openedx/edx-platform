@@ -1003,6 +1003,7 @@ def delete_v1_library(v1_library_key_string):
         "msg": "SUCCESS"
     }
 
+
 @shared_task(time_limit=30)
 @set_code_owner_attribute
 def replace_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):
@@ -1029,4 +1030,3 @@ def replace_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):
                 )
     # return sucess
     return None
-
