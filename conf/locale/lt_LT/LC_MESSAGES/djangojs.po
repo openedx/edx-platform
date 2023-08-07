@@ -50,7 +50,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-15 09:23+0000\n"
+"POT-Creation-Date: 2023-07-30 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Riina <ciairdabar@yahoo.com>, 2014-2015\n"
 "Language-Team: Lithuanian (Lithuania) (http://app.transifex.com/open-edx/edx-platform/language/lt_LT/)\n"
@@ -161,7 +161,8 @@ msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
+#: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
 #: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
 msgid "OK"
 msgstr "Taip"
@@ -2339,11 +2340,9 @@ msgstr "Sėkmingai įtraukti į sąrašą šie naudotojai:"
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"Sėkmingai išsiųsti registracijos el. laiškai šiems naudotojams. Juos bus "
-"leista įtraukti į sąrašą, kai tik jie užsiregistruos:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2354,11 +2353,9 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"Sėkmingai išsiųsti registracijos el. laiškai šiems naudotojams. Jie bus "
-"įtraukti į sąrašą, kai tik užsiregistruos:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -6360,6 +6357,32 @@ msgstr ""
 msgid "Pasting"
 msgstr ""
 
+#: cms/static/js/views/pages/container.js
+msgid "Some errors occurred"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "The following required files could not be added to the course:"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "You may need to update a file(s) manually"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid ""
+"The following files already exist in this course but don't match the version"
+" used by the component you pasted:"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "New files were added to this course's Files & Uploads"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "The following required files were imported to this course:"
+msgstr ""
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
@@ -9908,6 +9931,13 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore

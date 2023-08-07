@@ -104,7 +104,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.request.RequestPanel',
     'debug_toolbar.panels.sql.SQLPanel',
     'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.profiling.ProfilingPanel',
     'debug_toolbar.panels.history.HistoryPanel',
 )
@@ -161,7 +160,10 @@ CREDENTIALS_SERVICE_USERNAME = 'credentials_worker'
 FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 ########################## AUTHOR PERMISSION #######################
-FEATURES['ENABLE_CREATOR_GROUP'] = False
+FEATURES['ENABLE_CREATOR_GROUP'] = True
+
+########################## Library creation organizations restriction #######################
+FEATURES['ENABLE_ORGANIZATION_STAFF_ACCESS_FOR_CONTENT_LIBRARIES'] = True
 
 ################### FRONTEND APPLICATION PUBLISHER URL ###################
 FEATURES['FRONTEND_APP_PUBLISHER_URL'] = 'http://localhost:18400'

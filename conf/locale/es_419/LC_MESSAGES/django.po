@@ -4,14 +4,18 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 #
 # Translators:
+# 9c5b4d946e924003e6fccd6f2055aa6e_d770dcd <a808d3f0be132c530a888173712afc58_730423>, 2019
 # Adolfo Michel <Michel.14.993@gmail.com>, 2017
 # Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2018-2021
 # arrow1234 <aleoncavallo@gmail.com>, 2014
 # Anatoli Pena <djanatoli@gmail.com>, 2016
+# Anatoli Pena <djanatoli@gmail.com>, 2016
+# AngelesAlvarez, 2019
 # AngelesAlvarez, 2019
 # Anthony Mangano <amangano@edx.org>, 2017
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
+# arrow1234 <aleoncavallo@gmail.com>, 2014
 # e9f5c7240da83cbe9680b1396d652f40_6defbb3 <d1582c6e51e345ddd8ecb3bd4f47ae24_568913>, 2017
 # BS GRUPO <soporte@bsgrupo.com>, 2018
 # Carlos Arias Fernandez <cararias@gmail.com>, 2016
@@ -20,43 +24,55 @@
 # kikeramirz <danart474@gmail.com>, 2020
 # David Salazar <imdjsg@gmail.com>, 2014
 # dzepeda <davitzepeda@hotmail.com>, 2014
-# Diana Huang <dkh@edx.org>, 2022
+# Diana Huang <dkh@edx.org>, 2022-2023
+# diegobe <diegobe@iadb.org>, 2014
 # diegobe <diegobe@iadb.org>, 2014
 # Diego Rojas <diego.rojas@edunext.co>, 2017
 # David Salazar <imdjsg@gmail.com>, 2014
+# dzepeda <davitzepeda@hotmail.com>, 2014
+# e9f5c7240da83cbe9680b1396d652f40_6defbb3 <d1582c6e51e345ddd8ecb3bd4f47ae24_568913>, 2017
 # Eduardo Zambrano <ezambrano@edx.org>, 2017-2019
 # Elias Estay <eestay@u.uchile.cl>, 2015
+# Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2016
 # Felipe Espinoza <felipe.espinoza.r@uchile.cl>, 2020
 # Felipe Montoya <felipe.montoya@edunext.co>, 2019
+# Félix Antonio Valdez Noverola <felix@itesm.mx>, 2015
 # Félix Antonio Valdez Noverola <felix@itesm.mx>, 2015
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
 # Jesica Greco, 2022-2023
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
+# jorgebarrero <jorgebarrero@gmail.com>, 2014
+# José Luis <alagunajs@gmail.com>, 2016
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
-# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2020-2023
+# Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013,2015-2018,2020-2023
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013
 # Juan <juan.marrero@utec.edu.uy>, 2015
 # Juliana Kang <jkang@edx.org>, 2020
 # karlman72 <karlman72@gmail.com>, 2014
+# karlman72 <karlman72@gmail.com>, 2014
+# kikeramirz <danart474@gmail.com>, 2020
 # Laura Silva <lingison@edx.org>, 2015-2018
 # 9c5b4d946e924003e6fccd6f2055aa6e_d770dcd <a808d3f0be132c530a888173712afc58_730423>, 2019
 # Luis Manuel Moreno <luis.moreno@edunext.co>, 2019
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Marco Morales, 2018,2021
+# Marco Morales, 2018,2021
 # Marcos Buccella <marcosfiore07@gmail.com>, 2018
 # Marcos Buccella <marcosfiore07@hotmail.com>, 2018
 # Mariana Hernandez Barroso <mhernandez@edx.org>, 2021
 # Maria Perez <mperez@edx.org>, 2019
 # Marina Pastor <mpastor@edx.org>, 2017-2018
+# MarnyLopez, 2014
 # Matías Olivera <MatiasOlivera@outlook.com>, 2015
 # Matthew Piatetsky <mpiatetsky@edx.org>, 2018,2021
 # Matt Tuchfarber <matt@tuchfarber.com>, 2018
 # Miguel Bonilla <mbonilla@edx.org>, 2018
 # MarnyLopez, 2014
 # Muhammad Adeel Khan <adeel@edx.org>, 2019-2020
+# Natalia, 2013
 # Natalia, 2013
 # Natalia, 2013-2014,2018
 # Ned Batchelder <ned@edx.org>, 2016
@@ -65,8 +81,10 @@
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015
 # Paulina Rodriguez <pauli.rodriguez.c@gmail.com>, 2020
 # rcelaya <rcelaya@ula.ve>, 2014
+# rcelaya <rcelaya@ula.ve>, 2014
 # Sarina Canelake <sarina@tcril.org>, 2014-2015
 # Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2016
+# sebasco <sjduranh@gmail.com>, 2014
 # SENATICs Desarrollo <desarrollo.gov.py@gmail.com>, 2018
 # Sergio A. Salazar <sergiosalazar@live.ru>, 2015
 # sebasco <sjduranh@gmail.com>, 2014
@@ -75,6 +93,8 @@
 # xocoyotzin, 2014
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
 # wjmendez <walterj.mendez@gmail.com>, 2014
+# wjmendez <walterj.mendez@gmail.com>, 2014
+# xocoyotzin, 2014
 # José Luis <alagunajs@gmail.com>, 2016
 # Zainab Amir <zamir@edx.org>, 2019
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
@@ -154,7 +174,7 @@
 # Herty Nava <translation@bolmedia.ca>, 2013
 # Irvin Cabrera <pirpinachisloco@hotmail.com>, 2014
 # Ismael Saavedra <isma.18.94@gmail.com>, 2014
-# Jesica Greco, 2022
+# Jesica Greco, 2022-2023
 # jimenaianina <jime.ianina@gmail.com>, 2014
 # 1673e3cf8bd85685e54576636ae7f409, 2014
 # jorgebarrero <jorgebarrero@gmail.com>, 2014
@@ -227,7 +247,7 @@
 # Giancarlo  De  Agostini <giancarlo.deagostini@iaen.edu.ec>, 2015
 # Herty Nava <translation@bolmedia.ca>, 2013
 # Ismael Saavedra <isma.18.94@gmail.com>, 2014
-# Jesica Greco, 2022
+# Jesica Greco, 2022-2023
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015-2018,2023
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
@@ -274,7 +294,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-23 10:50+0000\n"
+"POT-Creation-Date: 2023-07-30 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: Albeiro Gonzalez <albeiro.gonzalez@edunext.co>, 2019\n"
 "Language-Team: Spanish (Latin America) (https://app.transifex.com/open-edx/teams/6205/es_419/)\n"
@@ -368,7 +388,7 @@ msgstr "Se requiere un archivo de transcripción."
 #: cms/djangoapps/contentstore/views/videos.py
 #: openedx/core/djangoapps/content_staging/data.py
 msgid "Ready"
-msgstr ""
+msgstr "Listo"
 
 #: cms/djangoapps/contentstore/views/videos.py
 #: lms/djangoapps/instructor/views/api.py
@@ -394,6 +414,17 @@ msgstr "Pendiente"
 #: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "Vacío"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+msgid "Invalid data"
+msgstr "Datos inválidos"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "Datos inválidos ({details})"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -500,7 +531,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Lock upgrade deadline date"
-msgstr ""
+msgstr "Fecha límite de actualización de bloqueo"
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -508,6 +539,10 @@ msgid ""
 "date. Set to False if there is no upgrade deadline or to use the default "
 "upgrade deadline."
 msgstr ""
+"OPCIONAL: Establecer en Verdadero para bloquear la fecha límite de "
+"actualización definida explícitamente. Establecer en Falso si no hay una "
+"fecha límite de actualización o para usar la fecha límite de actualización "
+"predeterminada."
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -577,7 +612,6 @@ msgstr "{currency_symbol}{price}"
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "Gratis"
@@ -2526,7 +2560,7 @@ msgstr "Política de cookies"
 
 #: lms/djangoapps/branding/api.py
 msgid "Your Privacy Choices"
-msgstr ""
+msgstr "Opciones de privacidad"
 
 #: lms/djangoapps/branding/api.py
 msgid "Trademark Policy"
@@ -3645,6 +3679,15 @@ msgid "Provide additional course content and resources with custom pages"
 msgstr ""
 "Provee contenido adicional para el curso y recursos con páginas "
 "personalizables"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Open Response Assessment Settings"
+msgstr "Configuración de evaluación de respuesta abierta"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Course level settings for Open Response Assessment."
+msgstr ""
+"Configuración del nivel del curso para la evaluación de respuesta abierta."
 
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
@@ -6205,57 +6248,6 @@ msgstr "Permitir"
 msgid "Error"
 msgstr "Error"
 
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Check out this course on edx"
-msgstr "Echa un vistazo a este curso en edx"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Enroll now"
-msgstr "Inscribirse ahora"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "View Course"
-msgstr "Ver curso"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Estimated 6 weeks"
-msgstr "6 semanas estimadas"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "4-6 hours per week"
-msgstr "4-6 horas por semana"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Self-paced"
-msgstr "A ritmo propio"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Progress at your own speed"
-msgstr "Progresa a tu propio ritmo"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Optional upgrade available"
-msgstr "Actualización opcional disponible"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "Check out this course on %(platform_name)s."
-msgstr "Mira este curso en %(platform_name)s."
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "This email message was automatically sent by %(lms_url)s "
-msgstr ""
-"Este mensaje de correo electrónico fue enviado automáticamente por "
-"%(lms_url)s"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
-#, python-format
-msgid "%(display_name)s"
-msgstr "%(display_name)s"
-
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
 msgstr "Verificación de ID Aprobada"
@@ -7429,6 +7421,7 @@ msgstr ""
 msgid "This user already has access to this library."
 msgstr "Este usuario ya tiene acceso a esta librería."
 
+#: openedx/core/djangoapps/content_staging/data.py
 #: cms/templates/certificates.html cms/templates/container.html
 #: cms/templates/course_outline.html cms/templates/group_configurations.html
 #: cms/templates/library.html cms/templates/manage_users.html
@@ -7441,11 +7434,11 @@ msgstr "Cargando"
 
 #: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
-msgstr ""
+msgstr "Venció"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Staged Content"
-msgstr ""
+msgstr "Contenido por etapas"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid ""
@@ -7455,10 +7448,12 @@ msgid ""
 "            e.g. \"video\" if a video is staged, or \"vertical\" for a unit.\n"
 "        "
 msgstr ""
+"\n"
+"Qué tipo de contenido se organiza. Solo se admite el contenido OLX y este campo debe ser el mismo que la etiqueta raíz del OLX. por ejemplo, \"video\"; si un video está en escena, o \"vertical\"; para una unidad."
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Original usage key/ID of the thing that is in the clipboard."
-msgstr ""
+msgstr "Clave/ID de uso original de lo que está en el portapapeles."
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -7769,6 +7764,8 @@ msgid ""
 "The Posting availabilty in discussions whether it will be enabled, scheduled"
 " or indefinitely disabled."
 msgstr ""
+"La disponibilidad de publicación en las discusiones si se habilitará, "
+"programará o deshabilitará indefinidamente."
 
 #: openedx/core/djangoapps/discussions/models.py
 msgid "The LTI configuration data for this context/provider."
@@ -7949,29 +7946,60 @@ msgstr "Incluir en lista negra a {country} para el curso {course}"
 msgid "Learner Pathways"
 msgstr "Rutas de aprendizaje"
 
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on your response to the "
+"post <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> comentó en la respuesta de la "
+"publicación <{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on "
+"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> respondió el "
+"<{strong}>{author_name}</{strong}> respuesta a su publicación "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> respondió a su publicación "
+"<{strong}>{post_title}</{strong}></{p}>"
+
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
 msgstr ""
+"La versión de configuración de preferencia de notificación no está "
+"actualizada."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Invalid app name."
-msgstr ""
+msgstr "Nombre de la aplicación invalido."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notifications marked as seen."
-msgstr ""
+msgstr "Notificaciones marcadas como vistas."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notification marked read."
-msgstr ""
+msgstr "Notificación marcada como leída."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Notifications marked read."
-msgstr ""
+msgstr "Notificaciones marcadas como leídas."
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "Invalid app_name or notification_id."
-msgstr ""
+msgstr "nombre_aplicación o id_notificación inválidos."
 
 #: openedx/core/djangoapps/oauth_dispatch/models.py
 msgid ""
@@ -8784,6 +8812,8 @@ msgid ""
 "Comma separated file that have username and user_email of the users that "
 "needs to be retired"
 msgstr ""
+"Archivo separado por comas que tiene nombre de usuario y correo electrónico "
+"de usuario de los usuarios que deben retirarse"
 
 #: openedx/core/djangoapps/user_api/preferences/api.py
 #, python-brace-format
@@ -9473,6 +9503,18 @@ msgid ""
 msgstr ""
 "Has cambiado exitosamente el horario de tu curso y tu calendario está "
 "actualizado."
+
+#: openedx/features/content_tagging/models.py wiki/models/article.py
+msgid "owner"
+msgstr "propietario"
+
+#: openedx/features/content_tagging/models.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"Organización relacionada con esta taxonomía. Si no hay ninguna, esta "
+"taxonomía está relacionada con todas las organizaciones."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -11728,7 +11770,7 @@ msgstr ""
 
 #: xmodule/course_block.py
 msgid "Video Sharing Options"
-msgstr ""
+msgstr "Opciones para compartir videos"
 
 #: xmodule/course_block.py
 msgid ""
@@ -11736,6 +11778,21 @@ msgid ""
 "three values: 'all-on', 'all-off' and 'per-video'. with 'per-video' as the "
 "default."
 msgstr ""
+"Especifica las opciones para compartir vídeos del curso. Es posible "
+"cualquiera de los tres valores siguientes: 'all-on', 'all-off' and 'per-"
+"video'. with 'per-video' as the default."
+
+#: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr "Forzar calificación flexible para ORA de pares"
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
+msgstr ""
+"Establecer este indicador forzará la opción de calificación flexible para "
+"todos los ORA calificados por pares en este curso."
 
 #: xmodule/course_block.py
 msgid "Course Instructor"
@@ -12880,6 +12937,8 @@ msgid ""
 "Here's a fun clip from a class I'm taking on {social_account_handle} from {organization_name}.\n"
 "\n"
 msgstr ""
+"Aquí hay un clip divertido de una clase que estoy tomando en {social_account_handle} de {organization_name}.\n"
+"\n"
 
 #: xmodule/video_block/sharing_sites.py
 #, python-brace-format
@@ -12887,6 +12946,8 @@ msgid ""
 "Here's a fun clip from a class I'm taking on {social_account_handle}.\n"
 "\n"
 msgstr ""
+"Aquí hay un clip divertido de una clase que estoy tomando en {social_account_handle}.\n"
+"\n"
 
 #: xmodule/video_block/sharing_sites.py
 #, python-brace-format
@@ -12894,6 +12955,8 @@ msgid ""
 "Here's a fun clip from a class I'm taking from {organization_name}.\n"
 "\n"
 msgstr ""
+"Aquí hay un clip divertido de una clase que estoy tomando de {organization_name}.\n"
+"\n"
 
 #: xmodule/video_block/sharing_sites.py
 #, python-brace-format
@@ -12901,6 +12964,8 @@ msgid ""
 "Here's a fun clip from a class I'm taking on {platform_name}.\n"
 "\n"
 msgstr ""
+"Aquí hay un clip divertido de una clase que estoy tomando en {platform_name}.\n"
+"\n"
 
 #: xmodule/video_block/transcripts_utils.py
 #, python-brace-format
@@ -13360,6 +13425,18 @@ msgstr ""
 msgid "Regenerate *all* course outlines"
 msgstr "Regenerar *todos* los esquemas de curso"
 
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+msgid "Upload completed"
+msgstr "Carga terminada"
+
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+#, python-brace-format
+msgid ""
+"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
+msgstr ""
+"El archivo {filename} excede el tamaño máximo de {maximum_size_in_megabytes}"
+" MB."
+
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
 "The groups in this configuration can be mapped to cohorts in the Instructor "
@@ -13713,18 +13790,6 @@ msgstr ""
 "El nombre del archivo de la imagen solo puede tener letras, número, guiones "
 "(-), y guiones bajos (_)."
 
-#: cms/djangoapps/contentstore/views/assets.py
-msgid "Upload completed"
-msgstr "Carga terminada"
-
-#: cms/djangoapps/contentstore/views/assets.py
-#, python-brace-format
-msgid ""
-"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
-msgstr ""
-"El archivo {filename} excede el tamaño máximo de {maximum_size_in_megabytes}"
-" MB."
-
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
 msgstr "debe tener un nombre para el certificado"
@@ -13754,7 +13819,7 @@ msgstr "Contenido de librerías"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Drag and Drop"
-msgstr ""
+msgstr "Arrastrar y soltar"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
@@ -14116,21 +14181,12 @@ msgid "Libraries cannot have more than {limit} components"
 msgstr "Las librerías no pueden tener más de {limit} componentes"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
-msgid "Invalid data"
-msgstr "Datos inválidos"
-
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Datos inválidos ({details})"
-
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "There was a problem pasting your component."
-msgstr ""
+msgstr "Hubo un problema al pegar su componente."
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Your clipboard is empty or invalid."
-msgstr ""
+msgstr "Su portapapeles está vacío o no es válido."
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
@@ -15147,15 +15203,15 @@ msgstr "Regresar a %s"
 
 #: lms/templates/public_video.html
 msgid "Learn more about this course"
-msgstr ""
+msgstr "Más información sobre este curso"
 
 #: lms/templates/public_video.html
 msgid "Go to course"
-msgstr ""
+msgstr "ir al curso"
 
 #: lms/templates/public_video.html
 msgid "Enroll in this course"
-msgstr ""
+msgstr "Inscribirse al curso"
 
 #: lms/templates/courseware/courseware-chromeless.html
 #: lms/templates/courseware/courseware.html
@@ -15415,15 +15471,15 @@ msgstr "Página siguiente"
 
 #: lms/templates/studio_render_children_view.html
 msgid "Paste Component"
-msgstr ""
+msgstr "Pegar componente"
 
 #: lms/templates/studio_render_children_view.html
 msgid "From:"
-msgstr ""
+msgstr "De:"
 
 #: lms/templates/studio_render_children_view.html
 msgid "What's in my clipboard?"
-msgstr ""
+msgstr "¿Qué hay en mi portapapeles?"
 
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
@@ -15556,15 +15612,15 @@ msgstr "Descargar archivo de video"
 
 #: lms/templates/video.html
 msgid "Share this video"
-msgstr ""
+msgstr "Compartir este video"
 
 #: lms/templates/video.html
 msgid "Share on {site}"
-msgstr ""
+msgstr "Compartir en {site}"
 
 #: lms/templates/video.html
 msgid "Copy"
-msgstr ""
+msgstr "Copiar"
 
 #: lms/templates/video.html
 msgid "Transcripts"
@@ -17390,6 +17446,11 @@ msgstr "Ocurrió un error. Por favor intenta nuevamente más tarde."
 #: lms/templates/courseware/course_about.html
 msgid "You are enrolled in this course"
 msgstr "Usted está inscrito en este curso:"
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "View Course"
+msgstr "Ver curso"
 
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
@@ -20029,6 +20090,28 @@ msgid "Add Staff"
 msgstr "Adicionar personal de apoyo"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Limited Staff"
+msgstr "Personal limitado"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Course team members with the Limited Staff role help you manage your course."
+" Limited Staff can enroll and unenroll learners, as well as modify their "
+"grades and access all course data. Limited Staff don't have access to your "
+"course in Studio. You can only give course team roles to enrolled users."
+msgstr ""
+"Los miembros del equipo del curso con el rol de Personal limitado lo ayudan "
+"a administrar su curso. El personal limitado puede inscribir y cancelar la "
+"inscripción de los estudiantes, así como modificar sus calificaciones y "
+"acceder a todos los datos del curso. El personal limitado no tiene acceso a "
+"su curso en Studio. Solo puede otorgar roles de equipo del curso a los "
+"usuarios inscritos."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Limited Staff"
+msgstr "Agregar personal limitado"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
 msgstr "Administrador"
 
@@ -22092,6 +22175,8 @@ msgid ""
 "To create a link to this unit from an HTML component in this course, enter "
 "{unit_link} as the URL value."
 msgstr ""
+"Para crear un enlace a esta unidad desde un componente HTML en este curso, "
+"ingrese {unit_link} como valor de URL."
 
 #: cms/templates/course-create-rerun.html
 msgid "Create a Course Rerun of:"
@@ -22288,6 +22373,9 @@ msgid ""
 "order to display the discussions sidebar, discussions xBlocks will no longer"
 " be visible to learners."
 msgstr ""
+"Este curso está utilizando una versión mejorada del foro de debate de edx. "
+"Para mostrar la barra lateral de debates, los xBlocks de debates ya no serán"
+" visibles para los alumnos."
 
 #: cms/templates/course_outline.html
 msgid " Learn more"
@@ -25056,7 +25144,7 @@ msgstr "Configuración de Acceso"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Copy to Clipboard"
-msgstr ""
+msgstr "Copiar al portapapeles"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Manage Access"
@@ -25424,6 +25512,10 @@ msgid "Outline"
 msgstr "Estructura"
 
 #: cms/templates/widgets/header.html
+msgid "Files & Media"
+msgstr "Archivos y medios"
+
+#: cms/templates/widgets/header.html
 msgid "Publisher"
 msgstr "Editor"
 
@@ -25780,10 +25872,6 @@ msgstr "modificado"
 #: wiki/models/article.py
 msgid "Article properties last modified"
 msgstr "Última modificación a las propiedades del artículo"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "propietario"
 
 #: wiki/models/article.py
 msgid ""

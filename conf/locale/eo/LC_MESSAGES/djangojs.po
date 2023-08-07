@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-02 20:35+0000\n"
-"PO-Revision-Date: 2023-07-02 20:36:06.132786\n"
+"POT-Creation-Date: 2023-08-06 20:36+0000\n"
+"PO-Revision-Date: 2023-08-06 20:36:13.887415\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: eo\n"
@@ -2808,11 +2808,11 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"Süççéssfüllý sént énröllmént émäïls tö thé föllöwïng üsérs. Théý wïll ßé "
-"ällöwéd tö énröll önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+"Émäïl çännöt ßé sént tö thé föllöwïng üsérs vïä ßätçh énröllmént. Théý wïll "
+"ßé ällöwéd tö énröll önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2824,11 +2824,11 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"Süççéssfüllý sént énröllmént émäïls tö thé föllöwïng üsérs. Théý wïll ßé "
-"énrölléd önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+"Émäïl çännöt ßé sént tö thé föllöwïng üsérs vïä ßätçh énröllmént. Théý wïll "
+"ßé énrölléd önçé théý régïstér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -11745,6 +11745,15 @@ msgstr ""
 msgid "Subsection is hidden after due date"
 msgstr ""
 "Süßséçtïön ïs hïddén äftér düé däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
+"Thïs süßséçtïön ïs çönfïgüréd äs \\\"%(gradingType)s\\\", whïçh döésn't "
+"éxïst ïn thé çürrént grädïng pölïçý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore

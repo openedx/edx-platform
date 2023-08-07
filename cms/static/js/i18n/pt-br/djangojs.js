@@ -710,8 +710,6 @@
     "Successfully enrolled the following users:": "Os seguintes usu\u00e1rios foram inscritos com sucesso:",
     "Successfully rescored problem for user {user}": "Problema de usu\u00e1rio {user} reavaliado corretamente",
     "Successfully reset the attempts for user {user}": "Tentativas para usu\u00e1rios {user} zeradas corretamente",
-    "Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:": "O e-mail de inscri\u00e7\u00e3o foi enviado corretamente para os seguintes usu\u00e1rios, que poder\u00e3o se inscrever ap\u00f3s realizar o cadastro:",
-    "Successfully sent enrollment emails to the following users. They will be enrolled once they register:": "O e-mail de inscri\u00e7\u00e3o foi enviado corretamente aos seguintes usu\u00e1rios, que poder\u00e3o se inscrever ap\u00f3s a realiza\u00e7\u00e3o do cadastro:",
     "Successfully started task to reset attempts for problem '<%- problem_id %>'. Click the 'Show Task Status' button to see the status of the task.": "A tarefa para repor as tentativas para o problema '<%- problem_id %>' foi iniciada com sucesso. Clique o bot\u00e3o 'Mostrar o Status da Tarefa' para ver o status dessa tarefa.",
     "Successfully unlinked.": "Desvinculado com sucesso.",
     "Tags": "Marca\u00e7\u00f5es",

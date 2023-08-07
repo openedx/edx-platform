@@ -403,7 +403,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-25 20:42+0000\n"
+"POT-Creation-Date: 2023-07-16 20:42+0000\n"
 "PO-Revision-Date: 2019-01-20 20:43+0000\n"
 "Last-Translator: ifLab <webmaster@iflab.org>, 2019\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/open-edx/teams/6205/zh_CN/)\n"
@@ -521,6 +521,17 @@ msgstr "等待"
 #: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "空白"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+msgid "Invalid data"
+msgstr ""
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr ""
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -685,7 +696,6 @@ msgstr "{currency_symbol}{price}"
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "免费"
@@ -3363,6 +3373,14 @@ msgstr "自定义页面"
 msgid "Provide additional course content and resources with custom pages"
 msgstr "使用自定义页面提供额外的课程内容和资源"
 
+#: lms/djangoapps/courseware/plugins.py
+msgid "Open Response Assessment Settings"
+msgstr ""
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Course level settings for Open Response Assessment."
+msgstr ""
+
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
 #: cms/templates/widgets/header.html
@@ -5654,55 +5672,6 @@ msgstr "允许"
 msgid "Error"
 msgstr "错误"
 
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Check out this course on edx"
-msgstr "在 edx 上查看此课程"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Enroll now"
-msgstr "现在注册"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "View Course"
-msgstr "查看课程"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Estimated 6 weeks"
-msgstr "预计 6 周"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "4-6 hours per week"
-msgstr "每周 4-6 小时"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Self-paced"
-msgstr "自定进度"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Progress at your own speed"
-msgstr "以自己的速度进步"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Optional upgrade available"
-msgstr "可选择升级"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "Check out this course on %(platform_name)s."
-msgstr "在 %(platform_name)s 上查看此课程。"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "This email message was automatically sent by %(lms_url)s "
-msgstr "此电子邮件由 %(lms_url)s 自动发送"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
-#, python-format
-msgid "%(display_name)s"
-msgstr "%(display_name)s"
-
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
 msgstr "身份验证已批准"
@@ -6800,7 +6769,7 @@ msgstr "正在加载"
 
 #: openedx/core/djangoapps/content_staging/data.py
 msgid "Expired"
-msgstr ""
+msgstr "已到期"
 
 #: openedx/core/djangoapps/content_staging/models.py
 msgid "Staged Content"
@@ -7245,6 +7214,28 @@ msgstr "课程{course}的黑名单国家： {country}"
 #: openedx/core/djangoapps/learner_pathway/apps.py
 msgid "Learner Pathways"
 msgstr "学习者路径"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on your response to the "
+"post <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on "
+"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
 
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
@@ -8612,6 +8603,16 @@ msgid ""
 "You have successfully shifted your course schedule and your calendar is up "
 "to date."
 msgstr "您已成功更改课程安排，并且您的日历是最新的。"
+
+#: wiki/models/article.py
+msgid "owner"
+msgstr "所有者"
+
+#: openedx/features/content_tagging/models.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -10577,6 +10578,16 @@ msgid ""
 msgstr ""
 
 #: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr ""
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
+msgstr ""
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "授课老师"
 
@@ -11957,6 +11968,16 @@ msgstr ""
 msgid "Regenerate *all* course outlines"
 msgstr ""
 
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+msgid "Upload completed"
+msgstr "上传完成"
+
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+#, python-brace-format
+msgid ""
+"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
+msgstr "{filename}文件超过{maximum_size_in_megabytes}。"
+
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
 "The groups in this configuration can be mapped to cohorts in the Instructor "
@@ -12277,16 +12298,6 @@ msgid ""
 "The image file name can only contain letters, numbers, hyphens (-), and "
 "underscores (_)."
 msgstr "图片文件名只支持字母、数字、连字符（-）、下划线（_）。"
-
-#: cms/djangoapps/contentstore/views/assets.py
-msgid "Upload completed"
-msgstr "上传完成"
-
-#: cms/djangoapps/contentstore/views/assets.py
-#, python-brace-format
-msgid ""
-"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
-msgstr "{filename}文件超过{maximum_size_in_megabytes}。"
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -12651,15 +12662,6 @@ msgstr "需要一个非零的正整数"
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr ""
-
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
-msgid "Invalid data"
-msgstr "无效的数据"
-
-#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "无效的数据 ({details})"
 
 #: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "There was a problem pasting your component."
@@ -15479,6 +15481,11 @@ msgid "You are enrolled in this course"
 msgstr "您选修了本课程"
 
 #: lms/templates/courseware/course_about.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "View Course"
+msgstr "查看课程"
+
+#: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr "该课程只能通过邀请选修"
 
@@ -17817,6 +17824,22 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
 msgstr "添加工作人员"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Limited Staff"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Course team members with the Limited Staff role help you manage your course."
+" Limited Staff can enroll and unenroll learners, as well as modify their "
+"grades and access all course data. Limited Staff don't have access to your "
+"course in Studio. You can only give course team roles to enrolled users."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Limited Staff"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
@@ -22482,6 +22505,10 @@ msgid "Outline"
 msgstr "大纲"
 
 #: cms/templates/widgets/header.html
+msgid "Files & Media"
+msgstr ""
+
+#: cms/templates/widgets/header.html
 msgid "Publisher"
 msgstr ""
 
@@ -22813,10 +22840,6 @@ msgstr "已修改"
 #: wiki/models/article.py
 msgid "Article properties last modified"
 msgstr "最后修改的文章属性"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "所有者"
 
 #: wiki/models/article.py
 msgid ""

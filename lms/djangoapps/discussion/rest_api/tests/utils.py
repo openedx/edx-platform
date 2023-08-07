@@ -665,7 +665,7 @@ class ThreadMock(object):
 
     def __init__(self, thread_id, creator, title, parent_id=None):
         self.id = thread_id
-        self.user_id = creator.id
+        self.user_id = str(creator.id)
         self.username = creator.username
         self.title = title
         self.parent_id = parent_id

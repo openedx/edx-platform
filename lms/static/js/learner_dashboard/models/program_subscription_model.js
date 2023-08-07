@@ -15,6 +15,7 @@ class ProgramSubscriptionModel extends Backbone.Model {
             programData: { subscription_prices },
             urls = {},
             userPreferences = {},
+            subscriptionsTrialLength: trialLength = 7,
         } = context;
 
         const priceInUSD = subscription_prices?.find(({ currency }) => currency === 'USD');
@@ -55,8 +56,6 @@ class ProgramSubscriptionModel extends Backbone.Model {
             data.trial_end,
             userPreferences
         );
-
-        const trialLength = 7;
 
         super(
             {
@@ -110,14 +109,17 @@ class ProgramSubscriptionModel extends Backbone.Model {
         const trialEndTime = DateUtils.localizeTime(
             DateUtils.stringToMoment(trialEndDate),
             userTimezone
-        ).startOf('day');
+        );
         const currentTime = DateUtils.localizeTime(
             moment.utc(),
             userTimezone
-        ).startOf('day');
+        );
 
-        return trialEndTime.diff(currentTime, 'days');
-
+        return trialEndTime.diff(currentTime, 'days') < 1
+            ? // 0 if trial end time is less than 24 hrs
+              0
+            : // else return actual difference in days
+              trialEndTime.startOf('day').diff(currentTime.startOf('day'), 'days');
     }
 }
 

@@ -110,11 +110,11 @@ def get_credentials(user, program_uuid=None, credential_type=None):
     )
 
 
-def get_courses_completion_status(lms_user_id, course_run_ids):
+def get_courses_completion_status(username, course_run_ids):
     """
-    Given the lms_user_id and course run ids, checks for course completion status
+    Given the username and course run ids, checks for course completion status
     Arguments:
-        lms_user_id (User): The user to authenticate as when requesting credentials.
+        username (User): Username of the user whose credentials are being requested.
         course_run_ids(List): list of course run ids for which we need to check the completion status
     Returns:
         list of course_run_ids for which user has completed the course
@@ -125,16 +125,16 @@ def get_courses_completion_status(lms_user_id, course_run_ids):
         log.warning('%s configuration is disabled.', credential_configuration.API_NAME)
         return [], False
 
-    base_api_url = get_credentials_api_base_url()
-    completion_status_url = f'{base_api_url}/api/credentials/learner_cert_status'
+    completion_status_url = (f'{settings.CREDENTIALS_INTERNAL_SERVICE_URL}/api'
+                             '/credentials/v1/learner_cert_status/')
     try:
         api_client = get_credentials_api_client(
             User.objects.get(username=settings.CREDENTIALS_SERVICE_USERNAME)
         )
         api_response = api_client.post(
             completion_status_url,
-            data={
-                'lms_user_id': lms_user_id,
+            json={
+                'username': username,
                 'course_runs': course_run_ids,
             }
         )
@@ -142,12 +142,16 @@ def get_courses_completion_status(lms_user_id, course_run_ids):
         course_completion_response = api_response.json()
     except Exception as exc:  # pylint: disable=broad-except
         log.exception("An unexpected error occurred while reqeusting course completion statuses "
-                      "for lms_user_id [%s] for course_run_ids [%s] with exc [%s]:",
-                      lms_user_id,
+                      "for user [%s] for course_run_ids [%s] with exc [%s]:",
+                      username,
                       course_run_ids,
                       exc
                       )
         return [], True
+    log.info("Course completion status response for user [%s] for course_run_ids [%s] is [%s]",
+             username,
+             course_run_ids,
+             course_completion_response)
     # Yes, This is course_credentials_data. The key is named status but
     # it contains all the courses data from credentials.
     course_credentials_data = course_completion_response.get('status', [])

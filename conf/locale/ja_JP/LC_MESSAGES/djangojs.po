@@ -78,7 +78,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-15 09:23+0000\n"
+"POT-Creation-Date: 2023-07-30 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Kyoto University <edxkyotoux@gmail.com>, 2017\n"
 "Language-Team: Japanese (Japan) (http://app.transifex.com/open-edx/edx-platform/language/ja_JP/)\n"
@@ -190,7 +190,8 @@ msgstr "ファイルを選択"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/js/views/course_info_update.js cms/static/js/views/tabs.js
+#: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/pages/container.js cms/static/js/views/tabs.js
 #: lms/static/js/Markdown.Editor.js xmodule/js/src/html/edit.js
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/templates/learner_dashboard/verification_popover.underscore
@@ -2287,9 +2288,9 @@ msgstr "次のユーザーが正常に受講登録されました: "
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
-msgstr "次のユーザーに受講登録メールが正常に送信されました。登録完了後に受講登録が可能になります: "
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
+msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2299,9 +2300,9 @@ msgstr "次のユーザーは登録完了後に受講登録が可能になりま
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
-msgstr "次のユーザーに受講登録メールが正常に送信されました。登録完了後に受講登録されます: "
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
+msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -6249,6 +6250,32 @@ msgstr ""
 msgid "Pasting"
 msgstr ""
 
+#: cms/static/js/views/pages/container.js
+msgid "Some errors occurred"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "The following required files could not be added to the course:"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "You may need to update a file(s) manually"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid ""
+"The following files already exist in this course but don't match the version"
+" used by the component you pasted:"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "New files were added to this course's Files & Uploads"
+msgstr ""
+
+#: cms/static/js/views/pages/container.js
+msgid "The following required files were imported to this course:"
+msgstr ""
+
 #. Translators: "title" is the name of the current component or unit being
 #. edited.
 #: cms/static/js/views/pages/container.js
@@ -9747,6 +9774,13 @@ msgstr "講座終了日以降サブセクションは非表示になります"
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
 msgstr "締切日以降サブセクションは非表示になります"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore

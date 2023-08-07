@@ -10,7 +10,7 @@ The ``xmodule`` folder contains a variety of old-yet-important functionality cor
 * the implementations of several different built-in content-level XBlocks, such as ``problem`` and ``html``; and
 * `assets for those built-in XBlocks`_.
 
-.. _assets for those built-in XBlocks: https://github.com/openedx/edx-platform/tree/master/assets
+.. _assets for those built-in XBlocks: https://github.com/openedx/edx-platform/tree/master/xmodule/assets#readme
 
 Historical Context
 ******************

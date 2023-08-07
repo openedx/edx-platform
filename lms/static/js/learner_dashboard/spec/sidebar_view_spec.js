@@ -6,7 +6,11 @@ describe('Sidebar View', () => {
     let view = null;
     const context = {
         marketingUrl: 'https://www.example.org/programs',
-        subscriptionsMarketingUrl: 'https://www.example.org/program-subscriptions',
+        subscriptionUpsellData: {
+            marketing_url: 'https://www.example.org/program-subscriptions',
+            minimum_price: '$39',
+            trial_length: 7,
+        },
         isUserB2CSubscriptionsEnabled: true,
     };
 
@@ -72,7 +76,7 @@ describe('Sidebar View', () => {
             el: '.sidebar',
             context: {
                 isUserB2CSubscriptionsEnabled: true,
-                subscriptionsMarketingUrl: '',
+                subscriptionUpsellData: context.subscriptionUpsellData,
             },
         });
         view.render();

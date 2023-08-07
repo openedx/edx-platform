@@ -71,6 +71,7 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
             'filter_': None,
             'permissions': set(),
             'active_only': None,
+            'course_keys': set(),
         }
 
     def test_basic(self):
@@ -99,6 +100,14 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
             self.cleaned_data['filter_'] = {field_name: field_value}
 
         self.assert_valid(self.cleaned_data)
+
+    def test_invalid_course_keys(self):
+        """
+        Verify form checks for validity of course keys provided
+        """
+
+        self.form_data['course_keys'] = 'course-v1:edX+DemoX+Demo_Course,invalid_course_key'
+        self.assert_error('course_keys', "'invalid_course_key' is not a valid course key.")
 
 
 class TestCourseIdListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreTestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
