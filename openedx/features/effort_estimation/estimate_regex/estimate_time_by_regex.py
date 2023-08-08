@@ -104,7 +104,7 @@ def estimate_time_by_regex(text):
 			regex_result = re.findall(TIME_MINUTE_REGEX, line_text)
 			if len(regex_result) == 1:
 				time_by_regex = float(regex_result[-1])
-			# print('============', time_by_regex, line_text)
+			print('============', time_by_regex, line_text)
 		
 		elif 'h' in line_text and time_by_regex is None:
 			regex_result = re.findall(TIME_H_REGEX, line_text)
@@ -168,6 +168,6 @@ def estimate_time_by_regex(text):
 	# 			print('========',regex_result ,  line_text)
 				
 
-	# print('======', time_by_regex, last_line)
+	print('======', time_by_regex, last_line)
  
 	return time_by_regex
