@@ -570,7 +570,7 @@ edx-i18n-tools==1.0.0
     #   ora2
 edx-milestones==0.5.0
     # via -r requirements/edx/base.txt
-edx-name-affirmation==2.3.5
+edx-name-affirmation==2.3.6
     # via -r requirements/edx/base.txt
 edx-opaque-keys[django]==2.3.0
     # via
@@ -590,7 +590,7 @@ edx-opaque-keys[django]==2.3.0
     #   ora2
 edx-organizations==6.12.1
     # via -r requirements/edx/base.txt
-edx-proctoring==4.16.0
+edx-proctoring==4.16.1
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring-proctortrack
