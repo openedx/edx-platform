@@ -180,7 +180,10 @@ def handle_xblock(request, usage_key_string=None):
                     return JsonResponse(ancestor_info)
                 # TODO: pass fields to get_block_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
-                    response = get_block_info(get_xblock(usage_key, request.user))
+                    data = request.data
+                    if ("customReadToken" in data["fields"]):
+                        log.info("*** customReadToken detected ***")
+                        response = get_block_info(get_xblock(usage_key, request.user))
                 return JsonResponse(response)
             else:
                 return HttpResponse(status=406)
@@ -267,6 +270,7 @@ def handle_xblock(request, usage_key_string=None):
 
 def modify_xblock(usage_key, request):
     request_data = request.json
+    print(f'In modify_xblock with data = {request_data.get("data")}, fields = {request_data.get("fields")}')
     return _save_xblock(
         request.user,
         get_xblock(usage_key, request.user),
