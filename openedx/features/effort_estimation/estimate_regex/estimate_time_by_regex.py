@@ -90,7 +90,7 @@ def estimate_time_by_regex(text):
 					time_by_regex += float(regex_result[-1])
 				except ValueError :
 					time_by_regex = None
-		elif 'gio' in line_text:
+		elif 'gio' in line_text and time_by_regex is None:
 			regex_result = re.findall(TIME_HOUR_REGEX, line_text)
 			if len(regex_result) == 1:
 				time_by_regex = float(regex_result[-1]) * 60
@@ -100,7 +100,7 @@ def estimate_time_by_regex(text):
 					time_by_regex += float(regex_result[-1])
 				except ValueError :
 					time_by_regex = None	
-		elif 'phut' in line_text:
+		elif 'phut' in line_text and time_by_regex is None:
 			regex_result = re.findall(TIME_MINUTE_REGEX, line_text)
 			if len(regex_result) == 1:
 				time_by_regex = float(regex_result[-1])
