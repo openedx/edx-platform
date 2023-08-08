@@ -859,3 +859,35 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
     process_question_responses(likert_questions, 'outros', 'end_unit_location')
     process_question_responses(nuance_interrogation_questions, 'nuance_interrogation', 'start_unit_location')
     return response
+
+
+def skill_reflection_individual_response(skills, likert_questions, nuance_interrogation_questions, user_id):
+    """
+    This is to prepare a response for skill reflection combined view
+    :param skills:
+    :param likert_questions:
+    :param nuance_interrogation_questions:
+    :return: {}
+    """
+    response = {
+        'skills': skills,
+        'intros': [],
+        'outros': [],
+        'nuance_interrogation': [],
+    }
+
+    def process_question_responses(questions, response_key, location_key):
+        for question in questions:
+            skill = question.skill.name
+            submission = question.submissions.filter(
+                user_id=user_id, problem_location=getattr(question, location_key),
+            ).first()
+            if submission:
+                question_response = submission.question_response
+                response_text = question_response['student_response']['response_text']
+                response[response_key].append({'skill': skill, 'response_text': response_text})
+
+    process_question_responses(likert_questions, 'intros', 'start_unit_location')
+    process_question_responses(likert_questions, 'outros', 'end_unit_location')
+    process_question_responses(nuance_interrogation_questions, 'nuance_interrogation', 'start_unit_location')
+    return response

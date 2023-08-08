@@ -38,6 +38,7 @@ from openedx.features.genplus_features.genplus_assessments.utils import (
     get_user_assessment_result,
     StudentResponse,
     skill_reflection_response,
+    skill_reflection_individual_response,
 )
 
 logger = logging.getLogger(__name__)
@@ -515,13 +516,19 @@ class SaveRatingResponseApiView(views.APIView):
         return Response({'status': 'fail', 'error': 'POST request failed', 'message': 'POST request failed with status code'}, status=400)
 
 
-class SkillReflectionApiView(views.APIView):
+class ProgramFilterMixin(views.APIView):
     def get_program_queryset(self):
+        program_id = self.request.GET.get('program_id')
+        program_ids = [program_id]
         qs = Program.get_active_programs()
-        program_ids = ProgramAccessRole.objects.filter(user=self.request.user).values_list('program',
-                                                                                           flat=True).distinct()
+        if program_id is None:
+            program_ids = ProgramAccessRole.objects.filter(user=self.request.user).values_list('program',
+                                                                                               flat=True).distinct()
         qs = qs.filter(id__in=program_ids)
         return qs
+
+
+class SkillReflectionApiView(ProgramFilterMixin):
 
     def get(self, request, **kwargs):
         skills = self.get_program_queryset().values_list('units__skill__name', flat=True).distinct().all()
@@ -540,6 +547,31 @@ class SkillReflectionApiView(views.APIView):
             skills,
             likert_questions,
             nuance_interogation_questions,
+        )
+
+        return Response(response)
+
+
+class SkillReflectionIndividualApiView(ProgramFilterMixin):
+    def get(self, request, **kwargs):
+        user_id = kwargs['user_id']
+        skills = self.get_program_queryset().values_list('units__skill__name', flat=True).distinct().all()
+        courses = self.get_program_queryset().values_list('units__course', flat=True).all()
+        likert_questions = SkillAssessmentQuestion.objects.filter(
+            start_unit__in=courses,
+            problem_type=SkillReflectionQuestionType.LIKERT.value,
+        ).all()
+
+        nuance_interogation_questions = SkillAssessmentQuestion.objects.filter(
+            start_unit__in=courses,
+            problem_type=SkillReflectionQuestionType.NUANCE_INTERROGATION.value,
+        ).all()
+
+        response = skill_reflection_individual_response(
+            skills,
+            likert_questions,
+            nuance_interogation_questions,
+            user_id
         )
 
         return Response(response)

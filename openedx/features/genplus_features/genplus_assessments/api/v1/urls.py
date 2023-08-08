@@ -5,7 +5,7 @@ from django.conf.urls import url
 
 from .views import (
     StudentAnswersViewSet, ClassFilterApiView, SkillAssessmentViewSet, SkillAssessmentAdminViewSet,
-    SaveRatingResponseApiView, SkillReflectionApiView
+    SaveRatingResponseApiView, SkillReflectionApiView, SkillReflectionIndividualApiView
 )
 
 # TODO: remove this ClassFilterApiView endpoint
@@ -26,4 +26,5 @@ urlpatterns = [
         }), name='skills-assessment-question-mapping'),
     url(r'^save-rating-response/$', SaveRatingResponseApiView.as_view()),
     url(r'skill-reflection/$', SkillReflectionApiView.as_view()),
+    url(r'skill-reflection-individual/(?P<user_id>\d+)/$', SkillReflectionIndividualApiView.as_view()),
 ]
