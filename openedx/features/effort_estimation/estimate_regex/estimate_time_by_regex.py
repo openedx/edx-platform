@@ -104,6 +104,11 @@ def estimate_time_by_regex(text):
 	if time_by_regex is not None:
 		if 'gio' in last_line or 'phut' in last_line:
 			time_by_regex = math.ceil(time_by_regex / 5) * 5
-	
+	else :
+		for line in lines :
+			line_text = no_accent_vietnamese(line.lower())
+			regex_result = re.findall(NUMBER_REGEX, line_text)
+			if 'thoi gian lam bai du kien' in line_text :
+				time_by_regex = float(regex_result[-1])
 
 	return time_by_regex

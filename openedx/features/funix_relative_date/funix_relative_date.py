@@ -28,7 +28,7 @@ class FunixRelativeDateLibary():
 		if len(date_blocks) == 0:
 			return []
 		# Add start date
-		start_date = date_blocks.pop(0)
+		start_date = date_blocks[0]
 		output = [
 			FunixCourseStartDate(course=course, user=user, date=self._date_to_datetime(start_date.date)),
 			TodaysDate(course=course, user=user)

@@ -977,11 +977,39 @@ def get_course_granded_lesson(course_key, user, include_access=False):
             due = block_data.get_xblock_field(subsection_key, 'due', None)
             graded = block_data.get_xblock_field(subsection_key, 'graded', False)
             effort_time = block_data.get_xblock_field(subsection_key, 'effort_time', -1)
+            title = block_data.get_xblock_field(subsection_key, 'display_name', _('Assignment'))
+            if 'Assignment' in title and effort_time != -1 :
+                first_component_block_id = get_first_component_of_block(subsection_key, block_data)
+                contains_gated_content = include_access and block_data.get_xblock_field(
+                    subsection_key, 'contains_gated_content', False)
+                
+
+                assignment_type = 'Assignment'
+                complete_date = block_data.get_xblock_field(subsection_key, BlockCompletionTransformer.COMPLETE_TIME, None)
+
+                url = None
+                start = block_data.get_xblock_field(subsection_key, 'start')
+                assignment_released = not start or start < now
+                if assignment_released:
+                    # url = reverse('jump_to', args=[course_key, subsection_key])
+                    complete = block_data.get_xblock_field(subsection_key, 'complete', False)
+                    # complete = is_block_structure_complete_for_assignments(block_data, subsection_key)
+                else:
+                    complete = False
+
+                # past_due = not complete and due < now
+                past_due = False
+                assignments.append(_Funix_Assignment(
+                    subsection_key, title, url, due, contains_gated_content,
+                    complete, past_due, assignment_type, None, first_component_block_id, complete_date, effort_time
+                ))
+
+            
             if graded and effort_time != -1:
                 first_component_block_id = get_first_component_of_block(subsection_key, block_data)
                 contains_gated_content = include_access and block_data.get_xblock_field(
                     subsection_key, 'contains_gated_content', False)
-                title = block_data.get_xblock_field(subsection_key, 'display_name', _('Assignment'))
+                
 
                 assignment_type = block_data.get_xblock_field(subsection_key, 'format', None)
                 complete_date = block_data.get_xblock_field(subsection_key, BlockCompletionTransformer.COMPLETE_TIME, None)
