@@ -279,8 +279,8 @@ function(
                 if (data.content.status === "expired") {
                     // This has expired and can no longer be pasted.
                     this.$(".paste-component").hide();
-                } else if (data.content.block_type_display === 'Unit') {
-                    // This is suitable for pasting into a unit.
+                } else if (data.content.block_type === 'vertical') {
+                    // This is suitable for pasting as a unit.
                     const detailsPopupEl = this.$(".clipboard-details-popup")[0];
                     // Only Units should have the paste button initialized
                     if (detailsPopupEl !== undefined) {
