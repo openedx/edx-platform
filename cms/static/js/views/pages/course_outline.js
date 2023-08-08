@@ -66,6 +66,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         },
 
         renderPage: function() {
+            // eslint-disable-next-line no-shadow
             var setInitialExpandState = function(xblockInfo, expandedLocators) {
                 if (xblockInfo.isCourse() || xblockInfo.isChapter()) {
                     expandedLocators.add(xblockInfo.get('id'));

@@ -130,6 +130,7 @@ define(
             checkExtValidity: function(file) {
                 var fileExtension;
                 if (!file.name) {
+                    // eslint-disable-next-line no-void
                     return void 0;
                 }
 

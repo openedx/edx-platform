@@ -49,6 +49,7 @@
             }));
 
             submitButton = this.$el.find('.submit-file-button');
+            // eslint-disable-next-line no-unused-expressions, no-sequences
             resultNotification = this.$el.find('.result'),
 
             this.$el.find('#file-upload-form').fileupload({
@@ -102,6 +103,7 @@
                 if (jqXHR.responseText) {
                     try {
                         message = JSON.parse(jqXHR.responseText).error;
+                    // eslint-disable-next-line no-empty
                     } catch (err) {
                     }
                 }

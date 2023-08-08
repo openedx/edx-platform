@@ -1063,8 +1063,6 @@
     "Success! \"{displayName}\" has been moved.": "Ondo! \"{displayName}\" mugitu da.",
     "Successfully enrolled and sent email to the following users:": "Egoki matrikulatu dira eta e-posta bidali zaie ondorengo erabiltzaileei: ",
     "Successfully enrolled the following users:": "Egoki matrikulatu dira ondorengo erabiltzaileak:",
-    "Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:": "Egoki bidali zaizkie matrikulazio e-postak ondorengo erabiltzaileei. Aukera izango dute matrikulatzeko identifikatzen direnean: ",
-    "Successfully sent enrollment emails to the following users. They will be enrolled once they register:": "Egoki bidali zaizkie matrikulazio e-postak ondorengo erabiltzaileei. Matrikulatu egingo ditugu identifikatzen direnean: ",
     "Successfully unlinked.": "Esteka egoki kenduta.",
     "Superscript": "Goi-indizea",
     "Support education research by providing additional information": "Lagundu hezkuntza-ikerketari informazio gehigarria emanez",

@@ -1222,8 +1222,6 @@
     "Successfully rescored problem for user {user}": "Berhasil menilai ulang permasalahan untuk pengguna {user}",
     "Successfully rescored problem to improve score for user {user}": "Berhasil menilai ulang permasalahan untuk memperbaiki nilai pengguna {user}",
     "Successfully reset the attempts for user {user}": "Berhasil menyetel ulang percobaan untuk pengguna {user}",
-    "Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:": "Berhasil mengirimkan email pendaftaran ke pengguna ini. Sehinga boleh bergabung ketika sudah terdaftar:",
-    "Successfully sent enrollment emails to the following users. They will be enrolled once they register:": "Berhasil mengirimkan email pendaftaran ke pengguna ini. Sehinga akan terdaftar ketika sudah terdaftar:",
     "Successfully started task to rescore problem '<%- problem_id %>' for all students. Click the 'Show Task Status' button to see the status of the task.": "Telah berhasil memulai tugas untuk menilai ulang permasalahan '<%- problem_id %>' untuk semua siswa. Klik tombol 'Tampilkan Status Tugas' untuk melihat status tugas.",
     "Successfully started task to reset attempts for problem '<%- problem_id %>'. Click the 'Show Task Status' button to see the status of the task.": "Berhasil memulai aktivitas penyetelan ulang percobaan untuk permasalahan '<%- problem_id %>'. Klik tombol 'Tampilkan Status Tugas' untuk melihat status tugas.",
     "Successfully unlinked.": "Berhasil membatalkan tautan.",
