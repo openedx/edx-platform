@@ -1345,6 +1345,25 @@ def get_course_grading(course_key):
     return grading_context
 
 
+def get_course_rerun_context(course_key, course_block, user):
+    """
+    Utils is used to get context of course rerun.
+    It is used for both DRF and django views.
+    """
+
+    from cms.djangoapps.contentstore.views.course import _get_course_creator_status
+
+    course_rerun_context = {
+        'source_course_key': course_key,
+        'display_name': course_block.display_name,
+        'user': user,
+        'course_creator_status': _get_course_creator_status(user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+    }
+
+    return course_rerun_context
+
+
 class StudioPermissionsService:
     """
     Service that can provide information about a user's permissions.

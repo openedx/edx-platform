@@ -104,6 +104,7 @@ from ..utils import (
     get_lms_link_for_item,
     get_proctored_exam_settings_url,
     get_course_outline_url,
+    get_course_rerun_context,
     get_studio_home_url,
     get_updates_url,
     get_advanced_settings_url,
@@ -335,13 +336,8 @@ def course_rerun_handler(request, course_key_string):
     with modulestore().bulk_operations(course_key):
         course_block = get_course_and_check_access(course_key, request.user, depth=3)
         if request.method == 'GET':
-            return render_to_response('course-create-rerun.html', {
-                'source_course_key': course_key,
-                'display_name': course_block.display_name,
-                'user': request.user,
-                'course_creator_status': _get_course_creator_status(request.user),
-                'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
-            })
+            course_rerun_context = get_course_rerun_context(course_key, course_block, request.user)
+            return render_to_response('course-create-rerun.html', course_rerun_context)
 
 
 @login_required

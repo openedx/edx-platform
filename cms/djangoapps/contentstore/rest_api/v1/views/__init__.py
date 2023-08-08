@@ -2,6 +2,7 @@
 Views for v1 contentstore API.
 """
 from .course_details import CourseDetailsView
+from .course_rerun import CourseRerunView
 from .grading import CourseGradingView
 from .proctoring import ProctoredExamSettingsView, ProctoringErrorsView
 from .settings import CourseSettingsView
