@@ -236,9 +236,7 @@ class BlockStructureModel(TimeStampedModel):
 
         if not created:
             cls._prune_files(data_usage_key)
-            
         cls._log(bs_model, operation, serialized_data)
-        
         return bs_model, created
 
     def __str__(self):
@@ -268,8 +266,7 @@ class BlockStructureModel(TimeStampedModel):
                 len(all_files_by_date),
                 data_usage_key,
                 num_to_keep,
-            )
-            
+            )            
         except Exception:  # pylint: disable=broad-except
             log.exception('BlockStructure: Exception when deleting old files; data_usage_key: %s.', data_usage_key)
 
