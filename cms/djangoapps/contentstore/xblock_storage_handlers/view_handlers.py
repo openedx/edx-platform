@@ -179,11 +179,13 @@ def handle_xblock(request, usage_key_string=None):
                     )
                     return JsonResponse(ancestor_info)
                 # TODO: pass fields to get_block_info and only return those
+                include_children_predicate=False
                 with modulestore().bulk_operations(usage_key.course_key):
                     data = request.data
                     if ("customReadToken" in data["fields"]):
                         log.info("*** customReadToken detected ***")
-                        response = get_block_info(get_xblock(usage_key, request.user))
+                        include_children_predicate=True
+                    response = get_block_info(get_xblock(usage_key, request.user), include_children_predicate)
                 return JsonResponse(response)
             else:
                 return HttpResponse(status=406)
@@ -981,6 +983,7 @@ def get_block_info(
     rewrite_static_links=True,
     include_ancestor_info=False,
     include_publishing_info=False,
+    include_children_predicate=False,
 ):
     """
     metadata, data, id representation of a leaf block fetcher.
@@ -1004,6 +1007,7 @@ def get_block_info(
             data=data,
             metadata=own_metadata(xblock),
             include_ancestor_info=include_ancestor_info,
+            include_children_predicate=include_children_predicate
         )
         if include_publishing_info:
             add_container_page_publishing_info(xblock, xblock_info)
@@ -1588,6 +1592,8 @@ def _create_xblock_child_info(
             ),
         }
     if xblock.has_children and include_children_predicate(xblock):
+        child_info["parent descriptor"] = (xblock.parent.block_type, xblock.parent.block_id)
+        child_info["child descriptors"] = [(child.block_type, child.block_id) for child in xblock.children]
         child_info["children"] = [
             create_xblock_info(
                 child,
