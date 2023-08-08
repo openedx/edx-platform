@@ -194,7 +194,7 @@ def install_node_prereqs():
         print(NO_PREREQ_MESSAGE)
         return
 
-    prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
+    prereq_cache("Node prereqs", ["package.json", "package-lock.json"], node_prereqs_installation)
 
 
 # To add a package to the uninstall list, just add it to this list! No need
