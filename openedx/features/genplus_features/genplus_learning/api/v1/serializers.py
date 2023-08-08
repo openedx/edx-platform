@@ -113,6 +113,7 @@ class ProgramSerializer(serializers.ModelSerializer):
     class Meta:
         model = Program
         fields = (
+            'id',
             'program_name',
             'year_group_name',
             'intro_unit',
