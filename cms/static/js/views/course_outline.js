@@ -216,9 +216,11 @@ function(
             ViewUtils.runOperationShowingMessage(gettext('Copying'), () => {
                 return $.postJSON(
                     clipboardEndpoint,
-                    { usage_key: this.model.get('id') },
+                    { usage_key: this.model.get('id') }
                 ).then((data) => {
-                    const status = data.content?.status;
+                    // const status = data.content?.status;
+                    const status = data.content && data.content.status;
+                    // ^ platform's old require.js/esprima breaks on newer syntax in some JS files but not all.
                     if (status === "ready") {
                         // The Unit has been copied and is ready to use.
                         this.refreshPasteButton(data); // Update our UI
@@ -230,20 +232,21 @@ function(
                         const deferred = $.Deferred();
                         const checkStatus = () => {
                             $.getJSON(clipboardEndpoint, (pollData) => {
-                                const newStatus = pollData.content?.status;
+                                // const newStatus = pollData.content?.status;
+                                const newStatus = pollData.content && pollData.content.status;
                                 if (newStatus === "ready") {
                                     this.refreshPasteButton(data);
                                     this.clipboardBroadcastChannel.postMessage(pollData);
                                     deferred.resolve(pollData);
                                 } else if (newStatus === "loading") {
-                                    setTimeout(checkStatus, 1_000);
+                                    setTimeout(checkStatus, 1000);
                                 } else {
                                     deferred.reject();
                                     throw new Error(`Unexpected clipboard status "${newStatus}" in successful API response.`);
                                 }
                             })
                         }
-                        setTimeout(checkStatus, 1_000);
+                        setTimeout(checkStatus, 1000);
                         return deferred;
                     } else {
                         throw new Error(`Unexpected clipboard status "${status}" in successful API response.`);
