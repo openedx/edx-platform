@@ -510,7 +510,7 @@ edx-opaque-keys[django]==2.3.0
     #   lti-consumer-xblock
     #   openedx-events
     #   ora2
-edx-organizations==6.12.0
+edx-organizations==6.12.1
     # via -r requirements/edx/kernel.in
 edx-proctoring==4.16.0
     # via
