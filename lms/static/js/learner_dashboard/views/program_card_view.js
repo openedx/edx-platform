@@ -27,14 +27,18 @@ class ProgramCardView extends Backbone.View {
         super(Object.assign({}, defaults, options));
     }
 
-    initialize(data) {
+    initialize({ context }) {
         this.tpl = HtmlUtils.template(programCardTpl);
-        this.progressCollection = data.context.progressCollection;
+        this.progressCollection = context.progressCollection;
         if (this.progressCollection) {
             this.progressModel = this.progressCollection.findWhere({
                 uuid: this.model.get('uuid'),
             });
         }
+        this.isSubscribed = (
+            context.isUserB2CSubscriptionsEnabled &&
+            this.model.get('subscriptionIndex') > -1
+        ) ?? false;
         this.render();
     }
 
@@ -44,7 +48,10 @@ class ProgramCardView extends Backbone.View {
         const data = $.extend(
             this.model.toJSON(),
             this.getProgramProgress(),
-            { orgList: orgList.join(' ') },
+            {
+                orgList: orgList.join(' '),
+                isSubscribed: this.isSubscribed,
+            },
         );
 
         HtmlUtils.setHtml(this.$el, this.tpl(data));

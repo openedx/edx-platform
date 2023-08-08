@@ -803,7 +803,7 @@ such that the value can be defined later than this assignment (file load order).
             }
             if (allowed.length && emailStudents) {
                 // Translators: A list of users appears after this sentence;
-                renderList(gettext('Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:'), (function() { // eslint-disable-line max-len
+                renderList(gettext('Email cannot be sent to the following users via batch enrollment. They will be allowed to enroll once they register:'), (function() { // eslint-disable-line max-len
                     // eslint-disable-next-line no-var
                     var k, len2, results;
                     results = [];
@@ -829,7 +829,7 @@ such that the value can be defined later than this assignment (file load order).
             }
             if (autoenrolled.length && emailStudents) {
                 // Translators: A list of users appears after this sentence;
-                renderList(gettext('Successfully sent enrollment emails to the following users. They will be enrolled once they register:'), (function() { // eslint-disable-line max-len
+                renderList(gettext('Email cannot be sent to the following users via batch enrollment. They will be enrolled once they register:'), (function() { // eslint-disable-line max-len
                     // eslint-disable-next-line no-var
                     var k, len2, results;
                     results = [];

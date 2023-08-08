@@ -22,6 +22,9 @@
                 }
 
                 _.bindAll(this, 'clickHandler');
+                _.bindAll(this, 'copyHandler');
+                _.bindAll(this, 'hideHandler');
+                _.bindAll(this, 'showHandler');
 
                 this.container = element;
 
@@ -37,10 +40,18 @@
                 // Initializes the module.
                 initialize: function() {
                     this.el = this.container.find('.wrapper-social-share');
-                    this.el.on('click', '.btn-link', this.clickHandler);
                     this.baseVideoUrl = this.el.data('url');
                     this.course_id = this.container.data('courseId');
                     this.block_id = this.container.data('blockId');
+                    this.el.on('click', '.social-share-link', this.clickHandler);
+
+                    this.closeBtn = this.el.find('.close-btn');
+                    this.toggleBtn = this.el.find('.social-toggle-btn');
+                    this.copyBtn = this.el.find('.public-video-copy-btn');
+                    this.shareContainer = this.el.find('.container-social-share');
+                    this.closeBtn.on('click', this.hideHandler);
+                    this.toggleBtn.on('click', this.showHandler);
+                    this.copyBtn.on('click', this.copyHandler);
                 },
 
                 // Fire an analytics event on share button click.
@@ -50,6 +61,23 @@
                     // eslint-disable-next-line no-var
                     var source = $(event.currentTarget).data('source');
                     self.sendAnalyticsEvent(source);
+                },
+
+                // eslint-disable-next-line no-unused-vars
+                hideHandler: function(event) {
+                    this.shareContainer.hide();
+                    this.toggleBtn.show();
+                },
+
+                // eslint-disable-next-line no-unused-vars
+                showHandler: function(event) {
+                    this.shareContainer.show();
+                    this.toggleBtn.hide();
+                },
+
+                // eslint-disable-next-line no-unused-vars
+                copyHandler: function(event) {
+                    navigator.clipboard.writeText(this.copyBtn.data('url'));
                 },
 
                 // Send an analytics event for share button tracking.

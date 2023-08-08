@@ -40,7 +40,11 @@ from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion.toggles import ENABLE_DISCUSSIONS_MFE, ENABLE_LEARNERS_TAB_IN_DISCUSSIONS_MFE
 from lms.djangoapps.discussion.toggles_utils import reported_content_email_notification_enabled
 from lms.djangoapps.discussion.views import is_privileged_user
-from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration, DiscussionTopicLink, Provider
+from openedx.core.djangoapps.discussions.models import (
+    DiscussionsConfiguration,
+    DiscussionTopicLink,
+    Provider,
+)
 from openedx.core.djangoapps.discussions.utils import get_accessible_discussion_xblocks
 from openedx.core.djangoapps.django_comment_common import comment_client
 from openedx.core.djangoapps.django_comment_common.comment_client.comment import Comment
@@ -123,7 +127,7 @@ from .utils import (
     discussion_open_for_user,
     get_usernames_for_course,
     get_usernames_from_search_string,
-    set_attribute
+    set_attribute, send_response_notifications, is_posting_allowed
 )
 
 
@@ -324,9 +328,14 @@ def get_course(request, course_key):
     course_config = DiscussionsConfiguration.get(course_key)
     EDIT_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_EDIT_REASON_CODES", {})
     CLOSE_REASON_CODES = getattr(settings, "DISCUSSION_MODERATION_CLOSE_REASON_CODES", {})
+    is_posting_enabled = is_posting_allowed(
+        course_config.posting_restrictions,
+        course.get_discussion_blackout_datetimes()
+    )
 
     return {
         "id": str(course_key),
+        "is_posting_enabled": is_posting_enabled,
         "blackouts": [
             {
                 "start": _format_datetime(blackout["start"]),
@@ -1503,7 +1512,8 @@ def create_comment(request, comment_data):
 
     track_comment_created_event(request, course, cc_comment, cc_thread["commentable_id"], followed=False,
                                 from_mfe_sidebar=from_mfe_sidebar)
-
+    send_response_notifications(thread=cc_thread, course=course, creator=request.user,
+                                parent_id=comment_data.get("parent_id"))
     return api_comment
 
 

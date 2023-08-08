@@ -190,6 +190,7 @@ class GetCourseTest(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase)
     def test_basic(self):
         assert get_course(self.request, self.course.id) == {
             'id': str(self.course.id),
+            'is_posting_enabled': True,
             'blackouts': [],
             'thread_list_url': 'http://testserver/api/discussion/v1/threads/?course_id=course-v1%3Ax%2By%2Bz',
             'following_thread_list_url':
@@ -2242,13 +2243,16 @@ class CreateCommentTest(
             "/api/v1/threads/test_thread/comments"
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # lint-amnesty, pylint: disable=no-member
-        assert parsed_body(httpretty.last_request()) == {
+
+        data = httpretty.latest_requests()
+        assert parsed_body(data[len(data) - 2]) == {
             'course_id': [str(self.course.id)],
             'body': ['Test body'],
             'user_id': [str(self.user.id)],
             'anonymous': ['False'],
             'anonymous_to_peers': ['False'],
         }
+
         expected_event_name = (
             "edx.forum.comment.created" if parent_id else
             "edx.forum.response.created"
@@ -2339,7 +2343,8 @@ class CreateCommentTest(
             "/api/v1/threads/test_thread/comments"
         )
         assert urlparse(httpretty.last_request().path).path == expected_url  # pylint: disable=no-member
-        assert parsed_body(httpretty.last_request()) == {
+        data = httpretty.latest_requests()
+        assert parsed_body(data[len(data) - 2]) == {
             "course_id": [str(self.course.id)],
             "body": ["Test body"],
             "user_id": [str(self.user.id)],

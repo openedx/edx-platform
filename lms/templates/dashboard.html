@@ -4,7 +4,6 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
 import pytz
-import six
 from datetime import datetime, timedelta
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -220,7 +219,7 @@ from common.djangoapps.student.models import CourseEnrollment
                 is_paid_course = True if entitlement else (session_id in enrolled_courses_either_paid)
                 is_course_voucher_refundable = (session_id in enrolled_courses_voucher_refundable)
                 course_requirements = courses_requirements_not_met.get(session_id)
-                related_programs = inverted_programs.get(six.text_type(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
+                related_programs = inverted_programs.get(str(entitlement.course_uuid if is_unfulfilled_entitlement else session_id))
                 show_consent_link = (session_id in consent_required_courses)
                 resume_button_url = resume_button_urls[dashboard_index]
               %>

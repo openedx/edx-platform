@@ -18,13 +18,12 @@ import json
 import logging
 from collections import OrderedDict, defaultdict
 from operator import itemgetter
-from urllib.parse import urljoin
 
 from django.conf import settings
-from django.urls import reverse
 from edx_django_utils.cache import RequestCache
 from lxml import etree
 from opaque_keys.edx.locator import AssetLocator
+from organizations.api import get_course_organization
 from web_fragments.fragment import Fragment
 from xblock.completable import XBlockCompletionMode
 from xblock.core import XBlock
@@ -49,11 +48,11 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.video_block import manage_video_subtitles_save
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
-    HTMLSnippet, ResourceTemplates, shim_xmodule_js,
+    ResourceTemplates, shim_xmodule_js,
     XModuleMixin, XModuleToXBlockMixin,
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
@@ -122,7 +121,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 @XBlock.needs('mako', 'user')
 class VideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
-        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin, HTMLSnippet,
+        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
         ResourceTemplates, XModuleMixin, LicenseMixin):
     """
     XML source example:
@@ -243,7 +242,8 @@ class VideoBlock(
         Return the student view.
         """
         fragment = Fragment(self.get_html())
-        add_webpack_to_fragment(fragment, 'VideoBlockPreview')
+        add_sass_to_fragment(fragment, 'VideoBlockDisplay.scss')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
         return fragment
 
@@ -260,7 +260,8 @@ class VideoBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'VideoBlockStudio')
+        add_sass_to_fragment(fragment, 'VideoBlockEditor.scss')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockEditor')
         shim_xmodule_js(fragment, 'TabsEditingDescriptor')
         return fragment
 
@@ -275,11 +276,15 @@ class VideoBlock(
             return self.student_view(context)
 
         fragment = Fragment(self.get_html(view=PUBLIC_VIEW, context=context))
-        add_webpack_to_fragment(fragment, 'VideoBlockPreview')
+        add_sass_to_fragment(fragment, 'VideoBlockDisplay.scss')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
         return fragment
 
     def get_html(self, view=STUDENT_VIEW, context=None):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements
+        """
+        Return html for a given view of this block.
+        """
         context = context or {}
         track_status = (self.download_track and self.track)
         transcript_download_format = self.transcript_download_format if not track_status else None
@@ -482,16 +487,16 @@ class VideoBlock(
             'transcript_download_format': transcript_download_format,
             'transcript_download_formats_list': self.fields['transcript_download_format'].values,  # lint-amnesty, pylint: disable=unsubscriptable-object
         }
+
         if self.is_public_sharing_enabled():
             public_video_url = self.get_public_video_url()
             template_context['public_sharing_enabled'] = True
             template_context['public_video_url'] = public_video_url
-            template_context['sharing_sites_info'] = sharing_sites_info_for_video(public_video_url)
-
-        # Public video previewing / social media sharing
-        if self.is_public_sharing_enabled():
-            template_context['public_sharing_enabled'] = True
-            template_context['public_video_url'] = self.get_public_video_url()
+            organization = get_course_organization(self.course_id)
+            template_context['sharing_sites_info'] = sharing_sites_info_for_video(
+                public_video_url,
+                organization=organization
+            )
 
         return self.runtime.service(self, 'mako').render_template('video.html', template_context)
 
@@ -512,11 +517,6 @@ class VideoBlock(
         """
         Is public sharing enabled for this video?
         """
-
-        # Sharing is DISABLED from studio
-        is_studio = getattr(self.runtime, "is_author_mode", False)
-        if is_studio:
-            return False
 
         # Video share feature must be enabled for sharing settings to take effect
         feature_enabled = PUBLIC_VIDEO_SHARE.is_enabled(self.location.course_key)
@@ -543,15 +543,7 @@ class VideoBlock(
         """
         Returns the public video url
         """
-        return urljoin(
-            settings.LMS_ROOT_URL,
-            reverse(
-                'render_public_video_xblock',
-                kwargs={
-                    'usage_key_string': str(self.location)
-                }
-            )
-        )
+        return fr'{settings.LMS_ROOT_URL}/videos/{str(self.location)}'
 
     def validate(self):
         """
@@ -674,7 +666,7 @@ class VideoBlock(
         # be shared with leaners. This is not possible with default rendering logic in backbonjs code, that is why
         # we are setting a new type and then do a custom rendering in backbonejs code to render the desired UI.
         editable_fields['public_access']['type'] = 'PublicAccess'
-        editable_fields['public_access']['url'] = fr'{settings.LMS_ROOT_URL}/videos/{str(self.location)}'
+        editable_fields['public_access']['url'] = self.get_public_video_url()
 
         # construct transcripts info and also find if `en` subs exist
         transcripts_info = self.get_transcripts_info()

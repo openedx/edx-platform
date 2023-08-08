@@ -5,6 +5,8 @@ import/named, import/no-useless-path-segments
 */
 /* globals setFixtures */
 
+import Backbone from 'backbone';
+
 import CollectionListView from '../views/collection_list_view';
 import ProgramCardView from '../views/program_card_view';
 import ProgramCollection from '../collections/program_collection';
@@ -14,6 +16,7 @@ describe('Collection List View', () => {
     let view = null;
     let programCollection;
     let progressCollection;
+    let subscriptionCollection;
     const context = {
         programsData: [
             {
@@ -103,14 +106,21 @@ describe('Collection List View', () => {
                 not_started: 3,
             },
         ],
+        programsSubscriptionData: [{
+            resource_id: 'a87e5eac-3c93-45a1-a8e1-4c79ca8401c8',
+            subscription_state: 'active',
+        }],
+        isUserB2CSubscriptionsEnabled: false,
     };
 
     beforeEach(() => {
         setFixtures('<div class="program-cards-container"></div>');
         programCollection = new ProgramCollection(context.programsData);
         progressCollection = new ProgressCollection();
+        subscriptionCollection = new Backbone.Collection(context.programsSubscriptionData);
         progressCollection.set(context.userProgress);
         context.progressCollection = progressCollection;
+        context.subscriptionCollection = subscriptionCollection;
 
         view = new CollectionListView({
             el: '.program-cards-container',

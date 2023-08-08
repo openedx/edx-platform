@@ -1,18 +1,19 @@
 <%page expression_filter="h"/>
 <%!
 from django.utils.translation import gettext as _
-from cms.djangoapps.contentstore.views.helpers import xblock_studio_url
+from cms.djangoapps.contentstore.helpers import xblock_studio_url
 from cms.djangoapps.contentstore.utils import is_visible_to_specific_partition_groups, get_editor_page_base_url, determine_label
 from lms.lib.utils import is_unit
 from openedx.core.djangolib.js_utils import (
     dump_js_escaped_json, js_escaped_string
 )
-from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_problem_editor, use_new_video_editor
+from cms.djangoapps.contentstore.toggles import use_new_text_editor, use_new_problem_editor, use_new_video_editor, use_video_gallery_flow
 %>
 <%
 use_new_editor_text = use_new_text_editor()
 use_new_editor_video = use_new_video_editor()
 use_new_editor_problem = use_new_problem_editor()
+use_new_video_gallery_flow = use_video_gallery_flow()
 xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
@@ -63,6 +64,7 @@ block_is_unit = is_unit(xblock)
     use-new-editor-text = ${use_new_editor_text}
     use-new-editor-video = ${use_new_editor_video}
     use-new-editor-problem = ${use_new_editor_problem}
+    use-video-gallery-flow = ${use_new_video_gallery_flow}
     authoring_MFE_base_url = ${get_editor_page_base_url(xblock.location.course_key)}
     data-block-type = ${xblock.scope_ids.block_type}
     data-usage-id = ${xblock.scope_ids.usage_id}
@@ -145,7 +147,7 @@ block_is_unit = is_unit(xblock)
                                       <ul>
                                         % if not show_inline:
                                             <li class="nav-item">
-                                                <a class="copy-button" href="#" role="button">${_("Copy")}</a>
+                                                <a class="copy-button" href="#" role="button">${_("Copy to Clipboard")}</a>
                                             </li>
                                             % if can_add:
                                                 <li class="nav-item">

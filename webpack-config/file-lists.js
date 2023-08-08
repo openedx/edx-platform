@@ -11,9 +11,7 @@ module.exports = {
         path.resolve(__dirname, '../common/static/common/js/components/views/paging_footer.js'),
         path.resolve(__dirname, '../cms/static/js/views/paging.js'),
         path.resolve(__dirname, '../common/static/common/js/components/utils/view_utils.js'),
-        /descriptors\/js/,
-        /modules\/js/,
-        /xmodule\/js\/src\//,
+        /xmodule\/js\/src/,
         path.resolve(__dirname, '../openedx/features/course_bookmarks/static/course_bookmarks/js/views/bookmark_button.js')
     ],
 

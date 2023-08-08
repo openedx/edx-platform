@@ -1,8 +1,3 @@
-/*
-eslint-disable import/no-extraneous-dependencies, import/no-duplicates, import/order, import/no-self-import,
-import/no-cycle, import/no-relative-packages, import/no-named-as-default, import/no-named-as-default-member,
-import/named, import/no-useless-path-segments
-*/
 /* globals setFixtures */
 
 import Backbone from 'backbone';
@@ -30,7 +25,7 @@ describe('Program Progress View', () => {
         "url": "/certificates/bed3980e67ca40f0b31e309d9dfe9e7e", "type": "course", "title": "Introduction to the Treatment of Urban Sewage"
       }
     ],
-    urls: {"program_listing_url": "/dashboard/programs/", "commerce_api_url": "/api/commerce/v0/baskets/", "track_selection_url": "/course_modes/choose/", "program_record_url": "/foo/bar", "buy_subscription_url": "/subscriptions", "manage_subscription_url": "/orders", "subscriptions_learner_help_center_url": "/learner"},
+    urls: {"program_listing_url": "/dashboard/programs/", "commerce_api_url": "/api/commerce/v0/baskets/", "track_selection_url": "/course_modes/choose/", "program_record_url": "/foo/bar", "buy_subscription_url": "/subscriptions", "orders_and_subscriptions_url": "/orders", "subscriptions_learner_help_center_url": "/learner"},
     userPreferences: {"pref-lang": "en"}
     };
     /* eslint-enable */
@@ -117,7 +112,7 @@ describe('Program Progress View', () => {
         isSubscriptionEligible = false;
         subscriptionData = {
             trial_end: '1970-01-01T03:25:45Z',
-            next_payment_date: '1970-06-03T07:12:04Z',
+            current_period_end: '1970-06-03T07:12:04Z',
             price: '100.00',
             currency: 'USD',
             subscription_state: 'pre',
@@ -270,7 +265,7 @@ describe('Program Progress View', () => {
         testSubscriptionState(
             'inactive',
             'Inactive subscription',
-            'Restart your subscription for $100/month. Your payment history is still available',
+            'Restart your subscription for $100/month USD. Your payment history is still available',
         );
     });
 });

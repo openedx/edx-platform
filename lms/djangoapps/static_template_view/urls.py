@@ -9,12 +9,6 @@ from django.urls import path, re_path
 from lms.djangoapps.static_template_view import views
 
 urlpatterns = [
-    # Semi-static views (these need to be rendered and have the login bar, but don't change)
-    path('404', views.render, {'template': '404.html'}, name="404"),
-    # display error page templates, for testing purposes
-    path('404', views.render_404, name='static_template_view.views.render_404'),
-    path('500', views.render_500, name='static_template_view.views.render_500'),
-
     path('blog', views.render, {'template': 'blog.html'}, name="blog"),
     path('contact', views.render, {'template': 'contact.html'}, name="contact"),
     path('donate', views.render, {'template': 'donate.html'}, name="donate"),

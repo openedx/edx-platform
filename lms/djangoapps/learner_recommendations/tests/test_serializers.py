@@ -6,9 +6,16 @@ from django.test import TestCase
 
 from lms.djangoapps.learner_recommendations.serializers import (
     DashboardRecommendationsSerializer,
-    CrossProductRecommendationsSerializer
+    RecommendationsContextSerializer,
+    CrossProductRecommendationsSerializer,
+    CrossProductAndAmplitudeRecommendationsSerializer,
+    AmplitudeRecommendationsSerializer
 )
-from lms.djangoapps.learner_recommendations.tests.test_data import mock_course_data
+from lms.djangoapps.learner_recommendations.tests.test_data import (
+    mock_amplitude_and_cross_product_course_data,
+    mock_cross_product_course_data,
+    mock_amplitude_course_data
+)
 
 
 class TestDashboardRecommendationsSerializer(TestCase):
@@ -85,10 +92,49 @@ class TestDashboardRecommendationsSerializer(TestCase):
         )
 
 
-class TestCrossProductRecommendationsSerializer(TestCase):
-    """Tests for the Cross Product Recommendations Serializer"""
+class TestRecommendationsContextSerializer(TestCase):
+    """Tests for RecommendationsContextSerializer"""
 
-    def mock_recommended_courses(self, num_of_courses):
+    def test_successful_serialization(self):
+        """Test that context data serializes correctly"""
+
+        serialized_data = RecommendationsContextSerializer(
+            {
+                "countryCode": "US",
+            }
+        ).data
+
+        self.assertDictEqual(
+            serialized_data,
+            {
+                "countryCode": "US",
+            },
+        )
+
+    def test_empty_response_serialization(self):
+        """Test that an empty response serializes correctly"""
+
+        serialized_data = RecommendationsContextSerializer(
+            {
+                "countryCode": "",
+            }
+        ).data
+
+        self.assertDictEqual(
+            serialized_data,
+            {
+                "countryCode": "",
+            },
+        )
+
+
+class TestCrossProductRecommendationsSerializers(TestCase):
+    """
+    Tests for the CrossProductRecommendationsSerializer,
+    AmplitudeRecommendationsSerializer, and CrossProductAndAmplitudeRecommendations Serializer
+    """
+
+    def mock_recommended_courses(self, num_of_courses=2):
         """Course data mock"""
 
         recommended_courses = []
@@ -123,32 +169,96 @@ class TestCrossProductRecommendationsSerializer(TestCase):
                         "marketing_url": f"https://www.marketing_url{index}.com",
                         "availability": "Current",
                     },
+                    "active_course_run_key": f"course-v1:Test+2023_T{index}",
+                    "marketing_url": f"https://www.marketing_url{index}.com",
                     "location_restriction": None
                 },
             )
 
         return recommended_courses
 
-    def test_successful_serialization(self):
+    def test_successful_cross_product_recommendation_serialization(self):
+        """Test that course data serializes correctly for CrossProductRecommendationSerializer"""
         courses = self.mock_recommended_courses(num_of_courses=2)
 
         serialized_data = CrossProductRecommendationsSerializer({
-            "courses": courses
+            "courses": courses,
         }).data
 
         self.assertDictEqual(
             serialized_data,
-            mock_course_data
+            mock_cross_product_course_data
         )
 
-    def test_no_course_data_serialization(self):
+    def test_successful_amplitude_recommendations_serialization(self):
+        """Test the course data serializes correctly for AmplitudeRecommendationsSerializer"""
+        courses = self.mock_recommended_courses(num_of_courses=4)
+
+        serialized_data = AmplitudeRecommendationsSerializer({
+            "amplitudeCourses": courses
+        }).data
+
+        self.assertDictEqual(
+            serialized_data,
+            mock_amplitude_course_data
+        )
+
+    def test_successful_cross_product_and_amplitude_recommendations_serializer(self):
+        """Test that course data serializes correctly for CrossProductAndAmplitudeRecommendationSerializer"""
+
+        cross_product_courses = self.mock_recommended_courses(num_of_courses=2)
+        amplitude_courses = self.mock_recommended_courses(num_of_courses=4)
+
+        serialized_data = CrossProductAndAmplitudeRecommendationsSerializer({
+            "crossProductCourses": cross_product_courses,
+            "amplitudeCourses": amplitude_courses,
+        }).data
+
+        self.assertDictEqual(
+            serialized_data,
+            mock_amplitude_and_cross_product_course_data
+        )
+
+    def test_no_cross_product_course_serialization(self):
+        """Tests that empty course data for CrossProductRecommendationsSerializer serializes properly"""
+
         serialized_data = CrossProductRecommendationsSerializer({
-            "courses": []
+            "courses": [],
         }).data
 
         self.assertDictEqual(
             serialized_data,
             {
-                "courses": []
+                "courses": [],
+            },
+        )
+
+    def test_no_amplitude_courses_serialization(self):
+        """Tests that empty course data for AmplitudeRecommendationsSerializer serializes properly"""
+
+        serialized_data = AmplitudeRecommendationsSerializer({
+            "amplitudeCourses": [],
+        }).data
+
+        self.assertDictEqual(
+            serialized_data,
+            {
+                "amplitudeCourses": [],
+            },
+        )
+
+    def test_no_amplitude_and_cross_product_and_course_serialization(self):
+        """Tests that empty course data for CrossProductRecommendationsSerializer serializes properly"""
+
+        serialized_data = CrossProductAndAmplitudeRecommendationsSerializer({
+            "crossProductCourses": [],
+            "amplitudeCourses": []
+        }).data
+
+        self.assertDictEqual(
+            serialized_data,
+            {
+                "crossProductCourses": [],
+                "amplitudeCourses": []
             },
         )

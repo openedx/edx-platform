@@ -8,10 +8,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 // eslint-disable-next-line no-unused-vars
 import classNames from 'classnames';
+// eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member
 import CircleChart from './CircleChart';
 import CircleChartLegend from './CircleChartLegend';
 import GradeTable from './GradeTable';
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line import/no-named-as-default, import/no-named-as-default-member, no-unused-vars
 import DueDates from './DueDates';
 import Discussions from './Discussions';
 
