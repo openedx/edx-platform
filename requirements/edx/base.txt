@@ -758,7 +758,7 @@ openedx-django-pyfs==3.4.0
     # via xblock
 openedx-django-require==2.1.0
     # via -r requirements/edx/kernel.in
-openedx-django-wiki==2.0.0
+openedx-django-wiki==2.0.1
     # via -r requirements/edx/kernel.in
 openedx-events==8.3.0
     # via
