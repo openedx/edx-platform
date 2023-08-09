@@ -1008,7 +1008,7 @@ pycryptodomex==3.18.0
     #   snowflake-connector-python
 pydata-sphinx-theme==0.13.3
     # via sphinx-book-theme
-pygments==2.15.1
+pygments==2.16.1
     # via
     #   -r requirements/edx/base.txt
     #   accessible-pygments

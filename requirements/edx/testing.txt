@@ -1098,7 +1098,7 @@ pydantic==2.1.1
     # via fastapi
 pydantic-core==2.4.0
     # via pydantic
-pygments==2.15.1
+pygments==2.16.1
     # via
     #   -r requirements/edx/base.txt
     #   -r requirements/edx/coverage.txt
