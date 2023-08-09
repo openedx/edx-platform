@@ -58,7 +58,7 @@ def cache_if_anonymous(*get_parameters):
             ):
                 # Use the cache. The same view accessed through different domain names may
                 # return different things, so include the domain name in the key.
-                domain = str(request.META.get('HTTP_HOST')) + '.'
+                domain = str(request.headers.get('host')) + '.'
                 cache_key = domain + "cache_if_anonymous." + get_language() + '.' + request.path
 
                 # Include the values of GET parameters in the cache key.

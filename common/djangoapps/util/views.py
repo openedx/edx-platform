@@ -210,7 +210,7 @@ def reset_course_deadlines(request):
     if not missed_gated_content:
         reset_self_paced_schedule(user, course_key)
 
-    referrer = request.META.get('HTTP_REFERER')
+    referrer = request.headers.get('referer')
     return redirect(referrer) if referrer else HttpResponse()
 
 

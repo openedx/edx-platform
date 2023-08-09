@@ -37,7 +37,7 @@ class ExceptionMiddleware(SocialAuthExceptionMiddleware, MiddlewareMixin):
     def process_exception(self, request, exception):
         """Handles specific exception raised by Python Social Auth eg HTTPError."""
 
-        referer_url = request.META.get('HTTP_REFERER', '')
+        referer_url = request.headers.get('referer', '')
         if (referer_url and isinstance(exception, HTTPError) and
                 exception.response.status_code == 502):
             referer_url = six.moves.urllib.parse.urlparse(referer_url).path

@@ -29,6 +29,7 @@ class OAuth2ProviderConfigForm(forms.ModelForm):
     backend_name = forms.ChoiceField(choices=((name, name) for name in _PSA_OAUTH2_BACKENDS))
 
 
+@admin.register(OAuth2ProviderConfig)
 class OAuth2ProviderConfigAdmin(KeyedConfigurationModelAdmin):
     """ Django Admin class for OAuth2ProviderConfig """
     form = OAuth2ProviderConfigForm
@@ -40,7 +41,6 @@ class OAuth2ProviderConfigAdmin(KeyedConfigurationModelAdmin):
             'skip_email_verification', 'change_date', 'changed_by', 'edit_link',
         )
 
-admin.site.register(OAuth2ProviderConfig, OAuth2ProviderConfigAdmin)
 
 
 class SAMLProviderConfigForm(forms.ModelForm):
@@ -48,6 +48,7 @@ class SAMLProviderConfigForm(forms.ModelForm):
     backend_name = forms.ChoiceField(choices=((name, name) for name in _PSA_SAML_BACKENDS))
 
 
+@admin.register(SAMLProviderConfig)
 class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
     """ Django Admin class for SAMLProviderConfig """
     form = SAMLProviderConfigForm
@@ -92,6 +93,9 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         actions.update(action_delete)
         return actions
 
+    @admin.display(
+        description='Name'
+    )
     def name_with_update_link(self, instance):
         """
         Record name with link for the change view.
@@ -103,8 +107,11 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         update_url += f'?source={instance.pk}'
         return format_html('<a href="{}">{}</a>', update_url, instance.name)
 
-    name_with_update_link.short_description = 'Name'
 
+    @admin.display(
+        description='Metadata Ready',
+        boolean=True,
+    )
     def has_data(self, inst):
         """ Do we have cached metadata for this SAML provider? """
         if not inst.is_active:
@@ -115,8 +122,6 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
                 return True
         return False
 
-    has_data.short_description = 'Metadata Ready'
-    has_data.boolean = True
 
     def mode(self, inst):
         """ Indicate if debug_mode is enabled or not"""
@@ -135,9 +140,9 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         super().save_model(request, obj, form, change)
         fetch_saml_metadata.apply_async((), countdown=2)
 
-admin.site.register(SAMLProviderConfig, SAMLProviderConfigAdmin)
 
 
+@admin.register(SAMLConfiguration)
 class SAMLConfigurationAdmin(KeyedConfigurationModelAdmin):
     """ Django Admin class for SAMLConfiguration """
     def get_list_display(self, request):
@@ -157,9 +162,9 @@ class SAMLConfigurationAdmin(KeyedConfigurationModelAdmin):
         priv1, priv2 = private_key[0:10], private_key[-10:]
         return format_html('Public: {}…{}<br>Private: {}…{}', pub1, pub2, priv1, priv2)
 
-admin.site.register(SAMLConfiguration, SAMLConfigurationAdmin)
 
 
+@admin.register(SAMLProviderData)
 class SAMLProviderDataAdmin(admin.ModelAdmin):
     """ Django Admin class for SAMLProviderData (Read Only) """
     list_display = ('entity_id', 'is_valid', 'fetched_at', 'expires_at', 'sso_url')
@@ -171,9 +176,9 @@ class SAMLProviderDataAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 
-admin.site.register(SAMLProviderData, SAMLProviderDataAdmin)
 
 
+@admin.register(LTIProviderConfig)
 class LTIProviderConfigAdmin(KeyedConfigurationModelAdmin):
     """ Django Admin class for LTIProviderConfig """
 
@@ -196,11 +201,10 @@ class LTIProviderConfigAdmin(KeyedConfigurationModelAdmin):
             'edit_link',
         )
 
-admin.site.register(LTIProviderConfig, LTIProviderConfigAdmin)
 
 
+@admin.register(AppleMigrationUserIdInfo)
 class AppleMigrationUserIdInfoAdmin(admin.ModelAdmin):
     """ Django Admin class for AppleMigrationUserIdInfo """
 
 
-admin.site.register(AppleMigrationUserIdInfo, AppleMigrationUserIdInfoAdmin)

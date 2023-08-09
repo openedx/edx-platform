@@ -46,7 +46,7 @@ def expect_json(view_function):
     def parse_json_into_request(request, *args, **kwargs):
         # cdodge: fix postback errors in CMS. The POST 'content-type' header can include additional information
         # e.g. 'charset', so we can't do a direct string compare
-        if "application/json" in request.META.get("CONTENT_TYPE", "") and request.body:
+        if "application/json" in request.headers.get("content-type", "") and request.body:
             try:
                 request.json = json.loads(request.body.decode("utf8"))
             except ValueError:
@@ -66,7 +66,7 @@ def expect_json_in_class_view(view):
     """
 
     def _wrapper_view(self, request, *args, **kwargs):
-        if "application/json" in request.META.get("CONTENT_TYPE", "") and request.body:
+        if "application/json" in request.headers.get("content-type", "") and request.body:
             try:
                 request.json = json.loads(request.body.decode("utf8"))
             except ValueError:
