@@ -1052,8 +1052,8 @@ def results_callback(request):  # lint-amnesty, pylint: disable=too-many-stateme
         return HttpResponseBadRequest(f"JSON should be dict. Received:\n\n{body}")
 
     headers = {
-        "Authorization": request.META.get("HTTP_AUTHORIZATION", ""),
-        "Date": request.META.get("HTTP_DATE", "")
+        "Authorization": request.headers.get("authorization", ""),
+        "Date": request.headers.get("date", "")
     }
 
     _response, access_key_and_sig = headers["Authorization"].split(" ")

@@ -23,9 +23,9 @@ class SurveyFormAdminForm(forms.ModelForm):
         return form
 
 
+@admin.register(SurveyForm)
 class SurveyFormAdmin(admin.ModelAdmin):
     """Admin for SurveyForm"""
     form = SurveyFormAdminForm
 
 
-admin.site.register(SurveyForm, SurveyFormAdmin)

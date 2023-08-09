@@ -12,6 +12,7 @@ admin.site.register(MobileApiConfig, ConfigurationModelAdmin)
 admin.site.register(IgnoreMobileAvailableFlagConfig, ConfigurationModelAdmin)
 
 
+@admin.register(AppVersionConfig)
 class AppVersionConfigAdmin(admin.ModelAdmin):
     """ Admin class for AppVersionConfig model """
     fields = ('platform', 'version', 'expire_at', 'enabled')
@@ -25,6 +26,7 @@ class AppVersionConfigAdmin(admin.ModelAdmin):
         return ['platform', 'version', 'expire_at', 'enabled', 'created_at', 'updated_at']
 
 
+@admin.register(MobileConfig)
 class MobileConfigAdmin(admin.ModelAdmin):
     """ Admin class for MobileConfig model """
     fields = ('name', 'value')
@@ -34,5 +36,3 @@ class MobileConfigAdmin(admin.ModelAdmin):
         ordering = ['name']
 
 
-admin.site.register(AppVersionConfig, AppVersionConfigAdmin)
-admin.site.register(MobileConfig, MobileConfigAdmin)

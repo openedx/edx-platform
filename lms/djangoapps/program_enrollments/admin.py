@@ -12,6 +12,7 @@ from lms.djangoapps.program_enrollments.models import (
 )
 
 
+@admin.register(ProgramEnrollment)
 class ProgramEnrollmentAdmin(admin.ModelAdmin):
     """
     Admin tool for the ProgramEnrollment model
@@ -32,6 +33,9 @@ class ProgramEnrollmentAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
 
 
+@admin.display(
+    description="Program Enrollment"
+)
 def _pce_pe_id(pce):
     """
     Generate a link to edit program enrollment, with ID and status in link text.
@@ -47,18 +51,30 @@ def _pce_pe_id(pce):
     return format_html("<a href={}>{}</a>", link_url, link_text)
 
 
+@admin.display(
+    description="Pgm Enrollment: User"
+)
 def _pce_pe_user(pce):
     return pce.program_enrollment.user
 
 
+@admin.display(
+    description="Pgm Enrollment: Ext User Key"
+)
 def _pce_pe_external_user_key(pce):
     return pce.program_enrollment.external_user_key
 
 
+@admin.display(
+    description="Pgm Enrollment: Pgm UUID"
+)
 def _pce_pe_program_uuid(pce):
     return pce.program_enrollment.program_uuid
 
 
+@admin.display(
+    description="Course Enrollment"
+)
 def _pce_ce(pce):
     """
     Generate text for course enrollment, including ID and is_active value.
@@ -71,13 +87,9 @@ def _pce_ce(pce):
         enrollment=enrollment, active_string=active_string
     )
 
-_pce_pe_id.short_description = "Program Enrollment"
-_pce_pe_user.short_description = "Pgm Enrollment: User"
-_pce_pe_external_user_key.short_description = "Pgm Enrollment: Ext User Key"
-_pce_pe_program_uuid.short_description = "Pgm Enrollment: Pgm UUID"
-_pce_ce.short_description = "Course Enrollment"
 
 
+@admin.register(ProgramCourseEnrollment)
 class ProgramCourseEnrollmentAdmin(admin.ModelAdmin):
     """
     Admin tool for the ProgramCourseEnrollment model
@@ -105,6 +117,9 @@ class ProgramCourseEnrollmentAdmin(admin.ModelAdmin):
     raw_id_fields = ('program_enrollment', 'course_enrollment')
 
 
+@admin.display(
+    description="Program Course Enrollment"
+)
 def _pending_role_assignment_enrollment_id(pending_role_assignment):
     """
     Generate a link to edit enrollment, with ID in link text.
@@ -120,6 +135,9 @@ def _pending_role_assignment_enrollment_id(pending_role_assignment):
     return format_html("<a href={}>{}</a>", link_url, link_text)
 
 
+@admin.display(
+    description="Pgm Enrollment: Ext User Key"
+)
 def _pending_role_assignment_external_user_key(pending_role_assignment):
     """
     Generate the external user key for a pending role assignment
@@ -127,10 +145,9 @@ def _pending_role_assignment_external_user_key(pending_role_assignment):
     pce = pending_role_assignment.enrollment
     return _pce_pe_external_user_key(pce)
 
-_pending_role_assignment_enrollment_id.short_description = "Program Course Enrollment"
-_pending_role_assignment_external_user_key.short_description = "Pgm Enrollment: Ext User Key"
 
 
+@admin.register(CourseAccessRoleAssignment)
 class CourseAccessRoleAssignmentAdmin(admin.ModelAdmin):
     """
     Admin tool for the CourseAccessRoleAssignment model
@@ -144,6 +161,3 @@ class CourseAccessRoleAssignmentAdmin(admin.ModelAdmin):
     list_filter = ('role',)
     raw_id_fields = ('enrollment',)
 
-admin.site.register(ProgramEnrollment, ProgramEnrollmentAdmin)
-admin.site.register(ProgramCourseEnrollment, ProgramCourseEnrollmentAdmin)
-admin.site.register(CourseAccessRoleAssignment, CourseAccessRoleAssignmentAdmin)

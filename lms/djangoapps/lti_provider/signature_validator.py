@@ -106,7 +106,7 @@ class SignatureValidator(RequestValidator):
         # request, but Django mangles them into its own format. The only header
         # that the library requires (for now) is 'Content-Type', so we
         # reconstruct just that one.
-        headers = {"Content-Type": request.META['CONTENT_TYPE']}
+        headers = {"Content-Type": request.headers['content-type']}
         result, __ = self.endpoint.validate_request(url, method, body, headers)
         return result
 
