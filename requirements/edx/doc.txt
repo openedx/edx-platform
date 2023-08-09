@@ -465,7 +465,7 @@ djangorestframework-xml==2.0.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-djfernet==0.8.1
+django-fernet-fields-v2==0.8
     # via
     #   -r requirements/edx/base.txt
     #   edxval
