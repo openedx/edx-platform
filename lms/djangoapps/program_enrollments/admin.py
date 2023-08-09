@@ -88,7 +88,6 @@ def _pce_ce(pce):
     )
 
 
-
 @admin.register(ProgramCourseEnrollment)
 class ProgramCourseEnrollmentAdmin(admin.ModelAdmin):
     """
