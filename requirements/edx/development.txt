@@ -461,7 +461,6 @@ django-environ==0.10.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-blockstore
-django-fernet-fields==0.6
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
