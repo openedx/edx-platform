@@ -146,9 +146,18 @@ def _is_library_component_limit_reached(usage_key):
 
 def _get_block_parent_children(xblock):
     response = {}
-    response["parent"] = (xblock.parent.block_type, xblock.parent.block_id)
+    response["parent"] = {
+        "block_type": xblock.parent.block_type,
+        "block_id": xblock.parent.block_id
+    }
     if xblock.children:
-        response["children"] = [(child.block_type, child.block_id) for child in xblock.children]
+        response["children"] = [
+            {
+                "block_type": child.block_type,
+                "block_id": child.block_id
+             }
+            for child in xblock.children
+        ]
     return response
 
 def handle_xblock(request, usage_key_string=None):
