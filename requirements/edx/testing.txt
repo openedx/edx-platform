@@ -584,7 +584,7 @@ edx-drf-extensions==8.8.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise @ git+https://github.com/openedx/edx-enterprise.git@replace_django_fernet
+git+https://github.com/openedx/edx-enterprise.git@replace_django_fernet
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
