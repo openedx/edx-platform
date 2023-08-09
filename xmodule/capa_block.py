@@ -19,7 +19,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_str
 from django.utils.functional import cached_property
 from lxml import etree
-from pkg_resources import resource_filename
 from pytz import utc
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
@@ -37,9 +36,8 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.graders import ShowCorrectness
 from xmodule.raw_block import RawMixin
 from xmodule.util.sandboxing import SandboxService
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
     XModuleToXBlockMixin,
@@ -131,7 +129,6 @@ class ProblemBlock(
     XmlMixin,
     EditingMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):
@@ -164,24 +161,6 @@ class ProblemBlock(
     icon_class = 'problem'
 
     uses_xmodule_styles_setup = True
-
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/javascript_loader.js'),
-            resource_filename(__name__, 'js/src/capa/display.js'),
-            resource_filename(__name__, 'js/src/collapsible.js'),
-            resource_filename(__name__, 'js/src/capa/imageinput.js'),
-            resource_filename(__name__, 'js/src/capa/schematic.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
-    }
-
-    studio_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/problem/edit.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
 
     display_name = String(
         display_name=_("Display Name"),
@@ -347,7 +326,8 @@ class ProblemBlock(
         else:
             html = self.get_html()
         fragment = Fragment(html)
-        add_webpack_to_fragment(fragment, 'ProblemBlockPreview')
+        add_sass_to_fragment(fragment, "ProblemBlockDisplay.scss")
+        add_webpack_js_to_fragment(fragment, 'ProblemBlockDisplay')
         shim_xmodule_js(fragment, 'Problem')
         return fragment
 
@@ -378,7 +358,8 @@ class ProblemBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'ProblemBlockStudio')
+        add_sass_to_fragment(fragment, 'ProblemBlockEditor.scss')
+        add_webpack_js_to_fragment(fragment, 'ProblemBlockEditor')
         shim_xmodule_js(fragment, 'MarkdownEditingDescriptor')
         return fragment
 

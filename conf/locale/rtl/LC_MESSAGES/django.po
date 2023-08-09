@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-06-25 20:36+0000\n"
-"PO-Revision-Date: 2023-06-25 20:36:15.566083\n"
+"POT-Creation-Date: 2023-08-07 15:37+0000\n"
+"PO-Revision-Date: 2023-08-07 15:37:07.297468\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: rtl\n"
@@ -61,11 +61,66 @@ msgstr "Ʉnᴉʇ"
 msgid "Problem"
 msgstr "Ᵽɹøblǝɯ"
 
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: xmodule/video_block/video_handlers.py
+#, python-brace-format
+msgid "The following parameters are required: {missing}."
+msgstr "Ŧɥǝ ɟølløʍᴉnƃ dɐɹɐɯǝʇǝɹs ɐɹǝ ɹǝbnᴉɹǝd: {missing}."
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: xmodule/video_block/video_handlers.py
+msgid ""
+"There is a problem with this transcript file. Try to upload a different "
+"file."
+msgstr ""
+"Ŧɥǝɹǝ ᴉs ɐ dɹøblǝɯ ʍᴉʇɥ ʇɥᴉs ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ. Ŧɹʎ ʇø ndløɐd ɐ dᴉɟɟǝɹǝnʇ "
+"ɟᴉlǝ."
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: xmodule/video_block/video_handlers.py
+#, python-brace-format
+msgid "A transcript with the \"{language_code}\" language code already exists."
+msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ʍᴉʇɥ ʇɥǝ \"{language_code}\" lɐnƃnɐƃǝ ɔødǝ ɐlɹǝɐdʎ ǝxᴉsʇs."
+
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py
+#: xmodule/video_block/video_handlers.py
+msgid "A transcript file is required."
+msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
+
 #: cms/djangoapps/contentstore/utils.py
 #: cms/djangoapps/contentstore/views/block.py
 #: cms/djangoapps/contentstore/views/component.py xmodule/html_block.py
 msgid "Text"
 msgstr "Ŧǝxʇ"
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: openedx/core/djangoapps/content_staging/data.py
+msgid "Ready"
+msgstr "Ɍǝɐdʎ"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: lms/djangoapps/instructor/views/api.py
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Name"
+msgstr "Nɐɯǝ"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: xmodule/video_block/video_xfields.py
+msgid "Video ID"
+msgstr "Vᴉdǝø ƗĐ"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
+msgid "Pending"
+msgstr "Ᵽǝndᴉnƃ"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
@@ -99,65 +154,21 @@ msgstr "Ⱥdʌɐnɔǝd"
 msgid "Entrance Exam"
 msgstr "Ɇnʇɹɐnɔǝ Ɇxɐɯ"
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_block/video_handlers.py
-#, python-brace-format
-msgid "The following parameters are required: {missing}."
-msgstr "Ŧɥǝ ɟølløʍᴉnƃ dɐɹɐɯǝʇǝɹs ɐɹǝ ɹǝbnᴉɹǝd: {missing}."
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_block/video_handlers.py
-msgid ""
-"There is a problem with this transcript file. Try to upload a different "
-"file."
-msgstr ""
-"Ŧɥǝɹǝ ᴉs ɐ dɹøblǝɯ ʍᴉʇɥ ʇɥᴉs ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ. Ŧɹʎ ʇø ndløɐd ɐ dᴉɟɟǝɹǝnʇ "
-"ɟᴉlǝ."
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: xmodule/video_block/video_handlers.py
-#, python-brace-format
-msgid "A transcript with the \"{language_code}\" language code already exists."
-msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ʍᴉʇɥ ʇɥǝ \"{language_code}\" lɐnƃnɐƃǝ ɔødǝ ɐlɹǝɐdʎ ǝxᴉsʇs."
-
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-#: cms/djangoapps/contentstore/views/transcripts_ajax.py
-#: xmodule/video_block/video_handlers.py
-msgid "A transcript file is required."
-msgstr "Ⱥ ʇɹɐnsɔɹᴉdʇ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
-
-#. Translators: This is the status for a video that the servers have
-#. successfully processed
-#: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/content_staging/data.py
-msgid "Ready"
-msgstr "Ɍǝɐdʎ"
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Name"
-msgstr "Nɐɯǝ"
-
-#: cms/djangoapps/contentstore/views/videos.py
-#: xmodule/video_block/video_xfields.py
-msgid "Video ID"
-msgstr "Vᴉdǝø ƗĐ"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This is listed as the duration for a video that has not
-#. yet reached the point in its processing by the servers where its
-#. duration is determined.
-#: cms/djangoapps/contentstore/views/videos.py
-#: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
-msgid "Pending"
-msgstr "Ᵽǝndᴉnƃ"
-
-#: cms/djangoapps/contentstore/xblock_services/create_xblock.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/create_xblock.py
 #: xmodule/library_content_block.py
 msgid "Empty"
 msgstr "Ɇɯdʇʎ"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+msgid "Invalid data"
+msgstr "Ɨnʌɐlᴉd dɐʇɐ"
+
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
+#: openedx/core/djangoapps/xblock/rest_api/views.py
+#, python-brace-format
+msgid "Invalid data ({details})"
+msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
 
 #: cms/templates/admin/base_site.html lms/templates/admin/base_site.html
 msgid "Django site admin"
@@ -344,7 +355,6 @@ msgstr "{currency_symbol}{price}"
 #. Translators: This refers to the cost of the course. In this case, the
 #. course costs nothing so it is free.
 #: common/djangoapps/course_modes/models.py
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
 #: lms/templates/course_modes/track_selection.html
 msgid "Free"
 msgstr "Fɹǝǝ"
@@ -3304,6 +3314,14 @@ msgstr "Ȼnsʇøɯ dɐƃǝs"
 msgid "Provide additional course content and resources with custom pages"
 msgstr "Ᵽɹøʌᴉdǝ ɐddᴉʇᴉønɐl ɔønɹsǝ ɔønʇǝnʇ ɐnd ɹǝsønɹɔǝs ʍᴉʇɥ ɔnsʇøɯ dɐƃǝs"
 
+#: lms/djangoapps/courseware/plugins.py
+msgid "Open Response Assessment Settings"
+msgstr "Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ Sǝʇʇᴉnƃs"
+
+#: lms/djangoapps/courseware/plugins.py
+msgid "Course level settings for Open Response Assessment."
+msgstr "Ȼønɹsǝ lǝʌǝl sǝʇʇᴉnƃs ɟøɹ Ødǝn Ɍǝsdønsǝ Ⱥssǝssɯǝnʇ."
+
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/__init__.py xmodule/tabs.py
 #: cms/templates/widgets/header.html
@@ -5788,55 +5806,6 @@ msgstr "Ⱥlløʍ"
 msgid "Error"
 msgstr "Ɇɹɹøɹ"
 
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Check out this course on edx"
-msgstr "Ȼɥǝɔʞ ønʇ ʇɥᴉs ɔønɹsǝ øn ǝdx"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Enroll now"
-msgstr "Ɇnɹøll nøʍ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-#: lms/templates/courseware/course_about.html
-#: lms/templates/dashboard/_dashboard_course_resume.html
-msgid "View Course"
-msgstr "Vᴉǝʍ Ȼønɹsǝ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Estimated 6 weeks"
-msgstr "Ɇsʇᴉɯɐʇǝd 6 ʍǝǝʞs"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "4-6 hours per week"
-msgstr "4-6 ɥønɹs dǝɹ ʍǝǝʞ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Self-paced"
-msgstr "Sǝlɟ-dɐɔǝd"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Progress at your own speed"
-msgstr "Ᵽɹøƃɹǝss ɐʇ ʎønɹ øʍn sdǝǝd"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.html
-msgid "Optional upgrade available"
-msgstr "Ødʇᴉønɐl ndƃɹɐdǝ ɐʌɐᴉlɐblǝ"
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "Check out this course on %(platform_name)s."
-msgstr "Ȼɥǝɔʞ ønʇ ʇɥᴉs ɔønɹsǝ øn %(platform_name)s."
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/body.txt
-#, python-format
-msgid "This email message was automatically sent by %(lms_url)s "
-msgstr "Ŧɥᴉs ǝɯɐᴉl ɯǝssɐƃǝ ʍɐs ɐnʇøɯɐʇᴉɔɐllʎ sǝnʇ bʎ %(lms_url)s "
-
-#: lms/templates/save_for_later/edx_ace/saveforlater/email/subject.txt
-#, python-format
-msgid "%(display_name)s"
-msgstr "%(display_name)s"
-
 #: lms/templates/verify_student/edx_ace/verificationapproved/email/body.html
 msgid "ID Verification Approved"
 msgstr "ƗĐ Vǝɹᴉɟᴉɔɐʇᴉøn Ⱥddɹøʌǝd"
@@ -7500,6 +7469,35 @@ msgstr "Ƀlɐɔʞlᴉsʇ {country} ɟøɹ {course}"
 msgid "Learner Pathways"
 msgstr "Łǝɐɹnǝɹ Ᵽɐʇɥʍɐʎs"
 
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on your response to the "
+"post <{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> ɔøɯɯǝnʇǝd øn ʎønɹ ɹǝsdønsǝ ʇø ʇɥǝ "
+"døsʇ <{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> commented on "
+"<{strong}>{author_name}'s</{strong}> response to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> ɔøɯɯǝnʇǝd øn "
+"<{strong}>{author_name}'s</{strong}> ɹǝsdønsǝ ʇø ʎønɹ døsʇ "
+"<{strong}>{post_title}</{strong}></{p}>"
+
+#: openedx/core/djangoapps/notifications/base_notification.py
+#, python-brace-format
+msgid ""
+"<{p}><{strong}>{replier_name}</{strong}> responded to your post "
+"<{strong}>{post_title}</{strong}></{p}>"
+msgstr ""
+"<{p}><{strong}>{replier_name}</{strong}> ɹǝsdøndǝd ʇø ʎønɹ døsʇ "
+"<{strong}>{post_title}</{strong}></{p}>"
+
 #: openedx/core/djangoapps/notifications/views.py
 msgid "The notification preference config version is not up to date."
 msgstr "Ŧɥǝ nøʇᴉɟᴉɔɐʇᴉøn dɹǝɟǝɹǝnɔǝ ɔønɟᴉƃ ʌǝɹsᴉøn ᴉs nøʇ nd ʇø dɐʇǝ."
@@ -8984,6 +8982,18 @@ msgid ""
 msgstr ""
 "Ɏøn ɥɐʌǝ snɔɔǝssɟnllʎ sɥᴉɟʇǝd ʎønɹ ɔønɹsǝ sɔɥǝdnlǝ ɐnd ʎønɹ ɔɐlǝndɐɹ ᴉs nd "
 "ʇø dɐʇǝ."
+
+#: openedx/features/content_tagging/models/base.py wiki/models/article.py
+msgid "owner"
+msgstr "øʍnǝɹ"
+
+#: openedx/features/content_tagging/models/base.py
+msgid ""
+"Organization that is related to this taxonomy.If None, then this taxonomy is"
+" related to all organizations."
+msgstr ""
+"Øɹƃɐnᴉzɐʇᴉøn ʇɥɐʇ ᴉs ɹǝlɐʇǝd ʇø ʇɥᴉs ʇɐxønøɯʎ.Ɨɟ Nønǝ, ʇɥǝn ʇɥᴉs ʇɐxønøɯʎ ᴉs"
+" ɹǝlɐʇǝd ʇø ɐll øɹƃɐnᴉzɐʇᴉøns."
 
 #: openedx/features/content_type_gating/models.py
 #: openedx/features/course_duration_limits/models.py
@@ -11166,6 +11176,18 @@ msgstr ""
 "dǝɟɐnlʇ."
 
 #: xmodule/course_block.py
+msgid "Force Flexible Grading for Peer ORAs"
+msgstr "Føɹɔǝ Flǝxᴉblǝ Ǥɹɐdᴉnƃ ɟøɹ Ᵽǝǝɹ ØɌȺs"
+
+#: xmodule/course_block.py
+msgid ""
+"Setting this flag will force on the flexible grading option for all peer-"
+"graded ORAs in this course."
+msgstr ""
+"Sǝʇʇᴉnƃ ʇɥᴉs ɟlɐƃ ʍᴉll ɟøɹɔǝ øn ʇɥǝ ɟlǝxᴉblǝ ƃɹɐdᴉnƃ ødʇᴉøn ɟøɹ ɐll dǝǝɹ-"
+"ƃɹɐdǝd ØɌȺs ᴉn ʇɥᴉs ɔønɹsǝ."
+
+#: xmodule/course_block.py
 msgid "Course Instructor"
 msgstr "Ȼønɹsǝ Ɨnsʇɹnɔʇøɹ"
 
@@ -12730,6 +12752,17 @@ msgstr "Ⱥll ɔønɹsǝ ønʇlᴉnǝ ɹǝƃǝnǝɹɐʇᴉøns snɔɔǝssɟnllʎ 
 msgid "Regenerate *all* course outlines"
 msgstr "Ɍǝƃǝnǝɹɐʇǝ *ɐll* ɔønɹsǝ ønʇlᴉnǝs"
 
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+msgid "Upload completed"
+msgstr "Ʉdløɐd ɔøɯdlǝʇǝd"
+
+#: cms/djangoapps/contentstore/asset_storage_handlers.py
+#, python-brace-format
+msgid ""
+"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
+msgstr ""
+"Fᴉlǝ {filename} ǝxɔǝǝds ɯɐxᴉɯnɯ sᴉzǝ øɟ {maximum_size_in_megabytes} MɃ."
+
 #: cms/djangoapps/contentstore/course_group_config.py
 msgid ""
 "The groups in this configuration can be mapped to cohorts in the Instructor "
@@ -12985,6 +13018,10 @@ msgstr "Ŧɹnǝ ʇø ɥᴉdǝ ʇɥǝ ʇɐb, ɐnd Fɐlsǝ ʇø sɥøʍ ᴉʇ."
 msgid "Change the visibility of tabs in a course."
 msgstr "Ȼɥɐnƃǝ ʇɥǝ ʌᴉsᴉbᴉlᴉʇʎ øɟ ʇɐbs ᴉn ɐ ɔønɹsǝ."
 
+#: cms/djangoapps/contentstore/transcript_storage_handlers.py
+msgid "The information you entered is incorrect."
+msgstr "Ŧɥǝ ᴉnɟøɹɯɐʇᴉøn ʎøn ǝnʇǝɹǝd ᴉs ᴉnɔøɹɹǝɔʇ."
+
 #: cms/djangoapps/contentstore/utils.py cms/templates/visibility_editor.html
 msgid "Deleted Group"
 msgstr "Đǝlǝʇǝd Ǥɹønd"
@@ -12998,13 +13035,13 @@ msgid "{previous_groups}, {current_group}"
 msgstr "{previous_groups}, {current_group}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Đndlᴉɔɐʇǝ øɟ {0}"
 
 #: cms/djangoapps/contentstore/utils.py
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
@@ -13012,6 +13049,123 @@ msgstr "Đndlᴉɔɐʇǝ øɟ '{0}'"
 #: cms/djangoapps/contentstore/utils.py
 msgid "Invalid prerequisite course key"
 msgstr "Ɨnʌɐlᴉd dɹǝɹǝbnᴉsᴉʇǝ ɔønɹsǝ ʞǝʎ"
+
+#. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
+#. Translators: This is the status of an active video upload
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#: cms/templates/import.html
+msgid "Uploading"
+msgstr "Ʉdløɐdᴉnƃ"
+
+#. Translators: This is the status for a video that the servers are currently
+#. processing
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "In Progress"
+msgstr "Ɨn Ᵽɹøƃɹǝss"
+
+#. Translators: This is the status for a video that is uploaded completely
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Uploaded"
+msgstr "Ʉdløɐdǝd"
+
+#. Translators: This is the status for a video that the servers have failed to
+#. process
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Failed"
+msgstr "Fɐᴉlǝd"
+
+#. Translators: This is the status for a video that is cancelled during upload
+#. by user
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Cancelled"
+msgstr "Ȼɐnɔǝllǝd"
+
+#. Translators: This is the status for a video which has failed
+#. due to being flagged as a duplicate by an external or internal CMS
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Failed Duplicate"
+msgstr "Fɐᴉlǝd Đndlᴉɔɐʇǝ"
+
+#. Translators: This is the status for a video which has duplicate token for
+#. youtube
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "YouTube Duplicate"
+msgstr "ɎønŦnbǝ Đndlᴉɔɐʇǝ"
+
+#. Translators: This is the status for a video for which an invalid
+#. processing token was provided in the course settings
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Invalid Token"
+msgstr "Ɨnʌɐlᴉd Ŧøʞǝn"
+
+#. Translators: This is the status for a video that was included in a course
+#. import
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Imported"
+msgstr "Ɨɯdøɹʇǝd"
+
+#. Translators: This is the status for a video that is in an unknown state
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Unknown"
+msgstr "Ʉnʞnøʍn"
+
+#. Translators: This is the status for a video that is having its
+#. transcription in progress on servers
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcription in Progress"
+msgstr "Ŧɹɐnsɔɹᴉdʇᴉøn ᴉn Ᵽɹøƃɹǝss"
+
+#. Translators: This is the status for a video whose transcription is complete
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcript Ready"
+msgstr "Ŧɹɐnsɔɹᴉdʇ Ɍǝɐdʎ"
+
+#. Translators: This is the status for a video whose transcription job was
+#. failed for some languages
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Partial Failure"
+msgstr "Ᵽɐɹʇᴉɐl Fɐᴉlnɹǝ"
+
+#. Translators: This is the status for a video whose transcription job has
+#. failed altogether
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Transcript Failed"
+msgstr "Ŧɹɐnsɔɹᴉdʇ Fɐᴉlǝd"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "An image file is required."
+msgstr "Ⱥn ᴉɯɐƃǝ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
+
+#. Translators: This is the header for a CSV file column
+#. containing URLs for video encodings for the named profile
+#. (e.g. desktop, mobile high quality, mobile low quality)
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#, python-brace-format
+msgid "{profile_name} URL"
+msgstr "{profile_name} ɄɌŁ"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Duration"
+msgstr "Đnɹɐʇᴉøn"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Date Added"
+msgstr "Đɐʇǝ Ⱥddǝd"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "Status"
+msgstr "Sʇɐʇns"
+
+#. Translators: This is the suggested filename when downloading the URL
+#. listing for videos uploaded through Studio
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+#, python-brace-format
+msgid "{course}_video_urls"
+msgstr "{course}_ʌᴉdǝø_nɹls"
+
+#: cms/djangoapps/contentstore/video_storage_handlers.py
+msgid "A non zero positive integer is expected"
+msgstr "Ⱥ nøn zǝɹø døsᴉʇᴉʌǝ ᴉnʇǝƃǝɹ ᴉs ǝxdǝɔʇǝd"
 
 #: cms/djangoapps/contentstore/video_utils.py
 msgid "The image must have name, content type, and size information."
@@ -13069,17 +13223,6 @@ msgid ""
 msgstr ""
 "Ŧɥǝ ᴉɯɐƃǝ ɟᴉlǝ nɐɯǝ ɔɐn ønlʎ ɔønʇɐᴉn lǝʇʇǝɹs, nnɯbǝɹs, ɥʎdɥǝns (-), ɐnd "
 "nndǝɹsɔøɹǝs (_)."
-
-#: cms/djangoapps/contentstore/views/assets.py
-msgid "Upload completed"
-msgstr "Ʉdløɐd ɔøɯdlǝʇǝd"
-
-#: cms/djangoapps/contentstore/views/assets.py
-#, python-brace-format
-msgid ""
-"File {filename} exceeds maximum size of {maximum_size_in_megabytes} MB."
-msgstr ""
-"Fᴉlǝ {filename} ǝxɔǝǝds ɯɐxᴉɯnɯ sᴉzǝ øɟ {maximum_size_in_megabytes} MɃ."
 
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "must have name of the certificate"
@@ -13259,10 +13402,6 @@ msgstr "'{organization_key}' ᴉs nøʇ ɐ ʌɐlᴉd øɹƃɐnᴉzɐʇᴉøn ᴉ
 msgid "Access restricted to: {list_of_groups}"
 msgstr "Ⱥɔɔǝss ɹǝsʇɹᴉɔʇǝd ʇø: {list_of_groups}"
 
-#: cms/djangoapps/contentstore/views/transcript_settings.py
-msgid "The information you entered is incorrect."
-msgstr "Ŧɥǝ ᴉnɟøɹɯɐʇᴉøn ʎøn ǝnʇǝɹǝd ᴉs ᴉnɔøɹɹǝɔʇ."
-
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" blocks."
 msgstr "Ŧɹɐnsɔɹᴉdʇs ɐɹǝ snddøɹʇǝd ønlʎ ɟøɹ \"ʌᴉdǝø\" bløɔʞs."
@@ -13341,183 +13480,58 @@ msgstr "Ɨnʌɐlᴉd `ɹølǝ` sdǝɔᴉɟᴉǝd."
 msgid "You may not remove the last Admin. Add another Admin first."
 msgstr "Ɏøn ɯɐʎ nøʇ ɹǝɯøʌǝ ʇɥǝ lɐsʇ Ⱥdɯᴉn. Ⱥdd ɐnøʇɥǝɹ Ⱥdɯᴉn ɟᴉɹsʇ."
 
-#. #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
-#. Translators: This is the status of an active video upload
-#: cms/djangoapps/contentstore/views/videos.py cms/templates/import.html
-msgid "Uploading"
-msgstr "Ʉdløɐdᴉnƃ"
-
-#. Translators: This is the status for a video that the servers are currently
-#. processing
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "In Progress"
-msgstr "Ɨn Ᵽɹøƃɹǝss"
-
-#. Translators: This is the status for a video that is uploaded completely
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Uploaded"
-msgstr "Ʉdløɐdǝd"
-
-#. Translators: This is the status for a video that the servers have failed to
-#. process
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Failed"
-msgstr "Fɐᴉlǝd"
-
-#. Translators: This is the status for a video that is cancelled during upload
-#. by user
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Cancelled"
-msgstr "Ȼɐnɔǝllǝd"
-
-#. Translators: This is the status for a video which has failed
-#. due to being flagged as a duplicate by an external or internal CMS
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Failed Duplicate"
-msgstr "Fɐᴉlǝd Đndlᴉɔɐʇǝ"
-
-#. Translators: This is the status for a video which has duplicate token for
-#. youtube
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "YouTube Duplicate"
-msgstr "ɎønŦnbǝ Đndlᴉɔɐʇǝ"
-
-#. Translators: This is the status for a video for which an invalid
-#. processing token was provided in the course settings
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Invalid Token"
-msgstr "Ɨnʌɐlᴉd Ŧøʞǝn"
-
-#. Translators: This is the status for a video that was included in a course
-#. import
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Imported"
-msgstr "Ɨɯdøɹʇǝd"
-
-#. Translators: This is the status for a video that is in an unknown state
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Unknown"
-msgstr "Ʉnʞnøʍn"
-
-#. Translators: This is the status for a video that is having its
-#. transcription in progress on servers
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcription in Progress"
-msgstr "Ŧɹɐnsɔɹᴉdʇᴉøn ᴉn Ᵽɹøƃɹǝss"
-
-#. Translators: This is the status for a video whose transcription is complete
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcript Ready"
-msgstr "Ŧɹɐnsɔɹᴉdʇ Ɍǝɐdʎ"
-
-#. Translators: This is the status for a video whose transcription job was
-#. failed for some languages
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Partial Failure"
-msgstr "Ᵽɐɹʇᴉɐl Fɐᴉlnɹǝ"
-
-#. Translators: This is the status for a video whose transcription job has
-#. failed altogether
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Transcript Failed"
-msgstr "Ŧɹɐnsɔɹᴉdʇ Fɐᴉlǝd"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "An image file is required."
-msgstr "Ⱥn ᴉɯɐƃǝ ɟᴉlǝ ᴉs ɹǝbnᴉɹǝd."
-
-#. Translators: This is the header for a CSV file column
-#. containing URLs for video encodings for the named profile
-#. (e.g. desktop, mobile high quality, mobile low quality)
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "{profile_name} URL"
-msgstr "{profile_name} ɄɌŁ"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Duration"
-msgstr "Đnɹɐʇᴉøn"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Date Added"
-msgstr "Đɐʇǝ Ⱥddǝd"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "Status"
-msgstr "Sʇɐʇns"
-
-#. Translators: This is the suggested filename when downloading the URL
-#. listing for videos uploaded through Studio
-#: cms/djangoapps/contentstore/views/videos.py
-#, python-brace-format
-msgid "{course}_video_urls"
-msgstr "{course}_ʌᴉdǝø_nɹls"
-
-#: cms/djangoapps/contentstore/views/videos.py
-msgid "A non zero positive integer is expected"
-msgstr "Ⱥ nøn zǝɹø døsᴉʇᴉʌǝ ᴉnʇǝƃǝɹ ᴉs ǝxdǝɔʇǝd"
-
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "Libraries cannot have more than {limit} components"
 msgstr "Łᴉbɹɐɹᴉǝs ɔɐnnøʇ ɥɐʌǝ ɯøɹǝ ʇɥɐn {limit} ɔøɯdønǝnʇs"
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
-msgid "Invalid data"
-msgstr "Ɨnʌɐlᴉd dɐʇɐ"
-
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
-#, python-brace-format
-msgid "Invalid data ({details})"
-msgstr "Ɨnʌɐlᴉd dɐʇɐ ({details})"
-
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "There was a problem pasting your component."
 msgstr "Ŧɥǝɹǝ ʍɐs ɐ dɹøblǝɯ dɐsʇᴉnƃ ʎønɹ ɔøɯdønǝnʇ."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Your clipboard is empty or invalid."
 msgstr "Ɏønɹ ɔlᴉdbøɐɹd ᴉs ǝɯdʇʎ øɹ ᴉnʌɐlᴉd."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "You can not move {source_type} into {target_parent_type}."
 msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ {source_type} ᴉnʇø {target_parent_type}."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "Item is already present in target location."
 msgstr "Ɨʇǝɯ ᴉs ɐlɹǝɐdʎ dɹǝsǝnʇ ᴉn ʇɐɹƃǝʇ løɔɐʇᴉøn."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item into itself."
 msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇsǝlɟ."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item into it's child."
 msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ ᴉnʇø ᴉʇ's ɔɥᴉld."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "You can not move an item directly into content experiment."
 msgstr "Ɏøn ɔɐn nøʇ ɯøʌǝ ɐn ᴉʇǝɯ dᴉɹǝɔʇlʎ ᴉnʇø ɔønʇǝnʇ ǝxdǝɹᴉɯǝnʇ."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "{source_usage_key} not found in {parent_usage_key}."
 msgstr "{source_usage_key} nøʇ ɟønnd ᴉn {parent_usage_key}."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid ""
 "You can not move {source_usage_key} at an invalid index ({target_index})."
 msgstr ""
 "Ɏøn ɔɐn nøʇ ɯøʌǝ {source_usage_key} ɐʇ ɐn ᴉnʌɐlᴉd ᴉndǝx ({target_index})."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "You must provide target_index ({target_index}) as an integer."
 msgstr "Ɏøn ɯnsʇ dɹøʌᴉdǝ ʇɐɹƃǝʇ_ᴉndǝx ({target_index}) ɐs ɐn ᴉnʇǝƃǝɹ."
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid ""
 "Students must score {score}{pct_sign} or higher to access course materials."
@@ -13526,11 +13540,11 @@ msgstr ""
 
 #. Translators: This is the percent sign. It will be used to represent
 #. a percent value out of 100, e.g. "58%" means "58/100".
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 msgid "%"
 msgstr "%"
 
-#: cms/djangoapps/contentstore/xblock_services/xblock_service.py
+#: cms/djangoapps/contentstore/xblock_storage_handlers/view_handlers.py
 #, python-brace-format
 msgid "{section_or_subsection} \"{display_name}\""
 msgstr "{section_or_subsection} \"{display_name}\""
@@ -16660,6 +16674,11 @@ msgid "You are enrolled in this course"
 msgstr "Ɏøn ɐɹǝ ǝnɹøllǝd ᴉn ʇɥᴉs ɔønɹsǝ"
 
 #: lms/templates/courseware/course_about.html
+#: lms/templates/dashboard/_dashboard_course_resume.html
+msgid "View Course"
+msgstr "Vᴉǝʍ Ȼønɹsǝ"
+
+#: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
 msgstr "Ɇnɹøllɯǝnʇ ᴉn ʇɥᴉs ɔønɹsǝ ᴉs bʎ ᴉnʌᴉʇɐʇᴉøn ønlʎ"
 
@@ -19224,6 +19243,26 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add Staff"
 msgstr "Ⱥdd Sʇɐɟɟ"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Limited Staff"
+msgstr "Łᴉɯᴉʇǝd Sʇɐɟɟ"
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid ""
+"Course team members with the Limited Staff role help you manage your course."
+" Limited Staff can enroll and unenroll learners, as well as modify their "
+"grades and access all course data. Limited Staff don't have access to your "
+"course in Studio. You can only give course team roles to enrolled users."
+msgstr ""
+"Ȼønɹsǝ ʇǝɐɯ ɯǝɯbǝɹs ʍᴉʇɥ ʇɥǝ Łᴉɯᴉʇǝd Sʇɐɟɟ ɹølǝ ɥǝld ʎøn ɯɐnɐƃǝ ʎønɹ ɔønɹsǝ."
+" Łᴉɯᴉʇǝd Sʇɐɟɟ ɔɐn ǝnɹøll ɐnd nnǝnɹøll lǝɐɹnǝɹs, ɐs ʍǝll ɐs ɯødᴉɟʎ ʇɥǝᴉɹ "
+"ƃɹɐdǝs ɐnd ɐɔɔǝss ɐll ɔønɹsǝ dɐʇɐ. Łᴉɯᴉʇǝd Sʇɐɟɟ døn'ʇ ɥɐʌǝ ɐɔɔǝss ʇø ʎønɹ "
+"ɔønɹsǝ ᴉn Sʇndᴉø. Ɏøn ɔɐn ønlʎ ƃᴉʌǝ ɔønɹsǝ ʇǝɐɯ ɹølǝs ʇø ǝnɹøllǝd nsǝɹs."
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html
+msgid "Add Limited Staff"
+msgstr "Ⱥdd Łᴉɯᴉʇǝd Sʇɐɟɟ"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Admin"
@@ -24491,6 +24530,10 @@ msgid "Outline"
 msgstr "Ønʇlᴉnǝ"
 
 #: cms/templates/widgets/header.html
+msgid "Files & Media"
+msgstr "Fᴉlǝs & Mǝdᴉɐ"
+
+#: cms/templates/widgets/header.html
 msgid "Publisher"
 msgstr "Ᵽnblᴉsɥǝɹ"
 
@@ -24839,10 +24882,6 @@ msgstr "ɯødᴉɟᴉǝd"
 #: wiki/models/article.py
 msgid "Article properties last modified"
 msgstr "Ⱥɹʇᴉɔlǝ dɹødǝɹʇᴉǝs lɐsʇ ɯødᴉɟᴉǝd"
-
-#: wiki/models/article.py
-msgid "owner"
-msgstr "øʍnǝɹ"
 
 #: wiki/models/article.py
 msgid ""

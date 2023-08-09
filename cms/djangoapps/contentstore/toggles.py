@@ -159,6 +159,25 @@ def use_new_problem_editor():
     return ENABLE_NEW_PROBLEM_EDITOR_FLAG.is_enabled()
 
 
+# .. toggle_name: new_editors.add_game_block_button
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag enables the creation of the new games block
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-07-26
+# .. toggle_target_removal_date: 2023-09-31
+# .. toggle_tickets: TNL-10924
+# .. toggle_warning:
+ENABLE_ADD_GAME_BLOCK_FLAG = WaffleFlag('new_editors.add_game_block_button', __name__)
+
+
+def use_add_game_block():
+    """
+    Returns a boolean if add game block button is enabled
+    """
+    return ENABLE_ADD_GAME_BLOCK_FLAG.is_enabled()
+
+
 # .. toggle_name: contentstore.individualize_anonymous_user_id
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
@@ -238,7 +257,7 @@ def use_new_home_page():
     return ENABLE_NEW_STUDIO_HOME_PAGE.is_enabled()
 
 
-# .. toggle_name: new_studio_mfe.use_new_custom_pages
+# .. toggle_name: contentstore.new_studio_mfe.use_new_custom_pages
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio custom pages mfe
@@ -258,7 +277,7 @@ def use_new_custom_pages(course_key):
     return ENABLE_NEW_STUDIO_CUSTOM_PAGES.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_schedule_details_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_schedule_details_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio schedule and details mfe
@@ -278,7 +297,7 @@ def use_new_schedule_details_page(course_key):
     return ENABLE_NEW_STUDIO_SCHEDULE_DETAILS_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_advanced_settings_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_advanced_settings_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio advanced settings page mfe
@@ -298,7 +317,7 @@ def use_new_advanced_settings_page(course_key):
     return ENABLE_NEW_STUDIO_ADVANCED_SETTINGS_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_grading_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_grading_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio grading page mfe
@@ -318,7 +337,7 @@ def use_new_grading_page(course_key):
     return ENABLE_NEW_STUDIO_GRADING_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_updates_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_updates_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio updates page mfe
@@ -338,7 +357,7 @@ def use_new_updates_page(course_key):
     return ENABLE_NEW_STUDIO_UPDATES_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_import_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_import_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio import page mfe
@@ -358,7 +377,7 @@ def use_new_import_page(course_key):
     return ENABLE_NEW_STUDIO_IMPORT_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_export_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_export_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio export page mfe
@@ -378,7 +397,7 @@ def use_new_export_page(course_key):
     return ENABLE_NEW_STUDIO_EXPORT_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_files_uploads_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_files_uploads_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio files and uploads page mfe
@@ -398,7 +417,7 @@ def use_new_files_uploads_page(course_key):
     return ENABLE_NEW_STUDIO_FILES_UPLOADS_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_video_uploads_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_video_uploads_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new video uploads page mfe
@@ -418,7 +437,7 @@ def use_new_video_uploads_page(course_key):
     return ENABLE_NEW_STUDIO_VIDEO_UPLOADS_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_course_outline_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_course_outline_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio course outline page mfe
@@ -438,7 +457,7 @@ def use_new_course_outline_page(course_key):
     return ENABLE_NEW_STUDIO_COURSE_OUTLINE_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_unit_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_unit_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio course outline page mfe
@@ -458,7 +477,7 @@ def use_new_unit_page(course_key):
     return ENABLE_NEW_STUDIO_UNIT_PAGE.is_enabled(course_key)
 
 
-# .. toggle_name: new_studio_mfe.use_new_course_team_page
+# .. toggle_name: contentstore.new_studio_mfe.use_new_course_team_page
 # .. toggle_implementation: CourseWaffleFlag
 # .. toggle_default: False
 # .. toggle_description: This flag enables the use of the new studio course team page mfe
@@ -476,3 +495,45 @@ def use_new_course_team_page(course_key):
     Returns a boolean if new studio course team mfe is enabled
     """
     return ENABLE_NEW_STUDIO_COURSE_TEAM_PAGE.is_enabled(course_key)
+
+
+# .. toggle_name: contentstore.mock_video_uploads
+# .. toggle_implementation: WaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag mocks contentstore video uploads for local development, if you don't have access to AWS
+# .. toggle_use_cases: open_edx
+# .. toggle_creation_date: 2023-7-25
+# .. toggle_tickets: TNL-10897
+# .. toggle_warning:
+MOCK_VIDEO_UPLOADS = WaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.mock_video_uploads', __name__)
+
+
+def use_mock_video_uploads():
+    """
+    Returns a boolean if video uploads should be mocked for local development
+    """
+    return MOCK_VIDEO_UPLOADS.is_enabled()
+
+
+# .. toggle_name: contentstore.default_enable_flexible_peer_openassessments
+# .. toggle_implementation: CourseWaffleFlag
+# .. toggle_default: False
+# .. toggle_description: This flag turns on the force_on_flexible_peer_openassessments
+#      setting for course reruns or new courses, where enabled.
+# .. toggle_use_cases: temporary
+# .. toggle_creation_date: 2023-06-27
+# .. toggle_target_removal_date: 2024-01-27
+# .. toggle_tickets: AU-1289
+# .. toggle_warning:
+DEFAULT_ENABLE_FLEXIBLE_PEER_OPENASSESSMENTS = CourseWaffleFlag(
+    f'{CONTENTSTORE_NAMESPACE}.default_enable_flexible_peer_openassessments', __name__)
+
+
+def default_enable_flexible_peer_openassessments(course_key):
+    """
+    Returns a boolean if ORA flexible peer grading should be toggled on for a
+    course rerun or new course. We expect this to be set at the organization
+    level to opt in/out of rolling forward this feature.
+    """
+    return DEFAULT_ENABLE_FLEXIBLE_PEER_OPENASSESSMENTS.is_enabled(course_key)

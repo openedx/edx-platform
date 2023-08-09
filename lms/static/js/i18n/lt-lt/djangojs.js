@@ -471,8 +471,6 @@
     "Successfully enrolled the following users:": "S\u0117kmingai \u012ftraukti \u012f s\u0105ra\u0161\u0105 \u0161ie naudotojai:",
     "Successfully rescored problem for user {user}": "S\u0117kmingai perskai\u010diuotas naudotojo {user} u\u017edavinio \u012fvertinimas.",
     "Successfully reset the attempts for user {user}": "S\u0117kmingai nustatyta, kad naudotojas {user} gal\u0117t\u0173 bandyti i\u0161 naujo. ",
-    "Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:": "S\u0117kmingai i\u0161si\u0173sti registracijos el. lai\u0161kai \u0161iems naudotojams. Juos bus leista \u012ftraukti \u012f s\u0105ra\u0161\u0105, kai tik jie u\u017esiregistruos:",
-    "Successfully sent enrollment emails to the following users. They will be enrolled once they register:": "S\u0117kmingai i\u0161si\u0173sti registracijos el. lai\u0161kai \u0161iems naudotojams. Jie bus \u012ftraukti \u012f s\u0105ra\u0161\u0105, kai tik u\u017esiregistruos:",
     "Successfully unlinked.": "S\u0117kmingai atjungta.",
     "Tags": "\u017dymos",
     "Tags:": "\u017dymos:",

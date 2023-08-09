@@ -13,7 +13,6 @@ import logging
 from collections import OrderedDict
 from copy import deepcopy
 
-from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 
 from lxml import etree
@@ -22,9 +21,8 @@ from xblock.fields import Boolean, Dict, List, Scope, String  # lint-amnesty, py
 from openedx.core.djangolib.markup import Text, HTML
 from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.stringify import stringify_children
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
@@ -42,7 +40,6 @@ class PollBlock(
     MakoTemplateBlockBase,
     XmlMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):  # pylint: disable=abstract-method
@@ -83,22 +80,6 @@ class PollBlock(
 
     resources_dir = None
     uses_xmodule_styles_setup = True
-
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/javascript_loader.js'),
-            resource_filename(__name__, 'js/src/poll/poll.js'),
-            resource_filename(__name__, 'js/src/poll/poll_main.js')
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
-    # There is no studio_view() for this XBlock but this is needed to make the
-    # the static_content command happy.
-    studio_view_js = {
-        'js': [],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js')
-    }
 
     def handle_ajax(self, dispatch, data):  # lint-amnesty, pylint: disable=unused-argument
         """Ajax handler.
@@ -155,7 +136,8 @@ class PollBlock(
             'configuration_json': self.dump_poll(),
         }
         fragment.add_content(self.runtime.service(self, 'mako').render_template('poll.html', params))
-        add_webpack_to_fragment(fragment, 'PollBlockPreview')
+        add_sass_to_fragment(fragment, 'PollBlockDisplay.scss')
+        add_webpack_js_to_fragment(fragment, 'PollBlockDisplay')
         shim_xmodule_js(fragment, 'Poll')
         return fragment
 

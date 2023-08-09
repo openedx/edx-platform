@@ -48,11 +48,11 @@ from xmodule.mako_block import MakoTemplateBlockBase
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.raw_block import EmptyDataRawMixin
 from xmodule.validation import StudioValidation, StudioValidationMessage
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.video_block import manage_video_subtitles_save
 from xmodule.x_module import (
     PUBLIC_VIEW, STUDENT_VIEW,
-    HTMLSnippet, ResourceTemplates, shim_xmodule_js,
+    ResourceTemplates, shim_xmodule_js,
     XModuleMixin, XModuleToXBlockMixin,
 )
 from xmodule.xml_block import XmlMixin, deserialize_field, is_pointer_tag, name_to_pathname
@@ -121,7 +121,7 @@ EXPORT_IMPORT_STATIC_DIR = 'static'
 @XBlock.needs('mako', 'user')
 class VideoBlock(
         VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, VideoStudentViewHandlers,
-        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin, HTMLSnippet,
+        EmptyDataRawMixin, XmlMixin, EditingMixin, XModuleToXBlockMixin,
         ResourceTemplates, XModuleMixin, LicenseMixin):
     """
     XML source example:
@@ -242,7 +242,8 @@ class VideoBlock(
         Return the student view.
         """
         fragment = Fragment(self.get_html())
-        add_webpack_to_fragment(fragment, 'VideoBlockPreview')
+        add_sass_to_fragment(fragment, 'VideoBlockDisplay.scss')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
         return fragment
 
@@ -259,7 +260,8 @@ class VideoBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'VideoBlockStudio')
+        add_sass_to_fragment(fragment, 'VideoBlockEditor.scss')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockEditor')
         shim_xmodule_js(fragment, 'TabsEditingDescriptor')
         return fragment
 
@@ -274,11 +276,15 @@ class VideoBlock(
             return self.student_view(context)
 
         fragment = Fragment(self.get_html(view=PUBLIC_VIEW, context=context))
-        add_webpack_to_fragment(fragment, 'VideoBlockPreview')
+        add_sass_to_fragment(fragment, 'VideoBlockDisplay.scss')
+        add_webpack_js_to_fragment(fragment, 'VideoBlockDisplay')
         shim_xmodule_js(fragment, 'Video')
         return fragment
 
     def get_html(self, view=STUDENT_VIEW, context=None):  # lint-amnesty, pylint: disable=arguments-differ, too-many-statements
+        """
+        Return html for a given view of this block.
+        """
         context = context or {}
         track_status = (self.download_track and self.track)
         transcript_download_format = self.transcript_download_format if not track_status else None

@@ -113,7 +113,9 @@ class PartitionService:
         through course.user_partitions, and any dynamic partitions that exist). Note: this returns
         both active and inactive partitions.
         """
-        return get_all_partitions_for_course(self.get_course())
+        if course := self.get_course():
+            return get_all_partitions_for_course(course)
+        return []
 
     def get_user_group_id_for_partition(self, user, user_partition_id):
         """

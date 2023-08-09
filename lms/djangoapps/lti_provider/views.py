@@ -145,7 +145,7 @@ def render_courseware(request, usage_key):
     """
     # return an HttpResponse object that contains the template and necessary context to render the courseware.
     from lms.djangoapps.courseware.views.views import render_xblock
-    return render_xblock(request, str(usage_key), check_if_enrolled=False)
+    return render_xblock(request, str(usage_key), check_if_enrolled=False, disable_staff_debug_info=True)
 
 
 def parse_course_and_usage_keys(course_id, usage_id):

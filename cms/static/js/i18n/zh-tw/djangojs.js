@@ -579,8 +579,6 @@
     "Successfully enrolled the following users:": "\u6210\u529f\u8a3b\u518a\u4ee5\u4e0b\u4f7f\u7528\u8005\uff1a",
     "Successfully rescored problem for user {user}": "\u6210\u529f\u91cd\u8a55\u7528\u6236 {user} \u5f97\u5206",
     "Successfully reset the attempts for user {user}": "\u6210\u529f\u91cd\u7f6e\u7528\u6236 {user}\u7684\u8acb\u6c42",
-    "Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:": "\u6210\u529f\u767c\u9001\u767b\u8a18\u96fb\u5b50\u90f5\u4ef6\u3002\u4e00\u65e6\u5b8c\u6210\u5e33\u865f\u8a3b\u518a\uff0c\u4ee5\u4e0b\u4f7f\u7528\u8005\u5c07\u88ab\u5141\u8a31\u8a3b\u518a\u8ab2\u7a0b\uff1a",
-    "Successfully sent enrollment emails to the following users. They will be enrolled once they register:": "\u6210\u529f\u767c\u9001\u8ab2\u7a0b\u8a3b\u518a\u96fb\u5b50\u90f5\u4ef6\u3002\u4e00\u65e6\u5b8c\u6210\u5e33\u865f\u8a3b\u518a\uff0c\u4ee5\u4e0b\u4f7f\u7528\u8005\u5c07\u88ab\u8a3b\u518a\u65bc\u8ab2\u7a0b\u4e2d\uff1a",
     "Successfully unlinked.": "\u6210\u529f\u5730\u53d6\u6d88\u9023\u7d50\u3002",
     "Supported": "\u652f\u63f4",
     "TOTAL": "\u7e3d\u984d",

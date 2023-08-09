@@ -133,6 +133,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                     tabsTemplate = this.loadTemplate('settings-modal-tabs');
                     HtmlUtils.setHtml(this.$('.modal-section'), HtmlUtils.HTML(tabsTemplate({tabs: tabs})));
                     _.each(this.options.tabs, function(tab) {
+                        // eslint-disable-next-line prefer-spread
                         this.options.editors.push.apply(
                             this.options.editors,
                             _.map(tab.editors, function(Editor) {
@@ -606,6 +607,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             this.$('.field-exam-review-rules textarea').val(value);
         },
         isValidTimeLimit: function(timeLimit) {
+            // eslint-disable-next-line prefer-regex-literals
             var pattern = new RegExp('^\\d{1,2}:[0-5][0-9]$');
             return pattern.test(timeLimit) && timeLimit !== '00:00';
         },
@@ -948,6 +950,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             } else {
                 $('.un-published-tip').show();
             }
+            // eslint-disable-next-line prefer-const
             let enabledForGraded = course.get('discussions_settings').enable_graded_units;
             if (this.model.get('graded') && !enabledForGraded) {
                 $('#discussion_enabled').prop('disabled', true);
@@ -1032,6 +1035,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
                 } else {
                     display = 'none';
                 }
+                // eslint-disable-next-line no-shadow
                 $.each(warning, function(_, element) {
                     element.style.display = display;
                 });

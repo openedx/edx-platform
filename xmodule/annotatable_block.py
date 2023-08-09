@@ -4,7 +4,6 @@ import logging
 import textwrap
 
 from lxml import etree
-from pkg_resources import resource_filename
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String
@@ -12,10 +11,9 @@ from xblock.fields import Scope, String
 from openedx.core.djangolib.markup import HTML, Text
 from xmodule.editing_block import EditingMixin
 from xmodule.raw_block import RawMixin
-from xmodule.util.xmodule_django import add_webpack_to_fragment
+from xmodule.util.builtin_assets import add_webpack_js_to_fragment, add_sass_to_fragment
 from xmodule.xml_block import XmlMixin
 from xmodule.x_module import (
-    HTMLSnippet,
     ResourceTemplates,
     shim_xmodule_js,
     XModuleMixin,
@@ -35,7 +33,6 @@ class AnnotatableBlock(
     XmlMixin,
     EditingMixin,
     XModuleToXBlockMixin,
-    HTMLSnippet,
     ResourceTemplates,
     XModuleMixin,
 ):
@@ -73,22 +70,6 @@ class AnnotatableBlock(
 
     uses_xmodule_styles_setup = True
 
-    preview_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/html/display.js'),
-            resource_filename(__name__, 'js/src/annotatable/display.js'),
-            resource_filename(__name__, 'js/src/javascript_loader.js'),
-            resource_filename(__name__, 'js/src/collapsible.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
-
-    studio_view_js = {
-        'js': [
-            resource_filename(__name__, 'js/src/raw/edit/xml.js'),
-        ],
-        'xmodule_js': resource_filename(__name__, 'js/src/xmodule.js'),
-    }
     studio_js_module_name = "XMLEditingDescriptor"
     mako_template = "widgets/raw-edit.html"
 
@@ -199,7 +180,8 @@ class AnnotatableBlock(
         """
         fragment = Fragment()
         fragment.add_content(self.get_html())
-        add_webpack_to_fragment(fragment, 'AnnotatableBlockPreview')
+        add_sass_to_fragment(fragment, 'AnnotatableBlockDisplay.scss')
+        add_webpack_js_to_fragment(fragment, 'AnnotatableBlockDisplay')
         shim_xmodule_js(fragment, 'Annotatable')
 
         return fragment
@@ -211,6 +193,7 @@ class AnnotatableBlock(
         fragment = Fragment(
             self.runtime.service(self, 'mako').render_template(self.mako_template, self.get_context())
         )
-        add_webpack_to_fragment(fragment, 'AnnotatableBlockStudio')
+        add_sass_to_fragment(fragment, 'AnnotatableBlockEditor.scss')
+        add_webpack_js_to_fragment(fragment, 'AnnotatableBlockEditor')
         shim_xmodule_js(fragment, self.studio_js_module_name)
         return fragment

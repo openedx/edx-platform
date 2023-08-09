@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -8,6 +9,7 @@ class ReactRendererException extends Error {
     }
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export class ReactRenderer {
     constructor({
         component, selector, componentName, props = {}

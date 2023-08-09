@@ -1,5 +1,6 @@
 /* global YT */
 
+// eslint-disable-next-line no-shadow-restricted-names
 (function(require, define, undefined) {
     'use strict';
 
@@ -157,6 +158,7 @@
                     });
 
                     describe('when not on a touch based device', function() {
+                        // eslint-disable-next-line no-shadow
                         var oldOTBD;
 
                         beforeEach(function() {

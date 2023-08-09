@@ -6,3 +6,5 @@ from .grading import CourseGradingView
 from .proctoring import ProctoredExamSettingsView, ProctoringErrorsView
 from .settings import CourseSettingsView
 from .xblock import XblockView
+from .assets import AssetsView
+from .videos import VideosView

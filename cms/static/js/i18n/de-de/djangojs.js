@@ -1665,8 +1665,6 @@
     "Successfully rescored problem for user {user}": "Fragestellung f\u00fcr Benutzer {user} erfolgreich neu bewertet.",
     "Successfully rescored problem to improve score for user {user}": "Erfolgreiche Neubewertung des Problems zur Verbesserung der Punktzahl f\u00fcr den Benutzer {user}",
     "Successfully reset the attempts for user {user}": "Versuche f\u00fcr Nutzer {user} erfolgreich zur\u00fcckgesetzt.",
-    "Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:": "An folgende Nutzer wurden erfolgreich E-Mails zur Einschreibung versandt. Sobald diese sich registriert haben, k\u00f6nnen sie sich einschreiben: ",
-    "Successfully sent enrollment emails to the following users. They will be enrolled once they register:": "An folgende Teilnehmer wurde erfolgreich eine E-Mail bez\u00fcgliche der Einschreibung versandt. Diese werden eingeschrieben, sobald sie sich registriert haben: ",
     "Successfully started task to rescore problem '<%- problem_id %>' for all students. Click the 'Show Task Status' button to see the status of the task.": "Erfolgreich gestartete Aufgabe zur Neubewertung des Problems <%- problem_id %>' f\u00fcr alle Teilnehmer. Klicken Sie auf die Schaltfl\u00e4che \"Aufgabenstatus anzeigen\", um den Status der Aufgabe anzuzeigen.",
     "Successfully started task to reset attempts for problem '<%- problem_id %>'. Click the 'Show Task Status' button to see the status of the task.": "Erfolgreich gestartete Aufgabe zum Zur\u00fccksetzen von Versuchen f\u00fcr das Problem '<%- problem_id %>'. Klicken Sie auf die Schaltfl\u00e4che \"Aufgabenstatus anzeigen\", um den Status der Aufgabe anzuzeigen.",
     "Successfully unlinked.": "Erfolgreich getrennt.",

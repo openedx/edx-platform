@@ -241,6 +241,7 @@ describe('CourseOutlinePage', function() {
         };
 
         it('can be published', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: true
             });
@@ -256,6 +257,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('should show publish button if it is not published and not changed', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: false,
                 published: false
@@ -264,6 +266,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('should show publish button if it is published and changed', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: true,
                 published: true
@@ -272,6 +275,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('should show publish button if it is not published, but changed', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: true,
                 published: false
@@ -280,6 +284,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('should hide publish button if it is not changed, but published', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = getMockCourseJSON({
                 has_changes: false,
                 published: true
@@ -589,6 +594,7 @@ describe('CourseOutlinePage', function() {
             setSelfPaced();
         });
 
+        // eslint-disable-next-line prefer-const
         createCourse = function(sectionOptions, courseOptions) {
             createCourseOutlinePage(this,
                 createMockCourseJSON(courseOptions, [
@@ -597,14 +603,17 @@ describe('CourseOutlinePage', function() {
             );
         };
 
+        // eslint-disable-next-line prefer-const
         createCourseWithHighlights = function(highlights) {
             createCourse({highlights: highlights});
         };
 
+        // eslint-disable-next-line prefer-const
         clickSaveOnModal = function() {
             $('.wrapper-modal-window .action-save').click();
         };
 
+        // eslint-disable-next-line prefer-const
         clickCancelOnModal = function() {
             $('.wrapper-modal-window .action-cancel').click();
         };
@@ -1043,6 +1052,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('can display a publish modal with a list of unpublished subsections and units', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = createMockCourseJSON({}, [
                     createMockSectionJSON({has_changes: true}, [
                         createMockSubsectionJSON({has_changes: true}, [
@@ -1319,6 +1329,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('can show correct editors for self_paced course', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = createMockCourseJSON({}, [
                 createMockSectionJSON({}, [
                     createMockSubsectionJSON({}, [])
@@ -2166,6 +2177,7 @@ describe('CourseOutlinePage', function() {
         });
 
         it('can display a publish modal with a list of unpublished units', function() {
+            // eslint-disable-next-line no-shadow
             var mockCourseJSON = createMockCourseJSON({}, [
                     createMockSectionJSON({has_changes: true}, [
                         createMockSubsectionJSON({has_changes: true}, [
@@ -2193,6 +2205,7 @@ describe('CourseOutlinePage', function() {
 
         describe('Self Paced with Custom Personalized Learner Schedules (PLS)', function() {
             beforeEach(function() {
+                // eslint-disable-next-line no-shadow
                 var mockCourseJSON = createMockCourseJSON({}, [
                     createMockSectionJSON({}, [
                         createMockSubsectionJSON({}, [])

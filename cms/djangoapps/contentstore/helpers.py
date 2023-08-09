@@ -1,30 +1,31 @@
 """
 Helper methods for Studio views.
 """
-
+from __future__ import annotations
+import logging
 import urllib
 from lxml import etree
+from mimetypes import guess_type
 
+from attrs import frozen, Factory
 from django.utils.translation import gettext as _
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locator import DefinitionLocator, LocalId
 from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.runtime import IdGenerator
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.xml_block import XmlMixin
 
-# from cms.djangoapps.contentstore.views.preview import _load_preview_block
 from cms.djangoapps.models.settings.course_grading import CourseGradingModel
-from common.djangoapps.student import auth
-from common.djangoapps.student.roles import CourseCreatorRole, OrgContentCreatorRole
-
-try:
-    # Technically this is a django app plugin, so we should not error if it's not installed:
-    import openedx.core.djangoapps.content_staging.api as content_staging_api
-except ImportError:
-    content_staging_api = None
+import openedx.core.djangoapps.content_staging.api as content_staging_api
 
 from .utils import reverse_course_url, reverse_library_url, reverse_usage_url
+
+log = logging.getLogger(__name__)
 
 # Note: Grader types are used throughout the platform but most usages are simply in-line
 # strings.  In addition, new grader types can be defined on the fly anytime one is needed
@@ -210,13 +211,24 @@ class ImportIdGenerator(IdGenerator):
         return DefinitionLocator(block_type, LocalId(block_type))
 
 
-def import_staged_content_from_user_clipboard(parent_key: UsageKey, request):
+@frozen
+class StaticFileNotices:
+    """ Information about what static files were updated (or not) when pasting content into another course """
+    new_files: list[str] = Factory(list)
+    conflicting_files: list[str] = Factory(list)
+    error_files: list[str] = Factory(list)
+
+
+def import_staged_content_from_user_clipboard(parent_key: UsageKey, request) -> tuple[XBlock | None, StaticFileNotices]:
     """
-    Import a block (and any children it has) from "staged" OLX.
+    Import a block (along with its children and any required static assets) from
+    the "staged" OLX in the user's clipboard.
+
     Does not deal with permissions or REST stuff - do that before calling this.
 
-    Returns the newly created block on success or None if the clipboard is
-    empty.
+    Returns (1) the newly created block on success or None if the clipboard is
+    empty, and (2) a summary of changes made to static files in the destination
+    course.
     """
 
     from cms.djangoapps.contentstore.views.preview import _load_preview_block
@@ -226,38 +238,183 @@ def import_staged_content_from_user_clipboard(parent_key: UsageKey, request):
     user_clipboard = content_staging_api.get_user_clipboard(request.user.id)
     if not user_clipboard:
         # Clipboard is empty or expired/error/loading
-        return None
-    block_type = user_clipboard.content.block_type
+        return None, StaticFileNotices()
     olx_str = content_staging_api.get_staged_content_olx(user_clipboard.content.id)
+    static_files = content_staging_api.get_staged_content_static_files(user_clipboard.content.id)
     node = etree.fromstring(olx_str)
     store = modulestore()
     with store.bulk_operations(parent_key.course_key):
         parent_descriptor = store.get_item(parent_key)
         # Some blocks like drag-and-drop only work here with the full XBlock runtime loaded:
-
         parent_xblock = _load_preview_block(request, parent_descriptor)
-        runtime = parent_xblock.runtime
-        # Generate the new ID:
-        id_generator = ImportIdGenerator(parent_key.context_key)
-        def_id = id_generator.create_definition(block_type, user_clipboard.source_usage_key.block_id)
-        usage_id = id_generator.create_usage(def_id)
-        keys = ScopeIds(None, block_type, def_id, usage_id)
-        # parse_xml is a really messy API. We pass both 'keys' and 'id_generator' and, depending on the XBlock, either
-        # one may be used to determine the new XBlock's usage key, and the other will be ignored. e.g. video ignores
-        # 'keys' and uses 'id_generator', but the default XBlock parse_xml ignores 'id_generator' and uses 'keys'.
-        # For children of this block, obviously only id_generator is used.
-        xblock_class = runtime.load_block_type(block_type)
+        new_xblock = _import_xml_node_to_parent(
+            node,
+            parent_xblock,
+            store,
+            user_id=request.user.id,
+            slug_hint=user_clipboard.source_usage_key.block_id,
+            copied_from_block=str(user_clipboard.source_usage_key),
+        )
+    # Now handle static files that need to go into Files & Uploads:
+    notices = _import_files_into_course(
+        course_key=parent_key.context_key,
+        staged_content_id=user_clipboard.content.id,
+        static_files=static_files,
+    )
+
+    return new_xblock, notices
+
+
+def _import_xml_node_to_parent(
+    node,
+    parent_xblock: XBlock,
+    # The modulestore we're using
+    store,
+    # The ID of the user who is performing this operation
+    user_id: int,
+    # Hint to use as usage ID (block_id) for the new XBlock
+    slug_hint: str | None = None,
+    # UsageKey of the XBlock that this one is a copy of
+    copied_from_block: str | None = None,
+) -> XBlock:
+    """
+    Given an XML node representing a serialized XBlock (OLX), import it into modulestore 'store' as a child of the
+    specified parent block. Recursively copy children as needed.
+    """
+    runtime = parent_xblock.runtime
+    parent_key = parent_xblock.scope_ids.usage_id
+    block_type = node.tag
+
+    # Generate the new ID:
+    id_generator = ImportIdGenerator(parent_key.context_key)
+    def_id = id_generator.create_definition(block_type, slug_hint)
+    usage_id = id_generator.create_usage(def_id)
+    keys = ScopeIds(None, block_type, def_id, usage_id)
+    # parse_xml is a really messy API. We pass both 'keys' and 'id_generator' and, depending on the XBlock, either
+    # one may be used to determine the new XBlock's usage key, and the other will be ignored. e.g. video ignores
+    # 'keys' and uses 'id_generator', but the default XBlock parse_xml ignores 'id_generator' and uses 'keys'.
+    # For children of this block, obviously only id_generator is used.
+    xblock_class = runtime.load_block_type(block_type)
+    # Note: if we find a case where any XBlock needs access to the block-specific static files that were saved to
+    # export_fs during copying, we could make them available here via runtime.resources_fs before calling parse_xml.
+    # However, currently the only known case for that is video block's transcript files, and those will
+    # automatically be "carried over" to the new XBlock even in a different course because the video ID is the same,
+    # and VAL will thus make the transcript available.
+
+    child_nodes = []
+    if not xblock_class.has_children:
+        # No children to worry about. The XML may contain child nodes, but they're not XBlocks.
         temp_xblock = xblock_class.parse_xml(node, runtime, keys, id_generator)
-        if xblock_class.has_children and temp_xblock.children:
-            raise NotImplementedError("We don't yet support pasting XBlocks with children")
-        temp_xblock.parent = parent_key
+    else:
+        # We have to handle the children ourselves, because there are lots of complex interactions between
+        #    * the vanilla XBlock parse_xml() method, and its lack of API for "create and save a new XBlock"
+        #    * the XmlMixin version of parse_xml() which only works with ImportSystem, not modulestore or the v2 runtime
+        #    * the modulestore APIs for creating and saving a new XBlock, which work but don't support XML parsing.
+        # We can safely assume that if the XBLock class supports children, every child node will be the XML
+        # serialization of a child block, in order. For blocks that don't support children, their XML content/nodes
+        # could be anything (e.g. HTML, capa)
+        node_without_children = etree.Element(node.tag, **node.attrib)
+        if issubclass(xblock_class, XmlMixin):
+            # Hack: XBlocks that use "XmlMixin" have their own XML parsing behavior, and in particular if they encounter
+            # an XML node that has no children and has only a "url_name" attribute, they'll try to load the XML data
+            # from an XML file in runtime.resources_fs. But that file doesn't exist here. So we set at least one
+            # additional attribute here to make sure that url_name is not the only attribute; otherwise in some cases,
+            # XmlMixin.parse_xml will try to load an XML file that doesn't exist, giving an error. The name and value
+            # of this attribute don't matter and should be ignored.
+            node_without_children.attrib["x-is-pointer-node"] = "no"
+        temp_xblock = xblock_class.parse_xml(node_without_children, runtime, keys, id_generator)
+        child_nodes = list(node)
+    if xblock_class.has_children and temp_xblock.children:
+        raise NotImplementedError("We don't yet support pasting XBlocks with children")
+    temp_xblock.parent = parent_key
+    if copied_from_block:
         # Store a reference to where this block was copied from, in the 'copied_from_block' field (AuthoringMixin)
-        temp_xblock.copied_from_block = str(user_clipboard.source_usage_key)
-        # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
-        new_xblock = store.update_item(temp_xblock, request.user.id, allow_not_found=True)
-        parent_xblock.children.append(new_xblock.location)
-        store.update_item(parent_xblock, request.user.id)
-        return new_xblock
+        temp_xblock.copied_from_block = copied_from_block
+    # Save the XBlock into modulestore. We need to save the block and its parent for this to work:
+    new_xblock = store.update_item(temp_xblock, user_id, allow_not_found=True)
+    parent_xblock.children.append(new_xblock.location)
+    store.update_item(parent_xblock, user_id)
+    for child_node in child_nodes:
+        _import_xml_node_to_parent(child_node, new_xblock, store, user_id=user_id)
+    return new_xblock
+
+
+def _import_files_into_course(
+    course_key: CourseKey,
+    staged_content_id: int,
+    static_files: list[content_staging_api.StagedContentFileData],
+) -> StaticFileNotices:
+    """
+    For the given staged static asset files (which are in "Staged Content" such as the user's clipbaord, but which
+    need to end up in the course's Files & Uploads page), import them into the destination course, unless they already
+    exist.
+    """
+    # List of files that were newly added to the destination course
+    new_files = []
+    # List of files that conflicted with identically named files already in the destination course
+    conflicting_files = []
+    # List of files that had an error (shouldn't happen unless we have some kind of bug)
+    error_files = []
+    for file_data_obj in static_files:
+        if not isinstance(file_data_obj.source_key, AssetKey):
+            # This static asset was managed by the XBlock and instead of being added to "Files & Uploads", it is stored
+            # using some other system. We could make it available via runtime.resources_fs during XML parsing, but it's
+            # not needed here.
+            continue
+        # At this point, we know this is a "Files & Uploads" asset that we may need to copy into the course:
+        try:
+            result = _import_file_into_course(course_key, staged_content_id, file_data_obj)
+            if result is True:
+                new_files.append(file_data_obj.filename)
+            elif result is None:
+                pass  # This file already exists; no action needed.
+            else:
+                conflicting_files.append(file_data_obj.filename)
+        except Exception:  # lint-amnesty, pylint: disable=broad-except
+            error_files.append(file_data_obj.filename)
+            log.exception(f"Failed to import Files & Uploads file {file_data_obj.filename}")
+    return StaticFileNotices(
+        new_files=new_files,
+        conflicting_files=conflicting_files,
+        error_files=error_files,
+    )
+
+
+def _import_file_into_course(
+    course_key: CourseKey,
+    staged_content_id: int,
+    file_data_obj: content_staging_api.StagedContentFileData,
+) -> bool | None:
+    """
+    Import a single staged static asset file into the course, unless it already exists.
+    Returns True if it was imported, False if there's a conflict, or None if
+    the file already existed (no action needed).
+    """
+    filename = file_data_obj.filename
+    new_key = course_key.make_asset_key("asset", filename)
+    try:
+        current_file = contentstore().find(new_key)
+    except NotFoundError:
+        current_file = None
+    if not current_file:
+        # This static asset should be imported into the new course:
+        content_type = guess_type(filename)[0]
+        data = content_staging_api.get_staged_content_static_file_data(staged_content_id, filename)
+        if data is None:
+            raise NotFoundError(file_data_obj.source_key)
+        content = StaticContent(new_key, name=filename, content_type=content_type, data=data)
+        # If it's an image file, also generate the thumbnail:
+        thumbnail_content, thumbnail_location = contentstore().generate_thumbnail(content)
+        if thumbnail_content is not None:
+            content.thumbnail_location = thumbnail_location
+        contentstore().save(content)
+        return True
+    elif current_file.content_digest == file_data_obj.md5_hash:
+        # The file already exists and matches exactly, so no action is needed
+        return None
+    else:
+        # There is a conflict with some other file that has the same name.
+        return False
 
 
 def is_item_in_course_tree(item):
@@ -272,15 +429,3 @@ def is_item_in_course_tree(item):
         ancestor = ancestor.get_parent()
 
     return ancestor is not None
-
-
-def is_content_creator(user, org):
-    """
-    Check if the user has the role to create content.
-
-    This function checks if the User has role to create content
-    or if the org is supplied, it checks for Org level course content
-    creator.
-    """
-    return (auth.user_has_role(user, CourseCreatorRole()) or
-            auth.user_has_role(user, OrgContentCreatorRole(org=org)))

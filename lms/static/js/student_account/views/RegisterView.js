@@ -134,7 +134,9 @@
 
                 html = this.renderFields(requiredFields, 'required-fields');
 
+                // eslint-disable-next-line prefer-spread
                 html.push.apply(html, this.renderFields(exposedOptionalFields, 'exposed-optional-fields'));
+                // eslint-disable-next-line prefer-spread
                 html.push.apply(html, this.renderFields(
                     optionalFields, `optional-fields ${!this.enableCoppaCompliance ? '' : 'full-length-fields'}`
                 ));

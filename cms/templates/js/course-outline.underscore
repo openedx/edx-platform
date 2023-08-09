@@ -78,8 +78,14 @@ if (staffOnlyMessage) {
 }
 
 var gradingType = gettext('Ungraded');
+var gradingPolicyMismatch = false;
 if (xblockInfo.get('graded')) {
     gradingType = xblockInfo.get('format')
+    if (gradingType) {
+        gradingPolicyMismatch = (
+            xblockInfo.get('course_graders').filter((cg) => cg.toLowerCase() === gradingType.toLowerCase())
+        ).length === 0;
+    }
 }
 
 var is_proctored_exam = xblockInfo.get('is_proctored_exam');
@@ -269,7 +275,7 @@ if (is_proctored_exam) {
                                     )
                                 %>
                             </span>
-                        <p>
+                        </p>
                     </div>
                 <% } %>
             <% } else if ((xblockInfo.get('due_date') && !course.get('self_paced')) || xblockInfo.get('graded')) { %>
@@ -299,7 +305,7 @@ if (is_proctored_exam) {
                                     )
                                 %>
                             </span>
-                        <p>
+                        </p>
                     </div>
                 <% } %>
             <% } else if (course.get('self_paced') && course.get('is_custom_relative_dates_active') && xblockInfo.get('relative_weeks_due')) { %>
@@ -325,7 +331,7 @@ if (is_proctored_exam) {
                                 )
                             %>
                         </span>
-                    <p>
+                    </p>
                 </div>
             <% } %>
             <div class="status-hide-after-due">
@@ -350,6 +356,22 @@ if (is_proctored_exam) {
                     <p class="status-message-copy"><%- statusMessages[i].text %></p>
                 </div>
             <% } %>
+            </div>
+        <% } %>
+        <% if (gradingPolicyMismatch) { %>
+            <div class="status-messages">
+                <div class="container-message wrapper-message">
+                    <div class="message has-warnings">
+                        <p class="warning">
+                            <span class="icon fa fa-warning" aria-hidden="true"></span>
+                            <%- interpolate(
+                                gettext("This subsection is configured as \"%(gradingType)s\", which doesn't exist in the current grading policy."),
+                                { gradingType: gradingType },
+                                true
+                            ) %>
+                        </p>
+                    </div>
+                </div>
             </div>
         <% } %>
     </div>

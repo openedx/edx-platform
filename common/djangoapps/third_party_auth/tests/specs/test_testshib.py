@@ -534,7 +534,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
                         'lastName': 'Smith',
                         'defaultFullName': 'John Smith',
                         'email': 'john@smith.com',
-                        'country': 'Australia',
+                        'country': 'United States',
                     }
                 })
             )
@@ -589,7 +589,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         what we're looking for, and when an empty override is provided (expected behavior is that
         existing value maps will be left alone).
         """
-        expected_country = 'AU'
+        expected_country = 'US'
         provider_settings = {
             'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
             'sapsf_private_key': 'fake_private_key_here',
@@ -632,7 +632,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
                         'firstName': 'John',
                         'lastName': 'Smith',
                         'defaultFullName': 'John Smith',
-                        'country': 'Australia'
+                        'country': 'United States'
                     }
                 })
             )
@@ -666,7 +666,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         what we're looking for, and when an empty override is provided (expected behavior is that
         existing value maps will be left alone).
         """
-        value_map = {'country': {'Australia': 'NZ'}}
+        value_map = {'country': {'United States': 'NZ'}}
         expected_country = 'NZ'
         provider_settings = {
             'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
@@ -695,8 +695,8 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         what we're looking for, and when an empty override is provided (expected behavior is that
         existing value maps will be left alone).
         """
-        value_map = {'country': {'United States': 'blahfake'}}
-        expected_country = 'AU'
+        value_map = {'country': {'Australia': 'blahfake'}}
+        expected_country = 'US'
         provider_settings = {
             'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
             'sapsf_private_key': 'fake_private_key_here',
@@ -726,7 +726,7 @@ class SuccessFactorsIntegrationTest(SamlIntegrationTestUtilities, IntegrationTes
         """
 
         value_map = {'country': {}}
-        expected_country = 'AU'
+        expected_country = 'US'
         provider_settings = {
             'sapsf_oauth_root_url': 'http://successfactors.com/oauth/',
             'sapsf_private_key': 'fake_private_key_here',

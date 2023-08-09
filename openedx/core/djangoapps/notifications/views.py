@@ -17,11 +17,17 @@ from rest_framework.views import APIView
 from common.djangoapps.student.models import CourseEnrollment
 from openedx.core.djangoapps.notifications.models import (
     CourseNotificationPreference,
-    get_course_notification_preference_config_version,
+    get_course_notification_preference_config_version
 )
 
 from .base_notification import COURSE_NOTIFICATION_APPS
-from .config.waffle import ENABLE_NOTIFICATIONS, SHOW_NOTIFICATIONS_TRAY
+from .config.waffle import ENABLE_NOTIFICATIONS
+from .events import (
+    notification_preference_update_event,
+    notification_preferences_viewed_event,
+    notification_read_event,
+    notifications_app_all_read_event,
+)
 from .models import Notification
 from .serializers import (
     NotificationCourseEnrollmentSerializer,
@@ -29,6 +35,7 @@ from .serializers import (
     UserCourseNotificationPreferenceSerializer,
     UserNotificationPreferenceUpdateSerializer
 )
+from .utils import get_show_notifications_tray
 
 
 class CourseEnrollmentListView(generics.ListAPIView):
@@ -36,23 +43,39 @@ class CourseEnrollmentListView(generics.ListAPIView):
     API endpoint to get active CourseEnrollments for requester.
 
     **Permissions**: User must be authenticated.
+    **Response Format** (paginated):
 
-    **Response Format**:
-        [
-            {
-                "course": {
-                    "id": (int) course_id,
-                    "display_name": (str) course_display_name
+        {
+            "next": (str) url_to_next_page_of_courses,
+            "previous": (str) url_to_previous_page_of_courses,
+            "count": (int) total_number_of_courses,
+            "num_pages": (int) total_number_of_pages,
+            "current_page": (int) current_page_number,
+            "start": (int) index_of_first_course_on_page,
+            "results" : [
+                {
+                    "course": {
+                        "id": (int) course_id,
+                        "display_name": (str) course_display_name
+                    },
                 },
-            },
-            ...
-        ]
-    **Response Error Codes**:
-            - 403: The requester cannot access resource.
+                ...
+            ],
+        }
+
+    Response Error Codes:
+    - 403: The requester cannot access resource.
     """
     serializer_class = NotificationCourseEnrollmentSerializer
     permission_classes = [permissions.IsAuthenticated]
-    pagination_class = None
+
+    def get_paginated_response(self, data):
+        """
+        Return a response given serialized page data with show_preferences flag.
+        """
+        response = super().get_paginated_response(data)
+        response.data["show_preferences"] = get_show_notifications_tray(self.request.user)
+        return response
 
     def get_queryset(self):
         user = self.request.user
@@ -63,14 +86,23 @@ class CourseEnrollmentListView(generics.ListAPIView):
         Returns the list of active course enrollments for which ENABLE_NOTIFICATIONS
         Waffle flag is enabled
         """
-        enrollment_queryset = self.get_queryset().select_related('course')
-        enrollments = [
-            enrollment
-            for enrollment in enrollment_queryset
-            if ENABLE_NOTIFICATIONS.is_enabled(enrollment.course.id)
-        ]
-        serializer = self.get_serializer(enrollments, many=True)
-        return Response(serializer.data)
+        queryset = self.filter_queryset(self.get_queryset())
+        course_ids = queryset.values_list('course_id', flat=True)
+
+        for course_id in course_ids:
+            if not ENABLE_NOTIFICATIONS.is_enabled(course_id):
+                queryset = queryset.exclude(course_id=course_id)
+
+        queryset = queryset.select_related('course').order_by('-id')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return Response({
+            "show_preferences": get_show_notifications_tray(request.user),
+            "results": self.get_serializer(queryset, many=True).data
+        })
 
 
 class UserNotificationPreferenceView(APIView):
@@ -149,6 +181,7 @@ class UserNotificationPreferenceView(APIView):
         course_id = CourseKey.from_string(course_key_string)
         user_preference = CourseNotificationPreference.get_updated_user_course_preferences(request.user, course_id)
         serializer = UserCourseNotificationPreferenceSerializer(user_preference)
+        notification_preferences_viewed_event(request, course_id)
         return Response(serializer.data)
 
     def patch(self, request, course_key_string):
@@ -177,11 +210,12 @@ class UserNotificationPreferenceView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
-        preference_update_serializer = UserNotificationPreferenceUpdateSerializer(
+        preference_update = UserNotificationPreferenceUpdateSerializer(
             user_course_notification_preference, data=request.data, partial=True
         )
-        preference_update_serializer.is_valid(raise_exception=True)
-        updated_notification_preferences = preference_update_serializer.save()
+        preference_update.is_valid(raise_exception=True)
+        updated_notification_preferences = preference_update.save()
+        notification_preference_update_event(request.user, course_id, preference_update.validated_data)
         serializer = UserCourseNotificationPreferenceSerializer(updated_notification_preferences)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -275,8 +309,11 @@ class NotificationCountView(APIView):
             .annotate(count=Count('*'))
         )
         count_total = 0
-        count_by_app_name_dict = {}
-        show_notifications_tray_enabled = False
+        show_notifications_tray = get_show_notifications_tray(request.user)
+        count_by_app_name_dict = {
+            app_name: 0
+            for app_name in COURSE_NOTIFICATION_APPS
+        }
 
         for item in count_by_app_name:
             app_name = item['app_name']
@@ -284,18 +321,8 @@ class NotificationCountView(APIView):
             count_total += count
             count_by_app_name_dict[app_name] = count
 
-        learner_enrollments_course_ids = CourseEnrollment.objects.filter(
-            user=request.user,
-            is_active=True
-        ).values_list('course_id', flat=True)
-
-        for course_id in learner_enrollments_course_ids:
-            if SHOW_NOTIFICATIONS_TRAY.is_enabled(course_id):
-                show_notifications_tray_enabled = True
-                break
-
         return Response({
-            "show_notifications_tray": show_notifications_tray_enabled,
+            "show_notifications_tray": show_notifications_tray,
             "count": count_total,
             "count_by_app_name": count_by_app_name_dict,
         })
@@ -370,17 +397,19 @@ class NotificationReadAPIView(APIView):
             notification = get_object_or_404(Notification, pk=notification_id, user=request.user)
             notification.last_read = read_at
             notification.save()
+            notification_read_event(request.user, notification)
             return Response({'message': _('Notification marked read.')}, status=status.HTTP_200_OK)
 
         app_name = request.data.get('app_name', '')
 
-        if app_name and app_name in COURSE_NOTIFICATION_APPS:
+        if app_name in COURSE_NOTIFICATION_APPS:
             notifications = Notification.objects.filter(
                 user=request.user,
                 app_name=app_name,
                 last_read__isnull=True,
             )
             notifications.update(last_read=read_at)
+            notifications_app_all_read_event(request.user, app_name)
             return Response({'message': _('Notifications marked read.')}, status=status.HTTP_200_OK)
 
         return Response({'error': _('Invalid app_name or notification_id.')}, status=status.HTTP_400_BAD_REQUEST)

@@ -2,6 +2,7 @@
 Models for notifications
 """
 import logging
+from typing import Dict
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -11,9 +12,8 @@ from opaque_keys.edx.django.models import CourseKeyField
 from openedx.core.djangoapps.notifications.base_notification import (
     NotificationAppManager,
     NotificationPreferenceSyncManager,
-    get_notification_content,
+    get_notification_content
 )
-
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 NOTIFICATION_CHANNELS = ['web', 'push', 'email']
 
 # Update this version when there is a change to any course specific notification type or app.
-COURSE_NOTIFICATION_CONFIG_VERSION = 1
+COURSE_NOTIFICATION_CONFIG_VERSION = 2
 
 
 def get_course_notification_preference_config():
@@ -127,7 +127,7 @@ class CourseNotificationPreference(TimeStampedModel):
         unique_together = ('user', 'course_id')
 
     def __str__(self):
-        return f'{self.user.username} - {self.course_id} - {self.notification_preference_config}'
+        return f'{self.user.username} - {self.course_id}'
 
     @staticmethod
     def get_updated_user_course_preferences(user, course_id):
@@ -151,3 +151,72 @@ class CourseNotificationPreference(TimeStampedModel):
             except Exception as e:
                 log.error(f'Unable to update notification preference for {user.username} to new config. {e}')
         return preferences
+
+    def get_app_config(self, app_name) -> Dict:
+        """
+        Returns the app config for the given app name.
+        """
+        return self.notification_preference_config.get(app_name, {})
+
+    def get_notification_types(self, app_name) -> Dict:
+        """
+        Returns the notification types for the given app name.
+
+        Sample Response:
+        {
+            'new_comment_on_post': {
+                'email': True,
+                'push': True,
+                'web': True,
+                'info': 'Comment on post'
+            },
+            'new_response_on_comment': {
+                'email': True,
+                'push': True,
+                'web': True,
+                'info': 'Response on comment'
+            },
+        """
+        return self.get_app_config(app_name).get('notification_types', {})
+
+    def get_notification_type_config(self, app_name, notification_type) -> Dict:
+        """
+        Returns the notification type config for the given app name and notification type.
+
+        Sample Response:
+        {
+            'email': True,
+            'push': True,
+            'web': True,
+            'info': 'Comment on post'
+        }
+        """
+        return self.get_notification_types(app_name).get(notification_type, {})
+
+    def get_web_config(self, app_name, notification_type) -> bool:
+        """
+        Returns the web config for the given app name and notification type.
+        """
+        if self.is_core(app_name, notification_type):
+            return self.get_core_config(app_name).get('web', False)
+        return self.get_notification_type_config(app_name, notification_type).get('web', False)
+
+    def is_core(self, app_name, notification_type) -> bool:
+        """
+        Returns True if the given notification type is a core notification type.
+        """
+        return notification_type in self.get_app_config(app_name).get('core_notification_types', [])
+
+    def get_core_config(self, app_name) -> Dict:
+        """
+        Returns the core config for the given app name.
+
+        Sample Response:
+        {
+            'email': True,
+            'push': True,
+            'web': True,
+            'info': 'comment on post and response on comment'
+        }
+        """
+        return self.get_notification_types(app_name).get('core', {})
