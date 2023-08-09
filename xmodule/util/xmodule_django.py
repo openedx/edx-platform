@@ -12,6 +12,6 @@ def get_current_request_hostname():
     hostname = None
     request = get_current_request()
     if request:
-        hostname = request.headers.get('host')
+        hostname = request.META.get('HTTP_HOST')
 
     return hostname
