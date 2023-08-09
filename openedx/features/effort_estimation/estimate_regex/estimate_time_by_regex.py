@@ -92,6 +92,9 @@ def estimate_time_by_regex(text):
 					time_by_regex = None
 		elif 'gio' in line_text and time_by_regex is None:
 			regex_result = re.findall(TIME_HOUR_REGEX, line_text)
+			
+			if len(regex_result) == 0 :
+				regex_result = re.findall(NUMBER_REGEX, line_text)
 			if len(regex_result) == 1:
 				time_by_regex = float(regex_result[-1]) * 60
 			if len(regex_result) >= 2:
@@ -99,7 +102,8 @@ def estimate_time_by_regex(text):
 					time_by_regex = float(regex_result[-2]) * 60
 					time_by_regex += float(regex_result[-1])
 				except ValueError :
-					time_by_regex = None				
+					time_by_regex = None	
+			
 		elif 'phut' in line_text and time_by_regex is None:
 			regex_result = re.findall(TIME_MINUTE_REGEX, line_text)
 			if len(regex_result) == 1:
@@ -114,7 +118,7 @@ def estimate_time_by_regex(text):
 			if len(regex_result) >= 2:
 				try : 
 					time_by_regex = float(regex_result[-2]) * 60
-					time_by_regex += float(regex_result[-1]) * 60
+					time_by_regex += float(regex_result[-1])
 				except ValueError :
 					time_by_regex = None	
 		elif 'p' in line_text  and time_by_regex is None:
@@ -139,6 +143,8 @@ def estimate_time_by_regex(text):
 		# Case 3: no result => return None
 		else:
 			time_by_regex = None
+		
+
 	
 
 	# Old method: extract minute and hour from last line
