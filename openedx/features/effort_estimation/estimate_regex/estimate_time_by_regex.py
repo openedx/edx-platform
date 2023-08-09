@@ -99,12 +99,12 @@ def estimate_time_by_regex(text):
 					time_by_regex = float(regex_result[-2]) * 60
 					time_by_regex += float(regex_result[-1])
 				except ValueError :
-					time_by_regex = None	
+					time_by_regex = None				
 		elif 'phut' in line_text and time_by_regex is None:
 			regex_result = re.findall(TIME_MINUTE_REGEX, line_text)
 			if len(regex_result) == 1:
 				time_by_regex = float(regex_result[-1])
-			print('============', time_by_regex, line_text)
+			# print('============', time_by_regex, line_text)
 		
 		elif 'h' in line_text and time_by_regex is None:
 			regex_result = re.findall(TIME_H_REGEX, line_text)
@@ -114,7 +114,7 @@ def estimate_time_by_regex(text):
 			if len(regex_result) >= 2:
 				try : 
 					time_by_regex = float(regex_result[-2]) * 60
-					time_by_regex += float(regex_result[-1])
+					time_by_regex += float(regex_result[-1]) * 60
 				except ValueError :
 					time_by_regex = None	
 		elif 'p' in line_text  and time_by_regex is None:
@@ -125,9 +125,20 @@ def estimate_time_by_regex(text):
 				time_by_regex = float(regex_result[-1])
 	
 		
-    
-    
-
+	if time_by_regex is None :
+		regex_result = re.findall(NUMBER_REGEX, last_line)
+		if len(regex_result) == 1:
+			time_by_regex = float(regex_result[-1])
+			# Case 2: two result => it is hours and minutes
+		elif len(regex_result) >= 2:
+			try : 
+				time_by_regex = float(regex_result[-2]) * 60
+				time_by_regex += float(regex_result[-1])
+			except ValueError :
+				time_by_regex = None
+		# Case 3: no result => return None
+		else:
+			time_by_regex = None
 	
 
 	# Old method: extract minute and hour from last line
@@ -147,11 +158,11 @@ def estimate_time_by_regex(text):
 	# 	time_by_regex = float(regex_result[-1])
 	# 	# Case 2: two result => it is hours and minutes
 	# elif len(regex_result) >= 2:
-		# try : 
-		# 	time_by_regex = float(regex_result[-2]) * 60
-		# 	time_by_regex += float(regex_result[-1])
-		# except ValueError :
-		# 	time_by_regex = None
+	# 	try : 
+	# 		time_by_regex = float(regex_result[-2]) * 60
+	# 		time_by_regex += float(regex_result[-1])
+	# 	except ValueError :
+	# 		time_by_regex = None
 	# # Case 3: no result => return None
 	# else:
 	# 	time_by_regex = None
@@ -168,6 +179,6 @@ def estimate_time_by_regex(text):
 	# 			print('========',regex_result ,  line_text)
 				
 
-	print('======', time_by_regex, last_line)
+	# print('======', time_by_regex, last_line)
  
 	return time_by_regex
