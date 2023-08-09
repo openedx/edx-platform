@@ -1608,8 +1608,6 @@ def _create_xblock_child_info(
             ),
         }
     if xblock.has_children and include_children_predicate(xblock):
-        child_info["parent descriptor"] = (xblock.parent.block_type, xblock.parent.block_id)
-        child_info["child descriptors"] = [(child.block_type, child.block_id) for child in xblock.children]
         child_info["children"] = [
             create_xblock_info(
                 child,
