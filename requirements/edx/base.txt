@@ -723,7 +723,6 @@ multidict==6.0.4
     # via
     #   aiohttp
     #   yarl
-mysqlclient==2.2.0
     # via
     #   -r requirements/edx/kernel.in
     #   openedx-blockstore
