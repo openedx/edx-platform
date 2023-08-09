@@ -146,10 +146,11 @@ def _is_library_component_limit_reached(usage_key):
 
 def _get_block_parent_children(xblock):
     response = {}
-    response["parent"] = {
-        "block_type": xblock.parent.block_type,
-        "block_id": xblock.parent.block_id
-    }
+    if (xblock.parent):
+        response["parent"] = {
+            "block_type": xblock.parent.block_type,
+            "block_id": xblock.parent.block_id
+        }
     if xblock.children:
         response["children"] = [
             {
