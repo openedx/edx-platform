@@ -19,6 +19,7 @@ from six import unichr
 from six.moves import range
 
 from xmodule.capa.safe_exec import safe_exec, update_hash
+from xmodule.capa.safe_exec.remote_exec import is_codejail_rest_service_enabled
 
 
 class TestSafeExec(unittest.TestCase):  # lint-amnesty, pylint: disable=missing-class-docstring
@@ -86,7 +87,7 @@ class TestSafeOrNot(unittest.TestCase):  # lint-amnesty, pylint: disable=missing
         throws SafeExecException, protecting the calling process.
         '''
         # Can't test for forbiddenness if CodeJail isn't configured for python.
-        if not jail_code.is_configured("python"):
+        if not jail_code.is_configured("python") or not is_codejail_rest_service_enabled():
             pytest.skip()
 
         g = {}
