@@ -54,7 +54,7 @@ jobs:
 
       - name: install requirements
         run: |
-          pip uninstall django-fernet-fields
+          pip uninstall --yes django-fernet-fields
           sudo make test-requirements
           if [[ "${{ matrix.django-version }}" != "pinned" ]]; then
             sudo pip install "django~=${{ matrix.django-version }}.0"
