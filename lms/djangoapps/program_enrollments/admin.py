@@ -146,7 +146,6 @@ def _pending_role_assignment_external_user_key(pending_role_assignment):
     return _pce_pe_external_user_key(pce)
 
 
-
 @admin.register(CourseAccessRoleAssignment)
 class CourseAccessRoleAssignmentAdmin(admin.ModelAdmin):
     """
@@ -160,4 +159,3 @@ class CourseAccessRoleAssignmentAdmin(admin.ModelAdmin):
     )
     list_filter = ('role',)
     raw_id_fields = ('enrollment',)
-

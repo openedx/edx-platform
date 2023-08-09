@@ -34,5 +34,3 @@ class MobileConfigAdmin(admin.ModelAdmin):
 
     class Meta:
         ordering = ['name']
-
-

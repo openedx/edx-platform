@@ -27,5 +27,3 @@ class SurveyFormAdminForm(forms.ModelForm):
 class SurveyFormAdmin(admin.ModelAdmin):
     """Admin for SurveyForm"""
     form = SurveyFormAdminForm
-
-
