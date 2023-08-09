@@ -1470,7 +1470,7 @@ pydata-sphinx-theme==0.13.3
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx-book-theme
-pygments==2.15.1
+pygments==2.16.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt

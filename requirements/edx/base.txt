@@ -842,7 +842,7 @@ pycryptodomex==3.18.0
     #   lti-consumer-xblock
     #   pyjwkest
     #   snowflake-connector-python
-pygments==2.15.1
+pygments==2.16.1
     # via
     #   -r requirements/edx/bundled.in
     #   py2neo
