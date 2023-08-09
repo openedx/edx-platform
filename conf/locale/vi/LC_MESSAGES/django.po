@@ -2932,7 +2932,7 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Progress"
-msgstr "Tiến trình học"
+msgstr "Tiến độ"
 
 #: lms/djangoapps/courseware/plugins.py
 msgid "Keep learners engaged and on track throughout the course."
@@ -2977,7 +2977,7 @@ msgstr ""
 #: lms/templates/courseware/courseware.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Course"
-msgstr "Khóa học"
+msgstr "Môn học"
 
 #: lms/templates/courseware/syllabus.html
 msgid "Syllabus"
@@ -14346,7 +14346,7 @@ msgstr "Định dạng ngày tháng theo dạng yyyy-mm-dd, ví dụ: 2015-10-30
 #: lms/templates/ccx/schedule.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Date"
-msgstr "Ngày"
+msgstr "Kế hoạch học tập"
 
 #. Translators: This explains to people using a screen reader how to interpret
 #. the format of HH:MM
