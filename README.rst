@@ -122,7 +122,7 @@ Contributions are welcome! The first step is to submit a signed
 information – it also contains guidelines for how to maintain high code
 quality, which will make your contribution more likely to be accepted.
 
-New features accepted. Discussing your new ideas with the maintainers
+New features are accepted. Discussing your new ideas with the maintainers
 before you write code will also increase the chances that features are accepted.
 
 Code of Conduct
