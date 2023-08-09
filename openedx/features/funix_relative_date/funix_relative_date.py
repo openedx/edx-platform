@@ -66,7 +66,7 @@ class FunixRelativeDateLibary():
 		def get_time(last_complete_date, goal, day=1):
 			last_complete_date += timedelta(days=day)
 			weekday = last_complete_date.weekday()
-			print('==============', last_complete_date)
+
 			if not getattr(goal, f'weekday_{weekday}'):
 				return get_time(last_complete_date, goal)
 
@@ -83,7 +83,7 @@ class FunixRelativeDateLibary():
 			last_complete_date = date.today()
 		else :
 			last_complete_date = datetime.strptime(selected_date, "%Y-%m-%d")
-		print('======last_complete_date==========', last_complete_date)
+
 		# last_complete_date = FunixRelativeDateDAO.get_enroll_date_by_id(user_id=user.id, course_id=course_id)
     
 		# Delete all old date
@@ -110,6 +110,8 @@ class FunixRelativeDateLibary():
 				left_time -= effort_time
 			else:
 				last_complete_date = get_time(last_complete_date, goal)
+				if 'Assignment' in asm.title :
+					arr.append(asm)
 				for el in arr:
 					index += 1
 					FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=el.block_key, type='block', index=index, date=last_complete_date).save()
