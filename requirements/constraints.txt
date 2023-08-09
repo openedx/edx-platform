@@ -22,7 +22,7 @@ click>=8.0,<9.0
 
 # django-storages version 1.9 drops support for boto storage backend.
 # 1.9 gives an error for details https://github.com/jschneier/django-storages/issues/831
-django-storages==1.9.1
+django-storages==1.10.1
 
 # The team that owns this package will manually bump this package rather than having it pulled in automatically.
 # This is to allow them to better control its deployment and to do it in a process that works better
