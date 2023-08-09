@@ -632,7 +632,7 @@ edx-rbac==1.7.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
-edx-rest-api-client==5.5.2
+edx-rest-api-client==5.6.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-enterprise
@@ -678,9 +678,9 @@ enmerkar==0.7.1
     # via
     #   -r requirements/edx/base.txt
     #   enmerkar-underscore
-enmerkar-underscore==2.1.0
+enmerkar-underscore==2.2.0
     # via -r requirements/edx/base.txt
-event-tracking==2.1.0
+event-tracking==2.2.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-proctoring
@@ -740,7 +740,7 @@ h11==0.14.0
     # via
     #   httpcore
     #   uvicorn
-help-tokens==2.2.0
+help-tokens==2.3.0
     # via -r requirements/edx/base.txt
 html5lib==1.1
     # via
@@ -1463,7 +1463,7 @@ stevedore==5.1.0
     #   edx-django-utils
     #   edx-enterprise
     #   edx-opaque-keys
-super-csv==3.0.1
+super-csv==3.1.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
