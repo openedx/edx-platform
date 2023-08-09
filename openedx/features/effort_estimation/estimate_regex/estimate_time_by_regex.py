@@ -92,9 +92,6 @@ def estimate_time_by_regex(text):
 					time_by_regex = None
 		elif 'gio' in line_text and time_by_regex is None:
 			regex_result = re.findall(TIME_HOUR_REGEX, line_text)
-			
-			if len(regex_result) == 0 :
-				regex_result = re.findall(NUMBER_REGEX, line_text)
 			if len(regex_result) == 1:
 				time_by_regex = float(regex_result[-1]) * 60
 			if len(regex_result) >= 2:
