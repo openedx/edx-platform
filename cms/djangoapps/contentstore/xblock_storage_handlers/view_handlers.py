@@ -144,6 +144,12 @@ def _is_library_component_limit_reached(usage_key):
     total_children = len(parent.children)
     return total_children + 1 > settings.MAX_BLOCKS_PER_CONTENT_LIBRARY
 
+def _get_block_parent_children(xblock):
+    response = {}
+    response["parent"] = (xblock.parent.block_type, xblock.parent.block_id)
+    if xblock.children:
+        response["children"] = [(child.block_type, child.block_id) for child in xblock.children]
+    return response
 
 def handle_xblock(request, usage_key_string=None):
     """
@@ -179,13 +185,14 @@ def handle_xblock(request, usage_key_string=None):
                     )
                     return JsonResponse(ancestor_info)
                 # TODO: pass fields to get_block_info and only return those
-                include_children_predicate=False
+                include_children_predicate=NEVER
                 with modulestore().bulk_operations(usage_key.course_key):
                     data = request.data
                     if ("customReadToken" in data["fields"]):
                         log.info("*** customReadToken detected ***")
-                        include_children_predicate=True
-                    response = get_block_info(get_xblock(usage_key, request.user), include_children_predicate)
+                        include_children_predicate=ALWAYS
+                    #response = get_block_info(get_xblock(usage_key, request.user), include_children_predicate = include_children_predicate)
+                    response = _get_block_parent_children(get_xblock(usage_key, request.user))
                 return JsonResponse(response)
             else:
                 return HttpResponse(status=406)
