@@ -9,6 +9,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.agreements.models import IntegritySignature
+from openedx.core.djangoapps.agreements.models import LTIPIITool
+from openedx.core.djangoapps.agreements.models import LTIPIISignature
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -68,3 +70,76 @@ def get_integrity_signatures_for_course(course_id):
     """
     course_key = CourseKey.from_string(course_id)
     return IntegritySignature.objects.filter(course_key=course_key)
+
+
+def get_ltipiitool(course_id):
+    """
+    Get a course's LTI tools that share PII.
+
+    Arguments:
+        * course_id (str)
+
+    Returns:
+        * A QuerySet of LTIPIITool object.
+    """
+    course_key = CourseKey.from_string(course_id)
+    course_ltipiitools = LTIPIITool.objects.get(course_key=course_key)
+    return course_ltipiitools
+
+
+def set_ltipiitool(course_id, lti_tools, lti_tools_hash):
+    """
+    Creates or updates a course's list of LTI tools that share PII.
+
+    Arguments:
+        * course_key (str)
+        * lti_tools (str)
+        * lti_tools_hash (int)
+
+    Returns:
+        * True or False depending on if the write was successful
+    """
+    course_key = CourseKey.from_string(course_id)
+    LTIPIITool.objects.update_or_create(
+        course_key=course_key,
+        lti_tools=lti_tools,
+        lti_tools_hash=lti_tools_hash)
+    
+
+def get_ltipiisignature(username, course_id):
+    """
+    Get a lti pii signature for a specific user.
+
+    Arguments:
+        * course_key (str)
+        * user (User)
+
+    Returns:
+        * An IntegritySignature object, or None if one does not exist for the
+        user + course combination.
+    """
+    course_key = CourseKey.from_string(course_id)
+    user = User.objects.get(username=username)
+    try:
+        return LTIPIISignature.objects.get(user=user, course_key=course_key)
+    except ObjectDoesNotExist:
+        return None
+
+
+def set_ltipiisignature(course_id, lti_tools, lti_tools_hash):
+    """
+    Creates or updates a user's acknowledgement of sharing PII via LTI tools.
+
+    Arguments:
+        * course_key (str)
+        * lti_tools (str)
+        * lti_tools_hash (int)
+
+    Returns:
+        * True or False depending on if the write was successful
+    """
+    course_key = CourseKey.from_string(course_id)
+    LTIPIITool.objects.update_or_create(
+        course_key=course_key,
+        lti_tools=lti_tools,
+        lti_tools_hash=lti_tools_hash)
