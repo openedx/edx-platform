@@ -111,7 +111,12 @@ def get_discussable_units(course, enable_graded_units, discussable_units=None):
                     idx += 1
                     if not is_discussable_unit(unit, store, enable_graded_units, subsection):
                         unit.discussion_enabled = False
-                        store.update_item(unit, unit.published_by, emit_signals=False)
+                        # TODO: if and log statement will be removed after testing.
+                        if str(course.id) == "course-v1:NedX+CMH43+2023_Summer":
+                            log.info(f"Updating discussions_enabled for {course.id}")
+                            store.update_item(unit, unit.published_by, isPublish=True, emit_signals=False)
+                        else:
+                            store.update_item(unit, unit.published_by, emit_signals=False)
                         continue
                     # check if discussable_units is type of list and discussable_units is empty
                     # it means if discussable_units is empty then we should not create any topic
