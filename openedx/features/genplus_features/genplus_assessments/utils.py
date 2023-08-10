@@ -104,26 +104,40 @@ class StudentResponse:
             if not value:
                 continue
             uuid = key.replace('input_', '')
-            title = (
-                problem.find(f".//label[@for='{key}']").text or problem.find(f".//span[@class='question-text']").text
-            )
-            answer = json.loads(JOURNAL_STYLE.format(value), strict=False)
-            defaults = {
-                'skill': self._get_course_skill(problem_block),
-                'journal_type': JournalTypes.STUDENT_POST,
-                'is_editable': False,
-                'title': title,
-                'description': json.dumps(answer),
-            }
-            if student_module:
-                defaults['created'] = student_module.created
-                defaults['modified'] = student_module.modified
+            title = self.extract_title(problem, key)
+            if title:
+                answer = json.loads(JOURNAL_STYLE.format(value), strict=False)
+                defaults = {
+                    'skill': self._get_course_skill(problem_block),
+                    'journal_type': JournalTypes.STUDENT_POST,
+                    'is_editable': False,
+                    'title': title,
+                    'description': json.dumps(answer),
+                }
+                if student_module:
+                    defaults['created'] = student_module.created
+                    defaults['modified'] = student_module.modified
 
-            obj, created = JournalPost.objects.update_or_create(
-                uuid=uuid,
-                student=kwargs.get('student'),
-                defaults=defaults
-            )
+                obj, created = JournalPost.objects.update_or_create(
+                    uuid=uuid,
+                    student=kwargs.get('student'),
+                    defaults=defaults
+                )
+
+    @staticmethod
+    def extract_title(problem, key):
+        title_queries = [
+            f".//label[@for='{key}']",
+            ".//span[@class='question-text']",
+            ".//label[@class='question-text']"
+        ]
+
+        for query in title_queries:
+            title_element = problem.find(query)
+            if title_element is not None and getattr(title_element, 'text'):
+                return title_element.text
+
+        return None
 
     def _create_and_update_choice_journal_entry(self, **kwargs):
         problem_block = kwargs.get('problem_block')
