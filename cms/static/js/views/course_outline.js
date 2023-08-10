@@ -260,7 +260,7 @@ function(
             if ($(element).hasClass('outline-subsection')) {
                 if (this.options.canEdit) {
                     // We should have the user's clipboard status.
-                    const data = this.options.clipboardData;
+                    const data = this.model.get("user_clipboard") || {"content": null};
                     this.refreshPasteButton(data);
                     // Refresh the status when something is copied on another tab:
                     this.clipboardBroadcastChannel.onmessage = (event) => { this.refreshPasteButton(event.data); };
