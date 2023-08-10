@@ -501,11 +501,11 @@ class RegistrationView(APIView):
             response = self._create_response(request, errors, status_code=403)
             return response
 
-        response = self._is_user_exist_in_multisite(request, data)
+        response = self._handle_duplicate_email_username(request, data)
         if response:
             return response
 
-        response = self._handle_duplicate_email_username(request, data)
+        response = self._is_user_exist_in_multisite(request, data)
         if response:
             return response
 
@@ -520,6 +520,7 @@ class RegistrationView(APIView):
     def _is_user_exist_in_multisite(self, request, data):
         email = data.get('email')
         username = data.get('username')
+        errors = {}
         if User.objects.filter(email=email, username=username).exists():
             user = User.objects.get(email=email, username=username)
             edly_access_user = create_edly_access_role(request, user)
@@ -527,13 +528,12 @@ class RegistrationView(APIView):
             return self._create_response(request, {}, status_code=200)
 
         elif User.objects.filter(email=email).exists():
-            return self._create_response(request,
-                                         {'user_message': "Use existing username for email: {}.".format(email)},
-                                         status_code=400)
+            errors["email"] = [{"user_message": "Email {} already exists".format(email)}]
+            return self._create_response(request, errors, status_code=400)
 
         elif User.objects.filter(username=username).exists():
-            return self._create_response(request, {'user_message': "Username '{}' already exists.".format(username)},
-                                         status_code=400)
+            errors["username"] = [{"user_message": "Username {} already exists.".format(username)}]
+            return self._create_response(request, errors, status_code=400)
 
     def _handle_duplicate_email_username(self, request, data):
         # pylint: disable=no-member
@@ -541,11 +541,12 @@ class RegistrationView(APIView):
         email = data.get('email')
         username = data.get('username')
         errors = {}
+        sub_org = get_edly_sub_org_from_request(request)
 
-        if email is not None and email_exists_or_retired(email):
+        if email is not None and email_exists_or_retired(email, sub_org):
             errors["email"] = [{"user_message": accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)}]
 
-        if username is not None and username_exists_or_retired(username):
+        if username is not None and username_exists_or_retired(username, sub_org):
             errors["username"] = [{"user_message": accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)}]
 
         if errors:
