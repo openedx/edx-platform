@@ -139,3 +139,11 @@ security@edx.org.
 .. _individual contributor agreement: https://openedx.org/cla
 .. _CONTRIBUTING: https://github.com/openedx/.github/blob/master/CONTRIBUTING.md
 .. _Community Code of Conduct: https://openedx.org/code-of-conduct/
+
+People
+******
+
+The current maintainers of this repository can be found on `Backstage`_.
+
+.. _Backstage: https://backstage.openedx.org/catalog/default/component/edx-platform
+
