@@ -108,15 +108,6 @@ IS_MARKETABLE = 'is_marketable'
 REGISTER_USER = Signal()
 
 
-# .. toggle_name: registration.enable_failure_logging
-# .. toggle_implementation: WaffleFlag
-# .. toggle_default: False
-# .. toggle_description: Enable verbose logging of registration failure messages
-# .. toggle_use_cases: temporary
-# .. toggle_creation_date: 2020-04-30
-# .. toggle_target_removal_date: 2020-06-01
-# .. toggle_warning: This temporary feature toggle does not have a target removal date.
-REGISTRATION_FAILURE_LOGGING_FLAG = WaffleFlag('registration.enable_failure_logging', __name__)
 REAL_IP_KEY = 'openedx.core.djangoapps.util.ratelimit.real_ip'
 
 
@@ -709,9 +700,6 @@ class RegistrationView(APIView):
         return JsonResponse(response_dict, status=status_code)
 
     def _log_validation_errors(self, request, errors, status_code):
-        if not REGISTRATION_FAILURE_LOGGING_FLAG.is_enabled():
-            return
-
         try:
             for field_key, errors in errors.items():  # lint-amnesty, pylint: disable=redefined-argument-from-local
                 for error in errors:

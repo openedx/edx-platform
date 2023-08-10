@@ -20,7 +20,6 @@ from social_django.models import Partial, UserSocialAuth
 from testfixtures import LogCapture
 from openedx_events.tests.utils import OpenEdxEventsTestMixin
 
-from edx_toggles.toggles.testutils import override_waffle_flag
 from openedx.core.djangoapps.site_configuration.helpers import get_value
 from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from openedx.core.djangoapps.user_api.accounts import (
@@ -49,7 +48,6 @@ from openedx.core.djangoapps.user_api.accounts.tests.retirement_helpers import (
 from openedx.core.djangoapps.user_api.tests.test_constants import SORTED_COUNTRIES
 from openedx.core.djangoapps.user_api.tests.test_helpers import TestCaseForm
 from openedx.core.djangoapps.user_api.tests.test_views import UserAPITestCase
-from openedx.core.djangoapps.user_authn.views.register import REGISTRATION_FAILURE_LOGGING_FLAG
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from openedx.core.lib.api import test_utils
 from common.djangoapps.student.helpers import authenticate_new_user
@@ -296,7 +294,6 @@ class RegistrationViewValidationErrorTest(
             }
         )
 
-    @override_waffle_flag(REGISTRATION_FAILURE_LOGGING_FLAG, True)
     def test_registration_failure_logging(self):
         # Register a user
         response = self.client.post(self.url, {
