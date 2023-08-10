@@ -28,13 +28,13 @@ class UnitPageTestCase(StudioPageTestCase):
         Verify that a public xblock's preview returns the expected HTML.
         """
         published_video = self.store.publish(self.video.location, self.user.id)  # lint-amnesty, pylint: disable=unused-variable
-        self.validate_preview_html(self.video, STUDENT_VIEW, can_add=False)
+        self.validate_preview_html(self.video, STUDENT_VIEW, in_unit=True, can_add=False)
 
     def test_draft_component_preview_html(self):
         """
         Verify that a draft xblock's preview returns the expected HTML.
         """
-        self.validate_preview_html(self.video, STUDENT_VIEW, can_add=False)
+        self.validate_preview_html(self.video, STUDENT_VIEW, in_unit=True, can_add=False)
 
     def test_public_child_container_preview_html(self):
         """
@@ -46,7 +46,7 @@ class UnitPageTestCase(StudioPageTestCase):
         BlockFactory.create(parent_location=child_container.location,
                             category='html', display_name='grandchild')
         published_child_container = self.store.publish(child_container.location, self.user.id)
-        self.validate_preview_html(published_child_container, STUDENT_VIEW, can_add=False)
+        self.validate_preview_html(published_child_container, STUDENT_VIEW, in_unit=True, can_add=False)
 
     def test_draft_child_container_preview_html(self):
         """
@@ -58,4 +58,4 @@ class UnitPageTestCase(StudioPageTestCase):
         BlockFactory.create(parent_location=child_container.location,
                             category='html', display_name='grandchild')
         draft_child_container = self.store.get_item(child_container.location)
-        self.validate_preview_html(draft_child_container, STUDENT_VIEW, can_add=False)
+        self.validate_preview_html(draft_child_container, STUDENT_VIEW, in_unit=True, can_add=False)
