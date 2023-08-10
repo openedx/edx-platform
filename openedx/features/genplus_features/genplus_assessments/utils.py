@@ -104,7 +104,9 @@ class StudentResponse:
             if not value:
                 continue
             uuid = key.replace('input_', '')
-            title = problem.find(f".//label[@for='{key}']").text
+            title = (
+                problem.find(f".//label[@for='{key}']").text or problem.find(f".//span[@class='question-text']").text
+            )
             answer = json.loads(JOURNAL_STYLE.format(value), strict=False)
             defaults = {
                 'skill': self._get_course_skill(problem_block),
