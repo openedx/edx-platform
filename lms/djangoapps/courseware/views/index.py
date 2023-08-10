@@ -463,7 +463,7 @@ class CoursewareIndex(View):
             self.field_data_cache,
         )
 
-        if COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id):
+        if DISABLE_COURSE_OUTLINE_PAGE_FLAG.is_enabled(self.course.id):
             course_block_tree = get_course_outline_block_tree(
                 request, six.text_type(self.course.id), request.user
             )
