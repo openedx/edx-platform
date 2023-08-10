@@ -12,6 +12,8 @@ import uuid
 
 from unittest import mock
 import ddt
+from django.conf import settings
+from django.test.utils import override_settings
 from django.urls import reverse
 from opaque_keys.edx.keys import CourseKey
 from web_fragments.fragment import Fragment
@@ -167,6 +169,7 @@ class TestViews(TestDiscussionXBlock):
             }
         )
 
+    @override_settings(FEATURES=dict(settings.FEATURES, ENABLE_DISCUSSION_SERVICE='True'))
     @ddt.data(
         (False, False, False),
         (True, False, False),
@@ -231,6 +234,7 @@ class TestTemplates(TestDiscussionXBlock):
         fragment = self.block.author_view({})
         assert f'data-discussion-id="{self.discussion_id}"' in fragment.content
 
+    @override_settings(FEATURES=dict(settings.FEATURES, ENABLE_DISCUSSION_SERVICE='True'))
     @ddt.data(
         (True, False, False),
         (False, True, False),
@@ -290,6 +294,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
             block = block.get_parent()
         return block
 
+    @override_settings(FEATURES=dict(settings.FEATURES, ENABLE_DISCUSSION_SERVICE='True'))
     def test_html_with_user(self):
         """
         Test rendered DiscussionXBlock permissions.
@@ -308,6 +313,7 @@ class TestXBlockInCourse(SharedModuleStoreTestCase):
         assert 'data-user-create-comment="false"' in html
         assert 'data-user-create-subcomment="false"' in html
 
+    @override_settings(FEATURES=dict(settings.FEATURES, ENABLE_DISCUSSION_SERVICE='True'))
     def test_discussion_render_successfully_with_orphan_parent(self):
         """
         Test that discussion xblock render successfully
@@ -407,6 +413,7 @@ class TestXBlockQueryLoad(SharedModuleStoreTestCase):
     Test the number of queries executed when rendering the XBlock.
     """
 
+    @override_settings(FEATURES=dict(settings.FEATURES, ENABLE_DISCUSSION_SERVICE='True'))
     def test_permissions_query_load(self):
         """
         Tests that the permissions queries are cached when rendering numerous discussion XBlocks.
