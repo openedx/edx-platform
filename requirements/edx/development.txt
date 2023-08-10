@@ -192,7 +192,7 @@ cffi==1.15.1
     #   cryptography
     #   pynacl
     #   snowflake-connector-python
-chardet==5.1.0
+chardet==5.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -406,7 +406,6 @@ django==3.2.20
     #   openedx-filters
     #   openedx-learning
     #   ora2
-    #   skill-tagging
     #   super-csv
     #   xss-utils
 django-appconf==1.0.5
@@ -507,7 +506,6 @@ django-model-utils==4.3.1
     #   edx-when
     #   edxval
     #   ora2
-    #   skill-tagging
     #   super-csv
 django-mptt==0.14.0
     # via
@@ -550,7 +548,7 @@ django-ses==3.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-django-simple-history==3.1.1
+django-simple-history==3.2.0
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
@@ -755,7 +753,7 @@ edx-enterprise==4.0.11
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-event-bus-kafka==5.2.0
+edx-event-bus-kafka==5.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1300,13 +1298,11 @@ openedx-events==8.3.0
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-    #   skill-tagging
 openedx-filters==1.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-    #   skill-tagging
 openedx-learning==0.1.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1319,7 +1315,7 @@ optimizely-sdk==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==5.2.1
+ora2==5.2.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1392,7 +1388,7 @@ pillow==9.5.0
     #   edx-enterprise
     #   edx-organizations
     #   edxval
-pip-tools==7.1.0
+pip-tools==7.2.0
     # via -r requirements/edx/../pip-tools.txt
 pkgutil-resolve-name==1.3.10
     # via
@@ -1474,7 +1470,7 @@ pydata-sphinx-theme==0.13.3
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx-book-theme
-pygments==2.15.1
+pygments==2.16.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1849,10 +1845,6 @@ six==1.16.0
     #   python-memcached
     #   sphinxcontrib-httpdomain
     #   tox
-skill-tagging==0.1.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 slumber==0.7.1
     # via
     #   -r requirements/edx/doc.txt
@@ -2167,7 +2159,7 @@ webob==1.8.7
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   xblock
-wheel==0.41.0
+wheel==0.41.1
     # via
     #   -r requirements/edx/../pip-tools.txt
     #   pip-tools

@@ -125,4 +125,4 @@ djangorestframework-stubs==3.14.0  # Pinned to match django-stubs. Remove this w
 libsass==0.10.0
 
 # incremental upgrade
-django-simple-history<=3.1.1
+django-simple-history==3.2.0
