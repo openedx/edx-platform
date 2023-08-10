@@ -9,14 +9,12 @@ import csv
 from django.core.management import BaseCommand, CommandError
 from celery import group
 
-
-
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from cms.djangoapps.contentstore.tasks import (
     replace_all_library_source_blocks_ids_for_course,
     validate_all_library_source_blocks_ids_for_course,
     undo_all_library_source_blocks_ids_for_course
-    )
+)
 
 log = logging.getLogger(__name__)
 
@@ -43,9 +41,9 @@ class Command(BaseCommand):
             replace_all_library_source_blocks_ids_for_course.s(
                 course,
                 v1_to_v2_lib_map
-                )
-            for course in courses
             )
+            for course in courses
+        )
         results = tasks.apply_async()
 
         for result in results.get():
@@ -55,7 +53,7 @@ class Command(BaseCommand):
                 continue
         log.info(
             "Completed replacing all v1 library source ids with v2 library source ids"
-            )
+        )
 
 
     def validate(self, v1_to_v2_lib_map):
@@ -78,9 +76,9 @@ class Command(BaseCommand):
         if validation.issubset(v1_to_v2_lib_map.values()):
             log.info("Validation: All values in the input map are present in courses.")
         else:
-             log.info(
+            log.info(
                 "Validation Failed: There are unmapped v1 libraries."
-                )
+            )
 
     def undo(self, v1_to_v2_lib_map):
         """ undo the changes made by replace_all_library_source_blocks_ids"""
@@ -96,7 +94,6 @@ class Command(BaseCommand):
                 log.error("Task failed with error: %s", str(result))
                 continue
         log.info("Completed replacing all v2 library source ids with v1 library source ids. Undo Complete")
-
 
     def handle(self, *args, **kwargs):
         """ Parse arguments and begin command"""
@@ -123,9 +120,9 @@ class Command(BaseCommand):
         except Exception as e:  # lint-amnesty, pylint: disable=broad-except
             log.error("An error occurred: %s", {str(e)})
 
-        if kwargs['validate'] :
+        if kwargs['validate']:
             self.validate(v1_to_v2_lib_map)
-        if kwargs['undo'] :
+        if kwargs['undo']:
             self.undo(v1_to_v2_lib_map)
         else:
             self.replace_all_library_source_blocks_ids(v1_to_v2_lib_map)

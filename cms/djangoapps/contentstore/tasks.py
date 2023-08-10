@@ -1003,6 +1003,7 @@ def delete_v1_library(v1_library_key_string):
         "msg": "SUCCESS"
     }
 
+
 @shared_task(time_limit=30)
 @set_code_owner_attribute
 def validate_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):
@@ -1027,6 +1028,7 @@ def validate_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):
     # return sucess
     return visited
 
+
 @shared_task(time_limit=30)
 @set_code_owner_attribute
 def replace_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):  # lint-amnesty, pylint: disable=useless-return
@@ -1042,9 +1044,9 @@ def replace_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map): 
             store.get_items(
                 course.id.for_branch(branch),
                 settings={'source_library_id': {'$exists': True}}
-                )
+            )
             for branch in [ModuleStoreEnum.BranchName.draft, ModuleStoreEnum.BranchName.published]
-            ]
+        ]
 
         published_dict = {block.location: block for block in published_blocks}
 
