@@ -229,7 +229,7 @@
                         return gettext('Please do not use any spaces in this field.');
                     }
                 } else {
-                    if (item !== encodeURIComponent(item) || item.match(/[!'()*]/)) {
+                    if (item !== encodeURIComponent(item) || item.match(/[!'.()*]/)) {
                         return gettext('Please do not use any spaces or special characters in this field.');
                     }
                 }

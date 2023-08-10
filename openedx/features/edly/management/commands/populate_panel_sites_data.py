@@ -232,11 +232,10 @@ class Command(BaseCommand):
         """
         Add users to edly sub organization and creates user activities.
         """
-        edly_access_users = EdlyMultiSiteAccess.objects.filter(user__in=users).distinct('user')
-        for user_profile in edly_access_users:
+        for user in users:
             logger.info('Saving edly user activity')
             for edly_sub_org in edly_sub_orgs:
-                edly_access_user = EdlyMultiSiteAccess.objects.get_or_create(user=user_profile, sub_org=edly_sub_org)
+                edly_access_user, _ = EdlyMultiSiteAccess.objects.get_or_create(user=user, sub_org=edly_sub_org)
                 try:
                     EdlyUserActivity.objects.get_or_create(
                         user=edly_access_user.user,

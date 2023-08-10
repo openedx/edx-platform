@@ -252,11 +252,16 @@ def is_username_retired(username):
         raise
 
 
-def username_exists_or_retired(username):
+def username_exists_or_retired(username, edly_sub_org=None):
     """
-    Check a username for existence -or- retirement against the User model.
+    Check a username for existence in the same sub-organization -or- retirement against the User model.
     """
-    return User.objects.filter(username=username).exists() or is_username_retired(username)
+    username_filter = Q(username=username)
+
+    if edly_sub_org:
+        username_filter &= Q(edly_multisite_user__sub_org=edly_sub_org)
+
+    return User.objects.filter(username_filter).exists() or is_username_retired(username)
 
 
 def is_email_retired(email):
@@ -272,11 +277,17 @@ def is_email_retired(email):
     return User.objects.filter(email__in=list(locally_hashed_emails)).exists()
 
 
-def email_exists_or_retired(email):
+def email_exists_or_retired(email, edly_sub_org=None):
     """
-    Check an email against the User model for existence.
+    Check an email against the User model for existence in same sub-organization.
     """
-    return User.objects.filter(email=email).exists() or is_email_retired(email)
+    email_filter = Q(email=email)
+
+    if edly_sub_org:
+        email_filter &= Q(edly_multisite_user__sub_org=edly_sub_org)
+
+    return User.objects.filter(email_filter).exists() or is_email_retired(email)
+
 
 
 def get_retired_username_by_username(username):

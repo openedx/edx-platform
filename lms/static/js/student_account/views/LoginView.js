@@ -170,15 +170,7 @@
                             paragraphStart: HtmlUtils.HTML('<p>'),
                             paragraphEnd: HtmlUtils.HTML('</p>'),
                             email: email,
-                            platform_name: this.platformName,
-                            anchorStart: HtmlUtils.HTML(
-                                StringUtils.interpolate(
-                                    '<a href="{passwordResetSupportUrl}">', {
-                                        passwordResetSupportUrl: this.passwordResetSupportUrl
-                                    }
-                                )
-                            ),
-                            anchorEnd: HtmlUtils.HTML('</a>')
+                            platform_name: this.platformName
                         }
                     );
 

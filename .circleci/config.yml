@@ -18,6 +18,9 @@ jobs:
       - run:
           name: "Install apt-get packages"
           command: |
+            sudo sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
+            sudo sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list
+            sudo sed -i '/stretch-updates/d' /etc/apt/sources.list
             sudo apt-get update
             sudo apt-get install -y software-properties-common mongodb curl git python-dev libxml2-dev libxmlsec1-dev libgeos-dev
       - run:

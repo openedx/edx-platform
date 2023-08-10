@@ -64,6 +64,7 @@ from openedx.features.edly.utils import (
     create_edly_access_role,
     create_learner_link_with_permission_groups,
     is_config_enabled,
+    get_edly_sub_org_from_request,
 )
 from common.djangoapps.student.helpers import (
     AccountValidationError,
@@ -511,6 +512,10 @@ class RegistrationView(APIView):
         if response:
             return response
 
+        response = self._is_user_exist_in_multisite(request, data)
+        if response:
+            return response
+
         response, user = self._create_account(request, data)
         if response:
             return response
@@ -520,17 +525,36 @@ class RegistrationView(APIView):
         set_logged_in_cookies(request, response, user)
         return response
 
+    def _is_user_exist_in_multisite(self, request, data):
+        email = data.get('email')
+        username = data.get('username')
+        errors = {}
+        if User.objects.filter(email=email, username=username).exists():
+            user = User.objects.get(email=email, username=username)
+            edly_access_user = create_edly_access_role(request, user)
+            create_learner_link_with_permission_groups(edly_access_user)
+            return self._create_response(request, {}, status_code=200)
+
+        elif User.objects.filter(email=email).exists():
+            errors["email"] = [{"user_message": "Email {} already exists".format(email)}]
+            return self._create_response(request, errors, status_code=400)
+
+        elif User.objects.filter(username=username).exists():
+            errors["username"] = [{"user_message": "Username {} already exists.".format(username)}]
+            return self._create_response(request, errors, status_code=400)
+
     def _handle_duplicate_email_username(self, request, data):
         # pylint: disable=no-member
         # TODO Verify whether this check is needed here - it may be duplicated in user_api.
         email = data.get('email')
         username = data.get('username')
         errors = {}
+        sub_org = get_edly_sub_org_from_request(request)
 
-        if email is not None and email_exists_or_retired(email):
+        if email is not None and email_exists_or_retired(email, sub_org):
             errors["email"] = [{"user_message": accounts_settings.EMAIL_CONFLICT_MSG.format(email_address=email)}]
 
-        if username is not None and username_exists_or_retired(username):
+        if username is not None and username_exists_or_retired(username, sub_org):
             errors["username"] = [{"user_message": accounts_settings.USERNAME_CONFLICT_MSG.format(username=username)}]
 
         if errors:
@@ -696,8 +720,9 @@ class RegistrationValidationView(APIView):
     def username_handler(self, request):
         """ Validates whether the username is valid. """
         username = request.data.get('username')
+        edly_sub_org = get_edly_sub_org_from_request(request)
         invalid_username_error = get_username_validation_error(username)
-        username_exists_error = get_username_existence_validation_error(username)
+        username_exists_error = get_username_existence_validation_error(username, edly_sub_org)
         # We prefer seeing for invalidity first.
         # Some invalid usernames (like for superusers) may exist.
         return invalid_username_error or username_exists_error
@@ -705,8 +730,9 @@ class RegistrationValidationView(APIView):
     def email_handler(self, request):
         """ Validates whether the email address is valid. """
         email = request.data.get('email')
+        edly_sub_org = get_edly_sub_org_from_request(request)
         invalid_email_error = get_email_validation_error(email)
-        email_exists_error = get_email_existence_validation_error(email)
+        email_exists_error = get_email_existence_validation_error(email, edly_sub_org)
         # We prefer seeing for invalidity first.
         # Some invalid emails (like a blank one for superusers) may exist.
         return invalid_email_error or email_exists_error

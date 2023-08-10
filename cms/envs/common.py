@@ -785,7 +785,8 @@ EDLY_JWT_ALGORITHM = 'HS256'
 
 ALLOWED_SITE_CONFIGURATIONS_OVERRIDE = [
     'BRANDING', 'COLORS', 'ALLOW_PUBLIC_ACCOUNT_CREATION', 'REGISTRATION_EXTRA_FIELDS',
-    'EMAILS_CONFIG', 'DJANGO_SETTINGS_OVERRIDE', 'GTM_ID', 'GA_ID',
+    'EMAILS_CONFIG', 'DJANGO_SETTINGS_OVERRIDE', 'GTM_ID', 'GA_ID', 'MOBILE_ENABLED', 
+    'MOBILE_APP_CONFIG'
 ]
 
 ALLOWED_DJANGO_SETTINGS_OVERRIDE = [
@@ -1834,6 +1835,26 @@ ADVANCED_PROBLEM_TYPES = [
     {
         'component': 'edlyrating',
         'boilerplate_name': None
+    },
+    {
+        'component': 'lti_consumer',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'kwl',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'annotatable',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'google-document',
+        'boilerplate_name': None
+    },
+    {
+        'component': 'library_content',
+        'boilerplate_name': None
     }
 ]
 
@@ -2443,10 +2464,13 @@ DEFAULT_EMAIL_LOGO_URL = 'https://edx-cdn.org/v3/default/logo.png'
 HOTJAR_TRACKING_ID = None
 
 # MIXPANEL ANALYTICS PROJECT TOKEN
-MIXPANEL_PROJECT_TOKEN = None
+MIXPANEL_PROJECT_TOKEN = 'replace-me'
 
 # USETIFUL PRODUCT TOUR TOKEN
 USETIFUL_TOKEN = 'USETIFUL_TOKEN'
 
 # REDIRECT URL FOR EXPIRED SITES
 EXPIRE_REDIRECT_URL = 'http://wordpress.edx.devstack.lms/pricing-and-plans/'
+
+# OPEN AI API KEY
+OPENAI_SECRET_KEY = 'set-secret-key'

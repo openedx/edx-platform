@@ -11,6 +11,7 @@ from django.views.generic import TemplateView
 from oauth2_provider.models import Application
 from six.moves.urllib.parse import parse_qs, urlsplit, urlunsplit  # pylint: disable=import-error
 
+from lms.envs.common import EDLY_PANEL_ADMIN_USERS_GROUP
 from openedx.core.djangoapps.user_authn.cookies import delete_logged_in_cookies
 from openedx.core.djangoapps.user_authn.utils import is_safe_login_or_logout_redirect
 from common.djangoapps.third_party_auth import pipeline as tpa_pipeline
@@ -28,6 +29,7 @@ class LogoutView(TemplateView):
 
     # Keep track of the page to which the user should ultimately be redirected.
     default_target = '/'
+    is_user_panel_admin = False
     tpa_logout_url = ''
 
     def post(self, request, *args, **kwargs):
@@ -73,9 +75,19 @@ class LogoutView(TemplateView):
             dot_client_id=self.request.GET.get('client_id'),
             require_https=self.request.is_secure(),
         )
-        return target_url if use_target_url else self.default_target
+
+        if use_target_url:
+            return target_url
+
+        if self.is_user_panel_admin:
+            return settings.PANEL_ADMIN_LOGOUT_REDIRECT_URL
+
+        return self.default_target
 
     def dispatch(self, request, *args, **kwargs):
+        if request.user.groups.filter(name=EDLY_PANEL_ADMIN_USERS_GROUP):
+            self.is_user_panel_admin = True
+
         # We do not log here, because we have a handler registered to perform logging on successful logouts.
         request.is_from_logout = True
 
