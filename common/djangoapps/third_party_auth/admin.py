@@ -106,7 +106,6 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         update_url += f'?source={instance.pk}'
         return format_html('<a href="{}">{}</a>', update_url, instance.name)
 
-
     @admin.display(
         description='Metadata Ready',
         boolean=True,
@@ -120,7 +119,6 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
             if record.is_valid():
                 return True
         return False
-
 
     def mode(self, inst):
         """ Indicate if debug_mode is enabled or not"""
@@ -200,4 +198,3 @@ class LTIProviderConfigAdmin(KeyedConfigurationModelAdmin):
 @admin.register(AppleMigrationUserIdInfo)
 class AppleMigrationUserIdInfoAdmin(admin.ModelAdmin):
     """ Django Admin class for AppleMigrationUserIdInfo """
-    pass
