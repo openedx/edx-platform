@@ -42,7 +42,6 @@ class OAuth2ProviderConfigAdmin(KeyedConfigurationModelAdmin):
         )
 
 
-
 class SAMLProviderConfigForm(forms.ModelForm):
     """ Django Admin form class for SAMLProviderConfig """
     backend_name = forms.ChoiceField(choices=((name, name) for name in _PSA_SAML_BACKENDS))
@@ -141,7 +140,6 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         fetch_saml_metadata.apply_async((), countdown=2)
 
 
-
 @admin.register(SAMLConfiguration)
 class SAMLConfigurationAdmin(KeyedConfigurationModelAdmin):
     """ Django Admin class for SAMLConfiguration """
@@ -163,7 +161,6 @@ class SAMLConfigurationAdmin(KeyedConfigurationModelAdmin):
         return format_html('Public: {}…{}<br>Private: {}…{}', pub1, pub2, priv1, priv2)
 
 
-
 @admin.register(SAMLProviderData)
 class SAMLProviderDataAdmin(admin.ModelAdmin):
     """ Django Admin class for SAMLProviderData (Read Only) """
@@ -174,8 +171,6 @@ class SAMLProviderDataAdmin(admin.ModelAdmin):
         if obj:  # editing an existing object
             return [field.name for field in self.model._meta.get_fields()]
         return self.readonly_fields
-
-
 
 
 @admin.register(LTIProviderConfig)
@@ -202,9 +197,7 @@ class LTIProviderConfigAdmin(KeyedConfigurationModelAdmin):
         )
 
 
-
 @admin.register(AppleMigrationUserIdInfo)
 class AppleMigrationUserIdInfoAdmin(admin.ModelAdmin):
     """ Django Admin class for AppleMigrationUserIdInfo """
-
-
+    pass
