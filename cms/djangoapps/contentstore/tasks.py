@@ -1052,7 +1052,7 @@ def replace_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map): 
 
         for draft_library_source_block in draft_blocks:
             try:
-                new_source_id = v1_to_v2_lib_map[draft_library_source_block.source_library_id]
+                new_source_id = str(v1_to_v2_lib_map[draft_library_source_block.source_library_id])
             except KeyError:
                 #skip invalid keys
                 LOGGER.error(
@@ -1097,22 +1097,47 @@ def undo_all_library_source_blocks_ids_for_course(course, v1_to_v2_lib_map):  # 
     v2_to_v1_lib_map = {v: k for k, v in v1_to_v2_lib_map.items()}
 
     store = modulestore()
-    with store.bulk_operations(course.id):
-        for branch in [ModuleStoreEnum.BranchName.draft, ModuleStoreEnum.BranchName.published]:
-            blocks = store.get_items(
-                course.id.for_branch(branch),
-                settings={'source_library_id': {'$exists': True}}
+    draft_blocks, published_blocks = [
+        store.get_items(
+            course.id.for_branch(branch),
+            settings={'source_library_id': {'$exists': True}}
+        )
+        for branch in [ModuleStoreEnum.BranchName.draft, ModuleStoreEnum.BranchName.published]
+    ]
+
+    published_dict = {block.location: block for block in published_blocks}
+
+    for draft_library_source_block in draft_blocks:
+        try:
+            new_source_id = str(v2_to_v1_lib_map[draft_library_source_block.source_library_id])
+        except KeyError:
+            #skip invalid keys
+            LOGGER.error(
+                'Key %s not found in mapping. Skipping block for course %s',
+                str({draft_library_source_block.source_library_id}),
+                str(course.id)
             )
-            for xblock in blocks:
-                try:
-                    xblock.source_library_id = v2_to_v1_lib_map[xblock.source_library_id]
-                    store.update_item(xblock, None)
-                except KeyError:
-                    #skip invalid keys
-                    LOGGER.error(
-                        'Key %s not found in mapping. Skipping block for course %s',
-                        str({xblock.source_library_id}),
-                        str(course.id)
-                    )
+            continue
+
+        # The publsihed branch should be updated as well as the draft branch
+        # This way, if authors "discard changes," they won't be reverted back to the V1 lib.
+        # However, we also don't want to publish the draft branch.
+        try:
+            if published_dict[draft_library_source_block.location] is not None:
+                #temporarily set the published version to be the draft & publish it.
+                temp = published_dict[draft_library_source_block.location]
+                temp.source_library_id = new_source_id
+                store.update_item(temp, None)
+                store.publish(temp.location, None)
+                draft_library_source_block.source_library_id = new_source_id
+                store.update_item(draft_library_source_block, None)
+        except KeyError:
+            #Warn, but just update the draft block if no published block for draft block.
+            LOGGER.warning(
+                'No matching published block for draft block %s',
+                str(draft_library_source_block.location)
+            )
+            draft_library_source_block.source_library_id = new_source_id
+            store.update_item(draft_library_source_block, None)
     # return success
     return

@@ -55,7 +55,6 @@ class Command(BaseCommand):
             "Completed replacing all v1 library source ids with v2 library source ids"
         )
 
-
     def validate(self, v1_to_v2_lib_map):
         """ Validate that replace_all_library_source_blocks_ids was successful"""
         courses = CourseOverview.get_all_courses()
