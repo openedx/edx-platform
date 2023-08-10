@@ -8,10 +8,11 @@
  *  - changes cause a refresh of the entire section rather than just the view for the changed xblock
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
-define(['jquery', 'underscore', 'js/views/xblock_outline', 'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils',
+define(['jquery', 'underscore', 'js/views/xblock_outline', 'edx-ui-toolkit/js/utils/string-utils',
+    'common/js/components/utils/view_utils', 'js/views/utils/xblock_utils',
     'js/models/xblock_outline_info', 'js/views/modals/course_outline_modals', 'js/utils/drag_and_drop'],
 function(
-    $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,
+    $, _, XBlockOutlineView, StringUtils, ViewUtils, XBlockViewUtils,
     XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
 ) {
     var CourseOutlineView = XBlockOutlineView.extend({
@@ -307,137 +308,48 @@ function(
             }
         },
 
-        findXBlockElement: function(target) {
-            return $(target).closest('.outline-subsection');
-        },
-
-        createPlaceholderElement: function() {
-            return $('<li/>', {class: 'outline-item outline-unit has-warnings is-draggable'});
-        },
-
-        getURLRoot: function() {
-            return this.model.urlRoot;
-        },
-
-        /**
-         * Refreshes the specified xblock's display. If the xblock is an inline child of a
-         * reorderable container then the element will be refreshed inline. If not, then the
-         * parent container will be refreshed instead.
-         * @param element An element representing the xblock to be refreshed.
-         * @param block_added Flag to indicate that new block has been just added.
-         */
-        refreshXBlock: function(element, block_added, is_duplicate) {
-            var xblockElement = this.findXBlockElement(element),
-                parentElement = xblockElement.parent(),
-                rootLocator = this.model.id;
-
-            if (xblockElement.length === 0 || xblockElement.data('locator') === rootLocator) {
-                this.render({refresh: true, block_added: block_added});
-            } else if (parentElement.hasClass('reorderable-container')) {
-                this.refreshChildXBlock(xblockElement, block_added, is_duplicate);
-            } else {
-                this.refreshXBlock(this.findXBlockElement(parentElement));
-            }
-        },
-
-        /**
-         * Refresh an xblock element inline on the page, using the specified xblockInfo.
-         * Note that the element is removed and replaced with the newly rendered xblock.
-         * @param xblockElement The xblock element to be refreshed.
-         * @param block_added Specifies if a block has been added, rather than just needs
-         * refreshing.
-         * @returns {jQuery promise} A promise representing the complete operation.
-         */
-        refreshChildXBlock: function(xblockElement, block_added, is_duplicate) {
-            var self = this,
-                xblockInfo,
-                TemporaryXBlockView,
-                temporaryView;
-            xblockInfo = new XBlockInfo({
-                id: xblockElement.data('locator')
-            });
-            // There is only one Backbone view created on the container page, which is
-            // for the container xblock itself. Any child xblocks rendered inside the
-            // container do not get a Backbone view. Thus, create a temporary view
-            // to render the content, and then replace the original element with the result.
-            TemporaryXBlockView = XBlockView.extend({
-                updateHtml: function(element, html) {
-                    // Replace the element with the new HTML content, rather than adding
-                    // it as child elements.
-                    this.$el = $(html).replaceAll(element); // xss-lint: disable=javascript-jquery-insertion
-                }
-            });
-            temporaryView = new TemporaryXBlockView({
-                model: xblockInfo,
-                view: self.xblockView.new_child_view,
-                el: xblockElement
-            });
-            return temporaryView.render({
-                success: function() {
-                    self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
-                    temporaryView.unbind(); // Remove the temporary view
-                },
-                initRuntimeData: this
-            });
-        },
-
-        onNewXBlock: function(xblockElement, scrollOffset, is_duplicate, data) {
-            var useNewTextEditor = this.$('.xblock-header-primary').attr('use-new-editor-text'),
-                useNewVideoEditor = this.$('.xblock-header-primary').attr('use-new-editor-video'),
-                useVideoGalleryFlow = this.$('.xblock-header-primary').attr("use-video-gallery-flow"),
-                useNewProblemEditor = this.$('.xblock-header-primary').attr('use-new-editor-problem');
-
-            // find the block type in the locator if available
-            if(data.hasOwnProperty('locator')) {
-                var matchBlockTypeFromLocator = /\@(.*?)\+/;
-                var blockType = data.locator.match(matchBlockTypeFromLocator);
-            }
-            if((useNewTextEditor === 'True' && blockType.includes('html'))
-                    || (useNewVideoEditor === 'True' && blockType.includes('video'))
-                    || (useNewProblemEditor === 'True' && blockType.includes('problem'))
-            ){
-                var destinationUrl;
-                if (useVideoGalleryFlow === "True" && blockType.includes("video")) {
-                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/course-videos/' + encodeURI(data.locator);
-                }
-                else {
-                    destinationUrl = this.$('.xblock-header-primary').attr("authoring_MFE_base_url") + '/' + blockType[1] + '/' + encodeURI(data.locator);
-                }
-                window.location.href = destinationUrl;
-                return;
-            }
-            // ViewUtils.setScrollOffset(xblockElement, scrollOffset);
-            xblockElement.data('locator', data.locator);
-            return this.refreshXBlock(xblockElement, true, is_duplicate);
+        createPlaceholderElementForPaste: function(category, componentDisplayName) {
+            const nameStr = StringUtils.interpolate(gettext("Copy of '{componentDisplayName}'"), { componentDisplayName }, true);
+            const el = document.createElement("li");
+            el.classList.add("outline-item", "outline-" + category, "has-warnings", "is-draggable");
+            el.innerHTML = `
+                <div class="${category}-header">
+                    <h3 class="${category}-header-details" style="width: 50%">
+                        <span class="${category}-title item-title">
+                            ${nameStr}
+                        </span>
+                    </h3>
+                    <div class="${category}-header-actions" style="width: 50%; text-align: right;">
+                        <span class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></span>
+                    </div>
+                </div>
+            `;
+            return $(el);
         },
 
         /** The user has clicked on the "Paste Unit button" */
         pasteUnit(event) {
             // event.preventDefault();
-            // Get the ID of the container (usually a unit/vertical) that we're pasting into:
-            const parentElement = this.findXBlockElement(event.target);
-            const parentLocator = parentElement.data('locator');
+            // Get the ID of the parent container (a subsection if we're pasting a unit/vertical) that we're pasting into
+            const $parentElement = $(event.target).closest('.outline-item');
+            const parentLocator = $parentElement.data('locator');
+            // Get the display name of what we're pasting:
+            const displayName = $(event.target).closest('.paste-component').find('.detail-block-name').text();
             // Create a placeholder XBlock while we're pasting:
-            const $placeholderEl = $(this.createPlaceholderElement());
-            const addComponentsPanel = $(event.target).closest('.paste-component').prev();
-
-            // const listPanel = addComponentsPanel.prev();
-            const listPanel = $(event.target).closest('.subsection-content').find('.list-units');
-
-            const scrollOffset = ViewUtils.getScrollOffset(addComponentsPanel);
-            const placeholderElement = $placeholderEl.appendTo(listPanel);
+            const $placeholderEl = this.createPlaceholderElementForPaste('unit', displayName);
+            const $listPanel = $(event.target).closest('.outline-content').children('ol').first();
+            $listPanel.append($placeholderEl);
 
             // Start showing a "Pasting" notification:
             ViewUtils.runOperationShowingMessage(gettext('Pasting'), () => {
-                return $.postJSON(this.getURLRoot() + '/', {
+                return $.postJSON(this.model.urlRoot + '/', {
                     parent_locator: parentLocator,
                     staged_content: "clipboard",
                 }).then((data) => {
-                    this.onNewXBlock(placeholderElement, scrollOffset, false, data);
+                    this.refresh(); // Update this and replace the placeholder with the actual pasted unit.
                     return data;
                 }).fail(() => {
-                    // Remove the placeholder if the paste failed
-                    placeholderElement.remove();
+                    $placeholderEl.remove();
                 });
             }).done((data) => {
                 const {
