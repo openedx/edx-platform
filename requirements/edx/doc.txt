@@ -570,7 +570,7 @@ edx-milestones==0.5.0
     # via -r requirements/edx/base.txt
 edx-name-affirmation==2.3.6
     # via -r requirements/edx/base.txt
-edx-opaque-keys[django]==2.3.0
+edx-opaque-keys[django]==2.4.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-bulk-grades
@@ -903,7 +903,7 @@ openedx-django-require==2.1.0
     # via -r requirements/edx/base.txt
 openedx-django-wiki==2.0.0
     # via -r requirements/edx/base.txt
-openedx-events==8.3.0
+openedx-events==8.5.0
     # via
     #   -r requirements/edx/base.txt
     #   edx-event-bus-kafka
