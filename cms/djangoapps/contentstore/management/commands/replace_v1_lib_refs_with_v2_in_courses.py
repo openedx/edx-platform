@@ -8,11 +8,15 @@ import csv
 
 from django.core.management import BaseCommand, CommandError
 from celery import group
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
+
+
 
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from cms.djangoapps.contentstore.tasks import replace_all_library_source_blocks_ids_for_course
+from cms.djangoapps.contentstore.tasks import (
+    replace_all_library_source_blocks_ids_for_course,
+    validate_all_library_source_blocks_ids_for_course,
+    undo_all_library_source_blocks_ids_for_course
+    )
 
 log = logging.getLogger(__name__)
 
@@ -20,12 +24,14 @@ log = logging.getLogger(__name__)
 class Command(BaseCommand):
     """
     Example usage:
-        $ ./manage.py cms replace_v1_lib_refs_with_v2_in_courses '/path/to/file/containing/library_mappings.csv'
-        $ ./manage.py cms replace_v1_lib_refs_with_v2_in_courses '/path/to/file/containing/library_mappings.csv'
-
+        $ ./manage.py cms replace_v1_lib_refs_with_v2_in_courses '/path/to/library_mappings.csv'
+        $ ./manage.py cms replace_v1_lib_refs_with_v2_in_courses '/path/to/library_mappings.csv' --validate
+        $ ./manage.py cms replace_v1_lib_refs_with_v2_in_courses '/path/to/library_mappings.csv' --undo
     """
     def add_arguments(self, parser):
         parser.add_argument('file_path', type=str, help='Path to the CSV file.')
+        parser.add_argument('--validate', action='store_true', help='Validate previous runs of the command')
+        parser.add_argument('--undo', action='store_true', help='Validate previous runs of the command')
 
     def replace_all_library_source_blocks_ids(self, v1_to_v2_lib_map):
         """A method to replace 'source_library_id' in all relevant blocks."""
@@ -33,7 +39,13 @@ class Command(BaseCommand):
         courses = CourseOverview.get_all_courses()
 
         # Use Celery to distribute the workload
-        tasks = group(replace_all_library_source_blocks_ids_for_course.s(course, v1_to_v2_lib_map) for course in courses)
+        tasks = group(
+            replace_all_library_source_blocks_ids_for_course.s(
+                course,
+                v1_to_v2_lib_map
+                )
+            for course in courses
+            )
         results = tasks.apply_async()
 
         for result in results.get():
@@ -41,11 +53,55 @@ class Command(BaseCommand):
                 # Handle the task failure here
                 log.error("Task failed with error: %s", str(result))
                 continue
-        log.info("Completed replacing all v1 library source ids with v2 library source ids")
+        log.info(
+            "Completed replacing all v1 library source ids with v2 library source ids"
+            )
+
+
+    def validate(self, v1_to_v2_lib_map):
+        """ Validate that replace_all_library_source_blocks_ids was successful"""
+        courses = CourseOverview.get_all_courses()
+
+        # Use Celery to distribute the workload
+        tasks = group(validate_all_library_source_blocks_ids_for_course.s(course, v1_to_v2_lib_map) for course in courses)  # lint-amnesty, pylint: disable=line-too-long
+        results = tasks.apply_async()
+
+        validation = set()
+        for result in results.get():
+            if isinstance(result, Exception):
+                # Handle the task failure here
+                log.error("Task failed with error: %s", str(result))
+                continue
+            else:
+                validation.update(result)
+
+        if validation.issubset(v1_to_v2_lib_map.values()):
+            log.info("Validation: All values in the input map are present in courses.")
+        else:
+             log.info(
+                "Validation Failed: There are unmapped v1 libraries."
+                )
+
+    def undo(self, v1_to_v2_lib_map):
+        """ undo the changes made by replace_all_library_source_blocks_ids"""
+        courses = CourseOverview.get_all_courses()
+
+        # Use Celery to distribute the workload
+        tasks = group(undo_all_library_source_blocks_ids_for_course.s(course, v1_to_v2_lib_map) for course in courses)
+        results = tasks.apply_async()
+
+        for result in results.get():
+            if isinstance(result, Exception):
+                # Handle the task failure here
+                log.error("Task failed with error: %s", str(result))
+                continue
+        log.info("Completed replacing all v2 library source ids with v1 library source ids. Undo Complete")
+
 
     def handle(self, *args, **kwargs):
-        """ Parse Arguements and begin Command"""
+        """ Parse arguments and begin command"""
         file_path = kwargs['file_path']
+        v1_to_v2_lib_map = {}
         try:
             with open(file_path, 'r', encoding='utf-8') as csvfile:
 
@@ -53,7 +109,6 @@ class Command(BaseCommand):
                     raise CommandError('Invalid file format. Only CSV files are supported.')
 
                 csv_reader = csv.reader(csvfile)
-                v1_to_v2_lib_map = {}
 
                 for row in csv_reader:
                     if len(row) >= 2:
@@ -65,7 +120,12 @@ class Command(BaseCommand):
 
         except FileNotFoundError:
             log.error("File not found at '%s'.", {file_path})
-        except Exception as e:
+        except Exception as e:  # lint-amnesty, pylint: disable=broad-except
             log.error("An error occurred: %s", {str(e)})
 
-        self.replace_all_library_source_blocks_ids(v1_to_v2_lib_map)
+        if kwargs['validate'] :
+            self.validate(v1_to_v2_lib_map)
+        if kwargs['undo'] :
+            self.undo(v1_to_v2_lib_map)
+        else:
+            self.replace_all_library_source_blocks_ids(v1_to_v2_lib_map)

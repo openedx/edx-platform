@@ -830,6 +830,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         store = self._verify_modulestore_support(xblock.location.course_key, 'update_item')
         xblock = store.update_item(xblock, user_id, allow_not_found, **kwargs)
+        print('ITEM UPDATED')
         # .. event_implemented_name: XBLOCK_UPDATED
         XBLOCK_UPDATED.send_event(
             time=datetime.now(timezone.utc),
