@@ -286,7 +286,6 @@ cryptography==38.0.4
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-    #   django-fernet-fields
     #   djfernet
     #   edx-enterprise
     #   jwcrypto
@@ -346,7 +345,6 @@ django==3.2.20
     #   django-cors-headers
     #   django-crum
     #   django-debug-toolbar
-    #   django-fernet-fields
     #   django-filter
     #   django-js-asset
     #   django-method-override
@@ -460,11 +458,6 @@ django-environ==0.10.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   openedx-blockstore
-django-fernet-fields==0.6
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
-    #   edx-enterprise
 django-filter==23.2
     # via
     #   -r requirements/edx/doc.txt
@@ -636,6 +629,7 @@ djfernet==0.8.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
+    #   edx-enterprise
     #   edxval
 docutils==0.19
     # via
@@ -748,9 +742,8 @@ edx-drf-extensions==8.8.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==4.0.11
+edx-enterprise @ git+https://github.com/openedx/edx-enterprise.git@replace_django_fernet
     # via
-    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
 edx-event-bus-kafka==5.3.0
