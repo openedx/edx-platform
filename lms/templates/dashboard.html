@@ -255,6 +255,8 @@ from common.djangoapps.student.models import CourseEnrollment
                     data.resume_button_url.forEach(d =>{
                       if (d.course_id === course_id){
                         aElement.href = d.url
+                        console.log('====course_id=====', course_id , d.course_id)
+                        console.log('================', d.url)
                         aElement.textContent = d.textContent
                         const spanElement = document.createElement('span')
                         spanElement.className = 'sr'
@@ -353,7 +355,7 @@ from common.djangoapps.student.models import CourseEnrollment
 
 %if show_account_activation_popup:
     <div id="activate-account-modal" class="modal activate-account-modal" aria-hidden="true" tabindex=0 >
-      <div class="inner-wrapper" role="dialog" aria-labelledby="activate-account-modal-title" aria-live="polite">
+      <div class="inner-wrapper container" role="dialog" aria-labelledby="activate-account-modal-title" aria-live="polite" style="width:50%">
           <h3>
              ${_("Activate your account so you can log back in")}
             <span class="sr">,
