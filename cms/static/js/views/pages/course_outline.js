@@ -70,7 +70,8 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
         pollingDelay: 100,
 
         options: {
-            collapsedClass: 'is-collapsed'
+            collapsedClass: 'is-collapsed',
+            initialUserClipboard: {content: null},
         },
 
         // Extracting this to a variable allows comprehensive themes to replace or extend `CourseOutlineView`.
