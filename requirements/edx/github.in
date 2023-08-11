@@ -86,3 +86,6 @@
 ##############################################################################
 
 # ... add dependencies here
+
+
+git+https://github.com/openedx/edx-enterprise.git@replace_django_fernet
