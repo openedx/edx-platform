@@ -58,8 +58,6 @@ class Command(BaseCommand):
     def validate(self, v1_to_v2_lib_map):
         """ Validate that replace_all_library_source_blocks_ids was successful"""
         courses = CourseOverview.get_all_courses()
-
-        # Use Celery to distribute the workload
         tasks = group(validate_all_library_source_blocks_ids_for_course.s(course, v1_to_v2_lib_map) for course in courses)  # lint-amnesty, pylint: disable=line-too-long
         results = tasks.apply_async()
 
