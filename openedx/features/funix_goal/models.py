@@ -31,7 +31,7 @@ class LearnGoal(models.Model):
 
 		goal_obj.save()
 
-		return FunixRelativeDateModule.FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id), selected_date=selected_date)
+		return FunixRelativeDateModule.FunixRelativeDateLibary.get_schedule(user_name=str(user), course_id=str(course_id), selected_date=selected_date,block_id=block_id)
 
 	@classmethod
 	def get_goal(self, course_id, user_id):
