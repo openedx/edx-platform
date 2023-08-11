@@ -22,7 +22,6 @@ function(
 
         initialize: function() {
             XBlockOutlineView.prototype.initialize.call(this);
-            this.clipboardBroadcastChannel = new BroadcastChannel("studio_clipboard_channel");
         },
 
         render: function() {
@@ -224,8 +223,7 @@ function(
                     // ^ platform's old require.js/esprima breaks on newer syntax in some JS files but not all.
                     if (status === "ready") {
                         // The Unit has been copied and is ready to use.
-                        this.refreshPasteButton(data); // Update our UI
-                        this.clipboardBroadcastChannel.postMessage(data); // And notify any other open tabs
+                        this.clipboardManager.updateUserClipboard(data); // This will update the UI and notify other tabs
                         return data;
                     } else if (status === "loading") {
                         // The clipboard is being loaded asynchronously.
@@ -236,8 +234,7 @@ function(
                                 // const newStatus = pollData.content?.status;
                                 const newStatus = pollData.content && pollData.content.status;
                                 if (newStatus === "ready") {
-                                    this.refreshPasteButton(data);
-                                    this.clipboardBroadcastChannel.postMessage(pollData);
+                                    this.clipboardManager.updateUserClipboard(pollData);
                                     deferred.resolve(pollData);
                                 } else if (newStatus === "loading") {
                                     setTimeout(checkStatus, 1000);
@@ -258,12 +255,13 @@ function(
 
         initializePasteButton(element) {
             if ($(element).hasClass('outline-subsection')) {
-                if (this.options.canEdit) {
-                    // We should have the user's clipboard status.
-                    const data = this.model.get("user_clipboard") || {"content": null};
-                    this.refreshPasteButton(data);
-                    // Refresh the status when something is copied on another tab:
-                    this.clipboardBroadcastChannel.onmessage = (event) => { this.refreshPasteButton(event.data); };
+                if (this.options.canEdit && this.clipboardManager) {
+                    // We should have the user's clipboard status from CourseOutlinePage, whose clipboardManager manages
+                    // the clipboard data on behalf of all the XBlocks in the outline.
+                    this.refreshPasteButton(this.clipboardManager.userClipboard);
+                    this.clipboardManager.addEventListener("update", (event) => {
+                        this.refreshPasteButton(event.detail);
+                    });
                 } else {
                     this.$(".paste-component").hide();
                 }

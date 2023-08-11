@@ -14,7 +14,6 @@ from datetime import datetime
 from uuid import uuid4
 
 from attrs import asdict
-from crum import get_current_request
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import (User)  # lint-amnesty, pylint: disable=imported-auth-user
@@ -51,7 +50,6 @@ from common.djangoapps.util.date_utils import get_default_time_display
 from common.djangoapps.util.json_request import JsonResponse, expect_json
 from common.djangoapps.xblock_django.user_service import DjangoXBlockUserService
 from openedx.core.djangoapps.bookmarks import api as bookmarks_api
-from openedx.core.djangoapps.content_staging import api as content_staging_api
 from openedx.core.djangoapps.discussions.models import DiscussionsConfiguration
 from openedx.core.djangoapps.video_config.toggles import PUBLIC_VIDEO_SHARE
 from openedx.core.lib.gating import api as gating_api
@@ -1235,12 +1233,6 @@ def create_xblock_info(  # lint-amnesty, pylint: disable=too-many-statements
                     "hide_after_due": xblock.hide_after_due,
                 }
             )
-            # Include clipboard data so we can paste units into this sequential if a unit is in the clipboard
-            if not is_library_block:  # Only in courses for now
-                request = get_current_request()
-                if request:
-                    clipboard_data = content_staging_api.get_user_clipboard_json(request.user.id, request)
-                    xblock_info["user_clipboard"] = clipboard_data
         elif xblock.category in ("chapter", "course"):
             if xblock.category == "chapter":
                 xblock_info.update(

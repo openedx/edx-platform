@@ -41,6 +41,7 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
             this.parentView = this.options.parentView;
             this.renderedChildren = false;
             this.model.on('sync', this.onSync, this);
+            this.clipboardManager = this.options.clipboardManager; // May be undefined if not on the course outline page
         },
 
         render: function() {
@@ -220,7 +221,8 @@ function($, _, gettext, BaseView, ViewUtils, XBlockViewUtils, XBlockStringFieldE
                 parentView: this,
                 initialState: this.initialState,
                 expandedLocators: this.expandedLocators,
-                template: this.template
+                template: this.template,
+                clipboardManager: this.clipboardManager,
             }, options));
         },
 

@@ -21,7 +21,8 @@ from django.urls import reverse
     require(["js/factories/outline"], function (OutlineFactory) {
         OutlineFactory(
             ${course_structure | n, dump_js_escaped_json},
-            ${initial_state | n, dump_js_escaped_json}
+            ${initial_state | n, dump_js_escaped_json},
+            ${initial_user_clipboard | n, dump_js_escaped_json}
         );
     });
 </%block>
