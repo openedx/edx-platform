@@ -20,10 +20,6 @@ function(
 
         templateName: 'course-outline',
 
-        initialize: function() {
-            XBlockOutlineView.prototype.initialize.call(this);
-        },
-
         render: function() {
             var renderResult = XBlockOutlineView.prototype.render.call(this);
             this.makeContentDraggable(this.el);
@@ -306,7 +302,7 @@ function(
             }
         },
 
-        createPlaceholderElementForPaste: function(category, componentDisplayName) {
+        createPlaceholderElementForPaste(category, componentDisplayName) {
             const nameStr = StringUtils.interpolate(gettext("Copy of '{componentDisplayName}'"), { componentDisplayName }, true);
             const el = document.createElement("li");
             el.classList.add("outline-item", "outline-" + category, "has-warnings", "is-draggable");
@@ -421,7 +417,7 @@ function(
          * event, we just toggle displaying the menu.
          * @param {*} event 
          */
-        showActionsMenu: function(event) {
+        showActionsMenu(event) {
             const showActionsButton = event.currentTarget;
             const subMenu = showActionsButton.parentElement.querySelector(".wrapper-nav-sub");
             // Code in 'base.js' normally handles toggling these dropdowns but since this one is
