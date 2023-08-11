@@ -993,8 +993,11 @@ def get_resume_button_urls(request):
     for dashboard_index, enrollment in enumerate(course_enrollments):
         course_overview = CourseOverview.get_from_id(enrollment.course_id)
         course_target = course_home_url(course_overview.id)
+        for url in resume_button_urls :
+            if str(enrollment.course_id) in url :
+                print('======course_id==========', enrollment.course_id , dashboard_index ,resume_button_url )
         resume_button_url = resume_button_urls[dashboard_index]
-        print('======course_id==========', enrollment.course_id , dashboard_index ,resume_button_url )
+        
         if resume_button_url == '' :
             textContent = _('View Course')
             url = course_target
