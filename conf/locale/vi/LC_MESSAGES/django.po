@@ -2985,7 +2985,7 @@ msgstr "Đề cương"
 
 #: lms/djangoapps/courseware/tabs.py
 msgid "Dates"
-msgstr ""
+msgstr "Kế hoạch học tập"
 
 #: lms/djangoapps/courseware/views/index.py
 #, python-brace-format

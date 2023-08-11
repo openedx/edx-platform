@@ -15,7 +15,7 @@ class LearnGoal(models.Model):
 	weekday_6 = models.BooleanField(default=False)
 
 	@classmethod
-	def set_goal(self, course_id, user, hours_per_day, week_days,selected_date):
+	def set_goal(self, course_id, user, hours_per_day, week_days,selected_date,block_id):
 		user_id = str(user.id)
 		self.objects.filter(course_id=course_id, user_id=user_id).delete()
 
