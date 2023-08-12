@@ -995,9 +995,9 @@ def get_resume_button_urls(request):
         course_target = course_home_url(course_overview.id)
         for url in resume_button_urls :
             if str(enrollment.course_id) in url :
-                print('======course_id==========', enrollment.course_id , dashboard_index ,url )
-        resume_button_url = resume_button_urls[dashboard_index]
+                resume_button_url = url
         
+        print('=======enrollment.course_id==========', enrollment.course_id,resume_button_url)
         if resume_button_url == '' :
             textContent = _('View Course')
             url = course_target
