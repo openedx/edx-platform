@@ -14,7 +14,7 @@
 
 -c ../constraints.txt
 
--r base.txt               # Core edx-platform production dependencies
+-r kernel.txt             # Core edx-platform production dependencies
 -r coverage.txt           # Utilities for calculating test coverage
 
 beautifulsoup4            # Library for extracting data from HTML and XML files
