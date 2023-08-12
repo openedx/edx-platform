@@ -24,5 +24,5 @@ class CreatorMixin:
         super().contribute_to_class(cls, name, *args, **kwargs)
         setattr(cls, name, Creator(self))
 
-    def from_db_value(self, value, expression, connection):  # lint-amnesty, pylint: disable=unused-argument
+    def from_db_value(self, value, connection):  # lint-amnesty, pylint: disable=unused-argument
         return self.to_python(value)

@@ -152,20 +152,19 @@ class SignatureValidator(RequestValidator):
         """
         raise NotImplementedError
 
-    def verify_realms(self, token, realms, request):
+    def verify_realms(self, token, request):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
         raise NotImplementedError
 
-    def validate_realms(self, client_key, token, request, uri=None,
-                        realms=None):
+    def validate_realms(self, client_key, token, request, uri=None):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
         raise NotImplementedError
 
-    def save_verifier(self, token, verifier, request):
+    def save_verifier(self, token, request):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
@@ -213,13 +212,13 @@ class SignatureValidator(RequestValidator):
         """
         raise NotImplementedError
 
-    def validate_requested_realms(self, client_key, realms, request):
+    def validate_requested_realms(self, client_key, request):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """
         raise NotImplementedError
 
-    def validate_verifier(self, client_key, token, verifier, request):
+    def validate_verifier(self, client_key, token, request):
         """
         Unused abstract method from super class. See documentation in RequestValidator
         """

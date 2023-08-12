@@ -108,7 +108,7 @@ class CourseHomeMetadataView(RetrieveAPIView):
 
         browser_timezone = self.request.query_params.get('browser_timezone', None)
         celebrations = get_celebrations_dict(
-            request.user, enrollment, course, user_timezone if not None else browser_timezone
+            request.user, enrollment, course, user_timezone
         )
 
         # Record course goals user activity for (web) learning mfe course tabs

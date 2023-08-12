@@ -143,7 +143,7 @@ class process_cached:  # pylint: disable=invalid-name
         """
         return self.func.__doc__
 
-    def __get__(self, obj, objtype):
+    def __get__(self, obj):
         """
         Support instance methods.
         """

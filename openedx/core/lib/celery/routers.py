@@ -12,7 +12,7 @@ from django.conf import settings
 log = logging.getLogger(__name__)
 
 
-def route_task(name, args, kwargs, options, task=None, **kw):  # pylint: disable=unused-argument
+def route_task(name, args, kwargs, options, task=None):  # pylint: disable=unused-argument
     """
     Celery-defined method allowing for custom routing logic.
 

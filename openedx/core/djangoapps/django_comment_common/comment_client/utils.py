@@ -31,7 +31,7 @@ def extract(dic, keys):
 
 
 def perform_request(method, url, data_or_params=None, raw=False,
-                    metric_action=None, metric_tags=None, paged_results=False):
+                    metric_action=None, metric_tags=None):
     # To avoid dependency conflict
     from openedx.core.djangoapps.django_comment_common.models import ForumsConfig
     config = ForumsConfig.current()

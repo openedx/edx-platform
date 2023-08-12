@@ -466,7 +466,7 @@ class MasqueradingKeyValueStore(KeyValueStore):
             return value != _DELETED_SENTINEL
 
 
-def filter_displayed_blocks(block, unused_view, frag, unused_context):  # lint-amnesty, pylint: disable=unused-argument
+def filter_displayed_blocks(block, frag):  # lint-amnesty, pylint: disable=unused-argument
     """
     A wrapper to only show XBlocks that set `show_in_read_only_mode` when masquerading as a specific user.
 

@@ -18,7 +18,6 @@ from common.djangoapps.student.models import User, UserProfile
 from common.djangoapps.track import segment
 
 from ..errors import (  # lint-amnesty, pylint: disable=unused-import
-    CountryCodeError,
     PreferenceUpdateError,
     PreferenceValidationError,
     UserAPIInternalError,

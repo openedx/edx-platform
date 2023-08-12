@@ -47,7 +47,7 @@ def _get_number_of_subtasks(total_num_items, items_per_task):
 
 
 @contextmanager
-def track_memory_usage(metric, course_id):  # lint-amnesty, pylint: disable=unused-argument
+def track_memory_usage(course_id):  # lint-amnesty, pylint: disable=unused-argument
     """
     Context manager to track how much memory (in bytes) a given process uses.
     Metrics will look like: 'course_email.subtask_generation.memory.rss'

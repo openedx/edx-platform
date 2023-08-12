@@ -537,7 +537,7 @@ class ViewNameMiddleware(MiddlewareMixin):
     """
     Django middleware object to inject view name into request context
     """
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    def process_view(self, request, view_func):
         """
         Injects the view name value into the request context
         """

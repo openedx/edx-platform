@@ -29,7 +29,7 @@ class CodeMirrorWidget(forms.Widget):
             default_attrs.update(attrs)
         super().__init__(default_attrs)
 
-    def render(self, name, value, attrs=None, renderer=None):
+    def render(self, name, value, attrs=None):
         if value is None:
             value = ''
 

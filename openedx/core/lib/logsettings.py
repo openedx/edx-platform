@@ -10,8 +10,7 @@ from logging.handlers import SysLogHandler
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 
 
-def get_logger_config(log_dir,  # lint-amnesty, pylint: disable=unused-argument
-                      logging_env="no_env",
+def get_logger_config(logging_env="no_env",  # lint-amnesty, pylint: disable=unused-argument           
                       local_loglevel='INFO',
                       service_variant=""):
     """
@@ -137,10 +136,7 @@ def log_python_warnings():
     logging.captureWarnings(True)
 
 
-def get_docker_logger_config(log_dir='/var/tmp',
-                             logging_env="no_env",
-                             edx_filename="edx.log",
-                             dev_env=False,
+def get_docker_logger_config(logging_env="no_env",
                              debug=False,
                              service_variant='lms'):
     """

@@ -202,7 +202,7 @@ class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
         return page
 
     @apidocs.schema()
-    def post(self, request, *unused_args, **unused_kwargs):  # lint-amnesty, pylint: disable=unused-argument
+    def post(self, request,):  # lint-amnesty, pylint: disable=unused-argument
         """Create a new bookmark for a user.
 
         The POST request only needs to contain one parameter "usage_id".

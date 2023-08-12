@@ -30,7 +30,6 @@ class CourseGradeFactory:
             collected_block_structure=None,
             course_structure=None,
             course_key=None,
-            create_if_needed=True,
     ):
         """
         Returns the CourseGrade for the given user in the course.
