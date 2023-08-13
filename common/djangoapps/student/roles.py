@@ -78,7 +78,7 @@ class RoleCache:
             )
 
     @staticmethod
-    def _get_roles(role):
+    def get_roles(role):
         """
         Return the roles that should have the same permissions as the specified role.
         """
@@ -90,7 +90,7 @@ class RoleCache:
         or a role that inherits from the specified role, course_id and org.
         """
         return any(
-            access_role.role in self._get_roles(role) and
+            access_role.role in self.get_roles(role) and
             access_role.course_id == course_id and
             access_role.org == org
             for access_role in self._roles
@@ -463,11 +463,11 @@ class UserBasedRole:
 
     def courses_with_role(self):
         """
-        Return a django QuerySet for all of the courses with this user x role. You can access
+        Return a django QuerySet for all of the courses with this user x (or derived from x) role. You can access
         any of these properties on each result record:
         * user (will be self.user--thus uninteresting)
         * org
         * course_id
         * role (will be self.role--thus uninteresting)
         """
-        return CourseAccessRole.objects.filter(role=self.role, user=self.user)
+        return CourseAccessRole.objects.filter(role__in=RoleCache.get_roles(self.role), user=self.user)
