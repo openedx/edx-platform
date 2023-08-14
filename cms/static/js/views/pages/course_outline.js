@@ -41,7 +41,7 @@ function($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils,
             this._userClipboard = newUserClipboard;
             // Emit an "updated" event so listeners can subscribe. This is different than the broadcast channel
             // because this only works within the DOM of a single tab, not across all open tabs that the user has.
-            // In other words, this even trickles down to each section, subsection, and unit view on the outline page.
+            // In other words, this event trickles down to each section, subsection, and unit view on the outline page.
             this.dispatchEvent(new CustomEvent("update", {detail: newUserClipboard}));
             // But also notify listeners on other tabs:
             if (broadcast) {
