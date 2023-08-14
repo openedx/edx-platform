@@ -1665,9 +1665,6 @@ INSTALLED_APPS = [
     # edx-milestones service
     'milestones',
 
-    # Coursegraph
-    'cms.djangoapps.coursegraph.apps.CoursegraphConfig',
-
     # Credit courses
     'openedx.core.djangoapps.credit.apps.CreditConfig',
 
@@ -1896,57 +1893,76 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 30 * 60
 
 
 ### Apps only installed in some instances
-# The order of INSTALLED_APPS matters, so this tuple is the app name and the item in INSTALLED_APPS
+# The order of INSTALLED_APPS matters, so this list contains tuples with the app name and the item in INSTALLED_APPS
 # that this app should be inserted *before*. A None here means it should be appended to the list.
 OPTIONAL_APPS = (
-    ('problem_builder', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
-    ('edx_sga', None),
+    # import to try, apps to add if successful: [(app name, insert before)]
+    ('problem_builder', (
+        ('problem_builder', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    )),
+    ('edx_sga', (
+        ('edx_sga', None),
+    )),
 
     # edx-ora2
-    ('submissions', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
-    ('openassessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
-    ('openassessment.assessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
-    ('openassessment.fileupload', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
-    ('openassessment.staffgrader', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
-    ('openassessment.workflow', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
-    ('openassessment.xblock', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('submissions', (
+        ('submissions', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    )),
+    ('openassessment', (
+        ('openassessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+        ('openassessment.assessment', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+        ('openassessment.fileupload', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+        ('openassessment.staffgrader', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+        ('openassessment.workflow', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+        ('openassessment.xblock', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    )),
 
     # edxval
-    ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    ('edxval', (
+        ('edxval', 'openedx.core.djangoapps.content.course_overviews.apps.CourseOverviewsConfig'),
+    )),
 
     # Enterprise App (http://github.com/openedx/edx-enterprise)
-    ('enterprise', None),
-    ('consent', None),
-    ('integrated_channels.integrated_channel', None),
-    ('integrated_channels.degreed', None),
-    ('integrated_channels.degreed2', None),
-    ('integrated_channels.sap_success_factors', None),
-    ('integrated_channels.xapi', None),
-    ('integrated_channels.cornerstone', None),
-    ('integrated_channels.blackboard', None),
-    ('integrated_channels.canvas', None),
-    ('integrated_channels.moodle', None),
+    ('enterprise', (
+        ('enterprise', None),
+        ('consent', None),
+        ('integrated_channels.integrated_channel', None),
+        ('integrated_channels.degreed', None),
+        ('integrated_channels.degreed2', None),
+        ('integrated_channels.sap_success_factors', None),
+        ('integrated_channels.xapi', None),
+        ('integrated_channels.cornerstone', None),
+        ('integrated_channels.blackboard', None),
+        ('integrated_channels.canvas', None),
+        ('integrated_channels.moodle', None),
+    )),
+
+    # CourseGraph, which depends on py2neo
+    ('py2neo', (
+        ('cms.djangoapps.coursegraph.apps.CoursegraphConfig', 'openedx.core.djangoapps.credit.apps.CreditConfig'),
+    ))
 )
 
 
-for app_name, insert_before in OPTIONAL_APPS:
+for try_import, app_specs in OPTIONAL_APPS:
     # First attempt to only find the module rather than actually importing it,
     # to avoid circular references - only try to import if it can't be found
     # by find_spec, which doesn't work with import hooks
     try:
-        spec = importlib.util.find_spec(app_name)
+        spec = importlib.util.find_spec(try_import)
     except ModuleNotFoundError:  # This occurs if the _parent_ module of the one we're asking for doesn't exist.
         spec = None
     if spec is None:
         try:
-            __import__(app_name)
+            __import__(try_import)
         except ImportError:
             continue
 
-    try:
-        INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
-    except (IndexError, ValueError):
-        INSTALLED_APPS.append(app_name)
+    for app_name, insert_before in app_specs:
+        try:
+            INSTALLED_APPS.insert(INSTALLED_APPS.index(insert_before), app_name)
+        except (IndexError, ValueError):
+            INSTALLED_APPS.append(app_name)
 
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
