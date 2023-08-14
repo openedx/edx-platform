@@ -35,10 +35,18 @@ class Command(BaseCommand):
             ).first()
             if user_social_auth:
                 with transaction.atomic():
-                    user_social_auth.uid = apple_user_id_info.new_apple_id
-                    user_social_auth.save()
-                    log.info(
-                        'Replaced Apple ID %s with %s',
-                        apple_user_id_info.old_apple_id,
-                        apple_user_id_info.new_apple_id
-                    )
+                    try:
+                        user_social_auth.uid = apple_user_id_info.new_apple_id
+                        user_social_auth.save()
+                        log.info(
+                            'Replaced Apple ID %s with %s',
+                            apple_user_id_info.old_apple_id,
+                            apple_user_id_info.new_apple_id
+                        )
+                    except Exception as e:  # pylint: disable=broad-except
+                        log.error(
+                            'An error occurred while replacing %s with %s. Error: %s',
+                            apple_user_id_info.old_apple_id,
+                            apple_user_id_info.new_apple_id,
+                            str(e)
+                        )

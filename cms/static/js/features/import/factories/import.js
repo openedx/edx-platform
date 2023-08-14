@@ -129,6 +129,7 @@ define([
                 },
 
                 progressall: function(e, data) {
+                    // eslint-disable-next-line no-mixed-operators
                     var percentInt = data.loaded / data.total * 100,
                         percentVal = parseInt(percentInt, 10) + '%',
                         doneAt;

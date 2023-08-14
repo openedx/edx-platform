@@ -50,7 +50,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-23 20:42+0000\n"
+"POT-Creation-Date: 2023-07-30 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Abel Camacho <abelcama@gmail.com>, 2017,2019-2020\n"
 "Language-Team: Basque (Spain) (http://app.transifex.com/open-edx/edx-platform/language/eu_ES/)\n"
@@ -123,6 +123,7 @@ msgstr "Ezabatu"
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -2344,11 +2345,9 @@ msgstr "Egoki matrikulatu dira ondorengo erabiltzaileak:"
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"Egoki bidali zaizkie matrikulazio e-postak ondorengo erabiltzaileei. Aukera "
-"izango dute matrikulatzeko identifikatzen direnean: "
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2359,11 +2358,9 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"Egoki bidali zaizkie matrikulazio e-postak ondorengo erabiltzaileei. "
-"Matrikulatu egingo ditugu identifikatzen direnean: "
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2768,6 +2765,10 @@ msgstr "Fitxategiaren izena"
 msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
 "sensitive nature of student information."
+msgstr ""
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
 msgstr ""
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
@@ -9901,6 +9902,13 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore

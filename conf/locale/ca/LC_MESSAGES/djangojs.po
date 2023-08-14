@@ -48,7 +48,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2023-07-23 20:42+0000\n"
+"POT-Creation-Date: 2023-07-30 20:42+0000\n"
 "PO-Revision-Date: 2014-06-11 15:18+0000\n"
 "Last-Translator: Waheed Ahmed <waheed@edx.org>, 2019\n"
 "Language-Team: Catalan (http://app.transifex.com/open-edx/edx-platform/language/ca/)\n"
@@ -118,6 +118,7 @@ msgstr ""
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -2270,11 +2271,9 @@ msgstr "Els següents usuaris han estat donats d'alta correctament:"
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"allowed to enroll once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be allowed to enroll once they register:"
 msgstr ""
-"S'han enviat correctament els emails d'alta dels següents usuaris. Es podran"
-" donar d'alta un cop s'enregistrin:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2284,11 +2283,9 @@ msgstr "Aquests usuaris poden donar-se d'alta un cop s'enregistrin:"
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
 msgid ""
-"Successfully sent enrollment emails to the following users. They will be "
-"enrolled once they register:"
+"Email cannot be sent to the following users via batch enrollment. They will "
+"be enrolled once they register:"
 msgstr ""
-"S'han enviat correctament els emails d'alta als següents usuaris. Seran "
-"donats d'alta un cop s'enregistrin:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/js/instructor_dashboard/membership.js
@@ -2691,6 +2688,10 @@ msgid ""
 msgstr ""
 "Els enllaços es generen sota demanda i caduquen en 5 minuts degut a la "
 "naturalesa sensible de la informació de l'estudiant."
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr ""
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
@@ -9947,6 +9948,13 @@ msgstr "La subsecció està oculta després de la data de finalització del curs
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
 msgstr "La subsecció està oculta després de la data de venciment"
+
+#: cms/templates/js/course-outline.underscore
+#, python-format
+msgid ""
+"This subsection is configured as \\\"%(gradingType)s\\\", which doesn't "
+"exist in the current grading policy."
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore

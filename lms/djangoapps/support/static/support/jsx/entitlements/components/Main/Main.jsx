@@ -7,6 +7,7 @@ import SearchContainer from '../Search/SearchContainer';
 import EntitlementSupportTableContainer from '../Table/EntitlementSupportTableContainer';
 import EntitlementFormContainer from '../EntitlementForm/container';
 
+// eslint-disable-next-line react/function-component-definition
 const Main = props => (
     <div className="entitlement-support-wrapper">
         <StatusAlert
@@ -27,6 +28,7 @@ const Main = props => (
     </div>
 );
 
+// eslint-disable-next-line react/function-component-definition
 const MainContent = (props) => {
     if (props.isFormOpen) {
         return <EntitlementFormContainer />;

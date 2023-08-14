@@ -1,0 +1,16 @@
+# This file records information about this repo. Its use is described in OEP-55:
+# https://open-edx-proposals.readthedocs.io/en/latest/processes/oep-0055-proc-project-maintainers.html
+
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: 'edx-platform'
+  description: "The monolith at the center of the Open edX platform"
+  links:
+    - url: "https://docs.openedx.org"
+      title: "Documentation"
+      icon: "Web"
+spec:
+  owner: group:arch-bom
+  type: 'service'
+  lifecycle: 'production'

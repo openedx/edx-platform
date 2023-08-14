@@ -192,7 +192,7 @@ cffi==1.15.1
     #   cryptography
     #   pynacl
     #   snowflake-connector-python
-chardet==5.1.0
+chardet==5.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -406,7 +406,6 @@ django==3.2.20
     #   openedx-filters
     #   openedx-learning
     #   ora2
-    #   skill-tagging
     #   super-csv
     #   xss-utils
 django-appconf==1.0.5
@@ -428,7 +427,7 @@ django-classy-tags==4.0.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   django-sekizai
-django-config-models==2.4.0
+django-config-models==2.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -507,7 +506,6 @@ django-model-utils==4.3.1
     #   edx-when
     #   edxval
     #   ora2
-    #   skill-tagging
     #   super-csv
 django-mptt==0.14.0
     # via
@@ -550,9 +548,9 @@ django-ses==3.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-django-simple-history==3.0.0
+django-simple-history==3.2.0
     # via
-    #   -c requirements/edx/../common_constraints.txt
+    #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
@@ -679,7 +677,7 @@ edx-api-doc-tools==1.7.0
     #   -r requirements/edx/testing.txt
     #   edx-name-affirmation
     #   openedx-blockstore
-edx-auth-backends==4.1.0
+edx-auth-backends==4.2.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -711,7 +709,7 @@ edx-completion==4.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-django-release-util==1.2.0
+edx-django-release-util==1.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -721,7 +719,7 @@ edx-django-sites-extensions==4.0.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-django-utils==5.6.0
+edx-django-utils==5.7.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -750,12 +748,12 @@ edx-drf-extensions==8.8.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==4.0.7
+edx-enterprise==4.0.14
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-event-bus-kafka==5.2.0
+edx-event-bus-kafka==5.3.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -763,7 +761,7 @@ edx-event-bus-redis==0.3.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-i18n-tools==1.0.0
+edx-i18n-tools==1.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -774,11 +772,11 @@ edx-milestones==0.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-name-affirmation==2.3.5
+edx-name-affirmation==2.3.6
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-opaque-keys[django]==2.3.0
+edx-opaque-keys[django]==2.4.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -795,11 +793,11 @@ edx-opaque-keys[django]==2.3.0
     #   lti-consumer-xblock
     #   openedx-events
     #   ora2
-edx-organizations==6.12.0
+edx-organizations==6.12.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-proctoring==4.16.0
+edx-proctoring==4.16.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -808,7 +806,7 @@ edx-proctoring-proctortrack==1.0.5
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-rbac==1.7.0
+edx-rbac==1.8.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -827,7 +825,7 @@ edx-sga==0.22.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-edx-submissions==3.5.6
+edx-submissions==3.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -837,7 +835,7 @@ edx-tincan-py35==1.0.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-enterprise
-edx-toggles==5.0.0
+edx-toggles==5.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -861,7 +859,7 @@ edx-when==2.4.0
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-proctoring
-edxval==2.3.0
+edxval==2.4.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1136,7 +1134,7 @@ loremipsum==1.0.5
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   ora2
-lti-consumer-xblock==9.5.5
+lti-consumer-xblock==9.6.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1290,23 +1288,21 @@ openedx-django-require==2.1.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-django-wiki==2.0.0
+openedx-django-wiki==2.0.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-openedx-events==8.3.0
+openedx-events==8.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   edx-event-bus-kafka
     #   edx-event-bus-redis
-    #   skill-tagging
 openedx-filters==1.5.0
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   lti-consumer-xblock
-    #   skill-tagging
 openedx-learning==0.1.1
     # via
     #   -r requirements/edx/doc.txt
@@ -1319,7 +1315,7 @@ optimizely-sdk==4.1.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
-ora2==5.2.1
+ora2==5.2.3
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1392,7 +1388,7 @@ pillow==9.5.0
     #   edx-enterprise
     #   edx-organizations
     #   edxval
-pip-tools==7.1.0
+pip-tools==7.2.0
     # via -r requirements/edx/../pip-tools.txt
 pkgutil-resolve-name==1.3.10
     # via
@@ -1474,7 +1470,7 @@ pydata-sphinx-theme==0.13.3
     # via
     #   -r requirements/edx/doc.txt
     #   sphinx-book-theme
-pygments==2.15.1
+pygments==2.16.1
     # via
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
@@ -1849,10 +1845,6 @@ six==1.16.0
     #   python-memcached
     #   sphinxcontrib-httpdomain
     #   tox
-skill-tagging==0.1.0
-    # via
-    #   -r requirements/edx/doc.txt
-    #   -r requirements/edx/testing.txt
 slumber==0.7.1
     # via
     #   -r requirements/edx/doc.txt
@@ -2167,7 +2159,7 @@ webob==1.8.7
     #   -r requirements/edx/doc.txt
     #   -r requirements/edx/testing.txt
     #   xblock
-wheel==0.41.0
+wheel==0.41.1
     # via
     #   -r requirements/edx/../pip-tools.txt
     #   pip-tools
