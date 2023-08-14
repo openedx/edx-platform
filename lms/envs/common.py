@@ -4029,7 +4029,11 @@ for app_name, insert_before in OPTIONAL_APPS:
     # First attempt to only find the module rather than actually importing it,
     # to avoid circular references - only try to import if it can't be found
     # by find_spec, which doesn't work with import hooks
-    if importlib.util.find_spec(app_name) is None:
+    try:
+        spec = importlib.util.find_spec(app_name)
+    except ModuleNotFoundError:  # This occurs if the _parent_ module of the one we're asking for doesn't exist.
+        spec = None
+    if spec is None:
         try:
             __import__(app_name)
         except ImportError:
