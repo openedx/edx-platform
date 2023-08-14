@@ -229,6 +229,34 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         assert is_active
         assert course_mode == enrollment_mode
 
+    def test_enroll_with_email(self):
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                },
+                'user_email': self.user.email
+            },
+            format='json'
+        )
+        assert resp.status_code == status.HTTP_200_OK
+
+    def test_enroll_with_user_and_email(self):
+        # The user has priority over the email.
+        resp = self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                },
+                'user': self.user.username,
+                'user_email': 'another_email@example.com'
+            },
+            format='json'
+        )
+        self.assertContains(resp, self.user.username, status_code=status.HTTP_200_OK)
+
     @ddt.data(
         # Default (no course modes in the database)
         # Expect that users are automatically enrolled as the default
