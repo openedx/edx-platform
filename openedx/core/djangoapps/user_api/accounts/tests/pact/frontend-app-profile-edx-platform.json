@@ -1,0 +1,78 @@
+{
+    "consumer": {
+      "name": "frontend-app-profile"
+    },
+    "provider": {
+        "name": "edx-platform"
+    },
+    "interactions": [
+      {
+        "description": "A request for user's basic information",
+        "providerState": "I have a user's basic information",
+        "request": {
+          "method": "GET",
+          "path": "/api/user/v1/accounts/staff"
+        },
+        "response": {
+          "body": {
+            "bio": "This is my bio",
+            "country": "ME",
+            "name": "Lemon Seltzer",
+            "username": "staff",
+            "is_active": true,
+            "gender": "m",
+            "mailing_address": "Park Ave",
+            "goals": "Learn and Grow!",
+            "year_of_birth": 1901,
+            "phone_number": "+11234567890"
+          },
+          "headers": {"Content-Type": "application/json"},
+          "matchingRules": {
+            "$.body.bio": {
+              "match": "type"
+            },
+            "$.body.country": {
+              "match": "type"
+            },
+            "$.body.name": {
+              "match": "type"
+            },
+            "$.body.username": {
+              "match": "type"
+            },
+            "$.body.is_active": {
+              "match": "type"
+            },
+            "$.body.gender": {
+              "match": "type"
+            },
+            "$.body.mailing_address": {
+              "match": "type"
+            },
+            "$.body.goals": {
+              "match": "type"
+            },
+            "$.body.year_of_birth": {
+              "match": "type"
+            },
+            "$.body.phone_number": {
+              "match": "type"
+            },
+          "status": 200
+        }
+      }
+    }
+    ],
+    "metadata": {
+      "pact-js": {
+        "version": "11.0.2"
+      },
+      "pactRust": {
+        "ffi": "0.4.0",
+        "models": "1.0.4"
+      },
+      "pactSpecification": {
+        "version": "2.0.0"
+      }
+    }
+  }
