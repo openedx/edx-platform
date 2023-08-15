@@ -145,7 +145,9 @@ class FunixRelativeDateLibary():
 					last_complete_date = get_time(last_complete_date, goal)
 					for el in arr:
 						index += 1
+						print('========', el.block_key, index)
 						relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=el.block_key, type='block', index=index)[0]
+
 						relativate_date.date = last_complete_date
 						relativate_date.save()
 						#FunixRelativeDate(user_id=user.id, course_id=str(course_id), block_id=el.block_key, type='block', index=index, date=last_complete_date).save()
