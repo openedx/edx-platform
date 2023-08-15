@@ -235,13 +235,13 @@ class JournalViewSet(GenzMixin, FlatMultipleModelMixin, viewsets.ModelViewSet):
 
         if self.gen_user.is_student:
             student = self.gen_user.student
-            journal_posts = journal_posts.filter(student=student)
-            booster_badges = BoosterBadgeAward.objects.filter(user=self.gen_user.user)
+            journal_posts = journal_posts.filter(student=student).order_by('-modified')
+            booster_badges = BoosterBadgeAward.objects.filter(user=self.gen_user.user).order_by('-modified')
         else:
             student_id = query_params.get('student_id')
             student = get_object_or_404(Student, pk=student_id)
-            journal_posts = journal_posts.filter(student=student)
-            booster_badges = BoosterBadgeAward.objects.filter(user__gen_user=student.gen_user)
+            journal_posts = journal_posts.filter(student=student).order_by('-modified')
+            booster_badges = BoosterBadgeAward.objects.filter(user__gen_user=student.gen_user).order_by('-modified')
 
         return [
             {
