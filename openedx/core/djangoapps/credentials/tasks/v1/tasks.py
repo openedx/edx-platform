@@ -389,7 +389,7 @@ def send_grade_if_interesting(
 
     # Grab grade data if we don't have them in hand
     if letter_grade is None or percent_grade is None or grade_last_updated is None:
-        grade = CourseGradeFactory().read(user, course_key=course_run_key, create_if_needed=False)
+        grade = CourseGradeFactory().read(user, course_key=course_run_key)
         if grade is None:
             if verbose:
                 logger.info(

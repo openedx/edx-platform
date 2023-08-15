@@ -72,7 +72,6 @@ class Thread(models.Model):
             params,
             metric_tags=['course_id:{}'.format(query_params['course_id'])],
             metric_action='thread.search',
-            paged_results=True
         )
         if query_params.get('text'):
             search_query = query_params['text']
