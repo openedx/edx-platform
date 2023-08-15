@@ -865,6 +865,7 @@ def skill_reflection_response(skills, likert_questions, nuance_interrogation_que
                 question_response = submission.question_response
                 response_text = question_response['student_response']['response_text']
                 stats[response_text] += 1
+                stats['points'] = question_response['student_response']['points']
 
             if stats:
                 key = f'total_{response_key}_{skill.lower()}'
