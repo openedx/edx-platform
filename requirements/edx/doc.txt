@@ -554,7 +554,7 @@ edx-drf-extensions==8.8.0
     #   edx-rbac
     #   edx-when
     #   edxval
-edx-enterprise==4.0.13
+edx-enterprise==4.0.14
     # via
     #   -c requirements/edx/../constraints.txt
     #   -r requirements/edx/base.txt
@@ -918,7 +918,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/base.txt
 optimizely-sdk==4.1.1
     # via -r requirements/edx/base.txt
-ora2==5.2.3
+ora2==5.2.4
     # via -r requirements/edx/base.txt
 oscrypto==1.3.0
     # via

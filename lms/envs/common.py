@@ -3286,6 +3286,13 @@ CROSS_DOMAIN_CSRF_COOKIE_NAME = ''
 ######################### Django Rest Framework ########################
 
 REST_FRAMEWORK = {
+    # This matches the original DRF default of Session and Basic Authentication, but
+    # adds observability to help us potentially adjust the defaults. We would like to
+    # add JwtAuthentication and drop BasicAuthentication, based on our findings.
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'openedx.core.djangolib.default_auth_classes.DefaultSessionAuthentication',
+        'openedx.core.djangolib.default_auth_classes.DefaultBasicAuthentication'
+    ],
     'DEFAULT_PAGINATION_CLASS': 'edx_rest_framework_extensions.paginators.DefaultPagination',
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
@@ -3303,7 +3310,7 @@ REST_FRAMEWORK = {
 
 # .. setting_name: REGISTRATION_VALIDATION_RATELIMIT
 # .. setting_default: 30/7d
-# .. setting_description: Whenver a user tries to register on edx, the data entered during registration
+# .. setting_description: Whenever a user tries to register on edx, the data entered during registration
 #    is validated via RegistrationValidationView.
 #    It's POST endpoint is rate-limited up to 30 requests per IP Address in a week by default.
 #    It was introduced because an attacker can guess or brute force a series of names to enumerate valid users.
