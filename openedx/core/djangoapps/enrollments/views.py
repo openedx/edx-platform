@@ -6,6 +6,7 @@ consist primarily of authentication, request validation, and serialization.
 
 
 import logging
+from re import match
 
 from django.core.exceptions import (  # lint-amnesty, pylint: disable=wrong-import-order
     ObjectDoesNotExist,
@@ -201,6 +202,17 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
 
         """
         username = username or request.user.username
+        # If You send an email:
+        if bool(match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', username)):
+            try:
+                username = User.objects.get(email=username).username
+            except ObjectDoesNotExist:
+                return Response(
+                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    data={
+                        'message': f'The user with the email address {username} does not exist.'
+                    }
+                )
 
         # TODO Implement proper permissions
         if request.user.username != username and not self.has_api_key_permissions(request) \

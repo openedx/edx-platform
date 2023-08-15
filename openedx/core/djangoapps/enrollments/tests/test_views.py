@@ -407,6 +407,24 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase, Ente
         assert CourseMode.DEFAULT_MODE_SLUG == data['mode']
         assert data['is_active']
 
+    def test_get_enrollment_by_email(self):
+        # Create an enrollment
+        self.client.post(
+            reverse('courseenrollments'),
+            {
+                'course_details': {
+                    'course_id': str(self.course.id)
+                },
+                'user': self.user.username
+            },
+            format='json'
+        )
+        # Get the enrollment with an email
+        resp = self.client.get(
+            reverse('courseenrollment', kwargs={"username": str(self.user.email), "course_id": str(self.course.id)})
+        )
+        self.assertContains(resp, self.user.username, status_code=status.HTTP_200_OK)
+
     def test_user_not_authenticated(self):
         # Log out, so we're no longer authenticated
         self.client.logout()
