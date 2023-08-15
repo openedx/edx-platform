@@ -478,7 +478,7 @@ def get_dashboard_course_limit():
     get course limit from configuration
     """
     course_limit = getattr(settings, 'DASHBOARD_COURSE_LIMIT', None)
-    return 30
+    return course_limit
 
 
 def check_for_unacknowledged_notices(context):
