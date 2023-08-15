@@ -39,7 +39,7 @@ jobs:
           SUMMARY_HELP=$(cat <<'EOMARKDOWN'
           # Inconsistent Python dependencies
 
-          It appears that the Python dependencies in this PR are inconsistent—a re-run of
+          It appears that the Python dependencies in this PR are inconsistent: A re-run of
           `make compile-requirements` produced changes. This might mean that your PR would
           fail to deploy properly in production, or could have inconsistent behavior for
           developers.

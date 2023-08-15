@@ -48,7 +48,7 @@ You might be directed to this section if a consistent-dependencies PR check has 
 Did you run ``make upgrade`` or ``make compile-requirements`` on a Mac directly?
 ================================================================================
 
-Some packages have different dependencies on Mac vs. Linux—usually not in ways that are relevant in production (they generally have to do with desktop integrations of developer tools) but this does cause "churn" and make it harder to review PRs when dependencies are alternatingly recompiled on Mac and Linux. As edx-platform runs on Linux, we want to ensure that dependencies are compiled for that platform.
+Some packages have different dependencies on Mac vs. Linux. Usually this is not relevant in production (they generally have to do with desktop integrations of developer tools) but this does cause "churn" and make it harder to review PRs when dependencies are alternatingly recompiled on Mac and Linux. As edx-platform runs on Linux, we want to ensure that dependencies are compiled for that platform.
 
 Solutions for Mac users:
 
