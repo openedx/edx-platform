@@ -43,7 +43,7 @@ This is considerably safer than trying to manually edit the ``*.txt`` files, whi
 Inconsistent dependencies
 *************************
 
-You might be directed to this section if a consistent-dependencies PR check has failed.
+You might be directed to this section if a PR check for consistent dependencies has failed.
 
 Did you run ``make upgrade`` or ``make compile-requirements`` on a Mac directly?
 ================================================================================
