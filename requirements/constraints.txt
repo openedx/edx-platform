@@ -84,9 +84,7 @@ boto3==1.7.0                       # Amazon Web Services SDK for Python
 botocore==1.10.84                  # via boto3, s3transfer
 
 # adding these constraints to minimize boto3 and botocore changeset
-social-auth-core==4.3.0
 babel==2.11.0
-social-auth-app-django==5.0.0
 algoliasearch==2.6.3
 django-ipware==4.0.2
 
