@@ -11,14 +11,14 @@
         "providerState": "I have a user's basic information",
         "request": {
           "method": "GET",
-          "path": "/api/user/v1/accounts/staff"
+          "path": "/api/user/v1/accounts/pact_staff"
         },
         "response": {
           "body": {
             "bio": "This is my bio",
             "country": "ME",
             "name": "Lemon Seltzer",
-            "username": "staff",
+            "username": "pact_staff",
             "is_active": true,
             "gender": "m",
             "mailing_address": "Park Ave",
