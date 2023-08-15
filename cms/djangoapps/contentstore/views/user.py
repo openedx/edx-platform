@@ -19,10 +19,9 @@ from common.djangoapps.student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS,
 from common.djangoapps.student.models import CourseEnrollment
 from common.djangoapps.student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from common.djangoapps.util.json_request import JsonResponse, expect_json
-from xmodule.modulestore.django import modulestore  # lint-amnesty, pylint: disable=wrong-import-order
 
 from ..toggles import use_new_course_team_page
-from ..utils import get_course_team_url
+from ..utils import get_course_team_url, get_course_team
 
 __all__ = ['request_course_creator', 'course_team_handler']
 
@@ -85,23 +84,8 @@ def _manage_users(request, course_key):
     if not user_perms & STUDIO_VIEW_USERS:
         raise PermissionDenied()
 
-    course_block = modulestore().get_course(course_key)
-    instructors = set(CourseInstructorRole(course_key).users_with_role())
-    # the page only lists staff and assumes they're a superset of instructors. Do a union to ensure.
-    staff = set(CourseStaffRole(course_key).users_with_role()).union(instructors)
-
-    formatted_users = []
-    for user in instructors:
-        formatted_users.append(user_with_role(user, 'instructor'))
-    for user in staff - instructors:
-        formatted_users.append(user_with_role(user, 'staff'))
-
-    return render_to_response('manage_users.html', {
-        'context_course': course_block,
-        'show_transfer_ownership_hint': request.user in instructors and len(instructors) == 1,
-        'users': formatted_users,
-        'allow_actions': bool(user_perms & STUDIO_EDIT_ROLES),
-    })
+    manage_users_context = get_course_team(request.user, course_key, user_perms)
+    return render_to_response('manage_users.html', manage_users_context)
 
 
 @expect_json
