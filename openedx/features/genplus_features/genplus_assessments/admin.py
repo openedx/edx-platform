@@ -21,14 +21,18 @@ class UserRatingAdmin(BaseModelAdmin):
 
 @admin.register(SkillAssessmentQuestion)
 class SkillAssessmentQuestionAdmin(admin.ModelAdmin):
-    list_display = ('program', 'question_number', 'start_unit', 'start_unit_location', 'end_unit', 'end_unit_location', 'skill',)
-    readonly_fields = ('program', 'question_number', 'start_unit', 'start_unit_location', 'end_unit', 'end_unit_location', 'skill',)
+    list_display = ('program', 'question_number', 'start_unit', 'start_unit_location',
+                    'end_unit', 'end_unit_location', 'skill',)
+    readonly_fields = ('program', 'question_number', 'start_unit', 'start_unit_location',
+                       'end_unit', 'end_unit_location', 'skill',)
 
 
 @admin.register(SkillAssessmentResponse)
 class SkillAssessmentResponseAdmin(admin.ModelAdmin):
-    list_display = ('user', 'get_program', 'get_question_number', 'skill_assessment_type', 'response_time', 'earned_score', 'total_score', 'created', 'modified',)
-    readonly_fields = ('user', 'question', 'earned_score', 'total_score', 'response_time', 'skill_assessment_type', 'question_response', 'created', 'modified',)
+    list_display = ('user', 'get_program', 'get_question_number', 'get_question_skill', 'skill_assessment_type',
+                    'response_time', 'earned_score', 'total_score', 'created', 'modified',)
+    readonly_fields = ('user', 'question', 'earned_score', 'total_score', 'response_time', 'skill_assessment_type',
+                       'question_response', 'created', 'modified',)
     search_fields = ('user__email',)
 
     def get_program(self, obj):
@@ -37,5 +41,13 @@ class SkillAssessmentResponseAdmin(admin.ModelAdmin):
     def get_question_number(self, obj):
         return obj.question.question_number
 
+
+    def get_question_skill(self, obj):
+        try:
+            return obj.question.skill.name
+        except AttributeError:
+            return '-'
+
     get_program.short_description = 'Program'
     get_question_number.short_description = 'Question No'
+    get_question_skill.short_description = 'Question Skill'
