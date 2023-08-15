@@ -96,7 +96,7 @@
           <ol>
               % for item_num, link in enumerate(footer['navigation_links'], start=1):
               <li class="nav-colophon-0${item_num}">
-                <a id="${link['name']}" href="${link['url']}">${link['title']}</a>
+                <a id="${link['name']}" href="${link['url']}" target='_blank'>${link['title']}</a>
               </li>
               % endfor
           </ol>
