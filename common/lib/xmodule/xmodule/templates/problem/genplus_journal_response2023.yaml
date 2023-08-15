@@ -27,7 +27,7 @@ data: |
               </div>
             </div>
             <div class="col">
-              <stringresponse answer="\w" type="regexp ci">
+              <stringresponse answer=".*." type="regexp ci">
                 <label>
                   <img src="/static/images/icon-tag.svg" width="25" alt="Tag" />
                   <span class="question-text">I am able to change my PACE, TONE, and VOLUME to make my communication more effective. For example I can...</span>

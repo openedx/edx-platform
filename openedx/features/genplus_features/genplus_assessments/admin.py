@@ -29,9 +29,9 @@ class SkillAssessmentQuestionAdmin(admin.ModelAdmin):
 
 @admin.register(SkillAssessmentResponse)
 class SkillAssessmentResponseAdmin(admin.ModelAdmin):
-    list_display = ('user', 'get_program', 'get_question_number', 'get_question_skill', 'skill_assessment_type',
+    list_display = ('user', 'get_program', 'get_question_number', 'get_question_skill', 'get_question_type',
                     'response_time', 'earned_score', 'total_score', 'created', 'modified',)
-    readonly_fields = ('user', 'question', 'earned_score', 'total_score', 'response_time', 'skill_assessment_type',
+    readonly_fields = ('user', 'question', 'earned_score', 'total_score', 'response_time',
                        'question_response', 'created', 'modified',)
     search_fields = ('user__email',)
 
@@ -48,6 +48,13 @@ class SkillAssessmentResponseAdmin(admin.ModelAdmin):
         except AttributeError:
             return '-'
 
+    def get_question_type(self, obj):
+        try:
+            return obj.question.problem_type
+        except AttributeError:
+            return '-'
+
     get_program.short_description = 'Program'
     get_question_number.short_description = 'Question No'
     get_question_skill.short_description = 'Question Skill'
+    get_question_type.short_description = 'Question Type'

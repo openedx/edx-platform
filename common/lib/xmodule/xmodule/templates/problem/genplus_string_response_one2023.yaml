@@ -21,7 +21,7 @@ data: |
             <div class="freehand-xblock-wapper">
               <div class="freehand-form">
                 <div class="wrapper-problem-response">
-                  <stringresponse answer="\w" type="regexp ci">
+                  <stringresponse answer=".*." type="regexp ci">
                   <span class="question-text-wrapper">
                     <label class="question-text">The technique from my strong plan I will to help me just before I go into an exam will be...</label>
                   </span>
