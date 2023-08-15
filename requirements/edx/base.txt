@@ -476,6 +476,7 @@ edx-drf-extensions==8.8.0
     #   edx-when
     #   edxval
 edx-enterprise @ git+https://github.com/openedx/edx-enterprise.git@replace_django_fernet
+
     # via
     #   -r requirements/edx/github.in
     #   -r requirements/edx/kernel.in
@@ -773,7 +774,7 @@ openedx-mongodbproxy==0.2.0
     # via -r requirements/edx/kernel.in
 optimizely-sdk==4.1.1
     # via -r requirements/edx/bundled.in
-ora2==5.2.3
+ora2==5.2.4
     # via -r requirements/edx/bundled.in
 oscrypto==1.3.0
     # via snowflake-connector-python

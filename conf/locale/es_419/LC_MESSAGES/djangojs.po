@@ -255,6 +255,7 @@ msgstr "Borrar"
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -3186,6 +3187,10 @@ msgstr ""
 "Los vínculos se generan por demanda y expiran en los siguientes 5 minutos "
 "dado a la naturaleza sensible de la información de calificaciones de "
 "estudiantes."
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr "Tienes acceso al tablero {enterpriseName}"
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""

@@ -137,7 +137,7 @@
 # Anastasija Teresenkova <anastasija_te@inbox.lv>, 2020
 # Andrey Bochkarev <abocha@ya.ru>, 2015
 # Andrey Mishchenko <andrey.mishchenko@raccoongang.com>, 2020
-# ashed <craysy@gmail.com>, 2022
+# ashed <craysy@gmail.com>, 2022-2023
 # Dmitri Polevoi <polevaiabrest@gmail.com>, 2014
 # Дмитрий Ошкало <dmitry.oshkalo@gmail.com>, 2015
 # SpaceOyster, 2016
@@ -247,6 +247,7 @@ msgstr "Удалить"
 #: cms/static/js/views/validation.js
 #: common/static/common/js/components/utils/view_utils.js
 #: lms/static/js/Markdown.Editor.js
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 #: lms/static/js/student_account/components/StudentAccountDeletionModal.jsx
 #: xmodule/js/src/html/edit.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -3058,6 +3059,10 @@ msgid ""
 msgstr ""
 "Ссылки создаются по требованию и остаются действительными в течение 5 минут "
 "в связи с деликатностью предоставленной слушателями информации."
+
+#: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
+msgid "You have access to the {enterpriseName} dashboard"
+msgstr ""
 
 #: lms/static/js/learner_dashboard/EnterpriseLearnerPortalModal.jsx
 msgid ""
