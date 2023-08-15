@@ -145,7 +145,7 @@ class FunixRelativeDateLibary():
 					last_complete_date = get_time(last_complete_date, goal)
 					for el in arr:
 						index += 1
-						print('========', el.block_key, index)
+						print('========', el.title,el.block_key, index)
 						relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=el.block_key, type='block', index=index)[0]
 
 						relativate_date.date = last_complete_date
@@ -156,7 +156,7 @@ class FunixRelativeDateLibary():
 						index += 1
 					
 						day_need = math.ceil(effort_time / left_time)			
-						print('===effort_time=====', asm.block_key, index)
+						print('===effort_time=====',asm.title ,asm.block_key, index)
 						relativate_date = FunixRelativeDate.objects.filter(user_id=user.id, course_id=str(course_id), block_id=asm.block_key, type='block', index=index)[0]
 						if str(asm.block_key) == block_id :
 							relativate_date.date = last_complete_date
