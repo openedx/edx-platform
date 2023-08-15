@@ -97,6 +97,7 @@ REQ_FILES = \
 	requirements/edx/coverage \
 	requirements/edx/paver \
 	requirements/edx-sandbox/py38 \
+	requirements/edx/kernel \
 	requirements/edx/base \
 	requirements/edx/doc \
 	requirements/edx/testing \

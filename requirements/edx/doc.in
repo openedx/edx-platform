@@ -1,7 +1,7 @@
 # Requirements for documentation validation
 -c ../constraints.txt
 
--r base.txt
+-r kernel.txt
 code-annotations          # provides annotations for certain documentation
 sphinx-book-theme         # Common theme for all Open edX projects
 gitpython                 # fetch git repo information
