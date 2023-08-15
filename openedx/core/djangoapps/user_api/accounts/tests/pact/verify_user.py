@@ -25,8 +25,8 @@ class ProviderState():
 
     def account_setup(self, request):
         """ Sets up the Profile that we want to mock in accordance to our contract """
-        User.objects.filter(username="staff").delete()
-        user_acc = UserFactory.create(username="staff")
+        User.objects.filter(username="pact_staff").delete()
+        user_acc = UserFactory.create(username="pact_staff")
         user_acc.profile.name = "Lemon Seltzer"
         user_acc.profile.bio = "This is my bio"
         user_acc.profile.country = "ME"
@@ -46,7 +46,7 @@ def provider_state(request):
     state_setup = {"I have a user's basic information": ProviderState().account_setup}
     request_body = json.loads(request.body)
     state = request_body.get('state')
-    User.objects.filter(username="staff").delete()
+    User.objects.filter(username="pact_staff").delete()
     print('Setting up provider state for state value: {}'.format(state))
     state_setup["I have a user's basic information"](request)
     return JsonResponse({'result': state})
